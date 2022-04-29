@@ -28,10 +28,10 @@ BuildRequires:  python3-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
 Requires:       bash
-Requires:       debugedit
 Requires:       libarchive
 Requires:       libselinux
 Requires:       lua
+Requires:       rpm-libs = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 Patch1: define-RPM_LD_FLAGS.patch
@@ -72,6 +72,7 @@ Requires:       %{name}-build-libs
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       bzip2
 Requires:       cpio
+Requires:       debugedit
 Requires:       elfutils-devel
 Requires:       elfutils-libelf
 Requires:       gzip
@@ -268,8 +269,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-6
-- Remove runtime requries for rpm-build and rpm-libs
+* Thu Apr 28 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-6
+- Remove main package requires for rpm-build
+- Move debugedit requires to rpm-build subpackage
 
 * Thu Apr 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.0-5
 - rpm-libs needs to run in container environments without systemd, audit was being
