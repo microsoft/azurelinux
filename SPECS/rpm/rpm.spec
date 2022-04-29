@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,12 +28,10 @@ BuildRequires:  python3-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
 Requires:       bash
-Requires:       debugedit
 Requires:       libarchive
 Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
-Requires:       rpm-build = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 Patch1: define-RPM_LD_FLAGS.patch
@@ -74,6 +72,7 @@ Requires:       %{name}-build-libs
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       bzip2
 Requires:       cpio
+Requires:       debugedit
 Requires:       elfutils-devel
 Requires:       elfutils-libelf
 Requires:       gzip
@@ -270,6 +269,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 28 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-6
+- Remove main package requires for rpm-build
+- Move debugedit requires to rpm-build subpackage
+
 * Thu Apr 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.0-5
 - rpm-libs needs to run in container environments without systemd, audit was being
 -   pulled in as an automatic dependency. Explicitly disable the audit config.
