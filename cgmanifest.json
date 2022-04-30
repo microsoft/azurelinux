@@ -216,7 +216,7 @@
         "other": {
           "name": "antlr",
           "version": "2.7.7",
-          "downloadUrl": "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/antlr-2.7.7.tar.bz2"
         }
       }
     },
@@ -8802,7 +8802,7 @@
         "other": {
           "name": "libmetalink",
           "version": "0.1.3",
-          "downloadUrl": "https://launchpad.net/libmetalink/trunk/libmetalink-0.1.3/+download/libmetalink-0.1.3.tar.bz2"
+          "downloadUrl": "https://launchpad.net/libmetalink/trunk/libmetalink-0.1.3/+download/libmetalink-0.1.3.tar.gz"
         }
       }
     },
@@ -12734,7 +12734,7 @@
         "other": {
           "name": "objectweb-asm",
           "version": "7.2",
-          "downloadUrl": "https://gitlab.ow2.org/asm/asm/-/archive/ASM_7_2/asm-ASM_7_2.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/objectweb-asm-7.2.tar.xz"
         }
       }
     },
@@ -13064,7 +13064,7 @@
         "other": {
           "name": "ocaml-num",
           "version": "1.3",
-          "downloadUrl": "https://github.com/ocaml/num/archive/v1.3.tar.gz"
+          "downloadUrl": "https://github.com/ocaml/num/archive/v1.3/ocaml-num-1.3.tar.gz"
         }
       }
     },
@@ -13515,7 +13515,7 @@
         "other": {
           "name": "openssl",
           "version": "1.1.1k",
-          "downloadUrl": "https://www.openssl.org/source/openssl-1.1.1k.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/openssl-1.1.1k-hobbled.tar.xz"
         }
       }
     },
@@ -27221,7 +27221,7 @@
         "other": {
           "name": "yajl",
           "version": "2.1.0",
-          "downloadUrl": "https://github.com/lloyd/yajl/archive/2.1.0.tar.gz"
+          "downloadUrl": "https://github.com/lloyd/yajl/archive/refs/tags/2.1.0.tar.gz"
         }
       }
     },
