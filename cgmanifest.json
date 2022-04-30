@@ -19295,7 +19295,7 @@
         "other": {
           "name": "pwgen",
           "version": "2.08",
-          "downloadUrl": "http://download.sf.net/pwgen/pwgen-2.08.tar.gz"
+          "downloadUrl": "https://download.sf.net/pwgen/pwgen-2.08.tar.gz"
         }
       }
     },
@@ -20095,7 +20095,7 @@
         "other": {
           "name": "python-filelock",
           "version": "3.0.12",
-          "downloadUrl": "https://github.com/benediktschmitt/py-filelock/archive/v3.0.12/python-filelock-3.0.12.tar.gz"
+          "downloadUrl": "https://github.com/benediktschmitt/py-filelock/archive/v3.0.12/py-filelock-3.0.12.tar.gz"
         }
       }
     },
@@ -21195,7 +21195,7 @@
         "other": {
           "name": "python-pytest-cov",
           "version": "2.12.1",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-cov/archive/v2.12.1/python-pytest-cov-2.12.1.tar.gz"
+          "downloadUrl": "https://github.com/pytest-dev/pytest-cov/archive/v2.12.1/pytest-cov-2.12.1.tar.gz"
         }
       }
     },
