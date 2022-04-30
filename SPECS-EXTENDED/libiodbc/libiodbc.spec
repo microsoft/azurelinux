@@ -112,6 +112,7 @@ rm -rfv %{buildroot}%{_datadir}/libiodbc/samples
 %changelog
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.52.13-4
 - Updating source URL.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.52.13-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

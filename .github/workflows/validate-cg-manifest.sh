@@ -57,6 +57,7 @@ ignore_signed_package=" \
   shim"
 
 alt_source_tag="Source9999"
+mariner_sources_url="https://cblmarinerstorage.blob.core.windows.net/sources/core"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/
@@ -93,7 +94,7 @@ do
 
   # Additional macros required to parse some spec files.
   spec_dir="$(dirname "$original_spec")"
-  defines=(-D "forgemeta %{nil}" -D "py3_dist X" -D "with_check 0" -D "dist .cm2" -D "__python3 python3" -D "_sourcedir $spec_dir" -D "fillup_prereq fillup")
+  defines=(-D "_mariner_sources_url $mariner_sources_url" -D "forgemeta %{nil}" -D "py3_dist X" -D "with_check 0" -D "dist .cm2" -D "__python3 python3" -D "_sourcedir $spec_dir" -D "fillup_prereq fillup")
 
   name=$(rpmspec --srpm  "${defines[@]}" --qf "%{NAME}" -q "$spec" 2>/dev/null)
   if [[ -z $name ]]
