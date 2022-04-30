@@ -20495,7 +20495,7 @@
         "other": {
           "name": "python-justbytes",
           "version": "0.11",
-          "downloadUrl": "https://pypi.io/packages/source//justbytes/justbytes-0.11.tar.gz"
+          "downloadUrl": "https://pypi.io/packages/source/j/justbytes/justbytes-0.11.tar.gz"
         }
       }
     },
@@ -21095,7 +21095,7 @@
         "other": {
           "name": "python-pydbus",
           "version": "0.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source//pydbus/pydbus-0.6.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pydbus/pydbus-0.6.0.tar.gz"
         }
       }
     },
