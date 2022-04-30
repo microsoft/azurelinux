@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.28
+Version:        8.0.29
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -42,7 +42,7 @@ sed -i "s/\(invalid_metadata\)/DISABLED_\1/" router/tests/component/test_routing
 
 cmake . \
       -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
-      -DWITH_BOOST=boost/boost_1_73_0 \
+      -DWITH_BOOST=boost/boost_1_77_0 \
       -DINSTALL_MANDIR=share/man \
       -DINSTALL_DOCDIR=share/doc \
       -DINSTALL_DOCREADMEDIR=share/doc \
@@ -93,6 +93,9 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/private/icudt69l/unames.icu
 
 %changelog
+* Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.0.29-1
+- Upgrade to v8.0.29 to fix 8 CVEs.
+
 * Wed Jan 26 2022 Neha Agarwal <pawelwi@microsoft.com> - 8.0.28-1
 - Upgrade to v8.0.28 to fix 16 CVEs.
 
