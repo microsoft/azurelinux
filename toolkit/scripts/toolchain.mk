@@ -144,28 +144,7 @@ $(raw_toolchain): $(toolchain_files)
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
-$(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
-	@echo "Building base packages"
-	# Always clean the existing chroot
-	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./build_mariner_toolchain.sh \
-			$(DIST_TAG) \
-			$(BUILD_NUMBER) \
-			$(RELEASE_VERSION) \
-			$(BUILD_DIR) \
-			$(RPMS_DIR) \
-			$(SPECS_DIR) \
-			$(RUN_CHECK) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(INCREMENTAL_TOOLCHAIN) \
-			$(BUILD_SRPMS_DIR) \
-			$(SRPMS_DIR) && \
-	mkdir -p $(RPMS_DIR)/noarch && \
-	mkdir -p $(RPMS_DIR)/$(build_arch) && \
-	cp -v $(toolchain_build_dir)/built_rpms_all/*noarch.rpm $(RPMS_DIR)/noarch && \
-	cp -v $(toolchain_build_dir)/built_rpms_all/*$(build_arch).rpm $(RPMS_DIR)/$(build_arch)
-	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt)
+$(final_toolchain):
 	touch $@
 
 .SILENT: $(toolchain_rpms)
@@ -230,7 +209,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 	touch $@
 else
 # Download from online package server
-$(toolchain_rpms): $(depend_REBUILD_TOOLCHAIN)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
@@ -243,6 +222,7 @@ $(toolchain_rpms): $(depend_REBUILD_TOOLCHAIN)
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 			-a $$log_file && \
 		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
+		touch $@ && \
 		break; \
 	done || { \
 		echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
