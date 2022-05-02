@@ -189,9 +189,9 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_tool
 	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_conents) && \
 	diff="$$( comm -3 $(toolchain_actual_conents) $(toolchain_expected_conents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Missmatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
+		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
 		echo "$${diff}"; \
-		$(call print_warning, $@ failed) ; \
+		$(call print_error, $@ failed) ; \
 	fi && \
 	touch $@
 	@echo Done validating toolchain
