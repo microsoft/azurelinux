@@ -3,7 +3,7 @@
 %global libfdt_version 1.6.0
 %global libseccomp_version 2.4.0
 %global libusbx_version 1.0.23
-%global meson_version 0.55.3
+%global meson_version 0.58.2
 %global usbredir_version 0.7.1
 %global ipxe_version 1.20.1
 %global excluded_targets moxie-softmmu
@@ -45,6 +45,7 @@
 %global have_block_gluster 0
 %define have_block_nfs 1
 %define have_librdma 1
+%define have_libcacard 1
 # LTO still has issues with qemu on armv7hl and aarch64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1952483
 %global _lto_cflags %{nil}
@@ -84,7 +85,6 @@
 %endif
 %define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
 %define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
-%define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
 %if %{with brltty}
 %define requires_char_baum Requires: %{name}-char-baum = %{evr}
 %else
@@ -92,7 +92,6 @@
 %endif
 %define requires_device_usb_host Requires: %{name}-device-usb-host = %{evr}
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
-%define requires_device_usb_smartcard Requires: %{name}-device-usb-smartcard = %{evr}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
 %define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
@@ -110,13 +109,17 @@
 %define requires_block_ssh %{nil}
 %endif
 %if %{with pulseaudio}
+%define pa_drv pa,
 %define requires_audio_pa Requires: %{name}-audio-pa = %{evr}
 %else
 %define requires_audio_pa %{nil}
 %endif
 %if %{with sdl}
+%define sdl_drv sdl,
+%define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %else
+%define requires_audio_sdl %{nil}
 %define requires_ui_sdl %{nil}
 %endif
 %if %{have_virgl}
@@ -125,6 +128,7 @@
 %define requires_device_display_vhost_user_gpu %{nil}
 %endif
 %if %{have_jack}
+%define jack_drv jack,
 %define requires_audio_jack Requires: %{name}-audio-jack = %{evr}
 %else
 %define requires_audio_jack %{nil}
@@ -141,6 +145,11 @@
 %define requires_device_display_qxl %{nil}
 %define requires_audio_spice %{nil}
 %define requires_char_spice %{nil}
+%endif
+%if %{have_libcacard}
+%define requires_device_usb_smartcard Requires: %{name}-device-usb-smartcard = %{evr}
+%else
+%define requires_device_usb_smartcard %{nil}
 %endif
 %global requires_all_modules \
 %requires_block_curl \
@@ -207,8 +216,8 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 %endif
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
-Version:        6.1.0
-Release:        14%{?dist}
+Version:        6.2.0
+Release:        1%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -224,11 +233,28 @@ Source27:       kvm.conf
 Source30:       kvm-s390x.conf
 Source31:       kvm-x86.conf
 Source36:       README.tests
-# Fix -cpu max
-# https://bugzilla.redhat.com/show_bug.cgi?id=1999700
-Patch1:         0001-target-i386-add-missing-bits-to-CR4_RESERVED_MASK.patch
-Patch2:         fixing-glibc-struct-statx-usage.patch
-Patch3:         disable_qos_test.patch
+Patch1:         fixing-glibc-struct-statx-usage.patch
+Patch2:         disable_qos_test.patch
+Patch3:         0001-sgx-stub-fix.patch
+# Fix various crashes with virtiofsd on F36+
+# https://bugzilla.redhat.com/2070066
+Patch4:         0001-tools-virtiofsd-Add-rseq-syscall-to-the-seccomp-allo.patch
+Patch5:         0002-virtiofsd-Do-not-support-blocking-flock.patch
+# acpi: fix QEMU crash when started with SLIC table
+# https://bugzilla.redhat.com/show_bug.cgi?id=2072303
+Patch6:         0001-acpi-fix-QEMU-crash-when-started-with-SLIC-table.patch
+# CVE-2022-0358 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/48302d4eb628ff0bea4d7e92cbf6b726410eb4c3
+# From https://bugzilla.redhat.com/show_bug.cgi?id=2046202
+Patch1000:      CVE-2022-0358.patch
+# CVE-2021-20255 does not seem to have been fixed in a release yet
+# From https://lists.gnu.org/archive/html/qemu-devel/2021-02/msg06098.html
+Patch1001:      CVE-2021-20255.patch
+# CVE-2022-1050 does not seem to have been fixed in a release yet
+# From https://lists.nongnu.org/archive/html/qemu-devel/2022-03/msg05197.html
+Patch1002:      CVE-2022-1050.patch
+# CVE-2022-26354 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/8d1b247f3748ac4078524130c6d7ae42b6140aaf
+Patch1003:      CVE-2022-26354.patch
+
 # alsa audio output
 BuildRequires:  alsa-lib-devel
 # reading bzip2 compressed dmg images
@@ -253,8 +279,10 @@ BuildRequires:  hostname
 BuildRequires:  libaio-devel
 BuildRequires:  libattr-devel
 BuildRequires:  libbpf-devel
+%if %{have_libcacard}
 # smartcard device
 BuildRequires:  libcacard-devel
+%endif
 # For virtiofs
 BuildRequires:  libcap-ng-devel
 # For network block driver
@@ -264,6 +292,7 @@ BuildRequires:  libiscsi-devel
 BuildRequires:  libjpeg-devel
 # For VNC PNG support
 BuildRequires:  libpng-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  libseccomp-devel >= %{libseccomp_version}
 BuildRequires:  libslirp-devel
 # TLS test suite
@@ -394,6 +423,7 @@ Requires:       %{name}-system-sh4 = %{version}-%{release}
 Requires:       %{name}-system-tricore = %{version}-%{release}
 Requires:       %{name}-system-xtensa = %{version}-%{release}
 Requires:       %{name}-tools = %{version}-%{release}
+Requires:       vhostuser-backend(fs)
 # Requires for the 'qemu' metapackage
 Requires:       %{name}-user = %{version}-%{release}
 Requires:       qemu-pr-helper = %{version}-%{release}
@@ -471,6 +501,14 @@ Summary:        qemu-pr-helper utility for %{name}
 %description -n qemu-pr-helper
 This package provides the qemu-pr-helper utility that is required for certain
 SCSI features.
+
+%package -n qemu-virtiofsd
+Summary: QEMU virtio-fs shared file system daemon
+Provides: vhostuser-backend(fs)
+%description -n qemu-virtiofsd
+This package provides virtiofsd daemon. This program is a vhost-user backend
+that implements the virtio-fs device that is used for sharing a host directory
+tree with a guest.
 
 %package        tests
 %define testsdir %{_libdir}/%{name}/tests-src
@@ -595,12 +633,14 @@ Requires:       %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the additional PulseAudi audio driver for QEMU.
 %endif
 
+%if %{with sdl}
 %package        audio-sdl
 Summary:        QEMU SDL audio driver
 Requires:       %{name}-common%{?_isa} = %{version}-%{release}
 
 %description audio-sdl
 This package provides the additional SDL audio driver for QEMU.
+%endif
 
 %if %{have_jack}
 %package        audio-jack
@@ -718,9 +758,11 @@ Requires:       %{name}-common%{?_isa} = %{version}-%{release}
 %description device-usb-redirect
 This package provides the usbredir device for QEMU.
 
+%if %{have_libcacard}
 %package        device-usb-smartcard
 Summary:        QEMU USB smartcard device
 Requires:       %{name}-common%{?_isa} = %{version}-%{release}
+%endif
 
 %description device-usb-smartcard
 This package provides the USB smartcard device for QEMU.
@@ -887,6 +929,9 @@ This package provides the QEMU system emulator for ARM systems.
 %package        system-arm-core
 Summary:        QEMU system emulator for ARM
 Requires:       %{name}-common = %{version}-%{release}
+%if %{have_edk2}
+Requires: edk2-arm
+%endif
 
 %description system-arm-core
 This package provides the QEMU system emulator for ARM boards.
@@ -1201,7 +1246,6 @@ mkdir -p %{qemu_kvm_build}
   --disable-hax                    \\\
   --disable-hvf                    \\\
   --disable-iconv                  \\\
-  --disable-jemalloc               \\\
   --disable-kvm                    \\\
   --disable-libdaxctl              \\\
   --disable-libiscsi               \\\
@@ -1253,7 +1297,6 @@ mkdir -p %{qemu_kvm_build}
   --disable-strip                  \\\
   --disable-system                 \\\
   --disable-tcg                    \\\
-  --disable-tcmalloc               \\\
   --disable-tools                  \\\
   --disable-tpm                    \\\
   --disable-u2f                    \\\
@@ -1306,7 +1349,7 @@ run_configure() {
         --with-suffix="%{name}" \
         --firmwarepath="%{firmwaredirs}" \
         --meson="%{__meson}" \
-        --enable-trace-backend=dtrace \
+        --enable-trace-backends=dtrace \
         --with-coroutine=ucontext \
         --with-git=git \
         --tls-priority=@QEMU,SYSTEM \
@@ -1345,7 +1388,7 @@ run_configure \
   --enable-debug-info \
   --enable-docs \
 %if %{have_fdt}
-  --enable-fdt \
+  --enable-fdt=system \
 %endif
   --enable-gnutls \
   --enable-guest-agent \
@@ -1408,7 +1451,7 @@ run_configure \
   --enable-xkbcommon \
   \
   \
-  --audio-drv-list=try-pa,sdl,alsa,try-jack,oss \
+  --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \
   --target-list-exclude=%{excluded_targets} \
   --with-default-devices \
   --enable-auth-pam \
@@ -1453,7 +1496,9 @@ run_configure \
   --enable-sdl-image \
 %endif
 %endif
+%if %{have_libcacard}
   --enable-smartcard \
+%endif
 %if %{have_spice}
   --enable-spice \
   --enable-spice-protocol \
@@ -1496,10 +1541,11 @@ run_configure \
 %make_build
 popd
 
+
+# We don't support qemu-ser-static
+
 # endif !tools_only
 %endif
-
-
 
 %install
 # Install qemu-guest-agent service and udev rules
@@ -1575,12 +1621,12 @@ install -m 0644 -t %{buildroot}%{_datadir}/%{name}/tracetool/format scripts/trac
 # Create new directories and put them all under tests-src
 mkdir -p %{buildroot}%{testsdir}/python
 mkdir -p %{buildroot}%{testsdir}/tests
-mkdir -p %{buildroot}%{testsdir}/tests/acceptance
+mkdir -p %{buildroot}%{testsdir}/tests/avocado
 mkdir -p %{buildroot}%{testsdir}/tests/qemu-iotests
 mkdir -p %{buildroot}%{testsdir}/scripts/qmp
 
 # Install avocado_qemu tests
-cp -R %{qemu_kvm_build}/tests/acceptance/* %{buildroot}%{testsdir}/tests/acceptance/
+cp -R %{qemu_kvm_build}/tests/avocado/* %{buildroot}%{testsdir}/tests/avocado/
 
 # Install qemu.py and qmp/ scripts required to run avocado_qemu tests
 cp -R %{qemu_kvm_build}/python/qemu %{buildroot}%{testsdir}/python
@@ -1769,6 +1815,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_unitdir}/qemu-pr-helper.socket
 %{_mandir}/man8/qemu-pr-helper.8*
 
+%files -n qemu-virtiofsd
+%{_mandir}/man1/virtiofsd.1*
+%{_libexecdir}/virtiofsd
+%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
+
 %files tools
 %{_bindir}/qemu-keymap
 %{_bindir}/qemu-edid
@@ -1791,11 +1842,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/icons/*
 %{_datadir}/%{name}/keymaps/
 %{_datadir}/%{name}/linuxboot_dma.bin
-%{_datadir}/%{name}/vhost-user/50-qemu-virtiofsd.json
 %attr(4755, -, -) %{_libexecdir}/qemu-bridge-helper
-%{_libexecdir}/virtiofsd
 %{_mandir}/man1/%{name}.1*
-%{_mandir}/man1/virtiofsd.1*
 %{_mandir}/man7/qemu-block-drivers.7*
 %{_mandir}/man7/qemu-cpu-models.7*
 %{_mandir}/man7/qemu-ga-ref.7*
@@ -1861,8 +1909,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_libdir}/%{name}/audio-pa.so
 %endif
 
+%if %{with sdl}
 %files audio-sdl
 %{_libdir}/%{name}/audio-sdl.so
+%endif
 
 %if %{have_jack}
 %files audio-jack
@@ -1916,8 +1966,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %files device-usb-redirect
 %{_libdir}/%{name}/hw-usb-redirect.so
 
+%if %{have_libcacard}
 %files device-usb-smartcard
 %{_libdir}/%{name}/hw-usb-smartcard.so
+%endif
 
 %if %{have_virgl}
 %files device-display-vhost-user-gpu
@@ -2041,6 +2093,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/%{name}/kvmvapic.bin
 %{_datadir}/%{name}/linuxboot.bin
 %{_datadir}/%{name}/multiboot.bin
+%{_datadir}/%{name}/multiboot_dma.bin
 %{_datadir}/%{name}/pvh.bin
 %{_datadir}/%{name}/qboot.rom
 %if %{need_qemu_kvm}
@@ -2221,6 +2274,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Wed Apr 20 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-1
+- Updated to match Fedora 36 (license: MIT)
+- Patched CVE-2022-0358, CVE-2021-20225, CVE-2022-1050
+- Backported patch for CVE-2022-26354
+
 * Mon Jan 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-14
 - Disabling 'qemu-system-x86*' subpackages build for non-AMD64 architectures.
 - Disabling dependency on 'ipxe' for non-AMD64 architectures.
