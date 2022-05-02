@@ -1,0 +1,60 @@
+From 1df72505f99a6f7bdf757ed044e6fd6d502efffe Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 2 May 2022 18:14:55 +0000
+Subject: [PATCH 29/29] iptables: Ioctl cgroup dirs.
+
+avc:  denied  { ioctl } for  pid=7230 comm="ip6tables" path="/sys/fs/cgroup" dev="cgroup2" ino=1
+scontext=system_u:system_r:iptables_t:s0
+tcontext=system_u:object_r:cgroup_t:s0 tclass=dir
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/filesystem.if | 19 +++++++++++++++++++
+ policy/modules/system/iptables.te   |  1 +
+ 2 files changed, 20 insertions(+)
+
+diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
+index dd261be1f..abaf52626 100644
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -770,6 +770,25 @@ interface(`fs_list_cgroup_dirs', `
+ 	dev_search_sysfs($1)
+ ')
+ 
++########################################
++## <summary>
++##	Ioctl cgroup directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`fs_ioctl_cgroup_dirs', `
++	gen_require(`
++		type cgroup_t;
++	')
++
++	allow $1 cgroup_t:dir ioctl;
++	dev_search_sysfs($1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Delete cgroup directories.
+diff --git a/policy/modules/system/iptables.te b/policy/modules/system/iptables.te
+index 294f7bcf5..9a00811e7 100644
+--- a/policy/modules/system/iptables.te
++++ b/policy/modules/system/iptables.te
+@@ -74,6 +74,7 @@ dev_read_sysfs(iptables_t)
+ fs_getattr_xattr_fs(iptables_t)
+ fs_search_auto_mountpoints(iptables_t)
+ fs_list_inotifyfs(iptables_t)
++fs_ioctl_cgroup_dirs(iptables_t)
+ 
+ mls_file_read_all_levels(iptables_t)
+ 
+-- 
+2.25.1
+

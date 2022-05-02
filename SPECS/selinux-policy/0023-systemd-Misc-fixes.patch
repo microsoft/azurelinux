@@ -1,0 +1,97 @@
+From 25ebb9530f325f1ec8385088405ade691fff3858 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 2 May 2022 15:39:07 +0000
+Subject: [PATCH 23/28] systemd: Misc fixes.
+
+---
+ policy/modules/system/init.if    | 18 ++++++++++++++++++
+ policy/modules/system/logging.te |  1 +
+ policy/modules/system/systemd.te | 10 +++++++---
+ 3 files changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index fda2faca5..8bc28e4ab 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -3361,6 +3361,24 @@ interface(`init_list_unit_dirs',`
+ 	init_search_units($1)
+ ')
+ 
++########################################
++## <summary>
++##	Get the attributes of systemd unit files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_getattr_generic_units_files',`
++	gen_require(`
++		type systemd_unit_t;
++	')
++
++	allow $1 systemd_unit_t:file read_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read systemd unit files
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 2d16c0d47..261a68905 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -560,6 +560,7 @@ ifdef(`init_systemd',`
+ 	logging_send_syslog_msg(syslogd_t)
+ 
+ 	systemd_manage_journal_files(syslogd_t)
++	systemd_watch_journal_dirs(syslogd_t)
+ 
+ 	udev_read_runtime_files(syslogd_t)
+ 
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index d3c2c3802..8997f2ac1 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -482,6 +482,7 @@ init_search_runtime(systemd_generator_t)
+ init_setattr_runtime_files(systemd_generator_t)
+ init_write_runtime_files(systemd_generator_t)
+ init_list_unit_dirs(systemd_generator_t)
++init_getattr_generic_units_files(systemd_generator_t)
+ init_read_generic_units_symlinks(systemd_generator_t)
+ init_read_script_files(systemd_generator_t)
+ 
+@@ -994,6 +995,9 @@ dev_read_sysfs(systemd_modules_load_t)
+ files_mmap_read_kernel_modules(systemd_modules_load_t)
+ files_read_etc_files(systemd_modules_load_t)
+ 
++fs_getattr_all_fs(systemd_modules_load_t)
++fs_search_all(systemd_modules_load_t)
++
+ modutils_read_module_config(systemd_modules_load_t)
+ modutils_read_module_deps(systemd_modules_load_t)
+ 
+@@ -1460,8 +1464,8 @@ systemd_log_parse_environment(systemd_sessions_t)
+ 
+ # sys_admin for sysctls such as kernel.kptr_restrict and kernel.dmesg_restrict
+ # sys_ptrace for kernel.yama.ptrace_scope
+-allow systemd_sysctl_t self:capability { sys_admin sys_ptrace };
+-dontaudit systemd_sysctl_t self:capability net_admin;
++# net_admin for network sysctls
++allow systemd_sysctl_t self:capability { net_admin sys_admin sys_ptrace };
+ 
+ kernel_read_kernel_sysctls(systemd_sysctl_t)
+ kernel_request_load_module(systemd_sysctl_t)
+@@ -1480,7 +1484,7 @@ systemd_log_parse_environment(systemd_sysctl_t)
+ # Sysusers local policy
+ #
+ 
+-allow systemd_sysusers_t self:capability { chown fsetid };
++allow systemd_sysusers_t self:capability { dac_read_search chown fsetid };
+ allow systemd_sysusers_t self:process setfscreate;
+ allow systemd_sysusers_t self:unix_dgram_socket sendto;
+ 
+-- 
+2.25.1
+
