@@ -20545,7 +20545,7 @@
         "other": {
           "name": "python-justbytes",
           "version": "0.11",
-          "downloadUrl": "https://pypi.io/packages/source//justbytes/justbytes-0.11.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-justbytes-0.11.tar.gz"
         }
       }
     },
