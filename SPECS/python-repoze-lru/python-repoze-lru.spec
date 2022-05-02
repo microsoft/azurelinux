@@ -6,13 +6,12 @@
 Summary:        A tiny LRU cache implementation and decorator
 Name:           python-%{pkgname}
 Version:        0.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 URL:            https://github.com/repoze/repoze.lru
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://pypi.io/packages/source/r/%{pypiname}/%{pypiname}-%{version}.tar.gz
-Source0:        %{pkgname}-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/r/%{pypiname}/%{pypiname}-%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -54,6 +53,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7-5
+- Updating source URL.
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 0.7-4
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 
