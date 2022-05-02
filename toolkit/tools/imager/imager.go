@@ -71,7 +71,7 @@ func main() {
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
 
 	// Run Preinstallation script
-	err = installutils.RunPreInstallScripts(config)
+	err = installutils.RunPreInstallScripts(config.SystemConfigs[defaultSystemConfig])
 	logger.PanicOnError(err, "Failed to preinstall scripts")
 
 	// Parse the kickstart partition file
