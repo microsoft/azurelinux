@@ -55,8 +55,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.23",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.23.tar.gz"
+          "version": "2.9.27",
+          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.27.tar.gz"
         }
       }
     },
