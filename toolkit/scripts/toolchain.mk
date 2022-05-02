@@ -11,7 +11,7 @@ $(call create_folder,$(RPMS_DIR)/noarch)
 $(call create_folder,$(SRPMS_DIR))
 
 toolchain_build_dir = $(BUILD_DIR)/toolchain
-toolchain_local_temp = $(BUILD_DIR)/toolchain_temp
+toolchain_local_temp = $(toolchain_build_dir)/extract_dir
 toolchain_logs_dir = $(LOGS_DIR)/toolchain
 toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
 toolchain_log_tail_length = 20
@@ -185,9 +185,9 @@ ifneq (,$(selected_toolchain_archive))
 #   `print_warning`
 $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_toolchain_archive)
 	@echo Validating contents of toolchain against manifest...
-	tar -I $(ARCHIVE_TOOL) -tf $(selected_toolchain_archive) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_conents) && \
-	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_conents) && \
-	diff="$$( comm -3 $(toolchain_actual_conents) $(toolchain_expected_conents) --check-order )" && \
+	tar -I $(ARCHIVE_TOOL) -tf $(selected_toolchain_archive) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_contents) && \
+	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
+	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
 		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
 		echo "$${diff}"; \
@@ -202,16 +202,26 @@ $(toolchain_local_temp)%: ;
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
 # them into the RPM folder.
-$(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(shell find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag
+
+# The $(depend_TOOLCHAIN_ARCHIVE) and $(depend_REBUILD_TOOLCHAIN) argument trackers are used to force a regeneration of the toolchain
+#	RPMs in the event the toolchain archive is changed in any way.
+$(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(shell find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $(toolchain_local_temp) && \
 	rm -f $(toolchain_local_temp)/* && \
 	tar -I $(ARCHIVE_TOOL) -xf $(selected_toolchain_archive) -C $(toolchain_local_temp) --strip-components 1 && \
 	touch $(BUILD_DIR)/toolchain_temp/* && \
 	touch $@
 
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
+# Replace the toolchain RPM if one of the following is true:
+#	The .rpm doesn't exist
+#	The .rpm is older than the archive we are extracting it from
+#	The toolchain configuration has been changed (depend_TOOLCHAIN_ARCHIVE and depend_REBUILD_TOOLCHAIN)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	tempFile=$(toolchain_local_temp)/$(notdir $@) && \
-	if [ ! -f $@ -o $(selected_toolchain_archive) -nt $@ ]; then \
+	if [ ! -f $@ \
+			-o $(selected_toolchain_archive) -nt $@ \
+			-o $(depend_TOOLCHAIN_ARCHIVE) -nt $@ \
+			-o $(depend_REBUILD_TOOLCHAIN) -nt $@ ]; then \
 		echo Extracting RPM $@ from toolchain && \
 		mkdir -p $(dir $@) && \
 		cp $$tempFile $(dir $@) && \
@@ -220,7 +230,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 	touch $@
 else
 # Download from online package server
-$(toolchain_rpms):
+$(toolchain_rpms): $(depend_REBUILD_TOOLCHAIN)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
