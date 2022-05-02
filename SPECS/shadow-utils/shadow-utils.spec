@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ BuildRequires:  docbook-style-xsl
 BuildRequires:  libxml2
 BuildRequires:  itstool
 Requires:       cracklib
+Requires:       libpwquality
 Requires:       libselinux
 Requires:       libsemanage
 Requires:       pam
@@ -193,6 +194,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Apr 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.9-8
+- Add explicit requirement on libpwquality (used in system-password pam file)
+
 * Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.9-7
 - Adding missing docbook-dtd-xml, docbook-style-xsl and libxml2 BR to build man pages.
 - Adding man file handling in files section.
