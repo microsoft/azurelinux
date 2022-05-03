@@ -1,14 +1,13 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.27.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            http://python-requests.org
-#Source0:       https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz
-Source0:        requests-%{version}.tar.gz
+Source0:        https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz#/requests-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -69,6 +68,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.27.1-4
+- Updating source URL.
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 2.27.1-3
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

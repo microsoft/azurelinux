@@ -1,11 +1,11 @@
 Name:       rtctl
 Version:    1.13
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    Scripts for controlling scheduling priorities of system threads
 Group:      Applications/System
 License:    GPL
 BuildArch:  noarch
-Source0:    rtctl-%{version}.tar.bz2
+Source0:    %{_mariner_sources_url}/rtctl-%{version}.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -41,6 +41,9 @@ systemctl disable rtctl
 fi
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-5
+- Updating source URL.
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.13-4
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - Remove %%clean stage

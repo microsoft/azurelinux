@@ -9,12 +9,12 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/refpolicy
-Source0:        %{url}/releases/download/RELEASE_${refpolicy_major}_${refpolicy_minor}/refpolicy-%{version}.tar.bz2
+Source0:        %{url}/releases/download/RELEASE_%{refpolicy_major}_%{refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Source3:        modules_targeted.conf
@@ -323,12 +323,15 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-4
+* Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-5
 - Additional compatibility for Fedora container-selinux.
 - Remove unneeded systemd_run_t domain
 - Updates for multipath LVM
 - Fix for console logins
 - New type for SAS management devices
+
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-4
+- Fixing source URL.
 
 * Mon Mar 14 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-3
 - Additional policy fixes for enforcing core images.

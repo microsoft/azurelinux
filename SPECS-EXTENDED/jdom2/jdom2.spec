@@ -1,14 +1,14 @@
 Summary:        Java manipulation of XML made easy
 Name:           jdom2
 Version:        2.0.6
-Release:        28%{?dist}
+Release:        29%{?dist}
 # Sam as the "Saxpath" license but restricts the use of the name "JDOM" instead of "SAXPath".
 License:        JDOM
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.jdom.org/
 # ./generate-tarball.sh
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/hunterhacker/jdom/archive/JDOM-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove bundled jars that might not have clear licensing
 Source4:        generate-tarball.sh
 # Use system libraries
@@ -85,6 +85,9 @@ cp -pr build/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.6-29
+- Fixing source URL.
+
 * Tue Feb 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.6-28
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

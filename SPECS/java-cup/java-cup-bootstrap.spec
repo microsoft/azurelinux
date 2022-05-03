@@ -21,14 +21,14 @@
 Summary:        LALR Parser Generator in Java
 Name:           java-cup-bootstrap
 Version:        0.11
-Release:        31%{?dist}
+Release:        32%{?dist}
 License:        HPND
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
 # TODO the version of our 11a source is no longer published
-Source0:        develop.tar.bz2
+Source0:        %{_mariner_sources_url}/develop.tar.bz2
 Source1:        java-cup-generated-files.tar.bz2
 Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/
@@ -101,6 +101,9 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %{_javadir}/*
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-32
+- Fixing source URL.
+
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.11-31
 - separate into bootstrap and non-bootstrap specs
 - License verified
