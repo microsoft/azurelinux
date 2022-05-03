@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -174,24 +174,24 @@ rm -rf %{buildroot}%{_infodir}
 cat > %{buildroot}%{_sysconfdir}/nsswitch.conf <<- "EOF"
 #       Begin /etc/nsswitch.conf
 
-    passwd: files
-    group: files
-    shadow: files
+	passwd: files
+	group: files
+	shadow: files
 
-    hosts: files dns
-    networks: files
+	hosts: files dns
+	networks: files
 
-    protocols: files
-    services: files
-    ethers: files
-    rpc: files
+	protocols: files
+	services: files
+	ethers: files
+	rpc: files
 #       End /etc/nsswitch.conf
 EOF
 cat > %{buildroot}%{_sysconfdir}/ld.so.conf <<- "EOF"
 #       Begin /etc/ld.so.conf
-    %{_prefix}/local/lib
-    /opt/lib
-    include %{_sysconfdir}/ld.so.conf.d/*.conf
+	%{_prefix}/local/lib
+	/opt/lib
+	include %{_sysconfdir}/ld.so.conf.d/*.conf
 EOF
 popd
 %find_lang %{name} --all-name
@@ -299,6 +299,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Mon May 02 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.35-2
+- To remove leading spaces in /etc/nsswitch.conf, use tabs instead of spaces
+
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 2.35-1
 - Upgrade to version 2.35
 - Cleanup old patch files
