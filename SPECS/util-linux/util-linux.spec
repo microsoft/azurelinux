@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,7 @@ BuildRequires:  audit-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
-Requires:       %{name}-devel = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
 Provides:       %{name}-ng = %{version}-%{release}
@@ -40,6 +40,7 @@ These are the additional language files of util-linux.
 Summary:        Header and library files for util-linux
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Provides:       libmount-devel = %{version}-%{release}
 Provides:       libblkid = %{version}-%{release}
 Provides:       libblkid-devel = %{version}-%{release}
@@ -116,21 +117,27 @@ rm -rf %{buildroot}/lib/systemd/system
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
-%files devel
+%files libs
 %defattr(-,root,root)
-%license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
-%license libblkid/COPYING
-%{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
 /lib/libblkid.so.*
 /lib/libmount.so.*
 /lib/libuuid.so.*
 /lib/libsmartcols.so.*
 /lib/libfdisk.so.*
+
+%files devel
+%defattr(-,root,root)
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
+%license libblkid/COPYING
+%{_libdir}/pkgconfig/*.pc
 %{_includedir}/*
 %{_mandir}/man3/*
 
 %changelog
+* Mon May 05 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.36.2-5
+- Split libraries into the util-linux-libs package
+
 * Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.2-4
 - Add Debian's PAM configs for runuser tool
 - Add build require on pam-devel so we have the pam headers
