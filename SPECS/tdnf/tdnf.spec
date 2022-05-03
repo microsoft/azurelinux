@@ -1,7 +1,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.2.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,12 +133,6 @@ find %{buildroot} -name '*.pyc' -delete
 
 %ldconfig_scriptlets
 
-%triggerin -n %{name} -- mariner-repos-shared
-for gpg_key in $(rpm -q -l mariner-repos-shared | grep "rpm-gpg")
-do
-    rpm --import "$gpg_key"
-done
-
 %files
 %license COPYING
 %defattr(-,root,root,0755)
@@ -184,6 +178,9 @@ done
 %{_bindir}/tdnf-automatic
 
 %changelog
+* Tue May 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
+- Reverting usage of "rpm" in RPM scripts since "/var/lib/rpm/.rpm.lock" is always taken.
+
 * Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.2.2-3
 - Update required dependecies for tdnf package which needs rpm-libs.
 
