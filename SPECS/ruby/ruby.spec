@@ -1,10 +1,84 @@
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
 %global rubygems_dir  %{_datadir}/rubygems
-%global ruby_libdir   %{_datadir}/%{name}
 
-%global gem_dir %{_libdir}/ruby/gems
+%global gem_dir %{_datadir}/ruby/gems
 %global rubygems_version              3.1.6
+%global rubygems_molinillo_version            0.7.0
+
+# Add version for default gems
+%global abbrev_version     0.1.0
+%global base64_version     0.1.1
+%global benchmark_version  0.2.0
+%global bigdecimal_version 3.1.1
+%global bundler_version    2.3.7
+%global cgi_version        0.3.1
+%global csv_version        3.2.2
+%global date_version       3.2.2
+%global delegate_version   0.2.0
+%global did_you_mean_version 1.6.1
+%global digest_version     3.1.0
+%global drb_version	       2.1.0
+%global english_version    0.7.1
+%global erb_version        2.2.3
+%global error_highlight_version	0.3.0
+%global etc_version        1.3.0
+%global fcntl_version      1.0.1
+%global fiddle_version     1.1.0
+%global fileutils_version  1.6.0
+%global find_version       0.1.1
+%global forwardable_version 1.3.2
+%global getoptlong_version 0.1.1
+%global io_console_version 0.5.11
+%global io_nonblock_version 0.1.0
+%global io_wait_version    0.2.1
+%global ipaddr_version     1.2.4
+%global irb_version        1.4.1
+%global json_version       2.6.1
+%global logger_version     1.5.0
+%global mutex_m_version    0.1.1
+%global net-http_version   0.2.0
+%global net-protocol_version 0.1.2
+%global nkf_version        0.1.1
+%global observer_version   0.1.1
+%global open3_version      0.1.1
+%global openssl_version    3.0.0
+%global open-uri_version   0.2.0
+%global optparse_version   0.2.0
+%global ostruct_version    0.5.2
+%global pathname_version   0.2.0
+%global pp_version         0.3.0
+%global prettyprint_version 0.1.1
+%global pstore_version     0.1.1
+%global psych_version      4.0.3
+%global racc_version       1.6.0
+%global rdoc_version       6.4.0
+%global readline_version   0.0.3
+%global readline_ext_version 0.1.4
+%global reline_version     0.3.0
+%global resolv_version     0.2.1
+%global resolv_replace_version 0.1.0
+%global rinda_version      0.1.1
+%global ruby2_keywords_version 0.0.5
+%global rubygems_version   3.3.7
+%global securerandom_version 0.1.1
+%global set_version        1.0.2
+%global shellwords_version 0.1.0
+%global singleton_version  0.1.1
+%global stringio_version   3.0.1
+%global strscan_version    3.0.1
+%global syslog_version     0.1.0
+%global tempfile_version   0.1.2
+%global time_version       0.2.0
+%global timeout_version    0.2.0
+%global tmpdir_version     0.1.2
+%global tsort_version      0.1.0
+%global un_version         0.2.0
+%global uri_version        0.11.0
+%global weakref_version    0.1.1
+%global win32ole_version   1.8.8
+%global yaml_version       0.2.0
+%global zlib_version       2.1.1
 
 Summary:        Ruby
 Name:           ruby
@@ -48,10 +122,150 @@ Provides:       %{name}-libs = %{version}-%{release}
 # TODO: When moving to Ruby 3.X for Mariner 2.0 release, these gemified stdlib
 # provides should be versioned according to the gem version.
 # More info: https://stdgems.org/
-Provides:       rubygem(did_you_mean) = %{version}-%{release}
-Provides:       rubygem(irb) = %{version}-%{release}
-Provides:       rubygem-irb = %{version}-%{release}
-Provides:       rubygem-did_you_mean = %{version}-%{release}
+Provides:       rubygem-abbrev = %{abbrev_version}-%{release}
+Provides:       rubygem(abbrev) = %{abbrev_version}-%{release}
+Provides:       rubygem-base64 = %{base64_version}-%{release}
+Provides:       rubygem(base64) = %{base64_version}-%{release}
+Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
+Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
+Provides:       rubygem-bigdecimal = %{bigdecimal_version}-%{release}
+Provides:       rubygem(bigdecimal) = %{bigdecimal_version}-%{release}
+Provides:       rubygem-bundler = %{bundler_version}-%{release}
+Provides:       rubygem(bundler) = %{bundler_version}-%{release}
+Provides:       rubygem-cgi = %{cgi_version}-%{release}
+Provides:       rubygem(cgi) = %{cgi_version}-%{release}
+Provides:       rubygem-csv = %{csv_version}-%{release}
+Provides:       rubygem(csv) = %{csv_version}-%{release}
+Provides:       rubygem-date = %{date_version}-%{release}
+Provides:       rubygem(date) = %{date_version}-%{release}
+Provides:       rubygem(delegate) = %{delegate_version}-%{release}
+Provides:       rubygem-delegate = %{delegate_version}-%{release}
+Provides:       rubygem(did_you_mean) = %{did_you_mean_version}-%{release}
+Provides:       rubygem-did_you_mean = %{did_you_mean_version}-%{release}
+Provides:       rubygem(digest) = %{digest_version}-%{release}
+Provides:       rubygem-digest = %{digest_version}-%{release}
+Provides:       rubygem(drb) = %{drb_version}-%{release}
+Provides:       rubygem-drb = %{drb_version}-%{release}
+Provides:       rubygem(english) = %{english_version}-%{release}
+Provides:       rubygem-english = %{english_version}-%{release}
+Provides:       rubygem(erb) = %{erb_version}-%{release}
+Provides:       rubygem-erb = %{erb_version}-%{release}
+Provides:       rubygem(error) = %{error_highlight_version}-%{release}
+Provides:       rubygem-error = %{error_highlight_version}-%{release}
+Provides:       rubygem(etc) = %{etc_version}-%{release}
+Provides:       rubygem-etc = %{etc_version}-%{release}
+Provides:       rubygem(fcntl) = %{fcntl_version}-%{release}
+Provides:       rubygem-fcntl = %{fcntl_version}-%{release}
+Provides:       rubygem(fiddle) = %{fiddle_version}-%{release}
+Provides:       rubygem-fiddle = %{fiddle_version}-%{release}
+Provides:       rubygem-fileutils = %{fileutils_version}-%{release}
+Provides:       rubygem(fileutils) = %{fileutils_version}-%{release}
+Provides:       rubygem-find = %{find_version}-%{release}
+Provides:       rubygem(find) = %{find_version}-%{release}
+Provides:       rubygem-forwardable = %{forwardable_version}-%{release}
+Provides:       rubygem(forwardable) = %{forwardable_version}-%{release}
+Provides:       rubygem-getoptlong = %{getoptlong_version}-%{release}
+Provides:       rubygem(getoptlong) = %{getoptlong_version}-%{release}
+Provides:       rubygem-io-console = %{io_console_version}-%{release}
+Provides:       rubygem(io-console) = %{io_console_version}-%{release}
+Provides:       rubygem-io-nonblock = %{io_nonblock_version}-%{release}
+Provides:       rubygem(io-nonblock) = %{io_nonblock_version}-%{release}
+Provides:       rubygem-io-wait = %{io_wait_version}-%{release}
+Provides:       rubygem(io-wait) = %{io_wait_version}-%{release}
+Provides:       rubygem-ipaddr = %{ipaddr_version}-%{release}
+Provides:       rubygem(ipaddr) = %{ipaddr_version}-%{release}
+Provides:       rubygem-irb = %{irb_version}-%{release}
+Provides:       rubygem(irb) = %{irb_version}-%{release}
+Provides:       rubygem-json = %{json_version}-%{release}
+Provides:       rubygem(json) = %{json_version}-%{release}
+Provides:       rubygem-logger = %{logger_version}-%{release}
+Provides:       rubygem(logger) = %{logger_version}-%{release}
+Provides:       rubygem-mutex_m = %{mutex_m_version}-%{release}
+Provides:       rubygem(mutex_m) = %{mutex_m_version}-%{release}
+Provides:       rubygem-net-http = %{net_http_version}-%{release}
+Provides:       rubygem(net-http) = %{net_http_version}-%{release}
+Provides:       rubygem-net-protocol = %{net_protocol_version}-%{release}
+Provides:       rubygem(net-protocol) = %{net_protocol_version}-%{release}
+Provides:       rubygem-nkf = %{nkf_version}-%{release}
+Provides:       rubygem(nkf) = %{nkf_version}-%{release}
+Provides:       rubygem-observer = %{observer_version}-%{release}
+Provides:       rubygem(observer) = %{observer_version}-%{release}
+Provides:       rubygem-open3 = %{open3_version}-%{release}
+Provides:       rubygem(open3) = %{open3_version}-%{release}
+Provides:       rubygem-openssl = %{openssl_version}-%{release}
+Provides:       rubygem(openssl) = %{openssl_version}-%{release}
+Provides:       rubygem-open-uri = %{open_uri_version}-%{release}
+Provides:       rubygem(open-uri) = %{open_uri_version}-%{release}
+Provides:       rubygem-optparse = %{optparse_version}-%{release}
+Provides:       rubygem(optparse) = %{optparse_version}-%{release}
+Provides:       rubygem-ostruct = %{ostruct_version}-%{release}
+Provides:       rubygem(ostruct) = %{ostruct_version}-%{release}
+Provides:       rubygem-pathname = %{pathname_version}-%{release}
+Provides:       rubygem(pathname) = %{pathname_version}-%{release}
+Provides:       rubygem-pp = %{pp_version}-%{release}
+Provides:       rubygem(pp) = %{pp_version}-%{release}
+Provides:       rubygem-prettyprint = %{prettyprint_version}-%{release}
+Provides:       rubygem(prettyprint) = %{prettyprint_version}-%{release}
+Provides:       rubygem-pstore = %{pstore_version}-%{release}
+Provides:       rubygem(pstore) = %{pstore_version}-%{release}
+Provides:       rubygem-psych = %{psych_version}-%{release}
+Provides:       rubygem(psych) = %{psych_version}-%{release}
+Provides:       rubygem-racc = %{racc_version}-%{release}
+Provides:       rubygem(racc) = %{racc_version}-%{release}
+Provides:       rubygem-rdoc = %{rdoc_version}-%{release}
+Provides:       rubygem(rdoc) = %{rdoc_version}-%{release}
+Provides:       rubygem-readline = %{readline_version}-%{release}
+Provides:       rubygem(readline) = %{readline_version}-%{release}
+Provides:       rubygem-readline-ext = %{readline_ext_version}-%{release}
+Provides:       rubygem(readline-ext) = %{readline_ext_version}-%{release}
+Provides:       rubygem-reline = %{reline_version}-%{release}
+Provides:       rubygem(reline) = %{reline_version}-%{release}
+Provides:       rubygem-resolv = %{resolv_version}-%{release}
+Provides:       rubygem(resolv) = %{resolv_version}-%{release}
+Provides:       rubygem-resolv-replace = %{resolv_replace_version}-%{release}
+Provides:       rubygem(resolv-replace) = %{resolv_replace_version}-%{release}
+Provides:       rubygem-rinda = %{rinda_version}-%{release}
+Provides:       rubygem(rinda) = %{rinda_version}-%{release}
+Provides:       rubygem-ruby2_keywords = %{ruby2_keywords_version}-%{release}
+Provides:       rubygem(ruby2_keywords) = %{ruby2_keywords_version}-%{release}
+Provides:       rubygem-rubygems = %{rubygems_version}-%{release}
+Provides:       rubygem(rubygems) = %{rubygems_version}-%{release}
+Provides:       rubygem-securerandom = %{securerandom_version}-%{release}
+Provides:       rubygem(securerandom) = %{securerandom_version}-%{release}
+Provides:       rubygem-set = %{set_version}-%{release}
+Provides:       rubygem(set) = %{set_version}-%{release}
+Provides:       rubygem-shellwords = %{shellwords_version}-%{release}
+Provides:       rubygem(shellwords) = %{shellwords_version}-%{release}
+Provides:       rubygem-singleton = %{singleton_version}-%{release}
+Provides:       rubygem(singleton) = %{singleton_version}-%{release}
+Provides:       rubygem-stringio = %{stringio_version}-%{release}
+Provides:       rubygem(stringio) = %{stringio_version}-%{release}
+Provides:       rubygem-strscan = %{strscan_version}-%{release}
+Provides:       rubygem(strscan) = %{strscan_version}-%{release}
+Provides:       rubygem-syslog = %{syslog_version}-%{release}
+Provides:       rubygem(syslog) = %{syslog_version}-%{release}
+Provides:       rubygem-tempfile = %{tempfile_version}-%{release}
+Provides:       rubygem(tempfile) = %{tempfile_version}-%{release}
+Provides:       rubygem-time = %{time_version}-%{release}
+Provides:       rubygem(time) = %{time_version}-%{release}
+Provides:       rubygem-timeout = %{timeout_version}-%{release}
+Provides:       rubygem(timeout) = %{timeout_version}-%{release}
+Provides:       rubygem-tmpdir = %{tmpdir_version}-%{release}
+Provides:       rubygem(tmpdir) = %{tmpdir_version}-%{release}
+Provides:       rubygem-tsort = %{tsort_version}-%{release}
+Provides:       rubygem(tsort) = %{tsort_version}-%{release}
+Provides:       rubygem-un = %{un_version}-%{release}
+Provides:       rubygem(un) = %{un_version}-%{release}
+Provides:       rubygem-uri = %{uri_version}-%{release}
+Provides:       rubygem(uri) = %{uri_version}-%{release}
+Provides:       rubygem-weakref = %{weakref_version}-%{release}
+Provides:       rubygem(weakref) = %{weakref_version}-%{release}
+Provides:       rubygem-win32ole = %{win32ole_version}-%{release}
+Provides:       rubygem(win32ole) = %{win32ole_version}-%{release}
+Provides:       rubygem-yaml = %{yaml_version}-%{release}
+Provides:       rubygem(yaml) = %{yaml_version}-%{release}
+Provides:       rubygem-zlib = %{zlib_version}-%{release}
+Provides:       rubygem(zlib) = %{zlib_version}-%{release}
 
 %description
 The Ruby package contains the Ruby development environment.
@@ -117,7 +331,6 @@ autoconf
         --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(uname -m) \
         --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(uname -m) \
         --with-rubygemsdir=%{rubygems_dir} \
-        --disable-rubygems \
         --enable-shared \
         --with-compress-debug-sections=no \
         --docdir=%{_docdir}/%{name}-%{version}
@@ -184,10 +397,6 @@ sudo -u test make test TESTS="-v"
 %dir %{rubygems_dir}
 %{rubygems_dir}/rubygems
 
-# Explicitly include only RubyGems directory strucure to avoid accidentally
-# packaged content.
-%dir %{gem_dir}
-
 %files -n rubygems-devel
 %{_rpmconfigdir}/macros.d/macros.rubygems
 %{_rpmconfigdir}/fileattrs/rubygems.attr
@@ -198,6 +407,7 @@ sudo -u test make test TESTS="-v"
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-3
 - Remove bundled gems from ruby.
+- Add provides for all default gems.
 
 * Fri Apr 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.2-2
 - Adding "Provides" for bundled gems: "minitest", "power_assert", "rake", and "test-unit".
