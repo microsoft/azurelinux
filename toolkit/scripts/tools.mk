@@ -146,7 +146,7 @@ worker_chroot_deps := \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
-$(chroot_worker): $(worker_chroot_deps)
+$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 else
 $(chroot_worker):
 endif
