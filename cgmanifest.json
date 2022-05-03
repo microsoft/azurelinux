@@ -20204,8 +20204,8 @@
         "type": "other",
         "other": {
           "name": "python-google-auth",
-          "version": "1.20.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-1.20.1.tar.gz"
+          "version": "2.6.6",
+          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.6.6.tar.gz"
         }
       }
     },
