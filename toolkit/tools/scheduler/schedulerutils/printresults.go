@@ -69,7 +69,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	for _, node := range pkgGraph.AllRunNodes() {
 		if node.State == pkggraph.StateUnresolved {
-			unresolvedDependencies[node.VersionedPkg.Name] = true
+			unresolvedDependencies[node.VersionedPkg.String()] = true
 		}
 	}
 

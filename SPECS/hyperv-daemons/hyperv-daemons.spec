@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.15.32.1
-Release:        2%{?dist}
+Version:        5.15.34.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,7 +103,7 @@ BuildArch:      noarch
 Contains tools and scripts useful for Hyper-V guests.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 %build
 pushd tools/hv
@@ -219,6 +219,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.34.1-1
+- Update source to 5.15.34.1
+
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
 - Bump release number to match kernel release
 

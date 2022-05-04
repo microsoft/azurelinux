@@ -1,11 +1,12 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt39
+%global rt_version rt40
 %define uname_r %{version}-%{rt_version}-%{release}
+%define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.32.1
-Release:        2%{?dist}
+Version:        5.15.34.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +20,7 @@ Source3:        cbl-mariner-ca-20211013.pem
 # When updating, make sure to grab the matching patch from 
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
-Patch0:         patch-5.15.32-%{rt_version}.patch
+Patch0:         patch-%{version_upstream}-%{rt_version}.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -132,7 +133,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
 
 %build
@@ -214,7 +215,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M lockdown=integrity
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -353,6 +354,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.34.1-1
+- Update source to 5.15.34.1
+
+* Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
+- Remove kernel lockdown config from grub envblock
+
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
 - Remove trace symlink from _bindir
 - Exclude files and directories under the debug folder from kernel and kernel-tools packages

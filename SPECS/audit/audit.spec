@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0.6
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
 Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel
+BuildRequires:  systemd-bootstrap-rpm-macros
 BuildRequires:  swig
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       gawk
@@ -75,10 +76,9 @@ and libauparse.
 
 %install
 mkdir -p %{buildroot}/{etc/audit/plugins.d,etc/audit/rules.d}
-mkdir -p %{buildroot}/%{_var}/opt/audit/log
 mkdir -p %{buildroot}/%{_var}/log
+mkdir -p %{buildroot}/%{_var}/log/audit
 mkdir -p %{buildroot}/%{_var}/spool/audit
-ln -sfv %{_var}/opt/audit/log %{buildroot}/%{_var}/log/audit
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -105,8 +105,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man5/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
-%dir %{_var}/opt/audit/log
-%{_var}/log/audit
+%dir %{_var}/log/audit
 %{_var}/spool/audit
 %attr(750,root,root) %dir %{_sysconfdir}/audit
 %attr(750,root,root) %dir %{_sysconfdir}/audit/rules.d
@@ -139,6 +138,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Mon Apr 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.6-6
+- Add BR on systemd-bootstrap-rpm-macros for correctness
+
+* Wed Apr 20 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.0.6-5
+- Return audit logs to their normal location without the use of a symlink
+
 * Tue Mar 15 2022 Andrew Phelps <anphel@microsoft.com> - 3.0.6-4
 - Break circular dependency with systemd by using Recommends
 

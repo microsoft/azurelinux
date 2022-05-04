@@ -1,6 +1,6 @@
 Name:           perl-Test-FailWarnings
 Version:        0.008
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        Add test failures if warnings are caught
 License:        ASL 2.0 
 Vendor:         Microsoft Corporation
@@ -27,6 +27,7 @@ BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(List::Util)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
@@ -60,6 +61,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.008-20
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.008-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

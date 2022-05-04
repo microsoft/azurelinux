@@ -1,6 +1,6 @@
 Name:		perl-File-Remove
 Version:	1.58
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Convenience module for removing files and directories
 License:	GPL+ or Artistic
 
@@ -29,6 +29,7 @@ BuildRequires:  perl(strict)
 BuildRequires:	perl(Test::More) >= 0.42
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
+BuildRequires:  perl(blib)
 
 BuildArch:	noarch
 
@@ -56,6 +57,10 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.58-7
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.58-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

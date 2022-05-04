@@ -10,36 +10,174 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"fmt"
 
 	"microsoft.com/pkggen/internal/logger"
 )
 
-// In kickstart installation, the kickstart file will include a file (/tmp/part-include)
-// that includes the partitioning commands populated by executing the preinstall script.
-// This function aims to parse the partitioning instruction from this kickstart partition file
-// and fill up the required Disk and PartitionSetting information.
+var (
+	diskInfo			map[string]int
+	curDiskIndex 		int
+	latestDiskIndex	int
+	disks 				[]Disk
+	partitionSettings	[]PartitionSetting
+)
 
-// Sample partition configuration for reference: https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/
-func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err error) {
+func updateNewDisk(diskValue string) {
+	// Don't create new disk if processing on the initial placeholder disk
+	if len(disks) != 1 || len(diskInfo) != 0 {
+		disks = append(disks, Disk{})
+	}
+	
+	disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
 
-	var (
-		parseCmd           string
-		partitionFlags     []string
-		partitionTableType PartitionTableType
-		diskInfo           map[string]int
-	)
+	// Set TargetDisk and TargetDiskType for unattended installation
+	disks[latestDiskIndex].TargetDisk.Type = "path"
+	disks[latestDiskIndex].TargetDisk.Value = diskValue
 
-	// Check whether the config already contains partition schema
-	if len(config.Disks) > 0 && len(config.Disks[0].Partitions) > 0 {
-		logger.Log.Infof("Partition scheme already exists")
-		return
+	diskInfo[diskValue] = latestDiskIndex
+	curDiskIndex = latestDiskIndex
+	latestDiskIndex++
+}
+
+func calculatePartitionSize(partSize string, diskPart *Partition) (err error) {
+	if len(disks[curDiskIndex].Partitions) == 0 {
+		diskPart.Start = 1
+	} else {
+		diskPart.Start = disks[curDiskIndex].Partitions[len(disks[curDiskIndex].Partitions)-1].End
 	}
 
-	// Check whether the incoming config is for initrd
-	if config.SystemConfigs[0].Name == "ISO initrd" {
-		return
+	partitionSize, err := strconv.ParseUint(partSize, 10, 64)
+	if err != nil {
+		return err
 	}
 
+	if !diskPart.Grow {
+		diskPart.End = diskPart.Start + partitionSize
+	}
+
+	return
+}
+
+func processPartitionInfo(option, value string, diskPart *Partition, diskPartitionSetting *PartitionSetting) (err error) {
+	// Check --ondisk flag
+	if option == "ondisk" {
+		// Check whether this disk has already been parsed or not
+		curIdx, ok := diskInfo[value]
+		if ok {
+			curDiskIndex = curIdx
+		} else {
+			updateNewDisk(value) 
+		}
+	}
+
+	// Check --fstype flag
+	if option == "fstype" {
+		if value == "biosboot" {
+			diskPart.FsType = "fat32"
+		} else if value == "swap" {
+			diskPart.FsType = "linux-swap"
+			// swap partition does not have a mount point
+			diskPartitionSetting.MountPoint = ""
+		} else {
+			diskPart.FsType = value
+		}
+	}
+
+	// Check --size flag
+	if option == "size" {
+		err := calculatePartitionSize(value, diskPart)
+		if err != nil {
+			return err
+		}
+	}
+
+	return
+}
+
+func processMountPoint(mountPoint string, diskPart *Partition, diskPartitionSetting *PartitionSetting) (err error) {
+	diskPartitionSetting.MountPoint = mountPoint
+	if mountPoint == "biosboot" {
+		diskPart.ID = "boot"
+		diskPart.Flags = append(diskPart.Flags, PartitionFlagBiosGrub)	
+		diskPartitionSetting.MountPoint = ""
+		diskPartitionSetting.ID = "boot"
+		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
+	} else if mountPoint == "/" {
+		diskPartitionSetting.ID = "rootfs"
+		diskPart.ID = "rootfs"
+	} else if strings.Contains(mountPoint, "/") || mountPoint == "swap" {
+		diskPartitionSetting.ID = mountPoint
+		diskPart.ID = mountPoint
+	} else {
+		// Other types of mount points are currently not supported
+		err := fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
+		return err
+	}
+
+	return
+}
+
+// ParsePartitionFlags parses the kickstart syntax of a kickstart-generated partition file
+func ParsePartitionFlags(partCmd string) (err error) {
+	// Only need to parse commands that contains --ondisk options
+	if strings.Contains(partCmd, "--ondisk") {
+		// Create new partition and partitionsetting
+		partition := new(Partition)
+		partitionSetting := new(PartitionSetting)
+ 		partitionSetting.MountIdentifier = MountIdentifierDefault
+		
+		partitionFlags := strings.Split(partCmd, " ")
+		for _, partitionFlag := range partitionFlags {
+			err := parseFlag(partitionFlag, partition, partitionSetting)
+			if err != nil {
+				return err
+			}
+		}
+
+		disks[curDiskIndex].Partitions = append(disks[curDiskIndex].Partitions, *partition)
+		partitionSettings = append(partitionSettings, *partitionSetting)
+	}
+
+	return
+}
+
+func parseFlag(partitionFlag string, diskPart *Partition, diskPartitionSetting *PartitionSetting) (err error) {
+	const optionStart = "--"
+	if strings.HasPrefix(partitionFlag, optionStart) {
+		// Find the index of "="
+		index := strings.Index(partitionFlag, "=")
+		if index != -1 {
+			optionName := partitionFlag[len(optionStart):index]
+			optionVal := partitionFlag[(index+1):len(partitionFlag)]
+			
+			err := processPartitionInfo(optionName, optionVal, diskPart, diskPartitionSetting)
+			if err != nil {
+				return err
+			}
+		} else {
+			// Check grow flag
+			if partitionFlag == "--grow" {
+				diskPart.Grow = true
+				diskPart.End = 0
+			}
+		}
+	} else {
+		// Update mount point
+		if partitionFlag != "part" {
+			err := processMountPoint(partitionFlag, diskPart, diskPartitionSetting)
+			if err != nil {
+				return err
+			}
+		} 
+	}
+
+	return
+}
+
+// ParseKickStartPartitionScheme parses a kickstart-generated partition file and 
+// construct the Disk and PartitionSetting information
+func ParseKickStartPartitionScheme(partitionFile string) (Retdisks []Disk, RetpartitionSettings []PartitionSetting, err error) {
 	file, err := os.Open(partitionFile)
 	if err != nil {
 		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
@@ -54,110 +192,23 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 		return
 	}
 
-	defaultDiskIndex := 0
-
+	disks = append(disks, Disk{})	
 	scanner := bufio.NewScanner(file)
 
 	// Create a mapping between the disk path and the index of the disk in the
 	// Disk array so that when we parse through the partition commands, we can
 	// determine which disk the parition instruction is targeted
 	diskInfo = make(map[string]int)
-	partitionTableType = PartitionTableTypeGpt
 
 	for scanner.Scan() {
-		parseCmd = scanner.Text()
-		//fmt.Printf("Parse Commands: %s\n", parseCmd)
-
-		// Find disk information
-		if strings.Contains(parseCmd, "--ondisk") {
-			partitionFlags = strings.Split(parseCmd, " ")
-			curDiskInfo := partitionFlags[len(partitionFlags)-1]
-			curDiskInfo = curDiskInfo[9:len(curDiskInfo)]
-
-			// Check whether this disk has already been parsed or not
-			curIdx, ok := diskInfo[curDiskInfo]
-			if !ok {
-				// Create new disk struct and append it into the Disk array
-				newDisk := Disk{}
-				newDisk.PartitionTableType = partitionTableType
-
-				// Set TargetDisk and TargetDiskType for unattended installation
-				newDisk.TargetDisk.Type = "path"
-				newDisk.TargetDisk.Value = curDiskInfo
-
-				diskInfo[curDiskInfo] = defaultDiskIndex
-				curIdx = defaultDiskIndex
-				defaultDiskIndex++
-
-				config.Disks = append(config.Disks, newDisk)
-			}
-
-			// Create new Partition and PartionSetting
-			partition := new(Partition)
-			partitionSetting := new(PartitionSetting)
-			partitionSetting.MountIdentifier = MountIdentifierDefault
-
-			// Find Mount Point
-			partitionSetting.MountPoint = partitionFlags[1]
-			if partitionFlags[1] == "biosboot" {
-				partitionSetting.MountPoint = ""
-				partitionSetting.ID = "boot"
-				partition.ID = "boot"
-				partition.Flags = append(partition.Flags, PartitionFlagBiosGrub)
-				config.Disks[curIdx].PartitionTableType = PartitionTableTypeGpt
-			} else if partitionFlags[1] == "/" {
-				partitionSetting.ID = "rootfs"
-				partition.ID = "rootfs"
-			} else {
-				partitionSetting.ID = partitionFlags[1]
-				partition.ID = partitionFlags[1]
-			}
-
-			// Loop through partition flags to fetch fstype, size etc.
-			for _, partOpt := range partitionFlags {
-
-				// Find fstype
-				if strings.Contains(partOpt, "--fstype") {
-					fstype := partOpt[9:len(partOpt)]
-					if fstype == "biosboot" {
-						partition.FsType = "fat32"
-					} else if fstype == "swap" {
-						partition.FsType = "linux-swap"
-
-						// swap partition does not have a mount point
-						partitionSetting.MountPoint = ""
-					} else {
-						partition.FsType = fstype
-					}
-				}
-
-				// Find partition size
-				if strings.Contains(partOpt, "--size") {
-					partSizeStr := partOpt[7:len(partOpt)]
-
-					if len(config.Disks[curIdx].Partitions) == 0 {
-						partition.Start = 1
-					} else {
-						partition.Start = config.Disks[curIdx].Partitions[len(config.Disks[curIdx].Partitions)-1].End
-					}
-
-					if strings.Contains(parseCmd, "--grow") {
-						// Fill out the rest of the space
-						partition.End = 0
-					} else {
-						partitionSize, err := strconv.ParseUint(partSizeStr, 10, 64)
-						if err != nil {
-							return err
-						}
-						partition.End = partition.Start + partitionSize
-					}
-				}
-			}
-
-			config.Disks[curIdx].Partitions = append(config.Disks[curIdx].Partitions, *partition)
-			config.SystemConfigs[curIdx].PartitionSettings = append(config.SystemConfigs[curIdx].PartitionSettings, *partitionSetting)
+		parseCmd := scanner.Text()
+		err = ParsePartitionFlags(parseCmd)
+		if err != nil {
+			return
 		}
 	}
 
+	Retdisks = disks
+	RetpartitionSettings = partitionSettings
 	return
 }

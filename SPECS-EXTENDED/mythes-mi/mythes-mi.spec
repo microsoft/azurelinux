@@ -4,10 +4,10 @@ Name: mythes-mi
 Summary: Maori thesaurus
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
-Release: 22%{?dist}
+Release: 23%{?dist}
 # Source is dead now
 # Source: http://packages.papakupu.maori.nz/mythes/mythes-mi-0.1.%%{upstreamid}-beta.tar.gz
-Source: mythes-mi-0.1.%{upstreamid}-beta.tar.gz
+Source: %{_mariner_sources_url}/mythes-mi-0.1.%{upstreamid}-beta.tar.gz
 URL: http://papakupu.maori.nz/
 License: Public Domain
 BuildArch: noarch
@@ -29,10 +29,15 @@ cp -p mi.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_mi_NZ_v2.idx
 
 
 %files
+%license mi.LICENSE
 %doc mi.AUTHORS mi.README mi.LICENSE
 %{_datadir}/mythes/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-23
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

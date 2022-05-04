@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name: container-exception-logger
 Version: 1.0.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Logging from a container to a host
 
 License: GPLv3+
@@ -12,7 +12,7 @@ URL: https://github.com/abrt/container-exception-logger
 # source is created by:
 # git clone https://github.com/abrt/container-exception-logger
 # cd container-exception-logger; tito build --tgz
-Source0: %{name}-%{version}.tar.gz
+Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: asciidoc
@@ -42,6 +42,10 @@ cp man/container-exception-logger.1 %{buildroot}/%{_mandir}/man1/container-excep
 %license COPYING
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-6
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

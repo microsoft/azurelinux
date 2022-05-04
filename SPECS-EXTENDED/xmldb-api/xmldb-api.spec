@@ -22,14 +22,13 @@ Distribution:   Mariner
 %define cvs_version 20041010
 Name:           xmldb-api
 Version:        0.1
-Release:        27%{?dist}
+Release:        28%{?dist}
 Summary:        XML:DB API for Java
 License:        Apache-1.1
-Group:          Development/Libraries/Java
 Url:            http://xmldb-org.sourceforge.net
 # cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org login
 # cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org export -D 2004-10-10 xapi
-Source0:        xmldb-xapi-%{cvs_version}-src.tar.bz2
+Source0:        %{_mariner_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2
 Patch0:         xmldb-api-java5-enum.patch
 BuildRequires:  ant >= 1.6
 BuildRequires:  javapackages-tools
@@ -121,7 +120,8 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %defattr(0644,root,root,0755)
-%doc src/{AUTHORS,LICENSE,README,config.xml}
+%license src/LICENSE
+%doc src/{AUTHORS,README,config.xml}
 %{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}.jar
 
@@ -140,6 +140,11 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.1-28
+- Update Source0
+- Improve formatting
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-27
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

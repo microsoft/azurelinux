@@ -9,8 +9,8 @@
 # This is the general location for libs/archs compatible with all
 # or most of the Ruby versions available in the Fedora repositories.
 %ruby_vendordir vendor_ruby
-%ruby_vendorlibdir %{ruby_libdir}/%{ruby_vendordir}
-%ruby_vendorarchdir %{ruby_libarchdir}/%{ruby_vendordir}
+%ruby_vendorlibdir %(ruby -rrbconfig -e "puts RbConfig::CONFIG['vendorlibdir']")
+%ruby_vendorarchdir %(ruby -rrbconfig -e "puts RbConfig::CONFIG['vendorarchdir']")
 
 # For ruby packages we want to filter out any provides caused by private
 # libs in %%{ruby_vendorarchdir}/%%{ruby_sitearchdir}.

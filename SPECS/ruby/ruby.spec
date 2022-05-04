@@ -4,13 +4,18 @@
 %global ruby_libdir   %{_datadir}/%{name}
 
 %global gem_dir %{_libdir}/ruby/gems
-%global rubygems_molinillo_version  0.5.7
-%global rubygems_version            3.1.6
+%global rubygems_molinillo_version    0.5.7
+%global rubygems_version              3.1.6
+
+%global rubygems_minitest_version     5.15.0
+%global rubygems_power_assert_version 2.0.1
+%global rubygems_rake_version         13.0.6
+%global rubygems_test_unit_version    3.5.3
 
 Summary:        Ruby
 Name:           ruby
 Version:        3.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,16 +34,19 @@ Patch0:         patch1-rb.patch
 Patch1:         patch2-rb.patch
 Patch2:         patch3-rb.patch
 Patch3:         patch4-rb.patch
+
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
-Requires:       gmp
-Requires:       openssl
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
+
+Requires:       gmp
+Requires:       openssl
+
 Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
@@ -50,6 +58,19 @@ Provides:       rubygem(did_you_mean) = %{version}-%{release}
 Provides:       rubygem(irb) = %{version}-%{release}
 Provides:       rubygem-irb = %{version}-%{release}
 Provides:       rubygem-did_you_mean = %{version}-%{release}
+
+Provides:       rubygem(minitest) = %{rubygems_minitest_version}
+Provides:       rubygem-minitest = %{rubygems_minitest_version}
+
+Provides:       rubygem(power_assert) = %{rubygems_power_assert_version}
+Provides:       rubygem-power_assert = %{rubygems_power_assert_version}
+
+Provides:       rubygem(rake) = %{rubygems_rake_version}
+Provides:       rubygem-rake = %{rubygems_rake_version}
+Provides:       rubygem-rake-doc = %{rubygems_rake_version}
+
+Provides:       rubygem(test-unit) = %{rubygems_test_unit_version}
+Provides:       rubygem-test-unit = %{rubygems_test_unit_version}
 
 %description
 The Ruby package contains the Ruby development environment.
@@ -189,6 +210,10 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Fri Apr 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.2-2
+- Adding "Provides" for bundled gems: "minitest", "power_assert", "rake", and "test-unit".
+- Updated vendor macros.
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-1
 - Update to v3.1.2.
 - Fix CVEs 2021-41817 and 2021-41819.
