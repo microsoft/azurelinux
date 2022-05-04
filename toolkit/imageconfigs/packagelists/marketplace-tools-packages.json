@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "dnf",
+        "wget"
+    ]
+}
