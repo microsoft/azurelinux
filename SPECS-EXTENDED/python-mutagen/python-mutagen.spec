@@ -68,7 +68,7 @@ rm -rf docs/_build/{.buildinfo,.doctrees}
 # But lint and code style issues don't mean there's antyhing wrong
 # with the code.
 rm -rv tests/quality/
-pip3 install pytest hypothesis
+pip3 install pytest==7.1.2 hypothesis==6.45.1
 
 %{__python3} setup.py test
 
