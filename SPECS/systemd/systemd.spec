@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,7 +42,7 @@ Requires:       pam
 Requires:       xz
 Requires(post): audit-libs
 Requires(post): pam
-Requires(post): util-linux-devel
+Requires(post): util-linux-libs
 Obsoletes:      systemd-bootstrap
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
@@ -258,6 +258,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Mon May 02 2022 Sriram Nambakam <snambakam@microsoft.com> - 250.3-5
+- Change Requires(post) to depend on util-linux-libs
+
 * Wed Apr 13 2022 Cameron Baird <cameronbaird@microsoft.com> - 250.3-4
 - Bring in an upstream change as patch fix-journald-audit-logging.patch
 - to prevent many-fielded audit messages from crashing systemd-journal
