@@ -1,1 +1,0 @@
-echo Enabling service for Azure Serial Console
