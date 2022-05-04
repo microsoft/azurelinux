@@ -46,6 +46,7 @@ var (
 	inputGraphFile  = exe.InputFlag(app, "Path to the DOT graph file to build.")
 	outputGraphFile = exe.OutputFlag(app, "Path to save the built DOT graph file.")
 
+	outputCSVFile = app.Flag("output-csv-file", "Path to save the CSV file.").Required().String()
 	workDir      = app.Flag("work-dir", "The directory to create the build folder").Required().String()
 	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFile     = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
@@ -392,6 +393,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
+	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 
 	return
 }
