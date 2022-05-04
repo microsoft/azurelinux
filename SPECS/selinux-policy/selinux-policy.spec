@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,18 @@ Patch14:        0014-systemd-Misc-updates.patch
 Patch15:        0015-rpm-Add-dnf-and-tdnf-labeling.patch
 Patch16:        0016-logging-Change-to-systemd-interface-for-tmpfilesd.patch
 Patch17:        0017-Add-cloud-init.patch
+Patch18:        0018-Add-compatibility-for-container-selinux.patch
+Patch19:        0019-systemd-Remove-systemd-run-domain.patch
+Patch20:        0020-unconfined-Add-missing-capability2-perms.patch
+Patch21:        0021-lvm-Updates-for-multipath-LVM.patch
+Patch22:        0022-locallogin-Use-init-file-descriptors.patch
+Patch23:        0023-systemd-Misc-fixes.patch
+Patch24:        0024-isns-Updates-from-testing.patch
+Patch25:        0025-container-docker-Fixes-for-containerd-and-kubernetes.patch
+Patch26:        0026-devices-Add-type-for-SAS-management-devices.patch
+Patch27:        0027-devices-Add-file-context-for-dev-vhost-vsock.patch
+Patch28:        0028-Add-dac_read_search-perms.patch
+Patch29:        0029-iptables-Ioctl-cgroup-dirs.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -311,6 +323,13 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-5
+- Additional compatibility for Fedora container-selinux.
+- Remove unneeded systemd_run_t domain
+- Updates for multipath LVM
+- Fix for console logins
+- New type for SAS management devices
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-4
 - Fixing source URL.
 
