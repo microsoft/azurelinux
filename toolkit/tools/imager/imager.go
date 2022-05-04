@@ -84,6 +84,10 @@ func main() {
 
 		config.Disks = disks
 		config.SystemConfigs[defaultSystemConfig].PartitionSettings = partitionSettings
+		err = config.IsValid()
+		if err != nil {
+			logger.PanicOnError(err, "Invalid image configuration")
+		}
 	}
 
 	// Currently only process 1 system config
