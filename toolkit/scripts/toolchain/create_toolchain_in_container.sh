@@ -62,7 +62,7 @@ rm -rvf ./populated_toolchain
 mv ./lfs ./populated_toolchain
 rm -rvf ./populated_toolchain/.dockerenv
 rm -rvf ./populated_toolchain/sources
-rm -rvf ./populated_toolchain/tools
+rm -rvf ./populated_toolchain/tools/libexec/gcc
 tar czf toolchain_from_container.tar.gz populated_toolchain
 ls -la ./
 ls -la ./populated_toolchain
