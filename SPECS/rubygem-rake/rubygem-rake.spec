@@ -1,11 +1,8 @@
 %global	gem_name      rake
-%global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
-
 Summary:        Rake is a Make-like program implemented in Ruby
 Name:           rubygem-%{gem_name}
 Version:        13.0.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,7 +40,7 @@ Documentation for %{name}.
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}/%{_bindir} %{gem_name}-%{version}.gem
 
 # Install man pages into appropriate place.
 mkdir -p %{buildroot}%{_mandir}/man1
@@ -68,9 +65,9 @@ popd
 %exclude %{gem_cache}
 %{gem_spec}
 %{_mandir}/man1/*
+%{_bindir}/rake
 %exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/rake.gemspec
-%exclude /usr/lib/ruby/gems/3.1.0/bin/rake
 
 %files doc
 %doc %{gem_dir}/doc/
@@ -78,6 +75,9 @@ popd
 %doc %{gem_instdir}/*.rdoc
 
 %changelog
+* Wed May 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-4
+- Add executable.
+
 * Fri Apr 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-3
 - Remove files not building.
 
