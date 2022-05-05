@@ -301,8 +301,6 @@ chroot_and_install_rpms perl-Fedora-VSP
 build_rpm_in_chroot_no_install perl-generators
 chroot_and_install_rpms perl-generators
 
-build_rpm_in_chroot_no_install wget
-
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre
 chroot_and_install_rpms pcre
