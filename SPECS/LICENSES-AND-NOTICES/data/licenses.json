@@ -2470,6 +2470,7 @@
                 "ModemManager",
                 "mozjs",
                 "mpfr",
+                "msft-golang",
                 "msr-tools",
                 "mysql",
                 "nano",
