@@ -7,20 +7,20 @@ package configuration
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
-	"fmt"
 
 	"microsoft.com/pkggen/internal/logger"
 )
 
 var (
-	diskInfo			map[string]int
-	curDiskIndex 		int
-	latestDiskIndex	int
-	disks 				[]Disk
-	partitionSettings	[]PartitionSetting
+	diskInfo          map[string]int
+	curDiskIndex      int
+	latestDiskIndex   int
+	disks             []Disk
+	partitionSettings []PartitionSetting
 )
 
 func updateNewDisk(diskValue string) {
@@ -28,7 +28,7 @@ func updateNewDisk(diskValue string) {
 	if len(disks) != 1 || len(diskInfo) != 0 {
 		disks = append(disks, Disk{})
 	}
-	
+
 	disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
 
 	// Set TargetDisk and TargetDiskType for unattended installation
@@ -67,7 +67,7 @@ func processPartitionInfo(option, value string, diskPart *Partition, diskPartiti
 		if ok {
 			curDiskIndex = curIdx
 		} else {
-			updateNewDisk(value) 
+			updateNewDisk(value)
 		}
 	}
 
@@ -99,7 +99,7 @@ func processMountPoint(mountPoint string, diskPart *Partition, diskPartitionSett
 	diskPartitionSetting.MountPoint = mountPoint
 	if mountPoint == "biosboot" {
 		diskPart.ID = "boot"
-		diskPart.Flags = append(diskPart.Flags, PartitionFlagBiosGrub)	
+		diskPart.Flags = append(diskPart.Flags, PartitionFlagBiosGrub)
 		diskPartitionSetting.MountPoint = ""
 		diskPartitionSetting.ID = "boot"
 		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
@@ -125,8 +125,8 @@ func ParsePartitionFlags(partCmd string) (err error) {
 		// Create new partition and partitionsetting
 		partition := new(Partition)
 		partitionSetting := new(PartitionSetting)
- 		partitionSetting.MountIdentifier = MountIdentifierDefault
-		
+		partitionSetting.MountIdentifier = MountIdentifierDefault
+
 		partitionFlags := strings.Split(partCmd, " ")
 		for _, partitionFlag := range partitionFlags {
 			err := parseFlag(partitionFlag, partition, partitionSetting)
@@ -149,8 +149,8 @@ func parseFlag(partitionFlag string, diskPart *Partition, diskPartitionSetting *
 		index := strings.Index(partitionFlag, "=")
 		if index != -1 {
 			optionName := partitionFlag[len(optionStart):index]
-			optionVal := partitionFlag[(index+1):len(partitionFlag)]
-			
+			optionVal := partitionFlag[(index + 1):len(partitionFlag)]
+
 			err := processPartitionInfo(optionName, optionVal, diskPart, diskPartitionSetting)
 			if err != nil {
 				return err
@@ -169,13 +169,13 @@ func parseFlag(partitionFlag string, diskPart *Partition, diskPartitionSetting *
 			if err != nil {
 				return err
 			}
-		} 
+		}
 	}
 
 	return
 }
 
-// ParseKickStartPartitionScheme parses a kickstart-generated partition file and 
+// ParseKickStartPartitionScheme parses a kickstart-generated partition file and
 // construct the Disk and PartitionSetting information
 func ParseKickStartPartitionScheme(partitionFile string) (Retdisks []Disk, RetpartitionSettings []PartitionSetting, err error) {
 	file, err := os.Open(partitionFile)
@@ -192,7 +192,7 @@ func ParseKickStartPartitionScheme(partitionFile string) (Retdisks []Disk, Retpa
 		return
 	}
 
-	disks = append(disks, Disk{})	
+	disks = append(disks, Disk{})
 	scanner := bufio.NewScanner(file)
 
 	// Create a mapping between the disk path and the index of the disk in the

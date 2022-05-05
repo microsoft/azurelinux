@@ -18,7 +18,7 @@ import (
 // An "End" value of 0 will determine the size of the partition using the next
 // partition's start offset or the value defined by "MaxSize", if this is the last
 // partition on the disk.
-// "Grow" tells the logical volume to fill up any available space (**Only used for 
+// "Grow" tells the logical volume to fill up any available space (**Only used for
 // kickstart-style unattended installation**)
 type Partition struct {
 	FsType    string          `json:"FsType"`
@@ -28,7 +28,7 @@ type Partition struct {
 	Start     uint64          `json:"Start"`
 	Flags     []PartitionFlag `json:"Flags"`
 	Artifacts []Artifact      `json:"Artifacts"`
-	Grow	  bool
+	Grow      bool
 }
 
 // HasFlag returns true if a given partition has a specific flag set.

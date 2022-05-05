@@ -75,12 +75,12 @@ func main() {
 		err = installutils.RunPreInstallScripts(config.SystemConfigs[defaultSystemConfig])
 		logger.PanicOnError(err, "Failed to preinstall scripts")
 
-		disks, partitionSettings, err :=  configuration.ParseKickStartPartitionScheme(kickstartPartitionFile)
+		disks, partitionSettings, err := configuration.ParseKickStartPartitionScheme(kickstartPartitionFile)
 		logger.PanicOnError(err, "Failed to parse partition schema")
 
 		config.Disks = disks
 		config.SystemConfigs[defaultSystemConfig].PartitionSettings = partitionSettings
-		
+
 		err = config.IsValid()
 		if err != nil {
 			logger.PanicOnError(err, "Invalid image configuration: %s", err)

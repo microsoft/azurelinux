@@ -16,7 +16,7 @@ import (
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
 	IsDefault          bool               `json:"IsDefault"`
-	IsKickStartBoot	   bool				  `json:"IsKickStartBoot"`
+	IsKickStartBoot    bool               `json:"IsKickStartBoot"`
 	BootType           string             `json:"BootType"`
 	Hostname           string             `json:"Hostname"`
 	Name               string             `json:"Name"`

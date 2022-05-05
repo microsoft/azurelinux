@@ -63,7 +63,7 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 	if err != nil {
 		return
 	}
-	
+
 	err = validatePackages(config)
 	if err != nil {
 		return
