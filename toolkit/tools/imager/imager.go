@@ -70,23 +70,20 @@ func main() {
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
 
-	err = installutils.RunPreInstallScripts(config.SystemConfigs[defaultSystemConfig])
-	logger.PanicOnError(err, "Failed to preinstall scripts")
+	// Execute preinstall scripts and parse partitioning when performing kickstart installation
+	if config.SystemConfigs[defaultSystemConfig].IsKickStartBoot {
+		err = installutils.RunPreInstallScripts(config.SystemConfigs[defaultSystemConfig])
+		logger.PanicOnError(err, "Failed to preinstall scripts")
 
-	// For kickstart-style installation, partition scheme resides within /tmp/part-include, 
-	// instead of the image config json. Thus, check whether the parsed config contains any 
-	// disk information, if not, then parse /tmp/part-include and populate the config
-	noPartitionInConfig := len(config.Disks) == 0
-	notRootFs := config.SystemConfigs[defaultSystemConfig].Name == "ISO initrd"
-	if noPartitionInConfig && !notRootFs {
 		disks, partitionSettings, err :=  configuration.ParseKickStartPartitionScheme(kickstartPartitionFile)
 		logger.PanicOnError(err, "Failed to parse partition schema")
 
 		config.Disks = disks
 		config.SystemConfigs[defaultSystemConfig].PartitionSettings = partitionSettings
+		
 		err = config.IsValid()
 		if err != nil {
-			logger.PanicOnError(err, "Invalid image configuration")
+			logger.PanicOnError(err, "Invalid image configuration: %s", err)
 		}
 	}
 

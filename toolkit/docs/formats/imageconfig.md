@@ -85,6 +85,10 @@ SystemConfigs is an array of SystemConfig entries.
 
 SystemConfig defines how each system present on the image is supposed to be configured.
 
+### IsKickStartBoot
+
+IsKickStartBoot is a boolean that determines whether this is a kickstart-style installation. It will determine whether to perform kickstart-specific operations like executing preinstall scripts and parsing kickstart partitioning file.
+
 ### PartitionSettings
 
 PartitionSettings key is an array of PartitionSetting entries.
