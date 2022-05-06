@@ -425,9 +425,9 @@ xz-lang-5.2.4-3.cm1.x86_64.rpm
 xz-libs-5.2.4-3.cm1.x86_64.rpm
 zip-3.0-5.cm1.x86_64.rpm
 zip-debuginfo-3.0-5.cm1.x86_64.rpm
-zlib-1.2.11-3.cm1.x86_64.rpm
-zlib-debuginfo-1.2.11-3.cm1.x86_64.rpm
-zlib-devel-1.2.11-3.cm1.x86_64.rpm
+zlib-1.2.12-1.cm1.x86_64.rpm
+zlib-debuginfo-1.2.12-1.cm1.x86_64.rpm
+zlib-devel-1.2.12-1.cm1.x86_64.rpm
 zstd-1.4.9-1.cm1.x86_64.rpm
 zstd-debuginfo-1.4.9-1.cm1.x86_64.rpm
 zstd-devel-1.4.9-1.cm1.x86_64.rpm

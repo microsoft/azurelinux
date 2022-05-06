@@ -1,7 +1,7 @@
 Summary:        Compression and decompression routines
 Name:           zlib
-Version:        1.2.11
-Release:        3%{?dist}
+Version:        1.2.12
+Release:        1%{?dist}
 URL:            http://www.zlib.net/
 License:        zlib
 Group:          Applications/System
@@ -47,9 +47,10 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.11-3
-- Added %%license line automatically
-
+*   Wed May 04 2022 Nick Samson <nisamson@microsoft.com> - 1.2.12-1
+-   Upgraded to 1.2.12 to fix CVE-2018-25032
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.11-3
+-   Added %%license line automatically
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.11-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.11-1

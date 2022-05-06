@@ -8945,8 +8945,8 @@
         "type": "other",
         "other": {
           "name": "zlib",
-          "version": "1.2.11",
-          "downloadUrl": "http://www.zlib.net/zlib-1.2.11.tar.xz"
+          "version": "1.2.12",
+          "downloadUrl": "http://www.zlib.net/zlib-1.2.12.tar.xz"
         }
       }
     },
