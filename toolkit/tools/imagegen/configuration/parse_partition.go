@@ -18,19 +18,19 @@ import (
 const (
 	kickstartPartitionOnDisk  = "--ondisk"
 	kickstartPartitionOnDrive = "--ondrive"
-	kickstartPartitionSize	  = "--size"
+	kickstartPartitionSize    = "--size"
 	kickstartPartitionFsType  = "--fstype"
 	kickstartPartitionGrow    = "--grow"
 )
 
 var (
-	diskInfo           		map[string]int
-	curDiskIndex       		int
-	latestDiskIndex    		int
-	disks              		[]Disk
-	partitionSettings  		[]PartitionSetting
-	partCmdProcess 	   		map[string]func(string) error
-	newDiskPartition		*Partition
+	diskInfo                map[string]int
+	curDiskIndex            int
+	latestDiskIndex         int
+	disks                   []Disk
+	partitionSettings       []PartitionSetting
+	partCmdProcess          map[string]func(string) error
+	newDiskPartition        *Partition
 	newDiskPartitionSetting *PartitionSetting
 )
 
@@ -124,7 +124,7 @@ func processPartitionFsType(inputFsType string) (err error) {
 		newDiskPartition.FsType = "fat32"
 	} else if fstype == "swap" {
 		newDiskPartition.FsType = "linux-swap"
-		
+
 		// swap partition does not have a mount point
 		newDiskPartitionSetting.MountPoint = ""
 	} else {
@@ -192,7 +192,7 @@ func parseFlag(partitionFlag string) (err error) {
 		if index != -1 {
 			optionName := partitionFlag[0:index]
 			optionVal := partitionFlag[(index + 1):len(partitionFlag)]
-			
+
 			err := partCmdProcess[optionName](optionVal)
 			if err != nil {
 				return err

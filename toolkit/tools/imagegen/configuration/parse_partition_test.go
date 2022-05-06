@@ -12,8 +12,8 @@ import (
 var (
 	InvalidOnDiskPartitionCommand = "part / --fstype=ext4 --size=800 --ondisk="
 	InvalidFstypePartitionCommand = "part / --fstype=     --size=800 --ondisk=/dev/sda"
-	InvalidSizePartitionCommand = "part / --fstype=ext4 --size=abcd --ondisk=/dev/sda"
-	
+	InvalidSizePartitionCommand   = "part / --fstype=ext4 --size=abcd --ondisk=/dev/sda"
+
 	ValidPartitionCommand1 = "part / --fstype=ext4 --size=800 --ondisk=/dev/sda"
 	ValidPartitionCommand2 = "part biosboot --fstype=biosboot --size=8 --ondisk=/dev/sda"
 
@@ -25,9 +25,9 @@ var (
 		},
 		Partitions: []Partition{
 			{
-				ID:		"rootfs",
-				Start:	1,
-				End:	801,
+				ID:     "rootfs",
+				Start:  1,
+				End:    801,
 				FsType: "ext4",
 			},
 		},
@@ -41,7 +41,7 @@ var (
 		},
 		Partitions: []Partition{
 			{
-				ID:     "boot",
+				ID: "boot",
 				Flags: []PartitionFlag{
 					"bios_grub",
 				},
@@ -50,9 +50,9 @@ var (
 				FsType: "fat32",
 			},
 			{
-				ID:		"rootfs",
-				Start:	9,
-				End:	809,
+				ID:     "rootfs",
+				Start:  9,
+				End:    809,
 				FsType: "ext4",
 			},
 		},
@@ -74,7 +74,7 @@ var (
 
 func TestShouldFailParsingInvalidOnDiskPartitionCommand(t *testing.T) {
 	initializePrerequisitesForParser()
-	
+
 	err := parsePartitionFlags(InvalidOnDiskPartitionCommand)
 	assert.Error(t, err)
 	assert.Equal(t, "--ondisk/--ondrive must not be empty", err.Error())
@@ -82,7 +82,7 @@ func TestShouldFailParsingInvalidOnDiskPartitionCommand(t *testing.T) {
 
 func TestShouldFailParsingInvalidFstypePartitionCommand(t *testing.T) {
 	initializePrerequisitesForParser()
-	
+
 	err := parsePartitionFlags(InvalidFstypePartitionCommand)
 	assert.Error(t, err)
 	assert.Equal(t, "--fstype must not be empty", err.Error())
@@ -90,7 +90,7 @@ func TestShouldFailParsingInvalidFstypePartitionCommand(t *testing.T) {
 
 func TestShouldFailParsingInvalidSizePartitionCommand(t *testing.T) {
 	initializePrerequisitesForParser()
-	
+
 	err := parsePartitionFlags(InvalidSizePartitionCommand)
 	assert.Error(t, err)
 	assert.Equal(t, "strconv.ParseUint: parsing \"abcd\": invalid syntax", err.Error())
@@ -101,7 +101,7 @@ func TestShouldSucceedParsingOneValidPartitionCommand(t *testing.T) {
 
 	err := parsePartitionFlags(ValidPartitionCommand1)
 	assert.NoError(t, err)
-	
+
 	assert.Equal(t, validTestParserDisk_OnePartition, disks[0])
 	assert.Equal(t, 1, len(disks))
 
@@ -116,7 +116,7 @@ func TestShouldSucceedParsingTwoValidPartitionCommands(t *testing.T) {
 	assert.NoError(t, err)
 	err = parsePartitionFlags(ValidPartitionCommand1)
 	assert.NoError(t, err)
-	
+
 	assert.Equal(t, validTestParserDisk_TwoPartitions, disks[0])
 	assert.Equal(t, 1, len(disks))
 
