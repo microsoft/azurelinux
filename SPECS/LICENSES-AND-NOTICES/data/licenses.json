@@ -647,7 +647,6 @@
                 "libpinyin",
                 "libplist",
                 "libpmemobj-cpp",
-                "libpq",
                 "libproxy",
                 "libpsm2",
                 "libpwquality",

@@ -958,7 +958,7 @@ make install
 #mv -v /usr/lib/libprocps.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libprocps.so) /usr/lib/libprocps.so
 popd
-rm -rf procps-ng-3.3.17
+rm -rf procps-3.3.17
 touch /logs/status_procpsng_complete
 
 echo util-linux-2.37.2

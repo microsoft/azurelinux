@@ -9300,16 +9300,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libpq",
-          "version": "12.2",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libproxy",
           "version": "0.4.17",
           "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
@@ -20204,8 +20194,8 @@
         "type": "other",
         "other": {
           "name": "python-google-auth",
-          "version": "1.20.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-1.20.1.tar.gz"
+          "version": "2.6.6",
+          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.6.6.tar.gz"
         }
       }
     },
