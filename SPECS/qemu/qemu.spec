@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -2275,6 +2275,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Fri May 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-2
+- Remove multiboot_dma.bin from aarch64 builds
+
 * Wed Apr 20 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-1
 - Updated to match Fedora 36 (license: MIT)
 - Patched CVE-2022-0358, CVE-2021-20225, CVE-2022-1050
