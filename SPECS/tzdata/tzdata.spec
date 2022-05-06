@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2021a
+Version:        2022a
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Fri May 06 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022a-1
+- Update to version  "2022a".
+
 * Mon Apr 05 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2021a-1
 - Update to version  "2021a".
 - Removed 'pacificnew' and 'systemv' from parsed zone info, since they have been removed from the sources.
