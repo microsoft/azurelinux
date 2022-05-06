@@ -565,8 +565,6 @@ util-linux-libs-2.37.2-5.cm2.x86_64.rpm
 util-linux-debuginfo-2.37.2-5.cm2.x86_64.rpm
 util-linux-devel-2.37.2-5.cm2.x86_64.rpm
 util-linux-lang-2.37.2-5.cm2.x86_64.rpm
-wget-1.21.2-1.cm2.x86_64.rpm
-wget-debuginfo-1.21.2-1.cm2.x86_64.rpm
 which-2.21-8.cm2.x86_64.rpm
 which-debuginfo-2.21-8.cm2.x86_64.rpm
 xz-5.2.5-1.cm2.x86_64.rpm
