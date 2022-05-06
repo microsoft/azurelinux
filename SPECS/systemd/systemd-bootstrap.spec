@@ -228,7 +228,7 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
-* Wed May 4 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-4
+* Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-4
 - Change build mode from "development" (default) to "release"
 
 * Wed Apr 13 2022 Cameron Baird <cameronbaird@microsoft.com> - 250.3-3
