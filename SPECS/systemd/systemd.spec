@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -101,7 +101,7 @@ meson  --prefix %{_prefix}                                            \
        --sysconfdir %{_sysconfdir}                                    \
        --localstatedir %{_var}                                        \
        -Dblkid=true                                                   \
-       -Dbuildtype=release                                            \
+       -Dmode=release                                                 \
        -Ddefault-dnssec=no                                            \
        -Dfirstboot=false                                              \
        -Dinstall-tests=false                                          \
@@ -258,6 +258,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-6
+- Change build mode from "development" (default) to "release"
+
 * Mon May 02 2022 Sriram Nambakam <snambakam@microsoft.com> - 250.3-5
 - Change Requires(post) to depend on util-linux-libs
 
