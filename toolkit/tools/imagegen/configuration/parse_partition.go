@@ -15,36 +15,89 @@ import (
 	"microsoft.com/pkggen/internal/logger"
 )
 
-var (
-	diskInfo          map[string]int
-	curDiskIndex      int
-	latestDiskIndex   int
-	disks             []Disk
-	partitionSettings []PartitionSetting
+const (
+	kickstartPartitionOnDisk  = "--ondisk"
+	kickstartPartitionOnDrive = "--ondrive"
+	kickstartPartitionSize	  = "--size"
+	kickstartPartitionFsType  = "--fstype"
+	kickstartPartitionGrow    = "--grow"
 )
 
-func updateNewDisk(diskValue string) {
-	// Don't create new disk if processing on the initial placeholder disk
-	if len(disks) != 1 || len(diskInfo) != 0 {
-		disks = append(disks, Disk{})
-	}
+var (
+	diskInfo           		map[string]int
+	curDiskIndex       		int
+	latestDiskIndex    		int
+	disks              		[]Disk
+	partitionSettings  		[]PartitionSetting
+	partCmdProcess 	   		map[string]func(string) error
+	newDiskPartition		*Partition
+	newDiskPartitionSetting *PartitionSetting
+)
 
-	disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+func initializePrerequisitesForParser() {
+	// Create a mapping between the disk path and the index of the disk in the
+	// Disk array so that when we parse through the partition commands, we can
+	// determine which disk the parition instruction is targeted
+	diskInfo = make(map[string]int)
 
-	// Set TargetDisk and TargetDiskType for unattended installation
-	disks[latestDiskIndex].TargetDisk.Type = "path"
-	disks[latestDiskIndex].TargetDisk.Value = diskValue
+	// Intialize a placeholder disk for the parser to populate the first partition
+	disks = []Disk{Disk{}}
+	partitionSettings = []PartitionSetting{}
+	curDiskIndex = 0
+	latestDiskIndex = 0
 
-	diskInfo[diskValue] = latestDiskIndex
-	curDiskIndex = latestDiskIndex
-	latestDiskIndex++
+	// Create a mapping of partition flags and corresponding processing functions
+	populatepartCmdProcessMap()
 }
 
-func calculatePartitionSize(partSize string, diskPart *Partition) (err error) {
-	if len(disks[curDiskIndex].Partitions) == 0 {
-		diskPart.Start = 1
+func populatepartCmdProcessMap() {
+	partCmdProcess = make(map[string]func(string) error)
+
+	// Currently only process "ondisk", "ondrive", "size" and "fstype"
+	// Expand this map if supporting more commands in the future
+	partCmdProcess[kickstartPartitionOnDisk] = processDisk
+	partCmdProcess[kickstartPartitionOnDrive] = processDisk
+	partCmdProcess[kickstartPartitionSize] = processPartitionSize
+	partCmdProcess[kickstartPartitionFsType] = processPartitionFsType
+}
+
+func processDisk(InputDiskValue string) (err error) {
+	diskValue := strings.TrimSpace(InputDiskValue)
+	if diskValue == "" {
+		return fmt.Errorf("--ondisk/--ondrive must not be empty")
+	}
+
+	// Check whether this disk has already been parsed or not
+	curIdx, ok := diskInfo[diskValue]
+	if ok {
+		curDiskIndex = curIdx
 	} else {
-		diskPart.Start = disks[curDiskIndex].Partitions[len(disks[curDiskIndex].Partitions)-1].End
+		// Don't create new disk if processing on the initial placeholder disk
+		if len(disks) != 1 || len(diskInfo) != 0 {
+			disks = append(disks, Disk{})
+		}
+
+		disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+
+		// Set TargetDisk and TargetDiskType for unattended installation
+		disks[latestDiskIndex].TargetDisk.Type = "path"
+		disks[latestDiskIndex].TargetDisk.Value = diskValue
+
+		diskInfo[diskValue] = latestDiskIndex
+		curDiskIndex = latestDiskIndex
+		latestDiskIndex++
+	}
+
+	return
+}
+
+func processPartitionSize(InputPartSize string) (err error) {
+	partSize := strings.TrimSpace(InputPartSize)
+
+	if len(disks[curDiskIndex].Partitions) == 0 {
+		newDiskPartition.Start = 1
+	} else {
+		newDiskPartition.Start = disks[curDiskIndex].Partitions[len(disks[curDiskIndex].Partitions)-1].End
 	}
 
 	partitionSize, err := strconv.ParseUint(partSize, 10, 64)
@@ -52,63 +105,54 @@ func calculatePartitionSize(partSize string, diskPart *Partition) (err error) {
 		return err
 	}
 
-	if !diskPart.Grow {
-		diskPart.End = diskPart.Start + partitionSize
+	if !newDiskPartition.Grow {
+		newDiskPartition.End = newDiskPartition.Start + partitionSize
 	}
 
 	return
 }
 
-func processPartitionInfo(option, value string, diskPart *Partition, diskPartitionSetting *PartitionSetting) (err error) {
-	// Check --ondisk flag
-	if option == "ondisk" {
-		// Check whether this disk has already been parsed or not
-		curIdx, ok := diskInfo[value]
-		if ok {
-			curDiskIndex = curIdx
-		} else {
-			updateNewDisk(value)
-		}
+func processPartitionFsType(inputFsType string) (err error) {
+	fstype := strings.TrimSpace(inputFsType)
+	if fstype == "" {
+		return fmt.Errorf("--fstype must not be empty")
 	}
 
-	// Check --fstype flag
-	if option == "fstype" {
-		if value == "biosboot" {
-			diskPart.FsType = "fat32"
-		} else if value == "swap" {
-			diskPart.FsType = "linux-swap"
-			// swap partition does not have a mount point
-			diskPartitionSetting.MountPoint = ""
-		} else {
-			diskPart.FsType = value
-		}
-	}
-
-	// Check --size flag
-	if option == "size" {
-		err := calculatePartitionSize(value, diskPart)
-		if err != nil {
-			return err
-		}
+	if fstype == "" {
+		return fmt.Errorf("fstype cannnot be empty")
+	} else if fstype == "biosboot" {
+		newDiskPartition.FsType = "fat32"
+	} else if fstype == "swap" {
+		newDiskPartition.FsType = "linux-swap"
+		
+		// swap partition does not have a mount point
+		newDiskPartitionSetting.MountPoint = ""
+	} else {
+		newDiskPartition.FsType = fstype
 	}
 
 	return
 }
 
-func processMountPoint(mountPoint string, diskPart *Partition, diskPartitionSetting *PartitionSetting) (err error) {
-	diskPartitionSetting.MountPoint = mountPoint
+func processMountPoint(InputMountPoint string) (err error) {
+	mountPoint := strings.TrimSpace(InputMountPoint)
+	if mountPoint == "" {
+		return fmt.Errorf("Mount Point must not be empty")
+	}
+
+	newDiskPartitionSetting.MountPoint = mountPoint
 	if mountPoint == "biosboot" {
-		diskPart.ID = "boot"
-		diskPart.Flags = append(diskPart.Flags, PartitionFlagBiosGrub)
-		diskPartitionSetting.MountPoint = ""
-		diskPartitionSetting.ID = "boot"
+		newDiskPartition.ID = "boot"
+		newDiskPartition.Flags = append(newDiskPartition.Flags, PartitionFlagBiosGrub)
+		newDiskPartitionSetting.MountPoint = ""
+		newDiskPartitionSetting.ID = "boot"
 		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
 	} else if mountPoint == "/" {
-		diskPartitionSetting.ID = "rootfs"
-		diskPart.ID = "rootfs"
-	} else if strings.Contains(mountPoint, "/") || mountPoint == "swap" {
-		diskPartitionSetting.ID = mountPoint
-		diskPart.ID = mountPoint
+		newDiskPartitionSetting.ID = "rootfs"
+		newDiskPartition.ID = "rootfs"
+	} else if strings.HasPrefix(mountPoint, "/") || mountPoint == "swap" {
+		newDiskPartitionSetting.ID = mountPoint
+		newDiskPartition.ID = mountPoint
 	} else {
 		// Other types of mount points are currently not supported
 		err := fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
@@ -118,54 +162,52 @@ func processMountPoint(mountPoint string, diskPart *Partition, diskPartitionSett
 	return
 }
 
-// ParsePartitionFlags parses the kickstart syntax of a kickstart-generated partition file
-func ParsePartitionFlags(partCmd string) (err error) {
+func parsePartitionFlags(partCmd string) (err error) {
 	// Only need to parse commands that contains --ondisk options
-	if strings.Contains(partCmd, "--ondisk") {
+	if strings.Contains(partCmd, kickstartPartitionOnDisk) || strings.Contains(partCmd, kickstartPartitionOnDrive) {
 		// Create new partition and partitionsetting
-		partition := new(Partition)
-		partitionSetting := new(PartitionSetting)
-		partitionSetting.MountIdentifier = MountIdentifierDefault
+		newDiskPartition = new(Partition)
+		newDiskPartitionSetting = new(PartitionSetting)
+		newDiskPartitionSetting.MountIdentifier = MountIdentifierDefault
 
 		partitionFlags := strings.Split(partCmd, " ")
 		for _, partitionFlag := range partitionFlags {
-			err := parseFlag(partitionFlag, partition, partitionSetting)
+			err := parseFlag(partitionFlag)
 			if err != nil {
 				return err
 			}
 		}
 
-		disks[curDiskIndex].Partitions = append(disks[curDiskIndex].Partitions, *partition)
-		partitionSettings = append(partitionSettings, *partitionSetting)
+		disks[curDiskIndex].Partitions = append(disks[curDiskIndex].Partitions, *newDiskPartition)
+		partitionSettings = append(partitionSettings, *newDiskPartitionSetting)
 	}
 
 	return
 }
 
-func parseFlag(partitionFlag string, diskPart *Partition, diskPartitionSetting *PartitionSetting) (err error) {
-	const optionStart = "--"
-	if strings.HasPrefix(partitionFlag, optionStart) {
+func parseFlag(partitionFlag string) (err error) {
+	if strings.HasPrefix(partitionFlag, "--") {
 		// Find the index of "="
 		index := strings.Index(partitionFlag, "=")
 		if index != -1 {
-			optionName := partitionFlag[len(optionStart):index]
+			optionName := partitionFlag[0:index]
 			optionVal := partitionFlag[(index + 1):len(partitionFlag)]
-
-			err := processPartitionInfo(optionName, optionVal, diskPart, diskPartitionSetting)
+			
+			err := partCmdProcess[optionName](optionVal)
 			if err != nil {
 				return err
 			}
 		} else {
 			// Check grow flag
-			if partitionFlag == "--grow" {
-				diskPart.Grow = true
-				diskPart.End = 0
+			if partitionFlag == kickstartPartitionGrow {
+				newDiskPartition.Grow = true
+				newDiskPartition.End = 0
 			}
 		}
 	} else {
 		// Update mount point
 		if partitionFlag != "part" {
-			err := processMountPoint(partitionFlag, diskPart, diskPartitionSetting)
+			err := processMountPoint(partitionFlag)
 			if err != nil {
 				return err
 			}
@@ -192,17 +234,10 @@ func ParseKickStartPartitionScheme(partitionFile string) (Retdisks []Disk, Retpa
 		return
 	}
 
-	disks = append(disks, Disk{})
 	scanner := bufio.NewScanner(file)
-
-	// Create a mapping between the disk path and the index of the disk in the
-	// Disk array so that when we parse through the partition commands, we can
-	// determine which disk the parition instruction is targeted
-	diskInfo = make(map[string]int)
-
 	for scanner.Scan() {
 		parseCmd := scanner.Text()
-		err = ParsePartitionFlags(parseCmd)
+		err = parsePartitionFlags(parseCmd)
 		if err != nil {
 			return
 		}

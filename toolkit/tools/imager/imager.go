@@ -70,25 +70,25 @@ func main() {
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
 
+	// Currently only process 1 system config
+	systemConfig := config.SystemConfigs[defaultSystemConfig]
+
 	// Execute preinstall scripts and parse partitioning when performing kickstart installation
-	if config.SystemConfigs[defaultSystemConfig].IsKickStartBoot {
-		err = installutils.RunPreInstallScripts(config.SystemConfigs[defaultSystemConfig])
+	if systemConfig.IsKickStartBoot {
+		err = installutils.RunPreInstallScripts(systemConfig)
 		logger.PanicOnError(err, "Failed to preinstall scripts")
 
 		disks, partitionSettings, err := configuration.ParseKickStartPartitionScheme(kickstartPartitionFile)
 		logger.PanicOnError(err, "Failed to parse partition schema")
 
 		config.Disks = disks
-		config.SystemConfigs[defaultSystemConfig].PartitionSettings = partitionSettings
+		systemConfig.PartitionSettings = partitionSettings
 
 		err = config.IsValid()
 		if err != nil {
 			logger.PanicOnError(err, "Invalid image configuration: %s", err)
 		}
 	}
-
-	// Currently only process 1 system config
-	systemConfig := config.SystemConfigs[defaultSystemConfig]
 
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
 	logger.PanicOnError(err, "Failed to build system configuration")
