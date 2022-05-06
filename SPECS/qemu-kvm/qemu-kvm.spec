@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,9 @@ Patch39:        CVE-2021-3545.patch
 Patch40:        CVE-2021-3930.patch
 Patch41:        CVE-2021-3607.patch
 Patch42:        CVE-2021-3608.patch
+Patch43:        CVE-2021-20257.patch
+Patch44:        CVE-2021-3748.patch
+Patch45:        CVE-2021-3638.patch
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
@@ -73,6 +76,11 @@ Patch1004:      CVE-2020-35506.nopatch
 Patch1005:      CVE-2021-4145.nopatch
 # CVE-2021-3947 is a stack-buffer-overflow in the NVME component. The current version (v4.2.0) does not ship it.
 Patch1006:      CVE-2021-3947.nopatch
+# CVE-2022-1050 only affects installations of QEMU with RDMA support. We don't have that enabled.
+Patch1007:      CVE-2022-1050.nopatch
+# CVE-2021-20295 only affects RedHat's particular release of QEMU
+Patch1008:      CVE-2021-20295.nopatch
+
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -198,6 +206,10 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Fri May 06 2022 Nick Samson <nisamson@microsoft.com> - 4.2.0-39
+- Patch CVE-2021-20257, CVE-2021-3638, CVE-2021-3748
+- Nopatch CVE-2022-1050, CVE-2021-20295
+
 * Wed Mar 16 2022 Muhammad Falak <mwani@microsoft.com> - 4.2.0-38
 - Patch CVE-2021-3607 & CVE-2021-3930
 - Backport patch to address CVE-2021-3608
