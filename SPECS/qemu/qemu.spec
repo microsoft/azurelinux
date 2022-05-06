@@ -1717,6 +1717,7 @@ rm -rf %{buildroot}%{_mandir}/man1/qemu-system-x86_64.1*
 rm -rf %{buildroot}%{_datadir}/%{name}/kvmvapic.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/linuxboot.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/multiboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/multiboot_dma.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/pvh.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/qboot.rom
 %endif
