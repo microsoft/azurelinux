@@ -4,9 +4,10 @@
 package schedulerutils
 
 import (
+	"encoding/csv"
+	"os"
 	"path/filepath"
 	"sync"
-    "os"
 
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkggraph"
@@ -51,21 +52,21 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	unbuiltSRPMs := make(map[string]*pkggraph.PkgNode)
 	unresolvedDependencies := make(map[string]bool)
 
-    buildNodes := pkgGraph.AllBuildNodes()
-    for _, node := range buildNodes {
-        if buildState.IsNodeCached(node) {
-            prebuiltSRPMs[node.SrpmPath] = node
-            continue
-        } else if buildState.IsNodeAvailable(node) {
-            builtSRPMs[node.SrpmPath] = node
-            continue
-        }
+	buildNodes := pkgGraph.AllBuildNodes()
+	for _, node := range buildNodes {
+		if buildState.IsNodeCached(node) {
+			prebuiltSRPMs[node.SrpmPath] = node
+			continue
+		} else if buildState.IsNodeAvailable(node) {
+			builtSRPMs[node.SrpmPath] = node
+			continue
+		}
 
 		_, found := failedSRPMs[node.SrpmPath]
 		if !found {
-            unbuiltSRPMs[node.SrpmPath] = node
-        }
-    }
+			unbuiltSRPMs[node.SrpmPath] = node
+		}
+	}
 
 	for _, node := range pkgGraph.AllRunNodes() {
 		if node.State == pkggraph.StateUnresolved {
@@ -73,58 +74,67 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 		}
 	}
 
-    csv_string := "Package,State,Blocker"
+	csvBlob := [][]string{{"Package", "State", "Blocker"}}
 
 	for srpm := range builtSRPMs {
-        csv_string += "\n" + filepath.Base(builtSRPMs[srpm].SrpmPath) + ",Built,,,"
+		csvBlob = append(csvBlob, []string{filepath.Base(builtSRPMs[srpm].SrpmPath), "Built"})
 	}
 
 	for srpm := range prebuiltSRPMs {
-        csv_string += "\n" + filepath.Base(prebuiltSRPMs[srpm].SrpmPath) + ",PreBuilt,,,"
+		csvBlob = append(csvBlob, []string{filepath.Base(prebuiltSRPMs[srpm].SrpmPath), "PreBuilt"})
 	}
 
 	for srpm := range failedSRPMs {
-        node := failedSRPMs[srpm]
-        csv_string += "\n" + filepath.Base(node.SrpmPath) + ",Failed,"
+		node := failedSRPMs[srpm]
+		csvRow := []string{filepath.Base(node.SrpmPath), "Failed"}
 
-        // Failed nodes shouldn't have any blockers
-        blocking_nodes_str := ""
-	    fromNodes := pkgGraph.From(node.ID())
-	    for fromNodes.Next() {
-		    fromNode := fromNodes.Node().(*pkggraph.PkgNode)
-            if _, found := failedSRPMs[fromNode.SrpmPath]; found {
-                blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-FAIL "
-            }
-            if _, found := unbuiltSRPMs[fromNode.SrpmPath]; found {
-                blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
-            }
-        }
+		// Failed nodes shouldn't have any blockers
+		blocking_nodes_str := ""
+		fromNodes := pkgGraph.From(node.ID())
+		for fromNodes.Next() {
+			fromNode := fromNodes.Node().(*pkggraph.PkgNode)
+			if _, found := failedSRPMs[fromNode.SrpmPath]; found {
+				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-FAIL "
+			}
+			if _, found := unbuiltSRPMs[fromNode.SrpmPath]; found {
+				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
+			}
+		}
 
-        csv_string += blocking_nodes_str
+		csvRow = append(csvRow, blocking_nodes_str)
+		csvBlob = append(csvBlob, csvRow)
 	}
 
 	for srpm := range unbuiltSRPMs {
-        node := unbuiltSRPMs[srpm]
-        csv_string += "\n" + filepath.Base(node.SrpmPath) + ",Unbuilt,"
+		node := unbuiltSRPMs[srpm]
+		csvRow := []string{filepath.Base(node.SrpmPath), "Unbuilt"}
 
-        blocking_nodes_str := ""
-	    fromNodes := pkgGraph.From(node.ID())
-	    for fromNodes.Next() {
-		    fromNode := fromNodes.Node().(*pkggraph.PkgNode)
-            if _, found := failedSRPMs[fromNode.SrpmPath]; found {
-                blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-FAIL "
-            }
-            if _, found := unbuiltSRPMs[fromNode.SrpmPath]; found {
-                blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
-            }
-        }
+		blocking_nodes_str := ""
+		fromNodes := pkgGraph.From(node.ID())
+		for fromNodes.Next() {
+			fromNode := fromNodes.Node().(*pkggraph.PkgNode)
+			if _, found := failedSRPMs[fromNode.SrpmPath]; found {
+				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-FAIL "
+			}
+			if _, found := unbuiltSRPMs[fromNode.SrpmPath]; found {
+				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
+			}
+		}
 
-        csv_string += blocking_nodes_str
+		csvRow = append(csvRow, blocking_nodes_str)
+		csvBlob = append(csvBlob, csvRow)
 	}
 
-    f, _ := os.Create(outputPath)
-    defer f.Close()
-    f.WriteString(csv_string)
+	csvFile, err := os.Create(outputPath)
+    if err != nil {
+        logger.Log.Warnf("Unable to create %s file. Error: %s", outputPath, err)
+        return
+    }
+
+	csvWriter := csv.NewWriter(csvFile)
+    csvWriter.WriteAll(csvBlob)
+
+	csvFile.Close()
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.

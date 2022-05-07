@@ -175,7 +175,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
-		--output-csv-file="$(output_csv_file)" \
+		--output-build-state-csv-file="$(output_csv_file)" \
 		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
 		--work-dir="$(CHROOT_DIR)" \
 		--worker-tar="$(chroot_worker)" \
