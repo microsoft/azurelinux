@@ -22,8 +22,6 @@ URL:            https://github.com/microsoft/go
 Source0:        https://github.com/microsoft/go/releases/download/v1.18.1-1-fips/go.20220414.3.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-Obsoletes:      %{name} < %{version}
-Provides:       %{name} = %{version}
 Conflicts:      go
 Conflicts:      golang
 
