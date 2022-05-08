@@ -6,7 +6,7 @@ package formats
 import (
 	"fmt"
 
-	"microsoft.com/pkggen/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 )
 
 // RdiffType represents the rdiff file system format

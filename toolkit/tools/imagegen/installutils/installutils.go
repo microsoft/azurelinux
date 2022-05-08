@@ -15,16 +15,16 @@ import (
 	"syscall"
 	"time"
 
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkgjson"
-	"microsoft.com/pkggen/internal/randomization"
-	"microsoft.com/pkggen/internal/retry"
-	"microsoft.com/pkggen/internal/safechroot"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (

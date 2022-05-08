@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
-	"microsoft.com/pkggen/internal/pkgjson"
 )
 
 var (

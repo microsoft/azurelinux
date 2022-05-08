@@ -7,16 +7,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/installutils"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/packagerepo/repocloner"
-	"microsoft.com/pkggen/internal/packagerepo/repocloner/rpmrepocloner"
-	"microsoft.com/pkggen/internal/packagerepo/repoutils"
-	"microsoft.com/pkggen/internal/pkggraph"
-	"microsoft.com/pkggen/internal/pkgjson"
 )
 
 var (
