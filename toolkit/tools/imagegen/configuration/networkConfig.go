@@ -134,17 +134,22 @@ func (n *Network) DeviceIsValid() (err error) {
 }
 
 func getSupportedNetworkDeviceList(nm gonetworkmanager.NetworkManager) (available_devices map[string]gonetworkmanager.Device, err error) {
+	var (
+		all_devices []gonetworkmanager.Device
+		device_name string
+	)
+	
 	available_devices = make(map[string]gonetworkmanager.Device)
 
-	all_devices, err := nm.GetDevices()
+	all_devices, err = nm.GetDevices()
 	if err != nil {
 		return
 	}
 
 	for _, network_device := range all_devices {
-		device_name, err := network_device.GetInterface()
+		device_name, err = network_device.GetInterface()
 		if err != nil {
-			return err
+			return
 		}
 
 		available_devices[device_name] = network_device
@@ -154,7 +159,52 @@ func getSupportedNetworkDeviceList(nm gonetworkmanager.NetworkManager) (availabl
 }
 
 func findDeviceNameFromHwAddr(nm gonetworkmanager.NetworkManager, hwAddr string) (deviceName string, err error) {
+	var (
+		activeConnections []gonetworkmanager.ActiveConnection
+		devices []gonetworkmanager.Device
+		deviceType gonetworkmanager.NmDeviceType
+		accessPoint gonetworkmanager.AccessPoint
+		address string
+	)
 	
+	activeConnections, err = nm.GetActiveConnections()
+	if err != nil {
+		return
+	}
+
+	for _, activeConnection := range activeConnections {
+		devices, err = activeConnection.GetDevices()
+		if err != nil {
+			return
+		}
+
+		for _, device := range devices {
+			deviceType, err = device.GetDeviceType()
+			if err != nil {
+				return
+			}
+
+			if deviceType == gonetworkmanager.NmDeviceTypeEthernet || deviceType == gonetworkmanager.NmDeviceTypeWifi {
+				accessPoint, err = activeConnection.GetSpecificObject()
+				if err != nil {
+					return
+				}
+
+				address, err = accessPoint.GetHWAddress()
+				if err != nil {
+					return
+				}
+
+				if address != "" && strings.ToUpper(address) == strings.ToUpper(hwAddr) {
+					deviceName, err = device.GetInterface()
+					return
+				}
+
+			}
+		}
+	}
+
+	return
 }
 
 func getDeviceNameFromNetworkData(network_data Network,nm gonetworkmanager.NetworkManager, supported_devices map[string]gonetworkmanager.Device) (deviceName string, err error) {
@@ -169,9 +219,18 @@ func getDeviceNameFromNetworkData(network_data Network,nm gonetworkmanager.Netwo
 		}
 	} else if strings.Contains(network_data.Device, ":") {
 		// Device setting by MAC address
-
+		deviceName, err = findDeviceNameFromHwAddr(nm, network_data.Device)
+	} else if strings.Contains(network_data.Device, "bootif") {
+		// ------- TODO: Where to bootif value
 	}
 
+	if deviceName != "" {
+		_, ok := supported_devices[deviceName]
+		if !ok {
+			logger.Log.Infof("device found (%s) is not supported", deviceName)
+			deviceName = ""
+		}
+	}
 
 	return
 }
