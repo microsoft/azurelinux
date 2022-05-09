@@ -1,7 +1,7 @@
 // Copyright Microsoft Corporation.
 // Licensed under the MIT License.
 
-package main
+package isomaker
 
 import (
 	"fmt"
