@@ -21,13 +21,13 @@ const (
 	kickstartPartitionSize    = "--size"
 	kickstartPartitionFsType  = "--fstype"
 	kickstartPartitionGrow    = "--grow"
-	biosbootPartition		  = "biosboot"
-	bootPartitionId			  = "boot"
-	rootfsPartitionId		  = "rootfs"
+	biosbootPartition         = "biosboot"
+	bootPartitionId           = "boot"
+	rootfsPartitionId         = "rootfs"
 
-	onDiskInputErrorMsg		  = "--ondisk/--ondrive must not be empty"
-	fsTypeInputErrorMsg       = "--fstype must not be empty"
-	mountPointErrorMsg        = "Mount Point must not be empty"
+	onDiskInputErrorMsg = "--ondisk/--ondrive must not be empty"
+	fsTypeInputErrorMsg = "--fstype must not be empty"
+	mountPointErrorMsg  = "Mount Point must not be empty"
 )
 
 var (
