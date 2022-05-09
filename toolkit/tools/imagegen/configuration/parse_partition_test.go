@@ -77,7 +77,7 @@ func TestShouldFailParsingInvalidOnDiskPartitionCommand(t *testing.T) {
 
 	err := parsePartitionFlags(InvalidOnDiskPartitionCommand)
 	assert.Error(t, err)
-	assert.Equal(t, "--ondisk/--ondrive must not be empty", err.Error())
+	assert.Equal(t, onDiskInputErrorMsg, err.Error())
 }
 
 func TestShouldFailParsingInvalidFstypePartitionCommand(t *testing.T) {
@@ -85,7 +85,7 @@ func TestShouldFailParsingInvalidFstypePartitionCommand(t *testing.T) {
 
 	err := parsePartitionFlags(InvalidFstypePartitionCommand)
 	assert.Error(t, err)
-	assert.Equal(t, "--fstype must not be empty", err.Error())
+	assert.Equal(t, fsTypeInputErrorMsg, err.Error())
 }
 
 func TestShouldFailParsingInvalidSizePartitionCommand(t *testing.T) {

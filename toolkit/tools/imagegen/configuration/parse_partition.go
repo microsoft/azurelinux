@@ -21,6 +21,13 @@ const (
 	kickstartPartitionSize    = "--size"
 	kickstartPartitionFsType  = "--fstype"
 	kickstartPartitionGrow    = "--grow"
+	biosbootPartition		  = "biosboot"
+	bootPartitionId			  = "boot"
+	rootfsPartitionId		  = "rootfs"
+
+	onDiskInputErrorMsg		  = "--ondisk/--ondrive must not be empty"
+	fsTypeInputErrorMsg       = "--fstype must not be empty"
+	mountPointErrorMsg        = "Mount Point must not be empty"
 )
 
 var (
@@ -61,10 +68,10 @@ func populatepartCmdProcessMap() {
 	partCmdProcess[kickstartPartitionFsType] = processPartitionFsType
 }
 
-func processDisk(InputDiskValue string) (err error) {
-	diskValue := strings.TrimSpace(InputDiskValue)
+func processDisk(inputDiskValue string) (err error) {
+	diskValue := strings.TrimSpace(inputDiskValue)
 	if diskValue == "" {
-		return fmt.Errorf("--ondisk/--ondrive must not be empty")
+		return fmt.Errorf(onDiskInputErrorMsg)
 	}
 
 	// Check whether this disk has already been parsed or not
@@ -91,8 +98,8 @@ func processDisk(InputDiskValue string) (err error) {
 	return
 }
 
-func processPartitionSize(InputPartSize string) (err error) {
-	partSize := strings.TrimSpace(InputPartSize)
+func processPartitionSize(inputPartSize string) (err error) {
+	partSize := strings.TrimSpace(inputPartSize)
 
 	if len(disks[curDiskIndex].Partitions) == 0 {
 		newDiskPartition.Start = 1
@@ -115,12 +122,8 @@ func processPartitionSize(InputPartSize string) (err error) {
 func processPartitionFsType(inputFsType string) (err error) {
 	fstype := strings.TrimSpace(inputFsType)
 	if fstype == "" {
-		return fmt.Errorf("--fstype must not be empty")
-	}
-
-	if fstype == "" {
-		return fmt.Errorf("fstype cannnot be empty")
-	} else if fstype == "biosboot" {
+		return fmt.Errorf(fsTypeInputErrorMsg)
+	} else if fstype == biosbootPartition {
 		newDiskPartition.FsType = "fat32"
 	} else if fstype == "swap" {
 		newDiskPartition.FsType = "linux-swap"
@@ -134,29 +137,28 @@ func processPartitionFsType(inputFsType string) (err error) {
 	return
 }
 
-func processMountPoint(InputMountPoint string) (err error) {
-	mountPoint := strings.TrimSpace(InputMountPoint)
+func processMountPoint(inputMountPoint string) (err error) {
+	mountPoint := strings.TrimSpace(inputMountPoint)
 	if mountPoint == "" {
-		return fmt.Errorf("Mount Point must not be empty")
+		return fmt.Errorf(mountPointErrorMsg)
 	}
 
 	newDiskPartitionSetting.MountPoint = mountPoint
-	if mountPoint == "biosboot" {
-		newDiskPartition.ID = "boot"
+	if mountPoint == biosbootPartition {
+		newDiskPartition.ID = bootPartitionId
 		newDiskPartition.Flags = append(newDiskPartition.Flags, PartitionFlagBiosGrub)
 		newDiskPartitionSetting.MountPoint = ""
-		newDiskPartitionSetting.ID = "boot"
+		newDiskPartitionSetting.ID = bootPartitionId
 		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
 	} else if mountPoint == "/" {
-		newDiskPartitionSetting.ID = "rootfs"
-		newDiskPartition.ID = "rootfs"
+		newDiskPartitionSetting.ID = rootfsPartitionId
+		newDiskPartition.ID = rootfsPartitionId
 	} else if strings.HasPrefix(mountPoint, "/") || mountPoint == "swap" {
 		newDiskPartitionSetting.ID = mountPoint
 		newDiskPartition.ID = mountPoint
 	} else {
 		// Other types of mount points are currently not supported
-		err := fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
-		return err
+		err = fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
 	}
 
 	return
@@ -219,7 +221,7 @@ func parseFlag(partitionFlag string) (err error) {
 
 // ParseKickStartPartitionScheme parses a kickstart-generated partition file and
 // construct the Disk and PartitionSetting information
-func ParseKickStartPartitionScheme(partitionFile string) (Retdisks []Disk, RetpartitionSettings []PartitionSetting, err error) {
+func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpartitionSettings []PartitionSetting, err error) {
 	file, err := os.Open(partitionFile)
 	if err != nil {
 		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
@@ -243,7 +245,7 @@ func ParseKickStartPartitionScheme(partitionFile string) (Retdisks []Disk, Retpa
 		}
 	}
 
-	Retdisks = disks
-	RetpartitionSettings = partitionSettings
+	retdisks = disks
+	retpartitionSettings = partitionSettings
 	return
 }
