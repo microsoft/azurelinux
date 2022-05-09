@@ -221,7 +221,7 @@ func getDeviceNameFromNetworkData(network_data Network,nm gonetworkmanager.Netwo
 		// Device setting by MAC address
 		deviceName, err = findDeviceNameFromHwAddr(nm, network_data.Device)
 	} else if strings.Contains(network_data.Device, "bootif") {
-		// ------- TODO: Where to bootif value
+		// ------- TODO: Where to read bootif value
 	}
 
 	if deviceName != "" {
@@ -233,6 +233,10 @@ func getDeviceNameFromNetworkData(network_data Network,nm gonetworkmanager.Netwo
 	}
 
 	return
+}
+
+func findConnectionofNetworkInterface(nm gonetworkmanager.NetworkManager, deviceName string) (connections []gonetworkmanager.Connection) {
+	
 }
 
 func ConfigureNetwork(systemConfig SystemConfig) (err error) {
@@ -250,6 +254,12 @@ func ConfigureNetwork(systemConfig SystemConfig) (err error) {
 	// Process the network data
 	for _, network_data := range systemConfig.Networks {
 		device_name, err := getDeviceNameFromNetworkData(network_data, nm, supported_devices) 
+		if err != nil || device_name == "" {
+			continue
+		}
+
+		connection := findConnectionofNetworkInterface(nm, device_name)
+
 	}
 
 
