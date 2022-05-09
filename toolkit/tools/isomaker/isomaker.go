@@ -6,10 +6,11 @@ package main
 import (
 	"os"
 
+	"gopkg.in/alecthomas/kingpin.v2"
+
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/image/isomaker"
 )
 
 var (
@@ -36,7 +37,7 @@ func main() {
 
 	logger.InitBestEffort(*logFilePath, *logLevel)
 
-	isoMaker := NewIsoMaker(
+	isoMaker := isomaker.NewIsoMaker(
 		*unattendedInstall,
 		*baseDirPath,
 		*buildDirPath,
