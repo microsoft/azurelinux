@@ -3,7 +3,7 @@
 #
 # Dockerfile to Mariner toolchain from scratch
 #
-FROM ubuntu:18.04
+FROM mcr.microsoft.com/oss/mirror/docker.io/library/ubuntu:18.04
 
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
