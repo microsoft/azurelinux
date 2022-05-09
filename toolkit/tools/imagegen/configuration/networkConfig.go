@@ -13,6 +13,7 @@ import (
 	"net"
 	
 	"github.com/phommel/gonetworkmanager"
+	"microsoft.com/pkggen/internal/logger"
 )
 
 type Network struct {
@@ -102,22 +103,22 @@ func validateIPAddress(ip string) (err error) {
 func (n *Network) IPAddrIsValid() (err error) {
 	ip := strings.Trim(n.Ip, " ")
 	if err = validateIPAddress(ip); err != nil {
-		return fmt.Error("Invalid input for --ip: %s", err)
+		return fmt.Errorf("Invalid input for --ip: %s", err)
 	}
 
 	netmask := strings.Trim(n.NetMask, " ")
 	if err = validateIPAddress(netmask); err != nil {
-		return fmt.Error("Invalid input for --netmask: %s", err)
+		return fmt.Errorf("Invalid input for --netmask: %s", err)
 	}
 
 	gateway := strings.Trim(n.GateWay, " ")
 	if err = validateIPAddress(gateway); err != nil {
-		return fmt.Error("Invalid input for --gateway: %s", err)
+		return fmt.Errorf("Invalid input for --gateway: %s", err)
 	}
 
 	for _, nameserver := range n.NameServer {
 		if err = validateIPAddress(strings.Trim(nameserver, " ")); err != nil {
-			return fmt.Error("Invalid input for --nameserver: %s", err)
+			return fmt.Errorf("Invalid input for --nameserver: %s", err)
 		} 
 	}
 
@@ -132,6 +133,66 @@ func (n *Network) DeviceIsValid() (err error) {
 	return
 }
 
-func InitializeNetwork(systemConfig SystemConfig) (err error) {
-	return nil
+func getSupportedNetworkDeviceList(nm gonetworkmanager.NetworkManager) (available_devices map[string]gonetworkmanager.Device, err error) {
+	available_devices = make(map[string]gonetworkmanager.Device)
+
+	all_devices, err := nm.GetDevices()
+	if err != nil {
+		return
+	}
+
+	for _, network_device := range all_devices {
+		device_name, err := network_device.GetInterface()
+		if err != nil {
+			return err
+		}
+
+		available_devices[device_name] = network_device
+	}
+
+	return 
+}
+
+func findDeviceNameFromHwAddr(nm gonetworkmanager.NetworkManager, hwAddr string) (deviceName string, err error) {
+	
+}
+
+func getDeviceNameFromNetworkData(network_data Network,nm gonetworkmanager.NetworkManager, supported_devices map[string]gonetworkmanager.Device) (deviceName string, err error) {
+	// Device setting by device name
+	if len(supported_devices) > 0 {
+		// Check if the device name is available
+		_, ok := supported_devices[network_data.Device] 
+		if ok {
+			logger.Log.Infof("Existing device found: %s", network_data.Device)
+			deviceName = network_data.Device
+			return
+		}
+	} else if strings.Contains(network_data.Device, ":") {
+		// Device setting by MAC address
+
+	}
+
+
+	return
+}
+
+func ConfigureNetwork(systemConfig SystemConfig) (err error) {
+	// Create a network manager instance
+	nm, err := gonetworkmanager.NewNetworkManager()
+	if err != nil {
+		return
+	}
+
+	supported_devices, err := getSupportedNetworkDeviceList(nm)
+	if err != nil {
+		return fmt.Errorf("Failed to find all supported network devices: %s", err)
+	}
+
+	// Process the network data
+	for _, network_data := range systemConfig.Networks {
+		device_name, err := getDeviceNameFromNetworkData(network_data, nm, supported_devices) 
+	}
+
+
+	return
 }
