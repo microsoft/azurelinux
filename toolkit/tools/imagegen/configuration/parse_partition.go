@@ -39,7 +39,7 @@ var (
 	partCmdProcess          map[string]func(string) error
 	newDiskPartition        *Partition
 	newDiskPartitionSetting *PartitionSetting
-	shouldFillDiskSpace		bool
+	shouldFillDiskSpace     bool
 )
 
 func initializePrerequisitesForParser() {
