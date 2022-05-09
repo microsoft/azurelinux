@@ -39,6 +39,7 @@ var (
 	partCmdProcess          map[string]func(string) error
 	newDiskPartition        *Partition
 	newDiskPartitionSetting *PartitionSetting
+	shouldFillDiskSpace		bool
 )
 
 func initializePrerequisitesForParser() {
@@ -47,7 +48,11 @@ func initializePrerequisitesForParser() {
 	// determine which disk the parition instruction is targeted
 	diskInfo = make(map[string]int)
 
-	// Intialize a placeholder disk for the parser to populate the first partition
+	// On the very first partition (boot partition), the partition type might determine
+	// what the partition table type is. Since the creation of Disk only happens when we parse
+	// the "--ondisk" flag and this flag is usually specified at the end of the part command, thus
+	// we need to add a placeholder disk initially so the partition table type can be updated when parsing
+	// the first partition
 	disks = []Disk{Disk{}}
 	partitionSettings = []PartitionSetting{}
 	curDiskIndex = 0
@@ -112,7 +117,9 @@ func processPartitionSize(inputPartSize string) (err error) {
 		return err
 	}
 
-	if !newDiskPartition.Grow {
+	if shouldFillDiskSpace {
+		shouldFillDiskSpace = false
+	} else {
 		newDiskPartition.End = newDiskPartition.Start + partitionSize
 	}
 
@@ -149,6 +156,7 @@ func processMountPoint(inputMountPoint string) (err error) {
 		newDiskPartition.Flags = append(newDiskPartition.Flags, PartitionFlagBiosGrub)
 		newDiskPartitionSetting.MountPoint = ""
 		newDiskPartitionSetting.ID = bootPartitionId
+		logger.Log.Infof("Print disk length: %d", len(disks))
 		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
 	} else if mountPoint == "/" {
 		newDiskPartitionSetting.ID = rootfsPartitionId
@@ -202,7 +210,7 @@ func parseFlag(partitionFlag string) (err error) {
 		} else {
 			// Check grow flag
 			if partitionFlag == kickstartPartitionGrow {
-				newDiskPartition.Grow = true
+				shouldFillDiskSpace = true
 				newDiskPartition.End = 0
 			}
 		}
@@ -235,6 +243,8 @@ func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpa
 		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
 		return
 	}
+
+	initializePrerequisitesForParser()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {

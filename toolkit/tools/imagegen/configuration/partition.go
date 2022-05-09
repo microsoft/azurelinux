@@ -28,7 +28,6 @@ type Partition struct {
 	Start     uint64          `json:"Start"`
 	Flags     []PartitionFlag `json:"Flags"`
 	Artifacts []Artifact      `json:"Artifacts"`
-	Grow      bool
 }
 
 // HasFlag returns true if a given partition has a specific flag set.

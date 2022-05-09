@@ -193,7 +193,7 @@ A sample PackageLists entry pointing to three files containing package lists:
 ```
 ### PreInstallScripts
 
-There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig).
+There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
 
 **NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
 
