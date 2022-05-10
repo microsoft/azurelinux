@@ -214,7 +214,7 @@ $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(t
 	mkdir -p $(toolchain_local_temp) && \
 	rm -f $(toolchain_local_temp)/* && \
 	tar -I $(ARCHIVE_TOOL) -xf $(selected_toolchain_archive) -C $(toolchain_local_temp) --strip-components 1 && \
-	touch $(BUILD_DIR)/toolchain_temp/* && \
+	touch $(toolchain_local_temp)/* && \
 	touch $@
 
 # Replace the toolchain RPM if one of the following is true:
