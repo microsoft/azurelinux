@@ -1,12 +1,12 @@
 # Got the intial spec from Fedora and modified it
-Summary:	Internationalization library for Perl, compatible with gettext
-Name:		perl-libintl-perl
-Version:	1.29
-Release:	6%{?dist}
-License:	GPLv3+
-Group: 		Development/Libraries
-URL: 		http://search.cpan.org/dist/libintl-perl/
-Source: 	https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}.tar.gz
+Summary:        Internationalization library for Perl, compatible with gettext
+Name:           perl-libintl-perl
+Version:        1.32
+Release:        1%{?dist}
+License:        GPLv3+
+Group:          Development/Libraries
+URL:            http://search.cpan.org/dist/libintl-perl/
+Source:         https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
@@ -185,8 +185,7 @@ make %{?_smp_mflags}
 
 %install
 make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f \( -name .packlist -o \
-			-name '*.bs' -size 0 \) -exec rm -f {} ';'
+find %{buildroot} -type f \( -name .packlist -o -name '*.bs' -size 0 \) -exec rm -f {} ';'
 chmod -R u+w %{buildroot}/*
 
 %check
@@ -199,6 +198,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.32-1
+- Update to 1.32
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.29-6
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

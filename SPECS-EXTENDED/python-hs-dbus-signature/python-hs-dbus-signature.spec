@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.06
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Hypothesis Strategy for Generating Arbitrary DBus Signatures
 
 License:        MPLv2.0
@@ -13,6 +13,10 @@ URL:            https://github.com/stratis-storage/hs-dbus-signature
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 This package contains a Hypothesis strategy for generating DBus signatures.\
@@ -28,8 +32,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
-BuildRequires:  python3-hypothesis
 
 %description -n python3-%{srcname} %{_description}
 
@@ -45,7 +47,9 @@ Python 3 version.
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v tests
+pip3 install pytest hypothesis
+pip3 install .
+pytest -v tests
 
 %files -n python3-%{srcname}
 %license LICENSE.txt
@@ -54,6 +58,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v tests
 %{python3_sitelib}/hs_dbus_signature-*.egg-info/
 
 %changelog
+* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.06-8
+- Drop BR on `pytest` & `hypothesis`
+- `pip install` latest deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.06-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

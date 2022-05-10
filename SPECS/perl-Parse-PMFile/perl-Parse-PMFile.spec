@@ -1,6 +1,6 @@
 Name:           perl-Parse-PMFile
-Version:        0.42
-Release:        5%{?dist}
+Version:        0.43
+Release:        1%{?dist}
 Summary:        Parses .pm file as PAUSE does
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
@@ -66,6 +66,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Apr 14 2022 Mateusz Malisz <mateusz.malisz@microsoft.com> - 0.43-1
+- Updating to 0.43
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.42-5
 - Adding 'BuildRequires: perl-generators'.
 

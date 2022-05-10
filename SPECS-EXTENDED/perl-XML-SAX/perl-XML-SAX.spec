@@ -1,7 +1,7 @@
 Summary:        SAX parser access API for Perl
 Name:           perl-XML-SAX
 Version:        1.02
-Release:        4%{?dist}
+Release:        5%{?dist}
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -9,7 +9,7 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/XML-SAX
 # Original source
 # http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-%%{version}.tar.gz
-Source0:        XML-SAX-%{version}-nopatents.tar.gz
+Source0:        %{_mariner_sources_url}/XML-SAX-%{version}-nopatents.tar.gz
 # XML-SAX contains patented code that we cannot ship. Therefore we use
 # this script to remove the patented code before shipping it.
 # Download the upstream tarball and invoke this script while in the
@@ -121,6 +121,10 @@ rm -rf "%{perl_vendorlib}/XML/SAX/ParserDetails.ini.backup" || :
 
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.02-5
+- Updated source URL.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.02-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

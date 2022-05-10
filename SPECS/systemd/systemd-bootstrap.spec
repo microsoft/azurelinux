@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,7 +80,7 @@ meson  --prefix %{_prefix}                                            \
        --sysconfdir %{_sysconfdir}                                    \
        --localstatedir %{_var}                                        \
        -Dblkid=true                                                   \
-       -Dbuildtype=release                                            \
+       -Dmode=release                                                 \
        -Ddefault-dnssec=no                                            \
        -Dfirstboot=false                                              \
        -Dinstall-tests=false                                          \
@@ -228,6 +228,9 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-4
+- Change build mode from "development" (default) to "release"
+
 * Wed Apr 13 2022 Cameron Baird <cameronbaird@microsoft.com> - 250.3-3
 - Bring in an upstream change as patch fix-journald-audit-logging.patch
 - to prevent many-fielded audit messages from crashing systemd-journal

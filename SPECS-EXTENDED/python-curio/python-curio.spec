@@ -24,16 +24,14 @@ probably find it to be a bit too-low level--it's probably best to think of it\
 as a library for building libraries.  Although you might not use it directly,\
 many of its ideas have influenced other libraries with similar functionality.
 
-%bcond_without tests
 
 Summary:        Building blocks for performing concurrent I/O
 Name:           python-%{pkgname}
 Version:        1.4
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        BSD
 URL:            https://github.com/dabeaz/curio
-#Source0:       https://files.pythonhosted.org/packages/source/c/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/source/c/%{pypi_name}/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
@@ -42,8 +40,8 @@ BuildArch:      noarch
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with tests}
-BuildRequires:  python3-pytest
+%if %{with_check}
+BuildRequires:  python3-pip
 %endif
 %{?python_provide:%python_provide python3-%{pkgname}}
 
@@ -59,10 +57,10 @@ rm -rf %{eggname}.egg-info
 %install
 %py3_install
 
-%if %{with tests}
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} --verbose -m 'not internet'
-%endif
+pip3 install pytest
+pip3 install .
+py.test --verbose -m 'not internet'
 
 %files -n python3-%{pkgname}
 %license LICENSE
@@ -71,28 +69,47 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} --verbose -
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.4-5
+- Drop BR on pytest & pip install latest deps
+- Use py.test instead of py.test-3 to enable ptest
+
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.4-4
+- Updated source URL.
+- License verified.
+
 * Tue Jan 12 2021 Steve Laughman <steve.laughman@microsoft.com> - 1.4-3
 - Correction to files declaration
+
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.4-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+
 * Mon Oct 05 2020 Yatin Karel <ykarel@redhat.com> - 1.4-1
 - Update to 1.4
+
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.1-2
 - Rebuilt for Python 3.9
+
 * Wed Mar 18 2020 Carl George <carl@george.computer> - 1.1-1
 - Latest upstream
 - Add patch0 to skip tests that require internet
+
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.9-5
 - Rebuilt for Python 3.8.0rc1 (#1748018)
+
 * Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 0.9-4
 - Rebuilt for Python 3.8
+
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Wed Sep 12 2018 Carl George <carl@george.computer> - 0.9-1
 - Initial package

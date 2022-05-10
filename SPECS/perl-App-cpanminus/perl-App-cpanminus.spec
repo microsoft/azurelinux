@@ -1,6 +1,6 @@
 Name:           perl-App-cpanminus
-Version:        1.7044
-Release:        10%{?dist}
+Version:        1.7045
+Release:        1%{?dist}
 Summary:        Get, unpack, build and install CPAN modules
 # Other files:  GPL+ OR Artistic
 ## unbundled
@@ -110,8 +110,8 @@ Provides:       cpanminus = %{version}-%{release}
 %global __provides_exclude %{__provides_exclude}|^perl\\(ModuleBuildSkipMan\\)
 
 %description
-Why? It's dependency free, requires zero configuration, and stands alone 
-but it's maintainable and extensible with plug-ins and friendly to shell 
+Why? It's dependency free, requires zero configuration, and stands alone
+but it's maintainable and extensible with plug-ins and friendly to shell
 scripting. When running, it requires only 10 MB of RAM.
 
 %prep
@@ -146,6 +146,9 @@ make test
 %{_bindir}/cpanm
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.7045-1
+- Update to 1.7045
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7044-10
 - Adding 'BuildRequires: perl-generators'.
 

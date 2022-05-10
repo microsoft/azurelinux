@@ -21,13 +21,14 @@
 Summary:        Another Tool for Language Recognition
 Name:           antlr
 Version:        2.7.7
-Release:        123%{?dist}
+Release:        124%{?dist}
 License:        Public Domain
 Group:          Development/Tools/Other
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.antlr.org/
-Source0:        antlr-%{version}.tar.bz2
+# Upstream source under https://www.antlr2.org/download/antlr-2.7.7.tar.gz. Needs verification.
+Source0:        %{_mariner_sources_url}/antlr-%{version}.tar.bz2
 Source1:        %{name}-build.xml
 Source2:        %{name}-script
 Source3:        http://repo2.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
@@ -208,6 +209,9 @@ find doc -type f | xargs chmod 0644
 %endif
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.7-124
+- Fixing source URL.
+
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.7.7-123
 - Move to SPECS
 - License verified

@@ -1,12 +1,12 @@
 Summary:       Setup RHEL-RT environment details
 Name:          rt-setup
 Version:       2.1
-Release:       4%{?dist}
+Release:       5%{?dist}
 License:       GPL+
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 Group:         System Environment/Base
-Source:        rt-setup-%{version}.tar.bz2
+Source:        %{_mariner_sources_url}/rt-setup-%{version}.tar.bz2
 Patch0:        no-annobin.patch
 ExclusiveArch: x86_64
 Requires:      /usr/sbin/groupadd
@@ -93,6 +93,9 @@ fi
 %attr(0644, root, root) %{_unitdir}/rt-entsk.service
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1-5
+- Updating source URL.
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.1-4
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - Remove %%clean stage

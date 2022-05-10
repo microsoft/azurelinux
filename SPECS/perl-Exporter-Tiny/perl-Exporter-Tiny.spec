@@ -1,12 +1,12 @@
 # Got the intial spec from Fedora and modified it
-Summary:	An exporter with the features of Sub::Exporter but only core dependencies
-Name:		perl-Exporter-Tiny
-Version:	1.002001
-Release:        6%{?dist}
-License:	(GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
-Group:		Development/Libraries
-URL:		http://search.cpan.org/dist/Exporter-Tiny/
-Source0:	https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{version}.tar.gz
+Summary:        An exporter with the features of Sub::Exporter but only core dependencies
+Name:           perl-Exporter-Tiny
+Version:        1.002002
+Release:        1%{?dist}
+License:        (GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
+Group:          Development/Libraries
+URL:            http://search.cpan.org/dist/Exporter-Tiny/
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/Exporter::Tiny::Manual*
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.002002-1
+- Update to 1.002002
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.002001-6
 - Adding 'BuildRequires: perl-generators'.
 

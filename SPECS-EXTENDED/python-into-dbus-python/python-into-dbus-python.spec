@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.07
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Transformer to dbus-python types
 
 License:        ASL 2.0
@@ -12,6 +12,10 @@ URL:            https://github.com/stratis-storage/into-dbus-python
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 Facilities for converting an object that inhabits core Python types, e.g.,\
@@ -25,7 +29,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
 BuildRequires:  python3-dbus-signature-pyparsing
 BuildRequires:  python3-dbus
 BuildRequires:  python3-hypothesis
@@ -47,7 +50,9 @@ Python 3 version.
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} TRAVIS=true pytest-%{python3_version} -v tests
+pip3 install pytest sortedcontainers
+pip3 install .
+pytest -v tests
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -56,6 +61,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} TRAVIS=true pytest-%{python3_version} 
 %{python3_sitelib}/into_dbus_python-*.egg-info/
 
 %changelog
+* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.07-5
+- Drop BR on pytest & pip install latest deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.07-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,12 +1,12 @@
 Summary:        Legacy Num library for arbitrary-precision integer and rational arithmetic
 Name:           ocaml-num
 Version:        1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ocaml/num
-Source0:        https://github.com/ocaml/num/archive/v%%{version}/%%{name}-%%{version}.tar.gz#/num-%{version}.tar.gz
+Source0:        https://github.com/ocaml/num/archive/v%{version}/%{name}-%{version}.tar.gz#/num-%{version}.tar.gz
 # All patches since 1.3 was released.
 Patch1:         0001-Bump-version.patch
 Patch2:         0002-Fix-usage-of-bytes-vs-string.patch
@@ -84,6 +84,9 @@ find $OCAMLFIND_DESTDIR -name '*.cmti' -delete
 %{_libdir}/ocaml/*.mli
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-2
+- Fixing source URL.
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-1
 - Fixing version number to be consistent with the used source.
 - Cleaning-up spec. License verified.

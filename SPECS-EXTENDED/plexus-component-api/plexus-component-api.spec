@@ -23,14 +23,14 @@ Distribution:   Mariner
 %define project_version %{base_ver}-alpha-%{alpha_ver}
 Name:           plexus-component-api
 Version:        %{base_ver}~alpha%{alpha_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Plexus Component API
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-component-api
 #svn export http://svn.codehaus.org/plexus/plexus-containers/tags/plexus-containers-1.0-alpha-15/plexus-component-api/ plexus-component-api-1.0-alpha-15
 #tar cJf plexus-component-api-1.0-alpha-15.tar.xz plexus-component-api-1.0-alpha-15/
-Source0:        %{name}-%{project_version}.tar.xz
+Source0:        %{_mariner_sources_url}/%{name}-%{project_version}.tar.xz
 Source1:        %{name}-build.xml
 Source2:        %{name}-LICENSE.txt
 BuildRequires:  ant
@@ -86,6 +86,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.0~alpha15-4
+- Updated source URL.
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0~alpha15-3
 - License verified
 
