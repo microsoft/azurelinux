@@ -11,8 +11,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"microsoft.com/pkggen/internal/logger"
+	"microsoft.com/pkggen/internal/retry"
+	"microsoft.com/pkggen/internal/shell"
 )
 
 // JoinURL concatenates baseURL with extraPaths
@@ -60,4 +63,25 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 	_, err = io.Copy(dstFile, response.Body)
 
 	return
+}
+
+// CheckNetworkAccess checks whether the installer environment has network access
+func CheckNetworkAccess() error {
+	const (
+		retryAttempts = 10
+		retryDuration = time.Second
+		squashErrors  = false
+	)
+
+	err := retry.Run(func() error {
+		err := shell.ExecuteLive(squashErrors, "ping", "-c", "1", "www.microsoft.com")
+		if err != nil {
+			logger.Log.Warnf("No network access yet")
+			return err
+		}
+
+		return err
+	}, retryAttempts, retryDuration)
+
+	return err
 }

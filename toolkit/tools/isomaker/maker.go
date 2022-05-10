@@ -470,6 +470,11 @@ func (im *IsoMaker) readAndVerifyConfig() {
 	config, err := configuration.LoadWithAbsolutePaths(im.configFilePath, im.baseDirPath)
 	logger.PanicOnError(err, "Failed while reading config file from '%s' with base directory '%s'.", im.configFilePath, im.baseDirPath)
 
+	// Set IsIsoInstall to true
+	for id, _ := range config.SystemConfigs {
+		config.SystemConfigs[id].IsIsoInstall = true
+	}
+
 	if im.unattendedInstall && (len(config.SystemConfigs) > 1) && !config.DefaultSystemConfig.IsDefault {
 		logger.Log.Panic("For unattended installation with more than one system configuration present you must select a default one with the [IsDefault] field.")
 	}
