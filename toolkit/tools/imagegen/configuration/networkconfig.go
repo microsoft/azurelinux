@@ -148,6 +148,7 @@ func getSupportedNetworkDeviceList(nm gonetworkmanager.NetworkManager) (availabl
 
 	for _, network_device := range all_devices {
 		device_name, err = network_device.GetInterface()
+		logger.Log.Infof("Network device name: %s", device_name)
 		if err != nil {
 			return
 		}
@@ -158,50 +159,48 @@ func getSupportedNetworkDeviceList(nm gonetworkmanager.NetworkManager) (availabl
 	return 
 }
 
-func findDeviceNameFromHwAddr(nm gonetworkmanager.NetworkManager, hwAddr string) (deviceName string, err error) {
+func findDeviceNameFromHwAddr(nm gonetworkmanager.NetworkManager, hwAddr string) (device_name string, err error) {
 	var (
-		activeConnections []gonetworkmanager.ActiveConnection
 		devices []gonetworkmanager.Device
 		deviceType gonetworkmanager.NmDeviceType
-		accessPoint gonetworkmanager.AccessPoint
-		address string
+		deviceName string
 	)
 	
-	activeConnections, err = nm.GetActiveConnections()
+	ifaces, err := net.Interfaces()
 	if err != nil {
 		return
 	}
 
-	for _, activeConnection := range activeConnections {
-		devices, err = activeConnection.GetDevices()
+	devices, err = nm.GetDevices()
+	if err != nil {
+		return
+	}
+
+	for _, device := range devices {
+		deviceType, err = device.GetDeviceType()
 		if err != nil {
 			return
 		}
 
-		for _, device := range devices {
-			deviceType, err = device.GetDeviceType()
-			if err != nil {
-				return
-			}
+		deviceName, err = device.GetInterface()
+		if err != nil {
+			return
+		}
 
-			if deviceType == gonetworkmanager.NmDeviceTypeEthernet || deviceType == gonetworkmanager.NmDeviceTypeWifi {
-				accessPoint, err = activeConnection.GetSpecificObject()
-				if err != nil {
-					return
+		if deviceType == gonetworkmanager.NmDeviceTypeEthernet || deviceType == gonetworkmanager.NmDeviceTypeWifi {
+			// Loop through all network interfaces
+			for _, iface := range ifaces {
+				if deviceName == iface.Name {
+					address := iface.HardwareAddr.String()
+					
+					if address != "" && strings.ToUpper(address) == strings.ToUpper(hwAddr) {
+						device_name = deviceName
+						return
+					}
 				}
-
-				address, err = accessPoint.GetHWAddress()
-				if err != nil {
-					return
-				}
-
-				if address != "" && strings.ToUpper(address) == strings.ToUpper(hwAddr) {
-					deviceName, err = device.GetInterface()
-					return
-				}
-
 			}
 		}
+
 	}
 
 	return
@@ -236,7 +235,7 @@ func getDeviceNameFromNetworkData(network_data Network,nm gonetworkmanager.Netwo
 }
 
 func findConnectionofNetworkInterface(nm gonetworkmanager.NetworkManager, deviceName string) (connections []gonetworkmanager.Connection) {
-	
+	return
 }
 
 func ConfigureNetwork(systemConfig SystemConfig) (err error) {
@@ -250,6 +249,8 @@ func ConfigureNetwork(systemConfig SystemConfig) (err error) {
 	if err != nil {
 		return fmt.Errorf("Failed to find all supported network devices: %s", err)
 	}
+
+	_, err = findDeviceNameFromHwAddr(nm, "00:15:5d:b9:2e:3d")
 
 	// Process the network data
 	for _, network_data := range systemConfig.Networks {
