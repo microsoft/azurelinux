@@ -74,23 +74,15 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 }
 
 func validateKickStartInstall(config configuration.Config) (err error) {
+	// If doing a kickstart-style installation, then the image config file
+	// must not have any partitioning info because that will be provided
+	// by the preinstall script
 	for _, systemConfig := range config.SystemConfigs {
-		// If doing a kickstart-style installation, then the image config file
-		// must not have any partitioning info because that will be provided
-		// by the preinstall script
 		if systemConfig.IsKickStartBoot {
 			if len(config.Disks) > 0 || len(systemConfig.PartitionSettings) > 0 {
 				return fmt.Errorf("Partition should not be specified in image config file when performing kickstart installation")
 			}
 		}
-
-		// Custom package repos should only be specified when doing a kickstart ISO
-		// installation and not for other scenarios
-		if len(systemConfig.PackageRepos) > 0 {
-			if !systemConfig.IsKickStartBoot || !systemConfig.IsIsoInstall {
-				return fmt.Errorf("Custom repo should not be specified when not doing kickstart ISO installation")
-			}
-		} 
 	}
 
 	return
