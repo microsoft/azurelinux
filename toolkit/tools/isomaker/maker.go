@@ -14,11 +14,12 @@ import (
 
 	"github.com/cavaliercoder/go-cpio"
 	"github.com/klauspost/pgzip"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/shell"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (
@@ -304,6 +305,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() {
 
 	im.copyAndRenameAdditionalFiles(configFilesAbsDirPath)
 	im.copyAndRenamePackagesJSONs(configFilesAbsDirPath)
+	im.copyAndRenamePreInstallScripts(configFilesAbsDirPath)
 	im.copyAndRenamePostInstallScripts(configFilesAbsDirPath)
 	im.copyAndRenameSSHPublicKeys(configFilesAbsDirPath)
 	im.saveConfigJSON(configFilesAbsDirPath)
@@ -340,6 +342,22 @@ func (im *IsoMaker) copyAndRenamePackagesJSONs(configFilesAbsDirPath string) {
 			isoPackagesRelativeFilePath := im.copyFileToConfigRoot(configFilesAbsDirPath, packagesSubDirName, localPackagesAbsFilePath)
 
 			systemConfig.PackageLists[i] = isoPackagesRelativeFilePath
+		}
+	}
+}
+
+// copyAndRenamePreInstallScripts will copy all pre-install scripts into an
+// ISO directory to make them available to the installer.
+// Each file gets placed in a separate directory to avoid potential name conflicts and
+// the config gets updated with the new ISO paths.
+func (im *IsoMaker) copyAndRenamePreInstallScripts(configFilesAbsDirPath string) {
+	const preInstallScriptsSubDirName = "preinstallscripts"
+
+	for _, systemConfig := range im.config.SystemConfigs {
+		for i, localScriptAbsFilePath := range systemConfig.PreInstallScripts {
+			isoScriptRelativeFilePath := im.copyFileToConfigRoot(configFilesAbsDirPath, preInstallScriptsSubDirName, localScriptAbsFilePath.Path)
+
+			systemConfig.PreInstallScripts[i].Path = isoScriptRelativeFilePath
 		}
 	}
 }

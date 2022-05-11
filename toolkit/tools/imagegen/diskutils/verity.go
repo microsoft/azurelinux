@@ -14,10 +14,10 @@ import (
 	"strconv"
 	"strings"
 
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/randomization"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (

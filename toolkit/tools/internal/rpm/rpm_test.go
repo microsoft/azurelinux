@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/stretchr/testify/assert"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 const specsDir = "testdata"

@@ -12,14 +12,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
+
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
-	"microsoft.com/pkggen/internal/buildpipeline"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/retry"
-	"microsoft.com/pkggen/internal/shell"
-	"microsoft.com/pkggen/internal/systemdependency"
 )
 
 // BindMountPointFlags is a set of flags to do a bind mount.

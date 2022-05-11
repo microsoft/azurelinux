@@ -4,8 +4,8 @@
 package formats
 
 import (
-	"microsoft.com/pkggen/internal/shell"
-	"microsoft.com/pkggen/internal/systemdependency"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 )
 
 // TarGzipType represents the tar.gz format

@@ -10,10 +10,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+
 	"github.com/stretchr/testify/assert"
 	"gonum.org/v1/gonum/graph"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkgjson"
 )
 
 // Note about test data:

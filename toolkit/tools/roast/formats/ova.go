@@ -16,11 +16,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"golang.org/x/sys/unix"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/shell"
+	"golang.org/x/sys/unix"
 )
 
 // OvaType represents the ova format

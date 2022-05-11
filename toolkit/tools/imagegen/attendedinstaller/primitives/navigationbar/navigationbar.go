@@ -6,7 +6,8 @@ package navigationbar
 import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
 )
 
 const (

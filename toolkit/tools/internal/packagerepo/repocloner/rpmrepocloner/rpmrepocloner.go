@@ -11,13 +11,13 @@ import (
 	"regexp"
 	"strings"
 
-	"microsoft.com/pkggen/internal/buildpipeline"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/packagerepo/repocloner"
-	"microsoft.com/pkggen/internal/packagerepo/repomanager/rpmrepomanager"
-	"microsoft.com/pkggen/internal/pkgjson"
-	"microsoft.com/pkggen/internal/safechroot"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (
