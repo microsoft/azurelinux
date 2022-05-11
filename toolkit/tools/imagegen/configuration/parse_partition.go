@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"microsoft.com/pkggen/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 const (
