@@ -6,9 +6,9 @@ package pkggraph
 import (
 	"fmt"
 
-	"gonum.org/v1/gonum/graph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 
-	"microsoft.com/pkggen/internal/logger"
+	"gonum.org/v1/gonum/graph"
 )
 
 const (

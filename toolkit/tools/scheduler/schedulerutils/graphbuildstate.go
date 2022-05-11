@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"sort"
 
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 )
 
 // nodeState represents the build state of a single node

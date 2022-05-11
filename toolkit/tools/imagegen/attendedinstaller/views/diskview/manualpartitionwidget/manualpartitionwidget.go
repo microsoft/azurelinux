@@ -7,16 +7,16 @@ import (
 	"fmt"
 	"strings"
 
-	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/enumfield"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/navigationbar"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/logger"
-
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/enumfield"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uiutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 const (

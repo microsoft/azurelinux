@@ -4,14 +4,14 @@
 package diskview
 
 import (
-	"microsoft.com/pkggen/imagegen/attendedinstaller/views/diskview/autopartitionwidget"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/views/diskview/manualpartitionwidget"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/logger"
-
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/diskview/autopartitionwidget"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/diskview/manualpartitionwidget"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 // UI constants.
