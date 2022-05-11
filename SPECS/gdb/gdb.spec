@@ -1,6 +1,6 @@
 Summary:        C debugger
 Name:           gdb
-Version:        11.1
+Version:        11.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -88,6 +88,10 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Thu Nov 11 2021 Fanzhe Lyu <falyu@microsoft.com> - 11.2
+- Upgrade to latest upstream version and remove upstreamed patches
+- Use system zlib during build
+
 * Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 11.1
 - Upgrade to latest upstream version and remove upstreamed patches
 - Use system zlib during build
