@@ -9,9 +9,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+
 	"github.com/stretchr/testify/assert"
-	"microsoft.com/pkggen/internal/buildpipeline"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 const (

@@ -14,13 +14,13 @@
 Summary:        Security client
 Name:           nss
 Version:        3.75
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
-Source0:        https://ftp.mozilla.org/pub/security/%{nss}/releases/NSS_3_75_RTM/src/%{name}-%{version}.tar.gz
+Source0:        https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_75_RTM/src/%{name}-%{version}.tar.gz
 Source1:        nss-util.pc.in
 Source2:        nss-util-config.in
 Source3:        nss.pc.in
@@ -217,6 +217,9 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.75-2
+- Fixing source URL.
+
 * Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.75-1
 - Upgrading to newest version 3.75
 - Adding nss.pc.in and nss-config.in as sources.

@@ -4,11 +4,10 @@ Distribution:   Mariner
 Summary: A log file analysis program
 Name: logwatch
 Version: 7.5.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT
 URL: http://www.logwatch.org/
-Source0: logwatch-%{version}.tar.gz
-#Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0: https://sourceforge.net/projects/%{name}/files/%{name}-%{version}/%{name}-%{version}.tar.gz
 # Temporary fix for update to DNF 4.4
 Source1: dnf-rpm.conf
 BuildRequires: perl-generators
@@ -90,7 +89,8 @@ echo "# Configuration overrides for specific logfiles/services may be placed her
 install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 
 %files
-%doc README HOWTO-Customize-LogWatch LICENSE
+%license LICENSE
+%doc README HOWTO-Customize-LogWatch
 %dir %{_var}/cache/logwatch
 %dir %{_sysconfdir}/logwatch
 %dir %{_sysconfdir}/logwatch/scripts
@@ -127,6 +127,10 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_unitdir}/logwatch.timer
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-4
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

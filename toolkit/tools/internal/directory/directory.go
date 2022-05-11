@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 // LastModifiedFile returns the timestamp and path to the file last modified inside a directory.

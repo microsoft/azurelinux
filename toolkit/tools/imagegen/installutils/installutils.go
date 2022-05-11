@@ -15,16 +15,16 @@ import (
 	"syscall"
 	"time"
 
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkgjson"
-	"microsoft.com/pkggen/internal/randomization"
-	"microsoft.com/pkggen/internal/retry"
-	"microsoft.com/pkggen/internal/safechroot"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (
@@ -498,7 +498,7 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
 	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
-	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\n")
+	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t(none)\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n")
 
 	return
 }
@@ -1834,12 +1834,6 @@ func RunPreInstallScripts(config configuration.SystemConfig) (err error) {
 
 	for _, script := range config.PreInstallScripts {
 		ReportActionf("Running pre-install script: %s", path.Base(script.Path))
-		logger.Log.Infof("Running pre-install script: %s", script.Path)
-
-		err = shell.ExecuteLive(squashErrors, "chmod", "a+x", script.Path)
-		if err != nil {
-			return
-		}
 
 		err = shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", script.Path, script.Args))
 		if err != nil {

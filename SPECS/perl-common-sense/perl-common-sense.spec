@@ -2,14 +2,14 @@
 # This arch-specific package has no binaries and generates no debuginfo
 %global debug_package %{nil}
 
-Summary:	"Common sense" Perl defaults
-Name:		perl-common-sense
-Version:	3.74
-Release:        8%{?dist}
-License:	GPL+ or Artistic
-Group:		Development/Libraries
-URL:		http://search.cpan.org/dist/common-sense
-Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
+Summary:        "Common sense" Perl defaults
+Name:           perl-common-sense
+Version:        3.75
+Release:        1%{?dist}
+License:        GPL+ or Artistic
+Group:          Development/Libraries
+URL:            http://search.cpan.org/dist/common-sense
+Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
@@ -18,7 +18,7 @@ BuildRequires:  perl-generators
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(common::sense) = %{version}-%{release}
 
-Patch1:		common-sense-3.71-podenc.patch
+Patch1:         common-sense-3.71-podenc.patch
 
 %description
 This module implements some sane defaults for Perl programs, as defined
@@ -27,17 +27,17 @@ Perl coders:
 
 It's supposed to be mostly the same, with much lower memory usage, as:
 
-	use utf8;
-	use strict qw(vars subs);
-	use feature qw(say state switch);
-	use feature qw(unicode_strings unicode_eval current_sub fc evalbytes);
-	no feature qw(array_base);
-	no warnings;
-	use warnings qw(FATAL closed threads internal debugging pack
-			portable prototype inplace io pipe unpack malloc
-			deprecated glob digit printf layer
-			reserved taint closure semicolon);
-	no warnings qw(exec newline unopened);
+        use utf8;
+        use strict qw(vars subs);
+        use feature qw(say state switch);
+        use feature qw(unicode_strings unicode_eval current_sub fc evalbytes);
+        no feature qw(array_base);
+        no warnings;
+        use warnings qw(FATAL closed threads internal debugging pack
+                        portable prototype inplace io pipe unpack malloc
+                        deprecated glob digit printf layer
+                        reserved taint closure semicolon);
+        no warnings qw(exec newline unopened);
 
 %prep
 %setup -q -n common-sense-%{version}
@@ -69,6 +69,9 @@ make test
 %{_mandir}/man3/common::sense.3*
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 3.75-1
+- Update to 3.75
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.74-8
 - Adding 'BuildRequires: perl-generators'.
 

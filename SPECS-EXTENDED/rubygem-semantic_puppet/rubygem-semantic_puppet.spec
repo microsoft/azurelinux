@@ -5,7 +5,7 @@
 Summary:        Useful tools for working with Semantic Versions
 Name:           rubygem-%{gem_name}
 Version:        1.0.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -29,13 +29,19 @@ gem build %{gem_name}
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 #add LICENSE file to buildroot from Source0
 cp LICENSE %{buildroot}%{gem_instdir}/
+#add lib folder to buildroot from Source0
+cp -r lib/ %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
 %license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE
+%{gem_instdir}/lib
 %{gemdir}
 
 %changelog
+* Tue May 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.4-3
+- Add lib/ from source.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.4-2
 - Build from .tar.gz source.
 

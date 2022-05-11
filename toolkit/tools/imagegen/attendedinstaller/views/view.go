@@ -4,10 +4,10 @@
 package views
 
 import (
-	"microsoft.com/pkggen/imagegen/configuration"
-
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 )
 
 // View is the interface for different "pages" in the attended installer.

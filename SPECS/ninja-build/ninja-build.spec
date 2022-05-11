@@ -1,17 +1,18 @@
 Summary:        Small build system with focus on speed
 Name:           ninja-build
 Version:        1.10.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ninja-build.org
-#Source0:       https://github.com/ninja-build/ninja/archive/v%%{version}.tar.gz
-Source0:        ninja-%{version}.tar.gz
+Source0:        https://github.com/ninja-build/ninja/archive/v%{version}.tar.gz#/ninja-%{version}.tar.gz
 Source1:        macros.ninja
-BuildRequires:  gcc
-BuildRequires:  gtest-devel
+BuildRequires:  gcc-c++
 BuildRequires:  python3-devel
+%if %{with_check}
+BuildRequires:  gtest-devel
+%endif
 
 %description
 Ninja is a small build system with a focus on speed.
@@ -44,16 +45,20 @@ install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.ninja
 %{_libdir}/rpm/macros.d/macros.ninja
 
 %changelog
+* Tue Apr 19 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.10.2-2
+- Only BR gtest during check builds
+- Change gcc BR to gcc-c++
+
 * Mon Dec 06 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.10.2-1
 - Updated to version 1.10.2.
 - Removed reference to missing HACKING doc file.
 
-*   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.2-3
--   License verified.
--   Fixed 'Source0' tag.
+* Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-3
+- License verified.
+- Fixed 'Source0' tag.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.2-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.8.2-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 1.8.2-1
--   Initial packaging
+* Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> - 1.8.2-1
+- Initial packaging

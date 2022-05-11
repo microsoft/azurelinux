@@ -7,8 +7,9 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
+
 	"github.com/rivo/tview"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/customshortcutlist"
 )
 
 const (

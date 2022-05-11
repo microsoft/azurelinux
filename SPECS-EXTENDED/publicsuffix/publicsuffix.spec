@@ -21,11 +21,11 @@ Distribution:   Mariner
 
 Name:           publicsuffix
 Version:        20201026
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Cross-vendor public domain suffix database
 License:        MPL-2.0
 URL:            https://publicsuffix.org/
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  psl-make-dafsa
 BuildArch:      noarch
 
@@ -61,6 +61,10 @@ install -m 644 -p -D public_suffix_list.dafsa \
 %{_datadir}/%{name}
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 20201026-3
+- Updated source URL.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201026-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

@@ -3,17 +3,17 @@ Distribution:   Mariner
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
-Release: 23%{?dist}
-License: GPLv3+ and LGPLv2+ and GPLv2+
+Release: 24%{?dist}
+License: GPLv3+
 URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
 # $ git clone git://git.savannah.gnu.org/enscript.git
-# $ git archive --format=tar --prefix=enscript-1.6.4/ v1.6.4 |gzip > enscript-1.6.4.tar.gz
-Source0: enscript-%{version}.tar.gz
-Source1: enscript-ruby-1.6.4.tar.gz
+# $ git archive --format=tar --prefix=%%{name}-%%{version}/ v%%{version} | gzip > %%{name}-%%{version}.tar.gz
+Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 #http://neugierig.org/software/ruby/ruby-enscript.tar.gz
-Source2: enscript-php-1.6.4.st
+Source1: %{_mariner_sources_url}/%{name}-ruby-1.6.4.tar.gz
 #http://home.raxnet.net/downloads/viewcvs/php.st
+Source2: enscript-php-1.6.4.st
 
 # RH #61294
 Patch3: enscript-1.6.1-locale.patch
@@ -106,7 +106,8 @@ for all in README THANKS; do
 done
 
 %files -f %{name}.lang -f share.list
-%doc AUTHORS ChangeLog COPYING docs/FAQ.html NEWS README README.ESCAPES THANKS TODO
+%license COPYING
+%doc AUTHORS ChangeLog docs/FAQ.html NEWS README README.ESCAPES THANKS TODO
 %{_bindir}/*
 %{_mandir}/man1/*
 %dir %{_datadir}/enscript
@@ -114,6 +115,10 @@ done
 %config(noreplace) %{_sysconfdir}/enscript.cfg
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-24
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

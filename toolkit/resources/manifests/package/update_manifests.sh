@@ -62,10 +62,8 @@ remove_packages_for_pkggen_core () {
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
     sed -i '/glib-doc/d' $TmpPkgGen
-    sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
     sed -i '/gpgme-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/gtest/d' $TmpPkgGen
     sed -i '/kbd/d' $TmpPkgGen
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
@@ -198,7 +196,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-tools/d' $TmpPkgGen
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
-    sed -i '/wget/d' $TmpPkgGen
     sed -i '/XML-Parser/d' $TmpPkgGen
     sed -i '/^zstd-doc/d' $TmpPkgGen
     sed -i '/^zip-/d' $TmpPkgGen

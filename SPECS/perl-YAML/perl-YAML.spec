@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        YAML Ain't Markup Language (tm)
 Name:           perl-YAML
-Version:        1.26
-Release:        6%{?dist}
+Version:        1.30
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML/
@@ -105,6 +105,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/YAML::Types.3*
 
 %changelog
+* Thu Apr 14 2022 Mateusz Malisz <mateusz.malisz@microsoft.com> - 1.30-1
+- Updated to 1.30
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-6
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

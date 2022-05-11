@@ -3,12 +3,16 @@ Distribution:   Mariner
 %global modname mccabe
 Name:               python-%{modname}
 Version:            0.6.1
-Release:            16%{?dist}
+Release:            17%{?dist}
 Summary:            McCabe complexity checker
 License:            MIT
 URL:                http://pypi.python.org/pypi/mccabe
 Source0:            https://files.pythonhosted.org/packages/source/m/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 BuildArch:          noarch
+
+%if %{with_check}
+BuildRequires:      python3-pip
+%endif
 
 %description
 Ned's script to check McCabe complexity.
@@ -20,8 +24,6 @@ checker.
 Summary:            McCabe checker, plugin for flake8
 BuildRequires:      python%{python3_pkgversion}-devel
 BuildRequires:      python%{python3_pkgversion}-setuptools
-BuildRequires:      python%{python3_pkgversion}-pytest
-BuildRequires:      python%{python3_pkgversion}-pytest-runner
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{modname}}
 
 %description -n python%{python3_pkgversion}-%{modname}
@@ -44,6 +46,7 @@ checker.
 
 
 %check
+pip3 install pytest
 %{__python3} -m pytest -v
 
 
@@ -56,6 +59,10 @@ checker.
 
 
 %changelog
+* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.1-17
+- Drop BR on pytest & pip install latest deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

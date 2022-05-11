@@ -67,14 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.32.1 API Headers
-tar xf kernel-5.15.32.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.32.1
+echo Linux-5.15.34.1 API Headers
+tar xf kernel-5.15.34.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.34.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.32.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.34.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -776,9 +776,9 @@ popd
 rm -rf openssl-1.1.1k
 touch /logs/status_openssl_complete
 
-echo Python-3.9.10
-tar xf Python-3.9.10.tar.xz
-pushd Python-3.9.10
+echo Python-3.9.12
+tar xf Python-3.9.12.tar.xz
+pushd Python-3.9.12
 ./configure --prefix=/usr       \
             --with-platlibdir=lib \
             --enable-shared     \
@@ -791,7 +791,7 @@ chmod -v 755 /usr/lib/libpython3.9.so.1.0
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.9.10
+rm -rf Python-3.9.12
 touch /logs/status_python399_complete
 
 echo Coreutils-8.32
@@ -958,7 +958,7 @@ make install
 #mv -v /usr/lib/libprocps.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libprocps.so) /usr/lib/libprocps.so
 popd
-rm -rf procps-ng-3.3.17
+rm -rf procps-3.3.17
 touch /logs/status_procpsng_complete
 
 echo util-linux-2.37.2

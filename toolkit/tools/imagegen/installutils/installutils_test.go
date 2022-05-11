@@ -7,8 +7,9 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+
 	"github.com/stretchr/testify/assert"
-	"microsoft.com/pkggen/internal/pkgjson"
 )
 
 func TestShouldReturnCorrectRequiredPackagesForArch(t *testing.T) {

@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary:        SBLIM syslog instrumentation
 Name:           sblim-cmpi-syslog
 Version:        0.9.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        EPL
 URL:            http://sourceforge.net/projects/sblim/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -13,7 +13,7 @@ URL:            http://sourceforge.net/projects/sblim/
 #  cvs -z3 -d:pserver:anonymous@sblim.cvs.sourceforge.net:/cvsroot/sblim co -P cmpi-syslog
 #  mv cmpi-syslog sblim-cmpi-syslog-0.8.0
 #  tar -cJvf sblim-cmpi-syslog-0.8.0.tar.xz sblim-cmpi-syslog-0.8.0
-Source0:        %{name}-%{version}.tar.bz2
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.bz2
 
 # use Pegasus' root/interop instead of root/PG_Interop
 Patch0:         sblim-cmpi-syslog-0.9.0-pegasus-interop.patch
@@ -60,15 +60,12 @@ SBLIM Base Syslog Testcase Files for SBLIM Testsuite
 %patch2 -p1 -b .prov-reg-sfcb-systemd
 %patch3 -p1 -b .format-security
 %patch4 -p1 -b .buffer-overflow-remove-tmpnam
-# removing COPYING, because it's misleading
-rm -f COPYING
-# ./autoconfiscate.sh
 
 %build
 %ifarch s390 s390x ppc ppc64
 export CFLAGS="$RPM_OPT_FLAGS -fsigned-char"
 %else
-export CFLAGS="$RPM_OPT_FLAGS" 
+export CFLAGS="$RPM_OPT_FLAGS"
 %endif
 %configure \
         TESTSUITEDIR=%{_datadir}/sblim-testsuite \
@@ -97,6 +94,8 @@ $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/msglogtest.sh \
 $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/messagelog.sh
 
 %files
+%license COPYING
+%doc AUTHORS ChangeLog INSTALL NEWS README
 %{_bindir}/syslog-service.sh
 %{provider_dir}/lib[Ss]yslog*.so*
 %{_datadir}/%{name}
@@ -129,6 +128,11 @@ $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/messagelog.sh
 %postun -p /sbin/ldconfig
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.9.0-19
+- Update Source0
+- Add %%doc and %%license
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

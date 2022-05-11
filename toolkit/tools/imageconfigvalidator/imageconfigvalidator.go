@@ -11,11 +11,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/installutils"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 var (
@@ -63,7 +64,28 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 	if err != nil {
 		return
 	}
+
 	err = validatePackages(config)
+	if err != nil {
+		return
+	}
+
+	err = validateKickStartInstall(config)
+	return
+}
+
+func validateKickStartInstall(config configuration.Config) (err error) {
+	// If doing a kickstart-style installation, then the image config file
+	// must not have any partitioning info because that will be provided
+	// by the preinstall script
+	for _, systemConfig := range config.SystemConfigs {
+		if systemConfig.IsKickStartBoot {
+			if len(config.Disks) > 0 || len(systemConfig.PartitionSettings) > 0 {
+				return fmt.Errorf("Partition should not be specified in image config file when performing kickstart installation")
+			}
+		}
+	}
+
 	return
 }
 

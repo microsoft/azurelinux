@@ -4,14 +4,14 @@
 package encryptview
 
 import (
-	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/navigationbar"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
-	"microsoft.com/pkggen/imagegen/configuration"
-
 	"github.com/gdamore/tcell"
 	"github.com/muesli/crunchy"
 	"github.com/rivo/tview"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uiutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 )
 
 // UI constants.

@@ -462,10 +462,10 @@ index ff4962750b3d..99484e8bbade 100644
  
  /*
 diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-index c287b9407f28..1d65f2801e13 100644
+index 981f0c4157c2..1d56f8536daf 100644
 --- a/arch/arm64/kernel/signal.c
 +++ b/arch/arm64/kernel/signal.c
-@@ -920,7 +920,7 @@ static void do_signal(struct pt_regs *regs)
+@@ -922,7 +922,7 @@ static void do_signal(struct pt_regs *regs)
  void do_notify_resume(struct pt_regs *regs, unsigned long thread_flags)
  {
  	do {
@@ -474,7 +474,7 @@ index c287b9407f28..1d65f2801e13 100644
  			/* Unmask Debug and SError for the next task */
  			local_daif_restore(DAIF_PROCCTX_NOIRQ);
  
-@@ -928,6 +928,14 @@ void do_notify_resume(struct pt_regs *regs, unsigned long thread_flags)
+@@ -930,6 +930,14 @@ void do_notify_resume(struct pt_regs *regs, unsigned long thread_flags)
  		} else {
  			local_daif_restore(DAIF_PROCCTX);
  
@@ -1019,7 +1019,7 @@ index c8848bb681a1..41fa1be980a3 100644
  #ifdef CONFIG_HOTPLUG_CPU
  void fixup_irqs(void)
 diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 1f96809606ac..3493d2b94530 100644
+index 819f8c2e2c67..6886c19ee362 100644
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
 @@ -107,6 +107,7 @@ config X86
@@ -1039,10 +1039,10 @@ index 1f96809606ac..3493d2b94530 100644
  	select HAVE_POSIX_CPU_TIMERS_TASK_WORK
  	select HAVE_REGS_AND_STACK_ACCESS_API
 diff --git a/arch/x86/include/asm/irq_stack.h b/arch/x86/include/asm/irq_stack.h
-index 8d55bd11848c..f755c217f67b 100644
+index e087cd7837c3..96cc92f63b06 100644
 --- a/arch/x86/include/asm/irq_stack.h
 +++ b/arch/x86/include/asm/irq_stack.h
-@@ -201,6 +201,7 @@
+@@ -202,6 +202,7 @@
  			      IRQ_CONSTRAINTS, regs, vector);		\
  }
  
@@ -1050,7 +1050,7 @@ index 8d55bd11848c..f755c217f67b 100644
  /*
   * Macro to invoke __do_softirq on the irq stack. This is only called from
   * task context when bottom halves are about to be reenabled and soft
-@@ -214,6 +215,8 @@
+@@ -215,6 +216,8 @@
  	__this_cpu_write(hardirq_stack_inuse, false);			\
  }
  
@@ -1362,10 +1362,10 @@ index a1202536fc57..a26a7c3849f5 100644
  #define orc_warn_current(args...)					\
  ({									\
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 61bc54748f22..62597025b6e7 100644
+index 5e2983959f23..0516459c2680 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8535,6 +8535,14 @@ int kvm_arch_init(void *opaque)
+@@ -8540,6 +8540,14 @@ int kvm_arch_init(void *opaque)
  		goto out;
  	}
  
@@ -2029,7 +2029,7 @@ index d030577ad6a2..ef1db3367df7 100644
  #include "hv_trace.h"
  
 diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 44bd0b6ff505..e51e488e5c2f 100644
+index a939ca1a8d54..3751c7408093 100644
 --- a/drivers/hv/vmbus_drv.c
 +++ b/drivers/hv/vmbus_drv.c
 @@ -22,6 +22,7 @@
@@ -2305,7 +2305,7 @@ index 1756a0ac6f08..3a2cbf35ea3d 100644
  	list_for_each_entry_safe(fcf, next, &del_list, list) {
  		/* Removes fcf from current list */
 diff --git a/drivers/scsi/libfc/fc_exch.c b/drivers/scsi/libfc/fc_exch.c
-index 841000445b9a..26d661ddc950 100644
+index aa223db4cf53..0ceb93800704 100644
 --- a/drivers/scsi/libfc/fc_exch.c
 +++ b/drivers/scsi/libfc/fc_exch.c
 @@ -825,10 +825,10 @@ static struct fc_exch *fc_exch_em_alloc(struct fc_lport *lport,
@@ -2550,10 +2550,10 @@ index fb65dc601b23..9af18b5d8296 100644
  
  static void mtk8250_set_flow_ctrl(struct uart_8250_port *up, int mode)
 diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
-index ec88b706e882..7774c63ce53d 100644
+index 723ec0806799..7d65cb9d62bc 100644
 --- a/drivers/tty/serial/8250/8250_port.c
 +++ b/drivers/tty/serial/8250/8250_port.c
-@@ -762,7 +762,7 @@ static void serial8250_set_sleep(struct uart_8250_port *p, int sleep)
+@@ -770,7 +770,7 @@ static void serial8250_set_sleep(struct uart_8250_port *p, int sleep)
  			serial_out(p, UART_EFR, UART_EFR_ECB);
  			serial_out(p, UART_LCR, 0);
  		}
@@ -2562,7 +2562,7 @@ index ec88b706e882..7774c63ce53d 100644
  		if (p->capabilities & UART_CAP_EFR) {
  			serial_out(p, UART_LCR, UART_LCR_CONF_MODE_B);
  			serial_out(p, UART_EFR, efr);
-@@ -1436,7 +1436,7 @@ static void serial8250_stop_rx(struct uart_port *port)
+@@ -1444,7 +1444,7 @@ static void serial8250_stop_rx(struct uart_port *port)
  
  	up->ier &= ~(UART_IER_RLSI | UART_IER_RDI);
  	up->port.read_status_mask &= ~UART_LSR_DR;
@@ -2571,7 +2571,7 @@ index ec88b706e882..7774c63ce53d 100644
  
  	serial8250_rpm_put(up);
  }
-@@ -1466,7 +1466,7 @@ void serial8250_em485_stop_tx(struct uart_8250_port *p)
+@@ -1474,7 +1474,7 @@ void serial8250_em485_stop_tx(struct uart_8250_port *p)
  		serial8250_clear_and_reinit_fifos(p);
  
  		p->ier |= UART_IER_RLSI | UART_IER_RDI;
@@ -2580,7 +2580,7 @@ index ec88b706e882..7774c63ce53d 100644
  	}
  }
  EXPORT_SYMBOL_GPL(serial8250_em485_stop_tx);
-@@ -1688,7 +1688,7 @@ static void serial8250_disable_ms(struct uart_port *port)
+@@ -1708,7 +1708,7 @@ static void serial8250_disable_ms(struct uart_port *port)
  	mctrl_gpio_disable_ms(up->gpios);
  
  	up->ier &= ~UART_IER_MSI;
@@ -2589,7 +2589,7 @@ index ec88b706e882..7774c63ce53d 100644
  }
  
  static void serial8250_enable_ms(struct uart_port *port)
-@@ -1704,7 +1704,7 @@ static void serial8250_enable_ms(struct uart_port *port)
+@@ -1724,7 +1724,7 @@ static void serial8250_enable_ms(struct uart_port *port)
  	up->ier |= UART_IER_MSI;
  
  	serial8250_rpm_get(up);
@@ -2598,7 +2598,7 @@ index ec88b706e882..7774c63ce53d 100644
  	serial8250_rpm_put(up);
  }
  
-@@ -2125,14 +2125,7 @@ static void serial8250_put_poll_char(struct uart_port *port,
+@@ -2143,14 +2143,7 @@ static void serial8250_put_poll_char(struct uart_port *port,
  	struct uart_8250_port *up = up_to_u8250p(port);
  
  	serial8250_rpm_get(up);
@@ -2614,7 +2614,7 @@ index ec88b706e882..7774c63ce53d 100644
  
  	wait_for_xmitr(up, BOTH_EMPTY);
  	/*
-@@ -2145,7 +2138,7 @@ static void serial8250_put_poll_char(struct uart_port *port,
+@@ -2163,7 +2156,7 @@ static void serial8250_put_poll_char(struct uart_port *port,
  	 *	and restore the IER
  	 */
  	wait_for_xmitr(up, BOTH_EMPTY);
@@ -2623,7 +2623,7 @@ index ec88b706e882..7774c63ce53d 100644
  	serial8250_rpm_put(up);
  }
  
-@@ -2448,7 +2441,7 @@ void serial8250_do_shutdown(struct uart_port *port)
+@@ -2466,7 +2459,7 @@ void serial8250_do_shutdown(struct uart_port *port)
  	 */
  	spin_lock_irqsave(&port->lock, flags);
  	up->ier = 0;
@@ -2632,7 +2632,7 @@ index ec88b706e882..7774c63ce53d 100644
  	spin_unlock_irqrestore(&port->lock, flags);
  
  	synchronize_irq(port->irq);
-@@ -2830,7 +2823,7 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
+@@ -2848,7 +2841,7 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
  	if (up->capabilities & UART_CAP_RTOIE)
  		up->ier |= UART_IER_RTOIE;
  
@@ -2641,7 +2641,7 @@ index ec88b706e882..7774c63ce53d 100644
  
  	if (up->capabilities & UART_CAP_EFR) {
  		unsigned char efr = 0;
-@@ -3296,7 +3289,7 @@ EXPORT_SYMBOL_GPL(serial8250_set_defaults);
+@@ -3314,7 +3307,7 @@ EXPORT_SYMBOL_GPL(serial8250_set_defaults);
  
  #ifdef CONFIG_SERIAL_8250_CONSOLE
  
@@ -2650,7 +2650,7 @@ index ec88b706e882..7774c63ce53d 100644
  {
  	struct uart_8250_port *up = up_to_u8250p(port);
  
-@@ -3304,6 +3297,18 @@ static void serial8250_console_putchar(struct uart_port *port, int ch)
+@@ -3322,6 +3315,18 @@ static void serial8250_console_putchar(struct uart_port *port, int ch)
  	serial_port_out(port, UART_TX, ch);
  }
  
@@ -2669,7 +2669,7 @@ index ec88b706e882..7774c63ce53d 100644
  /*
   *	Restore serial console when h/w power-off detected
   */
-@@ -3325,6 +3330,32 @@ static void serial8250_console_restore(struct uart_8250_port *up)
+@@ -3343,6 +3348,32 @@ static void serial8250_console_restore(struct uart_8250_port *up)
  	serial8250_out_MCR(up, UART_MCR_DTR | UART_MCR_RTS);
  }
  
@@ -2702,7 +2702,7 @@ index ec88b706e882..7774c63ce53d 100644
  /*
   *	Print a string to the serial port trying not to disturb
   *	any possible real use of the port...
-@@ -3341,24 +3372,12 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3359,24 +3390,12 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  	struct uart_port *port = &up->port;
  	unsigned long flags;
  	unsigned int ier;
@@ -2729,7 +2729,7 @@ index ec88b706e882..7774c63ce53d 100644
  
  	/* check scratch reg to see if port powered off during system sleep */
  	if (up->canary && (up->canary != serial_port_in(port, UART_SCR))) {
-@@ -3372,7 +3391,9 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3390,7 +3409,9 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  		mdelay(port->rs485.delay_rts_before_send);
  	}
  
@@ -2739,7 +2739,7 @@ index ec88b706e882..7774c63ce53d 100644
  
  	/*
  	 *	Finally, wait for transmitter to become empty
-@@ -3385,8 +3406,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3403,8 +3424,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  		if (em485->tx_stopped)
  			up->rs485_stop_tx(up);
  	}
@@ -2749,7 +2749,7 @@ index ec88b706e882..7774c63ce53d 100644
  
  	/*
  	 *	The receive handling will happen properly because the
-@@ -3398,8 +3418,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3416,8 +3436,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  	if (up->msr_saved_flags)
  		serial8250_modem_status(up);
  
@@ -2759,7 +2759,7 @@ index ec88b706e882..7774c63ce53d 100644
  }
  
  static unsigned int probe_baud(struct uart_port *port)
-@@ -3419,6 +3438,7 @@ static unsigned int probe_baud(struct uart_port *port)
+@@ -3437,6 +3456,7 @@ static unsigned int probe_baud(struct uart_port *port)
  
  int serial8250_console_setup(struct uart_port *port, char *options, bool probe)
  {
@@ -2767,7 +2767,7 @@ index ec88b706e882..7774c63ce53d 100644
  	int baud = 9600;
  	int bits = 8;
  	int parity = 'n';
-@@ -3428,6 +3448,8 @@ int serial8250_console_setup(struct uart_port *port, char *options, bool probe)
+@@ -3446,6 +3466,8 @@ int serial8250_console_setup(struct uart_port *port, char *options, bool probe)
  	if (!port->iobase && !port->membase)
  		return -ENODEV;
  
@@ -3118,7 +3118,7 @@ index b696543adab8..4799232935ee 100644
  	 * After the slowpath clears MNT_WRITE_HOLD, mnt_is_readonly will
  	 * be set to match its requirements. So we must not load that until
 diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
-index 9adc6f57a008..43989ec21a06 100644
+index 78219396788b..06bde5728e2f 100644
 --- a/fs/nfs/dir.c
 +++ b/fs/nfs/dir.c
 @@ -636,7 +636,7 @@ void nfs_prime_dcache(struct dentry *parent, struct nfs_entry *entry,
@@ -3130,7 +3130,7 @@ index 9adc6f57a008..43989ec21a06 100644
  	struct dentry *dentry;
  	struct dentry *alias;
  	struct inode *inode;
-@@ -1877,7 +1877,7 @@ int nfs_atomic_open(struct inode *dir, struct dentry *dentry,
+@@ -1867,7 +1867,7 @@ int nfs_atomic_open(struct inode *dir, struct dentry *dentry,
  		    struct file *file, unsigned open_flags,
  		    umode_t mode)
  {
@@ -3893,7 +3893,7 @@ index 9deedfeec2b1..7d049883a08a 100644
  
  extern void rt_mutex_unlock(struct rt_mutex *lock);
 diff --git a/include/linux/sched.h b/include/linux/sched.h
-index 76e869550646..8ce1a515a2b1 100644
+index 9016bbacedf3..52f06b92d916 100644
 --- a/include/linux/sched.h
 +++ b/include/linux/sched.h
 @@ -118,12 +118,8 @@ struct task_group;
@@ -3920,7 +3920,7 @@ index 76e869550646..8ce1a515a2b1 100644
  	unsigned long			sas_ss_sp;
  	size_t				sas_ss_size;
  	unsigned int			sas_ss_flags;
-@@ -1729,6 +1729,16 @@ static __always_inline bool is_percpu_thread(void)
+@@ -1737,6 +1737,16 @@ static __always_inline bool is_percpu_thread(void)
  #endif
  }
  
@@ -3937,7 +3937,7 @@ index 76e869550646..8ce1a515a2b1 100644
  /* Per-process atomic flags. */
  #define PFA_NO_NEW_PRIVS		0	/* May not gain new privileges. */
  #define PFA_SPREAD_PAGE			1	/* Spread page cache over cpuset */
-@@ -2004,6 +2014,118 @@ static inline int test_tsk_need_resched(struct task_struct *tsk)
+@@ -2012,6 +2022,118 @@ static inline int test_tsk_need_resched(struct task_struct *tsk)
  	return unlikely(test_tsk_thread_flag(tsk,TIF_NEED_RESCHED));
  }
  
@@ -4056,7 +4056,7 @@ index 76e869550646..8ce1a515a2b1 100644
  /*
   * cond_resched() and cond_resched_lock(): latency reduction via
   * explicit rescheduling in places that are safe. The return
-@@ -2038,7 +2160,7 @@ static inline int _cond_resched(void) { return 0; }
+@@ -2046,7 +2168,7 @@ static inline int _cond_resched(void) { return 0; }
  #endif /* !defined(CONFIG_PREEMPTION) || defined(CONFIG_PREEMPT_DYNAMIC) */
  
  #define cond_resched() ({			\
@@ -4065,7 +4065,7 @@ index 76e869550646..8ce1a515a2b1 100644
  	_cond_resched();			\
  })
  
-@@ -2046,19 +2168,38 @@ extern int __cond_resched_lock(spinlock_t *lock);
+@@ -2054,19 +2176,38 @@ extern int __cond_resched_lock(spinlock_t *lock);
  extern int __cond_resched_rwlock_read(rwlock_t *lock);
  extern int __cond_resched_rwlock_write(rwlock_t *lock);
  
@@ -4175,7 +4175,7 @@ index 5db211f43b29..aa011f668705 100644
  int serial8250_console_exit(struct uart_port *port);
  
 diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 532f5d402f06..d0faf14fe372 100644
+index e213acaa91ec..d8bc89ee46e3 100644
 --- a/include/linux/skbuff.h
 +++ b/include/linux/skbuff.h
 @@ -300,6 +300,7 @@ struct sk_buff_head {
@@ -4186,7 +4186,7 @@ index 532f5d402f06..d0faf14fe372 100644
  };
  
  struct sk_buff;
-@@ -1935,6 +1936,12 @@ static inline void skb_queue_head_init(struct sk_buff_head *list)
+@@ -1945,6 +1946,12 @@ static inline void skb_queue_head_init(struct sk_buff_head *list)
  	__skb_queue_head_init(list);
  }
  
@@ -4854,10 +4854,10 @@ index 11f8a845f259..0b8a65ae1d72 100644
  	   SLOB replaces the stock allocator with a drastically simpler
  	   allocator. SLOB is generally more space efficient but
 diff --git a/init/main.c b/init/main.c
-index bcd132d4e7bd..af4c7f963955 100644
+index 06b98350ebd2..e0ddf907950a 100644
 --- a/init/main.c
 +++ b/init/main.c
-@@ -1604,6 +1604,7 @@ static noinline void __init kernel_init_freeable(void)
+@@ -1608,6 +1608,7 @@ static noinline void __init kernel_init_freeable(void)
  
  	rcu_init_tasks_generic();
  	do_pre_smp_initcalls();
@@ -5676,10 +5676,10 @@ index 5b37a8567168..4a4d7092a2d8 100644
  	kfree(create);
  	return task;
 diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 92127296cf2b..cfd5cbf86470 100644
+index a30702b847ba..3aa2a6df1f87 100644
 --- a/kernel/locking/lockdep.c
 +++ b/kernel/locking/lockdep.c
-@@ -5473,6 +5473,7 @@ static noinstr void check_flags(unsigned long flags)
+@@ -5475,6 +5475,7 @@ static noinstr void check_flags(unsigned long flags)
  		}
  	}
  
@@ -5687,7 +5687,7 @@ index 92127296cf2b..cfd5cbf86470 100644
  	/*
  	 * We dont accurately track softirq state in e.g.
  	 * hardirq contexts (such as on 4KSTACKS), so only
-@@ -5487,6 +5488,7 @@ static noinstr void check_flags(unsigned long flags)
+@@ -5489,6 +5490,7 @@ static noinstr void check_flags(unsigned long flags)
  			DEBUG_LOCKS_WARN_ON(!current->softirqs_enabled);
  		}
  	}
@@ -6039,7 +6039,7 @@ index 9f3ed2fdb721..de8ab059dd96 100644
 -static inline bool printk_percpu_data_ready(void) { return false; }
  #endif /* CONFIG_PRINTK */
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 99221b016c68..0cc8e8acf545 100644
+index 7aeb13542ce7..c70f9cad56e2 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -44,6 +44,10 @@
@@ -6053,7 +6053,7 @@ index 99221b016c68..0cc8e8acf545 100644
  #include <linux/sched/clock.h>
  #include <linux/sched/debug.h>
  #include <linux/sched/task_stack.h>
-@@ -225,19 +229,7 @@ static int nr_ext_console_drivers;
+@@ -227,19 +231,7 @@ static int nr_ext_console_drivers;
  
  static int __down_trylock_console_sem(unsigned long ip)
  {
@@ -6074,7 +6074,7 @@ index 99221b016c68..0cc8e8acf545 100644
  		return 1;
  	mutex_acquire(&console_lock_dep_map, 0, 1, ip);
  	return 0;
-@@ -246,13 +238,9 @@ static int __down_trylock_console_sem(unsigned long ip)
+@@ -248,13 +240,9 @@ static int __down_trylock_console_sem(unsigned long ip)
  
  static void __up_console_sem(unsigned long ip)
  {
@@ -6088,7 +6088,7 @@ index 99221b016c68..0cc8e8acf545 100644
  }
  #define up_console_sem() __up_console_sem(_RET_IP_)
  
-@@ -266,11 +254,6 @@ static void __up_console_sem(unsigned long ip)
+@@ -268,11 +256,6 @@ static void __up_console_sem(unsigned long ip)
   */
  static int console_locked, console_suspended;
  
@@ -6100,7 +6100,7 @@ index 99221b016c68..0cc8e8acf545 100644
  /*
   *	Array of consoles built from command line options (console=)
   */
-@@ -350,10 +333,13 @@ static int console_msg_format = MSG_FORMAT_DEFAULT;
+@@ -352,10 +335,13 @@ static int console_msg_format = MSG_FORMAT_DEFAULT;
   * non-prinatable characters are escaped in the "\xff" notation.
   */
  
@@ -6115,7 +6115,7 @@ index 99221b016c68..0cc8e8acf545 100644
  DECLARE_WAIT_QUEUE_HEAD(log_wait);
  /* All 3 protected by @syslog_lock. */
  /* the next printk record to read by syslog(READ) or /proc/kmsg */
-@@ -361,17 +347,6 @@ static u64 syslog_seq;
+@@ -363,17 +349,6 @@ static u64 syslog_seq;
  static size_t syslog_partial;
  static bool syslog_time;
  
@@ -6133,7 +6133,7 @@ index 99221b016c68..0cc8e8acf545 100644
  /*
   * The next printk record to read after the last 'clear' command. There are
   * two copies (updated with seqcount_latch) so that reads can locklessly
-@@ -389,9 +364,6 @@ static struct latched_seq clear_seq = {
+@@ -391,9 +366,6 @@ static struct latched_seq clear_seq = {
  #define PREFIX_MAX		32
  #endif
  
@@ -6143,7 +6143,7 @@ index 99221b016c68..0cc8e8acf545 100644
  /* the maximum size allowed to be reserved for a record */
  #define LOG_LINE_MAX		(CONSOLE_LOG_MAX - PREFIX_MAX)
  
-@@ -430,12 +402,12 @@ static struct printk_ringbuffer *prb = &printk_rb_static;
+@@ -432,12 +404,12 @@ static struct printk_ringbuffer *prb = &printk_rb_static;
   */
  static bool __printk_percpu_data_ready __read_mostly;
  
@@ -6158,7 +6158,7 @@ index 99221b016c68..0cc8e8acf545 100644
  static void latched_seq_write(struct latched_seq *ls, u64 val)
  {
  	raw_write_seqcount_latch(&ls->latch);
-@@ -1747,188 +1719,152 @@ SYSCALL_DEFINE3(syslog, int, type, char __user *, buf, int, len)
+@@ -1749,188 +1721,152 @@ SYSCALL_DEFINE3(syslog, int, type, char __user *, buf, int, len)
  	return do_syslog(type, buf, len, SYSLOG_FROM_READER);
  }
  
@@ -6461,7 +6461,7 @@ index 99221b016c68..0cc8e8acf545 100644
  }
  
  /*
-@@ -2001,20 +1937,6 @@ static u8 *__printk_recursion_counter(void)
+@@ -2003,20 +1939,6 @@ static u8 *__printk_recursion_counter(void)
  		local_irq_restore(flags);		\
  	} while (0)
  
@@ -6482,7 +6482,7 @@ index 99221b016c68..0cc8e8acf545 100644
  static inline u32 printk_caller_id(void)
  {
  	return in_task() ? task_pid_nr(current) :
-@@ -2095,13 +2017,14 @@ static u16 printk_sprint(char *text, u16 size, int facility,
+@@ -2097,13 +2019,14 @@ static u16 printk_sprint(char *text, u16 size, int facility,
  }
  
  __printf(4, 0)
@@ -6500,7 +6500,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	struct printk_record r;
  	unsigned long irqflags;
  	u16 trunc_msg_len = 0;
-@@ -2112,6 +2035,7 @@ int vprintk_store(int facility, int level,
+@@ -2114,6 +2037,7 @@ int vprintk_store(int facility, int level,
  	u16 text_len;
  	int ret = 0;
  	u64 ts_nsec;
@@ -6508,7 +6508,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  	/*
  	 * Since the duration of printk() can vary depending on the message
-@@ -2150,6 +2074,7 @@ int vprintk_store(int facility, int level,
+@@ -2152,6 +2076,7 @@ int vprintk_store(int facility, int level,
  	if (flags & LOG_CONT) {
  		prb_rec_init_wr(&r, reserve_size);
  		if (prb_reserve_in_last(&e, prb, &r, caller_id, LOG_LINE_MAX)) {
@@ -6516,7 +6516,7 @@ index 99221b016c68..0cc8e8acf545 100644
  			text_len = printk_sprint(&r.text_buf[r.info->text_len], reserve_size,
  						 facility, &flags, fmt, args);
  			r.info->text_len += text_len;
-@@ -2157,6 +2082,7 @@ int vprintk_store(int facility, int level,
+@@ -2159,6 +2084,7 @@ int vprintk_store(int facility, int level,
  			if (flags & LOG_NEWLINE) {
  				r.info->flags |= LOG_NEWLINE;
  				prb_final_commit(&e);
@@ -6524,7 +6524,7 @@ index 99221b016c68..0cc8e8acf545 100644
  			} else {
  				prb_commit(&e);
  			}
-@@ -2180,6 +2106,7 @@ int vprintk_store(int facility, int level,
+@@ -2182,6 +2108,7 @@ int vprintk_store(int facility, int level,
  		if (!prb_reserve(&e, prb, &r))
  			goto out;
  	}
@@ -6532,7 +6532,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  	/* fill message */
  	text_len = printk_sprint(&r.text_buf[0], reserve_size, facility, &flags, fmt, args);
-@@ -2195,13 +2122,25 @@ int vprintk_store(int facility, int level,
+@@ -2197,13 +2124,25 @@ int vprintk_store(int facility, int level,
  		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
  
  	/* A message without a trailing newline can be continued. */
@@ -6560,7 +6560,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	printk_exit_irqrestore(recursion_ptr, irqflags);
  	return ret;
  }
-@@ -2211,50 +2150,43 @@ asmlinkage int vprintk_emit(int facility, int level,
+@@ -2213,50 +2152,43 @@ asmlinkage int vprintk_emit(int facility, int level,
  			    const char *fmt, va_list args)
  {
  	int printed_len;
@@ -6631,7 +6631,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  asmlinkage __visible int _printk(const char *fmt, ...)
  {
-@@ -2269,37 +2201,162 @@ asmlinkage __visible int _printk(const char *fmt, ...)
+@@ -2271,37 +2203,162 @@ asmlinkage __visible int _printk(const char *fmt, ...)
  }
  EXPORT_SYMBOL(_printk);
  
@@ -6817,7 +6817,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  #endif /* CONFIG_PRINTK */
  
-@@ -2556,34 +2613,6 @@ int is_console_locked(void)
+@@ -2558,34 +2615,6 @@ int is_console_locked(void)
  }
  EXPORT_SYMBOL(is_console_locked);
  
@@ -6852,7 +6852,7 @@ index 99221b016c68..0cc8e8acf545 100644
  /**
   * console_unlock - unlock the console system
   *
-@@ -2600,140 +2629,13 @@ static inline int can_use_console(void)
+@@ -2602,140 +2631,13 @@ static inline int can_use_console(void)
   */
  void console_unlock(void)
  {
@@ -6993,7 +6993,7 @@ index 99221b016c68..0cc8e8acf545 100644
  }
  EXPORT_SYMBOL(console_unlock);
  
-@@ -2783,18 +2685,20 @@ void console_unblank(void)
+@@ -2785,18 +2687,20 @@ void console_unblank(void)
   */
  void console_flush_on_panic(enum con_flush_mode mode)
  {
@@ -7025,7 +7025,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	console_unlock();
  }
  
-@@ -2930,6 +2834,7 @@ static int try_enable_new_console(struct console *newcon, bool user_specified)
+@@ -2932,6 +2836,7 @@ static int try_enable_new_console(struct console *newcon, bool user_specified)
  void register_console(struct console *newcon)
  {
  	struct console *bcon = NULL;
@@ -7033,7 +7033,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	int err;
  
  	for_each_console(bcon) {
-@@ -2952,6 +2857,8 @@ void register_console(struct console *newcon)
+@@ -2954,6 +2859,8 @@ void register_console(struct console *newcon)
  		}
  	}
  
@@ -7042,7 +7042,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	if (console_drivers && console_drivers->flags & CON_BOOT)
  		bcon = console_drivers;
  
-@@ -2993,8 +2900,10 @@ void register_console(struct console *newcon)
+@@ -2995,8 +2902,10 @@ void register_console(struct console *newcon)
  	 * the real console are the same physical device, it's annoying to
  	 * see the beginning boot messages twice
  	 */
@@ -7054,7 +7054,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  	/*
  	 *	Put this console in the list - keep the
-@@ -3016,27 +2925,21 @@ void register_console(struct console *newcon)
+@@ -3018,27 +2927,21 @@ void register_console(struct console *newcon)
  	if (newcon->flags & CON_EXTENDED)
  		nr_ext_console_drivers++;
  
@@ -7096,7 +7096,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	console_unlock();
  	console_sysfs_notify();
  
-@@ -3110,6 +3013,9 @@ int unregister_console(struct console *console)
+@@ -3112,6 +3015,9 @@ int unregister_console(struct console *console)
  	console_unlock();
  	console_sysfs_notify();
  
@@ -7106,7 +7106,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	if (console->exit)
  		res = console->exit(console);
  
-@@ -3192,6 +3098,15 @@ static int __init printk_late_init(void)
+@@ -3194,6 +3100,15 @@ static int __init printk_late_init(void)
  			unregister_console(con);
  		}
  	}
@@ -7122,7 +7122,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	ret = cpuhp_setup_state_nocalls(CPUHP_PRINTK_DEAD, "printk:dead", NULL,
  					console_cpu_notify);
  	WARN_ON(ret < 0);
-@@ -3207,7 +3122,6 @@ late_initcall(printk_late_init);
+@@ -3209,7 +3124,6 @@ late_initcall(printk_late_init);
   * Delayed printk version, for scheduler-internal messages:
   */
  #define PRINTK_PENDING_WAKEUP	0x01
@@ -7130,7 +7130,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  static DEFINE_PER_CPU(int, printk_pending);
  
-@@ -3215,14 +3129,8 @@ static void wake_up_klogd_work_func(struct irq_work *irq_work)
+@@ -3217,14 +3131,8 @@ static void wake_up_klogd_work_func(struct irq_work *irq_work)
  {
  	int pending = __this_cpu_xchg(printk_pending, 0);
  
@@ -7146,7 +7146,7 @@ index 99221b016c68..0cc8e8acf545 100644
  }
  
  static DEFINE_PER_CPU(struct irq_work, wake_up_klogd_work) =
-@@ -3241,42 +3149,9 @@ void wake_up_klogd(void)
+@@ -3243,42 +3151,9 @@ void wake_up_klogd(void)
  	preempt_enable();
  }
  
@@ -7190,7 +7190,7 @@ index 99221b016c68..0cc8e8acf545 100644
  }
  
  /*
-@@ -3405,6 +3280,24 @@ void kmsg_dump(enum kmsg_dump_reason reason)
+@@ -3407,6 +3282,24 @@ void kmsg_dump(enum kmsg_dump_reason reason)
  {
  	struct kmsg_dumper *dumper;
  
@@ -7215,7 +7215,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	rcu_read_lock();
  	list_for_each_entry_rcu(dumper, &dump_list, list) {
  		enum kmsg_dump_reason max_reason = dumper->max_reason;
-@@ -3587,6 +3480,7 @@ EXPORT_SYMBOL_GPL(kmsg_dump_rewind);
+@@ -3589,6 +3482,7 @@ EXPORT_SYMBOL_GPL(kmsg_dump_rewind);
  #ifdef CONFIG_SMP
  static atomic_t printk_cpulock_owner = ATOMIC_INIT(-1);
  static atomic_t printk_cpulock_nested = ATOMIC_INIT(0);
@@ -7223,7 +7223,7 @@ index 99221b016c68..0cc8e8acf545 100644
  
  /**
   * __printk_wait_on_cpu_lock() - Busy wait until the printk cpu-reentrant
-@@ -3666,6 +3560,9 @@ EXPORT_SYMBOL(__printk_cpu_trylock);
+@@ -3668,6 +3562,9 @@ EXPORT_SYMBOL(__printk_cpu_trylock);
   */
  void __printk_cpu_unlock(void)
  {
@@ -7233,7 +7233,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	if (atomic_read(&printk_cpulock_nested)) {
  		atomic_dec(&printk_cpulock_nested);
  		return;
-@@ -3676,6 +3573,12 @@ void __printk_cpu_unlock(void)
+@@ -3678,6 +3575,12 @@ void __printk_cpu_unlock(void)
  	 * LMM(__printk_cpu_unlock:A)
  	 */
  
@@ -7246,7 +7246,7 @@ index 99221b016c68..0cc8e8acf545 100644
  	/*
  	 * Guarantee loads and stores from this CPU when it was the
  	 * lock owner are visible to the next lock owner. This pairs
-@@ -3696,6 +3599,98 @@ void __printk_cpu_unlock(void)
+@@ -3698,6 +3601,98 @@ void __printk_cpu_unlock(void)
  	 */
  	atomic_set_release(&printk_cpulock_owner,
  			   -1); /* LMM(__printk_cpu_unlock:B) */
@@ -7404,7 +7404,7 @@ index ef0f9a2044da..000000000000
 -}
 -EXPORT_SYMBOL(vprintk);
 diff --git a/kernel/ptrace.c b/kernel/ptrace.c
-index f8589bf8d7dc..df08e8e64a83 100644
+index 516ad5e65849..98a80f95ff39 100644
 --- a/kernel/ptrace.c
 +++ b/kernel/ptrace.c
 @@ -197,7 +197,18 @@ static bool ptrace_freeze_traced(struct task_struct *task)
@@ -7539,10 +7539,10 @@ index 4ca6d5b199e8..477ebf6ec712 100644
  	div = div < 0 ? 7 : div > sizeof(long) * 8 - 2 ? sizeof(long) * 8 - 2 : div;
  	bl = max(rdp->blimit, pending >> div);
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index a0747eaa2dba..a031f078b084 100644
+index 779f3198b17d..243ae889ee67 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -74,7 +74,11 @@ __read_mostly int sysctl_resched_latency_warn_once = 1;
+@@ -75,7 +75,11 @@ __read_mostly int sysctl_resched_latency_warn_once = 1;
   * Number of tasks to iterate in a single balance run.
   * Limited because this is done with IRQs disabled.
   */
@@ -7554,7 +7554,7 @@ index a0747eaa2dba..a031f078b084 100644
  
  /*
   * period over which we measure -rt task CPU usage in us.
-@@ -982,6 +986,46 @@ void resched_curr(struct rq *rq)
+@@ -983,6 +987,46 @@ void resched_curr(struct rq *rq)
  		trace_sched_wake_idle_without_ipi(cpu);
  }
  
@@ -7601,7 +7601,7 @@ index a0747eaa2dba..a031f078b084 100644
  void resched_cpu(int cpu)
  {
  	struct rq *rq = cpu_rq(cpu);
-@@ -2137,6 +2181,7 @@ void migrate_disable(void)
+@@ -2138,6 +2182,7 @@ void migrate_disable(void)
  	preempt_disable();
  	this_rq()->nr_pinned++;
  	p->migration_disabled = 1;
@@ -7609,7 +7609,7 @@ index a0747eaa2dba..a031f078b084 100644
  	preempt_enable();
  }
  EXPORT_SYMBOL_GPL(migrate_disable);
-@@ -2148,6 +2193,8 @@ void migrate_enable(void)
+@@ -2149,6 +2194,8 @@ void migrate_enable(void)
  	if (p->migration_disabled > 1) {
  		p->migration_disabled--;
  		return;
@@ -7618,7 +7618,7 @@ index a0747eaa2dba..a031f078b084 100644
  	}
  
  	/*
-@@ -2165,6 +2212,7 @@ void migrate_enable(void)
+@@ -2166,6 +2213,7 @@ void migrate_enable(void)
  	barrier();
  	p->migration_disabled = 0;
  	this_rq()->nr_pinned--;
@@ -7626,7 +7626,7 @@ index a0747eaa2dba..a031f078b084 100644
  	preempt_enable();
  }
  EXPORT_SYMBOL_GPL(migrate_enable);
-@@ -2944,9 +2992,8 @@ void force_compatible_cpus_allowed_ptr(struct task_struct *p)
+@@ -2945,9 +2993,8 @@ void force_compatible_cpus_allowed_ptr(struct task_struct *p)
  
  out_set_mask:
  	if (printk_ratelimit()) {
@@ -7638,7 +7638,7 @@ index a0747eaa2dba..a031f078b084 100644
  	}
  
  	WARN_ON(set_cpus_allowed_ptr(p, override_mask));
-@@ -3202,7 +3249,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
+@@ -3203,7 +3250,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
  		 * is actually now running somewhere else!
  		 */
  		while (task_running(rq, p)) {
@@ -7647,7 +7647,7 @@ index a0747eaa2dba..a031f078b084 100644
  				return 0;
  			cpu_relax();
  		}
-@@ -3217,7 +3264,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
+@@ -3218,7 +3265,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
  		running = task_running(rq, p);
  		queued = task_on_rq_queued(p);
  		ncsw = 0;
@@ -7656,7 +7656,7 @@ index a0747eaa2dba..a031f078b084 100644
  			ncsw = p->nvcsw | LONG_MIN; /* sets MSB */
  		task_rq_unlock(rq, p, &rf);
  
-@@ -3251,7 +3298,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
+@@ -3252,7 +3299,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
  			ktime_t to = NSEC_PER_SEC / HZ;
  
  			set_current_state(TASK_UNINTERRUPTIBLE);
@@ -7665,7 +7665,7 @@ index a0747eaa2dba..a031f078b084 100644
  			continue;
  		}
  
-@@ -3376,8 +3423,8 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
+@@ -3377,8 +3424,8 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
  		 * leave kernel.
  		 */
  		if (p->mm && printk_ratelimit()) {
@@ -7676,7 +7676,7 @@ index a0747eaa2dba..a031f078b084 100644
  		}
  	}
  
-@@ -4385,6 +4432,9 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
+@@ -4386,6 +4433,9 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
  	p->on_cpu = 0;
  #endif
  	init_task_preempt_count(p);
@@ -7686,7 +7686,7 @@ index a0747eaa2dba..a031f078b084 100644
  #ifdef CONFIG_SMP
  	plist_node_init(&p->pushable_tasks, MAX_PRIO);
  	RB_CLEAR_NODE(&p->pushable_dl_tasks);
-@@ -4849,20 +4899,18 @@ static struct rq *finish_task_switch(struct task_struct *prev)
+@@ -4850,20 +4900,18 @@ static struct rq *finish_task_switch(struct task_struct *prev)
  	 */
  	if (mm) {
  		membarrier_mm_sync_core_before_usermode(mm);
@@ -7712,7 +7712,7 @@ index a0747eaa2dba..a031f078b084 100644
  
  		put_task_struct_rcu_user(prev);
  	}
-@@ -6263,6 +6311,7 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+@@ -6264,6 +6312,7 @@ static void __sched notrace __schedule(unsigned int sched_mode)
  
  	next = pick_next_task(rq, prev, &rf);
  	clear_tsk_need_resched(prev);
@@ -7720,7 +7720,7 @@ index a0747eaa2dba..a031f078b084 100644
  	clear_preempt_need_resched();
  #ifdef CONFIG_SCHED_DEBUG
  	rq->last_seen_need_resched_ns = 0;
-@@ -6480,6 +6529,30 @@ static void __sched notrace preempt_schedule_common(void)
+@@ -6481,6 +6530,30 @@ static void __sched notrace preempt_schedule_common(void)
  	} while (need_resched());
  }
  
@@ -7751,7 +7751,7 @@ index a0747eaa2dba..a031f078b084 100644
  #ifdef CONFIG_PREEMPTION
  /*
   * This is the entry point to schedule() from in-kernel preemption
-@@ -6493,7 +6566,8 @@ asmlinkage __visible void __sched notrace preempt_schedule(void)
+@@ -6494,7 +6567,8 @@ asmlinkage __visible void __sched notrace preempt_schedule(void)
  	 */
  	if (likely(!preemptible()))
  		return;
@@ -7761,7 +7761,7 @@ index a0747eaa2dba..a031f078b084 100644
  	preempt_schedule_common();
  }
  NOKPROBE_SYMBOL(preempt_schedule);
-@@ -6526,6 +6600,9 @@ asmlinkage __visible void __sched notrace preempt_schedule_notrace(void)
+@@ -6527,6 +6601,9 @@ asmlinkage __visible void __sched notrace preempt_schedule_notrace(void)
  	if (likely(!preemptible()))
  		return;
  
@@ -7771,7 +7771,7 @@ index a0747eaa2dba..a031f078b084 100644
  	do {
  		/*
  		 * Because the function tracer can trace preempt_count_sub()
-@@ -8678,7 +8755,9 @@ void __init init_idle(struct task_struct *idle, int cpu)
+@@ -8679,7 +8756,9 @@ void __init init_idle(struct task_struct *idle, int cpu)
  
  	/* Set the preempt count _outside_ the spinlocks! */
  	init_idle_preempt_count(idle, cpu);
@@ -7782,7 +7782,7 @@ index a0747eaa2dba..a031f078b084 100644
  	/*
  	 * The idle tasks have their own, simple scheduling class:
  	 */
-@@ -9472,14 +9551,8 @@ void __init sched_init(void)
+@@ -9473,14 +9552,8 @@ void __init sched_init(void)
  }
  
  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
@@ -7798,7 +7798,7 @@ index a0747eaa2dba..a031f078b084 100644
  {
  	unsigned int state = get_current_state();
  	/*
-@@ -9493,11 +9566,32 @@ void __might_sleep(const char *file, int line, int preempt_offset)
+@@ -9494,11 +9567,32 @@ void __might_sleep(const char *file, int line, int preempt_offset)
  			(void *)current->task_state_change,
  			(void *)current->task_state_change);
  
@@ -7833,7 +7833,7 @@ index a0747eaa2dba..a031f078b084 100644
  {
  	/* Ratelimiting timestamp: */
  	static unsigned long prev_jiffy;
-@@ -9507,7 +9601,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
+@@ -9508,7 +9602,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
  	/* WARN_ON_ONCE() by default, no rate limit required: */
  	rcu_sleep_check();
  
@@ -7842,7 +7842,7 @@ index a0747eaa2dba..a031f078b084 100644
  	     !is_idle_task(current) && !current->non_block_count) ||
  	    system_state == SYSTEM_BOOTING || system_state > SYSTEM_RUNNING ||
  	    oops_in_progress)
-@@ -9520,29 +9614,33 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
+@@ -9521,29 +9615,33 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
  	/* Save this before calling printk(), since that will clobber it: */
  	preempt_disable_ip = get_preempt_disable_ip(current);
  
@@ -7891,7 +7891,7 @@ index a0747eaa2dba..a031f078b084 100644
  void __cant_sleep(const char *file, int line, int preempt_offset)
  {
 diff --git a/kernel/sched/deadline.c b/kernel/sched/deadline.c
-index e94314633b39..fd7c4f972aaf 100644
+index 1f811b375bf0..3917cf8b6b1a 100644
 --- a/kernel/sched/deadline.c
 +++ b/kernel/sched/deadline.c
 @@ -800,7 +800,7 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
@@ -7904,7 +7904,7 @@ index e94314633b39..fd7c4f972aaf 100644
  		dl_se->runtime = pi_of(dl_se)->dl_runtime;
  	}
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 6420580f2730..238104c6431f 100644
+index 02766f3fe206..2e9d66ec812c 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -4247,10 +4247,7 @@ static inline void check_schedstat_required(void)
@@ -7973,7 +7973,7 @@ index 6420580f2730..238104c6431f 100644
  	/*
  	 * Only set the backward buddy when the current task is still
  	 * on the rq. This can happen when a wakeup gets interleaved
-@@ -11121,7 +11118,7 @@ static void task_fork_fair(struct task_struct *p)
+@@ -11123,7 +11120,7 @@ static void task_fork_fair(struct task_struct *p)
  		 * 'current' within the tree based on its new key value.
  		 */
  		swap(curr->vruntime, se->vruntime);
@@ -7982,7 +7982,7 @@ index 6420580f2730..238104c6431f 100644
  	}
  
  	se->vruntime -= cfs_rq->min_vruntime;
-@@ -11148,7 +11145,7 @@ prio_changed_fair(struct rq *rq, struct task_struct *p, int oldprio)
+@@ -11150,7 +11147,7 @@ prio_changed_fair(struct rq *rq, struct task_struct *p, int oldprio)
  	 */
  	if (task_current(rq, p)) {
  		if (p->prio > oldprio)
@@ -8049,7 +8049,7 @@ index 422f3b0445cf..2332f04b8181 100644
  	}
  
 diff --git a/kernel/sched/rt.c b/kernel/sched/rt.c
-index 54f9bb3f1560..709799a5a85d 100644
+index 2758cf5f7987..348c53a0b7cb 100644
 --- a/kernel/sched/rt.c
 +++ b/kernel/sched/rt.c
 @@ -982,7 +982,7 @@ static int sched_rt_runtime_exceeded(struct rt_rq *rt_rq)
@@ -8338,7 +8338,7 @@ index b73e8850e58d..149cc4b08d8e 100644
  }
  
 diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index 01002656f1ae..76ea2013135c 100644
+index b49756608f83..73172db23c84 100644
 --- a/kernel/trace/trace.c
 +++ b/kernel/trace/trace.c
 @@ -2636,7 +2636,13 @@ unsigned int tracing_gen_ctx_irq_test(unsigned int irqs_status)
@@ -8356,7 +8356,7 @@ index 01002656f1ae..76ea2013135c 100644
  		(min_t(unsigned int, migration_disable_value(), 0xf)) << 4;
  }
  
-@@ -4212,15 +4218,17 @@ unsigned long trace_total_entries(struct trace_array *tr)
+@@ -4217,15 +4223,17 @@ unsigned long trace_total_entries(struct trace_array *tr)
  
  static void print_lat_help_header(struct seq_file *m)
  {
@@ -8383,7 +8383,7 @@ index 01002656f1ae..76ea2013135c 100644
  }
  
  static void print_event_info(struct array_buffer *buf, struct seq_file *m)
-@@ -4254,14 +4262,16 @@ static void print_func_help_header_irq(struct array_buffer *buf, struct seq_file
+@@ -4259,14 +4267,16 @@ static void print_func_help_header_irq(struct array_buffer *buf, struct seq_file
  
  	print_event_info(buf, m);
  
@@ -8409,10 +8409,10 @@ index 01002656f1ae..76ea2013135c 100644
  
  void
 diff --git a/kernel/trace/trace_events.c b/kernel/trace/trace_events.c
-index 44d031ffe511..01165b0ed6aa 100644
+index c072e8b9849c..0098d7713f91 100644
 --- a/kernel/trace/trace_events.c
 +++ b/kernel/trace/trace_events.c
-@@ -184,6 +184,7 @@ static int trace_define_common_fields(void)
+@@ -192,6 +192,7 @@ static int trace_define_common_fields(void)
  	/* Holds both preempt_count and migrate_disable */
  	__common_field(unsigned char, preempt_count);
  	__common_field(int, pid);
@@ -9213,11 +9213,11 @@ index abb3432ed744..d5e82e4a57ad 100644
  			kunmap(miter->page);
 diff --git a/localversion-rt b/localversion-rt
 new file mode 100644
-index 000000000000..5498386d0d0c
+index 000000000000..2af6c89aee6d
 --- /dev/null
 +++ b/localversion-rt
 @@ -0,0 +1 @@
-+-rt39
++-rt40
 diff --git a/mm/Kconfig b/mm/Kconfig
 index c048dea7e342..88778414465b 100644
 --- a/mm/Kconfig
@@ -9232,10 +9232,10 @@ index c048dea7e342..88778414465b 100644
  	select XARRAY_MULTI
  	help
 diff --git a/mm/memory.c b/mm/memory.c
-index c52be6d6b605..e2c623027e32 100644
+index bdf7185f1bf2..a94622295533 100644
 --- a/mm/memory.c
 +++ b/mm/memory.c
-@@ -5265,7 +5265,7 @@ void __might_fault(const char *file, int line)
+@@ -5287,7 +5287,7 @@ void __might_fault(const char *file, int line)
  		return;
  	if (pagefault_disabled())
  		return;
@@ -9245,7 +9245,7 @@ index c52be6d6b605..e2c623027e32 100644
  	if (current->mm)
  		might_lock_read(&current->mm->mmap_lock);
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 7773bae3b6ed..33ecf2df08d1 100644
+index a4b0d7c1da56..8144e2587103 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
 @@ -3149,9 +3149,9 @@ static void drain_local_pages_wq(struct work_struct *work)
@@ -9525,7 +9525,7 @@ index fb13460c6dab..074472dfa94a 100644
  config BQL
  	bool
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 33dc2a3ff7d7..18e39b1a5c4e 100644
+index 804aba2228c2..c70dd117cbb6 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
 @@ -225,14 +225,14 @@ static inline struct hlist_head *dev_index_hash(struct net *net, int ifindex)
@@ -9711,7 +9711,7 @@ index 33dc2a3ff7d7..18e39b1a5c4e 100644
  		netif_rx_ni(skb);
  		input_queue_head_incr(oldsd);
  	}
-@@ -11639,7 +11648,7 @@ static int __init net_dev_init(void)
+@@ -11638,7 +11647,7 @@ static int __init net_dev_init(void)
  
  		INIT_WORK(flush, flush_backlog);
  
@@ -10187,7 +10187,7 @@ index 1a455847da54..9599afd0862d 100644
  
  
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 91d7a5a5a08d..003666616a8d 100644
+index 9c0e8ccf9bc5..8c85e93daa73 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
 @@ -842,9 +842,9 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
@@ -10237,85 +10237,6 @@ index 26c32407f029..ea7b96e296ef 100644
  	}
  }
  
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 75737267746f..e460c84b1f8e 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -637,7 +637,9 @@ int __inet_hash(struct sock *sk, struct sock *osk)
- 	int err = 0;
- 
- 	if (sk->sk_state != TCP_LISTEN) {
-+		local_bh_disable();
- 		inet_ehash_nolisten(sk, osk, NULL);
-+		local_bh_enable();
- 		return 0;
- 	}
- 	WARN_ON(!sk_unhashed(sk));
-@@ -669,11 +671,8 @@ int inet_hash(struct sock *sk)
- {
- 	int err = 0;
- 
--	if (sk->sk_state != TCP_CLOSE) {
--		local_bh_disable();
-+	if (sk->sk_state != TCP_CLOSE)
- 		err = __inet_hash(sk, NULL);
--		local_bh_enable();
--	}
- 
- 	return err;
- }
-@@ -684,17 +683,20 @@ void inet_unhash(struct sock *sk)
- 	struct inet_hashinfo *hashinfo = sk->sk_prot->h.hashinfo;
- 	struct inet_listen_hashbucket *ilb = NULL;
- 	spinlock_t *lock;
-+	bool state_listen;
- 
- 	if (sk_unhashed(sk))
- 		return;
- 
- 	if (sk->sk_state == TCP_LISTEN) {
-+		state_listen = true;
- 		ilb = &hashinfo->listening_hash[inet_sk_listen_hashfn(sk)];
--		lock = &ilb->lock;
-+		spin_lock(&ilb->lock);
- 	} else {
-+		state_listen = false;
- 		lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
-+		spin_lock_bh(lock);
- 	}
--	spin_lock_bh(lock);
- 	if (sk_unhashed(sk))
- 		goto unlock;
- 
-@@ -707,7 +709,10 @@ void inet_unhash(struct sock *sk)
- 	__sk_nulls_del_node_init_rcu(sk);
- 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
- unlock:
--	spin_unlock_bh(lock);
-+	if (state_listen)
-+		spin_unlock(&ilb->lock);
-+	else
-+		spin_unlock_bh(lock);
- }
- EXPORT_SYMBOL_GPL(inet_unhash);
- 
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 67c9114835c8..0a2e7f228391 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -333,11 +333,8 @@ int inet6_hash(struct sock *sk)
- {
- 	int err = 0;
- 
--	if (sk->sk_state != TCP_CLOSE) {
--		local_bh_disable();
-+	if (sk->sk_state != TCP_CLOSE)
- 		err = __inet_hash(sk, NULL);
--		local_bh_enable();
--	}
- 
- 	return err;
- }
 diff --git a/net/netfilter/xt_RATEEST.c b/net/netfilter/xt_RATEEST.c
 index 0d5c422f8745..8aec1b529364 100644
 --- a/net/netfilter/xt_RATEEST.c
@@ -11609,7 +11530,7 @@ index f64f3d62d6c2..e4087b2d3fc4 100644
  		return ret;
  
 diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-index 21a0e7c3b8de..e7dd316da551 100644
+index 3f3f56f6be4d..5dbcdc5b22b5 100644
 --- a/security/smack/smack_lsm.c
 +++ b/security/smack/smack_lsm.c
 @@ -51,8 +51,10 @@

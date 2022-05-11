@@ -6,9 +6,10 @@ package main
 import (
 	"os"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 var (

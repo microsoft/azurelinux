@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Locale-Codes
 Version:        3.66
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Distribution of modules to handle locale codes
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Locale-Codes
@@ -25,6 +25,7 @@ BuildRequires:  perl(if)
 BuildRequires:  perl(utf8)
 # Tests:
 # Release tests are deleted
+BuildRequires:  perl(deprecate)
 BuildRequires:  perl(Test::Inter) >= 1.09
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # deprecate not used on perl < 5.27.7
@@ -89,7 +90,11 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.66-3
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 3.66-4
+- Add an explicit BR on `perl(deprecate)` to enable ptest
+- License verified
+
+* Mon Nov 01 2021 Muhammad Falak <mwani@microsoft.com> - 3.66-3
 - Remove epoch
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.66-2

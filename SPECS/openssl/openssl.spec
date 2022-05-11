@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,8 @@ URL:            https://www.openssl.org/
 # We have to remove certain patented algorithms from the openssl source
 # tarball with the hobble-openssl script which is included below.
 # The original openssl upstream tarball cannot be shipped in the .src.rpm.
-Source0:        %{name}-%{version}-hobbled.tar.xz
+# Original source: https://www.openssl.org/source/openssl-1.1.1k.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}-hobbled.tar.xz
 Source1:        hobble-openssl
 Source2:        ec_curve.c
 Source3:        ectest.c
@@ -332,6 +333,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-14
+- Fixing source URL.
+
 * Wed Mar 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-13
 - Enable symcrypt detection patch.
 

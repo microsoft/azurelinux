@@ -18,6 +18,8 @@ import (
 // An "End" value of 0 will determine the size of the partition using the next
 // partition's start offset or the value defined by "MaxSize", if this is the last
 // partition on the disk.
+// "Grow" tells the logical volume to fill up any available space (**Only used for
+// kickstart-style unattended installation**)
 type Partition struct {
 	FsType    string          `json:"FsType"`
 	ID        string          `json:"ID"`

@@ -2,9 +2,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           meanwhile
 Version:        1.1.0
-Release:        29%{?dist}
+Release:        30%{?dist}
 Summary:        Lotus Sametime Community Client library
-License:        LGPLv2+
+License:        GPLv2+
 URL:            http://%{name}.sourceforge.net
 
 # The source for this package was pulled from upstream's vcs.  Use the following commands to generate the tarball:
@@ -12,7 +12,7 @@ URL:            http://%{name}.sourceforge.net
 # cvs -d:pserver:anonymous@meanwhile.cvs.sourceforge.net:/cvsroot/meanwhile co -d meanwhile-1.1.0 -r meanwhile_v1_1_0 meanwhile
 # tar -cvzf meanwhile-1.1.0.tar.gz meanwhile-1.1.0
 
-Source:         %{name}-%{version}.tar.gz
+Source:         %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-crash.patch
 Patch1:         %{name}-fix-glib-headers.patch
 Patch2:         %{name}-file-transfer.patch
@@ -79,7 +79,8 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %ldconfig_scriptlets libs
 
 %files
-%doc AUTHORS ChangeLog COPYING README TODO LICENSE
+%license COPYING LICENSE
+%doc AUTHORS ChangeLog README TODO
 %{_libdir}/lib%{name}.so.*
 
 %files devel
@@ -91,6 +92,10 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %doc docs/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-30
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

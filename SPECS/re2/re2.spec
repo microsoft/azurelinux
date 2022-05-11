@@ -3,12 +3,12 @@
 Summary:        C++ fast alternative to backtracking RE engines
 Name:           re2
 Version:        %{shortver}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://github.com/google/%{name}/
-Source0:        %{name}-%{longver}.tar.gz
+URL:            https://github.com/google/%{name}/
+Source0:        https://github.com/google/%{name}/archive/%{longver}.tar.gz#/%{name}-%{longver}.tar.gz
 # downstream patch to change soname .0 => .0a
 # This is in response to symbol changes in recent release per
 # https://bugzilla.redhat.com/show_bug.cgi?id=1672014#c10
@@ -86,6 +86,9 @@ rm -fv %{buildroot}%{_libdir}/libre2.a
 %{_libdir}/pkgconfig/re2.pc
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190801-10
+- Fixing source URL.
+
 * Thu Jun 03 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1:20190801-9
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

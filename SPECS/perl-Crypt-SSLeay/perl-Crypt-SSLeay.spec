@@ -2,8 +2,8 @@
 
 Summary:        Crypt::SSLeay - OpenSSL support for LWP
 Name:           perl-Crypt-SSLeay
-Version:        0.72
-Release:        8%{?dist}
+Version:        0.73_06
+Release:        1%{?dist}
 URL:            https://metacpan.org/release/Crypt-SSLeay
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -11,7 +11,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
-Patch0:         Use_TLS_client_method-with-OpenSSL-1.1.1.patch
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(XSLoader)
 Requires:       openssl
@@ -20,6 +19,7 @@ BuildRequires:  perl-generators
 BuildRequires:  openssl-devel
 BuildRequires:  perl-Path-Class
 BuildRequires:  perl-Try-Tiny
+BuildRequires:  perl(ExtUtils::CBuilder)
 
 Provides:       perl(Crypt::SSLeay) = %{version}-%{release}
 Provides:       perl(Crypt::SSLeay::CTX) = %{version}-%{release}
@@ -45,7 +45,6 @@ Work on Crypt::SSLeay has been continued only to provide https support for the L
 %prep
 %setup -q -n Crypt-SSLeay-%{version}
 cp %{SOURCE1} ./
-%patch0 -p0
 
 %build
 PERL5LIB=$(pwd) env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
@@ -54,8 +53,7 @@ make %{?_smp_mflags}
 
 %install
 make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f \( -name .packlist -o \
-            -name '*.bs' -size 0 \) -exec rm -f {} ';'
+find "%{buildroot}" -type f \( -name .packlist -o -name '*.bs' -size 0 \) -exec rm -f {} ';'
 
 %check
 make test
@@ -66,6 +64,10 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.73_06
+- Update to 0.73_06
+- Add missing requires for ExtUtils::CBuilder.
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.72-8
 - Adding 'BuildRequires: perl-generators'.
 
