@@ -8,7 +8,7 @@
 Summary:        A composable build system for OCaml
 Name:           ocaml-%{libname}
 Version:        2.8.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 # Dune itself is MIT.  Some bundled libraries have a different license:
 # ISC:
 # - vendor/cmdliner
@@ -23,8 +23,8 @@ Distribution:   Mariner
 URL:            https://dune.build
 Source0:        https://github.com/ocaml/%{libname}/archive/%{version}/%{libname}-%{version}.tar.gz
 
-BuildRequires:  %{py3_dist sphinx-rtd-theme}
-BuildRequires:  %{py3_dist sphinx}
+BuildRequires:  python3dist(sphinx-rtd-theme)
+BuildRequires:  python3dist(sphinx)
 BuildRequires:  make
 BuildRequires:  ocaml >= 4.08
 BuildRequires:  ocaml-csexp-devel >= 1.3.0
@@ -224,6 +224,9 @@ cp -ar README.md CHANGES.md MIGRATION.md doc/_build/* %{buildroot}%{_pkgdocdir}/
 %endif
 
 %changelog
+* Tue May 10 2022 Andrew Phelps <anphel@microsoft.com> - 2.8.5-4
+- Use python3dist instead of py3_dist macro
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.5-3
 - Cleaning-up spec. License verified.
 

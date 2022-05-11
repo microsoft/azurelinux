@@ -2,7 +2,7 @@
 Summary:        A code coverage report generator using GNU gcov
 Name:           gcovr
 Version:        5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,17 +11,17 @@ Source0:        https://github.com/gcovr/%{name}/archive/%{version}/%{name}-%{ve
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-Requires:       %{py3_dist Jinja2}
+Requires:       python3dist(jinja2)
 # for gcov
 Requires:       gcc
 BuildArch:      noarch
 %{?python_enable_dependency_generator}
 %if %{with docs}
-BuildRequires:  %{py3_dist Jinja2}
-BuildRequires:  %{py3_dist Sphinx}
-BuildRequires:  %{py3_dist lxml}
-BuildRequires:  %{py3_dist sphinx_rtd_theme}
-BuildRequires:  %{py3_dist sphinxcontrib-autoprogram} >= 0.1.5
+BuildRequires:  python3dist(jinja2)
+BuildRequires:  python3dist(sphinx)
+BuildRequires:  python3dist(lxml)
+BuildRequires:  python3dist(sphinx_rtd_theme)
+BuildRequires:  python3dist(sphinxcontrib-autoprogram) >= 0.1.5
 %endif
 
 %description
@@ -95,6 +95,9 @@ popd
 
 
 %changelog
+* Tue May 10 2022 Andrew Phelps <anphel@microsoft.com> - 5.0-2
+- Use python3dist instead of py3_dist macro
+
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0-1
 - Update to v5.0
 
