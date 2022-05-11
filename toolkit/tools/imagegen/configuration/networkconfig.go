@@ -12,7 +12,6 @@ import (
 	"regexp"
 	"net"
 	
-	"github.com/phommel/gonetworkmanager"
 	"microsoft.com/pkggen/internal/logger"
 )
 
