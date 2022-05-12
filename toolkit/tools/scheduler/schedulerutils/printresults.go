@@ -126,13 +126,13 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	}
 
 	csvFile, err := os.Create(outputPath)
-    if err != nil {
-        logger.Log.Warnf("Unable to create %s file. Error: %s", outputPath, err)
-        return
-    }
+	if err != nil {
+		logger.Log.Warnf("Unable to create %s file. Error: %s", outputPath, err)
+		return
+	}
 
 	csvWriter := csv.NewWriter(csvFile)
-    csvWriter.WriteAll(csvBlob)
+	csvWriter.WriteAll(csvBlob)
 
 	csvFile.Close()
 }
