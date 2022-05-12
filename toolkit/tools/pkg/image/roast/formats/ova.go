@@ -19,8 +19,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 // OvaType represents the ova format

@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 func TestMain(m *testing.M) {

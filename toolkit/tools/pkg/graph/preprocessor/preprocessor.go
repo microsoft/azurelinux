@@ -1,8 +1,8 @@
 package preprocessor
 
 import (
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 func (cfg *Config) ReadAndPreprocessGraph() (*pkggraph.PkgGraph, error) {

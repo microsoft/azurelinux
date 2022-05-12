@@ -10,14 +10,15 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/diskutils"
-	"golang.org/x/sys/unix"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 // Every valid mouse event handler will follow the format:

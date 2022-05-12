@@ -12,13 +12,13 @@ import (
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 const (
@@ -78,12 +78,12 @@ func New() *RpmRepoCloner {
 }
 
 // Initialize initializes rpmrepocloner, enabling Clone() to be called.
-//  - destinationDir is the directory to save RPMs
-//  - tmpDir is the directory to create a chroot
-//  - workerTar is the path to the worker tar used to seed the chroot
-//  - existingRpmsDir is the directory with prebuilt RPMs
-//  - usePreviewRepo if set, the upstream preview repository will be used.
-//  - repoDefinitions is a list of repo files to use when cloning RPMs
+//   - destinationDir is the directory to save RPMs
+//   - tmpDir is the directory to create a chroot
+//   - workerTar is the path to the worker tar used to seed the chroot
+//   - existingRpmsDir is the directory with prebuilt RPMs
+//   - usePreviewRepo if set, the upstream preview repository will be used.
+//   - repoDefinitions is a list of repo files to use when cloning RPMs
 func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false

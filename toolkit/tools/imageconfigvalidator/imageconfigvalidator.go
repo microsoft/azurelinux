@@ -10,10 +10,9 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/image/configvalidator"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
-
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 

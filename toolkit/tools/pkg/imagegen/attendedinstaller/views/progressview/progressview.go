@@ -10,11 +10,11 @@ import (
 	"github.com/rivo/tview"
 	"github.com/sirupsen/logrus"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/primitives/progressbar"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/uitext"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/uiutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 // UI constants.
