@@ -6,8 +6,8 @@ package schedulerutils
 import (
 	"sync"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/graph/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 

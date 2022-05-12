@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/graph/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
