@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/graph/grapher"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/graph/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 
 	"gopkg.in/alecthomas/kingpin.v2"
