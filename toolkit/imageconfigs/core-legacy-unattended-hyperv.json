@@ -47,7 +47,22 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "cbl-mariner",
+            "Networks": [
+                {
+                    "BootProto": "static",
+                    "GateWay": "10.154.212.129",
+                    "Ip": "10.154.212.158",
+                    "NetMask": "255.255.255.192",
+                    "OnBoot": true,
+                    "HostName": "henry-test",
+                    "NameServer": [
+                        "10.255.32.53",
+                        "10.255.33.53"
+                    ],
+                    "Device": "bootif"
+                }
+            ]
         }
     ]
 }

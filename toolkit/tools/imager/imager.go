@@ -73,8 +73,6 @@ func main() {
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
 
-	err = configuration.ConfigureNetwork(systemConfig)
-
 	// Execute preinstall scripts and parse partitioning when performing kickstart installation
 	if systemConfig.IsKickStartBoot {
 		err = installutils.RunPreInstallScripts(systemConfig)
