@@ -10,13 +10,13 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/primitives/customshortcutlist"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/primitives/navigationbar"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/uitext"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/uiutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 // UI constants.
