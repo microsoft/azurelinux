@@ -140,7 +140,6 @@ Requires:   systemd
 %if %{with quota_enables_tcpwrappers}
 Requires:   tcp_wrappers
 %endif
-Conflicts:  quota < 1:4.02-3
 
 %description rpc
 The RPC daemon allows to query and set disk quotas over network. If you run
