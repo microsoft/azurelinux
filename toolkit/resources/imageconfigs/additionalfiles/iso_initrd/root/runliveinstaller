@@ -5,37 +5,54 @@
 export TERMINFO=/usr/lib/mariner/terminfo
 export TERM=mariner-installer
 
-ISO_ROOT=/mnt/cdrom
-CONFIG_ROOT=$ISO_ROOT/config
-UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
-
-# parse script parameters:
-#
-# -c -> config root folder (optional)
-# -u -> unattended config file (optional)
-
-while getopts ":c:u:" OPTIONS; do
-  case "${OPTIONS}" in
-    c ) CONFIG_ROOT=$OPTARG ;;
-    u ) UNATTENDED_CONFIG_FILE=$OPTARG ;;
-
-    \? )
-        echo "Error - Invalid Option: -$OPTARG" 1>&2
-        exit 1
-        ;;
-    : )
-        echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
-        exit 1
-        ;;
-  esac
-done
-
 # Mounting the ISO root for the installer.
+ISO_ROOT=/mnt/cdrom
 mkdir -p $ISO_ROOT
 LABEL=CDROM
 
+#!! PXE customization !!#
+# Required for PXE boot
+CONFIG_DIR=""
+REPO=""
+CMDLINE=/proc/cmdline
+#!! end of PXE customization !!#
+
 if grep -qs $ISO_ROOT /proc/mounts; then
     echo ISO root already mounted
+#!! PXE customization !!#
+elif [[ $(grep "config_root" $CMDLINE) && $(grep "repo" $CMDLINE) ]];
+then
+    echo "PXE boot installation for Mariner"
+    /usr/sbin/configure_network.sh
+    IFS=' '
+    read -ra DATA <$CMDLINE
+    IFS='='
+    INDEX=0
+    while [ $INDEX -lt ${#DATA[@]} ]
+    do
+        read -r VAR VALUE <<< ${DATA[INDEX]}
+        if [ "${VAR}" == "config_root" ]; then
+            CONFIG_DIR=$VALUE
+            IFS='/'
+            read -ra CUT_DIRS <<< $VALUE
+            wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-4)) --directory-prefix=/mnt/cdrom/ --reject="index.html*" "$CONFIG_DIR"/
+            echo PXE boot config dir path: "$CONFIG_DIR"
+            # set execute permissions to all script files under config folder
+            # files copied over network with wget might not retain file permissions
+            find "$ISO_ROOT"/config/ -type f -iname "*.sh" -exec chmod a+x {} \;
+            IFS='='
+        elif [ "${VAR}" == "repo" ];
+        then
+            REPO=$VALUE
+            sed -i "s#baseurl=file:///mnt/cdrom/RPMS#baseurl=$REPO#g" /etc/yum.repos.d/mariner-iso.repo
+            echo PXE boot repo path: $REPO
+        else
+            echo "Retrieving config_root and repo details for PXE boot install..."
+        fi
+        ((INDEX++))
+    done
+    IFS=
+#!! end of PXE customization !!#
 else
     echo Attempt to mount the ISO root
     # It is possible that the partition isn't ready to be mounted when this script
@@ -52,31 +69,18 @@ else
     done
 fi
 
-if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
-    # Restrict speakup use to attended installs
-    # FIXME(thcrain-msft)
-    # This is a loop of silence to keep the default audio device alive
-    # This is a temporary workaround that is needed for VirtualBox,
-    # which is currently the most convenient platform to test on which
-    # has sound driver support. It creates a bit of hiss.
-    speaker-test -l0 -t wav -w ../../../../root/silence.wav -r 22050 >/dev/null 2>&1 &
+#!! PXE customization !!#
+# removed espeakup
+#!! end of PXE customization !!#
 
-    # Set better defaults for speakup punctuation level/speed
-    echo 2 > /sys/accessibility/speakup/punc_level
-    echo 2 > /sys/accessibility/speakup/reading_punc
-    echo 2 > /sys/accessibility/speakup/soft/rate
-
-    # Ensure the userspace speakup connector is up
-    systemctl enable espeakup
-    systemctl start espeakup
-fi
+CONFIG_ROOT=$ISO_ROOT/config
 
 cd /installer
 
 # Turn off echoing while the installer runs to stop sensitive data from rendering in the TTY session.
 stty -echo
 
-./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $UNATTENDED_CONFIG_FILE --template-config $CONFIG_ROOT/attended_config.json \
+./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $CONFIG_ROOT/unattended_config.json --template-config $CONFIG_ROOT/attended_config.json \
                 --build-dir $PWD --log-file=/installer/log.txt
 installerExitCode=$?
 
@@ -91,6 +95,8 @@ done
 stty echo
 
 if [ $installerExitCode -eq 0 ]; then
+    echo "Mariner OS installation has been completed sucessfully! Please reboot or device will auto reboot in few seconds."
+    sleep 60
     reboot
 else
     /bin/bash

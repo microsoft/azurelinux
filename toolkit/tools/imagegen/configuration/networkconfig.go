@@ -150,6 +150,10 @@ func findBootIfValue() (deviceAddr string) {
 		return
 	}
 
+	logger.Log.Infof("Print cmdline: %s", content)
+	arr := []int{}
+	logger.Log.Infof("Print xxxxx: %d", arr[1])
+
 	// Find the location of BOOTIF
 	kernelArgs := strings.Split(string(content), " ")
 	for _, kernelArg := range kernelArgs {
@@ -181,13 +185,13 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 					return
 				}
 			} else if networkData.Device == "bootif" {
-				// deviceAddress := findBootIfValue()
-				//if ifaceAddr != "" && strings.ToUpper(ifaceAddr) == strings.ToUpper(deviceAddress) {
-					if iface.Name == "eth0" {
-						deviceName = iface.Name
-						return
-					}
-				//}
+				deviceAddress := findBootIfValue()
+				if ifaceAddr != "" && strings.ToUpper(ifaceAddr) == strings.ToUpper(deviceAddress) {
+					//if iface.Name == "eth0" {
+					deviceName = iface.Name
+					return
+					//}
+				}
 			}
 		}
 	}

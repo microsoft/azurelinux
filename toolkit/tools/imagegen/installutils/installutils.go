@@ -483,7 +483,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		generateContainerManifests(installChroot)
 	}
 
-	if IsKickStartBoot {
+	if config.IsKickStartBoot {
 		err = configuration.ConfigureNetwork(installChroot, config)
 	}
 
