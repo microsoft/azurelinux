@@ -1,23 +1,22 @@
-# Scan ext file systems directly to increase performace of a quota
+# Scan ext file systems directly to increase the performace of a quota
 # initialization and check
 %bcond_without quota_enables_extdirect
 # Use netlink to monitor quota usage and warn interactive users
 %bcond_without quota_enables_netlink
-# Enable getting quotas over remotely
+# Enable getting quotas remotely over network
 %bcond_without quota_enables_rpc
-# Allow setting quota remotely
+# Allow setting quota remotely over network
 %bcond_without quota_enables_rpcsetquota
-# Disable TCP Wrappers guard in RPC quota daemon
+# Disable TCP Wrappers guard in the RPC quota daemon
 %bcond_with quota_enables_tcpwrappers
 
 Name:       quota
-Version:    4.05
-Release:    12%{?dist}
+Version:    4.06
+Release:    1%{?dist}
 Summary:    System administration tools for monitoring users' disk usage
 # quota_nld.c, quotaio_xfs.h:       GPLv2
 # bylabel.c copied from util-linux: GPLv2+
-# doc/quotas.ms, edquota.c:         BSD
-# COPYING:                          GPLv2 text and license declaration
+# COPYING:                          GPLv2 text and a license declaration
 ## Only in quota-rpc binary package
 # rquota_server.c:                  GPLv2+
 ## Only in quota-rpc and quota-nls binary packages
@@ -48,61 +47,36 @@ Summary:    System administration tools for monitoring users' disk usage
 # Makefile.in:                      FSFULLR
 # missing:                          GPLv2+ with exception
 # mkinstalldirs:                    Public Domain
-License: BSD and GPLv2 and GPLv2+
+License:        GPLv2 and GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://sourceforge.net/projects/linuxquota/
-Source0: http://downloads.sourceforge.net/linuxquota/%{name}-%{version}.tar.gz
-Source1: quota_nld.service
-Source2: quota_nld.sysconfig
-Source3: rpc-rquotad.service
-Source4: rpc-rquotad.sysconfig
-# Not accepted changes (378a64006bb1e818e84a1c77808563b802b028fa)
-Patch0: quota-4.04-warnquota-configuration-tunes.patch
-Patch1: quota-4.03-Validate-upper-bound-of-RPC-port.patch
-# Fix modifying CFLAGS and LDFLAGS by pkgconfig, in upstream after 4.05
-Patch2: quota-4.05-Revert-configure.ac-fix-pkg_check_modules-calls.patch
-# 1/6 Report an error if an RPC fails on an explicitly requested file system,
-# <https://sourceforge.net/p/linuxquota/bugs/134/>, in upstream after 4.05
-Patch3: quota-4.05-Make-messages-about-failures-for-NFS-consistent-with.patch
-# 2/6
-Patch4: quota-4.05-quotaops-Do-not-return-partial-list-from-getprivs.patch
-# 3/6
-Patch5: quota-4.05-quotaops-Do-not-leak-dquot-structures-on-failure.patch
-# 4/6
-Patch6: quota-4.05-setquota-Report-failure-to-obtain-quota-information.patch
-# 5/6
-Patch7: quota-4.05-rpc-Clarify-error-message-when-cannot-connect-to-rpc.patch
-# 6/6
-Patch8: quota-4.05-quotaops-Make-error-string-translatable.patch
-# Fix Free Software Foundation's postal address,
-# <https://sourceforge.net/p/linuxquota/bugs/133/>, in upstream after 4.05
-Patch9: quota-4.05-COPYING-Update-mailing-address.patch
-# Move quota_nld.pid file to /run,
-# <https://sourceforge.net/p/linuxquota/patches/49/>, in upstream after 4.05
-Patch10: quota-4.05-Make-a-directory-for-quota_nld-PID-file-configurable.patch
-# Optimize out useless checking of file systems with hidden quota files,
-# in upstream after 4.05
-Patch11: quota-4.05-quotacheck-Skip-checking-of-filesystems-with-hidded-.patch
-# Fix warnquota --help output, in upstream after 4.05
-Patch12: quota-4.05-warnquota-Fix-help-text.patch
-# Fix checking for the LDAP failures in the warnquota tool,
-# in upstream after 4.05
-Patch13: quota-4.05-warnquota-Properly-detect-LDAP-errors.patch
-# 1/2 Report detailed LDAP failures, in upstream after 4.05
-Patch14: quota-4.05-warnquota-Print-also-additional-error-info-for-LDAP-.patch
-# 2/2 Report detailed LDAP failures, in upstream after 4.05,
-# <https://sourceforge.net/p/linuxquota/patches/50/>
-Patch15: quota-4.05-warnquota-Free-LDAP-error-message.patch
-# Document CC_TO in warquota.conf is looked up with LDAP,
-# in upstream after 4.05
-Patch16: quota-4.05-warnquota-Clarify-that-CC_TO-gets-resolved-through-L.patch
-# Initialize all members of a configparams structure in warnquota,
-# in upstream after 4.05, <https://sourceforge.net/p/linuxquota/patches/51/>
-Patch17: quota-4.05-warnquota-Initialize-all-members-of-a-configparams-s.patch
-# Fix ignoring disabled quotas, bug #1805110, proposed to upstream,
-# <https://sourceforge.net/p/linuxquota/bugs/136/>
-Patch18: quota-4.05-Fix-ignoring-disabled-quotas.patch
+URL:            http://sourceforge.net/projects/linuxquota/
+Source0:        http://downloads.sourceforge.net/linuxquota/%{name}-%{version}.tar.gz
+Source1:        quota_nld.service
+Source2:        quota_nld.sysconfig
+Source3:        rpc-rquotad.service
+Source4:        rpc-rquotad.sysconfig
+# Not accepted changes (378a64006bb1e818e84a1c77808563b802b028fa), bug #680919
+Patch0:         quota-4.06-warnquota-configuration-tunes.patch
+# Fix parsing a TCP port number
+Patch1:         quota-4.03-Validate-upper-bound-of-RPC-port.patch
+# Remove a dead code from process_file(), in upstream after 4.06,
+# <https://sourceforge.net/p/linuxquota/patches/54/>
+Patch2:         quota-4.06-quotacheck-Remove-a-dead-code-from-process_file.patch
+# Fix a compilation warning in quotaops.c, in upstream after 4.06
+Patch3:         quota-4.06-quotaops-fix-compilation-warning.patch
+# Warn when kernel XFS large time stamp does fit into (32-bit) user-space
+# time_t, in upstream after 4.06
+Patch4:         quota-4.06-quotaio_xfs-Warn-when-large-kernel-timestamps-cannot.patch
+# Do not use a pointless compiler-internal __P() macro, in upstream after 4.06
+Patch5:         quota-4.06-Drop-sys-cdefs.h-usage.patch
+# Fix sa_mask initialization when registering PID file removal,
+# upstream bug #141, in upstream after 4.06
+Patch6:         quota-4.06-quota_nld-Initialize-sa_mask-when-registering-PID-fi.patch
+Patch7:         quota-4.06-quotacheck-quotaon-Always-display-message-about-depr.patch
+Patch8:         quota-4.06-common.c-fix-strncat-usage.patch
+Patch9:         quota-4.06-quotasys.c-fix-strncpy-usage.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bash
@@ -120,6 +94,7 @@ BuildRequires:  pkgconfig(ext2fs)
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(libnl-3.0) >= 3.1
 BuildRequires:  pkgconfig(libnl-genl-3.0)
+BuildRequires:  systemd
 %endif
 %if %{with quota_enables_rpc}
 BuildRequires:  rpcgen
@@ -142,9 +117,8 @@ and limiting user and or group disk usage per file system.
 Summary:    quota_nld daemon
 License:    GPLv2 and GPLv2+
 Requires:   quota-nls = %{version}-%{release}
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+# For %%{_unitdir} directory
+Requires:   systemd
 
 %description nld
 Daemon that listens on netlink socket and processes received quota warnings.
@@ -161,12 +135,11 @@ Summary:    RPC quota daemon
 License:    LGPLv2+ and GPLv2 and GPLv2+
 Requires:   quota-nls = %{version}-%{release}
 Requires:   rpcbind
+# For %%{_unitdir} directory
+Requires:   systemd
 %if %{with quota_enables_tcpwrappers}
 Requires:   tcp_wrappers
 %endif
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
 
 %description rpc
 The RPC daemon allows to query and set disk quotas over network. If you run
@@ -188,7 +161,7 @@ via cron(8).
 
 %package nls
 Summary:    Gettext catalogs for disk quota tools
-License:    BSD and LGPLv2+ and GPLv2 and GPLv2+
+License:    LGPLv2+ and GPLv2 and GPLv2+
 BuildArch:  noarch
 
 %description nls
@@ -199,6 +172,8 @@ Disk quota tools messages translated into different natural languages.
 %package devel
 Summary:    Development files for quota RPC
 License:    GPLv2
+# libtirpc-devel for an included <rpc/rpc.h>
+Requires:   libtirpc-devel
 # Do not run-require main package, the header files define RPC API to be
 # implemented by the developer, not an API for an existing quota library.
 
@@ -231,15 +206,6 @@ Linux/UNIX environment.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
 # Regenerate build scripts
 autoreconf -f -i
 
@@ -389,6 +355,9 @@ make check
 
 
 %changelog
+* Fri May 13 2022 Chris Co <chrco@microsoft.com> 4.06-1
+- Update to 4.06 (Imported from Fedora 36, license: MIT)
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.05-12
 - Removing 'Conflicts' on an older package never present in CBL-Mariner.
 - License verified.
