@@ -204,6 +204,9 @@ Linux/UNIX environment.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
 # Regenerate build scripts
 autoreconf -f -i
 
@@ -354,7 +357,7 @@ make check
 
 %changelog
 * Fri May 13 2022 Chris Co <chrco@microsoft.com> 4.06-1
-- 
+- Update to 4.06 (Imported from Fedora 36, license: MIT)
 
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.05-12
 - Removing 'Conflicts' on an older package never present in CBL-Mariner.
