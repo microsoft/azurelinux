@@ -7,7 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/cockpit-project/cockpit
 Source0:        https://github.com/cockpit-project/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
-BuildRequires:  python3
+Patch0:         CVE-2021-3660.patch
+Patch1:         CVE-2021-3698.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  e2fsprogs-devel
@@ -24,13 +25,12 @@ BuildRequires:  openssh
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  polkit-devel
+BuildRequires:  python3
 BuildRequires:  sed
 BuildRequires:  sudo
 BuildRequires:  systemd-devel >= 235
 BuildRequires:  which
 BuildRequires:  zlib-devel
-Patch0: CVE-2021-3660.patch
-Patch1: CVE-2021-3698.patch
 
 %description
 cockpit for mariner
