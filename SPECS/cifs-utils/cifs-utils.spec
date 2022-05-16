@@ -1,7 +1,7 @@
 Summary:        cifs client utils
 Name:           cifs-utils
 Version:        6.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,8 @@ Source0:        https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-%{ver
 Patch0:         CVE-2020-14342.patch
 Patch1:         CVE-2020-14342-fix.patch
 Patch2:         CVE-2021-20208.patch
+Patch3:         CVE-2022-29869.patch
+Patch4:         CVE-2022-27239.patch
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
 Requires:       libcap-ng
@@ -49,6 +51,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.8-6
+- Adding patches for CVE-2022-29869 and CVE-2022-27239.
+
 * Mon May 03 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.8-5
 - Adding a patch fo CVE-2021-20208.
 - Updated "URL" tag to use HTTPS.
