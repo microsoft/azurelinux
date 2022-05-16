@@ -20,12 +20,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/safechroot"
 )
 
 const (
