@@ -9,7 +9,6 @@ Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-27404.patch
-
 BuildRequires:  libtool
 BuildRequires:  zlib-devel
 
