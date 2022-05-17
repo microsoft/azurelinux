@@ -96,8 +96,11 @@ func (n *Network) HostNameIsValid() (err error) {
 	return
 }
 
-func validateIPAddress(ip string) (err error) {
-	if net.ParseIP(ip) == nil {
+func (n *Network) validateIPAddress(ip string) (err error) {
+	bootProto := strings.TrimSpace(n.BootProto)
+	if ip == "" && (bootProto == "" || bootProto == "dhcp")  {
+		return
+	} else if net.ParseIP(ip) == nil {
 		return fmt.Errorf("Invalid ip address (%s)", ip)
 	}
 
@@ -107,22 +110,22 @@ func validateIPAddress(ip string) (err error) {
 // IPAddrIsValid returns an error if ip, gateway, netmask or nameserver inputs are invalid ip addresses
 func (n *Network) IPAddrIsValid() (err error) {
 	ip := strings.Trim(n.Ip, " ")
-	if err = validateIPAddress(ip); err != nil {
+	if err = n.validateIPAddress(ip); err != nil {
 		return fmt.Errorf("Invalid input for --ip: %s", err)
 	}
 
 	netmask := strings.Trim(n.NetMask, " ")
-	if err = validateIPAddress(netmask); err != nil {
+	if err = n.validateIPAddress(netmask); err != nil {
 		return fmt.Errorf("Invalid input for --netmask: %s", err)
 	}
 
 	gateway := strings.Trim(n.GateWay, " ")
-	if err = validateIPAddress(gateway); err != nil {
+	if err = n.validateIPAddress(gateway); err != nil {
 		return fmt.Errorf("Invalid input for --gateway: %s", err)
 	}
 
 	for _, nameserver := range n.NameServer {
-		if err = validateIPAddress(strings.Trim(nameserver, " ")); err != nil {
+		if err = n.validateIPAddress(strings.Trim(nameserver, " ")); err != nil {
 			return fmt.Errorf("Invalid input for --nameserver: %s", err)
 		}
 	}
@@ -216,7 +219,7 @@ func populateMatchSection(networkData Network, fileName, deviceName string) (err
 	return
 }
 
-func populateNetworkSection(networkData Network, fileName string) (err error) {
+func populateNetworkSection(networkData Network, fileName string) (err error) {	
 	const (
 		id           = "[Network]\n"
 		ipField      = "Address="
@@ -224,13 +227,28 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 		dnsField     = "DNS="
 	)
 
-	// Obtain the cidr prefix length of netmask
-	stringMask := net.IPMask(net.ParseIP(networkData.NetMask).To4())
-	cidrPrefix, _ := stringMask.Size()
-	ipAddr := networkData.Ip + "/" + strconv.Itoa(cidrPrefix)
+	networkSection := id
 
-	networkSection := id + ipField + ipAddr + "\n" + gateWayField + networkData.GateWay + "\n"
+	// Currently only supports static IP setting
+	// Update IP and netmask
+	netMask := strings.Trim(networkData.NetMask, " ")
+	ip := strings.Trim(networkData.NetMask, " ")
+	
+	if (netMask != "" && ip != "") {
+		stringMask := net.IPMask(net.ParseIP(networkData.NetMask).To4())
+		cidrPrefix, _ := stringMask.Size()
+		ipAddr := networkData.Ip + "/" + strconv.Itoa(cidrPrefix)
 
+		networkSection = networkSection + ipField + ipAddr + "\n"
+	}
+
+	// Update Gateway
+	gateway := strings.Trim(networkData.GateWay, " ")
+	if (gateway != "") {
+		networkSection = networkSection + gateWayField + networkData.GateWay + "\n"
+	}
+
+	// Update Nameserver
 	for _, nameserver := range networkData.NameServer {
 		dnsSetting := dnsField + nameserver + "\n"
 		networkSection = networkSection + dnsSetting

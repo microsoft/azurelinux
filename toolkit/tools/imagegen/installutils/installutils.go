@@ -485,6 +485,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if config.IsKickStartBoot {
 		err = configuration.ConfigureNetwork(installChroot, config)
+		if err != nil {
+			return
+		}
 	}
 
 	// Run post-install scripts from within the installroot chroot
