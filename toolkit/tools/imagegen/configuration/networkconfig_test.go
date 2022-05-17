@@ -4,6 +4,7 @@
 package configuration
 
 import (
+	"os"
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -149,8 +150,13 @@ func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
 
 func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	const networkFile = "/etc/systemd/network/10-static-eth1.network"
-
 	testNetwork := ValidNetworks[0]
+
+	// Remove the file it already exists
+	if exists, _ := file.PathExists(networkFile); exists {
+		err := os.Remove(networkFile)
+		assert.NoError(t, err)
+	}
 
 	err := createNetworkConfigFile(nil, testNetwork, "eth1")
 	assert.NoError(t, err)
