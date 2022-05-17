@@ -10,15 +10,15 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"regexp"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"microsoft.com/pkggen/internal/file"
 	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/shell"
 	"microsoft.com/pkggen/internal/safechroot"
+	"microsoft.com/pkggen/internal/shell"
 )
 
 type Network struct {
@@ -98,7 +98,7 @@ func (n *Network) HostNameIsValid() (err error) {
 
 func (n *Network) validateIPAddress(ip string) (err error) {
 	bootProto := strings.TrimSpace(n.BootProto)
-	if ip == "" && (bootProto == "" || bootProto == "dhcp")  {
+	if ip == "" && (bootProto == "" || bootProto == "dhcp") {
 		return
 	} else if net.ParseIP(ip) == nil {
 		return fmt.Errorf("Invalid ip address (%s)", ip)
@@ -206,8 +206,8 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 
 func populateMatchSection(networkData Network, fileName, deviceName string) (err error) {
 	const (
-		id            = "[Match]\n"
-		NameField     = "Name="
+		id        = "[Match]\n"
+		NameField = "Name="
 	)
 
 	matchSection := id + NameField + deviceName + "\n"
@@ -219,7 +219,7 @@ func populateMatchSection(networkData Network, fileName, deviceName string) (err
 	return
 }
 
-func populateNetworkSection(networkData Network, fileName string) (err error) {	
+func populateNetworkSection(networkData Network, fileName string) (err error) {
 	const (
 		id           = "[Network]\n"
 		ipField      = "Address="
@@ -233,8 +233,8 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 	// Update IP and netmask
 	netMask := strings.Trim(networkData.NetMask, " ")
 	ip := strings.Trim(networkData.NetMask, " ")
-	
-	if (netMask != "" && ip != "") {
+
+	if netMask != "" && ip != "" {
 		stringMask := net.IPMask(net.ParseIP(networkData.NetMask).To4())
 		cidrPrefix, _ := stringMask.Size()
 		ipAddr := networkData.Ip + "/" + strconv.Itoa(cidrPrefix)
@@ -244,7 +244,7 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 
 	// Update Gateway
 	gateway := strings.Trim(networkData.GateWay, " ")
-	if (gateway != "") {
+	if gateway != "" {
 		networkSection = networkSection + gateWayField + networkData.GateWay + "\n"
 	}
 

@@ -14,11 +14,11 @@ var (
 	ValidNetworks = []Network{
 		{
 			BootProto: "static",
-			GateWay: "10.154.214.130",
-			Ip: "10.154.214.158",
-			NetMask: "255.255.255.0",
-			OnBoot: false,
-			HostName: "mariner-test",
+			GateWay:   "10.154.214.130",
+			Ip:        "10.154.214.158",
+			NetMask:   "255.255.255.0",
+			OnBoot:    false,
+			HostName:  "mariner-test",
 			NameServer: []string{
 				"10.159.32.34",
 			},
@@ -149,7 +149,7 @@ func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
 
 func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	const networkFile = "/etc/systemd/network/10-static-eth1.network"
-	
+
 	testNetwork := ValidNetworks[0]
 
 	err := createNetworkConfigFile(nil, testNetwork, "eth1")
