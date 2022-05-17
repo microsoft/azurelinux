@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.111.1
+Version:        5.10.116.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -636,6 +636,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue May 17 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.116.1-1
+- Update source to 5.10.116.1
+- Address CVE-2022-1048, CVE-2022-1353, CVE-2022-29582, CVE-2022-1195
+  CVE-2022-0494, CVE-2022-1015 
+
 * Tue Apr 19 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.111.1-1
 - Update source to 5.10.111.1
 - Enable CONFIG_BPF_UNPRIV_DEFAULT_OFF
