@@ -26236,6 +26236,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "webkit2gtk3",
+          "version": "2.36.1",
+          "downloadUrl": "https://webkitgtk.org/releases/webkitgtk-2.36.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "webrtc-audio-processing",
           "version": "0.3.1",
           "downloadUrl": "http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/webrtc-audio-processing-0.3.1.tar.xz"

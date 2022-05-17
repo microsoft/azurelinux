@@ -1861,6 +1861,7 @@
                 "wayland",
                 "wayland-protocols",
                 "web-assets",
+		"webkit2gtk3",
                 "webrtc-audio-processing",
                 "websocketpp",
                 "whois",

@@ -1,38 +1,23 @@
+Summary:        GTK Web content engine library
+Name:           webkit2gtk3
+Version:        2.36.1
+Release:        1%{?dist}
+License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.5)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 3;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
+URL:            https://www.webkitgtk.org/
+Source0:        https://webkitgtk.org/releases/webkitgtk-%{version}.tar.xz
 ## NOTE: Lots of files in various subdirectories have the same name (such as
 ## "LICENSE") so this short macro allows us to distinguish them by using their
 ## directory names (from the source tree) as prefixes for the files.
 %global add_to_license_files() \
         mkdir -p _license_files ; \
-        cp -p %1 _license_files/$(echo '%1' | sed -e 's!/!.!g')
-
-# Build documentation by default (use `rpmbuild --without docs` to override it).
-# This is used by Coverity. Coverity injects custom compiler warnings, but
-# any warning during WebKit docs build is fatal!
-%bcond_without docs
-
-Name:           webkit2gtk3
-Version:        2.36.1
-Release:        %autorelease
-Summary:        GTK Web content engine library
-
-License:        LGPLv2
-URL:            https://www.webkitgtk.org/
-Source0:        webkitgtk-%{version}.tar.xz
-
+        cp -p %{1} _license_files/$(echo '%{1}' | sed -e 's!/!.!g')
+# Filter out provides for private libraries
+%global __provides_exclude_from ^%{_libdir}/webkit2gtk-4\\.0/.*\\.so$
 BuildRequires:  bison
-BuildRequires:  ccache
 BuildRequires:  bubblewrap
+BuildRequires:  ccache
 BuildRequires:  cmake
 BuildRequires:  flex
 BuildRequires:  gcc-c++
@@ -44,11 +29,12 @@ BuildRequires:  gtk-doc
 BuildRequires:  hyphen-devel
 BuildRequires:  libatomic
 BuildRequires:  ninja-build
-BuildRequires:  perl(English)
-BuildRequires:  perl-local-lib
-BuildRequires:  perl-generators
-BuildRequires:  perl-Module-Build
 BuildRequires:  perl-File-Find-Rule
+BuildRequires:  perl-Module-Build
+BuildRequires:  perl-generators
+BuildRequires:  perl-local-lib
+
+BuildRequires:  perl(English)
 BuildRequires:  perl(File::Copy::Recursive)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
@@ -60,7 +46,6 @@ BuildRequires:  ruby
 BuildRequires:  rubygems
 BuildRequires:  rubygem-json
 BuildRequires:  xdg-dbus-proxy
-
 BuildRequires:  pkgconfig(atspi-2)
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(egl)
@@ -86,12 +71,15 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libseccomp)
 BuildRequires:  pkgconfig(libsecret-1)
 BuildRequires:  pkgconfig(libsoup-2.4)
-BuildRequires:  pkgconfig(libsystemd)
 BuildRequires:  pkgconfig(libtasn1)
 BuildRequires:  pkgconfig(libwebp)
 BuildRequires:  pkgconfig(libwoff2dec)
 BuildRequires:  pkgconfig(libxslt)
 BuildRequires:  pkgconfig(sqlite3)
+#Note: The following resolves to systemd-bootstrap instead of
+#      a package from the systemd package. As a workaround,
+#      using a BuildRequires(systemd) instead
+BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(upower-glib)
 BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-egl)
@@ -100,38 +88,28 @@ BuildRequires:  pkgconfig(wayland-server)
 BuildRequires:  pkgconfig(wpe-1.0)
 BuildRequires:  pkgconfig(wpebackend-fdo-1.0)
 BuildRequires:  pkgconfig(xt)
-
+# Require the jsc subpackage
+Requires:       %{name}-jsc%{?_isa} = %{version}-%{release}
 # These are hard requirements of WebKit's bubblewrap sandbox.
 Requires:       bubblewrap
 Requires:       xdg-dbus-proxy
-
 # If Geoclue is not running, the geolocation API will not work.
 Recommends:     geoclue2
-
 # Needed for various GStreamer elements.
 #Requires:     gstreamer-plugins-bad-free
 Requires:     gstreamer-plugins-good
-
 # If no xdg-desktop-portal backend is installed, many features will be broken
 # inside the sandbox. In particular, the -gtk backend has to be installed for
 # desktop settings access, including font settings.
 Recommends:     xdg-desktop-portal-gtk
-
 # This package was renamed, so obsolete the old webkitgtk4 package. This is
 # still here because some Fedora packages still depend on the webkitgtk4 name.
 Obsoletes:      webkitgtk4 < %{version}-%{release}
 Provides:       webkitgtk4 = %{version}-%{release}
-
 # We're supposed to specify versions here, but these libraries don't do
 # normal releases. Accordingly, they're not suitable to be system libs.
 Provides:       bundled(angle)
 Provides:       bundled(xdgmime)
-
-# Require the jsc subpackage
-Requires:       %{name}-jsc%{?_isa} = %{version}-%{release}
-
-# Filter out provides for private libraries
-%global __provides_exclude_from ^%{_libdir}/webkit2gtk-4\\.0/.*\\.so$
 
 %description
 WebKitGTK is the port of the portable web rendering engine WebKit to the
@@ -154,10 +132,10 @@ files for developing applications that use %{name}.
 %if %{with docs}
 %package        doc
 Summary:        Documentation files for %{name}
-BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
 Obsoletes:      webkitgtk4-doc < %{version}-%{release}
 Provides:       webkitgtk4-doc = %{version}-%{release}
+BuildArch:      noarch
 
 %description    doc
 This package contains developer documentation for %{name}.
@@ -228,19 +206,19 @@ rm -rf Source/ThirdParty/qunit/
 %find_lang WebKit2GTK-4.0
 
 # Finally, copy over and rename various files for %%license inclusion
-%add_to_license_files Source/JavaScriptCore/COPYING.LIB
-%add_to_license_files Source/ThirdParty/ANGLE/LICENSE
-%add_to_license_files Source/ThirdParty/ANGLE/src/common/third_party/smhasher/LICENSE
-%add_to_license_files Source/ThirdParty/ANGLE/src/third_party/libXNVCtrl/LICENSE
-%add_to_license_files Source/WebCore/LICENSE-APPLE
-%add_to_license_files Source/WebCore/LICENSE-LGPL-2
-%add_to_license_files Source/WebCore/LICENSE-LGPL-2.1
-%add_to_license_files Source/WebInspectorUI/UserInterface/External/CodeMirror/LICENSE
-%add_to_license_files Source/WebInspectorUI/UserInterface/External/Esprima/LICENSE
-%add_to_license_files Source/WebInspectorUI/UserInterface/External/three.js/LICENSE
-%add_to_license_files Source/WTF/icu/LICENSE
-%add_to_license_files Source/WTF/wtf/dtoa/COPYING
-%add_to_license_files Source/WTF/wtf/dtoa/LICENSE
+%{add_to_license_files} Source/JavaScriptCore/COPYING.LIB
+%{add_to_license_files} Source/ThirdParty/ANGLE/LICENSE
+%{add_to_license_files} Source/ThirdParty/ANGLE/src/common/third_party/smhasher/LICENSE
+%{add_to_license_files} Source/ThirdParty/ANGLE/src/third_party/libXNVCtrl/LICENSE
+%{add_to_license_files} Source/WebCore/LICENSE-APPLE
+%{add_to_license_files} Source/WebCore/LICENSE-LGPL-2
+%{add_to_license_files} Source/WebCore/LICENSE-LGPL-2.1
+%{add_to_license_files} Source/WebInspectorUI/UserInterface/External/CodeMirror/LICENSE
+%{add_to_license_files} Source/WebInspectorUI/UserInterface/External/Esprima/LICENSE
+%{add_to_license_files} Source/WebInspectorUI/UserInterface/External/three.js/LICENSE
+%{add_to_license_files} Source/WTF/icu/LICENSE
+%{add_to_license_files} Source/WTF/wtf/dtoa/COPYING
+%{add_to_license_files} Source/WTF/wtf/dtoa/LICENSE
 
 %files -f WebKit2GTK-4.0.lang
 %license _license_files/*ThirdParty*
@@ -295,8 +273,9 @@ rm -rf Source/ThirdParty/qunit/
 %endif
 
 %changelog
-- Sat May 14 2022 Sriram Nambakam <snambakam@microsoft.com> 2.36.1-1
-- Include package in Mariner
+* Sat May 14 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.36.1-1
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
+- License verified
 
 * Fri Feb 04 2022 Michael Catanzaro <mcatanzaro@redhat.com> 2.35.2-3
 - Fix dependency on gst-plugins-bad
@@ -722,4 +701,3 @@ rm -rf Source/ThirdParty/qunit/
 
 * Thu Jan 11 2018 Tomas Popela <tpopela@redhat.com> - 2.19.5-2
 - This package was formerly named webkitgtk4
-
