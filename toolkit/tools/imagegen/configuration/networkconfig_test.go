@@ -6,8 +6,8 @@ package configuration
 import (
 	"testing"
 
+	"github.com/microsoft/toolkit/tools/internal/file"
 	"github.com/stretchr/testify/assert"
-	"microsoft.com/pkggen/internal/file"
 )
 
 var (
