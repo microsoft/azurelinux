@@ -3,7 +3,7 @@
 %global gem_name elasticsearch
 Summary:        Ruby integrations for Elasticsearch
 Name:           rubygem-elasticsearch
-Version:        7.6.0
+Version:        8.2.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -28,10 +28,13 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE
+%license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE.txt
 %{gemdir}
 
 %changelog
+* Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2.0-1
+- Update to v8.2.0 to resolve CVE-2021-22144 and CVE-2021-22134.
+
 * Tue Jan 04 2021 Henry Li <lihl@microsoft.com> - 7.6.0-1
 - License verified
 - Original version for CBL-Mariner
