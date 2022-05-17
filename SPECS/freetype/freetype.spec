@@ -10,10 +10,10 @@ URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/freetype/freetype-%{version}.tar.gz
 Source1:        https://download.savannah.gnu.org/releases/freetype/freetype-doc-%{version}.tar.gz
 Patch0:         CVE-2022-27404.patch
-BuildRequires: 	brotli-devel
-BuildRequires: 	bzip2-devel
+BuildRequires:  brotli-devel
+BuildRequires:  bzip2-devel
 BuildRequires:  gcc
-BuildRequires: 	libpng-devel
+BuildRequires:  libpng-devel
 BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  zlib-devel
@@ -26,14 +26,14 @@ manages font files as well as efficiently load, hint and render
 individual glyphs. FreeType is not a font server or a complete
 text-rendering library.
 
-%package	devel
+%package        devel
 Summary:        Header and development files
 Requires:       freetype = %{version}-%{release}
 
-%description	devel	
+%description	devel
 The freetype-devel package includes the static libraries and header files
 for the FreeType font rendering engine.
- 
+
 Install freetype-devel if you want to develop programs which will use
 FreeType.
 
@@ -83,6 +83,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %changelog
 * Mon May 16 2022 Chris Co <chrco@microsoft.com> - 2.11.1-2
 - Address CVE-2022-27404
+- Fix lint
 
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.11.1-1
 - Update source to 2.11.1
