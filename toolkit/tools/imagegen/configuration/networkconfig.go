@@ -80,7 +80,7 @@ func (n *Network) BootProtoIsValid() (err error) {
 	case "", "dhcp", "bootp", "ibft", "static":
 		return
 	default:
-		return fmt.Errorf("invalid value for --bootproto (%s), bootproto can only be one of dhcp, bootp, ibft and static", n.BootProto)
+		return fmt.Errorf("Invalid input for --bootproto (%s), bootproto can only be one of dhcp, bootp, ibft and static", n.BootProto)
 	}
 }
 
@@ -90,7 +90,7 @@ func (n *Network) HostNameIsValid() (err error) {
 	re, _ := regexp.Compile(`^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`)
 
 	if !re.MatchString(hostname) {
-		return fmt.Errorf("Invalid value for --hostname (%s)", hostname)
+		return fmt.Errorf("Invalid input for --hostname (%s)", hostname)
 	}
 
 	return
@@ -133,7 +133,7 @@ func (n *Network) IPAddrIsValid() (err error) {
 // DeviceIsValid returns an error if the Device name is empty
 func (n *Network) DeviceIsValid() (err error) {
 	if strings.TrimSpace(n.Device) == "" {
-		return fmt.Errorf("invalid input for --device (%s), device cannot be empty", n.Device)
+		return fmt.Errorf("Invalid input for --device (), device cannot be empty")
 	}
 	return
 }
@@ -141,7 +141,7 @@ func (n *Network) DeviceIsValid() (err error) {
 func findBootIfValue() (deviceAddr string) {
 	const (
 		kernelArgFile = "/proc/cmdline"
-		startIndex    = 7
+		startIndex    = 10
 	)
 
 	content, err := os.ReadFile(kernelArgFile)
@@ -150,15 +150,19 @@ func findBootIfValue() (deviceAddr string) {
 		return
 	}
 
-	logger.Log.Infof("Print cmdline: %s", content)
-	arr := []int{}
-	logger.Log.Infof("Print xxxxx: %d", arr[1])
-
 	// Find the location of BOOTIF
 	kernelArgs := strings.Split(string(content), " ")
 	for _, kernelArg := range kernelArgs {
 		if strings.Contains(kernelArg, "BOOTIF") {
-			deviceAddr = kernelArg[7:len(kernelArg)]
+			rawDeviceAddr := []byte(kernelArg[startIndex:len(kernelArg)])
+
+			// Change the cmdline MAC address into valid format
+			for i, _ := range rawDeviceAddr {
+				if rawDeviceAddr[i] == '-' {
+					rawDeviceAddr[i] = ':'
+				}
+			}
+			deviceAddr = string(rawDeviceAddr)
 			return
 		}
 	}
@@ -172,25 +176,23 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 		return
 	}
 
+	if networkData.Device == "bootif" {
+		networkData.Device = findBootIfValue()
+	}
+
 	for _, iface := range ifaces {
 		if networkData.Device == iface.Name {
 			deviceName = networkData.Device
 			return
 		} else {
-			ifaceAddr := iface.HardwareAddr.String()
+			ifaceAddr := strings.TrimSpace(iface.HardwareAddr.String())
 
 			if strings.Contains(networkData.Device, ":") {
-				if ifaceAddr != "" && strings.ToUpper(ifaceAddr) == strings.ToUpper(networkData.Device) {
+				networkData.Device = strings.TrimSpace(networkData.Device)
+
+				if ifaceAddr != "" && strings.EqualFold(ifaceAddr, networkData.Device) {
 					deviceName = iface.Name
 					return
-				}
-			} else if networkData.Device == "bootif" {
-				deviceAddress := findBootIfValue()
-				if ifaceAddr != "" && strings.ToUpper(ifaceAddr) == strings.ToUpper(deviceAddress) {
-					//if iface.Name == "eth0" {
-					deviceName = iface.Name
-					return
-					//}
 				}
 			}
 		}
@@ -278,7 +280,7 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 		return
 	}
 
-	// Determinw whether to activate this device on boot
+	// Determine whether to activate this device on boot
 	if networkData.OnBoot {
 		installNetworkFile := filepath.Join(installChroot.RootDir(), networkFileName)
 		err = file.Copy(networkFileName, installNetworkFile)
