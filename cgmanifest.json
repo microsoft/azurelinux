@@ -7315,8 +7315,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elasticsearch",
-          "version": "7.6.0",
-          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-7.6.0.gem"
+          "version": "8.2.0",
+          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-8.2.0.gem"
         }
       }
     },
