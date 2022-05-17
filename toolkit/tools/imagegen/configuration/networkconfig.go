@@ -15,10 +15,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/microsoft/toolkit/tools/internal/file"
-	"github.com/microsoft/toolkit/tools/internal/logger"
-	"github.com/microsoft/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 type Network struct {
