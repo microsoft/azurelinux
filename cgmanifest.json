@@ -55,8 +55,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.23",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.23.tar.gz"
+          "version": "2.9.27",
+          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.27.tar.gz"
         }
       }
     },
@@ -7315,8 +7315,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elasticsearch",
-          "version": "7.6.0",
-          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-7.6.0.gem"
+          "version": "8.2.0",
+          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-8.2.0.gem"
         }
       }
     },
@@ -8945,8 +8945,8 @@
         "type": "other",
         "other": {
           "name": "zlib",
-          "version": "1.2.11",
-          "downloadUrl": "http://www.zlib.net/zlib-1.2.11.tar.xz"
+          "version": "1.2.12",
+          "downloadUrl": "http://www.zlib.net/zlib-1.2.12.tar.xz"
         }
       }
     },
