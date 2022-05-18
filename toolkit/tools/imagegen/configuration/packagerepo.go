@@ -158,7 +158,7 @@ func createCustomPackageRepo(installChroot *safechroot.Chroot, packageRepo Packa
 // and returns error if the operation fails
 func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (err error) {
 	const (
-		repoFileDir = "/etc/yum.repos.d/"
+		repoFileDir   = "/etc/yum.repos.d/"
 		localRepoFile = "/etc/yum.repos.d/mariner-iso.repo"
 		squashErrors  = false
 	)
