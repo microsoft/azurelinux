@@ -100,12 +100,12 @@ func TestShouldFailParsingInvalidBaseUrlBogusUrl_PackageRepo(t *testing.T) {
 // TestShouldSucceedCreatingPackageRepoFile
 // validates that package repo file can be created
 func TestShouldSucceedCreatingPackageRepoFile_PackageRepo(t *testing.T) {
-	const testRepoFile = "/mariner-official-base.repo"
+	const testRepoFile = "/mariner-official-preview.repo"
 	testPackageRepo := validPackageRepos[0]
 
 	shell.Execute("rm", testRepoFile)
 
-	err := createCustomRepoFile(testRepoFile, testPackageRepo)
+	err := createCustomPackageRepo(nil, testPackageRepo, "/")
 	assert.NoError(t, err)
 
 	testRepoContents, err := file.ReadLines(testRepoFile)

@@ -135,11 +135,30 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	return
 }
 
+func createCustomPackageRepo(installChroot *safechroot.Chroot, packageRepo PackageRepo, repoFileDir string) (err error) {
+
+	dstRepoPath := repoFileDir + packageRepo.Name + ".repo"
+
+	// Create repo file
+	err = createCustomRepoFile(dstRepoPath, packageRepo)
+	if err != nil {
+		return
+	}
+
+	// Check the repo file needs to be installed in the image
+	if packageRepo.Install {
+		installRepoFile := filepath.Join(installChroot.RootDir(), dstRepoPath)
+		err = file.Copy(dstRepoPath, installRepoFile)
+	}
+
+	return
+}
+
 // UpdatePackageRepo creates additional repo files specified by image configuration
 // and returns error if the operation fails
 func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (err error) {
 	const (
-		repoFileDir   = "/etc/yum.repos.d/"
+		repoFileDir = "/etc/yum.repos.d/"
 		localRepoFile = "/etc/yum.repos.d/mariner-iso.repo"
 		squashErrors  = false
 	)
@@ -171,21 +190,9 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 	// Loop through the PackageRepos field to determine if any customized package repos are specified.
 	// If specified, create new repo files for them
 	for _, packageRepo := range config.PackageRepos {
-		dstRepoPath := repoFileDir + packageRepo.Name + ".repo"
-
-		// Create repo file
-		err = createCustomRepoFile(dstRepoPath, packageRepo)
+		err = createCustomPackageRepo(installChroot, packageRepo, repoFileDir)
 		if err != nil {
 			return
-		}
-
-		// Check the repo file needs to be installed in the image
-		if packageRepo.Install {
-			installRepoFile := filepath.Join(installChroot.RootDir(), dstRepoPath)
-			err = file.Copy(dstRepoPath, installRepoFile)
-			if err != nil {
-				return
-			}
 		}
 	}
 
