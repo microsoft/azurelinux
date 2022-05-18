@@ -1,13 +1,15 @@
 Summary:        cifs client utils
 Name:           cifs-utils
 Version:        6.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Nfs-utils-client
 URL:            https://wiki.samba.org/index.php/LinuxCIFS_utils
 Source0:        https://download.samba.org/pub/linux-cifs/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2022-29869.patch
+Patch1:         CVE-2022-27239.patch
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
 BuildRequires:  keyutils-devel
@@ -70,6 +72,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Tue May 17 2022 Chris Co <chrco@microsoft.com> - 6.14-2
+- Address CVE-2022-27239, CVE-2022-29869
+
 * Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 6.14-1
 - Upgrade to 6.14.
 
