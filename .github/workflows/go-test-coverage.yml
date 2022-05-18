@@ -33,19 +33,6 @@ jobs:
           exit 1
         fi
 
-    - name: Check for out of date go modules
-      run: |
-        pushd toolkit
-        sudo make go-mod-tidy
-        modchanges=$(git diff tools/go.mod)
-        sumchanges=$(git diff tools/go.sum)
-        if [ -n "$modchanges$sumchanges" ]; then
-          echo Module files out of date!
-          git diff tools/go.mod
-          git diff tools/go.sum
-          exit 1
-        fi
-
     - name: Check for missing tests
       run: |
         pushd toolkit
@@ -54,12 +41,12 @@ jobs:
           sudo make go-test-coverage | grep "no test files"
           echo Missing $noTestCount Go Tests!
         fi
-    
+
     - name: Evaluate test coverage
       run: |
         pushd toolkit
         sudo make go-test-coverage
-    
+
     - name: Upload test coverage
       uses: actions/upload-artifact@v2.1.4
       with:
