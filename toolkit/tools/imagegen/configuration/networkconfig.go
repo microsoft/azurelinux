@@ -309,6 +309,21 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	return
 }
 
+func updateHostName(hostName string) (err error) {
+	const squashErrors = false
+
+	hostname := strings.TrimSpace(hostName)
+	if hostname != "" {
+		err = shell.ExecuteLive(squashErrors, "hostnamectl", "set-hostname", hostname)
+		if err != nil {
+			logger.Log.Errorf("Unable to set hostname: %s", err)
+		}
+	}
+
+	return
+}
+
+// ConfigureNetwork performs network configuration during the kickstart unattended installation process
 func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfig) (err error) {
 	const squashErrors = false
 	var dnsUpdate bool
@@ -317,12 +332,12 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 		deviceName, err := checkNetworkDeviceAvailability(networkData)
 		if err != nil || deviceName == "" {
 			logger.Log.Errorf("Could not find matching network device in the system")
-			break
+			return err
 		}
 
 		err = createNetworkConfigFile(installChroot, networkData, deviceName)
 		if err != nil {
-			break
+			return err
 		}
 
 		if len(networkData.NameServer) > 0 {
@@ -330,13 +345,9 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 		}
 
 		// Set hostname
-		hostname := strings.TrimSpace(networkData.HostName)
-		if hostname != "" {
-			err = shell.ExecuteLive(squashErrors, "hostname", hostname)
-			if err != nil {
-				logger.Log.Errorf("Unable to set hostname: %s", err)
-				return err
-			}
+		err = updateHostName(networkData.HostName)
+		if err != nil {
+			return err
 		}
 	}
 

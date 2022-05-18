@@ -5,6 +5,7 @@ package configuration
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -165,4 +166,17 @@ func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	testContents, err := file.ReadLines(networkFile)
 	assert.NoError(t, err)
 	assert.Equal(t, testContents, ValidNetWorkFileContent)
+}
+
+func TestShouldSucceedSettingHostName_Network(t *testing.T) {
+	const hostnameFile = "/etc/hostname"
+	testNetwork := ValidNetworks[0]
+
+	err := updateHostName(testNetwork.HostName)
+	assert.NoError(t, err)
+
+	// Check whether the hostname is set correctly
+	setHostName, err := file.ReadLines(hostnameFile)
+	assert.NoError(t, err)
+	assert.Equal(t, strings.Trim(setHostName[0], " "), strings.Trim(testNetwork.HostName, " "))
 }
