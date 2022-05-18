@@ -17,20 +17,18 @@ import (
 	"sync"
 	"time"
 
-	"microsoft.com/pkggen/internal/buildpipeline"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/network"
-	"microsoft.com/pkggen/internal/safechroot"
-
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/retry"
-	"microsoft.com/pkggen/internal/rpm"
-
-	"microsoft.com/pkggen/internal/directory"
-	"microsoft.com/pkggen/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 type fileSignaturesWrapper struct {

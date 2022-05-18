@@ -9,14 +9,14 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
+
 	"gonum.org/v1/gonum/graph"
 	"gopkg.in/alecthomas/kingpin.v2"
-
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
-	"microsoft.com/pkggen/scheduler/schedulerutils"
 )
 
 const (

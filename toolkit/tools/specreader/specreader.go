@@ -14,17 +14,17 @@ import (
 	"strings"
 	"sync"
 
-	"microsoft.com/pkggen/internal/buildpipeline"
-	"microsoft.com/pkggen/internal/directory"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/rpm"
-	"microsoft.com/pkggen/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 
 	"github.com/jinzhu/copier"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkgjson"
 )
 
 const (

@@ -5,7 +5,8 @@ package speakuputils
 
 import (
 	"github.com/bendahl/uinput"
-	"microsoft.com/pkggen/internal/shell"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 // Constants for start/stop speakup functions

@@ -1,4 +1,4 @@
-module microsoft.com/pkggen
+module github.com/microsoft/CBL-Mariner/toolkit/tools
 
 go 1.13
 

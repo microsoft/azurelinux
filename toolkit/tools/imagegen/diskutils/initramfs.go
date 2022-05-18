@@ -10,9 +10,10 @@ import (
 	"io"
 	"os"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+
 	"github.com/cavaliercoder/go-cpio"
 	"github.com/klauspost/pgzip"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 // InitramfsMount represented an editable initramfs
