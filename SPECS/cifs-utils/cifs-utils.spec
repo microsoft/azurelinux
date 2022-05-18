@@ -10,9 +10,9 @@ URL:            https://wiki.samba.org/index.php/LinuxCIFS_utils
 Source0:        https://download.samba.org/pub/linux-cifs/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         CVE-2022-29869.patch
 Patch1:         CVE-2022-27239.patch
+BuildRequires:  keyutils-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
-BuildRequires:  keyutils-devel
 BuildRequires:  pam-devel
 Requires:       libcap-ng
 
@@ -46,7 +46,7 @@ Provides header files needed for Cifs-Utils development.
 %build
 autoreconf -fiv
 %configure
-%configure --prefix=/usr ROOTSBINDIR=%{_sbindir}
+%configure --prefix=%{_prefix} ROOTSBINDIR=%{_sbindir}
 %make_build
 
 %install
@@ -74,6 +74,7 @@ make %{?_smp_mflags} check
 %changelog
 * Tue May 17 2022 Chris Co <chrco@microsoft.com> - 6.14-2
 - Address CVE-2022-27239, CVE-2022-29869
+- Fix lint
 
 * Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 6.14-1
 - Upgrade to 6.14.
