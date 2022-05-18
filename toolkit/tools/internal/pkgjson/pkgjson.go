@@ -8,10 +8,9 @@ import (
 	"regexp"
 	"strings"
 
-	"microsoft.com/pkggen/internal/versioncompare"
-
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/versioncompare"
 )
 
 const (

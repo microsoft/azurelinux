@@ -83,7 +83,7 @@ $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		go build \
-			-ldflags="-X microsoft.com/pkggen/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
+			-ldflags="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
 			-o $(TOOL_BINS_DIR)
 endif
 

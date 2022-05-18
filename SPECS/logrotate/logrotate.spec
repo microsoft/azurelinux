@@ -1,8 +1,7 @@
 Summary:        Logrotate
 Name:           logrotate
 Version:        3.18.1
-# Add back https://github.com/microsoft/CBL-Mariner/pull/2792 after GA
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,9 +30,6 @@ make %{?_smp_mflags}
 
 # Disable dateext since it can cause rotation to fail if run twice in a day
 sed -i 's/dateext/#dateext/' examples/logrotate.conf
-
-# Remove hardening options that are not supported by our current systemd version.
-sed -i -E '/ProtectClock=true|ProtectHostname=true|ProtectKernelLogs=true/d' examples/logrotate.service
 
 %install
 make DESTDIR=%{buildroot} install
@@ -65,6 +61,9 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 %ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 
 %changelog
+* Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.18.1-2
+- Reenable systemd hardening configs ProtectClock, ProtectHostname, and ProtectKernelLogs
+
 * Wed Jul 21 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.18.1-1
 - Update to version 3.18.1
 - Add default logrotate systemd service and logrotate.conf

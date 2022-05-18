@@ -12,10 +12,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/network"
-	"microsoft.com/pkggen/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 // PackageRepo defines the RPM repo to pull packages from during the installation
@@ -137,15 +138,33 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 // UpdatePackageRepo creates additional repo files specified by image configuration
 // and returns error if the operation fails
 func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (err error) {
-
-	const repoFileDir = "/etc/yum.repos.d/"
+	const (
+		repoFileDir   = "/etc/yum.repos.d/"
+		localRepoFile = "/etc/yum.repos.d/mariner-iso.repo"
+		squashErrors  = false
+	)
 
 	if exists, ferr := file.DirExists(repoFileDir); ferr != nil {
-		logger.Log.Errorf("Error accessing repo file.")
+		logger.Log.Errorf("Error accessing repo file directory.")
 		err = ferr
 		return
 	} else if !exists {
-		err = fmt.Errorf("/etc/yum.repos.d does not exist")
+		err = fmt.Errorf("%s: no such directory", repoFileDir)
+		return
+	}
+
+	// Remove mariner-iso.repo
+	if exists, ferr := file.PathExists(localRepoFile); ferr != nil {
+		logger.Log.Errorf("Error accessing /etc/yum.repos.d/mariner-iso.repo")
+		err = ferr
+		return
+	} else if !exists {
+		err = fmt.Errorf("%s: no such file or directory", localRepoFile)
+		return
+	}
+
+	err = shell.ExecuteLive(squashErrors, "rm", localRepoFile)
+	if err != nil {
 		return
 	}
 
