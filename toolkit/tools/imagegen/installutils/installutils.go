@@ -376,8 +376,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
 func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
 	const (
-		filesystemPkg     = "filesystem"
-		marinerReleasePkg = ""
+		filesystemPkg = "filesystem"
 	)
 
 	defer stopGPGAgent(installChroot)
