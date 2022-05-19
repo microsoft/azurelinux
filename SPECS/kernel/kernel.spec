@@ -367,7 +367,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-2
-- Fix cdrom, hyperv-mouse, kexec config in aarch64
+- Fix cdrom, hyperv-mouse, kexec and crash-on-demand config in aarch64
 
 * Mon May 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-1
 - Update source to 5.15.37.1
