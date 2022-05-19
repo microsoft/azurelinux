@@ -6,7 +6,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        16.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -31,7 +31,6 @@ BuildRequires:  zlib-devel
 Requires:       brotli
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
-Requires:       python3
 
 Provides:       npm = %{npm_version}.%{version}-%{release}
 
@@ -115,6 +114,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Mon May 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-2
+-   Remove python3 as a runtime dependency as it is not needed during runtime.
 *   Tue Apr 19 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-1
 -   Update to 16.14.2.
 *   Thu Feb 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.14.0-1
