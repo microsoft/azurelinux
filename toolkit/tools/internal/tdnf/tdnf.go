@@ -41,7 +41,7 @@ func GetReleaseverCliArg() (arg string, err error) {
 		if err != nil {
 			return
 		}
-		arg = fmt.Sprintf("%s=\"%s\"", releaseverArgument, majorVersion)
+		arg = fmt.Sprintf("%s=%s", releaseverArgument, majorVersion)
 		releaseverArgumentPopulatedCache = arg
 	} else {
 		arg = releaseverArgumentPopulatedCache
