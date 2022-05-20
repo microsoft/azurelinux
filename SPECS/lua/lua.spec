@@ -13,7 +13,7 @@
 
 Name:           lua
 Version:        %{major_version}.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Powerful light-weight programming language
 License:        MIT
 URL:            https://www.lua.org/
@@ -31,17 +31,18 @@ Source3:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 Source4:        luaconf.h
 Patch0:         %{name}-5.4.0-beta-autotoolize.patch
 Patch1:         %{name}-5.3.0-idsize.patch
-#Patch2:         %%{name}-5.3.0-luac-shared-link-fix.patch
+#Patch2:        %%{name}-5.3.0-luac-shared-link-fix.patch
 Patch3:         %{name}-5.2.2-configure-linux.patch
 Patch4:         %{name}-5.3.0-configure-compat-module.patch
 %if 0%{?bootstrap}
 Patch5:         %{name}-5.3.0-autotoolize.patch
-Patch6:		%{name}-5.3.5-luac-shared-link-fix.patch
+Patch6:		    %{name}-5.3.5-luac-shared-link-fix.patch
 %endif
 # https://www.lua.org/bugs.html
-Patch18:	%{name}-5.3.5-CVE-2020-24370.patch
-Patch19:	%{name}-5.4.3-bug3.patch
-Patch20:	CVE-2021-43519.patch
+Patch18:	    %{name}-5.3.5-CVE-2020-24370.patch
+Patch19:	    %{name}-5.4.3-bug3.patch
+Patch20:	    CVE-2021-43519.patch
+Patch21:        CVE-2022-28805.patch
 
 BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
 BuildRequires:  make
@@ -98,6 +99,7 @@ mv src/luaconf.h src/luaconf.h.template.in
 sed -i 's|5.3.0|%{version}|g' configure.ac
 %patch19 -p1 -b .bug3
 %patch20 -p1
+%patch21 -p1
 autoreconf -ifv
 
 %if 0%{?bootstrap}
@@ -213,6 +215,9 @@ popd
 
 
 %changelog
+* Fri May 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.4.3-2
+- Add upstream patch for CVE-2022-28805
+
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.3-1
 - Update lua version to 5.4.3
 - Apply patch for CVE-2021-43519.
