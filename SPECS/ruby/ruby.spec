@@ -300,9 +300,10 @@ Macros and development tools for packaging RubyGems.
 
 %prep
 %autosetup -p1
+# Remove all bundled gems
 pushd gems
-rm *
-echo "# gem-name version-to-bundle repository-url [optional-commit-hash-to-test-or-defaults-to-v-version]" > bundled_gems
+find -not -name 'bundled_gems' -delete
+sed -i '2,$d' bundled_gems
 popd
 
 %build
