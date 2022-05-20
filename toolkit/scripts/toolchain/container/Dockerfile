@@ -93,6 +93,7 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./go14_bootstrap_aarch64.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./cpio_extern_nocommon.patch", \
+       "./CVE-2021-38185.patch", \
        "./CVE-2021-36690.patch", \
        "$LFS/tools/" ]
 
