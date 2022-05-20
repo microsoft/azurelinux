@@ -148,7 +148,7 @@ func (s *SystemConfig) IsValid() (err error) {
 		}
 
 		if repoNames[packageRepo.Name] {
-			return fmt.Errorf("invalid [PackageRepos]: duplicate package repo names")
+			return fmt.Errorf("invalid [PackageRepos]: duplicate package repo names (%s)", packageRepo.Name)
 		}
 		repoNames[packageRepo.Name] = true
 	}
