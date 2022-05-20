@@ -472,7 +472,7 @@ func (im *IsoMaker) readAndVerifyConfig() {
 	logger.PanicOnError(err, "Failed while reading config file from '%s' with base directory '%s'.", im.configFilePath, im.baseDirPath)
 
 	// Set IsIsoInstall to true
-	for id, _ := range config.SystemConfigs {
+	for id := range config.SystemConfigs {
 		config.SystemConfigs[id].IsIsoInstall = true
 	}
 
