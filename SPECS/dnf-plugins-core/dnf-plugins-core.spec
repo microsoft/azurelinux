@@ -6,7 +6,7 @@
 Summary:        Core Plugins for DNF
 Name:           dnf-plugins-core
 Version:        4.0.22
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Group:          Applications/System
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
 #Source0:        https://github.com/rpm-software-management/dnf-plugins-core/archive/refs/tags/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         Fix-wrong-boot-time-RhBug-1960437.patch
 
 BuildRequires:  cmake
 BuildRequires:  git
@@ -99,7 +100,7 @@ repoquery, reposync, repotrack, repodiff, builddep, config-manager, debug,
 download and yum-groups-manager that use new implementations using DNF.
 
 %prep
-%autosetup
+%autosetup -p1
 mkdir build
 mkdir build-py3
 
@@ -222,6 +223,9 @@ ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yumdownloader
 %{_mandir}/man1/yum-utils.*
 
 %changelog
+* Thu May 19 2022 Chris Co <chrco@microsoft.com> - 4.0.22-3
+- Add patch to fix wrong boot time for needs-restarting
+
 * Fri Jul 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.22-2
 - Initial CBL-Mariner import from rpm-software-management (license: GPLv2+). License verified.
 

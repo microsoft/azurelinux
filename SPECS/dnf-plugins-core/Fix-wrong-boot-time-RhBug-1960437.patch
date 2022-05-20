@@ -1,0 +1,25 @@
+From 23cad14789fc8d2c327b9350c25c9edb7929a83c Mon Sep 17 00:00:00 2001
+From: Nicola Sella <nsella@redhat.com>
+Date: Thu, 8 Jul 2021 15:54:21 +0200
+Subject: [PATCH] Fix wrong boot time (RhBug:1960437)
+
+---
+ plugins/needs_restarting.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/needs_restarting.py b/plugins/needs_restarting.py
+index 1fedb73..91dbe66 100644
+--- a/plugins/needs_restarting.py
++++ b/plugins/needs_restarting.py
+@@ -199,7 +199,7 @@ class ProcessStart(object):
+ 
+     @staticmethod
+     def get_boot_time():
+-        return int(os.stat('/proc/1/cmdline').st_mtime)
++        return int(os.stat('/proc/1').st_mtime)
+ 
+     @staticmethod
+     def get_sc_clk_tck():
+-- 
+2.17.1
+
