@@ -137,7 +137,7 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 
 func createCustomPackageRepo(installChroot *safechroot.Chroot, packageRepo PackageRepo, repoFileDir string) (err error) {
 
-	dstRepoPath := repoFileDir + packageRepo.Name + ".repo"
+	dstRepoPath := filepath.Join(repoFileDir, packageRepo.Name + ".repo")
 
 	// Create repo file
 	err = createCustomRepoFile(dstRepoPath, packageRepo)
