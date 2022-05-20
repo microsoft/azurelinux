@@ -6321,8 +6321,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "68.2.0.6",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
+          "version": "68.2.0.9",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.9.tar.gz"
         }
       }
     },
@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "libepoxy",
-          "version": "1.5.5",
-          "downloadUrl": "https://github.com/anholt/libepoxy/releases/download/1.5.5/libepoxy-1.5.5.tar.xz"
+          "version": "1.5.10",
+          "downloadUrl": "https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz"
         }
       }
     },

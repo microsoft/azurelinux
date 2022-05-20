@@ -1043,6 +1043,7 @@ echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
 pushd cpio-2.13
 patch -Np1 -i /tools/cpio_extern_nocommon.patch
+patch -Np1 -i /tools/CVE-2021-38185.patch
 ./configure --prefix=/usr \
         --bindir=/bin \
         --enable-mt   \
