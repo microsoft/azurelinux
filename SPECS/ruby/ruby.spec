@@ -4,7 +4,6 @@
 
 %global gem_dir %{_datadir}/ruby/gems
 %global rubygems_version              3.1.6
-%global rubygems_molinillo_version            0.7.0
 
 # Add version for default gems
 %global abbrev_version     0.1.0
@@ -280,8 +279,6 @@ Recommends:     rubygem-io-console
 Recommends:     rubygem-rdoc
 Provides:       gem = %{rubygems_version}
 Provides:       ruby(rubygems) = %{rubygems_version}
-# https://github.com/rubygems/rubygems/pull/1189#issuecomment-121600910
-Provides:       bundled(rubygem-molinillo) = %{rubygems_molinillo_version}
 BuildArch:      noarch
 
 %description -n rubygems
