@@ -138,7 +138,7 @@ make test
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
 
-* Thu Apr 22 2021 Sérgio Basto <sergio@serjux.com> - 16.02-20
+* Thu Apr 22 2021 SÃ©rgio Basto <sergio@serjux.com> - 16.02-20
 - Fix two Null Pointer Dereferences, thanks to NSFOCUS Security Team
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 16.02-19
@@ -150,7 +150,7 @@ make test
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 16.02-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
-* Tue Sep 24 2019 Sérgio Basto <sergio@serjux.com> - 16.02-16
+* Tue Sep 24 2019 SÃ©rgio Basto <sergio@serjux.com> - 16.02-16
 - Add gcc10-conversion.patch provide by Red Hat's compiler team
 
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 16.02-15
@@ -170,16 +170,16 @@ make test
 - Rebuild to fix GCC 8 mis-compilation
   See https://da.gd/YJVwk ("GCC 8 ABI change on x86_64")
 
-* Tue Feb 06 2018 Sérgio Basto <sergio@serjux.com> - 16.02-10
+* Tue Feb 06 2018 SÃ©rgio Basto <sergio@serjux.com> - 16.02-10
 - Improve security patch
 
-* Sat Jan 27 2018 Sérgio Basto <sergio@serjux.com> - 16.02-9
+* Sat Jan 27 2018 SÃ©rgio Basto <sergio@serjux.com> - 16.02-9
 - Security fix for CVE-2017-17969 (from Debian)
 - Add 05-hardening-flags.patch, 09-man-update.patch, 10-drop-fm-doc.patch
   and 14-Fix-g++-warning.patch patches from Debian, very small changes
   better documentation, compile flags and compile warning.
 
-* Wed Jan 24 2018 Sérgio Basto <sergio@serjux.com> - 16.02-8
+* Wed Jan 24 2018 SÃ©rgio Basto <sergio@serjux.com> - 16.02-8
 - Add sub-package doc
 
 * Wed Jan 24 2018 Tomas Hoger <thoger@redhat.com> - 16.02-7
@@ -200,24 +200,24 @@ make test
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 16.02-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Mon Nov 21 2016 Sérgio Basto <sergio@serjux.com> - 16.02-2
+* Mon Nov 21 2016 SÃ©rgio Basto <sergio@serjux.com> - 16.02-2
 - Security fix for CVE-2016-9296
 
-* Mon Jul 18 2016 Sérgio Basto <sergio@serjux.com> - 16.02-1
+* Mon Jul 18 2016 SÃ©rgio Basto <sergio@serjux.com> - 16.02-1
 - Update p7zip to 16.02 and fix security issues
 
-* Sun Mar 27 2016 Sérgio Basto <sergio@serjux.com> - 15.14.1-1
+* Sun Mar 27 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.14.1-1
 - Update to 15.14.1
 - Revert 7zFM build, upstream recomends not build it
   http://sourceforge.net/p/p7zip/bugs/175/
 
-* Thu Mar 17 2016 Sérgio Basto <sergio@serjux.com> - 15.14-2
+* Thu Mar 17 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.14-2
 - Fix non-executable-in-bin for p7zipForFilemanager.
 - Remove p7zip_compress2.desktop to not duplicate the menu entries.
 - Also build 7zFM, rebuild p7zip_15.14_src_all-norar.tar.bz2, to build 7zFM
   instead 7zFM_do_not_use.
 
-* Tue Mar 15 2016 Sérgio Basto <sergio@serjux.com> - 15.14-1
+* Tue Mar 15 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.14-1
 - Update to 15.14 .
 - Rebase norar_cmake.patch
 - Minor improvement in snippet of documentation.
@@ -230,35 +230,35 @@ make test
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 15.09-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
-* Mon Jan 25 2016 Sérgio Basto <sergio@serjux.com> - 15.09-9
+* Mon Jan 25 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.09-9
 - Add 02_man.patch from Debian
 
-* Fri Jan 22 2016 Sérgio Basto <sergio@serjux.com> - 15.09-8
+* Fri Jan 22 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.09-8
 - Revert better solutions for "create unowned directory"
 
-* Fri Jan 22 2016 Sérgio Basto <sergio@serjux.com> - 15.09-7
+* Fri Jan 22 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.09-7
 - Split incorrect-fsf-address.patch and do not pack backup files
 
-* Fri Jan 22 2016 Sérgio Basto <sergio@serjux.com> - 15.09-6
+* Fri Jan 22 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.09-6
 - Stating in License.txt file that we removed non-Free unrar code
   from sources (#190277)
 - Fix incorrect fsf address in the license files.
 - Add p7zip_15.09-no7zG_and_7zFM.patch in a diferent patch.
 
-* Fri Jan 22 2016 Sérgio Basto <sergio@serjux.com> - 15.09-5
+* Fri Jan 22 2016 SÃ©rgio Basto <sergio@serjux.com> - 15.09-5
 - Add license tag
 - better solutions for "create unowned directory" (#917366)
 
-* Thu Dec 03 2015 Sérgio Basto <sergio@serjux.com> - 15.09-4
+* Thu Dec 03 2015 SÃ©rgio Basto <sergio@serjux.com> - 15.09-4
 - Fix CVE-2015-1038 (#1179505)
 
-* Wed Dec 02 2015 Sérgio Basto <sergio@serjux.com> - 15.09-3
+* Wed Dec 02 2015 SÃ©rgio Basto <sergio@serjux.com> - 15.09-3
 - Fix build on s390 architecture (#1286992)
 
-* Thu Nov 12 2015 Sérgio Basto <sergio@serjux.com> - 15.09-2
+* Thu Nov 12 2015 SÃ©rgio Basto <sergio@serjux.com> - 15.09-2
 - fix rhbz #917366
 
-* Thu Nov 05 2015 Sérgio Basto <sergio@serjux.com> - 15.09-1
+* Thu Nov 05 2015 SÃ©rgio Basto <sergio@serjux.com> - 15.09-1
 - Update to p7zip_15.09
 - Use cmake.
 - Refactor norar patch.

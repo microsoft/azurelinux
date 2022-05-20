@@ -37,12 +37,12 @@ coreutils-lang-8.30-11.cm1.aarch64.rpm
 cpio-2.13-3.cm1.aarch64.rpm
 cpio-debuginfo-2.13-3.cm1.aarch64.rpm
 cpio-lang-2.13-3.cm1.aarch64.rpm
-cracklib-2.9.7-2.cm1.aarch64.rpm
-cracklib-debuginfo-2.9.7-2.cm1.aarch64.rpm
-cracklib-devel-2.9.7-2.cm1.aarch64.rpm
-cracklib-dicts-2.9.7-2.cm1.aarch64.rpm
-cracklib-lang-2.9.7-2.cm1.aarch64.rpm
-cracklib-python-2.9.7-2.cm1.aarch64.rpm
+cracklib-2.9.7-3.cm1.aarch64.rpm
+cracklib-debuginfo-2.9.7-3.cm1.aarch64.rpm
+cracklib-devel-2.9.7-3.cm1.aarch64.rpm
+cracklib-dicts-2.9.7-3.cm1.aarch64.rpm
+cracklib-lang-2.9.7-3.cm1.aarch64.rpm
+cracklib-python-2.9.7-3.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-debuginfo-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-devel-0.11.1-6.cm1.aarch64.rpm
@@ -152,7 +152,7 @@ json-c-debuginfo-0.14-3.cm1.aarch64.rpm
 json-c-devel-0.14-3.cm1.aarch64.rpm
 kbd-2.0.4-7.cm1.aarch64.rpm
 kbd-debuginfo-2.0.4-7.cm1.aarch64.rpm
-kernel-headers-5.10.111.1-1.cm1.noarch.rpm
+kernel-headers-5.10.116.1-1.cm1.noarch.rpm
 kmod-25-4.cm1.aarch64.rpm
 kmod-debuginfo-25-4.cm1.aarch64.rpm
 kmod-devel-25-4.cm1.aarch64.rpm
@@ -354,7 +354,7 @@ python2-libs-2.7.18-9.cm1.aarch64.rpm
 python2-test-2.7.18-9.cm1.aarch64.rpm
 python2-tools-2.7.18-9.cm1.aarch64.rpm
 python3-audit-3.0-15.cm1.aarch64.rpm
-python3-cracklib-2.9.7-2.cm1.aarch64.rpm
+python3-cracklib-2.9.7-3.cm1.aarch64.rpm
 python3-gpg-1.13.1-6.cm1.aarch64.rpm
 python3-libcap-ng-0.7.9-3.cm1.aarch64.rpm
 python3-libxml2-2.9.13-1.cm1.aarch64.rpm
