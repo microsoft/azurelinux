@@ -63,7 +63,6 @@ findutils-lang-4.8.0-3.cm2.x86_64.rpm
 gettext-0.21-2.cm2.x86_64.rpm
 gzip-1.11-1.cm2.x86_64.rpm
 make-4.3-2.cm2.x86_64.rpm
-mariner-release-2.0-11.cm2.noarch.rpm
 patch-2.7.6-7.cm2.x86_64.rpm
 util-linux-2.37.2-5.cm2.x86_64.rpm
 util-linux-devel-2.37.2-5.cm2.x86_64.rpm

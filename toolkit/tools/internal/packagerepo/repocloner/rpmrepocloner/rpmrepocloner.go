@@ -18,6 +18,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 )
 
 const (
@@ -304,12 +305,22 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 // WhatProvides attempts to find packages which provide the requested PackageVer.
 func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
+	var (
+		releaseverCliArg string
+	)
+
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
 	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
 
 	baseArgs := []string{
 		"provides",
 		provideQuery,
 		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
+		releaseverCliArg,
 	}
 
 	foundPackages := make(map[string]bool)
@@ -398,6 +409,15 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 
 // ClonedRepoContents returns the packages contained in the cloned repository.
 func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoContents, err error) {
+	var (
+		releaseverCliArg string
+	)
+
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
 	repoContents = &repocloner.RepoContents{}
 	onStdout := func(args ...interface{}) {
 		if len(args) == 0 {
@@ -433,6 +453,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			"ALL",
 			fmt.Sprintf("--disablerepo=%s", allRepoIDs),
 			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
+			releaseverCliArg,
 		}
 		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
 	})
@@ -459,6 +480,10 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		unresolvedOutputPostfix = "available"
 	)
 
+	var (
+		releaseverCliArg string
+	)
+
 	if len(enabledRepoOrder) == 0 {
 		return false, fmt.Errorf("enabledRepoOrder cannot be empty")
 	}
@@ -467,6 +492,12 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 	// TDNF processes enable/disable repo requests in the order that they are passed.
 	// So if `--disablerepo=foo` and then `--enablerepo=foo` are passed, `foo` will be enabled.
 	baseArgs = append(baseArgs, "--disablerepo=*")
+
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+	baseArgs = append(baseArgs, releaseverCliArg)
 
 	var enabledRepoArgs []string
 	for _, repoID := range enabledRepoOrder {
