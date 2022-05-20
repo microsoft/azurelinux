@@ -41,9 +41,7 @@ bootloader used on PlayStation 3. The busybox package provides a binary
 better suited to normal use.
 
 %prep
-%setup -q
-%patch0 -p1 -b .stime
-%patch1 -p1
+%autosetup -p1
 
 %build
 # create static busybox - the executable is kept as busybox-static
