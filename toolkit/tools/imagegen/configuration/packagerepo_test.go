@@ -4,10 +4,11 @@
 package configuration
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,13 +30,14 @@ var (
 
 	validRepoContent = []string{
 		"[mariner-official-base]",
-		"name=mariner-official-base $releasever $basearch",
+		"name=mariner-official-base",
 		"baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch",
 		"gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 		"enabled=1",
-		"gpgcheck=0",
+		"gpgcheck=1",
+		"repo_gpgcheck=1",
 		"skip_if_unavailable=True",
-		"sslverify=0",
+		"sslverify=1",
 	}
 )
 
@@ -56,7 +58,7 @@ func TestShouldFailParsingInvalidName_PackageRepo(t *testing.T) {
 	testPackageRepo := validPackageRepos[0]
 	testPackageRepo.Name = ""
 
-	err := testPackageRepo.NameIsValid()
+	err := testPackageRepo.nameIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for package repo name (), name cannot be empty", err.Error())
 
@@ -72,7 +74,7 @@ func TestShouldFailParsingInvalidBaseUrlEmptyString_PackageRepo(t *testing.T) {
 	testPackageRepo := validPackageRepos[0]
 	testPackageRepo.BaseUrl = ""
 
-	err := testPackageRepo.RepoUrlIsValid()
+	err := testPackageRepo.repoUrlIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for package repo URL (), URL cannot be empty", err.Error())
 
@@ -88,7 +90,7 @@ func TestShouldFailParsingInvalidBaseUrlBogusUrl_PackageRepo(t *testing.T) {
 	testPackageRepo := validPackageRepos[0]
 	testPackageRepo.BaseUrl = "asjhdjkshd"
 
-	err := testPackageRepo.RepoUrlIsValid()
+	err := testPackageRepo.repoUrlIsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "parse \"asjhdjkshd\": invalid URI for request", err.Error())
 
@@ -100,15 +102,17 @@ func TestShouldFailParsingInvalidBaseUrlBogusUrl_PackageRepo(t *testing.T) {
 // TestShouldSucceedCreatingPackageRepoFile
 // validates that package repo file can be created
 func TestShouldSucceedCreatingPackageRepoFile_PackageRepo(t *testing.T) {
-	const testRepoFile = "/mariner-official-base.repo"
+	curDir, err := os.Getwd()
+	assert.NoError(t, err)
+	testRepoFile := filepath.Join(curDir, "mariner-official-base.repo")
 	testPackageRepo := validPackageRepos[0]
 
-	shell.Execute("rm", testRepoFile)
-
-	err := createCustomPackageRepo(nil, testPackageRepo, "/")
+	err = createCustomPackageRepo(nil, testPackageRepo, curDir)
 	assert.NoError(t, err)
 
 	testRepoContents, err := file.ReadLines(testRepoFile)
 	assert.NoError(t, err)
 	assert.Equal(t, testRepoContents, validRepoContent)
+
+	os.Remove(testRepoFile)
 }
