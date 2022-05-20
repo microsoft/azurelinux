@@ -1,5 +1,3 @@
-%global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name power_assert
 Summary:        Power Assert for Ruby
 Name:           rubygem-power_assert

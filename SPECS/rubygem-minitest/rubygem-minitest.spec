@@ -1,5 +1,4 @@
 %global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name minitest
 Summary:        Minitest provides a complete suite of testing facilities
 Name:           rubygem-minitest

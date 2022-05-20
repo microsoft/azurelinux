@@ -1,5 +1,3 @@
-%global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name test-unit
 Summary:        An xUnit family unit testing framework for Ruby
 Name:           rubygem-test-unit

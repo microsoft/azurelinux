@@ -1,10 +1,9 @@
 %global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name concurrent-ruby
 Summary:        Modern concurrency tools for Ruby
 Name:           rubygem-concurrent-ruby
 Version:        1.1.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-3
+- Cleanup
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-2
 - Add provides
 
