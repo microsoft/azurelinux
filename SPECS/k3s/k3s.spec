@@ -3,7 +3,7 @@
 %define util_path     %{_datadir}/k3s
 %define install_sh    %{util_path}/setup/install.sh
 %define uninstall_sh  %{util_path}/setup/uninstall.sh
-%define k3s_binary k3s-1.23.6-1.23.6.cm2.x86_64
+%define k3s_binary    k3s
 
 Name:    k3s
 Version: 1.23.6
@@ -82,4 +82,5 @@ exit 0
 * Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
 - Initial version
 
-#todo (lilustga) add to changelog
+* Fri May 20 2022 Lior Lustgarten <lilustga@microsoft.com>
+- Initial changes to build for Mariner
