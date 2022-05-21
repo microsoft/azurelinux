@@ -121,7 +121,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Fri Mar 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-15
+* Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-15
 - Include module_info.ld in macros only when include_mariner_package_note is set
 
 * Tue Apr 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-14
