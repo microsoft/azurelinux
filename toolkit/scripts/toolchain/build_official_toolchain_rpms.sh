@@ -154,6 +154,7 @@ chroot_and_run_rpmbuild () {
             $CHECK_SETTING                 \
             --define "with_check 1" --define "dist $PARAM_DIST_TAG" --define "mariner_build_number $PARAM_BUILD_NUM" \
             --define "mariner_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
+            --define "include_mariner_package_note 1" \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
 
     chroot_unmount
