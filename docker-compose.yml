@@ -7,7 +7,7 @@ services:
     environment:
       - GEM_HOME=/usr/local/bundle
       - JEKYLL_ENV=development
-    command: jekyll serve --drafts --future --watch --incremental
+    command: jekyll serve --future --watch --incremental
     ports:
       - 4000:4000
     volumes:

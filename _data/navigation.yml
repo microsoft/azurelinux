@@ -1,6 +1,4 @@
 main:
-  - title: "Rude FAQ"
-    url: /faq/
   - title: "Blog"
     url: /posts/
   - title: "Documentation"

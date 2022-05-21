@@ -2,8 +2,8 @@
 title: Mariner's Container Host 2.0
 type: post
 classes: wide
-published: true
-status: publish
+published: false
+status: draft
 categories:
 - Microsoft
 - Linux
