@@ -58,20 +58,20 @@ plugins:
   - jemoji
   - jekyll-include-cache
 
-#author:
-#  name   : "First Lastname"
-#  avatar : "/assets/images/bio-photo.jpg"
-#  bio    : "My awesome biography constrained to a sentence or two goes here."
-#  links:
-#    - label: "Website"
-#      icon: "fas fa-fw fa-link"
-#      url: "https://"
+author:
+  name   : "Mariner Dev Team"
+  avatar : "/assets/images/profile/mariner-logo.png"
+  bio    : "Mariner is Microsoft's Linux distribution for internal use"
+  links:
+    #    - label: "Mariner GitHub"
+    #      icon: "fas fa-fw fa-link"
+    #      url: "https://github.com/microsoft/CBL-Mariner"
 #    - label: "Twitter"
 #      icon: "fab fa-fw fa-twitter-square"
 #      url: "https://twitter.com/"
-#    - label: "GitHub"
-#      icon: "fab fa-fw fa-github"
-#      url: "https://github.com/"
+    - label: "Mariner GitHub Repo"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/microsoft/CBL-Mariner"
 
 footer:
   links:
@@ -100,7 +100,7 @@ defaults:
       type: pages
     values:
       layout: single
-      author_profile: false
+      author_profile: true
 
 category_archive:
   type: liquid
