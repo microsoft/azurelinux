@@ -124,7 +124,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        487%{?dist}
+Release:        488%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6810,6 +6810,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-488
+- Bump release to build with module_info.ld fix in mariner-rpm-macros
+
 * Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-487
 - Upgrade to version 5.34.1 referencing Fedora 37 (license: MIT)
 - Removed duplicate requires for perl(:VERSION) from gendep.macros
