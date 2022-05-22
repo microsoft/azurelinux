@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.7
-Release:        2%{?dist}
+Version:        10.6.8
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -454,6 +454,10 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Fri May 20 2022 Chris Co <chrco@microsoft.com> - 10.6.8-1
+- Upgrade to v10.6.8 to address CVE-2022-27448, CVE-2022-27449,
+  CVE-2022-27451, CVE-2022-27457, CVE-2022-27458
+
 * Fri Apr 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 10.6.7-2
 - Fix conflicts with mariadb-connector-c
 
