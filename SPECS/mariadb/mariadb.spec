@@ -302,6 +302,7 @@ fi
 %{_bindir}/replace
 %{_bindir}/resolve_stack_dump
 %{_bindir}/resolveip
+%{_bindir}/wsrep_sst_backup
 %{_bindir}/wsrep_sst_common
 %{_bindir}/wsrep_sst_mariabackup
 %{_bindir}/wsrep_sst_mysqldump
@@ -427,6 +428,8 @@ fi
 %{_mandir}/man3/*.3.gz
 
 %files errmsg
+%{_datadir}/mysql/bulgarian/errmsg.sys
+%{_datadir}/mysql/chinese/errmsg.sys
 %{_datadir}/mysql/czech/errmsg.sys
 %{_datadir}/mysql/danish/errmsg.sys
 %{_datadir}/mysql/dutch/errmsg.sys
@@ -457,6 +460,7 @@ fi
 * Fri May 20 2022 Chris Co <chrco@microsoft.com> - 10.6.8-1
 - Upgrade to v10.6.8 to address CVE-2022-27448, CVE-2022-27449,
   CVE-2022-27451, CVE-2022-27457, CVE-2022-27458
+- Add new files bulgarian errmsg.sys, chinese errmsg.sys, wsrep_sst_backup
 
 * Fri Apr 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 10.6.7-2
 - Fix conflicts with mariadb-connector-c
