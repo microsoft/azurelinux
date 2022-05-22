@@ -10,10 +10,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"golang.org/x/sys/unix"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
+	"golang.org/x/sys/unix"
 )
 
 const (

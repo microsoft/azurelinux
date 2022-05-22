@@ -13,15 +13,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/packagerepo/repomanager/rpmrepomanager"
-	"microsoft.com/pkggen/internal/rpm"
-	"microsoft.com/pkggen/internal/safechroot"
-	"microsoft.com/pkggen/internal/shell"
-	"microsoft.com/pkggen/internal/sliceutils"
 )
 
 const (
@@ -244,6 +246,10 @@ func tdnfInstall(packages []string) (err error) {
 		packageMatchGroup       = 1
 	)
 
+	var (
+		releaseverCliArg string
+	)
+
 	if len(packages) == 0 {
 		return
 	}
@@ -256,7 +262,12 @@ func tdnfInstall(packages []string) (err error) {
 		packages[i] = filepath.Base(strings.TrimSuffix(packages[i], ".rpm"))
 	}
 
-	installArgs := []string{"install", "-y"}
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
+	installArgs := []string{"install", "-y", releaseverCliArg}
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
 	foundNoMatchingPackages := false

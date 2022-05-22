@@ -20,6 +20,7 @@ docker ps -a
 
 # CPIO patch
 cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
+cp -v $MARINER_SPECS_DIR/cpio/CVE-2021-38185.patch ./container
 # Coreutils aarch64 patch
 cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
 # Binutils readonly patch
@@ -62,6 +63,7 @@ rm -rvf ./populated_toolchain
 mv ./lfs ./populated_toolchain
 rm -rvf ./populated_toolchain/.dockerenv
 rm -rvf ./populated_toolchain/sources
+rm -rvf ./populated_toolchain/tools/libexec/gcc
 tar czf toolchain_from_container.tar.gz populated_toolchain
 ls -la ./
 ls -la ./populated_toolchain
@@ -71,6 +73,7 @@ popd
 rm -vf ./container/rpm-define-RPM-LD-FLAGS.patch
 rm -vf ./container/coreutils-fix-get-sys_getdents-aarch64.patch
 rm -vf ./container/cpio_extern_nocommon.patch
+rm -vf ./container/CVE-2021-38185.patch
 rm -vf ./container/linker-script-readonly-keyword-support.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list

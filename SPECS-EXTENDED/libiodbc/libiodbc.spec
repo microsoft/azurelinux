@@ -7,12 +7,9 @@ Distribution:   Mariner
 Summary: iODBC Driver Manager
 Name: libiodbc
 Version: 3.52.13
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: LGPLv2 or BSD
 URL: http://www.iodbc.org/
-#URL: https://github.com/openlink/iODBC
-#Source0: http://www.iodbc.org/downloads/iODBC/libiodbc-%{version}.tar.gz
-#Source0: http://downloads.sf.net/iodbc/libiodbc-%{version}.tar.gz
 Source0: https://github.com/openlink/iODBC/archive/v%{version}/%{name}-%{version}.tar.gz
 
 ## upstream patches
@@ -113,6 +110,10 @@ rm -rfv %{buildroot}%{_datadir}/libiodbc/samples
 
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.52.13-4
+- Updating source URL.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.52.13-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

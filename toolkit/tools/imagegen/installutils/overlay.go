@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 // Overlay Struct representing an overlay mount

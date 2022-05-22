@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           python-%{upstream_name}
 Version:        0.12.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        A Kerberos authentication handler for python-requests
 License:        MIT
 URL:            https://github.com/requests/requests-kerberos
@@ -21,8 +21,11 @@ Patch1:         0001-switch-requirement-from-pykerberos-back-to-kerberos.patch
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
 BuildRequires:  python3-mock
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
+
 
 %description
 Requests is an HTTP library, written in Python, for human beings. This library 
@@ -53,7 +56,8 @@ authentication.
 %py3_build
 
 %check
-py.test-3 tests/
+pip3 install pytest
+py.test tests/
 
 %install
 %py3_install
@@ -65,6 +69,10 @@ py.test-3 tests/
 %{python3_sitelib}/%{module_name}*.egg-info
 
 %changelog
+* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.12.0-11
+- Use `py.test` instead of `py.test-3` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

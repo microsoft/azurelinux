@@ -22,13 +22,13 @@ Distribution:   Mariner
 %global apiver  1.0.1
 Name:           bea-stax
 Version:        1.2.0
-Release:        38%{?dist}
+Release:        39%{?dist}
 Summary:        Streaming API for XML
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            http://stax.codehaus.org/Home
 # http://dist.codehaus.org/stax/distributions/stax-src-%{version}.zip
-Source0:        stax-src-%{version}.zip
+Source0:        %{_mariner_sources_url}/stax-src-%{version}.zip
 # http://dist.codehaus.org/stax/jars/stax-%{version}.pom
 Source1:        stax-%{version}.pom
 # http://dist.codehaus.org/stax/jars/stax-api-%{apiver}.pom
@@ -106,6 +106,10 @@ install -p -m 0644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-api-%{version}
 %endif
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-39
+- Updating source URLs.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-38
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

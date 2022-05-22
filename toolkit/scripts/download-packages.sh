@@ -78,15 +78,22 @@ for directory in $directories; do
     for package_type in $packages_types; do
         echo "-- Downloading type $package_type for directory $directory..."
 
-        # If these are not srpms, there is additional directory to skip
+        # If these are from 1.0 and are not srpms, there is an additional directory to skip
         appendix=
         if [[ ! "$package_type" == "srpms" ]]; then
-            echo "-- Downloading RPMS - adding additional directory."
-            appendix="/rpms"
+            if [[ "$repository_url" == *"1.0"* ]]; then
+                echo "-- Downloading 1.0 RPMS - adding additional directory."
+                appendix="/rpms"
+            fi
         fi
 
         # Appendix contains the slash, if needed.
         get_packages "$repository_url"/"$directory"/"$package_type""$appendix"
+
+        # Also get debuginfo, unless this is 1.0
+        if [[ ! "$repository_url" == *"1.0"* ]]; then
+            get_packages "$repository_url"/"$directory"/"debuginfo"/"$package_type""$appendix"
+        fi
     done
 done
 

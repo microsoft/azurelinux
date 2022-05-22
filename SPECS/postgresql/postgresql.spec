@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,12 @@ PostgreSQL is an object-relational database management system.
 %package libs
 Summary:        Libraries for use with PostgreSQL
 Group:          Applications/Databases
+# Mariner used to have libpq and libpq-devel as separate packages, following Fedora's packaging scheme,
+# but this isn't needed for our use case and overcomplicates our packaging. So, let's ensure that
+# (a) the names are provided for compatibility, and
+# (b) we obsolete all versions published in Mariner 2.0's repositories (only libpq{,-devel}-12.2-3.cm2)
+Provides:       libpq = %{version}-%{release}
+Obsoletes:      libpq < 13
 
 %description libs
 The postgresql-libs package provides the essential shared libraries for any
@@ -48,8 +54,10 @@ PostgreSQL server.
 %package        devel
 Summary:        Development files for postgresql.
 Group:          Development/Libraries
-
 Requires:       postgresql = %{version}-%{release}
+# See libs subpackage for explanation of the libpq-devel provides/obsoletes
+Provides:       libpq-devel = %{version}-%{release}
+Obsoletes:      libpq-devel < 13
 
 %description    devel
 The postgresql-devel package contains libraries and header files for
@@ -75,7 +83,6 @@ make %{?_smp_mflags}
 cd contrib && make %{?_smp_mflags}
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install DESTDIR=%{buildroot}
 cd contrib && make install DESTDIR=%{buildroot}
 
@@ -91,8 +98,7 @@ sed -i '2219s/",/  ; EXIT_STATUS=$? ; sleep 5 ; exit $EXIT_STATUS",/g'  src/test
 chown -Rv nobody .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -166,6 +172,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Fri Apr 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 14.2-2
+- Add provides, obsoletes for libpq and libpq-devel packages
+
 * Wed Apr 13 2022 Henry Beberman <henry.beberman@microsoft.com> - 14.2-1
 - Update package version to resolve CVE-2021-23214 and CVE-2021-23222
 - Add pg_verifybackup and pg_amcheck, remove pg_standby

@@ -5,13 +5,12 @@
 Summary:        Loaders and dumpers for PyYAML
 Name:           python-%{pkgname}
 Version:        1.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/Phynix/yamlloader
-#Source0:       https://github.com/Phynix/%{pkgname}/archive/%{version}.tar.gz
-Source0:        %{pkgname}-%{version}.tar.gz
+Source0:        https://github.com/Phynix/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -50,6 +49,9 @@ python3 setup.py install --skip-build --root=%{buildroot}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-2
+- Updating source URL.
+
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.1.0-1
 - Updated to version 1.1.0
 

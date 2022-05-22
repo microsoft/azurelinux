@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
-Version:        1.25
-Release:        5%{?dist}
+Version:        1.31
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
@@ -57,6 +57,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.31-1
+- Update to 1.31
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25-5
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

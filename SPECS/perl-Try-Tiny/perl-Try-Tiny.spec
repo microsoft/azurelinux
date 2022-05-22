@@ -1,7 +1,7 @@
 Summary:        Minimal try/catch with proper preservation of $@
 Name:           perl-Try-Tiny
 Version:        0.30
-Release:        6%{?dist}
+Release:        7%{?dist}
 URL:            https://metacpan.org/release/Try-Tiny
 License:        MIT
 Group:          Development/Libraries
@@ -10,6 +10,7 @@ Distribution:   Mariner
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-%{version}.tar.gz
 
 BuildArch:      noarch
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 
@@ -42,6 +43,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.30-7
+-   Add missing BuildRequires for ExtUtils::MakeMaker
+
 *   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-6
 -   Adding 'BuildRequires: perl-generators'.
 
@@ -49,17 +53,23 @@ make test
 -   Use new perl package names.
 -   Build with NO_PACKLIST option.
 -   Provide perl(Try::Tiny).
+
 *   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.30-4
 -   Adding the "%%license" macro.
+
 *   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 0.30-3
 -   Update URL.
 -   Update License.
 -   License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.30-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Fri Sep 21 2018 Dweep Advani <dadvani@vmware.com> 0.30-1
 -   Update to version 0.30
+
 *   Wed Apr 26 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.28-2
 -   Fix arch
+
 *   Wed Apr 19 2017 Xiaolin Li <xiaolinl@vmware.com> 0.28-1
 -   Initial version.

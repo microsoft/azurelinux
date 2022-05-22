@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        SQLite DBI Driver
 Name:           perl-DBD-SQLite
-Version:        1.62
-Release:        6%{?dist}
+Version:        1.70
+Release:        1%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
@@ -42,8 +42,7 @@ make %{?_smp_mflags} OPTIMIZE="%{optflags}"
 
 %install
 make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f \( -name .packlist -o \
-     -name '*.bs' -size 0 \) -exec rm -f {} ';'
+find %{buildroot} -type f \( -name .packlist -o -name '*.bs' -size 0 \) -exec rm -f {} ';'
 %{_fixperms} %{buildroot}/*
 
 %check
@@ -56,6 +55,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.70-1
+- Update to 1.70
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.62-6
 - Remove unused `%%define sha1` lines
 

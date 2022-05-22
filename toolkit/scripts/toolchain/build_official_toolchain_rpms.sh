@@ -25,6 +25,7 @@ set -x
 
 export LFS=$MARINER_BUILD_DIR/toolchain/populated_toolchain
 TOPDIR=/usr/src/mariner
+CHROOT_BUILDROOT_DIR=$LFS$TOPDIR/BUILDROOT
 CHROOT_SOURCES_DIR=$LFS$TOPDIR/SOURCES
 CHROOT_SPECS_DIR=$LFS$TOPDIR/SPECS
 CHROOT_SRPMS_DIR=$LFS$TOPDIR/SRPMS
@@ -59,8 +60,10 @@ mkdir -pv $CHROOT_INSTALL_RPM_DIR
 mkdir -pv $TOOLCHAIN_LOGS
 mkdir -pv $CHROOT_RPMS_DIR
 
+# Remove artifacts from previous toolchain builds
 sudo rm -f $TOOLCHAIN_BUILD_LIST
 sudo rm -f $TOOLCHAIN_FAILURES
+sudo rm -rf $CHROOT_BUILDROOT_DIR
 touch $TOOLCHAIN_FAILURES
 
 chroot_mount () {
@@ -212,8 +215,6 @@ build_rpm_in_chroot_no_install mariner-rpm-macros
 copy_rpm_subpackage mariner-check-macros
 chroot_and_install_rpms mariner-rpm-macros
 chroot_and_install_rpms mariner-check-macros
-build_rpm_in_chroot_no_install mariner-release
-chroot_and_install_rpms mariner-release
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -298,8 +299,6 @@ chroot_and_install_rpms perl-Fedora-VSP
 build_rpm_in_chroot_no_install perl-generators
 chroot_and_install_rpms perl-generators
 
-build_rpm_in_chroot_no_install wget
-
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre
 chroot_and_install_rpms pcre
@@ -379,7 +378,6 @@ build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib
 chroot_and_install_rpms cracklib
-
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
@@ -392,10 +390,8 @@ build_rpm_in_chroot_no_install libxslt
 chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
 
-# gtest needs cmake
+# libsolv needs cmake
 chroot_and_install_rpms cmake
-build_rpm_in_chroot_no_install gtest
-
 build_rpm_in_chroot_no_install libsolv
 
 # glib needs perl-XML-Parser, python3-xml, gtk-doc, meson, libselinux
@@ -405,8 +401,6 @@ chroot_and_install_rpms perl-XML-Parser
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
-# ninja-build requires gtest
-chroot_and_install_rpms gtest
 build_rpm_in_chroot_no_install ninja-build
 
 # meson requires ninja-build, gettext
@@ -474,7 +468,7 @@ build_rpm_in_chroot_no_install pinentry
 build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
-# createrepo_c needs file, glib
+# createrepo_c needs cmake, file, glib
 chroot_and_install_rpms file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c

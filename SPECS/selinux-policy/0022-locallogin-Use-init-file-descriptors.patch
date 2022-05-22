@@ -1,0 +1,28 @@
+From 01fa9706a4fb562f4314c3743ef26bcd62e63797 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 2 May 2022 15:20:36 +0000
+Subject: [PATCH 22/28] locallogin: Use init file descriptors.
+
+Without this, some systems have slow or broken console login.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/locallogin.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index 12d3ea67e..a87b0a10e 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -125,7 +125,7 @@ auth_manage_pam_runtime_files(local_login_t)
+ auth_manage_pam_console_data(local_login_t)
+ auth_domtrans_pam_console(local_login_t)
+ 
+-init_dontaudit_use_fds(local_login_t)
++init_use_fds(local_login_t)
+ 
+ miscfiles_read_localization(local_login_t)
+ 
+-- 
+2.25.1
+

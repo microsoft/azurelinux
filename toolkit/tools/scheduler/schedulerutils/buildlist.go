@@ -7,11 +7,11 @@ import (
 	"bufio"
 	"os"
 
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/installutils"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
-	"microsoft.com/pkggen/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 )
 
 // CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.

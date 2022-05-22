@@ -7,11 +7,12 @@ Distribution:   Mariner
 Summary: Device-mapper Persistent Data Tools
 Name: device-mapper-persistent-data
 Version: 0.8.5
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv3+
 URL: https://github.com/jthornber/thin-provisioning-tools
-#Source0: https://github.com/jthornber/thin-provisioning-tools/archive/thin-provisioning-tools-% {version}.tar.gz
-Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Upstream source's hash is different from the Mariner one.
+# Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz
+Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Patch0: device-mapper-persistent-data-avoid-strip.patch
 
 BuildRequires: autoconf, expat-devel, libaio-devel, libstdc++-devel, boost-devel, gcc-c++
@@ -39,7 +40,8 @@ make %{?_smp_mflags} V=
 make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 
 %files
-%doc COPYING README.md
+%license COPYING
+%doc README.md
 %{_mandir}/man8/cache_check.8.gz
 %{_mandir}/man8/cache_dump.8.gz
 %{_mandir}/man8/cache_metadata_size.8.gz
@@ -82,6 +84,10 @@ make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 #% {_sbindir}/thin_show_duplicates
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-5
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,7 +4,7 @@
 Summary:        Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store
 Name:           cassandra
 Version:        4.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            http://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
@@ -46,6 +46,7 @@ Requires:       gawk
 Requires:       shadow-utils
 Requires(post): /bin/chown
 %{?systemd_requires}
+AutoReq:        no
 
 %description
 Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
@@ -63,6 +64,9 @@ mv repository ~/.m2/
 export JAVA_HOME="%{java_home}"
 export ANT_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
 ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true
+
+# clean build cache
+rm -rf ~/.m2
 
 %install
 mkdir -p %{buildroot}%{_var}/opt/%{name}/data
@@ -85,6 +89,7 @@ cp -p tools/bin/* %{buildroot}%{_bindir}/
 cp -r lib %{buildroot}%{_var}/opt/cassandra/
 cp -r build %{buildroot}%{_var}/opt/cassandra/
 cp -p build/tools/lib/stress.jar %{buildroot}%{_var}/opt/cassandra/lib
+cp -p build/tools/lib/fqltool.jar %{buildroot}%{_var}/opt/cassandra/lib
 cp -p build/apache-cassandra-%{version}.jar %{buildroot}%{_var}/opt/cassandra/lib
 
 mkdir -p %{buildroot}%{_unitdir}
@@ -102,7 +107,7 @@ EOF
 
 %pre
 getent group cassandra >/dev/null || /usr/sbin/groupadd -r cassandra
-getent passwd cassandra >/dev/null || /usr/sbin/useradd --comment "Cassandra" --shell /bin/bash -M -r --groups cassandra --home /var/opt/%{name}/data cassandra
+getent passwd cassandra >/dev/null || /usr/sbin/useradd --comment "Cassandra" --shell /bin/bash -M -r -g cassandra --groups cassandra --home /var/opt/%{name}/data cassandra
 
 %post
 %{_sbindir}/ldconfig
@@ -118,7 +123,6 @@ source /etc/profile.d/cassandra.sh
 %systemd_postun_with_restart cassandra.service
 if [ $1 -eq 0 ] ; then
     /usr/sbin/userdel cassandra
-    /usr/sbin/groupdel cassandra
 fi
 
 %files
@@ -137,6 +141,9 @@ fi
 %exclude %{_var}/opt/cassandra/build/lib
 
 %changelog
+* Tue May 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.3-2
+- Fix package install uninstall issues and cleanup build cache.
+
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.3-1
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - License verified

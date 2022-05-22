@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"microsoft.com/pkggen/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 // JoinURL concatenates baseURL with extraPaths

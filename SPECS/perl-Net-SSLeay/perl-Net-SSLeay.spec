@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
-Version:        1.88
-Release:        5%{?dist}
+Version:        1.92
+Release:        1%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -65,6 +65,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Thu Apr 14 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.92-1
+- Update to 1.92
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.88-5
 - Adding 'BuildRequires: perl-generators'.
 

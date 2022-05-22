@@ -22,11 +22,11 @@ Distribution:   Mariner
 %global svn_date 20130910
 Name:           jsr-305
 Version:        0.1+%{svn_date}
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Correctness annotations for Java code
 # The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
-License:        BSD-3-Clause
+License:        BSD and CC-BY
 Group:          Development/Libraries/Java
 URL:            https://code.google.com/archive/p/jsr-305
 # There has been no official release yet.  This is a snapshot of the Subversion
@@ -35,7 +35,7 @@ URL:            https://code.google.com/archive/p/jsr-305
 #   svn export -r %{svn_revision} http://%{name}.googlecode.com/svn/trunk %{name}
 #   tar -czvf %{name}-%{svn_date}svn.tgz %{name}
 # Source0:      https://storage.googleapis.com/google-code-archive-source/v2/code.google.com/jsr-305/source-archive.zip
-Source0:        jsr-305-%{svn_date}svn.tgz
+Source0:        %{_mariner_sources_url}/jsr-305-%{svn_date}svn.tgz
 Source1:        jsr-305-ri-build.xml
 # File containing URL to CC-BY license text
 Source2:        NOTICE-CC-BY.txt
@@ -103,6 +103,10 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-6
+- Updating source URLs.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

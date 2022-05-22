@@ -2,13 +2,12 @@
 Summary:        Pytest plugin for coverage reporting
 Name:           python-%{srcname}
 Version:        2.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pypi.python.org/pypi/pytest-cov
-#Source0:       https://github.com/pytest-dev/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/pytest-dev/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         0001-skip-tests-that-are-expected-to-fail.patch
 BuildArch:      noarch
 
@@ -51,6 +50,9 @@ tox -e py%{python3_version_nodots} -v
 %{python3_sitelib}/*
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.12.1-3
+- Updating source URL.
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 2.12.1-2
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

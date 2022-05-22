@@ -10,14 +10,15 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/imagegen/installutils"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/safechroot"
 )
 
 var (
@@ -48,6 +49,10 @@ const (
 	// sshPubKeysTempDirectory is the directory where installutils expects to pick up ssh public key files to add into
 	// the install directory
 	sshPubKeysTempDirectory = "/tmp/sshpubkeys"
+
+	// kickstartPartitionFile is the file that includes the partitioning schema used by
+	// kickstart installation
+	kickstartPartitionFile = "/tmp/part-include"
 )
 
 func main() {
@@ -69,9 +74,22 @@ func main() {
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
 
-	// Run Preinstallation script
-	err = installutils.RunPreInstallScripts(systemConfig)
-	logger.PanicOnError(err, "Failed to run pre installation script")
+	// Execute preinstall scripts and parse partitioning when performing kickstart installation
+	if systemConfig.IsKickStartBoot {
+		err = installutils.RunPreInstallScripts(systemConfig)
+		logger.PanicOnError(err, "Failed to preinstall scripts")
+
+		disks, partitionSettings, err := configuration.ParseKickStartPartitionScheme(kickstartPartitionFile)
+		logger.PanicOnError(err, "Failed to parse partition schema")
+
+		config.Disks = disks
+		systemConfig.PartitionSettings = partitionSettings
+
+		err = config.IsValid()
+		if err != nil {
+			logger.PanicOnError(err, "Invalid image configuration: %s", err)
+		}
+	}
 
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
 	logger.PanicOnError(err, "Failed to build system configuration")

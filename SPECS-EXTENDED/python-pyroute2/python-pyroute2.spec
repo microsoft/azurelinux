@@ -3,10 +3,10 @@
 Summary:        Pure Python netlink library
 Name:           python-%{srcname}
 Version:        0.6.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            https://github.com/svinota/%{srcname}
-Source0:        %{srcname}-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/p/pyroute2/%{srcname}-%{version}.tar.gz
 Source1:        %{srcname}.core-%{version}.tar.gz
 Source2:        %{srcname}.nslink-%{version}.tar.gz
 Source3:        %{srcname}.nftables-%{version}.tar.gz
@@ -85,6 +85,9 @@ cd ../pyroute2.ndb-%{version}
 
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.5-3
+- Fixing source URL.
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.6.5-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified

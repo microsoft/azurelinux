@@ -6,7 +6,7 @@ package formats
 import (
 	"fmt"
 
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (

@@ -1,13 +1,13 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.32.1
-Release:        3%{?dist}
+Version:        5.15.37.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
+#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders = %{version}-%{release}
@@ -17,14 +17,14 @@ BuildArch:      noarch
 The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 %build
 make mrproper
 make headers_check
 
 %install
-cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 make headers
 find usr/include -name '.*' -delete
 rm usr/include/Makefile
@@ -37,6 +37,15 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-2
+- Bump release number to match kernel release
+
+* Mon May 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-1
+- Update source to 5.15.37.1
+
+* Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.34.1-1
+- Update source to 5.15.34.1
+
 * Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
 - Bump release number to match kernel release
 
