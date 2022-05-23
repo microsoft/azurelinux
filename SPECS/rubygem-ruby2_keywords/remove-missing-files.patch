@@ -1,0 +1,11 @@
+diff -ruN a/ruby2_keywords.gemspec b/ruby2_keywords.gemspec
+--- a/ruby2_keywords.gemspec	2021-02-12 16:02:24.000000000 -0800
++++ b/ruby2_keywords.gemspec	2022-04-19 11:38:42.631055523 -0700
+@@ -13,7 +13,6 @@
+   s.extra_rdoc_files = [
+     "LICENSE",
+     "README.md",
+-    "ChangeLog",
+     *Dir.glob("#{__dir__}/logs/ChangeLog-*[^~]").map {|path| path[(__dir__.size+1)..-1]},
+   ]
+   s.files = [

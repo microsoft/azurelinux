@@ -1,0 +1,17 @@
+diff -ruN a/systemd-journal.gemspec b/systemd-journal.gemspec
+--- a/systemd-journal.gemspec	2020-07-30 15:18:50.000000000 -0700
++++ b/systemd-journal.gemspec	2022-04-18 16:52:33.690461380 -0700
+@@ -13,13 +13,6 @@
+   gem.summary       = 'Ruby bindings to libsystemd-journal'
+   gem.homepage      = 'https://github.com/ledbettj/systemd-journal'
+ 
+-  gem.cert_chain    = Dir['certs/john@throttle.io.pem']
+-
+-  if $PROGRAM_NAME.end_with?('gem')
+-    gem.signing_key = ENV['GEM_SIGNING_KEY']
+-    raise ArgumentError, 'Please set GEM_SIGNING_KEY' if gem.signing_key.nil?
+-  end
+-
+   gem.files         = `git ls-files`.split($/)
+   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
+   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
