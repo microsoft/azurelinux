@@ -81,6 +81,10 @@ footer:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/microsoft/CBL-Mariner"
+    - label: "Download Mariner"
+      icon: "fas fa-fw fa-download"
+      url: "https://osrelease.download.prss.microsoft.com/pr/download/Mariner-2.0-x86_64.iso"
+
 
 defaults:
   # _posts
