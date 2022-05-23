@@ -63,9 +63,9 @@ author:
   avatar : "/assets/images/profile/mariner-logo.png"
   bio    : "Mariner is Microsoft's Linux distribution for internal use"
   links:
-    #    - label: "Mariner GitHub"
-    #      icon: "fas fa-fw fa-link"
-    #      url: "https://github.com/microsoft/CBL-Mariner"
+    - label: "Download Mariner"
+      icon: "fas fa-fw fa-download"
+      url: "https://osrelease.download.prss.microsoft.com/pr/download/Mariner-2.0-x86_64.iso"
 #    - label: "Twitter"
 #      icon: "fab fa-fw fa-twitter-square"
 #      url: "https://twitter.com/"
