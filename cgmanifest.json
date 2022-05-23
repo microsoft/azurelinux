@@ -27424,6 +27424,16 @@
           "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
         }
       }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "usrsctp",
+          "version": "0.9.5.0",
+          "downloadUrl": "https://github.com/sctplab/usrsctp/archive/refs/tags/0.9.5.0.tar.gz"
+        }
+      }
     }
   ],
   "Version": 1

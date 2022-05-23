@@ -58,5 +58,10 @@ cd build/*
 
 %changelog
 * Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com>
-Initial SPEC
+- Initial SPEC
 
+* Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com>
+- Initial CBL-Mariner import from Azure (license: MIT).
+
+* Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com>
+- License verified.
