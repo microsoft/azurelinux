@@ -639,7 +639,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Tue May 17 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.116.1-1
 - Update source to 5.10.116.1
 - Address CVE-2022-1048, CVE-2022-1353, CVE-2022-29582, CVE-2022-1195
-  CVE-2022-0494, CVE-2022-1015 
+  CVE-2022-0494, CVE-2022-1015, CVE-2022-29968
 
 * Tue Apr 19 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.111.1-1
 - Update source to 5.10.111.1
