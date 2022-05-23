@@ -6321,8 +6321,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "68.2.0.6",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
+          "version": "68.2.0.9",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.9.tar.gz"
         }
       }
     },
@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "libepoxy",
-          "version": "1.5.5",
-          "downloadUrl": "https://github.com/anholt/libepoxy/releases/download/1.5.5/libepoxy-1.5.5.tar.xz"
+          "version": "1.5.10",
+          "downloadUrl": "https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz"
         }
       }
     },
@@ -11191,8 +11191,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.7",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.7.tar.gz"
+          "version": "10.6.8",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.8.tar.gz"
         }
       }
     },
@@ -26037,8 +26037,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4743",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4743.tar.gz"
+          "version": "8.2.4925",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4925.tar.gz"
         }
       }
     },

@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      8%{?dist}
+Release:      9%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -389,6 +389,10 @@ set bell-style none
 "\e[H": beginning-of-line
 "\e[F": end-of-line
 
+# ctrl + left/right arrow to jump words
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
 # End /etc/inputrc
 EOF
 #
@@ -562,6 +566,9 @@ return 0
 /usr/local/lib64
 
 %changelog
+*   Wed May 18 2022 Brendan Kerrigan <bkerrigan@microsoft.com> 1.1-9
+-   Update /etc/inputrc to enable Ctrl+LeftArrow and Ctrl+RightArrow word jumping binds.
+-   License Verified.
 *   Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> 1.1-8
 -   Add folders and symlinks for .dwz files.
 *   Mon Jun 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.1-7

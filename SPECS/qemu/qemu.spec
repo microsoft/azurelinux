@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -254,6 +254,7 @@ Patch1001:      CVE-2021-20255.patch
 Patch1002:      CVE-2022-1050.patch
 # CVE-2022-26354 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/8d1b247f3748ac4078524130c6d7ae42b6140aaf
 Patch1003:      CVE-2022-26354.patch
+Patch1004:      CVE-2022-26353.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2275,6 +2276,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Fri May 20 2022 Chris Co <chrco@microsoft.com> - 6.2.0-3
+- Patched CVE-2022-26353
+
 * Fri May 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-2
 - Remove multiboot_dma.bin from aarch64 builds
 

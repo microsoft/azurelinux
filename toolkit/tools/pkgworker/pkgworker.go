@@ -21,6 +21,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -245,6 +246,10 @@ func tdnfInstall(packages []string) (err error) {
 		packageMatchGroup       = 1
 	)
 
+	var (
+		releaseverCliArg string
+	)
+
 	if len(packages) == 0 {
 		return
 	}
@@ -257,7 +262,12 @@ func tdnfInstall(packages []string) (err error) {
 		packages[i] = filepath.Base(strings.TrimSuffix(packages[i], ".rpm"))
 	}
 
-	installArgs := []string{"install", "-y"}
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
+	installArgs := []string{"install", "-y", releaseverCliArg}
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
 	foundNoMatchingPackages := false
