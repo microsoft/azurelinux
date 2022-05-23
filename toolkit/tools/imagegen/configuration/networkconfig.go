@@ -28,9 +28,25 @@ type Network struct {
 	NetMask    string   `json:"NetMask"`
 	OnBoot     bool     `json:"OnBoot"`
 	HostName   string   `json:"HostName"`
-	NameServer []string `json:"NameServer"`
+	NameServers []string `json:"NameServer"`
 	Device     string   `json:"Device"`
 }
+
+// NetworkBootProto defines the different modes of network protocol
+type NetworkBootProto string
+
+const (
+	// NetworkBootProtoDHCP indicates that this is a DHCP protocol
+	NetworkBootProtoDHCP NetworkBootProto = "dhcp"
+	// NetworkBootProtoStatic indicates that this is a static protocol
+	NetworkBootProtoStatic NetworkBootProto = "static"
+	// NetworkBootProtoBOOTP indicates that this is a bootp protocol
+	NetworkBootProtoBOOTP NetworkBootProto = "bootp"
+	// NetworkBootProtoiBFT indicates that this is a ibft protocol
+	NetworkBootProtoiBFT NetworkBootProto = "ibft"
+	// NetworkBootProtoDefault indicates that this is a DHCP protocol
+	NetworkBootProtoDefault NetworkBootProto = ""
+)
 
 // UnmarshalJSON Unmarshals a Network entry
 func (n *Network) UnmarshalJSON(b []byte) (err error) {
@@ -51,22 +67,22 @@ func (n *Network) UnmarshalJSON(b []byte) (err error) {
 
 // IsValid returns an error if the Network struct is not valid
 func (n *Network) IsValid() (err error) {
-	err = n.BootProtoIsValid()
+	err = n.bootProtoIsValid()
 	if err != nil {
 		return
 	}
 
-	err = n.HostNameIsValid()
+	err = n.hostNameIsValid()
 	if err != nil {
 		return
 	}
 
-	err = n.IPAddrIsValid()
+	err = n.ipAddrIsValid()
 	if err != nil {
 		return
 	}
 
-	err = n.DeviceIsValid()
+	err = n.deviceIsValid()
 	if err != nil {
 		return
 	}
@@ -74,18 +90,63 @@ func (n *Network) IsValid() (err error) {
 	return
 }
 
-// BootProtoIsValid returns an error if input bootproto is invalid
-func (n *Network) BootProtoIsValid() (err error) {
+// ConfigureNetwork performs network configuration during the kickstart unattended installation process
+func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfig) (err error) {
+	const squashErrors = false
+	var dnsUpdate bool
+
+	for _, networkData := range systemConfig.Networks {
+		deviceName, err := checkNetworkDeviceAvailability(networkData)
+		if err != nil || deviceName == "" {
+			logger.Log.Errorf("Could not find matching network device in the system")
+			return err
+		}
+
+		err = createNetworkConfigFile(installChroot, networkData, deviceName)
+		if err != nil {
+			return err
+		}
+
+		if len(networkData.NameServers) > 0 {
+			dnsUpdate = true
+		}
+
+		// Set hostname
+		err = updateHostName(networkData.HostName)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-networkd")
+	if err != nil {
+		logger.Log.Errorf("Unable to restart systemd-networkd: %s", err)
+		return
+	}
+
+	if dnsUpdate {
+		err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-resolved")
+		if err != nil {
+			logger.Log.Errorf("Unable to restart systemd-resolved: %s", err)
+		}
+	}
+
+	return
+}
+
+// bootProtoIsValid returns an error if input bootproto is invalid
+func (n *Network) bootProtoIsValid() (err error) {
 	switch strings.TrimSpace(n.BootProto) {
-	case "", "dhcp", "bootp", "ibft", "static":
+	// No entry is valid, which defaults to DHCP protocol
+	case NetworkBootProtoDefault, NetworkBootProtoDHCP, NetworkBootProtoStatic, NetworkBootProtoBOOTP, NetworkBootProtoiBFT:
 		return
 	default:
-		return fmt.Errorf("Invalid input for --bootproto (%s), bootproto can only be one of dhcp, bootp, ibft and static", n.BootProto)
+		return fmt.Errorf("Invalid input for bootproto (%s), bootproto can only be one of dhcp, bootp, ibft and static", n.BootProto)
 	}
 }
 
-// HostNameIsValid returns an error if input hostanme is invalid
-func (n *Network) HostNameIsValid() (err error) {
+// hostNameIsValid returns an error if input hostanme is invalid
+func (n *Network) hostNameIsValid() (err error) {
 	hostname := strings.Trim(n.HostName, " ")
 	re, _ := regexp.Compile(`^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`)
 
@@ -107,8 +168,8 @@ func (n *Network) validateIPAddress(ip string) (err error) {
 	return
 }
 
-// IPAddrIsValid returns an error if ip, gateway, netmask or nameserver inputs are invalid ip addresses
-func (n *Network) IPAddrIsValid() (err error) {
+// ipAddrIsValid returns an error if ip, gateway, netmask or nameserver inputs are invalid ip addresses
+func (n *Network) ipAddrIsValid() (err error) {
 	ip := strings.Trim(n.Ip, " ")
 	if err = n.validateIPAddress(ip); err != nil {
 		return fmt.Errorf("Invalid input for --ip: %s", err)
@@ -124,7 +185,7 @@ func (n *Network) IPAddrIsValid() (err error) {
 		return fmt.Errorf("Invalid input for --gateway: %s", err)
 	}
 
-	for _, nameserver := range n.NameServer {
+	for _, nameserver := range n.NameServers {
 		if err = n.validateIPAddress(strings.Trim(nameserver, " ")); err != nil {
 			return fmt.Errorf("Invalid input for --nameserver: %s", err)
 		}
@@ -133,8 +194,8 @@ func (n *Network) IPAddrIsValid() (err error) {
 	return
 }
 
-// DeviceIsValid returns an error if the Device name is empty
-func (n *Network) DeviceIsValid() (err error) {
+// deviceIsValid returns an error if the Device name is empty
+func (n *Network) deviceIsValid() (err error) {
 	if strings.TrimSpace(n.Device) == "" {
 		return fmt.Errorf("Invalid input for --device (), device cannot be empty")
 	}
@@ -249,7 +310,7 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 	}
 
 	// Update Nameserver
-	for _, nameserver := range networkData.NameServer {
+	for _, nameserver := range networkData.NameServers {
 		dnsSetting := dnsField + nameserver + "\n"
 		networkSection = networkSection + dnsSetting
 	}
@@ -317,50 +378,6 @@ func updateHostName(hostName string) (err error) {
 		err = shell.ExecuteLive(squashErrors, "hostnamectl", "set-hostname", hostname)
 		if err != nil {
 			logger.Log.Errorf("Unable to set hostname: %s", err)
-		}
-	}
-
-	return
-}
-
-// ConfigureNetwork performs network configuration during the kickstart unattended installation process
-func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfig) (err error) {
-	const squashErrors = false
-	var dnsUpdate bool
-
-	for _, networkData := range systemConfig.Networks {
-		deviceName, err := checkNetworkDeviceAvailability(networkData)
-		if err != nil || deviceName == "" {
-			logger.Log.Errorf("Could not find matching network device in the system")
-			return err
-		}
-
-		err = createNetworkConfigFile(installChroot, networkData, deviceName)
-		if err != nil {
-			return err
-		}
-
-		if len(networkData.NameServer) > 0 {
-			dnsUpdate = true
-		}
-
-		// Set hostname
-		err = updateHostName(networkData.HostName)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-networkd")
-	if err != nil {
-		logger.Log.Errorf("Unable to restart systemd-networkd: %s", err)
-		return
-	}
-
-	if dnsUpdate {
-		err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-resolved")
-		if err != nil {
-			logger.Log.Errorf("Unable to restart systemd-resolved: %s", err)
 		}
 	}
 
