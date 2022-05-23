@@ -8,7 +8,7 @@ author: jperrin
 comments: false
 ---
 
-We’re pleased to announce the General Availability of Mariner 2.0, with generational updates to packages and feature improvements to help you build the most performant and secure Azure services and Edge appliances. Thank you to all the component and partner teams around Microsoft who helped make this release successful!
+We’re pleased to announce the General Availability of Mariner 2.0, with generational updates to packages and feature improvements for Azure to build the most performant and secure services and Edge appliances. Thank you to all the teams and users in and around Microsoft who helped make this release successful!
  
 With the release of Mariner 2.0, we will have roughly 7000 packages total in the distro across all repositories. Many of the 1.0 packages have been updated to current versions and are available in 2.0. The base and extended 2.0 packages are available on packages.microsoft.com. 
  
@@ -50,7 +50,7 @@ The Mariner 2.0 base container is reduced to ~67MB. Size reduction of the base i
 * Gen2: MicrosoftCBLMariner:cbl-mariner:cbl-mariner-2-gen2:latest
  
 # ISO Download
-* [https://aka.ms/mariner-2.0-x86_64-iso](https://osrelease.download.prss.microsoft.com/pr/download/Mariner-2.0-x86_64.iso)
+* [https://aka.ms/mariner-2.0-x86_64-iso](https://aka.ms/mariner-2.0-x86_64-iso)
  
  
 ## Kernel Updates
