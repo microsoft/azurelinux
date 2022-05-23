@@ -36,13 +36,13 @@
 %global json_version       2.6.1
 %global logger_version     1.5.0
 %global mutex_m_version    0.1.1
-%global net-http_version   0.2.0
-%global net-protocol_version 0.1.2
+%global net_http_version   0.2.0
+%global net_protocol_version 0.1.2
 %global nkf_version        0.1.1
 %global observer_version   0.1.1
 %global open3_version      0.1.1
 %global openssl_version    3.0.0
-%global open-uri_version   0.2.0
+%global open_uri_version   0.2.0
 %global optparse_version   0.2.0
 %global ostruct_version    0.5.2
 %global pathname_version   0.2.0
