@@ -340,9 +340,7 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 			return err
 		}
 
-		if len(networkData.NameServer) > 0 {
-			dnsUpdate = true
-		}
+		dnsUpdate = len(networkData.NameServer) > 0
 
 		// Set hostname
 		err = updateHostName(networkData.HostName)
