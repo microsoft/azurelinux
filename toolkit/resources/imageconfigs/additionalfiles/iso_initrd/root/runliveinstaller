@@ -41,7 +41,7 @@ LABEL=CDROM
 if grep -qs $ISO_ROOT /proc/mounts; then
     echo ISO root already mounted
 # Read from /proc/cmdline to get image configs from PXE server
-elif [[ $(grep "config_root" $CMDLINE) ]]; then
+elif grep -q "config_root" $CMDLINE; then
     for argument in $(cat "$CMDLINE")
     do
         IFS='=' read -r FLAG VALUE <<< $argument
