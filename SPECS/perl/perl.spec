@@ -63,7 +63,7 @@
 %undefine _package_note_file
 
 # Skip module metadata notes for perl due to issue with embedded build ldflags
-%undefine module_ldflags
+%undefine mariner_module_ldflags
 
 Name:           perl
 # These are all found licenses. They are distributed among various
@@ -6814,7 +6814,7 @@ popd
 # Old changelog entries are preserved in CVS.
 %changelog
 * Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-488
-- Bump release to build with module_info.ld fix in mariner-rpm-macros
+- Undefine "mariner_module_ldflags" to remove references to module_info.ld in embedded ldflags
 
 * Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-487
 - Upgrade to version 5.34.1 referencing Fedora 37 (license: MIT)
