@@ -236,7 +236,6 @@ generate_pkggen_core () {
         grep "^gettext-" $TmpPkgGen
         grep "^gzip-" $TmpPkgGen
         grep "^make-" $TmpPkgGen
-        grep "^mariner-release-" $TmpPkgGen
         grep "^patch-" $TmpPkgGen
         grep "^util-linux-" $TmpPkgGen
         grep "^tar-" $TmpPkgGen

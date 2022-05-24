@@ -11,8 +11,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+
 	"golang.org/x/sys/unix"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 // ShellProgram is the default shell program used by the tooling.

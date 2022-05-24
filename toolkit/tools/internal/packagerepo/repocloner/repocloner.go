@@ -3,9 +3,7 @@
 
 package repocloner
 
-import (
-	"microsoft.com/pkggen/internal/pkgjson"
-)
+import "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 
 // RepoContents contains an array of packages contained in a repo.
 type RepoContents struct {

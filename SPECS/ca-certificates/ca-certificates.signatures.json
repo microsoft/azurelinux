@@ -11,7 +11,7 @@
   "README.usr": "0d2e90b6cf575678cd9d4f409d92258ef0d676995d4d733acdb2425309a38ff8",
   "bundle2pem.sh": "a61e0d9f34e21456cfe175e9a682f56959240e66dfeb75bd2457226226aa413a",
   "certdata.base.txt": "76c4cd1860b9a6f6ee9c2a0dcddcef46f65950b7ec12d2a7eeabeedca4e379f9",
-  "certdata.microsoft.txt": "cb71369ce1fcab1a98d7b3fcdd10bd0c083275a5599e153b0be866706628e567",
+  "certdata.microsoft.txt": "346ce5e14975c088b8261808d9b053fb4ccaed9e7429e512a700797b86ba4590",
   "certdata2pem.py": "4f5848c14210758f19ab9fdc9ffd83733303a48642a3d47c4d682f904fdc0f33",
   "pem2bundle.sh": "f96a2f0071fb80e30332c0bd95853183f2f49a3c98d5e9fc4716aeeb001e3426",
   "trust-fixes": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",

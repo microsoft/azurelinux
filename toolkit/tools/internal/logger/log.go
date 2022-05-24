@@ -14,7 +14,8 @@ import (
 	"sync"
 
 	log "github.com/sirupsen/logrus"
-	"microsoft.com/pkggen/internal/logger/hooks/writerhook"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger/hooks/writerhook"
 )
 
 var (

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/logger"
 )
 
 // ToolkitVersion specifies the version of the toolkit and the reported version of all tools in it.

@@ -3550,8 +3550,8 @@
         "type": "other",
         "other": {
           "name": "gdb",
-          "version": "11.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-11.1.tar.xz"
+          "version": "11.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-11.2.tar.xz"
         }
       }
     },
@@ -5730,8 +5730,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.34.1.tar.gz"
+          "version": "5.15.37.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
         }
       }
     },
@@ -6321,8 +6321,8 @@
         "type": "other",
         "other": {
           "name": "icu",
-          "version": "68.2.0.6",
-          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
+          "version": "68.2.0.9",
+          "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.9.tar.gz"
         }
       }
     },
@@ -7171,8 +7171,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.34.1.tar.gz"
+          "version": "5.15.37.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
         }
       }
     },
@@ -7181,8 +7181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.34.1.tar.gz"
+          "version": "5.15.37.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
         }
       }
     },
@@ -7192,7 +7192,7 @@
         "other": {
           "name": "kernel-rt",
           "version": "5.15.34.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.34.1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.34.1.tar.gz"
         }
       }
     },
@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "libepoxy",
-          "version": "1.5.5",
-          "downloadUrl": "https://github.com/anholt/libepoxy/releases/download/1.5.5/libepoxy-1.5.5.tar.xz"
+          "version": "1.5.10",
+          "downloadUrl": "https://github.com/anholt/libepoxy/archive/refs/tags/1.5.10.tar.gz"
         }
       }
     },
@@ -11191,8 +11191,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.7",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.7.tar.gz"
+          "version": "10.6.8",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.8.tar.gz"
         }
       }
     },
@@ -22454,8 +22454,8 @@
         "type": "other",
         "other": {
           "name": "quota",
-          "version": "4.05",
-          "downloadUrl": "http://downloads.sourceforge.net/linuxquota/quota-4.05.tar.gz"
+          "version": "4.06",
+          "downloadUrl": "http://downloads.sourceforge.net/linuxquota/quota-4.06.tar.gz"
         }
       }
     },
@@ -24304,6 +24304,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sdbus-cpp",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "seabios",
           "version": "1.14.0",
           "downloadUrl": "https://www.seabios.org/downloads/seabios-1.14.0.tar.gz"
@@ -26027,8 +26037,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4743",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4743.tar.gz"
+          "version": "8.2.4925",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4925.tar.gz"
         }
       }
     },

@@ -1,4 +1,4 @@
-From 67a0dbf6434552e720b0d311597553b3a76f779e Mon Sep 17 00:00:00 2001
+From 6400cf65afed09c63d96cc62b1e7eee964bdb6cb Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
 Date: Tue, 23 Aug 2011 13:45:15 +0200
 Subject: [PATCH] warnquota configuration tunes
@@ -8,19 +8,20 @@ Content-Transfer-Encoding: 8bit
 
 Rest of changes (378a64006bb1e818e84a1c77808563b802b028fa) not
 accepted by upstream (we had root@... addresses and more enterprise
-wordings usually there).
+wordings usually there). Later improved by the upstream in
+0efb2331f1c39c9665fb6e92e83c7d080b877de1.
 
 Signed-off-by: Petr Písař <ppisar@redhat.com>
 ---
  warnquota.c    |  2 +-
- warnquota.conf | 17 ++++++++---------
- 2 files changed, 9 insertions(+), 10 deletions(-)
+ warnquota.conf | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/warnquota.c b/warnquota.c
-index 0d911e4..2c8e084 100644
+index 2882fee..48d79c0 100644
 --- a/warnquota.c
 +++ b/warnquota.c
-@@ -837,7 +837,7 @@ cc_parse_err:
+@@ -883,7 +883,7 @@ cc_parse_err:
  			}
  #ifdef USE_LDAP_MAIL_LOOKUP
  			else if (!strcmp(var, "LDAP_MAIL")) {
@@ -30,33 +31,36 @@ index 0d911e4..2c8e084 100644
  				else
  					config->use_ldap_mail = 0;
 diff --git a/warnquota.conf b/warnquota.conf
-index b06f81f..7e00947 100644
+index 5bbd0ab..366c3e0 100644
 --- a/warnquota.conf
 +++ b/warnquota.conf
-@@ -4,17 +4,16 @@
- # and even blank lines
+@@ -19,20 +19,20 @@ FAIL        = "configure /etc/warnquota.conf before running warnquota"
+ #
+ # command used for sending mails
+ #
+-MAIL_CMD = "/usr/lib/sendmail -t"
++MAIL_CMD	= "/usr/sbin/sendmail -t"
  
- # values can be quoted:
--#MAIL_CMD 	= "/usr/my/sendmail/instead/sendmail -t"
--MAIL_CMD 	= "/bin/echo"
--FROM 		= "bas@example.com"
-+MAIL_CMD 	= "/usr/sbin/sendmail -t"
-+FROM 		= "root@example.com"
- # but they don't have to be:
--SUBJECT 	= Hey, user, clean up your account!
--CC_TO 		= "sysadm@example.com"
-+SUBJECT 	= NOTE: You are exceeding your allocated disk space limits
+ #
+ # Standard mail fields
+-FROM        = "root@localhost"
+-SUBJECT 	= "Your account quota has exceeded!"
++FROM        = "root@example.com"
++SUBJECT 	= "You are exceeding your allocated disk space limits"
+ # Note that if LDAP is configured, the name in CC_TO gets looked up in LDAP
+ # to obtain email address similarly to email recipient address.
+-CC_TO 		= "root@localhost"
 +CC_TO 		= "root@example.com"
  # If you set this variable CC will be used only when user has less than
  # specified grace time left (examples of possible times: 5 seconds, 1 minute,
  # 12 hours, 5 days)
  # CC_BEFORE = 2 days
--SUPPORT 	= "support@example.com"
+-SUPPORT 	= "root@localhost"
 +SUPPORT 	= "root@example.com"
- PHONE 		= "(123) 456-1111 or (222) 333-4444"
+ PHONE 		= "123 456 789"
  # Text in the beginning of the mail (if not specified, default text is used)
  # This way text can be split to more lines
-@@ -22,11 +21,11 @@ PHONE 		= "(123) 456-1111 or (222) 333-4444"
+@@ -40,11 +40,11 @@ PHONE 		= "123 456 789"
  # The expressions %i, %h, %d, and %% are substituted for user/group name,
  # host name, domain name, and '%' respectively. For backward compatibility
  # %s behaves as %i but is deprecated.
@@ -72,5 +76,5 @@ index b06f81f..7e00947 100644
  GROUP_MESSAGE	= Hello,|\
  your group %i is using too much disk space at %h.|\
 -- 
-2.13.5
+2.25.4
 

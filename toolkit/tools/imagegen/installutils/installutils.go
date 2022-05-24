@@ -15,16 +15,17 @@ import (
 	"syscall"
 	"time"
 
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkgjson"
-	"microsoft.com/pkggen/internal/randomization"
-	"microsoft.com/pkggen/internal/retry"
-	"microsoft.com/pkggen/internal/safechroot"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 )
 
 const (
@@ -530,6 +531,10 @@ func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err er
 
 // TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
 func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesInstalled, totalPackages int, reportProgress bool) (packagesInstalled int, err error) {
+	var (
+		releaseverCliArg string
+	)
+
 	packagesInstalled = currentPackagesInstalled
 
 	onStdout := func(args ...interface{}) {
@@ -563,9 +568,15 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		}
 	}
 
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
 	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName,
-		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/")
+		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/",
+		releaseverCliArg)
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
@@ -582,9 +593,18 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 		releasePackage = "mariner-release"
 	)
 
+	var (
+		releaseverCliArg string
+	)
+
 	logger.Log.Debugf("Downloading '%s' package to a clean RPM root under '%s'.", releasePackage, installRoot)
 
-	err = shell.ExecuteLive(squashErrors, "tdnf", "download", "--alldeps", "--destdir", installRoot, releasePackage)
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
+	err = shell.ExecuteLive(squashErrors, "tdnf", "download", releaseverCliArg, "--alldeps", "--destdir", installRoot, releasePackage)
 	if err != nil {
 		logger.Log.Errorf("Failed to prepare the RPM database on downloading the 'mariner-release' package: %v", err)
 		return
@@ -644,8 +664,16 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 }
 
 func calculateTotalPackages(packages []string, installRoot string) (totalPackages int, err error) {
+	var (
+		releaseverCliArg string
+	)
 	allPackageNames := make(map[string]bool)
 	const tdnfAssumeNoStdErr = "Error(1032) : Operation aborted.\n"
+
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
 
 	// For every package calculate what dependencies would also be installed from it.
 	for _, pkg := range packages {
@@ -655,7 +683,7 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 		)
 
 		// Issue an install request but stop right before actually performing the install (assumeno)
-		stdout, stderr, err = shell.Execute("tdnf", "install", "--assumeno", "--nogpgcheck", pkg, "--installroot", installRoot)
+		stdout, stderr, err = shell.Execute("tdnf", "install", releaseverCliArg, "--assumeno", "--nogpgcheck", pkg, "--installroot", installRoot)
 		if err != nil {
 			// tdnf aborts the process when it detects an install with --assumeno.
 			if stderr == tdnfAssumeNoStdErr {

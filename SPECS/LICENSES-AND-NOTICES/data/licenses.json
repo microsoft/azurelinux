@@ -2051,6 +2051,7 @@
                 "rubygem-semantic_puppet",
                 "rubygem-stringio",
                 "rubygem-thor",
+                "sdbus-cpp",
                 "shim",
                 "shim-unsigned",
                 "shim-unsigned-aarch64",

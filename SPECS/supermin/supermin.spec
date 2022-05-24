@@ -21,7 +21,7 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,7 @@ Requires:       dnf-plugins-core
 # RHBZ#771310
 Requires:       e2fsprogs-libs >= 1.42
 Requires:       findutils
+Requires:       mariner-release
 Requires:       rpm
 Requires:       tar
 Requires:       util-linux-ng
@@ -128,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Tue Apr 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-3
+- Explicitly require mariner-release at run-time
+
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-2
 - Updating dependencies.
 
