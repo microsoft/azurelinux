@@ -11,7 +11,7 @@ Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
-Patch0:         CVE-2022-24903.patch
+Patch1:         CVE-2022-24903.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -33,6 +33,7 @@ It offers high-performance, great security features and a modular design. While 
 
 %prep
 %setup -q
+%patch1 -p1
 autoreconf -fvi
 
 %build
