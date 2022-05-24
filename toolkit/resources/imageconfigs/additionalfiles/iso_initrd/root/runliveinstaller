@@ -41,11 +41,11 @@ LABEL=CDROM
 if grep -qs $ISO_ROOT /proc/mounts; then
     echo ISO root already mounted
 # Read from /proc/cmdline to get image configs from PXE server
-elif grep -q "config_root" $CMDLINE; then
+elif grep -q "image-config" $CMDLINE; then
     for argument in $(cat "$CMDLINE")
     do
         IFS='=' read -r FLAG VALUE <<< $argument
-        if [ "${FLAG}" == "config_root" ]; then
+        if [ "${FLAG}" == "--image-config" ]; then
             SERVER_CONFIG_PATH=$VALUE
             IFS='/' read -ra CUT_DIRS <<< $VALUE
             wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-4)) --directory-prefix="$ISO_ROOT" --reject="index.html*" "$SERVER_CONFIG_PATH"/
