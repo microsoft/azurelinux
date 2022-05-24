@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
@@ -68,6 +69,11 @@ func (s *SystemConfig) IsValid() (err error) {
 	// Validate BootType
 
 	// Validate HostName
+	if !govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_") {
+		if s.Hostname != "" {
+			return fmt.Errorf("invalid [Hostname]: %s", s.Hostname)
+		}
+	}
 
 	if strings.TrimSpace(s.Name) == "" {
 		return fmt.Errorf("missing [Name] field")

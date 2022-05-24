@@ -471,7 +471,6 @@ var expectedConfiguration Config = Config{
 					Ip:        "192.169.20.148",
 					NetMask:   "255.255.255.0",
 					OnBoot:    false,
-					HostName:  "mariner-test",
 					NameServers: []string{
 						"192.168.30.23",
 					},

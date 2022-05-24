@@ -47,7 +47,20 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "cbl-mariner",
+            "Networks":[
+                {
+                    "BootProto": "dhcp ",
+                    "GateWay":   "192.168.20.4",
+                    "Ip":        "192.169.20.148",
+                    "NetMask":   "255.255.255.0",
+                    "OnBoot":    false,
+                    "NameServer": [
+                        "192.168.30.23"
+                    ],
+                    "Device": "eth0"
+                }
+            ]
         }
     ]
 }

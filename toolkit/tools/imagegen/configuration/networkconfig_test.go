@@ -5,7 +5,6 @@ package configuration
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -20,7 +19,6 @@ var (
 			Ip:        "10.154.214.158",
 			NetMask:   "255.255.255.0",
 			OnBoot:    false,
-			HostName:  "mariner-test",
 			NameServers: []string{
 				"10.159.32.34",
 			},
@@ -58,11 +56,11 @@ func TestShouldFailParsingInvalidBootProto_Network(t *testing.T) {
 
 	err := testNetwork.bootProtoIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --bootproto (abcd), bootproto can only be one of dhcp, bootp, ibft and static", err.Error())
+	assert.Equal(t, "invalid input for bootproto (abcd), bootproto can only be one of dhcp, bootp, ibft and static", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --bootproto (abcd), bootproto can only be one of dhcp, bootp, ibft and static", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for bootproto (abcd), bootproto can only be one of dhcp, bootp, ibft and static", err.Error())
 }
 
 func TestShouldFailParsingInvalidGateWay_Network(t *testing.T) {
@@ -72,11 +70,11 @@ func TestShouldFailParsingInvalidGateWay_Network(t *testing.T) {
 
 	err := testNetwork.ipAddrIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --gateway: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for gateway: invalid ip address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --gateway: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for gateway: invalid ip address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidIp_Network(t *testing.T) {
@@ -86,11 +84,11 @@ func TestShouldFailParsingInvalidIp_Network(t *testing.T) {
 
 	err := testNetwork.ipAddrIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --ip: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for ip: invalid ip address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --ip: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for ip: invalid ip address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidNetMask_Network(t *testing.T) {
@@ -100,25 +98,11 @@ func TestShouldFailParsingInvalidNetMask_Network(t *testing.T) {
 
 	err := testNetwork.ipAddrIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --netmask: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for netmask: invalid ip address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --netmask: Invalid ip address (abcd)", err.Error())
-}
-
-func TestShouldFailParsingInvalidHostName_Network(t *testing.T) {
-	var checkedNetwork Network
-	testNetwork := validNetworks[0]
-	testNetwork.HostName = "**??"
-
-	err := testNetwork.hostNameIsValid()
-	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --hostname (**??)", err.Error())
-
-	err = remarshalJSON(testNetwork, &checkedNetwork)
-	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --hostname (**??)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for netmask: invalid ip address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidNameServer_Network(t *testing.T) {
@@ -128,11 +112,11 @@ func TestShouldFailParsingInvalidNameServer_Network(t *testing.T) {
 
 	err := testNetwork.ipAddrIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --nameserver: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for nameserver: invalid ip address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --nameserver: Invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for nameserver: invalid ip address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
@@ -142,22 +126,16 @@ func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
 
 	err := testNetwork.deviceIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "Invalid input for --device (), device cannot be empty", err.Error())
+	assert.Equal(t, "invalid input for device, device cannot be empty", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: Invalid input for --device (), device cannot be empty", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for device, device cannot be empty", err.Error())
 }
 
 func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	const networkFile = "/etc/systemd/network/10-static-eth1.network"
 	testNetwork := validNetworks[0]
-
-	// Remove the file it already exists
-	if exists, _ := file.PathExists(networkFile); exists {
-		err := os.Remove(networkFile)
-		assert.NoError(t, err)
-	}
 
 	err := createNetworkConfigFile(nil, testNetwork, "eth1")
 	assert.NoError(t, err)
@@ -166,17 +144,8 @@ func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	testContents, err := file.ReadLines(networkFile)
 	assert.NoError(t, err)
 	assert.Equal(t, testContents, validNetWorkFileContent)
-}
 
-func TestShouldSucceedSettingHostName_Network(t *testing.T) {
-	const hostnameFile = "/etc/hostname"
-	testNetwork := validNetworks[0]
-
-	err := updateHostName(testNetwork.HostName)
-	assert.NoError(t, err)
-
-	// Check whether the hostname is set correctly
-	setHostName, err := file.ReadLines(hostnameFile)
-	assert.NoError(t, err)
-	assert.Equal(t, strings.Trim(setHostName[0], " "), strings.Trim(testNetwork.HostName, " "))
+	t.Cleanup(func() {
+		os.Remove(networkFile)
+	})
 }
