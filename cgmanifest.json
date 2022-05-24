@@ -22875,7 +22875,7 @@
         "type": "other",
         "other": {
           "name": "rsyslog",
-          "version": "8.2204.0",
+          "version": "8.2204.1",
           "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2204.1.tar.gz"
         }
       }
