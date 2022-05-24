@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+ AND LGPLv3 AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
+Patch0:         CVE-2022-24903.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -86,6 +87,9 @@ make %{?_smp_mflags} check
 %dir %attr(0755, root, root) %{_sysconfdir}/rsyslog.d
 
 %changelog
+* Mon May 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.37.0-7
+- Patching CVE-2022-24903
+
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-6
 - Add /etc/rsyslog.d directory.
 - License Verified.
