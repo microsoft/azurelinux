@@ -20,13 +20,13 @@ import (
 )
 
 type Network struct {
-	BootProto  string   `json:"BootProto"`
-	GateWay    string   `json:"GateWay"`
-	Ip         string   `json:"Ip"`
-	NetMask    string   `json:"NetMask"`
-	OnBoot     bool     `json:"OnBoot"`
+	BootProto   string   `json:"BootProto"`
+	GateWay     string   `json:"GateWay"`
+	Ip          string   `json:"Ip"`
+	NetMask     string   `json:"NetMask"`
+	OnBoot      bool     `json:"OnBoot"`
 	NameServers []string `json:"NameServer"`
-	Device     string   `json:"Device"`
+	Device      string   `json:"Device"`
 }
 
 // NetworkBootProto defines the different modes of network protocol
@@ -135,7 +135,7 @@ func (n *Network) getValidNetworkBootProtos() (types []NetworkBootProto) {
 }
 
 // bootProtoIsValid returns an error if input bootproto is invalid
-func (n *Network) bootProtoIsValid() (err error) {	
+func (n *Network) bootProtoIsValid() (err error) {
 	n.BootProto = strings.TrimSpace(n.BootProto)
 	for _, valid := range n.getValidNetworkBootProtos() {
 		if n.BootProto == valid.string() {
@@ -205,7 +205,7 @@ func findBootIfValue() (deviceAddr string) {
 		if strings.Contains(kernelArg, "BOOTIF") {
 			// The bootif value in the cmdline set by pxelinux is of the following format:
 			// bootif=01-MAC Address, where each byte value of the MAC address is separated
-			// by dashes instead of colons. Therefore, we're reading from the 10th spot of the 
+			// by dashes instead of colons. Therefore, we're reading from the 10th spot of the
 			// string to obtain the MAC address and then replace the dashes with colons
 			rawMACaddr := kernelArg[startIndex:len(kernelArg)]
 			deviceAddr = strings.Replace(rawMACaddr, "-", ":", -1)
@@ -328,7 +328,7 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	}
 
 	// Determine whether to activate this device on boot
-	// If yes, then also place a copy of the network file in the installer environment in addition to 
+	// If yes, then also place a copy of the network file in the installer environment in addition to
 	// the one on disk
 	if networkData.OnBoot {
 		installNetworkFile := filepath.Join(installChroot.RootDir(), networkFileName)
