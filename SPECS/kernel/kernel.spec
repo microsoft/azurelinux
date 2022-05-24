@@ -367,7 +367,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Mon May 23 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-3
-- Fix configs to bring down boot time
+- Fix configs to bring down initrd boot time
 
 * Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-2
 - Fix cdrom, hyperv-mouse, kexec and crash-on-demand config in aarch64
