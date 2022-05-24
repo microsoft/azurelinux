@@ -114,5 +114,7 @@ func TestShouldSucceedCreatingPackageRepoFile_PackageRepo(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, testRepoContents, validRepoContent)
 
-	os.Remove(testRepoFile)
+	t.Cleanup(func() {
+		os.Remove(testRepoFile)
+	})
 }
