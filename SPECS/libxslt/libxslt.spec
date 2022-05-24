@@ -25,8 +25,8 @@ Requires:       libxslt = %{version}-%{release}
 Header files for doing development with libxslt.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
+
 %build
 ./configure \
     --prefix=%{_prefix} \
