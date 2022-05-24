@@ -43,9 +43,6 @@ const (
 
 	// NoCompatibleArchError specifies the error message when processing a SPEC written for a different architecture.
 	NoCompatibleArchError = "error: No compatible architectures found for build"
-
-	// ELFHeaderPackageNoteDefine specifies include_mariner_package_note to enable embedding ELF note headers
-	ELFHeaderPackageNoteDefine = "include_mariner_package_note"
 )
 
 const (

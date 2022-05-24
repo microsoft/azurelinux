@@ -62,6 +62,9 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=2043092
 %undefine _package_note_file
 
+# Skip module metadata notes for perl due to issue with embedded build ldflags
+%undefine module_ldflags
+
 Name:           perl
 # These are all found licenses. They are distributed among various
 # subpackages.
