@@ -89,7 +89,9 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 
 	for _, networkData := range systemConfig.Networks {
 		deviceName, err := checkNetworkDeviceAvailability(networkData)
-		if err != nil || deviceName == "" {
+		if err != nil {
+			return err
+		} else if deviceName == "" {
 			err = fmt.Errorf("The input network device is currently not supported on this system")
 			return err
 		}
@@ -99,9 +101,7 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 			return err
 		}
 
-		if len(networkData.NameServers) > 0 {
-			dnsUpdate = true
-		}
+		dnsUpdate = len(networkData.NameServers) > 0
 	}
 
 	err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-networkd")
