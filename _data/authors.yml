@@ -7,7 +7,7 @@ jperrin:
       icon: "fab fa-fw fa-twitter-square"
       url: "https://twitter.com/BitIntegrity"
     - label: "Download Mariner"
-      icon: "fab fa-fw fa-cloud-arrow-down"
+      icon: "fas fa-fw fa-download"
       url: "https://aka.ms/mariner-2.0-x86_64-iso"
 Rachel Menge and Cameron Baird:
   name: "Rachel Menge and Cameron Baird"
