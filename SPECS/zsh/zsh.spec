@@ -2,8 +2,8 @@
 
 Summary:        Z shell
 Name:           zsh
-Version:        5.8
-Release:        5%{?dist}
+Version:        5.9
+Release:        1%{?dist}
 License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,6 +133,9 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.9-1
+- Update to v5.9 to address CVE-2021-45444
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-5
 - Removing the explicit %%clean stage.
 
