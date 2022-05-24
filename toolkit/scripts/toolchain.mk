@@ -179,9 +179,9 @@ selected_toolchain_archive = $(TOOLCHAIN_ARCHIVE)
 endif
 
 # We will have three options at this point:
-# 1) REBUILD_TOOLCHAIN: yes										-> Rebuild a toolchain from scratch and pace it into $(final_toolchain)
-# 2) REBUILD_TOOLCHAIN: no && TOOLCHAIN_ARCHIVE: 'foo.tar.gz'	-> Extract the RPMs from foo.tar.gz
-# 3) REBUILD_TOOLCHAIN: no && TOOLCHAIN_ARCHIVE: ''				-> Download required RPMs using wget
+# 1) REBUILD_TOOLCHAIN: yes                                     -> Rebuild a toolchain from scratch and place it into $(final_toolchain)
+# 2) REBUILD_TOOLCHAIN: no && TOOLCHAIN_ARCHIVE: 'foo.tar.gz'   -> Extract the RPMs from foo.tar.gz
+# 3) REBUILD_TOOLCHAIN: no && TOOLCHAIN_ARCHIVE: ''             -> Download required RPMs using wget
 
 # If there is an archive selected (build from scratch or provided via TOOLCHAIN_ARCHIVE), extract the RPMs from it.
 ifneq (,$(selected_toolchain_archive))
