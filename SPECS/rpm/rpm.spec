@@ -34,6 +34,7 @@ BuildRequires:  zstd-devel
 Requires:       bash
 Requires:       libarchive
 Requires:       libselinux
+Requires:       lua-libs
 Requires:       rpm-libs = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
@@ -246,6 +247,7 @@ popd
 %{_libdir}/rpm/mkinstalldirs
 %{_libdir}/rpm/pkgconfigdeps.sh
 %{_libdir}/rpm/*.prov
+%{_libdir}/rpm/pythondistdeps.py
 
 %{_libdir}/rpm/pythondeps.sh
 %{_libdir}/rpm/ocamldeps.sh
@@ -272,13 +274,11 @@ popd
 %files -n python3-rpm
 %defattr(-,root,root)
 %{python3_sitelib}/*
-%{_libdir}/rpm/pythondistdeps.py
-%{_fileattrsdir}/python.attr
 
 %changelog
 * Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.17.0-8
 - Move lua runtime dependency from main rpm package.  Move to rpm-build.
-- Move python files to python3-rpm package.  This removes the implied dependency on python3 by the rpm package.
+- Move python files to rpm-build package.  This removes the implied dependency on python3 by the rpm package.
 
 * Fri May 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 4.17.0-7
 - Add missing dependencies to rpmbuild (file, diff and patch)
