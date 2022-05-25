@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.rsyslog.com/
-Source0:        http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
+Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
