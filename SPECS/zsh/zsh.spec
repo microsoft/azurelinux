@@ -12,9 +12,7 @@ URL:            http://zsh.sourceforge.net/
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
 Source1:        zprofile.rhs
 Source2:        zshrc
-
 Patch0:         0001-Skipping-test-if-ran-as-superuser.patch
-
 BuildRequires:  binutils
 BuildRequires:  coreutils
 BuildRequires:  diffutils
@@ -28,11 +26,9 @@ BuildRequires:  ncurses-devel
 BuildRequires:  sed
 BuildRequires:  tar
 BuildRequires:  texinfo
-
 Requires(post): /bin/grep
 Requires(postun): /bin/grep
 Requires(postun): coreutils
-
 Provides:       /bin/zsh
 
 %description
