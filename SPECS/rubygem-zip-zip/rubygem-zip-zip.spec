@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name zip-zip
 Summary:        a simple adapter to let all your dependencies use RubyZip
-Name:           rubygem-zip-zip
+Name:           rubygem-%{gem_name}
 Version:        0.3
 Release:        1%{?dist}
 License:        MIT

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name public_suffix
 Summary:        Domain name parser for Ruby based on the Public Suffix List
-Name:           rubygem-public_suffix
+Name:           rubygem-%{gem_name}
 Version:        4.0.6
 Release:        1%{?dist}
 License:        MIT

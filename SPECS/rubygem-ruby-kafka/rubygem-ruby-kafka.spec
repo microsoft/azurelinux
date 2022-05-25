@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name ruby-kafka
 Summary:        A Ruby client library for Apache Kafka
-Name:           rubygem-ruby-kafka
+Name:           rubygem-%{gem_name}
 Version:        1.4.0
 Release:        1%{?dist}
 License:        Apache 2.0

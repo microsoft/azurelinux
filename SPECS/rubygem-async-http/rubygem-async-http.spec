@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name async-http
 Summary:        A HTTP client and server library
-Name:           rubygem-async-http
+Name:           rubygem-%{gem_name}
 Version:        0.56.5
 Release:        1%{?dist}
 License:        MIT

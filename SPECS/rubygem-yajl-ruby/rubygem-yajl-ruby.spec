@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name yajl-ruby
 Summary:        A streaming JSON parsing and encoding library for Ruby
-Name:           rubygem-yajl-ruby
+Name:           rubygem-%{gem_name}
 Version:        1.4.1
 Release:        1%{?dist}
 License:        MIT

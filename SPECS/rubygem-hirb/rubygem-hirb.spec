@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name hirb
 Summary:        A mini view framework for console/irb that's easy to use
-Name:           rubygem-hirb
+Name:           rubygem-%{gem_name}
 Version:        0.7.3
 Release:        1%{?dist}
 License:        MIT

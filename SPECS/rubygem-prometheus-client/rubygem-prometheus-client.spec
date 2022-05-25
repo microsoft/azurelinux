@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name prometheus-client
 Summary:        Prometheus instrumentation library for Ruby applications
-Name:           rubygem-prometheus-client
+Name:           rubygem-%{gem_name}
 Version:        4.0.0
 Release:        1%{?dist}
 License:        Apache 2.0

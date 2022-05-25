@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name sigdump
 Summary:        SIGQUIT of Java VM for Ruby
-Name:           rubygem-sigdump
+Name:           rubygem-%{gem_name}
 Version:        0.2.4
 Release:        1%{?dist}
 License:        MIT

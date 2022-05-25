@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name nio4r
 Summary:        Cross-platform asynchronous I/O primitives for scalable network clients and servers
-Name:           rubygem-nio4r
+Name:           rubygem-%{gem_name}
 Version:        2.5.8
 Release:        1%{?dist}
 License:        MIT

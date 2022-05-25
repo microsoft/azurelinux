@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name ltsv
 Summary:        A Parser / Dumper for LTSV
-Name:           rubygem-ltsv
+Name:           rubygem-%{gem_name}
 Version:        0.1.2
 Release:        1%{?dist}
 License:        MIT

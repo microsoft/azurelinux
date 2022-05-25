@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name httpclient
 Summary:        HTTP accessing library
-Name:           rubygem-httpclient
+Name:           rubygem-%{gem_name}
 Version:        2.8.3
 Release:        1%{?dist}
 License:        NAKAMURA, Hiroshi Open Source

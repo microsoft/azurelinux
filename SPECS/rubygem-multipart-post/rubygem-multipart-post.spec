@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name multipart-post
 Summary:        Adds multipart POST capability to net/http
-Name:           rubygem-multipart-post
+Name:           rubygem-%{gem_name}
 Version:        2.1.1
 Release:        1%{?dist}
 License:        MIT

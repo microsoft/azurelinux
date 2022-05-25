@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name ruby2_keywords
 Summary:        Shim library for Module#ruby2_keywords
-Name:           rubygem-ruby2_keywords
+Name:           rubygem-%{gem_name}
 Version:        0.0.5
 Release:        1%{?dist}
 License:        BSD

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name fluentd
 Summary:        Fluentd event collector
-Name:           rubygem-fluentd
+Name:           rubygem-%{gem_name}
 Version:        1.14.6
 Release:        1%{?dist}
 License:        ASL 2.0

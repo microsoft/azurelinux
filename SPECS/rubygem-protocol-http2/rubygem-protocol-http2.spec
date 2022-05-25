@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name protocol-http2
 Summary:        A low level implementation of the HTTP/2 protocol
-Name:           rubygem-protocol-http2
+Name:           rubygem-%{gem_name}
 Version:        0.14.2
 Release:        1%{?dist}
 License:        MIT

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name async-io
 Summary:        Concurrent wrappers for native Ruby IO & Sockets
-Name:           rubygem-async-io
+Name:           rubygem-%{gem_name}
 Version:        1.33.0
 Release:        1%{?dist}
 License:        MIT

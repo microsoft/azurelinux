@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name td
 Summary:        CUI Interface
-Name:           rubygem-td
+Name:           rubygem-%{gem_name}
 Version:        0.16.10
 Release:        1%{?dist}
 License:        Apache 2.0

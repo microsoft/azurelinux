@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name oj
 Summary:        Optimized JSON
-Name:           rubygem-oj
+Name:           rubygem-%{gem_name}
 Version:        3.13.11
 Release:        1%{?dist}
 License:        MIT

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name ruby-progressbar
 Summary:        Ruby/ProgressBar is a text progress bar library for Ruby
-Name:           rubygem-ruby-progressbar
+Name:           rubygem-%{gem_name}
 Version:        1.11.0
 Release:        1%{?dist}
 License:        MIT

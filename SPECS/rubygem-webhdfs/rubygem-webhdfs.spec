@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name webhdfs
 Summary:        Ruby client for Hadoop WebHDFS
-Name:           rubygem-webhdfs
+Name:           rubygem-%{gem_name}
 Version:        0.10.2
 Release:        1%{?dist}
 License:        Apache 2.0

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name aws-partitions
 Summary:        Provides interfaces to enumerate AWS partitions, regions, and services
-Name:           rubygem-aws-partitions
+Name:           rubygem-%{gem_name}
 Version:        1.576.0
 Release:        1%{?dist}
 License:        Apache 2.0

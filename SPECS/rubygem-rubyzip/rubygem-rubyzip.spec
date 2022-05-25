@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name rubyzip
 Summary:        a ruby module for reading and writing zip files
-Name:           rubygem-rubyzip
+Name:           rubygem-%{gem_name}
 Version:        2.3.2
 Release:        1%{?dist}
 License:        MIT

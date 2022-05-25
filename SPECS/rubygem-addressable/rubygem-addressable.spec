@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name addressable
 Summary:        an alternative implementation to the URI implementation that is part of Ruby's standard library
-Name:           rubygem-addressable
+Name:           rubygem-%{gem_name}
 Version:        2.8.0
 Release:        1%{?dist}
 License:        Apache 2.0

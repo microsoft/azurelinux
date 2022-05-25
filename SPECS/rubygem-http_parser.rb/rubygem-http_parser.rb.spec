@@ -1,6 +1,6 @@
 %global gem_name http_parser.rb
 Summary:        simple callback-based HTTP request/response parser
-Name:           rubygem-http_parser.rb
+Name:           rubygem-%{gem_name}
 Version:        0.6.1
 Release:        100%{?dist}
 License:        MIT

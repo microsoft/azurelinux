@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name aws-sdk-kms
 Summary:        Official AWS Ruby gem for AWS Key Management Service (KMS)
-Name:           rubygem-aws-sdk-kms
+Name:           rubygem-%{gem_name}
 Version:        1.55.0
 Release:        1%{?dist}
 License:        Apache 2.0

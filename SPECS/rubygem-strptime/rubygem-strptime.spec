@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name strptime
 Summary:        a fast strptime/strftime engine which uses VM
-Name:           rubygem-strptime
+Name:           rubygem-%{gem_name}
 Version:        0.2.5
 Release:        1%{?dist}
 License:        NARUSE, Yui Open Source

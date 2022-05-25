@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name serverengine
 Summary:        a framework to implement robust multiprocess servers like Unicorn
-Name:           rubygem-serverengine
+Name:           rubygem-%{gem_name}
 Version:        2.2.5
 Release:        1%{?dist}
 License:        Apache 2.0

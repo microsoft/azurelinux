@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name timers
 Summary:        Pure Ruby one-shot and periodic timers
-Name:           rubygem-timers
+Name:           rubygem-%{gem_name}
 Version:        4.3.2
 Release:        2%{?dist}
 License:        MIT

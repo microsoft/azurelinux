@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name td-client
 Summary:        Ruby Client Library for Treasure Data
-Name:           rubygem-td-client
+Name:           rubygem-%{gem_name}
 Version:        1.0.8
 Release:        1%{?dist}
 License:        Apache 2.0

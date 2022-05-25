@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name protocol-http
 Summary:        Provides abstractions to handle HTTP protocols
-Name:           rubygem-protocol-http
+Name:           rubygem-%{gem_name}
 Version:        0.22.5
 Release:        1%{?dist}
 License:        MIT

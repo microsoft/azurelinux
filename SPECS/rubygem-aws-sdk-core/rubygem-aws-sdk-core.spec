@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name aws-sdk-core
 Summary:        Provides API clients for AWS
-Name:           rubygem-aws-sdk-core
+Name:           rubygem-%{gem_name}
 Version:        3.130.1
 Release:        1%{?dist}
 License:        Apache 2.0

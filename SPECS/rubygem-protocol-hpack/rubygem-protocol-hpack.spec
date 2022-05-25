@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name protocol-hpack
 Summary:        A compresssor and decompressor for HTTP 2.0 HPACK
-Name:           rubygem-protocol-hpack
+Name:           rubygem-%{gem_name}
 Version:        1.4.2
 Release:        2%{?dist}
 License:        MIT

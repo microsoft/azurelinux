@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name aws-sdk-s3
 Summary:        Official AWS Ruby gem for Amazon Simple Storage Service (Amazon S3)
-Name:           rubygem-aws-sdk-s3
+Name:           rubygem-%{gem_name}
 Version:        1.113.0
 Release:        1%{?dist}
 License:        Apache 2.0

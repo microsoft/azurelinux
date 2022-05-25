@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name systemd-journal
 Summary:        Ruby bindings for reading/writing to the systemd journal
-Name:           rubygem-systemd-journal
+Name:           rubygem-%{gem_name}
 Version:        1.4.2
 Release:        1%{?dist}
 License:        MIT

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name parallel
 Summary:        Run any kind of code in parallel processes
-Name:           rubygem-parallel
+Name:           rubygem-%{gem_name}
 Version:        1.22.1
 Release:        1%{?dist}
 License:        MIT

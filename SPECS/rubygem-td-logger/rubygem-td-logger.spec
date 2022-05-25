@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name td-logger
 Summary:        Treasure Data logging library
-Name:           rubygem-td-logger
+Name:           rubygem-%{gem_name}
 Version:        0.3.27
 Release:        1%{?dist}
 License:        MIT

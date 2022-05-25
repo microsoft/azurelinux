@@ -1,6 +1,7 @@
 %global debug_package %{nil}
+%global gem_name jmespath
 Summary:        Ruby implementation of JMESPath
-Name:           rubygem-jmespath
+Name:           rubygem-%{gem_name}
 Version:        1.6.1
 Release:        1%{?dist}
 License:        Apache 2.0

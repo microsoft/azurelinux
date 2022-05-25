@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name tzinfo-data
 Summary:        Timezone Data for TZInfo
-Name:           rubygem-tzinfo-data
+Name:           rubygem-%{gem_name}
 Version:        1.2022.1
 Release:        1%{?dist}
 License:        MIT

@@ -1,6 +1,6 @@
 %global gem_name io-event
 Summary:        An event loop
-Name:           rubygem-io-event
+Name:           rubygem-%{gem_name}
 Version:        1.0.7
 Release:        1%{?dist}
 License:        MIT

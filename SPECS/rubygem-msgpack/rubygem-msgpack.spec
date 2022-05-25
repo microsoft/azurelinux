@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name msgpack
 Summary:        MessagePack implementation for Ruby
-Name:           rubygem-msgpack
+Name:           rubygem-%{gem_name}
 Version:        1.4.5
 Release:        1%{?dist}
 License:        Apache 2.0

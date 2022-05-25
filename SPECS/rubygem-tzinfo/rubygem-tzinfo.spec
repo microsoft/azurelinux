@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name tzinfo
 Summary:        Ruby Timezone Library
-Name:           rubygem-tzinfo
+Name:           rubygem-%{gem_name}
 Version:        2.0.4
 Release:        1%{?dist}
 License:        MIT

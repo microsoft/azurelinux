@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name async
 Summary:        An awesome asynchronous event-driven reactor for Ruby
-Name:           rubygem-async
+Name:           rubygem-%{gem_name}
 Version:        2.0.1
 Release:        1%{?dist}
 License:        MIT

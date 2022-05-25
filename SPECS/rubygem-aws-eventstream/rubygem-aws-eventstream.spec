@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name aws-eventstream
 Summary:        Amazon Web Services event stream library
-Name:           rubygem-aws-eventstream
+Name:           rubygem-%{gem_name}
 Version:        1.2.0
 Release:        1%{?dist}
 License:        Apache 2.0

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name aws-sdk-sqs
 Summary:        Official AWS Ruby gem for Amazon Simple Queue Service (Amazon SQS)
-Name:           rubygem-aws-sdk-sqs
+Name:           rubygem-%{gem_name}
 Version:        1.51.0
 Release:        1%{?dist}
 License:        Apache 2.0

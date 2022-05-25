@@ -1,8 +1,7 @@
 %global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name async-pool
 Summary:        Provides support for connection pooling both singleplex and multiplex resources
-Name:           rubygem-async-pool
+Name:           rubygem-%{gem_name}
 Version:        0.3.9
 Release:        1%{?dist}
 License:        MIT
