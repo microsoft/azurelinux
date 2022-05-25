@@ -14,7 +14,7 @@ Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
 # Upstream only publishes built docs for base_version.0
-Source4:        http://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
+Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
