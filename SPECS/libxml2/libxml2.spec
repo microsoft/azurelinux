@@ -1,6 +1,6 @@
 Summary:        Libxml2
 Name:           libxml2
-Version:        2.9.13
+Version:        2.9.14
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -80,6 +80,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Mon May 23 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.9.14-1
+- Updating to version 2.9.14 to fix CVE-2022-29824.
+
 * Thu Mar 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.13-1
 - Updating to version 2.9.13 to fix CVE-2022-23308.
 
