@@ -10151,8 +10151,8 @@
         "type": "other",
         "other": {
           "name": "libwpe",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.6.0/libwpe-1.6.0.tar.xz"
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.12.0/libwpe-1.12.0.tar.xz"
         }
       }
     },
@@ -26337,8 +26337,8 @@
         "type": "other",
         "other": {
           "name": "wpebackend-fdo",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/Igalia/wpebackend-fdo/archive/1.6.0/wpebackend-fdo-1.6.0.tar.xz"
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/Igalia/WPEBackend-fdo/archive/refs/tags/1.12.0.tar.gz"
         }
       }
     },
