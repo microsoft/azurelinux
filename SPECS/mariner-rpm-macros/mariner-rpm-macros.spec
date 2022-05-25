@@ -123,7 +123,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %changelog
 * Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-15
 - Remove module_info.ld from default LDFLAGS; require setting through "mariner_module_ldflags"
-- Predefine OS ID+Version in gen-ld-script.sh instead of parsing from /etc/os-release, which is no longer in toolchain environment
+- Modify gen-ld-script.sh to pass OS Version and predefine OS ID instead of parsing from /etc/os-release (no longer in toolchain env)
 
 * Tue Apr 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-14
 - Adding the "_mariner_sources_url" macro.
