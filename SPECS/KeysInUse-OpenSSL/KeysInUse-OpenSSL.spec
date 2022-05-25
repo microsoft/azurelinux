@@ -23,6 +23,9 @@ Requires:    openssl >= 1.1.1, openssl < 1.1.2
 %setup -q
 
 %build
+export GO111MODULE=off
+
+chmod 0755 ./scripts/build.sh
 ./scripts/build.sh
 
 cd ./packaging/util
