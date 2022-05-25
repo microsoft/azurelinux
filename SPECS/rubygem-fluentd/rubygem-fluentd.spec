@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Ruby
 URL:            https://www.fluentd.org/
 Source0:        https://github.com/fluent/fluentd/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         file-list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-async-http
@@ -30,7 +31,7 @@ management. It can collect, process and ship many kinds of data in near
 real-time.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
