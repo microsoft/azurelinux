@@ -16,7 +16,7 @@ Patch0:         %{name}-itervalues.patch
 Patch1:         %{name}-use-py3.patch
 BuildRequires:  python3-devel
 Requires:       python3
-Requires:       ncurses
+Requires:       python3-curses
 BuildArch:      noarch
 
 %description
@@ -45,7 +45,7 @@ Iotop is a Python program with a top like UI used to show the processes and thei
 
 %changelog
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
-- Add dependency on ncurses
+- Add dependency on python3-curses
 
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 0.6-9
 - Build with python3 instead of python2
