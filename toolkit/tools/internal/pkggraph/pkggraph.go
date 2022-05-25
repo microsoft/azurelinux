@@ -1381,6 +1381,9 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 
 	// This is a common error for developers, print this so they can try to fix it themselves.
+	// Circular dependencies in the core repo may be resolved by using toolchain RPMs which won't be rebuilt, BUT
+	// if we aren't doing a full rebuild with REBUILD_TOOLCHAIN=y those RPMs may not be available in ./out/RPMS so
+	// we should prompt the user to pull the full set of toolchain RPMs, and then copy them over to ./out/RPMS.
 	logger.Log.Warn("╔════════════════════════════════════════════════════════════════════════════════════════════════╗")
 	logger.Log.Warn("║ Are you building the core repo with a prebuilt or online toolchain? (REBUILD_TOOLCHAIN != y) ? ║")
 	logger.Log.Warn("║ Try running `make toolchain` and `make copy-toolchain-rpms` with your current arguments first! ║")
