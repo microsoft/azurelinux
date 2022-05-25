@@ -62,6 +62,9 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=2043092
 %undefine _package_note_file
 
+# Skip module metadata notes for perl due to issue with embedded build ldflags
+%undefine mariner_module_ldflags
+
 Name:           perl
 # These are all found licenses. They are distributed among various
 # subpackages.
@@ -124,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        487%{?dist}
+Release:        488%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6810,6 +6813,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-488
+- Undefine "mariner_module_ldflags" to remove references to module_info.ld in embedded ldflags
+
 * Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-487
 - Upgrade to version 5.34.1 referencing Fedora 37 (license: MIT)
 - Removed duplicate requires for perl(:VERSION) from gendep.macros
