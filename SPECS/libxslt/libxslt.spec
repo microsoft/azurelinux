@@ -72,7 +72,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
-* Mon May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.1.34-7
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.1.34-7
 - Applying patch for CVE-2021-30560.
 
 * Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.34-6
