@@ -109,12 +109,11 @@ func TestShouldSucceedCreatingPackageRepoFile_PackageRepo(t *testing.T) {
 
 	err = createCustomPackageRepo(nil, testPackageRepo, curDir)
 	assert.NoError(t, err)
+	t.Cleanup(func() {
+		os.Remove(testRepoFile)
+	})
 
 	testRepoContents, err := file.ReadLines(testRepoFile)
 	assert.NoError(t, err)
 	assert.Equal(t, testRepoContents, validRepoContent)
-
-	t.Cleanup(func() {
-		os.Remove(testRepoFile)
-	})
 }
