@@ -45,7 +45,7 @@ chmod 644 doc/{lst,ProgrammerManual/Tutorial}/*
 install -v -m755 -d %{_docdir}/%{name}-%{version}
 cp -v -R doc/* %{_docdir}/%{name}-%{version}
 rm -f %{buildroot}%{_libdir}/*.a
-rm -f %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -f %{buildroot}%{_libdir}/libltdl.*
 rm -rf %{buildroot}%{_datadir}/libtool
 
