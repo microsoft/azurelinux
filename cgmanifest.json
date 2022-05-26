@@ -2007,8 +2007,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.82.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.82.0.tar.gz"
+          "version": "7.83.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.0.tar.gz"
         }
       }
     },
@@ -2739,7 +2739,7 @@
         "other": {
           "name": "efi-rpm-macros",
           "version": "4",
-          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/releases/download/4/efi-rpm-macros-4.tar.bz2"
+          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/archive/refs/tags/4.tar.gz"
         }
       }
     },
@@ -5730,8 +5730,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
+          "version": "5.15.41.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz"
         }
       }
     },
@@ -7171,8 +7171,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
+          "version": "5.15.41.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz"
         }
       }
     },
@@ -7181,8 +7181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
+          "version": "5.15.41.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz"
         }
       }
     },
@@ -7192,7 +7192,7 @@
         "other": {
           "name": "kernel-rt",
           "version": "5.15.34.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.34.1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.34.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "libftdi",
-          "version": "1.4",
-          "downloadUrl": "http://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.4.tar.bz2"
+          "version": "1.5",
+          "downloadUrl": "https://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.5.tar.bz2"
         }
       }
     },
@@ -24294,9 +24294,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "sdparm",
-          "version": "1.11",
-          "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
+          "name": "sdbus-cpp",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v1.1.0.tar.gz"
         }
       }
     },
@@ -24304,9 +24304,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "sdbus-cpp",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v1.1.0.tar.gz"
+          "name": "sdparm",
+          "version": "1.11",
+          "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
         }
       }
     },

@@ -1,5 +1,5 @@
 filesystem-1.1-9.cm2.aarch64.rpm
-kernel-headers-5.15.37.1-4.cm2.noarch.rpm
+kernel-headers-5.15.41.1-1.cm2.noarch.rpm
 glibc-2.35-2.cm2.aarch64.rpm
 glibc-devel-2.35-2.cm2.aarch64.rpm
 glibc-i18n-2.35-2.cm2.aarch64.rpm
@@ -190,9 +190,9 @@ libsolv-devel-0.7.20-1.cm2.aarch64.rpm
 libssh2-1.9.0-2.cm2.aarch64.rpm
 libssh2-devel-1.9.0-2.cm2.aarch64.rpm
 krb5-1.19.2-1.cm2.aarch64.rpm
-curl-7.82.0-1.cm2.aarch64.rpm
-curl-devel-7.82.0-1.cm2.aarch64.rpm
-curl-libs-7.82.0-1.cm2.aarch64.rpm
+curl-7.83.0-1.cm2.aarch64.rpm
+curl-devel-7.83.0-1.cm2.aarch64.rpm
+curl-libs-7.83.0-1.cm2.aarch64.rpm
 tdnf-3.2.2-4.cm2.aarch64.rpm
 tdnf-cli-libs-3.2.2-4.cm2.aarch64.rpm
 tdnf-devel-3.2.2-4.cm2.aarch64.rpm

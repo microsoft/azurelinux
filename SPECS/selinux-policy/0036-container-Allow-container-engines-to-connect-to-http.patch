@@ -1,0 +1,72 @@
+From b8b83e5c125f8389a26fd31fd0638af3c283359c Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 23 May 2022 15:16:36 +0000
+Subject: [PATCH 36/37] container: Allow container engines to connect to http
+ cache ports.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/files.if       | 19 +++++++++++++++++++
+ policy/modules/services/container.te |  1 +
+ policy/modules/system/systemd.te     |  3 +++
+ 3 files changed, 23 insertions(+)
+
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index 75fdaa872..12e427b45 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -5003,6 +5003,25 @@ interface(`files_purge_tmp',`
+ 	delete_sock_files_pattern($1, tmpfile, tmpfile)
+ ')
+ 
++########################################
++## <summary>
++##	Get the attributes of all tmpfs files.
++## </summary>
++## <param name="type">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`files_getattr_all_tmpfs_files',`
++	gen_require(`
++		attribute tmpfsfile;
++	')
++
++	getattr_files_pattern($1, tmpfsfile, tmpfsfile)
++	fs_search_tmpfs($1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Set the attributes of the /usr directory.
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index ea76c1096..64b1ad918 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -381,6 +381,7 @@ corecmd_dontaudit_exec_all_executables(container_engine_domain)
+ 
+ corenet_tcp_bind_generic_node(container_engine_domain)
+ corenet_tcp_connect_http_port(container_engine_domain)
++corenet_tcp_connect_http_cache_port(container_engine_domain)
+ corenet_tcp_bind_all_ports(container_engine_domain)
+ corenet_udp_bind_all_ports(container_engine_domain)
+ corenet_rw_tun_tap_dev(container_engine_domain)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 48613bd20..21932008d 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -809,6 +809,9 @@ dev_setattr_video_dev(systemd_logind_t)
+ domain_obj_id_change_exemption(systemd_logind_t)
+ 
+ files_search_runtime(systemd_logind_t)
++# Getattr all shm segments as part of cleaning up the
++# segments of deleted ephemeral users.
++files_getattr_all_tmpfs_files(systemd_logind_t)
+ 
+ fs_getattr_cgroup(systemd_logind_t)
+ fs_getattr_tmpfs(systemd_logind_t)
+-- 
+2.25.1
+

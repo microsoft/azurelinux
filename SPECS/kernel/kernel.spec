@@ -6,8 +6,13 @@
 %endif
 Summary:        Linux Kernel
 Name:           kernel
+<<<<<<< HEAD
 Version:        5.15.37.1
 Release:        4%{?dist}
+=======
+Version:        5.15.41.1
+Release:        1%{?dist}
+>>>>>>> eb9bb8360bbaff71cf6ec7749f9b0ebb7c2ecce5
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -366,8 +371,14 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+<<<<<<< HEAD
 * Wed May 25 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.37.1-4
 - Disable SMACK kernel configuration
+=======
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.41.1-1
+- Update source to 5.15.41.1
+- Nopatch CVE-2020-35501, CVE-2022-28893, CVE-2022-29581
+>>>>>>> eb9bb8360bbaff71cf6ec7749f9b0ebb7c2ecce5
 
 * Mon May 23 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-3
 - Fix configs to bring down initrd boot time
