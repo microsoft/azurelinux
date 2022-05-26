@@ -2739,7 +2739,7 @@
         "other": {
           "name": "efi-rpm-macros",
           "version": "4",
-          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/releases/download/4/efi-rpm-macros-4.tar.bz2"
+          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/archive/refs/tags/4.tar.gz"
         }
       }
     },
