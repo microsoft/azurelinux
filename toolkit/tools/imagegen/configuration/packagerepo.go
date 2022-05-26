@@ -128,7 +128,7 @@ func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	additionalFields := gpgKey + enable + gpgCheck + repogpgCheck + skip + sslVerify
 	_, err = stringBuilder.WriteString(additionalFields)
 	if err != nil {
-		logger.Log.Errorf("Error writing additional fields: %s. Error: %s", additionalFields, err)	
+		logger.Log.Errorf("Error writing additional fields: %s. Error: %s", additionalFields, err)
 	}
 
 	return
@@ -178,9 +178,9 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 }
 
 func createCustomPackageRepo(installChroot *safechroot.Chroot, packageRepo PackageRepo, repoFileDir string) (err error) {
-	
+
 	dstRepoPath := filepath.Join(repoFileDir, packageRepo.Name+".repo")
-	
+
 	defer func() {
 		// Delete the repo file on failure
 		if err != nil {
