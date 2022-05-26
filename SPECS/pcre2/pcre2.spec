@@ -150,7 +150,7 @@ PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
 %prep
-%autosetup -p1
+%setup -q
 
 %build
 # Available JIT archs see sljit/sljitConfig.h
