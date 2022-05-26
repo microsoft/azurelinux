@@ -1,6 +1,6 @@
 Summary:        A library for Perl-compatible regular expressions
 Name:           pcre2
-Version:        10.39
+Version:        10.40
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -150,7 +150,7 @@ PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # Available JIT archs see sljit/sljitConfig.h
@@ -238,6 +238,9 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Thu May 26 2022 Cameron Baird <cameornbaird@microsoft.com> - 10.40-1
+- Upgrading to v10.40 to address CVE-2022-1586, CVE-2022-1587
+
 * Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.39-1
 - Upgrading to v10.39
 - Fixing source URL. 
