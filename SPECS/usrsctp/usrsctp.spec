@@ -7,7 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/sctplab/usrsctp
-Source0:        %{url}/archive/refs/tags/%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
@@ -28,9 +29,6 @@ Summary:        A portable SCTP userland stack
 Group:          Development/Libraries
 Requires:       %{name} = %{version}
 
-%description devel
-Need to revisit to add a short description
-
 %prep
 %autosetup
 mkdir build
@@ -48,7 +46,7 @@ cd build/*
 %files
 %defattr(-,root,root)
 %license LICENSE.md
-%{_libdir}/*.so*
+%{_libdir}/*.so.*
 
 %files devel
 %defattr(-,root,root)
@@ -57,11 +55,7 @@ cd build/*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com>
+* Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com> - 0.9.5.0-1
 - Initial SPEC
-
-* Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com>
 - Initial CBL-Mariner import from Azure (license: MIT).
-
-* Fri May 20 2022 Rahul Sharma <sharmarahu@microsoft.com>
 - License verified.
