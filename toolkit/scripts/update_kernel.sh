@@ -239,7 +239,7 @@ if [[ -z $WORKSPACE ]]; then
 fi
 
 # Create globals
-TAG="rolling-lts/mariner/$VERSION"
+TAG="rolling-lts/mariner-2/$VERSION"
 TMPDIR="tmp-dir"
 SPECS="kernel-headers kernel hyperv-daemons"
 DEFAULT_URL="https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/"
