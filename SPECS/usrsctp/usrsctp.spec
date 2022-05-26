@@ -38,11 +38,11 @@ mkdir build
 %build
 cd build
 %cmake -DCMAKE_BUILD_TYPE=Release ..
-cd *
+cd build
 %make_build
 
 %install
-cd build/*
+cd build
 %make_install
 
 %files
