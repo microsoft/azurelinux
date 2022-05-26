@@ -2,7 +2,7 @@ Summary:        Library to program and control the FTDI USB controller
 Name:           libftdi
 Version:        1.5
 Release:        1%{?dist}
-License:        LGPLv2
+License:        BSD and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.intra2net.com/en/developer/libftdi/
@@ -105,7 +105,7 @@ rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 
 
 %files
-%license COPYING.LIB
+%license COPYING-CMAKE-SCRIPTS COPYING.LIB
 %{_libdir}/libftdi1.so.2*
 %{_udevrulesdir}/69-libftdi.rules
 
@@ -139,6 +139,7 @@ rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 %changelog
 * Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-1
 - Updating to 1.5 using Fedora 36 (license: MIT) for guidance.
+- License verified.
 
 * Wed Jun 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
