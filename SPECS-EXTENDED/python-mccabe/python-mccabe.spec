@@ -1,14 +1,18 @@
+%global modname mccabe
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global modname mccabe
 Name:               python-%{modname}
 Version:            0.6.1
-Release:            17%{?dist}
+Release:            18%{?dist}
 Summary:            McCabe complexity checker
 License:            MIT
 URL:                http://pypi.python.org/pypi/mccabe
 Source0:            https://files.pythonhosted.org/packages/source/m/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 BuildArch:          noarch
+
+BuildRequires:      python%{python3_pkgversion}-pytest
+BuildRequires:      python%{python3_pkgversion}-pytest-runner
 
 %if %{with_check}
 BuildRequires:      python3-pip
@@ -59,6 +63,9 @@ pip3 install pytest
 
 
 %changelog
+* Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-18
+- Bringing back removed BRs to fix package build.
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.1-17
 - Drop BR on pytest & pip install latest deps to enable ptest
 - License verified
