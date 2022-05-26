@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/sctplab/usrsctp
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
@@ -28,6 +27,9 @@ retransmission mechanism is applied to correct loss or corruption of data.
 Summary:        A portable SCTP userland stack
 Group:          Development/Libraries
 Requires:       %{name} = %{version}
+
+%description devel
+usrsctp header files and libraries for developments
 
 %prep
 %autosetup

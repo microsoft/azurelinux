@@ -2064,7 +2064,7 @@
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
-                "usrsctp"
+                "usrsctp",
                 "vala",
                 "verity-read-only-root",
                 "vnstat",
