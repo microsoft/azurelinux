@@ -1,72 +1,69 @@
+Summary:        Library to program and control the FTDI USB controller
+Name:           libftdi
+Version:        1.5
+Release:        1%{?dist}
+License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		libftdi
-Version:	1.5
-Release:	1%{?dist}
-Summary:	Library to program and control the FTDI USB controller
-
-License:	LGPLv2
-URL:		https://www.intra2net.com/en/developer/libftdi/
-Source0:	https://www.intra2net.com/en/developer/%{name}/download/%{name}1-%{version}.tar.bz2
-
+URL:            https://www.intra2net.com/en/developer/libftdi/
+Source0:        https://www.intra2net.com/en/developer/%{name}/download/%{name}1-%{version}.tar.bz2
 # http://developer.intra2net.com/git/?p=libftdi;a=commitdiff;h=cdb28383402d248dbc6062f4391b038375c52385;hp=5c2c58e03ea999534e8cb64906c8ae8b15536c30
-Patch0:		libftdi-1.5-fix_pkgconfig_path.patch
+Patch0:         libftdi-1.5-fix_pkgconfig_path.patch
 
-BuildRequires:	cmake
-BuildRequires:	gcc
-BuildRequires:	gcc-c++
-BuildRequires:	doxygen
-BuildRequires:	boost-devel
-BuildRequires:	libconfuse-devel
-BuildRequires:	libusbx-devel
-BuildRequires:	make
-BuildRequires:	python3-devel
-BuildRequires:	swig
-BuildRequires:	systemd
+BuildRequires:  boost-devel
+BuildRequires:  cmake
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libconfuse-devel
+BuildRequires:  libusbx-devel
+BuildRequires:  make
+BuildRequires:  python3-devel
+BuildRequires:  swig
+BuildRequires:  systemd
 
-Requires:	systemd
-
+Requires:       systemd
 
 %description
 A library (using libusb) to talk to FTDI's FT2232C,
 FT232BM and FT245BM type chips including the popular bitbang mode.
 
 %package devel
-Summary:	Header files and static libraries for libftdi
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	python3-%{name}%{?_isa} = %{version}-%{release}
-Requires:	cmake-filesystem
+Summary:        Header files and static libraries for libftdi
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       cmake-filesystem
+Requires:       python3-%{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Header files and static libraries for libftdi
 
-
 %package -n python3-libftdi
 %{?python_provide:%python_provide python3-libftdi}
-Summary:	Libftdi library Python 3 binding
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Libftdi library Python 3 binding
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-libftdi
 Libftdi Python 3 Language bindings.
 
-
 %package c++
-Summary:	Libftdi library C++ binding
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Libftdi library C++ binding
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description c++
 Libftdi library C++ language binding.
 
-
 %package c++-devel
-Summary:	Libftdi library C++ binding development headers and libraries
-Requires:	%{name}-devel = %{version}-%{release}
-Requires:	%{name}-c++ = %{version}-%{release}
+Summary:        Libftdi library C++ binding development headers and libraries
+
+Requires:       %{name}-c++ = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
 
 %description c++-devel
 Libftdi library C++ binding development headers and libraries
 for building C++ applications with libftdi.
-
 
 %prep
 %autosetup -p1 -n %{name}1-%{version}
@@ -84,8 +81,8 @@ sed -i -e 's/GROUP="plugdev"/TAG+="uaccess"/g' packages/99-libftdi.rules
 
 install -D -pm 0644 packages/99-libftdi.rules %{buildroot}%{_udevrulesdir}/69-libftdi.rules
 
-mkdir -p %{buildroot}/usr/lib/udev/rules.d/
-install -pm 0644 packages/99-libftdi.rules %{buildroot}/usr/lib/udev/rules.d/69-libftdi.rules
+mkdir -p %{buildroot}%{_libdir}/udev/rules.d/
+install -pm 0644 packages/99-libftdi.rules %{buildroot}%{_libdir}/udev/rules.d/69-libftdi.rules
 
 # Cleanup examples
 rm -f %{buildroot}%{_bindir}/simple
@@ -99,8 +96,8 @@ rm -f %{buildroot}%{_bindir}/baud_test
 rm -f %{buildroot}%{_bindir}/serial_read
 rm -f %{buildroot}%{_bindir}/serial_test
 
-rm -f %{buildroot}%{_datadir}/doc/libftdi1/example.conf
-rm -f %{buildroot}%{_datadir}/doc/libftdipp1/example.conf
+rm -f %{buildroot}%{_docdir}/libftdi1/example.conf
+rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 
 
 %check
@@ -138,7 +135,6 @@ rm -f %{buildroot}%{_datadir}/doc/libftdipp1/example.conf
 %ldconfig_scriptlets
 
 %ldconfig_scriptlets c++
-
 
 %changelog
 * Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-1
