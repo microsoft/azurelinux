@@ -38,7 +38,6 @@ mkdir build
 %build
 cd build
 %cmake -DCMAKE_BUILD_TYPE=Release ..
-cd build
 %make_build
 
 %install
