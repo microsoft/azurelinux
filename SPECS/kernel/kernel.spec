@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.116.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -636,6 +636,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed May 25 2022 Minghe Ren <mingheren@microsoft.com> - 5.10.116.1-2
+- Disable SMACK kernel configuration
+
 * Tue May 17 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.116.1-1
 - Update source to 5.10.116.1
 - Address CVE-2022-1048, CVE-2022-1353, CVE-2022-29582, CVE-2022-1195
