@@ -14,8 +14,10 @@ cd $LFS/sources
 touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 
 cat /home/lfs/.bashrc
-LFS_TGT=$(uname -m)-lfs-linux-gnu
+# LFS_TGT=$(uname -m)-lfs-linux-gnu
+LFS_TGT=aarch64-lfs-linux-gnu
 
+# BINUTILS --------------------------------------------------------------------------------------
 echo Binutils-2.37 - Pass 1
 tar xf binutils-2.37.tar.xz
 pushd binutils-2.37
@@ -35,7 +37,9 @@ popd
 rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
+echo dallas binutils
 
+# GCC --------------------------------------------------------------------------------------
 echo GCC-11.2.0 - Pass 1
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
@@ -89,7 +93,7 @@ cd       build
 ../configure                                       \
     --target=$LFS_TGT                              \
     --prefix=/tools                                \
-    --with-glibc-version=2.11                      \
+    --with-glibc-version=2.35                      \
     --with-sysroot=$LFS                            \
     --with-newlib                                  \
     --without-headers                              \
@@ -109,32 +113,44 @@ cd       build
     --enable-languages=c,c++
 make -j$(nproc)
 make install
+
+cd ..
+cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/install-tools/include/limits.h # LFS recommended
 popd
 rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
+echo dallas gcc
 
+# HEADERS --------------------------------------------------------------------------------------
 echo Linux-5.15.37.1 API Headers
 tar xf kernel-5.15.37.1.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.37.1
 make mrproper
-make headers
+make ARCH=arm64 headers
 cp -rv usr/include/* /tools/include
+# cp -rv usr/include $LFS/usr # LFS suggestion
 popd
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.37.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
+echo dallas headers
 
+# GLIBC --------------------------------------------------------------------------------------
 echo glibc-2.35
 tar xf glibc-2.35.tar.xz
 pushd glibc-2.35
 patch -Np1 -i ../glibc-2.35-fhs-1.patch
 mkdir -v build
 cd       build
+      # --build=$MACHTYPE                   \
+      # --with-sysroot=$LFS                \
 ../configure                             \
       --prefix=/tools                    \
       --disable-werror                   \
       --host=$LFS_TGT                    \
+      --target=$LFS_TGT                  \
       --build=$(../scripts/config.guess) \
       --enable-kernel=3.2                \
       --with-headers=/tools/include      \
@@ -158,11 +174,14 @@ esac
 rm -v dummy.c a.out
 set -e
 echo End sanity check - temptoolchain - glibc
+sudo $LFS/tools/libexec/gcc/$LFS_TGT/11.2.0/install-tools/mkheaders
 popd
 rm -rf glibc-2.35
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
+echo dallas glibc
 
+# LIBSTDC++ --------------------------------------------------------------------------------------
 echo Libstdc++ from GCC-11.2.0
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
@@ -170,6 +189,7 @@ mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
     --host=$LFS_TGT                 \
+    --build=$(../config.guess)      \
     --prefix=/tools                 \
     --disable-multilib              \
     --disable-nls                   \
@@ -182,170 +202,201 @@ popd
 rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
+echo dallas libstdc++
 
-echo Binutils-2.37 - Pass 2
-tar xf binutils-2.37.tar.xz
-pushd binutils-2.37
-mkdir -v build
-cd build
-CC=$LFS_TGT-gcc                  \
-AR=$LFS_TGT-ar                   \
-RANLIB=$LFS_TGT-ranlib           \
-../configure                   	 \
-	    --prefix=/tools            \
-	    --disable-nls              \
-	    --disable-werror           \
-	    --with-lib-path=/tools/lib \
-	    --with-sysroot
-make -j$(nproc)
-make install
-make -C ld clean
-make -C ld LIB_PATH=/usr/lib:/lib
-cp -v ld/ld-new /tools/bin
-popd
-rm -rf binutils-2.37
+# echo Binutils-2.37 - Pass 2
+# tar xf binutils-2.37.tar.xz
+# pushd binutils-2.37
+# mkdir -v build
+# cd build
+# CC=$LFS_TGT-gcc                  \
+# AR=$LFS_TGT-ar                   \
+# RANLIB=$LFS_TGT-ranlib           \
+# ../configure                   	 \
+# 	    --prefix=/tools            \
+# 	    --disable-nls              \
+# 	    --disable-werror           \
+# 	    --with-lib-path=/tools/lib \
+# 	    --with-sysroot
+# make -j$(nproc)
+# make install
+# make -C ld clean
+# make -C ld LIB_PATH=/usr/lib:/lib
+# cp -v ld/ld-new /tools/bin
+# popd
+# rm -rf binutils-2.37
 
-touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
+# touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-echo GCC-11.2.0 - Pass 2
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
-# fix issue compiling with glibc 2.34
-sed -e '/static.*SIGSTKSZ/d' \
-    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
-    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
-cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
-  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
-case $(uname -m) in
-    x86_64)
-      for file in gcc/config/{linux,i386/linux{,64}}.h
-      do
-        cp -uv $file{,.orig}
-        sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
-            -e 's@/usr@/tools@g' $file.orig > $file
-        echo '
-      #undef STANDARD_STARTFILE_PREFIX_1
-      #undef STANDARD_STARTFILE_PREFIX_2
-      #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
-      #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
-        touch $file.orig
-      done
-    ;;
-    aarch64)
-      for file in $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h)
-      do
-        cp -uv $file{,.orig}
-        sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
-            -e 's@/usr@/tools@g' $file.orig > $file
-        echo '
-      #undef STANDARD_STARTFILE_PREFIX_1
-      #undef STANDARD_STARTFILE_PREFIX_2
-      #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
-      #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
-        touch $file.orig
-      done
-    ;;
-esac
-case $(uname -m) in
-  x86_64)
-    sed -e '/m64=/s/lib64/lib/' \
-        -i.orig gcc/config/i386/t-linux64
-  ;;
-  aarch64)
-    sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
-  ;;
-esac
-tar -xf ../mpfr-4.1.0.tar.xz
-mv -v mpfr-4.1.0 mpfr
-tar -xf ../gmp-6.2.1.tar.xz
-mv -v gmp-6.2.1 gmp
-tar -xf ../mpc-1.2.1.tar.gz
-mv -v mpc-1.2.1 mpc
-mkdir -v build
-cd       build
-CC=$LFS_TGT-gcc                                    \
-CXX=$LFS_TGT-g++                                   \
-AR=$LFS_TGT-ar                                     \
-RANLIB=$LFS_TGT-ranlib                             \
-../configure                                       \
-    --prefix=/tools                                \
-    --with-local-prefix=/tools                     \
-    --with-native-system-header-dir=/tools/include \
-    --enable-languages=c,c++                       \
-    --disable-libstdcxx-pch                        \
-    --disable-multilib                             \
-    --disable-bootstrap                            \
-    --disable-libgomp
-make -j$(nproc)
-make install
-ln -sv gcc /tools/bin/cc
-# Sanity check
-set +e
-echo sanity check - temptoolchain - gcc 11.2.0 pass2
-echo 'int main(){}' > dummy.c
-cc dummy.c
-readelf -l a.out | grep ': /tools'
-case $(uname -m) in
-  x86_64)
-    echo Expected: '[Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]'
-  ;;
-  aarch64)
-    echo Expected: '[Requesting program interpreter: /tools/lib/ld-linux-aarch64.so.1]'
-  ;;
-esac
-rm -v dummy.c a.out
-set -e
-echo End sanity check - temptoolchain - gcc 11.2.0 pass2
-popd
-rm -rf gcc-11.2.0
+# echo GCC-11.2.0 - Pass 2
+# tar xf gcc-11.2.0.tar.xz
+# pushd gcc-11.2.0
+# # fix issue compiling with glibc 2.34
+# sed -e '/static.*SIGSTKSZ/d' \
+#     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+#     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
+# cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+#   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
+# case $(uname -m) in
+#     x86_64)
+#       for file in gcc/config/{linux,i386/linux{,64}}.h
+#       do
+#         cp -uv $file{,.orig}
+#         sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
+#             -e 's@/usr@/tools@g' $file.orig > $file
+#         echo '
+#       #undef STANDARD_STARTFILE_PREFIX_1
+#       #undef STANDARD_STARTFILE_PREFIX_2
+#       #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+#       #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
+#         touch $file.orig
+#       done
+#     ;;
+#     aarch64)
+#       for file in $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h)
+#       do
+#         cp -uv $file{,.orig}
+#         sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
+#             -e 's@/usr@/tools@g' $file.orig > $file
+#         echo '
+#       #undef STANDARD_STARTFILE_PREFIX_1
+#       #undef STANDARD_STARTFILE_PREFIX_2
+#       #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+#       #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
+#         touch $file.orig
+#       done
+#     ;;
+# esac
+# case $(uname -m) in
+#   x86_64)
+#     sed -e '/m64=/s/lib64/lib/' \
+#         -i.orig gcc/config/i386/t-linux64
+#   ;;
+#   aarch64)
+#     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
+#   ;;
+# esac
+# tar -xf ../mpfr-4.1.0.tar.xz
+# mv -v mpfr-4.1.0 mpfr
+# tar -xf ../gmp-6.2.1.tar.xz
+# mv -v gmp-6.2.1 gmp
+# tar -xf ../mpc-1.2.1.tar.gz
+# mv -v mpc-1.2.1 mpc
+# mkdir -v build
+# cd       build
+# CC=$LFS_TGT-gcc                                    \
+# CXX=$LFS_TGT-g++                                   \
+# AR=$LFS_TGT-ar                                     \
+# RANLIB=$LFS_TGT-ranlib                             \
+# ../configure                                       \
+#     --prefix=/tools                                \
+#     --with-local-prefix=/tools                     \
+#     --with-native-system-header-dir=/tools/include \
+#     --enable-languages=c,c++                       \
+#     --disable-libstdcxx-pch                        \
+#     --disable-multilib                             \
+#     --disable-bootstrap                            \
+#     --disable-libgomp
+# make -j$(nproc)
+# make install
+# ln -sv gcc /tools/bin/cc
+# # Sanity check
+# set +e
+# echo sanity check - temptoolchain - gcc 11.2.0 pass2
+# echo 'int main(){}' > dummy.c
+# cc dummy.c
+# readelf -l a.out | grep ': /tools'
+# case $(uname -m) in
+#   x86_64)
+#     echo Expected: '[Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]'
+#   ;;
+#   aarch64)
+#     echo Expected: '[Requesting program interpreter: /tools/lib/ld-linux-aarch64.so.1]'
+#   ;;
+# esac
+# rm -v dummy.c a.out
+# set -e
+# echo End sanity check - temptoolchain - gcc 11.2.0 pass2
+# popd
+# rm -rf gcc-11.2.0
 
-touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
+# touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
 echo M4-1.4.19
 tar xf m4-1.4.19.tar.gz
 pushd m4-1.4.19
-./configure --prefix=/tools
+./configure --prefix=/tools --host=$LFS_TGT --build=$(build-aux/config.guess) --with-sysroot=$LFS 
 make -j$(nproc)
 make install
 popd
 rm -rf m4-1.4.19
 
 touch $LFS/logs/temptoolchain/status_m4_complete
+echo dallas m4
 
 echo Ncurses-6.2
 tar xf ncurses-6.2.tar.gz
 pushd ncurses-6.2
 sed -i s/mawk// configure
+
+mkdir build # LFS reccommended
+pushd build
+  ../configure
+  make -C include
+  make -C progs tic
+popd
+
 ./configure --prefix=/tools \
+            --host=$LFS_TGT     \
+            --build=$(./config.guess) \
+            --mandir=/tools/share/man      \
+            --with-manpage-format=normal \
             --with-shared   \
             --without-debug \
             --without-ada   \
             --enable-widec  \
+            --disable-stripping \
             --enable-overwrite
+# ./configure --prefix=/tools \
+#             --host=$LFS_TGT \
+#             --build=$(./config.guess) \
+#             --mandir=/usr/share/man      \
+#             --with-manpage-format=normal \
+#             --with-shared   \
+#             --without-debug \
+#             --without-ada   \
+#             --without-normal             \
+#             --enable-widec  \
+#             --disable-stripping \
+#             --enable-overwrite
 make -j$(nproc)
-make install
-ln -s libncursesw.so /tools/lib/libncurses.so
+sudo make DESTDIR=$LFS TIC_PATH=$(pwd)/build/progs/tic install
+sudo echo "INPUT(-lncursesw)" > $LFS/tools/lib/libncurses.so
+# make install
+# ln -s libncursesw.so /tools/lib/libncurses.so
 popd
 rm -rf ncurses-6.2
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
+echo dallas ncurses
 
 echo Bash-5.1.8
 tar xf bash-5.1.8.tar.gz
 pushd bash-5.1.8
-./configure --prefix=/tools --without-bash-malloc
+./configure --prefix=/tools --build=$(support/config.guess) --host=$LFS_TGT --without-bash-malloc
 make -j$(nproc)
 make install
 ln -sv bash /tools/bin/sh
 popd
 rm -rf bash-5.1.8
+echo dallas bash
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
 echo Bison-3.7.6
 tar xf bison-3.7.6.tar.xz
 pushd bison-3.7.6
-./configure --prefix=/tools
+./configure --prefix=/tools --build=$(uname -m)-lfs-linux-gnu --host=$LFS_TGT
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
 # try parallel make with new version
@@ -355,6 +406,7 @@ popd
 rm -rf bison-3.7.6
 
 touch $LFS/logs/temptoolchain/status_bison_complete
+echo dallas bison
 
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
@@ -364,215 +416,246 @@ case $(uname -m) in
         patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
     ;;
 esac
-./configure --prefix=/tools --enable-install-program=hostname
+patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
+./configure --prefix=/tools --host=$LFS_TGT --build=$(build-aux/config.guess) --enable-install-program=hostname
 make -j$(nproc)
 make install
 popd
 rm -rf coreutils-8.32
 
 touch $LFS/logs/temptoolchain/status_coreutils_complete
+echo dallas coreutils
 
 echo Diffutils-3.8
 tar xf diffutils-3.8.tar.xz
 pushd diffutils-3.8
-./configure --prefix=/tools
+./configure --prefix=/tools --host=$LFS_TGT --build=$(build-aux/config.guess)
 make -j$(nproc)
 make install
 popd
 rm -rf diffutils-3.8
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
+echo dallas diffutils
 
-echo File-5.40
-tar xf file-5.40.tar.gz
-pushd file-5.40
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-popd
-rm -rf file-5.40
+# The file version installed on my build machine is version 5.38. The version being compiled is 5.40. Cross-compilation can't be done with build version 5.38 and target version 5.40 
+# echo File-5.40
+# tar xf file-5.40.tar.gz
+# pushd file-5.40
 
-touch $LFS/logs/temptoolchain/status_file_complete
+# mkdir build # LFS recommended
+# pushd build
+#   ../configure --disable-bzlib      \
+#                --disable-libseccomp \
+#                --disable-xzlib      \
+#                --disable-zlib
+#   make
+# popd
 
-# "bzip2" should build after "file" to prevent error:
-#/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
-#collect2: error: ld returned 1 exit status
-#Makefile:499: recipe for target 'libmagic.la' failed
-echo Bzip2-1.0.8
-tar xf bzip2-1.0.8.tar.gz
-pushd bzip2-1.0.8
-make -j$(nproc)
-make PREFIX=/tools install
-popd
-rm -rf bzip2-1.0.8
+# ./configure --prefix=/tools --host=$LFS_TGT --build=$(./config.guess)
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf file-5.40
 
-touch $LFS/logs/temptoolchain/status_bzip2_complete
+# touch $LFS/logs/temptoolchain/status_file_complete
+# echo dallas file
 
-echo Findutils-4.8.0
-tar xf findutils-4.8.0.tar.xz
-pushd findutils-4.8.0
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-popd
-rm -rf findutils-4.8.0
+# # "bzip2" should build after "file" to prevent error:
+# #/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
+# #collect2: error: ld returned 1 exit status
+# #Makefile:499: recipe for target 'libmagic.la' failed
+# echo Bzip2-1.0.8
+# tar xf bzip2-1.0.8.tar.gz
+# pushd bzip2-1.0.8
+# make -j$(nproc)
+# make PREFIX=/tools install
+# popd
+# rm -rf bzip2-1.0.8
 
-touch $LFS/logs/temptoolchain/status_findutils_complete
+# touch $LFS/logs/temptoolchain/status_bzip2_complete
+
+# echo Findutils-4.8.0
+# tar xf findutils-4.8.0.tar.xz
+# pushd findutils-4.8.0
+# ./configure --prefix=/tools \
+#             --host=$LFS_TGT                 \
+#             --localstatedir=/var/lib/locate \
+#             --build=$(build-aux/config.guess)
+# make -j$(nproc)
+# sudo make install
+# popd
+# rm -rf findutils-4.8.0
+
+# touch $LFS/logs/temptoolchain/status_findutils_complete
+# echo dallas findutils
 
 echo Gawk-5.1.0
 tar xf gawk-5.1.0.tar.xz
 pushd gawk-5.1.0
-./configure --prefix=/tools
+./configure --prefix=/tools   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
 make -j$(nproc)
 make install
 popd
 rm -rf gawk-5.1.0
 
 touch $LFS/logs/temptoolchain/status_gawk_complete
+echo dallas gawk
 
-echo Gettext-0.19.8.1
-tar xf gettext-0.19.8.1.tar.xz
-pushd gettext-0.19.8.1
-./configure --disable-shared
-make -j$(nproc)
-cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /tools/bin
-popd
-rm -rf gettext-0.19.8.1
+# echo Gettext-0.19.8.1
+# tar xf gettext-0.19.8.1.tar.xz
+# pushd gettext-0.19.8.1
+# ./configure --disable-shared
+# make -j$(nproc)
+# cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /tools/bin
+# popd
+# rm -rf gettext-0.19.8.1
 
-touch $LFS/logs/temptoolchain/status_gettext_complete
+# touch $LFS/logs/temptoolchain/status_gettext_complete
 
 echo Grep-3.7
 tar xf grep-3.7.tar.xz
 pushd grep-3.7
-./configure --prefix=/tools
+./configure --prefix=/tools --host=$LFS_TGT
 make -j$(nproc)
 make install
 popd
 rm -rf grep-3.7
 
 touch $LFS/logs/temptoolchain/status_grep_complete
+echo dallas grep
 
 echo Gzip-1.11
 tar xf gzip-1.11.tar.xz
 pushd gzip-1.11
-./configure --prefix=/tools
+./configure --prefix=/tools --host=$LFS_TGT
 make -j$(nproc)
 make install
 popd
 rm -rf gzip-1.11
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
+echo dallas gzip
 
 echo Make-4.3
 tar xf make-4.3.tar.gz
 pushd make-4.3
-./configure --prefix=/tools --without-guile
+./configure --prefix=/tools --without-guile \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
 make -j$(nproc)
 make install
 popd
 rm -rf make-4.3
 
 touch $LFS/logs/temptoolchain/status_make_complete
+echo dallas make
 
 echo Patch-2.7.6
 tar xf patch-2.7.6.tar.xz
 pushd patch-2.7.6
-./configure --prefix=/tools
+./configure --prefix=/tools   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
 make -j$(nproc)
 make install
 popd
 rm -rf patch-2.7.6
 
 touch $LFS/logs/temptoolchain/status_patch_complete
+echo dallas patch
 
-echo Perl-5.32.0
-tar xf perl-5.32.0.tar.xz
-pushd perl-5.32.0
-sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
-# Using locally-built version of 'make' to avoid mismatch between the build machine's version
-# and the version we've built above. During its build, Perl runs 'make' from within its 'Makefile', so
-# we used to end up with the build machine's 4.2.1 version running a 4.3 version causing build errors.
-/tools/bin/make -j$(nproc)
-cp -v perl cpan/podlators/scripts/pod2man /tools/bin
-mkdir -pv /tools/lib/perl5/5.32.0
-cp -Rv lib/* /tools/lib/perl5/5.32.0
-popd
-rm -rf perl-5.32.0
+# echo Perl-5.32.0
+# tar xf perl-5.32.0.tar.xz
+# pushd perl-5.32.0
+# sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
+# # Using locally-built version of 'make' to avoid mismatch between the build machine's version
+# # and the version we've built above. During its build, Perl runs 'make' from within its 'Makefile', so
+# # we used to end up with the build machine's 4.2.1 version running a 4.3 version causing build errors.
+# /tools/bin/make -j$(nproc)
+# cp -v perl cpan/podlators/scripts/pod2man /tools/bin
+# mkdir -pv /tools/lib/perl5/5.32.0
+# cp -Rv lib/* /tools/lib/perl5/5.32.0
+# popd
+# rm -rf perl-5.32.0
 
-touch $LFS/logs/temptoolchain/status_perl_complete
+# touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.9.12
-tar xf Python-3.9.12.tar.xz
-pushd Python-3.9.12
-sed -i '/def add_multiarch_paths/a \        return' setup.py
-./configure --prefix=/tools --without-ensurepip --enable-shared
-make -j$(nproc)
-make install
-popd
-rm -rf Python-3.9.12
+# echo Python-3.9.12
+# tar xf Python-3.9.12.tar.xz
+# pushd Python-3.9.12
+# sed -i '/def add_multiarch_paths/a \        return' setup.py
+# ./configure --prefix=/tools --without-ensurepip --enable-shared
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf Python-3.9.12
 
-touch $LFS/logs/temptoolchain/status_python_complete
+# touch $LFS/logs/temptoolchain/status_python_complete
 
 echo Sed-4.8
 tar xf sed-4.8.tar.xz
 pushd sed-4.8
-./configure --prefix=/tools
+./configure --prefix=/tools --host=$LFS_TGT
 make -j$(nproc)
 make install
 popd
 rm -rf sed-4.8
 
 touch $LFS/logs/temptoolchain/status_sed_complete
+echo dallas sed
 
-echo Tar-1.34
-tar xf tar-1.34.tar.xz
-pushd tar-1.34
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-popd
-rm -rf tar-1.34
+# echo Tar-1.34
+# tar xf tar-1.34.tar.xz
+# pushd tar-1.34
+# ./configure --prefix=/tools
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf tar-1.34
 
-touch $LFS/logs/temptoolchain/status_tar_complete
+# touch $LFS/logs/temptoolchain/status_tar_complete
 
-echo Texinfo-6.8
-tar xf texinfo-6.8.tar.xz
-pushd texinfo-6.8
-# fix issue building with glibc 2.34:
-sed -e 's/__attribute_nonnull__/__nonnull/' \
-    -i gnulib/lib/malloc/dynarray-skeleton.c
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-popd
-rm -rf texinfo-6.8
+# echo Texinfo-6.8
+# tar xf texinfo-6.8.tar.xz
+# pushd texinfo-6.8
+# # fix issue building with glibc 2.34:
+# sed -e 's/__attribute_nonnull__/__nonnull/' \
+#     -i gnulib/lib/malloc/dynarray-skeleton.c
+# ./configure --prefix=/tools
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf texinfo-6.8
 
-touch $LFS/logs/temptoolchain/status_texinfo_complete
+# touch $LFS/logs/temptoolchain/status_texinfo_complete
 
-echo Xz-5.2.5
-tar xf xz-5.2.5.tar.xz
-pushd xz-5.2.5
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-popd
-rm -rf xz-5.2.5
+# echo Xz-5.2.5
+# tar xf xz-5.2.5.tar.xz
+# pushd xz-5.2.5
+# ./configure --prefix=/tools
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf xz-5.2.5
 
-touch $LFS/logs/temptoolchain/status_xz_complete
+# touch $LFS/logs/temptoolchain/status_xz_complete
 
-echo Flex-2.6.4
-tar xf flex-2.6.4.tar.gz
-pushd flex-2.6.4
-sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
-HELP2MAN=/tools/bin/true \
-./configure --prefix=/tools
-make -j$(nproc)
-make install
-popd
-rm -rf flex-2.6.4
+# echo Flex-2.6.4
+# tar xf flex-2.6.4.tar.gz
+# pushd flex-2.6.4
+# sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+# HELP2MAN=/tools/bin/true \
+# ./configure --prefix=/tools
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf flex-2.6.4
 
-touch $LFS/logs/temptoolchain/status_flex_complete
+# touch $LFS/logs/temptoolchain/status_flex_complete
 
-touch $LFS/logs/temptoolchain/temp_toolchain_complete
+# touch $LFS/logs/temptoolchain/temp_toolchain_complete
 
 echo Done with script

@@ -8,8 +8,7 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:1.0.20220226
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
 ENV LC_ALL=POSIX
-ENV PATH=/tools/bin:/bin:/usr/bin:/sbin:/usr/sbin 
-# ENV PATH=/bin:/usr/bin:/tools/bin:/sbin:/usr/sbin # specifying /tools/bin first causes build time dependencies for cross-compilation
+ENV PATH=/tools/bin:/bin:/usr/bin:/sbin:/usr/sbin
 
 COPY [ "./version-check-container.sh", \
        "$LFS/tools/" ]
@@ -77,8 +76,11 @@ COPY [ "./.bashrc", \
 
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
-       "./raw_cross_toolchain.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
+       "$LFS/tools/" ]
+
+USER lfs
+COPY [ "./coreutils-fix-get-sys_getdents-aarch64.patch", \
        "$LFS/tools/" ]
 
 USER root
@@ -86,10 +88,11 @@ RUN  chown -Rv lfs $LFS/tools && \
      chown -Rv lfs:lfs /home/lfs/
 
 USER lfs
-RUN /tools/toolchain_build_temp_tools.sh
+# RUN /tools/toolchain_build_temp_tools.sh
 
 COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain_build_in_chroot.sh", \
+       "./raw_cross_toolchain.sh", \
        "./mount_chroot_start_build.sh", \
        "./unmount_chroot.sh", \
        "./go14_bootstrap_aarch64.patch", \
@@ -101,4 +104,5 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
 
 USER root
 
-ENTRYPOINT [ "/tools/mount_chroot_start_build.sh" ]
+ENTRYPOINT [ "/bin/sh" ]
+
