@@ -1,6 +1,6 @@
 Name:           pcre2
 Version:        10.34
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A library for Perl-compatible regular expressions
 License:        BSD-3-Clause
 Group:          Development/Libraries/C and C++
@@ -256,6 +256,9 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Thu May 26 2022 Cameron Baird <cameronbaird@microsoft.com> - 10.34-2
+- Apply patches for CVEs CVE-2022-1586, CVE-2022-1587
+
 * Tue May 18 2020 Andrew Phelps <anphel@microsoft.com> - 10.34-1
 - Update to version 10.34
 
