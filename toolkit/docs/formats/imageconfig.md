@@ -225,7 +225,7 @@ A sample Networks entry pointing to one network configuration:
         "Ip":        "192.169.20.148",
         "NetMask":   "255.255.255.0",
         "OnBoot":    false,
-        "NameServer": [
+        "NameServers": [
             "192.168.30.23"
         ],
         "Device": "eth0"
