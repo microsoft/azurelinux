@@ -77,7 +77,6 @@ COPY [ "./.bashrc", \
 
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
-       "./raw_cross_toolchain.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
        "$LFS/tools/" ]
 
