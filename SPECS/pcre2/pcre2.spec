@@ -7,7 +7,7 @@ Group:          Development/Libraries/C and C++
 URL:            https://www.pcre.org/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/PhilipHazel/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 Patch0:         CVE-2022-1586.patch
 Patch1:         CVE-2022-1587.patch
 BuildRequires:  libgcc
