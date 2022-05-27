@@ -1,20 +1,19 @@
-From 0fbbbea15b38364830d7b341c86682f05575ae0b Mon Sep 17 00:00:00 2001
-From: Pawel <pawelwi@microsoft.com>
-Date: Tue, 10 Nov 2020 18:37:47 -0800
-Subject: [PATCH] Skipping test if ran as superuser.
+From c6a6995e482fca07771073417c5401d1e3d9fb0c Mon Sep 17 00:00:00 2001
+From: Cameron Baird <cam.thebaird@gmail.com>
+Date: Tue, 24 May 2022 14:58:59 -0700
+Subject: [PATCH] 0001-Skipping-test-if-ran-as-superuser
 
 ---
- Test/D02glob.ztst | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ Test/D02glob.ztst | 17 ++++++++++-------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/Test/D02glob.ztst b/Test/D02glob.ztst
-index b0650c8..39d97c1 100644
---- a/Test/D02glob.ztst
-+++ b/Test/D02glob.ztst
-@@ -729,11 +729,15 @@
+index 850a535..cb61eff 100644
+@@ -727,12 +727,15 @@
+ >does/not/exist
  >not/exist
  >exist
- 
+-
 - mkdir -m 000 glob.tmp/secret-d000
 - mkdir -m 111 glob.tmp/secret-d111
 - mkdir -m 444 glob.tmp/secret-d444
@@ -29,9 +28,9 @@ index b0650c8..39d97c1 100644
 + else
 +   ZTST_skip="cannot test unreadable directories globbing when tests run as superuser"
 + fi
- -f:unreadable directories can be globbed (users/24619, users/24626)
+ 0:unreadable directories can be globbed (users/24619, users/24626)
  >glob.tmp/secret-d000/  glob.tmp/secret-d000
  >glob.tmp/secret-d111/  glob.tmp/secret-d111
 -- 
-2.17.1
+2.25.1
 

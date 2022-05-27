@@ -80,6 +80,7 @@ func main() {
 	defines[rpm.DistTagDefine] = *distTag
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
+	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck, *packagesToInstall)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)

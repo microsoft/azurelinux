@@ -1,68 +1,69 @@
+Summary:        Library to program and control the FTDI USB controller
+Name:           libftdi
+Version:        1.5
+Release:        1%{?dist}
+License:        BSD and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		libftdi
-Version:	1.4
-Release:	3%{?dist}
-Summary:	Library to program and control the FTDI USB controller
+URL:            https://www.intra2net.com/en/developer/libftdi/
+Source0:        https://www.intra2net.com/en/developer/%{name}/download/%{name}1-%{version}.tar.bz2
+# http://developer.intra2net.com/git/?p=libftdi;a=commitdiff;h=cdb28383402d248dbc6062f4391b038375c52385;hp=5c2c58e03ea999534e8cb64906c8ae8b15536c30
+Patch0:         libftdi-1.5-fix_pkgconfig_path.patch
 
-License:	LGPLv2
-URL:		http://www.intra2net.com/de/produkte/opensource/ftdi/
-Source0:	http://www.intra2net.com/en/developer/%{name}/download/%{name}1-%{version}.tar.bz2
+BuildRequires:  boost-devel
+BuildRequires:  cmake
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libconfuse-devel
+BuildRequires:  libusbx-devel
+BuildRequires:  make
+BuildRequires:  python3-devel
+BuildRequires:  swig
+BuildRequires:  systemd
 
-# Swig requirements have changed in newer versions of CMake.
-# This has been reported to the mailing list
-Patch0:         libftdi-cmake_swig.patch
-
-BuildRequires:	cmake3 gcc-c++
-BuildRequires:	doxygen
-BuildRequires:	boost-devel
-BuildRequires:	libconfuse-devel
-BuildRequires:	libusbx-devel
-BuildRequires:	python3-devel
-BuildRequires:	swig
-
-Requires:	systemd
-
+Requires:       systemd
 
 %description
 A library (using libusb) to talk to FTDI's FT2232C,
 FT232BM and FT245BM type chips including the popular bitbang mode.
 
 %package devel
-Summary:	Header files and static libraries for libftdi
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	python3-%{name}%{?_isa} = %{version}-%{release}
+Summary:        Header files and static libraries for libftdi
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       cmake-filesystem
+Requires:       python3-%{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Header files and static libraries for libftdi
 
-
 %package -n python3-libftdi
 %{?python_provide:%python_provide python3-libftdi}
-Summary:	Libftdi library Python 3 binding
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Libftdi library Python 3 binding
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-libftdi
 Libftdi Python 3 Language bindings.
 
-
 %package c++
-Summary:	Libftdi library C++ binding
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Libftdi library C++ binding
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description c++
 Libftdi library C++ language binding.
 
-
 %package c++-devel
-Summary:	Libftdi library C++ binding development headers and libraries
-Requires:	%{name}-devel = %{version}-%{release}
-Requires:	%{name}-c++ = %{version}-%{release}
+Summary:        Libftdi library C++ binding development headers and libraries
+
+Requires:       %{name}-c++ = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
 
 %description c++-devel
 Libftdi library C++ binding development headers and libraries
 for building C++ applications with libftdi.
-
 
 %prep
 %autosetup -p1 -n %{name}1-%{version}
@@ -72,31 +73,16 @@ sed -i -e 's/GROUP="plugdev"/TAG+="uaccess"/g' packages/99-libftdi.rules
 
 
 %build
-export CMAKE_PREFIX_PATH=%{_prefix}
-
-mkdir build-py3 && pushd build-py3
-%{cmake3} -DPython_ADDITIONAL_VERSIONS=%{python3_version} -DLIB_SUFFIX:STRING="" ..
-%make_build
-popd
-
-# Fix python sheband lines
-find python/examples -type f -exec sed -i '1s=^#!/usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=' {} +
-
+%cmake -DSTATICLIBS=off -DFTDIPP=on -DPYTHON_BINDINGS=on -DDOCUMENTATION=on -DLIB_SUFFIX:STRING="" .
+%cmake_build
 
 %install
-pushd build-py3
-%make_install
-popd
+%cmake_install
 
-mkdir -p %{buildroot}/lib/udev/rules.d/
-install -pm 0644 packages/99-libftdi.rules %{buildroot}/lib/udev/rules.d/69-libftdi.rules
+install -D -pm 0644 packages/99-libftdi.rules %{buildroot}%{_udevrulesdir}/69-libftdi.rules
 
-find %{buildroot} -type f -name "*.la" -delete
-find %{buildroot} -type f -name "*.a" -delete
-
-#no man install
-mkdir -p %{buildroot}%{_mandir}/man3
-install -pm 0644 build-py3/doc/man/man3/*.3 %{buildroot}%{_mandir}/man3
+mkdir -p %{buildroot}%{_libdir}/udev/rules.d/
+install -pm 0644 packages/99-libftdi.rules %{buildroot}%{_libdir}/udev/rules.d/69-libftdi.rules
 
 # Cleanup examples
 rm -f %{buildroot}%{_bindir}/simple
@@ -109,9 +95,9 @@ rm -f %{buildroot}%{_bindir}/find_all_pp
 rm -f %{buildroot}%{_bindir}/baud_test
 rm -f %{buildroot}%{_bindir}/serial_read
 rm -f %{buildroot}%{_bindir}/serial_test
-rm -rf %{buildroot}%{_libdir}/cmake*
 
-rm -rf %{buildroot}%{_datadir}/doc/libftdi1/example.conf
+rm -f %{buildroot}%{_docdir}/libftdi1/example.conf
+rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 
 
 %check
@@ -119,20 +105,20 @@ rm -rf %{buildroot}%{_datadir}/doc/libftdi1/example.conf
 
 
 %files
-%license COPYING.LIB
-%doc AUTHORS ChangeLog README
+%license COPYING-CMAKE-SCRIPTS COPYING.LIB
 %{_libdir}/libftdi1.so.2*
-/lib/udev/rules.d/69-libftdi.rules
+%{_udevrulesdir}/69-libftdi.rules
 
 %files devel
-%doc build-py3/doc/html
+%doc AUTHORS ChangeLog
 %doc %{_datadir}/libftdi/examples
+%dir %{_includedir}/libftdi1
 %{_bindir}/ftdi_eeprom
 %{_bindir}/libftdi1-config
+%{_includedir}/libftdi1/*.h
 %{_libdir}/libftdi1.so
-%{_includedir}/libftdi1
 %{_libdir}/pkgconfig/libftdi1.pc
-%{_mandir}/man3/*
+%{_libdir}/cmake/libftdi1/
 
 %files -n python3-libftdi
 %{python3_sitearch}/*
@@ -143,15 +129,18 @@ rm -rf %{buildroot}%{_datadir}/doc/libftdi1/example.conf
 
 %files c++-devel
 %{_libdir}/libftdipp1.so
-%{_includedir}/libftdi1/*hpp
+%{_includedir}/libftdi1/*.hpp
 %{_libdir}/pkgconfig/libftdipp1.pc
 
 %ldconfig_scriptlets
 
 %ldconfig_scriptlets c++
 
-
 %changelog
+* Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-1
+- Updating to 1.5 using Fedora 36 (license: MIT) for guidance.
+- License verified.
+
 * Wed Jun 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly set an empty libdir suffix for CMake

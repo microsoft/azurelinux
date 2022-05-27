@@ -1,15 +1,15 @@
-From 488c4d63d104ada4b950b7b344e2eaebd02c53ba Mon Sep 17 00:00:00 2001
+From f67295a29599a37bc4511e749d1475dc0d26fe7f Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Mon, 2 May 2022 15:19:00 +0000
-Subject: [PATCH 21/28] lvm: Updates for multipath LVM.
+Subject: [PATCH 21/37] lvm: Updates for multipath LVM.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
  policy/modules/kernel/files.if | 18 ++++++++++++++++++
- policy/modules/system/lvm.if   | 18 ++++++++++++++++++
- policy/modules/system/lvm.te   |  8 +++++++-
- policy/modules/system/udev.te  |  5 +++--
- 4 files changed, 46 insertions(+), 3 deletions(-)
+ policy/modules/system/lvm.fc   |  1 +
+ policy/modules/system/lvm.te   | 10 +++++++++-
+ policy/modules/system/udev.te  |  5 ++++-
+ 4 files changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
 index e3c22b94a..97a54d998 100644
@@ -40,37 +40,20 @@ index e3c22b94a..97a54d998 100644
  ########################################
  ## <summary>
  ##	Get etc_t service status.
-diff --git a/policy/modules/system/lvm.if b/policy/modules/system/lvm.if
-index 468cbcaa8..bab3d4784 100644
---- a/policy/modules/system/lvm.if
-+++ b/policy/modules/system/lvm.if
-@@ -81,6 +81,24 @@ interface(`lvm_signull',`
- 	allow $1 lvm_t:process signull;
- ')
- 
-+########################################
-+## <summary>
-+##      Connect to LVM via abstract UNIX stream socket.
-+## </summary>
-+## <param name="domain">
-+##	<summary>
-+##	Domain allowed access.
-+##	</summary>
-+## </param>
-+#
-+interface(`lvm_abstract_stream_connect',`
-+	gen_require(`
-+		type lvm_t;
-+	')
-+
-+	allow $1 lvm_t:unix_stream_socket connectto;
-+')
-+
- ########################################
- ## <summary>
- ##	Read LVM configuration files.
+diff --git a/policy/modules/system/lvm.fc b/policy/modules/system/lvm.fc
+index 4a77c2cc1..adffdb82a 100644
+--- a/policy/modules/system/lvm.fc
++++ b/policy/modules/system/lvm.fc
+@@ -104,6 +104,7 @@
+ /usr/sbin/lvresize		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/lvs			--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/lvscan		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/sbin/multipath     --  gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/multipathd		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/multipath\.static	--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/pvchange		--	gen_context(system_u:object_r:lvm_exec_t,s0)
 diff --git a/policy/modules/system/lvm.te b/policy/modules/system/lvm.te
-index 1cf6e1753..9937bce80 100644
+index 1cf6e1753..b0d1c02b7 100644
 --- a/policy/modules/system/lvm.te
 +++ b/policy/modules/system/lvm.te
 @@ -51,7 +51,7 @@ files_type(lvm_var_lib_t)
@@ -90,7 +73,16 @@ index 1cf6e1753..9937bce80 100644
  # for when /usr is not mounted:
  kernel_dontaudit_search_unlabeled(lvm_t)
  # it has no reason to need this
-@@ -159,6 +160,7 @@ domain_read_all_domains_state(lvm_t)
+@@ -123,6 +124,8 @@ kernel_use_fds(lvm_t)
+ # for systemd-cryptsetup
+ kernel_read_crypto_sysctls(lvm_t)
+ kernel_search_debugfs(lvm_t)
++# multipath
++kernel_read_vm_overcommit_sysctl(lvm_t)
+ 
+ corecmd_exec_bin(lvm_t)
+ corecmd_exec_shell(lvm_t)
+@@ -159,6 +162,7 @@ domain_read_all_domains_state(lvm_t)
  
  files_read_usr_files(lvm_t)
  files_read_etc_files(lvm_t)
@@ -98,7 +90,7 @@ index 1cf6e1753..9937bce80 100644
  files_read_etc_runtime_files(lvm_t)
  
  fs_getattr_xattr_fs(lvm_t)
-@@ -210,6 +212,10 @@ seutil_read_file_contexts(lvm_t)
+@@ -210,6 +214,10 @@ seutil_read_file_contexts(lvm_t)
  seutil_search_default_contexts(lvm_t)
  seutil_sigchld_newrole(lvm_t)
  
@@ -110,35 +102,28 @@ index 1cf6e1753..9937bce80 100644
  
  ifdef(`init_systemd',`
 diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
-index 1a692b1f4..d3105f245 100644
+index 1a692b1f4..19c7fd29b 100644
 --- a/policy/modules/system/udev.te
 +++ b/policy/modules/system/udev.te
-@@ -42,7 +42,7 @@ ifdef(`enable_mcs',`
+@@ -56,6 +56,8 @@ allow udev_t self:unix_stream_socket connectto;
+ allow udev_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow udev_t self:netlink_generic_socket create_socket_perms;
+ allow udev_t self:rawip_socket create_socket_perms;
++# rdma_rename
++allow udev_t self:netlink_rdma_socket create_socket_perms;
  
- allow udev_t self:capability { chown dac_override dac_read_search fowner fsetid mknod net_admin net_raw setgid setuid sys_admin sys_nice sys_ptrace sys_rawio sys_resource };
- allow udev_t self:capability2 { wake_alarm block_suspend };
--allow udev_t self:process { transition signal_perms ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh rlimitinh dyntransition execmem setkeycreate setsockcreate getrlimit };
-+allow udev_t self:process { transition signal_perms ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh rlimitinh dyntransition execmem setkeycreate setsockcreate getrlimit setrlimit };
- allow udev_t self:fd use;
- allow udev_t self:fifo_file rw_fifo_file_perms;
- allow udev_t self:sock_file read_sock_file_perms;
-@@ -101,7 +101,7 @@ kernel_rw_unix_dgram_sockets(udev_t)
+ ifdef(`init_systemd',`
+ 	# systemd-vconsole-setup will be called by udev during virtual terminal initialization
+@@ -101,7 +103,8 @@ kernel_rw_unix_dgram_sockets(udev_t)
  kernel_signal(udev_t)
  kernel_search_debugfs(udev_t)
  kernel_search_key(udev_t)
 -
-+kernel_read_fs_sysctls(udev_t)
++# kpartx:
++kernel_get_sysvipc_info(udev_t)
  #https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=235182
  kernel_rw_net_sysctls(udev_t)
  kernel_read_crypto_sysctls(udev_t)
-@@ -324,6 +324,7 @@ optional_policy(`
- 
- optional_policy(`
- 	lvm_domtrans(udev_t)
-+	lvm_abstract_stream_connect(udev_t)
- ')
- 
- optional_policy(`
 -- 
 2.25.1
 

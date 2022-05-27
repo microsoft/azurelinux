@@ -43,6 +43,9 @@ const (
 
 	// NoCompatibleArchError specifies the error message when processing a SPEC written for a different architecture.
 	NoCompatibleArchError = "error: No compatible architectures found for build"
+
+	// MarinerModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
+	MarinerModuleLdflagsDefine = "mariner_module_ldflags"
 )
 
 const (

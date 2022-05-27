@@ -2007,8 +2007,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.82.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.82.0.tar.gz"
+          "version": "7.83.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.0.tar.gz"
         }
       }
     },
@@ -2739,7 +2739,7 @@
         "other": {
           "name": "efi-rpm-macros",
           "version": "4",
-          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/releases/download/4/efi-rpm-macros-4.tar.bz2"
+          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/archive/refs/tags/4.tar.gz"
         }
       }
     },
@@ -5730,8 +5730,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
+          "version": "5.15.41.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz"
         }
       }
     },
@@ -7171,8 +7171,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
+          "version": "5.15.41.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz"
         }
       }
     },
@@ -7181,8 +7181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.37.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.37.1.tar.gz"
+          "version": "5.15.41.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz"
         }
       }
     },
@@ -7192,7 +7192,7 @@
         "other": {
           "name": "kernel-rt",
           "version": "5.15.34.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.34.1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.34.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "libftdi",
-          "version": "1.4",
-          "downloadUrl": "http://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.4.tar.bz2"
+          "version": "1.5",
+          "downloadUrl": "https://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.5.tar.bz2"
         }
       }
     },
@@ -10151,8 +10151,8 @@
         "type": "other",
         "other": {
           "name": "libwpe",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.6.0/libwpe-1.6.0.tar.xz"
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.12.0/libwpe-1.12.0.tar.xz"
         }
       }
     },
@@ -10381,8 +10381,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.13",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.13/libxml2-v2.9.13.tar.gz"
+          "version": "2.9.14",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.14/libxml2-v2.9.14.tar.gz"
         }
       }
     },
@@ -11191,8 +11191,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.7",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.7.tar.gz"
+          "version": "10.6.8",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.8.tar.gz"
         }
       }
     },
@@ -13904,8 +13904,8 @@
         "type": "other",
         "other": {
           "name": "pcre2",
-          "version": "10.39",
-          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.39/pcre2-10.39.tar.bz2"
+          "version": "10.40",
+          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.bz2"
         }
       }
     },
@@ -22875,8 +22875,8 @@
         "type": "other",
         "other": {
           "name": "rsyslog",
-          "version": "8.2108.0",
-          "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2108.0.tar.gz"
+          "version": "8.2204.1",
+          "downloadUrl": "https://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2204.1.tar.gz"
         }
       }
     },
@@ -24294,9 +24294,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "sdparm",
-          "version": "1.11",
-          "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
+          "name": "sdbus-cpp",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v1.1.0.tar.gz"
         }
       }
     },
@@ -24304,9 +24304,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "sdbus-cpp",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v1.1.0.tar.gz"
+          "name": "sdparm",
+          "version": "1.11",
+          "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
         }
       }
     },
@@ -26337,8 +26337,8 @@
         "type": "other",
         "other": {
           "name": "wpebackend-fdo",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/Igalia/wpebackend-fdo/archive/1.6.0/wpebackend-fdo-1.6.0.tar.xz"
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/Igalia/WPEBackend-fdo/archive/refs/tags/1.12.0.tar.gz"
         }
       }
     },
@@ -27410,8 +27410,8 @@
         "type": "other",
         "other": {
           "name": "zsh",
-          "version": "5.8",
-          "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.8/zsh-5.8.tar.xz"
+          "version": "5.9",
+          "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz"
         }
       }
     },
