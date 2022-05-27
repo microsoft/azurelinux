@@ -105,6 +105,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugin/*
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
@@ -193,7 +194,7 @@ fi
 * Fri May 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4974-1
 - Update version to 8.2.4974 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629, 
   CVE-2022-1616, CVE-2022-1733, CVE-2022-1735, CVE-2022-1769, CVE-2022-1620, 
-  CVE-2022-1674
+  CVE-2022-1674.
 
 * Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4774-1
 - Update version to 8.2.4774 to fix CVE-2022-1420.
