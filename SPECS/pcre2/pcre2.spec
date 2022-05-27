@@ -8,6 +8,8 @@ URL:            https://www.pcre.org/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2022-1586.patch
+Patch1:         CVE-2022-1587.patch
 BuildRequires:  libgcc
 BuildRequires:  pkg-config
 BuildRequires:  zlib-devel
@@ -149,7 +151,7 @@ PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # Available JIT archs see sljit/sljitConfig.h
