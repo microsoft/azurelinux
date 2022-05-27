@@ -7311,8 +7311,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.19.2",
-          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.19.2/krb5-1.19.2.tar.gz"
+          "version": "1.19.3",
+          "downloadUrl": "https://kerberos.org/dist/krb5/1.19/krb5-1.19.3.tar.gz"
         }
       }
     },
