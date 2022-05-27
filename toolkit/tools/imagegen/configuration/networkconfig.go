@@ -29,21 +29,14 @@ type Network struct {
 	Device      string   `json:"Device"`
 }
 
-// NetworkBootProto defines the different modes of network protocol
-type NetworkBootProto string
-
-const (
-	// NetworkBootProtoDHCP indicates that this is a DHCP protocol
-	NetworkBootProtoDHCP NetworkBootProto = "dhcp"
-	// NetworkBootProtoStatic indicates that this is a static protocol
-	NetworkBootProtoStatic NetworkBootProto = "static"
-	// NetworkBootProtoBOOTP indicates that this is a bootp protocol
-	NetworkBootProtoBOOTP NetworkBootProto = "bootp"
-	// NetworkBootProtoiBFT indicates that this is a ibft protocol
-	NetworkBootProtoiBFT NetworkBootProto = "ibft"
-	// NetworkBootProtoDefault indicates that this is a DHCP protocol
-	NetworkBootProtoDefault NetworkBootProto = ""
-)
+// valid network boot protocols supported
+var validBootProtos = map[string]bool{
+	"dhcp":   true,
+	"static": true,
+	"bootp":  true,
+	"ibft":   true,
+	"":       true,
+}
 
 // UnmarshalJSON Unmarshals a Network entry
 func (n *Network) UnmarshalJSON(b []byte) (err error) {
@@ -120,28 +113,13 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 	return
 }
 
-func (n NetworkBootProto) string() string {
-	return fmt.Sprint(string(n))
-}
-
-func (n *Network) getValidNetworkBootProtos() (types []NetworkBootProto) {
-	return []NetworkBootProto{
-		NetworkBootProtoDHCP,
-		NetworkBootProtoStatic,
-		NetworkBootProtoBOOTP,
-		NetworkBootProtoiBFT,
-		NetworkBootProtoDefault,
-	}
-}
-
 // bootProtoIsValid returns an error if input bootproto is invalid
 func (n *Network) bootProtoIsValid() (err error) {
 	n.BootProto = strings.TrimSpace(n.BootProto)
-	for _, valid := range n.getValidNetworkBootProtos() {
-		if n.BootProto == valid.string() {
-			return
-		}
+	if validBootProtos[n.BootProto] {
+		return
 	}
+
 	return fmt.Errorf("invalid input for bootproto (%s), bootproto can only be one of dhcp, bootp, ibft and static", n.BootProto)
 }
 
