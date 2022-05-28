@@ -322,17 +322,6 @@ build_rpm_in_chroot_no_install libxml2
 copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms
-echo Download JDK rpms
-case $(uname -m) in
-    x86_64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-    aarch64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-esac
-
 # PCRE needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
 

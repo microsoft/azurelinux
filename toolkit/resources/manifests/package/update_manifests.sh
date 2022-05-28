@@ -303,7 +303,6 @@ generate_pkggen_core () {
         grep "^newt-lang-[0-9]" $TmpPkgGen
         grep "^chkconfig-[0-9]" $TmpPkgGen
         grep "^chkconfig-lang-[0-9]" $TmpPkgGen
-        grep "^msopenjdk-" $TmpPkgGen
         grep "^pyproject-" $TmpPkgGen
         grep "^audit-" $TmpPkgGen
     } > "$1"
