@@ -25,8 +25,8 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add README.rdoc file to buildroot from Source0
-cp README.rdoc %{buildroot}%{gem_instdir}/
+#add README.md file to buildroot from Source0
+cp README.md %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)

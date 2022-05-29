@@ -30,7 +30,7 @@ Documentation for %{name}
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_bindir} %{gem_name}-%{version}.gem
 
 %files
 %dir %{gem_instdir}
@@ -44,7 +44,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gem_instdir}/data
 %{gem_libdir}
 %{gem_spec}
-/usr/lib/ruby/gems/bin/asciidoctor
+%{_bindir}/asciidoctor
 %{gem_instdir}/bin
 %{gem_instdir}/man/asciidoctor.*
 %exclude %{gem_cache}

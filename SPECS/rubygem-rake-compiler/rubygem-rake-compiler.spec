@@ -1,27 +1,27 @@
 %global	gem_name rake-compiler
 %undefine        _changelog_trimtime
-Summary:    Rake-based Ruby C Extension task generator
-Name:       rubygem-%{gem_name}
-Version:    1.1.9
-Release:    1%{?dist}
-License:    MIT
-Vendor:     Microsoft Corporation
-Distribution:  Mariner
-URL:        https://rubydoc.info/gems/rake-compiler
-Source0:    https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-BuildRequires:	ruby(release)
-BuildRequires:	ruby(rubygems) >= 1.3.5
-BuildRequires:	rubygems-devel
+Summary:        Rake-based Ruby C Extension task generator
+Name:           rubygem-%{gem_name}
+Version:        1.1.9
+Release:        1%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://rubydoc.info/gems/rake-compiler
+Source0:        https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+BuildRequires:  ruby(release)
+BuildRequires:  ruby(rubygems) >= 1.3.5
+BuildRequires:  rubygems-devel
 # %%check
-BuildRequires:	rubygem(rake)
-BuildRequires:	rubygem(rspec) >= 3
+BuildRequires:  rubygem(rake)
+BuildRequires:  rubygem(rspec) >= 3
 # cucumber test needs ruby.h header and compiler
-BuildRequires:	gcc
-BuildRequires:	ruby-devel
-Requires:	ruby(release)
-Requires:	ruby(rubygems) >= 1.3.5
-BuildArch:	noarch
-Provides:	rubygem(%{gem_name}) = %{version}-%{release}
+BuildRequires:  gcc
+BuildRequires:  ruby-devel
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= 1.3.5
+BuildArch:      noarch
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 rake-compiler aims to help Gem developers while dealing with
@@ -30,14 +30,14 @@ Ruby C extensions, simplifiying the code and reducing the duplication.
 It follows *convention over configuration* and set an standarized
 structure to build and package C extensions in your gems.
 
-This is the result of expriences dealing with several Gems 
-that required native extensions across platforms and different 
-user configurations where details like portability and 
-clarity of code were lacking. 
+This is the result of expriences dealing with several Gems
+that required native extensions across platforms and different
+user configurations where details like portability and
+clarity of code were lacking.
 
 %package	doc
-Summary:	Documentation for %{name}
-Requires:	%{name} = %{version}-%{release}
+Summary:       Documentation for %{name}
+Requires:      %{name} = %{version}-%{release}
 
 %description	doc
 This package contains documentation for %{name}.
@@ -46,7 +46,7 @@ This package contains documentation for %{name}.
 %setup -q -n %{gem_name}-%{version}
 
 # rpmlint cosmetic
-find ./lib/rake -name \*.rb | xargs sed -i -e '\@/usr/bin/env@d'
+find ./lib/rake -name \*.rb | xargs sed -i -e '\@%{_bindir}/env@d'
 
 # Permission
 find . -name \*.rb -print0 | xargs --null chmod 0644

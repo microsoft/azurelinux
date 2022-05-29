@@ -23246,7 +23246,7 @@
         "other": {
           "name": "rubygem-fluent-config-regexp-type",
           "version": "1.0.0",
-          "downloadUrl": "https://rubygems.org/downloads/fluent-config-regexp-type-1.0.0.gem"
+          "downloadUrl": "https://github.com/okkez/fluent-config-regexp-type/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
