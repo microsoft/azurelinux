@@ -1,16 +1,17 @@
 %global debug_package %{nil}
 %global gem_name minitest
 Summary:        Minitest provides a complete suite of testing facilities
-Name:           rubygem-minitest
-Version:        5.13.0
-Release:        2%{?dist}
-License:        MIT
+Name:           rubygem-%{gem_name}
+Version:        5.15.0
+Release:        1%{?dist}
+# minitest source is licensed under MIT and minitest.gemspec is taken from ruby source, licensed under the rest
+License:        MIT AND (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/minitest
-# The upstream source doesn't contain gemspec file. This source has been taken from ruby-2.7.4.tar.xz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz/%{gem_name}-%{version}.tar.gz
+Source1:        minitest.gemspec
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
@@ -29,6 +30,7 @@ output.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+cp %{SOURCE1} .
 
 %build
 gem build %{gem_name}
@@ -44,6 +46,10 @@ cp README.rdoc %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Tue May 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.0-1
+- Update to v5.15.0
+- Get source.tar.gz from upstream, get initial .gemspec from ruby2.7.4 source (license (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD)
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.13.0-2
 - Add provides
 

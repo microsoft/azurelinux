@@ -1,83 +1,81 @@
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
 %global rubygems_dir  %{_datadir}/rubygems
-
 %global gem_dir %{_datadir}/ruby/gems
-%global rubygems_version              3.1.6
-
-# Add version for default gems
-%global abbrev_version     0.1.0
-%global base64_version     0.1.1
-%global benchmark_version  0.2.0
-%global bigdecimal_version 3.1.1
-%global bundler_version    2.3.7
-%global cgi_version        0.3.1
-%global csv_version        3.2.2
-%global date_version       3.2.2
-%global delegate_version   0.2.0
-%global did_you_mean_version 1.6.1
-%global digest_version     3.1.0
-%global drb_version	       2.1.0
-%global english_version    0.7.1
-%global erb_version        2.2.3
+%global rubygems_version        3.1.6
+# Add version for default gems from https://stdgems.org/
+%global abbrev_version          0.1.0
+%global base64_version          0.1.1
+%global benchmark_version       0.2.0
+%global bigdecimal_version      3.1.1
+%global bundler_version         2.3.7
+%global cgi_version             0.3.1
+%global csv_version             3.2.2
+%global date_version            3.2.2
+%global delegate_version        0.2.0
+%global did_you_mean_version    1.6.1
+%global digest_version          3.1.0
+%global drb_version	            2.1.0
+%global english_version         0.7.1
+%global erb_version             2.2.3
 %global error_highlight_version	0.3.0
-%global etc_version        1.3.0
-%global fcntl_version      1.0.1
-%global fiddle_version     1.1.0
-%global fileutils_version  1.6.0
-%global find_version       0.1.1
-%global forwardable_version 1.3.2
-%global getoptlong_version 0.1.1
-%global io_console_version 0.5.11
-%global io_nonblock_version 0.1.0
-%global io_wait_version    0.2.1
-%global ipaddr_version     1.2.4
-%global irb_version        1.4.1
-%global json_version       2.6.1
-%global logger_version     1.5.0
-%global mutex_m_version    0.1.1
-%global net_http_version   0.2.0
-%global net_protocol_version 0.1.2
-%global nkf_version        0.1.1
-%global observer_version   0.1.1
-%global open3_version      0.1.1
-%global openssl_version    3.0.0
-%global open_uri_version   0.2.0
-%global optparse_version   0.2.0
-%global ostruct_version    0.5.2
-%global pathname_version   0.2.0
-%global pp_version         0.3.0
-%global prettyprint_version 0.1.1
-%global pstore_version     0.1.1
-%global psych_version      4.0.3
-%global racc_version       1.6.0
-%global rdoc_version       6.4.0
-%global readline_version   0.0.3
-%global readline_ext_version 0.1.4
-%global reline_version     0.3.0
-%global resolv_version     0.2.1
-%global resolv_replace_version 0.1.0
-%global rinda_version      0.1.1
-%global ruby2_keywords_version 0.0.5
-%global rubygems_version   3.3.7
-%global securerandom_version 0.1.1
-%global set_version        1.0.2
-%global shellwords_version 0.1.0
-%global singleton_version  0.1.1
-%global stringio_version   3.0.1
-%global strscan_version    3.0.1
-%global syslog_version     0.1.0
-%global tempfile_version   0.1.2
-%global time_version       0.2.0
-%global timeout_version    0.2.0
-%global tmpdir_version     0.1.2
-%global tsort_version      0.1.0
-%global un_version         0.2.0
-%global uri_version        0.11.0
-%global weakref_version    0.1.1
-%global win32ole_version   1.8.8
-%global yaml_version       0.2.0
-%global zlib_version       2.1.1
+%global etc_version             1.3.0
+%global fcntl_version           1.0.1
+%global fiddle_version          1.1.0
+%global fileutils_version       1.6.0
+%global find_version            0.1.1
+%global forwardable_version     1.3.2
+%global getoptlong_version      0.1.1
+%global io_console_version      0.5.11
+%global io_nonblock_version     0.1.0
+%global io_wait_version         0.2.1
+%global ipaddr_version          1.2.4
+%global irb_version             1.4.1
+%global json_version            2.6.1
+%global logger_version          1.5.0
+%global mutex_m_version         0.1.1
+%global net_http_version        0.2.0
+%global net_protocol_version    0.1.2
+%global nkf_version             0.1.1
+%global observer_version        0.1.1
+%global open3_version           0.1.1
+%global openssl_version         3.0.0
+%global open_uri_version        0.2.0
+%global optparse_version        0.2.0
+%global ostruct_version         0.5.2
+%global pathname_version        0.2.0
+%global pp_version              0.3.0
+%global prettyprint_version     0.1.1
+%global pstore_version          0.1.1
+%global psych_version           4.0.3
+%global racc_version            1.6.0
+%global rdoc_version            6.4.0
+%global readline_version        0.0.3
+%global readline_ext_version    0.1.4
+%global reline_version          0.3.0
+%global resolv_version          0.2.1
+%global resolv_replace_version  0.1.0
+%global rinda_version           0.1.1
+%global ruby2_keywords_version  0.0.5
+%global rubygems_version        3.3.7
+%global securerandom_version    0.1.1
+%global set_version             1.0.2
+%global shellwords_version      0.1.0
+%global singleton_version       0.1.1
+%global stringio_version        3.0.1
+%global strscan_version         3.0.1
+%global syslog_version          0.1.0
+%global tempfile_version        0.1.2
+%global time_version            0.2.0
+%global timeout_version         0.2.0
+%global tmpdir_version          0.1.2
+%global tsort_version           0.1.0
+%global un_version              0.2.0
+%global uri_version             0.11.0
+%global weakref_version         0.1.1
+%global win32ole_version        1.8.8
+%global yaml_version            0.2.0
+%global zlib_version            2.1.1
 
 Summary:        Ruby
 Name:           ruby
@@ -101,7 +99,6 @@ Patch0:         patch1-rb.patch
 Patch1:         patch2-rb.patch
 Patch2:         patch3-rb.patch
 Patch3:         patch4-rb.patch
-
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -113,13 +110,12 @@ BuildRequires:  sudo
 
 Requires:       gmp
 Requires:       openssl
-
 Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}
-# TODO: When moving to Ruby 3.X for Mariner 2.0 release, these gemified stdlib
-# provides should be versioned according to the gem version.
+# TODO: When changing ruby version, these gemified stdlib
+# provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Provides:       rubygem-abbrev = %{abbrev_version}-%{release}
 Provides:       rubygem(abbrev) = %{abbrev_version}-%{release}
@@ -305,6 +301,9 @@ pushd gems
 find -not -name 'bundled_gems' -delete
 sed -i '2,$d' bundled_gems
 popd
+# Remove bigdecimal and bundler. Add them back when version provided by ruby >= current version
+rm -rf ext/bigdecimal
+rm -rf lib/bundler
 
 %build
 # Remove GCC specs and build environment linker scripts

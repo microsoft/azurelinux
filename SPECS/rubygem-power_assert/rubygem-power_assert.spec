@@ -1,9 +1,9 @@
 %global gem_name power_assert
 Summary:        Power Assert for Ruby
-Name:           rubygem-power_assert
+Name:           rubygem-%{gem_name}
 Version:        2.0.1
 Release:        3%{?dist}
-License:        BSD-2-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages

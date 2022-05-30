@@ -1,6 +1,6 @@
 %global gem_name test-unit
 Summary:        An xUnit family unit testing framework for Ruby
-Name:           rubygem-test-unit
+Name:           rubygem-%{gem_name}
 Version:        3.5.3
 Release:        3%{?dist}
 License:        PSF AND BSD

@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "minitest-5.13.0.tar.gz": "3419c96314b646125440b8cb4fb785d70a417795456d30b0e00b50d3bceba50a"
+  "minitest-5.15.0.tar.gz": "22c2efab66051353ef1f3c8ac9e5a765a8f21068f704e4863f61bfb6057193c1",
+  "minitest.gemspec": "d8a4ebacb964ff4f341612d48581c1d3f7e940504b7fc330435ffc21d3f138b9"
  }
 }
