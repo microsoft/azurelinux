@@ -7,15 +7,13 @@
 %global abbrev_version          0.1.0
 %global base64_version          0.1.1
 %global benchmark_version       0.2.0
-%global bigdecimal_version      3.1.1
-%global bundler_version         2.3.7
 %global cgi_version             0.3.1
 %global csv_version             3.2.2
 %global date_version            3.2.2
 %global delegate_version        0.2.0
 %global did_you_mean_version    1.6.1
 %global digest_version          3.1.0
-%global drb_version	            2.1.0
+%global drb_version	         2.1.0
 %global english_version         0.7.1
 %global erb_version             2.2.3
 %global error_highlight_version	0.3.0
@@ -123,10 +121,6 @@ Provides:       rubygem-base64 = %{base64_version}-%{release}
 Provides:       rubygem(base64) = %{base64_version}-%{release}
 Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
 Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
-Provides:       rubygem-bigdecimal = %{bigdecimal_version}-%{release}
-Provides:       rubygem(bigdecimal) = %{bigdecimal_version}-%{release}
-Provides:       rubygem-bundler = %{bundler_version}-%{release}
-Provides:       rubygem(bundler) = %{bundler_version}-%{release}
 Provides:       rubygem-cgi = %{cgi_version}-%{release}
 Provides:       rubygem(cgi) = %{cgi_version}-%{release}
 Provides:       rubygem-csv = %{csv_version}-%{release}
