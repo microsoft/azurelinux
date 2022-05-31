@@ -11,6 +11,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/minitest
 Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+# When updating the version, please make necessary changes in this .gemspec, e.g. update version, dependencies (use https://rubygems.org/gems/minitest)
 Source1:        minitest.gemspec
 BuildRequires:  git
 BuildRequires:  ruby

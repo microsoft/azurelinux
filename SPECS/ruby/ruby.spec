@@ -13,10 +13,10 @@
 %global delegate_version        0.2.0
 %global did_you_mean_version    1.6.1
 %global digest_version          3.1.0
-%global drb_version	         2.1.0
+%global drb_version             2.1.0
 %global english_version         0.7.1
 %global erb_version             2.2.3
-%global error_highlight_version	0.3.0
+%global error_highlight_version 0.3.0
 %global etc_version             1.3.0
 %global fcntl_version           1.0.1
 %global fiddle_version          1.1.0
@@ -81,6 +81,9 @@ Version:        3.1.2
 Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
+# TODO: When changing ruby version, these gemified stdlib
+# provides should be versioned according to the ruby version.
+# More info: https://stdgems.org/
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
