@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.4974
+Version:        8.2.4979
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -191,10 +191,10 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-* Fri May 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4974-1
-- Update version to 8.2.4974 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629, 
+* Fri May 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4979-1
+- Update version to 8.2.4979 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629, 
   CVE-2022-1616, CVE-2022-1733, CVE-2022-1735, CVE-2022-1769, CVE-2022-1620, 
-  CVE-2022-1674.
+  CVE-2022-1674, CVE-2022-1771, CVE-2022-1785, CVE-2022-1796.
 
 * Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4774-1
 - Update version to 8.2.4774 to fix CVE-2022-1420.
