@@ -1,41 +1,46 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\((MIME::QuotedPrint|Scalar::Util)\\)$
 # Perform optional tests
 %bcond_with perl_Bytes_Random_Secure_enables_optional_test
 
+Summary:        Perl extension to generate cryptographically-secure random bytes
 Name:           perl-Bytes-Random-Secure
 Version:        0.29
 Release:        21%{?dist}
-Summary:        Perl extension to generate cryptographically-secure random bytes
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Bytes-Random-Secure
 Source0:        https://cpan.metacpan.org/modules/by-module/Bytes/Bytes-Random-Secure-%{version}.tar.gz
 BuildArch:      noarch
-%if !%{with perl_Bytes_Random_Secure_enables_optional_test}
-BuildRequires:  coreutils
-%endif
+
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.6
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
+
 # Run-time:
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Crypt::Random::Seed)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(Math::Random::ISAAC)
-BuildRequires:  perl(MIME::Base64)
-BuildRequires:  perl(MIME::QuotedPrint) >= 3.03
-BuildRequires:  perl(Scalar::Util) >= 1.21
+
 # Tests:
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(English)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(List::Util)
+BuildRequires:  perl(MIME::Base64)
+BuildRequires:  perl(MIME::QuotedPrint) >= 3.03
+BuildRequires:  perl(Math::Random::ISAAC)
+BuildRequires:  perl(Scalar::Util) >= 1.21
 BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
+%if !%{with perl_Bytes_Random_Secure_enables_optional_test}
+BuildRequires:  coreutils
+%endif
 %if %{with perl_Bytes_Random_Secure_enables_optional_test}
 # Optional tests:
 # Pod::Coverage not used
@@ -50,11 +55,10 @@ BuildRequires:  perl(Statistics::Basic)
 # Test::Pod::Coverage
 BuildRequires:  perl(Test::Warn)
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Scalar::Util) >= 1.21
-Requires:       perl(MIME::QuotedPrint) >= 3.03
 
-%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\((MIME::QuotedPrint|Scalar::Util)\\)$
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(MIME::QuotedPrint) >= 3.03
+Requires:       perl(Scalar::Util) >= 1.21
 
 %description
 Bytes::Random::Secure provides two interfaces for obtaining crypto-quality
@@ -71,11 +75,11 @@ perl -i -ne 'print $_ unless m{^t/21-bytes_random_tests.t}' MANIFEST
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 unset RELEASE_TESTING

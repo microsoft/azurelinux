@@ -1,30 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Add a support for the egd daemon
-%bcond_without perl_Crypt_Random_Seed_enables_egd
-
+Summary:        Simple method to get strong randomness
 Name:           perl-Crypt-Random-Seed
 Version:        0.03
 Release:        23%{?dist}
-Summary:        Simple method to get strong randomness
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Crypt-Random-Seed
 Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-Random-Seed-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.6.2
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-# Run-time:
-BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Fcntl)
+
 # Win32 not used
 # Optional run-time:
 # Skip egd to exhibit /dev/random
@@ -32,18 +26,24 @@ BuildRequires:  perl(Fcntl)
 # Skip IO::Socket to exhibit /dev/random
 # Tests
 BuildRequires:  perl(Test::More) >= 0.45
+
+# Run-time:
+BuildRequires:  perl(base)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 # Optional tests:
 # Test::CheckManifest not used
 # Test::Kwalitee not used
 # Test::Perl::Critic not used
 # Test::Pod not used
 # Test::Pod::Coverage not used
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-# Crypt::Random::TESHA2 not used since we have /dev/random
-%if %{with perl_Crypt_Random_Seed_enables_egd}
+
 Suggests:       egd
 Suggests:       perl(IO::Socket)
-%endif
 
 %description
 A simple mechanism to get strong randomness. The main purpose of this
@@ -58,11 +58,11 @@ for plugging in a source.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 unset RELEASE_TESTING

@@ -1,21 +1,22 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Perl interface to the ISAAC PRNG algorithm
 Name:           perl-Math-Random-ISAAC
 Version:        1.004
 Release:        34%{?dist}
-Summary:        Perl interface to the ISAAC PRNG algorithm
-License:        Public Domain or MIT or GPL+ or Artistic
-
+License:        Public Domain OR MIT OR GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Math-Random-ISAAC
 Source0:        https://cpan.metacpan.org/authors/id/J/JA/JAWNSY/Math-Random-ISAAC-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires: make
+
+BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::LeakTrace)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::NoWarnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %{?perl_default_filter}
 
@@ -30,15 +31,15 @@ sed -i 's/\r//' examples/*.pl
 
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
+perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
+make pure_install DESTDIR=%{buildroot}
 
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
+find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{_fixperms} %{buildroot}/*
 
 %check
 make test

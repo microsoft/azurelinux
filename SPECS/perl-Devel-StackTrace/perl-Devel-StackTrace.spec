@@ -1,5 +1,5 @@
-Name:           perl-Devel-StackTrace
 Summary:        Perl module implementing stack trace and stack trace frame objects
+Name:           perl-Devel-StackTrace
 Version:        2.04
 Release:        8%{?dist}
 License:        Artistic 2.0
@@ -9,21 +9,21 @@ URL:            https://metacpan.org/release/Devel-StackTrace
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Devel-StackTrace-%{version}.tar.gz#/perl-Devel-StackTrace-%{version}.tar.gz
 BuildArch:      noarch
 
+BuildRequires:  make
+BuildRequires:  perl
 BuildRequires:  perl-generators
-BuildRequires:  %{__perl}
-BuildRequires:  %{__make}
-
-BuildRequires:  perl(base)
-BuildRequires:  perl(bytes)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
-BuildRequires:  perl(overload)
-BuildRequires:  perl(Test::More) >= 0.88
 BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(base)
+BuildRequires:  perl(bytes)
+BuildRequires:  perl(overload)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 The Devel::StackTrace module contains two classes, Devel::StackTrace
@@ -39,15 +39,15 @@ data available from caller() as of Perl 5.6.0.
 %setup -q -n Devel-StackTrace-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-%{__make} %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
+make %{?_smp_mflags}
 
 %install
-%{__make} pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install PERL_INSTALL_ROOT=%{buildroot}
+%{_fixperms} %{buildroot}/*
 
 %check
-%{__make} test
+make test
 
 %files
 %doc Changes
@@ -56,7 +56,7 @@ data available from caller() as of Perl 5.6.0.
 %{_mandir}/man3/*
 
 %changelog
-* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - :-8
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.04-8
 - License verified.
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.04-7

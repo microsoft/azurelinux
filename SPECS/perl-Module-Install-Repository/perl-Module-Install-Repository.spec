@@ -1,8 +1,8 @@
+Summary:        Automatically sets repository URL from Svn/Svk/Git checkout
 Name:           perl-Module-Install-Repository
 Version:        0.06
 Release:        25%{?dist}
-Summary:        Automatically sets repository URL from Svn/Svk/Git checkout
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Install-Repository
@@ -10,24 +10,27 @@ Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/Module-Instal
 Source1:        LICENSE.PTR
 Patch0:         Module-Install-Repository-0.06-Fix-building-on-Perl-without-dot-in-INC.patch
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter >= 0:5.005
 BuildRequires:  perl-generators
-BuildRequires:  perl(base)
+BuildRequires:  perl-interpreter >= 0:5.005
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Path)
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
+
 # Tests
 BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Path::Class)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(base)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -46,9 +49,9 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -delete
+%{_fixperms} %{buildroot}/*
 
 %check
 make test

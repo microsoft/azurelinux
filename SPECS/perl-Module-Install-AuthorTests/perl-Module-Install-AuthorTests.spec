@@ -1,28 +1,34 @@
+Summary:        Designate tests only run by module authors
 Name:           perl-Module-Install-AuthorTests
 Version:        0.002
 Release:        24%{?dist}
-Summary:        Designate tests only run by module authors
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Install-AuthorTests
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Module-Install-AuthorTests-%{version}.tar.gz#/perl-Module-Install-AuthorTests-%{version}.tar.gz
 Source1:        LICENSE.PTR
 BuildArch:      noarch
+
 BuildRequires:  perl-generators
-BuildRequires:  perl(inc::Module::Install)
+
+# Run-time:
+BuildRequires:  perl(Carp)
+
 # Build-time inc-ed:
 # XXX: We cannot remove ./inc because it build-requires this module (bootstrap)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
-# Run-time:
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(Module::Install::Base)
 BuildRequires:  perl(Module::Install)
+BuildRequires:  perl(Module::Install::Base)
+
 # Tests:
 BuildRequires:  perl(Test::More)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildRequires:  perl(inc::Module::Install)
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
 # Plug-in for Module::Install
 Requires:       perl(Module::Install)
 
@@ -34,14 +40,14 @@ should be run only if the module is being built by an author.
 %setup -q -n Module-Install-AuthorTests-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
+perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install PERL_INSTALL_ROOT=%{buildroot}
+find %{buildroot} -type f -name .packlist -exec rm -f {} \;
+find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
+%{_fixperms} %{buildroot}/*
 
 cp %{SOURCE1} .
 

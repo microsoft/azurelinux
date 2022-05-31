@@ -1,39 +1,36 @@
-# Enable dumping a stack trace
-%bcond_without perl_Test_NoWarnings_enables_stack_trace
-
+Summary:        Make sure you didn't emit any warnings while testing
 Name:           perl-Test-NoWarnings
 Version:        1.04
 Release:        23%{?dist}
-Summary:        Make sure you didn't emit any warnings while testing
 License:        LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-NoWarnings
 Source0:        https://cpan.metacpan.org/authors/id/A/AD/ADAMK/Test-NoWarnings-%{version}.tar.gz#/perl-Test-NoWarnings-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.6
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
+
 # Run-time:
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(Test::Builder) >= 0.86
-BuildRequires:  perl(warnings)
-BuildRequires:  perl(vars)
-%if %{with perl_Test_NoWarnings_enables_stack_trace}
-# Optional run-time:
 BuildRequires:  perl(Devel::StackTrace)
-%endif
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(Test::Builder) >= 0.86
+
 # Tests:
 BuildRequires:  perl(Test::More) >= 0.47
 BuildRequires:  perl(Test::Tester) >= 0.107
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-%if %{with perl_Test_NoWarnings_enables_stack_trace}
+
 Suggests:       perl(Devel::StackTrace)
-%endif
 
 %description
 In general, your tests shouldn't produce warnings. This module causes any
@@ -51,8 +48,8 @@ perl Makefile.PL NO_PACKLIST=1 INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
