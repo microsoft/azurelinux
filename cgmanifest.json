@@ -4195,8 +4195,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.3.34",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.34.tar.gz"
+          "version": "10.3.35",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.35.tar.gz"
         }
       }
     },

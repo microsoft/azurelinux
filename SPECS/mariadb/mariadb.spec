@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.34
+Version:        10.3.35
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -371,6 +371,13 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Tue May 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 10.3.35-1
+- Upgrade to latest 10.3.X release to fix 20 CVEs:
+- CVE-2021-46669, CVE-2022-21427, CVE-2022-27376, CVE-2022-27377, CVE-2022-27378,
+- CVE-2022-27379, CVE-2022-27379, CVE-2022-27380, CVE-2022-27381, CVE-2022-27383,
+- CVE-2022-27384, CVE-2022-27386, CVE-2022-27387, CVE-2022-27445, CVE-2022-27447,
+- CVE-2022-27448, CVE-2022-27449, CVE-2022-27452, CVE-2022-27456, CVE-2022-27458
+
 * Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 10.3.34-1
 - Upgrading to version 10.3.34
 - patch CVE-2021-46661, CVE-2021-46662, CVE-2021-46663, CVE-2021-46664, CVE-2021-46665, CVE-2021-46668
