@@ -4520,8 +4520,8 @@
         "type": "other",
         "other": {
           "name": "hivex",
-          "version": "1.3.18",
-          "downloadUrl": "http://libguestfs.org/download/hivex/hivex-1.3.18.tar.gz"
+          "version": "1.3.21",
+          "downloadUrl": "http://libguestfs.org/download/hivex/hivex-1.3.21.tar.gz"
         }
       }
     },
