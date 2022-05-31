@@ -3540,8 +3540,8 @@
         "type": "other",
         "other": {
           "name": "gd",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.0/libgd-2.3.0.tar.xz"
+          "version": "2.3.3",
+          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.0.tar.gz"
         }
       }
     },

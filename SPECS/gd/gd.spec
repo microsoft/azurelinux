@@ -19,14 +19,14 @@
 %define prjname libgd
 %define lname libgd3
 Name:           gd
-Version:        2.3.0
-Release:        5%{?dist}
+Version:        2.3.3
+Release:        1%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libgd.github.io/
-Source:         https://github.com/libgd/libgd/releases/download/%{name}-%{version}/%{prjname}-%{version}.tar.xz
+Source:         https://github.com/libgd/libgd/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        baselibs.conf
 # might be upstreamed, but could be suse specific also (/usr/share/fonts/Type1 font dir)
 Patch1:         gd-fontpath.patch
@@ -156,6 +156,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.3.3-1
+- Upgrade to 2.3.3 to address CVE-2021-38115 and CVE-2021-40812
+
 * Tue Apr 12 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.0-5
 - Backport patch from upstream to address CVE-2021-40145
 
