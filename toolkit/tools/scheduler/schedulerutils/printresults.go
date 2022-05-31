@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 )
 
 // PrintBuildResult prints a build result to the logger.
@@ -69,7 +69,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	for _, node := range pkgGraph.AllRunNodes() {
 		if node.State == pkggraph.StateUnresolved {
-			unresolvedDependencies[node.VersionedPkg.Name] = true
+			unresolvedDependencies[node.VersionedPkg.String()] = true
 		}
 	}
 

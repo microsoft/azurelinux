@@ -6,16 +6,15 @@ package progressview
 import (
 	"sync"
 
-	"microsoft.com/pkggen/imagegen/attendedinstaller/primitives/progressbar"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uitext"
-	"microsoft.com/pkggen/imagegen/attendedinstaller/uiutils"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/internal/logger"
-
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-
 	"github.com/sirupsen/logrus"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/progressbar"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uiutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 // UI constants.

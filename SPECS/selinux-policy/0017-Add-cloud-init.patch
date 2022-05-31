@@ -24,16 +24,17 @@ index 4c18154ce..1257de820 100644
  /usr/lib/dhcpcd/dhcpcd-run-hooks --	gen_context(system_u:object_r:bin_t,s0)
  /usr/lib/dovecot/.+			gen_context(system_u:object_r:bin_t,s0)
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 287e30b51..64f09b7fc 100644
+index 287e30b51..c2e841358 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -1849,3 +1849,17 @@ userdom_relabelto_user_runtime_dirs(systemd_user_runtime_dir_t)
+@@ -1849,3 +1849,18 @@ userdom_relabelto_user_runtime_dirs(systemd_user_runtime_dir_t)
  optional_policy(`
  	dbus_system_bus_client(systemd_user_runtime_dir_t)
  ')
 +
 +
 +# Temporary rules until cloud-init policy is implemented.
++allow fsadm_t initrc_tmp_t:file { getattr ioctl write };
 +allow mount_t initrc_runtime_t:dir mounton;
 +allow rpm_script_t initrc_t:fd use;
 +allow rpm_script_t initrc_t:fifo_file rw_inherited_fifo_file_perms;
@@ -46,5 +47,5 @@ index 287e30b51..64f09b7fc 100644
 +allow systemd_networkd_t init_runtime_t:dir list_dir_perms;
 +allow udev_t init_runtime_t:dir read;
 -- 
-2.17.1
+2.25.1
 

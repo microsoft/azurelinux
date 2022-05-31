@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:		perl-Test-Synopsis
 Version:	0.16
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Test your SYNOPSIS code
 License:	GPL+ or Artistic
 URL:		https://metacpan.org/release/Test-Synopsis
@@ -32,6 +32,7 @@ BuildRequires:	perl(IPC::Open3)
 BuildRequires:	perl(Test::Builder) >= 0.34
 BuildRequires:	perl(Test::Builder::Tester)
 BuildRequires:	perl(Test::More)
+BuildRequires:	perl(blib)
 # Extra Tests; can't run these when bootstrapping or in EL since many
 # of these packages won't be available
 %if 0%{!?perl_bootstrap:1} && 0%{!?rhel:1}
@@ -94,6 +95,10 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::Synopsis.3*
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.16-7
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

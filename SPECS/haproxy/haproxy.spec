@@ -61,6 +61,7 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 *   Thu Feb 24 2022 Minghe Ren <mingheren@microsoft.com> 2.4.13-1
 -   Update to 2.4.13
 -   License verified
+-   Add nopatch for CVE-2022-0711
 *   Thu Jun 04 2020 Ruying Chen <v-ruyche@microsoft.com> 2.1.5-1
 -   Update to 2.1.5
 *   Tue May 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.9.6-5

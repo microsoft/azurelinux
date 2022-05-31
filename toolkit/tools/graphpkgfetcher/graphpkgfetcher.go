@@ -9,16 +9,17 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
+
 	"gonum.org/v1/gonum/graph"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/packagerepo/repocloner/rpmrepocloner"
-	"microsoft.com/pkggen/internal/packagerepo/repoutils"
-	"microsoft.com/pkggen/internal/pkggraph"
-	"microsoft.com/pkggen/internal/pkgjson"
-	"microsoft.com/pkggen/internal/rpm"
-	"microsoft.com/pkggen/scheduler/schedulerutils"
 )
 
 var (

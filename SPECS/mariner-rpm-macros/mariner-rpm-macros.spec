@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,7 +20,7 @@ Source5:        macros.check
 Source6:        macros.python
 Source7:        macros.python3
 Source8:        macros.python-srpm
-Source9:       macros.openblas-srpm
+Source9:        macros.openblas-srpm
 Source10:       macros.nodejs-srpm
 Source11:       macros.mono-srpm
 Source12:       macros.ocaml-srpm
@@ -121,6 +121,13 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-15
+- Remove module_info.ld from default LDFLAGS; require setting through "mariner_module_ldflags"
+- Modify gen-ld-script.sh to pass OS Version and predefine OS ID instead of parsing from /etc/os-release (no longer in toolchain env)
+
+* Tue Apr 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-14
+- Adding the "_mariner_sources_url" macro.
+
 * Mon Mar 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0-13
 - Remove python2 RPM macros entirely
 - Remove python2-related SRPM macros

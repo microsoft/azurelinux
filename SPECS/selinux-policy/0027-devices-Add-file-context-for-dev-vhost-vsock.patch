@@ -1,0 +1,25 @@
+From de2e9bf2f8cb47fd64ac746a1f34159ae1de6739 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 2 May 2022 15:42:15 +0000
+Subject: [PATCH 27/28] devices: Add file context for /dev/vhost-vsock.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/devices.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/kernel/devices.fc b/policy/modules/kernel/devices.fc
+index 7a3fc08f5..009887934 100644
+--- a/policy/modules/kernel/devices.fc
++++ b/policy/modules/kernel/devices.fc
+@@ -138,6 +138,7 @@ ifdef(`distro_suse', `
+ /dev/vhci			-c	gen_context(system_u:object_r:vhost_device_t,s0)
+ /dev/vhost-net		-c	gen_context(system_u:object_r:vhost_device_t,s0)
+ /dev/vhost-scsi		-c	gen_context(system_u:object_r:vhost_device_t,s0)
++/dev/vhost-vsock    -c  gen_context(system_u:object_r:vhost_device_t,s0)
+ /dev/video.*		-c	gen_context(system_u:object_r:v4l_device_t,s0)
+ /dev/vmmon		-c	gen_context(system_u:object_r:vmware_device_t,s0)
+ /dev/vmnet.*		-c	gen_context(system_u:object_r:vmware_device_t,s0)
+-- 
+2.25.1
+

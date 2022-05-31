@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        5%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,25 +15,27 @@ Source2:        brp-strip-unneeded
 Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
 BuildRequires:  openssl-devel
 BuildRequires:  file-devel
+BuildRequires:  gettext
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
+BuildRequires:  sqlite-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
 Requires:       bash
-Requires:       debugedit
 Requires:       libarchive
 Requires:       libselinux
-Requires:       lua
+Requires:       lua-libs
 Requires:       rpm-libs = %{version}-%{release}
-Requires:       rpm-build = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 Patch1: define-RPM_LD_FLAGS.patch
@@ -70,14 +72,19 @@ Summary:        Librpmbuild.so.* libraries needed to build rpms.
 
 %package build
 Summary:        Binaries, scripts and libraries needed to build rpms.
-Requires:       %{name}-build-libs
+Requires:       %{name}-build-libs = %{version}-%{release}
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       bzip2
 Requires:       cpio
+Requires:       debugedit
+Requires:       diffutils
 Requires:       elfutils-devel
 Requires:       elfutils-libelf
+Requires:       file
 Requires:       gzip
+Requires:       lua
 Requires:       mariner-rpm-macros
+Requires:       patch
 Requires:       tar
 Requires:       unzip
 Requires:       xz
@@ -200,8 +207,6 @@ popd
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
 %{_libdir}/rpm-plugins/*
-%{_libdir}/rpm/pythondistdeps.py
-%{_fileattrsdir}/python.attr
 # Because of no doxygen dependency, we do not produce manpages that require it.
 # %{_mandir}/man8/rpm.8.gz
 # %{_mandir}/man8/rpm2cpio.8.gz
@@ -242,6 +247,7 @@ popd
 %{_libdir}/rpm/mkinstalldirs
 %{_libdir}/rpm/pkgconfigdeps.sh
 %{_libdir}/rpm/*.prov
+%{_libdir}/rpm/pythondistdeps.py
 
 %{_libdir}/rpm/pythondeps.sh
 %{_libdir}/rpm/ocamldeps.sh
@@ -270,6 +276,17 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.17.0-8
+- Move lua runtime dependency from main rpm package.  Move to rpm-build.
+- Move python files to rpm-build package.  This removes the implied dependency on python3 by the rpm package.
+
+* Fri May 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 4.17.0-7
+- Add missing dependencies to rpmbuild (file, diff and patch)
+
+* Thu Apr 28 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-6
+- Remove main package requires for rpm-build
+- Move debugedit requires to rpm-build subpackage
+
 * Thu Apr 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.0-5
 - rpm-libs needs to run in container environments without systemd, audit was being
 -   pulled in as an automatic dependency. Explicitly disable the audit config.

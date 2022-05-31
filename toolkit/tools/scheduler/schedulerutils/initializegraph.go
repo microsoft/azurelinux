@@ -6,9 +6,9 @@ package schedulerutils
 import (
 	"fmt"
 
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
-	"microsoft.com/pkggen/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 )
 
 const (

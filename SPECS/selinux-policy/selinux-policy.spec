@@ -9,12 +9,12 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/refpolicy
-Source0:        %{url}/releases/download/RELEASE_${refpolicy_major}_${refpolicy_minor}/refpolicy-%{version}.tar.bz2
+Source0:        %{url}/releases/download/RELEASE_%{refpolicy_major}_%{refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Source3:        modules_targeted.conf
@@ -35,6 +35,27 @@ Patch14:        0014-systemd-Misc-updates.patch
 Patch15:        0015-rpm-Add-dnf-and-tdnf-labeling.patch
 Patch16:        0016-logging-Change-to-systemd-interface-for-tmpfilesd.patch
 Patch17:        0017-Add-cloud-init.patch
+Patch18:        0018-Add-compatibility-for-container-selinux.patch
+Patch19:        0019-systemd-Remove-systemd-run-domain.patch
+Patch20:        0020-unconfined-Add-missing-capability2-perms.patch
+Patch21:        0021-lvm-Updates-for-multipath-LVM.patch
+Patch22:        0022-locallogin-Use-init-file-descriptors.patch
+Patch23:        0023-systemd-Misc-fixes.patch
+Patch24:        0024-isns-Updates-from-testing.patch
+Patch25:        0025-container-docker-Fixes-for-containerd-and-kubernetes.patch
+Patch26:        0026-devices-Add-type-for-SAS-management-devices.patch
+Patch27:        0027-devices-Add-file-context-for-dev-vhost-vsock.patch
+Patch28:        0028-Add-dac_read_search-perms.patch
+Patch29:        0029-iptables-Ioctl-cgroup-dirs.patch
+Patch30:        0030-container-allow-containers-to-manipulate-own-fds.patch
+Patch31:        0031-devices-Add-type-for-infiniband-devices.patch
+Patch32:        0032-storage-Add-fc-for-dev-ng-n-devices.patch
+Patch33:        0033-files-Add-prerequisite-access-for-files_mounton_non_.patch
+Patch34:        0034-files-Make-etc_runtime_t-a-config-file.patch
+Patch35:        0035-systemd-Fixes-for-coredumps-in-containers.patch
+Patch36:        0036-container-Allow-container-engines-to-connect-to-http.patch
+Patch37:        0037-container-Getattr-generic-device-nodes.patch
+Patch38:        0038-application-Allow-apps-to-use-init-fds.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -311,6 +332,23 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon May 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-6
+- Fix previous multipath LVM changes.
+- Add types for devices.
+- Cherry pick upstream commit for container fds.
+- Allow container engines to connect to http cache ports.
+- Allow container engines to stat() generic (device_t) devices.
+
+* Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-5
+- Additional compatibility for Fedora container-selinux.
+- Remove unneeded systemd_run_t domain
+- Updates for multipath LVM
+- Fix for console logins
+- New type for SAS management devices
+
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-4
+- Fixing source URL.
+
 * Mon Mar 14 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-3
 - Additional policy fixes for enforcing core images.
 

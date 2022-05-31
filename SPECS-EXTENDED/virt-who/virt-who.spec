@@ -19,14 +19,11 @@ Distribution:   Mariner
 
 Name:           virt-who
 Version:        0.24.2
-Release:        2%{?dist}
-
+Release:        3%{?dist}
 Summary:        Agent for reporting virtual guest IDs to subscription-manager
-
 License:        GPLv2+
 URL:            https://github.com/candlepin/virt-who
-Source0:        %{name}-%{version}.tar.gz
-
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  %{python_ver}-devel
 BuildRequires:  %{python_ver}-setuptools
@@ -39,8 +36,6 @@ Requires:      %{python_ver}-setuptools
 # libvirt python required for libvirt support
 
 Requires:       %{python_ver}-libvirt
-
-
 
 # python-rhsm 1.20 has the M2Crypto wrappers needed to replace M2Crypto
 # with the python standard libraries where plausible
@@ -87,7 +82,6 @@ report them to the subscription manager.
 %prep
 %setup -q
 
-
 %build
 %{python_exec} setup.py build
 
@@ -110,7 +104,6 @@ install -m 644 virt-who-zsh %{buildroot}/%{_datadir}/zsh/site-functions/_virt-wh
 
 # Don't run test suite in check section, because it need the system to be
 # registered to subscription-manager server
-
 %post
 %if %{use_systemd}
 %systemd_post virt-who.service
@@ -118,7 +111,6 @@ install -m 644 virt-who-zsh %{buildroot}/%{_datadir}/zsh/site-functions/_virt-wh
 # This adds the proper /etc/rc*.d links for the script
 /sbin/chkconfig --add virt-who
 %endif
-
 
 %preun
 %if %{use_systemd}
@@ -139,9 +131,9 @@ if [ "$1" -ge "1" ] ; then
 fi
 %endif
 
-
 %files
-%doc README.md LICENSE README.hyperv
+%license LICENSE
+%doc README.md README.hyperv
 %{_bindir}/virt-who
 %{_bindir}/virt-who-password
 %{python_sitelib}/*
@@ -161,8 +153,12 @@ fi
 %{_sysconfdir}/virt-who.d/template.conf
 %attr(600, root, root) %config(noreplace) %{_sysconfdir}/virt-who.conf
 
-
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.24.2-3
+- Update Source0
+- Improve formatting
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.2-2
 - Switching to using full number for the 'Release' tag.
 

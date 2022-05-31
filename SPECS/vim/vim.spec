@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.4743
+Version:        8.2.4925
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -10,7 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
-Provides:       vi = %{release}-%{version}
+Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
 
 %description
@@ -107,6 +107,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugin/*
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
@@ -192,6 +193,14 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Fri May 20 2022 Chris Co <chrco@microsoft.com> - 8.2.4925-1
+- Update version to 8.2.4925 to address CVE-2022-1381, CVE-2022-1420,
+  CVE-2022-1616, CVE-2022-1619, CVE-2022-1620, CVE-2022-1621, CVE-2022-1629
+- Add new file vimhelp.vim
+
+* Fri Apr 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.2.4743-2
+- Fix invalid vi provide with reversed %%{release}-%%{version} EVR
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 8.2.4743-1
 - Update version to 8.2.4743 to fix CVE-2022-0408,CVE-2022-0413,CVE-2022-0417,CVE-2022-0443,
 - CVE-2022-0554,CVE-2022-0572,CVE-2022-0629,CVE-2022-0685,CVE-2022-0729,CVE-2022-1160
@@ -311,4 +320,3 @@ fi
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 7.4-1
 - Initial build First version.
-

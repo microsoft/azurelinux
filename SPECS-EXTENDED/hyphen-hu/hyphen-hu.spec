@@ -4,10 +4,10 @@ Name: hyphen-hu
 Summary: Hungarian hyphenation rules
 %global upstreamid 20090612
 Version: 0.%{upstreamid}
-Release: 24%{?dist}
+Release: 25%{?dist}
 # Source URL is dead now
 # Source: http://download.github.com/nagybence-huhyphn-aa3fc85.tar.gz
-Source: nagybence-huhyphn-aa3fc85.tar.gz
+Source: %{_mariner_sources_url}/nagybence-huhyphn-aa3fc85.tar.gz
 URL: http://www.tipogral.hu/
 License: GPLv2
 BuildArch: noarch
@@ -37,6 +37,10 @@ cp -p hyph_hu.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_hu_HU.dic
 %{_datadir}/hyphen/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20090612-25
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20090612-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

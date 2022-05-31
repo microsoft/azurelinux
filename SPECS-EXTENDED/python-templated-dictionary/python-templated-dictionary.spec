@@ -4,14 +4,10 @@
 Summary:        Dictionary with Jinja2 expansion
 Name:           python-%{srcname}
 Version:        1.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 URL:            https://github.com/xsuchy/templated-dictionary
-# Source is created by:
-# git clone https://github.com/xsuchy/templated-dictionary && cd templated-dictionary
-# tito build --tgz --tag %%name-%%version-%%release
-# Source tar: https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 Requires:       python%{python3_pkgversion}-jinja2
@@ -43,6 +39,9 @@ version="%{version}" python3 setup.py install -O1 --skip-build --root %{buildroo
 %{python3_sitelib}/templated_dictionary*
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-6
+- Fixing source URL.
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.1-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified

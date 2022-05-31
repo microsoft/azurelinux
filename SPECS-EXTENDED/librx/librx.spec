@@ -1,14 +1,14 @@
 Summary: POSIX regexp functions
 Name: librx
 Version: 1.5
-Release: 36%{?dist}
+Release: 37%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://www.gnu.org/software/rx/rx.html
 # Originally downloaded from ftp://ftp.gnu.org/gnu/rx/rx-1.5.tar.bz2
 # The FSF no longer offers this code.
-Source0: rx-%{version}.tar.bz2
+Source0: %{_mariner_sources_url}/rx-%{version}.tar.bz2
 Patch0: rx-1.5-shared.patch
 Patch1: rx-1.5-texinfo.patch
 Patch2: librx-1.5-libdir64.patch
@@ -65,12 +65,17 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 %{_libdir}/*.so.*
 
 %files devel
+%license COPYING
 %doc ANNOUNCE BUILDING COOKOFF rx/ChangeLog
 %{_includedir}/*
 %{_infodir}/*
 %{_libdir}/*.so
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-37
+- Updating source URLs.
+- License verified.
+
 * Fri Dec 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.5-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Update installation directories to Mariner's location.

@@ -21,12 +21,14 @@ Distribution:   Mariner
 %define short_name      taglibs-standard
 Name:           jakarta-taglibs-standard
 Version:        1.1.1
-Release:        259%{?dist}
+Release:        260%{?dist}
 Summary:        Open Source Implementation of the JSP Standard Tag Library
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 Url:            http://tomcat.apache.org/taglibs/
-Source0:        jakarta-taglibs-standard-%{version}-src.tar.bz2
+# Need to switch to upstream's source tarball:
+# https://archive.apache.org/dist/jakarta/taglibs/standard/source/jakarta-taglibs-standard-1.1.1-src.tar.gz
+Source0:        %{_mariner_sources_url}/jakarta-taglibs-standard-%{version}-src.tar.bz2
 Patch0:         %{name}-%{version}-build.patch
 Patch1:         %{name}-java6-compatibility.patch
 Patch2:         %{name}-%{version}-remove-enums.patch
@@ -100,6 +102,10 @@ cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-260
+- Updating source URLs.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-259
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

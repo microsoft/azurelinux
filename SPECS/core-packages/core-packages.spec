@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,6 @@ Requires:       e2fsprogs
 Requires:       file
 Requires:       gdbm
 Requires:       grep
-Requires:       gzip
 Requires:       iana-etc
 Requires:       libtool
 Requires:       iproute
@@ -40,8 +39,6 @@ Requires:       net-tools
 Requires:       openssh-clients
 Requires:       pkg-config
 Requires:       procps-ng
-Requires:       rpm
-Requires:       sed
 Requires:       sudo
 Requires:       systemd
 Requires:       tar
@@ -61,6 +58,7 @@ Requires:       elfutils-libelf
 Requires:       expat
 Requires:       filesystem
 Requires:       findutils
+Requires:       gzip
 Requires:       mariner-release
 Requires:       mariner-repos
 Requires:       mariner-repos-extras
@@ -70,7 +68,9 @@ Requires:       nspr
 Requires:       nss-libs
 Requires:       openssl
 Requires:       readline
+Requires:       rpm
 Requires:       rpm-libs
+Requires:       sed
 Requires:       sqlite-libs
 Requires:       tdnf
 Requires:       tdnf-plugin-repogpgcheck
@@ -89,6 +89,12 @@ Requires:       zlib
 %files container
 
 %changelog
+* Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-6
+- Add rpm to base container image
+
+* Wed May 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-5
+- Add gzip and sed to base container image
+
 * Tue Apr 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-4
 - Provision official Repos for Official Release
 

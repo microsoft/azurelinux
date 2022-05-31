@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strconv"
 
-	"microsoft.com/pkggen/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 // Disk holds the disk partitioning, formatting and size information.

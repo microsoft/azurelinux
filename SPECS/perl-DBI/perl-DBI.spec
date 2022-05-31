@@ -4,8 +4,8 @@
 
 Summary:        A database access API for perl
 Name:           perl-DBI
-Version:        1.641
-Release:        6%{?dist}
+Version:        1.643
+Release:        1%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -155,6 +155,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.643-1
+- Update to 1.643
+
 * Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.641-6
 - Removing dependency on "perl-DB_File".
 - Removing unused macros.

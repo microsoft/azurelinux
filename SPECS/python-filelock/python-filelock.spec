@@ -2,13 +2,12 @@
 Summary:        A platform independent file lock
 Name:           python-%{srcname}
 Version:        3.0.12
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/benediktschmitt/py-filelock
-#Source0:       https://github.com/benediktschmitt/py-%{srcname}/archive/v%{version}/py-%{srcname}-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/benediktschmitt/py-%{srcname}/archive/v%{version}/py-%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -72,6 +71,9 @@ python%{python3_version} test.py
 %{_mandir}/man1/py-%{srcname}.1.gz
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.12-13
+- Updating source URL.
+
 * Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.0.12-12
 - Add python-devel
 

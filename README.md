@@ -16,8 +16,17 @@ Whether deployed as a container or a container host, CBL-Mariner consumes limite
 When security vulnerabilities arise, CBL-Mariner supports both a package-based update model and an image based update model.  Leveraging the common [RPM Package Manager](https://rpm.org/) system, CBL-Mariner makes the latest security patches and fixes available for download with the goal of fast turn-around times.   
 
 # Getting Started with CBL-Mariner: 
+Build
+Instructions for building CBL-Mariner may be found here: Toolkit Documentation.
 
-Instructions for building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md)
+ISO
+You can try CBL-Mariner with the following ISO Image: 
+- [Mariner 2.0 x86_64 ISO](https://aka.ms/mariner-2.0-x86_64-iso). 
+- [Mariner 1.0 x86_64 ISO](https://aka.ms/mariner-1.0-x86_64-iso).
+
+After downloading the ISO, use these instructions to install and use in a Hyper-V VM.
+
+Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking here or create a new feature request by clicking here. For additional information refer to the support.md file.
 
 # Trademarks
 

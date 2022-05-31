@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"strings"
 
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (
@@ -43,6 +43,9 @@ const (
 
 	// NoCompatibleArchError specifies the error message when processing a SPEC written for a different architecture.
 	NoCompatibleArchError = "error: No compatible architectures found for build"
+
+	// MarinerModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
+	MarinerModuleLdflagsDefine = "mariner_module_ldflags"
 )
 
 const (

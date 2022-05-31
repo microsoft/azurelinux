@@ -1,7 +1,7 @@
 Summary:        Command line tool for updating bootloader configs
 Name:           grubby
 Version:        8.40
-Release:        42%{?dist}
+Release:        43%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,6 @@ URL:            https://github.com/rhinstaller/grubby
 # we only pull git snaps at the moment
 # git clone git@github.com:rhinstaller/grubby.git
 # git archive --format=tar --prefix=grubby-%%{version}/ HEAD |bzip2 > grubby-%%{version}.tar.bz2
-# Source0: %%{name}-%%{version}.tar.bz2
 Source0:        https://github.com/rhboot/grubby/archive/%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        grubby-bls
 Source2:        grubby.in
@@ -118,6 +117,9 @@ current boot environment.
 %{_mandir}/man8/*.8*
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.40-43
+- Removing redundant "#Source0" comment.
+
 * Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 8.40-42
 - Add Fedora patch file (license: MIT) to fix linking with RPM >= 4.16.0
 - Remove git setup steps, apply patches using %%autosetup

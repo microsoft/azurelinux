@@ -1,17 +1,20 @@
+%define base_version %(echo %{version} | rev | cut -d'.' -f2- | rev)
+
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
-Version:        8.2108.0
-Release:        2%{?dist}
+Version:        8.2204.1
+Release:        1%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.rsyslog.com/
-Source0:        http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
+Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
-Source4:        http://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{version}.tar.gz
+# Upstream only publishes built docs for base_version.0
+Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -153,6 +156,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 8.2204.1-1
+- Update to v8.2204.1 to address CVE-2022-24903
+- Add more robust macro for Source4 url (prebuilt docs tar)
+
 * Thu Apr 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2108.0-2
 - Bring rsyslog.conf in line with other distros
 - add /var/log/messages for normal logs

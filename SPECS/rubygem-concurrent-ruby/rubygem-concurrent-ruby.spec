@@ -3,7 +3,7 @@
 Summary:        Modern concurrency tools for Ruby
 Name:           rubygem-concurrent-ruby
 Version:        1.1.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,15 +28,21 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+#add lib folder to buildroot from Source0
+cp -r lib/ %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
 %license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE.txt
+%{gem_instdir}/lib
 %{gemdir}
 
 %changelog
-* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-3
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-4
 - Cleanup
+
+* Tue May 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-3
+- Add lib/ from source
 
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-2
 - Add provides

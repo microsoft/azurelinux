@@ -1,15 +1,14 @@
 Summary:       A dictionary of English words for the /usr/share/dict directory
 Name:          words
 Version:       3.0
-Release:       37%{?dist}
+Release:       38%{?dist}
 License:       Public Domain
 # Note that Moby Project officially does not exist any more. The most complete
 # information about the project is in Wikipedia.
 URL:           https://en.wikipedia.org/wiki/Moby_Project
-# Source: http://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-Source0:       words-3.0.tar.Z
+Source0:       https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z#/%{name}-%{version}.tar.Z
 Source1:       LICENSE
 BuildArch:     noarch
 BuildRequires: dos2unix
@@ -55,6 +54,9 @@ ln -sf linux.words $RPM_BUILD_ROOT%{_datadir}/dict/words
 %{_datadir}/dict/words
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-38
+- Fixing source URL.
+
 * Tue Aug 25 2020 Nicolas Ontiveros <niontive@microsoft.com> - 3.0-37
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified.

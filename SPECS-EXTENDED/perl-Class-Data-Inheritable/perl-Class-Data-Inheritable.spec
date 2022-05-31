@@ -7,7 +7,7 @@
 
 Name:           perl-Class-Data-Inheritable
 Version:        0.08
-Release:        35%{?dist}
+Release:        36%{?dist}
 Summary:        Inheritable, overridable class data
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -16,7 +16,7 @@ URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
 # Source0:      https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-%%{version}.tar.gz
-Source0:        Class-Data-Inheritable-%{version}-clean.tar.gz
+Source0:        %{_mariner_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -66,6 +66,10 @@ make test
 %{_mandir}/man3/Class::Data::Inheritable.3pm*
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.08-36
+- Updated source URL.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-35
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

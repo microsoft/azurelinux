@@ -13,16 +13,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"microsoft.com/pkggen/imagegen/attendedinstaller"
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/imagegen/diskutils"
-	"microsoft.com/pkggen/internal/exe"
-	"microsoft.com/pkggen/internal/file"
-	"microsoft.com/pkggen/internal/jsonutils"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/shell"
 )
 
 var (

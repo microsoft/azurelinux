@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.7
+Version:        10.6.8
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -26,7 +26,7 @@ BuildRequires:  zlib-devel
 %if %{with_check}
 BuildRequires:  perl(Test::More)
 %endif
-
+Requires:       %{name}-connector-c
 Conflicts:      mysql
 
 %description
@@ -37,6 +37,7 @@ MariaDB turns data into structured information in a wide array of applications, 
 %package          server
 Summary:        MariaDB server
 Requires:       %{name}-errmsg = %{version}-%{release}
+Requires:       mariadb-connector-c-config
 
 %description      server
 The MariaDB server and related files
@@ -52,6 +53,7 @@ MariaDB Galera Cluster is a synchronous multi-master cluster for MariaDB. It is 
 %package          devel
 Summary:        Development headers for mariadb
 Requires:       %{name} = %{version}-%{release}
+Requires:       mariadb-connector-c-devel
 
 %description devel
 Development headers for developing applications linking to maridb
@@ -106,6 +108,20 @@ cd build
 make DESTDIR=%{buildroot} install
 mkdir -p %{buildroot}/%{_libdir}/systemd/system
 
+# Remove files that overlap with mariadb-connector-c packages
+rm %{buildroot}%{_bindir}/{mariadb_config,mariadb-config,mysql_config}
+rm %{buildroot}%{_sysconfdir}/my.cnf
+rm %{buildroot}%{_sysconfdir}/my.cnf.d/client.cnf
+rm %{buildroot}%{_libdir}/libmariadb.so.*
+rm %{buildroot}%{_libdir}/libmysqlclient.so
+rm %{buildroot}%{_libdir}/libmysqlclient_r.so
+rm %{buildroot}%{_libdir}/libmariadb.so
+rm %{buildroot}%{_libdir}/mysql/plugin/{auth_gssapi_client.so,caching_sha2_password.so,client_ed25519.so,dialog.so,mysql_clear_password.so,sha256_password.so}
+rm %{buildroot}%{_libdir}/pkgconfig/libmariadb.pc
+rm %{buildroot}%{_includedir}/mysql/{errmsg.h,ma_list.h,ma_pvio.h,ma_tls.h,mysql_version.h,mysqld_error.h,mariadb_com.h,mariadb_ctype.h,mariadb_dyncol.h,mariadb_rpl.h,mariadb_stmt.h,mariadb_version.h,mysql.h}
+rm %{buildroot}%{_includedir}/mysql/mariadb/ma_io.h
+rm %{buildroot}%{_includedir}/mysql/mysql/{client_plugin.h,plugin_auth.h,plugin_auth_common.h}
+
 mv  %{buildroot}%{_datadir}/systemd/mariadb.service %{buildroot}/%{_libdir}/systemd/system/mariadb.service
 mv  %{buildroot}%{_datadir}/systemd/mariadb@.service %{buildroot}/%{_libdir}/systemd/system/mariadb@.service
 mv  %{buildroot}%{_datadir}/systemd/mariadb-extra@.socket %{buildroot}/%{_libdir}/systemd/system/mariadb-extra@.socket
@@ -153,13 +169,9 @@ fi
 
 %files
 %defattr(-,root,root)
-%{_libdir}/libmysqlclient.so
-%{_libdir}/libmysqlclient_r.so
-%{_libdir}/libmariadb.so.*
 %{_libdir}/libmariadbd.so.*
 %{_bindir}/aria_s3_copy
 %{_bindir}/mariadb
-%{_bindir}/mariadb-config
 %{_bindir}/mariadb-access
 %{_bindir}/mariadb-admin
 %{_bindir}/mariadb-backup
@@ -204,10 +216,8 @@ fi
 %{_bindir}/mysqlimport
 %{_bindir}/mysqlshow
 %{_bindir}/mysqlslap
-%{_bindir}/mariadb_config
 %{_bindir}/mysql_client_test
 %{_bindir}/mysql_client_test_embedded
-%{_bindir}/mysql_config
 %{_bindir}/mysql_convert_table_format
 %{_bindir}/mysql_embedded
 %{_bindir}/mysql_fix_extensions
@@ -262,8 +272,6 @@ fi
 
 %files server
 %config(noreplace) %{_sysconfdir}/logrotate.d/mysql
-%config(noreplace) %{_sysconfdir}/my.cnf
-%config(noreplace) %{_sysconfdir}/my.cnf.d/client.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/enable_encryption.preset
 %config(noreplace) %{_sysconfdir}/my.cnf.d/mysql-clients.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/server.cnf
@@ -294,6 +302,7 @@ fi
 %{_bindir}/replace
 %{_bindir}/resolve_stack_dump
 %{_bindir}/resolveip
+%{_bindir}/wsrep_sst_backup
 %{_bindir}/wsrep_sst_common
 %{_bindir}/wsrep_sst_mariabackup
 %{_bindir}/wsrep_sst_mysqldump
@@ -413,13 +422,14 @@ fi
 %files devel
 %{_includedir}/mysql/*
 %{_datadir}/aclocal/mysql.m4
-%{_libdir}/libmariadb.so
 %{_libdir}/libmariadbd.so
 %{_libdir}/libmysqld.so
-%{_libdir}/pkgconfig/*mariadb.pc
+%{_libdir}/pkgconfig/mariadb.pc
 %{_mandir}/man3/*.3.gz
 
 %files errmsg
+%{_datadir}/mysql/bulgarian/errmsg.sys
+%{_datadir}/mysql/chinese/errmsg.sys
 %{_datadir}/mysql/czech/errmsg.sys
 %{_datadir}/mysql/danish/errmsg.sys
 %{_datadir}/mysql/dutch/errmsg.sys
@@ -447,6 +457,14 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Fri May 20 2022 Chris Co <chrco@microsoft.com> - 10.6.8-1
+- Upgrade to v10.6.8 to address CVE-2022-27448, CVE-2022-27449,
+  CVE-2022-27451, CVE-2022-27457, CVE-2022-27458
+- Add new files bulgarian errmsg.sys, chinese errmsg.sys, wsrep_sst_backup
+
+* Fri Apr 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 10.6.7-2
+- Fix conflicts with mariadb-connector-c
+
 * Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.6.7-1
 - Upgrading to v10.6.7.
 - Adding reference to new unpackaged man files.

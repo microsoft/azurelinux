@@ -6,10 +6,10 @@ package schedulerutils
 import (
 	"sync"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
-	"microsoft.com/pkggen/internal/logger"
-	"microsoft.com/pkggen/internal/pkggraph"
 )
 
 // CanSubGraph returns true if a node can be subgraphed without any unresolved dynamic dependencies.

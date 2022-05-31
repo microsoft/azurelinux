@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        1.5.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        AMQP 1.0 client library for Python
 
 License:        MIT
@@ -23,9 +23,8 @@ BuildRequires:  %{py3_dist setuptools}
 
 %if %{with_check}
 BuildRequires:  %{py3_dist certifi}
-BuildRequires:  %{py3_dist pytest}
 BuildRequires:  %{py3_dist pytest-asyncio}
-BuildRequires:  %{py3_dist six}
+BuildRequires:  python3-pip
 %endif
 
 %description
@@ -57,6 +56,7 @@ VERBOSE=1 %py3_build
 rm $RPM_BUILD_ROOT%{python3_sitearch}/%{srcname}/*.c
 
 %check
+pip3 install pytest six
 %pytest --disable-warnings -k "not test_error_loop_arg_async"
 
 %files -n python3-%{srcname}
@@ -67,6 +67,9 @@ rm $RPM_BUILD_ROOT%{python3_sitearch}/%{srcname}/*.c
 
 
 %changelog
+* Fri Apr 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.1-3
+- Drop BR on pytest, six & pip install deps to enable ptest
+
 * Wed Mar 23 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.1-2
 - Fix typo in BR for `%check` section
 

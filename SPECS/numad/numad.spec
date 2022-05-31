@@ -9,12 +9,12 @@ Name:           numad
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Versioning/#_snapshots
 # Using "+" instead of "^" because our version of RPM errors-out on the "^" symbol.
 Version:        0.5+%{git_short_commit_date}.%{git_short_commit}
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pagure.io/numad
-Source0:        %{name}-%{version}.tar.xz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.xz
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #   git clone -n https://pagure.io/numad.git numad-%%{version}
@@ -85,6 +85,9 @@ cp %{SOURCE1} .
 %systemd_postun numad.service
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5+20150602.aec1497e2b-33
+- Fixing source URL.
+
 * Tue Jul 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5+20150602.aec1497e2b-32
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Changed release to a simple integer.
