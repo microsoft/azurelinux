@@ -99,7 +99,7 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
 %changelog
 * Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 22.4.0-1
-- Upgrade to version 22.4.0
+- Upgrade to version 22.4.0 to fix CVE-2022-24801
 
 * Mon Mar 28 2022 Jon Slobodzian <joslobo@microsoft.com> - 22.2.0-1
 - Upgrade to version 22.2.0-1
