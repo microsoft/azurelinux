@@ -3,9 +3,9 @@
 
 Name:           perl-Test-NoWarnings
 Version:        1.04
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Make sure you didn't emit any warnings while testing
-License:        LGPLv2+
+License:        LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-NoWarnings
@@ -64,6 +64,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-23
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

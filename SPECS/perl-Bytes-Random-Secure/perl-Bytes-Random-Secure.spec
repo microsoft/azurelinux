@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           perl-Bytes-Random-Secure
 Version:        0.29
-Release:        20%{?dist}
+Release:        21%{?dist}
 Summary:        Perl extension to generate cryptographically-secure random bytes
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Bytes-Random-Secure
@@ -82,11 +82,16 @@ unset RELEASE_TESTING
 make test
 
 %files
+%license README
 %doc Changes README examples
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.29-21
+- Initial CBL-Mariner import from Fedora 34 (license: MIT).
+- License verified.
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.29-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 

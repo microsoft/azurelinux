@@ -1,7 +1,7 @@
 Name:           perl-Devel-StackTrace
 Summary:        Perl module implementing stack trace and stack trace frame objects
 Version:        2.04
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ data available from caller() as of Perl 5.6.0.
 %{_mandir}/man3/*
 
 %changelog
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - :-8
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.04-7
 - Remove epoch
 

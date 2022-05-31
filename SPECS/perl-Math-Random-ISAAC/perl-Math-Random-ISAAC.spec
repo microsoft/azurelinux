@@ -2,9 +2,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Math-Random-ISAAC
 Version:        1.004
-Release:        33%{?dist}
+Release:        34%{?dist}
 Summary:        Perl interface to the ISAAC PRNG algorithm
-License:        MIT or GPL+ or Artistic
+License:        Public Domain or MIT or GPL+ or Artistic
 
 URL:            https://metacpan.org/release/Math-Random-ISAAC
 Source0:        https://cpan.metacpan.org/authors/id/J/JA/JAWNSY/Math-Random-ISAAC-%{version}.tar.gz
@@ -44,13 +44,16 @@ find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
 make test
 
 %files
-%doc Changes examples README
-%{!?_licensedir:%global license %%doc}
 %license LICENSE
+%doc Changes examples README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.004-34
+- Initial CBL-Mariner import from Fedora 34 (license: MIT).
+- License verified.
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.004-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
