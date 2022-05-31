@@ -34,7 +34,6 @@ Patch1:         gd-fontpath.patch
 Patch2:         gd-format.patch
 # could be upstreamed
 Patch3:         gd-aliasing.patch
-Patch4:         CVE-2021-40145.patch
 BuildRequires:  fontconfig-devel
 # needed for tests
 BuildRequires:  libjpeg-devel
@@ -84,7 +83,6 @@ the formats accepted for inline images by most browsers.
 %patch1
 %patch2
 %patch3
-%patch4 -p1
 chmod 644 COPYING
 
 %build
