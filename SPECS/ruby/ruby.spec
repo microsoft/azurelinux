@@ -396,7 +396,7 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-3
+* Tue May 31 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-3
 - Remove bundled gems from ruby.
 - Add provides for all default gems.
 

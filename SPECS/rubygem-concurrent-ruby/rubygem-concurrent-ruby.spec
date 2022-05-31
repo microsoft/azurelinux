@@ -38,7 +38,7 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-4
+* Tue May 31 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-4
 - Cleanup
 
 * Tue May 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-3

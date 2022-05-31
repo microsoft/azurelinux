@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/minitest
-Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz/%{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Source1:        minitest.gemspec
 BuildRequires:  git
 BuildRequires:  ruby
