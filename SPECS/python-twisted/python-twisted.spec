@@ -1,14 +1,14 @@
 %global debug_package %{nil}
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
-Version:        22.2.0
+Version:        22.4.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://twistedmatrix.com
-Source0:        https://github.com/twisted/twisted/archive/refs/tags/twisted-%{version}.tar.gz
+Source0:        https://github.com/twisted/twisted/archive/twisted-%{version}.tar.gz
 # Disabling UDP multicast test, which failes in container environments.
 # For more details, see: https://twistedmatrix.com/trac/ticket/7494
 Patch0:         disable_multicast_test.patch
@@ -98,6 +98,9 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_bindir}/cftp3
 
 %changelog
+* Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 22.4.0-1
+- Upgrade to version 22.4.0
+
 * Mon Mar 28 2022 Jon Slobodzian <joslobo@microsoft.com> - 22.2.0-1
 - Upgrade to version 22.2.0-1
 
