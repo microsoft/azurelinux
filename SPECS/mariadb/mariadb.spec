@@ -255,6 +255,7 @@ rm -rf %{buildroot}
 %{_bindir}/replace
 %{_bindir}/resolve_stack_dump
 %{_bindir}/resolveip
+%{_bindir}/wsrep_sst_backup
 %{_bindir}/wsrep_sst_common
 %{_bindir}/wsrep_sst_mariabackup
 %{_bindir}/wsrep_sst_mysqldump
