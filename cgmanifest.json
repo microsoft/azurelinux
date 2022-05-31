@@ -25916,6 +25916,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "usrsctp",
+          "version": "0.9.5.0",
+          "downloadUrl": "https://github.com/sctplab/usrsctp/archive/refs/tags/0.9.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ustr",
           "version": "1.0.4",
           "downloadUrl": "http://www.and.org/ustr/1.0.4/ustr-1.0.4.tar.bz2"
