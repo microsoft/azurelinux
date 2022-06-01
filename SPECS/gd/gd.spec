@@ -26,7 +26,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libgd.github.io/
-Source:         https://github.com/libgd/libgd/archive/refs/tags/%{name}-%{version}.tar.gz
+Source:         https://github.com/libgd/libgd/releases/download/gd-%{version}/%{prjname}-%{version}.tar.xz
 Source1:        baselibs.conf
 # might be upstreamed, but could be suse specific also (/usr/share/fonts/Type1 font dir)
 Patch1:         gd-fontpath.patch
