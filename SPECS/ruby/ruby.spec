@@ -77,13 +77,13 @@
 
 Summary:        Ruby
 Name:           ruby
+# TODO: When changing ruby version, these gemified stdlib
+# provides should be versioned according to the ruby version.
+# More info: https://stdgems.org/
 Version:        3.1.2
 Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
-# TODO: When changing ruby version, these gemified stdlib
-# provides should be versioned according to the ruby version.
-# More info: https://stdgems.org/
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/

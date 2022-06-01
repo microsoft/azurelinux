@@ -9,7 +9,6 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://test-unit.github.io/
 Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         remove-missing-devdeps.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-power_assert

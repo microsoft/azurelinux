@@ -9,7 +9,6 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         remove-missing-devdeps.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(power_assert) = %{version}-%{release}
