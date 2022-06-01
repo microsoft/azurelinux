@@ -10,6 +10,8 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
+Provides:       vi = %{version}-%{release}
+Provides:       %{name}-minimal = %{version}-%{release}
 
 %description
 The Vim package contains a powerful text editor.
