@@ -170,30 +170,12 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_libdir}/pkcs11/onepin-opensc-pkcs11.so
 %{_libdir}/pkcs11/pkcs11-spy.so
 %{_datadir}/opensc/
-%{_mandir}/man1/cardos-tool.1*
-%{_mandir}/man1/cryptoflex-tool.1*
-%{_mandir}/man1/eidenv.1*
-%{_mandir}/man1/gids-tool.1*
-%{_mandir}/man1/iasecc-tool.1*
-%{_mandir}/man1/netkey-tool.1*
-%{_mandir}/man1/openpgp-tool.1*
-%{_mandir}/man1/opensc-explorer.*
-%{_mandir}/man1/opensc-tool.1*
-%{_mandir}/man1/opensc-asn1.1*
-%{_mandir}/man1/piv-tool.1*
-%{_mandir}/man1/pkcs11-tool.1*
-%{_mandir}/man1/pkcs15-crypt.1*
-%{_mandir}/man1/pkcs15-init.1*
-%{_mandir}/man1/pkcs15-tool.1*
-%{_mandir}/man1/sc-hsm-tool.1*
-%{_mandir}/man1/westcos-tool.1*
-%{_mandir}/man1/dnie-tool.1*
-%{_mandir}/man1/egk-tool.1*
-%{_mandir}/man5/pkcs15-profile.5*
+%{_mandir}/man1/*
+%{_mandir}/man5/*
 
 %changelog
 * Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.22.0-1
-- Upgrade to 0.22.0.
+- Upgrade to 0.22.0 to fix CVE-2020-26570, CVE-2020-26571, CVE-2020-26572, CVE-2021-42778, CVE-2021-42779, CVE-2021-42780, CVE-2021-42781, CVE-2021-42782
 
 * Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.20.0-9
 - License verified.
