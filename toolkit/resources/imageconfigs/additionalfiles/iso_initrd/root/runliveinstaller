@@ -42,17 +42,11 @@ if grep -qs $ISO_ROOT /proc/mounts; then
     echo ISO root already mounted
 # Read from /proc/cmdline to get image configs from PXE server
 elif grep -q "image-config" $CMDLINE; then
-    for argument in $(cat "$CMDLINE")
-    do
-        IFS='=' read -r FLAG VALUE <<< $argument
-        if [ "${FLAG}" == "--image-config" ]; then
-            SERVER_CONFIG_PATH=$VALUE
-            IFS='/' read -ra CUT_DIRS <<< $VALUE
-            wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-4)) --directory-prefix="$ISO_ROOT" --reject="index.html*" "$SERVER_CONFIG_PATH"/
-            # Enable all scripts under config directory to be executable
-            find "$CONFIG_ROOT"/ -type f -iname "*.sh" -exec chmod a+x {} \;
-        fi
-    done
+    IMAGE_CONFIG_VALUE=$(grep -oP "(?<=--image-config=)\S+" "$CMDLINE")
+    IFS='/' read -ra CUT_DIRS <<< $IMAGE_CONFIG_VALUE
+    wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-4)) --directory-prefix="$ISO_ROOT" --reject="index.html*" "$IMAGE_CONFIG_VALUE"/
+    # Enable all scripts under config directory to be executable
+    find "$CONFIG_ROOT"/ -type f -iname "*.sh" -exec chmod a+x {} \;
 else
     echo Attempt to mount the ISO root
     # It is possible that the partition isn't ready to be mounted when this script
