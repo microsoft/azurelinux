@@ -1,14 +1,13 @@
 Summary:        Netwide Assembler.
 Name:           nasm
 Version:        2.15.05
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.nasm.us
 Source0:        http://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
-ExclusiveArch:  x86_64
 
 %description
 NASM (Netwide Assembler) is an 80x86 assembler designed for portability and modularity. It includes a disassembler as well.
@@ -33,6 +32,9 @@ make %{?_smp_mflags} -k test
 %{_datadir}/*
 
 %changelog
+* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.15.05-2
+- Enabling package for ARM64 architectures.
+
 * Thu Jan 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.15.05-1
 - Upgrading to 2.15.05.
 - License verified.
