@@ -14,9 +14,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libguestfs.org/
 Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
-# Patches - all upstream since 1.3.18.
-Patch0001:      0001-Win-Hivex-Regedit-Accept-CRLF-line-endings.patch
-Patch0002:      0002-Win-Hivex-Regedit-Ignore-comments.patch
 
 BuildRequires:  %{_bindir}/pod2html
 BuildRequires:  %{_bindir}/pod2man
