@@ -8,7 +8,7 @@
 Summary:        Trace memory leaks
 Name:           perl-Test-LeakTrace
 Version:        0.16
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -119,6 +119,9 @@ make test
 %{_mandir}/man3/Test::LeakTrace::Script.3*
 
 %changelog
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-18
+- Linted spec.
+
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-17
 - License verified.
 
