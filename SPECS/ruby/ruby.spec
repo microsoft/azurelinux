@@ -1,6 +1,6 @@
 Summary:        Ruby
 Name:           ruby
-Version:        2.6.9
+Version:        2.6.10
 Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ sudo -u test make test TESTS="-v"
 %{_mandir}/man5/*
 
 %changelog
+* Tue May 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.6.10-1
+- Upgrade to 2.6.10 to fix CVE-2022-28739
+
 * Tue Mar 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.6.9-1
 - Upgrade to 2.6.9 to fix CVE-2021-41817, CVE-2021-41819
 
