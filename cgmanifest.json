@@ -14213,6 +14213,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Bytes-Random-Secure",
+          "version": "0.29",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Bytes/Bytes-Random-Secure-0.29.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Canary-Stability",
           "version": "2013",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-2013.tar.gz"
@@ -14726,6 +14736,16 @@
           "name": "perl-Crypt-PasswdMD5",
           "version": "1.4.0",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PasswdMD5-1.40.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Crypt-Random-Seed",
+          "version": "0.03",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-Random-Seed-0.03.tar.gz"
         }
       }
     },
@@ -16316,6 +16336,16 @@
           "name": "perl-Math-Int64",
           "version": "0.54",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-0.54.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Math-Random-ISAAC",
+          "version": "1.004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JA/JAWNSY/Math-Random-ISAAC-1.004.tar.gz"
         }
       }
     },
