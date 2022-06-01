@@ -8706,7 +8706,7 @@ CONFIG_IMA_QUEUE_EARLY_BOOT_KEYS=y
 # CONFIG_DEFAULT_SECURITY_SELINUX is not set
 CONFIG_DEFAULT_SECURITY_APPARMOR=y
 # CONFIG_DEFAULT_SECURITY_DAC is not set
-CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tomoyo"
+CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,tomoyo"
 
 #
 # Kernel hardening options
