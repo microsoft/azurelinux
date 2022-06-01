@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.4925
+Version:        8.2.4979
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -10,8 +10,6 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
-Provides:       vi = %{version}-%{release}
-Provides:       %{name}-minimal = %{version}-%{release}
 
 %description
 The Vim package contains a powerful text editor.
@@ -193,17 +191,32 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-* Fri May 20 2022 Chris Co <chrco@microsoft.com> - 8.2.4925-1
-- Update version to 8.2.4925 to address CVE-2022-1381, CVE-2022-1420,
-  CVE-2022-1616, CVE-2022-1619, CVE-2022-1620, CVE-2022-1621, CVE-2022-1629
-- Add new file vimhelp.vim
+* Fri May 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4979-1
+- Update version to 8.2.4979 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629, 
+  CVE-2022-1616, CVE-2022-1733, CVE-2022-1735, CVE-2022-1769, CVE-2022-1620, 
+  CVE-2022-1674, CVE-2022-1771, CVE-2022-1785, CVE-2022-1796.
 
-* Fri Apr 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.2.4743-2
-- Fix invalid vi provide with reversed %%{release}-%%{version} EVR
+* Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4774-1
+- Update version to 8.2.4774 to fix CVE-2022-1420.
 
-* Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 8.2.4743-1
-- Update version to 8.2.4743 to fix CVE-2022-0408,CVE-2022-0413,CVE-2022-0417,CVE-2022-0443,
-- CVE-2022-0554,CVE-2022-0572,CVE-2022-0629,CVE-2022-0685,CVE-2022-0729,CVE-2022-1160
+* Wed Apr 27 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4763-1
+- Update version to 8.2.4763 to fix CVE-2022-1381.
+
+* Thu Apr 07 2022 Nick Samson <nisamson@microsoft.com> - 8.2.4710-1
+- Update to 8.2.4710 to fix CVE-2022-1154
+
+* Thu Mar 24 2022 Andrew Phelps <anphel@microsoft.com> - 8.2.4563-1
+- Update version to 8.2.4563 to fix CVE-2022-0943
+
+* Wed Mar 02 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 8.2.4495-1
+- Update version to 8.2.4495 to fix CVE-2022-0729
+
+* Mon Feb 21 2022 Thomas Crain <thcrain@microsoft.com> - 8.2.4432-1
+- Update version to 8.2.4432 to fix CVE-2022-0554
+
+* Mon Feb 07 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4281-1
+- Update version to 8.2.4281 to fix CVE-2022-0443, CVE-2022-0417, CVE-2022-0413, 
+  CVE-2022-0408, CVE-2022-0407.
 
 * Thu Feb 03 2022 Chris Co <chrco@microsoft.com> - 8.2.4233-1
 - Update version to 8.2.4233 to fix CVE-2022-0392,CVE-2022-0393,CVE-2022-0359,CVE-2022-0361,CVE-2022-0368
