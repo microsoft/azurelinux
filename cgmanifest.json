@@ -23164,9 +23164,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-elastic-transport",
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/elastic/elastic-transport-ruby/archive/refs/tags/v8.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-elasticsearch",
-          "version": "7.6.0",
-          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-7.6.0.gem"
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.0.1.tar.gz"
         }
       }
     },
@@ -23175,18 +23185,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elasticsearch-api",
-          "version": "7.6.0",
-          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-api-7.6.0.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-elasticsearch-transport",
-          "version": "7.6.0",
-          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-transport-7.6.0.gem"
+          "version": "8.2.0",
+          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.2.0.tar.gz"
         }
       }
     },
@@ -23265,8 +23265,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-fluent-plugin-elasticsearch",
-          "version": "4.0.7",
-          "downloadUrl": "https://rubygems.org/downloads/fluent-plugin-elasticsearch-4.0.7.gem"
+          "version": "5.2.2",
+          "downloadUrl": "https://github.com/uken/fluent-plugin-elasticsearch/archive/refs/tags/v5.2.2.tar.gz"
         }
       }
     },
