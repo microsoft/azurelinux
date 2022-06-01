@@ -44,7 +44,7 @@ if grep -qs $ISO_ROOT /proc/mounts; then
 elif grep -q "image-config" $CMDLINE; then
     IMAGE_CONFIG_VALUE=$(grep -oP "(?<=--image-config=)\S+" "$CMDLINE")
     IFS='/' read -ra CUT_DIRS <<< $IMAGE_CONFIG_VALUE
-    wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-4)) --directory-prefix="$ISO_ROOT" --reject="index.html*" "$IMAGE_CONFIG_VALUE"/
+    wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-3)) --directory-prefix="$CONFIG_ROOT" --reject="index.html*" "$IMAGE_CONFIG_VALUE"/
     # Enable all scripts under config directory to be executable
     find "$CONFIG_ROOT"/ -type f -iname "*.sh" -exec chmod a+x {} \;
 else
