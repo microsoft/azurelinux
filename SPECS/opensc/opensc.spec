@@ -8,7 +8,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/OpenSC/OpenSC
-Source0:        https://github.com/OpenSC/OpenSC/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
 
 Patch1:         opensc-0.19.0-pinpad.patch
