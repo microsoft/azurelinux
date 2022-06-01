@@ -13455,7 +13455,7 @@
         "other": {
           "name": "opensc",
           "version": "0.22.0",
-          "downloadUrl": "https://github.com/OpenSC/OpenSC/archive/0.22.0.tar.gz"
+          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.22.0/opensc-0.22.0.tar.gz"
         }
       }
     },
