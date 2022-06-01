@@ -14,7 +14,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/refpolicy
-Source0:        %{url}/releases/download/RELEASE_${refpolicy_major}_%{refpolicy_minor}/refpolicy-%{version}.tar.bz2
+Source0:        %{url}/releases/download/RELEASE_%{refpolicy_major}_%{refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Source3:        modules_targeted.conf
