@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -332,21 +332,21 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Mon May 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-6
+* Mon May 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-7
 - Fix previous multipath LVM changes.
 - Add types for devices.
 - Cherry pick upstream commit for container fds.
 - Allow container engines to connect to http cache ports.
 - Allow container engines to stat() generic (device_t) devices.
 
-* Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-5
+* Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-6
 - Additional compatibility for Fedora container-selinux.
 - Remove unneeded systemd_run_t domain
 - Updates for multipath LVM
 - Fix for console logins
 - New type for SAS management devices
 
-* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-4
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-5
 - Fixing source URL.
 
 * Wed Mar 30 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-4
