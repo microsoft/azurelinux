@@ -21,7 +21,7 @@ trap clean_up EXIT SIGINT SIGTERM
 
 echo "Will download to '$TEMP_DIR':"
 
-OUTPUT_DIR="$HOME/Mariner_downloaded_sources"
+OUTPUT_DIR="$(pwd)/downloaded_sources"
 
 for spec in "${@:2}"
 do

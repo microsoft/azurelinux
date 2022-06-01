@@ -382,3 +382,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Output from the "download_spec_sources.sh" script
+downloaded_sources/
