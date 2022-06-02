@@ -9,18 +9,13 @@ Group:          System Environment/Base
 URL:            https://github.com/dynup/kpatch
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-Requires:       binutils
-Requires:       dnf-utils
-Requires:       gcc
-Requires:       glibc-devel
-Requires:       elfutils
-Requires:       elfutils-devel
-Requires:       kernel-debuginfo
-Requires:       kernel-headers
-Requires:       numactl-devel
-Requires:       openssl
-# Requires:       pesign
-Requires:       wget
+BuildRequires:  binutils
+BuildRequires:  dnf-utils
+BuildRequires:  elfutils
+BuildRequires:  elfutils-devel
+BuildRequires:  gcc
+BuildRequires:  glibc-devel
+BuildRequires:  kernel-headers
 
 %description
 Kpatch is a Linux dynamic kernel patching infrastructure which allows you to patch
@@ -33,6 +28,11 @@ It gives more control over uptime without sacrificing security or stability.
 %package devel
 Summary:        Tools for building livepatches with kpatch.
 Group:          Development/Tools
+
+Requires:       kernel-debuginfo
+Requires:       numactl-devel
+Requires:       openssl
+Requires:       wget
 
 %description devel
 %{summary}
@@ -47,7 +47,7 @@ Group:          Development/Tools
 %make_install PREFIX=%{_prefix}
 
 # We don't need to install manuals.
-rm -rf %{buildroot}/usr/share/man
+rm -rf %{buildroot}%{_mandir}
 
 %post
 %systemd_post kpatch.service
@@ -56,17 +56,17 @@ rm -rf %{buildroot}/usr/share/man
 %systemd_preun kpatch.service
 
 %files
-%license COPYING
 %defattr(-,root,root)
-%config(noreplace) /etc/init/kpatch.conf
-/usr/sbin/kpatch
-/usr/lib/systemd/system/kpatch.service
+%license COPYING
+%config(noreplace) %{_sysconfdir}/init/kpatch.conf
+%{_sbindir}/kpatch
+%{_libdir}/systemd/system/kpatch.service
 
 %files devel
 %license COPYING
-/usr/libexec/kpatch/*
-/usr/share/kpatch/patch/*
-/usr/bin/kpatch-build
+%{_libexecdir}/kpatch/*
+%{_datadir}/kpatch/patch/*
+%{_bindir}/kpatch-build
 
 %changelog
 * Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-1
