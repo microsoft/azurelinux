@@ -496,7 +496,7 @@ done
 
 %if 0%{?py_byte_compile:1}
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Python_Appendix/#manual-bytecompilation
-%{py_byte_compile} %{python3} %{buildroot}%{_datadir}/edk2/Python
+%py_byte_compile %{python3} %{buildroot}%{_datadir}/edk2/Python
 %endif
 
 
