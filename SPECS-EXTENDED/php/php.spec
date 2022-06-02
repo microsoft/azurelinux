@@ -59,7 +59,7 @@ Distribution:   Mariner
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
 Version: %{upver}%{?rcver:~%{rcver}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -95,6 +95,8 @@ Patch1: php-7.4.0-httpd.patch
 Patch5: php-7.2.0-includedir.patch
 Patch6: php-7.4.0-embed.patch
 Patch8: php-7.2.0-libdb.patch
+# Backported from https://github.com/php/php-src/commit/b3646440b1808abf0874b6f89027ce53ec5da03f
+Patch9: php-7.4.14-gd.patch
 
 # Functional changes
 Patch42: php-7.3.3-systzdata-v18.patch
@@ -705,6 +707,7 @@ in pure PHP.
 %patch5 -p1 -b .includedir
 %patch6 -p1 -b .embed
 %patch8 -p1 -b .libdb
+%patch9 -p1
 
 %patch42 -p1 -b .systzdata
 %patch43 -p1 -b .headers
@@ -1514,6 +1517,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 
 %changelog
+* Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.4.14-3
+- Adding a patch to work with "gd" 2.3.3+.
+
 * Thu Feb 11 2021 Henry Li <lihl@microsoft.com> - 7.4.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Change /usr/bin/ps to /bin/ps 
