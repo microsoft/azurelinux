@@ -646,7 +646,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
 * Mon Jul 15 2019 Cole Robinson <aintdiscole@gmail.com> - 20190501stable-2
-- License is now BSD
+- License is now BSD-2-Clause-Patent
 - Re-enable secureboot enrollment
 - Use qemu-ovmf-secureboot from git
 
