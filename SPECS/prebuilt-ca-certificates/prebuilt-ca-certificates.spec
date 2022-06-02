@@ -2,7 +2,7 @@
 Summary:        Prebuilt version of ca-certificates package.
 Name:           prebuilt-ca-certificates
 Version:        20200720
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,9 @@ URL:            https://hg.mozilla.org
 BuildArch:      noarch
 
 BuildRequires:  ca-certificates = %{version}-%{release}
+
+Provides:       %{name}-microsoft = %{version}-%{release}
+Provides:       %{name}-mozilla = %{version}-%{release}
 
 Conflicts:      prebuilt-ca-certificates-base
 
@@ -44,6 +47,9 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-24
+- Add provides for '%%{name}-microsoft' and '%%{name}-mozilla' for consistency with 'ca-certificates'.
+
 * Sun May 15 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-23
 - Making 'Release' match with 'ca-certificates'.
 
