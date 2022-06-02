@@ -1648,6 +1648,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %changelog
 * Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.4.14-3
 - Adding a patch to work with "gd" 2.3.3+.
+- License verified.
 
 * Thu Feb 11 2021 Henry Li <lihl@microsoft.com> - 7.4.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
