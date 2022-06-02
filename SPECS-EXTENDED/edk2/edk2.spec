@@ -57,8 +57,11 @@ Version:        %{edk2_stable_date}01stable
 Release:        3%{?dist}
 Summary:        EFI Development Kit II
 
-License:        BSD-2-Clause-Patent
+License:        BSD
 URL:            https://github.com/tianocore/tianocore.github.io/wiki/EDK-II/
+# Needed due to a dependency on "nasm", which doesn't officially support the ARM64 architecture.
+# See here: https://github.com/netwide-assembler/nasm/pull/3
+ExclusiveArch:  x86_64
 
 Source0:        https://github.com/tianocore/edk2/archive/%{edk2_stable_str}.tar.gz#/%{edk2_stable_str}.tar.gz
 Source1:        openssl-%{openssl_version}-hobbled.tar.xz
@@ -500,8 +503,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 
 %files tools
-%license License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl License.txt
 %{_bindir}/DevicePath
 %{_bindir}/EfiRom
 %{_bindir}/GenCrc32
@@ -544,8 +546,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 %if 0%{?build_ovmf_x64:1}
 %files ovmf
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl OvmfPkg/License.txt
 %doc OvmfPkg/README
 %doc ovmf-whitepaper-c770f8c.txt
 %dir /usr/share/%{name}
@@ -560,8 +561,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 %if 0%{?build_ovmf_ia32:1}
 %files ovmf-ia32
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl OvmfPkg/License.txt
 %doc OvmfPkg/README
 %doc ovmf-whitepaper-c770f8c.txt
 %dir /usr/share/%{name}
@@ -575,8 +575,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 %if 0%{?build_aavmf_aarch64:1}
 %files aarch64
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl OvmfPkg/License.txt
 %dir /usr/share/%{name}
 %dir /usr/share/%{name}/aarch64
 %dir /usr/share/qemu/firmware
@@ -588,8 +587,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 %if 0%{?build_aavmf_arm:1}
 %files arm
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl OvmfPkg/License.txt
 %dir /usr/share/%{name}
 %dir /usr/share/%{name}/arm
 %dir /usr/share/qemu/firmware
