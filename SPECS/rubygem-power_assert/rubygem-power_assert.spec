@@ -2,7 +2,7 @@
 Summary:        Power Assert for Ruby
 Name:           rubygem-%{gem_name}
 Version:        2.0.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,9 +38,6 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-3
-- Adding patch to remove missing development_dependencies from .gemspec
-
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-2
 - Add provides
 

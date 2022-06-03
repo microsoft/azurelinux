@@ -2,7 +2,7 @@
 Summary:        An xUnit family unit testing framework for Ruby
 Name:           rubygem-%{gem_name}
 Version:        3.5.3
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        PSF AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,9 +42,6 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-3
-- Adding patch to remove missing development_dependencies from .gemspec
-
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-2
 - Add provides
 
