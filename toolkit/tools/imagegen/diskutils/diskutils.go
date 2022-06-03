@@ -52,7 +52,6 @@ const (
 // Unit to byte conversion values
 // See https://www.gnu.org/software/parted/manual/parted.html#unit
 const (
-	s  = 512
 	B  = 1
 	KB = 1000
 	MB = 1000 * 1000
@@ -69,7 +68,6 @@ var (
 	sizeAndUnitRegexp = regexp.MustCompile(`(\d+)((Ki?|Mi?|Gi?|Ti?)?B)`)
 
 	unitToBytes = map[string]uint64{
-		"s":   s,
 		"B":   B,
 		"KB":  KB,
 		"MB":  MB,
@@ -343,7 +341,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		partitionNumber := idx + 1
 		partType := "primary"
 
-		// MBR only allows up to four primary partitions, thus check here whether 
+		// MBR only allows up to four primary partitions, thus check here whether
 		// we need to create extended partition or not in case more than four partitions are specified
 		if partitionNumber >= 4 && len(disk.Partitions) > 4 && partitionTableType == configuration.PartitionTableTypeMbr {
 			if partitionNumber == 4 {
@@ -354,12 +352,12 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 				extendedPartition.ID = "extended"
 				extendedPartition.Start = partition.Start
 				extendedPartition.End = disk.Partitions[len(disk.Partitions)-1].End
-		
+
 				partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), extendedPartition, partType)
 				if err != nil {
 					logger.Log.Warnf("Failed to create extended partition")
 					return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-				}	
+				}
 				partIDToFsTypeMap[extendedPartition.ID] = ""
 				partDevPathMap[extendedPartition.ID] = partDevPath
 			}
@@ -409,7 +407,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		fillToEndOption  = "100%"
 		sFmt             = "%ds"
 		timeoutInSeconds = "5"
-		MiBtoBytes		 = 1048576
+		MiBtoBytes       = 1048576
 	)
 
 	sectorSize, err := getSectorSize(diskDevPath)
@@ -418,13 +416,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	start := partition.Start * MiBtoBytes / sectorSize
-	end := partition.End * MiBtoBytes / sectorSize - 1
+	end := partition.End*MiBtoBytes/sectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
 
 	if partType == "logical" {
-		start = partition.Start * MiBtoBytes / sectorSize + 1
+		start = partition.Start*MiBtoBytes/sectorSize + 1
 	}
 
 	// Check wehther the start sector is 4K-aligned
@@ -464,7 +462,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
 		return "", err
 	}
-	logger.Log.Debugf("Partprobe -s returned: %s", stdout)	
+	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 }
 
@@ -739,10 +737,10 @@ func getSectorSize(diskDevPath string) (sectorSize uint64, err error) {
 func alignSectorAddress(sectorAddr uint64) (alignedSector uint64) {
 	const defaultBlockSize = 4096
 
-	if sectorAddr % defaultBlockSize == 0 || sectorAddr == (defaultBlockSize/2) {
+	if sectorAddr%defaultBlockSize == 0 || sectorAddr == (defaultBlockSize/2) {
 		alignedSector = sectorAddr
 	} else {
-		alignedSector = (sectorAddr / defaultBlockSize + 1) * defaultBlockSize
+		alignedSector = (sectorAddr/defaultBlockSize + 1) * defaultBlockSize
 	}
 
 	return
