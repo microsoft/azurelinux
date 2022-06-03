@@ -18,7 +18,7 @@ var (
 	ValidPartitionCommand2 = "part biosboot --fstype=biosboot --size=8 --ondisk=/dev/sda"
 
 	validTestParserDisk_OnePartition = Disk{
-		PartitionTableType: "gpt",
+		PartitionTableType: "mbr",
 		TargetDisk: TargetDisk{
 			Type:  "path",
 			Value: "/dev/sda",
@@ -34,7 +34,7 @@ var (
 	}
 
 	validTestParserDisk_TwoPartitions = Disk{
-		PartitionTableType: "gpt",
+		PartitionTableType: "mbr",
 		TargetDisk: TargetDisk{
 			Type:  "path",
 			Value: "/dev/sda",

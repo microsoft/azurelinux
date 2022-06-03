@@ -89,7 +89,17 @@ func processDisk(inputDiskValue string) (err error) {
 			disks = append(disks, Disk{})
 		}
 
-		disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+		// Read from /proc/cmdline to determine if the user is intending for a GPT partition
+		partitionTableType, err := GetKernelCmdLineValue("--gpt", 6)
+		if err != nil {
+			return err
+		}
+
+		if strings.TrimSpace(partitionTableType) != "" {
+			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+		} else {
+			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeMbr
+		}
 
 		// Set TargetDisk and TargetDiskType for unattended installation
 		disks[latestDiskIndex].TargetDisk.Type = "path"
@@ -156,8 +166,6 @@ func processMountPoint(inputMountPoint string) (err error) {
 		newDiskPartition.Flags = append(newDiskPartition.Flags, PartitionFlagBiosGrub)
 		newDiskPartitionSetting.MountPoint = ""
 		newDiskPartitionSetting.ID = bootPartitionId
-		logger.Log.Infof("Print disk length: %d", len(disks))
-		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
 	} else if mountPoint == "/" {
 		newDiskPartitionSetting.ID = rootfsPartitionId
 		newDiskPartition.ID = rootfsPartitionId
