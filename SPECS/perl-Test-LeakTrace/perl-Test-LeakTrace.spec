@@ -5,56 +5,61 @@
 %global with_valgrind 1
 %endif
 
-Name:		perl-Test-LeakTrace
-Summary:	Trace memory leaks
-Version:	0.16
-Release:	17%{?dist}
-License:	GPL+ or Artistic
+Summary:        Trace memory leaks
+Name:           perl-Test-LeakTrace
+Version:        0.16
+Release:        18%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		https://metacpan.org/release/Test-LeakTrace
-Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-LeakTrace-%{version}.tar.gz#/perl-Test-LeakTrace-%{version}.tar.gz
-Source1:	LICENSE.PTR
+URL:            https://metacpan.org/release/Test-LeakTrace
+Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-LeakTrace-%{version}.tar.gz#/perl-Test-LeakTrace-%{version}.tar.gz
+Source1:        LICENSE.PTR
+
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	gcc
-BuildRequires:	make
-BuildRequires:	perl-devel
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(FindBin)
-BuildRequires:	perl(ExtUtils::MakeMaker)
-BuildRequires:	perl(inc::Module::Install)
-BuildRequires:	perl(Module::CoreList)
-BuildRequires:	perl(Module::Install::AuthorTests)
-BuildRequires:	perl(Module::Install::Repository)
-BuildRequires:	sed
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  sed
+BuildRequires:  perl(Class::Struct)
+BuildRequires:  perl(Data::Dumper)
+
 # Module Runtime
-BuildRequires:	perl(Exporter) >= 5.57
-BuildRequires:	perl(strict)
-BuildRequires:	perl(Test::Builder::Module)
-BuildRequires:	perl(warnings)
-BuildRequires:	perl(XSLoader)
+BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::CoreList)
+BuildRequires:  perl(Module::Install::AuthorTests)
+BuildRequires:  perl(Module::Install::Repository)
+BuildRequires:  perl(Test::Builder::Module)
+BuildRequires:  perl(Test::More) >= 0.62
+BuildRequires:  perl(XSLoader)
+
 # Test Suite
-BuildRequires:	perl(autouse)
-BuildRequires:	perl(Class::Struct)
-BuildRequires:	perl(constant)
-BuildRequires:	perl(Data::Dumper)
-BuildRequires:	perl(Test::More) >= 0.62
-BuildRequires:	perl(threads)
+BuildRequires:  perl(autouse)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(threads)
+BuildRequires:  perl(warnings)
+
 # Extra Tests
 %if !%{defined perl_bootstrap}
-BuildRequires:	perl(Test::Pod) >= 1.14
-BuildRequires:	perl(Test::Pod::Coverage) >= 1.04
-BuildRequires:	perl(Test::Spellunker)
-BuildRequires:	perl(Test::Synopsis)
+BuildRequires:  perl(Test::Pod) >= 1.14
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
+BuildRequires:  perl(Test::Spellunker)
+BuildRequires:  perl(Test::Synopsis)
 %if 0%{?with_valgrind}
-BuildRequires:	perl(Test::Valgrind)
+BuildRequires:  perl(Test::Valgrind)
 %endif
 %endif
+
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 # Don't provide private perl libs
 %{?perl_default_filter}
@@ -114,6 +119,9 @@ make test
 %{_mandir}/man3/Test::LeakTrace::Script.3*
 
 %changelog
+* Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-18
+- Linted spec.
+
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-17
 - License verified.
 
@@ -301,4 +309,3 @@ make test
 
 * Sun Apr 04 2010 Chris Weyl <cweyl@alumni.drew.edu> - 0.10-1
 - Specfile by Fedora::App::MaintainerTools 0.006
-

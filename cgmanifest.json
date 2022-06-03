@@ -3540,8 +3540,8 @@
         "type": "other",
         "other": {
           "name": "gd",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.0/libgd-2.3.0.tar.xz"
+          "version": "2.3.3",
+          "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.xz"
         }
       }
     },
@@ -4520,8 +4520,8 @@
         "type": "other",
         "other": {
           "name": "hivex",
-          "version": "1.3.18",
-          "downloadUrl": "http://libguestfs.org/download/hivex/hivex-1.3.18.tar.gz"
+          "version": "1.3.21",
+          "downloadUrl": "http://libguestfs.org/download/hivex/hivex-1.3.21.tar.gz"
         }
       }
     },
@@ -11603,8 +11603,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.2.tar.gz"
         }
       }
     },
@@ -12563,8 +12563,8 @@
         "type": "other",
         "other": {
           "name": "ntfs-3g",
-          "version": "2021.8.22",
-          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2021.8.22.tgz"
+          "version": "2022.5.17",
+          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.5.17.tgz"
         }
       }
     },
@@ -13454,8 +13454,8 @@
         "type": "other",
         "other": {
           "name": "opensc",
-          "version": "0.20.0",
-          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.20.0/opensc-0.20.0.tar.gz"
+          "version": "0.22.0",
+          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.22.0/opensc-0.22.0.tar.gz"
         }
       }
     },
@@ -14213,6 +14213,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Bytes-Random-Secure",
+          "version": "0.29",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Bytes/Bytes-Random-Secure-0.29.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Canary-Stability",
           "version": "2013",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-2013.tar.gz"
@@ -14726,6 +14736,16 @@
           "name": "perl-Crypt-PasswdMD5",
           "version": "1.4.0",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PasswdMD5-1.40.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Crypt-Random-Seed",
+          "version": "0.03",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-Random-Seed-0.03.tar.gz"
         }
       }
     },
@@ -16316,6 +16336,16 @@
           "name": "perl-Math-Int64",
           "version": "0.54",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-0.54.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Math-Random-ISAAC",
+          "version": "1.004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JA/JAWNSY/Math-Random-ISAAC-1.004.tar.gz"
         }
       }
     },
@@ -21994,8 +22024,8 @@
         "type": "other",
         "other": {
           "name": "python-twisted",
-          "version": "22.2.0",
-          "downloadUrl": "https://github.com/twisted/twisted/archive/refs/tags/twisted-22.2.0.tar.gz"
+          "version": "22.4.0",
+          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.4.0.tar.gz"
         }
       }
     },
@@ -22865,8 +22895,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.2.3",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.3.tar.gz"
+          "version": "3.2.4",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.4.tar.gz"
         }
       }
     },
@@ -26027,8 +26057,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4925",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4925.tar.gz"
+          "version": "8.2.4979",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4979.tar.gz"
         }
       }
     },

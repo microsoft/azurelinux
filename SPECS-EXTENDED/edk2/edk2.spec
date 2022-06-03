@@ -1,14 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # RPM doesn't detect that code in /usr/share is python3, this forces it
 # https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Python_bytecompilation
-%global __python %{__python3}
-
+%global __python python3
 %global edk2_stable_date 202008
 %global edk2_stable_str  edk2-stable%{edk2_stable_date}
 %global openssl_version  1.1.1g
 %global qosb_version     20190521-gitf158f12
 %global softfloat_version 20180726-gitb64af41
+
+%define qosb_testing 0
+%define cross 0
+
+%ifarch %{ix86} x86_64
+%define build_ovmf_ia32 1
+%ifarch x86_64
+%define build_ovmf_x64 1
+%endif
+%endif
+
+%ifarch aarch64
+%define build_aavmf_aarch64 1
+%endif
+
+%ifarch %{arm}
+%define build_aavmf_arm 1
+%endif
+
+%if 0%{?cross}
+%define build_ovmf_x64 1
+%define build_ovmf_ia32 1
+%define build_aavmf_aarch64 1
+%define build_aavmf_arm 1
+%endif
 
 # Enable this to skip secureboot enrollment, if problems pop up
 %if %{with_check}
@@ -19,46 +41,26 @@ Distribution:   Mariner
 %global skip_enroll 1
 %endif
 
-%define qosb_testing 0
-
 %ifarch x86_64
 %if %{with_check}
 %define qosb_testing 1
 %endif
 %endif
-%define cross 0
 
-%ifarch %{ix86} x86_64
-%if 0%{?fedora:1}
-%define build_ovmf_ia32 1
-%endif
-%ifarch x86_64
-%define build_ovmf_x64 1
-%endif
-%endif
-%ifarch aarch64
-%define build_aavmf_aarch64 1
-%endif
-%ifarch %{arm}
-%define build_aavmf_arm 1
-%endif
-%if 0%{?cross}
-%define build_ovmf_x64 1
-%define build_ovmf_ia32 1
-%define build_aavmf_aarch64 1
-%define build_aavmf_arm 1
-%endif
-
+Summary:        EFI Development Kit II
 Name:           edk2
 # Even though edk2 stable releases are YYYYMM, we need
 # to use YYYMMDD to avoid needing to bump package epoch
 # due to previous 'git' Version:
 Version:        %{edk2_stable_date}01stable
-Release:        3%{?dist}
-Summary:        EFI Development Kit II
-
-License:        BSD-2-Clause-Patent
+Release:        4%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/tianocore/tianocore.github.io/wiki/EDK-II/
+# Needed due to a dependency on "nasm", which doesn't officially support the ARM64 architecture.
+# See here: https://github.com/netwide-assembler/nasm/pull/3
+ExclusiveArch:  x86_64
 
 Source0:        https://github.com/tianocore/edk2/archive/%{edk2_stable_str}.tar.gz#/%{edk2_stable_str}.tar.gz
 Source1:        openssl-%{openssl_version}-hobbled.tar.xz
@@ -71,7 +73,6 @@ Source10:       hobble-openssl
 Source11:       build-iso.sh
 Source12:       update-tarball.sh
 Source13:       openssl-patch-to-tarball.sh
-
 # Fedora-specific JSON "descriptor files"
 Source14:       40-edk2-ovmf-x64-sb-enrolled.json
 Source15:       50-edk2-ovmf-x64-sb.json
@@ -83,56 +84,44 @@ Source20:       70-edk2-aarch64-verbose.json
 Source21:       70-edk2-arm-verbose.json
 
 # non-upstream patches
-Patch0001: 0001-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-NvmExpre.patch
-Patch0002: 0002-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-the-DXE-.patch
-Patch0003: 0003-OvmfPkg-enable-DEBUG_VERBOSE.patch
-Patch0004: 0004-OvmfPkg-increase-max-debug-message-length-to-512.patch
-Patch0005: 0005-advertise-OpenSSL-on-TianoCore-splash-screen-boot-lo.patch
-Patch0006: 0006-OvmfPkg-QemuVideoDxe-enable-debug-messages-in-VbeShi.patch
-Patch0007: 0007-MdeModulePkg-TerminalDxe-add-other-text-resolutions.patch
-Patch0008: 0008-MdeModulePkg-TerminalDxe-set-xterm-resolution-on-mod.patch
-Patch0009: 0009-OvmfPkg-take-PcdResizeXterm-from-the-QEMU-command-li.patch
-Patch0010: 0010-ArmVirtPkg-take-PcdResizeXterm-from-the-QEMU-command.patch
-Patch0011: 0011-OvmfPkg-allow-exclusion-of-the-shell-from-the-firmwa.patch
-Patch0012: 0012-ArmPlatformPkg-introduce-fixed-PCD-for-early-hello-m.patch
-Patch0013: 0013-ArmPlatformPkg-PrePeiCore-write-early-hello-message-.patch
-Patch0014: 0014-ArmVirtPkg-set-early-hello-message-RH-only.patch
-Patch0015: 0015-Tweak-the-tools_def-to-support-cross-compiling.patch
-Patch0016: 0016-BaseTools-do-not-build-BrotliCompress-RH-only.patch
+Patch0001:      0001-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-NvmExpre.patch
+Patch0002:      0002-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-the-DXE-.patch
+Patch0003:      0003-OvmfPkg-enable-DEBUG_VERBOSE.patch
+Patch0004:      0004-OvmfPkg-increase-max-debug-message-length-to-512.patch
+Patch0005:      0005-advertise-OpenSSL-on-TianoCore-splash-screen-boot-lo.patch
+Patch0006:      0006-OvmfPkg-QemuVideoDxe-enable-debug-messages-in-VbeShi.patch
+Patch0007:      0007-MdeModulePkg-TerminalDxe-add-other-text-resolutions.patch
+Patch0008:      0008-MdeModulePkg-TerminalDxe-set-xterm-resolution-on-mod.patch
+Patch0009:      0009-OvmfPkg-take-PcdResizeXterm-from-the-QEMU-command-li.patch
+Patch0010:      0010-ArmVirtPkg-take-PcdResizeXterm-from-the-QEMU-command.patch
+Patch0011:      0011-OvmfPkg-allow-exclusion-of-the-shell-from-the-firmwa.patch
+Patch0012:      0012-ArmPlatformPkg-introduce-fixed-PCD-for-early-hello-m.patch
+Patch0013:      0013-ArmPlatformPkg-PrePeiCore-write-early-hello-message-.patch
+Patch0014:      0014-ArmVirtPkg-set-early-hello-message-RH-only.patch
+Patch0015:      0015-Tweak-the-tools_def-to-support-cross-compiling.patch
+Patch0016:      0016-BaseTools-do-not-build-BrotliCompress-RH-only.patch
 
-%if 0%{?cross}
-%endif
-
-%if 0%{?fedora:1}
-#
-# actual firmware builds support cross-compiling.  edk2-tools
-# in theory should build everywhere without much trouble, but
-# in practice the edk2 build system barfs on archs it doesn't know
-# (such as ppc), so lets limit things to the known-good ones.
-#
-ExclusiveArch:  %{ix86} x86_64 %{arm} aarch64
-%else
-ExclusiveArch:  x86_64 aarch64
-%endif
-
-BuildRequires:  gcc gcc-c++
-BuildRequires:  python3 python3-devel
+BuildRequires:  bc
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  genisoimage
+BuildRequires:  iasl
 BuildRequires:  libuuid-devel
+BuildRequires:  nasm
+BuildRequires:  python3
+BuildRequires:  python3-devel
+# These are for QOSB
+BuildRequires:  python3-requests
+BuildRequires:  qemu-img
+BuildRequires:  qemu-kvm
+BuildRequires:  sed
+
 %if 0%{?cross}
 BuildRequires:  gcc-aarch64-linux-gnu
 BuildRequires:  gcc-arm-linux-gnu
 BuildRequires:  gcc-x86_64-linux-gnu
 %endif
-BuildRequires:  iasl
-BuildRequires:  nasm
-BuildRequires:  qemu-img
-BuildRequires:  genisoimage
-BuildRequires:  bc
-BuildRequires:  sed
 
-# These are for QOSB
-BuildRequires:  python3-requests
-BuildRequires:  qemu-kvm
 %if %{?qosb_testing}
 # This is used for testing the enrollment: builds are run in a chroot, lacking
 # a kernel. The testing is only performed on x86_64 for now, but we can't make
@@ -150,12 +139,15 @@ and firmware images.
 
 %package tools
 Summary:        EFI Development Kit II Tools
+License:        BSD
+
 %description tools
 This package provides tools that are needed to
 build EFI executables and ROMs using the GNU tools.
 
 %package tools-python
 Summary:        EFI Development Kit II Tools
+License:        BSD
 Requires:       python3
 BuildArch:      noarch
 
@@ -166,30 +158,36 @@ you probably want to install edk2-tools only.
 
 %package tools-doc
 Summary:        Documentation for EFI Development Kit II Tools
+License:        BSD
 BuildArch:      noarch
+
 %description tools-doc
 This package documents the tools that are needed to
 build EFI executables and ROMs using the GNU tools.
 
 %package qosb
 Summary:        Tool to enroll secureboot
+License:        BSD
 Requires:       python3
-Buildarch:      noarch
+BuildArch:      noarch
+
 %description qosb
 This package contains QOSB (QEMU OVMF Secure Boot), which can enroll OVMF
 variable files to enforce Secure Boot.
-
 
 %if 0%{?build_ovmf_x64:1}
 %package ovmf
 Summary:        Open Virtual Machine Firmware
 # OVMF includes the Secure Boot and IPv6 features; it has a builtin OpenSSL
 # library.
-License:        BSD-2-Clause-Patent and OpenSSL
+License:        BSD AND OpenSSL
+BuildArch:      noarch
+
 Provides:       bundled(openssl)
+
 Provides:       OVMF = %{version}-%{release}
 Obsoletes:      OVMF < %{version}-%{release}
-BuildArch:      noarch
+
 %description ovmf
 EFI Development Kit II
 Open Virtual Machine Firmware (x64)
@@ -200,9 +198,11 @@ Open Virtual Machine Firmware (x64)
 Summary:        Open Virtual Machine Firmware
 # OVMF includes the Secure Boot and IPv6 features; it has a builtin OpenSSL
 # library.
-License:        BSD-2-Clause-Patent and OpenSSL
-Provides:       bundled(openssl)
+License:        BSD AND OpenSSL
 BuildArch:      noarch
+
+Provides:       bundled(openssl)
+
 %description ovmf-ia32
 EFI Development Kit II
 Open Virtual Machine Firmware (ia32)
@@ -211,12 +211,15 @@ Open Virtual Machine Firmware (ia32)
 %if 0%{?build_aavmf_aarch64:1}
 %package aarch64
 Summary:        AARCH64 Virtual Machine Firmware
+# No Secure Boot for AAVMF yet, but we include OpenSSL for the IPv6/HTTP boot stack.
+License:        BSD AND OpenSSL
+BuildArch:      noarch
+
 Provides:       AAVMF = %{version}-%{release}
 Obsoletes:      AAVMF < %{version}-%{release}
-BuildArch:      noarch
-# No Secure Boot for AAVMF yet, but we include OpenSSL for the IPv6/HTTP boot stack.
-License:        BSD-2-Clause-Patent and OpenSSL
+
 Provides:       bundled(openssl)
+
 %description aarch64
 EFI Development Kit II
 AARCH64 UEFI Firmware
@@ -225,9 +228,10 @@ AARCH64 UEFI Firmware
 %if 0%{?build_aavmf_arm:1}
 %package arm
 Summary:        ARM Virtual Machine Firmware
-BuildArch:      noarch
 # No Secure Boot for ARMv7, but we include OpenSSL for the IPv6/HTTP boot stack.
-License:        BSD-2-Clause-Patent and OpenSSL
+License:        BSD AND OpenSSL
+BuildArch:      noarch
+
 %description arm
 EFI Development Kit II
 ARMv7 UEFI Firmware
@@ -269,7 +273,7 @@ sed \
 
 
 %build
-export PYTHON_COMMAND=%{__python3}
+export PYTHON_COMMAND=python3
 source ./edksetup.sh
 
 # compiler
@@ -334,7 +338,7 @@ sh %{_sourcedir}/build-iso.sh ovmf/
 
 %if !%{skip_enroll}
 python3 qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator \
-    --qemu-binary /usr/bin/qemu-system-x86_64 \
+    --qemu-binary %{_bindir}/qemu-system-x86_64 \
     --ovmf-binary ovmf/OVMF_CODE.secboot.fd \
     --ovmf-template-vars ovmf/OVMF_VARS.fd \
     --uefi-shell-iso ovmf/UefiShell.iso \
@@ -397,7 +401,7 @@ dd of="arm/vars-template-pflash.raw" if="/dev/zero" bs=1M count=64
 %if 0%{?qosb_testing}
 %if !%{skip_enroll}
 python3 qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator \
-    --qemu-binary /usr/bin/qemu-system-x86_64 \
+    --qemu-binary %{_bindir}/qemu-system-x86_64 \
     --ovmf-binary ovmf/OVMF_CODE.secboot.fd \
     --ovmf-template-vars ovmf/OVMF_VARS.fd \
     --uefi-shell-iso ovmf/UefiShell.iso \
@@ -442,16 +446,16 @@ done
 # `/usr/share/firmware/`.  Create it.
 mkdir -p %{buildroot}/%{_datadir}/qemu/firmware
 
-mkdir -p %{buildroot}/usr/share/%{name}
+mkdir -p %{buildroot}%{_datadir}/%{name}
 %if 0%{?build_ovmf_x64:1}
-cp -a ovmf %{buildroot}/usr/share/%{name}
+cp -a ovmf %{buildroot}%{_datadir}/%{name}
 # Libvirt hardcodes this directory name
-mkdir %{buildroot}/usr/share/OVMF
-ln -sf ../%{name}/ovmf/OVMF_CODE.fd                %{buildroot}/usr/share/OVMF
-ln -sf ../%{name}/ovmf/OVMF_CODE.secboot.fd        %{buildroot}/usr/share/OVMF
-ln -sf ../%{name}/ovmf/OVMF_VARS.fd                %{buildroot}/usr/share/OVMF
-ln -sf ../%{name}/ovmf/OVMF_VARS.secboot.fd        %{buildroot}/usr/share/OVMF
-ln -sf ../%{name}/ovmf/UefiShell.iso               %{buildroot}/usr/share/OVMF
+mkdir %{buildroot}%{_datadir}/OVMF
+ln -sf ../%{name}/ovmf/OVMF_CODE.fd                %{buildroot}%{_datadir}/OVMF
+ln -sf ../%{name}/ovmf/OVMF_CODE.secboot.fd        %{buildroot}%{_datadir}/OVMF
+ln -sf ../%{name}/ovmf/OVMF_VARS.fd                %{buildroot}%{_datadir}/OVMF
+ln -sf ../%{name}/ovmf/OVMF_VARS.secboot.fd        %{buildroot}%{_datadir}/OVMF
+ln -sf ../%{name}/ovmf/UefiShell.iso               %{buildroot}%{_datadir}/OVMF
 
 for f in %{_sourcedir}/*edk2-ovmf-x64*.json; do
     install -pm 644 $f %{buildroot}/%{_datadir}/qemu/firmware
@@ -460,7 +464,7 @@ done
 
 
 %if 0%{?build_ovmf_ia32:1}
-cp -a ovmf-ia32 %{buildroot}/usr/share/%{name}
+cp -a ovmf-ia32 %{buildroot}%{_datadir}/%{name}
 
 for f in %{_sourcedir}/*edk2-ovmf-ia32*.json; do
     install -pm 644 $f %{buildroot}/%{_datadir}/qemu/firmware
@@ -469,11 +473,11 @@ done
 
 
 %if 0%{?build_aavmf_aarch64:1}
-cp -a aarch64 %{buildroot}/usr/share/%{name}
+cp -a aarch64 %{buildroot}%{_datadir}/%{name}
 # Libvirt hardcodes this directory name
-mkdir %{buildroot}/usr/share/AAVMF
-ln -sf ../%{name}/aarch64/QEMU_EFI-pflash.raw      %{buildroot}/usr/share/AAVMF/AAVMF_CODE.fd
-ln -sf ../%{name}/aarch64/vars-template-pflash.raw %{buildroot}/usr/share/AAVMF/AAVMF_VARS.fd
+mkdir %{buildroot}%{_datadir}/AAVMF
+ln -sf ../%{name}/aarch64/QEMU_EFI-pflash.raw      %{buildroot}%{_datadir}/AAVMF/AAVMF_CODE.fd
+ln -sf ../%{name}/aarch64/vars-template-pflash.raw %{buildroot}%{_datadir}/AAVMF/AAVMF_VARS.fd
 
 for f in %{_sourcedir}/*edk2-aarch64*.json; do
     install -pm 644 $f %{buildroot}/%{_datadir}/qemu/firmware
@@ -482,8 +486,8 @@ done
 
 
 %if 0%{?build_aavmf_arm:1}
-cp -a arm %{buildroot}/usr/share/%{name}
-ln -sf ../%{name}/arm/QEMU_EFI-pflash.raw          %{buildroot}/usr/share/AAVMF/AAVMF32_CODE.fd
+cp -a arm %{buildroot}%{_datadir}/%{name}
+ln -sf ../%{name}/arm/QEMU_EFI-pflash.raw          %{buildroot}%{_datadir}/AAVMF/AAVMF32_CODE.fd
 
 for f in %{_sourcedir}/*edk2-arm*.json; do
     install -pm 644 $f %{buildroot}/%{_datadir}/qemu/firmware
@@ -500,8 +504,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 
 %files tools
-%license License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl License.txt
 %{_bindir}/DevicePath
 %{_bindir}/EfiRom
 %{_bindir}/GenCrc32
@@ -544,63 +547,61 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 %if 0%{?build_ovmf_x64:1}
 %files ovmf
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl OvmfPkg/License.txt
 %doc OvmfPkg/README
 %doc ovmf-whitepaper-c770f8c.txt
-%dir /usr/share/%{name}
-%dir /usr/share/%{name}/ovmf
-%dir /usr/share/qemu/firmware
-/usr/share/%{name}/ovmf/OVMF*.fd
-/usr/share/%{name}/ovmf/*.efi
-/usr/share/%{name}/ovmf/*.iso
-/usr/share/qemu/firmware/*edk2-ovmf-x64*.json
-/usr/share/OVMF
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/ovmf
+%dir %{_datadir}/qemu/firmware
+%{_datadir}/%{name}/ovmf/OVMF*.fd
+%{_datadir}/%{name}/ovmf/*.efi
+%{_datadir}/%{name}/ovmf/*.iso
+%{_datadir}/qemu/firmware/*edk2-ovmf-x64*.json
+%{_datadir}/OVMF
 %endif
 
 %if 0%{?build_ovmf_ia32:1}
 %files ovmf-ia32
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
+%license LICENSE.openssl OvmfPkg/License.txt
 %doc OvmfPkg/README
 %doc ovmf-whitepaper-c770f8c.txt
-%dir /usr/share/%{name}
-%dir /usr/share/%{name}/ovmf-ia32
-%dir /usr/share/qemu/firmware
-/usr/share/%{name}/ovmf-ia32/OVMF*.fd
-/usr/share/%{name}/ovmf-ia32/*.efi
-/usr/share/%{name}/ovmf-ia32/*.iso
-/usr/share/qemu/firmware/*edk2-ovmf-ia32*.json
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/ovmf-ia32
+%dir %{_datadir}/qemu/firmware
+%{_datadir}/%{name}/ovmf-ia32/OVMF*.fd
+%{_datadir}/%{name}/ovmf-ia32/*.efi
+%{_datadir}/%{name}/ovmf-ia32/*.iso
+%{_datadir}/qemu/firmware/*edk2-ovmf-ia32*.json
 %endif
 
 %if 0%{?build_aavmf_aarch64:1}
 %files aarch64
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
-%dir /usr/share/%{name}
-%dir /usr/share/%{name}/aarch64
-%dir /usr/share/qemu/firmware
-/usr/share/%{name}/aarch64/QEMU*.fd
-/usr/share/%{name}/aarch64/*.raw
-/usr/share/qemu/firmware/*edk2-aarch64*.json
-/usr/share/AAVMF/AAVMF_*
+%license LICENSE.openssl OvmfPkg/License.txt
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/aarch64
+%dir %{_datadir}/qemu/firmware
+%{_datadir}/%{name}/aarch64/QEMU*.fd
+%{_datadir}/%{name}/aarch64/*.raw
+%{_datadir}/qemu/firmware/*edk2-aarch64*.json
+%{_datadir}/AAVMF/AAVMF_*
 %endif
 
 %if 0%{?build_aavmf_arm:1}
 %files arm
-%license OvmfPkg/License.txt
-%license LICENSE.openssl
-%dir /usr/share/%{name}
-%dir /usr/share/%{name}/arm
-%dir /usr/share/qemu/firmware
-/usr/share/%{name}/arm/QEMU*.fd
-/usr/share/%{name}/arm/*.raw
-/usr/share/qemu/firmware/*edk2-arm*.json
-/usr/share/AAVMF/AAVMF32_*
+%license LICENSE.openssl OvmfPkg/License.txt
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/arm
+%dir %{_datadir}/qemu/firmware
+%{_datadir}/%{name}/arm/QEMU*.fd
+%{_datadir}/%{name}/arm/*.raw
+%{_datadir}/qemu/firmware/*edk2-arm*.json
+%{_datadir}/AAVMF/AAVMF32_*
 %endif
 
-
 %changelog
+* Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200801stable-4
+- Switching to building exclusively for AMD64 due to dependency on "nasm".
+
 * Thu Apr 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20200801stable-3
 - Skip enroll that blocks building from containerized environment.
 - License verified.

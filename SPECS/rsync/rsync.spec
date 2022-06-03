@@ -1,19 +1,17 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.2.3
-Release:        2%{?dist}
+Version:        3.2.4
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Appication/Internet
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
-Patch0:         CVE-2020-14387.patch
 BuildRequires:  lz4-devel
-BuildRequires:  systemd
+BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
 Requires:       lz4
-Requires:       systemd
 Requires:       zlib
 
 %description
@@ -24,15 +22,15 @@ Rsync is a fast and extraordinarily versatile file copying tool. It can copy loc
 
 %build
 %configure --with-included-zlib=no --disable-xxhash
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-mkdir -p %{buildroot}/%{_sysconfdir}
-touch %{buildroot}/%{_sysconfdir}/rsyncd.conf
+%make_install
+mkdir -p %{buildroot}%{_sysconfdir}
+touch %{buildroot}%{_sysconfdir}/rsyncd.conf
 
-mkdir -p %{buildroot}/%{_libdir}/systemd/system
-cat << EOF >> %{buildroot}/%{_libdir}/systemd/system/rsyncd.service
+mkdir -p %{buildroot}%{_unitdir}
+cat << EOF >> %{buildroot}%{_unitdir}/rsyncd.service
 [Unit]
 Description=Rsync Server
 After=local-fs.target
@@ -46,10 +44,9 @@ WantedBy=multi-user.target
 EOF
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -63,6 +60,10 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Thu Jun 02 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.4-1
+- Upgrade to latest upstream version
+- Lint spec
+
 * Thu Apr 14 2022 Chris Co <chrco@microsoft.com> - 3.2.3-2
 - Add patch for CVE-2020-14387
 
