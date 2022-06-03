@@ -1,10 +1,9 @@
 %global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name hoe
 Summary:        Rake/Rubygems helper for project Rakefiles
 Name:           rubygem-hoe
 Version:        3.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.18.1-4
+- Cleanup
+
 * Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.18.1-1
 - License verified
 - Original version for CBL-Mariner
