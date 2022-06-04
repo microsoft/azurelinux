@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.82.0
+Version:        7.83.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -89,6 +89,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed May 25 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.83.0-1
+- Update to version 7.83.0
+
 * Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 7.82.0-1
 - Update to version 7.82.0
 

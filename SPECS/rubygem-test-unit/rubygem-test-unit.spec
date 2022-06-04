@@ -1,6 +1,6 @@
 %global gem_name test-unit
 Summary:        An xUnit family unit testing framework for Ruby
-Name:           rubygem-test-unit
+Name:           rubygem-%{gem_name}
 Version:        3.5.3
 Release:        2%{?dist}
 License:        PSF AND BSD
@@ -22,7 +22,7 @@ programming software development methodology, for Smalltalk's SUnit. It allows
 writing tests, checking results and automated testing in Ruby.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}

@@ -6,11 +6,10 @@
 # gen-ld-script.sh
 # Generate linker script to embed ELF binaries with build metadata
 
-# /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir}
-echo "gen-ld-script.sh name($1) version($2) _topdir($3)"
+# /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir} %{mariner_release_version}
+echo "gen-ld-script.sh name($1) version($2) _topdir($3) osversion($4)"
 
-OS_ID=$(sed -En 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)
-OS_VERSION=$(sed -En 's/^VERSION_ID="?([^"]+)"?/\1/p' /etc/os-release)
+OS_VERSION=$(echo $4 | cut -d. -f1,2)
 
 # Count number of dot separators in $2 (version)
 NUM_DOT_SEPARATORS="${2//[^.]}"
@@ -35,7 +34,7 @@ MODULE_INFO_DIR="$3/BUILD/"
 mkdir -pv $MODULE_INFO_DIR
 
 /usr/lib/rpm/mariner/generate-package-note.py \
-   --os "$OS_ID" \
+   --os "mariner" \
    --osVersion "$OS_VERSION" \
    --type "rpm" \
    --name "$1" \

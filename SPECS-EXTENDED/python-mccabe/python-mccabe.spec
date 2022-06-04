@@ -1,17 +1,24 @@
+%global modname mccabe
+
+Summary:        McCabe complexity checker
+Name:           python-%{modname}
+Version:        0.6.1
+Release:        18%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global modname mccabe
-Name:               python-%{modname}
-Version:            0.6.1
-Release:            17%{?dist}
-Summary:            McCabe complexity checker
-License:            MIT
-URL:                http://pypi.python.org/pypi/mccabe
-Source0:            https://files.pythonhosted.org/packages/source/m/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
-BuildArch:          noarch
+URL:            https://pypi.python.org/pypi/mccabe
+Source0:        https://files.pythonhosted.org/packages/source/m/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-pytest-runner
+BuildRequires:  python%{python3_pkgversion}-setuptools
 
 %if %{with_check}
-BuildRequires:      python3-pip
+BuildRequires:  python3-pip
 %endif
 
 %description
@@ -21,10 +28,8 @@ This module provides a plugin for flake8, the Python code
 checker.
 
 %package -n python%{python3_pkgversion}-%{modname}
-Summary:            McCabe checker, plugin for flake8
-BuildRequires:      python%{python3_pkgversion}-devel
-BuildRequires:      python%{python3_pkgversion}-setuptools
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{modname}}
+Summary:        McCabe checker, plugin for flake8
 
 %description -n python%{python3_pkgversion}-%{modname}
 Ned's script to check McCabe complexity.
@@ -32,23 +37,18 @@ Ned's script to check McCabe complexity.
 This module provides a plugin for flake8, the Python code
 checker.
 
-
 %prep
 %autosetup -n %{modname}-%{version}
-
 
 %build
 %py3_build
 
-
 %install
 %py3_install
 
-
 %check
 pip3 install pytest
-%{__python3} -m pytest -v
-
+python3 -m pytest -v
 
 %files -n python%{python3_pkgversion}-%{modname}
 %license LICENSE
@@ -57,8 +57,10 @@ pip3 install pytest
 %{python3_sitelib}/%{modname}-%{version}-*
 %{python3_sitelib}/__pycache__/%{modname}.*
 
-
 %changelog
+* Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-18
+- Bringing back removed BRs to fix package build.
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.1-17
 - Drop BR on pytest & pip install latest deps to enable ptest
 - License verified

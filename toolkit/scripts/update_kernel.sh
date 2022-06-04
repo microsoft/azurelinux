@@ -239,15 +239,15 @@ if [[ -z $WORKSPACE ]]; then
 fi
 
 # Create globals
-TAG="rolling-lts/mariner/$VERSION"
+TAG="rolling-lts/mariner-2/$VERSION"
 TMPDIR="tmp-dir"
-SPECS="kernel-headers kernel kernel-rt hyperv-daemons"
+SPECS="kernel-headers kernel hyperv-daemons"
 DEFAULT_URL="https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/"
 DEFAULT_EXTENSION=".tar.gz"
 FULL_URL=$DEFAULT_URL$TAG$DEFAULT_EXTENSION
 TARBALL_NAME="kernel-$VERSION$DEFAULT_EXTENSION"
 DOWNLOAD_FILE_PATH=$TMPDIR/$TARBALL_NAME
-SPECS="kernel-headers kernel kernel-rt hyperv-daemons"
+SPECS="kernel-headers kernel hyperv-daemons"
 SIGNED_SPECS="kernel-signed"
 NEW_RELEASE_NUMBER="Release:        1%{?dist}"
 CHANGELOG_ENTRY="Update source to $NEW_KERNEL_VERSION"

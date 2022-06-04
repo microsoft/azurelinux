@@ -1,0 +1,36 @@
+From 3f78663febf3bcda679737b73b85bafba72b3639 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 23 May 2022 20:45:58 +0000
+Subject: [PATCH 38/38] application: Allow apps to use init fds.
+
+This is needed for console/serial logins:
+
+avc:  denied  { use } for  pid=767 comm="semodule" path="/dev/ttyS0"
+dev="devtmpfs" ino=83
+scontext=unconfined_u:unconfined_r:semanage_t:s0-s0:c0.c1023
+tcontext=system_u:system_r:init_t:s0 tclass=fd permissive=0
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/application.te | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/policy/modules/system/application.te b/policy/modules/system/application.te
+index 658aeed0a..810d8e6c6 100644
+--- a/policy/modules/system/application.te
++++ b/policy/modules/system/application.te
+@@ -6,6 +6,11 @@ attribute application_domain_type;
+ # Executables to be run by user
+ attribute application_exec_type;
+ 
++ifdef(`init_systemd',`
++	# Needed for console/serial logins.
++	init_use_fds(application_domain_type)
++')
++
+ optional_policy(`
+ 	cron_sigchld(application_domain_type)
+ ')
+-- 
+2.25.1
+

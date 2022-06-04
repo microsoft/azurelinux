@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,7 +39,6 @@ Requires:       net-tools
 Requires:       openssh-clients
 Requires:       pkg-config
 Requires:       procps-ng
-Requires:       rpm
 Requires:       sudo
 Requires:       systemd
 Requires:       tar
@@ -69,6 +68,7 @@ Requires:       nspr
 Requires:       nss-libs
 Requires:       openssl
 Requires:       readline
+Requires:       rpm
 Requires:       rpm-libs
 Requires:       sed
 Requires:       sqlite-libs
@@ -89,6 +89,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-6
+- Add rpm to base container image
+
 * Wed May 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-5
 - Add gzip and sed to base container image
 
