@@ -147,7 +147,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
-* Wed Jun 1 2022 Minghe Ren <mingheren@microsoft.com> - 5.10.117.1-2
+* Wed Jun 01 2022 Minghe Ren <mingheren@microsoft.com> - 5.10.117.1-2
 - Bump release number to match kernel release
 
 * Tue May 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.117.1-1
