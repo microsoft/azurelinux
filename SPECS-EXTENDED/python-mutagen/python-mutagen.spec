@@ -6,7 +6,7 @@ Distribution:   Mariner
 
 Name:           python-%{modname}
 Version:        1.43.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Mutagen is a Python module to handle audio meta-data
 
 License:        GPLv2+
@@ -14,6 +14,10 @@ URL:            https://github.com/quodlibet/mutagen
 Source0:        %{url}/releases/download/release-%{version}/%{modname}-%{version}.tar.gz
 
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 Mutagen is a Python module to handle audio meta-data. It supports\
@@ -29,8 +33,6 @@ includes a module to handle generic Ogg bit-streams.
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{modname}}
 BuildRequires:  python3-devel
-BuildRequires:  python3-hypothesis
-BuildRequires:  python3-pytest
 BuildRequires:  python3-sphinx_rtd_theme
 Obsoletes:      python2-mutagen < 1.42.0-10
 
@@ -66,6 +68,7 @@ rm -rf docs/_build/{.buildinfo,.doctrees}
 # But lint and code style issues don't mean there's antyhing wrong
 # with the code.
 rm -rv tests/quality/
+pip3 install pytest==7.1.2 hypothesis==6.45.1
 
 %{__python3} setup.py test
 
@@ -83,6 +86,10 @@ rm -rv tests/quality/
 %doc docs/_build/*
 
 %changelog
+* Wed May 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.43.0-4
+- Drop BR on pytest & pip install latests deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.43.0-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
