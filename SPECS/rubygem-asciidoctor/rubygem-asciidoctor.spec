@@ -3,7 +3,7 @@
 Summary:        A fast, open source AsciiDoc implementation in Ruby
 Name:           rubygem-%{gem_name}
 Version:        2.0.17
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -54,6 +54,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{b
 %doc %{gem_docdir}
 
 %changelog
+* Sun Apr 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.17-2
+- Fixing build with ruby macros for Ruby 3.1.2.
+
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.17-1
 - Update to v2.0.17.
 - Build from .tar.gz source.

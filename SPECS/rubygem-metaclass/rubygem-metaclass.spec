@@ -5,8 +5,8 @@ Name:           rubygem-%{gem_name}
 Version:        0.0.4
 Release:        15%{?dist}
 License:        MIT
-Vendor:	        Microsoft Corporation
-Distribution:	Mariner
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/floehopper/metaclass/
 Source0:        https://github.com/floehopper/metaclass/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Make the test suite support MiniTest 5.x.

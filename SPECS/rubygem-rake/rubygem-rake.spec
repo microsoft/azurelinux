@@ -1,4 +1,4 @@
-%global	gem_name      rake
+%global gem_name      rake
 Summary:        Rake is a Make-like program implemented in Ruby
 Name:           rubygem-%{gem_name}
 Version:        13.0.6
@@ -22,7 +22,7 @@ BuildRequires:  rubygem(minitest) >= 5
 Rake is a Make-like program implemented in Ruby. Tasks and dependencies are
 specified in standard Ruby syntax.
 
-%package	doc
+%package  doc
 Summary:        Documentation for %{name}
 
 BuildArch:      noarch

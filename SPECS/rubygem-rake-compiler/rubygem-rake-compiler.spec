@@ -1,4 +1,4 @@
-%global	gem_name rake-compiler
+%global gem_name rake-compiler
 %undefine        _changelog_trimtime
 Summary:        Rake-based Ruby C Extension task generator
 Name:           rubygem-%{gem_name}
@@ -35,11 +35,11 @@ that required native extensions across platforms and different
 user configurations where details like portability and
 clarity of code were lacking.
 
-%package	doc
+%package  doc
 Summary:       Documentation for %{name}
 Requires:      %{name} = %{version}-%{release}
 
-%description	doc
+%description  doc
 This package contains documentation for %{name}.
 
 %prep

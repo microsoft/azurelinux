@@ -1,5 +1,6 @@
 %global debug_package %{nil}
 %global gem_name semantic_puppet
+
 Summary:        Useful tools for working with Semantic Versions
 Name:           rubygem-%{gem_name}
 Version:        1.0.4
@@ -37,6 +38,9 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Tue May 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.4-3
+- Add lib/ from source.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.4-2
 - Build from .tar.gz source.
 
