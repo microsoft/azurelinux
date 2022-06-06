@@ -409,7 +409,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	start := partition.Start * MiBtoBytes / sectorSize
-	end := partition.End * MiBtoBytes / sectorSize - 1
+	end := partition.End*MiBtoBytes/sectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
@@ -703,7 +703,7 @@ func createExtendedPartition(diskDevPath string, partitionTableType string, part
 	extendedPartition.Start = partitions[maxPrimaryPartitionsForMBR-1].Start
 	extendedPartition.End = partitions[len(partitions)-1].End
 
-	partDevPath, err := CreateSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType, extendedPartition, "extended")	
+	partDevPath, err := CreateSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType, extendedPartition, "extended")
 	if err != nil {
 		logger.Log.Warnf("Failed to create extended partition")
 		return
@@ -767,12 +767,12 @@ func alignSectorAddress(sectorAddr uint64) (alignedSector uint64) {
 
 func obtainPartitionDetail(partitionIndex int, hasExtendedPartition bool) (partType string, partitionNumber int) {
 	const (
-		primaryPartition = "primary"
+		primaryPartition  = "primary"
 		extendedPartition = "extended"
-		logicalPartition = "logical"
+		logicalPartition  = "logical"
 	)
 
-	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR - 1) {
+	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR-1) {
 		if partitionIndex == (maxPrimaryPartitionsForMBR - 1) {
 			partType = extendedPartition
 			partitionNumber = partitionIndex + 1
