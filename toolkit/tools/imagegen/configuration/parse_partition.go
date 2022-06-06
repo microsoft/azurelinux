@@ -96,7 +96,7 @@ func processDisk(inputDiskValue string) (err error) {
 			return err
 		}
 
-		if strings.TrimSpace(partitionTableType) != "" {
+		if strings.TrimSpace(partitionTableType) == "True" {
 			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
 		} else {
 			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeMbr
