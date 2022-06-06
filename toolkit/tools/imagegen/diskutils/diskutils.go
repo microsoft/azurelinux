@@ -743,7 +743,7 @@ func getSectorSize(diskDevPath string) (sectorSize uint64, err error) {
 		return
 	}
 
-	// he_sector_size should only have one line, return error if not
+	// hw_sector_size should only have one line, return error if not
 	if len(fileContent) != 1 {
 		err = fmt.Errorf("%s has more than one line", hw_sector_size_file)
 		return
