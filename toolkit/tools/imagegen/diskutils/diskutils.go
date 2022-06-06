@@ -49,6 +49,12 @@ const (
 	mappingFilePath = "/dev/mapper/"
 )
 
+const (
+	// maxPrimaryPartitionsForMBR is the maximum number of primary partitions
+	// allowed in the case of MBR partition
+	maxPrimaryPartitionsForMBR = 4
+)
+
 // Unit to byte conversion values
 // See https://www.gnu.org/software/parted/manual/parted.html#unit
 const (
@@ -336,32 +342,19 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		return
 	}
 
+	usingExtendedPartition := (len(disk.Partitions) > maxPrimaryPartitionsForMBR) && (partitionTableType == configuration.PartitionTableTypeMbr)
+
 	// Partitions assumed to be defined in sorted order
 	for idx, partition := range disk.Partitions {
-		partitionNumber := idx + 1
-		partType := "primary"
-
-		// MBR only allows up to four primary partitions, thus check here whether
-		// we need to create extended partition or not in case more than four partitions are specified
-		if partitionNumber >= 4 && len(disk.Partitions) > 4 && partitionTableType == configuration.PartitionTableTypeMbr {
-			if partitionNumber == 4 {
-				partType = "extended"
-
-				// Create a new partition object for extended partition
-				extendedPartition := configuration.Partition{}
-				extendedPartition.ID = "extended"
-				extendedPartition.Start = partition.Start
-				extendedPartition.End = disk.Partitions[len(disk.Partitions)-1].End
-
-				partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), extendedPartition, partType)
-				if err != nil {
-					logger.Log.Warnf("Failed to create extended partition")
-					return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-				}
-				partIDToFsTypeMap[extendedPartition.ID] = ""
-				partDevPathMap[extendedPartition.ID] = partDevPath
+		partType, partitionNumber := obtainPartitionDetail(idx, usingExtendedPartition)
+		// Insert an extended partition
+		if partType == "extended" {
+			err = createExtendedPartition(diskDevPath, partitionTableType.String(), disk.Partitions, partIDToFsTypeMap, partDevPathMap)
+			if err != nil {
+				return
 			}
 
+			// Update partType and partitionNumber
 			partType = "logical"
 			partitionNumber = partitionNumber + 1
 		}
@@ -416,13 +409,16 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	start := partition.Start * MiBtoBytes / sectorSize
-	end := partition.End*MiBtoBytes/sectorSize - 1
+	end := partition.End * MiBtoBytes / sectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
 
 	if partType == "logical" {
-		start = partition.Start*MiBtoBytes/sectorSize + 1
+		start = start + 1
+		if end != 0 {
+			end = end + 1
+		}
 	}
 
 	// Check wehther the start sector is 4K-aligned
@@ -463,6 +459,11 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		return "", err
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
+
+	if partType == "extended" {
+		return
+	}
+
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 }
 
@@ -695,6 +696,23 @@ func BootPartitionConfig(bootType string) (mountPoint, mountOptions string, flag
 	return
 }
 
+func createExtendedPartition(diskDevPath string, partitionTableType string, partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string) (err error) {
+	// Create a new partition object for extended partition
+	extendedPartition := configuration.Partition{}
+	extendedPartition.ID = "extended"
+	extendedPartition.Start = partitions[maxPrimaryPartitionsForMBR-1].Start
+	extendedPartition.End = partitions[len(partitions)-1].End
+
+	partDevPath, err := CreateSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType, extendedPartition, "extended")	
+	if err != nil {
+		logger.Log.Warnf("Failed to create extended partition")
+		return
+	}
+	partIDToFsTypeMap[extendedPartition.ID] = ""
+	partDevPathMap[extendedPartition.ID] = partDevPath
+	return
+}
+
 func getPartUUID(device string) (uuid string, err error) {
 	stdout, _, err := shell.Execute("blkid", device, "-s", "UUID", "-o", "value")
 	if err != nil {
@@ -715,12 +733,13 @@ func getSectorSize(diskDevPath string) (sectorSize uint64, err error) {
 		err = ferr
 		return
 	} else if !exists {
-		err = fmt.Errorf("Could not find the hw sector size file %s to obtain the sector size of the system", hw_sector_size_file)
+		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", hw_sector_size_file)
 		return
 	}
 
 	fileContent, err := file.ReadLines(hw_sector_size_file)
 	if err != nil {
+		logger.Log.Errorf("Failed to read from %s: %s", hw_sector_size_file, err)
 		return
 	}
 
@@ -741,6 +760,29 @@ func alignSectorAddress(sectorAddr uint64) (alignedSector uint64) {
 		alignedSector = sectorAddr
 	} else {
 		alignedSector = (sectorAddr/defaultBlockSize + 1) * defaultBlockSize
+	}
+
+	return
+}
+
+func obtainPartitionDetail(partitionIndex int, hasExtendedPartition bool) (partType string, partitionNumber int) {
+	const (
+		primaryPartition = "primary"
+		extendedPartition = "extended"
+		logicalPartition = "logical"
+	)
+
+	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR - 1) {
+		if partitionIndex == (maxPrimaryPartitionsForMBR - 1) {
+			partType = extendedPartition
+			partitionNumber = partitionIndex + 1
+		} else {
+			partType = logicalPartition
+			partitionNumber = partitionIndex + 2
+		}
+	} else {
+		partType = primaryPartition
+		partitionNumber = partitionIndex + 1
 	}
 
 	return

@@ -105,7 +105,13 @@ func GetKernelCmdLineValue(option string, startIndex int) (cmdlineValue string, 
 		return
 	}
 
-	cmdlineArgs := strings.Split(string(content), " ")
+	cmdline := string(content)
+	if strings.Count(cmdline, option) > 1 {
+		err = fmt.Errorf("/proc/cmdline contains duplicate %s entries, which is invalid", option)
+		return
+	}
+
+	cmdlineArgs := strings.Split(cmdline, " ")
 	for _, cmdlineArg := range cmdlineArgs {
 		if strings.Contains(cmdlineArg, option) {
 			cmdlineValue = cmdlineArg[startIndex:len(cmdlineArg)]
