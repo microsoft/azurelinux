@@ -1,7 +1,7 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2022.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,7 +43,6 @@ Requires:       dracut
 Requires:       gpgme
 Requires:       libassuan
 Requires:       systemd
-ExclusiveArch:  x86_64
 
 %description
 OSTree is a tool for managing bootable, immutable, versioned
@@ -156,6 +155,9 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2022.1-2
+- Enabling package for ARM64 architectures.
+
 * Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 2022.1-1
 - Upgrade to version 2022.1
 - Fix Source0 field to use macro to represent package version

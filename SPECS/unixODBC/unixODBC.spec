@@ -1,7 +1,7 @@
 Summary:        ODBC driver manager
 Name:           unixODBC
 Version:        2.3.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        http://www.unixodbc.org/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+Requires:       glibc-iconv
 
 %description
 The unixODBC package is an Open Source ODBC (Open DataBase Connectivity) sub-system and an ODBC SDK for Linux, Mac OSX, and UNIX.
@@ -44,7 +45,7 @@ chmod 644 doc/{lst,ProgrammerManual/Tutorial}/*
 install -v -m755 -d %{_docdir}/%{name}-%{version}
 cp -v -R doc/* %{_docdir}/%{name}-%{version}
 rm -f %{buildroot}%{_libdir}/*.a
-rm -f %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -f %{buildroot}%{_libdir}/libltdl.*
 rm -rf %{buildroot}%{_datadir}/libtool
 
@@ -71,6 +72,9 @@ rm -rf %{buildroot}%{_datadir}/libtool
 %{_libdir}/pkgconfig
 
 %changelog
+* Thu May 26 2022 Evan Lee <evlee@microsoft.com> - 2.3.9-2
+- Require glibc-iconv as a runtime dependency for unixODBC.
+
 * Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.9-1
 - Update to version 2.3.9.
 - License verified.

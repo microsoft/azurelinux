@@ -42,9 +42,6 @@ BuildRequires:  git
 BuildRequires:  golang
 BuildRequires:  patch
 
-# Temp: Do not build with 2.0 toolchain
-ExclusiveArch:  mips
-
 %description
 cert-manager is a Kubernetes add-on to automate the management and issuance
 of TLS certificates from various issuing sources.

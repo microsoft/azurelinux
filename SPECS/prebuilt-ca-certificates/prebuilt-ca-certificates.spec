@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        2.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,9 @@ URL:            https://docs.microsoft.com/en-us/security/trusted-root/program-r
 BuildArch:      noarch
 
 BuildRequires:  ca-certificates = %{epoch}:%{version}-%{release}
+
+Provides:       %{name}-microsoft = %{version}-%{release}
+Provides:       %{name}-mozilla = %{version}-%{release}
 
 Conflicts:      prebuilt-ca-certificates-base
 
@@ -45,6 +48,9 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
+- Add provides for '%%{name}-microsoft' and '%%{name}-mozilla' for consistency with 'ca-certificates'.
+
 * Fri May 20 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-3
 - Making 'Release' match with 'ca-certificates'.
 

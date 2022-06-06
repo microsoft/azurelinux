@@ -2,21 +2,16 @@
 %define nssdb %{_sysconfdir}/pki/nssdb
 Summary:        Smart card library and applications
 Name:           opensc
-Version:        0.20.0
-Release:        9%{?dist}
+Version:        0.22.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/OpenSC/OpenSC/wiki
+URL:            https://github.com/OpenSC/OpenSC
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
-# Missing from release tarball
-# https://github.com/OpenSC/OpenSC/blob/master/tests/common.sh
-Source2:        common.sh
+
 Patch1:         opensc-0.19.0-pinpad.patch
-Patch2:         opensc-0.20.0-no-common.patch
-# https://github.com/OpenSC/OpenSC/pull/1987
-Patch3:         opensc-0.20.0-cardos.patch
 BuildRequires:  pcsc-lite-devel
 BuildRequires:  readline-devel
 BuildRequires:  openssl-devel
@@ -50,10 +45,7 @@ every software/card that does so, too.
 %prep
 %setup -q
 %patch1 -p1 -b .pinpad
-%patch2 -p1 -b .no-common
-%patch3 -p1 -b .cardos
 
-cp %{SOURCE2} tests/
 # The test-pkcs11-tool-allowed-mechanisms already works in Fedora
 sed -i -e '/XFAIL_TESTS/,$ {
   s/XFAIL_TESTS.*/XFAIL_TESTS=test-pkcs11-tool-test.sh/
@@ -178,28 +170,13 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_libdir}/pkcs11/onepin-opensc-pkcs11.so
 %{_libdir}/pkcs11/pkcs11-spy.so
 %{_datadir}/opensc/
-%{_mandir}/man1/cardos-tool.1*
-%{_mandir}/man1/cryptoflex-tool.1*
-%{_mandir}/man1/eidenv.1*
-%{_mandir}/man1/gids-tool.1*
-%{_mandir}/man1/iasecc-tool.1*
-%{_mandir}/man1/netkey-tool.1*
-%{_mandir}/man1/openpgp-tool.1*
-%{_mandir}/man1/opensc-explorer.*
-%{_mandir}/man1/opensc-tool.1*
-%{_mandir}/man1/opensc-asn1.1*
-%{_mandir}/man1/piv-tool.1*
-%{_mandir}/man1/pkcs11-tool.1*
-%{_mandir}/man1/pkcs15-crypt.1*
-%{_mandir}/man1/pkcs15-init.1*
-%{_mandir}/man1/pkcs15-tool.1*
-%{_mandir}/man1/sc-hsm-tool.1*
-%{_mandir}/man1/westcos-tool.1*
-%{_mandir}/man1/dnie-tool.1*
-%{_mandir}/man1/egk-tool.1*
-%{_mandir}/man5/pkcs15-profile.5*
+%{_mandir}/man1/*
+%{_mandir}/man5/*
 
 %changelog
+* Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.22.0-1
+- Upgrade to 0.22.0 to fix CVE-2020-26570, CVE-2020-26571, CVE-2020-26572, CVE-2021-42778, CVE-2021-42779, CVE-2021-42780, CVE-2021-42781, CVE-2021-42782
+
 * Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.20.0-9
 - License verified.
 

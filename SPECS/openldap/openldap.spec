@@ -2,7 +2,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.57
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
 Patch2:         CVE-2015-3276.patch
 Patch3:         CVE-2021-27212.patch
+Patch4:         CVE-2022-29155.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  openssl-devel >= 1.0.1
@@ -71,6 +72,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
+* Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.57-7
+- Fix CVE-2022-29155
+
 * Wed Jan 05 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.4.57-6
 - Set --enable-dynamic to disable rpath in ldap tools
 - Ensure that default CPPFLAGS are preserved
