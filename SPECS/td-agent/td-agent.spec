@@ -5,7 +5,7 @@
 Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,7 +29,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
-BuildRequires:  ruby = 2.6.9
+BuildRequires:  ruby = 2.6.10
 BuildRequires:  rubygem-async-http
 BuildRequires:  rubygem-aws-partitions
 BuildRequires:  rubygem-aws-sdk-core
@@ -77,7 +77,7 @@ BuildRequires:  zlib-devel
 Requires:       jemalloc
 Requires:       jemalloc-devel
 Requires:       libxcrypt
-Requires:       ruby = 2.6.9
+Requires:       ruby = 2.6.10
 Requires:       rubygem-async-http
 Requires:       rubygem-aws-partitions
 Requires:       rubygem-aws-sdk-core
@@ -205,6 +205,9 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
+* Mon Jun 06 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.0.1-6
+- Update td-agent.patch due to the upgrade in ruby
+
 * Tue Mar 08 2022 Henry Li <lihl@microsoft.com> - 4.0.1-5
 - Update td-agent.patch due to the upgrade in ruby
 - Add versioning for ruby in BR and runtime requirement
