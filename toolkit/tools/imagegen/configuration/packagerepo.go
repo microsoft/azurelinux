@@ -133,10 +133,10 @@ func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 
 	additionalFields := []string{gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify}
 
-	for idx := range additionalFields {
-		_, err = stringBuilder.WriteString(additionalFields[idx])
+	for _, additionalField := range additionalFields {
+		_, err = stringBuilder.WriteString(additionalField)
 		if err != nil {
-			logger.Log.Errorf("Error writing additional fields: %s. Error: %s", additionalFields, err)
+			logger.Log.Errorf("Error writing additional field '%s' out of all fields: %s. Error: %s", additionalField, additionalFields, err)
 			return
 		}
 	}
