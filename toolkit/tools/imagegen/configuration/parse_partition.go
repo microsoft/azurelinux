@@ -91,7 +91,7 @@ func processDisk(inputDiskValue string) (err error) {
 
 		// Read from /proc/cmdline to determine if the user has specified "--gpt=xxx", which
 		// indicates a GPT partitioning
-		partitionTableType, err := GetKernelCmdLineValue("--gpt", 6)
+		partitionTableType, err := GetKernelCmdLineValue("--gpt")
 		if err != nil {
 			return err
 		}

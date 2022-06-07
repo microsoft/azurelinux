@@ -55,6 +55,11 @@ const (
 	maxPrimaryPartitionsForMBR = 4
 )
 
+const (
+	// oneMiBtoBytes is the conversion between 1 MiB to bytes
+	oneMiBtoBytes = 1048576
+)
+
 // Unit to byte conversion values
 // See https://www.gnu.org/software/parted/manual/parted.html#unit
 const (
@@ -400,7 +405,6 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		fillToEndOption  = "100%"
 		sFmt             = "%ds"
 		timeoutInSeconds = "5"
-		MiBtoBytes       = 1048576
 	)
 
 	logicalSectorSize, physicalSectorSize, err := getSectorSize(diskDevPath)
@@ -408,8 +412,8 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		return
 	}
 
-	start := partition.Start * MiBtoBytes / logicalSectorSize
-	end := partition.End*MiBtoBytes/logicalSectorSize - 1
+	start := partition.Start * oneMiBtoBytes / logicalSectorSize
+	end := partition.End * oneMiBtoBytes / logicalSectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
@@ -422,11 +426,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	// Check wehther the start sector is 4K-aligned
-	start = alignSectorAddress(start, physicalSectorSize)
+	start = alignSectorAddress(start, logicalSectorSize, physicalSectorSize)
+
+	logger.Log.Debugf("Input partition start: %d, aligned start sector: %d", partition.Start, start)
+	logger.Log.Debugf("Input partition end: %d, end sector: %d", partition.End, end)
 
 	fsType := partition.FsType
 
-	// Currently assumes we only make primary partitions.
 	if end == 0 {
 		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fillToEndOption)
 		if err != nil {
@@ -459,11 +465,6 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		return "", err
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
-
-	if partType == "extended" {
-		return
-	}
-
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 }
 
@@ -765,8 +766,11 @@ func getSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize ui
 	return
 }
 
-func alignSectorAddress(sectorAddr, physicalSectorSize uint64) (alignedSector uint64) {
-	if sectorAddr%physicalSectorSize == 0 || sectorAddr < physicalSectorSize {
+func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64) (alignedSector uint64) {
+	// Check if sectorAddr indicates the start of the first partition, which is 1MiB
+	if sectorAddr == (oneMiBtoBytes / logicalSectorSize) {
+		alignedSector = sectorAddr
+	} else if (sectorAddr % physicalSectorSize) == 0 {
 		alignedSector = sectorAddr
 	} else {
 		alignedSector = (sectorAddr/physicalSectorSize + 1) * physicalSectorSize
