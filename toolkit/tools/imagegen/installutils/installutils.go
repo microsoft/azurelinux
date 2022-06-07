@@ -511,7 +511,7 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
 	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
-	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\n")
+	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t(none)\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n")
 
 	return
 }
