@@ -16,7 +16,7 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v3
       with:
-        go-version: 1.18
+        go-version: "1.18"
       id: go
 
     - name: Check out code into the Go module directory
@@ -54,12 +54,12 @@ jobs:
           sudo make go-test-coverage | grep "no test files"
           echo Missing $noTestCount Go Tests!
         fi
-    
+
     - name: Evaluate test coverage
       run: |
         pushd toolkit
         sudo make go-test-coverage
-    
+
     - name: Upload test coverage
       uses: actions/upload-artifact@v3
       with:
