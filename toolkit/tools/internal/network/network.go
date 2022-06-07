@@ -73,24 +73,22 @@ func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 		squashErrors  = false
 	)
 
-	hasNetworkAccess := true
+	hasNetworkAccess = true
 
 	err = retry.Run(func() error {
 		err := shell.ExecuteLive(squashErrors, "ping", "-c", "1", "www.microsoft.com")
 		if err != nil {
 			logger.Log.Warnf("No network access yet")
-			hasNetWorkAccess = false
+			hasNetworkAccess = false
+		} else {
+			hasNetworkAccess = true
 		}
 
-		return nil
+		return err
 	}, retryAttempts, retryDuration)
 
 	if err != nil {
 		logger.Log.Errorf("Failure in multiple attempts to check network access")
-	}
-
-	if !hasNetWorkAccess {
-		err = fmt.Errorf("There's no network access available")
 	}
 
 	return

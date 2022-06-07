@@ -93,7 +93,10 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 
 	// It is possible that network access may not be up at this point,
 	// so check network access
-	err = network.CheckNetworkAccess()
+	err, hasNetworkAccess := network.CheckNetworkAccess()
+	if !hasNetworkAccess {
+		err = fmt.Errorf("no network access in the system")
+	}
 	return
 }
 
@@ -120,18 +123,22 @@ func (p *PackageRepo) repoUrlIsValid() (err error) {
 
 func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	const (
-		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
-		enable       = "enabled=1"
-		gpgCheck     = "gpgcheck=1"
-		repogpgCheck = "repo_gpgcheck=1"
-		skip         = "skip_if_unavailable=True"
-		sslVerify    = "sslverify=1"
+		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY\n"
+		enable       = "enabled=1\n"
+		gpgCheck     = "gpgcheck=1\n"
+		repogpgCheck = "repo_gpgcheck=1\n"
+		skip         = "skip_if_unavailable=True\n"
+		sslVerify    = "sslverify=1\n"
 	)
 
-	additionalFields := fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s\n", gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify)
-	_, err = stringBuilder.WriteString(additionalFields)
-	if err != nil {
-		logger.Log.Errorf("Error writing additional fields: %s. Error: %s", additionalFields, err)
+	additionalFields := []string{gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify}
+
+	for idx := range additionalFields {
+		_, err = stringBuilder.WriteString(additionalFields[idx])
+		if err != nil {
+			logger.Log.Errorf("Error writing additional fields: %s. Error: %s", additionalFields, err)
+			return
+		}
 	}
 
 	return
