@@ -112,20 +112,23 @@ func (p *PackageRepo) repoUrlIsValid() (err error) {
 	}
 
 	_, err = url.ParseRequestURI(p.BaseUrl)
+	if err != nil {
+		logger.Log.Errorf("Failed to parse input URL %s, Error: %s", p.BaseUrl, err)
+	}
 	return
 }
 
 func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	const (
-		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY\n"
-		enable       = "enabled=1\n"
-		gpgCheck     = "gpgcheck=1\n"
-		repogpgCheck = "repo_gpgcheck=1\n"
-		skip         = "skip_if_unavailable=True\n"
-		sslVerify    = "sslverify=1\n"
+		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
+		enable       = "enabled=1"
+		gpgCheck     = "gpgcheck=1"
+		repogpgCheck = "repo_gpgcheck=1"
+		skip         = "skip_if_unavailable=True"
+		sslVerify    = "sslverify=1"
 	)
 
-	additionalFields := gpgKey + enable + gpgCheck + repogpgCheck + skip + sslVerify
+	additionalFields := fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s\n", gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify)
 	_, err = stringBuilder.WriteString(additionalFields)
 	if err != nil {
 		logger.Log.Errorf("Error writing additional fields: %s. Error: %s", additionalFields, err)
