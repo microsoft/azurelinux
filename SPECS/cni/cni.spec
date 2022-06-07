@@ -3,7 +3,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni
 Version:        0.9.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/containernetworking/plugins
 #Source0:       https://github.com/containernetworking/plugins/archive/refs/tags/v0.9.1.tar.gz
@@ -42,6 +42,9 @@ install -vpm 0755 -t %{buildroot}%{_default_cni_plugins_dir} bin/*
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 0.9.1-7
+- Bumping release to rebuild with golang 1.18.3
+
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 0.9.1-6
 - Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
 

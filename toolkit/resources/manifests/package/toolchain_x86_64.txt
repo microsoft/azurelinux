@@ -2,11 +2,11 @@ alsa-lib-1.2.2-1.cm1.x86_64.rpm
 alsa-lib-debuginfo-1.2.2-1.cm1.x86_64.rpm
 alsa-lib-devel-1.2.2-1.cm1.x86_64.rpm
 asciidoc-8.6.10-4.cm1.noarch.rpm
-audit-3.0-15.cm1.x86_64.rpm
-audit-debuginfo-3.0-15.cm1.x86_64.rpm
-audit-devel-3.0-15.cm1.x86_64.rpm
-audit-libs-3.0-15.cm1.x86_64.rpm
-audit-python-3.0-15.cm1.x86_64.rpm
+audit-3.0-16.cm1.x86_64.rpm
+audit-debuginfo-3.0-16.cm1.x86_64.rpm
+audit-devel-3.0-16.cm1.x86_64.rpm
+audit-libs-3.0-16.cm1.x86_64.rpm
+audit-python-3.0-16.cm1.x86_64.rpm
 autoconf-2.69-10.cm1.noarch.rpm
 automake-1.16.1-3.cm1.noarch.rpm
 bash-4.4.23-1.cm1.x86_64.rpm
@@ -353,7 +353,7 @@ python2-libcap-ng-0.7.9-3.cm1.x86_64.rpm
 python2-libs-2.7.18-9.cm1.x86_64.rpm
 python2-test-2.7.18-9.cm1.x86_64.rpm
 python2-tools-2.7.18-9.cm1.x86_64.rpm
-python3-audit-3.0-15.cm1.x86_64.rpm
+python3-audit-3.0-16.cm1.x86_64.rpm
 python3-cracklib-2.9.7-3.cm1.x86_64.rpm
 python3-gpg-1.13.1-6.cm1.x86_64.rpm
 python3-libcap-ng-0.7.9-3.cm1.x86_64.rpm

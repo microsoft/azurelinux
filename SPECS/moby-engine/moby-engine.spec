@@ -1,7 +1,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 19.03.15+azure
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 
@@ -151,6 +151,9 @@ fi
 /usr/share/doc/%{name}-%{version}/*
 
 %changelog
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 19.03.15+azure-10
+- Bumping release to rebuild with golang 1.18.3
+
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 19.03.15+azure-9
 - Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
 
