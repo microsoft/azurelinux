@@ -403,13 +403,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		MiBtoBytes       = 1048576
 	)
 
-	sectorSize, err := getSectorSize(diskDevPath)
+	logicalSectorSize, physicalSectorSize, err := getSectorSize(diskDevPath)
 	if err != nil {
 		return
 	}
 
-	start := partition.Start * MiBtoBytes / sectorSize
-	end := partition.End*MiBtoBytes/sectorSize - 1
+	start := partition.Start * MiBtoBytes / logicalSectorSize
+	end := partition.End*MiBtoBytes/logicalSectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
@@ -422,7 +422,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	// Check wehther the start sector is 4K-aligned
-	start = alignSectorAddress(start)
+	start = alignSectorAddress(start, physicalSectorSize)
 
 	fsType := partition.FsType
 
@@ -723,29 +723,25 @@ func getPartUUID(device string) (uuid string, err error) {
 	return
 }
 
-func getSectorSize(diskDevPath string) (sectorSize uint64, err error) {
-	// Grab the specific disk name from /dev/xxx
-	diskName := diskDevPath[5:len(diskDevPath)]
-
-	hw_sector_size_file := fmt.Sprintf("/sys/block/%s/queue/hw_sector_size", diskName)
-	if exists, ferr := file.PathExists(hw_sector_size_file); ferr != nil {
-		logger.Log.Errorf("Error accessing sector size file %s", hw_sector_size_file)
+func checkSectorSizeFile(sectorFile string) (sectorSize uint64, err error) {
+	if exists, ferr := file.PathExists(sectorFile); ferr != nil {
+		logger.Log.Errorf("Error accessing sector size file %s", sectorFile)
 		err = ferr
 		return
 	} else if !exists {
-		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", hw_sector_size_file)
+		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", sectorFile)
 		return
 	}
 
-	fileContent, err := file.ReadLines(hw_sector_size_file)
+	fileContent, err := file.ReadLines(sectorFile)
 	if err != nil {
-		logger.Log.Errorf("Failed to read from %s: %s", hw_sector_size_file, err)
+		logger.Log.Errorf("Failed to read from %s: %s", sectorFile, err)
 		return
 	}
 
-	// he_sector_size should only have one line, return error if not
+	// sector file should only have one line, return error if not
 	if len(fileContent) != 1 {
-		err = fmt.Errorf("%s has more than one line", hw_sector_size_file)
+		err = fmt.Errorf("%s has more than one line", sectorFile)
 		return
 	}
 
@@ -753,13 +749,27 @@ func getSectorSize(diskDevPath string) (sectorSize uint64, err error) {
 	return
 }
 
-func alignSectorAddress(sectorAddr uint64) (alignedSector uint64) {
-	const defaultBlockSize = 4096
+func getSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize uint64, err error) {
+	// Grab the specific disk name from /dev/xxx
+	diskName := diskDevPath[5:len(diskDevPath)]
 
-	if sectorAddr%defaultBlockSize == 0 || sectorAddr == (defaultBlockSize/2) {
+	hw_sector_size_file := fmt.Sprintf("/sys/block/%s/queue/hw_sector_size", diskName)
+	physical_sector_size_file := fmt.Sprintf("/sys/block/%s/queue/physical_block_size", diskName)
+
+	logicalSectorSize, err = checkSectorSizeFile(hw_sector_size_file)
+	if err != nil {
+		return
+	}
+
+	physicalSectorSize, err = checkSectorSizeFile(physical_sector_size_file)
+	return
+}
+
+func alignSectorAddress(sectorAddr, physicalSectorSize uint64) (alignedSector uint64) {
+	if sectorAddr%physicalSectorSize == 0 || sectorAddr < physicalSectorSize {
 		alignedSector = sectorAddr
 	} else {
-		alignedSector = (sectorAddr/defaultBlockSize + 1) * defaultBlockSize
+		alignedSector = (sectorAddr/physicalSectorSize + 1) * physicalSectorSize
 	}
 
 	return
