@@ -13,7 +13,7 @@
 
 Name:           lua
 Version:        %{major_version}.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Powerful light-weight programming language
 License:        MIT
 URL:            https://www.lua.org/
@@ -43,6 +43,7 @@ Patch18:	    %{name}-5.3.5-CVE-2020-24370.patch
 Patch19:	    %{name}-5.4.3-bug3.patch
 Patch20:	    CVE-2021-43519.patch
 Patch21:        CVE-2022-28805.patch
+Patch22:        CVE-2021-44647.patch
 
 BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
 BuildRequires:  make
@@ -215,6 +216,9 @@ popd
 
 
 %changelog
+* Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.3-3
+- Patching CVE-2021-44647.
+
 * Fri May 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.4.3-2
 - Add upstream patch for CVE-2022-28805
 
