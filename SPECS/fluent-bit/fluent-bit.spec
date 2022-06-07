@@ -1,7 +1,7 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
 Version:        1.8.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,7 +52,8 @@ Development files for %{name}
     -DFLB_TESTS_INTERNAL=Off\
     -DFLB_RELEASE=On\
     -DFLB_DEBUG=Off\
-    -DFLB_TLS=On
+    -DFLB_TLS=On \
+    -DFLB_JEMALLOC=on
  
 %cmake_build
 
@@ -72,6 +73,9 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Thu Feb 19 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.8.12-2
+- Compile with -DFLB_JEMALLOC=on.
+
 * Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8.12-1
 - Update to version 1.8.12
 
