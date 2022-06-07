@@ -66,7 +66,7 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 }
 
 // CheckNetworkAccess checks whether the installer environment has network access
-func CheckNetworkAccess() (err error) {
+func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 	const (
 		retryAttempts = 10
 		retryDuration = time.Second
