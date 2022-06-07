@@ -94,6 +94,9 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 	// It is possible that network access may not be up at this point,
 	// so check network access
 	err, hasNetworkAccess := network.CheckNetworkAccess()
+	if err != nil {
+		return
+	}
 	if !hasNetworkAccess {
 		err = fmt.Errorf("no network access in the system")
 	}
