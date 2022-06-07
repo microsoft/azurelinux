@@ -3,7 +3,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.22.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes-sigs/cri-tools
 #Source0:       https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz
@@ -55,6 +55,9 @@ install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 rm -rf %{buildroot}/*
 
 %changelog
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.22.0-7
+- Bumping release to rebuild with golang 1.18.3
+
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.22.0-6
 - Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
 

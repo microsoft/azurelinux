@@ -1,7 +1,7 @@
 Summary: A Docker CLI plugin for extended build capabilities with BuildKit
 Name: moby-buildx
 Version: 0.4.1+azure
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -79,6 +79,9 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 0.4.1+azure-10
+- Bumping release to rebuild with golang 1.18.3
+
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 0.4.1+azure-9
 - Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
 

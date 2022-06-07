@@ -1875,8 +1875,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.16.15",
-          "downloadUrl": "https://golang.org/dl/go1.16.15.src.tar.gz"
+          "version": "1.18.3",
+          "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
         }
       }
     },

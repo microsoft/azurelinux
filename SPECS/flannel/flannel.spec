@@ -4,7 +4,7 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.14.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/flanneld
 
 %changelog
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 0.14.0-7
+- Bumping release to rebuild with golang 1.18.3
+
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 0.14.0-6
 - Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
 
