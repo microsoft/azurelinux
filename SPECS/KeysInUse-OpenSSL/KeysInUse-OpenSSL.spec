@@ -25,8 +25,8 @@ Requires:    openssl >= 1.1.1, openssl < 1.1.2
 %build
 export GO111MODULE=off
 
-chmod 0755 ./scripts/build.sh
-./scripts/build.sh
+cmake -DCMAKE_TOOLCHAIN_FILE=./cmake-toolchains/linux-amd64-glibc.cmake -H./ -B./build
+cmake --build ./build --target keysinuse
 
 cd ./packaging/util
 make $(realpath ../../bin/keysinuseutil)
@@ -34,18 +34,20 @@ make $(realpath ../../bin/keysinuseutil)
 %define keysinuse_dir %{buildroot}/%{_libdir}/keysinuse/
 %install
 mkdir -p %{keysinuse_dir}
+mkdir -p %{buildroot}/usr/bin/
+
 cp ./bin/keysinuse.so %{keysinuse_dir}
-cp ./bin/keysinuseutil %{keysinuse_dir}
+cp ./bin/keysinuseutil %{buildroot}/usr/bin/
 
 %files
 %license LICENSE
 %{_libdir}/keysinuse/keysinuse.so
-%{_libdir}/keysinuse/keysinuseutil
+/usr/bin/keysinuseutil
 
 %pre
-if [ -x /usr/lib/keysinuse/keysinuseutil ]; then
+if [ -x /usr/bin/keysinuseutil ]; then
   echo "Disabling version $2 of keysinuse engine for OpenSSL"
-  /usr/lib/keysinuse/keysinuseutil uninstall || echo "Failed to deconfigure old version"
+  /usr/bin/keysinuseutil uninstall || echo "Failed to deconfigure old version"
 fi
 
 %post
@@ -55,22 +57,22 @@ fi
 chown root:root /var/log/keysinuse
 chmod 1733 /var/log/keysinuse
 
-cp /usr/lib/keysinuse/keysinuse.so $(/usr/bin/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')
+ln -s /usr/lib/keysinuse/keysinuse.so $(/usr/bin/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so 
 
-if [ -x /usr/lib/keysinuse/keysinuseutil ]; then
+if [ -x /usr/bin/keysinuseutil ]; then
   echo "Enabling keysinuse engine for OpenSSL"
-  /usr/lib/keysinuse/keysinuseutil install || echo "Configuring engine failed"
+  /usr/bin/keysinuseutil install || echo "Configuring engine failed"
 fi
 
 %preun
-if [ -x /usr/lib/keysinuse/keysinuseutil ]; then
+if [ -x /usr/bin/keysinuseutil ]; then
   echo "Disabling keysinuse engine for OpenSSL"
-  /usr/lib/keysinuse/keysinuseutil uninstall || echo "Deconfiguring keysinuse engine failed"
+  /usr/bin/keysinuseutil uninstall || echo "Deconfiguring keysinuse engine failed"
 fi
 
-copied_engine=$(/usr/bin/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
-  if [ -e $copied_engine ]; then
-  rm $copied_engine
+engine_link=$(/usr/bin/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
+if [ -e $engine_link ]; then
+  rm $engine_link
 fi
 
 %changelog

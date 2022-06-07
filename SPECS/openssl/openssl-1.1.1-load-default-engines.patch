@@ -1,8 +1,25 @@
+diff --git a/crypto/engine/eng_all.c b/crypto/engine/eng_all.c
+index b675ed7892..b7abf3d61f 100644
+--- a/crypto/engine/eng_all.c
++++ b/crypto/engine/eng_all.c
+@@ -10,6 +10,12 @@
+ #include "internal/cryptlib.h"
+ #include "eng_local.h"
+ 
++ __attribute__((constructor))
++void ENGINE_static_initializer(void)
++{
++    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_DYNAMIC, NULL);
++}
++
+ void ENGINE_load_builtin_engines(void)
+ {
+     /* Some ENGINEs need this */
 diff --git a/crypto/init.c b/crypto/init.c
-index b23af7977c..794455d872 100644
+index 1b0d523bea..86e31c193e 100644
 --- a/crypto/init.c
 +++ b/crypto/init.c
-@@ -401,6 +401,151 @@ DEFINE_RUN_ONCE_STATIC(ossl_init_engine_afalg)
+@@ -402,6 +402,128 @@ DEFINE_RUN_ONCE_STATIC(ossl_init_engine_afalg)
  }
  #  endif
  # endif
@@ -78,27 +95,10 @@ index b23af7977c..794455d872 100644
 +    ENGINE *dynamic = NULL;
 +    ENGINE *keysinuse = NULL;
 +
-+    char *dynamic_path, *logging_id, *logging_backoff;
-+    CONF *keysinuse_conf = NCONF_new(NULL);
-+
-+    if (!NCONF_load(keysinuse_conf, "/usr/lib/keysinuse/keysinuse.cnf", NULL))
-+        goto err;
-+
-+    dynamic_path = NCONF_get_string(keysinuse_conf, "keysinuse_section", "dynamic_path");
-+    logging_id = NCONF_get_string(keysinuse_conf, "keysinuse_section", "logging_id");
-+    logging_backoff = NCONF_get_string(keysinuse_conf, "keysinuse_section", "logging_backoff");
-+
-+    if (dynamic_path == NULL ||
-+        logging_id == NULL)
-+        goto err;
-+
 +    dynamic = ENGINE_by_id("dynamic");
 +    if (!dynamic)
 +        goto err;
 +
-+    // These controls are already sent by the symcrypt
-+    // engine configuration if symcrypt is enabled.
-+    #ifdef OPENSSL_NO_SYMCRYPT_ENGINE
 +    // Get the default engine directory from the environment - may be NULL
 +    char *load_dir = ossl_safe_getenv("OPENSSL_ENGINES");
 +
@@ -114,8 +114,7 @@ index b23af7977c..794455d872 100644
 +        goto err;
 +    if (!ENGINE_ctrl_cmd_string(dynamic, "DIR_LOAD", "2", 0))
 +        goto err;
-+    #endif
-+    if (!ENGINE_ctrl_cmd_string(dynamic, "SO_PATH", dynamic_path, 0))
++    if (!ENGINE_ctrl_cmd_string(dynamic, "SO_PATH", "keysinuse.so", 0))
 +        goto err;
 +    if (!ENGINE_ctrl_cmd_string(dynamic, "ID", "keysinuse", 0))
 +        goto err;
@@ -128,10 +127,6 @@ index b23af7977c..794455d872 100644
 +    keysinuse = ENGINE_by_id("keysinuse");
 +    if (!keysinuse)
 +        goto err;
-+    if (!ENGINE_ctrl_cmd_string(keysinuse, "logging_id", logging_id, 0))
-+        goto err;
-+    if (logging_backoff != NULL && !ENGINE_ctrl_cmd_string(keysinuse, "logging_backoff", logging_backoff, 0))
-+        goto err;
 +
 +    // Make KeysInUse the default engine for RSA and EC algorithms
 +    if (!ENGINE_set_default_string(keysinuse, "RSA,EC"))
@@ -141,7 +136,6 @@ index b23af7977c..794455d872 100644
 +err:
 +    ENGINE_free(keysinuse);
 +    ENGINE_free(dynamic);
-+    NCONF_free(keysinuse_conf);
 +
 +#  ifdef OPENSSL_INIT_DEBUG
 +    fprintf(stderr, "OPENSSL_INIT: ossl_init_engine_keysinuse: %d \n",
@@ -154,7 +148,7 @@ index b23af7977c..794455d872 100644
  #endif
  
  #ifndef OPENSSL_NO_COMP
-@@ -714,9 +859,14 @@ int OPENSSL_init_crypto(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
+@@ -723,9 +845,14 @@ int OPENSSL_init_crypto(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
              && !RUN_ONCE(&engine_rdrand, ossl_init_engine_rdrand))
          return 0;
  # endif
