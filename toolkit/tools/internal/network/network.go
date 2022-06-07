@@ -73,7 +73,7 @@ func CheckNetworkAccess() (err error) {
 		squashErrors  = false
 	)
 
-	hasNetWorkAccess := true
+	hasNetworkAccess := true
 
 	err = retry.Run(func() error {
 		err := shell.ExecuteLive(squashErrors, "ping", "-c", "1", "www.microsoft.com")
