@@ -76,7 +76,7 @@ func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 	err = retry.Run(func() error {
 		err := shell.ExecuteLive(squashErrors, "ping", "-c", "1", "www.microsoft.com")
 		hasNetworkAccess = err == nil
-		if !hasNetworkAccess  {
+		if !hasNetworkAccess {
 			logger.Log.Warnf("No network access yet")
 		}
 

@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 // PackageRepo defines the RPM repo to pull packages from during the installation
@@ -81,6 +82,18 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 
 	// Remove mariner-iso.repo
 	os.Remove(localRepoFile)
+
+	// Clean up all newly created package repo files in case there's any
+	// repo file creation error
+	defer func() {
+		// Delete all files under /etc/yum.repos.d/
+		if err != nil {
+			err = shell.ExecuteLive(squashErrors, "rm", "%s/*", repoFileDir)
+			if err != nil {
+				logger.Log.Errorf("Failed to clean up repo files under %s. Error: %s", repoFileDir, err)
+			}
+		}
+	}()
 
 	// Loop through the PackageRepos field to determine if any customized package repos are specified.
 	// If specified, create new repo files for them
@@ -156,6 +169,16 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 		return
 	}
 
+	defer func() {
+		// Delete the repo file on failure
+		if err != nil {
+			err = os.Remove(fileName)
+			if err != nil {
+				logger.Log.Errorf("Failed to clean up repo file: %s. Error: %s", fileName, err)
+			}
+		}
+	}()
+
 	// Write the repo identifier field
 	repoId := fmt.Sprintf("[%s]\n", packageRepo.Name)
 	_, err = stringBuilder.WriteString(repoId)
@@ -191,18 +214,7 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 }
 
 func createCustomPackageRepo(installChroot *safechroot.Chroot, packageRepo PackageRepo, repoFileDir string) (err error) {
-
 	dstRepoPath := filepath.Join(repoFileDir, packageRepo.Name+".repo")
-
-	defer func() {
-		// Delete the repo file on failure
-		if err != nil {
-			err = os.Remove(dstRepoPath)
-			if err != nil {
-				logger.Log.Errorf("Failed to clean up repo file: %s. Error: %s", dstRepoPath, err)
-			}
-		}
-	}()
 
 	// Create repo file
 	err = createCustomRepoFile(dstRepoPath, packageRepo)
