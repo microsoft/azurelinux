@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.4774
+Version:        8.2.5064
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -105,6 +105,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugin/*
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
@@ -190,6 +191,14 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Mon Jun 06 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.2.5064-1
+- Update to version 8.2.5064 to fix CVEs: 2022-1851, 2022-1886, and 2022-1898.
+
+* Fri May 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4979-1
+- Update version to 8.2.4979 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629, 
+  CVE-2022-1616, CVE-2022-1733, CVE-2022-1735, CVE-2022-1769, CVE-2022-1620, 
+  CVE-2022-1674, CVE-2022-1771, CVE-2022-1785, CVE-2022-1796.
+
 * Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4774-1
 - Update version to 8.2.4774 to fix CVE-2022-1420.
 

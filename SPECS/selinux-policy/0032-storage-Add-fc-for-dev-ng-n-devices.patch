@@ -1,0 +1,25 @@
+From 626347b70d714d36f141967a6e16f4b4d16f22d6 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 23 May 2022 14:43:46 +0000
+Subject: [PATCH 32/37] storage: Add fc for /dev/ng*n* devices.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/storage.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/kernel/storage.fc b/policy/modules/kernel/storage.fc
+index 46395b8fc..3033ac4de 100644
+--- a/policy/modules/kernel/storage.fc
++++ b/policy/modules/kernel/storage.fc
+@@ -35,6 +35,7 @@
+ /dev/mtd.*		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+ /dev/mtd.*		-c	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+ /dev/nb[^/]+		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
++/dev/ng[0-9]+n[0-9]+	-c	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+ /dev/nvme[0-9]+		-c	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+ /dev/nvme[0-9]n[^/]+	-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+ /dev/optcd		-b	gen_context(system_u:object_r:removable_device_t,s0)
+-- 
+2.25.1
+

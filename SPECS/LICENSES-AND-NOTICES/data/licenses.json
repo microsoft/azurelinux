@@ -436,7 +436,7 @@
         "gnuplot",
         "gnutls",
         "gobject-introspection",
-        "golang-1.16",
+        "golang",
         "gperf",
         "gperftools",
         "gpgme",

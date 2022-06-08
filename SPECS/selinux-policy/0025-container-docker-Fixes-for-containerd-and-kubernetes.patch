@@ -1,0 +1,120 @@
+From 42ecd92f9c1f2febdc6bfcfa9337bbd05b8d5078 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 2 May 2022 15:40:27 +0000
+Subject: [PATCH 25/28] container, docker: Fixes for containerd and kubernetes
+ testing.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/corecommands.if | 18 ++++++++++++++++++
+ policy/modules/services/container.fc  |  5 +++++
+ policy/modules/services/container.te  |  3 +++
+ policy/modules/services/docker.te     |  5 +++++
+ 4 files changed, 31 insertions(+)
+
+diff --git a/policy/modules/kernel/corecommands.if b/policy/modules/kernel/corecommands.if
+index 2d7f27157..231aa69d9 100644
+--- a/policy/modules/kernel/corecommands.if
++++ b/policy/modules/kernel/corecommands.if
+@@ -142,6 +142,24 @@ interface(`corecmd_dontaudit_write_bin_dirs',`
+ 	dontaudit $1 bin_t:dir write;
+ ')
+ 
++########################################
++## <summary>
++##	Watch bin directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`corecmd_watch_bin_dirs',`
++	gen_require(`
++		type bin_t;
++	')
++
++	allow $1 bin_t:dir watch;
++')
++
+ ########################################
+ ## <summary>
+ ##	Get the attributes of files in bin directories.
+diff --git a/policy/modules/services/container.fc b/policy/modules/services/container.fc
+index ef5ad3b69..a4692c761 100644
+--- a/policy/modules/services/container.fc
++++ b/policy/modules/services/container.fc
+@@ -71,9 +71,14 @@ HOME_DIR/\.local/share/docker/volumes(/.*)?		gen_context(system_u:object_r:conta
+ /var/lib/docker/overlay2(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
+ /var/lib/docker/volumes/[^/]+/.*		gen_context(system_u:object_r:container_file_t,s0)
+ 
++/var/lib/etcd(/.*)?             gen_context(system_u:object_r:container_file_t,s0)
++
+ /var/lib/containerd(/.*)?		gen_context(system_u:object_r:container_var_lib_t,s0)
+ /var/lib/containerd/[^/]+/sandboxes(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
+ /var/lib/containerd/[^/]+/snapshots(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
+ 
++/var/lib/kubelet(/.*)?          gen_context(system_u:object_r:container_var_lib_t,s0)
++/var/lib/kubelet/pods(/.*)?     gen_context(system_u:object_r:container_file_t,s0)
++
+ /var/log/containers(/.*)?		gen_context(system_u:object_r:container_log_t,s0)
+ /var/log/pods(/.*)?		gen_context(system_u:object_r:container_log_t,s0)
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index d5f79b158..18cdc2dd5 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -175,6 +175,7 @@ allow container_domain container_ro_file_t:lnk_file read_lnk_file_perms;
+ allow container_domain container_ro_file_t:sock_file read_sock_file_perms;
+ 
+ can_exec(container_domain, container_file_t)
++corecmd_watch_bin_dirs(container_domain)
+ 
+ kernel_getattr_proc(container_domain)
+ kernel_list_all_proc(container_domain)
+@@ -471,6 +472,7 @@ can_exec(container_engine_domain, container_engine_exec_type)
+ list_dirs_pattern(container_engine_domain, container_config_t, container_config_t)
+ read_files_pattern(container_engine_domain, container_config_t, container_config_t)
+ read_lnk_files_pattern(container_engine_domain, container_config_t, container_config_t)
++allow container_engine_domain container_config_t:{ dir file } watch;
+ 
+ allow container_engine_domain container_engine_tmp_t:dir manage_dir_perms;
+ allow container_engine_domain container_engine_tmp_t:file manage_file_perms;
+@@ -493,6 +495,7 @@ allow container_engine_domain container_file_t:blk_file { manage_blk_file_perms
+ allow container_engine_domain container_file_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
+ allow container_engine_domain container_file_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
+ allow container_engine_domain container_file_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_domain container_file_t:sock_file { manage_sock_file_perms relabel_lnk_file_perms };
+ allow container_engine_domain container_file_t:filesystem { getattr relabelfrom relabelto mount unmount remount };
+ 
+ allow container_engine_domain container_ro_file_t:dir { manage_dir_perms relabel_dir_perms };
+diff --git a/policy/modules/services/docker.te b/policy/modules/services/docker.te
+index 7a657e15d..ba3d3ac66 100644
+--- a/policy/modules/services/docker.te
++++ b/policy/modules/services/docker.te
+@@ -34,17 +34,22 @@ application_domain(dockerc_user_t, dockerc_exec_t)
+ # Docker daemon local policy
+ #
+ 
++allow dockerd_t self:process getattr;
+ allow dockerd_t self:netlink_netfilter_socket create_socket_perms;
+ allow dockerd_t self:netlink_xfrm_socket create_socket_perms;
+ 
+ init_write_runtime_socket(dockerd_t)
+ container_runtime_named_socket_activation(dockerd_t)
+ 
++files_search_mnt(dockerd_t)
+ # docker fails to start if /proc/kallsyms is unreadable,
+ # but only when btrfs support is disabled
+ files_read_kernel_symbol_table(dockerd_t)
+ files_dontaudit_write_usr_dirs(dockerd_t)
+ 
++init_get_system_status(dockerd_t)
++init_stop_generic_units(dockerd_t)
++
+ kernel_relabelfrom_unlabeled_dirs(dockerd_t)
+ # docker wants to load binfmt_misc
+ kernel_request_load_module(dockerd_t)
+-- 
+2.25.1
+

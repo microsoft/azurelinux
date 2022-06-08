@@ -4,7 +4,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        20.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -14,6 +14,7 @@ Source0:        https://pypi.python.org/packages/source/T/Twisted/Twisted-%{vers
 Patch0:         extra_dependency.patch
 Patch1:         no_packet.patch
 Patch2:         CVE-2022-21712.patch
+Patch3:         CVE-2022-24801.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -24,13 +25,17 @@ BuildRequires:  python-zope-interface
 BuildRequires:  python-cryptography
 BuildRequires:  pyOpenSSL
 BuildRequires:  python-six
-
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-incremental
 BuildRequires:  python3-zope-interface
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  net-tools
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
 Requires:       python2
 Requires:       python2-libs
 Requires:       python-zope-interface
@@ -86,19 +91,20 @@ popd
 python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
 %check
+sed -i '/dump_all_version_info.py/d' tox.ini
 easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
-$easy_install_2 pip
+$easy_install_2 pip==20.3.4
 pip install --upgrade tox
 chmod g+w . -R
 useradd test -G root -m
-LANG=en_US.UTF-8 sudo -u test tox -e py27-tests
+LANG=en_US.UTF-8 sudo -u test tox -e py27-alldeps-nocov,
 pushd ../p3dir
 easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
 $easy_install_3 pip
-pip install --upgrade tox
+pip3 install --upgrade tox
 chmod g+w . -R
-LANG=en_US.UTF-8 sudo -u test tox -e py36-tests
+LANG=en_US.UTF-8 sudo -u test tox -e py37-alldeps-nocov
 popd
 
 %files
@@ -128,8 +134,12 @@ popd
 %{_bindir}/cftp3
 
 %changelog
-*   Sun Feb 20 2022 Mariner Autopatcher <cblmargh@microsoft.com> 20.3.0-2
--   Added patch file(s) CVE-2022-21712.patch
+* Wed Jun 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 20.3.0-3
+- Patch CVE-2022-24801
+
+* Sun Feb 20 2022 Mariner Autopatcher <cblmargh@microsoft.com> 20.3.0-2
+- Added patch file(s) CVE-2022-21712.patch
+
 * Fri Jul 30 2021 Thomas Crain <thcrain@microsoft.com> - 20.3.0-1
 - Upgrade to version 20.3.0 to fix CVE-2020-10108, CVE-2020-10109
 - Use %%autosetup instead of %%setup and %%patch

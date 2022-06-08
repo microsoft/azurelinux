@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.116.1
-Release:        1%{?dist}
+Version:        5.10.117.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -636,10 +636,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Jun 01 2022 Minghe Ren <mingheren@microsoft.com> - 5.10.117.1-2
+- Disable SMACK kernel configuration
+
+* Tue May 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.117.1-1
+- Update source to 5.10.117.1
+- Address CVE-2022-28893 
+
 * Tue May 17 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.116.1-1
 - Update source to 5.10.116.1
 - Address CVE-2022-1048, CVE-2022-1353, CVE-2022-29582, CVE-2022-1195
-  CVE-2022-0494, CVE-2022-1015 
+  CVE-2022-0494, CVE-2022-1015, CVE-2022-29968
 
 * Tue Apr 19 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.111.1-1
 - Update source to 5.10.111.1

@@ -675,8 +675,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.5",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.5.tar.gz"
+          "version": "0.103.6",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.6.tar.gz"
         }
       }
     },
@@ -1875,8 +1875,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.16.15",
-          "downloadUrl": "https://golang.org/dl/go1.16.15.src.tar.gz"
+          "version": "1.18.3",
+          "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
         }
       }
     },
@@ -2135,8 +2135,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.116.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.116.1.tar.gz"
+          "version": "5.10.117.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
         }
       }
     },
@@ -2465,8 +2465,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.116.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.116.1.tar.gz"
+          "version": "5.10.117.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
         }
       }
     },
@@ -2475,8 +2475,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.116.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.116.1.tar.gz"
+          "version": "5.10.117.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
         }
       }
     },
@@ -2485,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.116.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.116.1.tar.gz"
+          "version": "5.10.117.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
         }
       }
     },
@@ -4195,8 +4195,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.3.34",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.34.tar.gz"
+          "version": "10.3.35",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.35.tar.gz"
         }
       }
     },
@@ -4295,8 +4295,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.5.9+azure",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.5.9.tar.gz"
+          "version": "1.6.6+azure",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.6.tar.gz"
         }
       }
     },
@@ -5116,7 +5116,7 @@
         "other": {
           "name": "pcre2",
           "version": "10.34",
-          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre2-10.34.tar.bz2"
+          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.34/pcre2-10.34.tar.bz2"
         }
       }
     },
@@ -7135,8 +7135,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.6.9",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.9.tar.xz"
+          "version": "2.6.10",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.10.tar.xz"
         }
       }
     },
@@ -8615,8 +8615,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4774",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4774.tar.gz"
+          "version": "8.2.5064",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5064.tar.gz"
         }
       }
     },
