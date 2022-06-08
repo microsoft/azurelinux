@@ -88,7 +88,7 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 	defer func() {
 		// Delete all files under /etc/yum.repos.d/
 		if err != nil {
-			err = shell.ExecuteLive(squashErrors, "rm", "/etc/yum.repos.d/*")
+			err = shell.ExecuteLive(squashErrors, "rm", fmt.Sprintf("%s/*", repoFileDir))
 			if err != nil {
 				logger.Log.Errorf("Failed to clean up repo files under %s. Error: %s", repoFileDir, err)
 			}
