@@ -6,10 +6,11 @@
 ## The order of libs is important. See lib/Makefile.in for details
 %define bind_export_libs isc dns isccfg irs
 %{!?_export_dir:%global _export_dir /bind9-export/}
+
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.15
-Release:        4%{?dist}
+Version:        9.16.29
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,10 +31,6 @@ Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
 Source14:       setup-named-softhsm.sh
 Source15:       named-chroot.files
-# CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
-Patch0:         CVE-2019-6470.nopatch
-# CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
-Patch1:         CVE-2020-8623.nopatch
 Patch9:         bind-9.14-config-pkcs11.patch
 Patch10:        bind-9.10-dist-native-pkcs11.patch
 
@@ -613,6 +610,9 @@ fi;
 %{_tmpfilesdir}/named.conf
 
 %changelog
+* Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.29-1
+- Updating to 9.16.29 to fix CVE-2021-25219.
+
 * Mon Apr 04 2022 Henry Li <lihl@microsoft.com> - 9.16.15-4
 - Remove trusted-key.key which works with +sigchase, a deprecated feature
 - License Verified
