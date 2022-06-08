@@ -127,14 +127,16 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 
 	csvFile, err := os.Create(outputPath)
 	if err != nil {
-		logger.Log.Warnf("Unable to create %s file. Error: %s", outputPath, err)
+		logger.Log.Warnf("Unable to create '%s' file. Error: %s", outputPath, err)
 		return
 	}
+	defer csvFile.Close()
 
 	csvWriter := csv.NewWriter(csvFile)
-	csvWriter.WriteAll(csvBlob)
-
-	csvFile.Close()
+	err = csvWriter.WriteAll(csvBlob)
+	if err != nil {
+		logger.Log.Warnf("Failed to write to CSV file '%s'. Error: %s", outputPath, err)
+	}
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.
