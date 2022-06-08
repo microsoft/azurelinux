@@ -2,8 +2,8 @@
 
 Summary: Industry-standard container runtime
 Name: moby-containerd
-Version: 1.5.9+azure
-Release: 7%{?dist}
+Version: 1.6.6+azure
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -17,8 +17,6 @@ Source1: containerd.service
 Source2: containerd.toml
 Source3: NOTICE
 Source4: LICENSE
-
-Patch0:  CVE-2022-23648.patch
 
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
@@ -79,8 +77,8 @@ ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/contain
 %build
 export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
-export GOPROXY=off
-export GO111MODULE=off
+export GOPROXY=direct
+export GO111MODULE=on
 #export GOFLAGS=-trimpath
 export GOGC=off
 cd %{OUR_GOPATH}/src/github.com/containerd/containerd
@@ -134,6 +132,8 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
+- Upgrade to version 1.6.6 to fix CVE-2022-31030
 * Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.9+azure-7
 - Bumping release to rebuild with golang 1.18.3
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.5.9+azure-6
