@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.clamav.net
 Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
-
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -27,10 +26,8 @@ BuildRequires:  python3-pytest
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
-
 Requires:       openssl
 Requires:       zlib
-
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-lib = %{version}-%{release}
 
@@ -45,7 +42,7 @@ line scanner and an advanced tool for automatic database updates.
 
 %build
 # Notes:
-# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages 
+# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages
 #   which provides the necessary pieces to build 'clamav-milter'
 # - systemd should be enabled because default value is off
 cmake \
@@ -77,7 +74,7 @@ mkdir -p %{buildroot}%{_sharedstatedir}/clamav
 sed -ri \
     -e 's!^Example!#Example!' \
     -e 's!^#?(UpdateLogFile )!#\1!g;' %{buildroot}%{_sysconfdir}/clamav/freshclam.conf.sample
- 
+
 mv %{buildroot}%{_sysconfdir}/clamav/freshclam.conf{.sample,}
 # Can contain HTTPProxyPassword (bugz#1733112)
 chmod 600 %{buildroot}%{_sysconfdir}/clamav/freshclam.conf
