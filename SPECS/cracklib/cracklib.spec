@@ -185,7 +185,7 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 
 %changelog
 * Tue Jun 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
-- Remove packer symlink- not necessary, conflicts with Hasicorp's Packer tool
+- Remove packer symlink- not necessary, conflicts with Hashicorp's packer tool
 
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-4
 -   Removing the explicit %%clean stage.
