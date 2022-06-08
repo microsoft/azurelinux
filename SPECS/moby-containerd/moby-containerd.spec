@@ -77,8 +77,8 @@ ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/contain
 %build
 export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
-export GOPROXY=off
-export GO111MODULE=off
+export GOPROXY=direct
+export GO111MODULE=on
 #export GOFLAGS=-trimpath
 export GOGC=off
 cd %{OUR_GOPATH}/src/github.com/containerd/containerd
