@@ -501,7 +501,7 @@ pyproject-rpm-macros-1.0.0~rc1-2.cm2.noarch.rpm
 python-markupsafe-debuginfo-2.1.0-1.cm2.aarch64.rpm
 python3-3.9.12-1.cm2.aarch64.rpm
 python3-audit-3.0.6-6.cm2.aarch64.rpm
-python3-cracklib-2.9.7-4.cm2.aarch64.rpm
+python3-cracklib-2.9.7-5.cm2.aarch64.rpm
 python3-curses-3.9.12-1.cm2.aarch64.rpm
 python3-Cython-0.29.26-1.cm2.aarch64.rpm
 python3-debuginfo-3.9.12-1.cm2.aarch64.rpm
