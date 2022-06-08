@@ -16,14 +16,14 @@ claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
 Name:           python-%{pkgname}
-Version:        2.3.0
+Version:        2.4.0
 Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/1d/8e/01bdcfdbb352daaba8ea406d9df149c5bba7dbf70f908d4fa4c269fe6a08/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/d8/6b/6287745054dbcccf75903630346be77d4715c594402cec7c2518032416c2/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -69,6 +69,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %endif
 
 %changelog
+* Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-1
+- Updating to 2.4.0 to fix CVE-2022-29217.
+
 * Tue Feb 22 2022 Nick Samson <nisamson@microsoft.com> - 2.3.0-1
 - Updated to 2.3.0.
 - Removed pyjwt binary as it no longer exists.
