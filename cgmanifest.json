@@ -19174,8 +19174,8 @@
         "type": "other",
         "other": {
           "name": "prometheus",
-          "version": "2.24.1",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.24.1.tar.gz"
+          "version": "2.36.0",
+          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.36.0.tar.gz"
         }
       }
     },
