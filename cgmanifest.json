@@ -13713,6 +13713,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "packer",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pacrunner",
           "version": "0.16",
           "downloadUrl": "http://www.kernel.org/pub/linux/network/connman/pacrunner-0.16.tar.xz"
