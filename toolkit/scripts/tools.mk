@@ -140,13 +140,15 @@ worker_chroot_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/$(worker_manifest_name)
 sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
 worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chroot_manifest))
 
+# The worker chroot depends on specific toolchain RPMs, the $(toolchain_rpms): target in toolchain.mk knows how
+# to update these RPMs if required.
 worker_chroot_deps := \
 	$(worker_chroot_manifest) \
 	$(worker_chroot_rpm_paths) \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
-$(chroot_worker): $(worker_chroot_deps)
+$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 else
 $(chroot_worker):
 endif
