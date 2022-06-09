@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.15.41.1
-Release:        2%{?dist}
+Version:        5.15.45.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -219,6 +219,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
+- Update source to 5.15.45.1
+
 * Thu Jun 02 2022 Chris Patterson <cpatterson@microsoft.com> - 5.15.41.1-2
 - Fix ordering to ensure kvpd is started prior to cloud-init-local.service
 - Only start service if running under Hyper-V

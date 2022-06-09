@@ -1,12 +1,12 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt40
+%global rt_version rt46
 %define uname_r %{version}-%{rt_version}-%{release}
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.34.1
-Release:        2%{?dist}
+Version:        5.15.44.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -354,6 +354,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.44.1-1
+- Update source to 5.15.44.1
+
 * Mon Jun 06 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.34.1-2
 - Disable SMACK kernel configuration
 
