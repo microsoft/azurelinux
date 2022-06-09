@@ -184,7 +184,7 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
-* Tue Jun 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
+* Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
 - Remove packer symlink- not necessary, conflicts with Hashicorp's packer tool
 
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-4

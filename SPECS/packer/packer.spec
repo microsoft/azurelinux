@@ -60,6 +60,6 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Tue Jun 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.1-1
+* Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.1-1
 - Original version for CBL-Mariner.
 - License verified.

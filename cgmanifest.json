@@ -22986,7 +22986,7 @@
         "other": {
           "name": "ruby-augeas",
           "version": "0.5.0",
-          "downloadUrl": "https://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
+          "downloadUrl": "http://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
         }
       }
     },
@@ -25337,8 +25337,8 @@
         "type": "other",
         "other": {
           "name": "terraform",
-          "version": "1.1.7",
-          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.1.7.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.2.2.tar.gz"
         }
       }
     },
