@@ -8,7 +8,9 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:1.0.20220226
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
 ENV LC_ALL=POSIX
-ENV PATH=/tools/bin:/bin:/usr/bin:/sbin:/usr/sbin
+ENV PATH=/bin:/tools/bin:/usr/bin:/sbin:/usr/sbin
+# ENV PATH=/tools/bin:/bin:/usr/bin:/sbin:/usr/sbin
+ENV CONFIG_SITE=$LFS/usr/share/config.site
 
 COPY [ "./version-check-container.sh", \
        "$LFS/tools/" ]
@@ -41,6 +43,13 @@ RUN tdnf install -y \
     mkdir -pv $LFS/logs/temptoolchain && \
     mkdir -pv $LFS/tools && \
     ln    -sv $LFS/tools / && \
+
+    mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin} && \
+    ln -sv usr/bin $LFS/bin && \
+    ln -sv usr/lib $LFS/lib && \
+    ln -sv usr/sbin $LFS/sbin && \
+    mkdir -pv $LFS/lib64  && \
+
     $LFS/tools/version-check-container.sh
 
 COPY [ "./toolchain-sha256sums", \
@@ -66,6 +75,7 @@ RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     usermod -a -G sudo lfs && \
     chown -v lfs $LFS/tools && \
     chown -v lfs $LFS/sources && \
+    chown -v lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools} && \
     chown -Rv lfs $LFS/logs && \
     echo "lfs ALL = NOPASSWD : ALL" >> /etc/sudoers && \
     echo 'Defaults env_keep += "LFS LC_ALL LFS_TGT PATH MAKEFLAGS FETCH_TOOLCHAIN_MODE LFS_TEST LFS_DOCS JOB_COUNT LOOP IMAGE_SIZE INITRD_TREE IMAGE"' >> /etc/sudoers
@@ -88,11 +98,10 @@ RUN  chown -Rv lfs $LFS/tools && \
      chown -Rv lfs:lfs /home/lfs/
 
 USER lfs
-# RUN /tools/toolchain_build_temp_tools.sh
+RUN /tools/toolchain_build_temp_tools.sh
 
 COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain_build_in_chroot.sh", \
-       "./raw_cross_toolchain.sh", \
        "./mount_chroot_start_build.sh", \
        "./unmount_chroot.sh", \
        "./go14_bootstrap_aarch64.patch", \
