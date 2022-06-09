@@ -8,8 +8,9 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:1.0.20220226
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
 ENV LC_ALL=POSIX
-ENV PATH=/tools/bin:/bin:/usr/bin:/sbin:/usr/sbin 
-# ENV PATH=/bin:/usr/bin:/tools/bin:/sbin:/usr/sbin # specifying /tools/bin first causes build time dependencies for cross-compilation
+# specifying /tools/bin first causes build time dependency errors for cross-compilation
+ENV PATH=/bin:/usr/bin:/tools/bin:/sbin:/usr/sbin 
+# ENV PATH=/tools/bin:/bin:/usr/bin:/sbin:/usr/sbin 
 
 COPY [ "./version-check-container.sh", \
        "$LFS/tools/" ]
