@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://augeas.net
-Source0:        https://download.augeas.net/ruby/%{name}-%{version}.tgz
+Source0:        http://download.augeas.net/ruby/%{name}-%{version}.tgz
 
 BuildRequires:  augeas-devel >= 1.0.0
 BuildRequires:  gcc
@@ -49,6 +49,7 @@ ruby tests/tc_augeas.rb
 %changelog
 * Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-30
 - Adding missed BR on 'rubygem(rake)'.
+- Fixed source URL.
 
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.5.0-29
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
