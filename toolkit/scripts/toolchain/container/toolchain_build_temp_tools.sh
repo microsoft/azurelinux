@@ -14,13 +14,11 @@ cd $LFS/sources
 touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 
 cat /home/lfs/.bashrc
-# LFS_TGT=$(uname -m)-lfs-linux-gnu
-LFS_TGT=aarch64-lfs-linux-gnu
 
-# change PATH variable
-# PATH=/usr/bin
-# if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
-# PATH=$LFS/tools/bin:$PATH
+#force LFS_TGT to aarch64
+LFS_TGT=aarch64-lfs-linux-gnu
+# LFS_TGT=$(uname -m)-lfs-linux-gnu
+
 
 # BINUTILS --------------------------------------------------------------------------------------
 echo Binutils-2.37 - Pass 1
@@ -149,8 +147,6 @@ pushd glibc-2.35
 patch -Np1 -i ../glibc-2.35-fhs-1.patch
 mkdir -v build
 cd       build
-      # --build=$MACHTYPE                   \
-      # --with-sysroot=$LFS                \
 ../configure                             \
       --prefix=/tools                    \
       --disable-werror                   \
@@ -248,8 +244,6 @@ popd
 make -j$(nproc)
 sudo make DESTDIR=$LFS TIC_PATH=$(pwd)/build/progs/tic install
 sudo echo "INPUT(-lncursesw)" > $LFS/tools/lib/libncurses.so
-# make install
-# ln -s libncursesw.so /tools/lib/libncurses.so
 popd
 rm -rf ncurses-6.2
 
@@ -314,7 +308,7 @@ rm -rf diffutils-3.8
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 echo built diffutils
 
-# The file version installed on my build machine is version 5.38. The version being compiled is 5.40. Cross-compilation can't be done with build version 5.38 and target version 5.40 
+# Error installing File-5.40: The file version installed on my build machine is version 5.38. The version being compiled is 5.40. Cross-compilation can't be done with build version 5.38 and target version 5.40 
 # echo File-5.40
 # tar xf file-5.40.tar.gz
 # pushd file-5.40
@@ -337,6 +331,7 @@ echo built diffutils
 # touch $LFS/logs/temptoolchain/status_file_complete
 # echo built file
 
+# Skipping bzip2 since it is not listed on the LFS cross-toolchain documentation
 # # "bzip2" should build after "file" to prevent error:
 # #/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
 # #collect2: error: ld returned 1 exit status
@@ -445,6 +440,7 @@ rm -rf patch-2.7.6
 touch $LFS/logs/temptoolchain/status_patch_complete
 echo built patch
 
+# Skipping Perl since it is not listed on the LFS cross-toolchain documentation
 # echo Perl-5.32.0
 # tar xf perl-5.32.0.tar.xz
 # pushd perl-5.32.0
@@ -461,7 +457,7 @@ echo built patch
 
 # touch $LFS/logs/temptoolchain/status_perl_complete
 
-# Package does not exist
+# Skipping Python since the package does not exist in the Docker environment
 # echo Python-3.9.12
 # tar xf Python-3.9.12.tar.xz
 # pushd Python-3.9.12
@@ -498,7 +494,8 @@ rm -rf tar-1.34
 touch $LFS/logs/temptoolchain/status_tar_complete
 echo built tar
 
-# ERROR: ../tools/info/makedoc: Command not found
+# Error building texinfo: ../tools/info/makedoc: Command not found
+# This package is also not required for the cross-toolchain according to LFS documentation
 # echo Texinfo-6.8
 # tar xf texinfo-6.8.tar.xz
 # pushd texinfo-6.8
@@ -523,7 +520,7 @@ popd
 rm -rf xz-5.2.5
 
 touch $LFS/logs/temptoolchain/status_xz_complete
-echo built Xz
+echo built xz
 
 echo Flex-2.6.4
 tar xf flex-2.6.4.tar.gz
@@ -540,6 +537,7 @@ touch $LFS/logs/temptoolchain/status_flex_complete
 echo built flex
 
 
+# Skipping binutils pass 2: the make step currently fails
 # echo Binutils-2.37 - Pass 2
 # tar xf binutils-2.37.tar.xz
 # pushd binutils-2.37
@@ -552,7 +550,7 @@ echo built flex
 # touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
 
-
+# Skipping GCC pass 2: the configure step currently fails
 # echo GCC-11.2.0 - Pass 2
 # tar xf gcc-11.2.0.tar.xz
 # pushd gcc-11.2.0
