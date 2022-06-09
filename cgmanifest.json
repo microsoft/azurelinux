@@ -22986,7 +22986,7 @@
         "other": {
           "name": "ruby-augeas",
           "version": "0.5.0",
-          "downloadUrl": "https://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
+          "downloadUrl": "http://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
         }
       }
     },
