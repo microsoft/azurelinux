@@ -116,6 +116,7 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 %changelog
 * Thu Jun 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.27.5-1
 - Fixing CVEs
+- License Verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.27.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
