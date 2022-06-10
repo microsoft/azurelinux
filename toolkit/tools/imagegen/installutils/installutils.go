@@ -374,7 +374,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
 // - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
 	const (
 		filesystemPkg = "filesystem"
 	)
@@ -384,17 +384,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
-
-	if len(config.PackageRepos) > 0 {
-		if config.IsKickStartBoot && config.IsIsoInstall {
-			err = configuration.UpdatePackageRepo(installChroot, config)
-			if err != nil {
-				return
-			}
-		} else {
-			return fmt.Errorf("custom package repos should not be specified unless performing kickstart ISO installation")
-		}
-	}
 
 	// Initialize RPM Database so we can install RPMs into the installroot
 	err = initializeRpmDatabase(installRoot, diffDiskBuild)
@@ -457,7 +446,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !isRootFS {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, encryptedRoot, hidepidEnabled)
+		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, hidepidEnabled)
 		if err != nil {
 			return
 		}
@@ -652,7 +641,7 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -660,7 +649,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, hidepidEnabled)
+	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
 	if err != nil {
 		return
 	}
@@ -822,7 +811,7 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap map[string]string, hidepidEnabled bool) (err error) {
+func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -850,11 +839,15 @@ func updateFstab(installRoot string, config configuration.SystemConfig, installM
 	}
 
 	// Add swap entry if there is one
-	swapPartitionPath, ok := partIDToDevPathMap["swap"]
-	if ok {
-		err = addEntryToFstab(installRoot, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
-		if err != nil {
-			return
+	for partID, fstype := range partIDToFsTypeMap {
+		if fstype == "linux-swap" {
+			swapPartitionPath, exists := partIDToDevPathMap[partID]
+			if exists {
+				err = addEntryToFstab(installRoot, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
+				if err != nil {
+					return
+				}
+			}
 		}
 	}
 
