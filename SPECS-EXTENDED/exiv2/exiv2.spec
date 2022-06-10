@@ -8,18 +8,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.exiv2.org/
 Source0:        https://github.com/Exiv2/exiv2/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 BuildRequires:  cmake
 BuildRequires:  curl-devel
-BuildRequires:  doxygen 
+BuildRequires:  doxygen
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
-BuildRequires:  graphviz 
+BuildRequires:  graphviz
 BuildRequires:  libssh2-devel
 BuildRequires:  libxslt
 BuildRequires:  zlib-devel
-
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
@@ -35,25 +33,28 @@ A command line utility to access image metadata, allowing one to:
   Iptc metadata and Jpeg comments
 
 %package      devel
-Summary:      Header files, libraries and development documentation for %{name}
-Requires:     %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Header files, libraries and development documentation for %{name}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # FIXME/TODO: probably overlinking --rex
 # exiv2/exiv2Config.cmake:  INTERFACE_LINK_LIBRARIES "/usr/lib64/libexpat.so"
-Requires:     expat-devel%{?_isa} 
+Requires:       expat-devel%{?_isa}
+
 %description  devel
 %{summary}.
 
 %package      libs
-Summary:      Exif and Iptc metadata manipulation library
-Recommends:   %{name} = %{version}-%{release}
+Summary:        Exif and Iptc metadata manipulation library
+Recommends:     %{name} = %{version}-%{release}
+
 %description  libs
 A C++ library to access image metadata, supporting full read and write access
 to the Exif and Iptc metadata, Exif MakerNote support, extract and delete
 methods for Exif thumbnails, classes to access Ifd and so on.
 
 %package      doc
-Summary:      Api documentation for %{name}
-BuildArch:    noarch
+Summary:        Api documentation for %{name}
+BuildArch:      noarch
+
 %description  doc
 %{summary}.
 
