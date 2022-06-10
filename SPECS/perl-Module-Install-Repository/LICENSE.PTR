@@ -1,0 +1,9 @@
+License information taken from META.yml:
+
+(...)
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+...

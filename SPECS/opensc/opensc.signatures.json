@@ -1,7 +1,6 @@
 {
  "Signatures": {
-  "common.sh": "982c7885eccfabfc8111c0cf3b86d0e4c5f1fd873287f8284fef52ed018f251b",
-  "opensc-0.20.0.tar.gz": "bbf4b4f4a44463645c90a525e820a8059b2f742a53b7b944f941de3c97ba4863",
+  "opensc-0.22.0.tar.gz": "8d4e5347195ebea332be585df61dcc470331c26969e4b0447c851fb0844c7186",
   "opensc.module": "0e5acd06540dc70e0d6bae5c5451374f1d8addf9de169a6e5ef2c99753064441"
  }
 }

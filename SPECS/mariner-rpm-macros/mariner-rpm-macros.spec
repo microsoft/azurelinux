@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,6 +121,10 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-15
+- Remove module_info.ld from default LDFLAGS; require setting through "mariner_module_ldflags"
+- Modify gen-ld-script.sh to pass OS Version and predefine OS ID instead of parsing from /etc/os-release (no longer in toolchain env)
+
 * Tue Apr 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-14
 - Adding the "_mariner_sources_url" macro.
 

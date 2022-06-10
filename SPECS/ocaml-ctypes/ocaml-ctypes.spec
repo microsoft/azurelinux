@@ -1,7 +1,7 @@
 Summary:        Combinators for binding to C libraries without writing any C
 Name:           ocaml-ctypes
 Version:        0.18.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,10 @@ sed -i 's/^DOCFLAGS=/&-I $(shell ocamlfind query bigarray-compat) /' Makefile
 sed -i 's|-add ctypes|& -ldconf %{buildroot}%{_libdir}/ocaml/ld.conf|' Makefile
 
 %build
+# Fixing test build dependencies.
+sed -i -e "s/ounit/ounit2/" ctypes.opam
+sed -i -e "s/oUnit/ounit2/" Makefile.tests
+
 # FIXME: Infrequent build failures with parallel build
 # It looks like the configuration step isn't done before its results are needed
 make all XEN=disable
@@ -123,6 +127,9 @@ make test
 %doc *.html *.css
 
 %changelog
+* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.0-5
+- Fixing ptests.
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.0-4
 - Cleaning-up spec. License verified.
 

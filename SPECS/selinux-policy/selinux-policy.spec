@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,15 @@ Patch26:        0026-devices-Add-type-for-SAS-management-devices.patch
 Patch27:        0027-devices-Add-file-context-for-dev-vhost-vsock.patch
 Patch28:        0028-Add-dac_read_search-perms.patch
 Patch29:        0029-iptables-Ioctl-cgroup-dirs.patch
+Patch30:        0030-container-allow-containers-to-manipulate-own-fds.patch
+Patch31:        0031-devices-Add-type-for-infiniband-devices.patch
+Patch32:        0032-storage-Add-fc-for-dev-ng-n-devices.patch
+Patch33:        0033-files-Add-prerequisite-access-for-files_mounton_non_.patch
+Patch34:        0034-files-Make-etc_runtime_t-a-config-file.patch
+Patch35:        0035-systemd-Fixes-for-coredumps-in-containers.patch
+Patch36:        0036-container-Allow-container-engines-to-connect-to-http.patch
+Patch37:        0037-container-Getattr-generic-device-nodes.patch
+Patch38:        0038-application-Allow-apps-to-use-init-fds.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -323,6 +332,13 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon May 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-6
+- Fix previous multipath LVM changes.
+- Add types for devices.
+- Cherry pick upstream commit for container fds.
+- Allow container engines to connect to http cache ports.
+- Allow container engines to stat() generic (device_t) devices.
+
 * Mon May 02 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-5
 - Additional compatibility for Fedora container-selinux.
 - Remove unneeded systemd_run_t domain

@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,7 +34,7 @@ BuildRequires:  zstd-devel
 Requires:       bash
 Requires:       libarchive
 Requires:       libselinux
-Requires:       lua
+Requires:       lua-libs
 Requires:       rpm-libs = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
@@ -82,6 +82,7 @@ Requires:       elfutils-devel
 Requires:       elfutils-libelf
 Requires:       file
 Requires:       gzip
+Requires:       lua
 Requires:       mariner-rpm-macros
 Requires:       patch
 Requires:       tar
@@ -206,8 +207,6 @@ popd
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
 %{_libdir}/rpm-plugins/*
-%{_libdir}/rpm/pythondistdeps.py
-%{_fileattrsdir}/python.attr
 # Because of no doxygen dependency, we do not produce manpages that require it.
 # %{_mandir}/man8/rpm.8.gz
 # %{_mandir}/man8/rpm2cpio.8.gz
@@ -248,6 +247,7 @@ popd
 %{_libdir}/rpm/mkinstalldirs
 %{_libdir}/rpm/pkgconfigdeps.sh
 %{_libdir}/rpm/*.prov
+%{_libdir}/rpm/pythondistdeps.py
 
 %{_libdir}/rpm/pythondeps.sh
 %{_libdir}/rpm/ocamldeps.sh
@@ -276,6 +276,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.17.0-8
+- Move lua runtime dependency from main rpm package.  Move to rpm-build.
+- Move python files to rpm-build package.  This removes the implied dependency on python3 by the rpm package.
+
 * Fri May 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 4.17.0-7
 - Add missing dependencies to rpmbuild (file, diff and patch)
 

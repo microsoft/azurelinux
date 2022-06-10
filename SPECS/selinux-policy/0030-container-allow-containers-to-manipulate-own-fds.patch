@@ -1,0 +1,34 @@
+From 7081fde476c41ded9847552addd807d57febaa14 Mon Sep 17 00:00:00 2001
+From: Kenton Groombridge <me@concord.sh>
+Date: Fri, 29 Apr 2022 21:36:10 -0400
+Subject: [PATCH 30/37] container: allow containers to manipulate own fds
+
+Signed-off-by: Kenton Groombridge <me@concord.sh>
+---
+ policy/modules/services/container.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index 18cdc2dd5..ea76c1096 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -151,6 +151,8 @@ corenet_port(container_port_t)
+ allow container_domain self:capability { dac_override kill setgid setuid sys_boot sys_chroot };
+ allow container_domain self:cap_userns { chown dac_override fowner setgid setuid };
+ allow container_domain self:process { execstack execmem getattr getsched getsession setsched setcap setpgid signal_perms };
++allow container_domain self:dir rw_dir_perms;
++allow container_domain self:file create_file_perms;
+ allow container_domain self:fifo_file manage_fifo_file_perms;
+ allow container_domain self:sem create_sem_perms;
+ allow container_domain self:shm create_shm_perms;
+@@ -179,6 +181,7 @@ corecmd_watch_bin_dirs(container_domain)
+ 
+ kernel_getattr_proc(container_domain)
+ kernel_list_all_proc(container_domain)
++kernel_associate_proc(container_domain)
+ kernel_read_kernel_sysctls(container_domain)
+ kernel_rw_net_sysctls(container_domain)
+ kernel_read_system_state(container_domain)
+-- 
+2.25.1
+

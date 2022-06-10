@@ -385,6 +385,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
 
+	if len(config.PackageRepos) > 0 {
+		if config.IsKickStartBoot && config.IsIsoInstall {
+			err = configuration.UpdatePackageRepo(installChroot, config)
+			if err != nil {
+				return
+			}
+		} else {
+			return fmt.Errorf("custom package repos should not be specified unless performing kickstart ISO installation")
+		}
+	}
+
 	// Initialize RPM Database so we can install RPMs into the installroot
 	err = initializeRpmDatabase(installRoot, diffDiskBuild)
 	if err != nil {
