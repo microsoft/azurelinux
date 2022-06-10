@@ -2948,8 +2948,8 @@
         "type": "other",
         "other": {
           "name": "exiv2",
-          "version": "0.27.2",
-          "downloadUrl": "http://exiv2.org/builds/exiv2-0.27.2-Source.tar.gz"
+          "version": "0.27.5",
+          "downloadUrl": "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.27.5.tar.gz"
         }
       }
     },
