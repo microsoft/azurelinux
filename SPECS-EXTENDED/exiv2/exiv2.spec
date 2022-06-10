@@ -59,7 +59,7 @@ BuildArch:      noarch
 %{summary}.
 
 %prep
-%autosetup -n %{name}-%{version} -p1
+%autosetup -p1
 
 %build
 
