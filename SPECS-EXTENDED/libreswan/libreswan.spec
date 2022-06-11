@@ -208,7 +208,7 @@ certutil -N -d sql:$tmpdir --empty-password
 %changelog
 * Fri Jun 10 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.7-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- Lincense verified
+- License verified
 
 * Tue May 24 2022 Paul Wouters <paul.wouters@aiven.io> - 4.7-1
 - Updated to 4.7 (EAPTLS support, bugfixes)
