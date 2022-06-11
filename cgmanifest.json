@@ -9440,6 +9440,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libreswan",
+          "version": "4.7",
+          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "librevenge",
           "version": "0.0.4",
           "downloadUrl": "http://downloads.sourceforge.net/libwpd/librevenge-0.0.4.tar.xz"
