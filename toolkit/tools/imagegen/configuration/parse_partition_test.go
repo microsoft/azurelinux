@@ -25,7 +25,7 @@ var (
 		},
 		Partitions: []Partition{
 			{
-				ID:     "Partition1",
+				ID: "Partition1",
 				Flags: []PartitionFlag{
 					"bios_grub",
 				},

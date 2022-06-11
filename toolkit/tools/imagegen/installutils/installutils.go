@@ -370,6 +370,8 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - installMap is a map of mountpoints to physical device paths
 // - mountPointToFsTypeMap is a map of mountpoints to filesystem type
 // - mountPointToMountArgsMap is a map of mountpoints to mount options
+// - partIDToDevPathMap is a map of partition IDs to physical device paths
+// - partIDToFsTypeMap is a map of partition IDs to filesystem type
 // - isRootFS specifies if the installroot is either backed by a directory (rootfs) or a raw disk
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
@@ -384,6 +386,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
+
+	if len(config.PackageRepos) > 0 {
+		if config.IsKickStartBoot && config.IsIsoInstall {
+			err = configuration.UpdatePackageRepo(installChroot, config)
+			if err != nil {
+				return
+			}
+		} else {
+			return fmt.Errorf("custom package repos should not be specified unless performing kickstart ISO installation")
+		}
+	}
 
 	// Initialize RPM Database so we can install RPMs into the installroot
 	err = initializeRpmDatabase(installRoot, diffDiskBuild)
