@@ -947,8 +947,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.15",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.15/bind-9.16.15.tar.xz"
+          "version": "9.16.29",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.29/bind-9.16.29.tar.xz"
         }
       }
     },
@@ -1537,8 +1537,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "22.1",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.1/+download/cloud-init-22.1.tar.gz"
+          "version": "22.2",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.2/+download/cloud-init-22.2.tar.gz"
         }
       }
     },
@@ -2948,8 +2948,8 @@
         "type": "other",
         "other": {
           "name": "exiv2",
-          "version": "0.27.2",
-          "downloadUrl": "http://exiv2.org/builds/exiv2-0.27.2-Source.tar.gz"
+          "version": "0.27.5",
+          "downloadUrl": "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.27.5.tar.gz"
         }
       }
     },
@@ -13713,6 +13713,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "packer",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pacrunner",
           "version": "0.16",
           "downloadUrl": "http://www.kernel.org/pub/linux/network/connman/pacrunner-0.16.tar.xz"
@@ -19174,8 +19184,8 @@
         "type": "other",
         "other": {
           "name": "prometheus",
-          "version": "2.24.1",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.24.1.tar.gz"
+          "version": "2.36.0",
+          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.36.0.tar.gz"
         }
       }
     },
@@ -20544,8 +20554,8 @@
         "type": "other",
         "other": {
           "name": "python-jwt",
-          "version": "2.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/1d/8e/01bdcfdbb352daaba8ea406d9df149c5bba7dbf70f908d4fa4c269fe6a08/PyJWT-2.3.0.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/d8/6b/6287745054dbcccf75903630346be77d4715c594402cec7c2518032416c2/PyJWT-2.4.0.tar.gz"
         }
       }
     },
@@ -22976,7 +22986,7 @@
         "other": {
           "name": "ruby-augeas",
           "version": "0.5.0",
-          "downloadUrl": "https://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
+          "downloadUrl": "http://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
         }
       }
     },
@@ -25037,8 +25047,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "101.2.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v101.2.0.tar.gz"
+          "version": "102.0.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v102.0.0.tar.gz"
         }
       }
     },
@@ -25047,8 +25057,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.1.0.tar.gz"
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.2.0.tar.gz"
         }
       }
     },
@@ -25327,8 +25337,8 @@
         "type": "other",
         "other": {
           "name": "terraform",
-          "version": "1.1.7",
-          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.1.7.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.2.2.tar.gz"
         }
       }
     },
@@ -25887,8 +25897,8 @@
         "type": "other",
         "other": {
           "name": "usbredir",
-          "version": "0.10.0",
-          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.10.0.tar.xz"
+          "version": "0.12.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.12.0.tar.xz"
         }
       }
     },
@@ -25967,8 +25977,8 @@
         "type": "other",
         "other": {
           "name": "util-linux",
-          "version": "2.37.2",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.2.tar.xz"
+          "version": "2.37.4",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.4.tar.xz"
         }
       }
     },

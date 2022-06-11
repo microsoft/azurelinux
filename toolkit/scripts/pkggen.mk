@@ -33,6 +33,7 @@ graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
 preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
+output_csv_file   = $(PKGBUILD_DIR)/build_state.csv
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
@@ -183,6 +184,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
+		--output-build-state-csv-file="$(output_csv_file)" \
 		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
 		--work-dir="$(CHROOT_DIR)" \
 		--worker-tar="$(chroot_worker)" \

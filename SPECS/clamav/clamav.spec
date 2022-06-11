@@ -1,14 +1,13 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.104.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.clamav.net
 Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
-
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -27,10 +26,8 @@ BuildRequires:  python3-pytest
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
-
 Requires:       openssl
 Requires:       zlib
-
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-lib = %{version}-%{release}
 
@@ -44,37 +41,60 @@ line scanner and an advanced tool for automatic database updates.
 %autosetup
 
 %build
-mkdir -p build
-cd build
-
 # Notes:
-# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages 
+# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages
 #   which provides the necessary pieces to build 'clamav-milter'
 # - systemd should be enabled because default value is off
-cmake .. \
-    -D CMAKE_INSTALL_LIBDIR=%{buildroot}%{_libdir} \
-    -D CMAKE_INSTALL_BINDIR=%{buildroot}%{_bindir} \
-    -D CMAKE_INSTALL_SBINDIR=%{buildroot}%{_sbindir} \
-    -D CMAKE_INSTALL_MANDIR=%{buildroot}%{_mandir} \
-    -D CMAKE_INSTALL_DOCDIR=%{buildroot}%{_docdir} \
-    -D CMAKE_INSTALL_INCLUDEDIR=%{buildroot}%{_includedir} \
-    -D SYSTEMD_UNIT_DIR=%{buildroot}%{_libdir}/systemd/system \
-    -D APP_CONFIG_DIRECTORY=%{buildroot}%{_sysconfdir}/clamav \
-    -D DATABASE_DIRECTORY=%{buildroot}%{_sharedstatedir}/clamav \
+cmake \
+    -D CMAKE_INSTALL_LIBDIR=%{_libdir} \
+    -D CMAKE_INSTALL_BINDIR=%{_bindir} \
+    -D CMAKE_INSTALL_SBINDIR=%{_sbindir} \
+    -D CMAKE_INSTALL_MANDIR=%{_mandir} \
+    -D CMAKE_INSTALL_DOCDIR=%{_docdir} \
+    -D CMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
+    -D SYSTEMD_UNIT_DIR=%{_libdir}/systemd/system \
+    -D APP_CONFIG_DIRECTORY=%{_sysconfdir}/clamav \
+    -D DATABASE_DIRECTORY=%{_sharedstatedir}/clamav \
     -D ENABLE_SYSTEMD=ON \
     -D ENABLE_MILTER=OFF \
     -D ENABLE_EXAMPLES=OFF
-cmake --build .
+%cmake_build
 
 %check
 cd build
 ctest --verbose
 
 %install
-cd build
-cmake --build . --target install
+%cmake_install
 # do not install html doc ('clamav' cmake has no flag to specify that => remove the doc)
 rm -rf %{buildroot}%{_docdir}
+mkdir -p %{buildroot}%{_sharedstatedir}/clamav
+
+### freshclam config processing (from Fedora)
+sed -ri \
+    -e 's!^Example!#Example!' \
+    -e 's!^#?(UpdateLogFile )!#\1!g;' %{buildroot}%{_sysconfdir}/clamav/freshclam.conf.sample
+
+mv %{buildroot}%{_sysconfdir}/clamav/freshclam.conf{.sample,}
+# Can contain HTTPProxyPassword (bugz#1733112)
+chmod 600 %{buildroot}%{_sysconfdir}/clamav/freshclam.conf
+
+%pre
+if ! getent group clamav >/dev/null; then
+    groupadd -r clamav
+fi
+if ! getent passwd clamav >/dev/null; then
+    useradd -g clamav -d %{_sharedstatedir}/clamav\
+        -s /bin/false -M -r clamav
+fi
+
+%postun
+if getent passwd clamav >/dev/null; then
+    userdel clamav
+fi
+if getent group clamav >/dev/null; then
+    groupdel clamav
+fi
 
 %files
 %defattr(-,root,root)
@@ -86,12 +106,17 @@ rm -rf %{buildroot}%{_docdir}
 %{_bindir}/*
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
+%{_sysconfdir}/clamav/freshclam.conf
 %{_includedir}/*.h
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
+%dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Wed Jun 08 2022 Tom Fay <tomfay@microsoft.com> - 0.104.2-2
+- Fix freshclam DB download
+
 * Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.104.2-1
 - Upgrade to 0.104.2
 
