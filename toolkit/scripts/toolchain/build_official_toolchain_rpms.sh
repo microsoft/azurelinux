@@ -16,6 +16,7 @@ MARINER_TOOLCHAIN_MANIFESTS_DIR=$7
 INCREMENTAL_TOOLCHAIN=${8:-n}
 MARINER_INPUT_SRPMS_DIR=$9
 MARINER_OUTPUT_SRPMS_DIR=${10}
+MARINER_REHYDRATED_RPMS_DIR=${11}
 
 MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
@@ -59,12 +60,21 @@ mkdir -pv $CHROOT_SOURCES_DIR
 mkdir -pv $CHROOT_INSTALL_RPM_DIR
 mkdir -pv $TOOLCHAIN_LOGS
 mkdir -pv $CHROOT_RPMS_DIR
+mkdir -pv $CHROOT_RPMS_DIR_ARCH
+mkdir -pv $CHROOT_RPMS_DIR_NOARCH
 
 # Remove artifacts from previous toolchain builds
 sudo rm -f $TOOLCHAIN_BUILD_LIST
 sudo rm -f $TOOLCHAIN_FAILURES
 sudo rm -rf $CHROOT_BUILDROOT_DIR
 touch $TOOLCHAIN_FAILURES
+
+# If we're incrementally building and there are RPMs available to rehydrate from the repo, copy to the proper chroot RPM folder.
+# Empty files are indicative of a failure to download or a disabling of repo rehydration, so filter out empty RPMs.
+if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
+find $MARINER_REHYDRATED_RPMS_DIR -name "*.$(uname -m).rpm" -size +0 -exec cp {} $CHROOT_RPMS_DIR_ARCH ';'
+find $MARINER_REHYDRATED_RPMS_DIR -name "*.noarch.rpm" -size +0 -exec cp {} $CHROOT_RPMS_DIR_NOARCH ';'
+fi
 
 chroot_mount () {
     trap chroot_unmount EXIT
@@ -161,7 +171,7 @@ chroot_and_run_rpmbuild () {
 }
 
 build_rpm_in_chroot_no_install () {
-    # $1 = package name
+    # $1 = SRPM name
     # $2 = qualified package name
     if [ -n "$2" ]; then
         rpmPath=$(find $CHROOT_RPMS_DIR -name "$2-*" -print -quit)
@@ -411,8 +421,8 @@ build_rpm_in_chroot_no_install meson
 # gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
 chroot_and_install_rpms meson
-build_rpm_in_chroot_no_install python-pygments
-chroot_and_install_rpms python-pygments
+build_rpm_in_chroot_no_install python-pygments python3-pygments
+chroot_and_install_rpms python3-pygments
 
 # gtk-doc and ca-certificates require libxslt
 chroot_and_install_rpms docbook-dtd-xml
@@ -424,7 +434,7 @@ build_rpm_in_chroot_no_install gtk-doc
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
-build_rpm_in_chroot_no_install python-lxml
+build_rpm_in_chroot_no_install python-lxml python3-lxml
 chroot_and_install_rpms python3-lxml
 
 # p11-kit, libtasn1 and glib need gtk-doc
@@ -501,10 +511,10 @@ build_rpm_in_chroot_no_install rpm
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-xml are also needed but already installed
-build_rpm_in_chroot_no_install python-markupsafe
+build_rpm_in_chroot_no_install python-markupsafe python3-markupsafe
 copy_rpm_subpackage python3-markupsafe
 chroot_and_install_rpms python3-markupsafe
-build_rpm_in_chroot_no_install python-jinja2
+build_rpm_in_chroot_no_install python-jinja2 python3-jinja
 copy_rpm_subpackage python3-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
