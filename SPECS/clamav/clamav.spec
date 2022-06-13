@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.104.2
-Release:        2%{?dist}
+Version:        0.105.0
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,6 +114,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 0.105.0-1
+- Upgrade to version 0.105.0
+
 * Wed Jun 08 2022 Tom Fay <tomfay@microsoft.com> - 0.104.2-2
 - Fix freshclam DB download
 
