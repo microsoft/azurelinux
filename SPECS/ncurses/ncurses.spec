@@ -1,14 +1,13 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
-Version:        6.2
-Release:        6%{?dist}
+Version:        6.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://invisible-island.net/ncurses/
 Source0:        https://invisible-mirror.net/archives/%{name}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-39537.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -206,6 +205,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+* Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 6.3-1
+- Update to version 6.3
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2-6
 - Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
