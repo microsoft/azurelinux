@@ -38,7 +38,7 @@ of utilities including a flexible and scalable multi-threaded daemon, a command
 line scanner and an advanced tool for automatic database updates.
 
 %prep
-%autosetup
+%autosetup -n clamav-clamav-%{version}
 
 %build
 # Notes:
