@@ -368,6 +368,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
 - Update source to 5.15.45.1
+- Address CVE-2022-32250 with a nopatch
 
 * Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
 - Compiling ptp_kvm driver as a module 

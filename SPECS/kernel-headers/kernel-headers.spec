@@ -21,7 +21,6 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %build
 make mrproper
-make headers_check
 
 %install
 cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
@@ -39,6 +38,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %changelog
 * Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
 - Update source to 5.15.45.1
+- Remove make headers_check since it is a noop
 
 * Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
 - Bump release number to match kernel release
