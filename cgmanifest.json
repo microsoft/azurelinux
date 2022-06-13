@@ -10691,8 +10691,8 @@
         "type": "other",
         "other": {
           "name": "logrotate",
-          "version": "3.18.1",
-          "downloadUrl": "https://github.com/logrotate/logrotate/releases/download/3.18.1/logrotate-3.18.1.tar.gz"
+          "version": "3.20.1",
+          "downloadUrl": "https://github.com/logrotate/logrotate/releases/download/3.20.1/logrotate-3.20.1.tar.gz"
         }
       }
     },
