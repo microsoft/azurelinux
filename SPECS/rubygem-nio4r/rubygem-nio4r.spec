@@ -12,6 +12,7 @@ URL:            https://github.com/socketry/nio4r
 Source0:        https://github.com/socketry/nio4r/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 cross-platform asynchronous I/O primitives for scalable network clients and servers.

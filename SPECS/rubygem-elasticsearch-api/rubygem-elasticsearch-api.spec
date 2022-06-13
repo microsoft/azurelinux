@@ -13,6 +13,7 @@ Source0:        https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-multi_json
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 The elasticsearch-api library provides a Ruby implementation 

@@ -14,6 +14,7 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
 Requires:       rubygem-webhdfs
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Fluentd output plugin to write data into Hadoop HDFS over WebHDFS/HttpFs.

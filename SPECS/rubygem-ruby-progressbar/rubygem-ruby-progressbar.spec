@@ -12,6 +12,7 @@ URL:            https://github.com/jfelchner/ruby-progressbar
 Source0:        https://github.com/jfelchner/ruby-progressbar/archive/refs/tags/releases/v%{version}.tar.gz#/%{gem_name}-releases-v%{version}.tar.gz
 Patch0:         remove-pem.patch
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Ruby/ProgressBar is a flexible text progress bar library for

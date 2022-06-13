@@ -13,6 +13,7 @@ Source0:        https://github.com/treasure-data/td-client-ruby/archive/refs/tag
 BuildRequires:  ruby
 Requires:       rubygem-httpclient
 Requires:       rubygem-msgpack < 2
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Ruby Client Library for Treasure Data.

@@ -14,6 +14,7 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-faraday
 Requires:       rubygem-multi_json
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 This gem provides a low-level Ruby client for connecting to an Elastic cluster. It powers both the Elasticsearch client and the Elastic Enterprise Search client.

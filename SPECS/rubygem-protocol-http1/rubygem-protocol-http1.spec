@@ -13,6 +13,7 @@ Source0:        https://github.com/socketry/protocol-http1/archive/refs/tags/v%{
 Patch0:         remove-pem.patch
 BuildRequires:  ruby
 Requires:       rubygem-protocol-http
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides a low-level implementation of the HTTP/1 protocol.

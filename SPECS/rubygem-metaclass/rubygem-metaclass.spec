@@ -18,6 +18,7 @@ BuildRequires:  rubygems-devel
 BuildRequires:  ruby
 BuildRequires:  rubygem(minitest)
 BuildArch:      noarch
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Adds a metaclass method to all Ruby objects

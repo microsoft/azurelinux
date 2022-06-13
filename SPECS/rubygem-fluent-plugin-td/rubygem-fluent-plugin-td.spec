@@ -14,6 +14,7 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
 Requires:       rubygem-td-client
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 This Fluentd output plugin is used to upload

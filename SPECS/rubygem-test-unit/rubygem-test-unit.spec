@@ -14,6 +14,7 @@ BuildRequires:  ruby
 Requires:       rubygem-power_assert
 Provides:       rubygem(test-unit) = %{version}-%{release}
 BuildArch:      noarch
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Test::Unit (test-unit) is unit testing framework for Ruby, based on xUnit

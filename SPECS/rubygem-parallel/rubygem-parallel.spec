@@ -12,6 +12,7 @@ URL:            https://github.com/grosser/parallel
 Source0:        https://github.com/grosser/parallel/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Run any code in parallel Processes(> use all CPUs) or Threads(> speedup blocking operations).

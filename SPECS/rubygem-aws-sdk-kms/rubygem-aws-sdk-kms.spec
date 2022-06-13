@@ -18,6 +18,7 @@ Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-aws-sdk-core
 Requires:       rubygem-aws-sigv4
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Official AWS Ruby gem for AWS Key Management Service (KMS)

@@ -12,6 +12,7 @@ URL:            http://msgpack.org/
 Source0:        https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 MessagePack implementation for Ruby

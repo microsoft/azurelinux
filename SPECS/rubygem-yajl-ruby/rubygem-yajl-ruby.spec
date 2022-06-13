@@ -12,6 +12,7 @@ URL:            https://github.com/brianmario/yajl-ruby
 Source0:        https://github.com/brianmario/yajl-ruby/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 a C binding to the YAJL JSON parsing and generation library.

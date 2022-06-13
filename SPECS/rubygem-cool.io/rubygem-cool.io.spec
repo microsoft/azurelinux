@@ -12,6 +12,7 @@ URL:            https://github.com/tarcieri/cool.io
 Source0:        https://github.com/tarcieri/cool.io/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 An event library for Ruby, built on the libev event library

@@ -13,6 +13,7 @@ Source0:        https://github.com/socketry/protocol-http2/archive/refs/tags/v%{
 BuildRequires:  ruby
 Requires:       rubygem-protocol-hpack
 Requires:       rubygem-protocol-http
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides a low-level implementation of the HTTP/2 protocol.

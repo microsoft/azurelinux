@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            http://tagaholic.me/hirb/
 Source0:        https://github.com/cldwalker/hirb/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Hirb provides a mini view framework for console applications and

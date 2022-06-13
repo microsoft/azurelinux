@@ -15,6 +15,7 @@ BuildRequires:  ruby
 Requires:       rubygem-aws-sdk-s3
 Requires:       rubygem-aws-sdk-sqs
 Requires:       rubygem-fluentd
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Amazon S3 output plugin for Fluentd event collector

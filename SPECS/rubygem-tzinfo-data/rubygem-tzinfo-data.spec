@@ -12,6 +12,7 @@ URL:            https://tzinfo.github.io/
 Source0:        https://github.com/tzinfo/tzinfo-data/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-tzinfo
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 a fast strptime/strftime engine which uses VM.

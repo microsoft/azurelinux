@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/excon/excon
 Source0:        https://github.com/excon/excon/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Extended http(s) Connections.

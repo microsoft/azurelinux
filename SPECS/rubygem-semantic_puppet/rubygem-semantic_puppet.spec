@@ -13,6 +13,7 @@ URL:            https://github.com/puppetlabs/semantic_puppet
 Source0:        https://github.com/puppetlabs/semantic_puppet/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Tools used by Puppet to parse, validate, and compare Semantic Versions and

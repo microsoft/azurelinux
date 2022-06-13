@@ -17,6 +17,7 @@ URL:            https://github.com/aws/aws-sdk-ruby
 Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-aws-eventstream
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Amazon Web Services Signature Version 4 signing library.

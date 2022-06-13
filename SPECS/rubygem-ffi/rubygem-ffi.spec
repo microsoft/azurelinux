@@ -13,6 +13,7 @@ Source0:        https://github.com/ffi/ffi/archive/refs/tags/v%{version}.tar.gz#
 Patch0:         remove_missing_files.patch
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Ruby-FFI is a gem for programmatically loading dynamically-linked native libraries,

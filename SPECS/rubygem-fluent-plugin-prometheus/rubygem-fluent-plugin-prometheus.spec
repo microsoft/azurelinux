@@ -13,6 +13,7 @@ Source0:        https://github.com/fluent/fluent-plugin-prometheus/archive/refs/
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A fluent plugin that instruments metrics from records and exposes them via web interface.

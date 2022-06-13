@@ -13,6 +13,7 @@ Source0:        https://github.com/okkez/fluent-config-regexp-type/archive/refs/
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Fluentd 1.2.0 supports regexp type in config_param.

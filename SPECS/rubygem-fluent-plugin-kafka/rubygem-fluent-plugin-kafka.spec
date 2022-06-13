@@ -15,6 +15,7 @@ BuildRequires:  ruby
 Requires:       rubygem-fluentd
 Requires:       rubygem-ltsv
 Requires:       rubygem-ruby-kafka < 2
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A fluentd plugin to both consume and produce data for Apache Kafka.

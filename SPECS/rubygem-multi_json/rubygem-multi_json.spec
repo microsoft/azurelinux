@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            http://rdoc.info/projects/intridea/multi_json
 Source0:        https://github.com/intridea/multi_json/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A common interface to multiple JSON libraries, including Oj, Yajl, the JSON

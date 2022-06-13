@@ -14,6 +14,7 @@ Patch0:         remove-pem.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-ffi
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides the ability to navigate and read entries from the systemd

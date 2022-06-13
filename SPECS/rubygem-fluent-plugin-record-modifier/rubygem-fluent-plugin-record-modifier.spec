@@ -13,6 +13,7 @@ Source0:        https://github.com/repeatedly/fluent-plugin-record-modifier/arch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Filter plugin to modify event record for Fluentd

@@ -13,6 +13,7 @@ Source0:        https://github.com/zendesk/ruby-kafka/archive/refs/tags/v%{versi
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-digest-crc
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A Ruby client library for Apache Kafka, a distributed log and message

@@ -13,6 +13,7 @@ Source0:        https://github.com/lostisland/faraday/archive/refs/tags/v%{versi
 BuildRequires:  ruby
 Requires:       rubygem-multipart-post < 3
 Requires:       rubygem-ruby2_keywords
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Faraday is an HTTP client library that provides a common interface over

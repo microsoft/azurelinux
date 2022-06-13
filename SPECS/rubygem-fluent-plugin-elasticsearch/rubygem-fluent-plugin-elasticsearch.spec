@@ -15,6 +15,7 @@ BuildRequires:  ruby
 Requires:       rubygem-elasticsearch
 Requires:       rubygem-excon
 Requires:       rubygem-fluentd
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Elasticsearch output plugin for Fluent event collector

@@ -13,6 +13,7 @@ Source0:        https://github.com/fluent-plugin-systemd/fluent-plugin-systemd/a
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
 Requires:       rubygem-systemd-journal
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 This is a fluentd input plugin.

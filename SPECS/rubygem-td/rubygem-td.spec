@@ -21,6 +21,7 @@ Requires:       rubygem-td-client
 Requires:       rubygem-td-logger
 Requires:       rubygem-yajl-ruby
 Requires:       rubygem-zip-zip
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 This CUI utility wraps the Ruby Client Library td-client-ruby to

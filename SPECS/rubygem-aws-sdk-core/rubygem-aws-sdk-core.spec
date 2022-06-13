@@ -16,6 +16,7 @@ URL:            https://github.com/aws/aws-sdk-ruby
 #  sudo tar -cvf %{gem_name}-%{version}.tar.gz %{gem_name}-%{version}/
 Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides API clients for AWS

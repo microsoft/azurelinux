@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            http://www.ohler.com/oj/
 Source0:        https://github.com/ohler55/oj/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A fast JSON parser and Object marshaller as a Ruby gem.

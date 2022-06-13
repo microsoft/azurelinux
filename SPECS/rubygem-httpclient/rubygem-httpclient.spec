@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/nahi/httpclient
 Source0:        https://github.com/nahi/httpclient/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 'httpclient' gives something similar to the functionality of 

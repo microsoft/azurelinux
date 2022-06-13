@@ -12,6 +12,7 @@ URL:            https://github.com/rubyzip/rubyzip
 Source0:        https://github.com/rubyzip/rubyzip/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Rubyzip is a ruby library for reading and writing zip files.

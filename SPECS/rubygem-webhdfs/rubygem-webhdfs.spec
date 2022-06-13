@@ -12,6 +12,7 @@ URL:            https://github.com/kzk/webhdfs/
 Source0:        https://github.com/kzk/webhdfs/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-addressable
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A client library implementation for Hadoop WebHDFS, and HttpFs, for Ruby

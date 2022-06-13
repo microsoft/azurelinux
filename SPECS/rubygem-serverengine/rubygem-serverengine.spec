@@ -13,6 +13,7 @@ Source0:        https://github.com/treasure-data/serverengine/archive/refs/tags/
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-sigdump
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 a framework to implement robust multiprocess servers like Unicorn.

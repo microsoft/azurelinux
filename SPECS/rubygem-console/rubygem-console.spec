@@ -12,6 +12,7 @@ URL:            https://socketry.github.io/console/
 Source0:        https://github.com/socketry/console/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-fiber-local
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides console logging for Ruby applications.

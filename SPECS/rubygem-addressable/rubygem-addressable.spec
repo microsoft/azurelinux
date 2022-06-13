@@ -12,6 +12,7 @@ URL:            https://github.com/sporkmonger/addressable
 Source0:        https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-%{version}.tar.gz#/%{gem_name}-%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-public_suffix < 5.0
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Addressable is an alternative implementation to the URI implementation that is

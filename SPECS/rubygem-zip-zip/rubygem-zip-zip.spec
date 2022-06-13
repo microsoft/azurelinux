@@ -12,6 +12,7 @@ URL:            https://github.com/orien/zip-zip
 Source0:        https://github.com/orien/zip-zip/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-rubyzip
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 zip-zip provides a simple adapter to let all your dependencies 

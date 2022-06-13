@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/socketry/protocol-http
 Source0:        https://github.com/socketry/protocol-http/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides abstractions for working with the HTTP protocol.

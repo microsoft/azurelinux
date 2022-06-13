@@ -14,6 +14,7 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluent-config-regexp-type
 Requires:       rubygem-fluentd
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Fluentd Output filter plugin to rewrite tags that matches specified attribute.

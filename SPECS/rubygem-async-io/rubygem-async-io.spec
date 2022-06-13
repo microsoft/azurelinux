@@ -12,6 +12,7 @@ URL:            https://github.com/socketry/async-io
 Source0:        https://github.com/socketry/async-io/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-async
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Async::IO provides builds on async and provides asynchronous

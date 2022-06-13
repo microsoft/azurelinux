@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/prometheus/client_ruby
 Source0:        https://github.com/prometheus/client_ruby/archive/refs/tags/v%{version}.tar.gz#/client_ruby-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A suite of instrumentation metric primitives for Ruby that can be exposed through a HTTP interface.

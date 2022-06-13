@@ -13,6 +13,7 @@ Source0:        https://github.com/postmodern/digest-crc/archive/refs/tags/v%{ve
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-rake < 14.0.0
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Adds support for calculating Cyclic Redundancy Check (CRC) to the Digest module.

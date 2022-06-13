@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/socketry/timers
 Source0:        https://github.com/socketry/timers/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Collections of one-shot and periodic timers, intended for

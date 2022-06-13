@@ -14,6 +14,7 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-elastic-transport
 Requires:       rubygem-elasticsearch-api
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Ruby integrations for Elasticsearch (client, API, etc.)

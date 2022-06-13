@@ -19,6 +19,7 @@ BuildRequires:  ruby
 Requires:       rubygem-aws-sdk-core
 Requires:       rubygem-aws-sdk-kms
 Requires:       rubygem-aws-sigv4
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Official AWS Ruby gem for Amazon Simple Storage Service (Amazon S3)

@@ -11,6 +11,7 @@ Distribution:	Mariner
 URL:            https://asciidoctor.org/
 Source0:        https://github.com/%{gem_name}/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A fast, open source AsciiDoc implementation in Ruby.

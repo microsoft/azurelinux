@@ -8,8 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ruby.github.io/rake/
 Source0:        https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-
 BuildArch:      noarch
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 BuildRequires:  ruby
 BuildRequires:  ruby(release)

@@ -17,6 +17,7 @@ Requires:       rubygem-async-pool
 Requires:       rubygem-protocol-http
 Requires:       rubygem-protocol-http1
 Requires:       rubygem-protocol-http2
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 An asynchronous client and server implementation of HTTP/1.0,

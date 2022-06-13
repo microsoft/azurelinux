@@ -24,6 +24,7 @@ Requires:       rubygem-strptime < 1.0.0
 Requires:       rubygem-tzinfo < 3.0
 Requires:       rubygem-tzinfo-data < 2
 Requires:       rubygem-yajl-ruby < 2
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Fluentd is an open source data collector designed to scale and simplify log

@@ -13,6 +13,7 @@ Source0:        https://github.com/socketry/async-pool/archive/refs/tags/v%{vers
 Patch0:         remove-pem.patch
 BuildRequires:  ruby
 Requires:       rubygem-async
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides support for connection pooling both singleplex and multiplex resources.

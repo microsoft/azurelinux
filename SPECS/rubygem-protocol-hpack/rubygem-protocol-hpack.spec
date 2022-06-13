@@ -12,6 +12,7 @@ URL:            https://github.com/socketry/protocol-hpack
 Source0:        https://github.com/socketry/protocol-hpack/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides a compressor and decompressor

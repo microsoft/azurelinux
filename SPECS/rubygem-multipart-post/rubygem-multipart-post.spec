@@ -12,6 +12,7 @@ URL:            https://github.com/socketry/multipart-post
 Source0:        https://github.com/socketry/multipart-post/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Adds a streamy multipart form post capability to Net::HTTP.

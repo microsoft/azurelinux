@@ -2,7 +2,7 @@
 Summary:        simple callback-based HTTP request/response parser
 Name:           rubygem-%{gem_name}
 Version:        0.6.1
-Release:        100%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ BuildRequires:  rubygem-rake-compiler
 BuildRequires:  rubygem-rspec
 BuildRequires:  rubygem-yajl-ruby
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A simple callback-based HTTP request/response parser for writing

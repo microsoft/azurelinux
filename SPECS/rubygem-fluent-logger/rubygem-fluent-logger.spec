@@ -13,6 +13,7 @@ Source0:        https://github.com/fluent/fluent-logger-ruby/archive/refs/tags/v
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-msgpack < 2
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 A structured event logger.

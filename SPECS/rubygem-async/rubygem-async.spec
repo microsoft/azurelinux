@@ -14,6 +14,7 @@ BuildRequires:  ruby
 Requires:       rubygem-console
 Requires:       rubygem-nio4r
 Requires:       rubygem-timers
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Async is a composable asynchronous I/O framework

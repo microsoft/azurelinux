@@ -12,6 +12,7 @@ URL:            https://github.com/fluent/fluent-plugin-prometheus_pushgateway
 Source0:        https://github.com/fluent/fluent-plugin-prometheus_pushgateway/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 This is Fluentd's plugin for sending data collected by

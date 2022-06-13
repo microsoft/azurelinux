@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/socketry/fiber-local
 Source0:        https://github.com/socketry/fiber-local/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Provides a class-level mixin to make fiber local state easy.

@@ -12,6 +12,7 @@ URL:            https://github.com/fluent/sigdump
 Source0:        https://github.com/fluent/sigdump/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Use signal to show stacktrace of a Ruby
