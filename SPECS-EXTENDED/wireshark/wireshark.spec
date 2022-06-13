@@ -1,90 +1,68 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global with_lua 1
 %global with_maxminddb 1
 %global plugins_version 3.4
-%global with_gui 0
 
-Summary:	Network traffic analyzer
-Name:		wireshark
-Version:	3.4.4
-Release:	5%{?dist}
-License:	BSD and GPLv2
-Url:		http://www.wireshark.org/
-
-Source0:	https://wireshark.org/download/src/all-versions/%{name}-%{version}.tar.xz
-Source1:        https://www.wireshark.org/download/src/all-versions/SIGNATURES-%{version}.txt
-Source2:	90-wireshark-usbmon.rules
+Summary:	      Network traffic analyzer
+Name:		        wireshark
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Version:	      3.4.14
+Release:	      1%{?dist}
+License:	      BSD and GPLv2
+Url:		        http://www.wireshark.org/
+Source0:	      https://2.na.dl.wireshark.org/src/all-versions/%{name}-%{version}.tar.xz 
+Source1:	      90-wireshark-usbmon.rules
 
 # Fedora-specific
-Patch2:		wireshark-0002-Customize-permission-denied-error.patch
+Patch2:		      wireshark-0002-Customize-permission-denied-error.patch
 # Will be proposed upstream
-Patch3:		wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
+Patch3:		      wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
 # Fedora-specific
-Patch4:		wireshark-0004-Restore-Fedora-specific-groups.patch
+Patch4:	      	wireshark-0004-Restore-Fedora-specific-groups.patch
 # Fedora-specific
-Patch5:		wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
+Patch5:		      wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
 # Fedora-specific
-Patch6:		wireshark-0006-Move-tmp-to-var-tmp.patch
-Patch7:		wireshark-0007-cmakelists.patch
+Patch6:		      wireshark-0006-Move-tmp-to-var-tmp.patch
+Patch7:		      wireshark-0007-cmakelists.patch
 
 #install tshark together with wireshark GUI
-Requires:	%{name}-cli = %{version}-%{release}
 
-Requires:	xdg-utils
-Requires:	hicolor-icon-theme
-
-%if %{with_maxminddb} && 0%{?fedora}
-Requires:	libmaxminddb
-%endif
 
 BuildRequires:	bzip2-devel
-BuildRequires:	perl(English)
+BuildRequires:	bison
 BuildRequires:	c-ares-devel
+Buildrequires:  cmake
 BuildRequires:	elfutils-devel
+BuildRequires:	flex
 BuildRequires:	gcc-c++
+BuildRequires:  git
 BuildRequires:	glib2-devel
 BuildRequires:	gnutls-devel
 BuildRequires:	krb5-devel
 BuildRequires:	libcap-devel
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libnl3-devel
+BuildRequires:  libnghttp2-devel
 BuildRequires:	libpcap-devel >= 0.9
 BuildRequires:	libselinux-devel
 BuildRequires:	libsmi-devel
+Buildrequires:	libssh-devel
 BuildRequires:	openssl-devel
-BuildRequires:	desktop-file-utils
-BuildRequires:	xdg-utils
-BuildRequires:	bison
-BuildRequires:	flex
 BuildRequires:	pcre-devel
+BuildRequires:	perl(English)
 BuildRequires:	perl(Pod::Html)
 BuildRequires:	perl(Pod::Man)
 BuildRequires:	perl(open)
-Buildrequires:	libssh-devel
-BuildRequires:	qt5-linguist
-BuildRequires:	qt5-qtbase-devel
-%if %{with_gui}
-BuildRequires:	qt5-qtmultimedia-devel
-%endif
-BuildRequires:	qt5-qtsvg-devel
+BuildRequires:  python3
+Buildrequires:  python3-devel
+BuildRequires:  systemd-devel
+BuildRequires:	xdg-utils
 BuildRequires:	zlib-devel
-%if %{with_maxminddb} && 0%{?fedora}
-BuildRequires:	libmaxminddb-devel
-%endif
-%if %{with_lua} && 0%{?fedora}
-BuildRequires:	compat-lua-devel
-%endif
-Buildrequires: git
-%if 0%{?fedora}
-Buildrequires: python3-devel
-%endif
-Buildrequires: cmake
-#needed for sdjournal external capture interface
-BuildRequires: systemd-devel
-BuildRequires: libnghttp2-devel
-
-Obsoletes: wireshark-qt, wireshark-gtk
+Requires:       c-ares
+Requires:       glib2
+Requires:       systemd-libs
+Requires:       zlib
+Requires:	      %{name}-cli = %{version}-%{release}
 
 %description
 Wireshark allows you to examine protocol data stored in files or as it is
@@ -97,18 +75,18 @@ and the ability to reassemble multiple protocol packets in order to, for
 example, view a complete TCP stream, save the contents of a file which was
 transferred over HTTP or CIFS, or play back an RTP audio stream.
 
-%package	cli
-Summary:	Network traffic analyzer
-Requires(pre):	shadow-utils
-Requires(post): systemd-udev
+%package	      cli
+Summary:	        Network traffic analyzer
+Requires(pre):	  shadow-utils
+Requires(post):   systemd-udev
 
-%description cli
+%description    cli
 This package contains command-line utilities, plugins, and documentation for
 Wireshark.
 
-%package devel
-Summary:	Development headers and libraries for wireshark
-Requires:	%{name} = %{version}-%{release} glibc-devel glib2-devel
+%package        devel
+Summary:	        Development headers and libraries for wireshark
+Requires:	        %{name} = %{version}-%{release} glibc-devel glib2-devel
 
 %description devel
 The wireshark-devel package contains the header files, developer
@@ -122,28 +100,18 @@ and plugins.
 %build
 %cmake -G "Unix Makefiles" \
   -DDISABLE_WERROR=ON \
-%if %{with_gui}
-  -DBUILD_wireshark=ON \
-%else
-  -DBUILD_wireshark=OFF \
-%endif
-%if %{with_lua} && 0%{?fedora}
-  -DENABLE_LUA=ON \
-%else
   -DENABLE_LUA=OFF \
-%endif
-%if %{with_maxminddb} && 0%{?fedora} 
-  -DBUILD_mmdbresolve=ON \
-%else
-  -DBUILD_mmdbresolve=OFF \
-%endif
-  -DBUILD_randpktdump=OFF \
-  -DBUILD_androiddump=ON \
-  -DENABLE_SMI=ON \
-  -DENABLE_PLUGINS=ON \
+  -DENABLE_LIBXML2=ON \
   -DENABLE_NETLINK=ON \
+  -DENABLE_NGHTTP2=ON
+  -DENABLE_PLUGINS=ON \
+  -DENABLE_SMI=ON \
+  -DBUILD_androiddump=OFF \
   -DBUILD_dcerpcidl2wrs=OFF \
+  -DBUILD_mmdbresolve=OFF \
+  -DBUILD_randpktdump=OFF \
   -DBUILD_sdjournal=ON \
+  -DBUILD_wireshark=OFF \
   .
 
 make %{?_smp_mflags}
@@ -151,9 +119,6 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 
-%if %{with_gui}
-desktop-file-validate %{buildroot}%{_datadir}/applications/wireshark.desktop
-%endif
 
 #install devel files (inspired by debian/wireshark-dev.header-files)
 install -d -m 0755  %{buildroot}%{_includedir}/wireshark
@@ -179,7 +144,7 @@ install -m 644 epan/wmem/*.h		"${IDIR}/epan/wmem"
 install -m 644 wiretap/*.h		"${IDIR}/wiretap"
 install -m 644 wsutil/*.h		"${IDIR}/wsutil"
 install -m 644 ws_diag_control.h	"${IDIR}/"
-install -m 644 %{SOURCE2}		%{buildroot}%{_udevrulesdir}
+
 
 touch %{buildroot}%{_bindir}/%{name}
 
@@ -201,13 +166,6 @@ fi
 %ldconfig_postun cli
 
 %files
-%if %{with_gui}
-%{_datadir}/appdata/%{name}.appdata.xml
-%{_datadir}/applications/wireshark.desktop
-%{_datadir}/icons/hicolor/*/apps/*
-%{_datadir}/icons/hicolor/*/mimetypes/*
-%{_datadir}/mime/packages/wireshark.xml
-%endif
 %{_bindir}/wireshark
 %{_mandir}/man1/wireshark.*
 
@@ -223,9 +181,6 @@ fi
 %{_bindir}/sharkd
 %{_bindir}/text2pcap
 %{_bindir}/tshark
-%if %{with_maxminddb} && 0%{?fedora}
-%{_bindir}/mmdbresolve
-%endif
 %attr(0750, root, wireshark) %caps(cap_net_raw,cap_net_admin=ep) %{_bindir}/dumpcap
 %{_bindir}/rawshark
 %{_udevrulesdir}/90-wireshark-usbmon.rules
@@ -269,9 +224,6 @@ fi
 %{_mandir}/man1/dpauxmon.*
 %{_mandir}/man1/sdjournal.*
 %{_mandir}/man4/extcap.*
-%if %{with_maxminddb} && 0%{?fedora}
-%{_mandir}/man1/mmdbresolve.*
-%endif
 %dir %{_datadir}/wireshark
 %{_datadir}/wireshark/*
 %{_docdir}/wireshark/*.html
@@ -283,6 +235,9 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Jun 10 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.14-1
+- Update to resolves CVEs
+
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
 - License verified.
 
