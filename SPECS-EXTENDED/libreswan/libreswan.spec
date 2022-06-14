@@ -1,8 +1,6 @@
 %global _hardened_build 1
 # These are rpm macros and are 0 or 1
-%global with_efence 0
 %global with_development 0
-%global with_cavstests 1
 %global nss_version 3.52
 %global unbound_version 1.6.6
 # Libreswan config options
@@ -25,8 +23,6 @@
     USE_AUTHPAM=true \\\
 %{nil}
 
-#global prever dr1
-
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
@@ -36,8 +32,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 Url:            https://libreswan.org/
-Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{version}.tar.gz#/libreswan-%{version}.tar.gz
-%if 0%{with_cavstests}
+Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+%if %{with_check}
 Source3:        https://download.libreswan.org/cavs/ikev1_dsa.fax.bz2
 Source4:        https://download.libreswan.org/cavs/ikev1_psk.fax.bz2
 Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
@@ -66,9 +62,6 @@ BuildRequires: pkgconfig
 BuildRequires: systemd-devel
 BuildRequires: unbound-devel >= %{unbound_version}
 BuildRequires: xmlto
-%if 0%{with_efence}
-BuildRequires: ElectricFence
-%endif
 Requires: iproute >= 2.6.8
 Requires: nss >= %{nss_version}
 Requires: nss-softokn
@@ -101,7 +94,7 @@ Libreswan also supports IKEv2 (RFC7296) and Secure Labeling
 Libreswan is based on Openswan-2.6.38 which in turn is based on FreeS/WAN-2.04
 
 %prep
-%setup -q -n libreswan-%{version}%{?prever}
+%setup -q -n libreswan-%{version}
 # enable crypto-policies support
 sed -i "s:#[ ]*include \(.*\)\(/crypto-policies/back-ends/libreswan.config\)$:include \1\2:" configs/ipsec.conf.in
 sed -i "s/SUBDIRS += ipcheck/#SUBDIRS += ipchec/" testing/programs/Makefile
@@ -144,7 +137,6 @@ echo "include %{_sysconfdir}/ipsec.d/*.secrets" \
     > %{buildroot}%{_sysconfdir}/ipsec.secrets
 rm -fr %{buildroot}%{_sysconfdir}/rc.d/rc*
 
-%if 0%{with_cavstests}
 %check
 # There is an elaborate upstream testing infrastructure which we do not
 # run here - it takes hours and uses kvm
@@ -162,7 +154,6 @@ bunzip2 *.fax.bz2
 %{buildroot}%{_libexecdir}/ipsec/cavp -v1psk ikev1_psk.fax | \
     diff -u ikev1_psk.fax - > /dev/null
 : CAVS tests passed
-%endif
 
 # Some of these tests will show ERROR for negative testing - it will exit on real errors
 %{buildroot}%{_libexecdir}/ipsec/algparse -tp || { echo prooposal test failed; exit 1; }
@@ -186,7 +177,8 @@ certutil -N -d sql:$tmpdir --empty-password
 %systemd_postun_with_restart ipsec.service
 
 %files
-%doc CHANGES COPYING CREDITS README* LICENSE
+%license CREDITS COPYING LICENSE
+%doc CHANGES README* 
 %doc docs/*.* docs/examples
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ipsec.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ipsec.secrets
