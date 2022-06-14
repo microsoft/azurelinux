@@ -337,7 +337,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
-* Tue Jun 14 2022 Chris Co <chrco@microsoft.com> - 1.1.1k-16
+* Tue Jun 14 2022 Henry Li <lihl@microsoft.com> - 1.1.1k-16
 - Add patch to fix package test failure caused by expired cert
 
 * Fri May 13 2022 Chris Co <chrco@microsoft.com> - 1.1.1k-15
