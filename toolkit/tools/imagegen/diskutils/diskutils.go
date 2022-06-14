@@ -413,7 +413,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	start := partition.Start * oneMiBtoBytes / logicalSectorSize
-	end := partition.End * oneMiBtoBytes / logicalSectorSize - 1
+	end := partition.End*oneMiBtoBytes/logicalSectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
@@ -767,9 +767,16 @@ func getSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize ui
 }
 
 func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64) (alignedSector uint64) {
-	// Check if sectorAddr indicates the start of the first partition, which is 1MiB
-	if sectorAddr == (oneMiBtoBytes / logicalSectorSize) {
-		alignedSector = sectorAddr
+	// Need to make sure that starting sector of a partition is aligned based on the physical sector size of the system.
+	// For example, suppose the physical sector size is 4096. If the input start sector is 40960001, then this is misaligned,
+	// and need to be elevated to the next aligned address, which is (40960001/4096 + 1)*4096 = 4100096.
+
+	// We do need to take care of a special case, which is the first partition (normally boot partition) might be less than
+	// the physical sector size. In this case, we need to check whether the start sector is a multiple of 1 MiB.
+	if sectorAddr < physicalSectorSize {
+		if sectorAddr%(oneMiBtoBytes/logicalSectorSize) == 0 {
+			alignedSector = sectorAddr
+		}
 	} else if (sectorAddr % physicalSectorSize) == 0 {
 		alignedSector = sectorAddr
 	} else {
@@ -781,22 +788,29 @@ func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64
 
 func obtainPartitionDetail(partitionIndex int, hasExtendedPartition bool) (partType string, partitionNumber int) {
 	const (
-		primaryPartition  = "primary"
-		extendedPartition = "extended"
-		logicalPartition  = "logical"
+		primaryPartition              = "primary"
+		extendedPartition             = "extended"
+		logicalPartition              = "logical"
+		normalPartitionNumberToIndex  = 1
+		logicalPartitionNumberToIndex = 2
 	)
+
+	// partitionIndex is the index of the partition in the partition array, which starts at 0.
+	// partitionNumber, however, starts at 1 (E.g. /dev/sda1), and thus partitionNumber = partitionIndex + 1.
+	// In the case of logical partitions, since an extra extended partition has to be created first in order to
+	// to create logical partitions, so the partition number will further increase by 1, which equals partitionIndex + 2.
 
 	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR-1) {
 		if partitionIndex == (maxPrimaryPartitionsForMBR - 1) {
 			partType = extendedPartition
-			partitionNumber = partitionIndex + 1
+			partitionNumber = partitionIndex + normalPartitionNumberToIndex
 		} else {
 			partType = logicalPartition
-			partitionNumber = partitionIndex + 2
+			partitionNumber = partitionIndex + logicalPartitionNumberToIndex
 		}
 	} else {
 		partType = primaryPartition
-		partitionNumber = partitionIndex + 1
+		partitionNumber = partitionIndex + normalPartitionNumberToIndex
 	}
 
 	return
