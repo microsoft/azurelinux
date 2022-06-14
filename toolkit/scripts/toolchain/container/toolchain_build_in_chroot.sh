@@ -962,7 +962,7 @@ rm -rf procps-3.3.17
 touch /logs/status_procpsng_complete
 
 echo util-linux-2.37.4
-tar xf util-linux-2.37.4.tar.gz
+tar xf util-linux-2.37.4.tar.xz
 pushd util-linux-2.37.4
 mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
