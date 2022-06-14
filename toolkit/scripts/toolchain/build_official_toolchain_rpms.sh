@@ -234,7 +234,6 @@ build_rpm_in_chroot_no_install gdbm
 build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install gettext
 build_rpm_in_chroot_no_install sqlite
-build_rpm_in_chroot_no_install nspr
 build_rpm_in_chroot_no_install expat
 build_rpm_in_chroot_no_install libffi
 build_rpm_in_chroot_no_install xz
