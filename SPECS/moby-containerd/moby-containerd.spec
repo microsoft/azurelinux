@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -85,6 +85,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.1-4
+- Bump release to rebuild with golang 1.18.3
+
 * Mon Mar 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-3
 - Default cgroup to 'systemd'
 * Wed Mar 23 2022 Anirudh Gopal <angop@microsoft.com> - 1.6.1-2

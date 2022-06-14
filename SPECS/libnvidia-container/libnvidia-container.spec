@@ -4,7 +4,7 @@
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
 Version:        1.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -132,6 +132,9 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.0-2
+- Bump release to rebuild with golang 1.18.3
+
 * Tue Mar 29 2022 Adithya Jayachandran <adjayach@microsoft.com> - 1.9.0-1
 - Updating to libnvidia-container to version 1.9.0
 - Bump nvidia-modprobe to version 495.44 as required
