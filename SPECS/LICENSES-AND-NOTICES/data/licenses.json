@@ -2295,6 +2295,7 @@
                 "efibootmgr",
                 "efivar",
                 "elfutils",
+                "emacs",
                 "erlang",
                 "etcd-3.5.0",
                 "etcd-3.5.1",
