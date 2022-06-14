@@ -2330,7 +2330,7 @@
                 "gnuplot",
                 "gnutls",
                 "gobject-introspection",
-                "golang-1.17",
+                "golang",
                 "gperf",
                 "gperftools",
                 "gpgme",
