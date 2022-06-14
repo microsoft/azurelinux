@@ -46,7 +46,7 @@ BuildRequires:  libnghttp2-devel
 BuildRequires:  libpcap-devel >= 0.9
 BuildRequires:  libselinux-devel
 BuildRequires:  libsmi-devel
-Buildrequires:  libssh-devel
+BuildRequires:  libssh-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  perl(English)
