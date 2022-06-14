@@ -7,7 +7,7 @@ Distribution:   Mariner
 License:        GPLv3+ and CC0-1.0
 URL:            http://www.gnu.org/software/emacs/
 Group:          Applications/Editors
-Source0:        https://ftp.gnu.org/gnu/emacs/emacs-%{version}.tar.xz 
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
@@ -40,10 +40,10 @@ without leaving the editor.
             --without-xaw3d          \
             --without-xim            \
             --without-makeinfo
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} %{?_smp_mflags} install
+%make_install
 
 rm -rf %{buildroot}%{_infodir}
 rm -rf %{buildroot}%{_mandir}
