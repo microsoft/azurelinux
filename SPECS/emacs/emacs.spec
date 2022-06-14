@@ -5,7 +5,7 @@ Release:        2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv3+ and CC0-1.0
-URL:            http://www.gnu.org/software/emacs/
+URL:            https://www.gnu.org/software/emacs/
 Group:          Applications/Editors
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 
