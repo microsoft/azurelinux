@@ -17,6 +17,7 @@ import (
 type SystemConfig struct {
 	IsDefault          bool               `json:"IsDefault"`
 	IsKickStartBoot    bool               `json:"IsKickStartBoot"`
+	IsIsoInstall       bool               `json:"IsIsoInstall"`
 	BootType           string             `json:"BootType"`
 	Hostname           string             `json:"Hostname"`
 	Name               string             `json:"Name"`
@@ -28,6 +29,7 @@ type SystemConfig struct {
 	PartitionSettings  []PartitionSetting `json:"PartitionSettings"`
 	PreInstallScripts  []InstallScript    `json:"PreInstallScripts"`
 	PostInstallScripts []InstallScript    `json:"PostInstallScripts"`
+	PackageRepos       []PackageRepo      `json:"PackageRepos"`
 	Groups             []Group            `json:"Groups"`
 	Users              []User             `json:"Users"`
 	Encryption         RootEncryption     `json:"Encryption"`
@@ -136,6 +138,19 @@ func (s *SystemConfig) IsValid() (err error) {
 
 	if err = s.KernelCommandLine.IsValid(); err != nil {
 		return fmt.Errorf("invalid [KernelCommandLine]: %w", err)
+	}
+
+	// Validate that PackageRepos do not contain duplicate package repo name
+	repoNames := make(map[string]bool)
+	for _, packageRepo := range s.PackageRepos {
+		if err = packageRepo.IsValid(); err != nil {
+			return fmt.Errorf("invalid [PackageRepo]: %s. Error: %w", packageRepo.Name, err)
+		}
+
+		if repoNames[packageRepo.Name] {
+			return fmt.Errorf("invalid [PackageRepos]: duplicate package repo names (%s)", packageRepo.Name)
+		}
+		repoNames[packageRepo.Name] = true
 	}
 
 	//Validate PostInstallScripts

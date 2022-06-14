@@ -2,8 +2,8 @@
 
 Summary:        Z shell
 Name:           zsh
-Version:        5.8
-Release:        5%{?dist}
+Version:        5.9
+Release:        1%{?dist}
 License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,9 +12,7 @@ URL:            http://zsh.sourceforge.net/
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
 Source1:        zprofile.rhs
 Source2:        zshrc
-
 Patch0:         0001-Skipping-test-if-ran-as-superuser.patch
-
 BuildRequires:  binutils
 BuildRequires:  coreutils
 BuildRequires:  diffutils
@@ -28,11 +26,9 @@ BuildRequires:  ncurses-devel
 BuildRequires:  sed
 BuildRequires:  tar
 BuildRequires:  texinfo
-
 Requires(post): /bin/grep
 Requires(postun): /bin/grep
 Requires(postun): coreutils
-
 Provides:       /bin/zsh
 
 %description
@@ -133,6 +129,9 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.9-1
+- Update to v5.9 to address CVE-2021-45444
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-5
 - Removing the explicit %%clean stage.
 

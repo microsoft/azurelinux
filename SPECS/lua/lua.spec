@@ -11,15 +11,15 @@
 # Place rpm-macros into proper location.
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
+Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.3
-Release:        2%{?dist}
-Summary:        Powerful light-weight programming language
+Release:        3%{?dist}
 License:        MIT
-URL:            https://www.lua.org/
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Tools
+URL:            https://www.lua.org/
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 # copied from doc/readme.html on 2014-07-18
 Source1:        mit.txt
@@ -36,16 +36,22 @@ Patch3:         %{name}-5.2.2-configure-linux.patch
 Patch4:         %{name}-5.3.0-configure-compat-module.patch
 %if 0%{?bootstrap}
 Patch5:         %{name}-5.3.0-autotoolize.patch
-Patch6:		    %{name}-5.3.5-luac-shared-link-fix.patch
+Patch6:         %{name}-5.3.5-luac-shared-link-fix.patch
 %endif
 # https://www.lua.org/bugs.html
-Patch18:	    %{name}-5.3.5-CVE-2020-24370.patch
-Patch19:	    %{name}-5.4.3-bug3.patch
-Patch20:	    CVE-2021-43519.patch
+Patch18:        %{name}-5.3.5-CVE-2020-24370.patch
+Patch19:        %{name}-5.4.3-bug3.patch
+Patch20:        CVE-2021-43519.patch
 Patch21:        CVE-2022-28805.patch
+Patch22:        CVE-2021-44647.patch
 
-BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 BuildRequires:  make
+BuildRequires:  ncurses-devel
+BuildRequires:  readline-devel
+
 Requires:       lua-libs = %{version}-%{release}
 
 %description
@@ -61,8 +67,8 @@ configuration, scripting, and rapid prototyping.
 %package devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       pkgconfig
 Requires:       lua-rpm-macros
+Requires:       pkg-config
 
 %description devel
 This package contains development files for %{name}.
@@ -81,10 +87,9 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description static
 This package contains the static version of liblua for %{name}.
 
-
 %prep
 %if 0%{?bootstrap}
-%setup -q -a 2 -a 3 -n %{name}-%{version}
+%setup -q -a 2 -a 3
 %else
 %setup -q -a 3
 %endif
@@ -158,13 +163,13 @@ sed -i.orig -e '
     /db.lua/d;
     /errors.lua/d;
     ' all.lua
-LD_LIBRARY_PATH=$RPM_BUILD_ROOT/%{_libdir} $RPM_BUILD_ROOT/%{_bindir}/lua -e"_U=true" all.lua
+LD_LIBRARY_PATH=%{buildroot}/%{_libdir} %{buildroot}/%{_bindir}/lua -e"_U=true" all.lua
 
 %install
 %make_install
-rm $RPM_BUILD_ROOT%{_libdir}/*.la
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/lua/%{major_version}
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/lua/%{major_version}
+find %{buildroot} -type f -name "*.la" -delete -print
+mkdir -p %{buildroot}%{_libdir}/lua/%{major_version}
+mkdir -p %{buildroot}%{_datadir}/lua/%{major_version}
 
 # Rename luaconf.h to luaconf-<arch>.h to avoid file conflicts on
 # multilib systems and install luaconf.h wrapper
@@ -173,12 +178,12 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_includedir}/luaconf.h
 
 %if 0%{?bootstrap}
 pushd lua-%{bootstrap_version}
-mkdir $RPM_BUILD_ROOT/installdir
-make install DESTDIR=$RPM_BUILD_ROOT/installdir
-cp -a $RPM_BUILD_ROOT/installdir/%{_libdir}/liblua-%{bootstrap_major_version}.so $RPM_BUILD_ROOT%{_libdir}/
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/lua/%{bootstrap_major_version}
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/lua/%{bootstrap_major_version}
-rm -rf $RPM_BUILD_ROOT/installdir
+mkdir %{buildroot}/installdir
+make install DESTDIR=%{buildroot}/installdir
+cp -a %{buildroot}/installdir/%{_libdir}/liblua-%{bootstrap_major_version}.so %{buildroot}%{_libdir}/
+mkdir -p %{buildroot}%{_libdir}/lua/%{bootstrap_major_version}
+mkdir -p %{buildroot}%{_datadir}/lua/%{bootstrap_major_version}
+rm -rf %{buildroot}/installdir
 popd
 %endif
 
@@ -213,8 +218,10 @@ popd
 %files static
 %{_libdir}/*.a
 
-
 %changelog
+* Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.3-3
+- Patching CVE-2021-44647.
+
 * Fri May 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.4.3-2
 - Add upstream patch for CVE-2022-28805
 

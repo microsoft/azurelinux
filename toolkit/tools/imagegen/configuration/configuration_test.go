@@ -446,6 +446,18 @@ var expectedConfiguration Config = Config{
 					StartupCommand: "/usr/bin/somescript",
 				},
 			},
+			PackageRepos: []PackageRepo{
+				{
+					Name:    "repo1",
+					BaseUrl: "https://repo1.com",
+					Install: false,
+				},
+				{
+					Name:    "repo2",
+					BaseUrl: "https://repo2.com",
+					Install: false,
+				},
+			},
 			PreInstallScripts: []InstallScript{
 				{
 					Path: "arglessPreScript.sh",

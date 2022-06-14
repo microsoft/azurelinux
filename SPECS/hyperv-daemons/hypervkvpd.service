@@ -1,7 +1,9 @@
 [Unit]
 Description=Hyper-V KVP daemon
+ConditionVirtualization=microsoft
 BindsTo=sys-devices-virtual-misc-vmbus\x21hv_kvp.device
-After=network.target
+After=sys-devices-virtual-misc-vmbus\x21hv_kvp.device
+RequiresMountsFor=/var/lib/hyperv
 IgnoreOnIsolate=1
 
 [Service]

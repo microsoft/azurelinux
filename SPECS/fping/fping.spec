@@ -1,7 +1,7 @@
 Summary:        Utility to send ICMP echo probes to network hosts
 Name:           fping
 Version:        5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.fping.org/
 Source0:        https://github.com/schweikert/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
+Requires:       iana-etc
 
 %description
 fping is a ping like program which uses the Internet Control Message Protocol
@@ -33,9 +34,12 @@ rm -rf %{buildroot}%{_infodir}
 %{_sbindir}/fping6
 %license COPYING
 %doc CHANGELOG.md
-%doc %{_mandir}/man8/fping.8*
+%{_mandir}/man8/fping.8*
 
 %changelog
+* Thu May 12 2022 Eric Desrochers <edesrochers@microsoft.com> - 5.0-2
+- Add iana-etc as runtime depends
+
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0-1
 - Update to 5.0
 

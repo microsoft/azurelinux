@@ -1,11 +1,11 @@
 Summary:        Linux NTFS userspace driver
 Name:           ntfs-3g
-Version:        2021.8.22
+Version:        2022.5.17
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.ntfs-3g.org/
+URL:            https://www.tuxera.com/company/open-source/
 Source0:        https://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
 
@@ -170,6 +170,9 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.5.17-1
+- Updating to 2022.5.17 to fix CVE-2021-46790.
+
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2021.8.22-1
 - Updating to 2021.8.22.
 - Splitting out the "*-libs" subpackage using Fedora 36 spec (license: MIT) for guidance.
