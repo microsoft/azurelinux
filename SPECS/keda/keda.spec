@@ -57,6 +57,7 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %changelog
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 2.4.0-2
 - Bump release to rebuild with golang 1.18.3
+- License verified
 
 * Wed Aug 25 2021 Henry Li <lihl@microsoft.com> - 2.4.0-1
 - Original version for CBL-Mariner
