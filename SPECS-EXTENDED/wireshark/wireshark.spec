@@ -2,67 +2,71 @@
 %global with_maxminddb 1
 %global plugins_version 3.4
 
-Summary:	      Network traffic analyzer
-Name:		        wireshark
+Summary:        Network traffic analyzer
+Name:           wireshark
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:	      3.4.14
-Release:	      1%{?dist}
-License:	      BSD and GPLv2
-Url:		        http://www.wireshark.org/
-Source0:	      https://2.na.dl.wireshark.org/src/all-versions/%{name}-%{version}.tar.xz 
-Source1:	      90-wireshark-usbmon.rules
+Version:        3.4.14
+Release:        1%{?dist}
+License:        BSD and GPLv2
+Url:            https://www.wireshark.org/
+Source0:        https://2.na.dl.wireshark.org/src/all-versions/%{name}-%{version}.tar.xz 
+Source1:        90-wireshark-usbmon.rules
 
 # Fedora-specific
-Patch2:		      wireshark-0002-Customize-permission-denied-error.patch
+Patch2:         wireshark-0002-Customize-permission-denied-error.patch
 # Will be proposed upstream
-Patch3:		      wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
+Patch3:         wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
 # Fedora-specific
-Patch4:	      	wireshark-0004-Restore-Fedora-specific-groups.patch
+Patch4:         wireshark-0004-Restore-Fedora-specific-groups.patch
 # Fedora-specific
-Patch5:		      wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
+Patch5:         wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
 # Fedora-specific
-Patch6:		      wireshark-0006-Move-tmp-to-var-tmp.patch
-Patch7:		      wireshark-0007-cmakelists.patch
+Patch6:         wireshark-0006-Move-tmp-to-var-tmp.patch
+Patch7:         wireshark-0007-cmakelists.patch
 
 #install tshark together with wireshark GUI
 
 
-BuildRequires:	bzip2-devel
-BuildRequires:	bison
-BuildRequires:	c-ares-devel
+BuildRequires:  bzip2-devel
+BuildRequires:  bison
+BuildRequires:  c-ares-devel
 Buildrequires:  cmake
-BuildRequires:	elfutils-devel
-BuildRequires:	flex
-BuildRequires:	gcc-c++
+BuildRequires:  desktop-file-utils
+BuildRequires:  elfutils-devel
+BuildRequires:  flex
+BuildRequires:  gcc-c++
 BuildRequires:  git
-BuildRequires:	glib2-devel
-BuildRequires:	gnutls-devel
-BuildRequires:	krb5-devel
-BuildRequires:	libcap-devel
-BuildRequires:	libgcrypt-devel
-BuildRequires:	libnl3-devel
+BuildRequires:  glib2-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  krb5-devel
+BuildRequires:  libcap-devel
+BuildRequires:  libgcrypt-devel
+BuildRequires:  libnl3-devel
 BuildRequires:  libnghttp2-devel
-BuildRequires:	libpcap-devel >= 0.9
-BuildRequires:	libselinux-devel
-BuildRequires:	libsmi-devel
-Buildrequires:	libssh-devel
-BuildRequires:	openssl-devel
-BuildRequires:	pcre-devel
-BuildRequires:	perl(English)
-BuildRequires:	perl(Pod::Html)
-BuildRequires:	perl(Pod::Man)
-BuildRequires:	perl(open)
+BuildRequires:  libpcap-devel >= 0.9
+BuildRequires:  libselinux-devel
+BuildRequires:  libsmi-devel
+Buildrequires:  libssh-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pcre-devel
+BuildRequires:  perl(English)
+BuildRequires:  perl(Pod::Html)
+BuildRequires:  perl(Pod::Man)
+BuildRequires:  perl(open)
 BuildRequires:  python3
 Buildrequires:  python3-devel
+BuildRequires:  qt5-linguist
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtsvg-devel
 BuildRequires:  systemd-devel
-BuildRequires:	xdg-utils
-BuildRequires:	zlib-devel
+BuildRequires:  xdg-utils
+BuildRequires:  zlib-devel
 Requires:       c-ares
 Requires:       glib2
 Requires:       systemd-libs
 Requires:       zlib
-Requires:	      %{name}-cli = %{version}-%{release}
+Requires:       %{name}-cli = %{version}-%{release}
 
 %description
 Wireshark allows you to examine protocol data stored in files or as it is
@@ -75,9 +79,9 @@ and the ability to reassemble multiple protocol packets in order to, for
 example, view a complete TCP stream, save the contents of a file which was
 transferred over HTTP or CIFS, or play back an RTP audio stream.
 
-%package	      cli
-Summary:	        Network traffic analyzer
-Requires(pre):	  shadow-utils
+%package        cli
+Summary:          Network traffic analyzer
+Requires(pre):    shadow-utils
 Requires(post):   systemd-udev
 
 %description    cli
@@ -85,8 +89,8 @@ This package contains command-line utilities, plugins, and documentation for
 Wireshark.
 
 %package        devel
-Summary:	        Development headers and libraries for wireshark
-Requires:	        %{name} = %{version}-%{release} glibc-devel glib2-devel
+Summary:          Development headers and libraries for wireshark
+Requires:         %{name} = %{version}-%{release} glibc-devel glib2-devel
 
 %description devel
 The wireshark-devel package contains the header files, developer
@@ -99,6 +103,7 @@ and plugins.
 
 %build
 %cmake -G "Unix Makefiles" \
+  -DCMAKE_INSTALL_PREFIX="%{_prefix}" \
   -DDISABLE_WERROR=ON \
   -DENABLE_LUA=OFF \
   -DENABLE_LIBXML2=ON \
@@ -111,7 +116,6 @@ and plugins.
   -DBUILD_mmdbresolve=OFF \
   -DBUILD_randpktdump=OFF \
   -DBUILD_sdjournal=ON \
-  -DBUILD_wireshark=OFF \
   .
 
 make %{?_smp_mflags}
@@ -132,18 +136,19 @@ mkdir -p "${IDIR}/epan/wmem"
 mkdir -p "${IDIR}/wiretap"
 mkdir -p "${IDIR}/wsutil"
 mkdir -p %{buildroot}%{_udevrulesdir}
-install -m 644 config.h epan/register.h	"${IDIR}/"
-install -m 644 cfile.h file.h		"${IDIR}/"
-install -m 644 ws_symbol_export.h	"${IDIR}/"
-install -m 644 epan/*.h			"${IDIR}/epan/"
-install -m 644 epan/crypt/*.h		"${IDIR}/epan/crypt"
-install -m 644 epan/ftypes/*.h		"${IDIR}/epan/ftypes"
-install -m 644 epan/dfilter/*.h		"${IDIR}/epan/dfilter"
-install -m 644 epan/dissectors/*.h	"${IDIR}/epan/dissectors"
-install -m 644 epan/wmem/*.h		"${IDIR}/epan/wmem"
-install -m 644 wiretap/*.h		"${IDIR}/wiretap"
-install -m 644 wsutil/*.h		"${IDIR}/wsutil"
-install -m 644 ws_diag_control.h	"${IDIR}/"
+install -m 644 config.h epan/register.h "${IDIR}/"
+install -m 644 cfile.h file.h "${IDIR}/"
+install -m 644 ws_symbol_export.h "${IDIR}/"
+install -m 644 epan/*.h "${IDIR}/epan/"
+install -m 644 epan/crypt/*.h "${IDIR}/epan/crypt"
+install -m 644 epan/ftypes/*.h "${IDIR}/epan/ftypes"
+install -m 644 epan/dfilter/*.h "${IDIR}/epan/dfilter"
+install -m 644 epan/dissectors/*.h "${IDIR}/epan/dissectors"
+install -m 644 epan/wmem/*.h "${IDIR}/epan/wmem"
+install -m 644 wiretap/*.h "${IDIR}/wiretap"
+install -m 644 wsutil/*.h "${IDIR}/wsutil"
+install -m 644 ws_diag_control.h "${IDIR}/"
+install -m 644 %{SOURCE2} %{buildroot}%{_udevrulesdir}
 
 
 touch %{buildroot}%{_bindir}/%{name}
@@ -160,7 +165,7 @@ getent group usbmon >/dev/null || groupadd -r usbmon
 # skip triggering if udevd isn't even accessible, e.g. containers or
 # rpm-ostree-based systems
 if [ -S /run/udev/control ]; then
-	/usr/bin/udevadm trigger --subsystem-match=usbmon
+  /usr/bin/udevadm trigger --subsystem-match=usbmon
 fi
 
 %ldconfig_postun cli
