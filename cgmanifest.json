@@ -2797,6 +2797,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "emacs",
+          "version": "28.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "enca",
           "version": "1.19",
           "downloadUrl": "http://dl.cihar.com/enca/enca-1.19.tar.xz"
