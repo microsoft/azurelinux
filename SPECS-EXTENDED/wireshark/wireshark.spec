@@ -32,7 +32,6 @@ BuildRequires:  bzip2-devel
 BuildRequires:  bison
 BuildRequires:  c-ares-devel
 Buildrequires:  cmake
-BuildRequires:  desktop-file-utils
 BuildRequires:  elfutils-devel
 BuildRequires:  flex
 BuildRequires:  gcc-c++
@@ -56,9 +55,6 @@ BuildRequires:  perl(Pod::Man)
 BuildRequires:  perl(open)
 BuildRequires:  python3
 Buildrequires:  python3-devel
-BuildRequires:  qt5-linguist
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qtsvg-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xdg-utils
 BuildRequires:  zlib-devel
@@ -108,7 +104,7 @@ and plugins.
   -DENABLE_LUA=OFF \
   -DENABLE_LIBXML2=ON \
   -DENABLE_NETLINK=ON \
-  -DENABLE_NGHTTP2=ON
+  -DENABLE_NGHTTP2=ON \
   -DENABLE_PLUGINS=ON \
   -DENABLE_SMI=ON \
   -DBUILD_androiddump=OFF \
@@ -116,6 +112,7 @@ and plugins.
   -DBUILD_mmdbresolve=OFF \
   -DBUILD_randpktdump=OFF \
   -DBUILD_sdjournal=ON \
+  -DBUILD_wireshark=OFF \
   .
 
 make %{?_smp_mflags}
@@ -148,7 +145,7 @@ install -m 644 epan/wmem/*.h "${IDIR}/epan/wmem"
 install -m 644 wiretap/*.h "${IDIR}/wiretap"
 install -m 644 wsutil/*.h "${IDIR}/wsutil"
 install -m 644 ws_diag_control.h "${IDIR}/"
-install -m 644 %{SOURCE2} %{buildroot}%{_udevrulesdir}
+install -m 644 %{SOURCE1} %{buildroot}%{_udevrulesdir}
 
 
 touch %{buildroot}%{_bindir}/%{name}
@@ -198,7 +195,6 @@ fi
 %{_libdir}/wireshark/extcap/sshdump
 %{_libdir}/wireshark/extcap/sdjournal
 %{_libdir}/wireshark/extcap/dpauxmon
-%{_libdir}/wireshark/extcap/androiddump
 %dir %{_libdir}/wireshark/cmake
 %{_libdir}/wireshark/cmake/*.cmake
 #the version wireshark uses to store plugins is only x.y, not .z
@@ -242,6 +238,10 @@ fi
 %changelog
 * Fri Jun 10 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.14-1
 - Update to resolves CVEs
+- Disabled Android Dump.
+- Removed unused/disabled features.
+- Fixed Formatting.
+
 
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
 - License verified.
