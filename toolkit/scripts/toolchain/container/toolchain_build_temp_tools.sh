@@ -209,37 +209,23 @@ echo built libstdc++
 echo M4-1.4.19
 tar xf m4-1.4.19.tar.gz
 pushd m4-1.4.19
-./configure --prefix=/tools --host=$LFS_TGT --build=$(build-aux/config.guess) --with-sysroot=$LFS 
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf m4-1.4.19
 
 touch $LFS/logs/temptoolchain/status_m4_complete
-echo built m4
 
 echo Ncurses-6.2
 tar xf ncurses-6.2.tar.gz
 pushd ncurses-6.2
 sed -i s/mawk// configure
-
-mkdir build # LFS reccommended
-pushd build
-  ../configure
-  make -C include
-  make -C progs tic
-popd
-
 ./configure --prefix=/tools \
-            --host=$LFS_TGT     \
-            --build=$(./config.guess) \
-            --mandir=/tools/share/man      \
-            --with-manpage-format=normal \
             --with-shared   \
             --without-debug \
             --without-ada   \
             --enable-widec  \
-            --disable-stripping \
             --enable-overwrite
 make -j$(nproc)
 sudo make DESTDIR=$LFS TIC_PATH=$(pwd)/build/progs/tic install
@@ -248,25 +234,23 @@ popd
 rm -rf ncurses-6.2
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
-echo built ncurses
 
 echo Bash-5.1.8
 tar xf bash-5.1.8.tar.gz
 pushd bash-5.1.8
-./configure --prefix=/tools --build=$(support/config.guess) --host=$LFS_TGT --without-bash-malloc
+./configure --prefix=/tools --without-bash-malloc
 make -j$(nproc)
 make install
 ln -sv bash /tools/bin/sh
 popd
 rm -rf bash-5.1.8
-echo built bash
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
 echo Bison-3.7.6
 tar xf bison-3.7.6.tar.xz
 pushd bison-3.7.6
-./configure --prefix=/tools --build=$(uname -m)-lfs-linux-gnu --host=$LFS_TGT
+./configure --prefix=/tools
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
 # try parallel make with new version
@@ -276,7 +260,6 @@ popd
 rm -rf bison-3.7.6
 
 touch $LFS/logs/temptoolchain/status_bison_complete
-echo built bison
 
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
@@ -286,94 +269,72 @@ case $(uname -m) in
         patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
     ;;
 esac
-patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT --build=$(build-aux/config.guess) --enable-install-program=hostname
+./configure --prefix=/tools --enable-install-program=hostname
 make -j$(nproc)
 make install
 popd
 rm -rf coreutils-8.32
 
 touch $LFS/logs/temptoolchain/status_coreutils_complete
-echo built coreutils
 
 echo Diffutils-3.8
 tar xf diffutils-3.8.tar.xz
 pushd diffutils-3.8
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT --build=$(build-aux/config.guess)
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf diffutils-3.8
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
-echo built diffutils
 
-# Error installing File-5.40: The file version installed on my build machine is version 5.38. The version being compiled is 5.40. Cross-compilation can't be done with build version 5.38 and target version 5.40 
-# echo File-5.40
-# tar xf file-5.40.tar.gz
-# pushd file-5.40
+echo File-5.40
+tar xf file-5.40.tar.gz
+pushd file-5.40
+./configure --prefix=/tools
+make -j$(nproc)
+make install
+popd
+rm -rf file-5.40
 
-# mkdir build # LFS recommended
-# pushd build
-#   ../configure --disable-bzlib      \
-#                --disable-libseccomp \
-#                --disable-xzlib      \
-#                --disable-zlib
-#   make
-# popd
+touch $LFS/logs/temptoolchain/status_file_complete
+echo built file
 
-# ./configure --prefix=/tools --host=$LFS_TGT --build=$(./config.guess)
-# make -j$(nproc)
-# make install
-# popd
-# rm -rf file-5.40
+# "bzip2" should build after "file" to prevent error:
+#/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
+#collect2: error: ld returned 1 exit status
+#Makefile:499: recipe for target 'libmagic.la' failed
+echo Bzip2-1.0.8
+tar xf bzip2-1.0.8.tar.gz
+pushd bzip2-1.0.8
+make -j$(nproc)
+make PREFIX=/tools install
+popd
+rm -rf bzip2-1.0.8
 
-# touch $LFS/logs/temptoolchain/status_file_complete
-# echo built file
-
-# Skipping bzip2 since it is not listed on the LFS cross-toolchain documentation
-# # "bzip2" should build after "file" to prevent error:
-# #/temptoolchain/lfs/tools/bin/../lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/libbz2.a(blocksort.o): warning: relocation against `stderr@@GLIBC_2.2.5' in read-only section `.text'
-# #collect2: error: ld returned 1 exit status
-# #Makefile:499: recipe for target 'libmagic.la' failed
-# echo Bzip2-1.0.8
-# tar xf bzip2-1.0.8.tar.gz
-# pushd bzip2-1.0.8
-# make -j$(nproc)
-# make PREFIX=/tools install
-# popd
-# rm -rf bzip2-1.0.8
-
-# touch $LFS/logs/temptoolchain/status_bzip2_complete
+touch $LFS/logs/temptoolchain/status_bzip2_complete
 
 echo Findutils-4.8.0
 tar xf findutils-4.8.0.tar.xz
 pushd findutils-4.8.0
-./configure --prefix=/tools \
-            --host=$LFS_TGT                 \
-            --localstatedir=/var/lib/locate \
-            --build=$(build-aux/config.guess)
+./configure --prefix=/tools
 make -j$(nproc)
-sudo make install
+make install
 popd
 rm -rf findutils-4.8.0
 
 touch $LFS/logs/temptoolchain/status_findutils_complete
-echo built findutils
 
 echo Gawk-5.1.0
 tar xf gawk-5.1.0.tar.xz
 pushd gawk-5.1.0
-./configure --prefix=/tools   \
-            --host=$LFS_TGT \
-            --build=$(build-aux/config.guess)
+./configure --prefix=/tools
 make -j$(nproc)
-sudo make install
+make install
 popd
 rm -rf gawk-5.1.0
 
 touch $LFS/logs/temptoolchain/status_gawk_complete
-echo built gawk
 
 echo Gettext-0.19.8.1
 tar xf gettext-0.19.8.1.tar.xz
@@ -389,152 +350,134 @@ touch $LFS/logs/temptoolchain/status_gettext_complete
 echo Grep-3.7
 tar xf grep-3.7.tar.xz
 pushd grep-3.7
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf grep-3.7
 
 touch $LFS/logs/temptoolchain/status_grep_complete
-echo built grep
 
 echo Gzip-1.11
 tar xf gzip-1.11.tar.xz
 pushd gzip-1.11
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf gzip-1.11
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
-echo built gzip
 
 echo Make-4.3
 tar xf make-4.3.tar.gz
 pushd make-4.3
-./configure --prefix=/tools --without-guile \
-            --host=$LFS_TGT \
-            --build=$(build-aux/config.guess) \
-            --target=$LFS_TGT
+./configure --prefix=/tools --without-guile
 make -j$(nproc)
 make install
 popd
 rm -rf make-4.3
 
 touch $LFS/logs/temptoolchain/status_make_complete
-echo built make
 
 echo Patch-2.7.6
 tar xf patch-2.7.6.tar.xz
 pushd patch-2.7.6
-./configure --prefix=/tools   \
-            --host=$LFS_TGT \
-            --build=$(build-aux/config.guess) \
-            --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf patch-2.7.6
 
 touch $LFS/logs/temptoolchain/status_patch_complete
-echo built patch
 
-# Skipping Perl since it is not listed on the LFS cross-toolchain documentation
-# echo Perl-5.32.0
-# tar xf perl-5.32.0.tar.xz
-# pushd perl-5.32.0
-# sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
-# # Using locally-built version of 'make' to avoid mismatch between the build machine's version
-# # and the version we've built above. During its build, Perl runs 'make' from within its 'Makefile', so
-# # we used to end up with the build machine's 4.2.1 version running a 4.3 version causing build errors.
-# /tools/bin/make -j$(nproc)
-# cp -v perl cpan/podlators/scripts/pod2man /tools/bin
-# mkdir -pv /tools/lib/perl5/5.32.0
-# cp -Rv lib/* /tools/lib/perl5/5.32.0
-# popd
-# rm -rf perl-5.32.0
+echo Perl-5.32.0
+tar xf perl-5.32.0.tar.xz
+pushd perl-5.32.0
+sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
+# Using locally-built version of 'make' to avoid mismatch between the build machine's version
+# and the version we've built above. During its build, Perl runs 'make' from within its 'Makefile', so
+# we used to end up with the build machine's 4.2.1 version running a 4.3 version causing build errors.
+/tools/bin/make -j$(nproc)
+cp -v perl cpan/podlators/scripts/pod2man /tools/bin
+mkdir -pv /tools/lib/perl5/5.32.0
+cp -Rv lib/* /tools/lib/perl5/5.32.0
+popd
+rm -rf perl-5.32.0
 
-# touch $LFS/logs/temptoolchain/status_perl_complete
+touch $LFS/logs/temptoolchain/status_perl_complete
 
-# Skipping Python since the package does not exist in the Docker environment
-# echo Python-3.9.12
-# tar xf Python-3.9.12.tar.xz
-# pushd Python-3.9.12
-# sed -i '/def add_multiarch_paths/a \        return' setup.py
-# ./configure --prefix=/tools --without-ensurepip --enable-shared
-# make -j$(nproc)
-# make install
-# popd
-# rm -rf Python-3.9.12
+echo Python-3.9.12
+tar xf Python-3.9.12.tar.xz
+pushd Python-3.9.12
+sed -i '/def add_multiarch_paths/a \        return' setup.py
+./configure --prefix=/tools --without-ensurepip --enable-shared
+make -j$(nproc)
+make install
+popd
+rm -rf Python-3.9.12
 
-# touch $LFS/logs/temptoolchain/status_python_complete
+touch $LFS/logs/temptoolchain/status_python_complete
 
 echo Sed-4.8
 tar xf sed-4.8.tar.xz
 pushd sed-4.8
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf sed-4.8
 
 touch $LFS/logs/temptoolchain/status_sed_complete
-echo built sed
 
 echo Tar-1.34
 tar xf tar-1.34.tar.xz
 pushd tar-1.34
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf tar-1.34
 
 touch $LFS/logs/temptoolchain/status_tar_complete
-echo built tar
 
-# Error building texinfo: ../tools/info/makedoc: Command not found
-# This package is also not required for the cross-toolchain according to LFS documentation
-# echo Texinfo-6.8
-# tar xf texinfo-6.8.tar.xz
-# pushd texinfo-6.8
-# # fix issue building with glibc 2.34:
-# sed -e 's/__attribute_nonnull__/__nonnull/' \
-#     -i gnulib/lib/malloc/dynarray-skeleton.c
-# ./configure --prefix=/tools
-# make -j$(nproc)
-# make install
-# popd
-# rm -rf texinfo-6.8
+echo Texinfo-6.8
+tar xf texinfo-6.8.tar.xz
+pushd texinfo-6.8
+# fix issue building with glibc 2.34:
+sed -e 's/__attribute_nonnull__/__nonnull/' \
+    -i gnulib/lib/malloc/dynarray-skeleton.c
+./configure --prefix=/tools
+make -j$(nproc)
+make install
+popd
+rm -rf texinfo-6.8
 
-# touch $LFS/logs/temptoolchain/status_texinfo_complete
+touch $LFS/logs/temptoolchain/status_texinfo_complete
 
 echo Xz-5.2.5
 tar xf xz-5.2.5.tar.xz
 pushd xz-5.2.5
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf xz-5.2.5
 
 touch $LFS/logs/temptoolchain/status_xz_complete
-echo built xz
 
 echo Flex-2.6.4
 tar xf flex-2.6.4.tar.gz
 pushd flex-2.6.4
 sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
 HELP2MAN=/tools/bin/true \
-./configure --prefix=/tools --host=$LFS_TGT --target=$LFS_TGT
+./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
 rm -rf flex-2.6.4
 
 touch $LFS/logs/temptoolchain/status_flex_complete
-echo built flex
 
 
 # Skipping binutils pass 2: the make step currently fails
