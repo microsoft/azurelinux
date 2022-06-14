@@ -1,13 +1,15 @@
 Summary:        Platform-neutral API
 Name:           nspr
 Version:        4.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSPR
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.mozilla.org/pub/nspr/releases/v%{version}/src/%{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 Netscape Portable Runtime (NSPR) provides a platform-neutral API
@@ -16,34 +18,31 @@ for system level and libc like functions.
 %package        devel
 Summary:        Header and development files for nspr
 Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup
 cd nspr
 sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in
 sed -i 's#$(LIBRARY) ##' config/rules.mk
 
 %build
 cd nspr
-./configure \
-    --prefix=%{_prefix} \
-    --bindir=%{_bindir} \
+%configure \
     --with-mozilla \
     --with-pthreads \
-    $([ $(uname -m) = x86_64 ] && echo --enable-64bit) \
+    --enable-64bit \
     --disable-silent-rules
 
-make %{?_smp_mflags}
+%make_build
 
 %install
 cd nspr
-make DESTDIR=%{buildroot} install
+%make_install
 
-%post   -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -58,6 +57,10 @@ make DESTDIR=%{buildroot} install
 %{_datarootdir}/aclocal/*
 
 %changelog
+* Tue Jun 14 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.30-2
+- Add explicit build requirements
+- Lint spec
+
 * Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.30-1
 - Upgrading to v4.30 for nss
 
