@@ -7,7 +7,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.41.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -124,7 +124,6 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
-%build
 make mrproper
 
 %ifarch x86_64
@@ -162,6 +161,7 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
+%build
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 
 # Compile perf, python3-perf
@@ -366,6 +366,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.41.1-5
+- Moving ".config" update and check steps into the %%prep section.
+
 * Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
 - Compiling ptp_kvm driver as a module 
 
