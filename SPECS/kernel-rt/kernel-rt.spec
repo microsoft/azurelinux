@@ -357,7 +357,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.44.1-2
-- Updating build steps builds for the regular kernel.
+- Updating build steps for the regular kernel.
 
 * Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.44.1-1
 - Update source to 5.15.44.1
