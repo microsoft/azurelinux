@@ -3855,8 +3855,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.13",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.13/libxml2-v2.9.13.tar.gz"
+          "version": "2.9.14",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.14/libxml2-v2.9.14.tar.gz"
         }
       }
     },
