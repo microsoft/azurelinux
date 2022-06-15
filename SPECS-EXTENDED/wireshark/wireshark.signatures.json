@@ -1,7 +1,6 @@
 {
  "Signatures": {
   "90-wireshark-usbmon.rules": "31310c5e45835563ee9daba99bc09849cc004e8d9c712d0860211d5fa5563bcb",
-  "SIGNATURES-3.4.4.txt": "31cff87a96e012c113d2e5eec307bd4d9dc861aea5adfab5aa3a53f9a780e85c",
-  "wireshark-3.4.4.tar.xz": "729cd11e9715c600e5ad74ca472bacf8af32c20902192d5f2b271268511d4d29"
+  "wireshark-3.4.14.tar.xz": "32b0d0772e942d2d66cb3757bfb5027e53a6ddfbc908b65be5f3048f7a082dee"
  }
 }
