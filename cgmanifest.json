@@ -7310,6 +7310,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kpatch",
+          "version": "0.9.6",
+          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kpmcore",
           "version": "3.3.0",
           "downloadUrl": "http://download.kde.org/stable/kpmcore/3.3.0/src/kpmcore-3.3.0.tar.xz"
