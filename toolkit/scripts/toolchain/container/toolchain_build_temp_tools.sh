@@ -479,142 +479,126 @@ rm -rf flex-2.6.4
 
 touch $LFS/logs/temptoolchain/status_flex_complete
 
+echo Binutils-2.37 - Pass 2
+tar xf binutils-2.37.tar.xz
+pushd binutils-2.37
+mkdir -v build
+cd build
+CC=$LFS_TGT-gcc                  \
+AR=$LFS_TGT-ar                   \
+RANLIB=$LFS_TGT-ranlib
+../configure                   	 \
+	    --prefix=/tools            \
+      --target=$LFS_TGT          \
+	    --disable-nls              \
+	    --disable-werror           \
+	    --with-lib-path=/tools/lib \
+	    --with-sysroot
+make -j$(nproc)
+make install
+make -C ld clean
+make -C ld LIB_PATH=/usr/lib:/lib
+cp -v ld/ld-new /tools/bin
+popd
+rm -rf binutils-2.37
 
-# Skipping binutils pass 2: the make step currently fails
-# echo Binutils-2.37 - Pass 2
-# tar xf binutils-2.37.tar.xz
-# pushd binutils-2.37
-# ./configure --prefix=/usr --build=$(../config.guess) --host=$LFS_TGT --disable-nls --enable-shared --disable-werror --target=$LFS_TGT --enable-64-bit-bfd --with-lib-path=/tools/lib
-# make -j$(nproc)
-# make install
-# popd
-# rm -rf binutils-2.37
+touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-# touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
+echo GCC-11.2.0 - Pass 2
+tar xf gcc-11.2.0.tar.xz
+pushd gcc-11.2.0
+# fix issue compiling with glibc 2.34
+sed -e '/static.*SIGSTKSZ/d' \
+    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
+# cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+#   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
+case $(uname -m) in
+    x86_64)
+      for file in gcc/config/{linux,i386/linux{,64}}.h
+      do
+        cp -uv $file{,.orig}
+        sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
+            -e 's@/usr@/tools@g' $file.orig > $file
+        echo '
+      #undef STANDARD_STARTFILE_PREFIX_1
+      #undef STANDARD_STARTFILE_PREFIX_2
+      #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+      #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
+        touch $file.orig
+      done
+    ;;
+    aarch64)
+      for file in $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h)
+      do
+        cp -uv $file{,.orig}
+        sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
+            -e 's@/usr@/tools@g' $file.orig > $file
+        echo '
+      #undef STANDARD_STARTFILE_PREFIX_1
+      #undef STANDARD_STARTFILE_PREFIX_2
+      #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+      #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
+        touch $file.orig
+      done
+    ;;
+esac
+case $(uname -m) in
+  x86_64)
+    sed -e '/m64=/s/lib64/lib/' \
+        -i.orig gcc/config/i386/t-linux64
+  ;;
+  aarch64)
+    sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
+  ;;
+esac
+tar -xf ../mpfr-4.1.0.tar.xz
+mv -v mpfr-4.1.0 mpfr
+tar -xf ../gmp-6.2.1.tar.xz
+mv -v gmp-6.2.1 gmp
+tar -xf ../mpc-1.2.1.tar.gz
+mv -v mpc-1.2.1 mpc
+mkdir -v build
+cd       build
+CC=$LFS_TGT-gcc                                    \
+CXX=$LFS_TGT-g++                                   \
+AR=$LFS_TGT-ar                                     \
+RANLIB=$LFS_TGT-ranlib
+../configure                                       \
+    --prefix=/tools                                \
+    --with-local-prefix=/tools                     \
+    --with-native-system-header-dir=/tools/include \
+    --enable-languages=c,c++                       \
+    --disable-libstdcxx-pch                        \
+    --disable-multilib                             \
+    --disable-bootstrap                            \
+    --target=$LFS_TGT                              \
+    --with-sysroot=$LFS                            \
+    --disable-libgomp
+make -j$(nproc)
+make install
+ln -sv gcc /tools/bin/cc
+# Sanity check
+set +e
+echo sanity check - temptoolchain - gcc 11.2.0 pass2
+echo 'int main(){}' > dummy.c
+cc dummy.c
+readelf -l a.out | grep ': /tools'
+case $(uname -m) in
+  x86_64)
+    echo Expected: '[Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]'
+  ;;
+  aarch64)
+    echo Expected: '[Requesting program interpreter: /tools/lib/ld-linux-aarch64.so.1]'
+  ;;
+esac
+rm -v dummy.c a.out
+set -e
+echo End sanity check - temptoolchain - gcc 11.2.0 pass2
+popd
+rm -rf gcc-11.2.0
 
-
-# Skipping GCC pass 2: the configure step currently fails
-# echo GCC-11.2.0 - Pass 2
-# tar xf gcc-11.2.0.tar.xz
-# pushd gcc-11.2.0
-# # fix issue compiling with glibc 2.34
-# # sed -e '/static.*SIGSTKSZ/d' \
-# #     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
-# #     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
-# # cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
-# #   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
-# # case $(uname -m) in
-# #     x86_64)
-# #       for file in gcc/config/{linux,i386/linux{,64}}.h
-# #       do
-# #         cp -uv $file{,.orig}
-# #         sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
-# #             -e 's@/usr@/tools@g' $file.orig > $file
-# #         echo '
-# #       #undef STANDARD_STARTFILE_PREFIX_1
-# #       #undef STANDARD_STARTFILE_PREFIX_2
-# #       #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
-# #       #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
-# #         touch $file.orig
-# #       done
-# #     ;;
-# #     aarch64)
-# #       for file in $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h -o -name linux-eabi.h -o -name linux-elf.h -o -name aarch64-linux.h)
-# #       do
-# #         cp -uv $file{,.orig}
-# #         sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
-# #             -e 's@/usr@/tools@g' $file.orig > $file
-# #         echo '
-# #       #undef STANDARD_STARTFILE_PREFIX_1
-# #       #undef STANDARD_STARTFILE_PREFIX_2
-# #       #define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
-# #       #define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
-# #         touch $file.orig
-# #       done
-# #     ;;
-# # esac
-# # case $(uname -m) in
-# #   x86_64)
-# #     sed -e '/m64=/s/lib64/lib/' \
-# #         -i.orig gcc/config/i386/t-linux64
-# #   ;;
-# #   aarch64)
-# #     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
-# #   ;;
-# # esac
-# tar -xf ../mpfr-4.1.0.tar.xz
-# mv -v mpfr-4.1.0 mpfr
-# tar -xf ../gmp-6.2.1.tar.xz
-# mv -v gmp-6.2.1 gmp
-# tar -xf ../mpc-1.2.1.tar.gz
-# mv -v mpc-1.2.1 mpc
-
-# case $(uname -m) in
-#   x86_64)
-#     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
-#   ;;
-# esac
-
-# sed '/thread_header =/s/@.*@/gthr-posix.h/' \
-#     -i libgcc/Makefile.in libstdc++-v3/include/Makefile.in
-
-
-# mkdir -v build
-# cd       build
-
-# ../configure                                       \
-#     --build=$(../config.guess)                     \
-#     --host=$LFS_TGT                                \
-#     --target=$LFS_TGT                              \
-#     LDFLAGS_FOR_TARGET=-L$PWD/$LFS_TGT/libgcc      \
-#     --prefix=/usr                                  \
-#     --with-build-sysroot=$LFS                      \
-#     --enable-initfini-array                        \
-#     --disable-nls                                  \
-#     --disable-multilib                             \
-#     --disable-decimal-float                        \
-#     --disable-libatomic                            \
-#     --disable-libgomp                              \
-#     --disable-libquadmath                          \
-#     --disable-libssp                               \
-#     --disable-libvtv                               \
-#     --enable-languages=c                       \
-#     --with-local-prefix=/tools                     \
-#     --with-sysroot=$LFS                            \
-#     --with-native-system-header-dir=/tools/include
-# # ../configure                                       \
-# #     --prefix=/usr                                \
-# #     --with-local-prefix=/tools                     \
-# #     --with-native-system-header-dir=/tools/include \
-# #     --enable-languages=c,c++                       \
-# #     --disable-libstdcxx-pch                        \
-# #     --disable-multilib                             \
-# #     --disable-bootstrap                            \
-# #     --disable-libgomp
-# make -j$(nproc)
-# make install
-# ln -sv gcc /tools/bin/cc
-# # Sanity check
-# set +e
-# echo sanity check - temptoolchain - gcc 11.2.0 pass2
-# echo 'int main(){}' > dummy.c
-# cc dummy.c
-# readelf -l a.out | grep ': /tools'
-# case $(uname -m) in
-#   x86_64)
-#     echo Expected: '[Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]'
-#   ;;
-#   aarch64)
-#     echo Expected: '[Requesting program interpreter: /tools/lib/ld-linux-aarch64.so.1]'
-#   ;;
-# esac
-# rm -v dummy.c a.out
-# set -e
-# echo End sanity check - temptoolchain - gcc 11.2.0 pass2
-# popd
-# rm -rf gcc-11.2.0
-
-# touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
+touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
 
 touch $LFS/logs/temptoolchain/temp_toolchain_complete
