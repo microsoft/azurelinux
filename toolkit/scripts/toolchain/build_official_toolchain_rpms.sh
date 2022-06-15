@@ -488,6 +488,7 @@ build_rpm_in_chroot_no_install libselinux
 
 # libcap-ng needs: swig, python3
 build_rpm_in_chroot_no_install libcap-ng
+copy_rpm_subpackage python3-libcap-ng
 
 # util-linux and rpm require libselinux and libcap-ng
 chroot_and_install_rpms libselinux
