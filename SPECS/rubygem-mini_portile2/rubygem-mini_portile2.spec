@@ -26,6 +26,9 @@ gem build %{gem_name}
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 #add LICENSE.txt file to buildroot from Source0
 cp LICENSE.txt %{buildroot}%{gem_instdir}/
+#add lib and test folders to buildroot from Source0
+cp -r lib/ %{buildroot}%{gem_instdir}/
+cp -r test/ %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)

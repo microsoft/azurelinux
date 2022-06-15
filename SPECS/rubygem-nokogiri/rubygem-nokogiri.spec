@@ -12,6 +12,8 @@ URL:            https://nokogiri.org/
 Source0:        https://github.com/sparklemotion/nokogiri/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+BuildRequires:  libxml2-devel
+BuildRequires:  libxslt-devel
 BuildRequires:  rubygem-mini_portile2
 Requires:       rubygem-mini_portile2
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -29,9 +31,7 @@ parsers like libxml2 (C) and xerces (Java).
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE.md file to buildroot from Source0
-cp LICENSE.md %{buildroot}%{gem_instdir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem --platform=ruby -- --use-system-libraries
 
 %files
 %defattr(-,root,root,-)
