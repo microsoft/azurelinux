@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "apache-maven-3.8.4-bin.tar.gz": "2cdc9c519427bb20fdc25bef5a9063b790e4abd930e7b14b4e9f4863d6f9f13c",
+  "apache-maven-3.8.4-licenses.tar.gz": "48f775cd92c4d961b7d8e3fed403f42a9eefad1bb4ddf42c6e5cee93a5bcb693",
+  "apache-maven-3.8.4-m2.tar.gz": "4f70a0d3bcfea5f603b83dc59ecd7fd13e53830e9c940574f5d6a6b4e5d70495",
+  "apache-maven-3.8.4-src.tar.gz": "298bfb6172c134655f4f5608342f9c7bc798918ac165b8ded4af800be184ab9b"
+ }
+}

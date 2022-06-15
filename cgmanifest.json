@@ -11370,6 +11370,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "maven",
+          "version": "3.8.4",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.1/source/apache-maven-3.8.1-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "maven-compiler-plugin-bootstrap",
           "version": "3.8.1",
           "downloadUrl": "http://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
