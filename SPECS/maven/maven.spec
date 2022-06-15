@@ -39,7 +39,7 @@ Maven is a software project management and comprehension tool. Based on the conc
 
 %if 0%{?sources_generation}
 %package cached-sources
-Summary:    	NOT TO BE USED AS REGULAR PACKAGE! REQUIRES NETWORK ACCESS!
+Summary:        NOT TO BE USED AS REGULAR PACKAGE! REQUIRES NETWORK ACCESS!
 
 %description cached-sources
 %{summary}
