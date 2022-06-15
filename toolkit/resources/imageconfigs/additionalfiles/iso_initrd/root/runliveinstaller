@@ -44,7 +44,7 @@ if grep -qs $ISO_ROOT /proc/mounts; then
 elif grep -q "image-config" $CMDLINE; then
     IMAGE_CONFIG_VALUE=$(grep -oP "(?<=--image-config=)\S+" "$CMDLINE")
     # $IMAGE_CONFIG_VALUE will be in this fixed format: http://PXE_SERVER_IP/RANDOM_PATH
-    # CUT_DIS will be an array of strings separated by '/'
+    # CUT_DIRS will be an array of strings separated by '/'
     IFS='/' read -ra CUT_DIRS <<< $IMAGE_CONFIG_VALUE
     # To disable generation of any extra directories and just download the contents within the directory, 
     # use -nH to disable genration of host-prefix, "PXE_SERVER_IP". 
