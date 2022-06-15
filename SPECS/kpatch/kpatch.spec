@@ -29,7 +29,6 @@ It gives more control over uptime without sacrificing security or stability.
 Summary:        Tools for building livepatches with kpatch.
 Group:          Development/Tools
 
-Requires:       kernel-debuginfo
 Requires:       numactl-devel
 Requires:       openssl
 Requires:       patch
