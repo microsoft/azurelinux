@@ -35,7 +35,7 @@ Requires:       patch
 Requires:       rpm-build
 Requires:       wget
 
-%description devel
+%description build
 %{summary}
 
 %prep
