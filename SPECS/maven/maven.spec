@@ -1,14 +1,3 @@
-%global debug_package %{nil}
-
-# Switch "sources_generation" to 1 when running a package build to generate cached sources for regular builds.
-%define sources_generation 0
-%define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
-%define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
-
-%if ! 0%{?sources_generation}
-%define offline_build -o
-%endif
-
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.4
@@ -21,30 +10,36 @@ URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 # Using pre-compiled binaries because 'maven' requires itself during build-time.
 Source1:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/binaries/apache-%{name}-%{version}-bin.tar.gz
+%global debug_package %{nil}
+# Switch "sources_generation" to 1 when running a package build to generate cached sources for regular builds.
+%define sources_generation 0
+%define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
+%define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
+%if ! 0%{?sources_generation}
+%define offline_build -o
+%endif
+%define _prefixmvn %{_var}/opt/apache-%{name}
+%define _bindirmvn %{_prefixmvn}/bin
+%define _libdirmvn %{_prefixmvn}/lib
+BuildRequires:  ant
+BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  msopenjdk-11
+BuildRequires:  wget
+Requires:       %{_bindir}/which
+Requires:       msopenjdk-11
 # In order to re-generate these sources after a version update, switch "sources_generation" to 1
 # and make sure network is enabled during the build. The tarballs will be inside the built 'maven-cached-sources' subpackage.
 %if ! 0%{?sources_generation}
 Source2:        %{m2_cache_tarball_name}
 Source3:        %{licenses_tarball_name}
 %endif
-BuildRequires:  ant
-BuildRequires:  msopenjdk-11
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  wget
-Requires:       %{_bindir}/which
-Requires:       msopenjdk-11
-
-%define _prefixmvn %{_var}/opt/apache-%{name}
-%define _bindirmvn %{_prefixmvn}/bin
-%define _libdirmvn %{_prefixmvn}/lib
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
 
 %if 0%{?sources_generation}
-
 %package cached-sources
-Summary:    NOT TO BE USED AS REGULAR PACKAGE! REQUIRES NETWORK ACCESS!
+Summary:    	NOT TO BE USED AS REGULAR PACKAGE! REQUIRES NETWORK ACCESS!
 
 %description cached-sources
 %{summary}
@@ -56,30 +51,26 @@ the regular builds of "maven" when the "sources_generation" macro is set to 0.
 %prep
 # Setup mvn binary
 tar xf %{SOURCE1} --no-same-owner
-mv ./apache-maven-%{version} /var/opt/
-ln -sfvn apache-maven-%{version} /var/opt/apache-maven
-ln -sfv /var/opt/apache-maven/bin/mvn /usr/bin/mvn
+mv ./apache-maven-%{version} %{_var}/opt/
+ln -sfvn apache-maven-%{version} %{_var}/opt/apache-maven
+ln -sfv %{_var}/opt/apache-maven/bin/mvn %{_bindir}/mvn
 
 %if ! 0%{?sources_generation}
-
 # Setup maven .m2 cache directory
 mkdir /root/.m2
 pushd /root/.m2
 tar xf %{SOURCE2} --no-same-owner
 popd
-
 %endif
 
 %setup -q -n apache-%{name}-%{version}
 %if ! 0%{?sources_generation}
-
 # Setup licenses. Remove LICENSE.vm script, which downloads all subproject license files, and replace with prepopulated license tarball.
 rm -v apache-maven/src/main/appended-resources/META-INF/LICENSE.vm
 pushd apache-maven
 tar xf %{SOURCE3} --no-same-owner
-cp -v ./target/licenses/lib/* /var/opt/apache-maven/lib
+cp -v ./target/licenses/lib/* %{_var}/opt/apache-maven/lib
 popd
-
 %endif
 
 %build
@@ -157,7 +148,6 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/README.txt
 
 %if 0%{?sources_generation}
-
 %files cached-sources
 %{_prefixmvn}/%{m2_cache_tarball_name}
 %{_prefixmvn}/%{licenses_tarball_name}
@@ -165,7 +155,7 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %endif
 
 %changelog
-* Mon June 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-1
+* Mon Jun 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-1
 - Adding apache maven as build dependency for cassandra reaper.
 - Updated to version 3.8.4.
 
