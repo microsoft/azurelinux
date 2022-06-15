@@ -7820,6 +7820,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcriterion",
+          "version": "2.4.1",
+          "downloadUrl": "https://github.com/Snaipe/Criterion/releases/download/v2.4.1/criterion-v2.4.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdaemon",
           "version": "0.14",
           "downloadUrl": "https://0pointer.de/lennart/projects/libdaemon/libdaemon-0.14.tar.gz"

@@ -18,6 +18,7 @@ BuildRequires:  systemd-devel
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  python3-pip
+BuildRequires:  libcriterion
 %endif
 Requires:       glib
 Requires:       json-c
@@ -102,6 +103,7 @@ fi
 %systemd_postun_with_restart syslog-ng.service
 
 %files
+%exclude %{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt
 %config(noreplace) %{_sysconfdir}/syslog-ng/syslog-ng.conf
