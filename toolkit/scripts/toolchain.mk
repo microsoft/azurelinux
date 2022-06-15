@@ -161,11 +161,7 @@ $(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.f
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) && \
-	mkdir -p $(RPMS_DIR)/noarch && \
-	mkdir -p $(RPMS_DIR)/$(build_arch) && \
-	cp -v $(toolchain_build_dir)/built_rpms_all/*noarch.rpm $(RPMS_DIR)/noarch && \
-	cp -v $(toolchain_build_dir)/built_rpms_all/*$(build_arch).rpm $(RPMS_DIR)/$(build_arch)
-	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt)
+	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
 .SILENT: $(toolchain_rpms)
