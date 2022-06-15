@@ -8,7 +8,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/Snaipe/Criterion
-Source:         https://github.com/Snaipe/Criterion/releases/download/v%{version}/%{pr_name}-v%{version}.tar.xz
+Source:         https://github.com/Snaipe/Criterion/releases/download/v%{version}/%{pr_name}-%{version}.tar.xz
+BuildRequires:  make
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  clang
 BuildRequires:  libffi-devel
 BuildRequires:  meson
 BuildRequires:  ninja-build
