@@ -1,17 +1,17 @@
 %define pr_name criterion
-
+Summary:        A cross-platform C and C++ unit testing framework for the 21st century
 Name:           lib%{pr_name}
 Version:        2.4.1
 Release:        1%{?dist}
-Summary:        A cross-platform C and C++ unit testing framework for the 21st century
-Group:          Development/Libraries
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Development/Libraries
 URL:            https://github.com/Snaipe/Criterion
-Vendor:         Snaipe
 Source:         https://github.com/Snaipe/Criterion/releases/download/v%{version}/{pr_name}-v%{version}.tar.xz
+BuildRequires:  libffi-devel
 BuildRequires:  meson
 BuildRequires:  ninja-build
-BuildRequires:  libffi-devel
 Requires:       gcc
 
 %description
@@ -42,8 +42,8 @@ Full documentation: http://criterion.readthedocs.org/
 %{_includedir}/%{pr_name}/internal/assert/*.h
 %{_includedir}/%{pr_name}/internal/assert/*.hxx
 %{_libdir}/pkgconfig/*.pc
-/usr/share/locale/de/LC_MESSAGES/criterion.mo
-/usr/share/locale/fr/LC_MESSAGES/criterion.mo
+%{_datadir}/locale/de/LC_MESSAGES/criterion.mo
+%{_datadir}/locale/fr/LC_MESSAGES/criterion.mo
 
 %changelog
 * Wed Jun 15 2022 Bala <balakumaran.kannan@microsoft.com> - 2.4.1-0

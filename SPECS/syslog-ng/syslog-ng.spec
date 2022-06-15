@@ -103,7 +103,9 @@ fi
 %systemd_postun_with_restart syslog-ng.service
 
 %files
+%if %{with_check}
 %exclude %{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
+%endif
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt
 %config(noreplace) %{_sysconfdir}/syslog-ng/syslog-ng.conf
