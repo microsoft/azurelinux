@@ -25,13 +25,14 @@ without having to wait for long-running tasks to complete, for users to log off,
 for scheduled reboot windows.
 It gives more control over uptime without sacrificing security or stability.
 
-%package devel
+%package build
 Summary:        Tools for building livepatches with kpatch.
 Group:          Development/Tools
 
 Requires:       numactl-devel
 Requires:       openssl
 Requires:       patch
+Requires:       rpm-build
 Requires:       wget
 
 %description devel
@@ -62,7 +63,7 @@ rm -rf %{buildroot}%{_mandir}
 %{_sbindir}/kpatch
 %{_libdir}/systemd/system/kpatch.service
 
-%files devel
+%files build
 %license COPYING
 %{_libexecdir}/kpatch/*
 %{_datadir}/kpatch/patch/*
