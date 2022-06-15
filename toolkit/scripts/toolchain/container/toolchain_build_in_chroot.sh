@@ -1011,22 +1011,6 @@ popd
 rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
 
-echo nspr-4.21
-tar xf nspr-4.21.tar.gz
-pushd nspr-4.21
-cd nspr
-sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in
-sed -i 's#$(LIBRARY) ##'            config/rules.mk
-./configure --prefix=/usr \
-        --with-mozilla \
-        --with-pthreads \
-        --enable-64bit
-make -j$(nproc)
-make install
-popd
-rm -rf nspr-4.21
-touch /logs/status_nspr_complete
-
 echo popt-1.18
 tar xf popt-1.18.tar.gz
 pushd popt-1.18

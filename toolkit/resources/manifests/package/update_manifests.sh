@@ -245,7 +245,6 @@ generate_pkggen_core () {
         grep "^flex-" $TmpPkgGen
         grep "^bison-" $TmpPkgGen
         grep "^popt-" $TmpPkgGen
-        grep "^nspr-" $TmpPkgGen
         grep "^sqlite-" $TmpPkgGen
         grep "^elfutils-" $TmpPkgGen
         grep "^expat-" $TmpPkgGen
