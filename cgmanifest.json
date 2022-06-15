@@ -4425,8 +4425,8 @@
         "type": "other",
         "other": {
           "name": "ncurses",
-          "version": "6.2",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz"
+          "version": "6.3",
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.3.tar.gz"
         }
       }
     },
