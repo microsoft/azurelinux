@@ -84,7 +84,7 @@ exit 0
 
 %changelog
 * Wed Jun 15 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.7-1
-- Bump version to 6.2.6 to address CVE-2022-24736
+- Bump version to 6.2.7 to address CVE-2022-24736
 
 * Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.6-1
 - Bump version to 6.2.6 to fix ptest
