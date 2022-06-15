@@ -1981,6 +1981,7 @@
                 "jsonbuilder",
                 "keda",
                 "kernel-signed",
+                "kpatch",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
                 "kubernetes-1.19.7",
