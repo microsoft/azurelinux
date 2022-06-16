@@ -153,3 +153,4 @@ chown -R reaper: /var/log/cassandra-reaper/
 %changelog
 * Mon June 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-1
 - Initial Reaper build using apache maven and cached maven/nodejs artifacts.
+- License Verified
