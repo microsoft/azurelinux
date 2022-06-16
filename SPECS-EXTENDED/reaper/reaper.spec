@@ -2,7 +2,7 @@ Summary: Cassandra Reaper
 Name: reaper
 Version: 3.1.1
 Release: 1%{?dist}
-License: Apache License 2.0
+License: Apache 2.0
 Vendor: Microsoft Corporation
 Distribution: Mariner
 Group: Applications/System
