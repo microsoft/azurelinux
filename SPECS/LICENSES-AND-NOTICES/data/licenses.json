@@ -2046,6 +2046,7 @@
                 "python-sphinxcontrib-websupport",
                 "python-yamlloader",
                 "R",
+                "reaper",
                 "rocksdb",
                 "rubygem-asciidoctor",
                 "rubygem-bigdecimal",

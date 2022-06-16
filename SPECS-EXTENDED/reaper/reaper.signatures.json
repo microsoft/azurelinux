@@ -1,0 +1,12 @@
+{
+ "Signatures": {
+  "cassandra-reaper-3.1.1.tar.gz": "6efe52195ad4a3c3b7a6f928bafa60d3df011709d9bc918e717033bf86d724d8",
+  "reaper-bower-cache-3.1.1.tar.gz": "1b58255de560b3fa310fbd4c9a012f1b0515a9cc373570e5f0f9fdd26b28839a",
+  "reaper-bower-components-3.1.1.tar.gz": "4a8ccd913c41bea3640a48f0eca0e6776db3ae3293231f2900334bbcbb9df390",
+  "reaper-local-lib-node-modules-3.1.1.tar.gz": "e99efe085ae2821194d532427024319f7b9b9dc91a9fc571d23b3d5501f4c647",
+  "reaper-local-n-3.1.1.tar.gz": "37da6fbea790397222c08d4b596506cd3b9f7addc10208117225b1cd8b2a319e",
+  "reaper-m2-cache-3.1.1.tar.gz": "175626edfd656e6a10bdb756494bda213be01334c87463530d8a3dfce21005a6",
+  "reaper-npm-cache-3.1.1.tar.gz": "24453806c2b6a2602e76e9959c39099718b7eb2cd651c5a2924de6e9c9a4c781",
+  "reaper-srcui-node-modules-3.1.1.tar.gz": "bdc13796a9a15d4142fab0f0aae724f1c559092cff313d0b12057065e0117fae"
+ }
+}
