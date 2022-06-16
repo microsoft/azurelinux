@@ -78,3 +78,4 @@ fi
 %changelog
 * Thu Jun 16 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.1-1
 - Original version for CBL-Mariner
+- Verified license
