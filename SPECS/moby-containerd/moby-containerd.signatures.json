@@ -2,6 +2,6 @@
  "Signatures": {
   "containerd.service": "b7908653ff8298fc8c1c21854a6e338f40c607ec40d177269615a8f3448c5153",
   "containerd.toml": "793d4f11a4e69bdb3b1903da2cdf76b7f32dbc97197b12d295a05ecc284e230e",
-  "moby-containerd-1.6.1.tar.gz": "4622540a1a362a009148fafeca2a6d35443da79c2d92263c7a52489779a52bc5"
+  "moby-containerd-1.6.2.tar.gz": "4ea21a6b4649512366e7c31ae547ad89c6a69c6586a6d8565cff07898de344b0"
  }
 }

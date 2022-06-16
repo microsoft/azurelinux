@@ -3970,8 +3970,18 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.8",
-          "downloadUrl": "https://golang.org/dl/go1.17.8.src.tar.gz"
+          "version": "1.17.10",
+          "downloadUrl": "https://golang.org/dl/go1.17.10.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.18.3",
+          "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
         }
       }
     },
@@ -11603,8 +11613,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.1",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.1.tar.gz"
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.2.tar.gz"
         }
       }
     },

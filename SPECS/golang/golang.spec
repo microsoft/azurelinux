@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.17.10
+Version:        1.18.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -116,6 +116,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.3-1
+- Bump version to 1.18.3 to address CVE-2022-24675 & CVE-2022-28327
+
 * Tue Apr 12 2022 Muhammad Falak <mwani@microsoft.com> - 1.17.8-1
 - Bump version to 1.17.8 to address CVE-2021-44716
 
