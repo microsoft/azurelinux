@@ -3,7 +3,7 @@
 Summary:        Z shell
 Name:           zsh
 Version:        5.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version
 Source1:        zprofile.rhs
 Source2:        zshrc
 Patch0:         0001-Skipping-test-if-ran-as-superuser.patch
+Patch1:         fix-script-shebangs.patch
 BuildRequires:  binutils
 BuildRequires:  coreutils
 BuildRequires:  diffutils
@@ -54,7 +55,6 @@ mechanism, and more.
 This package contains the Zsh manual in html format.
 
 %prep
-
 %autosetup -p1
 
 %build
@@ -129,6 +129,9 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Thu Jun 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.9-2
+- Fix package install by patching out bad shebangs in included scripts
+
 * Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.9-1
 - Update to v5.9 to address CVE-2021-45444
 
