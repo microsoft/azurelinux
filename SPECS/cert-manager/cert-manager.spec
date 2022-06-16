@@ -39,7 +39,7 @@ Patch0:         Fix-dependency-checksum.patch
 Patch1:         Fix-os-WriteFile.patch
 BuildRequires:  bazel
 BuildRequires:  git
-BuildRequires:  golang
+BuildRequires:  golang <= 1.17.10
 BuildRequires:  patch
 
 %description
@@ -92,7 +92,8 @@ install -D -m0755 bazel-bin/cmd/acmesolver/acmesolver_/acmesolver %{buildroot}%{
 
 %changelog
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.3-2
-- Bump release to rebuild with golang 1.18.3
+- Add a hard BR on golang <= 1.17.10
+- Bump release to rebuild with golang 1.17.10
 
 * Fri Sep 10 2021 Henry Li <lihl@microsoft.com> - 1.5.3-1
 - Original version for CBL-Mariner
