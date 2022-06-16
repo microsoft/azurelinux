@@ -2331,6 +2331,7 @@
                 "gnutls",
                 "gobject-introspection",
                 "golang",
+                "golang-1.17",
                 "gperf",
                 "gperftools",
                 "gpgme",

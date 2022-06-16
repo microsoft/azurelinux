@@ -3970,6 +3970,16 @@
         "type": "other",
         "other": {
           "name": "golang",
+          "version": "1.17.10",
+          "downloadUrl": "https://golang.org/dl/go1.17.10.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
           "version": "1.18.3",
           "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
         }
