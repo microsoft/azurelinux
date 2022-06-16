@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%define install_path  /usr/bin
+%define install_path  /usr/local/bin
 %define util_path     %{_datadir}/k3s
 %define install_sh    %{util_path}/setup/install.sh
 %define uninstall_sh  %{util_path}/setup/uninstall.sh
@@ -10,7 +10,7 @@ Version: 1.23.6
 Release: %{version}%{?dist}
 Summary: Lightweight Kubernetes
 
-Group:   System Environment/Base		
+Group:   System Environment/Base
 License: ASL 2.0
 URL:     http://k3s.io
 Source0: %{name}-%{version}-k3s1.tar.gz
@@ -18,6 +18,7 @@ Source0: %{name}-%{version}-k3s1.tar.gz
 BuildRequires: golang
 BuildRequires: libseccomp-devel
 BuildRequires: btrfs-progs-devel
+Requires:      apparmor-parser
 
 %description
 The certified Kubernetes distribution built for IoT & Edge computing.
@@ -31,39 +32,18 @@ mkdir etc
 ./scripts/build
 ./scripts/package-cli
 
-
 %install
 install -d %{buildroot}%{install_path}
-install dist/artifacts/%{k3s_binary} %{buildroot}%{install_path}/k3s
+install dist/artifacts/%{k3s_binary} %{buildroot}%{install_path}/%{k3s_binary}
 install -d %{buildroot}%{util_path}/setup
 install package/rpm/install.sh %{buildroot}%{install_sh}
 
 %post
-# do not overwrite env file if present
-export INSTALL_K3S_UPGRADE=true
-export INSTALL_K3S_BIN_DIR=%{install_path}
 export INSTALL_K3S_SKIP_DOWNLOAD=true
 export INSTALL_K3S_SKIP_ENABLE=true
-export INSTALL_K3S_DEBUG=true
-export UNINSTALL_K3S_SH=%{uninstall_sh}
+export INSTALL_K3S_SKIP_START=true
 
-(
-    # install server service
-    INSTALL_K3S_NAME=server \
-        %{install_sh}
-
-    # install agent service
-    INSTALL_K3S_SYMLINK=skip \
-    INSTALL_K3S_BIN_DIR_READ_ONLY=true \
-    K3S_TOKEN=example-token \
-    K3S_URL=https://example-k3s-server:6443/ \
-        %{install_sh} agent
-
-# save debug log of the install
-) >%{util_path}/setup/install.log 2>&1
-
-%systemd_post k3s-server.service
-%systemd_post k3s-agent.service
+%{install_sh}
 exit 0
 
 %postun
@@ -79,8 +59,9 @@ exit 0
 %{install_sh}
 
 %changelog
-* Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
-- Initial version
-
+* Tue May 24 2022 Manuel Huber <mahuber@microsoft.com>
+- Changes to install phase on Mariner
 * Fri May 20 2022 Lior Lustgarten <lilustga@microsoft.com>
 - Initial changes to build for Mariner
+* Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
+- Initial version
