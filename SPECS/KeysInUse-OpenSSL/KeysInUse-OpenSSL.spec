@@ -1,6 +1,6 @@
 Summary:        The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 Name:           KeysInUse-OpenSSL
-Version:        0.3.0
+Version:        0.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -76,5 +76,5 @@ if [ -e $engine_link ]; then
 fi
 
 %changelog
-* Mon May 23 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.0-1
+* Thu Jun 16 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.1-1
 - Original version for CBL-Mariner
