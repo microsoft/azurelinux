@@ -3,7 +3,7 @@ module microsoft.com/pkggen
 go 1.17
 
 require (
-	github.com/bendahl/uinput v1.4.1
+	github.com/bendahl/uinput v1.5.1
 	github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e
 	github.com/deckarep/golang-set v1.8.0
 	github.com/gdamore/tcell v1.4.0
