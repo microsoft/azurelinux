@@ -37,8 +37,6 @@ Full documentation: http://criterion.readthedocs.org/
 
 %files
 %{_libdir}/*.so*
-%{_libdir}/*.a*
-%{_lib64dir}/*.a
 %{_includedir}/%{pr_name}/*.h
 %{_includedir}/%{pr_name}/new/*.h
 %{_includedir}/%{pr_name}/internal/*.h
@@ -48,6 +46,8 @@ Full documentation: http://criterion.readthedocs.org/
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/locale/de/LC_MESSAGES/criterion.mo
 %{_datadir}/locale/fr/LC_MESSAGES/criterion.mo
+%exclude %{_libdir}/*.a*
+%exclude %{_lib64dir}/*.a
 
 %changelog
 * Wed Jun 15 2022 Bala <balakumaran.kannan@microsoft.com> - 2.4.1-0
