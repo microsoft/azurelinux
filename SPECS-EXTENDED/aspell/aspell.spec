@@ -1,25 +1,27 @@
-Summary: Spell checker
-Name: aspell
-Version: 0.60.8
-Release: 6%{?dist}
+Summary:        Spell checker
+Name:           aspell
+Version:        0.60.8
+Release:        6%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
 #            modules/speller/default/affix.cpp
 # GPLv2+  .. ltmain.sh, misc/po-filter.c
 # BSD     .. myspell/munch.c
-License: LGPLv2+ and LGPLv2 and GPLv2+ and BSD
+License:        LGPLv2+ AND LGPLv2 AND GPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://aspell.net/
-Source: https://github.com/GNUAspell/aspell/archive/rel-%{version}.tar.gz
-
-Patch0: aspell-0.60.7-fileconflict.patch
-Patch1: aspell-0.60.7-pspell_conf.patch
-Patch2: aspell-0.60.7-mp.patch
-
-BuildRequires: gcc-c++
-BuildRequires: chrpath, gettext, ncurses-devel, pkgconfig, perl-interpreter
+URL:            http://aspell.net/
+Source:         https://github.com/GNUAspell/aspell/archive/rel-%{version}.tar.gz
+Patch0:         aspell-0.60.7-fileconflict.patch
+Patch1:         aspell-0.60.7-pspell_conf.patch
+Patch2:         aspell-0.60.7-mp.patch
+BuildRequires:  chrpath
+BuildRequires:  gcc-c++
+BuildRequires:  gettext
+BuildRequires:  ncurses-devel
+BuildRequires:  perl-interpreter
+BuildRequires:  pkgconfig
 
 %description
 GNU Aspell is a spell checker designed to eventually replace Ispell. It can
@@ -32,9 +34,9 @@ dictionaries and intelligently handling personal dictionaries when more
 than one Aspell process is open at once.
 
 %package devel
-Summary: Libraries and header files for Aspell development
-Requires: %{name} = %{version}-%{release}
-Requires: pkgconfig
+Summary:        Libraries and header files for Aspell development
+Requires:       %{name} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 The aspell-devel package includes libraries
@@ -59,32 +61,33 @@ cp manual/aspell-import.1 examples/aspell-import.1
 %install
 %make_install
 
-mkdir -p ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60
+mkdir -p %{buildroot}%{_libdir}/aspell-0.60
 
-mv ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60/ispell ${RPM_BUILD_ROOT}%{_bindir}
-mv ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60/spell ${RPM_BUILD_ROOT}%{_bindir}
+mv %{buildroot}%{_libdir}/aspell-0.60/ispell %{buildroot}%{_bindir}
+mv %{buildroot}%{_libdir}/aspell-0.60/spell %{buildroot}%{_bindir}
 
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//nroff-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//sgml-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//context-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//email-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//tex-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//texinfo-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60//markdown-filter.so
-chrpath --delete ${RPM_BUILD_ROOT}%{_bindir}/aspell
-chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/libpspell.so.*
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//nroff-filter.so
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//sgml-filter.so
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//context-filter.so
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//email-filter.so
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//tex-filter.so
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//texinfo-filter.so
+chrpath --delete %{buildroot}%{_libdir}/aspell-0.60//markdown-filter.so
+chrpath --delete %{buildroot}%{_bindir}/aspell
+chrpath --delete %{buildroot}%{_libdir}/libpspell.so.*
 
-rm -f ${RPM_BUILD_ROOT}%{_libdir}/libaspell.la
-rm -f ${RPM_BUILD_ROOT}%{_libdir}/libpspell.la
-rm -f ${RPM_BUILD_ROOT}%{_libdir}/aspell-0.60/*-filter.la
-rm -f ${RPM_BUILD_ROOT}%{_bindir}/aspell-import
-rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/aspell-import.1
-rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
+rm -f %{buildroot}%{_libdir}/libaspell.la
+rm -f %{buildroot}%{_libdir}/libpspell.la
+rm -f %{buildroot}%{_libdir}/aspell-0.60/*-filter.la
+rm -f %{buildroot}%{_bindir}/aspell-import
+rm -f %{buildroot}%{_mandir}/man1/aspell-import.1
+rm -f %{buildroot}%{_infodir}/dir
 
 %find_lang %{name}
 
 %files -f %{name}.lang
-%doc README TODO COPYING examples/aspell-import examples/aspell-import.1
+%license COPYING
+%doc README TODO examples/aspell-import examples/aspell-import.1
 %dir %{_libdir}/aspell-0.60
 %{_bindir}/a*
 %{_bindir}/ispell
@@ -112,6 +115,7 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 
 %changelog
 * Fri Jun 17 2022 Jamie Magee <jamagee@microsoft.com - 0.60.8-6
+- Switch from FTP to HTTPS source
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.60.8-5
 - Remove epoch
@@ -323,7 +327,6 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 - update to 0.60.3 - (bug 141968) thanks to Dawid Gajownik 
 - add BuildRequires: ncurses-devel, gettext 
 - add config script patch (thanks tmraz@redhat.com)
-
 
 * Mon Mar  7 2005 Ivana Varekova <varekova@redhat.com> 12:0.50.5-6
 - rebuilt
