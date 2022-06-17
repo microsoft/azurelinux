@@ -2,7 +2,7 @@
 %global gem_name elastic-transport
 Summary:        Transport classes and utilities shared among Ruby Elastic client libraries
 Name:           rubygem-elastic-transport
-Version:        8.0.1
+Version:        8.0.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation

@@ -2,7 +2,7 @@
 %global gem_name faraday
 Summary:        HTTP/REST API client library
 Name:           rubygem-faraday
-Version:        2.2.0
+Version:        1.10.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
