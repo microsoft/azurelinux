@@ -55,11 +55,10 @@ https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.60.tar.xz
 http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz
 https://download.savannah.gnu.org/releases/man-db/man-db-2.10.1.tar.xz
-https://archive.mozilla.org/pub/nspr/releases/v4.21/src/nspr-4.21.tar.gz
 https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.028.tar.gz
 https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.51.tar.gz
 https://www.openssl.org/source/openssl-1.1.1k.tar.gz
 https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz
 https://www.sqlite.org/2021/sqlite-autoconf-3360000.tar.gz
-https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.2.tar.xz
+https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.4.tar.xz
 https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz

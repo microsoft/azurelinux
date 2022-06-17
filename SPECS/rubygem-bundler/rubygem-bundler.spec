@@ -1,10 +1,9 @@
 %global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name bundler
 Summary:        manages an application's dependencies
 Name:           rubygem-bundler
 Version:        2.3.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,14 +27,19 @@ gem build %{gem_name}
 
 %install
 cd %{gem_name}
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_bindir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)
 %license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE.md
+%{_bindir}/bundle
+%{_bindir}/bundler
 %{gemdir}
 
 %changelog
+* Wed May 25 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.8-2
+- Build bin files.
+
 * Tue Mar 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.8-1
 - Update to v2.3.8.
 - Build from .tar.gz source.

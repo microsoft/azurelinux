@@ -194,7 +194,7 @@ function usage() {
     echo "e : Your email"
     echo "w : Absoulte path to your workspace for your update - no quotes\n"
 
-    echo "example usage: ./toolkit/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
+    echo "example usage: ./toolkit/scripts/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
 
     exit 1 
 }

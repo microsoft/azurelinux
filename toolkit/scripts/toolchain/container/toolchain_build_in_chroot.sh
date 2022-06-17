@@ -67,14 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.41.1 API Headers
-tar xf kernel-5.15.41.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.41.1
+echo Linux-5.15.45.1 API Headers
+tar xf kernel-5.15.45.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.45.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.41.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.45.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -961,12 +961,12 @@ popd
 rm -rf procps-3.3.17
 touch /logs/status_procpsng_complete
 
-echo util-linux-2.37.2
-tar xf util-linux-2.37.2.tar.xz
-pushd util-linux-2.37.2
+echo util-linux-2.37.4
+tar xf util-linux-2.37.4.tar.xz
+pushd util-linux-2.37.4
 mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
-            --docdir=/usr/share/doc/util-linux-2.37.2 \
+            --docdir=/usr/share/doc/util-linux-2.37.4 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -981,7 +981,7 @@ mkdir -pv /var/lib/hwclock
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.37.2
+rm -rf util-linux-2.37.4
 touch /logs/status_util-linux_complete
 
 #
@@ -1010,22 +1010,6 @@ make install
 popd
 rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
-
-echo nspr-4.21
-tar xf nspr-4.21.tar.gz
-pushd nspr-4.21
-cd nspr
-sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in
-sed -i 's#$(LIBRARY) ##'            config/rules.mk
-./configure --prefix=/usr \
-        --with-mozilla \
-        --with-pthreads \
-        --enable-64bit
-make -j$(nproc)
-make install
-popd
-rm -rf nspr-4.21
-touch /logs/status_nspr_complete
 
 echo popt-1.18
 tar xf popt-1.18.tar.gz

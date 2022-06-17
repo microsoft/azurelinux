@@ -1,31 +1,33 @@
 %global builddate $(date +"%%Y%%m%%d-%%T")
-%global commit_version "e4487274853c587717006eeda8804e597d120340"
+%global commit_version "d48f381d9a4e68c83283ce5233844807dfdc5ba5"
 
 Name:           prometheus
-Version:        2.24.1
-Release:        8%{?dist}
+Version:        2.36.0
+Release:        2%{?dist}
 Summary:        Prometheus monitoring system and time series database
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        ASL 2.0
 URL:            https://github.com/prometheus/prometheus
-#Source0:       https://github.com/prometheus/prometheus/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/prometheus/prometheus/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # unzip Source0
-# run 'make assets' in it
-# rm -rf web/ui/react-app
-# tar czvf web-ui-2.24.1.tar.gz web/ui
+# run 'make build' in it
+# tar       --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf web-ui-%%{version}.tar.gz web/ui
 Source10:       web-ui-%{version}.tar.gz
 Source1:        prometheus.service
 Source2:        prometheus.sysconfig
 Source3:        prometheus.yml
 Source4:        prometheus.conf
 Source5:        prometheus.logrotate
+# On version updates run "toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz"
 Source6:        %{name}-%{version}-vendor.tar.gz
 
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-Patch1:         0001-Fixed-TestChunkDiskMapper_WriteChunk_Chunk_IterateCh.patch
 
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  golang
@@ -39,7 +41,7 @@ The Prometheus monitoring system and time series database
 
 %build
 rm -rf web/ui
-tar xzvf %{SOURCE10}
+tar -xf %{SOURCE10}
 
 rm -rf vendor
 tar -xf %{SOURCE6} --no-same-owner
@@ -140,6 +142,12 @@ fi
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 2.36.0-2
+- Bump release to rebuild with golang 1.18.3
+
+* Mon Jun 06 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.0-1
+- Updating to version 2.36.0 to fix CVE-2021-29622.
+
 * Mon Jan 31 2022 Muhammad Falak <mwani@microsoft.com> - 2.24.1-8
 - Fix ptest by using 'go test' instead of 'go check'
 - Backport a patch to fix test in 'tsdb/chunks'

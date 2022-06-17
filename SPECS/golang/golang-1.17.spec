@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.17.8
+Version:        1.17.10
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
