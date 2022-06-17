@@ -33,3 +33,29 @@ index 798639b..88ee3e5 100644
  	line++;
  }
  
+
+From 9b16dfdf2b12ef89933af629d81489869d7688a6 Mon Sep 17 00:00:00 2001
+From: Olivia Crain <olivia@olivia.dev>
+Date: Fri, 17 Jun 2022 18:52:34 +0000
+Subject: [PATCH] gfs2hex.c: Fix format-security error in gfs2_inum_print2
+
+---
+ gfs2/edit/gfs2hex.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gfs2/edit/gfs2hex.c b/gfs2/edit/gfs2hex.c
+index 62d5cab..0972469 100644
+--- a/gfs2/edit/gfs2hex.c
++++ b/gfs2/edit/gfs2hex.c
+@@ -376,7 +376,7 @@ static void gfs2_inum_print2(const char *title,struct gfs2_inum *no)
+ 	if (termlines) {
+ 		check_highlight(TRUE);
+ 		move(line,2);
+-		printw(title);
++		printw("%s", title);
+ 		check_highlight(FALSE);
+ 	}
+ 	else
+-- 
+2.34.1
+
