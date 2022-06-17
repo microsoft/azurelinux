@@ -17,7 +17,7 @@ When security vulnerabilities arise, CBL-Mariner supports both a package-based u
 
 # Getting Started with CBL-Mariner: 
 Build
-Instructions for building CBL-Mariner may be found here: Toolkit Documentation.
+Instructions for building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md).
 
 ISO
 You can try CBL-Mariner with the following ISO Image: 
