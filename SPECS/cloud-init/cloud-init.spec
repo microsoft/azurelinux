@@ -1,7 +1,7 @@
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        22.2
+Version:        22.1
 Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -10,7 +10,8 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:         add-mariner-distro-support.patch
+# Add Mariner distro support to cloud-init 22.1
+Patch0:         mariner-22.1.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
@@ -141,9 +142,6 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Fri Jun 03 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-1
-- Update to cloud-init 22.2
-
 * Mon Mar 28 2022 Henry Beberman <henry.beberman@microsoft.com> - 22.1-2
 - Add netplan defaults to Mariner distro config patch
 
