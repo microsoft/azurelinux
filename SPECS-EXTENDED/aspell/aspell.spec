@@ -114,7 +114,7 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
-* Fri Jun 17 2022 Jamie Magee <jamagee@microsoft.com - 0.60.8-6
+* Fri Jun 17 2022 Jamie Magee <jamagee@microsoft.com> - 0.60.8-6
 - Switch from FTP to HTTPS source
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.60.8-5
