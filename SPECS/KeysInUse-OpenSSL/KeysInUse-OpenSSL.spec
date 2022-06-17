@@ -9,12 +9,13 @@ Group:          System/Libraries
 URL:            https://github.com/microsoft/KeysInUse-OpenSSL
 #Source0:       https://github.com/microsoft/KeysInUse-OpenSSL/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  openssl-devel
-BuildRequires:  golang >= 1.16.6
 BuildRequires:  cmake
 BuildRequires:  gcc
+BuildRequires:  golang >= 1.16.6
 BuildRequires:  make
-Requires:    openssl >= 1.1.1, openssl < 1.1.2
+BuildRequires:  openssl-devel
+Requires:       openssl < 1.1.2
+Requires:       openssl >= 1.1.1
 
 %description
  The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
@@ -32,50 +33,51 @@ cd ./packaging/util
 make $(realpath ../../bin/keysinuseutil)
 
 %define keysinuse_dir %{buildroot}/%{_libdir}/keysinuse/
+
 %install
 mkdir -p %{keysinuse_dir}
-mkdir -p %{buildroot}/usr/bin/
+mkdir -p %{buildroot}%{_bindir}/
 
 cp ./bin/keysinuse.so %{keysinuse_dir}
-cp ./bin/keysinuseutil %{buildroot}/usr/bin/
+cp ./bin/keysinuseutil %{buildroot}%{_bindir}/
 
 %files
 %license LICENSE
 %{_libdir}/keysinuse/keysinuse.so
-/usr/bin/keysinuseutil
+%{_bindir}/keysinuseutil
 
 %pre
-if [ -x /usr/bin/keysinuseutil ]; then
+if [ -x %{_bindir}/keysinuseutil ]; then
   echo "Disabling version $2 of keysinuse engine for OpenSSL"
-  /usr/bin/keysinuseutil uninstall || echo "Failed to deconfigure old version"
+  %{_bindir}/keysinuseutil uninstall || echo "Failed to deconfigure old version"
 fi
 
 %post
-if [ ! -e /var/log/keysinuse ]; then
-  mkdir /var/log/keysinuse
+if [ ! -e %{_var}/log/keysinuse ]; then
+  mkdir %{_var}/log/keysinuse
 fi
-chown root:root /var/log/keysinuse
-chmod 1733 /var/log/keysinuse
+chown root:root %{_var}/log/keysinuse
+chmod 1733 %{_var}/log/keysinuse
 
-ln -s /usr/lib/keysinuse/keysinuse.so $(/usr/bin/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so 
+ln -s %{_lib}/keysinuse/keysinuse.so $(%{_bindir}/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
 
-if [ -x /usr/bin/keysinuseutil ]; then
+if [ -x %{_bindir}/keysinuseutil ]; then
   echo "Enabling keysinuse engine for OpenSSL"
-  /usr/bin/keysinuseutil install || echo "Configuring engine failed"
+  %{_bindir}/keysinuseutil install || echo "Configuring engine failed"
 fi
 
 %preun
-if [ -x /usr/bin/keysinuseutil ]; then
+if [ -x %{_bindir}/keysinuseutil ]; then
   echo "Disabling keysinuse engine for OpenSSL"
-  /usr/bin/keysinuseutil uninstall || echo "Deconfiguring keysinuse engine failed"
+  %{_bindir}/keysinuseutil uninstall || echo "Deconfiguring keysinuse engine failed"
 fi
 
-engine_link=$(/usr/bin/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
+engine_link=$(%{_bindir}/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
 if [ -e $engine_link ]; then
   rm $engine_link
 fi
 
 %changelog
-* Thu Jun 16 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.1-1
+* Fri Jun 17 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.1-1
 - Original version for CBL-Mariner
 - Verified license
