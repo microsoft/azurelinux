@@ -1,7 +1,8 @@
+%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        22.2
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +11,6 @@ URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         add-mariner-distro-support.patch
-%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
@@ -30,7 +30,6 @@ BuildRequires:  python3-xml
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Requires:       dhcp-client
-Requires:       e2fsprogs
 Requires:       iproute
 Requires:       net-tools
 Requires:       python3
@@ -66,7 +65,6 @@ ssh keys and to let the user run various scripts.
 %package azure-kvp
 Summary:        Cloud-init configuration for Hyper-V telemetry
 Requires:       %{name} = %{version}-%{release}
-
 %description    azure-kvp
 Cloud-init configuration for Hyper-V telemetry
 
@@ -143,10 +141,7 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Wed Jun 08 2022 Tom Fay <tomfay@microsoft.com> - 22.2-3
-- Add missing e2fsprogs dependency
-
-* Fri Jun 03 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-2
+* Fri Jun 03 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-1
 - Update to cloud-init 22.2
 
 * Mon Mar 28 2022 Henry Beberman <henry.beberman@microsoft.com> - 22.1-2
@@ -385,3 +380,4 @@ make check %{?_smp_mflags}
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
+
