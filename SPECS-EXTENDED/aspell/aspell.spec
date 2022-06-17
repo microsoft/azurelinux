@@ -1,7 +1,7 @@
 Summary: Spell checker
 Name: aspell
 Version: 0.60.8
-Release: 5%{?dist}
+Release: 6%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
@@ -12,7 +12,7 @@ License: LGPLv2+ and LGPLv2 and GPLv2+ and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://aspell.net/
-Source: ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
+Source: https://github.com/GNUAspell/aspell/archive/rel-%{version}.tar.gz
 
 Patch0: aspell-0.60.7-fileconflict.patch
 Patch1: aspell-0.60.7-pspell_conf.patch
@@ -111,6 +111,8 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
+* Fri Jun 17 2022 Jamie Magee <jamagee@microsoft.com - 0.60.8-6
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.60.8-5
 - Remove epoch
 
