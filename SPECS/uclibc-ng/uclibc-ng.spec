@@ -83,7 +83,7 @@ rm -rf  %{buildroot}/include/
 
 %changelog
 * Fri Jun 17 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.0.41-1
-- Upgrading to 1.0.41 to fix CVE-2022-30295.
+- Upgrade uclibc-ng to 1.0.41 to fix CVE-2022-30295.
 
 * Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.37-2
 - Adding patch for CVE-2021-43523.
