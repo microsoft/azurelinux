@@ -23215,8 +23215,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elasticsearch-api",
-          "version": "8.2.0",
-          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.2.0.tar.gz"
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.0.1.tar.gz"
         }
       }
     },
@@ -23254,9 +23254,79 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-faraday",
-          "version": "2.0.3",
-          "downloadUrl": "https://github.com/lostisland/faraday-net_http/archive/refs/tags/v2.0.3.tar.gz"
+          "name": "rubygem-faraday-em_http",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-em_http/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-em_synchrony",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-em_synchrony/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-httpclient",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-httpclient/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-multipart",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-multipart/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-net_http",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-net_http/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-patron",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-rack",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-rack/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-faraday-retry",
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/lostisland/faraday-retry/archive/refs/tags/v1.0.1.tar.gz"
         }
       }
     },
@@ -23905,8 +23975,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rubyzip",
-          "version": "2.3.2",
-          "downloadUrl": "https://github.com/rubyzip/rubyzip/archive/refs/tags/v2.3.2.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/rubyzip/rubyzip/archive/refs/tags/v1.3.0.tar.gz"
         }
       }
     },

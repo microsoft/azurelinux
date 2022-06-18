@@ -2,7 +2,7 @@
 %global gem_name rubyzip
 Summary:        a ruby module for reading and writing zip files
 Name:           rubygem-%{gem_name}
-Version:        2.3.2
+Version:        1.3.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation

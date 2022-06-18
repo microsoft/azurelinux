@@ -2,7 +2,7 @@
 %global gem_name elasticsearch-api
 Summary:        Ruby API for Elasticsearch
 Name:           rubygem-elasticsearch-api
-Version:        8.2.0
+Version:        8.0.1
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
