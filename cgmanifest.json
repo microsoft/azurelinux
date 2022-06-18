@@ -25188,7 +25188,7 @@
         "other": {
           "name": "t1lib",
           "version": "5.1.2",
-          "downloadUrl": "ftp://sunsite.unc.edu/pub/Linux/libs/graphics/t1lib-5.1.2.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/t1lib-5.1.2.tar.gz"
         }
       }
     },
