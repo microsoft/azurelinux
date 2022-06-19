@@ -1,6 +1,6 @@
 %global debug_package %{nil}
-%global gem_name faraday-httpclient
-Summary:        Faraday adapter for HTTPClient
+%global gem_name faraday-net_http_persistent
+Summary:        Faraday Adapter for NetHttpPersistent
 Name:           rubygem-%{gem_name}
 Version:        1.0.0
 Release:        1%{?dist}
@@ -8,8 +8,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
-URL:            https://github.com/lostisland/faraday-httpclient
-Source0:        https://github.com/lostisland/faraday-httpclient/archive/refs/tags/v1.0.tar.gz#/%{gem_name}-1.0.tar.gz
+URL:            https://github.com/lostisland/faraday-net_http_persistent
+Source0:        https://github.com/lostisland/faraday-net_http/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
@@ -17,10 +17,10 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:      noarch
 
 %description
-This gem is a Faraday adapter for the HTTPClient library. Faraday is an HTTP client library that provides a common interface over many adapters. Every adapter is defined into its own gem. This gem defines the adapter for HTTPClient.
+This gem is a Faraday adapter for the Net::HTTP::Persistent gem.
 
 %prep
-%setup -q -n %{gem_name}-1.0
+%setup -q -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}

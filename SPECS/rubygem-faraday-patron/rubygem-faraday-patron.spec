@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-patron
-Source0:        https://github.com/lostisland/faraday-patron/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-1.0.tar.gz
+Source0:        https://github.com/lostisland/faraday-patron/archive/refs/tags/v1.0.tar.gz#/%{gem_name}-1.0.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)

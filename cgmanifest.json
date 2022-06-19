@@ -23274,9 +23274,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-faraday-excon",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-excon/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-faraday-httpclient",
           "version": "1.0.0",
-          "downloadUrl": "https://github.com/lostisland/faraday-httpclient/archive/refs/tags/v1.0.0.tar.gz"
+          "downloadUrl": "https://github.com/lostisland/faraday-httpclient/archive/refs/tags/v1.0.tar.gz"
         }
       }
     },
@@ -23304,9 +23314,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-faraday-net_http_persistent",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-net_http/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-faraday-patron",
           "version": "1.0.0",
-          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v1.0.0.tar.gz"
+          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v1.0.tar.gz"
         }
       }
     },
