@@ -2,7 +2,7 @@
 %global gem_name faraday-excon
 Summary:        Faraday adapter for Excon
 Name:           rubygem-%{gem_name}
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation

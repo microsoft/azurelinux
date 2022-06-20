@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-net_http_persistent
-Source0:        https://github.com/lostisland/faraday-net_http/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/lostisland/faraday-net_http_persistent/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
