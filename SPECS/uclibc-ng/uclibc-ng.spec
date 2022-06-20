@@ -3,15 +3,14 @@
 %global debug_package %{nil}
 Summary:        C library for embedded Linux
 Name:           uclibc-ng
-Version:        1.0.37
-Release:        2%{?dist}
+Version:        1.0.41
+Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://www.uclibc.org/
+URL:            https://www.uclibc-ng.org/
 Source0:        https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
 Source1:        uClibc.config
-Patch0:         CVE-2021-43523.patch
 
 BuildRequires:  gcc
 
@@ -83,6 +82,9 @@ rm -rf  %{buildroot}/include/
 %{_libdir}/uClibc
 
 %changelog
+* Fri Jun 17 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.0.41-1
+- Upgrade uclibc-ng to 1.0.41 to fix CVE-2022-30295.
+
 * Thu Nov 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.37-2
 - Adding patch for CVE-2021-43523.
 
