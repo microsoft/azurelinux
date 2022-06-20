@@ -108,9 +108,6 @@ make %{?_smp_mflags} \
     OPTIMIZE_CFLAGS="%{optflags}" \
 %endif
     WERROR_CFLAGS="-Werror -Wno-missing-field-initializers -Wno-lto-type-mismatch -Wno-maybe-uninitialized" \
-%if 0%{with_efence}
-    USE_EFENCE=true \
-%endif
     USERLINK="%{?__global_ldflags} -Wl,-z,relro -Wl,--as-needed  -Wl,-z,now -flto --no-lto" \
     %{libreswan_config} \
     programs
