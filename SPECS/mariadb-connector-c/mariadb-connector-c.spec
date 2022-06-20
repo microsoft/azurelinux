@@ -8,7 +8,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://mariadb.org/
-Source0:        https://downloads.mariadb.org/interstitial/connector-c-%{version}/%{name}-%{version}-src.tar.gz
+Source0:        https://archive.mariadb.org/connector-c-%{version}/%{name}-%{version}-src.tar.gz
 Source2:        my.cnf
 Source3:        client.cnf
 Patch0:         cmake_3.21.4_fix.patch
