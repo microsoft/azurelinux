@@ -11242,7 +11242,7 @@
         "other": {
           "name": "mariadb-connector-c",
           "version": "3.1.10",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
+          "downloadUrl": "https://archive.mariadb.org/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
         }
       }
     },
