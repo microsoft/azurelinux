@@ -2538,8 +2538,8 @@
         "type": "other",
         "other": {
           "name": "dpkg",
-          "version": "1.20.9",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.20.9.tar.xz"
+          "version": "1.20.10",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.20.10.tar.xz"
         }
       }
     },
