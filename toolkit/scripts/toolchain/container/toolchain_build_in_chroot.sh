@@ -777,9 +777,9 @@ popd
 rm -rf openssl-1.1.1k
 touch /logs/status_openssl_complete
 
-echo Python-3.9.12
-tar xf Python-3.9.12.tar.xz
-pushd Python-3.9.12
+echo Python-3.9.13
+tar xf Python-3.9.13.tar.xz
+pushd Python-3.9.13
 ./configure --prefix=/usr       \
             --with-platlibdir=lib \
             --enable-shared     \
@@ -792,8 +792,8 @@ chmod -v 755 /usr/lib/libpython3.9.so.1.0
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.9.12
-touch /logs/status_python399_complete
+rm -rf Python-3.9.13
+touch /logs/status_python39_complete
 
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
