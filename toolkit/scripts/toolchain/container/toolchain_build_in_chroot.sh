@@ -67,14 +67,15 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.45.1 API Headers
-tar xf kernel-5.15.45.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.45.1
+KERNEL_VERSION="5.15.48.1"
+echo Linux-${KERNEL_VERSION} API Headers
+tar xf kernel-${KERNEL_VERSION}.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.45.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02

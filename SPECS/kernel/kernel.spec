@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.45.1
-Release:        2%{?dist}
+Version:        5.15.48.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -367,6 +367,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
+- Update source to 5.15.48.1
+
 * Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.45.1-2
 - Moving ".config" update and check steps into the %%prep section.
 

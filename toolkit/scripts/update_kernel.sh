@@ -111,14 +111,8 @@ function update_toolchain_scripts {
     for script in $TOOLCHAIN_SCRIPTS
     do
         file=$TOOLCHAIN_FOLDER/container/$script
-        PATTERN="echo Linux-.* API Headers"
-        REPLACE="echo Linux-$VERSION API Headers"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-        PATTERN="tar xf $FILE_SIGNATURE_PATTERN.*.tar.gz"
-        REPLACE="tar xf $TARBALL_NAME"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-        PATTERN="CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-.*"
-        REPLACE="CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-$VERSION"
+        PATTERN="KERNEL_VERSION=\"$OLD_VERSION\""
+        REPLACE="KERNEL_VERSION=\"$VERSION\""
         sed -i "s/$PATTERN/$REPLACE/" $file
     done
 }
