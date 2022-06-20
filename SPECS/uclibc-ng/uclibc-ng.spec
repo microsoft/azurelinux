@@ -8,7 +8,7 @@ Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://www.uclibc.org/
+URL:            https://www.uclibc-ng.org/
 Source0:        https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
 Source1:        uClibc.config
 
