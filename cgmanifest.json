@@ -23154,6 +23154,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-connection_pool",
+          "version": "2.2.5",
+          "downloadUrl": "https://github.com/mperham/connection_pool/archive/refs/tags/v2.2.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-console",
           "version": "1.10.1",
           "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.10.1.tar.gz"
