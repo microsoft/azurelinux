@@ -18,17 +18,37 @@ Distribution: Mariner
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+Source3: NOTICE
+Source4: LICENSE
+
 Patch0:  Makefile.patch
 
 %{?systemd_requires}
 
+BuildRequires: bash
 BuildRequires: btrfs-progs-devel
+BuildRequires: cmake
+BuildRequires: device-mapper-devel
+BuildRequires: gcc
+BuildRequires: glibc-devel
+BuildRequires: libseccomp-devel
+BuildRequires: libselinux-devel
+BuildRequires: libtool
+BuildRequires: libltdl-devel
+BuildRequires: make
+BuildRequires: pkg-config
+BuildRequires: systemd-devel
+BuildRequires: tar
 BuildRequires: git
 BuildRequires: golang
+BuildRequires: which
 BuildRequires: go-md2man
-BuildRequires: make
 
-Requires: moby-runc >= 1.1.0+azure
+Requires: bash
+Requires: device-mapper-libs >= 1.02.90-1
+Requires: libcgroup
+Requires: libseccomp >= 2.3
+Requires: moby-runc >= 1.0.0~rc10~
 
 Conflicts: containerd
 Conflicts: containerd-io
@@ -59,11 +79,29 @@ export BUILDTAGS="-mod=vendor"
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
+export BUILDTAGS="-mod=vendor"
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
+
+mkdir -p %{buildroot}/%{_bindir}
+for i in bin/*; do
+    cp -aTv $i %{buildroot}/%{_bindir}/$(basename $i)
+done
 
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
+
+mkdir -p %{buildroot}/%{_docdir}/%{upstream_name}-%{version}
+install -D -p -m 0644 %{SOURCE3} %{buildroot}/%{_docdir}/%{upstream_name}-%{version}/NOTICE
+install -D -p -m 0644 %{SOURCE4} %{buildroot}/%{_docdir}/%{upstream_name}-%{version}/LICENSE
+
+mkdir -p %{buildroot}/%{_mandir}
+for i in man/*; do
+    f="$(basename $i)"
+    ext="${f##*.}"
+    mkdir -p "%{buildroot}%{_mandir}/man${ext}"
+    install -T -p -m 644 "$i" "%{buildroot}%{_mandir}/man${ext}/${f}"
+done
 
 %post
 %systemd_post containerd.service
@@ -85,6 +123,8 @@ fi
 %{_mandir}/*
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
+%{_docdir}/%{upstream_name}-%{version}/NOTICE
+%{_docdir}/%{upstream_name}-%{version}/LICENSE
 
 %changelog
 * Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
