@@ -116,8 +116,8 @@ fi
 %{_bindir}/*
 
 %changelog
-* Tue Apr 12 2022 Muhammad Falak <mwani@microsoft.com> - 1.17.8-1
-- Bump version to 1.17.8 to address CVE-2021-44716
+* Tue Apr 12 2022 Muhammad Falak <mwani@microsoft.com> - 1.17.10-1
+- Bump version to 1.17.10 to address CVE-2021-44716
 
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.17.1-2
 - Use _topdir instead of hard-coded value /usr/src/mariner
