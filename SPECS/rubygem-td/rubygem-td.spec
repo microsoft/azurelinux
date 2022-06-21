@@ -35,6 +35,8 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+#add lib files to buildroot from Source0
+cp -r lib/ %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
