@@ -444,7 +444,7 @@ rm -rf pkg-config-0.29.2
 touch /logs/status_pkgconfig_complete
 
 echo Ncurses-6.3
-tar xf ncurses-6.3-20220612.tar.gz
+tar xf ncurses-6.3-20220612.tgz
 pushd ncurses-6.3-20220612
 sed -i '/LIBTOOL_INSTALL/d' c++/Makefile.in
 ./configure --prefix=/usr           \
