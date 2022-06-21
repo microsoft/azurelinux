@@ -82,26 +82,9 @@ make VERSION="%{version}" REVISION="%{commit_hash}" test
 export BUILDTAGS="-mod=vendor"
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
 
-mkdir -p %{buildroot}/%{_bindir}
-for i in bin/*; do
-    cp -aTv $i %{buildroot}/%{_bindir}/$(basename $i)
-done
-
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
-
-mkdir -p %{buildroot}/%{_docdir}/%{upstream_name}-%{version}
-install -D -p -m 0644 %{SOURCE3} %{buildroot}/%{_docdir}/%{upstream_name}-%{version}/NOTICE
-install -D -p -m 0644 %{SOURCE4} %{buildroot}/%{_docdir}/%{upstream_name}-%{version}/LICENSE
-
-mkdir -p %{buildroot}/%{_mandir}
-for i in man/*; do
-    f="$(basename $i)"
-    ext="${f##*.}"
-    mkdir -p "%{buildroot}%{_mandir}/man${ext}"
-    install -T -p -m 644 "$i" "%{buildroot}%{_mandir}/man${ext}/${f}"
-done
 
 %post
 %systemd_post containerd.service
@@ -123,8 +106,6 @@ fi
 %{_mandir}/*
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
-%{_docdir}/%{upstream_name}-%{version}/NOTICE
-%{_docdir}/%{upstream_name}-%{version}/LICENSE
 
 %changelog
 * Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
