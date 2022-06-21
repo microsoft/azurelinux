@@ -9,7 +9,7 @@
 installDir="/opt/cross"
 kernelStandaloneInstallDir=${installDir}/kernel
 standaloneRootfsDir=${installDir}/rootfs
-kernelVersion="5.4.83"
+kernelVersion="5.15.48.1"
 
 # Note: Current rootfs unpacks to be fairly big. 2GB memory was not enough size to hold the unpacked initramfs
 # so when QEMU ran, it would fail with:

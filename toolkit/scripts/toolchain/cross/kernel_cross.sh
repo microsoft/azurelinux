@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-kernelVersion="5.4.83"
+kernelVersion="5.15.48.1"
 kernelTargetArch="arm64"
 toolchainTuple="aarch64-mariner-linux-gnu"
 
@@ -20,10 +20,10 @@ mkdir -p ${kernelStandaloneInstallDir}
 export PATH="${installDir}/bin":$PATH
 
 cd ${kernelBuildDir}
-wget https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-${kernelVersion}.tar.gz
-tar xf linux-msft-${kernelVersion}.tar.gz
+wget https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/${kernelVersion}.tar.gz
+for f in *.tar*; do tar xf $f; done
 
-cd WSL2-Linux-Kernel-linux-msft-${kernelVersion}
+cd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${kernelVersion}
 make ARCH=${kernelTargetArch} defconfig
 
 make ARCH=${kernelTargetArch} CROSS_COMPILE=${toolchainTuple}- -j$(nproc)

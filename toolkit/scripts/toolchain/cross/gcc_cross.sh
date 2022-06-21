@@ -36,7 +36,7 @@ cd ${buildDir}
 # Download source tarballs
 wget http://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.xz
 wget https://ftp.gnu.org/gnu/gcc/gcc-9.1.0/gcc-9.1.0.tar.xz
-wget https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-5.4.83.tar.gz
+wget https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz
 wget https://ftp.gnu.org/gnu/glibc/glibc-2.28.tar.xz
 wget https://ftp.gnu.org/gnu/mpfr/mpfr-4.0.1.tar.gz
 wget http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
@@ -53,7 +53,7 @@ cd ..
 
 export PATH="${installDir}/bin":$PATH
 
-cd WSL2-Linux-Kernel-linux-msft-5.4.83
+cd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.48.1
 make mrproper
 make ARCH=arm64 headers
 make ARCH=arm64 INSTALL_HDR_PATH=${sysroot} headers_install
