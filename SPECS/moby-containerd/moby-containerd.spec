@@ -1,61 +1,54 @@
 %global debug_package %{nil}
 %define upstream_name containerd
 %define commit_hash 10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
-
-Summary: Industry-standard container runtime
-Name: moby-%{upstream_name}
-Version: 1.6.6+azure
-Release: 1%{?dist}
-License: ASL 2.0
-Group: Tools/Container
-URL: https://www.containerd.io
-Vendor: Microsoft Corporation
-Distribution: Mariner
-
+Summary:        Industry-standard container runtime
+Name:           moby-%{upstream_name}
+Version:        1.6.6+azure
+Release:        1%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Tools/Container
+URL:            https://www.containerd.io
 # Git clone is a standard practice of producing source files for moby-* packages.
 # Please look at ./generate-sources.sh for generating source tar ball.
-
-Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: containerd.service
-Source2: containerd.toml
-Source3: NOTICE
-Source4: LICENSE
-
-Patch0:  Makefile.patch
+Source0:        https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        containerd.service
+Source2:        containerd.toml
+Source3:        NOTICE
+Source4:        LICENSE
+Patch0:         Makefile.patch
 
 %{?systemd_requires}
 
-BuildRequires: bash
-BuildRequires: btrfs-progs-devel
-BuildRequires: cmake
-BuildRequires: device-mapper-devel
-BuildRequires: gcc
-BuildRequires: glibc-devel
-BuildRequires: libseccomp-devel
-BuildRequires: libselinux-devel
-BuildRequires: libtool
-BuildRequires: libltdl-devel
-BuildRequires: make
-BuildRequires: pkg-config
-BuildRequires: systemd-devel
-BuildRequires: tar
-BuildRequires: git
-BuildRequires: golang
-BuildRequires: which
-BuildRequires: go-md2man
-
-Requires: bash
-Requires: device-mapper-libs >= 1.02.90-1
-Requires: libcgroup
-Requires: libseccomp >= 2.3
-Requires: moby-runc >= 1.0.0~rc10~
-
-Conflicts: containerd
-Conflicts: containerd-io
-Conflicts: moby-engine <= 3.0.10
-
-Obsoletes: containerd
-Obsoletes: containerd-io
+BuildRequires:  bash
+BuildRequires:  btrfs-progs-devel
+BuildRequires:  cmake
+BuildRequires:  device-mapper-devel
+BuildRequires:  gcc
+BuildRequires:  git
+BuildRequires:  glibc-devel
+BuildRequires:  go-md2man
+BuildRequires:  golang
+BuildRequires:  libltdl-devel
+BuildRequires:  libseccomp-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  pkg-config
+BuildRequires:  systemd-devel
+BuildRequires:  tar
+BuildRequires:  which
+Requires:       bash
+Requires:       device-mapper-libs >= 1.02.90-1
+Requires:       libcgroup
+Requires:       libseccomp >= 2.3
+Requires:       moby-runc >= 1.0.0~rc10~
+Conflicts:      containerd
+Conflicts:      containerd-io
+Conflicts:      moby-engine <= 3.0.10
+Obsoletes:      containerd
+Obsoletes:      containerd-io
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
@@ -80,7 +73,7 @@ make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
 export BUILDTAGS="-mod=vendor"
-make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
+make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="%{_prefix}" install install-man
 
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
@@ -110,6 +103,7 @@ fi
 %changelog
 * Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
 - Upgrade to version 1.6.6 to fix CVE-2022-31030
+- Lint spec
 * Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.9+azure-7
 - Bumping release to rebuild with golang 1.18.3
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.5.9+azure-6
