@@ -6,9 +6,9 @@ After=network.target
 [Service]
 ExecStartPre=/sbin/modprobe overlay
 ExecStart=/usr/bin/containerd
+Restart=always
 Delegate=yes
 KillMode=process
-Restart=always
 
 [Install]
 WantedBy=multi-user.target
