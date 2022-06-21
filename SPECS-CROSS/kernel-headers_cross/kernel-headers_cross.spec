@@ -51,14 +51,15 @@
 
 Summary:        Linux API header files
 Name:           %{_cross_name}-kernel-headers
-Version:        5.4.51
-Release:        13%{?dist}
+Version:        5.15.48.1
+Release:        1%{?dist}
 License:        GPLv2
-URL:            https://github.com/microsoft/WSL2-Linux-Kernel
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          System Environment/Kernel
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/microsoft/WSL2-Linux-Kernel/archive/linux-msft-%{version}.tar.gz
+#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%%{version}.tar.gz
+Source0:        kernel-%{version}.tar.gz
 BuildArch:      noarch
 Provides:       %{_cross_name}-glibc-kernheaders = %{version}-%{release}
 %if "%{_target_arch}" == "x86_64"
@@ -73,14 +74,13 @@ Provides:       %{_cross_name}-glibc-kernheaders = %{version}-%{release}
 The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
-%setup -q -n WSL2-Linux-Kernel-linux-msft-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 %build
 make mrproper
-make ARCH=%{arch} headers_check
 
 %install
-cd %{_builddir}/WSL2-Linux-Kernel-linux-msft-%{version}
+cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 make ARCH=%{arch} headers
 find usr/include -name '.*' -delete
 rm usr/include/Makefile
@@ -89,8 +89,12 @@ cp -rv usr/include/*    /%{buildroot}%{_cross_sysroot}%{_includedir}
 
 %files
 %defattr(-,root,root)
+%license COPYING
 %{_cross_sysroot}%{_includedir}/*
+
 %changelog
+* Mon Jun 20 2022 Chris Co <chrco@microsoft.com> - 5.15.48.1-1
+- Update to 5.15.48.1
 *   Thu Feb 11 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.51-13
 -   Fork normal kernel-headers package into cross compile aware version
 *   Mon Jan 11 2021 Thomas Crain <thcrain@microsoft.com> - 5.4.51-12
