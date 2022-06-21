@@ -128,7 +128,7 @@ fi
 
 %changelog
 * Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
-- Update to version 1.6.6
+- Upgrade to version 1.6.6 to fix CVE-2022-31030
 * Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.9+azure-7
 - Bumping release to rebuild with golang 1.18.3
 * Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.5.9+azure-6
