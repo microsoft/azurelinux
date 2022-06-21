@@ -237,6 +237,7 @@ generate_pkggen_core () {
         grep "^gzip-" $TmpPkgGen
         grep "^make-" $TmpPkgGen
         grep "^patch-" $TmpPkgGen
+        grep "^libcap-ng-" $TmpPkgGen
         grep "^util-linux-" $TmpPkgGen
         grep "^tar-" $TmpPkgGen
         grep "^xz-" $TmpPkgGen
@@ -305,7 +306,6 @@ generate_pkggen_core () {
         grep "^msopenjdk-" $TmpPkgGen
         grep "^pyproject-" $TmpPkgGen
         grep "^audit-" $TmpPkgGen
-        grep "^libcap-ng-" $TmpPkgGen
     } > "$1"
 }
 
