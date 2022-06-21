@@ -1,7 +1,7 @@
 Summary:	gptfdisk-1.0.4
 Name:		gptfdisk
 Version:	1.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv2+
 URL:		http://sourceforge.net/projects/gptfdisk/
 Group:		System Environment/Filesystem and Disk management
@@ -10,6 +10,7 @@ Distribution:   Mariner
 Source0:	http://downloads.sourceforge.net/project/gptfdisk/%{name}/%{version}/%{name}-%{version}.tar.gz
 %define sha1 gptfdisk=4c2d60bedd4eac1014727e3b126de96966205410
 Patch0:	    gptfdisk-1.0.4-convenience-1.patch
+Patch1:         fix-format-security.patch
 Requires: 	popt >= 1.16
 BuildRequires:	popt-devel
 BuildRequires:	ncurses-devel
@@ -22,8 +23,7 @@ and is a modern replacement for legacy PC-BIOS partitioned disk drives that use 
 Master Boot Record (MBR). The main program, gdisk, has an inteface similar to the
 classic fdisk program.
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 %build
 make %{?_smp_mflags} POPT=1
 %install
@@ -40,6 +40,9 @@ rm -rf %{buildroot}/*
 /sbin/*
 %{_mandir}/man8/*
 %changelog
+* Tue Jun 21 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.4-4
+- Introduce upstream patch to fix `-Werror=format-security` after ncurses 6.3 upgrade
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.4-3
 - Added %%license line automatically
 
