@@ -4,13 +4,16 @@
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
-Version: 1.6.6
+Version: 1.6.6+azure
 Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
+
+# Git clone is a standard practice of producing source files for moby-* packages.
+# Please look at ./generate-sources.sh for generating source tar ball.
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
@@ -24,9 +27,8 @@ BuildRequires: git
 BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
-#BuildRequires: systemd-rpm-macros
 
-Requires: moby-runc >= 1.1.0
+Requires: moby-runc >= 1.1.0+azure
 
 Conflicts: containerd
 Conflicts: containerd-io
@@ -49,11 +51,11 @@ used directly by developers or end-users.
 %autosetup -p1 -n %{upstream_name}-%{version}
 
 %build
-export BUILDTAGS="-mod=readonly"
+export BUILDTAGS="-mod=vendor"
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
-export BUILDTAGS="-mod=readonly"
+export BUILDTAGS="-mod=vendor"
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
@@ -85,16 +87,21 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
-* Mon Mar 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-3
-- Default cgroup to 'systemd'
-* Wed Mar 23 2022 Anirudh Gopal <angop@microsoft.com> - 1.6.1-2
-- Always restart containerd service
-* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-1
-- Update to version 1.6.1
-* Fri Jan 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.0.rc.3-1
-- Update to version 1.6.0-rc.3
-- Use code from upstream instead of Azure fork.
-* Tue Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.5.9+azure-1
+* Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
+- Update to version 1.6.6
+* Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.9+azure-7
+- Bumping release to rebuild with golang 1.18.3
+* Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.5.9+azure-6
+- Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.9+azure-5
+- Bump release to force rebuild with golang 1.16.15
+* Thu Mar 03 2022 Anirudh Gopal <angop@microsoft.com> - 1.5.9+azure-4
+- Enable containerd service restart
+* Wed Mar 02 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.9+azure-3
+- Fix CVE-2022-23648
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.9+azure-2
+- Bump release to force rebuild with golang 1.16.14
+* Wed Jan 19 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.5.9+azure-1
 - Update to version 1.5.9+azure
 * Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.4.4+azure-6
 - Increment release for force republishing using golang 1.16.12

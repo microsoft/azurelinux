@@ -8,8 +8,8 @@ CONTAINERD_REPO=https://github.com/containerd/containerd.git
 CONTAINERD_COMMIT=10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
 VERSION=1.6.6+azure
 
-mkdir -p /build/containerd-src
-cd /build/containerd-src
+mkdir -pv /build/containerd-src/containerd-${VERSION}
+cd /build/containerd-src/containerd-${VERSION}
 git clone ${CONTAINERD_REPO} .
 git fetch --tags origin ${CONTAINERD_COMMIT}
 git checkout ${CONTAINERD_COMMIT}
