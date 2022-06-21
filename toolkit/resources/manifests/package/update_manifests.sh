@@ -305,6 +305,7 @@ generate_pkggen_core () {
         grep "^msopenjdk-" $TmpPkgGen
         grep "^pyproject-" $TmpPkgGen
         grep "^audit-" $TmpPkgGen
+        grep "^libcap-ng-" $TmpPkgGen
     } > "$1"
 }
 
