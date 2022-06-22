@@ -14,7 +14,7 @@ URL:            https://github.com/aws/aws-sdk-ruby
 #  cd gems/%{gem_name}
 #  sudo mv %{gem_name} %{gem_name}-%{version} (find version from the VERSION file)
 #  sudo tar -cvf %{gem_name}-%{version}.tar.gz %{gem_name}-%{version}/
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
