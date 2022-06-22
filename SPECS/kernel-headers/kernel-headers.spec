@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.10.117.1
-Release:        2%{?dist}
+Version:        5.10.123.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,6 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %build
 make mrproper
-make headers_check
 
 %install
 cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
@@ -37,6 +36,10 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Mon Jun 20 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.123.1-1
+- Update source to 5.10.123.1
+- Remove make headers_check
+
 * Wed Jun 01 2022 Minghe Ren <mingheren@microsoft.com> - 5.10.117.1-2
 - Bump release number to match kernel release
 
