@@ -3,7 +3,7 @@
 Summary:        fluent logger for ruby
 Name:           rubygem-fluent-logger
 Version:        0.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.9.0-2
+- Build from .tar.gz source.
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 0.9.0-1
 - License verified
 - Original version for CBL-Mariner

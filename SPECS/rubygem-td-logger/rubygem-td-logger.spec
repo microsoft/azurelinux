@@ -3,7 +3,7 @@
 Summary:        Treasure Data logging library
 Name:           rubygem-%{gem_name}
 Version:        0.3.27
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.3.27-2
+- Build from .tar.gz source.
+
 * Wed Jan 06 2021 Henry Li <lihl@microsoft.com> - 0.3.27-1
 - License verified
 - Original version for CBL-Mariner

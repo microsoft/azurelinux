@@ -38,6 +38,10 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.0.1-1
+- Update to v8.0.1.
+- Build from .tar.gz source.
+
 * Tue Jan 05 2021 Henry Li <lihl@microsoft.com> - 7.6.0-1
 - License verified
 - Original version for CBL-Mariner

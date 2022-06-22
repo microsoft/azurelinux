@@ -4,7 +4,7 @@ Summary:        REXML is an XML toolkit for Ruby
 Name:           rubygem-%{gem_name}
 Version:        3.1.9.1
 Release:        1%{?dist}
-License:        BSD-2 Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages

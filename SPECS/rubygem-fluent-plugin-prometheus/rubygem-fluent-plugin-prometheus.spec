@@ -36,6 +36,10 @@ cp LICENSE %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.2-1
+- Update to v2.0.2.
+- Build from .tar.gz source.
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.7.3-1
 - License verified
 - Original version for CBL-Mariner

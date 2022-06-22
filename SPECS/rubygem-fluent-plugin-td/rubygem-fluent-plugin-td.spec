@@ -3,7 +3,7 @@
 Summary:        Fluentd plugin for Treasure Data Service
 Name:           rubygem-fluent-plugin-td
 Version:        1.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.0-2
+- Build from .tar.gz source.
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.1.0-1
 - License verified
 - Original version for CBL-Mariner

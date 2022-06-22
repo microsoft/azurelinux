@@ -3,7 +3,7 @@
 Summary:        a fast strptime/strftime engine which uses VM
 Name:           rubygem-%{gem_name}
 Version:        0.2.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        NARUSE, Yui Open Source
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ cp LICENSE.txt %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.2.5-2
+- Build from .tar.gz source.
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 0.2.5-1
 - License verified
 - Original version for CBL-Mariner

@@ -35,7 +35,6 @@ cp LICENSE %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.0-1
-- .gemspec file taken from upstream master branch
+* Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.5-1
 - License verified
 - Original version for CBL-Mariner

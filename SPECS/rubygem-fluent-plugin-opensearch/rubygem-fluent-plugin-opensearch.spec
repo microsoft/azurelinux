@@ -33,6 +33,6 @@ cp LICENSE.txt %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.0-1
+* Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.4-1
 - License verified
 - Original version for CBL-Mariner

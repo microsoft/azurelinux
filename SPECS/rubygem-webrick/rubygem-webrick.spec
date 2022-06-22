@@ -4,7 +4,7 @@ Summary:        HTTP server toolkit
 Name:           rubygem-%{gem_name}
 Version:        1.7.0
 Release:        1%{?dist}
-License:        BSD-2-Clause
+License:        BSD
 Vendor:	        Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ruby/webrick

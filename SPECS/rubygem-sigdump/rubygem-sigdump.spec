@@ -3,7 +3,7 @@
 Summary:        SIGQUIT of Java VM for Ruby
 Name:           rubygem-%{gem_name}
 Version:        0.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ cp LICENSE %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.2.4-2
+- Build from .tar.gz source.
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 0.2.4-1
 - License verified
 - Original version for CBL-Mariner

@@ -34,6 +34,6 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
-* Tue May 31 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 8.0.1-1
+* Tue May 31 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 8.0.0-1
 - License verified
 - Original version for CBL-Mariner

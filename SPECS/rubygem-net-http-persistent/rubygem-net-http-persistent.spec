@@ -36,6 +36,6 @@ cp README.rdoc %{buildroot}%{gem_instdir}/
 
 %changelog
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.0-1
-- .gemspec file taken from upstream master branch
+- .gemspec file taken from upstream master branch (License MIT)
 - License verified
 - Original version for CBL-Mariner

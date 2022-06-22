@@ -3,7 +3,7 @@
 Summary:        Filter plugin for modifying event record
 Name:           rubygem-fluent-plugin-record-modifier
 Version:        2.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ cp README.md %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.1.0-2
+- Build from .tar.gz source.
+
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 2.1.0-1
 - License verified
 - Original version for CBL-Mariner

@@ -3,7 +3,7 @@
 Summary:        Adds multipart POST capability to net/http
 Name:           rubygem-%{gem_name}
 Version:        2.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ cp LICENSE %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.1.1-2
+- Build from .tar.gz source.
+
 * Wed Jan 06 2021 Henry Li <lihl@microsoft.com> - 2.1.1-1
 - License verified
 - Original version for CBL-Mariner
