@@ -125,6 +125,7 @@ make check
 %changelog
 * Tue Jun 21 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.0-8
 - Add patch to fix build error with ncurses 6.3
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
