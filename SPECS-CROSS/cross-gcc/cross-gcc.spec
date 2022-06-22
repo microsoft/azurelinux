@@ -30,7 +30,7 @@
 
 # If we want our cross compile aware packges to also support native, we
 # need logic to switch modes something like this:
-%if %{_target_arch} != %{_host_arch}
+%if "%{_target_arch}" != "%{_host_arch}"
 %global _cross_prefix       %{_crossdir}%{_tuple}/
 %global _cross_sysroot      %{_crossdir}%{_tuple}/sysroot/
 %global _cross_includedir   /usr/%{_host}/%{_tuple}/include/
