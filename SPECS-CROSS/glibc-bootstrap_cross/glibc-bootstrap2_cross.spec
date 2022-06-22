@@ -221,6 +221,7 @@ cd %{_builddir}/%{name}-build
             --with-headers="$TEMP_SYSROOT/%{_includedir}" \
             --disable-multilib \
             libc_cv_forced_unwind=yes \
+            libc_cv_ctors_header=yes \
             --disable-werror
 
 make %{?_smp_mflags} DESTDIR=$TEMP_SYSROOT
