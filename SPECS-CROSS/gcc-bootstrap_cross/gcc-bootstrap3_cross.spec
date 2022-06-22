@@ -1,6 +1,7 @@
 %global security_hardening nofortify
 %global debug_package %{nil}
 %global set_build_flags %{nil}
+%define __os_install_post %{nil}
 
 # Globals which should be in a macro file.
 # These should be set programatically in the future.
