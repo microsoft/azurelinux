@@ -72,6 +72,7 @@ install -d -m 0755 %{buildroot}/run/%{name}/
 %changelog
 * Tue Jun 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.2.1-1
 - Upgrading to fix build break and align with latest ncurses update.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4-25
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
