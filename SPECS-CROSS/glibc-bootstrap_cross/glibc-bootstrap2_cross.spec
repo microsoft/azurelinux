@@ -203,6 +203,8 @@ CXXFLAGS=""
 #CXXFLAGS="`echo " %%{build_cxxflags} " | sed 's/-Wp,-D_FORTIFY_SOURCE=2//'`"
 export CFLAGS
 export CXXFLAGS
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
+export LDFLAGS
 
 # Need to make some temp directories to put files into, we don't want to polute our
 # build machines directores and we shouldn't be touching BUILDROOT yet.
