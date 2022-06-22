@@ -7130,6 +7130,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jx",
+          "version": "3.2.236",
+          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.2.236.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jzlib",
           "version": "1.1.3",
           "downloadUrl": "https://github.com/ymnk/jzlib/archive/1.1.3.tar.gz"
