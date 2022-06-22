@@ -485,8 +485,14 @@ build_rpm_in_chroot_no_install pam
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
-# util-linux and rpm require libselinux
+
+# libcap-ng needs: swig, python3
+build_rpm_in_chroot_no_install libcap-ng
+copy_rpm_subpackage python3-libcap-ng
+
+# util-linux and rpm require libselinux and libcap-ng
 chroot_and_install_rpms libselinux
+chroot_and_install_rpms libcap-ng
 build_rpm_in_chroot_no_install util-linux
 # rpm requires debugedit
 build_rpm_in_chroot_no_install debugedit
