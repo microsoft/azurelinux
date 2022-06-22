@@ -3,7 +3,7 @@
 Summary:        Fluentd Output filter plugin
 Name:           rubygem-fluent-plugin-rewrite-tag-filter
 Version:        2.4.0
-Release:        1%{dist}
+Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
