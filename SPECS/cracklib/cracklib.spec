@@ -4,7 +4,7 @@
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.7
-Release:          4%{?dist}
+Release:          5%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -117,7 +117,6 @@ util/cracklib-format dicts/cracklib* | util/cracklib-packer $RPM_BUILD_ROOT/%{_d
 echo password | util/cracklib-packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/empty
 rm -f $RPM_BUILD_ROOT/%{_datadir}/cracklib/cracklib-small
 ln -s cracklib-format $RPM_BUILD_ROOT/%{_sbindir}/mkdict
-ln -s cracklib-packer $RPM_BUILD_ROOT/%{_sbindir}/packer
 
 pushd python
 python3 setup.py install --skip-build --root %{buildroot}
@@ -185,6 +184,9 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
+* Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
+- Remove packer symlink- not necessary, conflicts with Hashicorp's packer tool
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-4
 -   Removing the explicit %%clean stage.
 

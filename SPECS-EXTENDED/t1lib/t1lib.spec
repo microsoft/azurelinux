@@ -2,14 +2,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           t1lib
 Version:        5.1.2
-Release:        27%{?dist}
+Release:        28%{?dist}
 
 Summary:        PostScript Type 1 font rasterizer
 
-License:        LGPLv2+
+License:        LGPLv2+ AND GPLv2+
 URL:            https://t1lib.org/
-Source0:        ftp://sunsite.unc.edu/pub/Linux/libs/graphics/t1lib-%{version}.tar.gz
-Patch0:         http://ftp.de.debian.org/debian/pool/main/t/t1lib/t1lib_5.1.2-3.diff.gz
+Source0:        %{_mariner_sources_url}/t1lib-%{version}.tar.gz
+# Patch originally from Debian at http://ftp.de.debian.org/debian/pool/main/t/t1lib/t1lib_5.1.2-3.diff.gz
+Patch0:         t1lib_5.1.2-3.patch
 Patch1:         t1lib-5.1.2-segf.patch
 # Fixes CVE-2010-2642, CVE-2011-0433
 # http://bugzilla.redhat.com/show_bug.cgi?id=679732
@@ -120,7 +121,8 @@ touch $RPM_BUILD_ROOT%{_datadir}/t1lib/{FontDatabase,t1lib.config}
 
 
 %files
-%doc Changes LGPL LICENSE README
+%license LGPL LICENSE
+%doc Changes README
 %dir %{_datadir}/t1lib
 %ghost %verify(not size mtime md5) %{_datadir}/t1lib/t1lib.config
 %ghost %verify(not size mtime md5) %{_datadir}/t1lib/FontDatabase
@@ -143,6 +145,11 @@ touch $RPM_BUILD_ROOT%{_datadir}/t1lib/{FontDatabase,t1lib.config}
 
 
 %changelog
+* Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.1.2-28
+- Rename Debian patch to fix SRPM packing
+- Fix dead upstream URL
+- License verified
+
 * Mon Mar 29 2021 Henry Li <lihl@microsoft.com> - 5.1.2-27
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove libXaw-devel from build requirment

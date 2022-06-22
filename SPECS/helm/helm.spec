@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.4.1
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -54,6 +54,10 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 3.4.1-5
+- Bump release to rebuild with golang 1.18.3
+- License verified
+
 * Mon Sep 20 2021 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-4
 - Patch CVE-2021-32690
 

@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.37.2
-Release:        5%{?dist}
+Version:        2.37.4
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -142,10 +142,13 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Tue May 03 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.36.2-5
+* Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37.4-1
+- Updating to 2.37.4 to fix CVE-2022-0563.
+
+* Tue May 03 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.37.2-5
 - Split libraries into the util-linux-libs package
 
-* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.2-4
+* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.37.2-4
 - Add Debian's PAM configs for runuser tool
 - Add build require on pam-devel so we have the pam headers
 

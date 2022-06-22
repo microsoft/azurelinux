@@ -1,4 +1,4 @@
-From 124c9e4c0500e7589ee63376e8f860f4abc675f2 Mon Sep 17 00:00:00 2001
+From e6ab9c67f0a14adc23c1067e03a106da1b1651b7 Mon Sep 17 00:00:00 2001
 From: Petr Mensik <pemensik@redhat.com>
 Date: Fri, 18 Oct 2019 21:30:52 +0200
 Subject: [PATCH] Move USE_PKCS11 and USE_OPENSSL out of config.h
@@ -13,7 +13,7 @@ Move it as normal define to CDEFINES.
  3 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/bin/confgen/Makefile.in b/bin/confgen/Makefile.in
-index 1f5165a..ef3e70c 100644
+index 1b7512d..c126bf3 100644
 --- a/bin/confgen/Makefile.in
 +++ b/bin/confgen/Makefile.in
 @@ -22,7 +22,7 @@ VERSION=@BIND9_VERSION@
@@ -26,10 +26,10 @@ index 1f5165a..ef3e70c 100644
  
  ISCCFGLIBS =	../../lib/isccfg/libisccfg.@A@
 diff --git a/configure.ac b/configure.ac
-index fde41dc..e5cc3cd 100644
+index f5483fe..08a7d8a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -935,10 +935,14 @@ AS_CASE([$enable_native_pkcs11],
+@@ -935,10 +935,14 @@ AC_SUBST([PKCS11_TEST])
  AC_SUBST([PKCS11_TOOLS])
  AC_SUBST([PKCS11_MANS])
  
@@ -47,7 +47,7 @@ index fde41dc..e5cc3cd 100644
  # preparation for automake
  # AM_CONDITIONAL([PKCS11_TOOLS], [test "$with_native_pkcs11" = "yes"])
 diff --git a/lib/dns/dst_internal.h b/lib/dns/dst_internal.h
-index 116e2d2..99bdf5b 100644
+index 2c3b4a3..55e9dc4 100644
 --- a/lib/dns/dst_internal.h
 +++ b/lib/dns/dst_internal.h
 @@ -38,6 +38,13 @@
@@ -64,7 +64,7 @@ index 116e2d2..99bdf5b 100644
  #if USE_PKCS11
  #include <pk11/pk11.h>
  #include <pk11/site.h>
-@@ -113,11 +120,10 @@ struct dst_key {
+@@ -116,11 +123,10 @@ struct dst_key {
  		void *generic;
  		dns_gss_ctx_id_t gssctx;
  		DH *dh;
@@ -79,4 +79,5 @@ index 116e2d2..99bdf5b 100644
  		dst_hmac_key_t *hmac_key;
  	} keydata; /*%< pointer to key in crypto pkg fmt */
 -- 
-2.21.1
+2.26.2
+

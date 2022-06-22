@@ -1,7 +1,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.23.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 %{_docdir}/%{name}
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.23.0-2
+- Bump release to rebuild with golang 1.18.3
+
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 1.23.0-1
 - Update to version 1.23.0
 
