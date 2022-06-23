@@ -5,14 +5,14 @@
 Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
-URL:            https://github.com/fluent-plugins-nursery/td-agent-builder
-#Source0:      https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz
-Source0:        td-agent-builder-testing-uploading-artifacts3.tar.gz
+URL:            https://github.com/fluent/fluent-package-builder
+#Source0:       https://github.com/fluent/fluent-package-builder/archive/refs/tags/v%{version}.tar.gz
+Source0:        fluent-package-builder-%{version}.tar.gz
 # td-agent enforces the ruby version used for building in td-agent/config.rb file. 
 # Therefore, everytime there's an upgrade in td-agent or ruby, please update this
 # patch file to update BUNDLED_RUBY_VERSION and RUBYGEM_VERSION to use the correct ruby
@@ -123,7 +123,7 @@ Requires(pre):  shadow-utils
 The stable distribution of Fluentd
 
 %prep
-%setup -q -n td-agent-builder-testing-uploading-artifacts3
+%setup -q -n fluent-package-builder-%{version}
 %patch0 -p1
 
 %build
@@ -205,6 +205,10 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
+* Thu Jun 23 2022 Henry Li <lihl@microsoft.com> - 4.0.1-7
+- Update Source0 to use the official v4.0.1 release
+- Update td-agent.patch to align with the new source code
+
 * Mon Jun 06 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.0.1-6
 - Update td-agent.patch due to the upgrade in ruby
 
