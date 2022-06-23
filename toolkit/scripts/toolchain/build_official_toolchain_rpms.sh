@@ -122,14 +122,25 @@ chroot_and_print_installed_rpms () {
 }
 
 chroot_and_install_rpms () {
-    # $1 = package name
+    # $1 = SRPM name
+    # $2 = qualified package name
     # Clean and then copy the RPM into the chroot directory for installation below
     rm -v $CHROOT_INSTALL_RPM_DIR/*
-    cp -v $CHROOT_RPMS_DIR_ARCH/$1-* $CHROOT_INSTALL_RPM_DIR
-    cp -v $CHROOT_RPMS_DIR_NOARCH/$1-* $CHROOT_INSTALL_RPM_DIR
+    if [[ -n $2 ]]; then
+        # If we're using the qualified package name, there's probably naming conflicts
+        # that prevent us from simply globbing for RPMs with a prefix of the qualified name.
+        # So, we add the version-release string to the pattern so we don't install unrelated packages
+        specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
+        specDir=$(dirname $specPath)
+        verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
+        find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
+    else
+        cp -v $CHROOT_RPMS_DIR_ARCH/$1-* $CHROOT_INSTALL_RPM_DIR
+        cp -v $CHROOT_RPMS_DIR_NOARCH/$1-* $CHROOT_INSTALL_RPM_DIR
+    fi
 
     chroot_mount
-
+    
     echo "RPM files to be installed..."
     chroot "$LFS" ls -la $CHROOT_INSTALL_RPM_DIR_IN_CHROOT
     echo "Installing the rpms..."
@@ -144,7 +155,7 @@ chroot_and_install_rpms () {
 }
 
 chroot_and_run_rpmbuild () {
-    # $1 = package name
+    # $1 = SRPM name
     echo "Will build spec for $1 in chroot"
     chroot_mount
 
@@ -173,18 +184,26 @@ chroot_and_run_rpmbuild () {
 build_rpm_in_chroot_no_install () {
     # $1 = SRPM name
     # $2 = qualified package name
+    specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
+    specDir=$(dirname $specPath)
+    verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
     if [ -n "$2" ]; then
-        rpmPath=$(find $CHROOT_RPMS_DIR -name "$2-*" -print -quit)
+        rpmPath=$(find $CHROOT_RPMS_DIR -name "$2-$verrel*" -print -quit)
     else
         rpmPath=$(find $CHROOT_RPMS_DIR -name "$1-*" -print -quit)
     fi
     if [ "$INCREMENTAL_TOOLCHAIN" = "y" ] && [ -n "$rpmPath" ]; then
         echo found $rpmPath for $1
-        find $CHROOT_RPMS_DIR -name "$1*" -exec cp {} $FINISHED_RPM_DIR ';'
+        if [[ -n "$2" ]]; then
+            # If we're using the qualified package name, there's probably naming conflicts
+            # that prevent us from simply globbing for RPMs with a prefix of the qualified name.
+            # So, we add the version-release string to the pattern to not pull in unrelated packages
+            find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $FINISHED_RPM_DIR ';'
+        else
+            find $CHROOT_RPMS_DIR -name "$1*" -exec cp {} $FINISHED_RPM_DIR ';'
+        fi
     else
         echo only building RPM $1 within the chroot
-        specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
-        specDir=$(dirname $specPath)
         srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
@@ -322,9 +341,9 @@ build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
 # Python3 needs to be installed for RPM to build
-build_rpm_in_chroot_no_install python3
+build_rpm_in_chroot_no_install python3 python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
-chroot_and_install_rpms python3
+chroot_and_install_rpms python3 python3
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
@@ -346,8 +365,8 @@ esac
 build_rpm_in_chroot_no_install grep
 
 # Lua needs to be installed for RPM to build
-build_rpm_in_chroot_no_install lua
-chroot_and_install_rpms lua
+build_rpm_in_chroot_no_install lua lua
+chroot_and_install_rpms lua lua
 
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
@@ -378,12 +397,7 @@ chroot_and_install_rpms libssh2
 chroot_and_install_rpms krb5
 build_rpm_in_chroot_no_install curl
 
-# python3-setuptools needs python3-xml
-# python3-xml is built by building python3
-chroot_and_install_rpms python3-xml
-
-# cracklib needs python3-setuptools
-chroot_and_install_rpms python3-setuptools
+# cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib
@@ -404,7 +418,7 @@ build_rpm_in_chroot_no_install docbook-style-xsl
 chroot_and_install_rpms cmake
 build_rpm_in_chroot_no_install libsolv
 
-# glib needs perl-XML-Parser, python3-xml, gtk-doc, meson, libselinux
+# glib needs perl-XML-Parser, python3-libs, gtk-doc, meson, libselinux
 chroot_and_install_rpms perl-XML-Parser
 
 # itstool needs python3-libxml2
@@ -428,7 +442,6 @@ chroot_and_install_rpms python3-pygments
 chroot_and_install_rpms docbook-dtd-xml
 chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
-chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gtk-doc
 
 # python3-lxml requires python3-Cython and libxslt
@@ -510,11 +523,11 @@ chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
 
 # python-jinja2 needs python3-markupsafe
-# python3-setuptools, python3-xml are also needed but already installed
+# python3-setuptools, python3-libs are also needed but already installed
 build_rpm_in_chroot_no_install python-markupsafe python3-markupsafe
 copy_rpm_subpackage python3-markupsafe
 chroot_and_install_rpms python3-markupsafe
-build_rpm_in_chroot_no_install python-jinja2 python3-jinja
+build_rpm_in_chroot_no_install python-jinja2 python3-jinja2
 copy_rpm_subpackage python3-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
@@ -538,7 +551,7 @@ chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
 build_rpm_in_chroot_no_install p11-kit
 
-# asciidoc needs python3-xml
+# asciidoc needs python3
 build_rpm_in_chroot_no_install asciidoc
 
 # ca-certificates needs p11-kit and asciidoc
