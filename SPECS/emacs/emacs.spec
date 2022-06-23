@@ -1,7 +1,7 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        28.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv3+ and CC0-1.0
@@ -69,18 +69,21 @@ rm %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/metainfo/emacs.metainfo.xml
 
 %changelog
-*  Tue Jun 14 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 28.1-2
--  Initial CBL-Mariner import from Photon (license: Apache2).
--  License verified
- 
-*  Mon Apr 18 2022 Gerrit Photon <photon-checkins@vmware.com> 28.1-1
--  Automatic Version Bump
+* Fri Jun 17 2022 Muhammad Falak <mwani@microsoft.com> - 28.1-3
+- Nopatch CVE-2007-6109
 
-*  Mon Apr 12 2021 Gerrit Photon <photon-checkins@vmware.com> 27.2-1
--  Automatic Version Bump
+* Tue Jun 14 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 28.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+- License verified
 
-*  Fri Oct 16 2020 Shreenidhi Shedi <sshedi@vmware.com> 27.1-2
--  Fix aarch64 build error
+* Mon Apr 18 2022 Gerrit Photon <photon-checkins@vmware.com> - 28.1-1
+- Automatic Version Bump
 
-*  Tue Oct 06 2020 Susant Sahani <ssahani@vmware.com>  27.1-1
--  Initial rpm release.
+* Mon Apr 12 2021 Gerrit Photon <photon-checkins@vmware.com> - 27.2-1
+- Automatic Version Bump
+
+* Fri Oct 16 2020 Shreenidhi Shedi <sshedi@vmware.com> - 27.1-2
+- Fix aarch64 build error
+
+* Tue Oct 06 2020 Susant Sahani <ssahani@vmware.com>  - 27.1-1
+- Initial rpm release.
