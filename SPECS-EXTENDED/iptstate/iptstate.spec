@@ -53,6 +53,7 @@ make install PREFIX=%{buildroot}%{_prefix} INSTALL="install -p"
 %changelog
 * Thu Jun 23 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.2.7-1
 - Upgrade version to 2.2.7 to fix build break.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.6-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

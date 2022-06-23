@@ -63,6 +63,7 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %changelog
 * Thu Jun 23 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.95-1
 - Upgrade version to 0.95 to fix build break
+- License verified
 
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 0.92-8
 - Remove epoch
