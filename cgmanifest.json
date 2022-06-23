@@ -8372,7 +8372,7 @@
         "other": {
           "name": "k3s",
           "version": "1.23.6",
-          "downloadUrl": "https://dev.azure.com/mariner-org/36d030d6-1d99-4ebd-878b-09af1f4f722f/_apis/git/repositories/12378dc2-9553-415a-bb98-0e52722d5bdb/items?path=/SPECS/k3s/SOURCES/k3s/k3s-1.23.6-k3s1.tar.gz&versionDescriptor%5BversionOptions%5D=0&versionDescriptor%5BversionType%5D=0&versionDescriptor%5Bversion%5D=main&resolveLfs=true&%24format=octetStream&api-version=5.0&download=true"
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
         }
       }
     },

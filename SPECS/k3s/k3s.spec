@@ -14,6 +14,22 @@ Group:   System Environment/Base
 License: ASL 2.0
 URL:     http://k3s.io
 Source0: %{name}-%{version}-k3s1.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# We are also pre-cloning 3 git repositories
+# How to re-build this file:
+# 1. wget https://github.com/k3s-i/%%{name}/archive/refs/tags/%%{version}+k3s1.tar.gz -O %%{name}-%%{version}-k3s1.tar.gz
+# 2. tar -xf %%{name}-%%{version}-k3s1.tar.gz
+# 3. cd %%{name}-%%{version}-k3s1
+# 4. go mod vendor
+# 5. pushd vendor
+# 6. git clone https://github.com/containerd/containerd.git -b release/1.6
+# 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
+# 8. git clone https://github.com/opencontainers/runc.git -b release-1.1
+# 9. popd
+# 10. tar -cf %%{name}-%%{version}-k3s1-vendor.tar.gz vendor
+Source1: %{name}-%{version}-k3s1-vendor.tar.gz
+Patch0:  vendor_build.patch
 
 BuildRequires: golang
 BuildRequires: libseccomp-devel
@@ -25,6 +41,9 @@ The certified Kubernetes distribution built for IoT & Edge computing.
 
 %prep
 %setup -q -n %{name}-%{version}-k3s1
+tar -xvf %{SOURCE1}
+
+%patch0 -p1
 
 %build
 mkdir -p build/static
@@ -65,3 +84,4 @@ exit 0
 - Initial changes to build for Mariner
 * Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
 - Initial version
+
