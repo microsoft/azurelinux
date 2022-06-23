@@ -170,7 +170,6 @@ openssl-devel-1.1.1k-16.cm2.x86_64.rpm
 openssl-libs-1.1.1k-16.cm2.x86_64.rpm
 openssl-perl-1.1.1k-16.cm2.x86_64.rpm
 openssl-static-1.1.1k-16.cm2.x86_64.rpm
-openssl-debuginfo-1.1.1k-16.cm2.x86_64.rpm
 libcap-2.60-1.cm2.x86_64.rpm
 libcap-devel-2.60-1.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
