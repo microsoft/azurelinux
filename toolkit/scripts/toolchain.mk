@@ -150,6 +150,10 @@ $(raw_toolchain): $(toolchain_files)
 # where an RPM is unavailable/download fails, we create an empty file. The build_official_toolchain_rpms.sh script
 # knows the distinction between empty/non-empty files.
 #
+# The main usage scenario is avoiding full toolchain rebuilds after changing a toolchain package. The time needed to
+# fully rebuild the final toolchain phase is vastly longer than the time needed to rehydrate most of the RPMs and
+# build one or two changed SRPMs. Additionally, it allows us to build against the packages that are already published.
+#
 # When is it meaningful to attempt to partially rehydrate? It makes no sense to partially rehydrate if:
 # - REBUILD_TOOLCHAIN = n: We aren't building the toolchain, so we defer to the full rehydration step
 # - INCREMENTAL_TOOLCHAIN = n: We explicitly want to build a full toolchain
