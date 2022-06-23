@@ -3,7 +3,7 @@ Distribution:   Mariner
 
 Name:           numatop
 Version:        2.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Memory access locality characterization and analysis
 
 License:        BSD
@@ -11,6 +11,7 @@ URL:            https://01.org/numatop
 Source:         https://github.com/intel/%{name}/releases/download/v%{version}/%{name}-v%{version}.tar.xz
 # https://github.com/intel/numatop/pull/53
 Patch0:         as-needed.patch
+Patch1:         fix-format-security.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -34,8 +35,7 @@ NumaTOP supports the Intel Xeon processors and PowerPC processors.
 
 
 %prep
-%autosetup -n %{name}-v%{version}
-
+%autosetup -p1 -n %{name}-v%{version}
 
 %build
 autoreconf -ivf
@@ -59,6 +59,10 @@ autoreconf -ivf
 
 
 %changelog
+* Tue Jun 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.1-5
+- Add patch to fix format-security wanings with ncurses 6.3
+- License verified
+
 * Wed Aug 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add patch to fix linking error
