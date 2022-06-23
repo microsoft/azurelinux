@@ -49,7 +49,6 @@ $(call create_folder,$(populated_toolchain_chroot))
 .PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
-partially-rehydrate-toolchain-from-repo: $(toolchain_rpms_rehydrated)
 
 clean: clean-toolchain
 
