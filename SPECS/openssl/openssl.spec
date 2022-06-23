@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,7 @@ Patch24:        CVE-2021-4160.nopatch
 Patch25:        CVE-2022-0778.patch
 Patch26:        CVE-2022-1292.patch
 Patch27:        openssl-1.1.1-update-expired-cert.patch
+Patch28:        CVE-2022-2068.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -139,6 +140,7 @@ cp %{SOURCE4} test/
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
+%patch28 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -318,6 +320,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Wed Jun 22 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-12
+- Patch for CVE-2022-2068
+
 * Tue Jun 14 2022 Henry Li <lihl@microsoft.com> - 1.1.1k-11
 - Add patch to fix package test failure caused by expired cert
 
