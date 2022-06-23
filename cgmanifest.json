@@ -6601,8 +6601,8 @@
         "type": "other",
         "other": {
           "name": "iptstate",
-          "version": "2.2.6",
-          "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.6/iptstate-2.2.6.tar.bz2"
+          "version": "2.2.7",
+          "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.7/iptstate-2.2.7.tar.bz2"
         }
       }
     },
@@ -11933,8 +11933,8 @@
         "type": "other",
         "other": {
           "name": "mtr",
-          "version": "0.92",
-          "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.92/mtr-0.92.tar.gz"
+          "version": "0.95",
+          "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.95/mtr-0.95.tar.gz"
         }
       }
     },
