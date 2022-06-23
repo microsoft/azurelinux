@@ -8,8 +8,8 @@ OUTPUT_FILE=$2
 # Extract the specs built from toolkit/scripts/toolchain/build_official_toolchain_rpms.sh
 # Each spec that is built will be on its own line in the following formats:
 #
-# build_rpm_in_chroot_no_install foo
-# build_rpm_in_chroot_no_install foo qualified-foo
+# build_rpm_in_chroot_no_install foo-spec-name
+# build_rpm_in_chroot_no_install foo-spec-name qualified-foo-rpm-name
 #
 # In both cases, the first entry is the actual spec name to extract.
 # The below sed command will extract every spec name that follows the above pattern and place it in $OUTPUT_FILE.
