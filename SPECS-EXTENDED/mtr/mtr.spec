@@ -2,8 +2,8 @@
 
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
-Version: 0.92
-Release: 8%{?dist}
+Version: 0.95
+Release: 1%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,7 @@ command line, e.g. for SSH sessions; and a GTK+ interface for X (provided
 in the mtr-gtk package).
 
 %prep
-%setup -q
+%autosetup
 
 %build
 export CFLAGS="%{optflags} -fPIE"
@@ -61,6 +61,9 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Wed Jun 22 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.95-1
+- Upgrade version to 0.95 to fix build break
+
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 0.92-8
 - Remove epoch
 
