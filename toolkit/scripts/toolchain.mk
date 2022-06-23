@@ -151,7 +151,7 @@ $(raw_toolchain): $(toolchain_files)
 # knows the distinction between empty/non-empty files.
 #
 # When is it meaningful to attempt to partially rehydrate? It makes no sense to partially rehydrate if:
-# - REBUILD_TOOLCAHIN = n: We aren't building the toolchain, so we defer to the full rehydration step
+# - REBUILD_TOOLCHAIN = n: We aren't building the toolchain, so we defer to the full rehydration step
 # - INCREMENTAL_TOOLCHAIN = n: We explicitly want to build a full toolchain
 # - ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = n: This flag explicitly disables partial toolchain rehydration from repos
 # In these cases, we just create empty files for each possible rehydrated RPM.
