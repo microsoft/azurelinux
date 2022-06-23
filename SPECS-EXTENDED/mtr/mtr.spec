@@ -52,7 +52,7 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc AUTHORS FORMATS NEWS README SECURITY
+%doc AUTHORS FORMATS NEWS README.md SECURITY
 %{_sbindir}/%{name}
 %caps(cap_net_raw=pe) %{_sbindir}/%{name}-packet
 %{_mandir}/man8/*
@@ -61,7 +61,7 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
-* Wed Jun 22 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.95-1
+* Thu Jun 23 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.95-1
 - Upgrade version to 0.95 to fix build break
 
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 0.92-8

@@ -51,7 +51,7 @@ make install PREFIX=%{buildroot}%{_prefix} INSTALL="install -p"
 %{_mandir}/man8/iptstate.*
 
 %changelog
-* Wed Jun 22 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.2.7-1
+* Thu Jun 23 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.2.7-1
 - Upgrade version to 2.2.7 to fix build break.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.6-11
