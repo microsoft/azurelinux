@@ -40,10 +40,8 @@ Requires:      apparmor-parser
 The certified Kubernetes distribution built for IoT & Edge computing.
 
 %prep
-%setup -q -n %{name}-%{version}-k3s1
+%autosetup -p1 -n %{name}-%{version}-k3s1
 tar -xvf %{SOURCE1}
-
-%patch0 -p1
 
 %build
 mkdir -p build/static
