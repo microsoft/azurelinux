@@ -8,6 +8,10 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.clamav.net
 Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
+# Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
+Source1:        %{name}-%{name}-%{version}-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -40,9 +44,15 @@ of utilities including a flexible and scalable multi-threaded daemon, a command
 line scanner and an advanced tool for automatic database updates.
 
 %prep
+# Setup .cargo directory
+mkdir -p $HOME
+pushd $HOME
+tar xf %{SOURCE1} --no-same-owner
+popd
 %autosetup -n clamav-clamav-%{version}
 
 %build
+export CARGO_NET_OFFLINE=true
 # Notes:
 # - milter must be disable because CBL-Mariner does not provide 'sendmail' packages
 #   which provides the necessary pieces to build 'clamav-milter'
