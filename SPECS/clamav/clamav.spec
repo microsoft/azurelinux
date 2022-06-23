@@ -13,6 +13,7 @@ BuildRequires:  check-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gdb
+BuildRequires:  git
 BuildRequires:  json-c-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
@@ -23,6 +24,7 @@ BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
+BuildRequires:  rust
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
