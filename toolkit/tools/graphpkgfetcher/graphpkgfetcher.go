@@ -242,7 +242,7 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 		var resolvedRPMs []string
 		logger.Log.Debugf("Found %d candidates. Resolving.", len(rpmPaths))
 
-		resolvedRPMs, err = rpm.ResolveCompetingPackages(rpmPaths...)
+		resolvedRPMs, err = rpm.ResolveCompetingPackages(*tmpDir, rpmPaths...)
 		if err != nil {
 			logger.Log.Errorf("Failed while trying to pick an RPM providing '%s' from the following RPMs: %v", node.VersionedPkg.Name, rpmPaths)
 			return

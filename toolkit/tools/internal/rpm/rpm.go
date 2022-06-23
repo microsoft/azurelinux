@@ -280,7 +280,7 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 
 // ResolveCompetingPackages takes in a list of RPMs and returns only the ones, which would
 // end up being installed after resolving outdated, obsoleted, or conflicting packages.
-func ResolveCompetingPackages(rpmPaths ...string) (resolvedRPMs []string, err error) {
+func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs []string, err error) {
 	const (
 		queryFormat       = ""
 		installedRPMIndex = 1
@@ -290,6 +290,8 @@ func ResolveCompetingPackages(rpmPaths ...string) (resolvedRPMs []string, err er
 	args := []string{
 		"-Uvvh",
 		"--nodeps",
+		"--root",
+		rootDir,
 		"--test",
 	}
 	args = append(args, rpmPaths...)
