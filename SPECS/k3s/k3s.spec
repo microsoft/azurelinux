@@ -35,6 +35,9 @@ BuildRequires: golang
 BuildRequires: libseccomp-devel
 BuildRequires: btrfs-progs-devel
 Requires:      apparmor-parser
+# Note: k3s is not exclusive with coredns, etcd, containerd, runc and other CBL-Mariner packages which it embeds.
+# This means there may be multiple versions of these packages. At this time exclusivity is not being enforced to
+# allow k3s to use its required version even when other versions are installed.
 
 %description
 The certified Kubernetes distribution built for IoT & Edge computing.
