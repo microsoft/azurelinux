@@ -71,7 +71,6 @@ touch %{_localstatedir}/cache/powertop/{saved_parameters.powertop,saved_results.
 %{_datadir}/bash-completion/completions/powertop
 
 %changelog
-
 * Thu Jun 23 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 2.13-3
 - Added patch to fix compilation with ncurses 6.3
 - License verified
