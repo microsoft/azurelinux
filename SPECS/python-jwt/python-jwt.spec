@@ -18,14 +18,14 @@ claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
 Name:           python-%{pkgname}
-Version:        1.7.1
-Release:        9%{?dist}
+Version:        2.4.0
+Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/d8/6b/6287745054dbcccf75903630346be77d4715c594402cec7c2518032416c2/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -49,8 +49,6 @@ BuildRequires:  python3-atomicwrites
 %prep
 %autosetup -n %{srcname}-%{version}
 rm -rf %{eggname}.egg-info
-# prevent pullng in `addopts` for pytest run later
-rm setup.cfg
 
 %build
 %{?with_python3:python3 setup.py build}
@@ -66,15 +64,16 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %if %{with python3}
 %files -n python3-%{pkgname}
-%doc README.rst AUTHORS
+%doc README.rst AUTHORS.rst
 %license LICENSE
 %{python3_sitelib}/%{libname}
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
-#%{python3_sitelib}/%{eggname}-%{version}-py3.7.egg-info
-%{_bindir}/pyjwt
 %endif
 
 %changelog
+* Thu Jun 23 2022 Minghe Ren <mingheren@microsoft.com> - 2.4.0-1
+- Update to v2.4.0 to fix CVE-2022-29217
+
 * Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.1-9
 - Pass check section
 
