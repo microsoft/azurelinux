@@ -45,10 +45,13 @@ PARAM_RELEASE_VER=$MARINER_RELEASE_VERSION
 #       build/toolchain/populated_toolchain
 #       build/toolchain/toolchain_from_container.tar.gz
 #
+# The build/toolchain/populated_toolchain folder might exist, but not have the unpacked
+# chroot environment inside it. So, we need to check if some expected directory exists
+# within $LFS.
 pushd $MARINER_BUILD_DIR/toolchain
-if [[ ! -d "$LFS" ]]
+if [[ ! -d "$LFS/usr" ]]
 then
-    echo "$LFS not created yet, unpacking tarball"
+    echo "$LFS not populated with chroot environment yet, unpacking tarball"
     tar -xzf toolchain_from_container.tar.gz --checkpoint=100000 --checkpoint-action=echo="%T"
 fi
 popd
