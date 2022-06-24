@@ -10,7 +10,6 @@ URL:              http://01.org/powertop/
 Source0:          http://github.com/fenrus75/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:          powertop.service
 
-
 # Sent upstream
 Patch0:           powertop-2.7-always-create-params.patch
 Patch1:           0001-ncurses.patch
