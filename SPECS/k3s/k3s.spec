@@ -84,6 +84,7 @@ exit 0
 * Tue May 24 2022 Manuel Huber <mahuber@microsoft.com> 1.23.6-1
 - Changes to install phase on Mariner
 * Fri May 20 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
+- License verified
 - Initial changes to build for Mariner
 - Initial CBL-Mariner import from Rancher (license: ASL 2.0).
 * Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
