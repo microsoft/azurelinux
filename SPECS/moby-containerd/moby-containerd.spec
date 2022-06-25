@@ -1,10 +1,10 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 10f428dac7cec44c864e1b830a4623af27a9fc70
+%define commit_hash 10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
-Version: 1.6.2
+Version: 1.6.6
 Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
@@ -85,6 +85,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Thu Jun 23 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.6.6-1
+- Bump version to 1.6.6 to address CVE-2022-31030
+
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.2-1
 - Bump version to 1.6.2 to address CVE-2022-24769
 - Rebuild with golang 1.18.3

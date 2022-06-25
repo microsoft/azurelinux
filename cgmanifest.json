@@ -1497,8 +1497,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.104.2",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.104.2.tar.gz"
+          "version": "0.105.0",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.0.tar.gz"
         }
       }
     },
@@ -2007,8 +2007,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.83.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.0.tar.gz"
+          "version": "7.83.1",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.1.tar.gz"
         }
       }
     },
@@ -2538,8 +2538,8 @@
         "type": "other",
         "other": {
           "name": "dpkg",
-          "version": "1.20.9",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.20.9.tar.xz"
+          "version": "1.20.10",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.20.10.tar.xz"
         }
       }
     },
@@ -5750,8 +5750,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.45.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.45.1.tar.gz"
+          "version": "5.15.48.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
         }
       }
     },
@@ -6591,8 +6591,8 @@
         "type": "other",
         "other": {
           "name": "iptraf-ng",
-          "version": "1.1.4",
-          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.1.4.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.2.1.tar.gz"
         }
       }
     },
@@ -6601,8 +6601,8 @@
         "type": "other",
         "other": {
           "name": "iptstate",
-          "version": "2.2.6",
-          "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.6/iptstate-2.2.6.tar.bz2"
+          "version": "2.2.7",
+          "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.7/iptstate-2.2.7.tar.bz2"
         }
       }
     },
@@ -7130,6 +7130,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jx",
+          "version": "3.2.236",
+          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.2.236.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jzlib",
           "version": "1.1.3",
           "downloadUrl": "https://github.com/ymnk/jzlib/archive/1.1.3.tar.gz"
@@ -7191,8 +7201,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.45.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.45.1.tar.gz"
+          "version": "5.15.48.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
         }
       }
     },
@@ -7201,8 +7211,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.45.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.45.1.tar.gz"
+          "version": "5.15.48.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
         }
       }
     },
@@ -8551,8 +8561,8 @@
         "type": "other",
         "other": {
           "name": "libinput",
-          "version": "1.16.4",
-          "downloadUrl": "https://www.freedesktop.org/software/libinput/libinput-1.16.4.tar.xz"
+          "version": "1.21.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.21.0/libinput-1.21.0.tar.bz2"
         }
       }
     },
@@ -9463,6 +9473,16 @@
           "name": "librepo",
           "version": "1.14.2",
           "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libreswan",
+          "version": "4.7",
+          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.7.tar.gz"
         }
       }
     },
@@ -11232,7 +11252,7 @@
         "other": {
           "name": "mariadb-connector-c",
           "version": "3.1.10",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
+          "downloadUrl": "https://archive.mariadb.org/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
         }
       }
     },
@@ -11613,8 +11633,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.2",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.2.tar.gz"
+          "version": "1.6.6",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.6.tar.gz"
         }
       }
     },
@@ -11913,8 +11933,8 @@
         "type": "other",
         "other": {
           "name": "mtr",
-          "version": "0.92",
-          "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.92/mtr-0.92.tar.gz"
+          "version": "0.95",
+          "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.95/mtr-0.95.tar.gz"
         }
       }
     },
@@ -11953,8 +11973,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.28",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.28.tar.gz"
+          "version": "8.0.29",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.29.tar.gz"
         }
       }
     },
@@ -22304,8 +22324,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.12",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.12/Python-3.9.12.tar.xz"
+          "version": "3.9.13",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tar.xz"
         }
       }
     },
@@ -25697,8 +25717,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.39",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.39/uClibc-ng-1.0.39.tar.xz"
+          "version": "1.0.41",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.41/uClibc-ng-1.0.41.tar.xz"
         }
       }
     },
