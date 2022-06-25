@@ -114,14 +114,15 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.117.1 API Headers
-tar xf kernel-5.10.117.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.117.1
+KERNEL_VERSION="5.10.123.1"
+echo Linux-${KERNEL_VERSION} API Headers
+tar xf kernel-${KERNEL_VERSION}.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.117.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -360,9 +361,9 @@ rm -rf m4-1.4.18
 
 touch $LFS/logs/temptoolchain/status_m4_complete
 
-echo Ncurses-6.2
-tar xf ncurses-6.2.tar.gz
-pushd ncurses-6.2
+echo Ncurses-6.3
+tar xf ncurses-6.3-20220612.tgz
+pushd ncurses-6.3-20220612
 sed -i s/mawk// configure
 ./configure --prefix=/tools \
             --with-shared   \
@@ -374,7 +375,7 @@ make -j$(nproc)
 make install
 ln -s libncursesw.so /tools/lib/libncurses.so
 popd
-rm -rf ncurses-6.2
+rm -rf ncurses-6.3-20220612
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
 

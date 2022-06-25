@@ -1,0 +1,84 @@
+From f8bdd0e64284d841544fd3ebe22f4652902ba8d2 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Tue, 9 Nov 2021 22:24:17 +0000
+Subject: [PATCH] ui/ui.c: always use "%s"-style format for printf()-style
+ functions
+
+`ncuses-6.3` added printf-style function attributes and now makes
+it easier to catch cases when user input is used in palce of format
+string when built with CFLAGS=-Werror=format-security:
+
+    ui/ui.c:714:16: error: format not a string literal and no format arguments [-Werror=format-security]
+      714 |         printw(copy_to);
+          |                ^~~~~~~
+
+Let's wrap all the missing places with "%s" format.
+
+Backported to v1.6.0 by mfrw on Jun 21 2022
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ ui/ui.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/ui/ui.c b/ui/ui.c
+index 06ec472..c07735f 100644
+--- a/ui/ui.c
++++ b/ui/ui.c
+@@ -25,7 +25,7 @@ void show_frame()
+ 	while(strlen(top) != (size_t)COLS - 1) {
+ 		snprintf(top + strlen(top), COLS - strlen(top), " ");
+ 	}
+-	mvprintw(0, 0, top);
++	mvprintw(0, 0, "%s", top);
+ 	for(i = 0; i < LINES; i++) {
+ 		mvprintw(i, 0, " ");
+ 		mvprintw(i, COLS - 1, " ");
+@@ -41,7 +41,7 @@ void show_footer()
+ 		snprintf(footer + strlen(footer), COLS - strlen(footer), " ");
+ 	}
+ 	attrset(COLOR_PAIR(4));
+-	mvprintw(LINES - 1, 0, footer);
++	mvprintw(LINES - 1, 0, "%s", footer);
+ }
+ 
+ char * check_control_in_sleep_input(int max_len, int column_offest, int line_offset)
+@@ -330,7 +330,7 @@ void print_assigned_objects_string(irq_t *irq, int *line_offset)
+ 	char assigned_to[128] = "\0";
+ 	for_each_int(irq->assigned_to, copy_assigned_obj, assigned_to);
+ 	assigned_to[strlen(assigned_to) - 2] = '\0';
+-	mvprintw(*line_offset, 36, assigned_to);
++	mvprintw(*line_offset, 36, "%s", assigned_to);
+ }
+ 
+ void print_irq_line(irq_t *irq, void *data)
+@@ -565,7 +565,7 @@ void settings()
+ 	uint8_t sleep_input_offset = strlen(info) + 3;
+ 	snprintf(info + strlen(info), 128 - strlen(info), "%lu\n", setup.sleep);
+ 	attrset(COLOR_PAIR(1));
+-	mvprintw(2, 3, info);
++	mvprintw(2, 3, "%s", info);
+ 	print_all_cpus();
+ 
+ 	int user_input = 1;
+@@ -663,7 +663,7 @@ void display_tree_node_irqs(irq_t *irq, void *data)
+ 	char indent[32] = "	   \0";
+ 	snprintf(indent + strlen(indent), 32 - strlen(indent), "%s", (char *)data);
+ 	attrset(COLOR_PAIR(3));
+-	printw("%sIRQ %lu, IRQs since last rebalance %lu\n",
++	printw("%sIRQ %u, IRQs since last rebalance %lu\n",
+ 			indent, irq->vector, irq->diff);
+ }
+ 
+@@ -710,7 +710,7 @@ void display_tree_node(cpu_node_t *node, void *data)
+ 	default:
+ 		break;
+ 	}
+-	printw(copy_to);
++	printw("%s", copy_to);
+ 	if(g_list_length(node->irqs) > 0) {
+ 		for_each_irq(node->irqs, display_tree_node_irqs, indent);
+ 	}
+-- 
+2.17.1
+

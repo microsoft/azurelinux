@@ -57,14 +57,15 @@ set -e
 #
 cd /sources
 
-echo Linux-5.10.117.1 API Headers
-tar xf kernel-5.10.117.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.117.1
+KERNEL_VERSION="5.10.123.1"
+echo Linux-${KERNEL_VERSION} API Headers
+tar xf kernel-${KERNEL_VERSION}.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.117.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -443,9 +444,9 @@ popd
 rm -rf pkg-config-0.29.2
 touch /logs/status_pkgconfig_complete
 
-echo Ncurses-6.2
-tar xf ncurses-6.2.tar.gz
-pushd ncurses-6.2
+echo Ncurses-6.3
+tar xf ncurses-6.3-20220612.tgz
+pushd ncurses-6.3-20220612
 sed -i '/LIBTOOL_INSTALL/d' c++/Makefile.in
 ./configure --prefix=/usr           \
             --mandir=/usr/share/man \
@@ -467,10 +468,10 @@ rm -vf                     /usr/lib/libcursesw.so
 echo "INPUT(-lncursesw)" > /usr/lib/libcursesw.so
 ln -sfv libncurses.so      /usr/lib/libcurses.so
 # Documentation
-mkdir -v       /usr/share/doc/ncurses-6.2
-cp -v -R doc/* /usr/share/doc/ncurses-6.2
+mkdir -v       /usr/share/doc/ncurses-6.3
+cp -v -R doc/* /usr/share/doc/ncurses-6.3
 popd
-rm -rf ncurses-6.2
+rm -rf ncurses-6.3-20220612
 touch /logs/status_ncurses_complete
 
 echo Libcap-2.26

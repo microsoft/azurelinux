@@ -1875,6 +1875,16 @@
         "type": "other",
         "other": {
           "name": "golang",
+          "version": "1.17.10",
+          "downloadUrl": "https://golang.org/dl/go1.17.10.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
           "version": "1.18.3",
           "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
         }
@@ -2135,8 +2145,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -2465,8 +2475,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -2475,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -2485,8 +2495,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.117.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -3855,8 +3865,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.13",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.13/libxml2-v2.9.13.tar.gz"
+          "version": "2.9.14",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.14/libxml2-v2.9.14.tar.gz"
         }
       }
     },
@@ -4425,8 +4435,8 @@
         "type": "other",
         "other": {
           "name": "ncurses",
-          "version": "6.2",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz"
+          "version": "6.3",
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.3-20220612.tgz"
         }
       }
     },
@@ -6245,8 +6255,8 @@
         "type": "other",
         "other": {
           "name": "python-jwt",
-          "version": "1.7.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/PyJWT-1.7.1.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/d8/6b/6287745054dbcccf75903630346be77d4715c594402cec7c2518032416c2/PyJWT-2.4.0.tar.gz"
         }
       }
     },
@@ -7315,8 +7325,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elasticsearch",
-          "version": "8.2.0",
-          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-8.2.0.gem"
+          "version": "8.2.2",
+          "downloadUrl": "https://rubygems.org/downloads/elasticsearch-8.2.2.gem"
         }
       }
     },
@@ -8475,8 +8485,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.37",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.37/uClibc-ng-1.0.37.tar.xz"
+          "version": "1.0.41",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.41/uClibc-ng-1.0.41.tar.xz"
         }
       }
     },
