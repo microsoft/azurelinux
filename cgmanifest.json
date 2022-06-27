@@ -1366,6 +1366,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cf-cli",
+          "version": "8.4.0",
+          "downloadUrl": "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cgdcbxd",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/jrfastab/cgdcbxd/archive/v1.0.2.tar.gz"

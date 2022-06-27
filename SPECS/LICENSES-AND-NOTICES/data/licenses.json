@@ -1952,6 +1952,7 @@
                 "bpftrace",
                 "ccache",
                 "cert-manager",
+                "cf-cli",
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor",
