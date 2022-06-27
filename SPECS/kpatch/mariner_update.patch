@@ -1,0 +1,119 @@
+From 7d81cab6e6b8485d447ae49e3ea9d11147fa7fee Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Wed, 15 Jun 2022 10:51:00 -0700
+Subject: [PATCH] Initial adjustments for CBL-Mariner.
+
+---
+ kpatch-build/kpatch-build | 53 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
+
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index 634095d..8f6ced3 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -638,13 +638,23 @@ if [[ $DEBUG -eq 1 ]] || [[ $DEBUG -ge 3 ]]; then
+ 	set -o xtrace
+ fi
+ 
++# Don't check external file.
++# shellcheck disable=SC1090
++if [[ -z "$USERSRCDIR" ]] && [[ -f "$RELEASE_FILE" ]]; then
++	source "$RELEASE_FILE"
++	DISTRO="$ID"
++fi
++
+ if [[ -n "$SRCRPM" ]]; then
+ 	if  [[ -n "$ARCHVERSION" ]]; then
+ 		warn "--archversion is incompatible with --sourcerpm"
+ 		exit 1
+ 	fi
+ 	rpmname="$(basename "$SRCRPM")"
+-	ARCHVERSION="${rpmname%.src.rpm}.$(uname -m)"
++	ARCHVERSION="${rpmname%.src.rpm}"
++	if [[ "$DISTRO" != mariner ]]; then
++		ARCHVERSION="${ARCHVERSION}.$(uname -m)"
++	fi
+ 	ARCHVERSION="${ARCHVERSION#kernel-}"
+ 	ARCHVERSION="${ARCHVERSION#alt-}"
+ fi
+@@ -705,14 +715,7 @@ fi
+ 
+ [[ -z "$TARGETS" ]] && TARGETS="vmlinux modules"
+ 
+-# Don't check external file.
+-# shellcheck disable=SC1090
+-if [[ -z "$USERSRCDIR" ]] && [[ -f "$RELEASE_FILE" ]]; then
+-	source "$RELEASE_FILE"
+-	DISTRO="$ID"
+-fi
+-
+-if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]]; then
++if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
+ 	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
+ 	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
+ 
+@@ -748,11 +751,15 @@ elif [[ -n "$OOT_MODULE" ]]; then
+ 	fi
+ elif [[ -e "$KERNEL_SRCDIR"/.config ]] && [[ -e "$VERSIONFILE" ]] && [[ "$(cat "$VERSIONFILE")" = "$ARCHVERSION" ]]; then
+ 	echo "Using cache at $KERNEL_SRCDIR"
+-
+ else
+-	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]]; then
++	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
+ 
+-		echo "Fedora/Red Hat distribution detected"
++		[[ "$DISTRO" = fedora ]] && echo "Fedora distribution detected"
++		[[ "$DISTRO" = rhel ]] && echo "RHEL distribution detected"
++		[[ "$DISTRO" = ol ]] && echo "Oracle Linux distribution detected"
++		[[ "$DISTRO" = centos ]] && echo "CentOS distribution detected"
++		[[ "$DISTRO" = openEuler ]] && echo "OpenEuler distribution detected"
++		[[ "$DISTRO" = mariner ]] && echo "CBL-Mariner distribution detected"
+ 
+ 		clean_cache
+ 
+@@ -760,6 +767,9 @@ else
+ 		if [[ -z "$SRCRPM" ]]; then
+ 			if [[ "$DISTRO" = fedora ]]; then
+ 				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
++			elif [[ "$DISTRO" = mariner ]]; then
++				source "$RELEASE_FILE"
++				wget -P "$TEMPDIR" "https://packages.microsoft.com/cbl-mariner/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
+ 			else
+ 				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
+ 				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die
+@@ -773,7 +783,15 @@ else
+ 		rpmbuild -D "_topdir $RPMTOPDIR" -bp --nodeps "--target=$(uname -m)" "$RPMTOPDIR"/SPECS/kernel$ALT.spec 2>&1 | logger ||
+ 			die "rpmbuild -bp failed.  you may need to run 'yum-builddep kernel' first."
+ 
+-		mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
++		if [[ "$DISTRO" = openEuler ]]; then
++			# openEuler has two directories with the same content after 'rpm -D'
++			# openEuler 21.09 has linux-* and linux-*-source while openEuler 20.03 has linux-* and linux-*-Source
++			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-*[sS]ource "$KERNEL_SRCDIR" 2>&1 | logger || die
++		elif [[ "$DISTRO" = mariner ]]; then
++			mv "$RPMTOPDIR"/BUILD/CBL-Mariner-Linux-Kernel-* "$KERNEL_SRCDIR" 2>&1 | logger || die
++		else
++			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
++		fi
+ 		rm -rf "$RPMTOPDIR"
+ 		rm -rf "$KERNEL_SRCDIR/.git"
+ 
+@@ -783,7 +801,14 @@ else
+ 
+ 		echo "$ARCHVERSION" > "$VERSIONFILE" || die
+ 
+-		[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
++		if [[ "$DISTRO" = openEuler ]]; then
++			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="/boot/config-${ARCHVERSION}"
++		elif [[ "$DISTRO" = mariner ]]; then
++			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$RPMTOPDIR/SOURCES/config"
++			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-${KREL}\"/" "$CONFIGFILE"
++		else
++			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
++		fi
+ 
+ 		(cd "$KERNEL_SRCDIR" && make mrproper 2>&1 | logger) || die
+ 
+-- 
+2.34.1
+

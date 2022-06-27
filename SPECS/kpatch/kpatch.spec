@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/dynup/kpatch
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         mariner_update.patch
 
 BuildRequires:  binutils
 BuildRequires:  dnf-utils
@@ -32,6 +33,7 @@ Group:          Development/Tools
 Requires:       numactl-devel
 Requires:       openssl
 Requires:       patch
+Requires:       perl
 Requires:       rpm-build
 Requires:       wget
 
@@ -39,7 +41,7 @@ Requires:       wget
 %{summary}
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %make_build
