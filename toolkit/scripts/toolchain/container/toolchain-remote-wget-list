@@ -103,8 +103,8 @@ https://xcb.freedesktop.org/dist/libxcb-1.12.tar.bz2
 https://xcb.freedesktop.org/dist/xcb-proto-1.12.tar.bz2
 https://www.x.org/pub/individual/lib/libXau-1.0.8.tar.bz2
 https://www.x.org/pub/individual/util/util-macros-1.19.1.tar.bz2
-http://www.linuxfromscratch.org/patches/blfs/8.1/xcb-proto-1.12-python3-1.patch
-http://www.linuxfromscratch.org/patches/blfs/8.1/libxcb-1.12-python3-1.patch
+https://www.linuxfromscratch.org/patches/downloads/xcb-proto/xcb-proto-1.12-python3-1.patch
+https://www.linuxfromscratch.org/patches/downloads/libxcb/libxcb-1.12-python3-1.patch
 https://www.x.org/pub/individual/proto/bigreqsproto-1.1.2.tar.bz2
 https://www.x.org/pub/individual/proto/compositeproto-0.4.2.tar.bz2
 https://www.x.org/pub/individual/proto/damageproto-1.2.1.tar.bz2
