@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates-base
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        2.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ BuildArch:      noarch
 
 BuildRequires:  ca-certificates-base = %{epoch}:%{version}-%{release}
 
+Conflicts:      ca-certificates-shared
 Conflicts:      prebuilt-ca-certificates
 
 %description
@@ -45,6 +46,9 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-5
+- Adding conflict information with "ca-certificates-shared".
+
 * Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
 - Making 'Release' match with 'ca-certificates'.
 
