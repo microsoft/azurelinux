@@ -13,7 +13,7 @@ Summary: Lightweight Kubernetes
 Group:   System Environment/Base
 License: ASL 2.0
 URL:     http://k3s.io
-Source0: https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s1.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We are also pre-cloning 3 git repositories
