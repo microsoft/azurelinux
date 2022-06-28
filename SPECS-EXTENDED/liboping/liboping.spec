@@ -86,7 +86,7 @@ LD_LIBRARY_PATH=../../src/.libs make -C bindings/perl test
 %{_mandir}/man3/ping_setopt.3*
 
 %changelog
-* Thu Jun 23 2022 Riken Maharjan <pawelwi@microsoft.com> - 1.10.0-14
+* Thu Jun 23 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.10.0-14
 - Patch for ncurses6.3 format issue.
 - License verified
 
