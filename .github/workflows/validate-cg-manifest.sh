@@ -117,7 +117,7 @@ do
     continue
   fi
 
-  parsed_spec="$(mariner_rpmspec --parse "$spec")"
+  parsed_spec="$(mariner_rpmspec --parse "$spec" 2>/dev/null)"
 
   # Reading the source0 file/URL.
   source0=$(echo "$parsed_spec" | grep -P "^\s*Source0?:" | cut -d: -f2- | xargs)
