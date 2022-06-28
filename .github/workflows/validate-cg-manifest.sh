@@ -11,6 +11,9 @@
 
 # $@ - Paths to spec files to check
 
+# shellcheck source=../../toolkit/scripts/rpmops.sh
+source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
+
 # Specs, which contain multiple source files and are split into many entries inside 'cgmanifest.json'.
 ignore_multiple_sources=" \
   xorg-x11-apps \
@@ -57,7 +60,6 @@ ignore_signed_package=" \
   shim"
 
 alt_source_tag="Source9999"
-mariner_sources_url="https://cblmarinerstorage.blob.core.windows.net/sources/core"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/
@@ -92,15 +94,11 @@ do
   # Removing trailing comments from "Source" tags.
   sed -Ei "s/^(\s*Source[0-9]*:.*)#.*/\1/" "$spec"
 
-  # Additional macros required to parse some spec files.
-  spec_dir="$(dirname "$original_spec")"
-  defines=(-D "_mariner_sources_url $mariner_sources_url" -D "forgemeta %{nil}" -D "py3_dist X" -D "with_check 0" -D "dist .cm2" -D "__python3 python3" -D "_sourcedir $spec_dir" -D "fillup_prereq fillup")
-
-  name=$(rpmspec --srpm  "${defines[@]}" --qf "%{NAME}" -q "$spec" 2>/dev/null)
+  name=$(mariner_rpmspec --srpm --qf "%{NAME}" -q "$spec" 2>/dev/null)
   if [[ -z $name ]]
   then
     echo "Failed to get name from '$original_spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:" >> bad_registrations.txt
-    rpmspec --srpm  "${defines[@]}" --qf "%{NAME}" -q "$spec" &>> bad_registrations.txt
+    mariner_rpmspec --srpm --qf "%{NAME}" -q "$spec" &>> bad_registrations.txt
     continue
   fi
 
@@ -111,15 +109,15 @@ do
     continue
   fi
 
-  version=$(rpmspec --srpm  "${defines[@]}" --qf "%{VERSION}" -q "$spec" 2>/dev/null )
+  version=$(mariner_rpmspec --srpm --qf "%{VERSION}" -q "$spec" 2>/dev/null )
   if [[ -z $version ]]
   then
     echo "Failed to get version from '$original_spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:" >> bad_registrations.txt
-    rpmspec --srpm  "${defines[@]}" --qf "%{VERSION}" -q "$spec" &>> bad_registrations.txt
+    mariner_rpmspec --srpm --qf "%{VERSION}" -q "$spec" &>> bad_registrations.txt
     continue
   fi
 
-  parsed_spec="$(rpmspec "${defines[@]}" --parse "$spec")"
+  parsed_spec="$(mariner_rpmspec --parse "$spec")"
 
   # Reading the source0 file/URL.
   source0=$(echo "$parsed_spec" | grep -P "^\s*Source0?:" | cut -d: -f2- | xargs)
