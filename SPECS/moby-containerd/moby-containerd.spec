@@ -44,6 +44,8 @@ Requires:       device-mapper-libs >= 1.02.90-1
 Requires:       libcgroup
 Requires:       libseccomp >= 2.3
 Requires:       moby-runc >= 1.0.0~rc10~
+Requires:       apparmor-parser
+Requires:       libapparmor
 Conflicts:      containerd
 Conflicts:      containerd-io
 Conflicts:      moby-engine <= 3.0.10
