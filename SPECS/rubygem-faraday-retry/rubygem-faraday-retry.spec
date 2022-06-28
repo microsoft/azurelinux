@@ -15,6 +15,7 @@ BuildRequires:  ruby
 Requires:       ruby(release)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:      noarch
+AutoReq:        no
 
 %description
 The Retry middleware automatically retries requests that fail due to intermittent client or server errors (such as network hiccups). By default, it retries 2 times and handles only timeout exceptions. It can be configured with an arbitrary number of retries, a list of exceptions to handle, a retry interval, a percentage of randomness to add to the retry interval, and a backoff factor. The middleware can also handle the Retry-After header automatically when configured with the right status codes (see below for an example).

@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/fluent/fluent-logger-ruby
 Source0:        https://github.com/fluent/fluent-logger-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-msgpack < 2
@@ -19,15 +20,13 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 A structured event logger.
 
 %prep
-%setup -q -n %{gem_name}-ruby-%{version}
+%autosetup -p1 -n %{gem_name}-ruby-%{version}
 
 %build
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add COPYING file to buildroot from Source0
-cp COPYING %{buildroot}%{gem_instdir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/3.1.0/bin/ %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://www.treasuredata.com/
 Source0:        https://github.com/treasure-data/td/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-hirb
@@ -28,15 +29,13 @@ This CUI utility wraps the Ruby Client Library td-client-ruby to
 interact with the REST API in managing databases and jobs on the Treasure Data Cloud.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add lib files to buildroot from Source0
-cp -r lib/ %{buildroot}%{gem_instdir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/3.1.0/bin/ %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

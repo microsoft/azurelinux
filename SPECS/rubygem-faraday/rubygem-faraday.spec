@@ -14,6 +14,7 @@ BuildRequires:  ruby
 Requires:       rubygem-multipart-post < 3
 Requires:       rubygem-ruby2_keywords
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
+AutoReq:        no
 
 %description
 Faraday is an HTTP client library that provides a common interface over
