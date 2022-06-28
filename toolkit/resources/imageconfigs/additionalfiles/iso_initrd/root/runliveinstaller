@@ -40,7 +40,7 @@ LABEL=CDROM
 function retry {
     local RETRY=0
     local LIMIT=10
-    SLEEPSECONDS=15
+    local SLEEPSECONDS=15
     while [ $RETRY -lt $LIMIT ]
     do
         "$@" && break
