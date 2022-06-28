@@ -24,6 +24,7 @@ function mariner_rpmspec {
         if [[ "$arg" == *.spec && -f "$arg" ]]
         then
             sourcedir="$(dirname "$arg")"
+            break
         fi
     done
 
