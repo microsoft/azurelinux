@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           liboping
 Version:        1.10.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        A C library to generate ICMP echo requests
 
 License:        GPLv2
@@ -10,6 +10,7 @@ URL:            https://noping.cc/
 Source0:        https://noping.cc/files/%{name}-%{version}.tar.bz2
 # Disable -Werror to avoid https://github.com/octo/liboping/issues/38
 Patch0:         liboping-1.10.0-no-werror.patch
+Patch1:         liboping-1.10-fix-format-ncurses63.patch
 
 BuildRequires:  gcc
 BuildRequires:  perl-devel
@@ -85,6 +86,10 @@ LD_LIBRARY_PATH=../../src/.libs make -C bindings/perl test
 %{_mandir}/man3/ping_setopt.3*
 
 %changelog
+* Thu Jun 23 2022 Riken Maharjan <pawelwi@microsoft.com> - 1.10.0-14
+- Patch for ncurses6.3 format issue.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.0-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

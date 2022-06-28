@@ -1,0 +1,32 @@
+diff -urN b/liboping-1.10.0/src/oping.c a/liboping-1.10.0/src/oping.c
+--- liboping-1.10.0/src/oping.c	2022-06-23 11:26:09.897532500 -0700
++++ liboping-1.10.0/src/oping.c	2022-06-23 11:53:44.215025100 -0700
+@@ -1125,7 +1125,7 @@
+ 			wattron (ctx->window, COLOR_PAIR(color));
+ 
+ 		if (has_utf8())
+-			mvwprintw (ctx->window, /* y = */ 3, /* x = */ x + 2, symbol);
++			mvwprintw (ctx->window, /* y = */ 3, /* x = */ x + 2, "%s", symbol);
+ 		else
+ 			mvwaddch (ctx->window, /* y = */ 3, /* x = */ x + 2, symbolc);
+ 
+@@ -1223,7 +1223,7 @@
+ 			mvwaddch (ctx->window, /* y = */ 3, /* x = */ x + 2, ' ');
+ 		else if (has_utf8 ())
+ 			mvwprintw (ctx->window, /* y = */ 3, /* x = */ x + 2,
+-					hist_symbols_utf8[index]);
++					"%s", hist_symbols_utf8[index]);
+ 		else
+ 			mvwaddch (ctx->window, /* y = */ 3, /* x = */ x + 2,
+ 					hist_symbols_acs[index] | A_ALTCHARSET);
+@@ -1600,8 +1600,8 @@
+ 
+ 			HOST_PRINTF ("%zu bytes from %s (%s): icmp_seq=%u ttl=%i ",
+ 					data_len, context->host, context->addr,
+-					sequence, recv_ttl,
+-					format_qos (recv_qos, recv_qos_str, sizeof (recv_qos_str)));
++					sequence, recv_ttl);
++					
+ 			if ((recv_qos != 0) || (opt_send_qos != 0))
+ 			{
+ 				HOST_PRINTF ("qos=%s ",
