@@ -1,0 +1,85 @@
+From 27857b10a34c0070e195e65b51967935f3ef4b69 Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Mon, 27 Jun 2022 16:36:34 -0700
+Subject: [PATCH] Fixing unit tests.
+
+---
+ tests/test_qthelp.py | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/tests/test_qthelp.py b/tests/test_qthelp.py
+index fd83241..4c5f77d 100644
+--- a/tests/test_qthelp.py
++++ b/tests/test_qthelp.py
+@@ -17,7 +17,7 @@ from sphinx.testing.util import etree_parse
+ def test_qthelp_basic(app, status, warning):
+     app.builder.build_all()
+ 
+-    qhp = (app.outdir / 'Python.qhp').text()
++    qhp = (app.outdir / 'Python.qhp').read_text()
+     assert '<customFilter name="Python ">' in qhp
+     assert '<filterAttribute>Python</filterAttribute>' in qhp
+     assert '<filterAttribute></filterAttribute>' in qhp
+@@ -26,7 +26,7 @@ def test_qthelp_basic(app, status, warning):
+     assert '<file>index.html</file>' in qhp
+     assert '<file>_static/basic.css</file>' in qhp
+ 
+-    qhcp = (app.outdir / 'Python.qhcp').text()
++    qhcp = (app.outdir / 'Python.qhcp').read_text()
+     assert '<title>Python  documentation</title>' in qhcp
+     assert '<homePage>qthelp://org.sphinx.python/doc/index.html</homePage>' in qhcp
+     assert '<startPage>qthelp://org.sphinx.python/doc/index.html</startPage>' in qhcp
+@@ -91,10 +91,10 @@ def test_qthelp_namespace(app, status, warning):
+     # default namespace
+     app.builder.build_all()
+ 
+-    qhp = (app.outdir / 'Python.qhp').text()
++    qhp = (app.outdir / 'Python.qhp').read_text()
+     assert '<namespace>org.sphinx.python</namespace>' in qhp
+ 
+-    qhcp = (app.outdir / 'Python.qhcp').text()
++    qhcp = (app.outdir / 'Python.qhcp').read_text()
+     assert '<homePage>qthelp://org.sphinx.python/doc/index.html</homePage>' in qhcp
+     assert '<startPage>qthelp://org.sphinx.python/doc/index.html</startPage>' in qhcp
+ 
+@@ -102,10 +102,10 @@ def test_qthelp_namespace(app, status, warning):
+     app.config.qthelp_namespace = 'org.sphinx-doc.sphinx'
+     app.builder.build_all()
+ 
+-    qhp = (app.outdir / 'Python.qhp').text()
++    qhp = (app.outdir / 'Python.qhp').read_text()
+     assert '<namespace>org.sphinx-doc.sphinx</namespace>' in qhp
+ 
+-    qhcp = (app.outdir / 'Python.qhcp').text()
++    qhcp = (app.outdir / 'Python.qhcp').read_text()
+     assert '<homePage>qthelp://org.sphinx-doc.sphinx/doc/index.html</homePage>' in qhcp
+     assert '<startPage>qthelp://org.sphinx-doc.sphinx/doc/index.html</startPage>' in qhcp
+ 
+@@ -115,10 +115,10 @@ def test_qthelp_title(app, status, warning):
+     # default title
+     app.builder.build_all()
+ 
+-    qhp = (app.outdir / 'Python.qhp').text()
++    qhp = (app.outdir / 'Python.qhp').read_text()
+     assert '<section title="Python  documentation" ref="index.html">' in qhp
+ 
+-    qhcp = (app.outdir / 'Python.qhcp').text()
++    qhcp = (app.outdir / 'Python.qhcp').read_text()
+     assert '<title>Python  documentation</title>' in qhcp
+ 
+     # give a title
+@@ -126,9 +126,9 @@ def test_qthelp_title(app, status, warning):
+     app.config.html_short_title = 'Sphinx <b>"short"</b> title'
+     app.builder.build_all()
+ 
+-    qhp = (app.outdir / 'Python.qhp').text()
++    qhp = (app.outdir / 'Python.qhp').read_text()
+     assert ('<section title="Sphinx &lt;b&gt;&#34;full&#34;&lt;/b&gt; title" ref="index.html">'
+             in qhp)
+ 
+-    qhcp = (app.outdir / 'Python.qhcp').text()
++    qhcp = (app.outdir / 'Python.qhcp').read_text()
+     assert '<title>Sphinx &lt;b&gt;&#34;short&#34;&lt;/b&gt; title</title>' in qhcp
+-- 
+2.34.1
+
