@@ -104,7 +104,7 @@ fi
 
 %changelog
 * Tue Jun 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.6.6+azure-2
-- Add dependency on apparmor_parser, libapparmor
+- Add dependency on apparmor-parser, libapparmor
 * Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
 - Upgrade to version 1.6.6 to fix CVE-2022-31030
 - Lint spec
