@@ -37,7 +37,7 @@ done
 mkdir -p $ISO_ROOT
 LABEL=CDROM
 
-function Retry {
+function retry {
     local RETRY=0
     local LIMIT=10
     SLEEPSECONDS=15
