@@ -4,7 +4,7 @@
 Summary:        Industry-standard container runtime
 Name:           moby-%{upstream_name}
 Version:        1.6.6+azure
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,8 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Jun 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.6.6+azure-2
+- Add dependency on apparmor_parser, libapparmor
 * Mon Jun 20 2022 Andrew Phelps <anphel@microsoft.com> - 1.6.6+azure-1
 - Upgrade to version 1.6.6 to fix CVE-2022-31030
 - Lint spec
