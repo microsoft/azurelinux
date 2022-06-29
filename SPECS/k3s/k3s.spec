@@ -62,6 +62,7 @@ install package/rpm/install.sh %{buildroot}%{install_sh}
 export INSTALL_K3S_SKIP_DOWNLOAD=true
 export INSTALL_K3S_SKIP_ENABLE=true
 export INSTALL_K3S_SKIP_START=true
+export UNINSTALL_K3S_SH=%{uninstall_sh}
 
 %{install_sh}
 exit 0
