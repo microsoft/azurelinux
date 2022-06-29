@@ -62,7 +62,7 @@ elif grep -q "image-config" $CMDLINE; then
     # It is possible that the installation environment does not have network access yet when
     # this script is first run. So use a retry loop 
     PXE_SERVER_IP=$(echo "$IMAGE_CONFIG_VALUE" | sed -e 's|^[^/]*//||' -e 's|/.*$||')
-    Retry ping -c 1 $PXE_SERVER_IP
+    retry ping -c 1 $PXE_SERVER_IP
 
     # To disable generation of any extra directories and just download the contents within the directory, 
     # use -nH to disable genration of host-prefix, "PXE_SERVER_IP". 
@@ -76,7 +76,7 @@ else
     echo Attempt to mount the ISO root
     # It is possible that the partition isn't ready to be mounted when this script
     # is first run. So use a retry loop.
-    Retry mount -L $LABEL -o ro $ISO_ROOT
+    retry mount -L $LABEL -o ro $ISO_ROOT
 fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
