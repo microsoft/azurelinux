@@ -46,7 +46,7 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
-* Mon Jun 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-6
+* Wed Jun 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-6
 - Adding conflict information with "ca-certificates-shared".
 
 * Wed Jun 29 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-5

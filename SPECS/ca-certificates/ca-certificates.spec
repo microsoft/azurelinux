@@ -318,7 +318,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
-* Mon Jun 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-6
+* Wed Jun 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-6
 - Bumping release to match with "prebuilt-*" packages.
 
 * Wed Jun 29 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-5
