@@ -17,6 +17,7 @@ BuildRequires:  make
 BuildRequires:  meson
 BuildRequires:  ninja-build
 Requires:       gcc
+Provides:       %{pr_name}
 
 %description
 A dead-simple, yet extensible, C and C++ unit testing framework.
