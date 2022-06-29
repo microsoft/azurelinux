@@ -38,15 +38,15 @@ mkdir -p $ISO_ROOT
 LABEL=CDROM
 
 function retry {
-    local RETRY=0
-    local LIMIT=10
-    local SLEEPSECONDS=15
-    while [ $RETRY -lt $LIMIT ]
+    local retry=0
+    local limit=10
+    local sleep_seconds=15
+    while [ $retry -lt $limit ]
     do
         "$@" && break
         echo "$@" failed. Retrying... 
-        ((RETRY++))
-        sleep $SLEEPSECONDS
+        ((retry++))
+        sleep $sleep_seconds
     done
 }
 
