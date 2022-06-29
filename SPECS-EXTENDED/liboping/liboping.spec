@@ -5,7 +5,7 @@ Version:        1.10.0
 Release:        14%{?dist}
 Summary:        A C library to generate ICMP echo requests
 
-License:        GPLv2
+License:        GPLv2+
 URL:            https://noping.cc/
 Source0:        https://noping.cc/files/%{name}-%{version}.tar.bz2
 # Disable -Werror to avoid https://github.com/octo/liboping/issues/38
