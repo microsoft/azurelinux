@@ -5,8 +5,8 @@
 # Git clone is a standard practice of producing source files for moby-* packages.
 
 RUNC_REPO=https://github.com/opencontainers/runc.git
-RUNC_COMMIT=067aaf8548d78269dcb2c13b856775e27c410f9c
-VERSION=v1.1.0
+RUNC_COMMIT=a916309fff0f838eb94e928713dbc3c0d0ac7aa4
+VERSION=v1.1.2
 
 mkdir -p /build/runc-src
 cd /build/runc-src

@@ -3985,8 +3985,8 @@
         "type": "other",
         "other": {
           "name": "logrotate",
-          "version": "3.18.1",
-          "downloadUrl": "https://github.com/logrotate/logrotate/releases/download/3.18.1/logrotate-3.18.1.tar.gz"
+          "version": "3.20.0",
+          "downloadUrl": "https://github.com/logrotate/logrotate/releases/download/3.20.0/logrotate-3.20.0.tar.gz"
         }
       }
     },
@@ -4325,8 +4325,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.1.0+azure",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/refs/tags/v1.1.0.tar.gz"
+          "version": "1.1.2+azure",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/refs/tags/v1.1.2.tar.gz"
         }
       }
     },
@@ -6865,8 +6865,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.11",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.11/Python-3.7.11.tar.xz"
+          "version": "3.7.13",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz"
         }
       }
     },
@@ -8625,8 +8625,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.5064",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5064.tar.gz"
+          "version": "8.2.5154",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5154.tar.gz"
         }
       }
     },
