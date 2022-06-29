@@ -44,7 +44,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -317,6 +317,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Wed Jun 29 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-25
+- Updating Microsoft trusted root CAs.
+
 * Thu Jun 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-24
 - Matching release with 'prebuilt-ca-certificates'.
 
