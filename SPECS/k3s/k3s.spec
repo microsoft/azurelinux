@@ -7,7 +7,7 @@
 
 Name:    k3s
 Version: 1.23.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Lightweight Kubernetes
 
 Group:   System Environment/Base
@@ -80,6 +80,8 @@ exit 0
 %{install_sh}
 
 %changelog
+* Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
+- Fixed uninstall path
 * Thu Jun 23 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
 - Switched to building using the upstream k3s tarball and a separate vendor tarball
 * Tue May 24 2022 Manuel Huber <mahuber@microsoft.com> 1.23.6-1
