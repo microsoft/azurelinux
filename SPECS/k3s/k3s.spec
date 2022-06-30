@@ -31,6 +31,8 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 Source1: %{name}-%{version}-vendor.tar.gz
 Patch0:  vendor_build.patch
 
+# K3s on Mariner is supported on x86_64 only:
+ExclusiveArch: x86_64
 BuildRequires: golang
 BuildRequires: libseccomp-devel
 BuildRequires: btrfs-progs-devel
@@ -82,6 +84,7 @@ exit 0
 %changelog
 * Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
 - Fixed uninstall path
+- Added exclusivity for x86_64
 * Thu Jun 23 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
 - Switched to building using the upstream k3s tarball and a separate vendor tarball
 * Tue May 24 2022 Manuel Huber <mahuber@microsoft.com> 1.23.6-1
