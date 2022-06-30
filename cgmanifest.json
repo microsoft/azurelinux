@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20211102.0",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+          "version": "20220623.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20220623.0/abseil-cpp-20220623.0.tar.gz"
         }
       }
     },
@@ -4300,8 +4300,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
+          "version": "1.12.1",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
         }
       }
     },
@@ -7160,6 +7160,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "k3s",
+          "version": "1.23.6",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
@@ -8373,16 +8383,6 @@
           "name": "libgphoto2",
           "version": "2.5.27",
           "downloadUrl": "http://downloads.sourceforge.net/gphoto/libgphoto2-2.5.27.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
-          "version": "1.23.6",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
         }
       }
     },

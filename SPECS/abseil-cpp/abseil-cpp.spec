@@ -1,28 +1,22 @@
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
-Version:        20211102.0
+Version:        20220623.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
-# Workaround until GTest publishes a release including the "GTEST_FLAG_GET" macro.
-# Currently only available in the "main" branch: https://github.com/google/googletest/commit/977cffc4423a2d6c0df3fc9a7b5253b8f79c3f18
-Patch0:         gtest_build_fix.patch
-# Workaround until GTest publishes a release including the "::testing::Conditional" matcher.
-# Currently only available in the "main" branch: https://github.com/google/googletest/commit/8306020a3e9eceafec65508868d7ab5c63bb41f7
-Patch1:         disabling_invalid_tests.patch
 
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
 BuildRequires:  make
 
 %if %{with_check}
-BuildRequires:  gmock
-BuildRequires:  gmock-devel
-BuildRequires:  gtest
-BuildRequires:  gtest-devel
+BuildRequires:  gmock >= 1.12.0
+BuildRequires:  gmock-devel >= 1.12.0
+BuildRequires:  gtest >= 1.12.0
+BuildRequires:  gtest-devel >= 1.12.0
 %endif
 
 %description
@@ -57,6 +51,7 @@ pushd build
   -DABSL_PROPAGATE_CXX_STD=ON \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 %if %{with_check}
+  -DABSL_BUILD_TESTING=ON \
   -DABSL_FIND_GOOGLETEST=ON \
   -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
   -DBUILD_TESTING=ON \
@@ -77,7 +72,7 @@ ctest --output-on-failure
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so.2111.*
+%{_libdir}/libabsl_*.so.2206.*
 
 %files devel
 %{_includedir}/absl
@@ -86,6 +81,9 @@ ctest --output-on-failure
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220623.0-1
+- Updating to 20220623.0 to remove workaround patches for GTest.
+
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20211102.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - License verified.
