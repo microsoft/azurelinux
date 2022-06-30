@@ -6,7 +6,7 @@ Version:   1.7.0
 Release:   7%{?dist}
 Source0:  https://github.com/hunspell/hunspell/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 URL:       https://github.com/hunspell/hunspell
-License:   LGPLv2+ or GPLv2+ or MPLv1.1 or BSD
+License:   (LGPLv2+ or GPLv2+ or MPLv1.1) and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  gcc-c++
