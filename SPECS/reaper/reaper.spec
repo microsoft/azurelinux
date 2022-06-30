@@ -2,6 +2,18 @@
 
 %define srcdir cassandra-%{name}-%{version}
 
+%define bower-components reaper-bower-components-%{version}.tar.gz
+%define srcui-node-modules reaper-srcui-node-modules-%{version}.tar.gz
+%define bower-cache reaper-bower-cache-%{version}.tar.gz
+%define maven-cache reaper-m2-cache-%{version}.tar.gz
+%define npm-cache reaper-npm-cache-%{version}.tar.gz
+%define local-lib-node-modules reaper-local-lib-node-modules-%{version}.tar.gz
+%define local-n reaper-local-n-%{version}.tar.gz
+
+# Flag to generate build caches. Set this to '1' in order to generate cache tarballs.
+# NOTE: This should ONLY be set to '1' when re-generating caches sources.
+%define generate_build_caches 1
+
 Name:           reaper
 Version:        3.1.1
 Release:        1%{?dist}
@@ -13,22 +25,24 @@ Group:          Applications/System
 URL:            https://cassandra-reaper.io/
 Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/%{version}.tar.gz#/cassandra-reaper-%{version}.tar.gz
 
+%if ! 0%{?generate_build_caches}
 # Building reaper from sources downloads artifacts related to maven/node/etc. These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
 # Below is the list of cached sources.
 # bower-components downloaded under src/ui
-Source1:        reaper-bower-components-%{version}.tar.gz
+Source1:        %{bower-components}
 # node_modules downloaded under src/ui
-Source2:        reaper-srcui-node-modules-%{version}.tar.gz
+Source2:        %{srcui-node-modules}
 # bower cache
-Source3:        reaper-bower-cache-%{version}.tar.gz
+Source3:        %{bower-cache}
 # m2 cache
-Source4:        reaper-m2-cache-%{version}.tar.gz
+Source4:        %{maven-cache}
 # npm cache
-Source5:        reaper-npm-cache-%{version}.tar.gz
+Source5:        %{npm-cache}
 # node_modules downloaded to /usr/local/lib
-Source6:        reaper-local-lib-node-modules-%{version}.tar.gz
+Source6:        %{local-lib-node-modules}
 # v14.18.0 node binary under /usr/local
-Source7:        reaper-local-n-%{version}.tar.gz
+Source7:        %{local-n}
+%endif
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -36,7 +50,9 @@ BuildRequires:  maven
 BuildRequires:  msopenjdk-11
 BuildRequires:  nodejs
 BuildRequires:  python3
+%if 0%{?generate_build_caches}
 BuildRequires:  sudo
+%endif
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 Provides:       reaper = %{version}-%{release}
@@ -44,10 +60,33 @@ Provides:       reaper = %{version}-%{release}
 %description
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
+%if 0%{?generate_build_caches}
+%package build-caches
+Summary: A temporary package to contain all the build caches that are needed to build reaper sources in offline mode.
+
+%description build-caches
+build-caches is a temporary package for generating reaper build caches. This is needed in order to build reaper in offline mode. NOT TO BE USED FOR REGULAR BUILDS. USE ONLY WHEN UPDATING BUILD CACHES.
+
+%endif
+
 %prep
 %autosetup -n cassandra-%{name}-%{version}
 
 %build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
+export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
+
+%if 0%{?generate_build_caches}
+echo "Reaper: Building in online mode and  generate caches."
+sudo npm install -g bower@~1.8.14
+sudo npm install -g n
+sudo n 14.18.0
+bower -v
+npm -v
+node -v
+cd %{_builddir}/%{srcdir}
+mvn clean package
+%else
 pushd "$HOME"
 echo "Installing bower cache."
 tar xf %{SOURCE3}
@@ -94,10 +133,9 @@ echo "Installing npm_modules"
 tar fx %{SOURCE2}
 popd
 
-export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
-export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
 # Building using maven in offline mode.
 mvn -DskipTests package -o
+%endif
 
 %install
 mkdir -p %{buildroot}%{_datadir}/cassandra-reaper
@@ -121,6 +159,39 @@ cp debian/cassandra-reaper.service %{buildroot}/lib/systemd/system/cassandra-rea
 chmod 7555 %{buildroot}%{_sysconfdir}/init.d/cassandra-reaper
 
 cp %{_builddir}/%{srcdir}/LICENSE.txt %{buildroot}%{_datadir}/licenses/reaper
+
+%if 0%{?generate_build_caches}
+echo "Installing build caches."
+pushd /root
+tar -cf %{bower-cache} .cache
+cp %{bower-cache} %{buildroot}/%{_prefix}
+
+tar -cf %{maven-cache} .m2
+cp %{maven-cache} %{buildroot}/%{_prefix}
+
+tar -cf %{npm-cache} .npm
+cp %{npm-cache} %{buildroot}/%{_prefix}
+popd
+
+pushd %{_builddir}/%{srcdir}/src/ui
+tar -cf %{bower-components} bower_components
+cp %{bower-components} %{buildroot}/%{_prefix}
+
+tar -cf %{srcui-node-modules} node_modules
+cp %{srcui-node-modules} %{buildroot}/%{_prefix}
+popd
+
+pushd /usr/local/lib
+tar -cf %{local-lib-node-modules} node_modules
+cp %{local-lib-node-modules} %{buildroot}/%{_prefix}
+popd
+
+pushd /usr/local/
+tar -cf %{local-n} n
+cp %{local-n} %{buildroot}/%{_prefix}
+popd
+echo "Build caches copied to %{_prefix}"
+%endif
 
 %pre
 if id -u reaper; then
@@ -151,6 +222,17 @@ chown -R reaper: %{_localstatedir}/log/cassandra-reaper/
 %{_sysconfdir}/bash_completion.d/spreaper
 %{_sysconfdir}/init.d/cassandra-reaper
 /lib/systemd/system/cassandra-reaper.service
+
+%if 0%{?generate_build_caches}
+%files build-caches
+%{_prefix}/%{bower-cache}
+%{_prefix}/%{maven-cache}
+%{_prefix}/%{npm-cache}
+%{_prefix}/%{bower-components}
+%{_prefix}/%{srcui-node-modules}
+%{_prefix}/%{local-lib-node-modules}
+%{_prefix}/%{local-n}
+%endif
 
 %changelog
 * Mon Jun 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-1
