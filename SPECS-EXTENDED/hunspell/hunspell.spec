@@ -3,11 +3,10 @@
 Name:      hunspell
 Summary:   A spell checker and morphological analyzer library
 Version:   1.7.0
-Release:   6%{?dist}
-# Source:  https://github.com/hunspell/hunspell/archive/refs/tags/v1.7.0.tar.gz
-Source:    https://github.com/hunspell/hunspell/archive/refs/tags/%{name}-%{version}.tar.gz
+Release:   7%{?dist}
+Source0:  https://github.com/hunspell/hunspell/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 URL:       https://github.com/hunspell/hunspell
-License:   LGPLv2+ or GPLv2+ or MPLv1.1
+License:   (LGPLv2+ or GPLv2+ or MPLv1.1) and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  gcc-c++
@@ -22,6 +21,7 @@ BuildRequires: words
 Requires:  hunspell-en-US
 
 Patch0: 0001-invalid-read-memory-access-624.patch
+Patch1: hunspell-1.7.0-print-format.patch
 
 %description
 Hunspell is a spell checker and morphological analyzer library and program 
@@ -39,6 +39,7 @@ Includes and definitions for developing with hunspell
 %prep
 %setup -q
 %patch0 -p1 -b .CVE-2019-16707
+%patch1 -p2 
 
 %build
 autoreconf -vfi
@@ -92,7 +93,8 @@ mkdir $RPM_BUILD_ROOT/%{_datadir}/myspell
 %ldconfig_scriptlets
 
 %files -f %{name}.lang
-%doc README COPYING COPYING.LESSER COPYING.MPL AUTHORS license.hunspell license.myspell THANKS
+%license  COPYING COPYING.LESSER COPYING.MPL license.hunspell license.myspell
+%doc README AUTHORS THANKS
 %{_libdir}/*.so.*
 %{_datadir}/myspell
 %{_bindir}/hunspell
@@ -120,6 +122,10 @@ mkdir $RPM_BUILD_ROOT/%{_datadir}/myspell
 %{_mandir}/man5/hunspell.5.gz
 
 %changelog
+* Wed Jun 22 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.0-7
+- Patch for the print format issue.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
