@@ -6,7 +6,6 @@
         "cronie-anacron",
         "logrotate",
         "core-packages-base-image",
-        "kpatch-build",
         "initramfs"
     ],
     "_comment": "Install 'initramfs' last to avoid unnecessary regeneration when other packages, such as 'kernel', are installed."

@@ -12,7 +12,7 @@
 Summary:        Utilities for managing the global file system (GFS2)
 Name:           gfs2-utils
 Version:        3.2.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ URL:            https://pagure.io/gfs2-utils
 Source:         https://releases.pagure.org/gfs2-utils/gfs2-utils-%{version}.tar.gz
 Patch0:         0-Fix_libuuid_linking.patch
 Patch1:         1-Fix_more_linking_errors.patch
+Patch2:         fix-format-security.patch
 
 BuildRequires:  automake
 BuildRequires:  bison
@@ -77,6 +78,9 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_libdir}/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
+* Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.0-10
+- Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-9
 - Cleaning-up spec. License verified.
 

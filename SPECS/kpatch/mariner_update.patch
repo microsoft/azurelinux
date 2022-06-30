@@ -1,17 +1,39 @@
-From 7d81cab6e6b8485d447ae49e3ea9d11147fa7fee Mon Sep 17 00:00:00 2001
+From 02d1b897968b6d01d8c38c4ad64120f81fa53247 Mon Sep 17 00:00:00 2001
 From: Pawel Winogrodzki <pawelwi@microsoft.com>
 Date: Wed, 15 Jun 2022 10:51:00 -0700
 Subject: [PATCH] Initial adjustments for CBL-Mariner.
 
 ---
- kpatch-build/kpatch-build | 53 ++++++++++++++++++++++++++++-----------
- 1 file changed, 39 insertions(+), 14 deletions(-)
+ kpatch-build/kpatch-build | 74 +++++++++++++++++++++++----------------
+ 1 file changed, 43 insertions(+), 31 deletions(-)
 
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index 634095d..8f6ced3 100755
+index 634095d..8868dbc 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
-@@ -638,13 +638,23 @@ if [[ $DEBUG -eq 1 ]] || [[ $DEBUG -ge 3 ]]; then
+@@ -205,21 +205,6 @@ rhel_kernel_version_gte() {
+         [  "${ARCHVERSION}" = "$(echo -e "${ARCHVERSION}\\n$1" | sort -rV | head -n1)" ]
+ }
+ 
+-# klp.arch relocations were supported prior to v5.8
+-# and prior to 4.18.0-240.el8
+-use_klp_arch()
+-{
+-	if kernel_is_rhel; then
+-		! rhel_kernel_version_gte 4.18.0-240.el8
+-	else
+-		! kernel_version_gte 5.8.0
+-	fi
+-}
+-
+-rhel_kernel_version_gte() {
+-        [  "${ARCHVERSION}" = "$(echo -e "${ARCHVERSION}\\n$1" | sort -rV | head -n1)" ]
+-}
+-
+ # klp.arch relocations were supported prior to v5.8
+ # and prior to 4.18.0-284.el8
+ use_klp_arch()
+@@ -638,13 +623,23 @@ if [[ $DEBUG -eq 1 ]] || [[ $DEBUG -ge 3 ]]; then
  	set -o xtrace
  fi
  
@@ -36,7 +58,16 @@ index 634095d..8f6ced3 100755
  	ARCHVERSION="${ARCHVERSION#kernel-}"
  	ARCHVERSION="${ARCHVERSION#alt-}"
  fi
-@@ -705,14 +715,7 @@ fi
+@@ -699,20 +694,15 @@ fi
+ KVER="${ARCHVERSION%%-*}"
+ if [[ "$ARCHVERSION" =~ - ]]; then
+ 	KREL="${ARCHVERSION##*-}"
+-	KREL="${KREL%.*}"
++	if [[ "$DISTRO" != mariner ]]; then
++		KREL="${KREL%.*}"
++	fi
+ fi
+ [[ "$ARCHVERSION" =~ .el7a. ]] && ALT="-alt"
  
  [[ -z "$TARGETS" ]] && TARGETS="vmlinux modules"
  
@@ -52,7 +83,7 @@ index 634095d..8f6ced3 100755
  	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
  	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
  
-@@ -748,11 +751,15 @@ elif [[ -n "$OOT_MODULE" ]]; then
+@@ -748,11 +738,15 @@ elif [[ -n "$OOT_MODULE" ]]; then
  	fi
  elif [[ -e "$KERNEL_SRCDIR"/.config ]] && [[ -e "$VERSIONFILE" ]] && [[ "$(cat "$VERSIONFILE")" = "$ARCHVERSION" ]]; then
  	echo "Using cache at $KERNEL_SRCDIR"
@@ -71,7 +102,7 @@ index 634095d..8f6ced3 100755
  
  		clean_cache
  
-@@ -760,6 +767,9 @@ else
+@@ -760,6 +754,9 @@ else
  		if [[ -z "$SRCRPM" ]]; then
  			if [[ "$DISTRO" = fedora ]]; then
  				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
@@ -81,7 +112,7 @@ index 634095d..8f6ced3 100755
  			else
  				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
  				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die
-@@ -773,7 +783,15 @@ else
+@@ -773,17 +770,32 @@ else
  		rpmbuild -D "_topdir $RPMTOPDIR" -bp --nodeps "--target=$(uname -m)" "$RPMTOPDIR"/SPECS/kernel$ALT.spec 2>&1 | logger ||
  			die "rpmbuild -bp failed.  you may need to run 'yum-builddep kernel' first."
  
@@ -98,7 +129,10 @@ index 634095d..8f6ced3 100755
  		rm -rf "$RPMTOPDIR"
  		rm -rf "$KERNEL_SRCDIR/.git"
  
-@@ -783,7 +801,14 @@ else
+-		if [[ "$ARCHVERSION" == *-* ]]; then
++		if [[ "$DISTRO" != mariner ]] && [[ "$ARCHVERSION" == *-* ]]; then
+ 			sed -i "s/^EXTRAVERSION.*/EXTRAVERSION = -${ARCHVERSION##*-}/" "$KERNEL_SRCDIR/Makefile" || die
+ 		fi
  
  		echo "$ARCHVERSION" > "$VERSIONFILE" || die
  
@@ -106,8 +140,8 @@ index 634095d..8f6ced3 100755
 +		if [[ "$DISTRO" = openEuler ]]; then
 +			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="/boot/config-${ARCHVERSION}"
 +		elif [[ "$DISTRO" = mariner ]]; then
-+			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$RPMTOPDIR/SOURCES/config"
-+			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-${KREL}\"/" "$CONFIGFILE"
++			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/new_config"
++			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-$KREL\"/" "$CONFIGFILE"
 +		else
 +			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
 +		fi

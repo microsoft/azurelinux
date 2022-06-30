@@ -655,6 +655,7 @@
                 "libraqm",
                 "LibRaw",
                 "libraw1394",
+                "libreswan",
                 "librevenge",
                 "librsvg2",
                 "librx",
@@ -1951,6 +1952,7 @@
                 "bpftrace",
                 "ccache",
                 "cert-manager",
+                "cf-cli",
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor",
@@ -1979,6 +1981,7 @@
                 "installkernel",
                 "ivykis",
                 "jsonbuilder",
+                "jx",
                 "keda",
                 "kernel-signed",
                 "kpatch",
@@ -2008,6 +2011,7 @@
                 "moby-containerd",
                 "moby-engine",
                 "moby-runc",
+                "msgpack",
                 "ncompress",
                 "nlohmann-json",
                 "nmap",
@@ -2331,6 +2335,7 @@
                 "gnuplot",
                 "gnutls",
                 "gobject-introspection",
+                "golang",
                 "golang-1.17",
                 "gperf",
                 "gperftools",
@@ -2705,6 +2710,12 @@
                 "zip",
                 "zlib",
                 "zsh"
+            ]
+        },
+        "Rancher": {
+            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "specs": [
+                "k3s"
             ]
         }
     }

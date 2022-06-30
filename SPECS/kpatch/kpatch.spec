@@ -1,7 +1,7 @@
 Summary:        Kpatch tooling
 Name:           kpatch
 Version:        0.9.6
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,8 @@ BuildRequires:  elfutils-devel
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  kernel-headers
+
+ExclusiveArch:  x86_64
 
 %description
 Kpatch is a Linux dynamic kernel patching infrastructure which allows you to patch
@@ -72,6 +74,12 @@ rm -rf %{buildroot}%{_mandir}
 %{_bindir}/kpatch-build
 
 %changelog
+* Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-3
+- Add Mariner-specific steps to 'kpatch-build'.
+
+* Fri Jun 17 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.9.6-2
+- Fix ARM64 build break (exclusive to AMD64)
+
 * Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-1
 - Original version for CBL-Mariner.
 - License verified.

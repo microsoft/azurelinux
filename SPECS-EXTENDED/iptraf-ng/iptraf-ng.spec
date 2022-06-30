@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary:        A console-based network monitoring utility
 Name:           iptraf-ng
-Version:        1.1.4
-Release:        25%{?dist}
+Version:        1.2.1
+Release:        1%{?dist}
 Source0:        https://github.com/iptraf-ng/iptraf-ng/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-logrotate.conf
 Source2:        %{name}-tmpfiles.conf
@@ -13,9 +13,6 @@ BuildRequires:  gcc
 BuildRequires:  ncurses-devel
 Obsoletes:      iptraf < 3.1
 Provides:       iptraf = 3.1
-Patch01:        0001-BUGFIX-fix-Floating-point-exception-in-tcplog_flowra.patch
-Patch02:        0002-Makefile-add-Werror-format-security.patch
-Patch03:        0003-fix-segfault-in-adding-interface.patch
 
 %description
 IPTraf-ng is a console-based network monitoring utility.  IPTraf gathers
@@ -36,10 +33,7 @@ built-in raw socket interface of the Linux kernel, so it can be used
 on a wide variety of supported network cards.
 
 %prep
-%setup -q
-%patch01 -p1
-%patch02 -p1
-%patch03 -p1
+%autosetup
 
 %build
 make %{?_smp_mflags} V=1 \
@@ -65,12 +59,10 @@ mkdir -p %{buildroot}/run
 install -d -m 0755 %{buildroot}/run/%{name}/
 
 %files
-%doc CHANGES FAQ LICENSE README* RELEASE-NOTES
+%doc CHANGES FAQ LICENSE README*
 %doc Documentation
 %{_sbindir}/iptraf-ng
-%{_sbindir}/rvnamed-ng
 %{_mandir}/man8/iptraf-ng.8*
-%{_mandir}/man8/rvnamed-ng.8*
 %{_localstatedir}/log/iptraf-ng
 %{_localstatedir}/lib/iptraf-ng
 %config(noreplace) %{_sysconfdir}/logrotate.d/iptraf-ng
@@ -78,6 +70,10 @@ install -d -m 0755 %{buildroot}/run/%{name}/
 %{_prefix}/lib/tmpfiles.d/%{name}.conf
 
 %changelog
+* Tue Jun 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.2.1-1
+- Upgrading to fix build break and align with latest ncurses update.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4-25
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

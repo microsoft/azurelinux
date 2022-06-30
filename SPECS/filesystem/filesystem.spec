@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      9%{?dist}
+Release:      10%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -19,7 +19,7 @@ for the directories. This version is for a system configured with systemd.
 #
 #	6.5.  Creating Directories
 #
-install -vdm 755 %{buildroot}/{dev,proc,run/{media/{floppy,cdrom},lock},sys}
+install -vdm 755 %{buildroot}/{dev,run/{media/{floppy,cdrom},lock}}
 install -vdm 755 %{buildroot}/{etc/{opt,sysconfig},home,mnt}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}/{var}
@@ -430,6 +430,13 @@ posix.symlink("../lib", "/usr/lib/debug/usr/lib64")
 posix.symlink("../.dwz", "/usr/lib/debug/usr/.dwz")
 return 0
 
+%pretrans -p <lua>
+posix.mkdir("/proc")
+posix.mkdir("/sys")
+posix.chmod("/proc", 0555)
+posix.chmod("/sys", 0555)
+return 0
+
 %files
 %defattr(-,root,root)
 #	Root filesystem
@@ -442,12 +449,12 @@ return 0
 
 /media
 %dir /mnt
-%dir /proc
+%ghost %attr(555,root,root) /proc
 %dir /root
 %dir /run
 /sbin
 /srv
-%dir /sys
+%ghost %attr(555,root,root) /sys
 %dir /tmp
 %dir /usr
 %dir /var
@@ -566,6 +573,10 @@ return 0
 /usr/local/lib64
 
 %changelog
+* Thu Jun 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1-10
+- Mark /proc and /sys as %%ghost
+- Create /proc and /sys as a pretransaction step
+
 *   Wed May 18 2022 Brendan Kerrigan <bkerrigan@microsoft.com> 1.1-9
 -   Update /etc/inputrc to enable Ctrl+LeftArrow and Ctrl+RightArrow word jumping binds.
 -   License Verified.

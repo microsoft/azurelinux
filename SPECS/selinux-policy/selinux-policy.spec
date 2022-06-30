@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,7 @@ Patch35:        0035-systemd-Fixes-for-coredumps-in-containers.patch
 Patch36:        0036-container-Allow-container-engines-to-connect-to-http.patch
 Patch37:        0037-container-Getattr-generic-device-nodes.patch
 Patch38:        0038-application-Allow-apps-to-use-init-fds.patch
+Patch39:        0039-unconfined-Manage-own-fds.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -332,6 +333,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Jun 15 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-7
+- Unconfined domains can manipulate thier own fds.
+
 * Mon May 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-6
 - Fix previous multipath LVM changes.
 - Add types for devices.

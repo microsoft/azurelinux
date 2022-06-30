@@ -4,8 +4,8 @@ Distribution:   Mariner
 %global pkgdatadir      %{_datadir}/dpkg
 
 Name:           dpkg
-Version:        1.20.9
-Release:        5%{?dist}
+Version:        1.20.10
+Release:        1%{?dist}
 Summary:        Package maintenance system for Debian Linux
 # The entire source code is GPLv2+ with exception of the following
 # lib/dpkg/md5.c, lib/dpkg/md5.h - Public domain
@@ -470,6 +470,10 @@ make VERBOSE=1 TESTSUITEFLAGS=--verbose \
 
 
 %changelog
+* Mon Jun 20 2022 Muhammad Falak <mwani@microsoft.com> - 1.20-10-1
+- Bump version to 1.20.10 to address CVE-2022-1664
+- License verified
+
 * Wed Nov 03 2021 Muhammad Falak <mwani@microsft.com> - 1.20.9-5
 - Remove epoch from tar
 

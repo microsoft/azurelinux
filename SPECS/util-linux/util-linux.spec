@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{
 Source1:        runuser
 Source2:        runuser-l
 BuildRequires:  audit-devel
+BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
@@ -142,6 +143,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jun 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.37.4-2
+- Add Buildrequires libcap-ng-devel to build setpriv
+
 * Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37.4-1
 - Updating to 2.37.4 to fix CVE-2022-0563.
 

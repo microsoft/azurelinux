@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.7-2
+- Bump release to rebuild with golang 1.18.3
+
 * Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 1.8.7-1
 - Upgrade to version 1.8.7
 - Update modify-go-build-option.patch

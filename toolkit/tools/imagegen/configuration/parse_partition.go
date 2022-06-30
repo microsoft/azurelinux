@@ -22,8 +22,6 @@ const (
 	kickstartPartitionFsType  = "--fstype"
 	kickstartPartitionGrow    = "--grow"
 	biosbootPartition         = "biosboot"
-	bootPartitionId           = "boot"
-	rootfsPartitionId         = "rootfs"
 
 	onDiskInputErrorMsg = "--ondisk/--ondrive must not be empty"
 	fsTypeInputErrorMsg = "--fstype must not be empty"
@@ -144,35 +142,33 @@ func processPartitionFsType(inputFsType string) (err error) {
 	return
 }
 
-func processMountPoint(inputMountPoint string) (err error) {
+func processMountPoint(inputMountPoint string, partitionNumber int) (err error) {
 	mountPoint := strings.TrimSpace(inputMountPoint)
 	if mountPoint == "" {
 		return fmt.Errorf(mountPointErrorMsg)
 	}
 
 	newDiskPartitionSetting.MountPoint = mountPoint
+	newDiskPartition.ID = fmt.Sprintf("Partition%d", partitionNumber)
+	newDiskPartitionSetting.ID = fmt.Sprintf("Partition%d", partitionNumber)
+
 	if mountPoint == biosbootPartition {
-		newDiskPartition.ID = bootPartitionId
 		newDiskPartition.Flags = append(newDiskPartition.Flags, PartitionFlagBiosGrub)
 		newDiskPartitionSetting.MountPoint = ""
-		newDiskPartitionSetting.ID = bootPartitionId
-		logger.Log.Infof("Print disk length: %d", len(disks))
 		disks[curDiskIndex].PartitionTableType = PartitionTableTypeGpt
-	} else if mountPoint == "/" {
-		newDiskPartitionSetting.ID = rootfsPartitionId
-		newDiskPartition.ID = rootfsPartitionId
-	} else if strings.HasPrefix(mountPoint, "/") || mountPoint == "swap" {
-		newDiskPartitionSetting.ID = mountPoint
-		newDiskPartition.ID = mountPoint
+	} else if mountPoint == "swap" {
+		newDiskPartitionSetting.MountPoint = ""
 	} else {
-		// Other types of mount points are currently not supported
-		err = fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
+		if !strings.HasPrefix(mountPoint, "/") {
+			// Other types of mount points are currently not supported
+			err = fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
+		}
 	}
 
 	return
 }
 
-func parsePartitionFlags(partCmd string) (err error) {
+func parsePartitionFlags(partCmd string, partitionNumber int) (err error) {
 	// Only need to parse commands that contains --ondisk options
 	if strings.Contains(partCmd, kickstartPartitionOnDisk) || strings.Contains(partCmd, kickstartPartitionOnDrive) {
 		// Create new partition and partitionsetting
@@ -182,7 +178,7 @@ func parsePartitionFlags(partCmd string) (err error) {
 
 		partitionFlags := strings.Split(partCmd, " ")
 		for _, partitionFlag := range partitionFlags {
-			err := parseFlag(partitionFlag)
+			err := parseFlag(partitionFlag, partitionNumber)
 			if err != nil {
 				return err
 			}
@@ -195,7 +191,7 @@ func parsePartitionFlags(partCmd string) (err error) {
 	return
 }
 
-func parseFlag(partitionFlag string) (err error) {
+func parseFlag(partitionFlag string, partitionNumber int) (err error) {
 	if strings.HasPrefix(partitionFlag, "--") {
 		// Find the index of "="
 		index := strings.Index(partitionFlag, "=")
@@ -217,7 +213,7 @@ func parseFlag(partitionFlag string) (err error) {
 	} else {
 		// Update mount point
 		if partitionFlag != "part" {
-			err := processMountPoint(partitionFlag)
+			err := processMountPoint(partitionFlag, partitionNumber)
 			if err != nil {
 				return err
 			}
@@ -247,12 +243,16 @@ func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpa
 	initializePrerequisitesForParser()
 
 	scanner := bufio.NewScanner(file)
+	partitionNumber := 1
+
 	for scanner.Scan() {
 		parseCmd := scanner.Text()
-		err = parsePartitionFlags(parseCmd)
+		err = parsePartitionFlags(parseCmd, partitionNumber)
 		if err != nil {
 			return
 		}
+
+		partitionNumber = partitionNumber + 1
 	}
 
 	retdisks = disks

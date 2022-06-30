@@ -4,7 +4,7 @@
 Summary: The open-source application container engine client.
 Name: moby-%{upstream_name}
 Version: 20.10.12
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://github.com/docker/cli
@@ -80,6 +80,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 20.10.12-2
+- Bump release to rebuild with golang 1.18.3
+
 * Thu Feb 3 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-1
 - Update to version 20.10.12
 - Use code from upstream instead of Azure fork.
