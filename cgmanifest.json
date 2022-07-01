@@ -3679,6 +3679,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gh",
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.13.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "giflib",
           "version": "5.2.1",
           "downloadUrl": "http://downloads.sourceforge.net/giflib/giflib-5.2.1.tar.gz"
