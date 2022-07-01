@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.21.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -203,6 +203,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.21.2-5
+- Bump release to rebuild with golang 1.18.3
+
 * Mon Apr 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.21.2-4
 - Replace openSUSE systemd macros with upstream systemd macros
 

@@ -1,12 +1,23 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
+
+%ifarch x86_64
+%define arch x86_64
+%define archdir x86
+%define config_source %{SOURCE1}
+%endif
+
 %ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE2}
 %endif
+
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.41.1
+Version:        5.15.48.1
 Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -124,20 +135,9 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
-%build
 make mrproper
 
-%ifarch x86_64
-cp %{SOURCE1} .config
-arch="x86_64"
-archdir="x86"
-%endif
-
-%ifarch aarch64
-cp %{SOURCE2} .config
-arch="arm64"
-archdir="arm64"
-%endif
+cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE4} certs/mariner.pem
@@ -145,7 +145,7 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=${arch} oldconfig
+make LC_ALL=  ARCH=%{arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
@@ -162,7 +162,8 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
+%build
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
@@ -214,7 +215,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -230,14 +231,17 @@ cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
 --add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
 EOF
 
+# Symlink /lib/modules/uname/vmlinuz to boot partition
+ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
+
 #    Cleanup dangling symlinks
 rm -rf %{buildroot}/lib/modules/%{uname_r}/source
 rm -rf %{buildroot}/lib/modules/%{uname_r}/build
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/${archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find $(find arch/${archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/${archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 %ifarch x86_64
 # CONFIG_STACK_VALIDATION=y requires objtool to build external modules
 install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
@@ -366,6 +370,26 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
+- Remove 'quiet' from commandline to enable verbose log
+
+* Mon Jun 27 2022 Henry Beberman <henry.beberman@microsoft.com> - 5.15.48.1-3
+- Enable CONFIG_VIRTIO_FS=m and CONFIG_FUSE_DAX=y
+- Symlink /lib/modules/uname/vmlinuz to /boot/vmlinuz-uname to improve compat with scripts seeking the kernel.
+
+* Wed Jun 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-2
+- Enabling Vgem driver in config. 
+
+* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
+- Update source to 5.15.48.1
+
+* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.45.1-2
+- Moving ".config" update and check steps into the %%prep section.
+
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
+- Update source to 5.15.45.1
+- Address CVE-2022-32250 with a nopatch
+
 * Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
 - Compiling ptp_kvm driver as a module 
 

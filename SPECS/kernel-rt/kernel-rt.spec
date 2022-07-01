@@ -1,19 +1,25 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt40
+%global rt_version rt46
 %define uname_r %{version}-%{rt_version}-%{release}
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
+
+%ifarch x86_64
+%define arch x86_64
+%define archdir x86
+%define config_source %{SOURCE1}
+%endif
+
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.34.1
+Version:        5.15.44.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
-Source0:        kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20211013.pem
@@ -136,14 +142,9 @@ manipulation of eBPF programs and maps.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
 
-%build
 make mrproper
 
-%ifarch x86_64
-cp %{SOURCE1} .config
-arch="x86_64"
-archdir="x86"
-%endif
+cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE3} certs/mariner.pem
@@ -151,7 +152,7 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=${arch} oldconfig
+make LC_ALL=  ARCH=%{arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
@@ -168,7 +169,8 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
+%build
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
@@ -236,9 +238,9 @@ rm -rf %{buildroot}/lib/modules/%{uname_r}/source
 rm -rf %{buildroot}/lib/modules/%{uname_r}/build
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/${archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find $(find arch/${archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/${archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 %ifarch x86_64
 # CONFIG_STACK_VALIDATION=y requires objtool to build external modules
 install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
@@ -354,6 +356,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.44.1-2
+- Updating build steps for the regular kernel.
+
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.44.1-1
+- Update source to 5.15.44.1
+
 * Mon Jun 06 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.34.1-2
 - Disable SMACK kernel configuration
 

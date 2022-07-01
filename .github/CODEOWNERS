@@ -6,3 +6,8 @@
 
 # Modification to what is considered "core packages" require admin approval.
 /SPECS/core-packages/* @microsoft/cbl-mariner-admins
+
+# Modifications to the raw toolchain require admin approval.
+/toolkit/scripts/toolchain/container/* @microsoft/cbl-mariner-admins
+/toolkit/scripts/toolchain/cgmanifest.json @microsoft/cbl-mariner-admins
+/toolkit/scripts/toolchain/create_toolchain_in_container.sh @microsoft/cbl-mariner-admins

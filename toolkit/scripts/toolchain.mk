@@ -12,8 +12,10 @@ $(call create_folder,$(SRPMS_DIR))
 
 toolchain_build_dir = $(BUILD_DIR)/toolchain
 toolchain_local_temp = $(toolchain_build_dir)/extract_dir
+toolchain_from_repos = $(toolchain_build_dir)/repo_rpms
 toolchain_logs_dir = $(LOGS_DIR)/toolchain
 toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
+toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest.txt
 toolchain_log_tail_length = 20
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
@@ -33,12 +35,15 @@ TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # the exact path of the required rpm
 # Outputs: $(toolchain_rpms_dir)/<arch>/<name>.<arch>.rpm
 sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
+sed_regex_full_path_rehydrated = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_from_repos)/\1`p'
 toolchain_rpms := $(shell sed -nr $(sed_regex_full_path) < $(TOOLCHAIN_MANIFEST))
 toolchain_rpms_buildarch := $(shell grep $(build_arch) $(TOOLCHAIN_MANIFEST))
 toolchain_rpms_noarch := $(shell grep noarch $(TOOLCHAIN_MANIFEST))
+toolchain_rpms_rehydrated := $(shell sed -nr $(sed_regex_full_path_rehydrated) < $(TOOLCHAIN_MANIFEST))
 
 $(call create_folder,$(toolchain_build_dir))
 $(call create_folder,$(toolchain_downloads_logs_dir))
+$(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
 
 .PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
@@ -51,6 +56,7 @@ clean-toolchain:
 	rm -rf $(toolchain_build_dir)
 	rm -rf $(toolchain_local_temp)
 	rm -rf $(toolchain_logs_dir)
+	rm -rf $(toolchain_from_repos)
 	rm -rf $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
 	rm -f $(SCRIPTS_DIR)/toolchain/container/toolchain-local-wget-list
 	rm -f $(SCRIPTS_DIR)/toolchain/container/texinfo-perl-fix.patch
@@ -106,7 +112,6 @@ compress-toolchain:
 # After hydrating the toolchain run
 # "sudo touch build/toolchain/toolchain_from_container.tar.gz" (should really check for existence of files in toolchain_*.txt)
 # "sudo make toolchain REBUILD_TOOLCHAIN=y INCREMENTAL_TOOLCHAIN=y"
-# Needs more testing before checkin
 hydrate-toolchain:
 	$(if $(TOOLCHAIN_CONTAINER_ARCHIVE),,$(error Must set TOOLCHAIN_CONTAINER_ARCHIVE=))
 	$(if $(TOOLCHAIN_ARCHIVE),,$(error Must set TOOLCHAIN_ARCHIVE=))
@@ -139,14 +144,53 @@ $(raw_toolchain): $(toolchain_files)
 			$(SPECS_DIR) \
 			$(SOURCE_URL)
 
-# Always start with a fresh toolchain chroot when rebuilding toolchain RPMs
+# This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
+# $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
+# filenames for each possibly-rehydrated RPM. We attempt to download each RPM from $(PACKAGE_URL_LIST). In cases
+# where an RPM is unavailable/download fails, we create an empty file. The build_official_toolchain_rpms.sh script
+# knows the distinction between empty/non-empty files.
 #
+# The main usage scenario is avoiding full toolchain rebuilds after changing a toolchain package. The time needed to
+# fully rebuild the final toolchain phase is vastly longer than the time needed to rehydrate most of the RPMs and
+# build one or two changed SRPMs. Additionally, it allows us to build against the packages that are already published.
+#
+# When is it meaningful to attempt to partially rehydrate? It makes no sense to partially rehydrate if:
+# - REBUILD_TOOLCHAIN = n: We aren't building the toolchain, so we defer to the full rehydration step
+# - INCREMENTAL_TOOLCHAIN = n: We explicitly want to build a full toolchain
+# - ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = n: This flag explicitly disables partial toolchain rehydration from repos
+# In these cases, we just create empty files for each possible rehydrated RPM.
+ifeq ($(strip $(INCREMENTAL_TOOLCHAIN))$(strip $(REBUILD_TOOLCHAIN))$(strip $(ALLOW_TOOLCHAIN_DOWNLOAD_FAIL)),yyy)
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
+	@rpm_filename="$(notdir $@)" && \
+	rpm_dir="$(dir $@)" && \
+	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
+	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee "$$log_file" && \
+	mkdir -p $$rpm_dir && \
+	cd $$rpm_dir && \
+	for url in $(PACKAGE_URL_LIST); do \
+		wget $$url/$$rpm_filename \
+			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
+			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
+			-a $$log_file && \
+		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
+		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee "$$log_file" && \
+		touch $@ && \
+		break; \
+	done || { \
+		echo "Could not find toolchain package in package repo: $$rpm_filename." | tee "$$log_file" && \
+		touch $@; \
+	}
+else
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) 
+	@touch $@
+endif
+
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
-$(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
+$(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo "Building base packages"
-	# Always clean the existing chroot
+	# Clean the existing chroot if not doing an incremental build
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
@@ -160,21 +204,18 @@ $(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.f
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(BUILD_SRPMS_DIR) \
-			$(SRPMS_DIR) && \
-	mkdir -p $(RPMS_DIR)/noarch && \
-	mkdir -p $(RPMS_DIR)/$(build_arch) && \
-	cp -v $(toolchain_build_dir)/built_rpms_all/*noarch.rpm $(RPMS_DIR)/noarch && \
-	cp -v $(toolchain_build_dir)/built_rpms_all/*$(build_arch).rpm $(RPMS_DIR)/$(build_arch)
-	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt)
+			$(SRPMS_DIR) \
+			$(toolchain_from_repos) && \
+	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
 .SILENT: $(toolchain_rpms)
 
 ifeq ($(REBUILD_TOOLCHAIN),y)
-# We know how to build this archive from scratch
+# We know how to build this archive from scratch (possibly with some rehydrated RPMs from the package repo)
 selected_toolchain_archive = $(final_toolchain)
 else
-# This may be an empty string, that is fine. If its empty we will try to use online packages
+# This may be an empty string, that is fine. If it's empty we will try to fully rehydrate using online packages
 selected_toolchain_archive = $(TOOLCHAIN_ARCHIVE)
 endif
 
@@ -186,8 +227,6 @@ endif
 # If there is an archive selected (build from scratch or provided via TOOLCHAIN_ARCHIVE), extract the RPMs from it.
 ifneq (,$(selected_toolchain_archive))
 # Our manifest files should always track the contents of the freshly built archives exactly
-#   Currently non-blocking, to make this a blocking check switch to `print_error` instead of
-#   `print_warning`
 $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_toolchain_archive)
 	@echo Validating contents of toolchain against manifest...
 	tar -I $(ARCHIVE_TOOL) -tf $(selected_toolchain_archive) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_contents) && \
@@ -234,7 +273,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 	fi || $(call print_error, $@ failed) ; \
 	touch $@
 
-# No archive was selected, so download from online package server instead.
+# No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
 $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 	@rpm_filename="$(notdir $@)" && \

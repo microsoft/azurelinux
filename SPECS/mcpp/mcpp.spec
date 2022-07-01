@@ -2,7 +2,7 @@
 Summary:        Alternative C/C++ preprocessor
 Name:           mcpp
 Version:        2.7.2
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            http://mcpp.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:         mcpp-manual.html.patch
 # Extracted from http://www.zeroc.com/download/Ice/3.4/ThirdParty-Sources-3.4.2.tar.gz
+# Also responsible for fixing CVE-2019-14274
 Patch1:         patch.mcpp.2.7.2
 # https://bugzilla.redhat.com/show_bug.cgi?id=948860
 Patch2:         mcpp-man.patch
@@ -88,6 +89,9 @@ rm -f %{buildroot}%{_libdir}/libmcpp.la
 %lang(ja) %doc doc-jp/mcpp-manual-jp.html
 
 %changelog
+* Mon Jun 27 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.7.2-28
+- Add inline comments to patch.mcpp.2.7.2 patch file to indicate it fixes CVE-2019-14274.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-27
 - License verified
 - Lint spec

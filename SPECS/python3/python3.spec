@@ -7,7 +7,7 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.12
+Version:        3.9.13
 Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
@@ -279,6 +279,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Jun 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-1
+- Upgrade to latest maintenance release for the 3.9 series
+
 * Tue Apr 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.12-1
 - Upgrade to latest maintenance release for the 3.9 series
 

@@ -655,6 +655,7 @@
                 "libraqm",
                 "LibRaw",
                 "libraw1394",
+                "libreswan",
                 "librevenge",
                 "librsvg2",
                 "librx",
@@ -1951,6 +1952,7 @@
                 "bpftrace",
                 "ccache",
                 "cert-manager",
+                "cf-cli",
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor",
@@ -1979,8 +1981,10 @@
                 "installkernel",
                 "ivykis",
                 "jsonbuilder",
+                "jx",
                 "keda",
                 "kernel-signed",
+                "kpatch",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
                 "kubernetes-1.19.7",
@@ -2007,12 +2011,14 @@
                 "moby-containerd",
                 "moby-engine",
                 "moby-runc",
+                "msgpack",
                 "ncompress",
                 "nlohmann-json",
                 "nmap",
                 "nmi",
                 "node-problem-detector",
                 "ntopng",
+                "packer",
                 "pcaudiolib",
                 "pcre2",
                 "perl-Test-Warnings",
@@ -2294,6 +2300,7 @@
                 "efibootmgr",
                 "efivar",
                 "elfutils",
+                "emacs",
                 "erlang",
                 "etcd-3.5.0",
                 "etcd-3.5.1",
@@ -2328,6 +2335,7 @@
                 "gnuplot",
                 "gnutls",
                 "gobject-introspection",
+                "golang",
                 "golang-1.17",
                 "gperf",
                 "gperftools",
@@ -2702,6 +2710,12 @@
                 "zip",
                 "zlib",
                 "zsh"
+            ]
+        },
+        "Rancher": {
+            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "specs": [
+                "k3s"
             ]
         }
     }

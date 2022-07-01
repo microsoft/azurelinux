@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.28
+Version:        8.0.29
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -31,7 +31,7 @@ Development headers for developing applications linking to maridb
 %build
 cmake . \
       -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
-      -DWITH_BOOST=boost/boost_1_73_0 \
+      -DWITH_BOOST=boost/boost_1_77_0 \
       -DINSTALL_MANDIR=share/man \
       -DINSTALL_DOCDIR=share/doc \
       -DINSTALL_DOCREADMEDIR=share/doc \
@@ -80,6 +80,9 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Thu Jun 23 2022 Henry Beberman <henry.beberman@microsoft.com> - 8.0.29-1
+- Upgrade to 8.0.29 to fix 17 CVEs
+
 * Wed Jan 26 2022 Neha Agarwal <thcrain@microsoft.com> - 8.0.28-1
 - Upgrade to 8.0.28 to fix 16 CVEs
 

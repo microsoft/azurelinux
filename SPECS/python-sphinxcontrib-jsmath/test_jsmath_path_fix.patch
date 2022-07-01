@@ -1,0 +1,40 @@
+From 7e3cfe705de9d05a4e872b3b75229bdacbc57227 Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Mon, 27 Jun 2022 16:42:51 -0700
+Subject: [PATCH] Fixing unit tests.
+
+---
+ tests/test_jsmath.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_jsmath.py b/tests/test_jsmath.py
+index 573d262..eea8a95 100644
+--- a/tests/test_jsmath.py
++++ b/tests/test_jsmath.py
+@@ -14,7 +14,7 @@ import pytest
+ @pytest.mark.sphinx('html', testroot='basic')
+ def test_basic(app, status, warning):
+     app.builder.build_all()
+-    content = (app.outdir / 'math.html').text()
++    content = (app.outdir / 'math.html').read_text()
+     print(content)
+     assert '<div class="math notranslate nohighlight">\nE = mc^2</div>' in content
+     assert ('<span class="eqno">(1)<a class="headerlink" href="#equation-pythagorean" '
+@@ -34,7 +34,7 @@ def test_basic(app, status, warning):
+ def test_numfig_enabled(app, status, warning):
+     app.builder.build_all()
+ 
+-    content = (app.outdir / 'math.html').text()
++    content = (app.outdir / 'math.html').read_text()
+     assert '<div class="math notranslate nohighlight">\nE = mc^2</div>' in content
+     assert ('<span class="eqno">(1.1)<a class="headerlink" href="#equation-pythagorean" '
+             'title="Permalink to this equation">¶</a></span>'
+@@ -52,5 +52,5 @@ def test_numfig_enabled(app, status, warning):
+ def test_disabled_when_equations_not_found(app, status, warning):
+     app.builder.build_all()
+ 
+-    content = (app.outdir / 'index.html').text()
++    content = (app.outdir / 'index.html').read_text()
+     assert 'jsmath.js' not in content
+-- 
+2.34.1

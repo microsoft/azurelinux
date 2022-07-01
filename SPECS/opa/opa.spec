@@ -5,7 +5,7 @@
 Summary:        Open source, general-purpose policy engine
 Name:           opa
 Version:        0.31.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -63,6 +63,9 @@ install -D -p -m 0644 _man/*         %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.31.0-2
+- Bump release to rebuild with golang 1.18.3
+
 * Thu Sep 16 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.31.0-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License Verified

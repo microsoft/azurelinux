@@ -20,6 +20,7 @@ PACKAGE_IGNORE_LIST    ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
+ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
 DOWNLOAD_SRPMS                  ?= n
