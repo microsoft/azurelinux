@@ -75,6 +75,7 @@ const (
 
 var (
 	sizeAndUnitRegexp = regexp.MustCompile(`(\d+)((Ki?|Mi?|Gi?|Ti?)?B)`)
+	diskDevPathRegexp = regexp.MustCompile(`^/dev/(\w+)$`)
 
 	unitToBytes = map[string]uint64{
 		"B":   B,
@@ -750,17 +751,13 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 
 func getSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize uint64, err error) {
 	const (
-		diskPathPattern = "/dev/sd"
 		diskNameStartIndex = 5
 	)
 
 	// Grab the specific disk name from /dev/xxx
-	matchResult, ferr := regexp.MatchString(diskPathPattern, diskDevPath)
+	matchResult := diskDevPathRegexp.MatchString(diskDevPath)
 	if !matchResult {
 		err = fmt.Errorf("input disk device path (%s) is of invalud format", diskDevPath)
-		return
-	} else if err != nil {
-		err = ferr
 		return
 	}
 	diskName := diskDevPath[diskNameStartIndex:len(diskDevPath)]
@@ -786,13 +783,13 @@ func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64
 	// the physical sector size. In this case, we need to check whether the start sector is a multiple of 1 MiB.
 	alignedSector = 0
 	if sectorAddr < physicalSectorSize {
-		if sectorAddr % (MiB / logicalSectorSize) == 0 {
+		if sectorAddr%(MiB/logicalSectorSize) == 0 {
 			alignedSector = sectorAddr
 		}
 	} else if (sectorAddr % physicalSectorSize) == 0 {
 		alignedSector = sectorAddr
 	} else {
-		alignedSector = (sectorAddr / physicalSectorSize + 1) * physicalSectorSize
+		alignedSector = (sectorAddr/physicalSectorSize + 1) * physicalSectorSize
 	}
 
 	return
@@ -809,7 +806,7 @@ func obtainPartitionDetail(partitionIndex int, hasExtendedPartition bool) (partT
 	// In the case of logical partitions, since an extra extended partition has to be created first in order to
 	// to create logical partitions, so the partition number will further increase by 1, which equals partitionIndex + 2.
 
-	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR - 1) {
+	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR-1) {
 		if partitionIndex == (maxPrimaryPartitionsForMBR - 1) {
 			partType = extendedPartitionType
 			partitionNumber = partitionIndex + indexOffsetForNormalPartitionNumber
