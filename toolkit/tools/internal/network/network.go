@@ -74,7 +74,13 @@ func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 	)
 
 	err = retry.Run(func() error {
-		err := shell.ExecuteLive(squashErrors, "ping", "-c", "1", "www.microsoft.com")
+		err := shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-networkd-wait-online")
+		if err != nil {
+			logger.Log.Errorf("Cannot start systemd-networkd-wait-online.service")
+			return err
+		}
+
+		err = shell.ExecuteLive(squashErrors, "systemctl", "is-active", "1", "www.microsoft.com")
 		hasNetworkAccess = err == nil
 		if !hasNetworkAccess {
 			logger.Log.Warnf("No network access yet")
