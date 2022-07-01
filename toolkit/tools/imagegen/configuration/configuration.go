@@ -107,7 +107,7 @@ func GetKernelCmdLineValue(option string) (cmdlineValue string, err error) {
 
 	cmdline := string(content)
 	if strings.Count(cmdline, option) > 1 {
-		err = fmt.Errorf("/proc/cmdline contains duplicate %s entries, which is invalid", option)
+		err = fmt.Errorf("/proc/cmdline contains duplicate (%s) entries, which is invalid", option)
 		return
 	}
 
