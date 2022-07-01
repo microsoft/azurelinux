@@ -1,4 +1,4 @@
-Summary:        GitHub’s official command line tool.
+Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
 Release:        1%{?dist}
@@ -40,7 +40,7 @@ Requires:       zsh
 %define our_gopath %{_topdir}/.gopath
 
 %description
-GitHub’s official command line tool.
+GitHub official command line tool.
 
 %prep
 %setup -q -n cli-%{version}
