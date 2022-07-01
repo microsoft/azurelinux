@@ -2,13 +2,13 @@
 
 %define srcdir cassandra-%{name}-%{version}
 
-%define bower-components reaper-bower-components-%{version}.tar.gz
-%define srcui-node-modules reaper-srcui-node-modules-%{version}.tar.gz
-%define bower-cache reaper-bower-cache-%{version}.tar.gz
-%define maven-cache reaper-m2-cache-%{version}.tar.gz
-%define npm-cache reaper-npm-cache-%{version}.tar.gz
-%define local-lib-node-modules reaper-local-lib-node-modules-%{version}.tar.gz
-%define local-n reaper-local-n-%{version}.tar.gz
+%define bower_components reaper-bower-components-%{version}.tar.gz
+%define srcui_node_modules reaper-srcui-node-modules-%{version}.tar.gz
+%define bower_cache reaper-bower-cache-%{version}.tar.gz
+%define maven_cache reaper-m2-cache-%{version}.tar.gz
+%define npm_cache reaper-npm-cache-%{version}.tar.gz
+%define local_lib_node_modules reaper-local-lib-node-modules-%{version}.tar.gz
+%define local_n reaper-local-n-%{version}.tar.gz
 
 # Flag to generate build caches. Set this to '1' in order to generate cache tarballs.
 # NOTE: This should ONLY be set to '1' when re-generating caches sources.
@@ -29,19 +29,19 @@ Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/t
 # Building reaper from sources downloads artifacts related to maven/node/etc. These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
 # Below is the list of cached sources.
 # bower-components downloaded under src/ui
-Source1:        %{bower-components}
+Source1:        %{bower_components}
 # node_modules downloaded under src/ui
-Source2:        %{srcui-node-modules}
+Source2:        %{srcui_node_modules}
 # bower cache
-Source3:        %{bower-cache}
+Source3:        %{bower_cache}
 # m2 cache
-Source4:        %{maven-cache}
+Source4:        %{maven_cache}
 # npm cache
-Source5:        %{npm-cache}
+Source5:        %{npm_cache}
 # node_modules downloaded to /usr/local/lib
-Source6:        %{local-lib-node-modules}
+Source6:        %{local_lib_node_modules}
 # v14.18.0 node binary under /usr/local
-Source7:        %{local-n}
+Source7:        %{local_n}
 %endif
 
 BuildRequires:  git
@@ -163,32 +163,32 @@ cp %{_builddir}/%{srcdir}/LICENSE.txt %{buildroot}%{_datadir}/licenses/reaper
 %if 0%{?generate_build_caches}
 echo "Installing build caches."
 pushd /root
-tar -cf %{bower-cache} .cache
-cp %{bower-cache} %{buildroot}/%{_prefix}
+tar -cf %{bower_cache} .cache
+cp %{bower_cache} %{buildroot}/%{_prefix}
 
-tar -cf %{maven-cache} .m2
-cp %{maven-cache} %{buildroot}/%{_prefix}
+tar -cf %{maven_cache} .m2
+cp %{maven_cache} %{buildroot}/%{_prefix}
 
-tar -cf %{npm-cache} .npm
-cp %{npm-cache} %{buildroot}/%{_prefix}
+tar -cf %{npm_cache} .npm
+cp %{npm_cache} %{buildroot}/%{_prefix}
 popd
 
 pushd %{_builddir}/%{srcdir}/src/ui
-tar -cf %{bower-components} bower_components
-cp %{bower-components} %{buildroot}/%{_prefix}
+tar -cf %{bower_components} bower_components
+cp %{bower_components} %{buildroot}/%{_prefix}
 
-tar -cf %{srcui-node-modules} node_modules
-cp %{srcui-node-modules} %{buildroot}/%{_prefix}
+tar -cf %{srcui_node_modules} node_modules
+cp %{srcui_node_modules} %{buildroot}/%{_prefix}
 popd
 
 pushd /usr/local/lib
-tar -cf %{local-lib-node-modules} node_modules
-cp %{local-lib-node-modules} %{buildroot}/%{_prefix}
+tar -cf %{local_lib_node_modules} node_modules
+cp %{local_lib_node_modules} %{buildroot}/%{_prefix}
 popd
 
 pushd /usr/local/
-tar -cf %{local-n} n
-cp %{local-n} %{buildroot}/%{_prefix}
+tar -cf %{local_n} n
+cp %{local_n} %{buildroot}/%{_prefix}
 popd
 echo "Build caches copied to %{_prefix}"
 %endif
@@ -225,13 +225,13 @@ chown -R reaper: %{_localstatedir}/log/cassandra-reaper/
 
 %if 0%{?generate_build_caches}
 %files build-caches
-%{_prefix}/%{bower-cache}
-%{_prefix}/%{maven-cache}
-%{_prefix}/%{npm-cache}
-%{_prefix}/%{bower-components}
-%{_prefix}/%{srcui-node-modules}
-%{_prefix}/%{local-lib-node-modules}
-%{_prefix}/%{local-n}
+%{_prefix}/%{bower_cache}
+%{_prefix}/%{maven_cache}
+%{_prefix}/%{npm_cache}
+%{_prefix}/%{bower_components}
+%{_prefix}/%{srcui_node_modules}
+%{_prefix}/%{local_lib_node_modules}
+%{_prefix}/%{local_n}
 %endif
 
 %changelog
