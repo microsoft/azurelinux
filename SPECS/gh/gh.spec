@@ -29,6 +29,7 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 BuildRequires:  golang >= 1.17.1
+BuildRequires:  git
 BuildRequires:  bash-completion
 BuildRequires:  fish
 BuildRequires:  zsh
