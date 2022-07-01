@@ -411,7 +411,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	}
 
 	start := partition.Start * MiB / logicalSectorSize
-	end := partition.End*MiB/logicalSectorSize - 1
+	end := partition.End * MiB / logicalSectorSize - 1
 	if partition.End == 0 {
 		end = 0
 	}
