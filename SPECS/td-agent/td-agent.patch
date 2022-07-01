@@ -1,0 +1,281 @@
+diff --git a/td-agent/Rakefile b/td-agent/Rakefile
+index 1519855..b761b6e 100755
+--- a/td-agent/Rakefile
++++ b/td-agent/Rakefile
+@@ -209,8 +209,8 @@ class DownloadTask
+     url_base = "https://github.com/jemalloc/jemalloc/releases/download/"
+     @file_jemalloc_source = File.join(DOWNLOADS_DIR, filename)
+     file @file_jemalloc_source do
+-      url = "#{url_base}/#{version}/#{filename}"
+-      download_file(url, filename)
++      ensure_directory(DOWNLOADS_DIR) do
++      end
+     end
+   end
+ 
+@@ -230,7 +230,8 @@ class DownloadTask
+     @file_ruby_source = File.join(DOWNLOADS_DIR, filename)
+ 
+     file @file_ruby_source do
+-      download_file(url, filename, sha256sum)
++      ensure_directory(DOWNLOADS_DIR) do
++      end
+     end
+   end
+ 
+@@ -244,7 +245,8 @@ class DownloadTask
+     @file_ruby_installer_x64 = File.join(DOWNLOADS_DIR, filename)
+ 
+     file @file_ruby_installer_x64 do
+-      download_file(url, filename, sha256sum)
++      ensure_directory(DOWNLOADS_DIR) do
++      end
+     end
+   end
+ 
+@@ -255,12 +257,6 @@ class DownloadTask
+         dirname = "fluentd-#{FLUENTD_REVISION}"
+         rm_rf("fluentd") if File.exists?("fluentd")
+         rm_rf(dirname) if File.exists?(dirname)
+-        sh("git", "clone", "https://github.com/fluent/fluentd.git")
+-        cd("fluentd") do
+-          sh("git", "checkout", FLUENTD_REVISION)
+-        end
+-        mv("fluentd", dirname)
+-        sh("tar", "cvfz", "#{dirname}.tar.gz", dirname)
+       end
+     end
+   end
+@@ -342,19 +338,29 @@ class BuildTask
+ 
+       desc "Install ruby gems"
+       task :ruby_gems => [:"download:ruby_gems", :fluentd] do
+-        install_gems(@download_task.files_ruby_gems)
++        ensure_directory(staging_bindir) do
++          cp("/usr/lib/ruby/gems/#{RUBYGEM_VERSION}/bin/nokogiri", ".")
++          cp("/usr/lib/ruby/gems/#{RUBYGEM_VERSION}/bin/td", ".")
++          cp("/usr/bin/bundle", ".")
++          cp("/usr/bin/bundler", ".")
++          cp("/usr/bin/rake", ".")
++          cp("/usr/lib/ruby/gems/#{RUBYGEM_VERSION}/bin/elastic_ruby_console", ".")
++          cp("/usr/lib/ruby/gems/#{RUBYGEM_VERSION}/bin/httpclient", ".")
++          cp("/usr/lib/ruby/gems/#{RUBYGEM_VERSION}/bin/fluent-post", ".")
++        end
+       end
+ 
+       desc "Install fluentd"
+       task :fluentd => [:"download:fluentd", :ruby] do
+-        cd(DOWNLOADS_DIR) do
+-          archive_path = @download_task.file_fluentd_archive
+-          fluentd_dir = archive_path.sub(/\.tar\.gz$/, '')
+-          sh("tar", "xvf", archive_path) unless File.exists?(fluentd_dir)
+-          cd("fluentd-#{FLUENTD_REVISION}") do
+-            sh("rake", "build")
+-            gem_install("pkg/fluentd-*.gem")
+-          end
++        ensure_directory(staging_bindir) do
++          cp("/usr/bin/fluent-cat", ".")
++          cp("/usr/bin/fluent-debug", ".")
++          cp("/usr/bin/fluent-gem", ".")
++          cp("/usr/bin/fluentd", ".")
++          cp("/usr/bin/fluent-binlog-reader", ".")
++          cp("/usr/bin/fluent-ca-generate", ".")
++          cp("/usr/bin/fluent-plugin-config-format", ".")
++          cp("/usr/bin/fluent-plugin-generate", ".")
+         end
+       end
+ 
+@@ -517,60 +523,49 @@ class BuildTask
+   end
+ 
+   def build_jemalloc
+-    tarball = @download_task.file_jemalloc_source
+-    source_dir = tarball.sub(/\.tar\.bz2$/, '')
+-
+-    sh("tar", "xvf", tarball, "-C", DOWNLOADS_DIR)
+-
+-    configure_opts = [
+-      "--prefix=#{install_prefix}",
+-    ]
+-    if ENV["TD_AGENT_STAGING_PATH"] and
+-      (ENV["TD_AGENT_STAGING_PATH"].end_with?("el8.aarch64") or
+-       ENV["TD_AGENT_STAGING_PATH"].end_with?("el7.aarch64"))
+-      # NOTE: There is a case that PAGE_SIZE detection on
+-      # CentOS 7 CentOS 8 with aarch64 AWS ARM instance.
+-      # So, explicitly set PAGE_SIZE by with-lg-page 16 (2^16 = 65536)
+-      configure_opts.concat(["--with-lg-page=16"])
++    ensure_directory(staging_bindir) do
++      cp("/usr/bin/jemalloc.sh", ".")
++      cp("/usr/bin/jemalloc-config", ".")
++      cp("/usr/bin/jeprof", ".")
++    end
++    ensure_directory(staging_libdir) do
++      cp("/usr/lib/libjemalloc.so", ".")
++      cp("/usr/lib/libjemalloc.so.2", ".")
++      mkdir_p("./pkgconfig")
++      cp("/usr/lib/pkgconfig/jemalloc.pc", "./pkgconfig")
+     end
+-    cd(source_dir) do
+-      sh("./configure", *configure_opts)
+-      sh("make", "install", "-j#{Etc.nprocessors}", "DESTDIR=#{STAGING_DIR}")
++    ensure_directory(staging_includedir) do
++      cp_r("/usr/include/jemalloc", ".")
+     end
+   end
+ 
+   def build_ruby_from_source
+-    tarball = @download_task.file_ruby_source
+-    ruby_source_dir = tarball.sub(/\.tar\.gz$/, '')
+-
+-    sh("tar", "xvf", tarball, "-C", DOWNLOADS_DIR)
+-
+-    configure_opts = [
+-      "--prefix=#{install_prefix}",
+-      "--enable-shared",
+-      "--disable-install-doc",
+-      "--with-compress-debug-sections=no", # https://bugs.ruby-lang.org/issues/12934
+-    ]
+-    cd(ruby_source_dir) do
+-      apply_ruby_patches
+-      sh("./configure", *configure_opts)
+-      sh("make", "install", "-j#{Etc.nprocessors}", "DESTDIR=#{STAGING_DIR}")
+-
+-      # For building gems. The built ruby & gem command cannot use without install.
+-      sh("make", "install")
++    ensure_directory(staging_bindir) do
++      cp("/usr/bin/bundle", ".")
++      cp("/usr/bin/bundler", ".")
++      cp("/usr/bin/erb", ".")
++      cp("/usr/bin/gem", ".")
++      cp("/usr/bin/irb", ".")
++      cp("/usr/bin/rake", ".")
++      cp("/usr/bin/rdoc", ".")
++      cp("/usr/bin/ri", ".")
++      cp("/usr/bin/ruby", ".")
++    end
++    ensure_directory(staging_libdir) do
++      cp("/usr/lib/libruby.so", ".")
++      cp("/usr/lib/libruby.so.3.1", ".")
++      cp("/usr/lib/libruby.so.3.1.2", ".")
++      cp_r("/usr/lib/ruby", ".")
++      cp("/usr/lib/pkgconfig/ruby-3.1.pc", "./pkgconfig")
++    end
++    ensure_directory(staging_includedir) do
++    cp_r("/usr/include/ruby", ".")
++    #  rm_rf("/usr/include/ruby-#{RUBYGEM_VERSION}/ruby-#{RUBYGEM_VERSION}")
+     end
+   end
+ 
+   def extract_ruby_installer
+     ensure_directory(td_agent_staging_dir) do
+-      path = File.expand_path(@download_task.file_ruby_installer_x64)
+-      src_dir = File.basename(path).sub(/\.7z$/, '')
+-      sh("7z",
+-         "x",    # Extract files with full paths
+-         "-y",   # Assume yes on all queries
+-         path)
+-      cp_r(Dir.glob(File.join(src_dir, "*")), ".")
+-      rm_rf(src_dir)
+     end
+   end
+ 
+@@ -619,6 +614,14 @@ class BuildTask
+     File.join(td_agent_staging_dir, "bin")
+   end
+ 
++  def staging_libdir
++    File.join(td_agent_staging_dir, "lib")
++  end
++
++  def staging_includedir
++    File.join(td_agent_staging_dir, "include")
++  end
++
+   def gem_command
+     if windows?
+       File.join(staging_bindir, "gem")
+@@ -626,7 +629,7 @@ class BuildTask
+       # On GNU/Linux we don't use gem command in staging path, use the one
+       # installed in the proper path instead since Ruby doesn't support
+       # running without install (although there are some solutions like rbenv).
+-      "#{install_prefix}/bin/gem"
++      "/usr/bin/gem"
+     end
+   end
+ 
+@@ -655,17 +658,14 @@ class BuildTask
+       expected    = File.join(install_prefix,       gem_dir_suffix)
+       staging_dir = File.join(td_agent_staging_dir, gem_dir_suffix)
+     end
+-    fail "Unsupposed gemdir: #{gemdir} (expected: #{expected})" unless gemdir == expected
+ 
+     staging_dir
+   end
+ 
+   def gem_install(gem_path)
+     ensure_directory(staging_bindir)
+-    ensure_directory(gem_staging_dir)
+ 
+     gem_home = ENV["GEM_HOME"]
+-    ENV["GEM_HOME"] = gem_staging_dir
+ 
+     gem_installation_command = [
+       gem_command, "install",
+@@ -692,27 +692,17 @@ class BuildTask
+   def install_jemalloc_license
+     return if windows?
+     ensure_directory(licenses_staging_dir) do
+-      tarball = @download_task.file_jemalloc_source
+-      source_dir = File.basename(tarball.sub(/\.tar\.bz2$/, ''))
+-      license_file = File.join(source_dir, "COPYING")
+-      sh("tar", "xf", tarball, license_file)
+-      mv(license_file, "LICENSE-jemalloc.txt")
+-      rm_rf(source_dir)
++      license_file = File.join("/usr/share/licenses/jemalloc", "COPYING")
++      cp(license_file, ".")
++      mv("COPYING", "LICENSE-jemalloc.txt")
+     end
+   end
+ 
+   def install_ruby_license
+     ensure_directory(licenses_staging_dir) do
+-      if windows?
+-        src  = File.join(td_agent_staging_dir, "LICENSE.txt")
+-        mv(src, "LICENSE-RubyInstaller.txt")
+-      end
+-      tarball = @download_task.file_ruby_source
+-      ruby_source_dir = File.basename(tarball.sub(/\.tar\.gz$/, ''))
+-      license_file = File.join(ruby_source_dir, "COPYING")
+-      sh("tar", "xf", tarball, license_file)
+-      mv(license_file, "LICENSE-Ruby.txt")
+-      rm_rf(ruby_source_dir)
++      license_file = File.join("/usr/share/licenses/ruby", "COPYING")
++      cp(license_file, ".")
++      mv("COPYING", "LICENSE-Ruby.txt")
+     end
+   end
+ 
+@@ -751,9 +741,6 @@ class BuildTask
+ 
+   def remove_needless_files
+     remove_files("#{td_agent_staging_dir}/share/doc", true) # Contains only jemalloc.html
+-    cd("#{gem_staging_dir}/cache") do
+-      remove_files("*.gem")
+-    end
+     Dir.glob("#{gem_staging_dir}/gems/*").each do |gem_dir|
+       cd(gem_dir) do
+         rm_rf(["test", "spec"])
+diff --git a/td-agent/config.rb b/td-agent/config.rb
+index bc9cd47..da872cc 100644
+--- a/td-agent/config.rb
++++ b/td-agent/config.rb
+@@ -13,7 +13,8 @@ JEMALLOC_VERSION = "5.2.1"
+ #BUNDLED_RUBY_SOURCE_SHA256SUM = "6c0bdf07876c69811a9e7dc237c43d40b1cb6369f68e0e17953d7279b524ad9a"
+ #BUNDLED_RUBY_VERSION = "2.6.6"
+ #BUNDLED_RUBY_SOURCE_SHA256SUM = "364b143def360bac1b74eb56ed60b1a0dca6439b00157ae11ff77d5cd2e92291"
+-BUNDLED_RUBY_VERSION = "2.7.1"
++BUNDLED_RUBY_VERSION = "3.1.2"
++RUBYGEM_VERSION= "3.1.0"
+ BUNDLED_RUBY_SOURCE_SHA256SUM = "d418483bdd0000576c1370571121a6eb24582116db0b7bb2005e90e250eae418"
+ 
+ BUNDLED_RUBY_PATCHES = [
