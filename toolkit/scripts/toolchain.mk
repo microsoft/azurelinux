@@ -164,20 +164,20 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee "$$log_file" && \
+	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
 	for url in $(PACKAGE_URL_LIST); do \
-		wget $$url/$$rpm_filename \
+		wget -nv --no-clobber $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 			-a $$log_file && \
 		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
-		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee "$$log_file" && \
+		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
 		touch $@ && \
 		break; \
 	done || { \
-		echo "Could not find toolchain package in package repo: $$rpm_filename." | tee "$$log_file" && \
+		echo "Could not find toolchain package in package repo: $$rpm_filename." | tee -a "$$log_file" && \
 		touch $@; \
 	}
 else
@@ -279,7 +279,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	echo "Downloading toolchain RPM: $$rpm_filename" | tee "$$log_file" && \
+	echo "Downloading toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
 	for url in $(PACKAGE_URL_LIST); do \
