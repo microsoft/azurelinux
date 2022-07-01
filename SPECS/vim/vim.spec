@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.5154
+Version:        8.2.5172
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -193,6 +193,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Jun 30 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2.5172-1
+- Upgrade to 8.2.5172 to fix CVE-2022-2175, CVE-2022-2182
+
 * Tue Jun 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.5154-1
 - Upgrade to 8.2.5154 to fix CVEs: 2022-2124, 2022-2125, 2022-2126 and 2022-2129
 
