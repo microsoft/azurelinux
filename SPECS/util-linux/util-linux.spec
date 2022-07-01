@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.37.2
-Release:        5%{?dist}
+Version:        2.37.4
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{
 Source1:        runuser
 Source2:        runuser-l
 BuildRequires:  audit-devel
+BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
@@ -142,10 +143,16 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Tue May 03 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.36.2-5
+* Mon Jun 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.37.4-2
+- Add Buildrequires libcap-ng-devel to build setpriv
+
+* Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37.4-1
+- Updating to 2.37.4 to fix CVE-2022-0563.
+
+* Tue May 03 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.37.2-5
 - Split libraries into the util-linux-libs package
 
-* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.2-4
+* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.37.2-4
 - Add Debian's PAM configs for runuser tool
 - Add build require on pam-devel so we have the pam headers
 

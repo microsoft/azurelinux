@@ -111,14 +111,8 @@ function update_toolchain_scripts {
     for script in $TOOLCHAIN_SCRIPTS
     do
         file=$TOOLCHAIN_FOLDER/container/$script
-        PATTERN="echo Linux-.* API Headers"
-        REPLACE="echo Linux-$VERSION API Headers"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-        PATTERN="tar xf $FILE_SIGNATURE_PATTERN.*.tar.gz"
-        REPLACE="tar xf $TARBALL_NAME"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-        PATTERN="CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-.*"
-        REPLACE="CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-$VERSION"
+        PATTERN="KERNEL_VERSION=\"$OLD_VERSION\""
+        REPLACE="KERNEL_VERSION=\"$VERSION\""
         sed -i "s/$PATTERN/$REPLACE/" $file
     done
 }
@@ -194,7 +188,7 @@ function usage() {
     echo "e : Your email"
     echo "w : Absoulte path to your workspace for your update - no quotes\n"
 
-    echo "example usage: ./toolkit/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
+    echo "example usage: ./toolkit/scripts/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
 
     exit 1 
 }
@@ -239,15 +233,15 @@ if [[ -z $WORKSPACE ]]; then
 fi
 
 # Create globals
-TAG="rolling-lts/mariner/$VERSION"
+TAG="rolling-lts/mariner-2/$VERSION"
 TMPDIR="tmp-dir"
-SPECS="kernel-headers kernel kernel-rt hyperv-daemons"
+SPECS="kernel-headers kernel hyperv-daemons"
 DEFAULT_URL="https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/"
 DEFAULT_EXTENSION=".tar.gz"
 FULL_URL=$DEFAULT_URL$TAG$DEFAULT_EXTENSION
 TARBALL_NAME="kernel-$VERSION$DEFAULT_EXTENSION"
 DOWNLOAD_FILE_PATH=$TMPDIR/$TARBALL_NAME
-SPECS="kernel-headers kernel kernel-rt hyperv-daemons"
+SPECS="kernel-headers kernel hyperv-daemons"
 SIGNED_SPECS="kernel-signed"
 NEW_RELEASE_NUMBER="Release:        1%{?dist}"
 CHANGELOG_ENTRY="Update source to $NEW_KERNEL_VERSION"

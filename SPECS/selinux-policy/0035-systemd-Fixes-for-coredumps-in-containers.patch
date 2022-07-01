@@ -1,0 +1,91 @@
+From b938bbb30cd1d92b3a5993eff4e898b0fa16e1dd Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 23 May 2022 14:56:55 +0000
+Subject: [PATCH 35/37] systemd: Fixes for coredumps in containers.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/filesystem.if | 18 ++++++++++++++++++
+ policy/modules/system/systemd.te    | 18 ++++++++++++++----
+ 2 files changed, 32 insertions(+), 4 deletions(-)
+
+diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
+index abaf52626..b3e5817b1 100644
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -3941,6 +3941,24 @@ interface(`fs_rw_nfsd_fs',`
+ 	rw_files_pattern($1, nfsd_fs_t, nfsd_fs_t)
+ ')
+ 
++########################################
++## <summary>
++##	Get the attributes of nsfs inodes (e.g. /proc/pid/ns/uts)
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`fs_getattr_nsfs_files',`
++	gen_require(`
++		type nsfs_t;
++	')
++
++	allow $1 nsfs_t:file getattr_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read nsfs inodes (e.g. /proc/pid/ns/uts)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 8997f2ac1..48613bd20 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -410,29 +410,39 @@ ifdef(`enable_mls',`
+ # coredump local policy
+ #
+ 
+-allow systemd_coredump_t self:unix_dgram_socket { create write connect getopt setopt };
+-allow systemd_coredump_t self:capability { setgid setuid setpcap };
+-allow systemd_coredump_t self:cap_userns sys_ptrace;
++allow systemd_coredump_t self:capability { setgid setuid setpcap sys_ptrace };
++allow systemd_coredump_t self:cap_userns { sys_admin sys_ptrace };
+ allow systemd_coredump_t self:process { getcap setcap setfscreate };
++allow systemd_coredump_t self:unix_dgram_socket { create write connect getopt setopt };
++allow systemd_coredump_t self:unix_stream_socket { create_stream_socket_perms connectto };
++allow systemd_coredump_t self:fifo_file rw_inherited_fifo_file_perms;
++dontaudit systemd_coredump_t self:capability net_admin;
+ 
+-manage_files_pattern(systemd_coredump_t, systemd_coredump_var_lib_t, systemd_coredump_var_lib_t)
++mmap_manage_files_pattern(systemd_coredump_t, systemd_coredump_var_lib_t, systemd_coredump_var_lib_t)
+ 
+ kernel_domtrans_to(systemd_coredump_t, systemd_coredump_exec_t)
+ kernel_read_kernel_sysctls(systemd_coredump_t)
+ kernel_read_system_state(systemd_coredump_t)
+ kernel_rw_pipes(systemd_coredump_t)
+ kernel_use_fds(systemd_coredump_t)
++kernel_read_crypto_sysctls(systemd_coredump_t)
+ 
+ corecmd_exec_bin(systemd_coredump_t)
+ corecmd_read_all_executables(systemd_coredump_t)
+ 
+ dev_write_kmsg(systemd_coredump_t)
+ 
++domain_read_all_domains_state(systemd_coredump_t)
++
+ files_getattr_all_mountpoints(systemd_coredump_t)
+ files_read_etc_files(systemd_coredump_t)
+ files_search_var_lib(systemd_coredump_t)
++files_mounton_root(systemd_coredump_t)
+ 
+ fs_getattr_xattr_fs(systemd_coredump_t)
++fs_getattr_nsfs_files(systemd_coredump_t)
++fs_search_cgroup_dirs(systemd_coredump_t)
++fs_getattr_cgroup(systemd_coredump_t)
+ 
+ selinux_getattr_fs(systemd_coredump_t)
+ 
+-- 
+2.25.1
+

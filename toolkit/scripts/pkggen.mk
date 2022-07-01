@@ -33,13 +33,15 @@ graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
 preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
+output_csv_file   = $(PKGBUILD_DIR)/build_state.csv
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph
+.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
+workplan: $(graph_file)
 clean: clean-workplan clean-cache
 clean-workplan:
 	rm -rf $(PKGBUILD_DIR)
@@ -77,6 +79,10 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--output $@
 
 # Convert the dependency information in the json file into a graph structure
+# We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
+ifeq ($(REBUILD_TOOLCHAIN),y)
+$(graph_file): $(toolchain_rpms)
+endif
 $(graph_file): $(specs_file) $(go-grapher)
 	$(go-grapher) \
 		--input $(specs_file) \
@@ -162,6 +168,10 @@ clean-compress-srpms:
 	rm -rf $(srpms_archive)
 
 ifeq ($(REBUILD_PACKAGES),y)
+# If we are responsible for building a toolchain, make sure those RPMs are also present in the output directory
+ifeq ($(REBUILD_TOOLCHAIN),y)
+$(RPMS_DIR): $(toolchain_rpms)
+endif
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@touch $@
 	@echo Finished updating $@
@@ -174,6 +184,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
+		--output-build-state-csv-file="$(output_csv_file)" \
 		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
 		--work-dir="$(CHROOT_DIR)" \
 		--worker-tar="$(chroot_worker)" \

@@ -1,15 +1,16 @@
 %define __requires_exclude ^/(usr/)?bin/(ba)?sh$
+%define maj_version %(echo %{version} | rev | cut -d'.' -f2- | rev)
 
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.19.2
+Version:        1.19.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
-Source0:        https://web.mit.edu/kerberos/dist/%{name}/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
@@ -118,6 +119,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Wed May 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.19.3-1
+- Update to version 1.19.3 to address CVE-2021-37750
+
 * Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.19.2-1
 - Update to version 1.19.2
 

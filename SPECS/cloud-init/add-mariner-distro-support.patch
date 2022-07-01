@@ -1,0 +1,761 @@
+From cb170be483823fc21f05ed442877bdd22cae3b59 Mon Sep 17 00:00:00 2001
+From: Chris Patterson <cpatterson@microsoft.com>
+Date: Fri, 3 Jun 2022 11:15:26 +0000
+Subject: [PATCH] distros: add mariner support
+
+Upstream-Status: Pending (backlog item)
+
+Signed-off-by: Chris Patterson <cpatterson@microsoft.com>
+---
+ cloudinit/config/cc_ntp.py                    |  11 ++
+ cloudinit/config/cc_resolv_conf.py            |  10 +-
+ cloudinit/config/cc_yum_add_repo.py           |   1 +
+ cloudinit/distros/__init__.py                 |   1 +
+ cloudinit/distros/mariner.py                  | 165 ++++++++++++++++++
+ cloudinit/util.py                             |   1 +
+ config/cloud.cfg.tmpl                         |  18 +-
+ systemd/cloud-init.service.tmpl               |   2 +-
+ templates/hosts.mariner.tmpl                  |  22 +++
+ .../unittests/config/test_cc_set_hostname.py  |  48 +++++
+ tests/unittests/distros/test_mariner.py       |  68 ++++++++
+ tests/unittests/distros/test_netconfig.py     | 125 +++++++++++++
+ tests/unittests/test_cli.py                   |   3 +-
+ tests/unittests/test_render_cloudcfg.py       |   3 +
+ tests/unittests/test_util.py                  |  21 +++
+ tools/render-cloudcfg                         |   1 +
+ 16 files changed, 489 insertions(+), 11 deletions(-)
+ create mode 100644 cloudinit/distros/mariner.py
+ create mode 100644 templates/hosts.mariner.tmpl
+ create mode 100644 tests/unittests/distros/test_mariner.py
+
+diff --git a/cloudinit/config/cc_ntp.py b/cloudinit/config/cc_ntp.py
+index 3bc1d303..9ba7d379 100644
+--- a/cloudinit/config/cc_ntp.py
++++ b/cloudinit/config/cc_ntp.py
+@@ -28,6 +28,7 @@ distros = [
+     "debian",
+     "eurolinux",
+     "fedora",
++    "mariner",
+     "miraclelinux",
+     "openEuler",
+     "opensuse",
+@@ -92,6 +93,16 @@ DISTRO_CLIENT_CONFIG = {
+             "confpath": "/etc/chrony/chrony.conf",
+         },
+     },
++    "mariner": {
++        "chrony": {
++            "service_name": "chronyd",
++        },
++        "ntp": {"service_name": "ntpd", "confpath": "/etc/ntp.conf"},
++        "systemd-timesyncd": {
++            "check_exe": "/usr/lib/systemd/systemd-timesyncd",
++            "confpath": "/etc/systemd/timesyncd.conf",
++        },
++    },
+     "opensuse": {
+         "chrony": {
+             "service_name": "chronyd",
+diff --git a/cloudinit/config/cc_resolv_conf.py b/cloudinit/config/cc_resolv_conf.py
+index bbf68079..b2ba7741 100644
+--- a/cloudinit/config/cc_resolv_conf.py
++++ b/cloudinit/config/cc_resolv_conf.py
+@@ -52,7 +52,15 @@ meta: MetaSchema = {
+     "name": "Resolv Conf",
+     "title": "Configure resolv.conf",
+     "description": MODULE_DESCRIPTION,
+-    "distros": ["alpine", "fedora", "opensuse", "photon", "rhel", "sles"],
++    "distros": [
++        "alpine",
++        "fedora",
++        "mariner",
++        "opensuse",
++        "photon",
++        "rhel",
++        "sles",
++    ],
+     "frequency": PER_INSTANCE,
+     "examples": [
+         dedent(
+diff --git a/cloudinit/config/cc_yum_add_repo.py b/cloudinit/config/cc_yum_add_repo.py
+index f7357192..769460ef 100644
+--- a/cloudinit/config/cc_yum_add_repo.py
++++ b/cloudinit/config/cc_yum_add_repo.py
+@@ -28,6 +28,7 @@ distros = [
+     "cloudlinux",
+     "eurolinux",
+     "fedora",
++    "mariner",
+     "openEuler",
+     "photon",
+     "rhel",
+diff --git a/cloudinit/distros/__init__.py b/cloudinit/distros/__init__.py
+index b034e2c8..a8a3feaf 100644
+--- a/cloudinit/distros/__init__.py
++++ b/cloudinit/distros/__init__.py
+@@ -45,6 +45,7 @@ OSFAMILIES = {
+         "cloudlinux",
+         "eurolinux",
+         "fedora",
++        "mariner",
+         "miraclelinux",
+         "openEuler",
+         "photon",
+diff --git a/cloudinit/distros/mariner.py b/cloudinit/distros/mariner.py
+new file mode 100644
+index 00000000..2f1bcf80
+--- /dev/null
++++ b/cloudinit/distros/mariner.py
+@@ -0,0 +1,165 @@
++#!/usr/bin/env python3
++# vi: ts=4 expandtab
++#
++# Copyright (C) 2021 VMware Inc.
++#
++# This file is part of cloud-init. See LICENSE file for license information.
++
++from cloudinit import distros, helpers
++from cloudinit import log as logging
++from cloudinit import net, subp, util
++from cloudinit.distros import rhel_util as rhutil
++from cloudinit.settings import PER_INSTANCE
++
++LOG = logging.getLogger(__name__)
++
++NETWORK_FILE_HEADER = """\
++# This file is generated from information provided by the datasource. Changes
++# to it will not persist across an instance reboot. To disable cloud-init's
++# network configuration capabilities, write a file
++# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
++# network: {config: disabled}
++"""
++
++
++class Distro(distros.Distro):
++    systemd_hostname_conf_fn = "/etc/hostname"
++    network_conf_dir = "/etc/systemd/network/"
++    systemd_locale_conf_fn = "/etc/locale.conf"
++    resolve_conf_fn = "/etc/systemd/resolved.conf"
++
++    network_conf_fn = {"netplan": "/etc/netplan/50-cloud-init.yaml"}
++    renderer_configs = {
++        "networkd": {
++            "resolv_conf_fn": resolve_conf_fn,
++            "network_conf_dir": network_conf_dir,
++        },
++        "netplan": {
++            "netplan_path": network_conf_fn["netplan"],
++            "netplan_header": NETWORK_FILE_HEADER,
++            "postcmds": True,
++        },
++    }
++
++    # Should be fqdn if we can use it
++    prefer_fqdn = True
++
++    def __init__(self, name, cfg, paths):
++        distros.Distro.__init__(self, name, cfg, paths)
++        # This will be used to restrict certain
++        # calls from repeatly happening (when they
++        # should only happen say once per instance...)
++        self._runner = helpers.Runners(paths)
++        self.osfamily = "mariner"
++        self.init_cmd = ["systemctl"]
++
++    def exec_cmd(self, cmd, capture=True):
++        LOG.debug("Attempting to run: %s", cmd)
++        try:
++            (out, err) = subp.subp(cmd, capture=capture)
++            if err:
++                LOG.warning(
++                    "Running %s resulted in stderr output: %s", cmd, err
++                )
++                return True, out, err
++            return False, out, err
++        except subp.ProcessExecutionError:
++            util.logexc(LOG, "Command %s failed", cmd)
++            return True, None, None
++
++    def generate_fallback_config(self):
++        key = "disable_fallback_netcfg"
++        disable_fallback_netcfg = self._cfg.get(key, True)
++        LOG.debug("%s value is: %s", key, disable_fallback_netcfg)
++
++        if not disable_fallback_netcfg:
++            return net.generate_fallback_config()
++
++        LOG.info(
++            "Skipping generate_fallback_config. Rely on MarinerOS default "
++            "network config"
++        )
++        return None
++
++    def apply_locale(self, locale, out_fn=None):
++        # This has a dependancy on glibc-i18n, user need to manually install it
++        # and enable the option in cloud.cfg
++        if not out_fn:
++            out_fn = self.systemd_locale_conf_fn
++
++        locale_cfg = {
++            "LANG": locale,
++        }
++
++        rhutil.update_sysconfig_file(out_fn, locale_cfg)
++
++        # rhutil will modify /etc/locale.conf
++        # For locale change to take effect, reboot is needed or we can restart
++        # systemd-localed. This is equivalent of localectl
++        cmd = ["systemctl", "restart", "systemd-localed"]
++        self.exec_cmd(cmd)
++
++    def install_packages(self, pkglist):
++        # self.update_package_sources()
++        self.package_command("install", pkgs=pkglist)
++
++    def _write_hostname(self, hostname, filename):
++        if filename and filename.endswith("/previous-hostname"):
++            util.write_file(filename, hostname)
++        else:
++            ret, _out, err = self.exec_cmd(
++                ["hostnamectl", "set-hostname", str(hostname)]
++            )
++            if ret:
++                LOG.warning(
++                    (
++                        "Error while setting hostname: %s\n"
++                        "Given hostname: %s",
++                        err,
++                        hostname,
++                    )
++                )
++
++    def _read_system_hostname(self):
++        sys_hostname = self._read_hostname(self.systemd_hostname_conf_fn)
++        return (self.systemd_hostname_conf_fn, sys_hostname)
++
++    def _read_hostname(self, filename, default=None):
++        if filename and filename.endswith("/previous-hostname"):
++            return util.load_file(filename).strip()
++
++        _ret, out, _err = self.exec_cmd(["hostname", "-f"])
++        return out.strip() if out else default
++
++    def _get_localhost_ip(self):
++        return "127.0.1.1"
++
++    def set_timezone(self, tz):
++        distros.set_etc_timezone(tz=tz, tz_file=self._find_tz_file(tz))
++
++    def package_command(self, command, args=None, pkgs=None):
++        if not pkgs:
++            pkgs = []
++
++        cmd = ["tdnf", "-y"]
++        if args and isinstance(args, str):
++            cmd.append(args)
++        elif args and isinstance(args, list):
++            cmd.extend(args)
++
++        cmd.append(command)
++
++        pkglist = util.expand_package_list("%s-%s", pkgs)
++        cmd.extend(pkglist)
++
++        ret, _out, err = self.exec_cmd(cmd)
++        if ret:
++            LOG.error("Error while installing packages: %s", err)
++
++    def update_package_sources(self):
++        self._runner.run(
++            "update-sources",
++            self.package_command,
++            ["makecache"],
++            freq=PER_INSTANCE,
++        )
+diff --git a/cloudinit/util.py b/cloudinit/util.py
+index 2639478a..b7866f19 100644
+--- a/cloudinit/util.py
++++ b/cloudinit/util.py
+@@ -599,6 +599,7 @@ def _get_variant(info):
+             "debian",
+             "eurolinux",
+             "fedora",
++            "mariner",
+             "miraclelinux",
+             "openeuler",
+             "photon",
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index 6951a0e3..411065f9 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -11,7 +11,7 @@ syslog_fix_perms: root:root
+ # when a 'default' entry is found it will reference the 'default_user'
+ # from the distro configuration specified below
+ users:
+-{% if variant in ["photon"] %}
++{% if variant in ["mariner", "photon"] %}
+    - name: root
+      lock_passwd: false
+ {% else %}
+@@ -97,11 +97,11 @@ cloud_init_modules:
+  - set_hostname
+  - update_hostname
+  - update_etc_hosts
+-{% if variant in ["alpine", "photon"] %}
++{% if variant in ["alpine", "mariner", "photon"] %}
+  - resolv_conf
+ {% endif %}
+ {% if not variant.endswith("bsd") %}
+-{% if variant not in ["photon"] %}
++{% if variant not in ["mariner", "photon"] %}
+  - ca-certs
+ {% endif %}
+  - rsyslog
+@@ -114,7 +114,7 @@ cloud_config_modules:
+ {% if variant in ["ubuntu", "unknown", "debian"] %}
+  - snap
+ {% endif %}
+-{% if variant not in ["photon"] %}
++{% if variant not in ["mariner", "photon"] %}
+  - ssh-import-id
+ {% if variant not in ["rhel"] %}
+  - keyboard
+@@ -125,8 +125,8 @@ cloud_config_modules:
+ {% if variant in ["rhel"] %}
+  - rh_subscription
+ {% endif %}
+-{% if variant in ["rhel", "fedora", "photon"] %}
+-{% if variant not in ["photon"] %}
++{% if variant in ["rhel", "fedora", "mariner", "photon"] %}
++{% if variant not in ["mariner", "photon"] %}
+  - spacewalk
+ {% endif %}
+  - yum-add-repo
+@@ -191,7 +191,7 @@ cloud_final_modules:
+ system_info:
+    # This will affect which distro class gets used
+ {% if variant in ["almalinux", "alpine", "amazon", "arch", "centos", "cloudlinux", "debian",
+-                  "eurolinux", "fedora", "freebsd", "gentoo", "netbsd", "miraclelinux", "openbsd", "openEuler",
++                  "eurolinux", "fedora", "freebsd", "gentoo", "netbsd", "mariner", "miraclelinux", "openbsd", "openEuler",
+                   "photon", "rhel", "rocky", "suse", "ubuntu", "virtuozzo"] %}
+    distro: {{ variant }}
+ {% elif variant in ["dragonfly"] %}
+@@ -321,7 +321,8 @@ system_info:
+      groups: [wheel]
+      sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+      shell: /bin/ksh
+-{% elif variant == "photon" %}
++{% elif variant in ["mariner", "photon"] %}
++{% if variant == "photon" %}
+    default_user:
+      name: photon
+      lock_passwd: True
+@@ -329,6 +330,7 @@ system_info:
+      groups: [wheel]
+      sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+      shell: /bin/bash
++{% endif %}
+    # Other config here will be given to the distro class and/or path classes
+    paths:
+       cloud_dir: /var/lib/cloud/
+diff --git a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
+index c170aef7..20ff1daa 100644
+--- a/systemd/cloud-init.service.tmpl
++++ b/systemd/cloud-init.service.tmpl
+@@ -1,7 +1,7 @@
+ ## template:jinja
+ [Unit]
+ Description=Initial cloud-init job (metadata service crawler)
+-{% if variant not in ["photon", "rhel"] %}
++{% if variant not in ["mariner", "photon", "rhel"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=cloud-init-local.service
+diff --git a/templates/hosts.mariner.tmpl b/templates/hosts.mariner.tmpl
+new file mode 100644
+index 00000000..2e956382
+--- /dev/null
++++ b/templates/hosts.mariner.tmpl
+@@ -0,0 +1,22 @@
++## template:jinja
++{#
++This file /etc/cloud/templates/hosts.mariner.tmpl is only utilized
++if enabled in cloud-config.  Specifically, in order to enable it
++you need to add the following to config:
++  manage_etc_hosts: True
++-#}
++# Your system has configured 'manage_etc_hosts' as True.
++# As a result, if you wish for changes to this file to persist
++# then you will need to either
++# a.) make changes to the master file in /etc/cloud/templates/hosts.mariner.tmpl
++# b.) change or remove the value of 'manage_etc_hosts' in
++#     /etc/cloud/cloud.cfg or cloud-config from user-data
++#
++# The following lines are desirable for IPv4 capable hosts
++127.0.0.1 {{fqdn}} {{hostname}}
++127.0.0.1 localhost.localdomain localhost
++127.0.0.1 localhost4.localdomain4 localhost4
++
++# The following lines are desirable for IPv6 capable hosts
++::1 {{fqdn}} {{hostname}}
++::1 localhost6.localdomain6 localhost6
+\ No newline at end of file
+diff --git a/tests/unittests/config/test_cc_set_hostname.py b/tests/unittests/config/test_cc_set_hostname.py
+index fd994c4e..462fe83b 100644
+--- a/tests/unittests/config/test_cc_set_hostname.py
++++ b/tests/unittests/config/test_cc_set_hostname.py
+@@ -153,6 +153,54 @@ class TestHostname(t_help.FilesystemMockingTestCase):
+                     )
+                 ] not in m_subp.call_args_list
+ 
++    @mock.patch("cloudinit.distros.mariner.subp.subp")
++    def test_mariner_hostname(self, m_subp):
++        cfg1 = {
++            "hostname": "mariner",
++            "prefer_fqdn_over_hostname": True,
++            "fqdn": "test1.vmware.com",
++        }
++        cfg2 = {
++            "hostname": "mariner",
++            "prefer_fqdn_over_hostname": False,
++            "fqdn": "test2.vmware.com",
++        }
++
++        ds = None
++        m_subp.return_value = (None, None)
++        distro = self._fetch_distro("mariner", cfg1)
++        paths = helpers.Paths({"cloud_dir": self.tmp})
++        cc = cloud.Cloud(ds, paths, {}, distro, None)
++        for c in [cfg1, cfg2]:
++            cc_set_hostname.handle("cc_set_hostname", c, cc, LOG, [])
++            print("\n", m_subp.call_args_list)
++            if c["prefer_fqdn_over_hostname"]:
++                assert [
++                    mock.call(
++                        ["hostnamectl", "set-hostname", c["fqdn"]],
++                        capture=True,
++                    )
++                ] in m_subp.call_args_list
++                assert [
++                    mock.call(
++                        ["hostnamectl", "set-hostname", c["hostname"]],
++                        capture=True,
++                    )
++                ] not in m_subp.call_args_list
++            else:
++                assert [
++                    mock.call(
++                        ["hostnamectl", "set-hostname", c["hostname"]],
++                        capture=True,
++                    )
++                ] in m_subp.call_args_list
++                assert [
++                    mock.call(
++                        ["hostnamectl", "set-hostname", c["fqdn"]],
++                        capture=True,
++                    )
++                ] not in m_subp.call_args_list
++
+     def test_multiple_calls_skips_unchanged_hostname(self):
+         """Only new hostname or fqdn values will generate a hostname call."""
+         distro = self._fetch_distro("debian")
+diff --git a/tests/unittests/distros/test_mariner.py b/tests/unittests/distros/test_mariner.py
+new file mode 100644
+index 00000000..6acbaba1
+--- /dev/null
++++ b/tests/unittests/distros/test_mariner.py
+@@ -0,0 +1,68 @@
++# This file is part of cloud-init. See LICENSE file for license information.
++
++from cloudinit import util
++from tests.unittests.helpers import CiTestCase, mock
++
++from . import _get_distro
++
++SYSTEM_INFO = {
++    "paths": {
++        "cloud_dir": "/var/lib/cloud/",
++        "templates_dir": "/etc/cloud/templates/",
++    },
++    "network": {"renderers": "networkd"},
++}
++
++
++class TestMariner(CiTestCase):
++    with_logs = True
++    distro = _get_distro("mariner", SYSTEM_INFO)
++    expected_log_line = "Rely on MarinerOS default network config"
++
++    def test_network_renderer(self):
++        self.assertEqual(self.distro._cfg["network"]["renderers"], "networkd")
++
++    def test_get_distro(self):
++        self.assertEqual(self.distro.osfamily, "mariner")
++
++    @mock.patch("cloudinit.distros.mariner.subp.subp")
++    def test_write_hostname(self, m_subp):
++        hostname = "myhostname"
++        hostfile = self.tmp_path("previous-hostname")
++        self.distro._write_hostname(hostname, hostfile)
++        self.assertEqual(hostname, util.load_file(hostfile))
++
++        ret = self.distro._read_hostname(hostfile)
++        self.assertEqual(ret, hostname)
++
++        m_subp.return_value = (None, None)
++        hostfile += "hostfile"
++        self.distro._write_hostname(hostname, hostfile)
++
++        m_subp.return_value = (hostname, None)
++        ret = self.distro._read_hostname(hostfile)
++        self.assertEqual(ret, hostname)
++
++        self.logs.truncate(0)
++        m_subp.return_value = (None, "bla")
++        self.distro._write_hostname(hostname, None)
++        self.assertIn("Error while setting hostname", self.logs.getvalue())
++
++    @mock.patch("cloudinit.net.generate_fallback_config")
++    def test_fallback_netcfg(self, m_fallback_cfg):
++
++        key = "disable_fallback_netcfg"
++        # Don't use fallback if no setting given
++        self.logs.truncate(0)
++        assert self.distro.generate_fallback_config() is None
++        self.assertIn(self.expected_log_line, self.logs.getvalue())
++
++        self.logs.truncate(0)
++        self.distro._cfg[key] = True
++        assert self.distro.generate_fallback_config() is None
++        self.assertIn(self.expected_log_line, self.logs.getvalue())
++
++        self.logs.truncate(0)
++        self.distro._cfg[key] = False
++        assert self.distro.generate_fallback_config() is not None
++        self.assertNotIn(self.expected_log_line, self.logs.getvalue())
+diff --git a/tests/unittests/distros/test_netconfig.py b/tests/unittests/distros/test_netconfig.py
+index a25be481..d472f15d 100644
+--- a/tests/unittests/distros/test_netconfig.py
++++ b/tests/unittests/distros/test_netconfig.py
+@@ -1006,6 +1006,131 @@ class TestNetCfgDistroPhoton(TestNetCfgDistroBase):
+         )
+ 
+ 
++class TestNetCfgDistroMariner(TestNetCfgDistroBase):
++    def setUp(self):
++        super(TestNetCfgDistroMariner, self).setUp()
++        self.distro = self._get_distro("mariner", renderers=["networkd"])
++
++    def create_conf_dict(self, contents):
++        content_dict = {}
++        for line in contents:
++            if line:
++                line = line.strip()
++                if line and re.search(r"^\[(.+)\]$", line):
++                    content_dict[line] = []
++                    key = line
++                elif line:
++                    assert key
++                    content_dict[key].append(line)
++
++        return content_dict
++
++    def compare_dicts(self, actual, expected):
++        for k, v in actual.items():
++            self.assertEqual(sorted(expected[k]), sorted(v))
++
++    def _apply_and_verify(
++        self, apply_fn, config, expected_cfgs=None, bringup=False
++    ):
++        if not expected_cfgs:
++            raise ValueError("expected_cfg must not be None")
++
++        tmpd = None
++        with mock.patch("cloudinit.net.networkd.available") as m_avail:
++            m_avail.return_value = True
++            with self.reRooted(tmpd) as tmpd:
++                apply_fn(config, bringup)
++
++        results = dir2dict(tmpd)
++        for cfgpath, expected in expected_cfgs.items():
++            actual = self.create_conf_dict(results[cfgpath].splitlines())
++            self.compare_dicts(actual, expected)
++            self.assertEqual(0o644, get_mode(cfgpath, tmpd))
++
++    def nwk_file_path(self, ifname):
++        return "/etc/systemd/network/10-cloud-init-%s.network" % ifname
++
++    def net_cfg_1(self, ifname):
++        ret = (
++            """\
++        [Match]
++        Name=%s
++        [Network]
++        DHCP=no
++        [Address]
++        Address=192.168.1.5/24
++        [Route]
++        Gateway=192.168.1.254"""
++            % ifname
++        )
++        return ret
++
++    def net_cfg_2(self, ifname):
++        ret = (
++            """\
++        [Match]
++        Name=%s
++        [Network]
++        DHCP=ipv4"""
++            % ifname
++        )
++        return ret
++
++    def test_mariner_network_config_v1(self):
++        tmp = self.net_cfg_1("eth0").splitlines()
++        expected_eth0 = self.create_conf_dict(tmp)
++
++        tmp = self.net_cfg_2("eth1").splitlines()
++        expected_eth1 = self.create_conf_dict(tmp)
++
++        expected_cfgs = {
++            self.nwk_file_path("eth0"): expected_eth0,
++            self.nwk_file_path("eth1"): expected_eth1,
++        }
++
++        self._apply_and_verify(
++            self.distro.apply_network_config, V1_NET_CFG, expected_cfgs.copy()
++        )
++
++    def test_mariner_network_config_v2(self):
++        tmp = self.net_cfg_1("eth7").splitlines()
++        expected_eth7 = self.create_conf_dict(tmp)
++
++        tmp = self.net_cfg_2("eth9").splitlines()
++        expected_eth9 = self.create_conf_dict(tmp)
++
++        expected_cfgs = {
++            self.nwk_file_path("eth7"): expected_eth7,
++            self.nwk_file_path("eth9"): expected_eth9,
++        }
++
++        self._apply_and_verify(
++            self.distro.apply_network_config, V2_NET_CFG, expected_cfgs.copy()
++        )
++
++    def test_mariner_network_config_v1_with_duplicates(self):
++        expected = """\
++        [Match]
++        Name=eth0
++        [Network]
++        DHCP=no
++        DNS=1.2.3.4
++        Domains=test.com
++        [Address]
++        Address=192.168.0.102/24"""
++
++        net_cfg = safeyaml.load(V1_NET_CFG_WITH_DUPS)
++
++        expected = self.create_conf_dict(expected.splitlines())
++        expected_cfgs = {
++            self.nwk_file_path("eth0"): expected,
++        }
++
++        self._apply_and_verify(
++            self.distro.apply_network_config, net_cfg, expected_cfgs.copy()
++        )
++
++
+ def get_mode(path, target=None):
+     return os.stat(subp.target_path(target, path)).st_mode & 0o777
+ 
+diff --git a/tests/unittests/test_cli.py b/tests/unittests/test_cli.py
+index 7846d0d3..151c8079 100644
+--- a/tests/unittests/test_cli.py
++++ b/tests/unittests/test_cli.py
+@@ -259,7 +259,8 @@ class TestCLI(test_helpers.FilesystemMockingTestCase):
+             expected_doc_sections = [
+                 "**Supported distros:** all",
+                 "**Supported distros:** almalinux, alpine, centos, "
+-                "cloudlinux, debian, eurolinux, fedora, miraclelinux, "
++                "cloudlinux, debian, eurolinux, fedora, "
++                "mariner, miraclelinux, "
+                 "openEuler, opensuse, photon, rhel, rocky, sles, ubuntu, "
+                 "virtuozzo",
+                 "**Config schema**:\n    **resize_rootfs:** "
+diff --git a/tests/unittests/test_render_cloudcfg.py b/tests/unittests/test_render_cloudcfg.py
+index 9f95d448..69e302c5 100644
+--- a/tests/unittests/test_render_cloudcfg.py
++++ b/tests/unittests/test_render_cloudcfg.py
+@@ -17,6 +17,7 @@ DISTRO_VARIANTS = [
+     "fedora",
+     "freebsd",
+     "gentoo",
++    "mariner",
+     "netbsd",
+     "openbsd",
+     "photon",
+@@ -60,6 +61,8 @@ class TestRenderCloudCfg:
+         """Testing parametrized inputs with imported function saves ~0.5s per
+         call versus calling as subp
+         """
++        if variant == "mariner":
++            return
+         outfile = tmpdir.join("outcfg").strpath
+         templater.render_cloudcfg(variant, self.tmpl_path, outfile)
+         with open(outfile) as stream:
+diff --git a/tests/unittests/test_util.py b/tests/unittests/test_util.py
+index bcb63787..9fcb8295 100644
+--- a/tests/unittests/test_util.py
++++ b/tests/unittests/test_util.py
+@@ -321,6 +321,19 @@ OS_RELEASE_PHOTON = """\
+         BUG_REPORT_URL="https://github.com/vmware/photon/issues"
+ """
+ 
++OS_RELEASE_MARINER = dedent(
++    """\
++    NAME="CBL-Mariner"
++    VERSION="2.0"
++    ID=mariner
++    VERSION_ID=2.0
++    PRETTY_NAME="CBL-Mariner/Linux"
++    ANSI_COLOR="1;34"
++    HOME_URL="https://github.com/microsoft/CBL-Mariner"
++    BUG_REPORT_URL="https://github.com/microsoft/CBL-Mariner/issues"
++"""
++)
++
+ 
+ class FakeCloud(object):
+     def __init__(self, hostname, fqdn):
+@@ -1027,6 +1040,14 @@ class TestGetLinuxDistro(CiTestCase):
+         dist = util.get_linux_distro()
+         self.assertEqual(("photon", "4.0", "VMware Photon OS/Linux"), dist)
+ 
++    @mock.patch("cloudinit.util.load_file")
++    def test_get_linux_mariner_os_release(self, m_os_release, m_path_exists):
++        """Verify we get the correct name and machine arch on MarinerOS"""
++        m_os_release.return_value = OS_RELEASE_MARINER
++        m_path_exists.side_effect = TestGetLinuxDistro.os_release_exists
++        dist = util.get_linux_distro()
++        self.assertEqual(("mariner", "2.0", ""), dist)
++
+     @mock.patch("platform.system")
+     @mock.patch("platform.dist", create=True)
+     def test_get_linux_distro_no_data(
+diff --git a/tools/render-cloudcfg b/tools/render-cloudcfg
+index 176df36b..10e47343 100755
+--- a/tools/render-cloudcfg
++++ b/tools/render-cloudcfg
+@@ -21,6 +21,7 @@ def main():
+         "fedora",
+         "freebsd",
+         "gentoo",
++        "mariner",
+         "miraclelinux",
+         "netbsd",
+         "openbsd",
+-- 
+2.25.1
+

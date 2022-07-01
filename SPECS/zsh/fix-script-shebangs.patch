@@ -1,0 +1,66 @@
+From a59124d7f64c11c66e1064a4743a21e363f9ec5b Mon Sep 17 00:00:00 2001
+From: Olivia Crain <olivia@olivia.dev>
+Date: Thu, 16 Jun 2022 18:10:03 +0000
+Subject: [PATCH] Fix scripts with /usr/local/bin/zsh shebang lines
+
+---
+ Functions/VCS_Info/test-repo-git-rebase-apply | 2 +-
+ Functions/VCS_Info/test-repo-git-rebase-merge | 2 +-
+ Misc/globtests                                | 2 +-
+ Misc/globtests.ksh                            | 2 +-
+ Util/reporter                                 | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Functions/VCS_Info/test-repo-git-rebase-apply b/Functions/VCS_Info/test-repo-git-rebase-apply
+index ce49690..7bff9e5 100755
+--- a/Functions/VCS_Info/test-repo-git-rebase-apply
++++ b/Functions/VCS_Info/test-repo-git-rebase-apply
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/zsh -f
++#!/usr/bin/zsh -f
+ #
+ # This script creates a test repository for testing the git backend's behaviour during rebase-apply operations.
+ #
+diff --git a/Functions/VCS_Info/test-repo-git-rebase-merge b/Functions/VCS_Info/test-repo-git-rebase-merge
+index ce49690..7bff9e5 100755
+--- a/Functions/VCS_Info/test-repo-git-rebase-merge
++++ b/Functions/VCS_Info/test-repo-git-rebase-merge
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/zsh -f
++#!/usr/bin/zsh -f
+ #
+ # This script creates a test repository for testing the git backend's behaviour during rebase-apply operations.
+ #
+diff --git a/Misc/globtests b/Misc/globtests
+index 482c962..0c08c28 100755
+--- a/Misc/globtests
++++ b/Misc/globtests
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/zsh -f
++#!/usr/bin/zsh -f
+ 
+ setopt extendedglob badpattern
+ unsetopt kshglob
+diff --git a/Misc/globtests.ksh b/Misc/globtests.ksh
+index 6a9bf9b..59c086e 100755
+--- a/Misc/globtests.ksh
++++ b/Misc/globtests.ksh
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/zsh -f
++#!/usr/bin/zsh -f
+ 
+ setopt kshglob extendedglob
+ 
+diff --git a/Util/reporter b/Util/reporter
+index 7ddd51f..08b58b1 100644
+--- a/Util/reporter
++++ b/Util/reporter
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/zsh
++#!/usr/bin/zsh
+ #
+ # NAME:
+ #	reporter
+-- 
+2.34.1
+

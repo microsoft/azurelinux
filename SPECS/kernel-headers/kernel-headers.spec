@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.37.1
-Release:        2%{?dist}
+Version:        5.15.48.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,6 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %build
 make mrproper
-make headers_check
 
 %install
 cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
@@ -37,6 +36,40 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
+- Bump release number to match kernel release
+
+* Mon Jun 27 2022 Henry Beberman <henry.beberman@microsoft.com> - 5.15.48.1-3
+- Bump release number to match kernel release
+
+* Wed Jun 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-2
+- Bump release number to match kernel release
+
+* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
+- Update source to 5.15.48.1
+
+* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.45.1-2
+- Bump release number to match kernel release
+
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
+- Update source to 5.15.45.1
+- Remove make headers_check since it is a noop
+
+* Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
+- Bump release number to match kernel release
+
+* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.41.1-3
+- Bump release number to match kernel release
+
+* Thu May 26 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.41.1-2
+- Bump release number to match kernel release
+
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.41.1-1
+- Update source to 5.15.41.1
+
+* Tue May 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-3
+- Bump release number to match kernel release
+
 * Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-2
 - Bump release number to match kernel release
 

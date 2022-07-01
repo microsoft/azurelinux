@@ -1,7 +1,7 @@
 Summary:        USB network redirection protocol libraries
 Name:           usbredir
-Version:        0.10.0
-Release:        3%{?dist}
+Version:        0.12.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ A simple USB host TCP server, using libusbredirhost.
 %{_mandir}/man1/usbredirserver.1*
 
 %changelog
+* Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.0-1
+- Updating to 0.12.0 to fix CVE-2021-3700.
+
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.0-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec

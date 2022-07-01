@@ -9,17 +9,17 @@
 %_lib               lib
 %_lib64             lib64
 %_prefix            /usr
-%_exec_prefix       /usr
-%_bindir            /usr/bin
-%_sbindir           /usr/sbin
+%_exec_prefix       %{_prefix}
+%_bindir            %{_exec_prefix}/bin
+%_sbindir           %{_exec_prefix}/sbin
 %_libdir            /usr/%{_lib}
 %_lib64dir          /usr/%{_lib64}
-%_libexecdir        /usr/libexec
-%_datadir           /usr/share
-%_docdir            /usr/share/doc
-%_includedir        /usr/include
-%_infodir           /usr/share/info
-%_mandir            /usr/share/man
+%_libexecdir        %{_exec_prefix}/libexec
+%_datadir           %{_prefix}/share
+%_docdir            %{_datadir}/doc
+%_includedir        %{_prefix}/include
+%_infodir           %{_datadir}/info
+%_mandir            %{_datadir}/man
 %_oldincludedir     /usr/include
 %_sharedstatedir    /var/lib
 %_var               /var
@@ -36,7 +36,7 @@
 # Generate metadata linker script before prep section of each SPEC
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
-/usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir}\
+/usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir} %{mariner_release_version}\
 %{nil}
 
 # This section overrides the default behavior of the build macro to export
@@ -82,11 +82,13 @@
 # Binary macros
 %__make %{_bindir}/make
 
+# Enable linking with module_info.ld in Mariner build environment by defining: mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld
+
 # Compilation and linking flag macros
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} -Wl,-dT,%{_topdir}/BUILD/module_info.ld
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?mariner_module_ldflags:%{mariner_module_ldflags}}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}

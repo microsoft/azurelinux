@@ -3,12 +3,14 @@
 Summary:        Sphinx extension for HTML help files
 Name:           python-%{pypi_name}
 Version:        2.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+# Upstream fix: https://github.com/sphinx-doc/sphinxcontrib-htmlhelp/pull/16
+Patch0:         test_htmlhelp_path_fix.patch
 
 BuildArch:      noarch
 
@@ -39,7 +41,7 @@ Summary:        %{summary}
 sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files.
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -p1 -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
 
 %build
@@ -77,6 +79,9 @@ python3 -m pytest
 %{python3_sitelib}/sphinxcontrib_htmlhelp-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-5
+- Fixing ptests.
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Cleaning-up spec. License verified.

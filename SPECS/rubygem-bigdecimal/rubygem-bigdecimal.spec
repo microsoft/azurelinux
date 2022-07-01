@@ -1,10 +1,9 @@
 %global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name bigdecimal
 Summary:        BigDecimal provides arbitrary-precision floating point decimal arithmetic
 Name:           rubygem-bigdecimal
 Version:        3.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +44,9 @@ cp LICENSE.txt %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Tue May 31 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-3
+- Cleanup
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-2
 - Add provides
 

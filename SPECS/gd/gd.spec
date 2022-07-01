@@ -19,8 +19,8 @@
 %define prjname libgd
 %define lname libgd3
 Name:           gd
-Version:        2.3.0
-Release:        5%{?dist}
+Version:        2.3.3
+Release:        2%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -34,7 +34,6 @@ Patch1:         gd-fontpath.patch
 Patch2:         gd-format.patch
 # could be upstreamed
 Patch3:         gd-aliasing.patch
-Patch4:         CVE-2021-40145.patch
 BuildRequires:  fontconfig-devel
 # needed for tests
 BuildRequires:  libjpeg-devel
@@ -84,7 +83,6 @@ the formats accepted for inline images by most browsers.
 %patch1
 %patch2
 %patch3
-%patch4 -p1
 chmod 644 COPYING
 
 %build
@@ -122,6 +120,7 @@ XFAIL_TESTS="gdimagegrayscale/basic $XFAIL_TESTS"
 %endif
 %endif
 export XFAIL_TESTS
+export TMPDIR=${TMPDIR:/tmp}
 %make_build check
 
 %install
@@ -158,6 +157,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Tue Jun 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.3.3-2
+- Added temporary directory variable to check section to fix failing tests
+- See https://github.com/libgd/libgd/issues/763 for details
+
+* Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.3.3-1
+- Upgrade to 2.3.3 to address CVE-2021-38115 and CVE-2021-40812
+
 * Tue Apr 12 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.0-5
 - Backport patch from upstream to address CVE-2021-40145
 

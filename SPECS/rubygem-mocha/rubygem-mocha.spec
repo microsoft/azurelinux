@@ -1,10 +1,8 @@
-%global debug_package %{nil}
-%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name mocha
 Summary:        Mocking and stubbing library
 Name:           rubygem-mocha
 Version:        1.13.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +38,9 @@ cp COPYING.md %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.0-4
+- Cleanup
+
 * Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.0-3
 - Adding patch to remove missing development_dependencies from .gemspec
 
