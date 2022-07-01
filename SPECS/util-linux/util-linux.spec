@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,8 @@ URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/a
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
 Source1:        runuser
 Source2:        runuser-l
+Source3:        su
+Source4:        su-l
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -71,7 +73,6 @@ autoreconf -fi
     --disable-nologin \
     --disable-chfn-chsh \
     --disable-login \
-    --disable-su \
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
@@ -95,6 +96,8 @@ install -d %{buildroot}%{_sharedstatedir}/libuuid
 install -vdm755 %{buildroot}%{_sysconfdir}/pam.d
 install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
+install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
+install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
@@ -121,6 +124,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_docdir}/util-linux/getopt*
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser-l
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su-l
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -143,6 +148,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.4-3
+- Enable su tool and related PAM configs
+
 * Mon Jun 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.37.4-2
 - Add Buildrequires libcap-ng-devel to build setpriv
 
