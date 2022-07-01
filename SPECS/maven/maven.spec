@@ -1,3 +1,16 @@
+%global debug_package %{nil}
+# Switch "sources_generation" to 1 when running a package build to generate cached sources for regular builds.
+%define sources_generation 0
+%define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
+%define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
+
+%define _prefixmvn %{_var}/opt/apache-%{name}
+%define _bindirmvn %{_prefixmvn}/bin
+%define _libdirmvn %{_prefixmvn}/lib
+
+# Mariner 1.0 based package version being used. This needs to be updated in case of updates in 1.0.
+%define mvn_1_0_pmc_ver 3.5.4-13
+
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.4
@@ -7,24 +20,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://maven.apache.org/
-Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
-# Using pre-compiled binaries because 'maven' requires itself during build-time.
-Source1:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/binaries/apache-%{name}-%{version}-bin.tar.gz
-%global debug_package %{nil}
-# Switch "sources_generation" to 1 when running a package build to generate cached sources for regular builds.
-%define sources_generation 0
-%define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
-%define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
+Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz#/apache-%{name}-%{version}-src.tar.gz
+# @TODO
+# Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
+# Relying on 1.0 maven rpm to provide the mvn binary for the build.
+%ifarch x86_64
+Source1:        https://packages.microsoft.com/cbl-mariner/1.0/prod/base/x86_64/rpms/%{name}-%{mvn_1_0_pmc_ver}.cm1.x86_64.rpm#/%{name}-%{mvn_1_0_pmc_ver}.cm1.x86_64.rpm
+%endif
+%ifarch aarch64
+Source1:        https://packages.microsoft.com/cbl-mariner/1.0/prod/base/aarch64/rpms/%{name}-%{mvn_1_0_pmc_ver}.cm1.aarch64.rpm#/%{name}-%{mvn_1_0_pmc_ver}.cm1.aarch64.rpm
+%endif
+
 %if ! 0%{?sources_generation}
 %define offline_build -o
 %endif
-%define _prefixmvn %{_var}/opt/apache-%{name}
-%define _bindirmvn %{_prefixmvn}/bin
-%define _libdirmvn %{_prefixmvn}/lib
-BuildRequires:  ant
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  msopenjdk-11
 BuildRequires:  wget
+BuildRequires:  which
 Requires:       %{_bindir}/which
 Requires:       msopenjdk-11
 # In order to re-generate these sources after a version update, switch "sources_generation" to 1
@@ -49,11 +62,9 @@ the regular builds of "maven" when the "sources_generation" macro is set to 0.
 %endif
 
 %prep
-# Setup mvn binary
-tar xf %{SOURCE1} --no-same-owner
-mv ./apache-maven-%{version} %{_var}/opt/
-ln -sfvn apache-maven-%{version} %{_var}/opt/apache-maven
-ln -sfv %{_var}/opt/apache-maven/bin/mvn %{_bindir}/mvn
+# Installing 1.0 maven rpm from PMC to provide prebuilt mvn binary.
+rpm -i --nodeps %{SOURCE1}
+which mvn
 
 %if ! 0%{?sources_generation}
 # Setup maven .m2 cache directory
@@ -85,6 +96,33 @@ pwd
 echo $LD_LIBRARY_PATH
 echo $MAVEN_DIST_DIR
 mvn -DdistributionTargetDir=$MAVEN_DIST_DIR -DskipTests clean package %{?offline_build}
+
+%check
+echo "1.0 based mvn rpm is uploaded to mariner blob store. Compare checksums of blob rpm and latest pmc rpm package."
+pushd %{_tmppath}
+mvnpmcmd5=
+%ifarch x86_64
+wget https://packages.microsoft.com/cbl-mariner/1.0/prod/base/x86_64/rpms/maven-%{mvn_1_0_pmc_ver}.cm1.x86_64.rpm
+mvnpmcmd5=$(md5sum maven-%{mvn_1_0_pmc_ver}.cm1.x86_64.rpm)
+mvnpmcmd5=$(echo $mvnpmcmd5 | cut -d' ' -f 1)
+%endif
+%ifarch aarch64
+wget https://packages.microsoft.com/cbl-mariner/1.0/prod/base/aarch64/rpms/maven-%{mvn_1_0_pmc_ver}.cm1.aarch64.rpm
+mvnpmcmd5=$(md5sum maven-%{mvn_1_0_pmc_ver}.cm1.aarch64.rpm)
+mvnpmcmd5=$(echo $mvnpmcmd5 | cut -d' ' -f 1)
+%endif
+
+mvnmd5=$(md5sum %{SOURCE1})
+mvnmd5=$(echo $mvnmd5 | cut -d' ' -f 1)
+
+if [[ $mvnpmcmd5 =~ $mvnmd5 ]];then
+echo "mvn m5sum matches."
+else
+echo "Mismatch in mvn md5sum, exiting build."
+popd
+exit 1
+fi
+popd
 
 %install
 mkdir -p %{buildroot}%{_prefixmvn}
@@ -157,6 +195,7 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %changelog
 * Mon Jun 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-1
 - Adding apache maven as build dependency for cassandra reaper.
+- Using 1.0 maven rpm from PMC as source to provide pre-built binary for building sources.
 - Updated to version 3.8.4.
 
 * Wed May 05 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.1-1
