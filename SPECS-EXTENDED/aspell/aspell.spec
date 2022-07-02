@@ -12,7 +12,7 @@ License:        LGPLv2+ AND LGPLv2 AND GPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://aspell.net/
-Source:         https://github.com/GNUAspell/aspell/archive/rel-%{version}.tar.gz
+Source:         https://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
 Patch2:         aspell-0.60.7-mp.patch
@@ -43,7 +43,7 @@ The aspell-devel package includes libraries
 and header files needed for Aspell development.
 
 %prep
-%setup -q -n %{name}-rel-%{version}
+%setup -q
 %patch0 -p1 -b .fc
 %patch1 -p1 -b .mlib
 %patch2 -p1 -b .ai
