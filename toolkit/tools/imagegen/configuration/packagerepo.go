@@ -141,10 +141,10 @@ func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	const (
 		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY\n"
 		enable       = "enabled=1\n"
-		gpgCheck     = "gpgcheck=0\n"
-		repogpgCheck = "repo_gpgcheck=0\n"
+		gpgCheck     = "gpgcheck=1\n"
+		repogpgCheck = "repo_gpgcheck=1\n"
 		skip         = "skip_if_unavailable=True\n"
-		sslVerify    = "sslverify=0\n"
+		sslVerify    = "sslverify=1\n"
 	)
 
 	additionalFields := []string{gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify}

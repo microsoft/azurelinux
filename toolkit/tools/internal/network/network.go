@@ -71,7 +71,7 @@ func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 		retryAttempts = 10
 		retryDuration = time.Second
 		squashErrors  = false
-		activeStatus = "active"
+		activeStatus  = "active"
 	)
 
 	err = retry.Run(func() error {
