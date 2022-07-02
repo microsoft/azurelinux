@@ -43,7 +43,7 @@ The aspell-devel package includes libraries
 and header files needed for Aspell development.
 
 %prep
-%setup -q
+%setup -q -n %{name}-rel-%{version}
 %patch0 -p1 -b .fc
 %patch1 -p1 -b .mlib
 %patch2 -p1 -b .ai
