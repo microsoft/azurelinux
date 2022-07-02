@@ -71,6 +71,7 @@ func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 		retryAttempts = 10
 		retryDuration = time.Second
 		squashErrors  = false
+		activeStatus = "active"
 	)
 
 	err = retry.Run(func() error {
@@ -80,8 +81,14 @@ func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 			return err
 		}
 
-		err = shell.ExecuteLive(squashErrors, "systemctl", "is-active", "1", "www.microsoft.com")
-		hasNetworkAccess = err == nil
+		stdout, stderr, err := shell.Execute("systemctl", "is-active", "systemd-networkd-wait-online")
+		if err != nil {
+			logger.Log.Errorf("Failed to query status of systemd-networkd-wait-online: %v", stderr)
+			return err
+		}
+
+		serviceStatus := strings.TrimSpace(stdout)
+		hasNetworkAccess = serviceStatus == activeStatus
 		if !hasNetworkAccess {
 			logger.Log.Warnf("No network access yet")
 		}

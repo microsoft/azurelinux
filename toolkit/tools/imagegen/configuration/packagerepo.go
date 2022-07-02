@@ -111,7 +111,7 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 		return
 	}
 	if !hasNetworkAccess {
-		logger.Log.Warnf("No outbound network access in the system. Expected if system is only configured with internal network access")
+		err = fmt.Errorf("no network access in the system")
 	}
 	return
 }
@@ -141,10 +141,10 @@ func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	const (
 		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY\n"
 		enable       = "enabled=1\n"
-		gpgCheck     = "gpgcheck=1\n"
-		repogpgCheck = "repo_gpgcheck=1\n"
+		gpgCheck     = "gpgcheck=0\n"
+		repogpgCheck = "repo_gpgcheck=0\n"
 		skip         = "skip_if_unavailable=True\n"
-		sslVerify    = "sslverify=1\n"
+		sslVerify    = "sslverify=0\n"
 	)
 
 	additionalFields := []string{gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify}
