@@ -1665,12 +1665,6 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
 
-%ifarch aarch64
-# Provided by package ipxe
-rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
-rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
-%endif
-
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
 # Provided by package seabios
@@ -2284,7 +2278,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 %changelog
 * Fri Jul 01 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-5
-- Ship efi*rom & pxe*rom rom files for x86_64 arch
+- Ship efi*rom & pxe*rom rom files
 
 * Wed Jun 15 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-4
 - Address CVE-2021-4206
