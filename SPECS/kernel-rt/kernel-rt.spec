@@ -13,7 +13,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.44.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 ExclusiveArch:  x86_64
+%ifarch x86_64
+BuildRequires:  pciutils-devel
+%endif
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -175,6 +178,10 @@ make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{a
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
 
+%ifarch x86_64
+make -C tools turbostat cpupower
+%endif
+
 #Compile bpftool
 make -C tools/bpf/bpftool
 
@@ -262,6 +269,11 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
+%ifarch x86_64
+# Install turbostat cpupower
+make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
+%endif
+
 # Remove trace (symlink to perf). This file creates duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
 
@@ -299,7 +311,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files
 %defattr(-,root,root)
 %license COPYING
-%exclude %dir /usr/lib/debug
+%exclude %dir %{_lib}/debug
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
@@ -336,8 +348,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
+%{_sbindir}/cpufreq-bench
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
+%{_lib64dir}/libcpupower.so*
+%{_sysconfdir}/cpufreq-bench.conf
+%{_includedir}/cpuidle.h
+%{_includedir}/cpufreq.h
+%{_mandir}/man1/cpupower*.gz
+%{_mandir}/man8/turbostat*.gz
+%{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
+%{_datadir}/bash-completion/completions/cpupower
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
@@ -356,6 +377,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jul 01 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-3
+- Build turbostat and cpupower
+
 * Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.44.1-2
 - Updating build steps for the regular kernel.
 
