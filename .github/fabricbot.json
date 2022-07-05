@@ -47,6 +47,7 @@
       "version": "1.0",
       "id": "znSU-jzNE",
       "config": {
+        "taskName": "Apply security tag for CVE patches",
         "conditions": {
           "operator": "and",
           "operands": [
@@ -71,8 +72,7 @@
               "label": "security"
             }
           }
-        ],
-        "taskName": "Apply security tag for CVE patches"
+        ]
       }
     },
     {
@@ -82,6 +82,7 @@
       "version": "1.0",
       "id": "7jJOHIRF6",
       "config": {
+        "taskName": "Add label for automatic PRs",
         "conditions": {
           "operator": "and",
           "operands": [
@@ -105,18 +106,11 @@
           "issues",
           "project_card"
         ],
-        "taskName": "Add label for automatic PRs",
         "actions": [
           {
             "name": "addLabel",
             "parameters": {
               "label": "Automatic PR"
-            }
-          },
-          {
-            "name": "",
-            "parameters": {
-              "reviewer": "CBL-Mariner-Devs"
             }
           }
         ]
