@@ -45,6 +45,6 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
-* Thu Jun 30 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.0-1
+* Fri Jul 01 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.0-1
 - Original version for CBL-Mariner.
 - License verified.
