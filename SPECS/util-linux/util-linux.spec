@@ -20,6 +20,7 @@ BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
+Conflicts:      shadow-utils < 4.9-10
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
