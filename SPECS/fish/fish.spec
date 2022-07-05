@@ -125,7 +125,7 @@ fi
 %{_pkgdocdir}
 
 %changelog
-* Fri Jul 01 2022 Daniel McIlvaney <damcilva@microsft.com> -  3.5.0-1
+* Fri Jul 01 2022 Daniel McIlvaney <damcilva@microsft.com> - 3.5.0-1
 - Update to 3.5.0 to reslove CVE-2022-20001
 
 * Thu Jun 30 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.2-5
