@@ -47,6 +47,7 @@ Provides:       /usr/sbin/nologin
 Provides:       /usr/sbin/useradd
 Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
+Conflicts:      util-linux < 2.37.4-3
 
 %description
 The Shadow package contains programs for handling passwords
@@ -88,7 +89,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-group-name-max-length=32 \
     --with-selinux \
     --with-audit \
-    --enable-man
+    --enable-man \
+    --with-su=no
 %make_build
 
 %install
@@ -174,7 +176,7 @@ chmod 000 %{_sysconfdir}/shadow
 
 %changelog
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-10
-- Remove su
+- Remove su binary which is now provided by util-linux
 
 * Mon Apr 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-9
 - Change /etc/shadow file permission to 000 and make it trackable by shadow-utils
