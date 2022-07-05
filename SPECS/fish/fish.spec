@@ -1,14 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
-
 Name:           fish
 Version:        3.1.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Friendly interactive shell
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 # GPLv2
 #   - src/fish.cpp
 #   and rest..
@@ -31,8 +29,6 @@ Summary:        Friendly interactive shell
 License:        GPLv2 and BSD and ISC and LGPLv2+ and MIT
 URL:            https://fishshell.com
 Source0:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
-Source1:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz.asc
-Source2:        gpgkey-003837986104878835FA516D7A67D962D88A709A.gpg
 
 BuildRequires:  cmake >= 3.2
 BuildRequires:  ninja-build
@@ -61,7 +57,6 @@ highlighting, autosuggestions, and tab completions that just work, with
 nothing to learn or configure.
 
 %prep
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
 rm -vrf pcre2-*
 
@@ -125,6 +120,10 @@ fi
 %{_pkgdocdir}
 
 %changelog
+* Thu Jun 30 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.2-5
+- Mariner has sha256 check so remove not required gpg and asc files.
+- Align vendor and distribution entries
+
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.2-4
 - Use _topdir instead of hard-coded value /usr/src/mariner
 - License verified

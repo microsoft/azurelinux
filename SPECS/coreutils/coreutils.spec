@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,6 +55,7 @@ These are the additional language files of coreutils.
 autoreconf -fi
 export FORCE_UNSAFE_CONFIGURE=1 &&  ./configure \
     --prefix=%{_prefix} \
+    --enable-install-program=arch \
     --enable-no-install-program=kill,uptime \
     --disable-silent-rules
 make %{?_smp_mflags}
@@ -64,7 +65,7 @@ make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
 install -vdm 755 %{buildroot}%{_sbindir}
 install -vdm 755 %{buildroot}%{_mandir}/man8
-mv -v %{buildroot}%{_bindir}/{cat,chgrp,chmod,chown,cp,date,dd,df,echo} %{buildroot}/bin
+mv -v %{buildroot}%{_bindir}/{arch,cat,chgrp,chmod,chown,cp,date,dd,df,echo} %{buildroot}/bin
 mv -v %{buildroot}%{_bindir}/{false,ln,ls,mkdir,mknod,mv,pwd,rm} %{buildroot}/bin
 mv -v %{buildroot}%{_bindir}/{rmdir,stty,sync,true,uname,test,[} %{buildroot}/bin
 mv -v %{buildroot}%{_bindir}/chroot %{buildroot}%{_sbindir}
@@ -104,6 +105,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Wed Jun 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.32-4
+- Configure build to output `arch` binary (equivalent to `uname -m`)
+
 * Wed Mar 23 2022 Chris PeBenito <chpebeni@microsoft.com> 8.32-3
 - Add missing BuildRequires needed to correctly enable SELinux support.
 
