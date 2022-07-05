@@ -21,7 +21,7 @@ const (
 // - It will subgraph the graph to only contain the desired packages if possible.
 func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, deltaBuild bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
-		strictGoalNode       = true
+		strictGoalNode = true
 	)
 	// Delta builds can use cached implicit nodes
 	canUseCachedImplicit := deltaBuild
