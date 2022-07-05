@@ -3188,8 +3188,8 @@
         "type": "other",
         "other": {
           "name": "fish",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.1.2/fish-3.1.2.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
         }
       }
     },

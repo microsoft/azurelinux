@@ -2,8 +2,8 @@
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
 Name:           fish
-Version:        3.1.2
-Release:        5%{?dist}
+Version:        3.5.0
+Release:        1%{?dist}
 Summary:        Friendly interactive shell
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,7 +28,7 @@ Distribution:   Mariner
 #   - user_doc/html/_static/underscore.js
 License:        GPLv2 and BSD and ISC and LGPLv2+ and MIT
 URL:            https://fishshell.com
-Source0:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  cmake >= 3.2
 BuildRequires:  ninja-build
@@ -45,6 +45,9 @@ BuildRequires:  python3-devel
 Recommends:     man-db
 Recommends:     man-pages
 Recommends:     groff-base
+
+# Expects the `kill` command to be available
+Requires:       util-linux
 
 Provides:       bundled(js-angular) = 1.0.8
 Provides:       bundled(js-jquery) = 3.3.1
@@ -85,8 +88,8 @@ sed -i 's^/usr/local/^/usr/^g' %{_vpath_builddir}/*.pc
 %ninja_install -C %{_vpath_builddir}
 
 # Install docs from tarball root
-cp -a README.md %{buildroot}%{_pkgdocdir}
-cp -a CONTRIBUTING.md %{buildroot}%{_pkgdocdir}
+cp -a README.rst %{buildroot}%{_pkgdocdir}
+cp -a CONTRIBUTING.rst %{buildroot}%{_pkgdocdir}
 
 %find_lang %{name}
 
@@ -115,11 +118,16 @@ fi
 %{_mandir}/man1/fish*.1*
 %{_bindir}/fish*
 %config(noreplace) %{_sysconfdir}/fish/
+%{_datadir}/applications/fish.desktop
 %{_datadir}/fish/
+%{_datadir}/pixmaps/fish.png
 %{_datadir}/pkgconfig/fish.pc
 %{_pkgdocdir}
 
 %changelog
+* Fri Jul 01 2022 Daniel McIlvaney <damcilva@microsft.com> -  3.5.0-1
+- Update to 3.5.0 to reslove CVE-2022-20001
+
 * Thu Jun 30 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.2-5
 - Mariner has sha256 check so remove not required gpg and asc files.
 - Align vendor and distribution entries
