@@ -38,8 +38,8 @@ make $(realpath ../../bin/keysinuseutil)
 mkdir -p %{keysinuse_dir}
 mkdir -p %{buildroot}%{_bindir}/
 
-cp ./bin/keysinuse.so %{keysinuse_dir}
-cp ./bin/keysinuseutil %{buildroot}%{_bindir}/
+install -m 0644 ./bin/keysinuse.so %{keysinuse_dir}
+install -m 0744 ./bin/keysinuseutil %{buildroot}%{_bindir}/
 
 %files
 %license LICENSE
@@ -71,7 +71,7 @@ if [ -x %{_bindir}/keysinuseutil ]; then
   echo "Disabling keysinuse engine for OpenSSL"
   %{_bindir}/keysinuseutil uninstall || echo "Deconfiguring keysinuse engine failed"
 fi
-
+with
 engine_link=$(%{_bindir}/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
 if [ -e $engine_link ]; then
   rm $engine_link
