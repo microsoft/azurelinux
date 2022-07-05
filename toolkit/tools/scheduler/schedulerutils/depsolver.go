@@ -18,7 +18,6 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 	search := traverse.BreadthFirst{}
 
 	foundUnsolvableNode := false
-	numUnsolvableNodes := 0
 
 	// Walk entire graph and print list of any/all unsolvable nodes
 	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
@@ -42,11 +41,9 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		// This node is not yet solvable
 		logger.Log.Warnf("Could not subgraph due to node: %v", pkgNode)
 		foundUnsolvableNode = true
-		numUnsolvableNodes++
 		return
 	})
 
-	logger.Log.Warnf("Number of unsolvable nodes: %d", numUnsolvableNodes)
 	return foundUnsolvableNode == false
 }
 
