@@ -1665,6 +1665,11 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
 
+%ifarch aarch64
+rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
+rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
+%endif
+
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
 # Provided by package seabios
