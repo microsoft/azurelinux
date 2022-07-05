@@ -724,6 +724,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azcopy",
+          "version": "10.15.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.15.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-iot-sdk-c",
           "version": "2022.01.21",
           "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_01_2022_Ref01.tar.gz"
@@ -2089,6 +2099,16 @@
           "name": "dbus-python",
           "version": "1.2.16",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
