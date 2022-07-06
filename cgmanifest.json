@@ -6510,6 +6510,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "intel-ipsec-mb",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/intel/intel-ipsec-mb/archive/v1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "intltool",
           "version": "0.51.0",
           "downloadUrl": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
