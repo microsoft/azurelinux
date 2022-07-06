@@ -165,32 +165,19 @@ func (n *Network) deviceIsValid() (err error) {
 	return
 }
 
-func findBootIfValue() (deviceAddr string) {
-	const (
-		kernelArgFile = "/proc/cmdline"
-		startIndex    = 10
-	)
-
-	content, err := os.ReadFile(kernelArgFile)
-	if err != nil {
-		logger.Log.Errorf("failed to read from /proc/cmdline")
+func findBootIfValue() (deviceAddr string, err error) {
+	bootifValue, ferr := GetKernelCmdLineValue("BOOTIF")
+	bootifValue = strings.TrimSpace(bootifValue)
+	if ferr != nil || bootifValue != "" {
+		err = ferr
 		return
 	}
 
-	// Find the location of BOOTIF
-	kernelArgs := strings.Split(string(content), " ")
-	for _, kernelArg := range kernelArgs {
-		if strings.Contains(kernelArg, "BOOTIF") {
-			// The bootif value in the cmdline set by pxelinux is of the following format:
-			// bootif=01-MAC Address, where each byte value of the MAC address is separated
-			// by dashes instead of colons. Therefore, we're reading from the 10th spot of the
-			// string to obtain the MAC address and then replace the dashes with colons
-			rawMACaddr := kernelArg[startIndex:len(kernelArg)]
-			deviceAddr = strings.Replace(rawMACaddr, "-", ":", -1)
-			return
-		}
-	}
-
+	// The bootif value in the cmdline set by pxelinux is of the following format:
+	// bootif=01-MAC Address, where each byte value of the MAC address is separated
+	// by dashes instead of colons. Therefore, we're reading from the 10th spot of the
+	// string to obtain the MAC address and then replace the dashes with colons	
+	deviceAddr = strings.Replace(bootifValue, "-", ":", -1)
 	return
 }
 
