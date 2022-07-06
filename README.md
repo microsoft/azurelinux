@@ -45,3 +45,5 @@ Any Linux distribution, including CBL-Mariner, benefits from contributions by th
 4) [Linux from Scratch](http://www.linuxfromscratch.org)
 
 5) [Openmamba](https://openmamba.org/en/) for SPEC files
+
+make change in readme file
