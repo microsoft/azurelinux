@@ -1,169 +1,94 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Enable python3 build by default
-%bcond_without python3
-# Disable python2 build by default
-%bcond_with python2
-
-%if 0%{?rhel} >= 8
-# Disable tests on epel8 - dependencies dont exist.
-%bcond_with tests
-%else
-%bcond_without tests
-%endif
-
-Name:           python-requests-mock
-Version:        1.7.0
-Release:        3%{?dist}
+%global pypi_name requests-mock
+Name:           python-%{pypi_name}
+Version:        1.8.0
+Release:        6%{?dist}
 Summary:        A requests mocking tool for python
-
 License:        ASL 2.0
+Vendor:         Mariner
+Distribution:   Microsoft Corporation
 URL:            https://requests-mock.readthedocs.io/
-Source0:        https://pypi.io/packages/source/r/requests-mock/requests-mock-%{version}.tar.gz#/python-requests-mock-%{version}.tar.gz
-
+Source0:        https://pypi.io/packages/source/r/requests-mock/requests-mock-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 Patch0:         0002-Use-system-urllib3-package.patch
 Patch1:         0003-Allow-skipping-purl-tests-if-it-is-not-present.patch
-
 BuildArch:      noarch
 
 %description
 requests-mock provides a simple way to do HTTP mocking at the
 python-requests layer.
 
-%if %{with python2}
-%package -n python2-requests-mock
+%package -n python3-%{pypi_name}
 Summary:        A requests mocking tool for python
-
-Requires:       python2-requests
-Requires:       python2-six
-
-# This {?fedora:2} syntax is because it's python2- on f28+ but just python- on
-# epel still. Hopefully this can be removed when epel is fixed.
-BuildRequires:  python%{?fedora:2}-urllib3
-
-# standard requirements needed for testing
-BuildRequires:  python2-requests
-BuildRequires:  python2-six
-
-BuildRequires:  python2-devel
-BuildRequires:  python2-pbr
-BuildRequires:  python2-setuptools
-
-%if 0%{?rhel} && 0%{?rhel} <= 6
-BuildRequires:  python-discover
-%endif
-
-%if %{with tests}
-BuildRequires:  python2-mock
-BuildRequires:  python2-pytest
-BuildRequires:  python%{?fedora:2}-fixtures
-BuildRequires:  python%{?fedora:2}-testtools
-%endif
-
-
-%{?python_provide:%python_provide python2-requests-mock}
-
-
-%description -n python2-requests-mock
-requests-mock provides a simple way to do HTTP mocking at the
-python-requests layer.
-%endif
-
-
-%if %{with python3}
-%package -n python%{python3_pkgversion}-requests-mock
-Summary:        A requests mocking tool for python
-
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-requests
+BuildRequires:  python%{python3_pkgversion}-six
+BuildRequires:  python%{python3_pkgversion}-pbr
+BuildRequires:  python%{python3_pkgversion}-urllib3
+BuildRequires:  python%{python3_pkgversion}-setuptools
 Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-six
 
-# standard requirements needed for testing
+%if %{with_check}
 BuildRequires:  python%{python3_pkgversion}-requests
-BuildRequires:  python%{python3_pkgversion}-six
-BuildRequires:  python%{python3_pkgversion}-urllib3
-
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-pbr
-BuildRequires:  python%{python3_pkgversion}-setuptools
-
-%{?python_provide:%python_provide python3-requests-mock}
-
-%if %{with tests}
-BuildRequires:  python%{python3_pkgversion}-fixtures
 BuildRequires:  python%{python3_pkgversion}-mock
 BuildRequires:  python%{python3_pkgversion}-testtools
 BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
+%{?python_provide:%python_provide python3-requests-mock}
 
-%description -n python%{python3_pkgversion}-requests-mock
+%description -n python3-%{pypi_name}
 requests-mock provides a simple way to do HTTP mocking at the
 python-requests layer.
-%endif
-
 
 %prep
-%setup -q -n requests-mock-%{version}
-%patch0 -p1
-%patch1 -p1
-
+%autosetup -p1 -n requests-mock-%{version}
 # Remove bundled egg-info
 rm -rf requests_mock.egg-info
 
-
 %build
-%if %{with python2}
-%py2_build
-%endif
-
-%if %{with python3}
 %py3_build
-%endif
-
 
 %install
-%if %{with python2}
-%py2_install
-%endif
-
-%if %{with python3}
 %py3_install
-%endif
-
 
 %check
-%if %{with tests}
-%if %{with python2}
-%{__python2} -m testtools.run discover
-%{__python2} -m pytest tests/pytest
-%endif
+%{python3} -m testtools.run discover
+%pytest3 tests/pytest
 
-%if %{with python3}
-%{__python3} -m testtools.run discover
-%{__python3} -m pytest tests/pytest
-%endif
-%endif
-
-
-%if %{with python2}
-%files -n python2-requests-mock
-%license LICENSE
-%doc README.rst ChangeLog
-%{python2_sitelib}/requests_mock
-%{python2_sitelib}/requests_mock-%{version}-py%{python2_version}.egg-info
-%endif
-
-
-%if %{with python3}
-%files -n python%{python3_pkgversion}-requests-mock
+%files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE
 %doc README.rst ChangeLog
 %{python3_sitelib}/requests_mock
 %{python3_sitelib}/requests_mock-%{version}-py%{python3_version}.egg-info
-%endif
-
 
 %changelog
+* Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.0-6
+- Updating SPEC from Fedora36 (License: ASL 2.0)
+- Bump version to 1.8.0
+- Adding as build dependency for apache-libcloud needed by cassandra-medusa.
+- License Verified
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.8.0-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 15 2020 Joel Capitao <jcapitao@redhat.com> - 1.8.0-1
+- Update to 1.8.0
+- Remove Python 2 subpackage
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

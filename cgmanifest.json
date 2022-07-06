@@ -21564,8 +21564,8 @@
         "type": "other",
         "other": {
           "name": "python-requests-mock",
-          "version": "1.7.0",
-          "downloadUrl": "https://pypi.io/packages/source/r/requests-mock/requests-mock-1.7.0.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://pypi.io/packages/source/r/requests-mock/requests-mock-1.8.0.tar.gz"
         }
       }
     },
