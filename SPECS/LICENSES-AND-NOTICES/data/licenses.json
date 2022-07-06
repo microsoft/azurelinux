@@ -2648,6 +2648,7 @@
                 "python-werkzeug",
                 "python-zope-interface",
                 "python3",
+                "python3-geomet",
                 "pytz",
                 "PyYAML",
                 "rapidjson",
