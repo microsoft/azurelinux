@@ -18,7 +18,7 @@ var (
 	validPartitionCommand2 = "part / --fstype=ext4 --size=800 --ondisk=/dev/sda"
 
 	validTestParserDisk_OnePartition = Disk{
-		PartitionTableType: "gpt",
+		PartitionTableType: "mbr",
 		TargetDisk: TargetDisk{
 			Type:  "path",
 			Value: "/dev/sda",
@@ -37,7 +37,7 @@ var (
 	}
 
 	validTestParserDisk_TwoPartitions = Disk{
-		PartitionTableType: "gpt",
+		PartitionTableType: "mbr",
 		TargetDisk: TargetDisk{
 			Type:  "path",
 			Value: "/dev/sda",
