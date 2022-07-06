@@ -21233,6 +21233,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pycryptodome",
+          "version": "3.14.1",
+          "downloadUrl": "https://github.com/Legrandin/pycryptodome/archive/v3.14.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pycurl",
           "version": "7.43.0.2",
           "downloadUrl": "https://pypi.io/packages/source/p/pycurl/pycurl-7.43.0.2.tar.gz"
