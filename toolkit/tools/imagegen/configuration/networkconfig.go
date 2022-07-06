@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -188,7 +187,11 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 	}
 
 	if networkData.Device == "bootif" {
-		networkData.Device = findBootIfValue()
+		networkData.Device, err = findBootIfValue()
+		if err != nil {
+			logger.Log.Errorf("Failed to read bootif value from /proc/cmdline")
+			return
+		}
 	}
 
 	for _, iface := range ifaces {
