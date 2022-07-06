@@ -86,6 +86,7 @@ install -p -m0644 %{buildroot}%{python3_sitelib}/%{modname}/bash_completion.d/py
 %changelog
 * Mon Jul 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.10.0-6
 - Bump release due to bump in fish to 3.5.0.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
