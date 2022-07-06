@@ -1511,6 +1511,7 @@
                 "python-evdev",
                 "python-extras",
                 "python-faker",
+                "python-fasteners",
                 "python-fields",
                 "python-filelock",
                 "python-fixtures",

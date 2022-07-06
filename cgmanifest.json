@@ -20333,6 +20333,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-fasteners",
+          "version": "0.17.3",
+          "downloadUrl": "https://github.com/harlowja/fasteners/archive/refs/tags/0.17.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-ecdsa",
           "version": "0.17.0",
           "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.17.0.tar.gz"
