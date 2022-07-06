@@ -1,0 +1,29 @@
+From eaaaf25063a212ffb895a83af97ca114a643c070 Mon Sep 17 00:00:00 2001
+From: Paul Howarth <paul@city-fan.org>
+Date: Tue, 17 May 2022 17:00:42 +0100
+Subject: [PATCH] Mark new tests that require SHA1
+
+Like https://github.com/paramiko/paramiko/pull/2011
+---
+ tests/test_client.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/test_client.py b/tests/test_client.py
+index fdf19c45..3db4cd22 100644
+--- a/tests/test_client.py
++++ b/tests/test_client.py
+@@ -370,9 +370,11 @@ class SSHClientTest(ClientTest):
+             == "{}-cert-v01@openssh.com".format(alg)
+         )
+ 
++    @requires_sha1_signing
+     def test_old_openssh_needs_ssh_rsa_for_certs_not_rsa_sha2(self):
+         self._cert_algo_test(ver="7.7", alg="ssh-rsa")
+ 
++    @requires_sha1_signing
+     def test_newer_openssh_uses_rsa_sha2_for_certs_not_ssh_rsa(self):
+         # NOTE: 512 happens to be first in our list and is thus chosen
+         self._cert_algo_test(ver="7.8", alg="rsa-sha2-512")
+-- 
+2.35.3
+

@@ -21143,6 +21143,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-paramiko",
+          "version": "2.11.0",
+          "downloadUrl": "https://github.com/paramiko/paramiko/archive/refs/tags/2.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pbr",
           "version": "5.8.1",
           "downloadUrl": "https://pypi.io/packages/source/p/pbr/pbr-5.8.1.tar.gz"
