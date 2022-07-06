@@ -339,7 +339,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
-* Tue Jul 17 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.1.1k-18
+* Tue Jul 05 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.1.1k-18
 - Add optional patch to use KeysInUse as default engine
 
 * Wed Jun 22 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.1.1k-17
