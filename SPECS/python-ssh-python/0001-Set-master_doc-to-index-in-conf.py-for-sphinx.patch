@@ -1,0 +1,19 @@
+From c0ae7b341645958a94ced29b84ab8f66a045bd5a Mon Sep 17 00:00:00 2001
+From: James Slagle <jslagle@redhat.com>
+Date: Mon, 13 Dec 2021 15:06:26 -0500
+Subject: [PATCH] Set master_doc to index in conf.py for sphinx
+
+
+diff --git a/doc/conf.py b/doc/conf.py
+index 95d8999..a28f7c2 100644
+--- a/doc/conf.py
++++ b/doc/conf.py
+@@ -121,3 +121,5 @@ html_sidebars = {
+ htmlhelp_basename = 'ssh-pythondoc'
+ intersphinx_mapping = {'https://docs.python.org/': None}
+ autoclass_content = "both"
++
++master_doc = "index"
+-- 
+2.31.1
+
