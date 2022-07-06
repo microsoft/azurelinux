@@ -676,7 +676,7 @@
         "other": {
           "name": "autoconf213",
           "version": "2.13",
-          "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf/autoconf-2.13.tar.gz"
         }
       }
     },
@@ -717,6 +717,16 @@
           "name": "avahi",
           "version": "0.8",
           "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.8/avahi-0.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "azcopy",
+          "version": "10.15.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.15.0.tar.gz"
         }
       }
     },
@@ -2089,6 +2099,16 @@
           "name": "dbus-python",
           "version": "1.2.16",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
