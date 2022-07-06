@@ -21143,6 +21143,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-parallel-ssh",
+          "version": "1.9.1",
+          "downloadUrl": "https://github.com/ParallelSSH/parallel-ssh/archive/refs/tags/1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pbr",
           "version": "5.8.1",
           "downloadUrl": "https://pypi.io/packages/source/p/pbr/pbr-5.8.1.tar.gz"
