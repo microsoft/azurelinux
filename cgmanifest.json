@@ -27489,6 +27489,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xxhash",
+          "version": "0.8.1",
+          "downloadUrl": "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xz",
           "version": "5.2.5",
           "downloadUrl": "https://tukaani.org/xz/xz-5.2.5.tar.xz"
