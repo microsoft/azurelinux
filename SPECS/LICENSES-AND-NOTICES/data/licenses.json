@@ -2040,6 +2040,7 @@
                 "python-cachetools",
                 "python-cherrypy",
                 "python-execnet",
+                "python-ffwd-client",
                 "python-logutils",
                 "python-nocasedict",
                 "python-pecan",

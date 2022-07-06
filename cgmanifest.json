@@ -20333,6 +20333,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ffwd-client",
+          "version": "0.0.2",
+          "downloadUrl": "https://github.com/udoprog/ffwd-client-python/archive/refs/tags/0.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-fields",
           "version": "5.0.0",
           "downloadUrl": "https://github.com/ionelmc/python-fields/archive/v5.0.0/python-fields-5.0.0.tar.gz"
