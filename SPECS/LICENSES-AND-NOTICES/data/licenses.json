@@ -2212,6 +2212,7 @@
                 "plexus-utils",
                 "psl-make-dafsa",
                 "publicsuffix",
+                "python-click-aliases",
                 "qdox",
                 "regexp",
                 "relaxngDatatype",

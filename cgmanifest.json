@@ -19963,6 +19963,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-click-aliases",
+          "version": "1.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/click-aliases/click-aliases-1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cliff",
           "version": "2.16.0",
           "downloadUrl": "https://pypi.io/packages/source/c/cliff/cliff-2.16.0.tar.gz"
