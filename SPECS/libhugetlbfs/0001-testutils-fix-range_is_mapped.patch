@@ -1,0 +1,68 @@
+From 192ac21a3c057c5dedca4cdd1bf700f38992030c Mon Sep 17 00:00:00 2001
+Message-Id: <192ac21a3c057c5dedca4cdd1bf700f38992030c.1496667760.git.jstancek@redhat.com>
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 1 Jun 2017 09:48:41 +0200
+Subject: [PATCH v2 1/2] testutils: fix range_is_mapped()
+
+It doesn't return correct value when tested region is
+completely inside existing mapping:
+
+  +--------------------------------------+
+  ^ start                                ^ end
+           +----------------+
+           ^ low            ^ high
+
+Rather than testing for all combinations of 2 regions overlapping,
+flip the condition and test if they don't overlap.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+---
+ tests/testutils.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+This is a v2 series for:
+  https://groups.google.com/forum/#!topic/libhugetlbfs/tAsWjuJ7x8k
+
+diff --git a/tests/testutils.c b/tests/testutils.c
+index 629837045465..f42852e1938b 100644
+--- a/tests/testutils.c
++++ b/tests/testutils.c
+@@ -190,19 +190,29 @@ int range_is_mapped(unsigned long low, unsigned long high)
+ 			return -1;
+ 		}
+ 
+-		if ((start >= low) && (start < high)) {
++		/*
++		 * (existing mapping)    (tested region)
++		 * +----------------+      +.......+
++		 * ^start           ^end   ^ low   ^high
++		 */
++		if (low >= end) {
+ 			fclose(f);
+-			return 1;
++			return 0;
+ 		}
+-		if ((end >= low) && (end < high)) {
++
++		/*
++		 * (tested region)  (existing mapping)
++		 *     +.....+      +----------------+
++		 *     ^low  ^high  ^ start          ^end
++		 */
++		if (high <= start) {
+ 			fclose(f);
+-			return 1;
++			return 0;
+ 		}
+-
+ 	}
+ 
+ 	fclose(f);
+-	return 0;
++	return 1;
+ }
+ 
+ /*
+-- 
+1.8.3.1
+

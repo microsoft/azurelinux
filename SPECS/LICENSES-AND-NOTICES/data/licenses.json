@@ -585,6 +585,7 @@
                 "libgxim",
                 "libgxps",
                 "libhangul",
+                "libhugetlbfs",
                 "libibcommon",
                 "libical",
                 "libICE",

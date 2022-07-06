@@ -8540,6 +8540,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libhugetlbfs",
+          "version": "2.23",
+          "downloadUrl": "https://github.com/libhugetlbfs/libhugetlbfs/releases/download/2.23/libhugetlbfs-2.23.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libibcommon",
           "version": "1.2.0",
           "downloadUrl": "http://www.openfabrics.org/downloads/management/libibcommon-1.2.0.tar.gz"
