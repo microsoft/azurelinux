@@ -1496,6 +1496,7 @@
                 "python-curio",
                 "python-cytoolz",
                 "python-d2to1",
+                "python-datadog",
                 "python-dbus-client-gen",
                 "python-dbus-python-client-gen",
                 "python-dbus-signature-pyparsing",

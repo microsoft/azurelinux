@@ -20123,6 +20123,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-datadog",
+          "version": "0.44.0",
+          "downloadUrl": "https://github.com/DataDog/datadogpy/archive/refs/tags/v0.44.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-dateutil",
           "version": "2.7.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/a0/b0/a4e3241d2dee665fea11baec21389aec6886655cd4db7647ddf96c3fad15/python-dateutil-2.7.3.tar.gz"
