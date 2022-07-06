@@ -3,11 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	fmt.Println("Starting dashboard")
-	path := "/home/james/repos/CBL-Mariner/toolkit/tools/internal/timestamp/results/create_worker_chroot.csv"
+	wd, _ := os.Getwd()
+	idx := strings.Index(wd, "CBL-Mariner/toolkit")
+	wd = wd[0 : idx+19]
+	wd += "/tools/internal/timestamp/results/create_worker_chroot.csv"
+	path := wd
 	currentStat, _ := os.Stat(path)
 	for true {
 		newStat, _ := os.Stat(path)
