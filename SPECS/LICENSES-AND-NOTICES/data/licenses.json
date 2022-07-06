@@ -1603,6 +1603,7 @@
                 "python-requests-toolbelt",
                 "python-requests_ntlm",
                 "python-responses",
+                "python-retrying",
                 "python-rfc3986",
                 "python-rpm-generators",
                 "python-rpmfluff",
