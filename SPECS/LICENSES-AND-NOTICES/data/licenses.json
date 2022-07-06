@@ -1632,6 +1632,7 @@
                 "python-sphinxcontrib-qthelp",
                 "python-sphinxcontrib-serializinghtml",
                 "python-sqlalchemy",
+                "python-ssh2-python",
                 "python-stevedore",
                 "python-suds",
                 "python-systemd",

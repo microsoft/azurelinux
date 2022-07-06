@@ -22053,6 +22053,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ssh2-python",
+          "version": "0.27.0",
+          "downloadUrl": "https://github.com/ParallelSSH/ssh2-python/archive/refs/tags/%{version}.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sphinxcontrib-applehelp",
           "version": "1.0.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-applehelp/sphinxcontrib-applehelp-1.0.2.tar.gz"
