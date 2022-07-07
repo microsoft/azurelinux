@@ -1956,6 +1956,7 @@
                 "blobfuse",
                 "bmon",
                 "bpftrace",
+                "cassandra-medusa",
                 "ccache",
                 "cert-manager",
                 "cf-cli",
