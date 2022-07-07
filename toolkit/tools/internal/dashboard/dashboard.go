@@ -45,7 +45,7 @@ func main() {
 				continue
 			}
 			// getUpdate(currStat, idx, filePath)
-			getUpdates(currStat, idx, filePath)
+			getUpdate(currStat, idx, filePath)
 		}
 	}
 
@@ -63,7 +63,7 @@ func main() {
 
 // Check if the file has been updated, and get updated contents if it did.
 // Assumption: the file and its parent directories of the file have been created.
-func getUpdates(currStat fs.FileInfo, idx int, filePath string) {
+func getUpdate(currStat fs.FileInfo, idx int, filePath string) {
 	currNumLines := getNumLines(filePath)
 	if currNumLines != CSVSize[idx] {
 		CSVSize[idx] = currNumLines
