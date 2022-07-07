@@ -165,9 +165,11 @@ func (n *Network) deviceIsValid() (err error) {
 }
 
 func findBootIfValue() (deviceAddr string, err error) {
+	const macAddressStartIndex = 3
+
 	bootifValue, ferr := GetKernelCmdLineValue("BOOTIF")
 	bootifValue = strings.TrimSpace(bootifValue)
-	if ferr != nil || bootifValue != "" {
+	if ferr != nil || bootifValue == "" {
 		err = ferr
 		return
 	}
@@ -175,8 +177,8 @@ func findBootIfValue() (deviceAddr string, err error) {
 	// The bootif value in the cmdline set by pxelinux is of the following format:
 	// bootif=01-MAC Address, where each byte value of the MAC address is separated
 	// by dashes instead of colons. Therefore, we're reading from the 10th spot of the
-	// string to obtain the MAC address and then replace the dashes with colons	
-	deviceAddr = strings.Replace(bootifValue, "-", ":", -1)
+	// string to obtain the MAC address and then replace the dashes with colons
+	deviceAddr = strings.Replace(bootifValue[macAddressStartIndex:len(bootifValue)], "-", ":", -1)
 	return
 }
 
