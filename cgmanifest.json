@@ -7025,8 +7025,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "5.0.14",
-          "downloadUrl": "http://download.redis.io/releases/redis-5.0.14.tar.gz"
+          "version": "6.2.7",
+          "downloadUrl": "http://download.redis.io/releases/redis-6.2.7.tar.gz"
         }
       }
     },
