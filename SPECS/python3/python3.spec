@@ -168,9 +168,10 @@ ln -sf libpython3.7m.so %{buildroot}%{_libdir}/libpython3.7.so
 cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix3.7.py
 ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 
-# python is for python2 update pip3 with python3.7
+# unversioned python is for python2, so update pip3/pip3.7 with python3.7
 # this patch needs update when python3.7 version bump up
 sed -i 's|#!/usr/bin/python|#!/usr/bin/python3.7|' %{buildroot}%{_bindir}/pip3
+sed -i 's|#!/usr/bin/python|#!/usr/bin/python3.7|' %{buildroot}%{_bindir}/pip3.7
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
@@ -279,7 +280,7 @@ make  %{?_smp_mflags} test
 
 %changelog
 * Wed Jul 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.7.13-2
-- Fix for bad interpreter error when run pip3
+- Fix for bad interpreter error when running pip3, pip3.7
 
 * Tue Jun 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.7.13-1
 - Upgrade to 3.7.13 to resolve CVE-2019-12900
