@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/socketry/protocol-hpack
 Source0:        https://github.com/socketry/protocol-hpack/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -19,7 +20,7 @@ Provides a compressor and decompressor
 for HTTP 2.0 headers, HPACK, as defined by RFC7541.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build http-hpack

@@ -2,7 +2,7 @@
 %global gem_name rexml
 Summary:        REXML is an XML toolkit for Ruby
 Name:           rubygem-%{gem_name}
-Version:        3.1.9.1
+Version:        3.2.5
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -28,8 +28,6 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE.txt file to buildroot from Source0
-cp LICENSE.txt %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
@@ -37,6 +35,6 @@ cp LICENSE.txt %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.9.1-1
+* Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2.5-1
 - License verified
 - Original version for CBL-Mariner

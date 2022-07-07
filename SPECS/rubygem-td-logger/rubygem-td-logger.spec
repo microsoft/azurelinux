@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/treasure-data/td-logger-ruby
 Source0:        https://github.com/treasure-data/td-logger-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluent-logger < 2.0
@@ -22,7 +23,7 @@ This gem is a logging library for Treasure Data. The events
 logged by this module will be uploaded into the cloud.
 
 %prep
-%setup -q -n %{gem_name}-ruby-%{version}
+%autosetup -p1 -n %{gem_name}-ruby-%{version}
 
 %build
 gem build %{gem_name}

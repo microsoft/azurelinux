@@ -10,7 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ledbettj/systemd-journal
 Source0:        https://github.com/ledbettj/systemd-journal/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         remove-pem.patch
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-ffi

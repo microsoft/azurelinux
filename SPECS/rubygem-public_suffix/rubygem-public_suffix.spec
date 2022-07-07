@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://simonecarletti.com/code/publicsuffix-ruby/
 Source0:        https://github.com/weppos/publicsuffix-ruby/archive/refs/tags/v%{version}.tar.gz#/publicsuffix-ruby-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -18,7 +19,7 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 PublicSuffix is a Ruby domain name parser based on the Public Suffix List.
 
 %prep
-%setup -q -n publicsuffix-ruby-%{version}
+%autosetup -p1 -n publicsuffix-ruby-%{version}
 
 %build
 gem build %{gem_name}

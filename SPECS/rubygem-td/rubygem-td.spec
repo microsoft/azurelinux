@@ -13,6 +13,7 @@ Source0:        https://github.com/treasure-data/td/archive/refs/tags/v%{version
 Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
+AutoReq:        no
 Requires:       rubygem-hirb
 Requires:       rubygem-msgpack
 Requires:       rubygem-parallel

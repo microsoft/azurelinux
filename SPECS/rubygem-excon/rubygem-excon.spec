@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gem_name excon
 Summary:        Extended http(s) Connections
-Name:           rubygem-excon
+Name:           rubygem-%{gem_name}
 Version:        0.92.2
 Release:        1%{?dist}
 License:        MIT
@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/excon/excon
 Source0:        https://github.com/excon/excon/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
@@ -17,7 +18,7 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 Extended http(s) Connections.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}

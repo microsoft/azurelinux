@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/mperham/connection_pool
 Source0:        https://github.com/mperham/connection_pool/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -19,15 +20,13 @@ Generic connection pooling for Ruby
 MongoDB has its own connection pool. ActiveRecord has its own connection pool. This is a generic connection pool that can be used with anything, e.g. Redis, Dalli and other Ruby network clients.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE file to buildroot from Source0
-cp LICENSE %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
