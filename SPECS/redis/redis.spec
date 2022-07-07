@@ -1,24 +1,24 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        5.0.14
+Version:        6.2.7
 Release:        1%{?dist}
 License:        BSD
-URL:            https://redis.io/
-Group:          Applications/Databases
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/Databases
+URL:            https://redis.io/
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
-Patch2:         disable_active_defrag_big_keys.patch
-
+Patch1:         disable_active_defrag_big_keys.patch
 BuildRequires:  gcc
-BuildRequires:  systemd
 BuildRequires:  make
-BuildRequires:  which
+BuildRequires:  systemd
 BuildRequires:  tcl
 BuildRequires:  tcl-devel
+BuildRequires:  which
 Requires:       systemd
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
 
 %description
 Redis is an in-memory data structure store, used as database, cache and message broker.
@@ -31,12 +31,12 @@ make %{?_smp_mflags}
 
 %install
 install -vdm 755 %{buildroot}
-make PREFIX=%{buildroot}/usr install
+make PREFIX=%{buildroot}%{_prefix} install
 install -D -m 0640 %{name}.conf %{buildroot}%{_sysconfdir}/%{name}.conf
-mkdir -p %{buildroot}/var/lib/redis
-mkdir -p %{buildroot}/var/log
-mkdir -p %{buildroot}/var/opt/%{name}/log
-ln -sfv /var/opt/%{name}/log %{buildroot}/var/log/%{name}
+mkdir -p %{buildroot}%{_sharedstatedir}/redis
+mkdir -p %{buildroot}%{_var}/log
+mkdir -p %{buildroot}%{_var}/opt/%{name}/log
+ln -sfv %{_var}/opt/%{name}/log %{buildroot}%{_var}/log/%{name}
 mkdir -p %{buildroot}/usr/lib/systemd/system
 cat << EOF >>  %{buildroot}/usr/lib/systemd/system/redis.service
 [Unit]
@@ -44,8 +44,8 @@ Description=Redis in-memory key-value database
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/redis-server /etc/redis.conf --daemonize no
-ExecStop=/usr/bin/redis-cli shutdown
+ExecStart=%{_bindir}/redis-server %{_sysconfdir}/redis.conf --daemonize no
+ExecStop=%{_bindir}/redis-cli shutdown
 User=redis
 Group=redis
 
@@ -75,14 +75,24 @@ exit 0
 %files
 %defattr(-,root,root)
 %license COPYING
-%dir %attr(0750, redis, redis) /var/lib/redis
-%dir %attr(0750, redis, redis) /var/opt/%{name}/log
+%dir %attr(0750, redis, redis) %{_sharedstatedir}/redis
+%dir %attr(0750, redis, redis) %{_var}/opt/%{name}/log
 %attr(0750, redis, redis) %{_var}/log/%{name}
 %{_bindir}/*
 %{_libdir}/systemd/*
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Wed Jun 15 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.7-1
+- Bump version to 6.2.7 to address CVE-2022-24736
+
+* Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.6-1
+- Bump version to 6.2.6 to fix ptest
+
+* Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.2.5-1
+- Update to version 6.2.5.
+- Modified patch to apply to new version.
+
 * Mon Oct 18 2021 Neha Agarwal <nehaagarwal@microsoft.com> 5.0.14-1
 - Update version for CVE-2021-32626, CVE-2021-32627, CVE-2021-32628, CVE-2021-32675, CVE-2021-32687, CVE-2021-32762, CVE-2021-41099
 
