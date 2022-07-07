@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,6 @@ Source3:        login
 Source4:        other
 Source5:        passwd
 Source6:        sshd
-Source7:        su
 Source8:        system-account
 Source9:        system-auth
 Source10:       system-password
@@ -48,6 +47,7 @@ Provides:       /usr/sbin/nologin
 Provides:       /usr/sbin/useradd
 Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
+Conflicts:      util-linux < 2.37.4-3
 
 %description
 The Shadow package contains programs for handling passwords
@@ -89,7 +89,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-group-name-max-length=32 \
     --with-selinux \
     --with-audit \
-    --enable-man
+    --enable-man \
+    --with-su=no
 %make_build
 
 %install
@@ -127,7 +128,6 @@ install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE5} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE6} %{buildroot}%{_sysconfdir}/pam.d/
-install -vm644 %{SOURCE7} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE8} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE9} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE10} %{buildroot}%{_sysconfdir}/pam.d/
@@ -175,6 +175,9 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-10
+- Remove su binary which is now provided by util-linux
+
 * Mon Apr 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-9
 - Change /etc/shadow file permission to 000 and make it trackable by shadow-utils
 
