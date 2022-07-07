@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/fs"
 	"os"
@@ -43,7 +44,8 @@ func main() {
 				// fmt.Printf("File doesn't exist. \n")
 				continue
 			}
-			getUpdate(currStat, idx, filePath)
+			// getUpdate(currStat, idx, filePath)
+			getUpdates(currStat, idx, filePath)
 		}
 	}
 
@@ -51,10 +53,33 @@ func main() {
 
 // Check if the file has been updated, and get updated contents if it did.
 // Assumption: the file and its parent directories of the file have been created.
-func getUpdate(currStat fs.FileInfo, idx int, filePath string) {
-	if currStat.Size() != CSVSize[idx] {
-		CSVSize[idx] = currStat.Size()
-		fmt.Printf("%s has %d bytes\n", filePath, currStat.Size())
+// func getUpdate(currStat fs.FileInfo, idx int, filePath string) {
+// 	if currStat.Size() != CSVSize[idx] {
+// 		CSVSize[idx] = currStat.Size()
+// 		fmt.Printf("%s has %d bytes\n", currStat.Name(), currStat.Size())
+// 	}
+// 	// fmt.Printf("No change in file size for %s \n.", filePath)
+// }
+
+// Check if the file has been updated, and get updated contents if it did.
+// Assumption: the file and its parent directories of the file have been created.
+func getUpdates(currStat fs.FileInfo, idx int, filePath string) {
+	currNumLines := getNumLines(filePath)
+	if currNumLines != CSVSize[idx] {
+		CSVSize[idx] = currNumLines
+		fmt.Printf("%s has %d lines\n", currStat.Name(), currNumLines)
 	}
-	// fmt.Printf("No change in file size for %s \n.", filePath)
+}
+
+// Naive implementation (potentially inefficient for larger files)
+func getNumLines(filepath string) int64 {
+	file, _ := os.Open(filepath)
+	fileScanner := bufio.NewScanner(file)
+	count := 0
+
+	for fileScanner.Scan() {
+		count++
+	}
+
+	return int64(count)
 }

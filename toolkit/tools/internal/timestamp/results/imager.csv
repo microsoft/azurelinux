@@ -1,0 +1,4 @@
+imager,Setting up,,714.899µs,Thu Jul  7 14:42:28 EDT 2022,Thu Jul  7 14:42:28 EDT 2022
+imager,buildSystemConfig,install packages into image,3.991848283s,Thu Jul  7 14:42:28 EDT 2022,Thu Jul  7 14:42:32 EDT 2022
+imager,buildSystemConfig,Create Parition to Mountpoint map,29.305792017s,Thu Jul  7 14:42:32 EDT 2022,Thu Jul  7 14:43:02 EDT 2022
+imager,buildSystemConfig,Cleanup encrypted disks,47.5µs,Thu Jul  7 14:43:02 EDT 2022,Thu Jul  7 14:43:02 EDT 2022

@@ -1,0 +1,4 @@
+create_worker_chroot.sh,finish adding RPM to worker chroot,,Thu Jul  7 14:40:50 EDT 2022
+create_worker_chroot.sh,finish adding RPM DB entry,,Thu Jul  7 14:41:03 EDT 2022
+create_worker_chroot.sh,finish importing GPG keys,,Thu Jul  7 14:41:03 EDT 2022
+create_worker_chroot.sh,Done installing all packages,,Thu Jul  7 14:41:14 EDT 2022
