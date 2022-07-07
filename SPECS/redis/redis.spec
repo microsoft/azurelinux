@@ -83,15 +83,8 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
-* Wed Jun 15 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.7-1
-- Bump version to 6.2.7 to address CVE-2022-24736
-
-* Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.6-1
-- Bump version to 6.2.6 to fix ptest
-
-* Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.2.5-1
-- Update to version 6.2.5.
-- Modified patch to apply to new version.
+* Thu Jul 07 2022 Nick Samson <nisamson@microsoft.com> - 6.2.7-1
+- Backport version 6.2.7 to address CVE-2022-24736
 
 * Mon Oct 18 2021 Neha Agarwal <nehaagarwal@microsoft.com> 5.0.14-1
 - Update version for CVE-2021-32626, CVE-2021-32627, CVE-2021-32628, CVE-2021-32675, CVE-2021-32687, CVE-2021-32762, CVE-2021-41099
