@@ -169,6 +169,7 @@ cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix3.7.py
 ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 
 # python is for python2 update pip3 with python3.7
+# this patch needs update when python3.7 version bump up
 sed -i 's|#!/usr/bin/python|#!/usr/bin/python3.7|' %{buildroot}%{_bindir}/pip3
 
 # Remove unused stuff
