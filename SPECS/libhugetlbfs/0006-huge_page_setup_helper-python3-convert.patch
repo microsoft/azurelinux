@@ -1,0 +1,11 @@
+diff --git a/huge_page_setup_helper.py b/huge_page_setup_helper.py
+index 43c9916..7ba0c92 100755
+--- a/huge_page_setup_helper.py
++++ b/huge_page_setup_helper.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ 
+ #
+ # Tool to set up Linux large page support with minimal effort
+
