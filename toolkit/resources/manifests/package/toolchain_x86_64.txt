@@ -242,7 +242,7 @@ meson-0.60.2-2.cm2.noarch.rpm
 mpfr-4.1.0-1.cm2.x86_64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.x86_64.rpm
 mpfr-devel-4.1.0-1.cm2.x86_64.rpm
-msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm
+msopenjdk-11-11.0.15+10-LTS-1.x86_64.rpm
 ncurses-6.3-1.cm2.x86_64.rpm
 ncurses-compat-6.3-1.cm2.x86_64.rpm
 ncurses-debuginfo-6.3-1.cm2.x86_64.rpm
@@ -259,12 +259,12 @@ npth-1.6-4.cm2.x86_64.rpm
 npth-debuginfo-1.6-4.cm2.x86_64.rpm
 npth-devel-1.6-4.cm2.x86_64.rpm
 ntsysv-1.20-3.cm2.x86_64.rpm
-openssl-1.1.1k-17.cm2.x86_64.rpm
-openssl-debuginfo-1.1.1k-17.cm2.x86_64.rpm
-openssl-devel-1.1.1k-17.cm2.x86_64.rpm
-openssl-libs-1.1.1k-17.cm2.x86_64.rpm
-openssl-perl-1.1.1k-17.cm2.x86_64.rpm
-openssl-static-1.1.1k-17.cm2.x86_64.rpm
+openssl-1.1.1k-18.cm2.x86_64.rpm
+openssl-debuginfo-1.1.1k-18.cm2.x86_64.rpm
+openssl-devel-1.1.1k-18.cm2.x86_64.rpm
+openssl-libs-1.1.1k-18.cm2.x86_64.rpm
+openssl-perl-1.1.1k-18.cm2.x86_64.rpm
+openssl-static-1.1.1k-18.cm2.x86_64.rpm
 p11-kit-0.24.1-1.cm2.x86_64.rpm
 p11-kit-debuginfo-0.24.1-1.cm2.x86_64.rpm
 p11-kit-devel-0.24.1-1.cm2.x86_64.rpm

@@ -3208,8 +3208,8 @@
         "type": "other",
         "other": {
           "name": "fish",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.1.2/fish-3.1.2.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
         }
       }
     },
@@ -6510,6 +6510,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "intel-ipsec-mb",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/intel/intel-ipsec-mb/archive/v1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "intel-pf-bb-config",
+          "version": "22.03",
+          "downloadUrl": "https://github.com/intel/pf-bb-config/archive/v22.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "intltool",
           "version": "0.51.0",
           "downloadUrl": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
@@ -7303,6 +7323,16 @@
           "name": "keycloak-httpd-client-install",
           "version": "1.1",
           "downloadUrl": "https://github.com/jdennis/keycloak-httpd-client-install/archive/RELEASE_1_1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "KeysInUse-OpenSSL",
+          "version": "0.3.1",
+          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.1.tar.gz"
         }
       }
     },
@@ -11933,8 +11963,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.14.1+1-LTS-31207.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm"
+          "version": "11.0.15+10-LTS-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.15+10-LTS-1.aarch64.rpm"
         }
       }
     },
@@ -11943,8 +11973,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.14.1+1-LTS-31207.x86_64.rpm",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm"
+          "version": "11.0.15+10-LTS-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.15+10-LTS-1.x86_64.rpm"
         }
       }
     },

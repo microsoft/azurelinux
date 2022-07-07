@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,7 +42,7 @@ Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
-Patch22:        openssl-1.1.1-fips-SymCrypt.patch
+Patch22:        openssl-1.1.1-load-default-engines.patch
 Patch23:        CVE-2021-3711.patch
 Patch24:        CVE-2021-3712.patch
 Patch25:        CVE-2022-0778.patch
@@ -339,6 +339,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Tue Jul 05 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.1.1k-18
+- Add optional patch to use KeysInUse as default engine
+
 * Wed Jun 22 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.1.1k-17
 - Add patch for CVE-2022-2068
 
