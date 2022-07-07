@@ -1,0 +1,39 @@
+Index: apache-libcloud-3.5.1/libcloud/compute/drivers/gce.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/compute/drivers/gce.py
++++ apache-libcloud-3.5.1/libcloud/compute/drivers/gce.py
+@@ -1981,12 +1981,19 @@ class GCENodeDriver(NodeDriver):
+         "debian-cloud": ["debian-8", "debian-9", "debian-10"],
+         "opensuse-cloud": ["opensuse-leap"],
+         "rhel-cloud": ["rhel-6", "rhel-7", "rhel-8"],
+-        "suse-cloud": ["sles-11", "sles-12", "sles-15"],
++        "suse-cloud": ["sles-12", "sles-15"],
+         "suse-byos-cloud": [
+             "sles-11-byos",
+             "sles-12-byos",
++            "sles-15-byos",
++            "sles-12-sp1-sap-byos",
+             "sles-12-sp2-sap-byos",
+             "sles-12-sp3-sap-byos",
++            "sles-12-sp4-sap-byos",
++            "sles-12-sp5-sap-byos",
++            "sles-15-sap-byos",
++            "sles-15-sp1-sap-byos",
++            "sles-15-sp1-chost-byos",
+             "suse-manager-proxy-byos",
+             "suse-manager-server-byos",
+         ],
+@@ -1994,7 +2001,13 @@ class GCENodeDriver(NodeDriver):
+             "sles-12-sp2-sap",
+             "sles-12-sp3-sap",
+             "sles-12-sp4-sap",
++            "sles-12-sp5-sap",
+             "sles-15-sap",
++            "sles-15-sp1-sap",
++        ],
++        "suse-sap-cal-cloud": [
++            "sles-12-sp1-sapcal",
++            "sles-12-sp3-sapcal",
+         ],
+         "ubuntu-os-cloud": [
+             "ubuntu-1404-lts",

@@ -1,0 +1,490 @@
+From e62bb28cdbd685203d44a9a4028f311ea155476c Mon Sep 17 00:00:00 2001
+From: Tomaz Muraus <tomaz@tomaz.me>
+Date: Tue, 10 May 2022 23:44:18 +0200
+Subject: [PATCH] Use unittest.mock library from stdlib instead of using 3rd
+ party mock dependency.
+
+Reported by @pgajdos, closes #1684.
+---
+ libcloud/test/common/test_aws.py                    |  2 +-
+ libcloud/test/common/test_base.py                   |  2 +-
+ libcloud/test/common/test_base_driver.py            |  2 +-
+ libcloud/test/common/test_google.py                 |  2 +-
+ libcloud/test/common/test_nfsn.py                   |  2 +-
+ libcloud/test/common/test_openstack.py              |  2 +-
+ libcloud/test/common/test_openstack_identity.py     |  2 +-
+ libcloud/test/common/test_retry_limit.py            |  2 +-
+ libcloud/test/common/test_upcloud.py                |  2 +-
+ libcloud/test/compute/test_azure_arm.py             |  2 +-
+ libcloud/test/compute/test_deployment.py            |  2 +-
+ libcloud/test/compute/test_gce.py                   |  2 +-
+ libcloud/test/compute/test_gig_g8.py                |  2 +-
+ libcloud/test/compute/test_libvirt_driver.py        |  2 +-
+ libcloud/test/compute/test_openstack.py             |  4 ++--
+ libcloud/test/compute/test_ovh.py                   |  2 +-
+ libcloud/test/compute/test_ssh_client.py            |  2 +-
+ libcloud/test/compute/test_vcloud.py                |  2 +-
+ libcloud/test/dns/test_base.py                      |  2 +-
+ libcloud/test/dns/test_durabledns.py                |  2 +-
+ libcloud/test/dns/test_zonomi.py                    |  2 +-
+ libcloud/test/storage/test_backblaze_b2.py          |  2 +-
+ libcloud/test/storage/test_base.py                  |  4 ++--
+ libcloud/test/storage/test_cloudfiles.py            |  6 +++---
+ libcloud/test/storage/test_google_storage.py        |  6 +++---
+ libcloud/test/storage/test_oss.py                   |  5 +----
+ libcloud/test/storage/test_s3.py                    |  6 +++---
+ libcloud/test/test_connection.py                    |  2 +-
+ libcloud/test/test_init.py                          |  2 +-
+ libcloud/test/test_logging_connection.py            |  2 +-
+ requirements-tests.txt                              |  1 -
+ setup.py                                            |  1 -
+ 35 files changed, 50 insertions(+), 47 deletions(-)
+
+
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_aws.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_aws.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_aws.py
+@@ -17,7 +17,7 @@ import sys
+ import unittest
+ from datetime import datetime
+ 
+-import mock
++from unittest import mock
+ 
+ from libcloud.common.aws import AWSRequestSignerAlgorithmV4
+ from libcloud.common.aws import SignedAWSConnection
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_base.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_base.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_base.py
+@@ -16,7 +16,7 @@
+ import unittest
+ import sys
+ 
+-import mock
++from unittest import mock
+ 
+ from libcloud.common.base import LazyObject, Response
+ from libcloud.common.exceptions import BaseHTTPError, RateLimitReachedError
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_base_driver.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_base_driver.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_base_driver.py
+@@ -15,7 +15,7 @@
+ 
+ import sys
+ 
+-from mock import Mock
++from unittest.mock import Mock
+ 
+ from libcloud.common.base import BaseDriver
+ 
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_google.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_google.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_google.py
+@@ -16,7 +16,7 @@
+ Tests for Google Connection classes.
+ """
+ import datetime
+-import mock
++from unittest import mock
+ import os
+ import sys
+ import unittest
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_nfsn.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_nfsn.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_nfsn.py
+@@ -17,7 +17,7 @@ import string
+ import sys
+ import unittest
+ 
+-from mock import Mock, patch
++from unittest.mock import Mock, patch
+ 
+ from libcloud.common.nfsn import NFSNConnection
+ from libcloud.test import LibcloudTestCase, MockHttp
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_openstack.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_openstack.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_openstack.py
+@@ -17,7 +17,7 @@ import sys
+ import unittest
+ from unittest.mock import patch
+ 
+-from mock import Mock
++from unittest.mock import Mock
+ from libcloud.common.base import LibcloudConnection
+ from libcloud.common.openstack import OpenStackBaseConnection
+ 
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_openstack_identity.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_openstack_identity.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_openstack_identity.py
+@@ -21,7 +21,7 @@ try:
+ except ImportError:
+     import json
+ 
+-from mock import Mock
++from unittest.mock import Mock
+ 
+ from libcloud.utils.py3 import httplib
+ from libcloud.utils.py3 import assertRaisesRegex
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_retry_limit.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_retry_limit.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_retry_limit.py
+@@ -16,7 +16,7 @@
+ import socket
+ import ssl
+ 
+-from mock import Mock, patch, MagicMock
++from unittest.mock import Mock, patch, MagicMock
+ 
+ from libcloud.utils.retry import TRANSIENT_SSL_ERROR
+ from libcloud.common.base import Connection
+Index: apache-libcloud-3.5.1/libcloud/test/common/test_upcloud.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/common/test_upcloud.py
++++ apache-libcloud-3.5.1/libcloud/test/common/test_upcloud.py
+@@ -15,7 +15,7 @@
+ import sys
+ import json
+ 
+-from mock import Mock, call
++from unittest.mock import Mock, call
+ 
+ from libcloud.common.upcloud import (
+     UpcloudCreateNodeRequestBody,
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_azure_arm.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_azure_arm.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_azure_arm.py
+@@ -18,7 +18,7 @@ import sys
+ import functools
+ from datetime import datetime
+ 
+-import mock
++from unittest import mock
+ 
+ from libcloud.common.exceptions import BaseHTTPError
+ from libcloud.common.types import LibcloudError
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_deployment.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_deployment.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_deployment.py
+@@ -39,7 +39,7 @@ from libcloud.compute.drivers.rackspace
+ 
+ from libcloud.test import MockHttp, XML_HEADERS
+ from libcloud.test.file_fixtures import ComputeFileFixtures
+-from mock import Mock, patch
++from unittest.mock import Mock, patch
+ 
+ from libcloud.test.secrets import RACKSPACE_PARAMS
+ 
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_gce.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_gce.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_gce.py
+@@ -17,7 +17,7 @@ Tests for Google Compute Engine Driver
+ """
+ 
+ import datetime
+-import mock
++from unittest import mock
+ import sys
+ import unittest
+ 
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_gig_g8.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_gig_g8.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_gig_g8.py
+@@ -18,7 +18,7 @@ import base64
+ import json
+ import time
+ 
+-import mock
++from unittest import mock
+ 
+ from libcloud.utils.py3 import httplib
+ from libcloud.test import MockHttp
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_libvirt_driver.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_libvirt_driver.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_libvirt_driver.py
+@@ -15,7 +15,7 @@
+ 
+ import sys
+ 
+-import mock
++from unittest import mock
+ 
+ from libcloud.compute.drivers.libvirt_driver import LibvirtNodeDriver
+ from libcloud.compute.drivers.libvirt_driver import have_libvirt
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_openstack.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_openstack.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_openstack.py
+@@ -19,7 +19,7 @@ import os
+ import sys
+ import unittest
+ import datetime
+-import mock
++from unittest import mock
+ import pytest
+ 
+ from libcloud.utils.iso8601 import UTC
+@@ -29,7 +29,7 @@ try:
+ except ImportError:
+     import json
+ 
+-from mock import Mock, patch
++from unittest.mock import Mock, patch
+ import requests_mock
+ 
+ from libcloud.utils.py3 import httplib
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_ovh.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_ovh.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_ovh.py
+@@ -14,7 +14,7 @@
+ # limitations under the License.
+ import sys
+ import unittest
+-from mock import patch
++from unittest.mock import patch
+ 
+ from libcloud.utils.py3 import httplib
+ from libcloud.common.exceptions import BaseHTTPError
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_ssh_client.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_ssh_client.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_ssh_client.py
+@@ -32,7 +32,7 @@ from libcloud.utils.py3 import StringIO
+ from libcloud.utils.py3 import u
+ from libcloud.utils.py3 import assertRaisesRegex
+ 
+-from mock import patch, Mock, MagicMock, call
++from unittest.mock import patch, Mock, MagicMock, call
+ 
+ if not have_paramiko:
+     ParamikoSSHClient = None  # NOQA
+Index: apache-libcloud-3.5.1/libcloud/test/compute/test_vcloud.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/compute/test_vcloud.py
++++ apache-libcloud-3.5.1/libcloud/test/compute/test_vcloud.py
+@@ -45,7 +45,7 @@ from libcloud.compute.types import NodeS
+ from libcloud.test import MockHttp
+ from libcloud.test.compute import TestCaseMixin
+ from libcloud.test.file_fixtures import ComputeFileFixtures
+-from mock import patch, mock_open
++from unittest.mock import patch, mock_open
+ 
+ from libcloud.test.secrets import VCLOUD_PARAMS
+ 
+Index: apache-libcloud-3.5.1/libcloud/test/dns/test_base.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/dns/test_base.py
++++ apache-libcloud-3.5.1/libcloud/test/dns/test_base.py
+@@ -18,7 +18,7 @@ import sys
+ import tempfile
+ import datetime
+ 
+-from mock import Mock
++from unittest.mock import Mock
+ 
+ from libcloud import __version__
+ from libcloud.test import unittest
+Index: apache-libcloud-3.5.1/libcloud/test/dns/test_durabledns.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/dns/test_durabledns.py
++++ apache-libcloud-3.5.1/libcloud/test/dns/test_durabledns.py
+@@ -15,7 +15,7 @@
+ import sys
+ import unittest
+ 
+-from mock import MagicMock
++from unittest.mock import MagicMock
+ 
+ from libcloud.dns.base import Record, Zone
+ from libcloud.dns.types import RecordType
+Index: apache-libcloud-3.5.1/libcloud/test/dns/test_zonomi.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/dns/test_zonomi.py
++++ apache-libcloud-3.5.1/libcloud/test/dns/test_zonomi.py
+@@ -13,7 +13,7 @@
+ # limitations under the License.
+ import sys
+ import unittest
+-from mock import MagicMock
++from unittest.mock import MagicMock
+ 
+ 
+ from libcloud.test import MockHttp
+Index: apache-libcloud-3.5.1/libcloud/test/storage/test_backblaze_b2.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/storage/test_backblaze_b2.py
++++ apache-libcloud-3.5.1/libcloud/test/storage/test_backblaze_b2.py
+@@ -17,7 +17,7 @@ import os
+ import sys
+ import tempfile
+ 
+-import mock
++from unittest import mock
+ import json
+ 
+ from libcloud.storage.drivers.backblaze_b2 import BackblazeB2StorageDriver
+Index: apache-libcloud-3.5.1/libcloud/test/storage/test_base.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/storage/test_base.py
++++ apache-libcloud-3.5.1/libcloud/test/storage/test_base.py
+@@ -18,8 +18,8 @@ import hashlib
+ import sys
+ from io import BytesIO
+ 
+-import mock
+-from mock import Mock
++from unittest import mock
++from unittest.mock import Mock
+ 
+ from libcloud.common.exceptions import RateLimitReachedError
+ from libcloud.storage.base import DEFAULT_CONTENT_TYPE
+Index: apache-libcloud-3.5.1/libcloud/test/storage/test_cloudfiles.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/storage/test_cloudfiles.py
++++ apache-libcloud-3.5.1/libcloud/test/storage/test_cloudfiles.py
+@@ -24,9 +24,9 @@ from io import BytesIO
+ import hashlib
+ from hashlib import sha1
+ 
+-import mock
+-from mock import Mock
+-from mock import PropertyMock
++from unittest import mock
++from unittest.mock import Mock
++from unittest.mock import PropertyMock
+ 
+ import libcloud.utils.files
+ 
+Index: apache-libcloud-3.5.1/libcloud/test/storage/test_google_storage.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/storage/test_google_storage.py
++++ apache-libcloud-3.5.1/libcloud/test/storage/test_google_storage.py
+@@ -15,7 +15,7 @@
+ 
+ import copy
+ import json
+-import mock
++from unittest import mock
+ import re
+ import sys
+ import unittest
+@@ -24,8 +24,8 @@ from io import BytesIO
+ 
+ import email.utils
+ import pytest
+-from mock import Mock
+-from mock import PropertyMock
++from unittest.mock import Mock
++from unittest.mock import PropertyMock
+ 
+ from libcloud.common.google import GoogleAuthType
+ from libcloud.common.types import InvalidCredsError
+Index: apache-libcloud-3.5.1/libcloud/test/storage/test_oss.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/storage/test_oss.py
++++ apache-libcloud-3.5.1/libcloud/test/storage/test_oss.py
+@@ -19,10 +19,7 @@ import os
+ import sys
+ import unittest
+ 
+-try:
+-    import mock
+-except ImportError:
+-    from unittest import mock
++from unittest import mock
+ 
+ from libcloud.utils.py3 import b
+ from libcloud.utils.py3 import httplib
+Index: apache-libcloud-3.5.1/libcloud/test/storage/test_s3.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/storage/test_s3.py
++++ apache-libcloud-3.5.1/libcloud/test/storage/test_s3.py
+@@ -21,9 +21,9 @@ import sys
+ from io import BytesIO
+ from hashlib import sha1
+ 
+-import mock
+-from mock import Mock
+-from mock import PropertyMock
++from unittest import mock
++from unittest.mock import Mock
++from unittest.mock import PropertyMock
+ import libcloud.utils.files  # NOQA: F401
+ 
+ from libcloud.utils.py3 import ET
+Index: apache-libcloud-3.5.1/libcloud/test/test_connection.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/test_connection.py
++++ apache-libcloud-3.5.1/libcloud/test/test_connection.py
+@@ -21,7 +21,7 @@ import sys
+ from unittest import mock
+ 
+ import requests_mock
+-from mock import Mock, patch
++from unittest.mock import Mock, patch
+ from requests.exceptions import ConnectTimeout
+ 
+ import libcloud.common.base
+Index: apache-libcloud-3.5.1/libcloud/test/test_init.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/test_init.py
++++ apache-libcloud-3.5.1/libcloud/test/test_init.py
+@@ -26,7 +26,7 @@ try:
+ except ImportError:
+     have_paramiko = False
+ 
+-from mock import patch
++from unittest.mock import patch
+ 
+ import libcloud
+ from libcloud import _init_once
+Index: apache-libcloud-3.5.1/libcloud/test/test_logging_connection.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/test/test_logging_connection.py
++++ apache-libcloud-3.5.1/libcloud/test/test_logging_connection.py
+@@ -19,7 +19,7 @@ from io import StringIO
+ import zlib
+ import requests_mock
+ 
+-import mock
++from unittest import mock
+ 
+ import libcloud
+ from libcloud.test import unittest
+Index: apache-libcloud-3.5.1/requirements-tests.txt
+===================================================================
+--- apache-libcloud-3.5.1.orig/requirements-tests.txt
++++ apache-libcloud-3.5.1/requirements-tests.txt
+@@ -2,7 +2,6 @@ pep8==1.7.1
+ flake8==4.0.1
+ astroid==2.8.4
+ pylint==2.11.1
+-mock==4.0.3
+ codecov==2.1.12
+ coverage==4.5.4
+ requests>=2.27.1
+Index: apache-libcloud-3.5.1/setup.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/setup.py
++++ apache-libcloud-3.5.1/setup.py
+@@ -208,7 +208,6 @@ if setuptools_version < (36, 2):
+         raise RuntimeError(msg)
+ 
+ TEST_REQUIREMENTS = [
+-    "mock",
+     "requests_mock",
+     "pytest",
+     "pytest-runner",

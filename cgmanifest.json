@@ -19733,6 +19733,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-apache-libcloud",
+          "version": "3.5.1",
+          "downloadUrl": "http://archive.apache.org/dist/libcloud/apache-libcloud-3.5.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pybind11",
           "version": "2.6.2",
           "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.6.2/pybind11-2.6.2.tar.gz"

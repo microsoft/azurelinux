@@ -1,0 +1,24 @@
+Index: apache-libcloud-3.5.1/libcloud/compute/drivers/ec2.py
+===================================================================
+--- apache-libcloud-3.5.1.orig/libcloud/compute/drivers/ec2.py
++++ apache-libcloud-3.5.1/libcloud/compute/drivers/ec2.py
+@@ -1622,12 +1622,18 @@ class BaseEC2NodeDriver(NodeDriver):
+                                        on-demand price will be used.
+         :type       ex_spot_max_price: ``float``
+         """
++
++        try:
++            instance_type = size.id
++        except AttributeError:
++            instance_type = size
++
+         params = {
+             "Action": "RunInstances",
+             "ImageId": image.id,
+             "MinCount": str(ex_mincount),
+             "MaxCount": str(ex_maxcount),
+-            "InstanceType": size.id,
++            "InstanceType": instance_type,
+         }
+ 
+         if ex_terminate_on_shutdown:
