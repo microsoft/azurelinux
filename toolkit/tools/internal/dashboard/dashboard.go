@@ -11,12 +11,12 @@ import (
 
 var (
 	targetDir string
-	targetCSV = map[string][]int64 {
-		"create_worker_chroot.csv": []int64{0, 4}, 
-		"imageconfigvalidator.csv": []int64{0, 2}, 
-		"imagepkgfetcher.csv": []int64{0, 9}, 
-		"imager.csv": []int64{0, 4}, 
-		"roast.csv": []int64{0, 3},
+	targetCSV = map[string][]int64{
+		"create_worker_chroot.csv": []int64{0, 4},
+		"imageconfigvalidator.csv": []int64{0, 2},
+		"imagepkgfetcher.csv":      []int64{0, 9},
+		"imager.csv":               []int64{0, 4},
+		"roast.csv":                []int64{0, 3},
 	}
 	// targetCSV = []string{"create_worker_chroot.csv", "imageconfigvalidator.csv", "imagepkgfetcher.csv", "imager.csv", "roast.csv"}
 	// CSVSize   = []int64{0, 0, 0, 0, 0}
@@ -62,21 +62,28 @@ func main() {
 // Check if the file has been updated, and get updated contents if it did.
 // Assumption: the file and its parent directories of the file have been created.
 func getUpdate(currStat fs.FileInfo, idx int, filePath string) {
-	currNumLines := getNumLines(targetDir + filePath)
+	currNumLines := getNumLines(filePath)
 	if currNumLines != targetCSV[filePath][0] {
 		targetCSV[filePath][0] = currNumLines
-		fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
+		
+		fmt.Printf("%s has %d lines \n\n", currStat.Name(), currNumLines)
+		fmt.Printf("--------\n")
 	}
 }
 
 // Naive implementation (potentially inefficient for larger files)
 func getNumLines(filepath string) int64 {
-	file, _ := os.Open(filepath)
+	file, _ := os.Open(targetDir + filepath)
 	fileScanner := bufio.NewScanner(file)
+	// fileScanner.Split(bufio.ScanLines) // Tells the scanner to read the file line by line (by default)
 	count := 0
 
 	for fileScanner.Scan() {
 		count++
+		// if there are new lines, print each line
+		if count > int(targetCSV[filepath][0]) {
+			fmt.Printf("[%d / %d] in %s: %s \n", count, targetCSV[filepath][1], filepath, fileScanner.Text())
+		}
 	}
 
 	return int64(count)
