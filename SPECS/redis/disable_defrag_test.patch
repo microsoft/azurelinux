@@ -1,5 +1,5 @@
---- redis-6.2.7/tests/unit/memefficiency.tcl	2022-04-27 06:31:52.000000000 -0700
-+++ redis-6.2.7/tests/unit/memefficiency.tcl.fix	2022-07-08 14:25:52.527671864 -0700
+--- a/tests/unit/memefficiency.tcl	2022-04-27 06:31:52.000000000 -0700
++++ b/tests/unit/memefficiency.tcl	2022-07-08 14:25:52.527671864 -0700
 @@ -38,7 +38,7 @@
  
  run_solo {defrag} {
