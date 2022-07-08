@@ -26,7 +26,7 @@ var (
 		},
 	}
 
-	validNetWorkFileContent = []string{
+	validNetworkFileContent = []string{
 		"[Match]",
 		"Name=eth1",
 		"",
