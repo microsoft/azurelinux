@@ -197,18 +197,10 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 	}
 
 	for _, iface := range ifaces {
-		if networkData.Device == iface.Name {
-			deviceName = networkData.Device
+		ifaceHardwareAddr := strings.TrimSpace(iface.HardwareAddr.String())
+		if networkData.Device == iface.Name || strings.EqualFold(ifaceHardwareAddr, networkData.Device) {
+			deviceName = iface.Name
 			return
-		} else {
-			ifaceAddr := strings.TrimSpace(iface.HardwareAddr.String())
-
-			if strings.Contains(networkData.Device, ":") {
-				if ifaceAddr != "" && strings.EqualFold(ifaceAddr, networkData.Device) {
-					deviceName = iface.Name
-					return
-				}
-			}
 		}
 	}
 
