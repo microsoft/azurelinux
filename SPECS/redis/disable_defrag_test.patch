@@ -1,0 +1,11 @@
+--- redis-6.2.7/tests/unit/memefficiency.tcl	2022-04-27 06:31:52.000000000 -0700
++++ redis-6.2.7/tests/unit/memefficiency.tcl.fix	2022-07-08 14:25:52.527671864 -0700
+@@ -38,7 +38,7 @@
+ 
+ run_solo {defrag} {
+ start_server {tags {"defrag"} overrides {appendonly yes auto-aof-rewrite-percentage 0 save ""}} {
+-    if {[string match {*jemalloc*} [s mem_allocator]] && [r debug mallctl arenas.page] <= 8192} {
++    if {0} {
+         test "Active defrag" {
+             r config set hz 100
+             r config set activedefrag no
