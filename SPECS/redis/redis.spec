@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        6.2.7
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
