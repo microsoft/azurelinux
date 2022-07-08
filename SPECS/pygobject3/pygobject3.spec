@@ -24,6 +24,7 @@ BuildRequires:  dbus
 BuildRequires:  glib-schemas
 BuildRequires:  gobject-introspection-python
 BuildRequires:  openssl-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-test
 BuildRequires:  python3-xml
@@ -65,8 +66,7 @@ python3 setup.py build
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pytest
+pip3 install pytest
 python3 setup.py test
 
 %clean
