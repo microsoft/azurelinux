@@ -2,11 +2,7 @@
 %define kernel_release 4%{?dist}
 %define kernel_full_version %{kernel_version}-%{kernel_release}
 
-%define builds_module %([[ -n "$(echo "%{patches}" | grep -oP "CVE-\d+-\d+(?=\.patch)")" ]] && echo 1 || echo 0)
-
-%if !%{builds_module}
-%define debug_package %{nil}
-%endif
+%define builds_module %([[ -n "$(echo "%{patches}" | grep -oP "CVE-\\d+-\\d+(?=\\.patch)")" ]] && echo 1 || echo 0)
 
 # Kpatch-build allows only alphanumeric characters, '-', and '_'.
 %define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_-]/-}")
@@ -37,6 +33,11 @@ Source2:        mariner.pem
 Patch0:         CVE-2022-12345.patch
 Patch100:       CVE-2022-67890.nopatch
 
+# Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
+%if !%{builds_module}
+%global debug_package %{nil}
+%endif
+
 ExclusiveArch:  x86_64
 
 BuildRequires:  audit-devel
@@ -66,7 +67,8 @@ BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-build
 
-Requires(post): kpatch
+Requires(post):  kpatch
+Requires(preun): kpatch
 
 %description
 A set of kernel livepatches addressing CVEs present in Mariner's
