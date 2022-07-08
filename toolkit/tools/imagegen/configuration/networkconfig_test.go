@@ -68,13 +68,13 @@ func TestShouldFailParsingInvalidGateWay_Network(t *testing.T) {
 	testNetwork := validNetworks[0]
 	testNetwork.GateWay = "abcd"
 
-	err := testNetwork.ipAddrIsValid()
+	err := testNetwork.ipAddressesAreValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid input for gateway: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for gateway: invalid IP address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: invalid input for gateway: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for gateway: invalid IP address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidIp_Network(t *testing.T) {
@@ -82,13 +82,13 @@ func TestShouldFailParsingInvalidIp_Network(t *testing.T) {
 	testNetwork := validNetworks[0]
 	testNetwork.Ip = "abcd"
 
-	err := testNetwork.ipAddrIsValid()
+	err := testNetwork.ipAddressesAreValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid input for ip: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for IP: invalid IP address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: invalid input for ip: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for IP: invalid IP address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidNetMask_Network(t *testing.T) {
@@ -96,13 +96,13 @@ func TestShouldFailParsingInvalidNetMask_Network(t *testing.T) {
 	testNetwork := validNetworks[0]
 	testNetwork.NetMask = "abcd"
 
-	err := testNetwork.ipAddrIsValid()
+	err := testNetwork.ipAddressesAreValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid input for netmask: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for netmask: invalid IP address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: invalid input for netmask: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for netmask: invalid IP address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidNameServer_Network(t *testing.T) {
@@ -110,13 +110,13 @@ func TestShouldFailParsingInvalidNameServer_Network(t *testing.T) {
 	testNetwork := validNetworks[0]
 	testNetwork.NameServers = []string{"abcd"}
 
-	err := testNetwork.ipAddrIsValid()
+	err := testNetwork.ipAddressesAreValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid input for nameserver: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "invalid input for nameserver: invalid IP address (abcd)", err.Error())
 
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Network]: invalid input for nameserver: invalid ip address (abcd)", err.Error())
+	assert.Equal(t, "failed to parse [Network]: invalid input for nameserver: invalid IP address (abcd)", err.Error())
 }
 
 func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
@@ -146,5 +146,5 @@ func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	// Check whether the contents in the network file is correct
 	testContents, err := file.ReadLines(networkFile)
 	assert.NoError(t, err)
-	assert.Equal(t, testContents, validNetWorkFileContent)
+	assert.Equal(t, testContents, validNetworkFileContent)
 }

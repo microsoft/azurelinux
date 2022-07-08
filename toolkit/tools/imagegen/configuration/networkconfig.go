@@ -61,7 +61,7 @@ func (n *Network) IsValid() (err error) {
 		return
 	}
 
-	err = n.ipAddrIsValid()
+	err = n.ipAddressesAreValid()
 	if err != nil {
 		return
 	}
@@ -84,7 +84,7 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 		if err != nil {
 			return err
 		} else if deviceName == "" {
-			err = fmt.Errorf("The input network device is currently not supported on this system")
+			err = fmt.Errorf("the input network device is currently not supported on this system")
 			return err
 		}
 
@@ -93,7 +93,10 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 			return err
 		}
 
-		dnsUpdate = len(networkData.NameServers) > 0
+		hasDNSinConfig := len(networkData.NameServers) > 0
+		if hasDNSinConfig {
+			dnsUpdate = true
+		}
 	}
 
 	err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-networkd")
@@ -126,16 +129,16 @@ func (n *Network) validateIPAddress(ip string) (err error) {
 	if ip == "" && (n.BootProto == "" || n.BootProto == "dhcp") {
 		return
 	} else if net.ParseIP(ip) == nil {
-		return fmt.Errorf("invalid ip address (%s)", ip)
+		return fmt.Errorf("invalid IP address (%s)", ip)
 	}
 
 	return
 }
 
-// ipAddrIsValid returns an error if ip, gateway, netmask or nameserver inputs are invalid ip addresses
-func (n *Network) ipAddrIsValid() (err error) {
+// ipAddressesAreValid returns an error if ip, gateway, netmask or nameserver inputs are invalid ip addresses
+func (n *Network) ipAddressesAreValid() (err error) {
 	if err = n.validateIPAddress(n.Ip); err != nil {
-		return fmt.Errorf("invalid input for ip: %w", err)
+		return fmt.Errorf("invalid input for IP: %w", err)
 	}
 
 	if err = n.validateIPAddress(n.NetMask); err != nil {
@@ -169,16 +172,19 @@ func findBootIfValue() (deviceAddr string, err error) {
 
 	bootifValue, ferr := GetKernelCmdLineValue("BOOTIF")
 	bootifValue = strings.TrimSpace(bootifValue)
-	if ferr != nil || bootifValue == "" {
+	if ferr != nil {
 		err = ferr
+		return
+	} else if bootifValue == "" {
+		err = fmt.Errorf("empty MAC address when device is set to (bootif)")
 		return
 	}
 
 	// The bootif value in the cmdline set by pxelinux is of the following format:
-	// bootif=01-MAC Address, where each byte value of the MAC address is separated
-	// by dashes instead of colons. Therefore, we're reading from the 10th spot of the
+	// bootif=01-<MAC Address>, where each byte value of the MAC address is separated
+	// by dashes instead of colons. Therefore, we're reading from the 4th spot of the
 	// string to obtain the MAC address and then replace the dashes with colons
-	deviceAddr = strings.Replace(bootifValue[macAddressStartIndex:len(bootifValue)], "-", ":", -1)
+	deviceAddr = strings.ReplaceAll(bootifValue[macAddressStartIndex:len(bootifValue)], "-", ":")
 	return
 }
 
@@ -227,8 +233,8 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 	// Write IP and netmask
 	if networkData.NetMask != "" && networkData.Ip != "" {
 		stringMask := net.IPMask(net.ParseIP(networkData.NetMask).To4())
-		cidrPrefix, _ := stringMask.Size()
-		networkSection.WriteString(fmt.Sprintf("Address=%s/%d\n", networkData.Ip, cidrPrefix))
+		cidrNumber, _ := stringMask.Size()
+		networkSection.WriteString(fmt.Sprintf("Address=%s/%d\n", networkData.Ip, cidrNumber))
 	}
 
 	// Write Gateway
@@ -253,6 +259,7 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	const (
 		networkFileDir = "/etc/systemd/network"
 		filePrefix     = "10"
+		squashErrors   = false
 	)
 
 	if exists, ferr := file.DirExists(networkFileDir); ferr != nil {
@@ -266,25 +273,36 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 
 	logger.Log.Debugf("Start creating network file")
 
-	networkFileName := fmt.Sprintf("%s/%s-%s-%s.network", networkFileDir, filePrefix, networkData.BootProto, deviceName)
-	if exists, _ := file.PathExists(networkFileName); exists {
-		return fmt.Errorf("network file (%s) already exists", networkFileName)
+	networkFilePath := fmt.Sprintf("%s/%s-%s-%s.network", networkFileDir, filePrefix, networkData.BootProto, deviceName)
+	exists, err := file.PathExists(networkFilePath)
+	if exists && err == nil {
+		return fmt.Errorf("network file (%s) already exists", networkFilePath)
 	}
 
-	err = file.Create(networkFileName, 0644)
+	err = file.Create(networkFilePath, 0644)
 	if err != nil {
-		logger.Log.Errorf("Error creating file %s: %s", networkFileName, err)
+		logger.Log.Errorf("Error creating file %s: %s", networkFilePath, err)
 		return
 	}
 
+	defer func() {
+		// Delete the network file on failure
+		if err != nil {
+			err = shell.ExecuteLive(squashErrors, "rm", networkFilePath)
+			if err != nil {
+				logger.Log.Errorf("Failed to clean up network file (%s). Error: %s", networkFilePath, err)
+			}
+		}
+	}()
+
 	// Write the [match] field
-	err = populateMatchSection(networkData, networkFileName, deviceName)
+	err = populateMatchSection(networkData, networkFilePath, deviceName)
 	if err != nil {
 		return
 	}
 
 	// Write the [Network] field
-	err = populateNetworkSection(networkData, networkFileName)
+	err = populateNetworkSection(networkData, networkFilePath)
 	if err != nil {
 		return
 	}
@@ -293,8 +311,8 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	// If yes, then also place a copy of the network file in the installer environment in addition to
 	// the one on disk
 	if networkData.OnBoot {
-		installNetworkFile := filepath.Join(installChroot.RootDir(), networkFileName)
-		err = file.Copy(networkFileName, installNetworkFile)
+		installNetworkFile := filepath.Join(installChroot.RootDir(), networkFilePath)
+		err = file.Copy(networkFilePath, installNetworkFile)
 	}
 
 	return
