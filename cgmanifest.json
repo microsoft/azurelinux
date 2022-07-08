@@ -3035,8 +3035,8 @@
         "type": "other",
         "other": {
           "name": "libjpeg-turbo",
-          "version": "2.0.0",
-          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.0.0.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.2.tar.gz"
         }
       }
     },
@@ -3495,8 +3495,8 @@
         "type": "other",
         "other": {
           "name": "libtiff",
-          "version": "4.1.0",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.1.0/libtiff-v4.1.0.tar.gz"
+          "version": "4.4.0",
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.4.0/libtiff-v4.4.0.tar.gz"
         }
       }
     },
@@ -7025,8 +7025,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "5.0.14",
-          "downloadUrl": "http://download.redis.io/releases/redis-5.0.14.tar.gz"
+          "version": "6.2.7",
+          "downloadUrl": "http://download.redis.io/releases/redis-6.2.7.tar.gz"
         }
       }
     },
