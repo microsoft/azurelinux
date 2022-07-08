@@ -11,6 +11,10 @@
 
 %define patches_description \
 %(
+    if [[ -z "%{patches}" ]]
+    then
+        echo "No CVE patches evaluated for this kernel version, yet."
+    fi
     for patch in %{patches}
     do
         cve_number=$(basename "${patch%.*}")
