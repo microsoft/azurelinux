@@ -168,10 +168,9 @@ ln -sf libpython3.7m.so %{buildroot}%{_libdir}/libpython3.7.so
 cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix3.7.py
 ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
 
-# unversioned python is for python2, so update pip3/pip3.7 with python3.7
+# unversioned python is for python2, so update pip3/pip3.7/easy_install-3.7 with python3.7
 # this patch needs update when python3.7 version bump up
-sed -i 's|#!/usr/bin/python|#!/usr/bin/python3.7|' %{buildroot}%{_bindir}/pip3
-sed -i 's|#!/usr/bin/python|#!/usr/bin/python3.7|' %{buildroot}%{_bindir}/pip3.7
+sed -i 's|#!/usr/bin/python|#!%{_bindir}/python3.7|' %{buildroot}%{_bindir}/{pip3,pip3.7,easy_install-3.7}
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
