@@ -139,13 +139,12 @@ func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 
 	err := createNetworkConfigFile(nil, testNetwork, "eth1")
 	assert.NoError(t, err)
+	t.Cleanup(func() {
+		os.Remove(networkFile)
+	})
 
 	// Check whether the contents in the network file is correct
 	testContents, err := file.ReadLines(networkFile)
 	assert.NoError(t, err)
 	assert.Equal(t, testContents, validNetWorkFileContent)
-
-	t.Cleanup(func() {
-		os.Remove(networkFile)
-	})
 }
