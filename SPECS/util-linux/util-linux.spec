@@ -19,6 +19,7 @@ BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
+# util-linux contains su, which conflicts with shadow-utils < 4.9-10 that also contained su
 Conflicts:      shadow-utils < 4.9-10
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
@@ -147,7 +148,7 @@ rm -rf %{buildroot}/lib/systemd/system
 
 %changelog
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.4-3
-- Enable su tool and related PAM configs
+- Enable su tool and related PAM config
 
 * Mon Jun 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.37.4-2
 - Add Buildrequires libcap-ng-devel to build setpriv

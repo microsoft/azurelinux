@@ -24,7 +24,6 @@ Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
-BuildRequires:  audit-libs-devel
 BuildRequires:  automake
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
@@ -49,7 +48,6 @@ Provides:       /usr/sbin/nologin
 Provides:       /usr/sbin/useradd
 Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
-Conflicts:      util-linux < 2.37.4-3
 
 %description
 The Shadow package contains programs for handling passwords
