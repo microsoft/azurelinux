@@ -1,3 +1,5 @@
+# This patch file also fixes CVE-2019-14274, see inline comments below for exact chunks - damcilva 2022-06-27
+
 diff -r -c -N ../mcpp-2.7.2-old/noconfig/vc2010.dif ./noconfig/vc2010.dif
 *** ../mcpp-2.7.2-old/noconfig/vc2010.dif	Wed Dec 31 20:30:00 1969
 --- ./noconfig/vc2010.dif	Fri May 14 12:47:22 2010
@@ -130,6 +132,7 @@ diff -r -c -N ../mcpp-2.7.2-old/src/support.c ./src/support.c
       size_t      length
   )
   {
+# This chunk fixes CVE-2019-14274 - damcilva 2022-06-27
 !     if (mem_buf_p->bytes_avail < length + 1) {  /* Need to allocate more memory */
           size_t size = MAX( BUF_INCR_SIZE, length);
   
@@ -140,6 +143,7 @@ diff -r -c -N ../mcpp-2.7.2-old/src/support.c ./src/support.c
                       sp -= 2;
                       while (*sp != '\n')     /* Until end of line    */
                           mcpp_fputc( *sp++, OUT);
+# This chunk fixes CVE-2019-14274 - damcilva 2022-06-27
 +                     mcpp_fputc( '\n', OUT);
 +                     wrong_line = TRUE;
                   }

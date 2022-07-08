@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -1664,9 +1664,12 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc32
 rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
-# Provided by package ipxe
+
+%ifarch aarch64
 rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
 rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
+%endif
+
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
 # Provided by package seabios
@@ -2099,6 +2102,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/%{name}/multiboot_dma.bin
 %{_datadir}/%{name}/pvh.bin
 %{_datadir}/%{name}/qboot.rom
+%{_datadir}/%{name}/pxe*rom
+%{_datadir}/%{name}/efi*rom
 %if %{need_qemu_kvm}
 %{_bindir}/qemu-kvm
 %{_mandir}/man1/qemu-kvm.1*
@@ -2277,6 +2282,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Fri Jul 01 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-5
+- Ship efi*rom & pxe*rom rom files
+
 * Wed Jun 15 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-4
 - Address CVE-2021-4206
 

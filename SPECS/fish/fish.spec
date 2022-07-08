@@ -1,14 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
-
 Name:           fish
-Version:        3.1.2
-Release:        4%{?dist}
+Version:        3.5.0
+Release:        1%{?dist}
 Summary:        Friendly interactive shell
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 # GPLv2
 #   - src/fish.cpp
 #   and rest..
@@ -30,9 +28,7 @@ Summary:        Friendly interactive shell
 #   - user_doc/html/_static/underscore.js
 License:        GPLv2 and BSD and ISC and LGPLv2+ and MIT
 URL:            https://fishshell.com
-Source0:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
-Source1:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz.asc
-Source2:        gpgkey-003837986104878835FA516D7A67D962D88A709A.gpg
+Source0:        https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  cmake >= 3.2
 BuildRequires:  ninja-build
@@ -50,6 +46,9 @@ Recommends:     man-db
 Recommends:     man-pages
 Recommends:     groff-base
 
+# Expects the `kill` command to be available
+Requires:       util-linux
+
 Provides:       bundled(js-angular) = 1.0.8
 Provides:       bundled(js-jquery) = 3.3.1
 Provides:       bundled(js-underscore) = 1.9.1
@@ -61,7 +60,6 @@ highlighting, autosuggestions, and tab completions that just work, with
 nothing to learn or configure.
 
 %prep
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
 rm -vrf pcre2-*
 
@@ -90,8 +88,8 @@ sed -i 's^/usr/local/^/usr/^g' %{_vpath_builddir}/*.pc
 %ninja_install -C %{_vpath_builddir}
 
 # Install docs from tarball root
-cp -a README.md %{buildroot}%{_pkgdocdir}
-cp -a CONTRIBUTING.md %{buildroot}%{_pkgdocdir}
+cp -a README.rst %{buildroot}%{_pkgdocdir}
+cp -a CONTRIBUTING.rst %{buildroot}%{_pkgdocdir}
 
 %find_lang %{name}
 
@@ -120,11 +118,20 @@ fi
 %{_mandir}/man1/fish*.1*
 %{_bindir}/fish*
 %config(noreplace) %{_sysconfdir}/fish/
+%{_datadir}/applications/fish.desktop
 %{_datadir}/fish/
+%{_datadir}/pixmaps/fish.png
 %{_datadir}/pkgconfig/fish.pc
 %{_pkgdocdir}
 
 %changelog
+* Fri Jul 01 2022 Daniel McIlvaney <damcilva@microsft.com> - 3.5.0-1
+- Update to 3.5.0 to reslove CVE-2022-20001
+
+* Thu Jun 30 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.2-5
+- Mariner has sha256 check so remove not required gpg and asc files.
+- Align vendor and distribution entries
+
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.2-4
 - Use _topdir instead of hard-coded value /usr/src/mariner
 - License verified
