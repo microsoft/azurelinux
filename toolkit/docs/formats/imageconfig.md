@@ -214,7 +214,7 @@ A sample PreInstallScripts entry pointing to two install scripts where one has i
 
 ### Networks
 
-Kickstart style unattended installations tends to perform network configurations during the installation process to set IP address, configure the hostname, DNS etc. Thus, the Networks entry is added to enable the users to specify the network config parameters. Currently, the Mariner tooling only supports a subset of the kickstart network command options: bootproto, gateway, ip, net mask, DNS and device. Hostname can be configured using the "Hostname" entry of the image config. 
+Kickstart style unattended installations tends to perform network configurations during the installation process to set IP address, configure the hostname, DNS etc. Thus, the `Networks` entry is added to enable the users to specify the network config parameters. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config. 
 
 A sample Networks entry pointing to one network configuration:
 ``` json
@@ -231,8 +231,6 @@ A sample Networks entry pointing to one network configuration:
         "Device": "eth0"
     }
 ],
-```
-
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.
