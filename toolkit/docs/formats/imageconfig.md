@@ -231,6 +231,8 @@ A sample Networks entry pointing to one network configuration:
         "Device": "eth0"
     }
 ],
+```
+
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.

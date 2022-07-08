@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -215,7 +216,7 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 
 func populateMatchSection(networkData Network, fileName, deviceName string) (err error) {
 	matchSection := fmt.Sprintf("[Match]\nName=%s\n", deviceName)
-	err = file.Append(matchSection+"\n", fileName)
+	err = file.Append(matchSection, fileName)
 	if err != nil {
 		logger.Log.Errorf("Failed to write [Match] section: %s", err)
 	}
@@ -259,7 +260,6 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	const (
 		networkFileDir = "/etc/systemd/network"
 		filePrefix     = "10"
-		squashErrors   = false
 	)
 
 	if exists, ferr := file.DirExists(networkFileDir); ferr != nil {
@@ -288,7 +288,7 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	defer func() {
 		// Delete the network file on failure
 		if err != nil {
-			err = shell.ExecuteLive(squashErrors, "rm", networkFilePath)
+			err = os.Remove(networkFilePath)
 			if err != nil {
 				logger.Log.Errorf("Failed to clean up network file (%s). Error: %s", networkFilePath, err)
 			}
@@ -297,6 +297,12 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 
 	// Write the [match] field
 	err = populateMatchSection(networkData, networkFilePath, deviceName)
+	if err != nil {
+		return
+	}
+
+	// Add a line gap between the two sections for better formatting
+	err = file.Append("\n", networkFilePath)
 	if err != nil {
 		return
 	}
