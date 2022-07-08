@@ -40,12 +40,12 @@ var (
 // TestMain found in configuration_test.go.
 
 func TestShouldPassParsingValidNetworks_Network(t *testing.T) {
-	for _, b := range validNetworks {
+	for _, inputNetwork := range validNetworks {
 		var checkedNetwork Network
-		assert.NoError(t, b.IsValid())
-		err := remarshalJSON(b, &checkedNetwork)
+		assert.NoError(t, inputNetwork.IsValid())
+		err := remarshalJSON(inputNetwork, &checkedNetwork)
 		assert.NoError(t, err)
-		assert.Equal(t, b, checkedNetwork)
+		assert.Equal(t, inputNetwork, checkedNetwork)
 	}
 }
 
