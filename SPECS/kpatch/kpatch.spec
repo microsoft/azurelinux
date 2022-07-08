@@ -10,6 +10,8 @@ URL:            https://github.com/dynup/kpatch
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         mariner_update.patch
 
+ExclusiveArch:  x86_64
+
 BuildRequires:  binutils
 BuildRequires:  dnf-utils
 BuildRequires:  elfutils
@@ -17,8 +19,6 @@ BuildRequires:  elfutils-devel
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  kernel-headers
-
-ExclusiveArch:  x86_64
 
 %description
 Kpatch is a Linux dynamic kernel patching infrastructure which allows you to patch
