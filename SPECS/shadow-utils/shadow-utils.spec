@@ -22,12 +22,14 @@ Source12:       useradd-default
 Source13:       login-defs
 Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
-BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
+BuildRequires:  audit-libs-devel
 BuildRequires:  automake
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
 BuildRequires:  itstool
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
