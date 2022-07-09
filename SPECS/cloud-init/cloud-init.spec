@@ -1,4 +1,3 @@
-%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        22.2
@@ -32,6 +31,7 @@ BuildRequires:  python3-xml
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Requires:       dhcp-client
+Requires:       e2fsprogs
 Requires:       iproute
 Requires:       net-tools
 Requires:       python3
@@ -67,6 +67,7 @@ ssh keys and to let the user run various scripts.
 %package azure-kvp
 Summary:        Cloud-init configuration for Hyper-V telemetry
 Requires:       %{name} = %{version}-%{release}
+
 %description    azure-kvp
 Cloud-init configuration for Hyper-V telemetry
 
@@ -390,4 +391,3 @@ make check %{?_smp_mflags}
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-
