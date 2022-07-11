@@ -65,6 +65,10 @@ cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
+* Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
+- Bump release number to match grub release number
+- Add the grub pxe efi binary
+
 * Mon Feb 28 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Bump release number to match grub release number
 

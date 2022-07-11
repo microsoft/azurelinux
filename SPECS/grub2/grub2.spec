@@ -322,6 +322,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
+- Add the grub pxe efi binary which has empty prefix set
+
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Enable multiboot2 support for x86_64
 
