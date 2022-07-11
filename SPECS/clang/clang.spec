@@ -68,18 +68,15 @@ make DESTDIR=%{buildroot} install
 cd build
 make clang-check
 
-%{clean}
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
-%license LICENSE.TXT
 %{_bindir}/*
 %{_libexecdir}/*
 %{_datadir}/*
 
 %files libs
 %defattr(-,root,root)
+%license LICENSE.TXT
 %{_libdir}/clang/*
 %{_libdir}/*.so.*
 
