@@ -1,34 +1,34 @@
-Summary:	      Library for extracting extra information from image files
-Name:		        libexif
-Version:	      0.6.24
-Release:	      1%{?dist}
-License:	      LGPLv2+
+Summary:        Library for extracting extra information from image files
+Name:           libexif
+Version:        0.6.24
+Release:        1%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		        https://libexif.github.io/
-Source0:	      https://github.com/libexif/libexif/releases/download/v%{version}/%{name}-%{version}.tar.bz2
-BuildRequires:	doxygen
+URL:            https://libexif.github.io/
+Source0:        https://github.com/libexif/libexif/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+BuildRequires:  doxygen
 BuildRequires:  gcc
-BuildRequires:	gettext-devel
+BuildRequires:  gettext-devel
 BuildRequires:  make
-BuildRequires:	pkgconfig
+BuildRequires:  pkgconfig
 
 %description
 Most digital cameras produce EXIF files, which are JPEG files with
 extra tags that contain information about the image. The EXIF library
 allows you to parse an EXIF file and read the data from those tags.
 
-%package      devel
-Summary:	    Files needed for libexif application development
-Requires:	    %{name} = %{version}-%{release}
+%package        devel
+Summary:        Files needed for libexif application development
+Requires:       %{name} = %{version}-%{release}
 
-%description  devel
+%description    devel
 The libexif-devel package contains the libraries and header files
 for writing programs that use libexif.
 
-%package      doc
-Summary:	    The EXIF Library API documentation
-Requires:	    %{name} = %{version}-%{release}
+%package        doc
+Summary:        The EXIF Library API documentation
+Requires:       %{name} = %{version}-%{release}
 
 %description doc
 API Documentation for programmers wishing to use libexif in their programs.
