@@ -43,6 +43,7 @@ This package contains development files for %{name}.
 %install
 %make_install
 find %{buildroot} -type f -name '*.la' -delete -print
+find %{buildroot} -type f -name '*.a' -delete -print
 
 %check
 %make_build check
