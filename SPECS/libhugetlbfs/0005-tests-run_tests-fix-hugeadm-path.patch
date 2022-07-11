@@ -1,0 +1,13 @@
+diff --git a/tests/run_tests.py b/tests/run_tests.py
+index 5c10f6d..b6f73bb 100755
+--- a/tests/run_tests.py
++++ b/tests/run_tests.py
+@@ -247,7 +247,7 @@ def get_pagesizes():
+     """
+     sizes = set()
+     out = ""
+-    (rc, out) = bash("../obj/hugeadm --page-sizes")
++    (rc, out) = bash("hugeadm --page-sizes")
+     if rc != 0 or out == "":
+         return sizes
+ 
