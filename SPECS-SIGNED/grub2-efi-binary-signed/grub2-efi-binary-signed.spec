@@ -2,15 +2,16 @@
 %ifarch x86_64
 %global buildarch x86_64
 %global grubefiname grubx64.efi
+%global grubpxeefiname grubx64-pxe.efi
 %endif
 %ifarch aarch64
 %global buildarch aarch64
-%global grubefiname grubaa64.efi
+%global grubpxeefiname grubaa64-pxe.efi
 %endif
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +30,7 @@ URL:            https://www.gnu.org/software/grub
 #   4. Build this spec
 Source0:        grub2-efi-binary-%{version}-%{release}.%{buildarch}.rpm
 Source1:        %{grubefiname}
+Source2:        %{grubpxeefiname}
 
 %description
 This package contains the GRUB EFI image signed for secure boot. The package is
@@ -56,9 +58,11 @@ specifically created for installing on %{buildarch} systems
 %install
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
 cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
+cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %files -n grub2-efi-binary
 /boot/efi/EFI/BOOT/%{grubefiname}
+/boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
 * Mon Feb 28 2022 Henry Li <lihl@microsoft.com> - 2.06-3
