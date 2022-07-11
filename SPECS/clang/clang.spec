@@ -14,6 +14,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  zlib-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  python2-devel
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       libstdc++-devel
 Requires:       ncurses
 Requires:       llvm
@@ -23,6 +24,12 @@ Requires:       python2
 
 %description
 The goal of the Clang project is to create a new C based language front-end: C, C++, Objective C/C++, OpenCL C and others for the LLVM compiler. You can get and build the source today.
+
+%package libs
+Summary:        Runtime library for clang
+
+%description libs
+Runtime library for clang.
 
 %package devel
 Summary:        Development headers for clang
@@ -69,15 +76,18 @@ rm -rf %{buildroot}/*
 %license LICENSE.TXT
 %{_bindir}/*
 %{_libexecdir}/*
-%{_libdir}/*.so.*
 %{_datadir}/*
+
+%files libs
+%defattr(-,root,root)
+%{_libdir}/clang/*
+%{_libdir}/*.so.*
 
 %files devel
 %defattr(-,root,root)
 %{_libdir}/*.so
 %{_libdir}/*.a
 %{_libdir}/cmake/*
-%{_libdir}/clang/*
 %{_includedir}/*
 
 %changelog
