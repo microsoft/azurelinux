@@ -45,18 +45,14 @@ func main() {
 		// Check if the target directory exists. Assume we only need to check one directory for now.
 		currStat, err := os.Stat(targetDir)
 		if os.IsNotExist(err) {
-			// fmt.Printf("The target directory %s doesn't exist. \n", targetDir)
 			continue
 		}
 
 		// Check update for each target file.
 		for filePath, _ := range targetCSV {
-			// filePath = targetDir + filePath
-			// fmt.Printf("Processing file %s. \n", filePath)
 			currStat, err = os.Stat(targetDir + filePath)
 			// Check if the file exists.
 			if os.IsNotExist(err) {
-				// fmt.Printf("File doesn't exist. \n")
 				continue
 			}
 			// getUpdate(currStat, idx, filePath)
@@ -64,12 +60,7 @@ func main() {
 			if currNumLines != targetCSV[filePath][0] {
 				targetCSV[filePath][0] = currNumLines
 				fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
-				sum := int64(0)
-				for _, value := range targetCSV {
-					sum += value[0]
-				}
-				print(sum)
-				bar.Set(int(sum))
+				bar.Incr()
 			}
 			// getUpdate(currStat, idx, filePath)
 		}
