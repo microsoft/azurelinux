@@ -1,7 +1,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        8.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        NCSA
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/cfe-%{version}.src.tar.xz
