@@ -8370,6 +8370,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgdiplus",
+          "version": "6.1",
+          "downloadUrl": "https://download.mono-project.com/sources/libgdiplus/libgdiplus-6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgee",
           "version": "0.20.3",
           "downloadUrl": "https://download.gnome.org/sources/libgee/0.20/libgee-0.20.3.tar.xz"

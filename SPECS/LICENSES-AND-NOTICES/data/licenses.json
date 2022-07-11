@@ -2001,6 +2001,7 @@
                 "libacvp",
                 "libconfini",
                 "libconfuse",
+                "libgdiplus",
                 "libmaxminddb",
                 "libmetalink",
                 "libsafec",
