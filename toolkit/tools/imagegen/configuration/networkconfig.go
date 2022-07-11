@@ -275,7 +275,10 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 
 	networkFilePath := fmt.Sprintf("%s/%s-%s-%s.network", networkFileDir, filePrefix, networkData.BootProto, deviceName)
 	exists, err := file.PathExists(networkFilePath)
-	if exists && err == nil {
+	if err != nil {
+		logger.Log.Errorf("Error checking file path (%s): %s", networkFilePath, err)
+		return err
+	} else if exists {
 		return fmt.Errorf("network file (%s) already exists", networkFilePath)
 	}
 
