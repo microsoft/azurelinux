@@ -234,8 +234,8 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 	// Write IP and netmask
 	if networkData.NetMask != "" && networkData.Ip != "" {
 		stringMask := net.IPMask(net.ParseIP(networkData.NetMask).To4())
-		cidrNumber, _ := stringMask.Size()
-		networkSection.WriteString(fmt.Sprintf("Address=%s/%d\n", networkData.Ip, cidrNumber))
+		networkMask, _ := stringMask.Size()
+		networkSection.WriteString(fmt.Sprintf("Address=%s/%d\n", networkData.Ip, networkMask))
 	}
 
 	// Write Gateway
