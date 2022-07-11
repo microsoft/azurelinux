@@ -64,7 +64,12 @@ func main() {
 			if currNumLines != targetCSV[filePath][0] {
 				targetCSV[filePath][0] = currNumLines
 				fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
-
+				sum := int64(0)
+				for _, value := range targetCSV {
+					sum += value[0]
+				}
+				print(sum)
+				bar.Set(int(sum))
 			}
 			// getUpdate(currStat, idx, filePath)
 		}
