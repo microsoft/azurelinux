@@ -1,0 +1,29 @@
+From 8ad2e4301730bc7a5a07a7ca101f6e114abc1fe6 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 7 Jul 2022 13:58:15 +0000
+Subject: [PATCH 42/42] kernel: hv_utils shutdown on systemd systems.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/kernel.te | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 30e34bec5..00d49136c 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -380,6 +380,11 @@ ifdef(`init_systemd',`
+ 		dev_filetrans_input_dev(kernel_t)
+ 	')
+ 
++	optional_policy(`
++		systemd_start_power_units(kernel_t)
++		systemd_status_power_units(kernel_t)
++	')
++
+ 	optional_policy(`
+ 		selinux_compute_create_context(kernel_t)
+ 	')
+-- 
+2.25.1
+
