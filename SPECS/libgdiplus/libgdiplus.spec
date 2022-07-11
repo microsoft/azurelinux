@@ -47,6 +47,7 @@ find %{buildroot} -type f -name '*.a' -delete -print
 
 %check
 %make_build check
+cat tests/test-suite.log
 
 %ldconfig_scriptlets
 
