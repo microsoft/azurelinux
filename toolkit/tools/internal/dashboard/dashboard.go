@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/gosuri/uiprogress"
 )
 
 var (
@@ -25,6 +27,11 @@ var (
 
 func main() {
 	fmt.Println("Starting dashboard")
+	uiprogress.Start() // start rendering
+	bar := uiprogress.AddBar(22)
+	bar.AppendCompleted()
+	bar.PrependElapsed()
+
 	wd, _ := os.Getwd()
 	idx := strings.Index(wd, "CBL-Mariner/toolkit")
 	wd = wd[0 : idx+19]
@@ -53,7 +60,13 @@ func main() {
 				continue
 			}
 			// getUpdate(currStat, idx, filePath)
-			getUpdate(currStat, idx, filePath)
+			currNumLines := getNumLines(targetDir + filePath)
+			if currNumLines != targetCSV[filePath][0] {
+				targetCSV[filePath][0] = currNumLines
+				fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
+
+			}
+			// getUpdate(currStat, idx, filePath)
 		}
 	}
 
@@ -62,27 +75,21 @@ func main() {
 // Check if the file has been updated, and get updated contents if it did.
 // Assumption: the file and its parent directories of the file have been created.
 func getUpdate(currStat fs.FileInfo, idx int, filePath string) {
-	currNumLines := getNumLines(filePath)
+	currNumLines := getNumLines(targetDir + filePath)
 	if currNumLines != targetCSV[filePath][0] {
 		targetCSV[filePath][0] = currNumLines
-		
-		fmt.Printf("%s has %d lines \n\n", currStat.Name(), currNumLines)
-		fmt.Printf("--------\n")
+		fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
 	}
 }
 
 // Naive implementation (potentially inefficient for larger files)
 func getNumLines(filepath string) int64 {
-	file, _ := os.Open(targetDir + filepath)
+	file, _ := os.Open(filepath)
 	fileScanner := bufio.NewScanner(file)
 	count := 0
 
 	for fileScanner.Scan() {
 		count++
-		// if there are new lines, print each line
-		if count > int(targetCSV[filepath][0]) {
-			fmt.Printf("[%d / %d] in %s: %s \n", count, targetCSV[filepath][1], filepath, fileScanner.Text())
-		}
 	}
 
 	return int64(count)
