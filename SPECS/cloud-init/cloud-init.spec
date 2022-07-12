@@ -106,7 +106,7 @@ echo -e 'CERT1\nLINE2\nLINE3\nCERT2\nLINE2\nLINE3' > "${crt_file}"
 conf_file='%{_sysconfdir}/ca-certificates.conf'
 echo -e 'line1\nline2\nline3\ncloud-init-ca-certs.crt\n' > "${conf_file}"
 
-%define test_pkgs pytest-metadata unittest2 mock attrs iniconfig httpretty netifaces
+%define test_pkgs pytest-metadata unittest2 mock attrs iniconfig netifaces
 
 pip3 install --upgrade %{test_pkgs}
 pip3 install -r test-requirements.txt
@@ -147,7 +147,7 @@ make check %{?_smp_mflags}
 
 %changelog
 * Tue Jul 12 2022 Muhammad Falak <mwani@microsoft.com> - 22.2-5
-- Install `test-requirements.txt` to enable ptest
+- Install check requirements from `test-requirements.txt` to enable ptest
 
 * Thu Jun 30 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-4
 - Patch for CVE-2022-2084
