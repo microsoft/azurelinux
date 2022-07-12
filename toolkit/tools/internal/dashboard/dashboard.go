@@ -38,9 +38,7 @@ func main() {
 	wd = wd[0 : idx+19]
 	targetDir = wd + "/tools/internal/timestamp/results/"
 
-	// Use an infinite for loop to watch out for new updates
 	for {
-		// run this iteration periodically for smaller overhead
 		time.Sleep(1 * time.Second)
 		bar.Set(currProgress)
 
@@ -64,14 +62,12 @@ func main() {
 			if os.IsNotExist(err) {
 				continue
 			}
-			// getUpdate(currStat, idx, filePath)
 			currNumLines := getNumLines(targetDir + filePath)
 			if currNumLines != targetCSV[filePath][0] {
 				targetCSV[filePath][0] = currNumLines
-				fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
+				// fmt.Printf("%s has %d lines \n", currStat.Name(), currNumLines)
 				bar.Incr()
 			}
-			// getUpdate(currStat, idx, filePath)
 		}
 	}
 
