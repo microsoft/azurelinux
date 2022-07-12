@@ -11,14 +11,11 @@
 
 %define patches_description \
 %(
-    if [[ -z "%{patches}" ]]
-    then
-        echo "No CVE patches evaluated for this kernel version, yet."
-    fi
+    echo "Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel updated required):"
     for patch in %{patches}
     do
         cve_number=$(basename "${patch%.*}")
-        [[ "$patch" == *.patch ]] && echo "Patched: $cve_number" || echo "NOT patched (kernel update required): $cve_number"
+        [[ "$patch" == *.patch ]] && echo "*$cve_number" || echo "\!$cve_number: $(cat "$patch")"
     done
 )
 
@@ -34,8 +31,6 @@ URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
 Source1:        config
 Source2:        mariner.pem
-Patch0:         CVE-2022-12345.patch
-Patch100:       CVE-2022-67890.nopatch
 
 # Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
 %if !%{builds_module}
