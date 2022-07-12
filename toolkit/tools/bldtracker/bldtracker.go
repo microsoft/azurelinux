@@ -9,6 +9,8 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
+	"syscall"
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
@@ -73,6 +75,24 @@ func record(completePath string) {
 		logger.Log.Panicf("Unable to open file (may not have been created): %s", completePath)
 	}
 	defer file.Close()
+
+// Records a new timestamp to the specific CSV for the specified shell script.
+func record(completePath string) {
+	file, err := os.OpenFile(completePath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		logger.Log.Panicf("Unable to open file (may not have been created): %s", completePath)
+	}
+	defer file.Close()
+	// Create a new csv writer.
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// err = writer.Write([]string{info.toolName, info.stepName, info.actionName, info.duration.String()})
+	err = writer.Write([]string{*scriptName, *stepName, *actionName, time.Now().Format(time.UnixDate)})
+	if err != nil {
+		fmt.Printf("Unable to write to file: %s", *filePath)
+	}
+}
 
 	// Write the timestamp to CSV file using a helper function from timestamp.go.
 	timestamp.WriteStamp(file, timestamp.NewBldTracker(*scriptName, *stepName, *actionName, time.Now()))

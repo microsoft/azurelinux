@@ -75,7 +75,6 @@ func getUpdate(currStat fs.FileInfo, idx int, filePath string) {
 func getNumLines(filepath string) int64 {
 	file, _ := os.Open(targetDir + filepath)
 	fileScanner := bufio.NewScanner(file)
-	// fileScanner.Split(bufio.ScanLines) // Tells the scanner to read the file line by line (by default)
 	count := 0
 
 	for fileScanner.Scan() {
