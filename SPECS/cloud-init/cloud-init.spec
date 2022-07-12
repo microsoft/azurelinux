@@ -147,7 +147,7 @@ make check %{?_smp_mflags}
 
 %changelog
 * Tue Jul 12 2022 Muhammad Falak <mwani@microsoft.com> - 22.2-5
-- Install required packages to enable ptest
+- Install `test-requirements.txt` to enable ptest
 
 * Thu Jun 30 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-4
 - Patch for CVE-2022-2084
