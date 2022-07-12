@@ -6,6 +6,7 @@
 %endif
 %ifarch aarch64
 %global buildarch aarch64
+%global grubefiname grubaa64.efi
 %global grubpxeefiname grubaa64-pxe.efi
 %endif
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
