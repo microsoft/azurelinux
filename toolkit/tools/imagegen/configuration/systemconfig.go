@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
@@ -29,6 +30,7 @@ type SystemConfig struct {
 	PartitionSettings  []PartitionSetting `json:"PartitionSettings"`
 	PreInstallScripts  []InstallScript    `json:"PreInstallScripts"`
 	PostInstallScripts []InstallScript    `json:"PostInstallScripts"`
+	Networks           []Network          `json:"Networks"`
 	PackageRepos       []PackageRepo      `json:"PackageRepos"`
 	Groups             []Group            `json:"Groups"`
 	Users              []User             `json:"Users"`
@@ -69,6 +71,9 @@ func (s *SystemConfig) IsValid() (err error) {
 	// Validate BootType
 
 	// Validate HostName
+	if (!govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_")) && s.Hostname != "" {
+		return fmt.Errorf("invalid [Hostname]: %s", s.Hostname)
+	}
 
 	if strings.TrimSpace(s.Name) == "" {
 		return fmt.Errorf("missing [Name] field")
@@ -154,6 +159,14 @@ func (s *SystemConfig) IsValid() (err error) {
 	}
 
 	//Validate PostInstallScripts
+
+	// Validate Networks
+	for idx, network := range s.Networks {
+		if err = network.IsValid(); err != nil {
+			return fmt.Errorf("invalid [Network] config (%d): %w", (idx + 1), err)
+		}
+	}
+
 	//Validate Groups
 	//Validate Users
 	for _, b := range s.Users {

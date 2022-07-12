@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,6 @@ Source3:        login
 Source4:        other
 Source5:        passwd
 Source6:        sshd
-Source7:        su
 Source8:        system-account
 Source9:        system-auth
 Source10:       system-password
@@ -23,12 +22,13 @@ Source12:       useradd-default
 Source13:       login-defs
 Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
-BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
 BuildRequires:  itstool
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
@@ -89,7 +89,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-group-name-max-length=32 \
     --with-selinux \
     --with-audit \
-    --enable-man
+    --enable-man \
+    --with-su=no
 %make_build
 
 %install
@@ -127,7 +128,6 @@ install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE5} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE6} %{buildroot}%{_sysconfdir}/pam.d/
-install -vm644 %{SOURCE7} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE8} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE9} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE10} %{buildroot}%{_sysconfdir}/pam.d/
@@ -175,6 +175,10 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-10
+- Remove su binary which is now provided by util-linux
+- Update BuildRequires to ensure man pages build
+
 * Mon Apr 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-9
 - Change /etc/shadow file permission to 000 and make it trackable by shadow-utils
 
