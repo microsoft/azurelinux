@@ -1875,8 +1875,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.10",
-          "downloadUrl": "https://golang.org/dl/go1.17.10.src.tar.gz"
+          "version": "1.17.12",
+          "downloadUrl": "https://golang.org/dl/go1.17.12.src.tar.gz"
         }
       }
     },
@@ -1885,8 +1885,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.3",
-          "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
+          "version": "1.18.4",
+          "downloadUrl": "https://golang.org/dl/go1.18.4.src.tar.gz"
         }
       }
     },
