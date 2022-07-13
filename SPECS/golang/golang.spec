@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.18.3
+Version:        1.18.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -116,6 +116,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.18.4-1
+- Updated to version 1.18.4 to fix the following CVEs:
+- 2022-1705, 2022-28131, 2022-30630, 2022-30631, 2022-30632, 2022-30633, 2022-30635, 2022-32148
+
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.3-1
 - Bump version to 1.18.3 to address CVE-2022-24675 & CVE-2022-28327
 
