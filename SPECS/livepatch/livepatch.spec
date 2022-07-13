@@ -4,8 +4,8 @@
 
 %define builds_module %([[ -n "$(echo "%{patches}" | grep -oP "CVE-\\d+-\\d+(?=\\.patch)")" ]] && echo 1 || echo 0)
 
-# Kpatch-build allows only alphanumeric characters, '-', and '_'.
-%define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_-]/_}")
+# Kpatch module names allow only alphanumeric characters and '_'.
+%define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
 %define livepatch_install_dir /usr/lib/livepatch/%{kernel_full_version}
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_name}.ko
 
