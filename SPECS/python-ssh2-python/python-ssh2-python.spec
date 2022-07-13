@@ -13,6 +13,7 @@ Distribution:   Mariner
 URL:            https://github.com/ParallelSSH/ssh2-python
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/ssh2-python-%{version}.tar.gz
 Source1:        conftest.py
+
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  libssh2-devel
@@ -23,8 +24,16 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-six
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  %{_sbindir}/sshd %{_bindir}/ssh-agent
+BuildRequires:  %{_sbindir}/sshd
+BuildRequires:  %{_bindir}/ssh-agent
 %endif
 
 %description
@@ -36,8 +45,6 @@ Summary:        %{summary}
 
 %description -n python3-%{modname}
 %{summary}.
-
-Python 3 version.
 
 %prep
 %autosetup -n %{modname}-%{version}
@@ -61,15 +68,9 @@ export CXXFLAGS="${CXXFLAGS:-${RPM_OPT_FLAGS}}"
 
 %check
 # FIXME skip b0rken tests with segmentation fault from jinja2, rhbz#2007478
-rm tests/test_knownhost.py tests/test_session.py\
- tests/test_sftp.py tests/test_utils.py
-# FIXME skip b0rken tests with json
-rm tests/test_exceptions.py
+rm tests/test_knownhost.py tests/test_session.py tests/test_sftp.py
 # FIXME skip another b0rken tests
 rm tests/test_channel.py
-# disable some options for sshd running inside mock, see tests of libssh2
-echo UsePrivilegeSeparation no >> tests/embedded_server/sshd_config.tmpl
-echo StrictModes no >> tests/embedded_server/sshd_config.tmpl
 
 # fake ssh-agent
 eval `ssh-agent`
@@ -77,6 +78,7 @@ chmod 600 tests/unit_test_key
 ssh-add tests/unit_test_key
 ssh-add -l
 
+%{python3} -m pip install more-itertools
 %pytest -v tests
 
 %files -n python3-%{modname}
@@ -87,7 +89,7 @@ ssh-add -l
 
 %changelog
 * Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.27.0-1
-- Initial CBL-Mariner import from Fedora 35(License: LGPLv2)
+- Initial CBL-Mariner import from Fedora 35
 - Adding as run dependency for package cassandra medusa
 - bump version to 0.27.0
 - License Verified
