@@ -7160,6 +7160,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "k3s",
+          "version": "1.23.6",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
@@ -8373,16 +8383,6 @@
           "name": "libgphoto2",
           "version": "2.5.27",
           "downloadUrl": "http://downloads.sourceforge.net/gphoto/libgphoto2-2.5.27.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
-          "version": "1.23.6",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
         }
       }
     },
@@ -10643,6 +10643,16 @@
           "name": "linuxptp",
           "version": "2.0",
           "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.48.1-4.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
         }
       }
     },

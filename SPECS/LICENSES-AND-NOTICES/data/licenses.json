@@ -1999,6 +1999,7 @@
                 "libsafec",
                 "libuv",
                 "libxml++",
+                "livepatch",
                 "lld",
                 "lsb-release",
                 "lttng-consume",
