@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 5.10.123.1 Kernel Configuration
+# Linux/x86_64 5.10.128.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 9.1.0"
 CONFIG_CC_IS_GCC=y
@@ -3072,10 +3072,9 @@ CONFIG_TCG_CRB=y
 # CONFIG_TCG_TIS_ST33ZP24_I2C is not set
 # CONFIG_TELCLOCK is not set
 # CONFIG_XILLYBUS is not set
-# end of Character devices
-
 CONFIG_RANDOM_TRUST_CPU=y
 # CONFIG_RANDOM_TRUST_BOOTLOADER is not set
+# end of Character devices
 
 #
 # I2C support
@@ -6876,6 +6875,7 @@ CONFIG_CRYPTO_LIB_POLY1305_RSIZE=11
 CONFIG_CRYPTO_LIB_SHA256=y
 # end of Crypto library routines
 
+CONFIG_LIB_MEMNEQ=y
 CONFIG_CRC_CCITT=y
 CONFIG_CRC16=y
 CONFIG_CRC_T10DIF=y
