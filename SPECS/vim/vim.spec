@@ -126,7 +126,7 @@ fi
 %{_datarootdir}/vim/vim*/spell/*
 %{_datarootdir}/vim/vim*/syntax/*
 %exclude %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%exclude %{_datarootdir}/vim/vim*/syntax/syntax.vim
+%exclude %{_datarootdir}/vim/vim90/syntax/syntax.vim
 %exclude %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_datarootdir}/vim/vim*/tools/*
 %{_datarootdir}/vim/vim*/tutor/*
