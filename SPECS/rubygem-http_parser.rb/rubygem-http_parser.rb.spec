@@ -41,8 +41,6 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE-MIT file to buildroot from Source0
-cp LICENSE-MIT %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)

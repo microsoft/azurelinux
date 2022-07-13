@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/flavorjones/mini_portile
 Source0:        https://github.com/flavorjones/mini_portile/archive/refs/tags/v%{version}.tar.gz#/mini_portile-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
@@ -17,18 +18,13 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 This project is a minimalistic implementation of a port/recipe system for developers.
 
 %prep
-%setup -q -n mini_portile-%{version}
+%autosetup -p1 -n mini_portile-%{version}
 
 %build
 gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE.txt file to buildroot from Source0
-cp LICENSE.txt %{buildroot}%{gem_instdir}/
-#add lib and test folders to buildroot from Source0
-cp -r lib/ %{buildroot}%{gem_instdir}/
-cp -r test/ %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)

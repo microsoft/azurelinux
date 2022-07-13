@@ -2,7 +2,7 @@
 %global gem_name async
 Summary:        An awesome asynchronous event-driven reactor for Ruby
 Name:           rubygem-%{gem_name}
-Version:        2.0.1
+Version:        1.30.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -34,8 +34,8 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
-* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-1
-- Update to v2.0.1.
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.30.2-1
+- Update to v1.30.2.
 - Build from .tar.gz source.
 
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.27.0-1

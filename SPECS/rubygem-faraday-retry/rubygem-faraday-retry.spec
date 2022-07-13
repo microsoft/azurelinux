@@ -28,8 +28,6 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE.md file to buildroot from Source0
-cp LICENSE.md %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)

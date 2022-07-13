@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/uken/fluent-plugin-elasticsearch
 Source0:        https://github.com/uken/fluent-plugin-elasticsearch/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-elasticsearch
@@ -21,15 +22,13 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 Elasticsearch output plugin for Fluent event collector
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add LICENSE.txt file to buildroot from Source0
-cp LICENSE.txt %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
