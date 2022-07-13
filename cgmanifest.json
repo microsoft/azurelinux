@@ -7330,16 +7330,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "KeysInUse-OpenSSL",
-          "version": "0.3.1",
-          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "keyutils",
           "version": "1.6.1",
           "downloadUrl": "https://people.redhat.com/~dhowells/keyutils/keyutils-1.6.1.tar.bz2"
