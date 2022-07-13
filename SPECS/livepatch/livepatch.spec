@@ -83,13 +83,13 @@ cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{kernel_release}"/' .config
 
-%if %{builds_module}
 %build
-# Building cumulative patch.
-for patch in %{patches}
-do
-    [[ "$patch" == *.patch ]] && cat "$patch" >> %{livepatch_name}.patch
-done
+%if %{builds_module}
+    # Building cumulative patch.
+    for patch in %{patches}
+    do
+        [[ "$patch" == *.patch ]] && cat "$patch" >> %{livepatch_name}.patch
+    done
 
     kpatch-build -ddd \
         --sourcedir . \
