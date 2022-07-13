@@ -5,7 +5,7 @@
 %define builds_module %([[ -n "$(echo "%{patches}" | grep -oP "CVE-\\d+-\\d+(?=\\.patch)")" ]] && echo 1 || echo 0)
 
 # Kpatch-build allows only alphanumeric characters, '-', and '_'.
-%define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_-]/-}")
+%define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_-]/_}")
 %define livepatch_install_dir /usr/lib/livepatch/%{kernel_full_version}
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_name}.ko
 
@@ -113,8 +113,7 @@ then
 fi
 
 %preun
-# Package update will remove the old patch for us - we want to do it here only during package removal.
-if [[ $1 == 0 ]] && [[ -f "%{livepatch_module_path}" ]]
+if kpatch list | grep -q "%{livepatch_name}"
 then
     kpatch uninstall %{livepatch_name}
     kpatch unload %{livepatch_name}
