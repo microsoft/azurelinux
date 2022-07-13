@@ -8,7 +8,9 @@ package configuration
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
@@ -91,6 +93,33 @@ func (c *Config) GetDiskContainingPartition(partition *Partition) (disk *Disk) {
 		}
 	}
 	return nil
+}
+
+// GetKernelCmdLineValue returns the output of a specific option setting in /proc/cmdline
+func GetKernelCmdLineValue(option string) (cmdlineValue string, err error) {
+	const cmdlineFile = "/proc/cmdline"
+
+	content, err := os.ReadFile(cmdlineFile)
+	if err != nil {
+		logger.Log.Errorf("failed to read from %s", cmdlineFile)
+		return
+	}
+
+	cmdline := string(content)
+	if strings.Count(cmdline, option) > 1 {
+		err = fmt.Errorf("/proc/cmdline contains duplicate (%s) entries, which is invalid", option)
+		return
+	}
+
+	cmdlineArgs := strings.Split(cmdline, " ")
+	for _, cmdlineArg := range cmdlineArgs {
+		if strings.Contains(cmdlineArg, option) {
+			cmdlineValue = cmdlineArg[(len(option) + 1):len(cmdlineArg)]
+			return
+		}
+	}
+
+	return
 }
 
 // checkDeviceMapperFlags checks if Encryption and read-only roots have the required 'dmroot' flag.

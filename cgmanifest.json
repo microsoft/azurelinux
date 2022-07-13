@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20211102.0",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+          "version": "20220623.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20220623.0/abseil-cpp-20220623.0.tar.gz"
         }
       }
     },
@@ -676,7 +676,7 @@
         "other": {
           "name": "autoconf213",
           "version": "2.13",
-          "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf/autoconf-2.13.tar.gz"
         }
       }
     },
@@ -717,6 +717,16 @@
           "name": "avahi",
           "version": "0.8",
           "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.8/avahi-0.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "azcopy",
+          "version": "10.15.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.15.0.tar.gz"
         }
       }
     },
@@ -2096,6 +2106,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dbxtool",
           "version": "8",
           "downloadUrl": "https://github.com/vathpela/dbxtool/releases/download/dbxtool-8/dbxtool-8.tar.bz2"
@@ -3188,8 +3208,8 @@
         "type": "other",
         "other": {
           "name": "fish",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.1.2/fish-3.1.2.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
         }
       }
     },
@@ -3672,6 +3692,16 @@
           "name": "gfs2-utils",
           "version": "3.2.0",
           "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gh",
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.13.0.tar.gz"
         }
       }
     },
@@ -4300,8 +4330,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
+          "version": "1.12.1",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
         }
       }
     },
@@ -4621,7 +4651,7 @@
         "other": {
           "name": "hunspell",
           "version": "1.7.0",
-          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/hunspell-1.7.0.tar.gz"
+          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/v1.7.0.tar.gz"
         }
       }
     },
@@ -6480,6 +6510,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "intel-ipsec-mb",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/intel/intel-ipsec-mb/archive/v1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "intel-pf-bb-config",
+          "version": "22.03",
+          "downloadUrl": "https://github.com/intel/pf-bb-config/archive/v22.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "intltool",
           "version": "0.51.0",
           "downloadUrl": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
@@ -7273,6 +7323,16 @@
           "name": "keycloak-httpd-client-install",
           "version": "1.1",
           "downloadUrl": "https://github.com/jdennis/keycloak-httpd-client-install/archive/RELEASE_1_1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "KeysInUse-OpenSSL",
+          "version": "0.3.1",
+          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.1.tar.gz"
         }
       }
     },
@@ -8473,6 +8533,16 @@
           "name": "libhangul",
           "version": "0.1.0",
           "downloadUrl": "https://libhangul.googlecode.com/files/libhangul-0.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libhugetlbfs",
+          "version": "2.23",
+          "downloadUrl": "https://github.com/libhugetlbfs/libhugetlbfs/releases/download/2.23/libhugetlbfs-2.23.tar.gz"
         }
       }
     },
@@ -26157,8 +26227,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.5154",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5154.tar.gz"
+          "version": "8.2.5172",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5172.tar.gz"
         }
       }
     },

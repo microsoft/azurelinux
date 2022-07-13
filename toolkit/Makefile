@@ -47,6 +47,7 @@ CLEANUP_PACKAGE_BUILDS          ?= y
 USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
+DELTA_BUILD                     ?= n
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -123,7 +124,8 @@ TLS_KEY     ?=
 
 # Build defines
 DIST_TAG           ?= .cm2
-BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
+# Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
+BUILD_NUMBER       ?= $(shell runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD)
 # an empty BUILD_NUMBER breaks the build later on
 ifeq ($(BUILD_NUMBER),)
    BUILD_NUMBER = non-git

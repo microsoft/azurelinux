@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.5154
-Release:        1%{?dist}
+Version:        8.2.5172
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
+BuildRequires:  python3-devel
 Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
 
@@ -29,6 +30,7 @@ The vim extra package contains a extra files for powerful text editor.
 %prep
 %autosetup -p1
 echo '#define SYS_VIMRC_FILE "%{_sysconfdir}/vimrc"' >> src/feature.h
+%py3_shebang_fix runtime/tools/demoserver.py
 
 %build
 %configure --enable-multibyte
@@ -193,6 +195,12 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.2.5172-2
+- Fix unversioned python shebang in demoserver.py example script
+
+* Thu Jun 30 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2.5172-1
+- Upgrade to 8.2.5172 to fix CVE-2022-2175, CVE-2022-2182
+
 * Tue Jun 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.5154-1
 - Upgrade to 8.2.5154 to fix CVEs: 2022-2124, 2022-2125, 2022-2126 and 2022-2129
 

@@ -55,6 +55,9 @@
       - [`HYDRATED_BUILD=...`](#hydrated_build)
         - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
         - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
+      - [`DELTA_BUILD=...`](#delta_build)
+        - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
+        - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -522,6 +525,17 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 ##### `HYDRATED_BUILD=`**`n`** *(default)*
 
 > Normal build. No hydrated RPMs will be used.
+
+#### `DELTA_BUILD=...`]
+
+##### `DELTA_BUILD=`**`y`**]
+
+> Delta build. Used for fast delta builds where published packages are pre-populated and only new or added packages are built.
+
+##### `DELTA_BUILD=`**`n`** *(default)*
+
+> Normal build.
+
 
 ## All Build Targets
 

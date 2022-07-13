@@ -7,7 +7,7 @@
 
 Name:    k3s
 Version: 1.23.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Lightweight Kubernetes
 
 Group:   System Environment/Base
@@ -31,6 +31,8 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 Source1: %{name}-%{version}-vendor.tar.gz
 Patch0:  vendor_build.patch
 
+# K3s on Mariner is supported on x86_64 only:
+ExclusiveArch: x86_64
 BuildRequires: golang
 BuildRequires: libseccomp-devel
 BuildRequires: btrfs-progs-devel
@@ -62,6 +64,7 @@ install package/rpm/install.sh %{buildroot}%{install_sh}
 export INSTALL_K3S_SKIP_DOWNLOAD=true
 export INSTALL_K3S_SKIP_ENABLE=true
 export INSTALL_K3S_SKIP_START=true
+export UNINSTALL_K3S_SH=%{uninstall_sh}
 
 %{install_sh}
 exit 0
@@ -79,6 +82,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
+- Fixed uninstall path
+- Added exclusivity for x86_64
 * Thu Jun 23 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
 - Switched to building using the upstream k3s tarball and a separate vendor tarball
 * Tue May 24 2022 Manuel Huber <mahuber@microsoft.com> 1.23.6-1

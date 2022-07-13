@@ -1,0 +1,24 @@
+diff -urN a/hunspell-1.7.0/src/tools/hunspell.cxx b/hunspell-1.7.0/src/tools/hunspell.cxx
+--- a/hunspell-1.7.0/src/tools/hunspell.cxx	2022-06-22 17:41:40.025754800 -0700
++++ b/hunspell-1.7.0/src/tools/hunspell.cxx	2022-06-27 16:35:13.916216700 -0700
+@@ -581,7 +581,7 @@
+ #ifdef HAVE_CURSES_H
+ char* scanline(char* message) {
+   char input[INPUTLEN];
+-  printw(message);
++  printw("%c",message);
+   echo();
+   getnstr(input, INPUTLEN);
+   noecho();
+@@ -1180,9 +1180,9 @@
+   mvprintw(MAXPREVLINE + 2, 0, "\n");
+   for (size_t i = 0; i < wlst.size(); ++i) {
+     if ((wlst.size() > 10) && (i < 10)) {
+-      printw(" 0%d: %s\n", i, chenc(wlst[i], io_enc, ui_enc).c_str());
++      printw(" 0%zu: %s\n", i, chenc(wlst[i], io_enc, ui_enc).c_str());
+     } else {
+-      printw(" %d: %s\n", i, chenc(wlst[i], io_enc, ui_enc).c_str());
++      printw(" %u: %s\n", i, chenc(wlst[i], io_enc, ui_enc).c_str());
+     }
+   }
+ 
