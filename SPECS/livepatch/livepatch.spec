@@ -113,9 +113,13 @@ then
 fi
 
 %preun
-if kpatch list | grep -q "%{livepatch_name}"
+if kpatch list | grep -qP "%{livepatch_name} \(%{kernel_release}\)"
 then
     kpatch uninstall %{livepatch_name}
+fi
+
+if kpatch list | grep -qP "%{livepatch_name} \[enabled\]"
+then
     kpatch unload %{livepatch_name}
 fi
 
