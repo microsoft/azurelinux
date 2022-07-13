@@ -83,24 +83,14 @@ cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{kernel_release}"/' .config
 
+%if %{builds_module}
 %build
-
-# Building cumulative patch and patch lists.
-touch {,not_}patched
+# Building cumulative patch.
 for patch in %{patches}
 do
-    cve_number=$(basename "${patch%.*}")
-    if [[ "$patch" == *.patch ]]
-    then
-        cat "$patch" >> %{livepatch_name}.patch
-        echo "$cve_number" >> patched
-    else
-        echo -n "$cve_number: " >> not_patched
-        cat "$patch" >> not_patched
-    fi    
+    [[ "$patch" == *.patch ]] && cat "$patch" >> %{livepatch_name}.patch
 done
 
-%if %{builds_module}
     kpatch-build -ddd \
         --sourcedir . \
         --vmlinux %{_libdir}/debug/lib/modules/%{kernel_full_version}/vmlinux \
@@ -110,8 +100,6 @@ done
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
-
-install -m 744 *patched %{buildroot}%{livepatch_install_dir}
 
 %if %{builds_module}
     install -m 744 %{livepatch_name}.ko %{buildroot}%{livepatch_module_path}
@@ -133,8 +121,6 @@ fi
 
 %files
 %defattr(-,root,root)
-%{livepatch_install_dir}/not_patched
-%{livepatch_install_dir}/patched
 %if %{builds_module}
 %{livepatch_module_path}
 %endif
