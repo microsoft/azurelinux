@@ -113,7 +113,8 @@ then
 fi
 
 %preun
-if [[ -f "%{livepatch_module_path}" ]]
+# Package update will remove the old patch for us - we want to do it here only during package removal.
+if [[ $1 == 0 ]] && [[ -f "%{livepatch_module_path}" ]]
 then
     kpatch uninstall %{livepatch_name}
     kpatch unload %{livepatch_name}
