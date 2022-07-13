@@ -9,10 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:      http://www.xxhash.com/
 Source0:  https://github.com/Cyan4973/xxHash/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-#    Fix compilation on RHEL 7 ppc64le (gcc 4.8)
-#    https://github.com/Cyan4973/xxHash/issues/622
-#    https://github.com/Cyan4973/xxHash/pull/631
-Patch0:   %{name}-epel7-ppc64le.patch
 
 BuildRequires:	make
 BuildRequires:	gcc
@@ -56,11 +52,11 @@ BuildArch:  noarch
 Documentation files for the xxhash library
 
 %prep
-%autosetup -p1 -n xxHash-%{version}
+%autosetup -n xxHash-%{version}
 
 %build
 # Enable runtime detection of sse2/avx2/avx512 on intel architectures
-%ifarch %{ix86} x86_64
+%ifarch x86_64
 %global dispatch 1
 %else
 %global dispatch 0
@@ -102,7 +98,7 @@ make test-xxhsum-c
 
 %changelog
 * Wed Jul 6 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.8.1-3
-- Initial import for CBL-Mariner from Fedora 36 (License: BSD & GPLv2+)
+- Initial import for CBL-Mariner from Fedora 36 (License: MIT).
 - Adding as run dependency for cassandra medusa package.
 - License Verified.
 
