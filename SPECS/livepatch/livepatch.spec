@@ -113,7 +113,7 @@ then
 fi
 
 %preun
-if kpatch list | grep -qP "%{livepatch_name} \(%{kernel_release}\)"
+if kpatch list | grep -qP "%{livepatch_name} \(%{kernel_full_version}\)"
 then
     kpatch uninstall %{livepatch_name}
 fi
