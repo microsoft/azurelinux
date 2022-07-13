@@ -7,7 +7,8 @@ Version: 1.7
 Release: 7%{?dist}
 License: Copyright only
 # Upstream maintainer provided tarball, ibiblio no longer allowing uploads
-Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Upstream Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz
+Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 # Taken from http://packages.debian.org/changelogs/pool/main/s/symlinks/symlinks_1.2-4.2/symlinks.copyright
 Source1: symlinks-LICENSE.txt
 BuildRequires: gcc
@@ -45,7 +46,7 @@ install -m 644 symlinks.1 $RPM_BUILD_ROOT%{_mandir}/man1
 - Moving symlinks from SPECS-EXTENEDED to SPECS based on Fedora 36..
 - Adding as run dependency for package cassandra medusa.
 - Updating changelog.
-- License Verified.
+- License verified.
  
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
