@@ -32,6 +32,7 @@ It gives more control over uptime without sacrificing security or stability.
 Summary:        Tools for building livepatches with kpatch.
 Group:          Development/Tools
 
+Requires:       mariner-release
 Requires:       numactl-devel
 Requires:       openssl
 Requires:       patch
