@@ -1,4 +1,3 @@
-%{?python_enable_dependency_generator}
 %global modname ssh-python
 Name:           python-%{modname}
 Version:        0.9.0
@@ -9,7 +8,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ParallelSSH/ssh-python
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{modname}-%{version}.tar.gz
-
 Patch0001:      0001-Set-master_doc-to-index-in-conf.py-for-sphinx.patch
 
 BuildRequires:  cmake
@@ -22,8 +20,16 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-six
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  %{_sbindir}/sshd %{_bindir}/ssh-agent
+BuildRequires:  %{_sbindir}/sshd
+BuildRequires:  %{_bindir}/ssh-agent
 %endif
 
 Recommends: python3-%{modname}-doc
@@ -38,11 +44,8 @@ Summary:        %{summary}
 %description -n python3-%{modname}
 %{summary}.
 
-Python 3 version.
-
 %prep
-%setup -n %{modname}-%{version}
-%patch1 -p1
+%autosetup -p1 -n %{modname}-%{version}
 # No bundled libs
 rm -vrf libssh
 sed -i -r 's:build_ssh[(].*:pass:' setup.py
@@ -65,13 +68,8 @@ export CXXFLAGS="${CXXFLAGS:-${RPM_OPT_FLAGS}}"
 rm -f %{buildroot}/%{python3_sitearch}/ssh/__init__.pxd
 chmod 0755 %{buildroot}/%{python3_sitearch}/ssh/*.so
 
-
 %check
-# disable some options for sshd running inside mock
-echo UsePrivilegeSeparation no >> tests/embedded_server/sshd_config.tmpl
-echo StrictModes no >> tests/embedded_server/sshd_config.tmpl
-# test_statvfs/test_fstatvfs do not seem to work in mock
-rm -f tests/test_sftp.py
+%{python3} -m pip install more-itertools
 %pytest -v tests
 
 %files -n python3-%{modname}
@@ -91,7 +89,7 @@ Summary:        %{summary} documentation
 
 %changelog
 * Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.9.0-3
-- Initial CBL-Mariner import from Fedora 36 (License: LGPLv2)
+- Initial CBL-Mariner import from Fedora 36.
 - Adding as run dependency for package cassandra medusa
 - License Verified
 
