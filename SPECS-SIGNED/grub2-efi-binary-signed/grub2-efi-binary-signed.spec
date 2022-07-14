@@ -2,12 +2,12 @@
 %ifarch x86_64
 %global buildarch x86_64
 %global grubefiname grubx64.efi
-%global grubpxeefiname grubx64-pxe.efi
+%global grubpxeefiname grubx64-noprefix.efi
 %endif
 %ifarch aarch64
 %global buildarch aarch64
 %global grubefiname grubaa64.efi
-%global grubpxeefiname grubaa64-pxe.efi
+%global grubpxeefiname grubaa64-noprefix.efi
 %endif
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
@@ -52,6 +52,17 @@ Provides:       grub2-efi-x64 = %{version}-%{release}
 This package contains the GRUB EFI image signed for secure boot. The package is
 specifically created for installing on %{buildarch} systems
 
+%package -n     grub2-efi-binary-noprefix
+Summary:        GRand Unified Bootloader
+Group:          Applications/System
+%ifarch x86_64
+Provides:       grub2-efi-x64-noprefix = %{version}-%{release}
+%endif
+
+%description -n grub2-efi-binary-noprefix
+This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
+specifically created for installing on %{buildarch} systems
+
 %prep
 
 %build
@@ -63,12 +74,14 @@ cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %files -n grub2-efi-binary
 /boot/efi/EFI/BOOT/%{grubefiname}
+
+%files -n grub2-efi-binary-noprefix
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
 * Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
 - Bump release number to match grub release number
-- Add the grub pxe efi binary
+- Add grub2-efi-binary-noprefix subpackage for the additional efi binary with no prefix directory set
 
 * Mon Feb 28 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Bump release number to match grub release number
