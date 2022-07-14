@@ -54,7 +54,9 @@ autoreconf -fvi
   --disable-notify \
   --disable-assert \
   --enable-pcsc \
+%if %{with_check}
   --enable-cmocka \
+%endif
   --enable-sm \
   --with-pcsc-provider=libpcsclite.so.1 \
   --with-completiondir="%{_sysconfdir}/bash_completion.d/"
