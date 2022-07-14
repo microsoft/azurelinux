@@ -1,14 +1,14 @@
-From 02d1b897968b6d01d8c38c4ad64120f81fa53247 Mon Sep 17 00:00:00 2001
+From 4f97bfb7590a10b6e8b267dc1f595a57a8d9659f Mon Sep 17 00:00:00 2001
 From: Pawel Winogrodzki <pawelwi@microsoft.com>
 Date: Wed, 15 Jun 2022 10:51:00 -0700
-Subject: [PATCH] Initial adjustments for CBL-Mariner.
+Subject: [PATCH] Adjustments for CBL-Mariner.
 
 ---
- kpatch-build/kpatch-build | 74 +++++++++++++++++++++++----------------
- 1 file changed, 43 insertions(+), 31 deletions(-)
+ kpatch-build/kpatch-build | 61 ++++++++++++++++++++-------------------
+ 1 file changed, 31 insertions(+), 30 deletions(-)
 
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index 634095d..8868dbc 100755
+index 634095d..7766e0d 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
 @@ -205,21 +205,6 @@ rhel_kernel_version_gte() {
@@ -83,26 +83,18 @@ index 634095d..8868dbc 100755
  	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
  	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
  
-@@ -748,11 +738,15 @@ elif [[ -n "$OOT_MODULE" ]]; then
+@@ -748,9 +738,8 @@ elif [[ -n "$OOT_MODULE" ]]; then
  	fi
  elif [[ -e "$KERNEL_SRCDIR"/.config ]] && [[ -e "$VERSIONFILE" ]] && [[ "$(cat "$VERSIONFILE")" = "$ARCHVERSION" ]]; then
  	echo "Using cache at $KERNEL_SRCDIR"
 -
  else
 -	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]]; then
-+	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
++	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = mariner ]]; then
  
--		echo "Fedora/Red Hat distribution detected"
-+		[[ "$DISTRO" = fedora ]] && echo "Fedora distribution detected"
-+		[[ "$DISTRO" = rhel ]] && echo "RHEL distribution detected"
-+		[[ "$DISTRO" = ol ]] && echo "Oracle Linux distribution detected"
-+		[[ "$DISTRO" = centos ]] && echo "CentOS distribution detected"
-+		[[ "$DISTRO" = openEuler ]] && echo "OpenEuler distribution detected"
-+		[[ "$DISTRO" = mariner ]] && echo "CBL-Mariner distribution detected"
+ 		echo "Fedora/Red Hat distribution detected"
  
- 		clean_cache
- 
-@@ -760,6 +754,9 @@ else
+@@ -760,6 +749,9 @@ else
  		if [[ -z "$SRCRPM" ]]; then
  			if [[ "$DISTRO" = fedora ]]; then
  				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
@@ -112,16 +104,12 @@ index 634095d..8868dbc 100755
  			else
  				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
  				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die
-@@ -773,17 +770,32 @@ else
+@@ -773,17 +765,26 @@ else
  		rpmbuild -D "_topdir $RPMTOPDIR" -bp --nodeps "--target=$(uname -m)" "$RPMTOPDIR"/SPECS/kernel$ALT.spec 2>&1 | logger ||
  			die "rpmbuild -bp failed.  you may need to run 'yum-builddep kernel' first."
  
 -		mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
-+		if [[ "$DISTRO" = openEuler ]]; then
-+			# openEuler has two directories with the same content after 'rpm -D'
-+			# openEuler 21.09 has linux-* and linux-*-source while openEuler 20.03 has linux-* and linux-*-Source
-+			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-*[sS]ource "$KERNEL_SRCDIR" 2>&1 | logger || die
-+		elif [[ "$DISTRO" = mariner ]]; then
++		if [[ "$DISTRO" = mariner ]]; then
 +			mv "$RPMTOPDIR"/BUILD/CBL-Mariner-Linux-Kernel-* "$KERNEL_SRCDIR" 2>&1 | logger || die
 +		else
 +			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
@@ -137,9 +125,7 @@ index 634095d..8868dbc 100755
  		echo "$ARCHVERSION" > "$VERSIONFILE" || die
  
 -		[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
-+		if [[ "$DISTRO" = openEuler ]]; then
-+			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="/boot/config-${ARCHVERSION}"
-+		elif [[ "$DISTRO" = mariner ]]; then
++		if [[ "$DISTRO" = mariner ]]; then
 +			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/new_config"
 +			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-$KREL\"/" "$CONFIGFILE"
 +		else
