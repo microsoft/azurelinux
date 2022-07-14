@@ -30,8 +30,9 @@ URL:            https://www.gnu.org/software/grub
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 Source0:        grub2-efi-binary-%{version}-%{release}.%{buildarch}.rpm
-Source1:        %{grubefiname}
-Source2:        %{grubpxeefiname}
+Source1:        grub2-efi-binary-noprefix-%{version}-%{release}.%{buildarch}.rpm
+Source2:        %{grubefiname}
+Source3:        %{grubpxeefiname}
 
 %description
 This package contains the GRUB EFI image signed for secure boot. The package is
@@ -69,8 +70,8 @@ specifically created for installing on %{buildarch} systems
 
 %install
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
-cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
-cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
+cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
+cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %files -n grub2-efi-binary
 /boot/efi/EFI/BOOT/%{grubefiname}
