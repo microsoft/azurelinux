@@ -9,10 +9,10 @@
 ######## DEFINITIONS ########
 
 # Build targets
-ifndef CONFIG_FILE
-$(warning CONFIG_FILE is empty, defaulting to toolkit's core-efi.json unless CONFIG_FILE="" was set explicitly.)
+ifeq ($(origin CONFIG_FILE), undefined)
+CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
+$(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
 endif
-CONFIG_FILE            ?= $(toolkit_root)/imageconfigs/core-efi.json
 CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
