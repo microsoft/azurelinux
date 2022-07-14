@@ -17,23 +17,24 @@
 
 
 %global debug_package %{nil}
+Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.51.0
 Release:        1%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary:        Container native virtualization
-License:        Apache-2.0
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
+#Source0:       https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.51.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
 BuildRequires:  glibc-devel
+BuildRequires:  golang
 BuildRequires:  golang-packaging
-BuildRequires:  pkgconfig
+BuildRequires:  pkg-config
 BuildRequires:  rsync
 BuildRequires:  sed
-BuildRequires:  golang
 BuildRequires:  pkgconfig(libvirt)
 ExclusiveArch:  x86_64 aarch64
 
@@ -102,7 +103,7 @@ The package provides Kubevirt end-to-end tests.
 %build
 export GOFLAGS="-buildmode=pie"
 KUBEVIRT_VERSION=%{version} \
-KUBEVIRT_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
+KUBEVIRT_SOURCE_DATE_EPOCH="$(date -r LICENSE +%{s})" \
 KUBEVIRT_GIT_COMMIT='v%{version}' \
 KUBEVIRT_GIT_VERSION='v%{version}' \
 KUBEVIRT_GIT_TREE_STATE="clean" \
@@ -205,7 +206,10 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
-* Thu Jul 14 2022 Kanika Nema <kanikanema@microsoft.com> - 0.51.0
-- License verified
+#FIXME: First changelog entry header failed to parse
+* Thu Jul 14 2022 Kanika Nema <kanikanema@microsoft.com> 0.51.0
+- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
 - Initial changes to build for Mariner
-- Initial CBL-Mariner import from openSUSE (license: Apache 2.0)
+- License verified
+* Thu Jan 01 1970  <> - --1
+
