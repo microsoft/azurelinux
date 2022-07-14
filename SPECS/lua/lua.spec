@@ -220,7 +220,6 @@ popd
 %{_libdir}/*.a
 
 %changelog
-33099
 * Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 5.4.3-4
 - Patching CVE-2022-33099.
 
