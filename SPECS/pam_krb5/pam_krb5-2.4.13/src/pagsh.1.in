@@ -1,0 +1,29 @@
+.TH pagsh 8 2006/01/11 "@OS_DISTRIBUTION@" "System Administrator's Manual"
+
+.SH NAME
+pagsh \- run a command in a new PAG
+
+.SH SYNOPSIS
+pagsh [ [-c \fIcommand\fP ] | [ args ... ] ]
+
+.SH DESCRIPTION
+The \fIpagsh\fP command creates a new PAG and then runs the user's shell (as
+specified by the \fISHELL\fP variable in the environment) with the specified
+arguments.
+
+.SH ARGUMENTS
+.TP
+-c
+This is usually the argument used to pass a quoted command to a shell.
+
+.SH "SEE ALSO"
+.BR pam_krb5 (5)
+.BR krb5.conf (5)
+.br
+
+.SH BUGS
+Probably, but let's hope not.  If you find any, please file them in the
+bug database at http://bugzilla.redhat.com/ against the "pam_krb5" component.
+
+.SH AUTHOR
+Nalin Dahyabhai <nalin@redhat.com>

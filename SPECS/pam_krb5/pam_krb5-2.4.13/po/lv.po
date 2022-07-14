@@ -1,0 +1,42 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Red Hat, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+# Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: pam_krb5 2.4.11\n"
+"Report-Msgid-Bugs-To: http://git.fedorahosted.org/git/?p=pam_krb5.git;a=blob;"
+"f=AUTHORS;hb=HEAD\n"
+"POT-Creation-Date: 2016-01-27 15:21-0500\n"
+"PO-Revision-Date: 2013-11-20 04:45-0500\n"
+"Last-Translator: Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>\n"
+"Language-Team: Latvian (http://www.transifex.com/projects/p/pam_krb5/"
+"language/lv/)\n"
+"Language: lv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+"X-Generator: Zanata 3.7.1\n"
+
+#: src/auth.c:127 src/auth.c:279 src/prompter.c:347
+msgid "Password: "
+msgstr "Parole: "
+
+#: src/password.c:288
+#, c-format
+msgid "%s%sPassword: "
+msgstr "%s%sParole: "
+
+#: src/password.c:430 src/prompter.c:357 src/prompter.c:360
+#, c-format
+msgid "New %s%sPassword: "
+msgstr "Jauna %s%sparole: "
+
+#: src/password.c:433 src/prompter.c:373 src/prompter.c:376
+#, c-format
+msgid "Repeat New %s%sPassword: "
+msgstr "Atkārtot jauno %s%sparoli: "

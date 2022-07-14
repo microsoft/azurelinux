@@ -1,0 +1,8 @@
+MIT Kerberos expects, at minimum, to be configured with the location of the
+trusted root certificates and the user's identity.  These options, passed
+through the "preauth_options" option, include:
+  X509_anchors (for example "FILE:/etc/pki/tls/cert.pem")
+  X509_user_identity (for example "PKCS11:/usr/$LIB/libcoolkeypk11.so")
+Their corresponding names in the [libdefaults] section of krb5.conf are:
+  pkinit_anchors
+  pkinit_identities

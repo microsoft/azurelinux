@@ -1,0 +1,6 @@
+Later:
+- Figure out how mappings should work with
+  krb5_aname_to_localname
+  krb5_kuserok
+- Check if krb5_cc_gen_new() is really a better way to go when generating
+  session credential caches.

@@ -1,0 +1,7 @@
+
+Succeed: correct password, warn about expiration.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+`WARNEXPIRED'
+AUTH	0	Success
+ACCT	12	Authentication token is no longer valid; new one required

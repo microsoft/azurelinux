@@ -1,0 +1,13 @@
+
+Succeed: correct password, expired, change.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+`Password expired.  You must change it now.'
+`New Kerberos 5 Password: ' -> `bar'
+`Repeat New Kerberos 5 Password: ' -> `bar'
+AUTH	0	Success
+ACCT	0	Success
+ESTCRED	0	Success
+OPENSESS	0	Success
+CLOSESESS	0	Success
+DELCRED	0	Success

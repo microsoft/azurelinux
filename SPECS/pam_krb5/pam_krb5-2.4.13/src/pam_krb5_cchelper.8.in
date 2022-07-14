@@ -1,0 +1,61 @@
+.TH pam_krb5_cchelper 8 2013/04/16 "@OS_DISTRIBUTION@" "System Administrator's Manual"
+
+.SH NAME
+@SECURITYDIR@/@PACKAGE@/pam_krb5_cchelper \- Credential cache helper
+
+.SH SYNOPSIS
+.B pam_krb5_cchelper [-c|-u|-d] [ccname] [uid] [gid]
+
+.SH DESCRIPTION
+The pam_krb5.so module uses pam_krb5_cchelper to create, update, and remove
+credential caches.
+
+.SH ARGUMENTS
+.IP -c|-u|-d
+A flag indicating whether the helper is expected to create, update, or
+destroy a ccache.  When creating a ccache, the \fIccname\fP argument
+should be a name or a pattern ending in XXXXXX.  When updating or deleting a
+ccache, the \fIccname\fP argument should be the name of an extant ccache.
+
+.IP ccname
+A credential cache name or name pattern of the form
+\fITYPE\fR:\fI@default_ccache_dir@/foo or
+\fITYPE\fR:\fI@default_ccache_dir@/fooXXXXXX\fR.
+
+.IP uid
+An optional numeric UID which the helper will attempt to switch to before
+creating a ccache.  The helper continues in its task if the attempt fails.
+
+.IP gid
+An optional numeric GID which the helper will attempt to switch to before
+creating a ccache.  The helper continues in its task if the attempt fails.
+
+.SH OPERATION
+The helper will read contents from its standard input.
+.br
+If input of suitable length is not read, the specified credential cache is
+deleted.
+.br
+If input of suitable length is read, a temporary file is created and the input
+is stored to the file.  If TYPE is FILE, the file's name will be based on the
+pattern and the name of this new credential cache will be printed.  If TYPE is
+not FILE, a new credential cache will be created and the contents of the
+temporary file will be treated as a credential cache whose contents will be
+copied into the new credential cache, whose name will be printed.
+
+.SH FILES
+\fI@SECURITYDIR@/pam_krb5.so\fR
+.br
+
+.SH "SEE ALSO"
+.BR mkstemp (3)
+.BR pam_krb5 (5)
+.BR pam_krb5 (8)
+.br
+
+.SH BUGS
+Probably, but let's hope not.  If you find any, please file them in the
+bug database at http://bugzilla.redhat.com/ against the "pam_krb5" component.
+
+.SH AUTHOR
+Nalin Dahyabhai <nalin@redhat.com>

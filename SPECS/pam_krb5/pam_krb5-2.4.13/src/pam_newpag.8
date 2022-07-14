@@ -1,0 +1,41 @@
+.TH pam_newpag 8 2006/01/11 "Red Hat Linux" "System Administrator's Manual"
+
+.SH NAME
+pam_newpag \- create a new process authentication group
+
+.SH SYNOPSIS
+.B auth optional /lib64/security/pam_newpag.so
+.br
+.B session optional /lib64/security/pam_newpag.so
+
+.SH DESCRIPTION
+The pam_newpag.so module's sole purpose is to provide a workaround for
+applications which leak AFS credentials into child processes which are created
+on behalf of other users.  A new PAG is created when the calling application
+attempts to either establish new credentials using the \fBpam_setcred\fR
+function or open a session using the \fBpam_open_session\fR function.
+
+.SH ARGUMENTS
+
+.IP debug
+turns on debugging via \fBsyslog\fR(3).  Debugging messages are logged with
+priority LOG_DEBUG.
+
+.IP ignore_afs
+tells pam_newpag.so to do nothing.
+
+.SH FILES
+\fI/etc/krb5.conf\fR
+.br
+
+.SH "SEE ALSO"
+.BR pam_newpag (5)
+.BR krb5.conf (5)
+.br
+
+.SH BUGS
+Probably, but let's hope not.  If you find any, please file them in the
+bug database at http://bugzilla.redhat.com/ against the "pam_krb5" component.
+
+.SH AUTHOR
+Nalin Dahyabhai <nalin@redhat.com>

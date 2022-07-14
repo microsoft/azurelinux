@@ -1,0 +1,43 @@
+.TH pam_newpag 5 2006/01/11 "@OS_DISTRIBUTION@" "System Administrator's Manual"
+
+.SH NAME
+pam_newpag \- create a new process authentication group
+
+.SH DESCRIPTION
+pam_newpag.so reads its configuration information from the \fBappdefaults\fR
+section of \fBkrb5.conf\fR(5).  You should read the \fBkrb5.conf\fR(5) man page
+before continuing here.  The module expects its configuration information to be
+in the \fB@PAM_KRB5_APPNAME@\fR subsection of the \fBappdefaults\fR section.
+
+.SH DIRECTIVES
+.IP debug=[\fItrue\fR|\fIfalse\fR]
+turns on debugging via \fBsyslog\fR(3).  Debug messages are logged with
+priority \fILOG_DEBUG\fR.
+
+.IP ignore_afs=[\fItrue\fR|\fIfalse\fR]
+tells pam_newpag.so to completely ignore the presence of AFS, preventing
+any attempts to create a new PAG on behalf of the calling application.
+Because it reduces the module to a no-op, this is not particularly
+useful.
+
+.SH EXAMPLE
+
+[appdefaults]
+  pam = {
+    TEST.EXAMPLE.COM = {
+      debug = true
+    }
+  }
+
+.SH FILES
+\fI/etc/krb5.conf\fR
+.br
+.SH "SEE ALSO"
+.BR pam_newpag (8)
+.br
+.SH BUGS
+Probably, but let's hope not.  If you find any, please file them in the
+bug database at http://bugzilla.redhat.com/ against the "pam_krb5" component.
+
+.SH AUTHOR
+Nalin Dahyabhai <nalin@redhat.com>

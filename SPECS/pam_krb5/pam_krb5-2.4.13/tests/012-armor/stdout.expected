@@ -1,0 +1,14 @@
+
+Calling module `pam_krb5.so'.
+AUTH	0	Success
+OPENSESS	0	Success
+pam_krb5_armor_ccache=MEMORY
+FILE:/tmp/krb5_cc_$UID_XXXXXX
+CLOSESESS	0	Success
+
+Calling module `pam_krb5.so'.
+AUTH	0	Success
+OPENSESS	0	Success
+pam_krb5_armor_ccache=MEMORY
+FILE:/tmp/krb5_cc_$UID_XXXXXX
+CLOSESESS	0	Success

@@ -1,0 +1,6 @@
+
+Fail: incorrect password.
+Calling module `pam_krb5.so'.
+`Password: ' -> `bar'
+AUTH	7	Authentication failure
+ACCT	0	Success

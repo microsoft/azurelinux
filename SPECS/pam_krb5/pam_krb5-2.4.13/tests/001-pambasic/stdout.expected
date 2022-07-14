@@ -1,0 +1,55 @@
+
+Setting password to "foo".
+
+Fail: incorrect password.
+Calling module `pam_krb5.so'.
+`Password: ' -> `bar'
+AUTH	7	Authentication failure
+
+Fail: incorrect password.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foolong'
+AUTH	7	Authentication failure
+
+Fail: incorrect password.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foolongerstill'
+AUTH	7	Authentication failure
+
+Succeed: correct password.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+AUTH	0	Success
+ESTCRED	0	Success
+OPENSESS	0	Success
+CLOSESESS	0	Success
+DELCRED	0	Success
+
+Fail: cannot read password.
+Calling module `pam_krb5.so'.
+AUTH	7	Authentication failure
+
+Succeed: correct password, incorrect first attempt.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+AUTH	0	Success
+ESTCRED	0	Success
+DELCRED	0	Success
+
+Succeed: correct password, maybe use incorrect second attempt.
+Calling module `pam_krb5.so'.
+AUTH	0	Success
+OPENSESS	0	Success
+CLOSESESS	0	Success
+
+Succeed: correct password, ignore second attempt.
+Calling module `pam_krb5.so'.
+AUTH	0	Success
+ESTCRED	0	Success
+OPENSESS	0	Success
+CLOSESESS	0	Success
+DELCRED	0	Success
+
+Succeed: correct password, maybe use incorrect second attempt.
+Calling module `pam_krb5.so'.
+AUTH	0	Success

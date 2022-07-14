@@ -1,0 +1,1783 @@
+2011-07-29
+	* tests/: remove some bashisms, add more explicit error reporting to
+	the test harness (trac #1, Aleksander Adamowski)
+
+2011-07-28
+	* src/session.c,src/session.h: make the current open/close session
+	function into one that's called with an extra parameter to help
+	clarify when we're calling it
+	* src/auth.c: call the new open/close session "worker" function with
+	information indicating that it's really a setcred call
+	* configure.ac: add a --with-default-no-cred-session option
+	* src/options.c,src/options.h: track the cred_session option
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: note "cred_session"
+	* src/session.c: when opening/closing a session, if cred_sessios is
+	false and we're called from pam_sm_setcred, just return success
+	* src/auth.c: when we get non-"external" creds, be sure to note that
+	* src/sly.c: if libpam has a KRB5CCNAME set, look there for creds
+	before looking in the default location
+	* src/stash.c: always re-read "external" creds when called by libpam
+	* src/tokens.c: create a temporary in-memory ccache for use in
+	obtaining tokens using v5 creds, since we might not be creating one
+	on disk any more
+
+2011-04-27
+	* configure.ac: check for krb5_set_trace_callback()
+	* src/log.h,src/logpam.c,src/logstdio.c: add a trace() function
+	to log trace messages along with debug messages
+	* src/options.c: set the trace callback to our own logging function
+	if the "trace" option is enabled
+	* src/pam_krb5.5.in,src/pam_krb5.8.in,README: make a note about
+	the "trace" option
+
+2011-04-27
+	* src/password.c(pam_sm_chauthtok): if we managed to get password
+	changing creds the first time, don't try again, but do prompt for
+	a password if we're still expected to be the module that does it
+
+2011-03-25
+	* src/stash.c(_pam_krb5_stash_external_read): add a flag to track
+	whether or not our creds were externally obtained, and set it
+	correctly
+	* src/session.c(pam_sm_open_session): only create a v5 ccache if
+	the creds we have weren't externally obtained (#690832)
+
+2011-03-03
+	* src/v5.c(v5_change_password): prefer krb5_change_password() over
+	krb5_set_password()
+	* configure.ac: go back to checking for address manipulation
+	declarations
+	* tests: disable tests that depend on address manipulation if we
+	didn't find those functions; run the test kdc on tcp, too
+
+2010-09-07
+	* src/kuserok.c(add a double-check using krb5_aname_to_localname()
+	when options->always_allow_localname is set)
+	* src/options.c: parse options->always_allow_localname
+
+2010-07-22
+	* src/v5.c(v5_validate_ccache): add, using user-to-user auth with an
+	already-present ccache to verify that the KDC that issued the just-
+	obtained creds was the same one that issued the previously-obtained
+	ones.
+	* src/v5.c(v5_validate_keytab): rename from the previous v5_validate
+	function.
+	* src/v5.c(v5_validate): try to validate using the keytab first, and
+	if we don't get a definite answer, maybe try with the default ccache
+	* src/v5.c(v5_get_creds): keep track of whether or not validation
+	found keys that could be used for validation
+	* src/options.c,src/v5.c: make validation using user-to-user logic an
+	option, and enable it by default
+	* src/v5.c(v5_validate_keytab): split out the server principal
+	selection logic into a separate "v5_select_keytab_service" function
+	* src/v5.c(v5_validate_keytab): rename to v5_validate_using_keytab,
+	using v5_select_keytab_service() to select a service name, or using
+	NULL if it fails for whatever reason.
+	* src/v5.c(v5_validate_ccache): rename to v5_validate_using_ccache
+	* src/v5.c(v5_get_creds): drop logic that cares about whether or not
+	we found acceptable keys
+	* src/options.c,src/pam_krb5.5.in,src/pam_krb5.8.in: switch to enabling
+	validation by default
+
+2010-03-29
+	* src/options.c,src/options.h,src/acct.c,src/auth.c: add and heed an
+	"ignore_k5login" boolean option.
+
+2010-03-08
+	* krb5.spec,configure.ac: 2.3.11
+
+2010-02-24
+	* src/v5.c,v5.h: add wrapper functions for reading a cred keyblock as
+	a keyblock (v5_creds_get_key) and a ticket's client
+	(v5_ticket_get_client), and a wrapper for the set-user-to-user-key
+	function (v5_auth_con_setuserkey).
+	* src/uuauth.c: use the just-introduced abstractions
+	* src/v5.c,v5.h: add wrapper function for krb5_enctype_to_string()
+
+2010-02-12
+	* src/minikafs.c: crank up debug verbosity (Chris Wing, #157107)
+	* src/kuserok.c(_pam_krb5_kuserok): also set up the user's ccache,
+	in case there's a process on the box that expects the user to have
+	creds before it can look up the location of the user's .k5login file
+	or read from it (#563442)
+	* src/harness.c: fix --debug
+	* src/kuserok.c,src/storetmp.c: don't close stdio on our helpers if
+	we don't need to
+	* src/logstdio.c: make it clear when a subprocess is debug logging
+
+2010-01-19
+	* src/minikafs.c: call krb5_allow_weak_crypto(), if defined, before
+	doing anything with DES.  call krb5_enctype_enable(), if defined,
+	before attempting to get a credential with a specific enctype.
+
+2010-01-07
+	* configure.in: check for krb5_change_password, krb5_set_password,
+	krb5_xfree
+	* src/v5.c: add v5_change_password(); make v5_free_unparsed_name()
+	call krb5_xfree(), if it exists, in preference over
+	krb5_free_unparsed_name() or free()
+	* src/password.c: use v5_change_password()
+
+2009-12-11
+	* Makefile.am,configure.ac: relegate use of RPM to the 'archive'
+	target, don't use it in our regular build machinery
+	* configure.ac,src/options.c,src/stash.c,src/v4.c,src/v5.c: add a
+	'multiple_ccaches' option, and change the default behavior from on
+	to off
+	* configure.ac,src/options.c: allow setting a default value for
+	chpw_prompt
+
+2009-11-10
+	* src/harness.c: we're not using our internal logging stuff, so we can
+	eject most of the Kerberos-specific bits
+
+2009-10-07
+	* src/prompter.c(_pam_krb5_prompt_type): add, abstracting out an
+	API difference.
+	* src/prompter.c(_pam_krb5_generic_prompter): use prompt type
+	information to override prompt text for new passwords.  Change saving
+	of the PAM_AUTHTOK so that we do so only when we've asked for both a
+	new password and confirmation.  Fix what might have been a bug in
+	how we number responses when we're asked for the current password and
+	we're suppressing such requests in unknown cases where libkrb5 could
+	ask both for the current and new passwords.
+	* src/tokens.c,src/minikafs.c,src/afs5log.c,src/options.c: fix some
+	signedness warnings
+
+2009-10-05
+	* src/prompter.c(_pam_krb5_prompt_is_for_password): check the
+	prompt_type first.
+
+2009-10-05
+	* src/options.c(_pam_krb5_options_init): parse the "chpw_prompt"
+	flag
+	* src/initopts.c(_pam_krb5_set_init_opts): enable or disable
+	change-expired-password behavior based on the chpw_prompt setting
+	rather than forcing it off all of the time
+	* src/prompter.c(_pam_krb5_generic_prompter): when we're letting the
+	library attempt to change expired passwords, set PAM_AUTHTOK to
+	what the user typed in
+
+2009-06-26
+	* src/options.c(option_b): don't leak the list of values
+
+2009-06-26
+	* src/sly.c(_pam_krb5_sly_maybe_refresh): refresh creds in the default
+	ccache location when KRB5CCNAME isn't set in the environment (#507984)
+
+2009-06-26
+	* src/stash.c: derive the stash name from the user some bits of the
+	configuration rather than the principal name which we end up hopefully
+	deriving using the user and those bits of the configuration.
+	* src/options.c: hang on to a copy of the mappings list, in its
+	original form, for use later
+
+2009-06-15
+	* src/v5.c(v5_validate): walk the keytab, looking for a host key,
+	and fall back to just using the first one (#450776)
+
+2009-06-09
+	* src/initopts.c,src/v5.c: compile fixes for krb5 1.7
+
+2009-06-04
+	* src/prompter.c(_pam_krb5_generic_prompter): if the prompt looks
+	like a password prompt, use "Password: " instead
+
+2009-05-27
+	* src/auth.c(pam_sm_authenticate): if we need to be the module that
+	asks for a password, do so before sanity checking things like whether
+	or not the user name is valid (#502602)
+	* src/auth.c(pam_sm_authenticate),
+	src/prompter.c(_pam_krb5_generic_prompter): only allow libkrb5 to
+	ask for a password if we weren't supplied with one and didn't ask for
+	one ourselves
+
+2009-03-04
+	* src/initopts.c(_pam_krb5_set_init_opts_for_pwchange): add, for
+	setting options which are appropriate for obtaining password-changing
+	credentials
+	* src/v5.c: use temporary-for-pwchange opts when we try to get
+	password-changing creds as a way to check that an expired password
+	is correct.
+	* src/password.c: use temporary-for-pwchange opts when we try to get
+	password-changing creds as a way to check that an expired password
+	is correct.
+
+2009-02-11
+	* src/options.c(_pam_krb5_options_init): don't log ticket and
+	renew lifetimes of 0, which we interpret as "let the library use
+	its settings" anyway
+
+2009-02-06
+	* src/kuserok.c(_pam_krb5_kuserok): close the read end of the
+	pipe that's used to gather the child's result (Dan Walsh)
+	* src/storetmp.c(_pam_krb5_storetmp_data): close the write end
+	of the pipe to the child if we encounter an error writing to it
+	(Dan Walsh)
+
+2009-02-05
+	* src/minikafs.c: remove minikafs_realm_of_cell(), which is not
+	used anywhere
+	* src/minikafs.c(minikafs_4log): pass the locally-initialized
+	context to minikafs_realm_of_cell_with_context() rather than the
+	passed-in value, so that minikafs_realm_of_cell_with_context()
+	can skip the init call if we're passed NULL
+
+2008-10-29
+	* src/password.c (pam_sm_chauthtok): if the "use_shmem" option is
+	set, stash the credentials which we obtain after a password change
+	in shared memory as well.  Based on patch from and initial report
+	by Michael Calmer.
+
+2008-10-16
+	* src/acct.c,src/auth.c,src/password.c,src/session.c,src/sly.c: be
+	resistant to libpam returning NULL from pam_get_user() even though it
+	results a successful result code (#467208).
+
+2008-10-01
+	* src/perms.c,src/perms.h: add functions for swapping real and
+	effective UID and GID, if they're different
+	* src/v5.c: swap the real and effective UID and GID when reading
+	credentials from an "existing_ticket" ccache
+
+2008-09-03
+	* configure.ac,src/Makefile.am: link pam_krb5.so with libpam unless
+	explicitly disabled at compile-time (#227097,#460998)
+
+2008-09-03
+	* src/options.c (option_b): if the realm name given to us is NULL,
+	don't bother consulting the appdefaults
+	* src/options.c (_pam_krb5_options_init): check for the "debug" flag
+	earlier (Simo Sorce)
+
+2008-08-08
+	* src/Makefile.am: reverse the order of libpam_krb5.la and PAM_LIBS
+	so that people adding things like -Wl,--as-needed -Wl,--no-undefined
+	will be able to (patch from Guillaume Rousse)
+
+2008-04-10
+	* po/Makevars: extract text strings correctly (#441858).
+	* po/POTFILES.in: note that input strings are planned to be UTF-8
+	(#441858).
+
+2008-04-09
+	* src/session.c(pam_sm_open_session): when setting up creds to use
+	for obtaining tokens, don't bother trying to save v4 creds if we
+	don't have any.
+
+2008-03-26
+	* src/auth.c(pam_sm_authenticate): unconditionally set PAM_AUTHTOK
+	when we prompt the user for a password (#437179)
+
+2008-03-20
+	* configure.ac,src/auth.c,src/password.c: use Y_ as a macro
+	for dgettext rather than _, because <openssl/des_old.h> will
+	undefine _, and we end up including it indirectly when building with
+	Heimdal with v4 compatibility enabled.
+
+2008-03-18
+	* src/afs5log.c(main): actually hook up the '-n' flag to the
+	null_afs_first option, so that it does something useful.
+
+2008-03-17
+	* src/auth.c,src/password.c: mark user-visible strings for
+	translation (Michael Calmer).
+	* configure.ac: call macros to set up for gettext (Michael Calmer)
+	* po/POTFILES.in: add (Michael Calmer)
+	* po/Makevars: add
+
+2008-03-10:
+	* NEWS, pam_krb5.spec: update version, note last changes
+	* README: note the new SCM location
+	* src/minikafs.c: remove workaround for NI_MAXHOST not being defined,
+	because it's noise until we need it somewhere.
+
+2008-03-07:
+	* src/password.c: force at least one attempt to authenticate using
+	the KDC, even in the pathological case where there's no previously-
+	entered password and we were told not to ask for one (#400611)
+	* src/options.c,src/minikafs.c,src/afs5log.c: merge Jan Iven's changes
+	to add a "nullafs" option, so that when we're guessing the principal
+	name for an AFS service we'll try the no-instance version first
+	(#249558)
+	* src/minikafs.c: if we're going to guess the realm name because
+	the whereis pioctl failed, guess the far-more-likely-to-be-correct
+	upper cased version of the cell's name than the cell's name.
+
+2008-03-03:
+	* src/options.c: update copyright date for token_strategy stuff.
+
+2008-03-03:
+	* src/noafs.c: fix signature of stub version of minikafs_log().
+
+2008-02-18:
+	* src/minikafs.c: flesh out some getprop bits, but don't use them
+	because the number of KDC round trips would go _way_ up
+
+2008-02-18:
+	* src/minikafs.c: stub out the routines to use the cache manager's
+	rxk5.enctypes property, if it reports one
+
+2008-02-14:
+	* src/password.c,src/prompter.c: suppress compiler warnings about how
+	we use prompter callback data.
+
+2008-02-14:
+	* src/sly.c: suppress a compiler warning calling tf_init().
+
+2008-02-14:
+	* src/minikafs.c: rework formatting of tokens to use indirections
+	provided by v5.c instead of poking at creds structures directly
+
+2008-02-14:
+	* src/v5.c,src/v5.h(v5_creds_get_etype): remove the need for the
+	context pointer.
+	* src/v5.c,src/v5.h(v5_creds_key_contents): return const data.
+	* src/v5.c,src/v5.h: add functions for picking out principal name
+	components and addresses and authdata from creds structures.
+	* src/v5.c(v5_principal_compare): rewrite to use these new functions.
+	* src/v5.c(v5_get_creds): correctly log the pkinit identity template.
+
+2008-02-14:
+	* src/tokens.c,src/afs5log.c: only recognize "v4" and "524" strategies
+	if we're building with krb4 support.
+
+2008-02-14:
+	* src/options.c: when we're debug-logging lifetimes, also log a
+	days/hours/minutes/seconds breakdown.
+
+2008-02-07:
+	* README,configure.ac,src/options.c,src/tokens.c,src/afs5log.c,
+	src/afs5log.1.in,src/pam_krb5.5.in: add a "token_strategy" option
+	to pam_krb5, and a matching "-s" option to afs5log.  That, in
+	combination being able to specify the best guess at the principal name
+	for a cell, should really let people cut down on what's getting to be
+	a large set of round trips to the KDC.
+
+2008-02-07:
+	* configure.ac: get the sense of --enable-keyutils right, so that we
+	warn when it's not requested, and error when it's requested, instead
+	of the other way around.
+	* src/afs5log.c: reorder the default list of methods, close the ccache
+	properly, and free the temporary homedir string for debugging use.
+	* src/minikafs.c(minikafs_5settoken2): add, to set a v5 cred.
+	* src/minikafs.c(minikafs_5log,minikafs_5log_with_principal): take a
+	flag to signal that we should try rxk5, and use it and the 2b flag to
+	designate which method we want to use (no longer trying more than one
+	during a single invocation).
+	* src/minikafs.c(encode_bytes,encode_ubytes): take const input.
+	* src/minikafs.c(encode_string): add.
+	* src/tokens.c: add rxk5 to the default method lists.
+
+2008-02-07:
+	* src/kuserok.c(_pam_krb5_kuserok): add a function which wraps
+	krb5_kuserok() in a subprocess which can create a new PAG, get tokens,
+	and drop privileges to the user's account, all so that we can attempt
+	to read the user's .k5login if we need to, and without disturbing any
+	AFS creds the calling process might have.
+	* src/auth.c(pam_sm_authenticate),src/acct.c(pam_sm_acct_mgmt): use
+	_pam_krb5_kuserok() instead of trying to get tokens, call
+	krb5_kuserok(), and clear tokens
+
+2008-02-07:
+	* src/minikafs.c: don't barf on compile if NI_MAXHOST isn't defined.
+
+2008-01-29:
+	* src/options.c: log a debug message when we disable prompting
+	on behalf of libkrb5
+
+2007-12-11:
+	* src/auth.c: don't ask for another password when we've already
+	gotten an unknown-user error, since there's no point then (Paul
+	Batkowski, #400611)
+
+2007-12-05:
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: give an example ("no_debug")
+	to make it more clear that you can add exceptions to "true" settings
+	that way.  Stress that no_subsequent_prompt may be needed for apps
+	which do the "PAM_PROMPT_ECHO_OFF" means "what's the current
+	password?" dance, which can really screw us up when we can't disable
+	the change-password-during-get_init_creds behavoir.
+	* src/v5.c(v5_alloc_get_init_creds_opt): call the library's struct
+	init function for the we-malloc-it case.
+	* src/initopts.c(_pam_krb5_set_init_opts): disable the library's own
+	change-password-during-get_init_creds behavior, if we're building with
+	one which lets us disable it, so that we can handle it ourselves.
+
+2007-12-04:
+	* src/options.c(option_b): take a service name, and a default enable
+	and disable list.  If we have no command-line argument, check for the
+	service's name in the list of values given in the config file, then
+	check for a regular boolean setting in the configuration file, and
+	lastly check our default configuration using the default enable and
+	disable lists.
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: note that boolean options take
+	lists of service names now.
+
+2007-11-09:
+	* src/auth.c: fetch tokens when "tokens" is enabled and we're not
+	configured to use krb4, instead of not doing anything like that
+	* src/auth.c(pam_sm_authenticate): fetch tokens (if we haven't
+	already) before checking the user's .k5login with krb5_kuserok()
+	* src/acct.c(pam_sm_acct_mgmt): fetch tokens before checking the
+	user's .k5login with krb5_kuserok()
+
+2007-11-08:
+	* src/stash.c: if we're about to create a ccache with a name identical
+	to one which we've already created (and haven't since destroyed), try
+	to make the name unique by appending a "_" to it (mainly for keyrings).
+	When creating a temporary FILE: ccache, use mkstemp() to generate the
+	file so that mkstemp patterns don't get used literally.  When removing
+	a ccache, treat EKEYREVOKED when resolving the ccache as a successful
+	result.
+	* src/*.c: when printing UIDs and GIDs, case to "unsigned long long"
+	if available.
+	* src/auth.c,src/acct.c,src/session.c: skip "minimum_uid" checks when
+	"no_user_check" was given, in which case we can't know the user's UID.
+	* configure.ac: fix some of the help text. make use of keyutils
+	something we can issue an error for if the library isn't detected,
+	if the user explicitly requests it.
+	* src/stash.c(_pam_krb5_read_keyring): add a level of indirection to
+	avoid a type-safety warning.
+
+2007-11-05:
+	* src/stash.c(_pam_krb5_stash_chown_keyring): add, to make sure that
+	keyrings we create for the user can actually be modified by the user
+	after the session is opened (spotted by Michael Calmer)
+
+2007-10-31:
+	* src/sly.c(_pam_krb5_sly_maybe_refresh): note that we stored creds
+	when we do so for non-FILE ccaches, so that we don't forget to fetch
+	new tokens if we need to do so.
+
+2007-10-26:
+	* src/sly.c(sly_v5): only free the ccache principal name if the call
+	to retrieve it succeeded.
+	* src/sly.c(_pam_krb5_sly_maybe_refresh): debug log when we decide
+	to do things.  Don't bother trying to refresh an unset KRB5CCNAME.
+	* src/shmem.c: correctly check the value returned of shmat() in
+	the place where it was being done wrong.
+	* src/v5.c: change internally-used ccaches from FILE: to MEMORY:
+
+2007-10-26:
+	* src/stash.c(_pam_krb5_stash_cc_copy): don't nuke the new ccache
+	on failure iterating it, the parent will for any error.
+	* src/stash.c: obey the ccname_template when we clone for the user,
+	which is the only time it matters anyway.
+
+2007-10-25:
+	* src/harness.c: use the PAM environment when running commands
+
+2007-10-23:
+	* src/log.c: use the AUTHPRIV facility, when defined, else AUTH,
+	else the default.
+
+2007-09-05:
+	* src/v5.c(v5_passwd_error_message): tweak some error text to
+	hopefully make more sense to people (#230438)
+
+2007-08-15:
+	* src/v4.c: if we fail to open the ticket file with TKT_FIL_ACC,
+	debug log the file's permissions and our process's identity
+
+2007-08-02:
+	* src/v4.c: warn when an fchown() fails, and don't try to give away
+	our file; that's for later
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: note that "tokens" is
+	unnecessary if the calling application was written correctly.
+	* src/pam_krb5.8.in: reintroduce a missing line.
+	* COPYING: be more explicit about which BSD license we mean
+
+2007-07-27:
+	* src/v5.c: fix v5_check_initialized_pwc() with Heimdal
+	* src/v4.c: fix compilation for no-krb4-support cases, avoid cloning
+	the tktfile if we were asked not to do that
+	* src/stash.c: don't leak the v4 tktfile name when cleaning up, and
+	fix the check for whether or not we have a saved file
+
+2007-07-25:
+	* src/v4.c: try to clean up the debug message for v5->v4 principal
+	name conversion
+
+2007-07-24:
+	* configure.ac: check for krb5_get_prompt_types, though we don't do
+	anything with it yet.
+	* src/minikafs.c: factor the v5- and v4-specific bits of settoken()
+	out into a single function, and allocate the buffer from the heap
+	rather than dynamically-sizing it based on the function's arguments.
+
+2007-07-20:
+	* src/v5.c: get v5_check_initialized_pwc() working on Heimdal.
+	* src/pam_krb5_storetmp.c: silence a compiler warning comparing the
+	return code from write() with strlen().
+	* src/password.c: tweak the error message which is logged when
+	password changing fails to avoid "()".  Check for the presence of
+	password-changing creds in the update phase, and error out if they
+	aren't found.
+	* src/v5.c: add v5_check_initialized_pwc() to check specifically
+	for password-changing credentials.
+	* src/v4.c,src/v5.c,src/auth.c,src/session.c: distinguish between
+	ccache and ticket files which we create for users and those which
+	we create for our own use (which needn't involve the helper).
+	* src/options.c: let options_l() take a default value.
+	* configure.ac,src/options.c: let the user specify a default
+	"use_shmem" and "external" value at build-time.
+
+2007-07-19:
+	* src/acct.c: return ignore instead of user-unknown for client-revoked
+	errors when ignore_unknown_users has been specified, for consistency
+
+2007-07-19:
+	* src/password.c: report the synthetic PAM result from attempting to
+	get password-changing creds (part of #230439)
+
+2007-07-13:
+	* src/v5.c: treat a "client revoked" error (which is generated by
+	disabling the account, at least on a Windows KDC) as an "unknown
+	principal" error (#230442).
+
+2007-07-13:
+	* src/v5.c: initialize the entire prompter_data structure.
+	* src/v4.c,src/v5.c,src/minikafs.c,src/tokens.c,src/init.c: use the
+	error_message wrapper.
+	* src/auth.c: check for NULL or empty passwords.
+
+2007-07-12:
+	* src/stash.c: switch from saving a path and removing the file to a
+	push/pop interface, allowing multiple ccaches and ticket files to
+	exist at the same time
+	* src/v4.c,src/v5.c: use push/pop to create/remove files
+	* src/tokens.c: use the topmost ccache name
+	* src/session.c: don't skip creating ccache/ticket files when we've
+	already done so
+
+2007-07-10:
+	* src/options.c: be more careful about freeing a couple of list
+	parameters.
+
+2007-07-10:
+	* src/harness.c: add a --run option, so that I can run a command
+	when the session's set up and the credentials are initialized.
+
+2007-06-24:
+	* src/password.c: display the right string.
+	* tests/run-tests: start to adjust for getting-prompts-changes-passwords
+	behavior.
+	* tests/config/kdc.conf.in: place the location of files in the right
+	part of the file
+
+2007-06-24:
+	* src/password.c(pam_sm_chauthtok): always display result_text for
+	the user's sake.  Actually check that we opened the pwhelp file,
+	like Luke's original patch did.
+
+2007-06-24:
+	* tests/pwhelp.txt,tests/run-tests: add a test for the pwhelp option.
+
+2007-06-24:
+	* Makefile.am: don't use the gmake $(shell) option; use backticks.
+
+2007-06-24:
+	* src/options.c: add a "pwhelp" option.
+	* src/password.c(pam_sm_chauthtok): display the contents of the
+	pwhelp file before doing anything else when in the preliminary check
+	phase (#230465, Luke Howard).
+
+2007-06-24:
+	* src/prompter.c(_pam_krb5_always_fail_prompter,
+	_pam_krb5_previous_prompter): output the banner and name information
+	if it was given (#230450).
+
+2007-06-24:
+	* src/password.c(pam_sm_chauthtok): when returning, note whether
+	we are here for the preliminary check or the actual update in the
+	debug message (#230444, Luke Howard).
+
+2007-06-24:
+	* src/password.c(pam_sm_chauthtok): set v5_attempted to 1 for
+	correctness (#230446, Luke Howard, Pieter Krul).
+
+2007-06-24:
+	* src/options.c: don't pass in PAM handles when we don't actually use
+	them.
+
+2007-06-24:
+	* src/acct.c(pam_sm_acct_mgmt): return PAM_USER_UNKNOWN in event of
+	a client-revoked error (#230442, Luke Howard, Christian Bolz, Pieter
+	Krul)
+
+2007-06-24:
+	* src/stash.c(_pam_krb5_stash_shm_read_v5): correct an argument size
+	mismatch calling the logging function.
+
+2006-09-21:
+	* src/auth.c(pam_sm_authenticate): try again to clean up the three
+	possible setups (pre-entered password, one for which we prompt directly,
+	libkrb5 asking questions) to minimize the number of calls we make to
+	krb5_get_init_creds_password().
+	* src/prompter.c(_pam_krb5_prompt_is_password): take the prompter
+	callback data instead of the string.
+	* src/prompter.c(_pam_krb5_*prompter): if we're debugging sensitive
+	data, log both the answer we give and the default provided by libkrb5
+	* src/v5.c(v5_get_creds): guard against potential problems logging a
+	NULL password.
+	* src/acct.c(pam_sm_acct_mgmt): if the previous attempt to authenticate
+	gave us decrypt-integrity-check-failed or preauthentication-failed,
+	assume that there's no pam_acct_mgmt error to report (#207410)
+
+2006-09-20:
+	* src/password.c(pam_sm_chauthtok): set the AUTHTOK and OLDAUTHTOK
+	items properly (report and patch from Michael Calmer).
+	* tests/run-tests: clear any policy we've applied to the user when we
+	delete the user's entry (report and patch from Michael Calmer).
+
+2006-09-13:
+	* src/harness.c: add the ability to preset the AUTHTOK and OLDAUTHTOK
+	items.
+
+2006-09-12:
+	* src/harness.c: add the ability to preset the AUTHTOK and OLDAUTHTOK
+	items.
+	* src/prompter.c(_pam_krb5_always_fail_prompter): add a prompter which
+	always fails and one which always return a previously-input password.
+	* src/options.c,options.h: rework the processing of initial_prompt,
+	add subsequent_prompt
+
+2006-09-08:
+	* src/options.c,options.h: track whether or not we want to let libkrb5
+	ask for information via the callbacks.
+	* src/v5.c(v5_get_creds): give the caller a way to specify which
+	prompter callback we should use.
+	* src/auth.c(pam_sm_authenticate): rework the prompting bits so that
+	it makes more correct use of the initial_prompt/use_first_pass flags
+	and correctly disables use of the callback for arbitrary prompts
+	* configure.ac: provide a --with-os-distribution flag for people who
+	want to replace the "Red Hat Linux" bit in the man pages with the
+	name of a product or OS which still exists
+	* src/pam_krb5.5.in: mention pam_passwdqc.so along with pam_cracklib.so
+
+2006-08-28:
+	* configure.ac: change the preference from <krb5/krb5.h> to <krb5.h>,
+	so that we don't pick up the system <krb5/krb5.h> when we need the
+	<krb5.h> which lives in the directory pointed out by krb5-config
+
+2006-08-28:
+	* src/v5.c(v5_passwd_error_message): add a function to interpret the
+	error codes returned for password-change requests.
+	* src/password.c(pam_sm_chauthtok): log text for server-supplied error
+	code along with the failure information.
+
+2006-07-27:
+	* src/auth.c: include unistd.h to get the declaration of getuid().
+
+2006-07-26:
+	* src/options.c(option_i): check for strtoll()/long long.
+	* configure.ac: check for strtoll().
+	* src/v4.c(v4_save): actually set the permissions on the new file to
+	the requested values.  Note in the warning why we fail to open a
+	file, which is returned as the result and not in errno.
+	* src/storetmp.c(_pam_krb5_storetmp_data): try to setreu/gid if either
+	the real or effective values don't match the desired value.
+	* src/pam_krb5_storetmp.c(main): only use strtoll() if it's
+	available, otherwise just use strtol().
+	* src/stash.c(_pam_krb5_stash_clone): go back to overwriting the
+	template, to avoid uncontrolled growth in the filename.
+	* src/session.c(pam_sm_open_session): specify the current real
+	UID and GID when creating temporary v4 credential files.  Note the
+	guessed UID and GID of the user in the debug message.
+	* src/auth.c(pam_sm_authenticate): always specify the current real
+	UID and GID when creating temporary v4 credential files.
+	* src/stash.c(_pam_krb5_stash_clone): build the new ccache name by
+	appending the mkstemp template instead of assuming the previous file
+	ended with one
+	* configure.ac: check for "long long" explicitly
+	* src/storetmp.c(_pam_krb5_storetmp_data): use a long long print
+	specifier only if we actually have a "long long" type.  Fix incorrect
+	usage of sigaction.
+
+2006-07-25:
+	* src/stash.c(_pam_krb5_stash_external_read): note when we try to
+	pick up external creds, and when we fail to do so.
+	* src/storetmp.c(_pam_krb5_storetmp_data): save and set signal handlers
+	before we fork().  Go back to allowing setuid/setgid to fail, but only
+	after we attempt to drop setuid/setgid status (which gets to fail, too,
+	but renders the helper unuseful).
+	* src/sly.c,src/sly.h(_pam_krb5_sly_looks_unsafe,
+	_pam_krb5_sly_maybe_refresh): move detection of whether or not it
+	looks safe into another function.
+	* src/auth.c(pam_sm_setcred): if it doesn't look safe to refresh
+	credentials, just return PAM_IGNORE (#197428).
+	* src/storetmp.c(_pam_krb5_storetmp_data): save and restore the SIGPIPE
+	handler in case our child exits, drop any setuid/setgid pretense
+	when we're called from a setuid application (#190159, patch by Jon
+	Fautley), bail early if calls to setuid/setgid fail.
+	* configure.ac: look for krb5/krb5.h in preference to krb5.h (new in
+	MIT Kerberos 1.5)
+	* src/stash.c(_pam_krb5_stash_external_read): if the default principal
+	in the ccache doesn't match the userinfo structure, update the
+	userinfo structure, based on patch from Jan Iven (#182239,#197660).
+	* src/v4.c(v4save): always use the name of the v5 principal when saving
+	credentials, especially for the "external" case where it may not be the
+	value we originally guessed (#197660).
+	* src/pam_krb5.5.in: note that the krb4_convert_524 and krb4_use_as_req
+	options don't affect each other.
+	* src/prompter.c(_pam_krb5_prompter): be more careful about other
+	ways which our prompting callback can try to break us (noted by Michael
+	Calmer).
+
+2006-04-21:
+	* src/prompter.c(_pam_krb5_prompter): check for dumb converation
+	functions which return success but set the response to NULL.  From
+	Michael Calmer.
+
+2006-02-29:
+	* src/v5.c(v5_get_creds): don't try to validate creds which aren't
+	TGTs, because the attempt will always fail unless the matching key
+	is in the keytab, which should never be the case for the
+	password-changing service (#187303, rbasch)
+	* src/tokens.c(tokens_obtain): if v4 has been disabled completely,
+	go ahead and try to set 2b tokens because we're going to end up having
+	to do that anyway (#182378).  If we have a hint principal, note it in
+	debug output.
+	* src/minikafs.c(minikafs_5log_with_principal): if we read a client
+	principal from the ccache, unparse it and include it in debug messages.
+	If we fail to obtain creds from the KDC, note why we failed.
+
+2006-02-23:
+	* src/stash.c(_pam_krb5_stash_get): skip v4 creds setup when v4 isn't
+	enabled.
+
+2006-02-21:
+	* src/v4.c, src/v4.h (v4_save): make ccname a const char *.
+	* src/v5.c, src/v5.h (v5_save): make ccname a const char *.
+	* src/stash.c(_pam_krb5_stash_get): when we pick up v5 creds via either
+	"external" or "use_shmem", do 524 conversion if we need to do so.
+	* src/session.c(pam_sm_open_session): also create a v4 tktfile if
+	KRB5CCNAME was already set.
+	* src/afs5log.c, src/minikafs.c: use init_secure_context when possible.
+	* src/Makefile.am: juggle deps so that linking works again.
+
+2006-02-07:
+	* src/pam_newpag.8.in: edit
+
+2006-02-06:
+	* src/options.c,src/options.h: break down and add an explicit option
+	for disabling v4-via-as-req attempts
+	* src/minikafs.c: don't try to convert creds for use in setting v4
+	tokens when krb4_convert_524 is disabled.
+	* src/v4.c: don't try to get initial creds if krb4_use_as_req is off.
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: document krb4_use_as_req.
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: point out that we turn on v4
+	support if AFS is detected at run-time.
+	* README: document krb4_use_as_req.
+	* TODO: update because 2.2 was tagged a while ago
+
+2006-01-26:
+	* src/minikafs.c: wrap a debug message in an if (debugging) clause.
+	* src/session.c: wrap a pair of debugging messages in an if (debugging)
+	clause (#179037).
+	* configure.ac: if $with_gnu_ld is set, set SYMBOLIC_LINKER_FLAG to
+	the right variation on -Bsymbolic
+	* src/Makefile.am: use the SYMBOLIC_LINKER_FLAG when linking modules
+
+2006-01-16:
+	* src/afs5log.1, src/pagsh.1: fix the bug reporting instructions.
+
+2006-01-16:
+	* src/password.c(pam_sm_chauthtok): fix handling of no-password-given
+	cases.
+	* src/harness.c: work around Linux-PAM actively trying to keep us from
+	doing what we're doing.  Adjust command-line parsing to allow both
+	password-change phases to be called out.
+	* tests/run-tests.c: add a password-not-good-enough-at-change-time
+	test case.
+	* src/password.c(pam_sm_chauthtok): cast away a couple of compiler
+	warnings.
+	* src/Makefile.am: tweak dependencies on dummy files for the sake of
+	distcheck.
+
+2006-01-13:
+	* src/log.h,src/log.c,src/logstdio.c: add notice_user() to for spewing
+	an error message at the user.
+	* src/password.c(pam_sm_chauthtok): if we got a result string back from
+	the password-changing server, attempt to display it.
+
+2006-01-11:
+	* src/session.c: no, I did touch that file last year.
+	* src/pam_krb5.5.in: document the "ignore_afs" option.
+	* src/pam_newpag.c: add.
+	* src/pam_newpag.5.in: add.
+	* src/pam_newpag.8.in: add.
+	* src/Makefile.am: add rules for building pam_newpag.so.
+	* configure.ac: generate man pages for pam_newpag.
+	* src/pam_dummy_acct.c: add.
+	* src/pam_dummy_chauthtok.c: add.
+	* src/Makefile.am: add rules for building harness-newpag
+	* src/pagsh.1: add.
+
+2005-12-19:
+	* src/items.c: include <stdio.h> to get the definition of NULL (Jesse
+	Keating).
+	* src/init.c: same bug, different file.
+
+2005-11-21:
+	* src/v5.c(v5_validate): don't leak the keytab file descriptor (patch
+	from Daniel Colascione, #173681).
+
+2005-11-15:
+	* src/afs5log.c: actually check for AFS support first, so that the
+	ioctl-only support case will work properly.
+
+2005-11-07:
+	* src/options.c: allow "validate" to be specified using a list of
+	service names as well.
+
+2005-11-07:
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: add proper quoting for arguments
+	which include whitespace
+
+2005-11-01:
+	* src/stash.c(_pam_krb5_stash_shm_write_v5/4): initialize the segment
+	key and owner in the stash when we write to it, in case the application
+	decides to never call pam_end(), so that we can clean up the segment
+	during session close.
+
+2005-11-01:
+	* src/stash.c,src/stash.h,src/shmem.csrc/shmem.h: log debug messages
+	when we remove segments.
+
+2005-10-31:
+	* src/stash.c,src/stash.h,src/shmem.csrc/shmem.h: track the PID which
+	created the shared memory segment, so that we don't try to remove it
+	twice and accidentally stomp on another process.
+
+2005-10-28:
+	* src/session.c(pam_sm_open_session): dispose of shared memory segments
+	once we've read their contents, in case we won't be able to dispose of
+	them later (patch from Greg Wettstein).
+	* src/shmem.c,src/shmem.h: add a _pam_krb5_shm_remove() function for
+	use by the session functions (patch from Greg Wettstein).
+	* src/stash.c,src/stash.h: add a v5shm/v4shm field to the stash
+	structure to track the ID of the shared memory segment
+	* src/session.c: don't leak the values of $KRB5CCNAME and $KRBTKFILE
+	which we set; libpam makes copies of the values which are passed-in.
+	* src/session.c: unset PAM environment variables by setting "<VAR>",
+	not "<VAR>=", in accordance with the Linux-PAM docs.
+	* src/session.c: unset PAM environment variables which list the shared
+	memory segment identifiers when we destroy the segments.
+
+2005-10-20:
+	* src/shmcat.c: add.
+	* src/Makefile.am: update.
+
+2005-10-19:
+	* src/options.c: initialize options->debug correctly when it's
+	neither explicitly enabled nor disabled (patch from Greg Wettstein).
+
+2005-10-19:
+	* src/acct.c,src/pam_krb5.5.in,src/pam_krb5.8.in: note that the
+	"existing_ticket" option bypasses account management checks, too.
+
+2005-10-18:
+	* src/options.c,src/options.h: parse the "existing_ticket" option
+	(patch from Nathan Huff).
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: update.
+	* src/v5.c: if the "existing_ticket" option is used, attempt to read
+	the TGT cred from the default ccache, and accept that as sufficient
+	for successful authentication (patch from Nathan Huff).
+	* src/auth.c: if the "existing_ticket" option is used, call to get
+	creds before prompting for a password (patch from Nathan Huff).
+	
+2005-10-18:
+	* src/acct.c: remove an unused variable to silence a compile warning.
+	* src/harness.c: check the result of fgets().
+	* src/minikafs.c: comment out minikafs_unpag(), which was static and
+	unused, to silence a compile warning.
+	* src/tokens.c: check for errors from readlink().
+
+2005-10-13:
+	* configure.ac: clean up logic for setting pkgsecuritydir correctly if
+	a libdir isn't passed to configure (Greg Wettstein).
+
+2005-10-06:
+	* src/afs5log.c: recognize that "--" means "no more options".
+
+2005-10-06:
+	* autogen: use RPM's optflags for CFLAGS, if available.
+	* src/afs5log.c: don't autolog to the local cell if the '-p' flag was
+	given on the command line.
+	* src/minikafs.c,src/pagsh.c: implement an unpag() call, then check
+	and find out that it's the same as unlog(), so comment it out.
+
+2005-10-06:
+	* src/options.c: make "tokens" an option which can also take a list of
+	service names for which it should be enabled.
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: update section for "tokens".
+	* src/pam_krb5.5.in: fix header text for "external" and "use_shmem".
+
+2005-10-05:
+	* configure.ac: prereq the version of autoconf which my development
+	box has, to avoid possible AC_CONFIG_HEADER/AM_CONFIG_HEADER wackiness.
+	* src/pam_krb5_storetmp.8.in: use the actual installation paths.
+	* src/acct.c: list the actual result code in the debug message.
+
+2005-10-05:
+	clean up CVS version tags
+	* README.winbind: clear up a couple of finer points.
+	* src/Makefile.am,src/pam_krb5_storetmp.8.in: add a man page for the
+	temp file helper.
+	* pam_krb5.spec: list bindir and section 1 man page files in the files
+	manifest.
+
+2005-10-05:
+	* src/session.c: suppress duplicate success messages.
+	* src/stash.c: warn on shmem failures.
+
+2005-10-05:
+	* src/shmem.c: always detach from the segment, even in error cases.
+	* src/stash.c: note when we manipulate shared memory when debugging.
+
+2005-10-04:
+	* configure.ac: oh right, enable AFS support on *-sun-* now.
+
+2005-10-04:
+	* src/options.c,src/pam_krb5.5.in,src/pam_krb5.8.in: add
+	"ignore_unknown_upn" as an alias for the "ignore_unknown_principals",
+	to match behavior of patch from Luke Howard.  Correct the option
+	parsing code so that it matches the option named in the man pages.
+	* src/acct.c,src/auth.c: Merge most of the rest of Luke's patch for
+	changed behavior when this option is supplied.
+	* configure.ac: set the default keytab path to "FILE:/etc/krb5.keytab",
+	not just "/etc/krb5.keytab".
+	* src/acct.c,src/auth.c,src/conv.c,src/harness.c,src/initopts.c,
+	src/items.c,src/map.c,src/minikafs.c,src/noafs.c,src/options.c,
+	src/password.c,src/prompter.c,src/session.c,src/shmem.c,src/sly.c,
+	src/stash.c,src/tokens.c,src/userinfo.c,src/v4.c,src/v5.c: include
+	<security/pam_appl.h> before every inclusion of <security/pam_modules.h>
+	(patch from Luke Howard).
+	* src/minikafs.c: define __NR_afs_syscall on Solaris, use the standard
+	names for sized integer types (patch from Luke Howard).
+	* src/userinfo.c: prefer __posix_getpwnam_r() to getpwnam_r() on
+	Solaris (patch from Luke Howard).
+	* configure.ac,src/pam_krb5.8.in: list the configured path for the
+	module in the example in the man pages.
+
+2005-10-04:
+	* configure.ac: check for the presence of <sys/ioccom.h> (patch from
+	Luke Howard).
+	* src/minikafs.c: include <sys/ioccom.h>, if present (patch from Luke
+	Howard).
+
+2005-10-04:
+	* src/password.c: save the result of getting new credentials with the
+	newly-set password so that we don't forget to store them in the user's
+	session ccache, and return the more correct PAM_AUTHTOK_RECOVER_ERR
+	instead of PAM_AUTHTOK_ERR if we were called with "use_authtok" and
+	there is no PAM_AUTHTOK item set (patches from Michael Calmer).
+
+2005-10-04:
+	* src/options.c,src/options.h: parse the "krb4_convert_524" option.
+	Accept "don't" and "dont" as prefixes which indicate that a boolean
+	option is disabled.
+	* src/pam_krb5.5.in,src/pam_krb5.8.in: list the "krb4_convert_524"
+	option.  Conditionalize portions of the text which are specific to
+	Kerberos IV or AFS.
+	* src/pam_krb5.8.in: fix the synopsis.
+	* src/v4.c: don't attempt to use the 524 service to obtain a v4 TGT
+	if the "krb4_convert_524" option is disabled.
+
+2005-10-04:
+	* configure.ac: only trust 'krb5-config --libs krb4' to provide krb4
+	if '-lkrb4' is in the output -- krb5 1.2.7's krb5-config doesn't exit
+	with an error when built without krb4 support
+
+2005-10-04:
+	* configure.ac: sort out --with-krb4/--without-krb4 logic so that it
+	defaults to use-krb4-if-available.
+	* src/session.c, src/stash.c, src/tokens.c, src/userinfo.c: add missing
+	inclusion of <limits.h>
+
+2005-08-22:
+	* configure.ac: add maintainer mode.  Add definitions so that the
+	preprocessed man pages will be able to omit portions which pertain to
+	options not selected at compile-time (i.e., AFS).
+	* src/afslog.c, src/afslog.h: add (not yet tested) -p flag support.
+	* noafs.c: update for changed prototype for minikafs_log().
+
+2005-08-15:
+	* src/password.c(pam_sm_chauthtok): save the old password as the
+	PAM_OLDAUTHTOK item, not the PAM_AUTHTOK item.  Apparently libpam
+	doesn't do anything with these (patch from Michael Calmer).
+	* src/password.c(pam_sm_chauthtok): double-check that we don't
+	get NULL as an old or new password (patch from Michael Calmer).
+	* src/password.c(pam_sm_chauthtok): better match the behavior of
+	pam_unix and pam_ldap by treating "use_authtok" as an indication
+	that PAM_AUTHTOK *has* to have been set already, and otherwise
+	that it's okay to prompt (patch from Michael Calmer).
+
+2005-07-12:
+	* src/password.c(pam_sm_chauthtok): check the result_code returned by
+	krb5_change_password() as well as the return code (patch from Dan Perry)
+
+2005-06-21:
+	* src/tokens.c(tokens_obtain): don't skip a cell if it's both the
+	local/home and in the set of explicitly-specified cells (Jack Neely).
+
+2005-06-20:
+	* configure.ac: fix --disable-Werror, --disable-extra-warnings so that
+	they actually work as expected.
+	* src/shmem.c, src/stash.c, src/storetmp.c: fix compile warnings.
+
+2005-06-17:
+	* src/minikafs.c,src/minikafs.h: add a variant of cell_of_file which
+	walks up the tree if it fails.
+	* src/afs5log.c,src/tokens.c: use the new cell_of_file variant instead
+	of handling the logic locally.
+	* src/minikafs.c: increase the default size of the address list we
+	pass to the whereis pioctl, and make its growth exponential instead of
+	linear if we fail with E2BIG (Jack Neely).
+	* README: note that we don't re-get tokens if the home directory is in
+	the local cell
+	* NEWS: note that SAM support hasn't been tested, and that "external"
+	isn't limited to use with OpenSSH
+
+2005-05-18:
+	* src/afs5log.1: add
+	* src/Makefile.am: install afs5log and afs5log.1
+	* src/afs5log.c: debug-log when we're obtaining tokens for the local
+	or the user's home cell
+	* src/minikafs.c(realm_of_cell): debug-log IP->hostname conversion
+	* src/minikafs.c(minikafs_5log): rearrange the order of things so that
+	we don't always try to determine the realm name ourselves, so that if
+	a principal was supplied, we actually can be faster.
+	* src/minikafs.c(minikafs_4log): be careful for cases where we may have
+	been passed a NULL krb5 context.
+
+2005-05-09:
+	* src/minikafs.c(realm_of_cell): debug-log failures in the whereis
+	pioctl, stop looking at addresses if we hit 0.0.0.0.
+	* src/minikafs.c(minikafs_5log): if realm_of_cell succeeds, don't
+	clear the realm name (duh).
+
+2005-05-09:
+	* src/minikafs.c: add a wrapper for the ws_cell pioctl.
+	* src/tokens.c,src/afs5log.c: use ws_cell to find the default cell
+	instead of guessing by doing a cell_of_file on /afs (#157109)
+
+2005-04-27:
+	* src/minikafs.c: also try afs@DEFAULTREALM if the default realm is
+	not the same as the derived realm (sort of from Christopher Allen Wing).
+	* src/options.c,src/options.h: track a "ignore_unknown_principals"
+	boolean flag, with "ignore_unknown_spn" being consulted if it's unset.
+	Parse cell names which contain a '=' character as if they're of the
+	form cell_name=principal_name.
+	* src/minikafs.c,src/minikafs.h: if a principal name was given, try
+	to get creds for the named service and use them.  If that doesn't work,
+	fall back to previous behavior.
+	* src/afs5log.c: parse "=" signs in command-line arguments, as options.c
+	does.
+	* src/acct.c: return PAM_IGNORE if the error is either
+	KDC_ERR_C_PRINCIPAL_UNKNOWN or KDC_ERR_NAME_EXP and
+	ignore_unknown_principals was set, else PAM_USER_UNKNOWN as before.
+	* src/v5.c: return PAM_IGNORE if the error is either
+	KDC_ERR_C_PRINCIPAL_UNKNOWN or 5KDC_ERR_NAME_EXP and
+	ignore_unknown_principals was set, else PAM_USER_UNKNOWN as
+	before.
+	* src/minikafs.c: correctly handle E2BIG errors from a WHEREIS pioctl,
+	bug spotted by Lamont Granquist.  Handle multiple IPs coming back,
+	and try to look up a host name and realm name in turn until we either
+	succeed or run out of addresses.
+	* src/minikafs.c: when obtaining tokens, try to get credentials for
+	afs@defaultrealm if defaultrealm resembles the cell name and doesn't
+	resemble the derived realm name, which can happen if deriving the
+	realm name didn't work for whatever reason.
+	* src/options.c: don't leak the mappings list when freeing options
+	structures.
+	* src/pagsh.c: unbreak by not assuming that "-c" as a first option
+	meant that the user wanted a help message.
+	* src/pam_krb5.5,src/pam_krb5.8: use \fR instead of \fP for resetting
+	formatting.
+	* src/tokens.c: if the default or home cell was explicitly listed in
+	the configuration, skip initial attempts to get tokens for them, in
+	case the user specified principal names for the services.
+	* src/tokens.c: remove tokens_getcells() and tokens_freecells(), which
+	weren't being used.
+
+2005-03-14:
+	* src/options.c: accept "," as a separator for list parameters, so that
+	we can pass parameters with list values in via argv
+
+2005-03-14:
+	* src/noafs.c: add.
+	* configure.ac: fix the keytab result message.  Add a --without-afs
+	flag.
+
+2005-03-04:
+	* configure.ac: bail if security/pam_appl.h or security/pam_modules.h
+	aren't found.
+
+2005-03-04:
+	* src/v4.h: restore the prototypes to avoid warnings, typedef the one
+	krb4 struct we pass around to avoid an error.
+
+2005-03-04:
+	* configure.ac: remove -Wno-unused-parameters from the set of extra
+	warning flags.  Add a newline after inclusion of <krb5.h> when we're
+	testing for structures defined in the krb5 API.
+	* src/sly.c: compile in a dummy sly_v4() if USE_KRB4 isn't defined
+	* src/v4.h: don't provide prototypes if USE_KRB4 isn't defined.
+
+2005-02-28:
+	* configure.in: demote -Wextra and friends --enable-extra-warnings
+	status.
+
+2005-02-28:
+	* src/minikafs.c: fix compilation against releases which didn't define
+	KRB_TICKET_GRANTING_TICKET.
+	* src/pagsh.c: add missing <stdio.h> inclusion.
+	* src/minikafs.c: handle cases where krb_life_to_time() isn't available.
+	* src/pagsh.c: add a --help flag, by assuming that the command will
+	never start with "-".
+
+2005-02-24 nalin
+	* src/logstdio.c: add a log_progname global to adjust log messages.
+	* src/afs5log.c,src/harness.c: set log_progname at startup.
+	* src/prompter.c: suppress prompts for the previously-entered password.
+	* src/userinfo.c: clean up some valgrind-caught weirdness.
+	* src/harness.c: use getpass() instead of fgets() for
+	PAM_PROMPT_ECHO_OFF prompts.  Kids, don't try that at home.
+	* src/sly.c: only refresh the default krb5 ccache if its principal is
+	the one we've authenticated.
+	* src/tokens.c: log a debug message if we create a new PAG.  When
+	determining the user's home cell, if the user's home directory is a
+	symlink, chase it.
+2005-02-24 nalin
+	* configure.ac: add a --enable-default-keytab-location flag.
+	* src/options.c,src/pam_krb5.5.in,src/pam_krb5.8.in: obey it.
+	* README: document that it can be overridden.  (Don't want to change
+	this to README.in to actually reflect that override value.)
+	* src/v4.c(v4_get_creds): error out if password is NULL or zero-length.
+	* src/v5.c(v5_get_creds): provide the prompter callback to libkrb5.
+	* src/options.c: add an "initial_prompt"/"no_initial_prompt" option
+	which suppresses the initial password prompt.  It's useless for
+	providing a PAM_AUTHTOK to subsequent modules, but is useful now that
+	we're providing a prompter callback to libkrb5.
+	* src/auth.c: handle no_initial_prompt cases.  Get AFS tokens if the
+	saved password turned out to be correct.
+	* src/log.c: fix a few memory leaks.
+	* src/harness.c: add, to make debugging easier.
+2005-02-23 nalin
+	* src/init.c: don't call initialize_krb5_error_table; this currently
+	leads to a crash due to libkrb5 from MIT's 1.4 release making an
+	invalid assumption about e2fsprogs 1.36's libcom_err (SF #1150146)
+2005-02-14 nalin
+	* src/stash.c,src/stash.h: add a field to the stash structure for
+	keeping of whether or not we set the KRB5CCNAME/KRBTKFILE environment
+	variables
+	* src/session.c: clear KRB5CCNAME/KRBTKFILE if we're removing the
+	files *and* we set the variables.  Treat zero-length values as we
+	treate NULL values for those variables.
+2005-02-08 nalin
+	* src/afs5log.c: properly screen out "dynroot" as a cell name, walk up
+	from the user's home directory if we can't determine in which cell it
+	is that it resides
+
+2005-02-08 nalin
+	* src/acct.c: treat a KRB5KDC_ERR_PREAUTH_FAILED error as if it were
+	a KRB5KRB_AP_ERR_BAD_INTEGRITY error.
+	* README,src/pam_krb5.5.in,src/pam_krb5.8.in: doc updates.
+
+2005-02-08 nalin
+	* src/userinfo.c,src/userinfo.h: look up and make note of the user's
+	home directory.
+	* src/tokens.c(tokens_obtain): attempt to determine the cell in which
+	the user's home directory resides, and default to obtaining tokens for
+	that cell as well, unless it's the same as the default cell.  Skip
+	cells given to the afs_cells option if they are the same as either the
+	local cell or the user's home cell.
+	* src/options.c: handle "external" like we handle "use_shmem".
+	* src/stash.c: read a krbtgt key from $KRB5CCNAME if "external" was
+	set.  Try to reuse the passed-in krb5_context, if possible.
+	* src/session.c: don't create new ccache or ticket files if KRB5CCNAME
+	or KRBTKFILE are already set in the PAM environment, respectively.
+
+2005-02-07 nalin
+	* src/minikafs.c(minikafs_5log): initialize use_ccache as a handle for
+	the default cred cache, not ccache, when ccache is NULL.
+	* src/options.c(option_t): add, for parsing a value as a krb5_deltat if
+	it can't be parsed as a normal integer.
+	* src/options.h: change normal and renewable lifetimes to krb5_deltat
+	* src/options.c(_pam_krb5_options_init): parse lifetimes using option_t
+	instead of option_i.
+	* src/*.c: random signed/unsigned warning corrections.
+
+2004-09-13 nalin
+	* src/tokens.c: skip getting tokens for the cell of /afs if that cell
+	is "dynroot", which is what OpenAFS's dynamic-root support gives us.
+	* src/auth.c: run the krb5_kuserok() check in the authentication phase
+	as well (Douglas E. Engert).
+
+2004-09-02 nalin
+	* src/minikafs.c: add copyright statement because the ioctl patch is
+	too much like heimdal's implementation.
+
+2004-08-31 nalin
+	* src/shmem.c,src/shmem.h: add, several functions for handling shared
+	memory.
+	* src/auth.c:(pam_sm_authenticate): log the realm as well. store
+	credentials to shared memory on success if the "use_shmem" flag was
+	given, or if "use_shmem=" lists the current service, or is true.
+	* src/stash.c:(_pam_krb5_stash_shm_read,_pam_krb5_stash_shm_write): add.
+	* src/storetmp.c(_pam_krb5_read_with_retry): make non-static.
+	* src/storetmp.c(_pam_krb5_storetmp_file): add a hook for storing a copy
+	of the file contents in a blob of memory.
+
+2004-08-31 nalin
+	* src/password.c(pam_sm_chauthtok): during the preliminary check phase,
+	read the current password as the PAM_OLDAUTHTOK item, not PAM_AUTHTOK
+	(Ludek Finstrle, #131246)
+
+2004-08-27 nalin
+	* src/userinfo.c(_pam_krb5_user_info_init): override the realm name to
+	be the one which was passed in (Carlos A. Villegas, #116198).
+
+2004-08-27 nalin
+	* src/minikafs.c: handle cases where the length of the realm name >
+	length of the cell name.
+
+2004-08-27 nalin
+	* src/options.c(_pam_krb5_options_init): set the default realm for
+	ctx (#116198).
+
+2004-08-26 nalin
+	* src/options.h,options.c: add an ignore_afs flag to the options
+	structure, heavily based on Matthew Miller's patch (#126345).
+	* auth.c, session.c, sly.c: obey ignore_afs.
+
+2004-08-26 nalin
+	* src/acct.c(pam_sm_acct_mgmt): skip .k5login check of user_check was
+	disabled -- it's not as if we can expect an unknown user to have a home
+	directory.
+
+2004-08-26 nalin
+	* src/conv.c(_pam_krb5_conv_call): return PAM_BAD_ITEM instead of
+	PAM_CONV_ERR if the application didn't define a conversation function.
+
+2004-08-26 nalin
+	* src/minikafs.c(minikafs_ioctlcall): add, from Alexander Boström
+	(#127529).
+	* src/minikafs.c(minikafs_call): add, calling afs_ioctlcall or
+	afs_syscall as appropriate, from Alexander Boström (#127529).  The
+	setpag and pioctl functions now call this function instead of our
+	afs_syscall.
+	* src/minikafs.c(minikafs_has_afs): check for ioctl-based interface to
+	Arla or OpenAFS for Linux 2.6, from Alexander Boström (#127529).
+
+2004-08-26 nalin
+	* src/password.c(pam_sm_chauthtok): prompt for the user's current
+	password when use_first_pass isn't flagged, ignoring use_authtok
+	during the initial-authentication pass (#130950).
+
+2004-06-14 nalin
+	* src/session.c(pam_sm_open_session,pam_sm_close_session): log what
+	we return, and why, if debugging is enabled.
+
+2004-06-14 nalin
+	* src/acct.c(pam_sm_acct_mgmt): likewise, catch and log specific error
+	information for EAGAIN, KRB5_REALM_CANT_RESOLVE, and KRB5_KDC_UNREACH
+	errors.
+
+2004-06-14 nalin
+	* src/v5.c(v5_get_creds): return PAM_AUTHINFO_UNAVAIL if we got EAGAIN,
+	which is triggered by a transient hostname resolution error (John
+	Dennis).  Also do this for KRB5_REALM_CANT_RESOLVE and KRB5_KDC_UNREACH
+	error cases.
+
+2004-04-21 nalin
+	* Makefile.am: make configure depend on pam_krb5.spec.
+	* autogen: run with --enable-maintainer-mode so that the dependency
+	gets honored when autogen is used.
+	* pam_krb5.spec: bump version.
+
+2004-04-21 nalin
+	* src/minikafs.c: print debug messages when doing realmofcell stuff.
+
+2004-04-21 nalin
+	* configure.ac: perform all checks for Kerberos functions with all of
+	the libraries we've found.
+
+2004-04-21 nalin
+	* configure.ac: escape sed expressions correctly so that LDFLAGS doesn't
+	include -l flags for Kerberos, skip all krb4 checks if --without-krb4
+	is passed in.
+	* src/Makefile.am: add KRB5_LIBS and KRB4_LIBS as needed.
+	* src/minikafs.c: use krb524_convert_creds_kdc if krb5_524_convert_creds
+	isn't available.  Force v5 mode on if USE_KRB4 is not defined.
+
+2004-04-21 nalin
+	* configure.ac: search for PAM libraries separately
+	* src/Makefile.am: use a convenience library to compile code only once
+	* src/afs5log.c: supply a non-bogus ccache and options argument to
+	minikafs, provide local logging functions which use stdio.
+
+2004-04-15 nalin
+	* configure.ac: default krb5-config and krb4-config to ':', add non
+	library arguments output by --libs to LIBS
+	* src/minikafs.c: add missing <stdio.h> include.
+	* src/stash.c: fix compile for non-USE_KRB4 case.
+	* src/v4.c: fix compile for non-USE_KRB4 case.
+	* src/v5.c(v5_cc_retrieve_match): add.
+	* src/v5.c(v5_creds_key_length): add.
+	* src/v5.c(v5_creds_key_contents): add.
+
+2004-03-23 nalin
+	* configure.ac: remove kafs/krbafs checks.
+	* src/Makefile.am: add EXTRA_PROGRAMS target for afs5log.
+	* src/afs5log.c: add a test program for exercising minikafs.
+	* src/minikafs.c, src/minikafs.h: add a less-portable but more-flexible
+	krbafs implementation.
+	* src/options.c(_pam_krb5_options_init): distinguish between v4 for
+	general use and v4 because we're using AFS.
+
+2004-03-16 nalin
+	* src/pam_krb5_storetmp.c: remove the file if it's not a valid mkstemp
+	pattern, even if we were passed a UID/GID.
+
+2004-03-16 nalin
+	* src/storetmp.c: drop privileges before we exec the helper.
+
+2004-03-16 nalin
+	* src/pam_krb5_storetmp.c: only attempt to change to the required
+	UID/GID if we are not already running with that UID/GID, and only
+	attempt to clear the supplemental groups list if uid == 0 (we're root).
+
+2004-03-16 nalin
+	* src/session.c: remove explict calls to chown(), which would be denied
+	by SELinux in enforcing mode, instead expecting the helper to handle it
+	all.
+	* src/v5.c: remove explict calls to chown(), which would be denied by
+	SELinux in enforcing mode, instead expecting the helper to handle it
+	all.
+	* src/v4.c: remove explict calls to chown(), which would be denied by
+	SELinux in enforcing mode, instead expecting the helper to handle it
+	all.
+	* src/storetmp.c: pass the user's uid and gid to the helper, it already
+	knows what to do.
+	* src/tokens.c(tokens_useful): add.
+	* src/session.c: when opening a session, create temporary tickets for
+	grabbing tokens with the current permissions so that libkrb4 doesn't
+	reject them, then clean them up, then create those for the user.
+
+2004-03-10 nalin
+	* src/pam_krb5_storetmp.c: if the filename pattern supplied is not a
+	valid pattern (does not end with XXXXXX), delete the file instead,
+	reporting success in the same way.
+	* src/session.c(pam_sm_close_session): note ticket file deletions when
+	debugging.
+	* src/storetmp.c(_pam_krb5_storetmp_delete): add, to invoke the helper
+	for removal of a file.
+	* src/stash.c(_pam_krb5_stash_clean): add, to attempt to remove a file
+	using the helper, falling back to unlink() if the helper fails.
+	* src/v4.c(v4_destroy): use _pam_krb5_stash_clean instead of unlink()
+	to remove ticket files.
+	* src/v5.c(v5_destroy): use _pam_krb5_stash_clean instead of unlink()
+	to remove ccache files.
+
+2004-02-27 nalin
+	* src/session.c(pam_sm_open_session): only set variables if the ticket
+	files have non-zero-length filenames.
+
+2004-02-27 nalin
+	* src/storetmp.c(_pam_krb5_storetmp_data): open /dev/null three times to
+	ensure that pipe() won't give us any stdio descriptors.  Reintroduce the
+	call to execl() which got dropped earlier.
+
+2004-02-27 nalin
+	* src/pam_krb5_storetmp.c: add this helper, which creates a file using
+	mkstemp, filling it with supplied data.
+	* src/storetmp.c: add routines for using pam_krb5_storetmp to create
+	copies of session-specific ticket files after crossing an exec(), so
+	that a new SELinux context can apply to the new file.
+	* everything: update copyright statements to include this year.
+	* src/stash.c(_pam_krb5_stash_clone_v5): add, to call
+	_pam_krb5_storetmp_file to copy the ccache.
+	* src/v5.c(v5_save): clone the ticket file after creating it.
+	* src/stash.c(_pam_krb5_stash_clone_v4): add, to call
+	_pam_krb5_storetmp_file to copy the ccache.
+	* src/v4.c(v4_save): clone the ticket file after creating it.
+
+2004-01-07 nalin
+	* src/stash.h: always have a v4present field in the structure.
+	* src/v4.h: don't try 524 conversion if we don't have krb4 -- we
+	wouldn't be able to do anything with the results.  Noted by Jörg
+	Albert.
+
+2004-01-07 nalin
+	* src/v4.c(v4_save): make the stub v4_save function match the
+	non-stub's prototype.  Noted by Jörg Albert.
+	* src/v4.c(v4_destroy): don't return a value from this function, which
+	returns void.  Noted by Jörg Albert.
+
+2003-11-25 nalin
+	* README: updates
+
+2003-11-20 nalin
+	* src/userinfo.c, src/userinfo.h: when setting things up for a user,
+	obey "mappings" settings.  Because we can't be certain that the
+	generated principal will pass through aname_to_lname correctly, don't
+	do that any more.
+
+2003-11-20 nalin
+	* src/initopts.c(_pam_krb5_set_init_opts): set the ticket lifetime,
+	if configured, as an initopt.  This change lets us fix #109331.
+
+2003-11-20 nalin
+	* src/options.c, src/options.h: add code for parsing a "mappings"
+	setting.  Reintroduce ticket_lifetime, which I mistakenly thought was
+	a libdefault setting now.
+
+2003-11-20 nalin
+	* src/map.c, src/map.h: add mapping functions which mimic OpenLDAP's
+	saslRegexp functionality for mapping local user names to principal
+	names.
+
+2003-11-20 nalin
+	* src/init.c: instead of forcing the realm when parsing principals,
+	make realm= set the default realm.
+
+2003-11-19 nalin
+	* src/v5.c(v5_get_creds): use the realm from the unparsed version of
+	the principal name when constructing service principals.
+
+2003-09-22 nalin
+	* src/session.c: actually return where we were supposed to return.
+
+2003-09-19 nalin
+	* src/session.c: if v5attempted is 0 or v5result is not 0, don't
+	mess with tokens or credentials.  This allows apps which change their
+	UIDs to keep tokens unless they obtained some of their own.
+	* src/auth.c: before attempting authentication, reset v5attempted so
+	that we don't count a previous authentication failure as a failure
+	forever.
+	* src/acct.c: if v5attempted is not set in the user's stash, attempt
+	to get initial credentials for the user.  If the password check fails,
+	assume the user name is valid.
+
+2003-09-05 nalin
+	* src/stash.h: add a v5attempted field to track whether or not we've
+	attempted to get v5 creds for this user. add an afspag field to track
+	whether or not we've created an afs PAG.
+	* src/stash.c: initialize v5attempted and other fields, even if it's
+	redundant after using memset to clear the whole structure.
+	* src/auth.c: set v5attempted in the user's stash immediately after
+	all calls to v5_get_creds.
+	* src/acct.c: if v5attempted is not set in the user's stash, just
+	return PAM_IGNORE.
+	* src/tokens.c: only delete tokens on session close if we created a
+	pag, lest we lose tokens when reverting back in su.  Only warn about
+	errors getting tokens if v5attempted was set (else these become debug
+	messages).
+	* src/pam_krb5.8.in: note the behavior of the module in acct stacks.
+
+2003-09-05 nalin
+	* configure.ac: check for krb_time_to_life.
+	* src/v4.c: use krb_time_to_life to convert lifetimes from seconds to
+	bytes, not krb_life_to_time, which does the opposite.
+
+2003-08-14 nalin
+	* configure.ac: check for __posix_getpwnam_r.
+	* src/userinfo.c(get_pw): use __posix_getpwnam_r if it is available and
+	getpwnam_r isn't available
+
+2003-08-14 nalin
+	* src/session.c(pam_close_session), src/sly.c: return PAM_USER_UNKNOWN
+	instead of PAM_SERVICE_ERR if we fail to get information about the user.
+
+2003-08-14 nalin
+	* src/auth.c(pam_sm_authenticate): log the PAM error code we're
+	returning if we're returning a failure after all attempts have been
+	made.  Save the password entered by the user in the normal we-prompted
+	case.
+	* pam_krb5.spec: bump version to 2.0.1
+
+2003-08-14 nalin
+	* src/auth.c, src/acct.c, src/session.c(pam_open_session),
+	src/password.c: return PAM_USER_UNKNOWN instead of PAM_SERVICE_ERR if
+	we fail to get information about the user.
+	
+2003-08-14 nalin
+	* tests/run-tests: leave some time between expiring of passwords and
+	attempts to check if they've truly been expired, in case the server
+	implementation considers expiration time to be the end of the second
+	instead of the start
+
+2003-08-13 nalin
+	* src/xstr.c, src/xstr.h: add xstrfree().
+	* src/auth.c, src/options.c, src/password.c, src/prompter.c,
+	src/stash.c, src/userinfo.c, src/v4.c, src/v5.c: use xstrfree() to
+	free strings.
+
+Thu Aug  7 2003 nalin
+- Major overhaul and refactoring of everything.
+
+Thu Jan 30 2003 Nalin Dahyabhai <nalin@redhat.com>
+- Fix uninitialized pointer crash when we fail to retrieve cached return values.
+
+Wed Jan 29 2003 Nalin Dahyabhai <nalin@redhat.com>
+- Fix accidental double-free because libpam doesn't appear to make copies of
+  the names for data items.
+
+Fri Aug 23 2002 Nalin Dahyabhai <nalin@redhat.com>
+- Update docs on the location of the anoncvs tree.
+- Add warnings to the list of options we invoke $(CC) with.
+- Use per-user stash and stored return value names.
+
+Wed Aug  7 2002 Nalin Dahyabhai <nalin@redhat.com>
+- Treat PAM_REFRESH_CRED like PAM_REINITIALIZE_CRED.  From Jason Heiss.
+
+Fri May 24 2002 Nalin Dahyabhai <nalin@redhat.com>
+- Fix a parser bug, pointed out by Balazs GAL.
+
+Wed May 22 2002 Nalin Dahyabhai <nalin@redhat.com>
+- Guess that the current cell name is the same as the realm name, lower-cased.
+
+Fri Feb 15 2002 Nalin Dahyabhai <nalin@redhat.com>
+- Update docs to give info about the account management function.
+
+Mon Feb 11 2002 Nalin Dahyabhai <nalin@redhat.com>
+- Add account management, which checks for key expiration and .k5login files.
+
+Tue Sep 25 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Fix parsing of options which have multiple whitespace-separated values,
+  like afs_cells.
+
+Wed Sep  5 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Link with libresolv to get res_search, tip from Justin McNutt, who
+  built it statically.
+- Explicitly link with libdes425.
+- Handle cases where getpwnam_r fails but still sets the result pointer.
+- If use_authtok is given and there is no authtok, error out.
+
+Mon Aug 27 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Set the default realm when a default realm is specified.
+
+Thu Aug 23 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Only use Kerberos error codes when there is no PAM error yet.
+
+Wed Aug 22 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Add minimum UID support. (#52358)
+- Don't link pam_krb5 with libkrbafs; that dependency should only exist for
+  pam_krb5afs.
+
+Wed Aug 22 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Add minimum UID support (suggested by Matthew Miller).
+- Don't link pam_krb5 with libkrbafs.
+- Make all options in krb5.conf available as PAM config options.  This should
+  make things more interesting.
+
+Tue Jul 31 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Merge patch from Chris Chiappa for building with Heimdal.
+
+Mon Jul 24 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Note that we had to prepend the current directory to a given path in
+  dlopen.c when we had to (noted by Onime Clement).
+
+Tue Jul 17 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Return PAM_NEW_AUTHTOK_REQD when attempts to get initial credentials
+  fail with KRB5KDC_ERR_KEY_EXP (noted by Onime Clement).
+
+Thu Jul 12 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Add info about accessing the CVS repository to the README.
+- Parser cleanups (thanks to Dane Skow for a more complicated sample).
+
+Fri Jul  6 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Don't set forwardable and assorted other flags when getting password-
+  changing service ticket (noted, and fix supplied, by Onime Clement).
+- Try __posix_getpwnam_r on Solaris before we try getpwnam_r, which may
+  or may not be expecting the same number/type of arguments (noted by
+  Onime Clement).
+- Use krb5_aname_to_localname to convert the principal to a login name
+  and set PAM_USER to the result when authenticating.
+- Some autoconf fixes for failure cases.
+
+Wed Jun 26 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Use krb5_change_password() to change passwords.
+
+Tue Jun 12 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Use getpwnam_r instead of getpwnam when available.
+
+Fri Jun  8 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Cleanup some autoconf checks.
+
+Thu Jun  7 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Don't call initialize_krb5_error_table() or initialize_ovk_error_table()
+  if they're not found at compile-time (reported for RHL 6.x by Chris Riley).
+
+Thu May 31 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Note that [pam] is still checked in addition to [appdefaults].
+- Note that AFS and Kerberos IV support requires working Kerberos IV
+  configuration files (i.e., kinit -4 needs to work) (doc changes
+  suggested by Martin Schulz).
+
+Tue May 29 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Add max_timeout, timeout_shift, initial_timeout, and addressless options
+  (patches from Simon Wilkinson).
+- Fix the README to document the [appdefaults] section instead of [pam].
+- Change example host and cell names in the README to use example domains.
+
+Wed May  2 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Don't delete tokens unless we're also removing ticket files (report and
+  patch from Sean Dilda).
+- Report initialization errors better.
+
+Thu Apr 26 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Treat semicolons as a comment character, like hash marks (bug reported by
+  Greg Francis at Gonzaga University).
+- Use the [:blank:] equivalence class to simplify the configuration file parser.
+- Don't mess with the real environment.
+- Implement mostly-complete aging support.
+
+Sat Apr  7 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Tweak the man page (can't use italics and bold simultaneously).
+
+Fri Apr  6 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Restore the default TGS value (#35015).
+
+Wed Mar 28 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Fix a debug message.
+- Fix uninitialized pointer error.
+
+Mon Mar 26 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Don't fail to fixup the krb5 ccache if something goes wrong obtaining
+  v4 credentials or creating a krb4 ticket file (#33262).
+
+Thu Mar 22 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Fixup the man page.
+- Log return code from k_setpag() when debugging.
+- Create credentials and get tokens when setcred is called for REINITIALIZE.
+
+Wed Mar 21 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Don't twiddle ownerships until after we get AFS tokens.
+- Use the current time instead of the issue time when storing v4 creds, since
+  we don't know the issuing host's byte order.
+- Depend on a PAM development header again instead of pam-devel.
+
+Tue Mar 20 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Add a separate config file parser for compatibility with settings that
+  predate the appdefault API.
+- Use a version script under Linux to avoid polluting the global namespace.
+- Don't have a default for afs_cells.
+- Need to close the file when we succeed in fixing permissions (noted by
+  jlkatz@eos.ncsu.edu).
+
+Mon Mar 19 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Use the appdefault API to read krb5.conf if available.
+- Create v4 tickets in such a way as to allow 1.2.2 to not think there's
+  something fishy going on.
+
+Tue Feb 13 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Don't log unknown user names to syslog -- they might be sensitive information.
+
+Fri Feb  9 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Handle cases where krb5_init_context() fails.
+
+Wed Jan 17 2001 Nalin Dahyabhai <nalin@redhat.com>
+- Be more careful around memory allocation (fixes from David J. MacKenzie).
+
+Mon Jan 15 2001 Nalin Dahyabhai <nalin@redhat.com>
+- No fair trying to make me authenticate '(null)'!
+
+Wed Nov  7 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Only try to delete ccache files once.
+- Ignore extra data in v4 TGTs, but do log it.
+- Require "validate" to be true to try validating, and fail if validation fails.
+
+Thu Aug 10 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Fix handing of null passwords.
+
+Wed Jul  5 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Integrate some fixes for Solaris 7 from Trevor Schroeder (flock.c is
+  entirely his).
+
+Tue Jun 27 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Integrate Seth Vidal's "no_user_check" argument, so that non-privileged
+  users (i.e., secure web servers) can also do checks.
+
+Wed May 17 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Make errors chown()ing ccache files non-fatal if (getuid() != 0), suggested
+  by Steve Langasek.
+
+Mon May 15 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Attempt to get initial Kerberos IV credentials when we get Kerberos 5 creds
+
+Thu Apr 20 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Chris Chiappa's modifications for customizing the ccache directory
+
+Wed Apr 19 2000 Nalin Dahyabhai <nalin@redhat.com>
+- Mark Dawson's fix for krb4_convert not being forced on when afs_cells defined
+
+Thu March 23 2000 Nalin Dahyabhai <nalin@redhat.com>
+- fix problem with leftover ticket files after multiple setcred() calls
+
+Mon March 20 2000 Nalin Dahyabhai <nalin@redhat.com>
+- add proper copyright statements
+- save password for modules later in the stack
+
+Fri March 03 2000 Nalin Dahyabhai <nalin@redhat.com>
+- clean up prompter
+
+Thu March 02 2000 Nalin Dahyabhai <nalin@redhat.com>
+- add krbafs as a requirement
+
+Fri February 04 2000 Nalin Dahyabhai <nalin@redhat.com>
+- pick up non-afs PAM config files again
+
+Wed February 02 2000 Nalin Dahyabhai <nalin@redhat.com>
+- autoconf and putenv() fixes for broken apps
+- fix for compressed man pages
+
+Fri January 14 2000 Nalin Dahyabhai <nalin@redhat.com>
+- fix stupid bug in password-changing
+- add check that user exists in Kerberos before prompting to make password-
+  changing sane for mixed environments
+
+Thu January 6 2000 Nalin Dahyabhai <nalin@redhat.com>
+- merge in spelling and other fixes from Michael K. Johnson
+- modify to build both normal and AFS-aware version if krbafs.h is found
+
+Fri December 31 1999 Nalin Dahyabhai <nalin@redhat.com>
+- change to using ticket files created with mkstemp()
+
+Tue December 28 1999 Nalin Dahyabhai <nalin@redhat.com>
+- make setcred() return the same code as authenticate() to make sure that libpam
+  walks the auth stack the same way for both functions
+
+Wed December 22 1999 Nalin Dahyabhai <nalin@redhat.com>
+- add man pages that don't mention AFS at all
+
+Tue November 30 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- add linking with libcrypt, remove linking with libpam
+
+Mon November 29 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- Make creating the Kerberos IV ticket a non-fatal error if there are problems.
+- Add man pages.
+
+Mon November 8 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- Clean up PAM_AUTHTOK_RECOVER{,Y}_ERR definition problems and Solaris LD flags.
+  Problems spotted and solution proposed by Nitin Dahyabhai <nitind@pobox.com>.
+
+Wed November 3 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- Massive restructuring and cleaning out of 1.0-specific code.
+
+Mon October 4 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- Update for krb5 1.1 release
+
+Mon July 26 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- Configure should die if krb5.h or krbafs.h isn't found (bfdimmic@eos.ncsu.edu)
+
+Thu July 15 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- Added reason to authentication failure messages (wjlyerly@eos.ncsu.edu)
+- Only prompt for second password if first password fails
+
+Fri June 18 1999 Nalin Dahyabhai <nalin.dahyabhai@pobox.com>
+- First public release.  Bwah-ha-ha-ha-ha-ha-ha!

@@ -1,0 +1,52 @@
+Winbind makes users who are members of a domain appear to be normal users, with
+the domain name frequently included as a prefix of the user name.  Kerberos
+doesn't handle this perfectly.
+
+Specifically, for a user named tester in domain TEST and realm
+TEST.EXAMPLE.COM, we have two names.
+
+Kerberos principal name (userPrincipalName): tester@TEST.EXAMPLE.COM
+Winbind/POSIX user name:                     TEST\tester
+
+For certain internal functions (such as access control checking using a
+user's .k5login file), the library will need to convert a principal name
+to a user name.  This is controlled by the 'auth_to_local_names' and
+'auth_to_local' configuration settings for the default realm in /krb5.conf.
+One such mapping would look like:
+  [libdefaults]
+    default_relam = TEST.EXAMPLE.COM
+  [realms]
+    TEST.EXAMPLE.COM = {
+      auth_to_local = RULE:[1:$0\$1](TEST\.EXAMPLE\.COM\\.*)s/TEST\.EXAMPLE\.COM/TEST/g
+      auth_to_local = DEFAULT
+    }
+
+The argument to RULE: is the concatentation of:
+* An optional input formulation
+  "[" number-of-components ":" template "]"
+  Where number-of-components is the number of instance parts + 1, and the
+  template mixes literal text with portions of the principal name ($1
+  is the root part, $2 is the first instance, $3 the second, etc., $0 the
+  realm in MIT krb5 1.3.4 and later).
+* An optional regex
+  If specified, the formulated string must match this regexp for this rule
+  to be applied.
+* An optional sed expression
+  "s/" matchexp "/" output "/" ["g"]
+
+The DEFAULT rule more or less equates to
+  RULE:[1:$1]
+and must be explicitly listed to benefit from its effects if any RULEs are
+specified.
+
+This solves one problem, but pam_krb5 needs some way to convert a user name
+which is provided by PAM into a principal name, and there is no configurable
+way to do this using the Kerberos libraries.  To support this, pam_krb5 has a
+"mappings" configuration directive which can be used to map a user name to a
+principal name.  The directive takes pairs of arguments (regexps and output
+specifiers).  A specifier can refer to a substring matched in its regexp by
+specifying a "$" and the relative location of the substring in the regexp.
+  [appdefaults]
+   pam = {
+     mappings = ^TEST\\(.*)$ $1@TEST.EXAMPLE.COM
+   }

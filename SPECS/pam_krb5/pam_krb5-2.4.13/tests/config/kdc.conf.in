@@ -1,0 +1,17 @@
+[kdcdefaults]
+ kdc_ports = 8801
+ kdc_tcp_ports = 8801
+
+[realms]
+ EXAMPLE.COM = {
+  pkinit_identity = PKCS12:@TESTDIR@/kdc/@TESTHOST@.p12
+  pkinit_anchors = FILE:@TESTDIR@/kdc/ca.crt
+  acl_file = @TESTDIR@/config/kadm5.acl
+  admin_keytab = @TESTDIR@/kdc/kadm5.keytab
+  dict_file = /usr/share/dict/words
+  database_name = @TESTDIR@/kdc/principal
+  key_stash_file = @TESTDIR@/kdc/stash_file
+  supported_enctypes = aes256-cts:normal rc4-hmac:normal des3-cbc-sha1:normal des-cbc-crc:normal
+  kpasswd_port = 8802
+  kadmind_port = 8803
+ }

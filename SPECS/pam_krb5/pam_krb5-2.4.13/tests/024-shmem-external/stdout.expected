@@ -1,0 +1,24 @@
+
+Forking, without use_shmem, with external:
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+AUTH	0	Success
+Calling module `pam_krb5.so'.
+ESTCRED	0	Success
+OPENSESS	0	Success
+/dev/bogus-missing-file
+CLOSESESS	0	Success
+DELCRED	0	Success
+
+Forking, with use_shmem, with external:
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+AUTH	0	Success
+Sending environment = `pam_krb5_stash_${test_principal}_EXAMPLE.COM__1_shm=KEY/UID'.
+Calling module `pam_krb5.so'.
+Environment = `pam_krb5_stash_${test_principal}_EXAMPLE.COM__1_shm=KEY/UID'.
+ESTCRED	0	Success
+OPENSESS	0	Success
+FILE:$testdir/kdc/krb5_cc_$UID_XXXXXX
+CLOSESESS	0	Success
+DELCRED	0	Success

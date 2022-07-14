@@ -1,0 +1,10 @@
+
+Checking handling of options.
+
+Default ccache directory.
+Calling module `pam_krb5.so'.
+`Password: ' -> `foo'
+AUTH	0	Success
+ESTCRED	0	Success
+FILE:/tmp/krb5_cc_$UID_XXXXXX
+DELCRED	0	Success

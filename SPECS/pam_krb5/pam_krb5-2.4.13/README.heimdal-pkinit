@@ -1,0 +1,4 @@
+In addition to specifying the user's pkinit_identity to pam_krb5, Heimdal
+expects, at minimum, to be configured with the location of the trusted root
+certificates using the "pkinit_anchors" option in the [libdefaults] section
+of krb5.conf.

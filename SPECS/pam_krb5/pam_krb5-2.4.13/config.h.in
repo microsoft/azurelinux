@@ -1,0 +1,517 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to the ordered list of methods which should be used when attempting
+   to get tickets for use as armor. */
+#undef DEFAULT_ARMOR_STRATEGY
+
+/* Define to the name of the directory in which ccache files will be stored by
+   default. */
+#undef DEFAULT_CCACHE_DIR
+
+/* Define if we should read the default ccname from libkrb5. */
+#undef DEFAULT_CCNAME_FROM_LIBKRB5
+
+/* Define to the template used to generate name of the user's ccache. */
+#undef DEFAULT_CCNAME_TEMPLATE
+
+/* Set to the default value for the "chpw_prompt" setting. */
+#undef DEFAULT_CHPW_PROMPT
+
+/* Set to the default value for the "external" setting. */
+#undef DEFAULT_EXTERNAL
+
+/* Define to the default location for your keytab file, which will be used for
+   verifying TGTs. */
+#undef DEFAULT_KEYTAB_LOCATION
+
+/* Set to the default value for the "multiple_ccaches" setting. */
+#undef DEFAULT_MULTIPLE_CCACHES
+
+/* Set to the default value for the "no_cred_session" setting. */
+#undef DEFAULT_NO_CRED_SESSION
+
+/* Set to the default location of the client's private key and PKI
+   certificate. */
+#undef DEFAULT_PKINIT_IDENTITY
+
+/* Set to the default list of preauthentication options. */
+#undef DEFAULT_PREAUTH_OPTIONS
+
+/* Define to the realm name which will be used if no realm is given as a
+   parameter and none is given in krb5.conf. */
+#undef DEFAULT_REALM
+
+/* Define to the ordered list of methods which should be used when attempting
+   to set AFS tokens. */
+#undef DEFAULT_TOKEN_STRATEGY
+
+/* Set to the default value for the "use-shmem" setting. */
+#undef DEFAULT_USE_SHMEM
+
+/* Define to 1 if translation of program messages to the user's native
+   language is requested. */
+#undef ENABLE_NLS
+
+/* Define to enable token-setting support. */
+#undef HAVE_AFS
+
+/* Define to 1 if you have the MacOS X function CFLocaleCopyCurrent in the
+   CoreFoundation framework. */
+#undef HAVE_CFLOCALECOPYCURRENT
+
+/* Define to 1 if you have the MacOS X function CFPreferencesCopyAppValue in
+   the CoreFoundation framework. */
+#undef HAVE_CFPREFERENCESCOPYAPPVALUE
+
+/* Define to 1 if you have the <com_err.h> header file. */
+#undef HAVE_COM_ERR_H
+
+/* Define if the GNU dcgettext() function is already present or preinstalled.
+   */
+#undef HAVE_DCGETTEXT
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define if your krb5.h declares the error_message() function. */
+#undef HAVE_ERROR_MESSAGE_DECL
+
+/* Define to 1 if you have the <et/com_err.h> header file. */
+#undef HAVE_ET_COM_ERR_H
+
+/* Define to 1 if you have the `getpwnam_r' function. */
+#undef HAVE_GETPWNAM_R
+
+/* Define if the GNU gettext() function is already present or preinstalled. */
+#undef HAVE_GETTEXT
+
+/* Define if you have the iconv() function and it works. */
+#undef HAVE_ICONV
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `keyctl_chown' function. */
+#undef HAVE_KEYCTL_CHOWN
+
+/* Define if you have libkeyutils. */
+#undef HAVE_KEYUTILS
+
+/* Define to 1 if you have the <keyutils.h> header file. */
+#undef HAVE_KEYUTILS_H
+
+/* Define to 1 if the system has the type `krb5_addresses'. */
+#undef HAVE_KRB5_ADDRESSES
+
+/* Define to 1 if `address' is a member of `krb5_address'. */
+#undef HAVE_KRB5_ADDRESS_ADDRESS
+
+/* Define to 1 if `addrtype' is a member of `krb5_address'. */
+#undef HAVE_KRB5_ADDRESS_ADDRTYPE
+
+/* Define to 1 if `addr_type' is a member of `krb5_address'. */
+#undef HAVE_KRB5_ADDRESS_ADDR_TYPE
+
+/* Define to 1 if `contents' is a member of `krb5_address'. */
+#undef HAVE_KRB5_ADDRESS_CONTENTS
+
+/* Define to 1 if `length' is a member of `krb5_address'. */
+#undef HAVE_KRB5_ADDRESS_LENGTH
+
+/* Define to 1 if you have the `krb5_allow_weak_crypto' function. */
+#undef HAVE_KRB5_ALLOW_WEAK_CRYPTO
+
+/* Define to 1 if you have the `krb5_aname_to_localname' function. */
+#undef HAVE_KRB5_ANAME_TO_LOCALNAME
+
+/* Define to 1 if `ad_type' is a member of `krb5_authdata'. */
+#undef HAVE_KRB5_AUTHDATA_AD_TYPE
+
+/* Define to 1 if `contents' is a member of `krb5_authdata'. */
+#undef HAVE_KRB5_AUTHDATA_CONTENTS
+
+/* Define to 1 if `len' is a member of `krb5_authdata'. */
+#undef HAVE_KRB5_AUTHDATA_LEN
+
+/* Define to 1 if `length' is a member of `krb5_authdata'. */
+#undef HAVE_KRB5_AUTHDATA_LENGTH
+
+/* Define to 1 if `val' is a member of `krb5_authdata'. */
+#undef HAVE_KRB5_AUTHDATA_VAL
+
+/* Define to 1 if you have the `krb5_auth_con_setuserkey' function. */
+#undef HAVE_KRB5_AUTH_CON_SETUSERKEY
+
+/* Define to 1 if you have the `krb5_auth_con_setuseruserkey' function. */
+#undef HAVE_KRB5_AUTH_CON_SETUSERUSERKEY
+
+/* Define to 1 if you have the `krb5_cc_cache_match' function. */
+#undef HAVE_KRB5_CC_CACHE_MATCH
+
+/* Define to 1 if you have the `krb5_cc_copy_creds' function. */
+#undef HAVE_KRB5_CC_COPY_CREDS
+
+/* Define to 1 if you have the `krb5_cc_get_full_name' function. */
+#undef HAVE_KRB5_CC_GET_FULL_NAME
+
+/* Define to 1 if you have the `krb5_cc_new_unique' function. */
+#undef HAVE_KRB5_CC_NEW_UNIQUE
+
+/* Define to 1 if you have the `krb5_cc_support_switch' function. */
+#undef HAVE_KRB5_CC_SUPPORT_SWITCH
+
+/* Define to 1 if you have the `krb5_change_password' function. */
+#undef HAVE_KRB5_CHANGE_PASSWORD
+
+/* Define to 1 if the system has the type `krb5_const_realm'. */
+#undef HAVE_KRB5_CONST_REALM
+
+/* Define if your krb5.h declares the krb5_copy_addr() function. */
+#undef HAVE_KRB5_COPY_ADDR
+
+/* Define to 1 if `flags.b' is a member of `krb5_creds'. */
+#undef HAVE_KRB5_CREDS_FLAGS_B
+
+/* Define to 1 if `flags.i' is a member of `krb5_creds'. */
+#undef HAVE_KRB5_CREDS_FLAGS_I
+
+/* Define to 1 if `is_skey' is a member of `krb5_creds'. */
+#undef HAVE_KRB5_CREDS_IS_SKEY
+
+/* Define to 1 if `keyblock' is a member of `krb5_creds'. */
+#undef HAVE_KRB5_CREDS_KEYBLOCK
+
+/* Define to 1 if `session' is a member of `krb5_creds'. */
+#undef HAVE_KRB5_CREDS_SESSION
+
+/* Define to 1 if `ticket_flags' is a member of `krb5_creds'. */
+#undef HAVE_KRB5_CREDS_TICKET_FLAGS
+
+/* Define to 1 if you have the `krb5_enctype_enable' function. */
+#undef HAVE_KRB5_ENCTYPE_ENABLE
+
+/* Define to 1 if you have the `krb5_enctype_to_string' function. */
+#undef HAVE_KRB5_ENCTYPE_TO_STRING
+
+/* Define to 1 if you have the `krb5_free_default_realm' function. */
+#undef HAVE_KRB5_FREE_DEFAULT_REALM
+
+/* Define to 1 if you have the `krb5_free_keytab_entry_contents' function. */
+#undef HAVE_KRB5_FREE_KEYTAB_ENTRY_CONTENTS
+
+/* Define to 1 if you have the `krb5_free_string' function. */
+#undef HAVE_KRB5_FREE_STRING
+
+/* Define to 1 if you have the `krb5_free_unparsed_name' function. */
+#undef HAVE_KRB5_FREE_UNPARSED_NAME
+
+/* Define if your krb5.h declares the krb5_get_all_client_addrs() function. */
+#undef HAVE_KRB5_GET_ALL_CLIENT_ADDRS
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_alloc' function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_ALLOC
+
+/* Define if your library provides both `krb5_get_init_creds_opt_alloc' and
+   `krb5_get_init_creds_opt_free'. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_ALLOC_FREE
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_free' function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_FREE
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_canonicalize'
+   function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_CANONICALIZE
+
+/* Define to 1 if you have the
+   `krb5_get_init_creds_opt_set_change_password_prompt' function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_CHANGE_PASSWORD_PROMPT
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_fast_ccache'
+   function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_FAST_CCACHE
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_fast_flags'
+   function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_FAST_FLAGS
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_out_ccache'
+   function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_OUT_CCACHE
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_pa' function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_PA
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_pkinit' function.
+   */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_PKINIT
+
+/* Define to 1 if you have the `krb5_get_init_creds_opt_set_preauth_list'
+   function. */
+#undef HAVE_KRB5_GET_INIT_CREDS_OPT_SET_PREAUTH_LIST
+
+/* Define to 1 if you have the `krb5_get_profile' function. */
+#undef HAVE_KRB5_GET_PROFILE
+
+/* Define to 1 if you have the `krb5_get_prompt_types' function. */
+#undef HAVE_KRB5_GET_PROMPT_TYPES
+
+/* Define to 1 if you have the <krb5.h> header file. */
+#undef HAVE_KRB5_H
+
+/* Define to 1 if you have the `krb5_init_secure_context' function. */
+#undef HAVE_KRB5_INIT_SECURE_CONTEXT
+
+/* Define to 1 if `contents' is a member of `krb5_keyblock'. */
+#undef HAVE_KRB5_KEYBLOCK_CONTENTS
+
+/* Define to 1 if `enctype' is a member of `krb5_keyblock'. */
+#undef HAVE_KRB5_KEYBLOCK_ENCTYPE
+
+/* Define to 1 if `keytype' is a member of `krb5_keyblock'. */
+#undef HAVE_KRB5_KEYBLOCK_KEYTYPE
+
+/* Define to 1 if `keyvalue' is a member of `krb5_keyblock'. */
+#undef HAVE_KRB5_KEYBLOCK_KEYVALUE
+
+/* Define to 1 if `length' is a member of `krb5_keyblock'. */
+#undef HAVE_KRB5_KEYBLOCK_LENGTH
+
+/* Define to 1 if you have the <krb5/krb5.h> header file. */
+#undef HAVE_KRB5_KRB5_H
+
+/* Define if your krb5.h declares the krb5_os_hostaddr() function. */
+#undef HAVE_KRB5_OS_HOSTADDR
+
+/* Define if your krb5.h declares the krb5_os_localaddr() function. */
+#undef HAVE_KRB5_OS_LOCALADDR
+
+/* Define to 1 if you have the `krb5_parse_name_flags' function. */
+#undef HAVE_KRB5_PARSE_NAME_FLAGS
+
+/* Define to 1 if the system has the type `krb5_principal_data'. */
+#undef HAVE_KRB5_PRINCIPAL_DATA
+
+/* Define to 1 if `data' is a member of `krb5_principal_data'. */
+#undef HAVE_KRB5_PRINCIPAL_DATA_DATA
+
+/* Define to 1 if `length' is a member of `krb5_principal_data'. */
+#undef HAVE_KRB5_PRINCIPAL_DATA_LENGTH
+
+/* Define to 1 if `name.name_string.len' is a member of `krb5_principal_data'.
+   */
+#undef HAVE_KRB5_PRINCIPAL_DATA_NAME_NAME_STRING_LEN
+
+/* Define to 1 if `name.name_string.val' is a member of `krb5_principal_data'.
+   */
+#undef HAVE_KRB5_PRINCIPAL_DATA_NAME_NAME_STRING_VAL
+
+/* Define to 1 if `realm' is a member of `krb5_principal_data'. */
+#undef HAVE_KRB5_PRINCIPAL_DATA_REALM
+
+/* Define to 1 if `realm.data' is a member of `krb5_principal_data'. */
+#undef HAVE_KRB5_PRINCIPAL_DATA_REALM_DATA
+
+/* Define to 1 if `realm.length' is a member of `krb5_principal_data'. */
+#undef HAVE_KRB5_PRINCIPAL_DATA_REALM_LENGTH
+
+/* Define to 1 if `prompt_type' is a member of `krb5_prompt'. */
+#undef HAVE_KRB5_PROMPT_PROMPT_TYPE
+
+/* Define to 1 if you have the `krb5_set_password' function. */
+#undef HAVE_KRB5_SET_PASSWORD
+
+/* Define to 1 if you have the `krb5_set_principal_realm' function. */
+#undef HAVE_KRB5_SET_PRINCIPAL_REALM
+
+/* Define to 1 if you have the `krb5_set_trace_callback' function. */
+#undef HAVE_KRB5_SET_TRACE_CALLBACK
+
+/* Define to 1 if `client' is a member of `krb5_ticket'. */
+#undef HAVE_KRB5_TICKET_CLIENT
+
+/* Define to 1 if `enc_part2' is a member of `krb5_ticket'. */
+#undef HAVE_KRB5_TICKET_ENC_PART2
+
+/* Define to 1 if `ticket.transited.contents' is a member of `krb5_ticket'. */
+#undef HAVE_KRB5_TICKET_TICKET_TRANSITED_CONTENTS
+
+/* Define to 1 if you have the `krb5_xfree' function. */
+#undef HAVE_KRB5_XFREE
+
+/* Define to 1 if you have the `crypt' library (-lcrypt). */
+#undef HAVE_LIBCRYPT
+
+/* Define to 1 if you have the `dl' library (-ldl). */
+#undef HAVE_LIBDL
+
+/* Define to 1 if you have the `keyutils' library (-lkeyutils). */
+#undef HAVE_LIBKEYUTILS
+
+/* Define to 1 if you have the `pam' library (-lpam). */
+#undef HAVE_LIBPAM
+
+/* Define to 1 if you have the `resolv' library (-lresolv). */
+#undef HAVE_LIBRESOLV
+
+/* Define to 1 if you have the `selinux' library (-lselinux). */
+#undef HAVE_LIBSELINUX
+
+/* Define to 1 if the system has the type `long long'. */
+#undef HAVE_LONG_LONG
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define if you have the misc_conv function. */
+#undef HAVE_MISC_CONV
+
+/* Define to 1 if you have the `profile_get_string' function. */
+#undef HAVE_PROFILE_GET_STRING
+
+/* Define to 1 if you have the <profile.h> header file. */
+#undef HAVE_PROFILE_H
+
+/* Define to 1 if you have the `profile_release' function. */
+#undef HAVE_PROFILE_RELEASE
+
+/* Define to 1 if you have the `profile_release_string' function. */
+#undef HAVE_PROFILE_RELEASE_STRING
+
+/* Define to 1 if you have the <security/pam_appl.h> header file. */
+#undef HAVE_SECURITY_PAM_APPL_H
+
+/* Define to 1 if you have the <security/pam_misc.h> header file. */
+#undef HAVE_SECURITY_PAM_MISC_H
+
+/* Define to 1 if you have the <security/pam_modules.h> header file. */
+#undef HAVE_SECURITY_PAM_MODULES_H
+
+/* Define to 1 if you have the <selinux/label.h> header file. */
+#undef HAVE_SELINUX_LABEL_H
+
+/* Define to 1 if you have the <selinux/selinux.h> header file. */
+#undef HAVE_SELINUX_SELINUX_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strtoll' function. */
+#undef HAVE_STRTOLL
+
+/* Define to 1 if the system has the type `struct krb5_trace_info'. */
+#undef HAVE_STRUCT_KRB5_TRACE_INFO
+
+/* Define to 1 if the system has the type `struct _krb5_trace_info'. */
+#undef HAVE_STRUCT__KRB5_TRACE_INFO
+
+/* Define to 1 if you have the <sys/ioccom.h> header file. */
+#undef HAVE_SYS_IOCCOM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `__posix_getpwnam_r' function. */
+#undef HAVE___POSIX_GETPWNAM_R
+
+/* Define if krb5_enctype_to_string() takes a size third. */
+#undef KRB5_ENCTYPE_TO_STRING_TAKES_A_SIZE_THIRD
+
+/* Define if krb5_get_init_creds_opt_free() takes two arguments. */
+#undef KRB5_GET_INIT_CREDS_OPT_ALLOC_FREE_TAKES_2_ARGS
+
+/* Define if krb5_get_init_creds_opt_set_canonicalize() takes three arguments.
+   */
+#undef KRB5_GET_INIT_CREDS_OPT_SET_CANONICALIZE_TAKES_3_ARGS
+
+/* Define if krb5_get_init_creds_opt_set_pkinit() takes 11 arguments. */
+#undef KRB5_GET_INIT_CREDS_OPT_SET_PKINIT_TAKES_11_ARGS
+
+/* Define to the name of your Kerberos 5 header. */
+#undef KRB5_H
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to the application name, which defines which appdefaults section
+   will be expected to hold this module's configuration in krb5.conf. */
+#undef PAM_KRB5_APPNAME
+
+/* Add attribute tags to help spot format specifier problems. */
+ #ifdef __GNUC__
+ #define PAM_KRB5_GNUC_PRINTF(__x,__y) __attribute__((format(printf,__x,__y)))
+ #else
+ #define PAM_KRB5_GNUC_PRINTF(__x,__y)
+ #endif
+
+
+/* Define to the proper qualifier (either const or nothing) for your PAM
+   implementation. */
+#undef PAM_KRB5_MAYBE_CONST
+
+/* Define to the principal name of the password-changing service for any given
+   realm. */
+#undef PASSWORD_CHANGE_PRINCIPAL
+
+/* The location of pam_krb5 helpers. */
+#undef PKGSECURITYDIR
+
+/* The location where the pam_krb5 module will be installed. */
+#undef SECURITYDIR
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Label directories if we create them. */
+#undef USE_SELINUX
+
+/* Version number of package */
+#undef VERSION
+
+
+ /* Why Y_? Because if we somehow pull in OpenSSL's <des_old.h>, it'll
+    undefine _ out from under us. */
+ #ifdef ENABLE_NLS
+ #include <libintl.h>
+ #define Y_(msgid) dgettext(PACKAGE, msgid)
+ #define N_(msgid) msgid
+ #else
+ #define Y_(msgid) (msgid)
+ #define N_(msgid) msgid
+ #endif /* ENABLE_NLS */
+

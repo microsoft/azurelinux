@@ -1,0 +1,56 @@
+.TH afs5log 8 2007/12/18 "@OS_DISTRIBUTION@" "System Administrator's Manual"
+
+.SH NAME
+afs5log \- AFS token initializer
+
+.SH SYNOPSIS
+afs5log [ [-v] [-5] [-k] [-p \fIpath\fP] [cell[=principal] ] ] [...]
+
+.SH DESCRIPTION
+The \fIafs5log\fP command uses Kerberos to obtain AFS tokens for the named
+cells.  If no cell is named, tokens are obtained for the local cell.  If the
+principal name of the \fIafs\fP service for the cell is known, the cell
+name may also be given in the form \fIcell\fP=\fIprincipal_name\fP.
+Attempts are made to obtain Kerberos IV credentials first, and if that fails,
+\fIafs5log\fP will create Kerberos 5 (\fI2b-style\fP) tokens.
+
+.SH ARGUMENTS
+.TP
+-v
+Turns on verbose mode.  \fIafs5log\fP will print debugging messages while it
+does its work.  Use more than once to get more detail.
+.TP
+-p \fIpath\fP
+Determine which cell the specified \fIpath\fP resides in, and obtain tokens for
+that cell.
+.TP
+-s \fIstrategy\fP
+Overrides the default token-setting strategy
+("\fI@DEFAULT_TOKEN_STRATEGY@\fP") with
+the named strategy.  Recognized strategy names include:
+ \fIrxk5\fP  rxk5 (requires OpenAFS 1.6 or later)
+ \fI2b\fP    rxkad "2b" (requires OpenAFS 1.2.8 or later)
+.TP
+-5
+Skip attempts to use Kerberos IV and just use \fI2b\fP-style tokens, which are
+only supported by OpenAFS 1.2.8 and later.
+.TP
+-k
+Skip attempts to use Kerberos IV and use \fIrxk5\fP-style tokens, which are
+only supported by OpenAFS 1.6 and later.
+.TP
+-n
+Assume that, if a cell name and a realm name differ only by case, that the
+name of the AFS service's principal name doesn't include an instance.
+
+.SH "SEE ALSO"
+.BR pam_krb5 (5)
+.BR krb5.conf (5)
+.br
+
+.SH BUGS
+Probably, but let's hope not.  If you find any, please file them in the
+bug database at http://bugzilla.redhat.com/ against the "pam_krb5" component.
+
+.SH AUTHOR
+Nalin Dahyabhai <nalin@redhat.com>
