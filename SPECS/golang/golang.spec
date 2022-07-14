@@ -118,7 +118,7 @@ fi
 %changelog
 * Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.18.4-1
 - Updated to version 1.18.4 to fix the following CVEs:
-- 2022-1705, 2022-28131, 2022-30630, 2022-30631, 2022-30632, 2022-30633, 2022-30635, 2022-32148
+- 2022-1705, 2022-1962, 2022-28131, 2022-30630, 2022-30631, 2022-30632, 2022-30633, 2022-30635, 2022-32148
 
 * Mon Jun 06 2022 Andrew Phelps <anphel@microsoft.com> - 1.18.3-1
 - Upgrade to version 1.18.3

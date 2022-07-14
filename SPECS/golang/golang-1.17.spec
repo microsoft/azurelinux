@@ -118,7 +118,7 @@ fi
 %changelog
 * Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.17.12-1
 - Updated to version 1.17.12 to fix the following CVEs:
-- 2022-1705, 2022-28131, 2022-30630, 2022-30631, 2022-30632, 2022-30633, 2022-30635, 2022-32148
+- 2022-1705, 2022-1962, 2022-28131, 2022-30630, 2022-30631, 2022-30632, 2022-30633, 2022-30635, 2022-32148
 
 * Tue Apr 12 2022 Muhammad Falak <mwani@microsoft.com> - 1.17.10-1
 - Bump version to 1.17.10 to address CVE-2021-44716
