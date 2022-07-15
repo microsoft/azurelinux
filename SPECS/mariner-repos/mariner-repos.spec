@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,8 @@ Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 Source12:       mariner-extended-debuginfo.repo
 Source13:       mariner-extended-debuginfo-preview.repo
+Source14:       mariner-base-srpms.repo
+Source15:       mariner-extended-srpms.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -208,12 +210,23 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-preview.repo
 
+%files base-srpms
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-base-srpms.repo
+
+%files extended-srpms
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-srpms.repo
+
 %files shared
 %dir %{_sysconfdir}/yum.repos.d
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-8
+- Add base-srpms and extended-srpms repos
+
 * Tue Apr 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-7
 - Add support for extended debuginfo repositories for Mariner 2.0
 
