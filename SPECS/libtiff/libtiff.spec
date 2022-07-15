@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
+# Also fixes CVE-2022-2057 and CVE-2022-2058.
 Patch0:         CVE-2022-2056.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
