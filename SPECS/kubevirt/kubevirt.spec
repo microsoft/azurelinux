@@ -137,9 +137,10 @@ install -p -m 0755 _out/tests/tests.test %{buildroot}%{_bindir}/virt-tests
 install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}%{_bindir}/
 
 # virt-launcher configurations
-install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/
-install -p -m 0644 cmd/virt-launcher/libvirtd.conf %{buildroot}%{_datadir}/
-install -p -m 0644 cmd/virt-launcher/nsswitch.conf %{buildroot}%{_datadir}/
+mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
+install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
+install -p -m 0644 cmd/virt-launcher/libvirtd.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
+install -p -m 0644 cmd/virt-launcher/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
 
 
 # virt-launcher SELinux policy needs to land in virt-handler container
@@ -186,13 +187,13 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %files virt-launcher
 %license LICENSE
 %doc README.md
+%dir %{_datadir}/kube-virt
+%dir %{_datadir}/kube-virt/virt-launcher
 %{_bindir}/virt-launcher
 %{_bindir}/virt-freezer
 %{_bindir}/virt-probe
 %{_bindir}/node-labeller.sh
-%{_datadir}/qemu.conf
-%{_datadir}/libvirtd.conf
-%{_datadir}/nsswitch.conf
+%{_datadir}/kube-virt/virt-launcher
 
 %files virt-operator
 %license LICENSE
