@@ -2183,7 +2183,6 @@
                 "junit",
                 "junitperf",
                 "jzlib",
-                "kubevirt",
                 "kured",
                 "libcontainers-common",
                 "libva",

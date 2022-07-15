@@ -16,7 +16,6 @@
 #
 
 
-%global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.51.0
@@ -29,10 +28,11 @@ URL:            https://github.com/kubevirt/kubevirt
 #Source0:       https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.51.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
+%global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  golang
 BuildRequires:  golang-packaging
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 BuildRequires:  pkgconfig(libvirt)
