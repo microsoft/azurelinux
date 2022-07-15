@@ -37,7 +37,7 @@ Patch13:        CVE-2021-23336.patch
 # CVE-2022-0391 patch backported from 3.7 courtesy of openSUSE
 # https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2022-0391-urllib_parse-newline-parsing.patch?expand=1 
 Patch14:        CVE-2022-0391.patch
-# CVE-2021-3733 patch backported from 3.7 courtesy of openSUSE
+# CVE-2021-3733 patch backported from 3.11 courtesy of openSUSE
 # https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2021-3733-fix-ReDoS-in-request.patch?expand=1
 Patch15:        CVE-2021-3733.patch
 BuildRequires:  pkg-config >= 0.28
