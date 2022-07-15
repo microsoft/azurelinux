@@ -1,0 +1,15 @@
+--- a/Lib/urllib2.py
++++ b/Lib/urllib2.py
+@@ -856,7 +856,7 @@ class AbstractBasicAuthHandler:
+ 
+     # allow for double- and single-quoted realm values
+     # (single quotes are a violation of the RFC, but appear in the wild)
+-    rx = re.compile('(?:[^,]*,)*[ \t]*([^ \t]+)[ \t]+'
++    rx = re.compile('(?:[^,]*,)*[ \t]*([^ \t,]+)[ \t]+'
+                     'realm=(["\']?)([^"\']*)\\2', re.I)
+ 
+     # XXX could pre-emptively send auth info already accepted (RFC 2617,
+--- /dev/null
++++ b/Misc/NEWS.d/next/Security/2021-01-31-05-28-14.bpo-43075.DoAXqO.rst
+@@ -0,0 +1 @@
++Fix Regular Expression Denial of Service (ReDoS) vulnerability in :class:`urllib.request.AbstractBasicAuthHandler`.  The ReDoS-vulnerable regex has quadratic worst-case complexity and it allows cause a denial of service when identifying crafted invalid RFCs. This ReDoS issue is on the client side and needs remote attackers to control the HTTP server.
