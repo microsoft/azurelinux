@@ -10,7 +10,8 @@ Distribution:   Mariner
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
 # CVE-2020-35522 also covers 35521.
 Patch0:         CVE-2020-35521.nopatch
-Patch1:         CVE-2022-2056_CVE-2022-2057_CVE-2022-2058.patch
+# Also fixes CVE-2022-2057 and CVE-2022-2058.
+Patch1:         CVE-2022-2056.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
