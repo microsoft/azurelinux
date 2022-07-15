@@ -1575,6 +1575,7 @@
                 "python-pycares",
                 "python-pycdlib",
                 "python-pycosat",
+                "python-pycryptodomex",
                 "python-pydbus",
                 "python-pymongo",
                 "python-PyMySQL",
