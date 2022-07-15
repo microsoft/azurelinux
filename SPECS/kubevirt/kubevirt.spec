@@ -21,7 +21,7 @@ Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.51.0
 Release:        1%{?dist}
-License:        Apache-2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Management
