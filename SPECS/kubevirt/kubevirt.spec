@@ -207,59 +207,76 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 
 %changelog
 * Thu Jul 14 2022 Kanika Nema <kanikanema@microsoft.com> - 0.51.0-1
-- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
-- Initial changes to build for Mariner
 - License verified
+- Initial changes to build for Mariner
+- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
+
 * Thu Mar 10 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.51.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.51.0
+
 * Fri Feb 11 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.50.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.50.0
+
 * Wed Jan 19 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Pack nft rules and nsswitch.conf for virt-handler
 - Drop kubevirt-psp-caasp.yaml and cleanup the spec
+
 * Wed Jan 12 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.49.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.49.0
   Includes the fix for CVE-2021-43565 (bsc#1193930)
+
 * Thu Dec 16 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.48.1
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.48.1
+
 * Fri Dec  3 2021 Guillaume GARDET <guillaume.gardet@opensuse.org>
 - Enable build on aarch64
+
 * Fri Nov 26 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Detect SLE15 SP4 build environment
+
 * Fri Nov 12 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.47.1
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.47.1
+
 * Tue Oct 19 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Pack only kubevirt-{operator,cr}.yaml into manifests
 - Include manifests/testing/* into tests package
 - Use disks-images-provider.yaml from upstream
+
 * Mon Oct 11 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.46.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.46.0
 - Drop upstreamed patch 0001-Specify-format-of-the-backing-image.patch
+
 * Thu Sep  9 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.45.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.45.0
+
 * Fri Aug 27 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Fix issue with recent qemu-img
   0001-Specify-format-of-the-backing-image.patch
+
 * Fri Aug 27 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.44.1
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.44.1
+
 * Mon Aug  9 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.44.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.44.0
+
 * Mon Jul 12 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Drop upstreamed patch 0002-Don-t-use-Bazel-in-build-manifests.sh.patch
 - Install node-labeller.sh in %%{_bindir}
 - Update to version 0.43.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.43.0
+
 * Wed Jun 30 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Generate meta info for containers during rpm build
+
 * Wed Jun  9 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Use registry.suse.com as the default fallback for sle
 - Rename macro registry_path to kubevirt_registry_path
@@ -268,8 +285,10 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 - Drop --skipj2 arg for build-manifests.sh
 - Update to version 0.42.1
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.42.1
+
 * Fri Jun  4 2021 Fabian Vogt <fvogt@suse.com>
 - Also specify the registry in kubevirt_containers_meta
+
 * Thu May 20 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Use git format-patch:
   0001-Don-t-build-virtctl-for-darwin-and-windows.patch
@@ -278,38 +297,52 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   dont-build-virtctl-darwin.patch
   dont-use-bazel-in-build-manifests.patch
   fix-double-free-of-VirDomain.patch
+
 * Thu May 20 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.41.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.41.0
+
 * Tue May 18 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Drop fix-virsh-domcapabilities-error.patch (bsc#1185119)
+
 * Mon May 17 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Do not package OLM manifests
+
 * Thu May  6 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Install virt-launcher SELinux policy (bsc#1185714)
+
 * Thu Apr 29 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Include release number into docker tag
 - Add kubevirt_containers_meta build service
+
 * Thu Apr 29 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Set default reg_path='registry.opensuse.org/kubevirt'
 - Add _constraints file with disk requirements
+
 * Fri Apr 23 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Fix virt-launcher crash
   fix-double-free-of-VirDomain.patch
+
 * Tue Apr 20 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Fix issue when calling `virsh-domcapabilities`
   fix-virsh-domcapabilities-error.patch
+
 * Tue Apr 20 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Package node-labeller.sh along with virt-launcher
+
 * Mon Apr 19 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.40.0
   Release notes https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0
+
 * Mon Apr 19 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Disable changelog generation via tar_scm service (too verbose)
+
 * Thu Apr 15 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Drop csv-generator
+
 * Wed Apr  7 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update registry path
+
 * Wed Mar  3 2021 vasily.ulyanov@suse.com
 - Update to version 0.38.1:
   * Run bazelisk run //plugins/cmd/uploader:uploader -- -workspace /home/prow/go/src/github.com/kubevirt/project-infra/../kubevirt/WORKSPACE -dry-run=false
@@ -518,8 +551,10 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * Extend VMI count metric to include osinfo
   * fix: change url and label name for "good-first-issue" on CONTRIBUTING.md
   Added patch: dont-use-bazel-in-build-manifests.patch
+
 * Mon Feb 15 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Add building of virt-tests
+
 * Wed Jan 20 2021 jfehlig@suse.com
 - Update to version 0.37.0:
   * Remove travis-ci logic for pushing to quay app registery
@@ -649,6 +684,7 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * Enable and fix tests
   * Fix gosec issue of: Potential file inclusion via variable
   Dropped patch: fix-goflags-overwrite.patch
+
 * Mon Dec 21 2020 jfehlig@suse.com
 - Update to version 0.36.0:
   * Functional test to verify vmis are migratable after update to from latest KubeVirt official release
@@ -894,9 +930,11 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * Make the name of components bold
   * Improved the Technical Overview description
   * Fixed typo
+
 * Fri Nov 13 2020 James Fehlig <jfehlig@suse.com>
 - Fix -buildmode=pie
   fix-goflags-overwrite.patch, dont-build-virtctl-darwin.patch
+
 * Tue Nov 10 2020 jfehlig@suse.com
 - Update to version 0.35.0:
   * sriov lane: skip flaky tests until their issue is resolved
@@ -1091,10 +1129,12 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * tests, libvmi: Introduce CloudInit NoCloud Network Data
   * functest for PR #4132
   * Fix coexistance of scsi and sata drives
+
 * Mon Nov  9 2020 James Fehlig <jfehlig@suse.com>
 - spec: Add rpmlintrc to filter statically-linked-binary warning
   for container-disk binary. The binary must be statically linked
   since it runs in a scratch container.
+
 * Fri Nov  6 2020 James Fehlig <jfehlig@suse.com>
 - spec: Generate the registry path for kubevirt-operator.yaml at
   build time. Prjconf macro 'registry_path' can be used to
@@ -1103,12 +1143,16 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   privileged PSP, to the manifests subpackage
 - spec: Don't add component name to DOCKER_PREFIX passed to
   build-manifests.sh
+
 * Sat Oct 31 2020 Jan Zerebecki <jzerebecki@suse.com>
 - Add package with built YAML manifests used to install kubevirt
+
 * Thu Oct 29 2020 James Fehlig <jfehlig@suse.com>
 - spec: Remove needless use of chmod and build-copy-artifacts.sh
+
 * Fri Oct 23 2020 James Fehlig <jfehlig@suse.com>
 - spec: Fix typo in date command
+
 * Wed Oct  7 2020 jfehlig@suse.com
 - Update to version 0.34.0:
   * jsc#ECO-2411
@@ -1393,9 +1437,11 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * Added e2e test for unused memory metric
   * Fix virtctl build for linux-amd64
   * Adds new metric kubevirt_vmi_memory_unused_bytes
+
 * Wed Sep 30 2020 James Fehlig <jfehlig@suse.com>
 - Preparation for initial submission to SLE15 SP2
   jsc#ECO-2411
+
 * Tue Sep 15 2020 dmueller@suse.com
 - Update to version 0.33.0:
   * Enhance operator functional tests to validate pods are torn down after kv cr is deleted
@@ -1567,6 +1613,7 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * Give the VM rename operation more time to create a new VM
   * Expose guest swap metrics
   * Use 'kill' instead of 'killall' for libvirtd in func test
+
 * Fri Sep 11 2020 dmueller@suse.com
 - add license/readmes
 - Update to version 0.32.0:
@@ -1582,32 +1629,41 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
   * tests, vmi_config: Fix expecter false positives In these tests, BExp-ecting "pass" always worked,   because the command line was matched. Splitting the word in 2 on the command line ensures   the match to happen (or not) in the result. Also removed unused 'fail' echos.
   * virtctl cli error handling
   * Re-enabling test pointing to #2272
+
 * Tue Jul 28 2020 James Fehlig <jfehlig@suse.com>
 - spec: Add 'ExclusiveArch: x86_64' since currently kubevirt only
   builds for x86_64
+
 * Wed Jul 22 2020 James Fehlig <jfehlig@suse.com>
 - Split out container-disk to a separate package since it is used
   by virt-handler and virt-launcher
+
 * Mon Jul 20 2020 James Fehlig <jfehlig@suse.com>
 - Update to 0.31.0
   Dropped rename-chroot.patch since the upstream variant is included
   in this release
+
 * Fri Jun 26 2020 James Fehlig <jfehlig@suse.com>
 - Rename chroot utility to virt-chroot
+
 * Wed Jun 24 2020 James Fehlig <jfehlig@suse.com>
 - Add container-disk to virt-handler package
+
 * Tue Jun 23 2020 James Fehlig <jfehlig@suse.com>
 - Update to 0.30.0
   Dropped build-fix.patch since the upstream variant is included
   in this release
+
 * Mon Jun 22 2020 James Fehlig <jfehlig@suse.com>
 - Add building of virt-launcher
+
 * Thu May 28 2020 James Fehlig <jfehlig@suse.com>
 - Add building of virt-handler and virt-operator
+
 * Mon May 11 2020 James Fehlig <jfehlig@suse.com>
 - Add building of virt-api and virt-controller
 - Fix build
   build-fix.patch
+
 * Wed May  6 2020 James Fehlig <jfehlig@suse.com>
 - Initial attempt to package kubevirt 0.29.0
-
