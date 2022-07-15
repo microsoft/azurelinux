@@ -5,8 +5,8 @@ Version:       2.11.0
 Release:       2%{?dist}
 Summary:       SSH2 protocol library for python
 License:       LGPLv2+
-Vendor:        Mariner
-Distribution:  Microsoft Corporation
+Distribution:  Mariner
+Vendor:        Microsoft Corporation
 URL:           https://github.com/paramiko/paramiko
 Source0:       %{url}/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
@@ -52,14 +52,19 @@ BuildRequires: python3-pynacl
 BuildRequires: python3-setuptools
 BuildRequires: python3-six
 %if %{with_check}
-BuildRequires: python3-pytest
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-six
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 Recommends:    %{py3_dist pyasn1} >= 0.1.7
 
 %description -n python%{python3_pkgversion}-%{srcname}
 %{paramiko_desc}
-
-Python 3 version.
 
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
@@ -77,6 +82,7 @@ sphinx-build-3 -b html sites/docs/ html/
 rm html/.buildinfo
 
 %check
+%{python3} -m pip install more-itertools
 PYTHONPATH=%{buildroot}%{python3_sitelib} pytest3
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -87,10 +93,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest3
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.11.0-2
-- Initial CBL-Mariner import from Fedora36 (License: LGPLv2)
+- Initial CBL-Mariner import from Fedora36 (License: MIT)
 - Adding as build dependency for apache-libcloud needed by cassandra-medusa.
 - Removing subpackage doc.
-- License Verified
+- License verified
 
 * Tue May 17 2022 Paul Howarth <paul@city-fan.org> - 2.11.0-1
 - Update to 2.11.0
