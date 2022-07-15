@@ -210,7 +210,7 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 * Thu Jul 14 2022 Kanika Nema <kanikanema@microsoft.com> - 0.51.0-1
 - License verified
 - Initial changes to build for Mariner
-- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
+- Initial CBL-Mariner import from openSUSE TumbleWeed (license: same as "License" tag)
 
 * Thu Mar 10 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 0.51.0
