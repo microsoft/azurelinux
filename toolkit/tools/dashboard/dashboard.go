@@ -94,7 +94,7 @@ func main() {
 			}
 
 			// If the file exists, check if there has been any updates since we last visited.
-			currFile.getUpdate(currStat)
+			go currFile.getUpdate(currStat)
 		}
 	}
 
