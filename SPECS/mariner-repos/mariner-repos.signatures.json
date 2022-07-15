@@ -6,13 +6,13 @@
   "mariner-debuginfo.repo": "30fa6120d3b0a11926f46151b0c0747dd05c63d82887383bd0dfece8e2cb41b8",
   "mariner-extended-preview.repo": "b7d5d89bb5ce1b1deade6c34aae8c9c9e62890eb235ac4a8557e5444a57b5ec9",
   "mariner-extended-debuginfo-preview.repo": "91bae443d61c28b444a880a27480eb1025cf3e43813c63acc6ba2b78b2513eb7",
-  "mariner-extended.repo": "fda0174a7e397ad730f73c27732b71ae1c5e8e44b7e15e5493545bf501a4e3c4",
+  "mariner-extended.repo": "fa22c4e1e4940e28671f9690494008bf816cd4c491589cd75caf7b2d30778246",
   "mariner-extended-debuginfo.repo": "2958ee03334cdc615175f3f2c5d9e8a4e81bc1996a3fbb7158f224c11960aa8c",
   "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
   "mariner-extras.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
   "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
   "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
-  "mariner-official-base.repo": "1022cf71d875a2d5df7d54145898a64912cee14c2ce47ed505032840e97054da",
+  "mariner-official-base.repo": "ea5f4ac0f37990b75d9f54201ad39e9c1d0e7d534573a85ad2dd1d39899080bd",
   "mariner-official-preview.repo": "db4d5a7df5a0e6876b60d06d06715b27ae87e3433ec51c98be16eefbe9375aaf"
  }
 }
