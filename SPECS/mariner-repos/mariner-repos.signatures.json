@@ -10,6 +10,9 @@
   "mariner-ui.repo": "3e434c6418de638ff919f373f666866d0e075b8f26deeec4b96fb47e1d62d9b3",
   "mariner-ui-preview.repo": "77a094a136cab2a927cffe92753e853f44b28607010cf48af7a2781edb7aded0",
   "mariner-microsoft.repo": "135b5d5b925fd351cdd3db9063895dc79eb6d6c49d891d6507a5acd8a0c6effc",
-  "mariner-microsoft-preview.repo": "92e7b972026de175bf744525a8a2e40cff94b1cd5d6489a12d024ec57da02de3"
+  "mariner-microsoft-preview.repo": "92e7b972026de175bf744525a8a2e40cff94b1cd5d6489a12d024ec57da02de3",
+  "mariner-base-srpms.repo": "3b9fef951dec8f77f02cba1353e005f8fab4c580bba0c62095eb713fc22901bd",
+  "mariner-update-srpms.repo": "0aaa1793136e593de958f01c006f719256b8ba78e0d98822a70b1791213fcb66",
+  "mariner-ui-srpms.repo": "20e2baecaf2960c5fa256233052dd421c5c3592d6ad34a525bec03bb79777f58"
  }
 }
