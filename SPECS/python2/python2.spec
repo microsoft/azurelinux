@@ -37,7 +37,7 @@ Patch13:        CVE-2021-23336.patch
 # CVE-2022-0391 patch backported from 3.7 courtesy of openSUSE
 # https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2022-0391-urllib_parse-newline-parsing.patch?expand=1 
 Patch14:        CVE-2022-0391.patch
-# CVE-2022-3733 patch backported from 3.7 courtesy of openSUSE
+# CVE-2021-3733 patch backported from 3.7 courtesy of openSUSE
 # https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2021-3733-fix-ReDoS-in-request.patch?expand=1
 Patch15:        CVE-2021-3733.patch
 BuildRequires:  pkg-config >= 0.28
@@ -253,7 +253,7 @@ make test
 
 %changelog
 * Fri Jul 15 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.7.18-10
-- Patch CVE-2022-3733
+- Patch CVE-2021-3733
 
 * Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.7.18-9
 - Patch CVE-2022-0391
