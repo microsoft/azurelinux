@@ -119,6 +119,22 @@ Requires:       %{name}-shared = %{version}-%{release}
 %description preview
 %{summary}
 
+%package base-srpms
+Summary:        CBL-Mariner base SRPMS repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description base-srpms
+%{summary}
+
+%package extended-srpms
+Summary:        CBL-Mariner extended SRPMS repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description extended-srpms
+%{summary}
+
 %package shared
 Summary:        Directories and files needed by all %{name} configurations.
 Group:          System Environment/Base
@@ -145,6 +161,8 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
+install -m 644 %{SOURCE14} $REPO_DIRECTORY
+install -m 644 %{SOURCE15} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
