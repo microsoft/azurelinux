@@ -1,43 +1,30 @@
+Summary:	    Multithreaded IO generation tool
+Name:		    fio
+Version:	    3.30
+Release:	    1%{?dist}
+License:	    GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		fio
-Version:	3.29
-Release:	1%{?dist}
-Summary:	Multithreaded IO generation tool
-
-License:	GPLv2
-URL:		http://git.kernel.dk/?p=fio.git;a=summary
-Source0:	http://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
-
-Patch0:		fio-3.29-link-t-io_uring-with-libaio.patch
-Patch1:		fio-3.29-use-LDFLAGS-for-dynamic-engines.patch
-
+URL:		    https://git.kernel.dk/?p=fio.git;a=summary
+Source0:	    https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
 BuildRequires:	gcc
 BuildRequires:	gnupg2
 BuildRequires:	libaio-devel
-BuildRequires:	zlib-devel
-BuildRequires:	python3-devel
-BuildRequires:	libnbd-devel
 BuildRequires:	libcurl-devel
+BuildRequires:	libnbd-devel
+BuildRequires:	librbd1-devel
+BuildRequires:	librdmacm-devel
+BuildRequires:	numactl-devel
 BuildRequires:	openssl-devel
-%ifarch x86_64 ppc64le
+BuildRequires:	python3-devel
+BuildRequires:	zlib-devel
+%ifarch x86_64
 BuildRequires:	libpmem-devel
 BuildRequires:	libpmemblk-devel
 %endif
-
-%ifnarch %{arm} %{ix86} ppc64le
-BuildRequires:	librbd1-devel
+%if %{with_check}
+BuildRequires:  CUnit-devel
 %endif
-
-%ifnarch %{arm}
-BuildRequires:	numactl-devel
-BuildRequires:	librdmacm-devel
-%endif
-BuildRequires: make
-
-# Don't create automated dependencies for the fio engines.
-# https://bugzilla.redhat.com/show_bug.cgi?id=1884954
-%global __provides_exclude_from ^%{_libdir}/fio/
 
 # Main fio package has soft dependencies on all the engine
 # subpackages, but allows the engines to be uninstalled if not needed
@@ -45,17 +32,13 @@ BuildRequires: make
 Recommends:     %{name}-engine-libaio
 Recommends:     %{name}-engine-http
 Recommends:     %{name}-engine-nbd
-%ifarch x86-64 ppc64le
+Recommends:     %{name}-engine-rados
+Recommends:     %{name}-engine-rbd
+Recommends:     %{name}-engine-rdma
+%ifarch x86-64
 Recommends:     %{name}-engine-dev-dax
 Recommends:     %{name}-engine-pmemblk
 Recommends:     %{name}-engine-libpmem
-%endif
-%ifnarch %{arm} %{ix86} ppc64le
-Recommends:     %{name}-engine-rados
-Recommends:     %{name}-engine-rbd
-%endif
-%ifnarch %{arm}
-Recommends:     %{name}-engine-rdma
 %endif
 
 %description
@@ -68,29 +51,29 @@ one wants to simulate.
 
 %package engine-libaio
 Summary:        Linux libaio engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-libaio
 Linux libaio engine for %{name}.
 
 %package engine-http
 Summary:        HTTP engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-http
 HTTP engine for %{name}.
 
 %package engine-nbd
 Summary:        Network Block Device engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-nbd
 Network Block Device (NBD) engine for %{name}.
 
-%ifarch x86_64 ppc64le
+%ifarch x86_64
 %package engine-dev-dax
 Summary:        PMDK dev-dax engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-dev-dax
 dev-dax engine for %{name}.
@@ -98,10 +81,10 @@ Read and write using device DAX to a persistent memory device
 (e.g., /dev/dax0.0) through the PMDK libpmem library.
 %endif
 
-%ifarch x86_64 ppc64le
+%ifarch x86_64
 %package engine-pmemblk
 Summary:        PMDK pmemblk engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-pmemblk
 pmemblk engine for %{name}.
@@ -109,10 +92,10 @@ Read and write using filesystem DAX to a file on a filesystem mounted with
 DAX on a persistent memory device through the PMDK libpmemblk library.
 %endif
 
-%ifarch x86_64 ppc64le
+%ifarch x86_64
 %package engine-libpmem
 Summary:        PMDK pmemblk engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-libpmem
 libpmem engine for %{name}.
@@ -120,35 +103,31 @@ Read and write using mmap I/O to a file on a filesystem mounted with DAX
 on a persistent memory device through the PMDK libpmem library.
 %endif
 
-%ifnarch %{arm} %{ix86} ppc64le
 %package engine-rados
 Summary:        Rados engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-rados
 Rados engine for %{name}.
 
 %package engine-rbd
 Summary:        Rados Block Device engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-rbd
 Rados Block Device (RBD) engine for %{name}.
-%endif
 
-%ifnarch %{arm}
 %package engine-rdma
 Summary:        RDMA engine for %{name}.
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description engine-rdma
 RDMA engine for %{name}.
-%endif
 
 %prep
 %autosetup -p1
 
-pathfix.py -i %{__python3} -pn \
+%py3_shebang_fix \
  tools/fio_jsonplus_clat2csv \
  tools/fiologparser.py \
  tools/hist/*.py \
@@ -160,14 +139,17 @@ sed -e 's,/usr/local/lib/,%{_libdir}/,g' -i os/os-linux.h
 
 %build
 ./configure --disable-optimizations --enable-libnbd --dynamic-libengines
-EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" make V=1 %{?_smp_mflags}
+EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 
 %install
-make install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio INSTALL="install -p"
+
+%check
+%make_build test
 
 %files
 %license COPYING MORAL-LICENSE
-%doc README REPORTING-BUGS HOWTO examples
+%doc README.rst REPORTING-BUGS HOWTO.rst examples
 %doc GFIO-TODO SERVER-TODO STEADYSTATE-TODO
 %dir %{_datadir}/%{name}
 %dir %{_libdir}/fio/
@@ -175,7 +157,7 @@ make install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio DESTDIR=$
 %{_mandir}/man1/*
 %{_datadir}/%{name}/*
 
-%ifarch x86_64 ppc64le
+%ifarch x86_64
 %files engine-dev-dax
 %{_libdir}/fio/fio-dev-dax.so
 %endif
@@ -186,7 +168,7 @@ make install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio DESTDIR=$
 %files engine-libaio
 %{_libdir}/fio/fio-libaio.so
 
-%ifarch x86_64 ppc64le
+%ifarch x86_64
 %files engine-libpmem
 %{_libdir}/fio/fio-libpmem.so
 %endif
@@ -194,25 +176,29 @@ make install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio DESTDIR=$
 %files engine-nbd
 %{_libdir}/fio/fio-nbd.so
 
-%ifarch x86_64 ppc64le
+%ifarch x86_64
 %files engine-pmemblk
 %{_libdir}/fio/fio-pmemblk.so
 %endif
 
-%ifnarch %{arm} %{ix86} ppc64le
 %files engine-rados
 %{_libdir}/fio/fio-rados.so
 
 %files engine-rbd
 %{_libdir}/fio/fio-rbd.so
-%endif
 
-%ifnarch %{arm}
 %files engine-rdma
 %{_libdir}/fio/fio-rdma.so
-%endif
 
 %changelog
+* Fri July 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.30-1
+- Promote to Mariner base repo
+- Update to latest upstream version and remove upstreamed patches
+- Remove provides filtering- fixed upstream
+- Remove references to architectures Mariner does not support
+- Add package test
+- Lint spec
+
 * Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.29-1
 - Updating to version 3.29 using Fedora 36 specs (license: MIT) as guidance.
 - License verified.
