@@ -13,8 +13,6 @@
   "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
   "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
   "mariner-official-base.repo": "1022cf71d875a2d5df7d54145898a64912cee14c2ce47ed505032840e97054da",
-  "mariner-official-preview.repo": "db4d5a7df5a0e6876b60d06d06715b27ae87e3433ec51c98be16eefbe9375aaf",
-  "mariner-base-srpms.repo": "3b9fef951dec8f77f02cba1353e005f8fab4c580bba0c62095eb713fc22901bd",
-  "mariner-extended-srpms.repo": "9559af5ed24353db2929b97cf2a9d9bfe133f161f7fc7ca1f3b11bfc862cf3f5"
+  "mariner-official-preview.repo": "db4d5a7df5a0e6876b60d06d06715b27ae87e3433ec51c98be16eefbe9375aaf"
  }
 }

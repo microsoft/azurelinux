@@ -21,8 +21,6 @@ Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 Source12:       mariner-extended-debuginfo.repo
 Source13:       mariner-extended-debuginfo-preview.repo
-Source14:       mariner-base-srpms.repo
-Source15:       mariner-extended-srpms.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -119,22 +117,6 @@ Requires:       %{name}-shared = %{version}-%{release}
 %description preview
 %{summary}
 
-%package base-srpms
-Summary:        CBL-Mariner base SRPMS repo file.
-Group:          System Environment/Base
-Requires:       %{name}-shared = %{version}-%{release}
-
-%description base-srpms
-%{summary}
-
-%package extended-srpms
-Summary:        CBL-Mariner extended SRPMS repo file.
-Group:          System Environment/Base
-Requires:       %{name}-shared = %{version}-%{release}
-
-%description extended-srpms
-%{summary}
-
 %package shared
 Summary:        Directories and files needed by all %{name} configurations.
 Group:          System Environment/Base
@@ -161,8 +143,6 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
-install -m 644 %{SOURCE14} $REPO_DIRECTORY
-install -m 644 %{SOURCE15} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -227,14 +207,6 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %files preview
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-preview.repo
-
-%files base-srpms
-%defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-base-srpms.repo
-
-%files extended-srpms
-%defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-srpms.repo
 
 %files shared
 %dir %{_sysconfdir}/yum.repos.d
