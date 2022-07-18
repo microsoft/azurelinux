@@ -18,9 +18,6 @@ Source7:        mariner-extras.repo
 Source8:        mariner-extras-preview.repo
 Source9:        mariner-microsoft.repo
 Source10:       mariner-microsoft-preview.repo
-Source11:       mariner-base-srpms.repo
-Source12:       mariner-update-srpms.repo
-Source13:       mariner-ui-srpms.repo
 
 Requires(post):  gpgme
 Requires(post):  rpm
@@ -86,30 +83,6 @@ Requires: %{name} = %{version}-%{release}
 %description microsoft-preview
 %{summary}
 
-%package microsoft-base-srpms
-Summary:  CBL-Mariner Base SRPMS repository.
-Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
-
-%description microsoft-base-srpms
-%{summary}
-
-%package microsoft-update-srpms
-Summary:  CBL-Mariner Update SRPMS repository.
-Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
-
-%description microsoft-update-srpms
-%{summary}
-
-%package microsoft-ui-srpms
-Summary:  CBL-Mariner UI SRPMS repository.
-Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
-
-%description microsoft-ui-srpms
-%{summary}
-
 %install
 rm -rf $RPM_BUILD_ROOT
 export REPO_DIRECTORY="$RPM_BUILD_ROOT/etc/yum.repos.d"
@@ -123,9 +96,6 @@ install -m 644 %{SOURCE7} $REPO_DIRECTORY
 install -m 644 %{SOURCE8} $REPO_DIRECTORY
 install -m 644 %{SOURCE9} $REPO_DIRECTORY
 install -m 644 %{SOURCE10} $REPO_DIRECTORY
-install -m 644 %{SOURCE11} $REPO_DIRECTORY
-install -m 644 %{SOURCE12} $REPO_DIRECTORY
-install -m 644 %{SOURCE13} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="$RPM_BUILD_ROOT/etc/pki/rpm-gpg"
 
@@ -182,21 +152,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
 
-%files microsoft-base-srpms
-%defattr(-,root,root,-)
-%config(noreplace) /etc/yum.repos.d/mariner-base-srpms.repo
-
-%files microsoft-update-srpms
-%defattr(-,root,root,-)
-%config(noreplace) /etc/yum.repos.d/mariner-update-srpms.repo
-
-%files microsoft-ui-srpms
-%defattr(-,root,root,-)
-%config(noreplace) /etc/yum.repos.d/mariner-ui-srpms.repo
-
 %changelog
 *   Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 1.0-15
--   Add microsoft-base-srpms, microsoft-update-srpms, and microsoft-ui-srpms repo packages.
+-   Add SRPMS repos for base, update, and coreui (all disabled by default)
 
 *   Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-14
 -   Add microsoft and microsoft-preview repo configuration packages.  
