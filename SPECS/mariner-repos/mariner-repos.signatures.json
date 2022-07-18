@@ -2,17 +2,13 @@
  "Signatures": {
   "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
-  "mariner-debuginfo-preview.repo": "29cb315de45902ba2455fe3ad61be04f21979db924dba8231c534346b4647739",
-  "mariner-debuginfo.repo": "30fa6120d3b0a11926f46151b0c0747dd05c63d82887383bd0dfece8e2cb41b8",
-  "mariner-extended-preview.repo": "8b6e4d4dc0b277d208f9e902b38e24e53b9eab4a33604a8c08f66e11c2c8f61f",
-  "mariner-extended-debuginfo-preview.repo": "91bae443d61c28b444a880a27480eb1025cf3e43813c63acc6ba2b78b2513eb7",
-  "mariner-extended.repo": "db70a109ee3cf3139150b1f292f218c60f54da5bc1e10b54efdfb3c0ff78277f",
-  "mariner-extended-debuginfo.repo": "2958ee03334cdc615175f3f2c5d9e8a4e81bc1996a3fbb7158f224c11960aa8c",
+  "mariner-extended-preview.repo": "1499dcedc6dddec5c57dbc15ec19a8f26605b70a1c293192e0fafd514d7ad83e",
+  "mariner-extended.repo": "654c1b50810442bb10ebc8fecf6b48a74ff5c38906ebb9a90b6779adf9fad443",
   "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
   "mariner-extras.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
   "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
   "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
-  "mariner-official-base.repo": "7afec8343a6d33085ca4d55de4275ed86ab44ffd0ad72f801aaf69516bea98c7",
-  "mariner-official-preview.repo": "1aae67607226aa5b8a1e6ff1b87080dfa28970ef4284a2fd2e2f7c99e45f0206"
+  "mariner-official-base.repo": "4d7ecff06728fc92d629d5371bc0f04084ec4cd654887ced41d9d1be136ee8ce",
+  "mariner-official-preview.repo": "25d9875fcae366e55c4b7106d6f76e5f943dda8b9d89fd1f653bb672f786c405"
  }
 }

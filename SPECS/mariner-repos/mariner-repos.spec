@@ -9,8 +9,6 @@ Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        MICROSOFT-RPM-GPG-KEY
 Source1:        MICROSOFT-METADATA-GPG-KEY
-Source2:        mariner-debuginfo.repo
-Source3:        mariner-debuginfo-preview.repo
 Source4:        mariner-extended.repo
 Source5:        mariner-extended-preview.repo
 Source6:        mariner-extras.repo
@@ -19,31 +17,17 @@ Source8:        mariner-microsoft.repo
 Source9:        mariner-microsoft-preview.repo
 Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
-Source12:       mariner-extended-debuginfo.repo
-Source13:       mariner-extended-debuginfo-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
+Obsoletes:      mariner-repos-debuginfo < 2.0-8
+Obsoletes:      mariner-repos-debuginfo-preview < 2.0-8
+Obsoletes:      mariner-extended-debuginfo < 2.0-8
+Obsoletes:      mariner-extended-debuginfo-preview < 2.0-8
 
 BuildArch:      noarch
 
 %description
 CBL-Mariner repo files and gpg keys
-
-%package debug
-Summary:        CBL-Mariner Debuginfo repo file.
-Group:          System Environment/Base
-Requires:       %{name}-shared = %{version}-%{release}
-
-%description debug
-%{summary}
-
-%package debug-preview
-Summary:        CBL-Mariner Debuginfo preview repo file.
-Group:          System Environment/Base
-Requires:       %{name}-shared = %{version}-%{release}
-
-%description debug-preview
-%{summary}
 
 %package extended
 Summary:        CBL-Mariner Extended repo file.
@@ -51,14 +35,6 @@ Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
 %description extended
-%{summary}
-
-%package extended-debug
-Summary:        CBL-Mariner Extended Debuginfo repo file.
-Group:          System Environment/Base
-Requires:       %{name}-shared = %{version}-%{release}
-
-%description extended-debug
 %{summary}
 
 %package extended-preview
@@ -141,8 +117,6 @@ install -m 644 %{SOURCE8} $REPO_DIRECTORY
 install -m 644 %{SOURCE9} $REPO_DIRECTORY
 install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
-install -m 644 %{SOURCE12} $REPO_DIRECTORY
-install -m 644 %{SOURCE13} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -164,29 +138,13 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-base.repo
 
-%files debug
-%defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo.repo
-
-%files debug-preview
-%defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo-preview.repo
-
 %files extended
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended.repo
 
-%files extended-debug
-%defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-debuginfo.repo
-
 %files extended-preview
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-preview.repo
-
-%files extended-debug-preview
-%defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-debuginfo-preview.repo
 
 %files extras
 %defattr(-,root,root,-)
@@ -215,7 +173,8 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %changelog
 * Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-8
-- Add base-srpms and extended-srpms repos
+- Add SRPM and Debuginfo repos to existing base, extended, and preview subpackages
+- Remove and obsolete the debuginfo repo files
 
 * Tue Apr 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-7
 - Add support for extended debuginfo repositories for Mariner 2.0
