@@ -215,7 +215,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %changelog
 * Fri Jul 15 2022 Tom Fay <tomfay@microsoft.com> - 2.0-8
-- Add disabled and source repo configuration to official and extended repo definition.
+- Add debuginfo and source repo configuration to official and extended repo definition.
 - This enables easier management of source and debuginfo packages via `dnf download`.
 
 * Tue Apr 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-7
