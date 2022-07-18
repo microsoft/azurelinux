@@ -8,8 +8,8 @@ enabled=1
 skip_if_unavailable=True
 sslverify=1
 
-[mariner-official-update-srpms]
-name=CBL-Mariner Official Update $releasever SRPMS
+[mariner-official-update-source]
+name=CBL-Mariner Official Update $releasever Source
 baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/update/srpms
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpgcheck=1
