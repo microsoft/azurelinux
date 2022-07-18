@@ -1,13 +1,16 @@
 Summary:        C11 Annex K functions
 Name:           libsafec
 Version:        3.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/rurban/safeclib
 Source0:        https://github.com/rurban/safeclib/releases/download/v%{version}/safeclib-%{version}.tar.xz
+Patch0:         libsafec-3.7.1-issue119.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  awk
 BuildRequires:  gcc
+BuildRequires:  libtool
 BuildRequires:  make
 %if %{with_check}
 BuildRequires:  tzdata
@@ -30,7 +33,7 @@ Summary:        Tools to detect use of unsafe libc APIs
 Tools to detect use of unsafe libc APIs
 
 %prep
-%setup -q -n safeclib-%{version}
+%autosetup -n safeclib-%{version} -p1
 
 %build
 autoreconf -Wall --install
@@ -65,6 +68,9 @@ find %{buildroot} -type f -name "*.pc" -delete -print
 %{_mandir}/man1/*
 
 %changelog
-*   Wed Apr 20 2022 Andy Caldwell <andycaldwell@microsoft.com>  3.7.1-1
+* Wed Jul 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 3.7.1-2
+- Don't emit runtime safety check when getenv fails to find variable.
+
+* Wed Apr 20 2022 Andy Caldwell <andycaldwell@microsoft.com> - 3.7.1-1
 - Original version for CBL-Mariner (license: MIT).
 - License verified

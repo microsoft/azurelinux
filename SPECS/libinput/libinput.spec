@@ -2,13 +2,13 @@
 
 Summary:        Input device library
 Name:           libinput
-Version:        1.16.4
-Release:        4%{?dist}
+Version:        1.21.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.freedesktop.org/wiki/Software/libinput/
-Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://gitlab.freedesktop.org/libinput/libinput/-/archive/%{version}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  check
 BuildRequires:  gcc
@@ -95,10 +95,17 @@ find %{buildroot}/%{_mandir}/man1 -type f -regextype posix-egrep -regex "$UTILS_
 %{_libdir}/pkgconfig/libinput.pc
 
 %files test
+%{_libexecdir}/libinput/libinput-test
 %{_libexecdir}/libinput/libinput-test-suite
+%{_libexecdir}/libinput/libinput-test-utils
+%{_mandir}/man1/libinput-test.1*
 %{_mandir}/man1/libinput-test-suite.1*
 
 %changelog
+* Fri Jun 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.21.0-1
+- Update to version 1.21.0 to fix CVE-2022-1215
+- Added libinput-test and libinput-test-utils to test package.
+
 * Mon Oct 04 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.4-4
 - Replacing BR 'pkgconfig(libudev)' with 'systemd-devel' to avoid build confusion
   between 'systemd-bootstrap-devel' and 'systemd-devel'.

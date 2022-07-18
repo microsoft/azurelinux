@@ -3,7 +3,7 @@
 %global debug_package %{nil}
 Summary:        C library for embedded Linux
 Name:           uclibc-ng
-Version:        1.0.39
+Version:        1.0.41
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
@@ -82,6 +82,9 @@ rm -rf  %{buildroot}/include/
 %{_libdir}/uClibc
 
 %changelog
+* Fri Jun 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.0.41-1
+- Updating to version 1.0.41 to fix CVE-2022-30295.
+
 * Mon Jan 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.39-1
 - Updating to version 1.0.39.
 

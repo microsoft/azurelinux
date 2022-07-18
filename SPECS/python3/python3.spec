@@ -1,6 +1,10 @@
 %global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
 %global __brp_python_bytecompile %{nil}
+# Automating the extraction of these alternate version strings has proven to be tricky,
+# with regards to tooling available in the toolchain build environment.
+# These will be manually maintained for the time being.
 %global majmin 3.9
+%global majmin_nodots 39
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
 %global pip_version 22.0.4
 %global setuptools_version 58.1.0
@@ -8,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.13
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +41,8 @@ Provides:       %{_bindir}/python
 Provides:       /bin/python
 Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
+Provides:       python%{majmin} = %{version}-%{release}
+Provides:       python%{majmin_nodots} = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  iana-etc
 BuildRequires:  tzdata
@@ -59,6 +65,8 @@ Requires:       sqlite-libs
 # python3-xml was provided as a separate package in Mariner 1.0
 # We fold this into the libs subpackage in Mariner 2.0
 Provides:       %{name}-xml = %{version}-%{release}
+Provides:       python%{majmin}-libs = %{version}-%{release}
+Provides:       python%{majmin_nodots}-libs = %{version}-%{release}
 
 %description    libs
 The python interpreter can be embedded into applications wanting to
@@ -70,6 +78,8 @@ Summary:        Python module interface for NCurses Library
 Group:          Applications/System
 Requires:       ncurses
 Requires:       %{name}-libs = %{version}-%{release}
+Provides:       python%{majmin}-curses = %{version}-%{release}
+Provides:       python%{majmin_nodots}-curses = %{version}-%{release}
 
 %description    curses
 The python3-curses package provides interface for ncurses library.
@@ -80,6 +90,8 @@ Group:          Development/Libraries
 Requires:       expat-devel >= 2.1.0
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-setuptools = %{version}-%{release}
+Provides:       python%{majmin}-devel = %{version}-%{release}
+Provides:       python%{majmin_nodots}-devel = %{version}-%{release}
 
 %description    devel
 The Python programming language's interpreter can be extended with
@@ -96,6 +108,8 @@ documentation.
 Summary:        A collection of development tools included with Python.
 Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
+Provides:       python%{majmin}-tools = %{version}-%{release}
+Provides:       python%{majmin_nodots}-tools = %{version}-%{release}
 
 %description    tools
 The Python package includes several development tools that are used
@@ -127,6 +141,8 @@ setuptools is a collection of enhancements to the Python distutils that allow yo
 Summary:        Regression tests package for Python.
 Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
+Provides:       python%{majmin}-test = %{version}-%{release}
+Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 
 %description test
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
@@ -181,6 +197,9 @@ pip3 install --no-cache-dir --no-index --ignore-installed \
     setuptools-%{setuptools_version}-py3-none-any.whl \
     pip-%{pip_version}-py3-none-any.whl
 popd
+
+# Windows executables get installed by pip and setuptools- we don't need these.
+find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
 # Install pathfix.py to bindir
 cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
@@ -279,6 +298,13 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Jul 12 2022 Olivia Crain <oliviacrain> - 3.9.13-3
+- Update cgi3 patch to use versioned python shebang 
+
+* Fri Jul 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-2
+- Remove Windows executables from pip, setuptools subpackages
+- Add provides in the style of python39-%%{subpackage}, python3.9-%%{subpackage} for all packages except pip, setuptools 
+
 * Mon Jun 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-1
 - Upgrade to latest maintenance release for the 3.9 series
 

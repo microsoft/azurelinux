@@ -210,6 +210,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
+		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
 		$(logging_command) && \
 	touch $@
 

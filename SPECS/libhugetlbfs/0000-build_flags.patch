@@ -1,0 +1,56 @@
+diff --git a/Makefile b/Makefile
+index 51e41f0..573a799 100644
+--- a/Makefile
++++ b/Makefile
+@@ -25,9 +25,6 @@ NODEPTARGETS=<version.h> <clean>
+ 
+ INSTALL = install
+ 
+-LDFLAGS += -ldl
+-CFLAGS ?= -O2 -g
+-CFLAGS += -Wall -fPIC
+ CPPFLAGS += -D__LIBHUGETLBFS__
+ 
+ ARCH ?= $(shell uname -m | sed -e s/i.86/i386/)
+@@ -279,22 +276,22 @@ snapshot: $(VERSION)
+ obj32/%.o: %.c
+ 	@$(VECHO) CC32 $@
+ 	@mkdir -p obj32
+-	$(CC32) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
++	$(CC32) $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ -c $<
+ 
+ obj64/%.o: %.c
+ 	@$(VECHO) CC64 $@
+ 	@mkdir -p obj64
+-	$(CC64) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
++	$(CC64) $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ -c $<
+ 
+ obj32/%.o: %.S
+ 	@$(VECHO) AS32 $@
+ 	@mkdir -p obj32
+-	$(CC32) $(CPPFLAGS) -o $@ -c $<
++	$(CC32) $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ -c $<
+ 
+ obj64/%.o: %.S
+ 	@$(VECHO) AS64 $@
+ 	@mkdir -p obj64
+-	$(CC64) $(CPPFLAGS) -o $@ -c $<
++	$(CC64) $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ -c $<
+ 
+ obj32/libhugetlbfs.a: $(LIBOBJS32)
+ 	@$(VECHO) AR32 $@
+diff --git a/tests/Makefile b/tests/Makefile
+index 073df96..508a6ec 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -33,8 +33,8 @@ HELPERS = get_hugetlbfs_path compare_kvers
+ HELPER_LIBS = libheapshrink.so
+ BADTOOLCHAIN = bad-toolchain.sh
+ 
+-CFLAGS = -O2 -Wall -g
+-CPPFLAGS = -I..
++CFLAGS ?= -O2 -Wall -g
++CPPFLAGS += -I..
+ STATIC_LIBHUGE = -Wl,--whole-archive -lhugetlbfs -Wl,--no-whole-archive
+ STATIC_LDLIBS = -Wl,--no-as-needed -lpthread
+ LDLIBS = $(STATIC_LDLIBS) -ldl -lhugetlbfs_privutils

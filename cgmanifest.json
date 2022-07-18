@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20211102.0",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20211102.0/abseil-cpp-20211102.0.tar.gz"
+          "version": "20220623.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20220623.0/abseil-cpp-20220623.0.tar.gz"
         }
       }
     },
@@ -676,7 +676,7 @@
         "other": {
           "name": "autoconf213",
           "version": "2.13",
-          "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf/autoconf-2.13.tar.gz"
         }
       }
     },
@@ -717,6 +717,16 @@
           "name": "avahi",
           "version": "0.8",
           "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.8/avahi-0.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "azcopy",
+          "version": "10.15.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.15.0.tar.gz"
         }
       }
     },
@@ -1366,6 +1376,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cf-cli",
+          "version": "8.4.0",
+          "downloadUrl": "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cgdcbxd",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/jrfastab/cgdcbxd/archive/v1.0.2.tar.gz"
@@ -1497,8 +1517,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.104.2",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.104.2.tar.gz"
+          "version": "0.105.0",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.0.tar.gz"
         }
       }
     },
@@ -2079,6 +2099,16 @@
           "name": "dbus-python",
           "version": "1.2.16",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
@@ -3028,8 +3058,8 @@
         "type": "other",
         "other": {
           "name": "fakeroot",
-          "version": "1.28",
-          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.28.orig.tar.gz"
+          "version": "1.29",
+          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.29.orig.tar.gz"
         }
       }
     },
@@ -3178,8 +3208,8 @@
         "type": "other",
         "other": {
           "name": "fish",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.1.2/fish-3.1.2.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
         }
       }
     },
@@ -3669,6 +3699,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gh",
+          "version": "2.13.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.13.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "giflib",
           "version": "5.2.1",
           "downloadUrl": "http://downloads.sourceforge.net/giflib/giflib-5.2.1.tar.gz"
@@ -3680,8 +3720,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.2",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.2.tar.xz"
+          "version": "2.33.4",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.4.tar.xz"
         }
       }
     },
@@ -4290,8 +4330,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.11.0.tar.gz"
+          "version": "1.12.1",
+          "downloadUrl": "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
         }
       }
     },
@@ -4611,7 +4651,7 @@
         "other": {
           "name": "hunspell",
           "version": "1.7.0",
-          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/hunspell-1.7.0.tar.gz"
+          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/v1.7.0.tar.gz"
         }
       }
     },
@@ -6470,6 +6510,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "intel-ipsec-mb",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/intel/intel-ipsec-mb/archive/v1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "intel-pf-bb-config",
+          "version": "22.03",
+          "downloadUrl": "https://github.com/intel/pf-bb-config/archive/v22.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "intltool",
           "version": "0.51.0",
           "downloadUrl": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
@@ -6591,8 +6651,8 @@
         "type": "other",
         "other": {
           "name": "iptraf-ng",
-          "version": "1.1.4",
-          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.1.4.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.2.1.tar.gz"
         }
       }
     },
@@ -6601,8 +6661,8 @@
         "type": "other",
         "other": {
           "name": "iptstate",
-          "version": "2.2.6",
-          "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.6/iptstate-2.2.6.tar.bz2"
+          "version": "2.2.7",
+          "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.7/iptstate-2.2.7.tar.bz2"
         }
       }
     },
@@ -7130,9 +7190,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jx",
+          "version": "3.2.236",
+          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.2.236.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jzlib",
           "version": "1.1.3",
           "downloadUrl": "https://github.com/ymnk/jzlib/archive/1.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "k3s",
+          "version": "1.23.6",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
         }
       }
     },
@@ -7243,6 +7323,16 @@
           "name": "keycloak-httpd-client-install",
           "version": "1.1",
           "downloadUrl": "https://github.com/jdennis/keycloak-httpd-client-install/archive/RELEASE_1_1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "KeysInUse-OpenSSL",
+          "version": "0.3.1",
+          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.1.tar.gz"
         }
       }
     },
@@ -8450,6 +8540,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libhugetlbfs",
+          "version": "2.23",
+          "downloadUrl": "https://github.com/libhugetlbfs/libhugetlbfs/releases/download/2.23/libhugetlbfs-2.23.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libibcommon",
           "version": "1.2.0",
           "downloadUrl": "http://www.openfabrics.org/downloads/management/libibcommon-1.2.0.tar.gz"
@@ -8551,8 +8651,8 @@
         "type": "other",
         "other": {
           "name": "libinput",
-          "version": "1.16.4",
-          "downloadUrl": "https://www.freedesktop.org/software/libinput/libinput-1.16.4.tar.xz"
+          "version": "1.21.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.21.0/libinput-1.21.0.tar.bz2"
         }
       }
     },
@@ -11623,8 +11723,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.2",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.2.tar.gz"
+          "version": "1.6.6",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.6.tar.gz"
         }
       }
     },
@@ -11862,6 +11962,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "msgpack",
+          "version": "3.3.0",
+          "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "msopenjdk-11",
           "version": "11.0.14.1+1-LTS-31207.aarch64",
           "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm"
@@ -11923,8 +12033,8 @@
         "type": "other",
         "other": {
           "name": "mtr",
-          "version": "0.92",
-          "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.92/mtr-0.92.tar.gz"
+          "version": "0.95",
+          "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.95/mtr-0.95.tar.gz"
         }
       }
     },
@@ -11963,8 +12073,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.28",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.28.tar.gz"
+          "version": "8.0.29",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.29.tar.gz"
         }
       }
     },
@@ -25877,8 +25987,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.39",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.39/uClibc-ng-1.0.39.tar.xz"
+          "version": "1.0.41",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.41/uClibc-ng-1.0.41.tar.xz"
         }
       }
     },
@@ -26277,8 +26387,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.5064",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5064.tar.gz"
+          "version": "9.0.0050",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0050.tar.gz"
         }
       }
     },

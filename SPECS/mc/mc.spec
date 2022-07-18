@@ -1,7 +1,7 @@
 Summary:        File manager
 Name:           mc
 Version:        4.8.27
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        http://ftp.midnight-commander.org/%{name}-%{version}.tar.xz
 Patch0:         disable-extfs-test.patch
 BuildRequires:  glib-devel
 BuildRequires:  pcre-devel
+BuildRequires:  python3-devel
 BuildRequires:  slang-devel
 Requires:       glib
 Requires:       pcre
@@ -28,6 +29,7 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 
 %install
 %make_install
+%py3_shebang_fix %{buildroot}%{_libexecdir}/mc/extfs.d/{s3+,uc1541}
 
 %check
 %make_build -k check
@@ -43,6 +45,9 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 %exclude %{_prefix}/src
 
 %changelog
+* Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.8.27-2
+- Fix unversioned python shebangs in extfs helpers
+
 * Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.27-1
 - Upgrade to latest version to fix CVE-2021-36370
 - License verified

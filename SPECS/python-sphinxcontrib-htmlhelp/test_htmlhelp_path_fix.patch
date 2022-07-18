@@ -1,0 +1,31 @@
+From 248ff52b3c3d39c20cdaef3052ac7507a407733a Mon Sep 17 00:00:00 2001
+From: Takeshi KOMIYA <i.tkomiya@gmail.com>
+Date: Sat, 17 Jul 2021 18:55:20 +0900
+Subject: [PATCH] Fix #9457: RemovedInSphinx50Warning on testing
+
+---
+ tests/test_htmlhelp.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_htmlhelp.py b/tests/test_htmlhelp.py
+index a74c66a..8774d4b 100644
+--- a/tests/test_htmlhelp.py
++++ b/tests/test_htmlhelp.py
+@@ -21,7 +21,7 @@
+ def test_build_htmlhelp(app, status, warning):
+     app.build()
+ 
+-    hhp = (app.outdir / 'pythondoc.hhp').text()
++    hhp = (app.outdir / 'pythondoc.hhp').read_text()
+     assert 'Compiled file=pythondoc.chm' in hhp
+     assert 'Contents file=pythondoc.hhc' in hhp
+     assert 'Default Window=pythondoc' in hhp
+@@ -84,7 +84,7 @@ def assert_sitemap(node, name, filename):
+         assert node[1].attrib == {'name': 'Local', 'value': filename}
+ 
+     # .hhc file
+-    hhc = (app.outdir / 'pythondoc.hhc').text()
++    hhc = (app.outdir / 'pythondoc.hhc').read_text()
+     tree = HTMLParser(namespaceHTMLElements=False).parse(hhc)
+     items = tree.find('.//body/ul')
+     assert len(items) == 4
