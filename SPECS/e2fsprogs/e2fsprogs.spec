@@ -1,7 +1,7 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.46.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,7 +62,8 @@ rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
 %check
-make %{?_smp_mflags} check
+# Mult-threaded runs are flaky.
+make -j1 check
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -128,6 +129,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Jul 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.46.5-2
+- Running package tests in a single thread.
+
 * Mon Feb 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.46.5-1
 - Bump version to 1.46.5 to enable ptest
 
