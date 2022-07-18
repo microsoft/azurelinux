@@ -100,7 +100,7 @@ The package provides Kubevirt end-to-end tests.
 %autosetup -p1
 
 %build
-export GOFLAGS+="-buildmode=pie"
+export GOFLAGS+=" -buildmode=pie"
 KUBEVIRT_VERSION=%{version} \
 KUBEVIRT_SOURCE_DATE_EPOCH="$(date -r LICENSE +%{s})" \
 KUBEVIRT_GIT_COMMIT='v%{version}' \
