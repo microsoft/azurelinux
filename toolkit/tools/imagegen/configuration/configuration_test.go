@@ -476,6 +476,19 @@ var expectedConfiguration Config = Config{
 					Args: "--input abc --output cba",
 				},
 			},
+			Networks: []Network{
+				{
+					BootProto: "dhcp",
+					GateWay:   "192.168.20.4",
+					Ip:        "192.169.20.148",
+					NetMask:   "255.255.255.0",
+					OnBoot:    false,
+					NameServers: []string{
+						"192.168.30.23",
+					},
+					Device: "eth0",
+				},
+			},
 			Encryption: RootEncryption{
 				Enable:   true,
 				Password: "EncryptPassphrase123",

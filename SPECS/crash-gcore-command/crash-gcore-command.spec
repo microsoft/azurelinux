@@ -1,6 +1,6 @@
 Name:          crash-gcore-command
 Version:       1.6.1
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       gcore extension module for crash utility
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -13,6 +13,7 @@ BuildRequires: zlib-devel
 BuildRequires: crash-devel >= 7.2.5
 Requires:      crash >= 7.2.5
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
+ExclusiveArch: x86_64
 
 %description
 Command for creating a core dump file of a user-space task that was
@@ -41,6 +42,8 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %doc COPYING
 
 %changelog
+*   Fri Jul 08 2022 Andrew Phelps <anphel@microsoft.com> 1.6.1-2
+-   Add ExclusiveArch: x86_64
 *   Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> 1.6.1-1
 -   Update to version 1.6.1
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 1.5.1-2

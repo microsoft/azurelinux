@@ -1,18 +1,23 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.104.2
-Release:        2%{?dist}
+Version:        0.105.0
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.clamav.net
 Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
+# Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
+Source1:        %{name}-%{name}-%{version}-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gdb
+BuildRequires:  git
 BuildRequires:  json-c-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
@@ -23,6 +28,7 @@ BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
+BuildRequires:  rust
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
@@ -38,9 +44,15 @@ of utilities including a flexible and scalable multi-threaded daemon, a command
 line scanner and an advanced tool for automatic database updates.
 
 %prep
-%autosetup
+# Setup .cargo directory
+mkdir -p $HOME
+pushd $HOME
+tar xf %{SOURCE1} --no-same-owner
+popd
+%autosetup -n clamav-clamav-%{version}
 
 %build
+export CARGO_NET_OFFLINE=true
 # Notes:
 # - milter must be disable because CBL-Mariner does not provide 'sendmail' packages
 #   which provides the necessary pieces to build 'clamav-milter'
@@ -114,6 +126,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 0.105.0-1
+- Upgrade to version 0.105.0
+
 * Wed Jun 08 2022 Tom Fay <tomfay@microsoft.com> - 0.104.2-2
 - Fix freshclam DB download
 

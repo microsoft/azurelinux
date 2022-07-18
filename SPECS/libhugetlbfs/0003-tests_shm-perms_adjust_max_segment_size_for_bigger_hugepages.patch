@@ -1,0 +1,26 @@
+diff --git a/tests/run_tests.py b/tests/run_tests.py
+index 3c95a03..f88e1e2 100755
+--- a/tests/run_tests.py
++++ b/tests/run_tests.py
+@@ -557,7 +557,7 @@ def functional_tests():
+         do_test("mremap-expand-slice-collision.sh")
+         do_test("mremap-fixed-normal-near-huge.sh")
+         do_test("mremap-fixed-huge-near-normal.sh")
+-    do_shm_test("shm-perms", 64*1024*1024)
++    do_shm_test("shm-perms", 1024*1024*1024)
+ 
+     # Tests requiring an active mount and hugepage COW
+     do_test("private")
+diff --git a/tests/shm-perms.c b/tests/shm-perms.c
+index 590a101..12d7609 100644
+--- a/tests/shm-perms.c
++++ b/tests/shm-perms.c
+@@ -32,7 +32,7 @@
+ 	"* to a segment with different permissions.  A segment is created  *\n"\
+ 	"* and children attach read-only to check reservation accounting.  *"
+ 
+-#define SEGMENT_SIZE	((size_t)0x4000000)
++#define SEGMENT_SIZE	((size_t)0x40000000)
+ #define SEGMENT_KEY	0x82ba15ff
+ #define STRIDE		0x200000
+ 

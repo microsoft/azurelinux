@@ -1,0 +1,56 @@
+From 112f4b7266cae313e5a7f3d720360cdb294db496 Mon Sep 17 00:00:00 2001
+From: Rafael Aquini <aquini@redhat.com>
+Date: Sun, 12 Apr 2020 22:59:32 -0400
+Subject: [PATCH] tests: include missing LDFLAGS to make targets
+
+Signed-off-by: Rafael Aquini <aquini@redhat.com>
+---
+ tests/Makefile | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tests/Makefile b/tests/Makefile
+index 9fd15eb..216942e 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -120,32 +120,32 @@ shmoverride_linked.c: shmoverride_unlinked.c
+ obj32/%.o: %.c
+ 	@$(VECHO) CC32 $@
+ 	@mkdir -p obj32
+-	$(CC32) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
++	$(CC32) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
+ 
+ obj64/%.o: %.c
+ 	@$(VECHO) CC64 $@
+ 	@mkdir -p obj64
+-	$(CC64) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
++	$(CC64) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
+ 
+ obj32/%-pic.o: %.c
+ 	@$(VECHO) CC32 $@
+ 	@mkdir -p obj32
+-	$(CC32) $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ -c $<
++	$(CC32) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -fPIC -o $@ -c $<
+ 
+ obj64/%-pic.o: %.c
+ 	@$(VECHO) CC64 $@
+ 	@mkdir -p obj64
+-	$(CC64) $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ -c $<
++	$(CC64) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -fPIC -o $@ -c $<
+ 
+ obj32/libheapshrink.so: obj32/heapshrink-helper-pic.o
+ 	@$(VECHO) LD32 "(shared)" $@
+ 	@mkdir -p obj32
+-	$(CC32) -Wl,-soname,$(notdir $@) -shared -o $@ $^
++	$(CC32) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^
+ 
+ obj64/libheapshrink.so: obj64/heapshrink-helper-pic.o
+ 	@$(VECHO) LD64 "(shared)" $@
+ 	@mkdir -p obj64
+-	$(CC64) -Wl,-soname,$(notdir $@) -shared -o $@ $^
++	$(CC64) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^
+ 
+ $(LIB_TESTS:%=obj32/%): %: %.o obj32/testutils.o obj32/libtestutils.o
+ 	@$(VECHO) LD32 "(lib test)" $@
+-- 
+2.25.2
+

@@ -8,6 +8,9 @@
 # $1 - Changelog message.
 # ${@:2} - Paths to spec files to update.
 
+# shellcheck source=../../toolkit/scripts/rpmops.sh
+source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
+
 changelog_message="$1"
 
 if [[ $# -lt 2 ]]
@@ -41,14 +44,11 @@ do
 
     echo "Updating '$spec_path'."
 
-    spec_dir="$(dirname "$spec_path")"
-    defines=(-D "py3_dist X" -D "with_check 1" -D "dist .cm1" -D "__python3 python3" -D "_sourcedir '$spec_dir'")
-
     release=$(grep -oP "^Release:\s*\d+" "$spec_path" | grep -oP "\d+$")
     release=$((release+1))
-    version=$(rpmspec --srpm -q "$spec_path" --qf "%{VERSION}\n" "${defines[@]}" 2>/dev/null)
+    version=$(mariner_rpmspec --srpm -q "$spec_path" --qf "%{VERSION}\n" 2>/dev/null)
 
-    epoch="$(rpmspec --srpm -q "$spec_path" --qf "%{EPOCH}\n" "${defines[@]}" 2>/dev/null):"
+    epoch="$(mariner_rpmspec --srpm -q "$spec_path" --qf "%{EPOCH}\n" 2>/dev/null):"
     if [[ "$epoch" == "(none):" ]]
     then
         epoch=""

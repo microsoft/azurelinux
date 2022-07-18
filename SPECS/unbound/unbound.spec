@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
 Version:        1.13.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        %{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 BuildRequires:  expat-devel
+BuildRequires:  libevent-devel
 BuildRequires:  python3-devel
 BuildRequires:  swig
 BuildRequires:  systemd
@@ -54,12 +55,14 @@ unbound dns server docs
     --disable-static \
     --with-pythonmodule \
     --with-pyunbound \
+    --with-libevent \
     PYTHON=%{python3}
 %make_build
 
 %install
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
+make DESTDIR=%{buildroot} unbound-event-install
 install -vdm755 %{buildroot}%{_unitdir}
 install -pm 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 
@@ -94,6 +97,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Fri Jul 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.13.2-2
+- Build with libevent
+
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.2-1
 - Update to version 1.13.2.
 

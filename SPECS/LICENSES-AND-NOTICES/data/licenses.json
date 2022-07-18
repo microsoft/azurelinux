@@ -459,6 +459,7 @@
                 "infinipath-psm",
                 "iniparser",
                 "intel-cmt-cat",
+                "intel-ipsec-mb",
                 "ioping",
                 "IP2Location",
                 "ipa-pgothic-fonts",
@@ -584,6 +585,7 @@
                 "libgxim",
                 "libgxps",
                 "libhangul",
+                "libhugetlbfs",
                 "libibcommon",
                 "libical",
                 "libICE",
@@ -655,6 +657,7 @@
                 "libraqm",
                 "LibRaw",
                 "libraw1394",
+                "libreswan",
                 "librevenge",
                 "librsvg2",
                 "librx",
@@ -1943,6 +1946,7 @@
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
                 "application-gateway-kubernetes-ingress",
+                "azcopy",
                 "azure-iot-sdk-c",
                 "azure-storage-cpp",
                 "bazel",
@@ -1951,6 +1955,7 @@
                 "bpftrace",
                 "ccache",
                 "cert-manager",
+                "cf-cli",
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor",
@@ -1959,6 +1964,7 @@
                 "coredns-1.8.4",
                 "coredns-1.8.6",
                 "dbus-x11",
+                "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",
                 "distroless-packages",
@@ -1970,6 +1976,7 @@
                 "fluent-bit",
                 "freefont",
                 "gflags",
+                "gh",
                 "go-md2man",
                 "grpc",
                 "grub2-efi-binary-signed",
@@ -1977,10 +1984,13 @@
                 "gtk-update-icon-cache",
                 "helm",
                 "installkernel",
+                "intel-pf-bb-config",
                 "ivykis",
                 "jsonbuilder",
+                "jx",
                 "keda",
                 "kernel-signed",
+                "KeysInUse-OpenSSL",
                 "kpatch",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
@@ -2008,6 +2018,7 @@
                 "moby-containerd",
                 "moby-engine",
                 "moby-runc",
+                "msgpack",
                 "ncompress",
                 "nlohmann-json",
                 "nmap",
@@ -2706,6 +2717,12 @@
                 "zip",
                 "zlib",
                 "zsh"
+            ]
+        },
+        "Rancher": {
+            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "specs": [
+                "k3s"
             ]
         }
     }

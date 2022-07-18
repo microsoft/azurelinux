@@ -55,6 +55,9 @@
       - [`HYDRATED_BUILD=...`](#hydrated_build)
         - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
         - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
+      - [`DELTA_BUILD=...`](#delta_build)
+        - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
+        - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -401,6 +404,26 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Bootstrap the toolchain from the host environment in a docker container. The toolchain consists of those packages which are required to build all other packages (*gcc, tdnf, etc*)
 
+#### `INCREMENTAL_TOOLCHAIN=...`
+
+##### `INCREMENTAL_TOOLCHAIN=`**`n`** *(default)*
+
+> If rebuilding the toolchain (`REBUILD_TOOLCHAIN=y`), perform a full build of the final toolchain packages. No RPMs from (a) previous failed builds or (b) upstream package repos will be reused.
+
+##### `INCREMENTAL_TOOLCHAIN=`**`y`**
+
+> Do not clear out the toolchain build chroot before performing a build of the final toolchain packages. RPMs within the toolchain build chroot will be used as a cache to avoid rebuilding already-built SRPMs. These RPMs can be seeded by (a) previous failed builds or (b) upstream package repos.
+
+#### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
+
+##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`n`** *(default)*
+
+> If performing an incremental toolchain build (`INCREMENTAL_TOOLCHAIN=y`), do not attempt to pull any packages from `$(PACKAGE_URL_LIST)`.
+
+##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`y`**
+
+> If performing an incremental toolchain build (`INCREMENTAL_TOOLCHAIN=y`), attempt to pull as many RPMs listed in the arch-specific toolchain manifest from the repos listed in `$(PACKAGE_URL_LIST)`. These RPMs will used as a cache to avoid rebuilding already-built SRPMs.
+
 #### `DOWNLOAD_SRPMS=...`
 
 ##### `DOWNLOAD_SRPMS=`**`n`** *(default)*
@@ -502,6 +525,17 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 ##### `HYDRATED_BUILD=`**`n`** *(default)*
 
 > Normal build. No hydrated RPMs will be used.
+
+#### `DELTA_BUILD=...`]
+
+##### `DELTA_BUILD=`**`y`**]
+
+> Delta build. Used for fast delta builds where published packages are pre-populated and only new or added packages are built.
+
+##### `DELTA_BUILD=`**`n`** *(default)*
+
+> Normal build.
+
 
 ## All Build Targets
 
@@ -611,6 +645,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
 | REBUILD_TOOLCHAIN             | n                                                                                                      | Bootstrap the toolchain packages locally or download them?
+| ALLOW_TOOLCHAIN_DOWNLOAD_FAIL | n                                                                                                      | Allow for partial rehydration of the toolchain from `$(PACKAGE_URL_LIST)`? Only applicable if `REBUILD_TOOLCHAIN=y` and `INCREMENTAL_TOOLCHAIN=y`.
 | REBUILD_PACKAGES              | y                                                                                                      | Build packages locally or download them? Only packages with a local spec file will be built.
 | REBUILD_TOOLS                 | n                                                                                                      | Build the go tools locally or take them from the SDK?
 | TOOLCHAIN_ARCHIVE             |                                                                                                        | Instead of downloading toolchain *.rpms, extract them from here (see `REBUILD_TOOLCHAIN`).
