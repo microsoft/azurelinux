@@ -1,26 +1,26 @@
-Summary:	    Multithreaded IO generation tool
-Name:		    fio
-Version:	    3.30
-Release:	    1%{?dist}
-License:	    GPLv2
+Summary:        Multithreaded IO generation tool
+Name:           fio
+Version:        3.30
+Release:        1%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		    https://git.kernel.dk/?p=fio.git;a=summary
-Source0:	    https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
-BuildRequires:	gcc
-BuildRequires:	gnupg2
-BuildRequires:	libaio-devel
-BuildRequires:	libcurl-devel
-BuildRequires:	libnbd-devel
-BuildRequires:	librbd1-devel
-BuildRequires:	librdmacm-devel
-BuildRequires:	numactl-devel
-BuildRequires:	openssl-devel
-BuildRequires:	python3-devel
-BuildRequires:	zlib-devel
+URL:            https://git.kernel.dk/?p=fio.git;a=summary
+Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
+BuildRequires:  gcc
+BuildRequires:  gnupg2
+BuildRequires:  libaio-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  libnbd-devel
+BuildRequires:  librbd1-devel
+BuildRequires:  librdmacm-devel
+BuildRequires:  numactl-devel
+BuildRequires:  openssl-devel
+BuildRequires:  python3-devel
+BuildRequires:  zlib-devel
 %ifarch x86_64
-BuildRequires:	libpmem-devel
-BuildRequires:	libpmemblk-devel
+BuildRequires:  libpmem-devel
+BuildRequires:  libpmemblk-devel
 %endif
 %if %{with_check}
 BuildRequires:  CUnit-devel
