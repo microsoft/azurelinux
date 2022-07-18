@@ -14,7 +14,6 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 This gem is a Faraday adapter for the Net::HTTP::Persistent gem.

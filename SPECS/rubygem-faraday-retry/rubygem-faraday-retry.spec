@@ -14,7 +14,6 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
-BuildArch:      noarch
 AutoReq:        no
 
 %description

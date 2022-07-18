@@ -14,7 +14,6 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 This gem is a Faraday adapter for a Rack app. Faraday is an HTTP client library that provides a common interface over many adapters. Every adapter is defined into its own gem. This gem defines the adapter for a Rack app.

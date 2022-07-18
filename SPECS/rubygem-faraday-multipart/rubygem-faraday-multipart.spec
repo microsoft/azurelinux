@@ -14,7 +14,6 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 Perform multipart-post requests using Faraday. The Multipart middleware converts a Faraday::Request#body Hash of key/value pairs into a multipart form request.

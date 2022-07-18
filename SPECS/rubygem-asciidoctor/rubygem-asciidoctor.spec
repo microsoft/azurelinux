@@ -55,7 +55,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{b
 %doc %{gem_docdir}
 
 %changelog
-* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.8.0-3
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.17-3
 - Add provides, bindir
 
 * Sun Apr 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.17-2

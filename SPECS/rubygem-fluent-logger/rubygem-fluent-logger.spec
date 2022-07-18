@@ -1,5 +1,6 @@
 %global debug_package %{nil}
 %global gem_name fluent-logger
+%global gems_version 3.1.0
 Summary:        fluent logger for ruby
 Name:           rubygem-fluent-logger
 Version:        0.9.0
@@ -26,7 +27,7 @@ A structured event logger.
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/3.1.0/bin/ %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/%{gems_version}/bin/ %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

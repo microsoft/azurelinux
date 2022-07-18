@@ -13,7 +13,6 @@ Source0:        https://github.com/ruby/rexml/archive/refs/tags/v%{version}.tar.
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
-BuildArch:      noarch
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description

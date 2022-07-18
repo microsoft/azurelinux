@@ -1,5 +1,6 @@
 %global debug_package %{nil}
 %global gem_name td
+%global gems_version 3.1.0
 Summary:        CUI Interface
 Name:           rubygem-%{gem_name}
 Version:        0.16.8
@@ -36,7 +37,7 @@ interact with the REST API in managing databases and jobs on the Treasure Data C
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/3.1.0/bin/ %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/%{gems_version}/bin/ %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

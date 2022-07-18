@@ -15,7 +15,6 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 BinData provides a declarative way to read and write structured binary data.
