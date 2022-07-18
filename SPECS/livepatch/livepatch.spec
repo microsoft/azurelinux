@@ -11,7 +11,7 @@
 
 %define patches_description \
 %(
-    echo "Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel updated required):"
+    echo "Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):"
     for patch in %{patches}
     do
         cve_number=$(basename "${patch%.*}")
