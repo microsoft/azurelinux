@@ -4,7 +4,7 @@ Distribution:   Mariner
 Summary:	Reference implementation of the iCalendar data type and serialization format
 Name:		libical
 Version:	3.0.9
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	LGPLv2 or MPLv2.0
 URL:		https://libical.github.io/libical/
 Source:		https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
