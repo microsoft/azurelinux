@@ -4,15 +4,15 @@
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
   "mariner-debuginfo-preview.repo": "29cb315de45902ba2455fe3ad61be04f21979db924dba8231c534346b4647739",
   "mariner-debuginfo.repo": "30fa6120d3b0a11926f46151b0c0747dd05c63d82887383bd0dfece8e2cb41b8",
-  "mariner-extended-preview.repo": "b7d5d89bb5ce1b1deade6c34aae8c9c9e62890eb235ac4a8557e5444a57b5ec9",
+  "mariner-extended-preview.repo": "8b6e4d4dc0b277d208f9e902b38e24e53b9eab4a33604a8c08f66e11c2c8f61f",
   "mariner-extended-debuginfo-preview.repo": "91bae443d61c28b444a880a27480eb1025cf3e43813c63acc6ba2b78b2513eb7",
-  "mariner-extended.repo": "fda0174a7e397ad730f73c27732b71ae1c5e8e44b7e15e5493545bf501a4e3c4",
+  "mariner-extended.repo": "db70a109ee3cf3139150b1f292f218c60f54da5bc1e10b54efdfb3c0ff78277f",
   "mariner-extended-debuginfo.repo": "2958ee03334cdc615175f3f2c5d9e8a4e81bc1996a3fbb7158f224c11960aa8c",
   "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
   "mariner-extras.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
   "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
   "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
-  "mariner-official-base.repo": "1022cf71d875a2d5df7d54145898a64912cee14c2ce47ed505032840e97054da",
-  "mariner-official-preview.repo": "db4d5a7df5a0e6876b60d06d06715b27ae87e3433ec51c98be16eefbe9375aaf"
+  "mariner-official-base.repo": "7afec8343a6d33085ca4d55de4275ed86ab44ffd0ad72f801aaf69516bea98c7",
+  "mariner-official-preview.repo": "1aae67607226aa5b8a1e6ff1b87080dfa28970ef4284a2fd2e2f7c99e45f0206"
  }
 }
