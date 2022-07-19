@@ -1,4 +1,7 @@
-Name:           python3-geomet
+%global srcname geomet
+%global debug_package %{nil}
+
+Name:           python-%{srcname}
 Version:        0.2.1
 Release:        1%{?dist}
 Summary:        GeoJSON <-> WKT/WKB conversion utilities
@@ -7,20 +10,28 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 Url:            https://github.com/geomet
-Source0:        https://github.com/geomet/geomet/archive/refs/tags/%{version}.tar.gz#/geomet-%{version}.tar.gz
-BuildRequires:  python3
-BuildRequires:  python3-libs
+Source0:        https://github.com/geomet/geomet/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+BuildArch:      noarch
+
+BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
+
+%global _description \
+Convert GeoJSON to WKT/WKB (Well-Known Text/Binary), and vice versa.
+
+%description %_description
+
+%package -n python3-%{srcname}
+Summary:        %{summary}
 Requires:       python3
-Requires:       python3-libs
 Requires:       python3-six
 Requires:       python3-click
 Requires:       python3-setuptools
 
-BuildArch:      noarch
-
-%description
-Convert GeoJSON to WKT/WKB (Well-Known Text/Binary), and vice versa.
+%description -n python3-%{srcname} %{_description}
 
 %prep
 %autosetup -n geomet-%{version}
@@ -36,7 +47,7 @@ rm -f %{buildroot}/%{_exec_prefix}/LICENSE
 %check
 %python3 setup.py test
 
-%files
+%files -n python3-%{srcname}
 %defattr(-,root,root,-)
 %license LICENSE
 %{_bindir}/geomet
@@ -44,7 +55,7 @@ rm -f %{buildroot}/%{_exec_prefix}/LICENSE
 
 %changelog
 *   Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.2.1-1
--   Initial CBL-Mariner import from PhotonOS (license: ASL 2.0)
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 -   Bumping version to 0.2.1
 -   Adding as run dependency for python-cassandra-driver needed by cassandra-medusa.
 -   License Verified.
