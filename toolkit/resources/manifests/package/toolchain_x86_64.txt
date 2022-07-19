@@ -44,10 +44,10 @@ cracklib-lang-2.9.7-5.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-debuginfo-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-devel-0.17.5-1.cm2.x86_64.rpm
-curl-7.83.1-1.cm2.x86_64.rpm
-curl-debuginfo-7.83.1-1.cm2.x86_64.rpm
-curl-devel-7.83.1-1.cm2.x86_64.rpm
-curl-libs-7.83.1-1.cm2.x86_64.rpm
+curl-7.84.0-1.cm2.x86_64.rpm
+curl-debuginfo-7.84.0-1.cm2.x86_64.rpm
+curl-devel-7.84.0-1.cm2.x86_64.rpm
+curl-libs-7.84.0-1.cm2.x86_64.rpm
 Cython-debuginfo-0.29.26-1.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-1.cm2.x86_64.rpm
