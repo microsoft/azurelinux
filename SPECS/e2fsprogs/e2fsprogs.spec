@@ -66,9 +66,11 @@ rm -rf %{buildroot}%{_infodir}
 make -j1 check
 for failed_test in $(find tests -name "*.failed")
 do
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "Log '$failed_test':"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    cat << EOF
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+"Log '$failed_test':"
+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+EOF
     cat $file_test
 done
 
@@ -137,7 +139,7 @@ done
 
 %changelog
 * Mon Jul 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.46.5-2
-- Running package tests in a single thread.
+- Running package tests in a single thread and printing logs for failures.
 
 * Mon Feb 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.46.5-1
 - Bump version to 1.46.5 to enable ptest
