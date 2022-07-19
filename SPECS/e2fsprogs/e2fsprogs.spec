@@ -64,6 +64,13 @@ rm -rf %{buildroot}%{_infodir}
 %check
 # Mult-threaded runs are flaky.
 make -j1 check
+for failed_test in $(find tests -name "*.failed")
+do
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "Log '$failed_test':"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    cat $file_test
+done
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
