@@ -9,8 +9,10 @@ License: BSD or LGPLv2+
 URL: https://pagure.io/pam_krb5/
 BuildRequires: keyutils-libs-devel
 BuildRequires: krb5-devel
+BuildRequires: krb5
 BuildRequires: pam-devel
 BuildRequires: libselinux-devel
+BuildRequires: shadow-utils
 BuildRequires: gcc
 BuildRequires: git
 # Needed by tests.
