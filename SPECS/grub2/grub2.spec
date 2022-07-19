@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,8 @@ Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
 Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
+# CVE-2021-3981
+Patch0167:      0167-restore-umask-for-grub-config.patch 
 # Add nopatches for tooling
 Patch1000:      CVE-2021-3418.nopatch
 Patch1001:      CVE-2020-14372.nopatch
@@ -313,6 +315,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-4
+- Fix patch CVE-2021-3981
+
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Enable multiboot2 support for x86_64
 
