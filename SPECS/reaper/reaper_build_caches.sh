@@ -1,11 +1,23 @@
 #! /bin/bash
 
-set -eux pipefail
+set -euxo pipefail
 
 # NOTE: EXECUTING with id=0 (root) CAUSES REAPER BUILD TO FAIL.
+if [[ $(id -u) -eq 0 ]]; then
+    echo "Must run script as non-root user!" >&2
+    exit 1
+fi
+
 # Cassandra reaper version for which to generate build caches.
-# Set this to the required version.
+# (a) Modify VERSION="x.x.x" in script.
+# (b) Pass arguments to command line: ./reaper_build_caches.sh 3.1.1
 VERSION="3.1.1"
+if [ $? -gt 1 ]; then
+    VERSION=$1
+fi
+
+echo "Building Cassandra cache for version '$VERSION'."
+
 # URL to download the sources to build
 SOURCE_URL="https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/${VERSION}.tar.gz"
 
@@ -19,6 +31,18 @@ LOCAL_LIB_NODE_MODULES="reaper-local-lib-node-modules-${VERSION}.tar.gz"
 LOCAL_N="reaper-local-n-${VERSION}.tar.gz"
 
 tempDir=$(mktemp -d)
+
+function cleanup {
+	exit_code=$?
+	set +e
+	if [[ -n $tempDir ]];then
+		rm -Rf $tempDir
+		echo "Deleted $tempDir."
+	fi
+	exit $exit_code
+}
+
+trap cleanup EXIT SIGINT SIGTERM
 
 mkdir -p ${tempDir}/mariner_caches
 
@@ -45,6 +69,7 @@ function dieIfError {
 function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs | dieIfError
+	npm config set cache "$tempDir/.npm" --global
 	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
 	# incompatibilities.
 	# Backward compatible with node@v14.18.0
@@ -52,11 +77,7 @@ function installNodeModules {
 	# is incoorectly set that causes 'which' to still point to older path, as access/newfstatat fail with -ENOPERM
 	# Setting a new global npm folder for fixing permission issues.
 	# (works well with id=0, but reaper build will fail.)
-	mkdir --mode 0777 $HOME/.npm-global
-	echo $HOME
 	npm config set prefix "$HOME/.npm-global"
-	echo $HOME
-	npm config get prefix
 	export PATH="$HOME/.npm-global/bin":$PATH
 	npm install -g n
 	export N_PREFIX="$HOME/.npm-global"
@@ -87,37 +108,39 @@ function createCacheTars {
 	pushd ${HOME}
 	echo "creating bower_cache tar..."
 	tar -cf ${BOWER_CACHE} .cache
-	cp ${BOWER_CACHE} ${marinerCacheDir}
+	mv ${BOWER_CACHE} ${marinerCacheDir}
+	popd
 
+	pushd ${tempDir}
 	echo "creating maven_cache tar..."
 	tar -cf ${MAVEN_CACHE} .m2
-	cp ${MAVEN_CACHE} ${marinerCacheDir}
+	mv ${MAVEN_CACHE} ${marinerCacheDir}
 
 	echo "creating npm_cache tar..."
 	tar -cf ${NPM_CACHE} .npm
-	cp ${NPM_CACHE} ${marinerCacheDir}
+	mv ${NPM_CACHE} ${marinerCacheDir}
 	popd
 
 	pushd ${tempDir}/cassandra-reaper-${VERSION}/src/ui
 	echo "creating bower_components tar..."
 	tar -cf ${BOWER_COMPONENTS} bower_components
-	cp ${BOWER_COMPONENTS} ${marinerCacheDir}
+	mv ${BOWER_COMPONENTS} ${marinerCacheDir}
 
 	echo "creating node_modules tar..."
 	tar -cf ${SRC_UI_NODE_MODULES} node_modules
-	cp ${SRC_UI_NODE_MODULES} ${marinerCacheDir}
+	mv ${SRC_UI_NODE_MODULES} ${marinerCacheDir}
 	popd
 
 	pushd $HOME/.npm-global/lib
 	echo "creating local_lib_node_modules tar..."
 	tar -cf ${LOCAL_LIB_NODE_MODULES} node_modules
-	cp ${LOCAL_LIB_NODE_MODULES} ${marinerCacheDir}
+	mv ${LOCAL_LIB_NODE_MODULES} ${marinerCacheDir}
 	popd
 
 	pushd $HOME/.npm-global
 	echo "creating local node tar..."
 	tar -cf ${LOCAL_N} n
-	cp ${LOCAL_N} ${marinerCacheDir}
+	mv ${LOCAL_N} ${marinerCacheDir}
 	popd
 }
 
@@ -130,6 +153,7 @@ sudo tdnf install -y msopenjdk-11 | dieIfError
 
 echo "Installing maven modules."
 sudo tdnf install -y maven | dieIfError
+export MAVEN_OPTS="-Dmaven.repo.local=$tempDir/.m2/repository"
 
 installNodeModules
 
@@ -137,6 +161,8 @@ buildReaperSources
 
 createCacheTars
 
-cp -a ${marinerCacheDir} $HOME
+mkdir "$HOME/mariner_caches"
+
+cp -a ${marinerCacheDir} "$HOME/mariner_caches"
 
 echo "Copied cache tars to $HOME/mariner_caches/ .Exiting."
