@@ -21715,7 +21715,7 @@
         "other": {
           "name": "python-retrying",
           "version": "1.3.3",
-          "downloadUrl": "%{url}/archive/refs/tags/v1.3.3.tar.gz"
+          "downloadUrl": "https://github.com/rholder/retrying/archive/refs/tags/v1.3.3.tar.gz"
         }
       }
     },
