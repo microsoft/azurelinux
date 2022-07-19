@@ -73,7 +73,7 @@ do
 "Log '$failed_test':"
 "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 EOF
-    cat $file_test
+    cat $failed_test
 done
 
 # Last command's status is how we determine if the tests failed or not.
