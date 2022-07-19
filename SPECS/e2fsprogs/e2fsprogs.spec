@@ -62,8 +62,10 @@ rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
 %check
-# Mult-threaded runs are flaky.
+# Multi-threaded runs are flaky.
 make -j1 check
+test_status=$?
+
 for failed_test in $(find tests -name "*.failed")
 do
     cat << EOF
@@ -73,6 +75,9 @@ do
 EOF
     cat $file_test
 done
+
+# Last command's status is how we determine if the tests failed or not.
+[[ $test_status -eq 0 ]]
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
