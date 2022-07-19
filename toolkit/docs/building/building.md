@@ -58,6 +58,9 @@
       - [`DELTA_BUILD=...`](#delta_build)
         - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
         - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
+      - [`FAST_BUILD=...`](#fast_build)
+        - [`FAST_BUILD=`**`y`**`](#fast_buildy)
+        - [`FAST_BUILD=`**`n`** *(default)*](#fast_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -516,9 +519,9 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > - at least one of the RPM packages mentioned in the manifest file, or
 > - the script responsible for building the chroot.
 
-#### `HYDRATED_BUILD=...`]
+#### `HYDRATED_BUILD=...`
 
-##### `HYDRATED_BUILD=`**`y`**]
+##### `HYDRATED_BUILD=`**`y`**
 
 > If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
 
@@ -526,15 +529,25 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 > Normal build. No hydrated RPMs will be used.
 
-#### `DELTA_BUILD=...`]
+#### `DELTA_BUILD=...`
 
-##### `DELTA_BUILD=`**`y`**]
+##### `DELTA_BUILD=`**`y`**
 
 > Delta build. Used for fast delta builds where published packages are pre-populated and only new or added packages are built.
 
 ##### `DELTA_BUILD=`**`n`** *(default)*
 
 > Normal build.
+
+#### `FAST_BUILD=...`
+
+##### `FAST_BUILD=`**`y`**
+
+> Only pack a subset of spec files under `$(SPECS_DIR)`. The subset to pack is the intersection of `$(PACKAGE_BUILD_LIST)` and `$(PACKAGE_REBUILD_LIST)`, with specs listed in `$(PACKAGE_IGNORE_LIST)` ignored. This drastically speeds up the build by (a) skipping packing/expanding most SRPMs and (b) not considering as large of a package graph during the package build phase. This type of build is not a substitute for a full build for most changes, but is appropriate for fast development iteration.
+
+##### `FAST_BUILD=`**`n`** *(default)*
+
+> Will pack all specs under `$(SPECS_DIR)`.
 
 
 ## All Build Targets
