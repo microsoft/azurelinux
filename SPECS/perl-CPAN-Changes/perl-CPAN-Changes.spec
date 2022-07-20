@@ -1,7 +1,7 @@
 Name:		perl-CPAN-Changes
 Summary:	Read and write Changes files
 Version:	0.400002
-Release:	15%{?dist}
+Release:	16%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,15 +26,19 @@ BuildRequires:	perl(warnings)
 # Script Runtime
 BuildRequires:	perl(Getopt::Long)
 BuildRequires:	perl(Pod::Usage)
+
+%if %{with_check}
 # Test Suite
 BuildRequires:	perl(Test::More) >= 0.96
-# Optional Tests
-%if 0%{?fedora:1}
+# Optional Tests, currently not supported in Mariner.
+%if 0
 BuildRequires:	perl(Moo)
 %endif
 # Extra Tests
 BuildRequires:	perl(Test::Pod) >= 1.00
 BuildRequires:	perl(Test::Pod::Coverage) >= 1.00
+%endif
+
 # Runtime
 Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(version) >= 0.99.06
@@ -80,6 +84,10 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::CPAN::Changes.3*
 
 %changelog
+* Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.400002-16
+- License verified.
+- Spec clean-up.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.400002-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
