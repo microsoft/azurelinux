@@ -1,5 +1,3 @@
-%bcond_without tests
-
 # Sphinx-generated HTML documentation is not suitable for packaging; see
 # https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
 #
@@ -25,10 +23,13 @@ Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/fasteners-%{version}
 # longer used and only supports Python 2.
 Patch:          %{url}/commit/49d8f5bb56157a82ff3e6128b506638a214e6d43.patch
 BuildArch:      noarch
-BuildRequires:  python3
+
 BuildRequires:  python3-devel
-BuildRequires:  python3-pip
 BuildRequires:  python-wheel
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+%endif
 
 %global common_description %{expand: \
 Cross platform locks for threads and processes}
@@ -48,7 +49,7 @@ Summary:        A python package that provides useful locks
 sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 %endif
 %generate_buildrequires
-%pyproject_buildrequires %{?with_tests:requirements-test.txt}
+%pyproject_buildrequires -r
 
 %build
 %pyproject_wheel
@@ -58,21 +59,19 @@ sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 %pyproject_save_files fasteners
 
 %check
-%if %{with tests}
+%{python3} -m pip install atomicwrites attrs pluggy pygments six more-itertools
 %pytest %{?!with_diskcache:--ignore=tests/test_reader_writer_lock.py}
-%else
 %pyproject_check_import -e 'fasteners.pywin32*'
-%endif
 
 %files -n python3-fasteners -f %{pyproject_files}
 # pyproject_files handles LICENSE; verify with “rpm -qL -p …”
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.17.3-3
-- Initial CBL-Mariner import from Fedora 36 (License: ASL 2.0)
+- Initial CBL-Mariner import from Fedora36 (license: MIT)
 - Adding as run dependency for package cassandra medusa
 - Removing subpackage 'doc'.
-- License Verified.
+- License verified
 
 * Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17.3-2
 - Build Sphinx docs as PDF in a new -doc subpackage
