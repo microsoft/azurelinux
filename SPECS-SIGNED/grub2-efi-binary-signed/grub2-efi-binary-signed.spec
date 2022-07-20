@@ -57,7 +57,6 @@ specifically created for installing on %{buildarch} systems
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
 %ifarch x86_64
-Provides:       grub2-efi-x64-noprefix = %{version}-%{release}
 %endif
 
 %description -n grub2-efi-binary-noprefix
