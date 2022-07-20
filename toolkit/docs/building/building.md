@@ -58,9 +58,6 @@
       - [`DELTA_BUILD=...`](#delta_build)
         - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
         - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
-      - [`FAST_BUILD=...`](#fast_build)
-        - [`FAST_BUILD=`**`y`**`](#fast_buildy)
-        - [`FAST_BUILD=`**`n`** *(default)*](#fast_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -539,17 +536,6 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 > Normal build.
 
-#### `FAST_BUILD=...`
-
-##### `FAST_BUILD=`**`y`**
-
-> Only pack a subset of spec files under `$(SPECS_DIR)`. The subset to pack is the intersection of `$(PACKAGE_BUILD_LIST)` and `$(PACKAGE_REBUILD_LIST)`, with specs listed in `$(PACKAGE_IGNORE_LIST)` ignored. This drastically speeds up the build by (a) skipping packing/expanding most SRPMs and (b) not considering as large of a package graph during the package build phase. This type of build is not a substitute for a full build for most changes, but is appropriate for fast development iteration.
-
-##### `FAST_BUILD=`**`n`** *(default)*
-
-> Will pack all specs under `$(SPECS_DIR)`.
-
-
 ## All Build Targets
 
 These are the useful build targets:
@@ -649,6 +635,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
+| SRPM_PACK_LIST                |                                                                                                        | List of spec basenames to build into SRPMs. If empty, all specs under `$(SPECS_DIR)` will be packed.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 
 ---

@@ -17,6 +17,7 @@ CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
 PACKAGE_IGNORE_LIST    ?=
+SRPM_PACK_LIST         ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
@@ -48,7 +49,6 @@ USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 DELTA_BUILD                     ?= n
-FAST_BUILD                      ?= n
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
