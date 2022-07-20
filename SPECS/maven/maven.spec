@@ -22,7 +22,6 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz#/apache-%{name}-%{version}-src.tar.gz
-# @TODO
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 1.0 maven rpm to provide the mvn binary for the build.
 %ifarch x86_64
@@ -36,8 +35,8 @@ Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.
 # In order to generate tarballs, use "maven_build_caches.sh".
 # ./maven_build_caches.sh -v <Maven version string> -a <x86_64 | aarch64>
 # ex: ./maven_build_caches.sh -v 3.8.4 -a x86_64
-Source3:        %{m2_cache_tarball_name}
-Source4:        %{licenses_tarball_name}
+Source2:        %{m2_cache_tarball_name}
+Sourc33:        %{licenses_tarball_name}
 
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  msopenjdk-11
@@ -58,14 +57,14 @@ mvn -v
 # Setup maven .m2 cache directory
 mkdir /root/.m2
 pushd /root/.m2
-tar xf %{SOURCE3} --no-same-owner
+tar xf %{SOURCE2} --no-same-owner
 popd
 
 %setup -q -n apache-%{name}-%{version}
 # Setup licenses. Remove LICENSE.vm script, which downloads all subproject license files, and replace with prepopulated license tarball.
 rm -v apache-maven/src/main/appended-resources/META-INF/LICENSE.vm
 pushd apache-maven
-tar xf %{SOURCE4} --no-same-owner
+tar xf %{SOURCE3} --no-same-owner
 cp -v ./target/licenses/lib/* %{_var}/opt/apache-maven/lib
 popd
 
