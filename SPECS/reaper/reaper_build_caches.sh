@@ -44,9 +44,9 @@ function cleanup {
 
 trap cleanup EXIT SIGINT SIGTERM
 
-mkdir -p ${tempDir}/mariner_caches
-
 marinerCacheDir=${tempDir}/mariner_caches
+
+mkdir -p ${marinerCacheDir}
 
 function checkInternet {
 	sudo tdnf install -y nc
@@ -59,16 +59,9 @@ function checkInternet {
 	fi
 }
 
-function dieIfError {
-	if [ $? -ne 0 ];then
-		echo "Error $?, exiting build."
-		exit $?
-	fi
-}
-
 function installNodeModules {
 	echo "Installing node modules."
-	sudo tdnf install -y nodejs | dieIfError
+	sudo tdnf install -y nodejs
 	npm config set cache "$tempDir/.npm" --global
 	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
 	# incompatibilities.
@@ -92,7 +85,7 @@ function installNodeModules {
 
 function buildReaperSources {
 	pushd $tempDir
-	sudo tdnf install -y wget | dieIfError
+	sudo tdnf install -y wget
 	wget $SOURCE_URL -O reaper.tar.gz
 	tar -xf reaper.tar.gz
 	cd cassandra-reaper-${VERSION}
@@ -149,10 +142,10 @@ echo "Generate cassandra reaper build caches..."
 checkInternet
 
 echo "Installing msopenjdk-11."
-sudo tdnf install -y msopenjdk-11 | dieIfError
+sudo tdnf install -y msopenjdk-11
 
 echo "Installing maven modules."
-sudo tdnf install -y maven | dieIfError
+sudo tdnf install -y maven
 export MAVEN_OPTS="-Dmaven.repo.local=$tempDir/.m2/repository"
 
 installNodeModules
