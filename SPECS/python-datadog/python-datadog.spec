@@ -1,8 +1,3 @@
-# Enable Python dependency generation
-%{?python_enable_dependency_generator}
-
-%{!?python3_pkgversion: %global python3_pkgversion 3}
-
 Name:           python-datadog
 Version:        0.44.0
 Release:        2%{?dist}
@@ -12,8 +7,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/DataDog/datadogpy
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/datadogpy-%{version}.tar.gz
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-devel
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -24,11 +22,8 @@ server, to interact with Datadog and efficiently report events and metrics.
 
 %package -n python%{python3_pkgversion}-datadog
 Summary:        Python wrapper for the Datadog API
-%if %{undefined python_enable_dependency_generator}
-Requires:       python%{python3_pkgversion}-requests >= 2.6.0
-%endif
-
-%{?python_provide:%python_provide python%{python3_pkgversion}-datadog}
+Requires:       python3-requests >= 2.6.0
+Provides:       python3-datadog
 
 %description -n python%{python3_pkgversion}-datadog
 Datadogpy is a collection of tools suitable for inclusion in existing Python
@@ -49,6 +44,10 @@ server, to interact with Datadog and efficiently report events and metrics.
 # package, but it still gets built right now.
 rm %{buildroot}/%{_bindir}/dog{,wrap}
 
+%check
+%{python3} -m pip install tox
+tox -e py%{python3_version_nodots} -v
+
 %files -n python%{python3_pkgversion}-datadog
 %license LICENSE
 %{python3_sitelib}/datadog*
@@ -57,9 +56,9 @@ rm %{buildroot}/%{_bindir}/dog{,wrap}
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.44.0-2
-- Initial CBL-Mariner import from fedora 36 (License: BSD)
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as run dependency for package cassandra medusa
-- License Verified
+- License verified
 
 * Wed Mar 16 2022 Dalton Miner <daltonminer@gmail.com> - 0.44.0-1
 - Update to 0.44.0
