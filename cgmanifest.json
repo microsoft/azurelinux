@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.83.1",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.1.tar.gz"
+          "version": "7.84.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.84.0.tar.gz"
         }
       }
     },
