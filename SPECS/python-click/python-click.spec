@@ -1,4 +1,6 @@
 %global pypi_name click
+%global debug_package %{nil}
+
 Name:           python-%{pypi_name}
 Version:        8.0.4
 Release:        3%{?dist}
@@ -6,7 +8,7 @@ Summary:        Simple wrapper around optparse for powerful command line utiliti
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/mitsuhiko/click
+URL:            https://github.com/pallets/click
 Source0:        https://github.com/pallets/click/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -18,18 +20,18 @@ comes with good defaults out of the box.
 
 %description %{_description}
 
-%package -n     python%{python3_pkgversion}-%{pypi_name}
+%package -n     python3-%{pypi_name}
 Summary:        %{summary}
-
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  pyproject-rpm-macros
-BuildRequires:  python-wheel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-devel
+BuildRequires:  python3-wheel
 %if %{with_check}
-BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python3-pip
+BuildRequires:  python3-packaging
+BuildRequires:  python3-pytest
 %endif
 
-%global _description \
-%description -n python%{python3_pkgversion}-%{pypi_name} %{_description}
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
@@ -39,57 +41,60 @@ sed -i 's|requirements/tests.txt|requirements/tests.in|' tox.ini
 # https://github.com/pallets/click/commit/91b2cd67dd04b2843fd6c71e582876c826f5b78e
 sed -i 's|pytest<7|pytest|' requirements/tests.in
 
-%generate_buildrequires
-%pyproject_buildrequires -t
-
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
-%pyproject_save_files %{pypi_name}
+%{pyproject_install}
+%{pyproject_save_files} %{pypi_name}
 
 %check
+%{python3} -m pip install tox attrs iniconfig pluggy py toml tox-current-env atomicwrites more-itertools six
 %tox
 
-%files -n python%{python3_pkgversion}-%{pypi_name} -f %pyproject_files
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE.rst
 %doc README.rst CHANGES.rst
 
 %changelog
 * Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 8.0.4-3
-- Import from Fedora 36 (License: BSD)
 - Bumping version to 8.0.4
 - Adding as run dependency (Requires) for package cassandra medusa.
 - Merged changelogs.
+
 - Wed Mar 02 2022 Charalampos Stratakis <cstratak@redhat.com> - 8.0.4-2
 - Unpin pytest version
+
 - Thu Feb 24 2022 Charalampos Stratakis <cstratak@redhat.com> - 8.0.4-1
 - Update to 8.0.4
 - Resolves: rhbz#2056119
+
 - Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 - Fri Nov 05 2021 Karolina Surma <ksurma@redhat.com> - 8.0.3-1
 - Update to 8.0.3
 - Resolves: rhbz#2012353
+
 - Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
 - Thu Jul 08 2021 Lumír Balhar <lbalhar@redhat.com> - 8.0.1-2
 - Use test dependencies without version locks
+
 - Tue Jun 22 2021 Lumír Balhar <lbalhar@redhat.com> - 8.0.1-1
 - Update to 8.0.1
 - Resolves: rhbz#1901659
+
 - Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 7.1.2-6
 - Rebuilt for Python 3.10
-- Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.2-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 7.1.2-5
 - Drop BR on pytest & pip install latest deps to enable ptest
 - License verified
 
-* Fri Sep 11 2020 Charalampos Stratakis <cstratak@redhat.com> - 7.1.2-4
-- Modernize the SPEC and convert it to pyproject macros
+* Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 7.1.2-4
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
