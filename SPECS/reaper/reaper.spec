@@ -163,5 +163,5 @@ chown -R reaper: %{_localstatedir}/log/cassandra-reaper/
 
 %changelog
 * Mon Jun 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-1
-- Original version for CBL-Mariner (License: MIT)
+- Original version for CBL-Mariner (license: MIT)
 - License verified
