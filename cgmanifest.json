@@ -25226,6 +25226,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sysbench",
+          "version": "1.0.20",
+          "downloadUrl": "https://github.com/akopytov/sysbench/archive/1.0.20/sysbench-1.0.20.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sysfsutils",
           "version": "2.1.0",
           "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
