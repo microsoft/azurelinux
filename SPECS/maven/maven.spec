@@ -15,7 +15,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,19 +24,16 @@ URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz#/apache-%{name}-%{version}-src.tar.gz
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 1.0 maven rpm to provide the mvn binary for the build.
-%ifarch x86_64
 Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.x86_64.rpm
-%else
-Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.aarch64.rpm
-%endif
+Source2: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.aarch64.rpm
 
 # CBL-Mariner build are without network connection. Hence, we need to generate build caches as tarballs to build
 # rpms in offline mode.
 # In order to generate tarballs, use "maven_build_caches.sh".
 # ./maven_build_caches.sh -v <Maven version string> -a <x86_64 | aarch64>
 # ex: ./maven_build_caches.sh -v 3.8.4 -a x86_64
-Source2:        %{m2_cache_tarball_name}
-Source3:        %{licenses_tarball_name}
+Source3:        %{m2_cache_tarball_name}
+Source4:        %{licenses_tarball_name}
 
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  msopenjdk-11
@@ -51,20 +48,24 @@ Maven is a software project management and comprehension tool. Based on the conc
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
 echo "Installing mvn 1.0 using rpm with --nodeps."
+%ifarch x86_64
 rpm -i --nodeps %{SOURCE1}
+%else
+rpm -i --nodeps %{SOURCE2}
+%endif
 mvn -v
 
 # Setup maven .m2 cache directory
 mkdir /root/.m2
 pushd /root/.m2
-tar xf %{SOURCE2} --no-same-owner
+tar xf %{SOURCE3} --no-same-owner
 popd
 
 %setup -q -n apache-%{name}-%{version}
 # Setup licenses. Remove LICENSE.vm script, which downloads all subproject license files, and replace with prepopulated license tarball.
 rm -v apache-maven/src/main/appended-resources/META-INF/LICENSE.vm
 pushd apache-maven
-tar xf %{SOURCE3} --no-same-owner
+tar xf %{SOURCE4} --no-same-owner
 cp -v ./target/licenses/lib/* %{_var}/opt/apache-maven/lib
 popd
 
@@ -132,6 +133,9 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/README.txt
 
 %changelog
+* Wed Jul 20 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-2
+- Adding both x86_64 and aarch64 1.0 maven rpm as sources.
+
 * Mon Jun 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-1
 - Adding apache maven as build dependency for cassandra reaper.
 - Using 1.0 maven rpm from PMC as source to provide pre-built binary for building sources
