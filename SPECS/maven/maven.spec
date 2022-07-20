@@ -36,7 +36,7 @@ Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.
 # ./maven_build_caches.sh -v <Maven version string> -a <x86_64 | aarch64>
 # ex: ./maven_build_caches.sh -v 3.8.4 -a x86_64
 Source2:        %{m2_cache_tarball_name}
-Sourc33:        %{licenses_tarball_name}
+Source3:        %{licenses_tarball_name}
 
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  msopenjdk-11
