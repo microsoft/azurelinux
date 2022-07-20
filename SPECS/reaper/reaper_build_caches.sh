@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
 # NOTE: EXECUTING with id=0 (root) CAUSES REAPER BUILD TO FAIL.
 if [[ $(id -u) -eq 0 ]]; then
@@ -12,7 +12,7 @@ fi
 # (a) Modify VERSION="x.x.x" in script.
 # (b) Pass arguments to command line: ./reaper_build_caches.sh 3.1.1
 VERSION="3.1.1"
-if [ $? -gt 1 ]; then
+if [ $# -ge 1 ]; then
     VERSION=$1
 fi
 
