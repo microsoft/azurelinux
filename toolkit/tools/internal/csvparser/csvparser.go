@@ -38,8 +38,9 @@ func FilepathsToArray(parentDir string) []string {
 	image_pkg_fetcher_path := parentDir + "/imagepkgfetcher.csv"
 	imager_path := parentDir + "/imager.csv"
 	roast_path := parentDir + "/roast.csv"
+	init_path := parentDir + "/init"
 
-	fileArray := []string{image_config_validator_path, image_pkg_fetcher_path, imager_path, roast_path}
+	fileArray := []string{image_config_validator_path, image_pkg_fetcher_path, imager_path, roast_path, init_path}
 
 	return fileArray
 }
@@ -69,10 +70,22 @@ func OutputCSVLog(files []string) {
 		CSVToArray(file)
 	}
 
-	fmt.Printf("start: %s\n", timeArray[0][4])
+	wd, _ := os.Getwd()
+	idx := strings.Index(wd, "CBL-Mariner")
+	wd = wd[0 : idx+11]
+	wd += "/build/timestamp/"
+	initInfo, err := os.Stat(wd + "init")
+	
+	if err != nil {
+		fmt.Println("Unable to locate init file.")
+	}
+	
+
+	startTime := initInfo.ModTime()
+
+	fmt.Printf("start: %s\n", startTime.Format(time.UnixDate))
 	fmt.Printf("end: %s\n", timeArray[len(timeArray)-1][5])
 
-	startTime, err := time.Parse(time.UnixDate, timeArray[0][4])
 	if err != nil {
 		panic(err)
 	}
