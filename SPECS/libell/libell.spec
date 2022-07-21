@@ -57,6 +57,9 @@ find %{buildroot} -type f -name "*.la" -delete
 
 
 %changelog
+* Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 0.48-2
+- Promote to Mariner base repo
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-1
 - Update to version 0.48.
 - License verified.

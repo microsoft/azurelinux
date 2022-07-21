@@ -125,6 +125,9 @@ make test ARGS="-V" -C %{_target_platform}
 %{_datadir}/vala/vapi/libical-glib.vapi
 
 %changelog
+* Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 3.0.9-5
+- Promote to Mariner base repo
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-4
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
