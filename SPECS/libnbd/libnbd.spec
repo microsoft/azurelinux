@@ -1,24 +1,14 @@
-# If there are patches which touch autotools files, set this to 1.
-%global patches_touch_autotools %{nil}
-
 # The source directory.
 %global source_directory 1.12-stable
-
+Summary:        NBD client library in userspace
 Name:           libnbd
 Version:        1.12.1
-Release:        1%{?dist}
-Summary:        NBD client library in userspace
-
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.com/nbdkit/libnbd
-
 Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
-
-%if 0%{patches_touch_autotools}
-BuildRequires: autoconf, automake, libtool
-%endif
 
 # For the core library.
 BuildRequires:  gcc
@@ -44,7 +34,7 @@ BuildRequires:  glib2-devel
 # For bash-completion.
 BuildRequires:  bash-completion
 
-# Only for running the test suite.
+%if %{with_check}
 BuildRequires:  coreutils
 BuildRequires:  gcc-c++
 BuildRequires:  gnutls-utils
@@ -53,7 +43,7 @@ BuildRequires:  jq
 BuildRequires:  nbd
 BuildRequires:  qemu-img
 BuildRequires:  util-linux
-
+%endif
 
 %description
 NBD — Network Block Device — is a protocol for accessing Block Devices
@@ -75,83 +65,64 @@ The key features are:
 
  * Bindings in several programming languages.
 
-
-%package devel
+%package        devel
 Summary:        Development headers for %{name}
 License:        LGPLv2+ and BSD
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 This package contains development headers for %{name}.
 
-
-%package -n ocaml-%{name}
+%package -n     ocaml-%{name}
 Summary:        OCaml language bindings for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+Requires:       %{name} = %{version}-%{release}
 
 %description -n ocaml-%{name}
 This package contains OCaml language bindings for %{name}.
 
-
-%package -n ocaml-%{name}-devel
+%package -n     ocaml-%{name}-devel
 Summary:        OCaml language development package for %{name}
 License:        LGPLv2+ and BSD
-Requires:       ocaml-%{name}%{?_isa} = %{version}-%{release}
-
+Requires:       ocaml-%{name} = %{version}-%{release}
 
 %description -n ocaml-%{name}-devel
 This package contains OCaml language development package for
 %{name}.  Install this if you want to compile OCaml software which
 uses %{name}.
 
-
-%package -n python3-%{name}
+%package -n     python3-%{name}
 Summary:        Python 3 bindings for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{name}}
 
 # The Python module happens to be called lib*.so.  Don't scan it and
 # have a bogus "Provides: libnbdmod.*".
 %global __provides_exclude_from ^%{python3_sitearch}/lib.*\\.so
 
-
 %description -n python3-%{name}
 python3-%{name} contains Python 3 bindings for %{name}.
 
-
-%package -n nbdfuse
+%package -n     nbdfuse
 Summary:        FUSE support for %{name}
 License:        LGPLv2+ and BSD
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Recommends:     fuse3
-
 
 %description -n nbdfuse
 This package contains FUSE support for %{name}.
 
-
-%package bash-completion
+%package        bash-completion
 Summary:       Bash tab-completion for %{name}
 BuildArch:     noarch
 Requires:      bash-completion >= 2.0
-# Don't use _isa here because it's a noarch package.  This dependency
-# is just to ensure that the subpackage is updated along with libnbd.
 Requires:      %{name} = %{version}-%{release}
-
 
 %description bash-completion
 Install this package if you want intelligent bash tab-completion
 for %{name}.
 
-
 %prep
 %autosetup -p1
-%if 0%{patches_touch_autotools}
-autoreconf -i
-%endif
-
 
 %build
 %configure \
@@ -162,19 +133,14 @@ autoreconf -i
     --enable-ocaml \
     --enable-fuse \
     --disable-golang
-
-make %{?_smp_mflags}
-
+%make_build
 
 %install
 %make_install
-
-# Delete libtool crap.
-find $RPM_BUILD_ROOT -name '*.la' -delete
+find %{buildroot} -type f -name '*.la' -print -delete
 
 # Delete the golang man page since we're not distributing the bindings.
-rm $RPM_BUILD_ROOT%{_mandir}/man3/libnbd-golang.3*
-
+rm %{buildroot}%{_mandir}/man3/libnbd-golang.3*
 
 %check
 function skip_test ()
@@ -195,7 +161,7 @@ skip_test fuse/test-*.sh
 make -C tests connect-tcp6 ||:
 skip_test tests/connect-tcp6
 
-make %{?_smp_mflags} check || {
+%make_build check || {
     for f in $(find -name test-suite.log); do
         echo
         echo "==== $f ===="
@@ -214,7 +180,6 @@ make %{?_smp_mflags} check || {
 %{_mandir}/man1/nbdcopy.1*
 %{_mandir}/man1/nbdinfo.1*
 
-
 %files devel
 %doc TODO examples/*.c
 %license examples/LICENSE-FOR-EXAMPLES
@@ -226,7 +191,6 @@ make %{?_smp_mflags} check || {
 %{_mandir}/man3/libnbd-security.3*
 %{_mandir}/man3/nbd_*.3*
 
-
 %files -n ocaml-%{name}
 %{_libdir}/ocaml/nbd
 %exclude %{_libdir}/ocaml/nbd/*.a
@@ -235,7 +199,6 @@ make %{?_smp_mflags} check || {
 %exclude %{_libdir}/ocaml/nbd/*.mli
 %{_libdir}/ocaml/stublibs/dllmlnbd.so
 %{_libdir}/ocaml/stublibs/dllmlnbd.so.owner
-
 
 %files -n ocaml-%{name}-devel
 %doc ocaml/examples/*.ml
@@ -248,7 +211,6 @@ make %{?_smp_mflags} check || {
 %{_mandir}/man3/NBD.3*
 %{_mandir}/man3/NBD.*.3*
 
-
 %files -n python3-%{name}
 %{python3_sitearch}/libnbdmod*.so
 %{python3_sitearch}/nbd.py
@@ -257,11 +219,9 @@ make %{?_smp_mflags} check || {
 %{_bindir}/nbdsh
 %{_mandir}/man1/nbdsh.1*
 
-
 %files -n nbdfuse
 %{_bindir}/nbdfuse
 %{_mandir}/man1/nbdfuse.1*
-
 
 %files bash-completion
 %dir %{_datadir}/bash-completion/completions
@@ -272,6 +232,10 @@ make %{?_smp_mflags} check || {
 
 
 %changelog
+* Fri Jul 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.12.1-2
+- Promote to Mariner base repo
+- Lint spec
+
 * Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.1-1
 - Updating to version 1.12.1 using Fedora 36 spec (license: MIT) for guidance.
 
