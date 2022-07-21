@@ -22813,6 +22813,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "reaper",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ragel",
           "version": "7.0.4",
           "downloadUrl": "https://github.com/adrian-thurston/ragel/archive/7.0.4.tar.gz"
