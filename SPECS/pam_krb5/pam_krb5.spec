@@ -1,26 +1,23 @@
-Summary:	A Pluggable Authentication Module for Kerberos 5
-Name:		pam_krb5
-Version:	4.11
-Release:	2%{?dist}
-License:	MIT and BSD
-Group:		System/Libraries
-URL:		https://github.com/rra/pam-krb5
-Source0:	%{url}/archive/refs/tags/upstream/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0001:	0001-Drop-module-long-test.patch
-
-Requires:	pam
-
-BuildRequires:	byacc
-BuildRequires:	flex
-BuildRequires:	gcc
-BuildRequires:	krb5-devel
-BuildRequires:	pam-devel
-
+Summary:        A Pluggable Authentication Module for Kerberos 5
+Name:           pam_krb5
+Version:        4.11
+Release:        2%{?dist}
+License:        MIT AND BSD
+Group:          System/Libraries
+URL:            https://github.com/rra/pam-krb5
+Source0:        %{url}/archive/refs/tags/upstream/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0001:      0001-Drop-module-long-test.patch
+BuildRequires:  byacc
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  krb5-devel
+BuildRequires:  pam-devel
+BuildRequires:  perl(Test::Pod)
 # for testing
-BuildRequires:	perl(lib)
-BuildRequires:	perl(Test::Pod)
+BuildRequires:  perl(lib)
+Requires:       pam
 
-%description 
+%description
 pam-krb5 is a Kerberos v5 PAM module for either MIT Kerberos or
 Heimdal.  It supports ticket refreshing by screen savers, configurable
 authorization handling, authentication of non-local accounts for
@@ -31,8 +28,8 @@ PrivilegeSeparation enabled, and supports extensive configuration
 either by PAM options or in krb5.conf or both.  PKINIT is supported
 with recent versions of both MIT Kerberos and Heimdal and FAST is
 supported with recent MIT Kerberos.
-  
-%prep 
+
+%prep
 %setup -q -n pam-krb5-upstream-%{version}
 
 %autopatch -p1
@@ -48,7 +45,7 @@ supported with recent MIT Kerberos.
 sed -ri -e 's|/lib(64)?/|/\$LIB/|g' %{buildroot}/%{_mandir}/man*/pam_krb5*.5*
 
 # cleanup
-rm -f %{buildroot}/%{_libdir}/security/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # https://github.com/rra/pam-krb5/issues/25
@@ -56,7 +53,7 @@ rm -f %{buildroot}/%{_libdir}/security/*.la
 # That has to be done as someone with write access to /etc/
 # which is not the mockbuild user.
 #
-%{__make} check
+make check
 
 %files
 %license LICENSE

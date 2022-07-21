@@ -13915,7 +13915,7 @@
         "other": {
           "name": "pam_krb5",
           "version": "4.11",
-          "downloadUrl": "https://github.com/rra/pam-krb5/archive/refs/tags/upstream/4.11.tar.gz#/pam_krb5-4.11.tar.gz"
+          "downloadUrl": "https://github.com/rra/pam-krb5/archive/refs/tags/upstream/4.11.tar.gz"
         }
       }
     },
