@@ -11,13 +11,15 @@ import (
 	"time"
 
 	"github.com/gosuri/uiprogress"
+	"github.com/gosuri/uiprogress/util/strutil"
 )
 
 type stampedFile struct {
-	fileName  string
-	currLine  int32
-	totalLine int32
-	bar       *uiprogress.Bar
+	fileName     string
+	currLine     int32
+	totalLine    int32
+	bar          *uiprogress.Bar
+	lastStepDesc string
 }
 
 var (
@@ -28,38 +30,48 @@ var (
 	targetDir     string
 	targetCSV     = []*stampedFile{
 		&stampedFile{
-			fileName:  "create_worker_chroot.csv",
-			currLine:  0,
-			totalLine: 5,
+			fileName:     "create_worker_chroot.csv",
+			currLine:     0,
+			totalLine:    5,
+			lastStepDesc: "Added lines to worker chroot",
 		},
 		&stampedFile{
-			fileName:  "imageconfigvalidator.csv",
-			currLine:  0,
-			totalLine: 2,
+			fileName:     "imageconfigvalidator.csv",
+			currLine:     0,
+			totalLine:    2,
+			lastStepDesc: "Added lines to config validator",
 		},
 		&stampedFile{
-			fileName:  "imagepkgfetcher.csv",
-			currLine:  0,
-			totalLine: 9,
+			fileName:     "imagepkgfetcher.csv",
+			currLine:     0,
+			totalLine:    9,
+			lastStepDesc: "Added lines to package fetcher",
 		},
 		&stampedFile{
-			fileName:  "imager.csv",
-			currLine:  0,
-			totalLine: 4,
+			fileName:     "imager.csv",
+			currLine:     0,
+			totalLine:    4,
+			lastStepDesc: "Added lines to imager",
 		},
 		&stampedFile{
-			fileName:  "roast.csv",
-			currLine:  0,
-			totalLine: 3,
+			fileName:     "roast.csv",
+			currLine:     0,
+			totalLine:    3,
+			lastStepDesc: "Added lines to roast",
 		},
 	}
 	// targetJSON = []string{} // for future version
 )
 
 func main() {
-	fmt.Println("Starting dashboard")
+	fmt.Println("Starting dashboard:")
 	uiprogress.Start()
 	bar := uiprogress.AddBar(int(totalProgress)).AppendCompleted().PrependElapsed()
+
+	bar.PrependFunc(func(b *uiprogress.Bar) string {
+		return "Building image:"
+	})
+
 	SetSubBar()
 
 	wd, _ := os.Getwd()
@@ -106,9 +118,16 @@ func (file *stampedFile) getUpdate(currStat fs.FileInfo) {
 	currNumLines := file.getNumLines()
 	if currNumLines != file.currLine {
 		atomic.AddInt32(&currProgress, currNumLines-file.currLine)
+		currStatus := fmt.Sprintf("[%d / %d] ", currProgress, totalProgress)
+
 		file.currLine = currNumLines
-		// fmt.Printf("Progress: %d / %d \n", currProgress, totalProgress)
 		file.bar.Set(int(currNumLines))
+
+		// Change progress bar label for that specific file
+		file.bar.PrependFunc(func(b *uiprogress.Bar) string {
+			return strutil.Resize(currStatus+file.fileName+": "+file.lastStepDesc, 40)
+		})
+
 		// pop one task off the queue when it's done
 		if currNumLines == file.totalLine {
 			wg.Done()
@@ -116,18 +135,21 @@ func (file *stampedFile) getUpdate(currStat fs.FileInfo) {
 	}
 }
 
-// Naive implementation (potentially inefficient for larger files).
 func (file *stampedFile) getNumLines() int32 {
 	currfile, _ := os.Open(targetDir + file.fileName)
 	fileScanner := bufio.NewScanner(currfile)
 	count := int32(0)
+	lastLine := ""
 
 	for fileScanner.Scan() {
 		count += 1
+		lastLine = fileScanner.Text() // Naive: always gets overwritten by last line in CSV
 		if count > file.currLine {
 			// fmt.Printf("[%d / %d] in %s: %s \n", count, targetCSV[filepath][1], filepath, fileScanner.Text())
 		}
 	}
+
+	file.lastStepDesc = lastLine
 
 	return count
 }
@@ -146,6 +168,9 @@ func SetSubBar() {
 	for i, _ := range targetCSV {
 		currFile := targetCSV[i]
 		currFile.bar = uiprogress.AddBar(int(currFile.totalLine)).AppendCompleted().PrependElapsed()
+		currFile.bar.PrependFunc(func(b *uiprogress.Bar) string {
+			return currFile.fileName + ": "
+		})
 		wg.Add(1)
 	}
 }
