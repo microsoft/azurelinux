@@ -3,7 +3,7 @@
 Summary:        A module to simplify fiber-local state
 Name:           rubygem-fiber-local
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Jul 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-3
+- Add provides, add missing files
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-2
 - Build from .tar.gz source.
 

@@ -34,7 +34,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 
 %changelog
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3.1-1
-- Update to v1.3.1.
+- Downgrade to v1.3.1.
 - Build from .tar.gz source.
 
 * Mon Jan 04 2021 Henry Li <lihl@microsoft.com> - 1.4.1-1

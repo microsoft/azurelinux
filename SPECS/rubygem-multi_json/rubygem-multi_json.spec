@@ -1,9 +1,9 @@
 %global debug_package %{nil}
 %global gem_name multi_json
 Summary:        A generic swappable back-end for JSON handling
-Name:           rubygem-multi_json
+Name:           rubygem-%{gem_name}
 Version:        1.15.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Jul 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.0-3
+- Add provides.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.0-2
 - Build from .tar.gz source.
 

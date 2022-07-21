@@ -3,7 +3,7 @@
 Summary:        Logging for Ruby
 Name:           rubygem-console
 Version:        1.10.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Jul 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.10.1-3
+- Add provides.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.10.1-2
 - Build from .tar.gz source.
 
