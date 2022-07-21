@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libell
 Version:        0.48
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embedded Linux library
 License:        LGPLv2+
 URL:            https://01.org/ell
@@ -57,6 +57,9 @@ find %{buildroot} -type f -name "*.la" -delete
 
 
 %changelog
+* Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 0.48-2
+- Promote to Mariner base repo
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-1
 - Update to version 0.48.
 - License verified.
