@@ -4,7 +4,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.19.3
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,6 @@ URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pam-devel
 Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       %{name}-libs = %{version}-%{release}
@@ -54,7 +53,6 @@ autoconf &&
     --sysconfdir=%{_sysconfdir} \
     --localstatedir=%{_sharedstatedir} \
     --with-system-et         \
-    --with-pam \
     --with-system-ss         \
     --with-system-verto=no   \
     --enable-dns-for-realm   \
