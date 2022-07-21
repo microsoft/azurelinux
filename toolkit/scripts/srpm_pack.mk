@@ -19,7 +19,7 @@ SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
 
-ifeq ($(strip $(SRPM_PACK_LIST)),)
+ifneq ($(strip $(SRPM_PACK_LIST)),)
 local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 	@echo $(strip $(SRPM_PACK_LIST)) | tr " " "\n" > $(srpm_pack_list_file)
