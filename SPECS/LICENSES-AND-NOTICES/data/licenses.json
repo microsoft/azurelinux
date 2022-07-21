@@ -958,6 +958,7 @@
                 "p7zip",
                 "pacrunner",
                 "pakchois",
+                "pam_krb5",
                 "pam_wrapper",
                 "papi",
                 "paps",
