@@ -2726,6 +2726,12 @@
             "specs": [
                 "k3s"
             ]
+        },
+        "Sysbench source": {
+            "license": "[GPLv2+ License](https://github.com/akopytov/sysbench/blob/master/COPYING)",
+            "specs": [
+                "sysbench"
+            ]
         }
     }
 }
