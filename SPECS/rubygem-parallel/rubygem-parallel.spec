@@ -10,6 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/grosser/parallel
 Source0:        https://github.com/grosser/parallel/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -19,16 +20,13 @@ Run any code in parallel Processes(> use all CPUs) or Threads(> speedup blocking
 Best suited for map-reduce or e.g. parallel downloads/uploads.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add MIT-LICENSE.txt and lib files to buildroot from Source0
-cp -r lib/ %{buildroot}%{gem_instdir}/
-cp MIT-LICENSE.txt %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
