@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,7 @@ Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
 Provides:       selinux-policy-base
 Provides:       selinux-policy-targeted
+Provides:       container-selinux
 BuildArch:      noarch
 
 %description
@@ -337,6 +338,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Jul 20 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.20220106-10
+- SELinux policy supports container-selinux adding to provides.
+
 * Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-9
 - Fixes for interactive container use.
 
