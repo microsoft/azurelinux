@@ -3,7 +3,7 @@
 Summary:        Adds a metaclass method to all Ruby objects
 Name:           rubygem-%{gem_name}
 Version:        0.0.4
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source0:        https://github.com/floehopper/metaclass/archive/refs/tags/v%{ver
 # Make the test suite support MiniTest 5.x.
 # https://github.com/floehopper/metaclass/commit/cff40cbace639d3b66d7913d99e74e56f91905b8
 Patch0:         rubygem-metaclass-0.0.4-Move-to-Minitest-5.patch
+Patch1:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
@@ -23,14 +24,6 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 %description
 Adds a metaclass method to all Ruby objects
 
-%package doc
-Summary: Documentation for %{name}
-Requires: %{name} = %{version}-%{release}
-BuildArch: noarch
-
-%description doc
-Documentation for %{name}
-
 %prep
 %autosetup -p1 -n %{gem_name}-%{version}
 
@@ -38,37 +31,21 @@ Documentation for %{name}
 gem build %{gem_name}
 
 %install
-gem install %{gem_name}-%{version}.gem
-mkdir -p %{buildroot}%{gem_instdir}
-cp -a /%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec %{buildroot}%{gem_dir}/
-#add lib and test files to buildroot from Source0
-cp -a lib/ %{buildroot}%{gem_instdir}/
-cp -a test/ %{buildroot}%{gem_instdir}/
-#add COPYING, README, Rakefile and Gemfile files to buildroot from Source0
-cp COPYING.txt %{buildroot}%{gem_instdir}/
-cp README.md %{buildroot}%{gem_instdir}/
-cp Rakefile %{buildroot}%{gem_instdir}/
-cp Gemfile %{buildroot}%{gem_instdir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %check
 # test_helper.rb currently references bundler, so it is easier to avoid
 # its usage at all.
-sed -i '/require "bundler\/setup"/ d' test/test_helper.rb
 ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 
 %files
-%dir %{gem_instdir}
-%license %{gem_instdir}/COPYING.txt
-%{gem_libdir}
-%{gem_dir}/%{gem_name}-%{version}.gemspec
-
-%files doc
-%doc %{gem_instdir}/README.md
-%{gem_instdir}/Gemfile
-%{gem_instdir}/Rakefile
-%{gem_instdir}/test
+%defattr(-,root,root,-)
+%{gemdir}
 
 %changelog
+* Tue Jul 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-16
+- Add provides, add missing files, remove doc package
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-15
 - Build from .tar.gz source.
 
