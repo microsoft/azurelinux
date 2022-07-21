@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "libexif",
-          "version": "0.6.22",
-          "downloadUrl": "https://github.com/libexif/libexif/archive/libexif-0_6_22-release.tar.gz"
+          "version": "0.6.24",
+          "downloadUrl": "https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2"
         }
       }
     },
@@ -8363,6 +8363,16 @@
           "name": "libgcrypt",
           "version": "1.9.4",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgdiplus",
+          "version": "6.1",
+          "downloadUrl": "https://download.mono-project.com/sources/libgdiplus/libgdiplus-6.1.tar.gz"
         }
       }
     },

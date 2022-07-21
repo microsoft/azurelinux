@@ -1,89 +1,82 @@
+Summary:        Library for extracting extra information from image files
+Name:           libexif
+Version:        0.6.24
+Release:        1%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary:	Library for extracting extra information from image files
-Name:		libexif
-Version:	0.6.22
-Release:	3%{?dist}
-License:	LGPLv2+
-URL:		https://libexif.github.io/
-%global tarball_version %(echo %{version} | sed -e 's|\\.|_|g')
-Source0:	https://github.com/libexif/libexif/archive/libexif-%{tarball_version}-release.tar.gz
-
-# https://github.com/libexif/libexif/commit/ce03ad7ef4e8aeefce79192bf5b6f69fae396f0c
-Patch0:         CVE-2020-0181-CVE-2020-0198.patch
-# https://github.com/libexif/libexif/commit/9266d14b5ca4e29b970fa03272318e5f99386e06
-Patch1:         CVE-2020-0452.patch
-
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	doxygen
-BuildRequires:	gettext-devel
-BuildRequires:	libtool
-BuildRequires:	pkgconfig
+URL:            https://libexif.github.io/
+Source0:        https://github.com/libexif/libexif/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  make
+BuildRequires:  pkgconfig
 
 %description
 Most digital cameras produce EXIF files, which are JPEG files with
 extra tags that contain information about the image. The EXIF library
 allows you to parse an EXIF file and read the data from those tags.
 
-%package devel
-Summary:	Files needed for libexif application development
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-%description devel
+%package        devel
+Summary:        Files needed for libexif application development
+Requires:       %{name} = %{version}-%{release}
+
+%description    devel
 The libexif-devel package contains the libraries and header files
 for writing programs that use libexif.
 
-%package doc
-Summary:	The EXIF Library API documentation
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+%package        doc
+Summary:        The EXIF Library API documentation
+Requires:       %{name} = %{version}-%{release}
+
 %description doc
 API Documentation for programmers wishing to use libexif in their programs.
 
-
 %prep
-%autosetup -n libexif-libexif-%{tarball_version}-release -p1
-
+%autosetup -p1
 
 %build
-autoreconf -fiv
-
 %configure \
   --disable-static
-
 %make_build
-
 
 %install
 %make_install
-
-rm -fv %{buildroot}%{_libdir}/lib*.la
-
+find %{buildroot} -type f -name '*.la' -delete -print
 rm -rf %{buildroot}%{_datadir}/doc/libexif
 cp -R doc/doxygen-output/libexif-api.html .
 iconv -f latin1 -t utf-8 < COPYING > COPYING.utf8; cp COPYING.utf8 COPYING
 iconv -f latin1 -t utf-8 < README > README.utf8; cp README.utf8 README
+
 %find_lang libexif-12
 
 %check
-make check
+%make_build check
 
 %ldconfig_scriptlets
 
 %files -f libexif-12.lang
-%doc README NEWS
 %license COPYING
-%{_libdir}/libexif.so.12*
+%doc README NEWS
+%{_libdir}/%{name}.so.12*
 
 %files devel
-%{_includedir}/libexif
-%{_libdir}/libexif.so
-%{_libdir}/pkgconfig/libexif.pc
+%{_includedir}/%{name}
+%{_libdir}/%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 %files doc
 %doc libexif-api.html
 
-
 %changelog
+* Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.6.24-1
+- Upgrade to latest upstream version
+- Promote to mariner-official-base repo
+- Remove patches already present in source
+- Lint spec
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.22-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

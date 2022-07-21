@@ -1,64 +1,52 @@
+Name:           giflib
+Summary:        A library and utilities for processing GIFs
+Version:        5.2.1
+Release:        6%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:          giflib
-Summary:       A library and utilities for processing GIFs
-Version:       5.2.1
-Release:       5%{?dist}
-
-License:       MIT
-URL:           http://www.sourceforge.net/projects/%{name}/
-Source:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            http://www.sourceforge.net/projects/giflib/
+Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Move quantize.c back into libgif.so (#1750122)
-Patch0:        giflib_quantize.patch
-
-BuildRequires: gcc
-BuildRequires: make
-BuildRequires: xmlto
-
+Patch0:         giflib_quantize.patch
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  xmlto
 
 %description
 giflib is a library for reading and writing gif images.
 
+%package        devel
+Summary:        Development files for programs using the giflib library
+Requires:       %{name} = %{version}-%{release}
 
-%package devel
-Summary:       Development files for programs using the giflib library
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description devel
+%description    devel
 The giflib-devel package includes header files, libraries necessary for
 developing programs which use the giflib library.
 
+%package        utils
+Summary:        Programs for manipulating GIF format image files
+Requires:       %{name} = %{version}-%{release}
 
-%package utils
-Summary:       Programs for manipulating GIF format image files
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description utils
+%description    utils
 The giflib-utils package contains various programs for manipulating GIF
 format image files.
-
 
 %prep
 %autosetup -p1
 
-
 %build
 %make_build CFLAGS="%{optflags} -fPIC" LDFLAGS="%{__global_ldflags}"
 
-
 %install
 %make_install PREFIX="%{_prefix}" LIBDIR="%{_libdir}"
-
-# Drop static library
-rm -f %{buildroot}%{_libdir}/libgif.a
-
+find %{buildroot} -name '*.a' -print -delete
 
 %ldconfig_scriptlets
 
-
 %files
-%doc ChangeLog NEWS README
 %license COPYING
+%doc ChangeLog NEWS README
 %{_libdir}/libgif.so.7*
 
 %files devel
@@ -70,8 +58,12 @@ rm -f %{buildroot}%{_libdir}/libgif.a
 %{_bindir}/gif*
 %{_mandir}/man1/*.1*
 
-
 %changelog
+* Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-6
+- Promote to mariner-official-base repo
+- Lint spec
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
