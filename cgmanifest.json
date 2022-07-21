@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.83.1",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.1.tar.gz"
+          "version": "7.84.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.84.0.tar.gz"
         }
       }
     },
@@ -3178,8 +3178,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.29",
-          "downloadUrl": "http://brick.kernel.dk/snaps/fio-3.29.tar.bz2"
+          "version": "3.30",
+          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
         }
       }
     },
@@ -3720,8 +3720,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.2",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.2.tar.xz"
+          "version": "2.33.4",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.4.tar.xz"
         }
       }
     },
@@ -7460,6 +7460,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kubevirt",
+          "version": "0.51.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.51.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kured",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.9.1.tar.gz"
@@ -8261,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "libexif",
-          "version": "0.6.22",
-          "downloadUrl": "https://github.com/libexif/libexif/archive/libexif-0_6_22-release.tar.gz"
+          "version": "0.6.24",
+          "downloadUrl": "https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2"
         }
       }
     },
@@ -8353,6 +8363,16 @@
           "name": "libgcrypt",
           "version": "1.9.4",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgdiplus",
+          "version": "6.1",
+          "downloadUrl": "https://download.mono-project.com/sources/libgdiplus/libgdiplus-6.1.tar.gz"
         }
       }
     },
@@ -11363,6 +11383,16 @@
           "name": "marisa",
           "version": "0.2.4",
           "downloadUrl": "https://marisa-trie.googlecode.com/files/marisa-0.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven",
+          "version": "3.8.4",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.4/source/apache-maven-3.8.4-src.tar.gz"
         }
       }
     },
@@ -22793,6 +22823,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "reaper",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rear",
           "version": "2.4",
           "downloadUrl": "https://sourceforge.net/projects/rear/files/rear/2.4/rear-2.4.tar.gz"
@@ -25226,6 +25266,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sysbench",
+          "version": "1.0.20",
+          "downloadUrl": "https://github.com/akopytov/sysbench/archive/1.0.20/sysbench-1.0.20.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sysfsutils",
           "version": "2.1.0",
           "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
@@ -26217,8 +26267,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.5172",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5172.tar.gz"
+          "version": "9.0.0050",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0050.tar.gz"
         }
       }
     },

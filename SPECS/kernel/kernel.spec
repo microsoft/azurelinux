@@ -18,7 +18,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.48.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -391,8 +391,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 5.15.48.1-5
+* Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 5.15.48.1-6
 - Add turbostat and cpupower to kernel-tools
+
+* Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
+- Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
+- Add CONFIG_IKHEADERS=m to enable eBPF standard tracers.
 
 * Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
 - Remove 'quiet' from commandline to enable verbose log

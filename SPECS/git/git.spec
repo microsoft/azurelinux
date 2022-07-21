@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.33.2
-Release:        2%{?dist}
+Version:        2.33.4
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -168,6 +168,9 @@ fi
 %endif
 
 %changelog
+* Wed Jul 14 2022 Bala <balakumaran.kannan@microsoft.com> - 2.33.4-1
+- Upgrade to 2.33.4 to address CVE-2022-29187
+
 * Fri Jun 17 2022 Sean Dougherty <sdougherty@microsoft.com> - 2.33.2-2
 - Add less to list of required runtime packages
 

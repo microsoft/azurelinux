@@ -3,32 +3,30 @@
 Summary:        Smart card library and applications
 Name:           opensc
 Version:        0.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/OpenSC/OpenSC
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
-
 Patch1:         opensc-0.19.0-pinpad.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  bash-completion
+BuildRequires:  docbook-style-xsl
+BuildRequires:  libtool
+BuildRequires:  libxslt
+BuildRequires:  gcc
+BuildRequires:  openssl-devel
 BuildRequires:  pcsc-lite-devel
 BuildRequires:  readline-devel
-BuildRequires:  openssl-devel
-BuildRequires:  /usr/bin/xsltproc
-BuildRequires:  docbook-style-xsl
-BuildRequires:  autoconf automake libtool gcc
-BuildRequires:  bash-completion
 BuildRequires:  zlib-devel
-# For tests
+%if %{with_check}
 BuildRequires:  libcmocka-devel
 BuildRequires:  softhsm
-BuildRequires:  openssl
-Requires:       pcsc-lite-libs%{?_isa}
+%endif
 Requires:       pcsc-lite
-Obsoletes:      mozilla-opensc-signer < 0.12.0
-Obsoletes:      opensc-devel < 0.12.0
-Obsoletes:      coolkey <= 1.1.0-36
 # The simclist is bundled in upstream
 Provides:       bundled(simclist) = 1.5
 
@@ -41,74 +39,47 @@ supporting this API (such as Mozilla Firefox and Thunderbird) can use it. On
 the card OpenSC implements the PKCS#15 standard and aims to be compatible with
 every software/card that does so, too.
 
-
 %prep
-%setup -q
-%patch1 -p1 -b .pinpad
-
-# The test-pkcs11-tool-allowed-mechanisms already works in Fedora
-sed -i -e '/XFAIL_TESTS/,$ {
-  s/XFAIL_TESTS.*/XFAIL_TESTS=test-pkcs11-tool-test.sh/
-  q
-}' tests/Makefile.am
+%autosetup -p1
 
 cp -p src/pkcs15init/README ./README.pkcs15init
 cp -p src/scconf/README.scconf .
-# No {_libdir} here to avoid multilib conflicts; it's just an example
-sed -i -e 's|/usr/local/towitoko/lib/|/usr/lib/ctapi/|' etc/opensc.conf.example.in
+sed -i -e 's|/usr/local/towitoko/lib/|%{_libdir}/ctapi/|' etc/opensc.conf.example.in
 
 %build
 autoreconf -fvi
-%ifarch %{ix86}
-sed -i -e 's/opensc.conf/opensc-%{_arch}.conf/g' src/libopensc/Makefile.in
-%endif
-sed -i -e 's|"/lib /usr/lib\b|"/%{_lib} %{_libdir}|' configure # lib64 rpaths
-%configure  --disable-static \
+%configure \
+  --disable-static \
   --disable-autostart-items \
   --disable-notify \
   --disable-assert \
   --enable-pcsc \
+%if %{with_check}
   --enable-cmocka \
+%endif
   --enable-sm \
   --with-pcsc-provider=libpcsclite.so.1 \
   --with-completiondir="%{_sysconfdir}/bash_completion.d/"
-make %{?_smp_mflags} V=1
-
-%check
-make check
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-install -Dpm 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/p11-kit/modules/opensc.module
+%make_install
+install -Dpm 644 %{SOURCE1} %{buildroot}%{_datadir}/p11-kit/modules/opensc.module
 
-%ifarch %{ix86}
-# To avoid multilib issues, move these files on 32b intel architectures
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/opensc.conf
-install -Dpm 644 etc/opensc.conf $RPM_BUILD_ROOT%{_sysconfdir}/opensc-%{_arch}.conf
-rm -f $RPM_BUILD_ROOT%{_mandir}/man5/opensc.conf.5
-install -Dpm 644 doc/files/opensc.conf.5 $RPM_BUILD_ROOT%{_mandir}/man5/opensc-%{_arch}.conf.5
-# use NEWS file timestamp as reference for configuration file
-touch -r NEWS $RPM_BUILD_ROOT%{_sysconfdir}/opensc-%{_arch}.conf
-touch -r NEWS $RPM_BUILD_ROOT%{_mandir}/man5/opensc-%{_arch}.conf.5
-%else
 # For backward compatibility, symlink the old location to the new files
-ln -s %{_sysconfdir}/opensc.conf $RPM_BUILD_ROOT%{_sysconfdir}/opensc-%{_arch}.conf
-%endif
+ln -s %{_sysconfdir}/opensc.conf %{buildroot}%{_sysconfdir}/opensc-%{_arch}.conf
 
-find $RPM_BUILD_ROOT%{_libdir} -type f -name "*.la" | xargs rm
+find %{buildroot} -type f -name '*.la' -print -delete
 
-rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/opensc
+rm -rf %{buildroot}%{_datadir}/doc/opensc
 
 # Upstream considers libopensc API internal and no longer ships
 # public headers and pkgconfig files.
 # Remove the symlink as nothing is supposed to link against libopensc.
-rm -f $RPM_BUILD_ROOT%{_libdir}/libopensc.so
+rm -f %{buildroot}%{_libdir}/libopensc.so
 # remove the .pc file so we do not confuse users #1673139
-rm -f $RPM_BUILD_ROOT%{_libdir}/pkgconfig/*.pc
-rm -f $RPM_BUILD_ROOT%{_libdir}/libsmm-local.so
-%if 0%{?rhel} && 0%{?rhel} < 7
-rm -rf %{buildroot}%{_datadir}/bash-completion/
-%endif
+rm -f %{buildroot}%{_libdir}/pkgconfig/*.pc
+rm -f %{buildroot}%{_libdir}/libsmm-local.so
 
 # the npa-tool builds to nothing since we do not have OpenPACE library
 rm -rf %{buildroot}%{_bindir}/npa-tool
@@ -119,22 +90,17 @@ rm %{buildroot}%{_bindir}/opensc-notify
 rm %{buildroot}%{_datadir}/applications/org.opensc.notify.desktop
 rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%check
+%make_build check
+
+%ldconfig_scriptlets
 
 %files
 %license COPYING
 %doc NEWS README*
-
 %{_sysconfdir}/bash_completion.d/
-
-%ifarch %{ix86}
-%{_mandir}/man5/opensc-%{_arch}.conf.5*
-%else
 %config(noreplace) %{_sysconfdir}/opensc.conf
 %{_mandir}/man5/opensc.conf.5*
-%endif
-
 %config(noreplace) %{_sysconfdir}/opensc-%{_arch}.conf
 # Co-owned with p11-kit so it is not hard dependency
 %dir %{_datadir}/p11-kit
@@ -174,6 +140,12 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man5/*
 
 %changelog
+* Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.22.0-2
+- test-pkcs11-tool-test-threads is marked as xfail upstream- remove Fedora-specific line un-xfailing the test
+- Remove obsoletes for packages Mariner has never shipped 
+- Remove Fedora, RHEL, multilib compatibility code
+- Lint spec
+
 * Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.22.0-1
 - Upgrade to 0.22.0 to fix CVE-2020-26570, CVE-2020-26571, CVE-2020-26572, CVE-2021-42778, CVE-2021-42779, CVE-2021-42780, CVE-2021-42781, CVE-2021-42782
 
