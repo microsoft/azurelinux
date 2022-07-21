@@ -44,9 +44,11 @@ function cleanup {
 
 trap cleanup EXIT SIGINT SIGTERM
 
-marinerCacheDir=${tempDir}/mariner_caches
+reaperCacheDir=${tempDir}/reaper_caches
+homeCacheDir=${tempDir}/cache
 
-mkdir -p ${marinerCacheDir}
+mkdir -p ${reaperCacheDir}
+mkdir -p ${homeCacheDir}
 
 function checkInternet {
 	sudo tdnf install -y nc
@@ -62,7 +64,7 @@ function checkInternet {
 function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs
-	npm config set cache "$tempDir/.npm" --global
+	npm config set cache "$homeCacheDir/.npm" --global
 	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
 	# incompatibilities.
 	# Backward compatible with node@v14.18.0
@@ -70,11 +72,13 @@ function installNodeModules {
 	# is incoorectly set that causes 'which' to still point to older path, as access/newfstatat fail with -ENOPERM
 	# Setting a new global npm folder for fixing permission issues.
 	# (works well with id=0, but reaper build will fail.)
-	npm config set prefix "$HOME/.npm-global"
-	export PATH="$HOME/.npm-global/bin":$PATH
+	mkdir --mode 0777 $homeCacheDir/.npm-global
+	npm config set prefix "$homeCacheDir/.npm-global"
+	export PATH="$homeCacheDir/.npm-global/bin":$PATH
 	npm install -g n
-	export N_PREFIX="$HOME/.npm-global"
+	export N_PREFIX="$homeCacheDir/.npm-global"
 	n 14.18.0
+	export XDG_CACHE_HOME=$homeCacheDir/.cache
 	npm install -g bower
 	# Clear bash hash tables for node/npm paths
 	hash -r
@@ -98,42 +102,40 @@ function buildReaperSources {
 
 function createCacheTars {
 	echo "Creating build caches."
-	pushd ${HOME}
+	pushd ${homeCacheDir}
 	echo "creating bower_cache tar..."
 	tar -cf ${BOWER_CACHE} .cache
-	mv ${BOWER_CACHE} ${marinerCacheDir}
-	popd
+	mv ${BOWER_CACHE} ${reaperCacheDir}
 
-	pushd ${tempDir}
 	echo "creating maven_cache tar..."
 	tar -cf ${MAVEN_CACHE} .m2
-	mv ${MAVEN_CACHE} ${marinerCacheDir}
+	mv ${MAVEN_CACHE} ${reaperCacheDir}
 
 	echo "creating npm_cache tar..."
 	tar -cf ${NPM_CACHE} .npm
-	mv ${NPM_CACHE} ${marinerCacheDir}
+	mv ${NPM_CACHE} ${reaperCacheDir}
 	popd
 
 	pushd ${tempDir}/cassandra-reaper-${VERSION}/src/ui
 	echo "creating bower_components tar..."
 	tar -cf ${BOWER_COMPONENTS} bower_components
-	mv ${BOWER_COMPONENTS} ${marinerCacheDir}
+	mv ${BOWER_COMPONENTS} ${reaperCacheDir}
 
 	echo "creating node_modules tar..."
 	tar -cf ${SRC_UI_NODE_MODULES} node_modules
-	mv ${SRC_UI_NODE_MODULES} ${marinerCacheDir}
+	mv ${SRC_UI_NODE_MODULES} ${reaperCacheDir}
 	popd
 
-	pushd $HOME/.npm-global/lib
+	pushd $homeCacheDir/.npm-global/lib
 	echo "creating local_lib_node_modules tar..."
 	tar -cf ${LOCAL_LIB_NODE_MODULES} node_modules
-	mv ${LOCAL_LIB_NODE_MODULES} ${marinerCacheDir}
+	mv ${LOCAL_LIB_NODE_MODULES} ${reaperCacheDir}
 	popd
 
-	pushd $HOME/.npm-global
+	pushd $homeCacheDir/.npm-global
 	echo "creating local node tar..."
 	tar -cf ${LOCAL_N} n
-	mv ${LOCAL_N} ${marinerCacheDir}
+	mv ${LOCAL_N} ${reaperCacheDir}
 	popd
 }
 
@@ -146,7 +148,7 @@ sudo tdnf install -y msopenjdk-11
 
 echo "Installing maven modules."
 sudo tdnf install -y maven
-export MAVEN_OPTS="-Dmaven.repo.local=$tempDir/.m2/repository"
+export MAVEN_OPTS="-Dmaven.repo.local=$homeCacheDir/.m2/repository"
 
 installNodeModules
 
@@ -154,8 +156,8 @@ buildReaperSources
 
 createCacheTars
 
-mkdir "$HOME/mariner_caches"
+mkdir "$HOME/reaper_caches"
 
-cp -a ${marinerCacheDir} "$HOME/mariner_caches"
+cp -a ${reaperCacheDir} "$HOME/reaper_caches"
 
-echo "Copied cache tars to $HOME/mariner_caches/ .Exiting."
+echo "Copied cache tars to $HOME/reaper_caches/ .Exiting."
