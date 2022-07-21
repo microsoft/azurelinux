@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:           perl-XML-XPath
 Version:        1.44
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        XPath parser and evaluator for Perl
 # XML/XPath.pm, XML/XPath/PerlSAX.pm, REAME: GPL+ or Artistic
 # Others: Artistic 2.0
@@ -90,6 +90,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44-13
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.44-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
