@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,20 +46,8 @@ Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
 Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
-# Add nopatches for tooling
-Patch1000:      CVE-2021-3418.nopatch
-Patch1001:      CVE-2020-14372.nopatch
-Patch1002:      CVE-2020-25632.nopatch
-Patch1003:      CVE-2020-25647.nopatch
-Patch1004:      CVE-2020-27779.nopatch
-Patch1005:      CVE-2021-20233.nopatch
-Patch1006:      CVE-2020-10713.nopatch
-Patch1007:      CVE-2020-14308.nopatch
-Patch1008:      CVE-2020-14309.nopatch
-Patch1009:      CVE-2020-14310.nopatch
-Patch1010:      CVE-2020-14311.nopatch
-Patch1011:      CVE-2020-27749.nopatch
-Patch1012:      CVE-2021-20225.nopatch
+# CVE-2021-3981
+Patch0167:      0167-restore-umask-for-grub-config.patch 
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -338,6 +326,10 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-5
+- Resolve CVE-2021-3981
+- Remove specification of nopatch files in the spec file
+
 * Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
 - Create additional efi binary that has no prefix directory set
 - Add grub2-efi-binary-noprefix subpackage for efi binary with no prefix set
