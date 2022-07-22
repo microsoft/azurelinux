@@ -276,6 +276,7 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %changelog
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 5.63-2
 - Promote to Mariner base repo
+- Lint spec
 
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.63-1
 - Update to version 5.63 using Fedora 36 spec (license: MIT) for guidance.
