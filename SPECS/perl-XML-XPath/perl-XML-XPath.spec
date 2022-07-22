@@ -1,51 +1,57 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(XML::Parser\\)$
+
+# Optional tests, disabled due to missing dependencies.
+%bcond_with perl_XML_XPath_enables_optional_test
+
+Summary:        XPath parser and evaluator for Perl
 Name:           perl-XML-XPath
 Version:        1.44
-Release:        6%{?dist}
-Summary:        XPath parser and evaluator for Perl
+Release:        13%{?dist}
 # XML/XPath.pm, XML/XPath/PerlSAX.pm, REAME: GPL+ or Artistic
 # Others: Artistic 2.0
-License:        Artistic 2.0 and (GPL+ or Artistic)
+License:        Artistic 2.0 AND (GPL+ OR Artistic)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/XML-XPath
-Source0:        https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-%{version}.tar.gz#/perl-XML-XPath-%{version}.tar.gz
-
+Source0:        https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-# Run-time
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(IO::File)
-BuildRequires:  perl(overload)
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(vars)
 BuildRequires:  perl(XML::Parser) >= 2.23
-# Tests
-BuildRequires:  perl(lib)
-BuildRequires:  perl(open)
-BuildRequires:  perl(Path::Tiny) >= 0.076
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+
+%if %{with_check}
+BuildRequires:  perl(App::cpanminus)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(open)
 BuildRequires:  perl(utf8)
 # Optional tests
+%if %{with perl_XML_XPath_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(Test::CPAN::Meta)
 BuildRequires:  perl(Test::CPAN::Meta::JSON)
+%endif
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(POSIX)
-Requires:       perl(warnings)
 Requires:       perl(XML::Parser) >= 2.23
-
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\(XML::Parser\)$
+Requires:       perl(warnings)
 
 %description
 This module aims to comply exactly to the XPath specification at
@@ -57,19 +63,20 @@ this as they support functionality beyond XPath.
 %setup -q -n XML-XPath-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%make_build
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%_fixperms %{buildroot}/*
 
-mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1/
-cat >> $RPM_BUILD_ROOT/%{_mandir}/man1/xpath.1 << EOF
+mkdir -p %{buildroot}/%{_mandir}/man1/
+cat >> %{buildroot}/%{_mandir}/man1/xpath.1 << EOF
 .so man3/XML::XPath.3pm
 EOF
 
 %check
+cpanm Path::Tiny
 make test
 
 %files
@@ -81,8 +88,30 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44-13
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.44-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.44-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.44-10
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.44-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec 15 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.44-8
+- Do not run optional test on RHEL
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.44-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.44-6
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.44-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

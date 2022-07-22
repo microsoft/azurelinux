@@ -1,43 +1,52 @@
-Name:		perl-CPAN-Changes
-Summary:	Read and write Changes files
-Version:	0.400002
-Release:	15%{?dist}
-License:	GPL+ or Artistic
+Summary:        Read and write Changes files
+Name:           perl-CPAN-Changes
+Version:        0.400002
+Release:        16%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		https://metacpan.org/release/CPAN-Changes
-Source0:	https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-%{version}.tar.gz#/perl-CPAN-Changes-%{version}.tar.gz
-BuildArch:	noarch
+URL:            https://metacpan.org/release/CPAN-Changes
+Source0:        https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildArch:      noarch
+
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	make
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(ExtUtils::MakeMaker)
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+
 # Module Runtime
-BuildRequires:	perl(Encode)
-BuildRequires:	perl(Scalar::Util)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(Test::Builder)
-BuildRequires:	perl(Text::Wrap)
-BuildRequires:	perl(version) >= 0.99.06
-BuildRequires:	perl(warnings)
+BuildRequires:  perl(Encode)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+
 # Script Runtime
-BuildRequires:	perl(Getopt::Long)
-BuildRequires:	perl(Pod::Usage)
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(Pod::Usage)
+BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Test::Builder)
+BuildRequires:  perl(Text::Wrap)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(version) >= 0.99.06
+BuildRequires:  perl(warnings)
+
+%if %{with_check}
 # Test Suite
-BuildRequires:	perl(Test::More) >= 0.96
-# Optional Tests
-%if 0%{?fedora:1}
-BuildRequires:	perl(Moo)
-%endif
+BuildRequires:  perl(Test::More) >= 0.96
+
 # Extra Tests
-BuildRequires:	perl(Test::Pod) >= 1.00
-BuildRequires:	perl(Test::Pod::Coverage) >= 1.00
+BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+
+# Optional Tests, currently not supported in Mariner.
+%if 0
+BuildRequires:  perl(Moo)
+%endif
+%endif
+
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(version) >= 0.99.06
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(version) >= 0.99.06
 
 %description
 It is standard practice to include a Changes file in your distribution. The
@@ -80,6 +89,10 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::CPAN::Changes.3*
 
 %changelog
+* Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.400002-16
+- License verified.
+- Spec clean-up.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.400002-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
