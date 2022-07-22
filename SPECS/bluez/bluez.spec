@@ -160,7 +160,7 @@ if test -d ${RPM_BUILD_ROOT}/usr/lib64/cups ; then
 	rm -rf ${RPM_BUILD_ROOT}%{_libdir}/cups
 fi
 
-rm -f ${RPM_BUILD_ROOT}/%{_sysconfdir}/udev/*.rules ${RPM_BUILD_ROOT}/usr/lib/udev/rules.d/*.rules
+rm -f ${RPM_BUILD_ROOT}/%{_sysconfdir}/udev/*.rules ${RPM_BUILD_ROOT}/%{_libdir}/udev/rules.d/*.rules
 install -D -p -m0644 tools/hid2hci.rules ${RPM_BUILD_ROOT}/%{_udevrulesdir}/97-hid2hci.rules
 
 install -d -m0755 $RPM_BUILD_ROOT/%{_localstatedir}/lib/bluetooth
@@ -251,7 +251,7 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %_cups_serverbin/backend/bluetooth
 
 %files hid2hci
-/usr/lib/udev/hid2hci
+%{_libdir}/udev/hid2hci
 %{_mandir}/man1/hid2hci.1*
 %{_udevrulesdir}/97-hid2hci.rules
 
