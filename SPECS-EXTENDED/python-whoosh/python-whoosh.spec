@@ -5,7 +5,7 @@
 
 Name:           python-whoosh
 Version:        2.7.4
-Release:        20%{?dist}
+Release:        21%{?dist}
 Summary:        Fast, pure-Python full text indexing, search, and spell checking library 
 
 License:        BSD 
@@ -45,7 +45,7 @@ functionality to their applications and websites. Every part of how Whoosh
 works can be extended or replaced to meet your needs exactly.
 
 %prep
-%setup -q -n %{mod_name}-%{version}
+%setup -q -n whoosh-%{version}
 # pytest 4
 sed -i 's/\[pytest\]/\[tool:pytest\]/' setup.cfg
 
@@ -62,6 +62,7 @@ rm -rf docs/html/.doctrees
 %py3_install
 
 %check
+%{__python3} -m pip install wheel
 %{__python3} setup.py test
 
 %files -n python%{python3_pkgversion}-whoosh
@@ -74,6 +75,10 @@ rm -rf docs/html/.doctrees
 %{python3_sitelib}/*.egg-info/
 
 %changelog
+* Fri Jul 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.4-21
+- Install `wheel` package in %check section to enable build
+- Switch to github tarball
+
 * Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.4-20
 - Add an explicit BR on `pip` to enable ptest
 - License verified
