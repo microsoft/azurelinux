@@ -47,11 +47,6 @@ supported with recent MIT Kerberos.
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-# https://github.com/rra/pam-krb5/issues/25
-# self-tests fail unless a default realm is set.
-# That has to be done as someone with write access to /etc/
-# which is not the mockbuild user.
-#
 make check
 
 %files
