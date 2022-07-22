@@ -2,7 +2,7 @@ Summary:        A Pluggable Authentication Module for Kerberos 5
 Name:           pam_krb5
 Version:        4.11
 Release:        2%{?dist}
-License:        BSD or LGPLv2+
+License:        BSD OR LGPLv2+
 Group:          System/Libraries
 URL:            https://github.com/rra/pam-krb5
 Source0:        %{url}/archive/refs/tags/upstream/%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -12,12 +12,12 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  krb5-devel
 BuildRequires:  pam-devel
+Requires:       pam
 # for testing
 %if %{with_check}
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Pod)
+BuildRequires:  perl(lib)
 %endif
-Requires:       pam
 
 %description
 pam-krb5 is a Kerberos v5 PAM module for either MIT Kerberos or
