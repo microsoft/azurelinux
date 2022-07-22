@@ -1,63 +1,67 @@
+%global _description \
+A modern, feature-rich and highly-tunable Python client libraryfor Apache Cassandra (2.1+) using exclusively Cassandra's binary protocol and Cassandra Query Language v3.
+
+%global pypi_name cassandra-driver
+
 Summary:        A modern, feature-rich and highly-tunable Python client library for Apache Cassandra (2.1+)
-Name:           python3-cassandra-driver
-Version:        3.24.0
-Release:        5%{?dist}
-Url:            https://github.com/datastax/python-driver#datastax-python-driver-for-apache-cassandra
+Name:           python-%{pypi_name}
+Version:        3.25.0
+Release:        1%{?dist}
+URL:            https://github.com/datastax/python-driver#datastax-python-driver-for-apache-cassandra
 License:        ASL 2.0
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://github.com/datastax/python-driver/archive/refs/tags/%{version}.tar.gz#/cassandra-driver-%{version}.tar.gz
-BuildRequires:  python3
+Source0:        https://github.com/datastax/python-driver/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+
+%description %{_description}
+
+%package -n     python3-%{pypi_name}
+Summary:        %{summary}
+BuildRequires:  libev-devel
 BuildRequires:  python3-Cython
-BuildRequires:  python3-libs
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pip
-BuildRequires:  libev-devel
-BuildRequires:  libev
-%if %{with_check}
-BuildRequires:  python3-pytest
-BuildRequires:  python3-packaging
-BuildRequires:  openssl-devel
-BuildRequires:  curl-devel
-BuildRequires:  iana-etc
-%endif
 Requires:       libev
 Requires:       python3
-Requires:       python3-libs
 Requires:       python3-six
 Requires:       python3-geomet < 0.3
+%if %{with_check}
+BuildRequires:  curl-devel
+BuildRequires:  iana-etc
+BuildRequires:  openssl-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-packaging
+%endif
 
-%description
-A modern, feature-rich and highly-tunable Python client library for Apache Cassandra (2.1+)
-using exclusively Cassandra's binary protocol and Cassandra Query Language v3. The driver
-supports Python 2.7, 3.3, 3.4, 3.5, and 3.6.
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -n python-driver-%{version}
 
 %build
-%{py3_build "--no-cython"}
+%py3_build
 
 %install
 %py3_install
 
 %check
-pip3 install nose scales mock ccm unittest2 pytz sure pure-sasl twisted gevent eventlet packaging Netbase
-%python3 setup.py gevent_nosetests
-%python3 setup.py eventlet_nosetests
+%{python3} -m pip install -r test-requirements.txt
+%{python3} setup.py gevent_nosetests
+%{python3} setup.py eventlet_nosetests
 
-%files
-%defattr(-,root,root,-)
+%files -n python3-%{pypi_name}
+%license LICENSE
+%doc CHANGELOG.rst README.rst
 %{python3_sitelib}/*
 
 %changelog
-*   Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.24.0-5
--   Initial CBL-D Mariner import from PhotonOs (License: ASL 2.0)
--   Adding as run dependency for package cassandra medusa needed by cosmosDb.
--   Use pip to download dependencies for %check section instead of easy_install.
--   License Verified
+*   Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.25.0-1
+-   Initial CBL-Mariner import from Photon (license: ASL 2.0)
+-   Bumping version to 3.25.0
+-   Adding as run dependency for package cassandra medusa.
+-   License verified
 *   Fri Jun 11 2021 Ankit Jain <ankitja@vmware.com> 3.24.0-4
 -   Fixed install time dependency
 *   Tue Dec 15 2020 Shreenidhi Shedi <sshedi@vmware.com> 3.24.0-3
