@@ -2,7 +2,7 @@ Summary:        A Pluggable Authentication Module for Kerberos 5
 Name:           pam_krb5
 Version:        4.11
 Release:        2%{?dist}
-License:        MIT AND BSD
+License:        BSD or LGPLv2+
 Group:          System/Libraries
 URL:            https://github.com/rra/pam-krb5
 Source0:        %{url}/archive/refs/tags/upstream/%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -12,9 +12,11 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  krb5-devel
 BuildRequires:  pam-devel
-BuildRequires:  perl(Test::Pod)
 # for testing
+%if %{with_check}
 BuildRequires:  perl(lib)
+BuildRequires:  perl(Test::Pod)
+%endif
 Requires:       pam
 
 %description
@@ -41,9 +43,6 @@ supported with recent MIT Kerberos.
 %install
 %make_install
 
-# Make the paths jive to avoid conflicts on multilib systems.
-sed -ri -e 's|/lib(64)?/|/\$LIB/|g' %{buildroot}/%{_mandir}/man*/pam_krb5*.5*
-
 # cleanup
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -66,6 +65,7 @@ make check
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
 - Change %{_pam_libdir} to %{_libdir} as the former macro is not supported in CBL-Mariner
+- Add with_check macro to gate test requirements
 
 * Wed Feb 23 2022 Pat Riehecky <riehecky@fnal.gov> 4.11-1
 - Initial fedora package
