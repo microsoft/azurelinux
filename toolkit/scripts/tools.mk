@@ -151,7 +151,7 @@ worker_chroot_deps := \
 ifeq ($(REFRESH_WORKER_CHROOT),y)
 $(chroot_worker): $(worker_chroot_deps) $(go-bldtracker) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 else
-$(chroot_worker): $(go-bldtracker)
+$(chroot_worker):
 endif
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
 

@@ -54,7 +54,7 @@ var (
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
 
-	timestampFile = app.Flag("timestamp-file", "File that stores timestamp for this program.").Required().String()
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
@@ -99,7 +99,6 @@ func main() {
 	}
 	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "finishing up")
 	csvparser.OutputCSVLog(filepath.Dir(*timestampFile))
-
 }
 
 func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag, tmpDir string, config configuration.Config) (err error) {

@@ -103,10 +103,3 @@ func Test_WritetoFile_range(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	info1.RecordToFile("step 3", "action 1", os.Stdout)
 }
-
-func Test_filename(t *testing.T) {
-	completePath := "/home/xuanchen/repos/pod_repo/CBL-Mariner/build/timestamp/imageconfigvalidator.csv"
-	fileName := filepath.Base(completePath)
-	fmt.Printf("%s \n", fileName)
-	fmt.Printf("%s \n", fileName[:len(fileName)-4])
-}
