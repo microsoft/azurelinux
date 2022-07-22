@@ -1,15 +1,17 @@
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(XML::Parser\\)$
+
 # Optional tests, disabled due to missing dependencies.
 %bcond_with perl_XML_XPath_enables_optional_test
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        XPath parser and evaluator for Perl
 Name:           perl-XML-XPath
 Version:        1.44
 Release:        13%{?dist}
-Summary:        XPath parser and evaluator for Perl
 # XML/XPath.pm, XML/XPath/PerlSAX.pm, REAME: GPL+ or Artistic
 # Others: Artistic 2.0
-License:        Artistic 2.0 and (GPL+ or Artistic)
+License:        Artistic 2.0 AND (GPL+ OR Artistic)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/XML-XPath
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-%{version}.tar.gz
 BuildArch:      noarch
@@ -18,42 +20,38 @@ BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(IO::File)
-BuildRequires:  perl(overload)
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(vars)
 BuildRequires:  perl(XML::Parser) >= 2.23
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
 
 %if %{with_check}
-BuildRequires:  perl(lib)
-BuildRequires:  perl(open)
 BuildRequires:  perl(Path::Tiny) >= 0.076
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(open)
 BuildRequires:  perl(utf8)
-
 # Optional tests
 %if %{with perl_XML_XPath_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(Test::CPAN::Meta)
 BuildRequires:  perl(Test::CPAN::Meta::JSON)
 %endif
-
 %endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(POSIX)
-Requires:       perl(warnings)
 Requires:       perl(XML::Parser) >= 2.23
-
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(XML::Parser\\)$
+Requires:       perl(warnings)
 
 %description
 This module aims to comply exactly to the XPath specification at
@@ -66,14 +64,14 @@ this as they support functionality beyond XPath.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%_fixperms %{buildroot}/*
 
-mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1/
-cat >> $RPM_BUILD_ROOT/%{_mandir}/man1/xpath.1 << EOF
+mkdir -p %{buildroot}/%{_mandir}/man1/
+cat >> %{buildroot}/%{_mandir}/man1/xpath.1 << EOF
 .so man3/XML::XPath.3pm
 EOF
 
