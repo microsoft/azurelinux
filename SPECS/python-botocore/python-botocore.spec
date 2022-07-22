@@ -1,31 +1,30 @@
+%global pypi_name botocore
+%global debug_package %{nil}
+
 Summary:        Low-level, data-driven core of boto 3
 Name:           python-%{pypi_name}
 # NOTICE - Updating this package requires updating python-boto3
-Version:        1.24.33
-Release:        2%{?dist}
+Version:        1.27.35
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/boto/botocore
 Source0:        https://github.com/boto/botocore/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
-%global pypi_name botocore
-# Replace removed inspect.formatargspec with inspect.signature
-# This is needed for compatibility with Python 3.11 and
-# can be removed once upstream PR is merged.
-Patch2507:      https://github.com/boto/botocore/pull/2507.patch
 BuildArch:      noarch
 
 BuildRequires:  pyproject-rpm-macros
-BuildRequires:  python3
-BuildRequires:  python3-pip
 BuildRequires:  python3-devel
-BuildRequires:  python3-jsonschema
-BuildRequires:  python-mock
-BuildRequires:  python3-setuptools
-BuildRequires:  python-wheel
 BuildRequires:  python3-jmespath
-
+BuildRequires:  python3-jsonschema
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
+Requires:       python3
+Requires:       python3-dateutil
+Requires:       python3-jmespath
+Requires:       python3-urllib3
 %if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif
 
@@ -38,24 +37,18 @@ Summary:        Low-level, data-driven core of boto 3
 Provides:       bundled(python3-six) = 1.10.0
 %{?python_provide:%python_provide python3-%{pypi_name}}
 
-
 %description -n python3-%{pypi_name}
 A low-level interface to a growing number of Amazon Web Services. The
 botocore package is the foundation for the AWS CLI as well as boto3.
 
 %prep
-%autosetup -n %{pypi_name}-%{version} -p1
-rm -vr %{pypi_name}.egg-info
+%autosetup -n %{pypi_name}-%{version}
 # Remove online tests
 rm -vr tests/integration
 # This test tried to import tests/cmd-runner which failed as the code was
 # unable to import "botocore". I'm not 100% sure why this happened but for now
 # just exclude this one test and run all the other functional tests.
 rm -vr tests/functional/leak
-
-%generate_buildrequires
-# -r use final runtime dependencies as BuildRequires
-%pyproject_buildrequires -r
 
 %build
 %pyproject_wheel
@@ -64,7 +57,8 @@ rm -vr tests/functional/leak
 %pyproject_install
 
 %check
-%pytest3
+%{python3} -m pip install tox tox-current-env
+%tox
 
 %files -n python3-%{pypi_name}
 %doc README.rst
@@ -73,10 +67,11 @@ rm -vr tests/functional/leak
 %{python3_sitelib}/%{pypi_name}-*.dist-info/
 
 %changelog
-* Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.24.33-2
-- Initial CBL-Mariner import from Fedora 36 (license: ASL 2.0)
+* Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.27.35-1
+- Initial CBL-Mariner import from fedora 36 (license: MIT)
+- Bumping version to 1.27.35.
 - Adding as Run dependency (Requires) for cassandra medusa.
-- License Verified.
+- License verified.
 
 * Mon Apr 04 2022 Gwyn Ciesla <gwync@protonmail.com> - 1.24.33-1
 - 1.24.33

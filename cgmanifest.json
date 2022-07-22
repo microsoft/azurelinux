@@ -19874,8 +19874,8 @@
         "type": "other",
         "other": {
           "name": "python-botocore",
-          "version": "1.24.33",
-          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.24.33.tar.gz"
+          "version": "1.27.35",
+          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.27.35.tar.gz"
         }
       }
     },
