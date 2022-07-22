@@ -6,9 +6,7 @@
 package timestamp
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
