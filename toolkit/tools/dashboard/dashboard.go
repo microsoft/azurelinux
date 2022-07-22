@@ -121,11 +121,6 @@ func (file *stampedFile) getUpdate(currStat fs.FileInfo) {
 		file.currLine = currNumLines
 		file.bar.Set(int(currNumLines))
 
-		// Change progress bar label for that specific file
-		// file.bar.PrependFunc(func(b *uiprogress.Bar) string {
-		// 	return file.fileName + ": " + file.lastStepDesc
-		// })
-
 		// pop one task off the queue when it's done
 		if currNumLines == file.totalLine {
 			wg.Done()
