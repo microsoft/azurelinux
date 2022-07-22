@@ -14,7 +14,12 @@
 
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+
+%global _description \
+Apache Libcloud is a standard Python library that abstracts away \
+differences among multiple cloud provider APIs.
+%global pypi_name apache-libcloud
+
 Name:           python-apache-libcloud
 Version:        3.5.1
 Release:        2
@@ -24,39 +29,40 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://libcloud.apache.org
-Source0:        http://archive.apache.org/dist/libcloud/apache-libcloud-%{version}.tar.bz2#/apache-libcloud-%{version}.tar.gz
+Source0:        https://github.com/apache/libcloud/archive/refs/tags/v3.5.1.tar.gz#/%{pypi_name}-%{version}.tar.gz
+BuildArch:      noarch
 Patch1:         gce_image_projects.patch
 Patch2:         ec2_create_node.patch
 Patch3:         skip-some-tests-for-older-paramiko-versions.patch
 # PATCH-FIX-UPSTREAM https://github.com/Kami/libcloud/commit/e62bb28cdbd685203d44a9a4028f311ea155476c Use unittest.mock library from stdlib instead of using 3rd party mock dependency.
 Patch4:         mock.patch
+
+BuildRequires:  fdupes
 BuildRequires:  libvirt-python3
 BuildRequires:  python3-lockfile
 BuildRequires:  python3-lxml
 BuildRequires:  python3-paramiko
 BuildRequires:  python3-pyOpenSSL
-BuildRequires:  python3-pytest
 BuildRequires:  python3-requests-mock
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-typing
-BuildRequires:  python3-xml
-BuildRequires:  fdupes
 BuildRequires:  pyproject-rpm-macros
 Requires:       python3-lxml
 Requires:       python3-requests
-Requires:       python3-typing
-Suggests:       python-libvirt-python
-Suggests:       python-lockfile
-Suggests:       python-paramiko
-Suggests:       python-pysphere
-BuildArch:      noarch
 
-%description
-Apache Libcloud is a standard Python library that abstracts away
-differences among multiple cloud provider APIs.
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+%endif
+
+%description %{_description}
+
+%package -n     python3-%{pypi_name}
+Summary:        %{summary}
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
-%autosetup -p1 -n apache-libcloud-%{version}
+%autosetup -p1 -n %{pypi_name}-%{version}
 sed -i '/^#!/d' demos/gce_demo.py
 chmod a-x demos/gce_demo.py
 # Setup tests
@@ -74,22 +80,22 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
 %fdupes %{buildroot}%{python3_sitelib}
 
 %check
+%{python3} -m pip install atomicwrites attrs pluggy pygments six more-itertools
 # Skip OvhTests::test_list_nodes_invalid_region which tries to reach OVH servers
 # Skip ShellOutSSHClientTests tests which attempt to ssh to localhost
 # Skip test_key_file_non_pem_format_error since OpenSSH support is backported for SLE python-paramiko < 2.7.0
-# Note these four extra py3 failures are undesirable and should be fixed: fail in s390 and ppc64
 %pytest -k '(not test_consume_stderr_chunk_contains_part_of_multi_byte_utf8_character and not test_consume_stdout_chunk_contains_part_of_multi_byte_utf8_character and not test_consume_stdout_chunk_contains_non_utf8_character and not test_consume_stderr_chunk_contains_non_utf8_character and not test_key_file_non_pem_format_error and not ShellOutSSHClientTests and not ElasticContainerDriverTestCase and not test_list_nodes_invalid_region and not test_connection_timeout_raised and not test_retry_on_all_default_retry_exception_classes)'
 
-%files
+%files -n python3-%{pypi_name}
 %license LICENSE
 %doc CHANGES.rst README.rst demos/ example_*.py
 %{python3_sitelib}/*
 
 %changelog
 * Thu Jul 07 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.5.1-2
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (License: ASL 2.0)
+- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: ASL 2.0)
 - Adding as run dependency for package cassandra medusa.
-- License Verified. 
+- License verified
 * Fri May 13 2022 Markéta Machová <mmachova@suse.com>
 - update to 3.5.1
   * Support for Python 3.5 which has been EOL for more than a year now has been removed.
