@@ -99,7 +99,6 @@ func main() {
 	}
 	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "finishing up")
 	csvparser.OutputCSVLog(filepath.Dir(*timestampFile))
-
 }
 
 func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag, tmpDir string, config configuration.Config) (err error) {
