@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -27,6 +28,8 @@ var (
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
 	baseDirPath = exe.InputDirFlag(app, "Base directory for relative file paths from the config.")
+
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamp for this program.").Required().String()
 )
 
 func main() {
@@ -35,6 +38,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp.InitCSV(*timestampFile)
 
 	inPath, err := filepath.Abs(*input)
 	logger.PanicOnError(err, "Error when calculating input path")
@@ -46,7 +50,7 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Failed while loading image configuration '%s': %s", inPath, err)
 	}
-
+	timestamp.Stamp.RecordToCSV("Setting up", "")
 	// Basic validation will occur during load, but we can add additional checking here.
 	err = ValidateConfiguration(config)
 	if err != nil {
@@ -78,6 +82,10 @@ func validateKickStartInstall(config configuration.Config) (err error) {
 	// If doing a kickstart-style installation, then the image config file
 	// must not have any partitioning info because that will be provided
 	// by the preinstall script
+
+	timestamp.Stamp.Start()
+	defer timestamp.Stamp.RecordToCSV("validateKickStartInstall", "")
+
 	for _, systemConfig := range config.SystemConfigs {
 		if systemConfig.IsKickStartBoot {
 			if len(config.Disks) > 0 || len(systemConfig.PartitionSettings) > 0 {
@@ -98,6 +106,10 @@ func validatePackages(config configuration.Config) (err error) {
 		dracutFipsPkgName  = "dracut-fips"
 		fipsKernelCmdLine  = "fips=1"
 	)
+
+	timestamp.Stamp.Start()
+	defer timestamp.Stamp.RecordToCSV("validatePackages", "")
+
 	for _, systemConfig := range config.SystemConfigs {
 		packageList, err := installutils.PackageNamesFromSingleSystemConfig(systemConfig)
 		if err != nil {
@@ -144,5 +156,6 @@ func validatePackages(config configuration.Config) (err error) {
 			}
 		}
 	}
+
 	return
 }

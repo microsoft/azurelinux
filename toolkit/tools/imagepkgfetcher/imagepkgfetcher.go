@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -46,12 +47,15 @@ var (
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
+
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamp for this program. ").Required().String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp.InitCSV(*timestampFile)
 
 	if *externalOnly && strings.TrimSpace(*inputGraph) == "" {
 		logger.Log.Fatal("input-graph must be provided if external-only is set.")
@@ -64,6 +68,8 @@ func main() {
 	}
 	defer cloner.Close()
 
+	timestamp.Stamp.RecordToCSV("Initialize cloner", "")
+
 	if !*disableUpstreamRepos {
 		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
 		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
@@ -71,6 +77,8 @@ func main() {
 			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
 		}
 	}
+
+	timestamp.Stamp.RecordToCSV("Add network files", "")
 
 	if strings.TrimSpace(*inputSummaryFile) != "" {
 		// If an input summary file was provided, simply restore the cache using the file.
@@ -89,10 +97,15 @@ func main() {
 		logger.Log.Panicf("Failed to convert downloaded RPMs into a repo. Error: %s", err)
 	}
 
+	timestamp.Stamp.RecordToCSV("Convert pkg to repo", "")
+
 	if strings.TrimSpace(*outputSummaryFile) != "" {
 		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
 		logger.PanicOnError(err, "Failed to save cloned repo contents")
 	}
+
+	timestamp.Stamp.RecordToCSV("finishing up", "")
+
 }
 
 func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {
@@ -102,6 +115,7 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 	if err != nil {
 		return
 	}
+	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Load config with absolute paths")
 
 	packageVersionsInConfig, err := installutils.PackageNamesFromConfig(cfg)
 	if err != nil {
@@ -118,8 +132,12 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 		}
 	}
 
+	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Add kernel packages from KernelOptions")
+
 	// Add any packages required by the install tools
 	packageVersionsInConfig = append(packageVersionsInConfig, installutils.GetRequiredPackagesForInstall()...)
+
+	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Add packages required by install tools")
 
 	logger.Log.Infof("Cloning: %v", packageVersionsInConfig)
 	// The image tools don't care if a package was created locally or not, just that it exists. Disregard if it is prebuilt or not.

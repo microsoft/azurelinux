@@ -31,6 +31,7 @@ go_tool_list = \
 	specreader \
 	srpmpacker \
 	validatechroot \
+	bldtracker \
 
 # For each utility "util", create a "out/tools/util" target which references code in "tools/util/"
 go_tool_targets = $(foreach target,$(go_tool_list),$(TOOL_BINS_DIR)/$(target))
@@ -148,11 +149,11 @@ worker_chroot_deps := \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
-$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
+$(chroot_worker): $(worker_chroot_deps) $(go-bldtracker) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 else
-$(chroot_worker):
+$(chroot_worker): $(go-bldtracker)
 endif
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \

@@ -7,17 +7,26 @@
 # $3 path to find RPMs. May be in PATH/<arch>/*.rpm
 # $4 path to log directory
 
-[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir>"; exit; }
+[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ] && [ -n "$6" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir> <./bldtracker>"; exit; }
 
 chroot_base=$1
 packages=$2
 rpm_path=$3
 log_path=$4
+bldtracker=$5
+timestamp_dir=$6
 
 chroot_name="worker_chroot"
 chroot_builder_folder=$chroot_base/$chroot_name
 chroot_archive=$chroot_base/$chroot_name.tar.gz
 chroot_log="$log_path"/$chroot_name.log
+
+$bldtracker \
+    --script-name="create_worker_chroot.sh" \
+    --step-name="Start running the script" \
+    --dir-path=$timestamp_dir \
+    --log-path="$log_path" \
+    --mode="n"
 
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
@@ -41,6 +50,15 @@ install_one_toolchain_rpm () {
     fi
 }
 
+record_timestamp () {
+    $bldtracker \
+        --script-name="create_worker_chroot.sh" \
+        --step-name="$1" \
+        --dir-path=$timestamp_dir \
+        --log-path="$log_path" \
+        --mode="r"
+}
+
 rm -rf "$chroot_builder_folder"
 rm -f "$chroot_archive"
 rm -f "$chroot_log"
@@ -53,6 +71,8 @@ HOME=/root
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
+
+record_timestamp "finish adding RPM to worker chroot"
 
 TEMP_DB_PATH=/temp_db
 echo "Setting up a clean RPM database before the Berkeley DB -> SQLite conversion under '$TEMP_DB_PATH'." | tee -a "$chroot_log"
@@ -70,6 +90,8 @@ while read -r package || [ -n "$package" ]; do
     chroot "$chroot_builder_folder" rm $package
 done < "$packages"
 
+record_timestamp "finish adding RPM DB entry"
+
 echo "Overwriting old RPM database with the results of the conversion." | tee -a "$chroot_log"
 chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
 chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
@@ -80,6 +102,8 @@ do
     echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
     chroot "$chroot_builder_folder" rpm --import "$gpg_key"
 done
+
+record_timestamp "finish importing GPG keys"
 
 HOME=$ORIGINAL_HOME
 
@@ -100,3 +124,6 @@ else
     tar -I gzip -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 fi
 echo "Done creating $chroot_archive." | tee -a "$chroot_log"
+
+record_timestamp "Done installing all packages"
+

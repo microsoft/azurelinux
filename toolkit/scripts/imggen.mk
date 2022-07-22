@@ -74,7 +74,8 @@ $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(de
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imageconfigvalidator) \
 		--input=$(CONFIG_FILE) \
-		--dir=$(CONFIG_BASE_DIR) && \
+		--dir=$(CONFIG_BASE_DIR) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imageconfigvalidator.csv && \
 	touch $@
 
 
@@ -103,7 +104,8 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		$(imagepkgfetcher_extra_flags) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
-		--output-dir=$(local_and_external_rpm_cache)
+		--output-dir=$(local_and_external_rpm_cache) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.csv 
 
 make-raw-image: $(imager_disk_output_dir)
 $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
@@ -124,7 +126,8 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--tdnf-worker $(chroot_worker) \
 		--repo-file=$(imggen_local_repo) \
 		--assets $(assets_dir) \
-		--output-dir $(imager_disk_output_dir) && \
+		--output-dir $(imager_disk_output_dir) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imager.csv && \
 	touch $@
 
 # Sometimes files will have been deleted, that is fine so long as we were able to detect the change
@@ -141,7 +144,8 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--release-version $(RELEASE_VERSION) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/roast.log \
-		--image-tag=$(IMAGE_TAG)
+		--image-tag=$(IMAGE_TAG) \
+		--timestamp-file=$(TIMESTAMP_DIR)/roast.csv
 
 $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
@@ -161,7 +165,8 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		$(imagepkgfetcher_extra_flags) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
-		--output-dir=$(external_rpm_cache)
+		--output-dir=$(external_rpm_cache) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.csv 
 
 # Stand alone target to build just the initrd, should not be used in conjunction with other targets. Use the 'iso' target instead.
 initrd: $(go-liveinstaller) $(go-imager)
