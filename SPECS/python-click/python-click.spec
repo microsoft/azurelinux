@@ -30,6 +30,7 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pytest
 %endif
+Requires:       python3
 
 %description -n python3-%{pypi_name} %{_description}
 
