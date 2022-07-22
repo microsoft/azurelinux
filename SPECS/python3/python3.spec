@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -298,6 +298,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Jul 12 2022 Olivia Crain <oliviacrain> - 3.9.13-3
+- Update cgi3 patch to use versioned python shebang 
+
 * Fri Jul 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-2
 - Remove Windows executables from pip, setuptools subpackages
 - Add provides in the style of python39-%%{subpackage}, python3.9-%%{subpackage} for all packages except pip, setuptools 

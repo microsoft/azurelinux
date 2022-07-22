@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,24 +13,15 @@ Source1:        serial-console.sh
 # The following two patches are sourced from RedHat via Photon
 Patch0:         coreutils-8.32-i18n-1.patch
 Patch1:         coreutils-8.10-uname-1.patch
-# Upstream community agreed to not fix this
-Patch2:         CVE-2016-2781.nopatch
-# CVE-2013-0221 is fixed in coreutils-8.32-i18n-1.patch
-Patch3:         CVE-2013-0221.nopatch
-# CVE-2013-0222 is fixed in coreutils-8.32-i18n-1.patch
-Patch4:         CVE-2013-0222.nopatch
-# CVE-2013-0223 is fixed in coreutils-8.32-i18n-1.patch
-Patch5:         CVE-2013-0223.nopatch
-Patch6:         skip_test_if_run_as_root.patch
+Patch2:         skip_test_if_run_as_root.patch
+Patch3:         fix_test_env_signal_handler.patch
+Patch4:         coreutils-fix-get-sys_getdents-aarch64.patch
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
 Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
-%ifarch aarch64
-Patch7:         coreutils-fix-get-sys_getdents-aarch64.patch
-%endif
 %if %{with_check}
 BuildRequires:  perl
 BuildRequires:  perl(File::Find)
@@ -49,7 +40,14 @@ Requires:       coreutils >= %{version}
 These are the additional language files of coreutils.
 
 %prep
-%autosetup -p1
+%autosetup -N
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%ifarch aarch64
+%patch4 -p1
+%endif
 
 %build
 autoreconf -fi
@@ -105,6 +103,11 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.32-5
+- Add upstream patch to fix race in env-signal-handler test
+- Ensure SRPMs built on any architecture include all patches
+- Remove nopatch files from spec
+
 * Wed Jun 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.32-4
 - Configure build to output `arch` binary (equivalent to `uname -m`)
 

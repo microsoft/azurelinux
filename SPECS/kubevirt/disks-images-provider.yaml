@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: disks-images-provider
+  namespace: kubevirt
+  labels:
+    kubevirt.io: "disks-images-provider"
+spec:
+  selector:
+    matchLabels:
+      kubevirt.io: "disks-images-provider"
+  template:
+    metadata:
+      labels:
+        name: disks-images-provider
+        kubevirt.io: disks-images-provider
+      name: disks-images-provider
+    spec:
+      serviceAccountName: kubevirt-testing
+      containers:
+        - name: target
+          image: quay.io/kubevirt/disks-images-provider:v0.51.0
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","source /etc/bashrc && chroot /host losetup -d ${LOOP_DEVICE} && chroot /host umount ${LOOP_DEVICE_HP} && chroot /host losetup -d ${LOOP_DEVICE_HP}"]
+          volumeMounts:
+          - name: images
+            mountPath: /hostImages
+          - name: local-storage
+            mountPath: /local-storage
+          - name: host-dir
+            mountPath: /host
+            mountPropagation: Bidirectional
+          securityContext:
+            privileged: true
+          readinessProbe:
+            exec:
+              command:
+              - cat
+              - /ready
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: images
+          hostPath:
+            path: /tmp/hostImages
+            type: DirectoryOrCreate
+        - name: local-storage
+          hostPath:
+            path: /mnt/local-storage
+            type: DirectoryOrCreate
+        - name: host-dir
+          hostPath:
+            path: /
