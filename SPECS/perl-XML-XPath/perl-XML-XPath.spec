@@ -1,12 +1,8 @@
+# Optional tests, disabled due to missing dependencies.
+%bcond_with perl_XML_XPath_enables_optional_test
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Run optional tests
-%if ! (0%{?rhel})
-%bcond_without perl_XML_XPath_enables_optional_test
-%else
-%bcond_with perl_XML_XPath_enables_optional_test
-%endif
-
 Name:           perl-XML-XPath
 Version:        1.44
 Release:        13%{?dist}
@@ -16,8 +12,8 @@ Summary:        XPath parser and evaluator for Perl
 License:        Artistic 2.0 and (GPL+ or Artistic)
 URL:            https://metacpan.org/release/XML-XPath
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-%{version}.tar.gz
-
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
@@ -25,7 +21,6 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-# Run-time
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Exporter)
@@ -35,18 +30,22 @@ BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(XML::Parser) >= 2.23
-# Tests
+
+%if %{with_check}
 BuildRequires:  perl(lib)
 BuildRequires:  perl(open)
 BuildRequires:  perl(Path::Tiny) >= 0.076
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(utf8)
+
 # Optional tests
 %if %{with perl_XML_XPath_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(Test::CPAN::Meta)
 BuildRequires:  perl(Test::CPAN::Meta::JSON)
+%endif
+
 %endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
