@@ -34,7 +34,7 @@ BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 
 %if %{with_check}
-BuildRequires:  perl(Path::Tiny) >= 0.076
+BuildRequires:  perl(App::cpanminus)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(lib)
@@ -76,6 +76,7 @@ cat >> %{buildroot}/%{_mandir}/man1/xpath.1 << EOF
 EOF
 
 %check
+cpanm Path::Tiny
 make test
 
 %files
