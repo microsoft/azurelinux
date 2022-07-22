@@ -22503,9 +22503,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python3-cassandra-driver",
-          "version": "3.24.0",
-          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.24.0.tar.gz"
+          "name": "python-cassandra-driver",
+          "version": "3.25.0",
+          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.25.0.tar.gz"
         }
       }
     },
