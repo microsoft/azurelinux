@@ -1,0 +1,47 @@
+diff --git a/package/rpm/install.sh b/package/rpm/install.sh
+old mode 100755
+new mode 100644
+index bd3a459d..73f65c9b
+--- a/package/rpm/install.sh
++++ b/package/rpm/install.sh
+@@ -43,12 +43,8 @@ set -e
+ #     Commit of k3s to download from temporary cloud storage.
+ #     * (for developer & QA use)
+ #
+-#   - INSTALL_K3S_BIN_DIR
+-#     Directory to install k3s binary, links, and uninstall script to, or use
+-#     /usr/local/bin as the default
+-#
+ #   - INSTALL_K3S_BIN_DIR_READ_ONLY
+-#     If set to true will not write files to INSTALL_K3S_BIN_DIR, forces
++#     If set to true will not write files to BIN_DIR, forces
+ #     setting INSTALL_K3S_SKIP_DOWNLOAD=true
+ #
+ #   - INSTALL_K3S_SYSTEMD_DIR
+@@ -114,15 +110,8 @@ fatal()
+
+ # --- fatal if no systemd or openrc ---
+ verify_system() {
+-    if [ -x /sbin/openrc-run ]; then
+-        HAS_OPENRC=true
+-        return
+-    fi
+-    if [ -d /run/systemd ]; then
+-        HAS_SYSTEMD=true
+-        return
+-    fi
+-    fatal 'Can not find systemd or openrc to use as a process supervisor for k3s'
++    HAS_SYSTEMD=true
++    return
+ }
+
+ # --- add quotes to command arguments ---
+@@ -219,7 +208,7 @@ setup_env() {
+     fi
+
+     # --- use binary install directory if defined or create default ---
+-    BIN_DIR=${INSTALL_K3S_BIN_DIR:-/usr/local/bin}
++    BIN_DIR=/usr/local/bin
+     DATA_DIR=/var/lib/rancher/k3s
+
+     # --- set related files from system name ---
