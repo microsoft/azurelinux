@@ -13,8 +13,7 @@ Version:        1.4.2
 Release:        4%{?dist}
 License:        MIT
 URL:            https://github.com/pytest-dev/pytest-timeout
-#Source0:       https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-pexpect
