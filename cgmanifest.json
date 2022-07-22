@@ -21475,7 +21475,7 @@
         "other": {
           "name": "python-pytest-subtests",
           "version": "0.3.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-subtests/python-pytest-subtests-0.3.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-subtests/pytest-subtests-0.3.1.tar.gz"
         }
       }
     },
