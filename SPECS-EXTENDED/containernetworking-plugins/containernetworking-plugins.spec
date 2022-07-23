@@ -11,6 +11,7 @@
 %global provider_tld com
 %global project containernetworking
 %global repo plugins
+%global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path %{provider_prefix}
 %global git0 https://%{import_path}
 

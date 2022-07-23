@@ -22,6 +22,7 @@
 %global import_path_plugins %{provider}.%{provider_tld}/%{project}/%{repo_plugins}
 %global git_plugins https://%{import_path_plugins}
 %global commit_plugins 18822f9a4fb35d1349eb256f4cd2bfd372474d84
+%global shortcommit_plugins %(c=%{commit_plugins}; echo ${c:0:7})
 
 # gvproxy
 %global repo_gvproxy gvisor-tap-vsock
@@ -29,6 +30,7 @@
 %global import_path_gvproxy %%{provider}.%{provider_tld}/%{project}/%{repo_gvproxy}
 %global git_gvproxy https://%{import_path_gvproxy}
 %global commit_gvproxy 4ee84d66bd86668f011733d8873989b5862bcd07
+%global shortcommit_gvproxy %(c=%{commit_gvproxy}; echo ${c:0:7})
 
 %global built_tag v4.1.1
 
@@ -41,8 +43,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io/
 Source0:        %{git0}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-18822f9.tar.gz
-Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-4ee84d6.tar.gz
+Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-%{shortcommit_plugins}.tar.gz
+Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-%{shortcommit_gvproxy}.tar.gz
 Provides:       %{name}-manpages = %{version}-%{release}
 BuildRequires:  go-md2man
 BuildRequires:  golang

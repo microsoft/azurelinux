@@ -12454,7 +12454,7 @@
         "other": {
           "name": "netavark",
           "version": "1.0.3",
-          "downloadUrl": "https://github.com/containers/netavark/archive/refs/tags/v1.0.3.tar.gz"
+          "downloadUrl": "https://github.com/containers/netavark/archive/v1.0.3/1.0.3.tar.gz"
         }
       }
     },
