@@ -14,8 +14,8 @@ $(call create_folder,$(BUILD_DIR)/tools)
 
 # List of go utilities in tools/ directory
 go_tool_list = \
-	boilerplate \
 	bldtracker \
+	boilerplate \
 	depsearch \
 	grapher \
 	graphpkgfetcher \
