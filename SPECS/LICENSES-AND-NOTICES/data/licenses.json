@@ -852,6 +852,7 @@
                 "nbd",
                 "nbdkit",
                 "neon",
+                "netavark",
                 "netcf",
                 "netlabel_tools",
                 "netpbm",
