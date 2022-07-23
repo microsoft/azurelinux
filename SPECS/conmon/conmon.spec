@@ -7,8 +7,8 @@
 %endif
 Summary:        OCI container runtime monitor
 Name:           conmon
-Version:        2.0.29
-Release:        3%{?dist}
+Version:        2.1.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,24 +19,29 @@ BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  glib2-devel
 BuildRequires:  go-md2man
+BuildRequires:  libseccomp-devel
 BuildRequires:  make
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-libs
 Requires:       glib2
 Requires:       systemd-libs
+Requires:       libseccomp
 
 %description
 %{summary}.
 
 %prep
 %autosetup -Sgit -n %{name}-%{version}
+sed -i 's|install.bin: bin/conmon|install.bin:|' Makefile
+sed -i 's|install.crio: bin/conmon|install.crio:|' Makefile
 
 %build
-make GOMD2MAN=go-md2man DEBUGFLAG="-g" bin/conmon
+make DEBUGFLAG="-g" bin/conmon
 make GOMD2MAN=go-md2man -C docs
 
 %install
 make PREFIX=%{buildroot}%{_prefix} install install.crio
+%{__make} PREFIX=%{buildroot}%{_prefix} -C docs install
 
 %files
 %license LICENSE
@@ -47,6 +52,10 @@ make PREFIX=%{buildroot}%{_prefix} install install.crio
 %dir %{_libexecdir}/crio
 
 %changelog
+* Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-1
+- Upgrade to latest version 2.1.0.
+- Updated SPEC file with required 2.1.0 version compatibility.
+
 * Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 2.0.29-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
