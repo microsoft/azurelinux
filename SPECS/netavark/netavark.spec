@@ -16,10 +16,8 @@ License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://github.com/containers/%{name}
-# Source0:     %{url}/archive/%{built_tag}/%{version}.tar.gz
-Source0:       netavark-1.0.3.tar.gz
-# Source1:     %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
-Source1:       netavark-v1.0.3-vendor.tar.gz
+Source0:       %{url}/archive/%{built_tag}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:       %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
 BuildRequires: cargo
 BuildRequires: make
 BuildRequires: rust

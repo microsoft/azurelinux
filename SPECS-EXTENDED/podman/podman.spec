@@ -40,12 +40,9 @@ Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io/
-# Source0:      %{git0}/archive/%{built_tag}.tar.gz
-Source0:        %{name}-4.1.1.tar.gz
-# Source1:      %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz
-Source1:        dnsname-18822f9.tar.gz
-# Source2:      %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz
-Source2:        gvisor-tap-vsock-4ee84d6.tar.gz
+Source0:        %{git0}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-18822f9.tar.gz
+Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-4ee84d6.tar.gz
 Provides:       %{name}-manpages = %{version}-%{release}
 BuildRequires:  go-md2man
 BuildRequires:  golang

@@ -27,7 +27,7 @@ Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
 Release:        1%{?dist}
-License:        Apache-2.0 AND GPL-3.0-or-later
+License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Management
