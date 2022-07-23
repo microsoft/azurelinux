@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.48.1
-Release:        4%{?dist}
+Version:        5.15.55.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+%ifarch x86_64
+BuildRequires:  pciutils-devel
+%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -168,6 +171,10 @@ make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{a
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
 
+%ifarch x86_64
+make -C tools turbostat cpupower
+%endif
+
 #Compile bpftool
 make -C tools/bpf/bpftool
 
@@ -267,6 +274,11 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
+%ifarch x86_64
+# Install turbostat cpupower
+make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
+%endif
+
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
 
@@ -341,8 +353,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
+%{_sbindir}/cpufreq-bench
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
+%{_lib64dir}/libcpupower.so*
+%{_sysconfdir}/cpufreq-bench.conf
+%{_includedir}/cpuidle.h
+%{_includedir}/cpufreq.h
+%{_mandir}/man1/cpupower*.gz
+%{_mandir}/man8/turbostat*.gz
+%{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
+%{_datadir}/bash-completion/completions/cpupower
 %endif
 %ifarch aarch64
 %{_libdir}/traceevent
@@ -370,6 +391,16 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jul 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.55.1-1
+- Upgrade to 5.15.55.1
+
+* Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 5.15.48.1-6
+- Add turbostat and cpupower to kernel-tools
+
+* Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
+- Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
+- Add CONFIG_IKHEADERS=m to enable eBPF standard tracers.
+
 * Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
 - Remove 'quiet' from commandline to enable verbose log
 

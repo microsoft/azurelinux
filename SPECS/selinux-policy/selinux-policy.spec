@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,10 @@ Patch36:        0036-container-Allow-container-engines-to-connect-to-http.patch
 Patch37:        0037-container-Getattr-generic-device-nodes.patch
 Patch38:        0038-application-Allow-apps-to-use-init-fds.patch
 Patch39:        0039-unconfined-Manage-own-fds.patch
+Patch40:        0040-usermanage-Add-sysctl-access-for-groupadd-to-get-num.patch
+Patch41:        0041-systemd-systemd-cgroups-reads-kernel.cap_last_cap-sy.patch
+Patch42:        0042-kernel-hv_utils-shutdown-on-systemd-systems.patch
+Patch43:        0043-Container-Minor-fixes-from-interactive-container-use.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -333,6 +337,13 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-9
+- Fixes for interactive container use.
+
+* Thu Jul 07 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-8
+- Add sysctl access for groupadd and systemd-cgroups
+- Allow access for hv_utils shutdown sequence access to poweroff.target.
+
 * Wed Jun 15 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-7
 - Unconfined domains can manipulate thier own fds.
 
