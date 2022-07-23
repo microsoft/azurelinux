@@ -84,7 +84,7 @@ when the container is deleted.
 rm -rf plugins/main/windows
 
 # Use correct paths in cni-dhcp unitfiles
-sed -i 's/\/opt\/cni\/bin/\%{_prefix}\/libexec\/cni/' plugins/ipam/dhcp/systemd/cni-dhcp.service
+sed -i 's|/opt/cni\/bin|\%{_prefix}/libexec/cni|' plugins/ipam/dhcp/systemd/cni-dhcp.service
 
 %build
 export ORG_PATH="%{provider}.%{provider_tld}/%{project}"
@@ -130,7 +130,7 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %changelog
 * Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.1-1
 - Upgrade version to 1.1.1.
-- Updated SPEC file for compotibility with 1.1.1 version.
+- Updated SPEC file for compatibility with 1.1.1 version.
 
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-3
 - Fixing usage of the '%%gobuild' macro.
