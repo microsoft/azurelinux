@@ -28,7 +28,6 @@ License:        GPLv2 and LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-#URL:            https://github.com/openucx/xpmem
 URL:            https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/xpmem-2.6.3.orig.tar.gz
 Source:         %{name}-%{version}.tar.gz
 BuildRequires:  automake
@@ -127,9 +126,6 @@ echo "xpmem" >%{buildroot}%{_prefix}/lib/modules-load.d/xpmem.conf
 %if %{with kernel_only}
 rm -f %{buildroot}/usr/lib*/pkgconfig/cray-xpmem.pc
 %endif
-
-%clean
-rm -rf %{buildroot}
 
 %if ! %{with kernel_only}
 %post   -n libxpmem -p /sbin/ldconfig
