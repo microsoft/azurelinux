@@ -230,7 +230,7 @@ fi
 %endif
 
 %changelog
-* Thu Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 1.1.4.90mlnx1-1
+* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 1.1.4.90mlnx1-1
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
 - Lint spec to conform to Mariner 
 - License verified
