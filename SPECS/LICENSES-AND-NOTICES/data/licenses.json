@@ -2109,6 +2109,7 @@
         "NVIDIA": {
             "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
+                "knem",
                 "libnvidia-container",
                 "nvidia-container-runtime",
                 "nvidia-container-toolkit",
