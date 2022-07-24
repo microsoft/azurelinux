@@ -28,13 +28,6 @@
 #  $Id: ofed-scripts.spec 8402 2006-07-06 06:35:57Z vlad $
 #
 
-%global CUSTOM_PREFIX %(if ( echo %{_prefix} | grep -E "^/usr$|^/usr/$" > /dev/null ); then echo -n '0'; else echo -n '1'; fi)
-
-%global debug_package %{nil}
-
-%global long-release OFED.5.6.0.6.8
-
-
 Summary:        OFED scripts
 Name:           ofed-scripts
 Version:        5.6
@@ -43,15 +36,17 @@ License:        GPLv2/BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
-URL:            http://www.openfabrics.org
+URL:            https://www.openfabrics.org
 #Source0:       https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+%global CUSTOM_PREFIX %(if ( echo %{_prefix} | grep -E "^/usr$|^/usr/$" > /dev/null ); then echo -n '0'; else echo -n '1'; fi)
+%global debug_package %{nil}
+%global long-release OFED.5.6.0.6.8
 
 %description
 OpenFabrics scripts
 
 %prep
-[ "%{buildroot}" != "/" -a -d %{buildroot} ] && rm -rf %{buildroot}
 %autosetup -p1 -n %{name}-%{version}
 cp debian/copyright COPYRIGHT
 
@@ -62,25 +57,25 @@ cp debian/copyright COPYRIGHT
 touch ofed-files
 %endif
 
-install -d %{buildroot}%{_prefix}/bin
-install -d %{buildroot}%{_prefix}/sbin
-install -m 0755 uninstall.sh %{buildroot}%{_prefix}/sbin/ofed_uninstall.sh
-install -m 0755 sysinfo-snapshot.py %{buildroot}%{_prefix}/sbin
-install -m 0755 vendor_pre_uninstall.sh %{buildroot}%{_prefix}/sbin
-install -m 0755 vendor_post_uninstall.sh %{buildroot}%{_prefix}/sbin
-install -m 0755 ofed_info %{buildroot}%{_prefix}/bin
-install -m 0755 ofed_rpm_info %{buildroot}%{_prefix}/bin
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_sbindir}
+install -m 0755 uninstall.sh %{buildroot}%{_sbindir}/ofed_uninstall.sh
+install -m 0755 sysinfo-snapshot.py %{buildroot}%{_sbindir}
+install -m 0755 vendor_pre_uninstall.sh %{buildroot}%{_sbindir}
+install -m 0755 vendor_post_uninstall.sh %{buildroot}%{_sbindir}
+install -m 0755 ofed_info %{buildroot}%{_bindir}
+install -m 0755 ofed_rpm_info %{buildroot}%{_bindir}
 # Mariner not yet supported upstream
-# install -m 0755 hca_self_test.ofed %{buildroot}%{_prefix}/bin
+# install -m 0755 hca_self_test.ofed %{buildroot}%{_bindir}
 
 %if "%{CUSTOM_PREFIX}" == "1"
 install -d %{buildroot}/etc/profile.d
 cat > %{buildroot}/etc/profile.d/ofed.sh << EOF
-if ! echo \${PATH} | grep -q %{_prefix}/bin ; then
-        PATH=\${PATH}:%{_prefix}/bin
+if ! echo \${PATH} | grep -q %{_bindir} ; then
+        PATH=\${PATH}:%{_bindir}
 fi
-if ! echo \${PATH} | grep -q %{_prefix}/sbin ; then
-        PATH=\${PATH}:%{_prefix}/sbin
+if ! echo \${PATH} | grep -q %{_sbindir} ; then
+        PATH=\${PATH}:%{_sbindir}
 fi
 if ! echo \${MANPATH} | grep -q %{_mandir} ; then
         MANPATH=\${MANPATH}:%{_mandir}
@@ -88,14 +83,14 @@ fi
 EOF
 cat > %{buildroot}/etc/profile.d/ofed.csh << EOF
 if (\$?path) then
-if ( "\${path}" !~ *%{_prefix}/bin* ) then
-        set path = ( \$path %{_prefix}/bin )
+if ( "\${path}" !~ *%{_bindir}* ) then
+        set path = ( \$path %{_bindir} )
 endif
-if ( "\${path}" !~ *%{_prefix}/sbin* ) then
-        set path = ( \$path %{_prefix}/sbin )
+if ( "\${path}" !~ *%{_sbindir}* ) then
+        set path = ( \$path %{_sbindir} )
 endif
 else
-        set path = ( %{_prefix}/bin %{_prefix}/sbin )
+        set path = ( %{_bindir} %{_sbindir} )
 endif
 if (\$?MANPATH) then
 if ( "\${MANPATH}" !~ *%{_mandir}* ) then
@@ -173,9 +168,6 @@ if [ $1 = 0 ]; then  #Erase, not upgrade
 fi
 /sbin/ldconfig
 
-%clean
-[ "%{buildroot}" != "/" -a -d %{buildroot} ] && rm -rf %{buildroot}
-
 %if "%{CUSTOM_PREFIX}" == "1"
 %files -f ofed-files
 %else
@@ -183,28 +175,37 @@ fi
 %endif
 %defattr(-,root,root)
 %license COPYRIGHT
-%{_prefix}/bin/*
-%{_prefix}/sbin/*
+%{_bindir}/*
+%{_sbindir}/*
 
 %changelog
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0)
 - License verified
+
 * Sun Jan 08 2017 Alaa Hleihel <alaa@mellanox.com>
 - Added hca_self_test.ofed script
+
 * Sun Dec 13 2015 Nizar Swidan <nizars@mellanox.com>
 - Replaced sysinfo-snapshot.sh with sysinfo-snapshot.py
+
 * Tue Nov 13 2012 Vladimir Sokolovsky <vlad@mellanox.com>
 - Added ofed_rpm_info
+
 * Tue Aug  7 2012 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Added sysinfo-snapshot.sh
+
 * Wed Jul 25 2012 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Added QoS utilities
+
 * Tue Oct  9 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Added ofed.[c]sh and ofed.conf if prefix is not /usr
+
 * Tue Aug 21 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Changed version to 1.3
+
 * Mon Apr  2  2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - uninstall.sh renamed to ofed_uninstall.sh and placed under %{_prefix}/sbin
+
 * Tue Jun  13 2006 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Initial packaging
