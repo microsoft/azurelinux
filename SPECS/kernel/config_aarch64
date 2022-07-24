@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.128.1 Kernel Configuration
+# Linux/arm64 5.10.131.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 9.1.0"
 CONFIG_CC_IS_GCC=y
@@ -4159,9 +4159,10 @@ CONFIG_TCG_TIS_ST33ZP24_SPI=m
 CONFIG_XILLYBUS=m
 CONFIG_XILLYBUS_PCIE=m
 CONFIG_XILLYBUS_OF=m
+# end of Character devices
+
 # CONFIG_RANDOM_TRUST_CPU is not set
 # CONFIG_RANDOM_TRUST_BOOTLOADER is not set
-# end of Character devices
 
 #
 # I2C support
@@ -9007,7 +9008,6 @@ CONFIG_CRYPTO_LIB_POLY1305_GENERIC=m
 CONFIG_CRYPTO_LIB_SHA256=y
 # end of Crypto library routines
 
-CONFIG_LIB_MEMNEQ=y
 CONFIG_CRC_CCITT=y
 CONFIG_CRC16=y
 CONFIG_CRC_T10DIF=y
