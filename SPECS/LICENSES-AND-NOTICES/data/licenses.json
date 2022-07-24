@@ -2111,6 +2111,7 @@
             "specs": [
                 "knem",
                 "libnvidia-container",
+                "mlx-bootctl",
                 "nvidia-container-runtime",
                 "nvidia-container-toolkit",
                 "nvidia-docker2",
