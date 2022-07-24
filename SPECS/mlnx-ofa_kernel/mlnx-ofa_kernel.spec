@@ -80,7 +80,7 @@
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 Version:        5.6
-Release:        OFED.700.5.6.1.0.3.1%{?dist}
+Release:        OFED.5.6.1.0.3.1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -382,10 +382,6 @@ case $(uname -m) in
 	;;
 esac
 %endif
-
-%clean
-rm -rf %{buildroot}
-
 
 %if "%{KMP}" != "1"
 %post -n %{non_kmp_pname}
