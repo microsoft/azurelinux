@@ -25946,6 +25946,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "umoci",
+          "version": "0.4.7",
+          "downloadUrl": "https://github.com/opencontainers/umoci/archive/refs/tags/v0.4.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "unbound",
           "version": "1.13.2",
           "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.13.2.tar.gz"
