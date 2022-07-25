@@ -12743,8 +12743,8 @@
         "type": "other",
         "other": {
           "name": "nss_wrapper",
-          "version": "1.1.11",
-          "downloadUrl": "https://ftp.samba.org/pub/cwrap/nss_wrapper-1.1.11.tar.gz"
+          "version": "1.1.12",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/nss_wrapper-1.1.12.tar.gz"
         }
       }
     },
