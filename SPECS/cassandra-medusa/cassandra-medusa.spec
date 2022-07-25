@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 Name:           cassandra-medusa
 Version:        0.13.2
 Release:        1%{?dist}
@@ -11,10 +13,6 @@ BuildArch:      noarch
 BuildRequires:  python3
 BuildRequires:  python3-setuptools
 BuildRequires:  libevent-devel
-%if %{with_check}
-BuildRequires:  python3-pip
-BuildRequires:  sudo
-%endif
 Requires:       python3-dateutil
 Requires:       python3-click
 Requires:       python-click-aliases
@@ -37,6 +35,11 @@ Requires:       python3-fasteners
 Requires:       python3-datadog
 Requires:       python3-botocore
 Requires:       python3-dns
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  sudo
+%endif
 
 %description
 Cassandra Medusa is Apache Cassandra backup system.
@@ -51,13 +54,18 @@ It is a command line tool that offers the following features:
 - Full or differential backups -n python3-fasteners
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1
 
 %build
 %py3_build
 
 %install
 %py3_install
+
+%check
+%{python3} -m pip install atomicwrites attrs pluggy pygments six more-itertools
+%{python3} -m pip install -r requirements.txt
+%{pytest} -v tests
 
 %files
 %license LICENSE
@@ -68,7 +76,7 @@ It is a command line tool that offers the following features:
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.13.2-1
-- Original first spec draft of medusa for CBL-Mariner(License: ASL 2.0).
+- Original version for CBL-Mariner (license: MIT)
 - Adding dependencies based on sources 'requirements.txt'.
 - Not adding K8 integration runtime packages for now.
-- License Verified.
+- License verified
