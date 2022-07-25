@@ -75,11 +75,10 @@ func OutputCSVLog(files []string) {
 	wd = wd[0 : idx+11]
 	wd += "/build/timestamp/"
 	initInfo, err := os.Stat(wd + "init")
-	
+
 	if err != nil {
 		fmt.Println("Unable to locate init file.")
 	}
-	
 
 	startTime := initInfo.ModTime()
 
