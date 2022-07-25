@@ -1,7 +1,7 @@
-Summary:        A portable number theoretic multiple-precision integer library
 Name:           libtommath
 Version:        1.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
+Summary:        A portable number theoretic multiple-precision integer library
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ find %{buildroot} -name '*.a' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.1.0-5
+- Move to SPECS folder
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-4
 - Removing docs to drop dependency on 'ghostscript'.
 - License verified.
