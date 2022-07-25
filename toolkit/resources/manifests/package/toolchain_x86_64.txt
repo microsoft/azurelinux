@@ -131,7 +131,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-kernel-headers-5.15.48.1-5.cm2.noarch.rpm
+kernel-headers-5.15.55.1-1.cm2.noarch.rpm
 kmod-29-1.cm2.x86_64.rpm
 kmod-debuginfo-29-1.cm2.x86_64.rpm
 kmod-devel-29-1.cm2.x86_64.rpm
@@ -497,7 +497,7 @@ procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-debuginfo-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
 procps-ng-lang-3.3.17-1.cm2.x86_64.rpm
-pyproject-rpm-macros-1.0.0~rc1-2.cm2.noarch.rpm
+pyproject-rpm-macros-1.0.0~rc1-3.cm2.noarch.rpm
 python-markupsafe-debuginfo-2.1.0-1.cm2.x86_64.rpm
 python3-3.9.13-3.cm2.x86_64.rpm
 python3-audit-3.0.6-7.cm2.x86_64.rpm

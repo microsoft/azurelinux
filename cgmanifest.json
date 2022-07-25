@@ -1697,8 +1697,8 @@
         "type": "other",
         "other": {
           "name": "conmon",
-          "version": "2.0.29",
-          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/containers/conmon/archive/v2.1.0.tar.gz"
         }
       }
     },
@@ -1737,8 +1737,8 @@
         "type": "other",
         "other": {
           "name": "containernetworking-plugins",
-          "version": "0.9.0",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.0.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.1.1.tar.gz"
         }
       }
     },
@@ -2106,16 +2106,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dcos-cli",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dbxtool",
           "version": "8",
           "downloadUrl": "https://github.com/vathpela/dbxtool/releases/download/dbxtool-8/dbxtool-8.tar.bz2"
@@ -2129,6 +2119,16 @@
           "name": "dconf",
           "version": "0.36.0",
           "downloadUrl": "https://download.gnome.org/sources/dconf/0.36/dconf-0.36.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
@@ -5790,8 +5790,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7271,8 +7271,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7281,8 +7281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7941,8 +7941,8 @@
         "type": "other",
         "other": {
           "name": "libcontainers-common",
-          "version": "20200727",
-          "downloadUrl": "https://github.com/containers/image/archive/v5.5.1.tar.gz"
+          "version": "20210626",
+          "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz"
         }
       }
     },
@@ -12445,6 +12445,16 @@
           "name": "net-tools",
           "version": "2.10",
           "downloadUrl": "https://downloads.sourceforge.net/project/net-tools/net-tools-2.10.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "netavark",
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/containers/netavark/archive/v1.0.3/1.0.3.tar.gz"
         }
       }
     },
@@ -19214,8 +19224,8 @@
         "type": "other",
         "other": {
           "name": "podman",
-          "version": "2.2.1",
-          "downloadUrl": "https://github.com/containers/podman/archive/v2.2.1.tar.gz"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/containers/podman/archive/v4.1.1.tar.gz"
         }
       }
     },
@@ -21485,7 +21495,7 @@
         "other": {
           "name": "python-pytest-subtests",
           "version": "0.3.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-subtests/python-pytest-subtests-0.3.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-subtests/pytest-subtests-0.3.1.tar.gz"
         }
       }
     },
@@ -21495,7 +21505,7 @@
         "other": {
           "name": "python-pytest-timeout",
           "version": "1.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-timeout/python-pytest-timeout-1.4.2.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-timeout/pytest-timeout-1.4.2.tar.gz"
         }
       }
     },
@@ -22826,16 +22836,6 @@
           "name": "realmd",
           "version": "0.16.3",
           "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "reaper",
-          "version": "3.1.1",
-          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
         }
       }
     },
