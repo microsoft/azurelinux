@@ -8,7 +8,6 @@ package timestamp
 
 import (
 	"encoding/csv"
-	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -82,28 +81,6 @@ func (info *TimeInfo) Start() {
 func (info *TimeInfo) track() {
 	info.endTime = time.Now()
 	info.duration = info.endTime.Sub(info.startTime)
-}
-
-// Records a new timestamp and outputs it through the io.Writer specified in the input.
-func (info *TimeInfo) RecordToFile(stepName string, actionName string, writer io.Writer) {
-	info.track()
-	info.stepName = stepName
-	info.actionName = actionName
-
-	// Generates the message.
-	msg := info.stepName + " " + info.actionName + " in " + info.toolName + " took " + info.duration.String() + ". "
-	if info.timeRange {
-		msg += "Started at " + info.startTime.Format(time.UnixDate) + "; ended at " + info.endTime.Format(time.UnixDate) + ". \n"
-	} else {
-		msg += "\n"
-	}
-	_, err := io.WriteString(writer, msg)
-	if err != nil {
-		logger.Log.Warnf("Fail to write to file. %s\n", err)
-	}
-
-	// In case .start() is not called.
-	info.startTime = info.endTime
 }
 
 // Records a new timestamp and writes it to the corresponding csv file.
