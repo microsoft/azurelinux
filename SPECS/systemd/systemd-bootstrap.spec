@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -228,6 +228,9 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Wed Jul 21 2022 Minghe Ren <mingheren@microsoft.com> - 250.3-5
+- Modify 50-security-hardening.conf to imporve security
+
 * Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-4
 - Change build mode from "development" (default) to "release"
 

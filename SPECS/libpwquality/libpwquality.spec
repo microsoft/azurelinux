@@ -3,7 +3,7 @@
 Summary:        A library for password generation and password quality checking
 Name:           libpwquality
 Version:        1.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,7 @@ pronounceable passwords from Python applications.
 
 %prep
 %setup -q
+sed -i "s/# minclass = 0/minclass = 4/g" src/pwquality.conf
 
 %build
 [ -f %{_bindir}/python3 ] || ln -s %{_bindir}/python3 /bin/python
@@ -107,6 +108,9 @@ mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d
 %{python3_sitearch}/*.egg-info
 
 %changelog
+* Fri Jul 22 2022 Minghe Ren <mingheren@microsoft.com> - 1.4.4-2
+- Ensure password creation requirements are configured
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.4.4-1
 - Upgrade to version 1.4.4
 

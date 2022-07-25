@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2204.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -156,6 +156,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 8.2204.1-2
+- Modify rsyslog.conf to improve security
+
 * Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 8.2204.1-1
 - Update to v8.2204.1 to address CVE-2022-24903
 - Add more robust macro for Source4 url (prebuilt docs tar)

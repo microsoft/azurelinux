@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -147,6 +147,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 2.37.4-4
+- Modify su to improve security
+
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.4-3
 - Enable su tool and related PAM config
 
