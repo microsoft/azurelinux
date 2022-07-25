@@ -1,15 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Network Block Device user-space tools (TCP version)
 Name:           nbd
 Version:        3.20
-Release:        4%{?dist}
-Summary:        Network Block Device user-space tools (TCP version)
+Release:        5%{?dist}
 License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://nbd.sourceforge.net
 Source0:        http://downloads.sourceforge.net/project/nbd/%{name}/%{version}/%{name}-%{version}.tar.xz
 Source1:        nbd-server.service
 Source2:        nbd-server.sysconfig
-
 BuildRequires:  gcc
 BuildRequires:  glib2-devel >= 2.26
 BuildRequires:  gnutls-devel
@@ -23,7 +22,7 @@ Tools for the Linux Kernel's network block device, allowing you to use
 remote block devices over a TCP/IP network.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure --enable-syslog --enable-lfs --enable-gznbd
@@ -40,12 +39,12 @@ EOF
 install -pDm644 %{S:1} %{buildroot}%{_unitdir}/nbd-server.service
 install -pDm644 %{S:2} %{buildroot}%{_sysconfdir}/sysconfig/nbd-server
 
-%check
+# Disable tests as it hangs the pipeline infinitely
+# %%check
 # wait longer for nbd-server to fully start,
 # one second may not be enough on Fedora building infra
-sed -i -e 's/sleep 1/sleep 10/' tests/run/simple_test
-# Disable tests as it hangs the pipeline infinitely
-#make check
+# sed -i -e 's/sleep 1/sleep 10/' tests/run/simple_test
+# make check
 
 %post
 %systemd_post nbd-server.service
@@ -71,6 +70,11 @@ sed -i -e 's/sleep 1/sleep 10/' tests/run/simple_test
 %{_unitdir}/nbd@.service.d
 
 %changelog
+* Fri Jul 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.20-5
+- Promote to Mariner base repo
+- Modify test disabling in a way that's more friendly to our package test log parser
+- Lint spec
+
 * Sun Apr 17 2022 Muhammad Falak <mwani@microsoft.com> - 3.20-4
 - Disable tests as they hang the ptest pipeline
 - License verified

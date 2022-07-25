@@ -14,12 +14,22 @@
 SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
-
-local_specs = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
-local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
-local_sources = $(shell find $(SPECS_DIR)/ -name '*')
+SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
+
+ifneq ($(strip $(SRPM_PACK_LIST)),)
+local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
+$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
+	@echo $(strip $(SRPM_PACK_LIST)) | tr " " "\n" > $(srpm_pack_list_file)
+else # Empty pack list, build all under $(SPECS_DIR)
+local_specs = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
+$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
+	@touch $@
+endif
+
+local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
@@ -68,7 +78,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -81,7 +91,8 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		--log-file=$(LOGS_DIR)/pkggen/srpms/srpmpacker.log \
+		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
+		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) && \
 	touch $@
 

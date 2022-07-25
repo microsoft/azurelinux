@@ -2002,6 +2002,7 @@
                 "libacvp",
                 "libconfini",
                 "libconfuse",
+                "libgdiplus",
                 "libmaxminddb",
                 "libmetalink",
                 "libsafec",
@@ -2047,6 +2048,7 @@
                 "python-sphinxcontrib-websupport",
                 "python-yamlloader",
                 "R",
+                "reaper",
                 "rocksdb",
                 "rubygem-asciidoctor",
                 "rubygem-bigdecimal",
@@ -2184,6 +2186,7 @@
                 "junit",
                 "junitperf",
                 "jzlib",
+                "kubevirt",
                 "kured",
                 "libcontainers-common",
                 "libva",
@@ -2481,6 +2484,7 @@
                 "man-db",
                 "man-pages",
                 "mariadb",
+                "maven",
                 "mc",
                 "mercurial",
                 "meson",
@@ -2724,6 +2728,12 @@
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "k3s"
+            ]
+        },
+        "Sysbench source": {
+            "license": "[GPLv2+ License](https://github.com/akopytov/sysbench/blob/master/COPYING)",
+            "specs": [
+                "sysbench"
             ]
         }
     }
