@@ -26,7 +26,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -195,6 +195,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.7-3
+- Move from SPECS-EXTENDED to SPECS
+
 * Fri Jun 10 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.7-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified

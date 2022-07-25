@@ -1,6 +1,6 @@
 Name:           perl-Devel-CheckLib
 Version:        1.14
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Check that a library is available
 
 License:        GPL+ or Artistic
@@ -60,6 +60,9 @@ make test
 
 
 %changelog
+* Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.14-5
+- Move from SPECS-EXTENDED to SPECS
+
 * Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.14-4
 - Add an explicit BR on `perl(blib)` to enable ptest
 - License verified

@@ -1,6 +1,6 @@
 Name:           perl-Mock-Config
 Version:        0.03
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Temporarily set Config or XSConfig values
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -46,6 +46,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 0.03-12
+- Move from SPECS-EXTENDED to SPECS
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.03-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,6 +1,6 @@
 Name:           perl-Capture-Tiny
 Version:        0.48
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Capture STDOUT and STDERR from Perl, XS or external programs
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 0.48-9
+- Move from SPECS-EXTENDED to SPECS
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
