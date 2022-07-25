@@ -283,7 +283,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 	}
-	timestamp.Stamp.RecordToCSV("Finishing up build system config", "Cleanup encrypted disks")
+	timestamp.Stamp.RecordToCSV("Finish up build system config", "Cleanup encrypted disks")
 
 	return
 }
