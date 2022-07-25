@@ -2081,6 +2081,7 @@
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
+                "umoci",
                 "usrsctp",
                 "vala",
                 "verity-read-only-root",
