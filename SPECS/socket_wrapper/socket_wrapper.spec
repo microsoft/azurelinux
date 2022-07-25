@@ -1,16 +1,12 @@
 Name:           socket_wrapper
-Version:        1.2.4
-Release:        2%{?dist}
-
+Version:        1.3.3
+Release:        1%{?dist}
 License:        BSD
 Summary:        A library passing all socket communications through Unix sockets
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://cwrap.org/
-
+URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        socket_wrapper.keyring
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -34,48 +30,81 @@ SOCKET_WRAPPER_DIR=/path/to/swrap_dir
 This package doesn't have a devel package because this project is for
 development/testing.
 
+%package -n lib%{name}_noop
+Summary:        A library providing dummies for socket_wrapper
+
+%description -n lib%{name}_noop
+Applications with the need to call socket_wrapper_enabled() should link against
+-lsocket_wrapper_noop in order to resolve the symbol at link time.
+
+%package -n lib%{name}_noop-devel
+Summary:        Development headers for libsocket_wrapper_noop
+Requires:       libsocket_wrapper_noop = %{version}
+
+%description -n lib%{name}_noop-devel
+Development headers for applications with the need to call
+socket_wrapper_enabled().
+
 %prep
-gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build
-if test ! -e "obj"; then
 mkdir obj
-fi
 pushd obj
-%cmake \
--DUNIT_TESTING=ON \
-%{_builddir}/%{name}-%{version}
 
-make %{?_smp_mflags} VERBOSE=1
+%cmake \
+    -DUNIT_TESTING=ON ..
+
+%cmake_build
+
 popd
 
 %install
 pushd obj
-make DESTDIR=%{buildroot} install
+
+%cmake_install
+
 popd
 
 %ldconfig_scriptlets
 
+%ldconfig_scriptlets -n libsocket_wrapper_noop
+
 %check
 pushd obj
-ctest --output-on-failure
 
-LD_PRELOAD=src/libsocket_wrapper.so bash -c '>/dev/null'
+%ctest
+
+ls -l %{__cmake_builddir}/src/libsocket_wrapper.so
+LD_PRELOAD=%{__cmake_builddir}/src/libsocket_wrapper.so bash -c '>/dev/null'
 
 popd
 
 %files
 %doc AUTHORS README.md CHANGELOG
 %license LICENSE
-%{_libdir}/libsocket_wrapper.so*
-%dir %{_libdir}/cmake/socket_wrapper
-%{_libdir}/cmake/socket_wrapper/socket_wrapper-config-version.cmake
-%{_libdir}/cmake/socket_wrapper/socket_wrapper-config.cmake
-%{_libdir}/pkgconfig/socket_wrapper.pc
-%{_mandir}/man1/socket_wrapper.1*
+%{_libdir}/lib%{name}.so*
+%dir %{_libdir}/cmake/%{name}
+%{_libdir}/cmake/%{name}/%{name}-config-version.cmake
+%{_libdir}/cmake/%{name}/%{name}-config.cmake
+%{_libdir}/pkgconfig/%{name}.pc
+%{_mandir}/man1/%{name}.1*
+
+%files -n lib%{name}_noop
+%{_libdir}/lib%{name}_noop.so.*
+
+%files -n lib%{name}_noop-devel
+%{_includedir}/%{name}.h
+%{_libdir}/lib%{name}_noop.so
+%{_libdir}/cmake/%{name}/%{name}_noop-config*.cmake
+%{_libdir}/pkgconfig/%{name}_noop.pc
 
 %changelog
+* Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.3-1
+- Bumping version to 1.3.3.
+- Remove gpg signature verification.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
