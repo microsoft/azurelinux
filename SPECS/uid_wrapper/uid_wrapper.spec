@@ -1,22 +1,15 @@
 Name:           uid_wrapper
-Version:        1.2.7
-Release:        4%{?dist}
-
+Version:        1.2.9
+Release:        1%{?dist}
 Summary:        A wrapper for privilege separation
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://cwrap.org/
-
+URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        uid_wrapper.keyring
 
-Patch0:         0001-pkg-config-Fix-installation-path.patch
-Patch1:         uid_wrapper-1.2.7-cmake-config-fix-installation-path.patch
-
-BuildRequires:  gcc
 BuildRequires:  cmake
+BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libcmocka-devel >= 1.1.0
 
@@ -38,7 +31,6 @@ This package doesn't have a devel package cause this project is for
 development/testing.
 
 %prep
-gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build
@@ -78,6 +70,12 @@ popd
 %{_mandir}/man1/uid_wrapper.1*
 
 %changelog
+* Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.2.9-1
+- Bumping version to 1.2.9.
+- Remove gpg signature check.
+- Remove patches which are fixed in this version.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.7-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
