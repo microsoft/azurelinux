@@ -2,7 +2,6 @@
 %global _description %{expand:PyCryptodome is a self-contained Python package of low-level cryptographic
 primitives. It's a fork of PyCrypto. It brings several enhancements with respect
 to the last official version of PyCrypto (2.6.1), for instance:
-
   * Authenticated encryption modes (GCM, CCM, EAX, SIV, OCB)
   * Accelerated AES on Intel platforms via AES-NI
   * Elliptic curves cryptography (NIST P-256 curve only)
@@ -18,12 +17,10 @@ to the last official version of PyCrypto (2.6.1), for instance:
     userspace)
   * Cleaner RSA and DSA key generation (largely based on FIPS 186-4)
   * Major clean ups and simplification of the code base
-
 PyCryptodome is not a wrapper to a separate C library like OpenSSL. To the
 largest possible extent, algorithms are implemented in pure Python. Only the
 pieces that are extremely critical to performance (e.g. block ciphers) are
 implemented as C extensions.
-
 Note: all modules are installed under the Cryptodome package to avoid conflicts
 with the PyCrypto library.}
 
@@ -36,7 +33,7 @@ Distribution:   Mariner
 # PyCrypto-based code is public domain, further PyCryptodome contributions are
 # BSD
 License:        BSD and Public Domain
-URL:            http://www.pycryptodome.org/
+URL:            https://www.pycryptodome.org/
 Source0:        https://github.com/Legrandin/pycryptodome/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # Use external libtomcrypt library
 Patch0:         %{name}-3.15.0-use_external_libtomcrypt.patch
@@ -44,11 +41,15 @@ Patch0:         %{name}-3.15.0-use_external_libtomcrypt.patch
 BuildRequires:  gcc
 BuildRequires:  libtomcrypt-devel
 BuildRequires:  make
-BuildRequires:  python3-pip
 BuildRequires:  python3-devel
-BuildRequires:  python-wheel
+BuildRequires:  python3-wheel
 # Needed for documentation
 BuildRequires:  python3-sphinx
+Requires:       python3
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 %{_description}
@@ -77,28 +78,26 @@ This package provides the PyCryptodome test suite module (Cryptodome.SelfTest).
 rm -r src/libtom/
 
 # Remove shebang
-sed '1{\@^#! /usr/bin/env python@d}' lib/Crypto/SelfTest/__main__.py >lib/Crypto/SelfTest/__main__.py.new && \
+sed '1{\@^#! %{_bindir}/env python@d}' lib/Crypto/SelfTest/__main__.py >lib/Crypto/SelfTest/__main__.py.new && \
 touch -r lib/Crypto/SelfTest/__main__.py lib/Crypto/SelfTest/__main__.py.new && \
 mv lib/Crypto/SelfTest/__main__.py.new lib/Crypto/SelfTest/__main__.py
 
-%generate_buildrequires
 export PYCRYPTODOME_DEBUG=1
-%pyproject_buildrequires -r
 
 %build
 touch .separate_namespace
-%pyproject_wheel
+%{pyproject_wheel}
 # Build documentation
 %make_build -C Doc/ man SPHINXBUILD=sphinx-build
 
 %install
-%pyproject_install
+%{pyproject_install}
 %pyproject_save_files Cryptodome
 # Install man pages
-install -Dpm 0644 Doc/_build/man/pycryptodome.1 $RPM_BUILD_ROOT%{_mandir}/man1/pycryptodome.1
+install -Dpm 0644 Doc/_build/man/pycryptodome.1 %{buildroot}%{_mandir}/man1/pycryptodome.1
 
 %check
-PYTHONPATH=$RPM_BUILD_ROOT%{python3_sitearch}/ %{__python3} setup.py test
+PYTHONPATH=%{buildroot}%{python3_sitearch}/ %{python3} setup.py test
 
 %files -n python3-%{srcname} -f %{pyproject_files}
 %doc AUTHORS.rst Changelog.rst README.rst
@@ -111,9 +110,9 @@ PYTHONPATH=$RPM_BUILD_ROOT%{python3_sitearch}/ %{__python3} setup.py test
 
 %changelog
 * Fri Jul 15 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.15.0-2
-- Initial CBL-Mariner import from Fedora 36 (License: MIT)
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as dependency for package cassandra medusa
-- License verified.
+- License verified
 
 * Thu Jun 23 2022 Mohamed El Morabity <melmorabity@fedoraproject.org> - 3.15.0-1
 - Update to 3.15.0
