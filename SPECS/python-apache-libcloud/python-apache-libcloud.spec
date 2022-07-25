@@ -22,20 +22,19 @@ differences among multiple cloud provider APIs.
 
 Name:           python-apache-libcloud
 Version:        3.5.1
-Release:        2
+Release:        2%{?dist}
 Summary:        Abstraction over multiple cloud provider APIs
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://libcloud.apache.org
-Source0:        https://github.com/apache/libcloud/archive/refs/tags/v3.5.1.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://github.com/apache/libcloud/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 Patch1:         gce_image_projects.patch
 Patch2:         ec2_create_node.patch
-Patch3:         skip-some-tests-for-older-paramiko-versions.patch
 # PATCH-FIX-UPSTREAM https://github.com/Kami/libcloud/commit/e62bb28cdbd685203d44a9a4028f311ea155476c Use unittest.mock library from stdlib instead of using 3rd party mock dependency.
-Patch4:         mock.patch
+Patch3:         mock.patch
 
 BuildRequires:  fdupes
 BuildRequires:  libvirt-python3
@@ -84,7 +83,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
 # Skip OvhTests::test_list_nodes_invalid_region which tries to reach OVH servers
 # Skip ShellOutSSHClientTests tests which attempt to ssh to localhost
 # Skip test_key_file_non_pem_format_error since OpenSSH support is backported for SLE python-paramiko < 2.7.0
-%pytest -k '(not test_consume_stderr_chunk_contains_part_of_multi_byte_utf8_character and not test_consume_stdout_chunk_contains_part_of_multi_byte_utf8_character and not test_consume_stdout_chunk_contains_non_utf8_character and not test_consume_stderr_chunk_contains_non_utf8_character and not test_key_file_non_pem_format_error and not ShellOutSSHClientTests and not ElasticContainerDriverTestCase and not test_list_nodes_invalid_region and not test_connection_timeout_raised and not test_retry_on_all_default_retry_exception_classes)'
+%pytest -k '(not test_consume_stderr_chunk_contains_part_of_multi_byte_utf8_character and not test_consume_stdout_chunk_contains_part_of_multi_byte_utf8_character and not test_consume_stdout_chunk_contains_non_utf8_character and not test_consume_stderr_chunk_contains_non_utf8_character and not ElasticContainerDriverTestCase and not test_connection_timeout_raised and not test_retry_on_all_default_retry_exception_classes)'
 
 %files -n python3-%{pypi_name}
 %license LICENSE
