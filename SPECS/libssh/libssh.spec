@@ -1,42 +1,39 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Name:           libssh
-Version:        0.9.5
-Release:        2%{?dist}
+Version:        0.9.6
+Release:        1%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
-URL:            http://www.libssh.org
-
-Source0:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz
-Source1:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz.asc
-Source2:        https://cryptomilk.org/gpgkey-8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D.gpg#/%{name}.keyring
-Source3:        libssh_client.config
-Source4:        libssh_server.config
+URL:            https://www.libssh.org
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Source0:        https://git.libssh.org/projects/libssh.git/snapshot/%{name}-%{version}.tar.gz
+Source1:        libssh_client.config
+Source2:        libssh_server.config
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  gnupg2
-BuildRequires:  openssl-devel
-BuildRequires:  pkgconfig
-BuildRequires:  zlib-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libcmocka-devel
-BuildRequires:  pam_wrapper
-BuildRequires:  socket_wrapper
-BuildRequires:  nss_wrapper
-BuildRequires:  uid_wrapper
-BuildRequires:  openssh-clients
-BuildRequires:  openssh-server
 BuildRequires:  nmap-ncat
+BuildRequires:  nss_wrapper
+BuildRequires:  openssh-devel
+BuildRequires:  openssh-server
+BuildRequires:  openssl-clients
+BuildRequires:  pam_wrapper
+BuildRequires:  pkgconfig
+BuildRequires:  socket_wrapper
+BuildRequires:  uid_wrapper
+BuildRequires:  zlib-devel
 
 Requires:       %{name}-config = %{version}-%{release}
 
 Recommends:     crypto-policies
 
-%ifarch aarch64 ppc64 ppc64le s390x x86_64
-Provides: libssh_threads.so.4()(64bit)
+%ifarch aarch64 x86_64
+Provides:       libssh_threads.so.4()(64bit)
 %else
-Provides: libssh_threads.so.4
+Provides:       libssh_threads.so.4
 %endif
 
 %description
@@ -64,7 +61,6 @@ Obsoletes:      %{name} < 0.9.0-3
 The %{name}-config package provides the default configuration files for %{name}.
 
 %prep
-gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build
@@ -87,8 +83,8 @@ popd
 %install
 make DESTDIR=%{buildroot} install/fast -C obj
 install -d -m755 %{buildroot}%{_sysconfdir}/libssh
-install -m644 %{SOURCE3} %{buildroot}%{_sysconfdir}/libssh/libssh_client.config
-install -m644 %{SOURCE4} %{buildroot}%{_sysconfdir}/libssh/libssh_server.config
+install -m644 %{SOURCE1} %{buildroot}%{_sysconfdir}/libssh/libssh_client.config
+install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/libssh/libssh_server.config
 
 #
 # Workaround for the removal of libssh_threads.so
@@ -136,6 +132,10 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.9.6-1
+- Bumping version to 0.9.6
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.5-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
