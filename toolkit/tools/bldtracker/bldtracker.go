@@ -34,7 +34,7 @@ func main() {
 	logger.InitBestEffort(*logPath+"/chroot_timestamp.log", "trace")
 
 	// Construct the csv path.
-	completePath = *dirPath + "/" + *scriptName + ".csv"
+	completePath = filepath.Join(*dirPath, *scriptName + ".csv")
 
 	// Perform different actions based on the input "mode".
 	switch *mode {
