@@ -162,7 +162,7 @@ func SetSubBar() {
 		currFile := targetCSV[i]
 		currFile.bar = uiprogress.AddBar(int(currFile.totalLine)).AppendCompleted()
 		currFile.bar.PrependFunc(func(b *uiprogress.Bar) string {
-			return fmt.Sprintf("%20s: %-35s", currFile.fileName[:len(currFile.fileName) - 4], currFile.lastStepDesc)
+			return fmt.Sprintf("%20s: %-35s", currFile.fileName[:len(currFile.fileName)-4], currFile.lastStepDesc)
 		})
 		wg.Add(1)
 	}
