@@ -1,25 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Name:           pam_wrapper
-Version:        1.1.3
-Release:        3%{?dist}
-
+Version:        1.1.4
+Release:        1%{?dist}
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
-Url:            http://cwrap.org/
-
+URL:            https://cwrap.org/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        pam_wrapper.keyring
 
-BuildRequires:  gcc
-BuildRequires:  gnupg2
 BuildRequires:  cmake
-BuildRequires:  libcmocka-devel
-BuildRequires:  python3-devel
-BuildRequires:  pam-devel
 BuildRequires:  doxygen
+BuildRequires:  gcc
 BuildRequires:  git
+BuildRequires:  gnupg2
+BuildRequires:  libcmocka-devel
+BuildRequires:  pam-devel
+BuildRequires:  python3-devel
 
 Recommends:     cmake
 Recommends:     pkgconfig
@@ -34,7 +30,6 @@ which simplifies testing of modules. You can combine it with the cmocka
 unit testing framework or you can use the provided Python bindings to
 write tests for your module in Python.
 
-
 %package -n libpamtest
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
@@ -44,16 +39,14 @@ Requires:       pam_wrapper = %{version}-%{release}
 If you plan to test a PAM module you can use this library, which simplifies
 testing of modules.
 
-
 %package -n libpamtest-devel
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
-Requires:       pam_wrapper = %{version}-%{release}
 Requires:       libpamtest = %{version}-%{release}
+Requires:       pam_wrapper = %{version}-%{release}
 
 Recommends:     cmake
 Recommends:     pkgconfig
-
 
 %description -n libpamtest-devel
 If you plan to develop tests for a PAM module you can use this library,
@@ -67,23 +60,19 @@ License:        GPLv3+
 %description -n libpamtest-doc
 Documentation for libpamtest development.
 
-
 %package -n python3-libpamtest
 Summary:        A python wrapper for libpamtest
 License:        GPLv3+
-Requires:       pam_wrapper = %{version}-%{release}
 Requires:       libpamtest = %{version}-%{release}
+Requires:       pam_wrapper = %{version}-%{release}
 
 %description -n python3-libpamtest
 If you plan to develop python tests for a PAM module you can use this
 library, which simplifies testing of modules. This subpackage includes
 the header files for libpamtest
 
-
 %prep
-gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -S git
-
 
 %build
 if test ! -e "obj"; then
@@ -99,7 +88,6 @@ make %{?_smp_mflags} VERBOSE=1
 make doc VERBOSE=1
 popd
 
-
 %install
 pushd obj
 make DESTDIR=%{buildroot} install
@@ -108,7 +96,6 @@ popd
 %ldconfig_scriptlets
 
 %ldconfig_scriptlets -n libpamtest
-
 
 %check
 pushd obj
@@ -152,6 +139,11 @@ popd
 %{python3_sitearch}/pypamtest.so
 
 %changelog
+* Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.1.4-1
+- Bumping version to 1.1.4.
+- Remove gpg signature verification
+- License verified
+ 
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
 - Remove python2 macros
 
