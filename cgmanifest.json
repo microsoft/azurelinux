@@ -25937,8 +25937,8 @@
         "type": "other",
         "other": {
           "name": "uid_wrapper",
-          "version": "1.2.7",
-          "downloadUrl": "https://ftp.samba.org/pub/cwrap/uid_wrapper-1.2.7.tar.gz"
+          "version": "1.2.9",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/uid_wrapper-1.2.9.tar.gz"
         }
       }
     },
