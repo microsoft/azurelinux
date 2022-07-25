@@ -24,7 +24,7 @@ var (
 	dirPath      = app.Flag("dir-path", "The folder that stores timestamp csvs.").Required().ExistingDir() // currently must be absolute
 	logPath      = app.Flag("log-path", "Directory for log files").Required().ExistingDir()
 	validModes   = []string{"n", "r"}
-	mode         = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record'('r').").Required().Enum(validModes...)
+	mode         = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record' ('r').").Required().Enum(validModes...)
 	completePath string
 )
 
