@@ -1,8 +1,6 @@
 # For bootstrapping sphinxcontrib-websupport
 %bcond_without docs
 
-%global mod_name whoosh
-
 Name:           python-whoosh
 Version:        2.7.4
 Release:        21%{?dist}
@@ -45,7 +43,7 @@ functionality to their applications and websites. Every part of how Whoosh
 works can be extended or replaced to meet your needs exactly.
 
 %prep
-%setup -q -n %{mod_name}-%{version}
+%setup -q -n whoosh-%{version}
 # pytest 4
 sed -i 's/\[pytest\]/\[tool:pytest\]/' setup.cfg
 
