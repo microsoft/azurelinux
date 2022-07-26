@@ -22,8 +22,8 @@ server, to interact with Datadog and efficiently report events and metrics.
 
 %package -n python%{python3_pkgversion}-datadog
 Summary:        Python wrapper for the Datadog API
+Requires:       python3
 Requires:       python3-requests >= 2.6.0
-Provides:       python3-datadog
 
 %description -n python%{python3_pkgversion}-datadog
 Datadogpy is a collection of tools suitable for inclusion in existing Python
