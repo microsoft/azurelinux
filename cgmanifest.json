@@ -22395,7 +22395,7 @@
         "other": {
           "name": "python-whoosh",
           "version": "2.7.4",
-          "downloadUrl": "https://pypi.python.org/packages/source/W/Whoosh/Whoosh-2.7.4.tar.gz"
+          "downloadUrl": "https://github.com/mchaput/whoosh/archive/refs/tags/v2.7.4.tar.gz"
         }
       }
     },
