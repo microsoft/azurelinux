@@ -1,12 +1,17 @@
-Name:           python-ffwd-client
+%global pypi_name ffwd
+%global _description \
+Flexible metric forwarding agent (FFWD) client for python.
+
+Name:           python-%{pypi_name}
 Version:        0.0.2
 Release:        1%{?dist}
 Summary:        Flexible metric forwarding agent(ffwd) client for python
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/udoprog/ffwd-client-python
-Source0:        https://github.com/udoprog/ffwd-client-python/archive/refs/tags/%{version}.tar.gz#/ffwd-client-python-%{version}.tar.gz
+URL:            https://github.com/udoprog/%{pypi_name}-client-python
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-client-python-%{version}.tar.gz
+
 BuildRequires:  python3-setuptools
 %if %{with_check}
 BuildRequires:  python3-pip
@@ -14,11 +19,15 @@ BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
-%description
-Flexible metric forwarding agent (FFWD) client for python.
+%description %{_description}
+
+%package -n     python3-%{pypi_name}
+Summary:        %{summary}
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
-%autosetup -n ffwd-client-python-%{version} -p1
+%autosetup -n %{pypi_name}-client-python-%{version} -p1
 
 %build
 %py3_build
@@ -30,7 +39,7 @@ Flexible metric forwarding agent (FFWD) client for python.
 %{python3} -m pip install atomicwrites attrs pluggy pygments six more-itertools
 %{python3} -m pytest -v tests
 
-%files
+%files -n python3-%{pypi_name}
 %doc README.md
 %license LICENSE
 %{_bindir}/ffwd-send

@@ -20333,7 +20333,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-ffwd-client",
+          "name": "python-ffwd",
           "version": "0.0.2",
           "downloadUrl": "https://github.com/udoprog/ffwd-client-python/archive/refs/tags/0.0.2.tar.gz"
         }
