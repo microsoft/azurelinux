@@ -19735,7 +19735,7 @@
         "other": {
           "name": "python-apache-libcloud",
           "version": "3.5.1",
-          "downloadUrl": "http://archive.apache.org/dist/libcloud/apache-libcloud-3.5.1.tar.bz2"
+          "downloadUrl": "https://github.com/apache/libcloud/archive/refs/tags/v3.5.1.tar.gz"
         }
       }
     },
