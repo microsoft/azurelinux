@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global _hardened_build 1
 
 %bcond_without python3
@@ -31,18 +29,21 @@ Distribution:   Mariner
 %{?perl_default_filter}
 %endif
 
-Summary: Low-level DNS(SEC) library with API
-Name: ldns
-Version: 1.7.0
-Release: 31%{?dist}
 
-License: BSD
-Url: http://www.nlnetlabs.nl/%{name}/
-Source0: http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
-Patch1: ldns-1.7.0-multilib.patch
-Patch2: ldns-1.7.0-parse-limit.patch
-Patch3: ldns-1.7.0-realloc.patch
-Patch4: ldns-1.7.0-Update-for-SWIG-4.patch
+Summary:        Low-level DNS(SEC) library with API
+Name:           ldns
+Version:        1.7.0
+Release:        32%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Libraries
+Url:            http://www.nlnetlabs.nl/%{name}/
+Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
+Patch1:         ldns-1.7.0-multilib.patch
+Patch2:         ldns-1.7.0-parse-limit.patch
+Patch3:         ldns-1.7.0-realloc.patch
+Patch4:         ldns-1.7.0-Update-for-SWIG-4.patch
 
 # Only needed for builds from svn snapshot
 %if 0%{snapshot}
@@ -294,6 +295,9 @@ rm -rf doc/man
 %doc doc
 
 %changelog
+* Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-32
+- Move from SPECS-EXTENDED to SPECS
+
 * Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-31
 - Fixing configuration step in %%build.
 - Removing content related to Python 2 builds.
