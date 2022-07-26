@@ -7,9 +7,8 @@ License:        ASL 2.0
 Vendor:         Mariner
 Distribution:   Microsoft Corporation
 URL:            https://requests-mock.readthedocs.io/
-Source0:        https://pypi.io/packages/source/r/requests-mock/requests-mock-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/r/requests-mock/%{pypi_name}-%{version}.tar.gz
 Patch0:         0002-Use-system-urllib3-package.patch
-Patch1:         0003-Allow-skipping-purl-tests-if-it-is-not-present.patch
 BuildArch:      noarch
 
 %description
@@ -30,9 +29,7 @@ Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-six
 
 %if %{with_check}
-BuildRequires:  python%{python3_pkgversion}-requests
-BuildRequires:  python%{python3_pkgversion}-mock
-BuildRequires:  python%{python3_pkgversion}-testtools
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
@@ -54,6 +51,7 @@ rm -rf requests_mock.egg-info
 %py3_install
 
 %check
+%{python3} -m pip install -r test-requirements.txt
 %{python3} -m testtools.run discover
 %pytest3 tests/pytest
 
@@ -65,10 +63,10 @@ rm -rf requests_mock.egg-info
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.0-6
-- Updating SPEC from Fedora36 (License: ASL 2.0)
+- Updating SPEC from Fedora 36 (license: MIT)
 - Bump version to 1.8.0
 - Adding as build dependency for apache-libcloud needed by cassandra-medusa.
-- License Verified
+- License verified
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
