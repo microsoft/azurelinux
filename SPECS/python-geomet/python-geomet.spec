@@ -1,5 +1,7 @@
 %global srcname geomet
 %global debug_package %{nil}
+%global _description \
+Convert GeoJSON to WKT/WKB (Well-Known Text/Binary), and vice versa.
 
 Name:           python-%{srcname}
 Version:        0.2.1
@@ -9,7 +11,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-Url:            https://github.com/geomet
+URL:            https://github.com/geomet
 Source0:        https://github.com/geomet/geomet/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -19,17 +21,13 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-pip
 %endif
 
-%global _description \
-Convert GeoJSON to WKT/WKB (Well-Known Text/Binary), and vice versa.
-
-%description %_description
+%description %{_description}
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
 Requires:       python3
-Requires:       python3-six
 Requires:       python3-click
-Requires:       python3-setuptools
+Requires:       python3-six
 
 %description -n python3-%{srcname} %{_description}
 
@@ -45,10 +43,10 @@ Requires:       python3-setuptools
 rm -f %{buildroot}/%{_exec_prefix}/LICENSE
 
 %check
+%{python3} -m pip install -r test-requirements.txt
 %python3 setup.py test
 
 %files -n python3-%{srcname}
-%defattr(-,root,root,-)
 %license LICENSE
 %{_bindir}/geomet
 %{python3_sitelib}/*
