@@ -2007,7 +2007,7 @@
         "type": "other",
         "other": {
           "name": "ctags",
-          "version": "5.9",
+          "version": "5.9.20220619.0",
           "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/p5.9.20220619.0.tar.gz"
         }
       }
