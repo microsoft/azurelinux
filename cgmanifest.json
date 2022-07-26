@@ -22493,7 +22493,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python3-geomet",
+          "name": "python-geomet",
           "version": "0.2.1",
           "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/0.2.1.tar.gz"
         }
