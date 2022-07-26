@@ -60,10 +60,9 @@ export LANG=en_US.UTF-8
 
 %changelog
 * Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.0.1-1
-- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - Adding as run dependency (Requires) for package cassandra medusa for cosmosDb.
 - License verified
-
 * Mon Apr 27 2020 Tomáš Chvátal <tchvatal@suse.com>
 - Disable test_invalid checks, quotes change in output
 * Thu Sep 19 2019 John Vandenberg <jayvdb@gmail.com>
