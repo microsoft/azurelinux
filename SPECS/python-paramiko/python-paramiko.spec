@@ -10,21 +10,13 @@ Vendor:        Microsoft Corporation
 URL:           https://github.com/paramiko/paramiko
 Source0:       %{url}/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
-# Skip tests that would fail without SHA-1 signing support in backend (e.g. on EL-9)
-# Can be removed when https://github.com/paramiko/paramiko/pull/2057/ is released
-Patch1:        0001-Mark-new-tests-that-require-SHA1.patch
-
-# Skip tests requiring invoke if it's not installed
-# Can be removed when https://github.com/paramiko/paramiko/pull/1667/ is released
-Patch2:        0002-Skip-tests-requiring-invoke.patch
-
 # Remove pytest-relaxed, which depends on pytest4
 # Can be removed when https://github.com/paramiko/paramiko/pull/1665/ is released
-Patch3:        0003-remove-pytest-relaxed-dep.patch
+Patch1:        0001-remove-pytest-relaxed-dep.patch
 
 # Avoid use of deprecated python-mock by using unittest.mock instead
 # Can be removed when https://github.com/paramiko/paramiko/pull/1666/ is released
-Patch4:        0004-remove-mock-dep.patch
+Patch2:        0002-remove-mock-dep.patch
 
 BuildArch:     noarch
 
@@ -51,16 +43,16 @@ BuildRequires: python3-pyasn1
 BuildRequires: python3-pynacl
 BuildRequires: python3-setuptools
 BuildRequires: python3-six
+Requires:      python3-bcrypt
+Requires:      python3-cryptography
+Requires:      python3-pynacl
+Requires:      python3-six
+
 %if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-docutils
-BuildRequires:  python3-pluggy
-BuildRequires:  python3-pygments
-BuildRequires:  python3-six
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif
+
 Recommends:    %{py3_dist pyasn1} >= 0.1.7
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -82,7 +74,7 @@ sphinx-build-3 -b html sites/docs/ html/
 rm html/.buildinfo
 
 %check
-%{python3} -m pip install more-itertools
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools invoke
 PYTHONPATH=%{buildroot}%{python3_sitelib} pytest3
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -93,7 +85,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest3
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.11.0-2
-- Initial CBL-Mariner import from Fedora36 (License: MIT)
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as build dependency for apache-libcloud needed by cassandra-medusa.
 - Removing subpackage doc.
 - License verified

@@ -41,10 +41,10 @@ packages.
  from paramiko import SSHClient
 --- a/tests/test_config.py
 +++ b/tests/test_config.py
-@@ -11,7 +11,11 @@ try:
- except ImportError:
-     Result = None
+@@ -7,7 +7,11 @@
+ from paramiko.py3compat import string_types
  
+ from invoke import Result
 -from mock import patch
 +try:
 +    from unittest.mock import patch
@@ -54,6 +54,7 @@ packages.
  from pytest import raises, mark, fixture
  
  from paramiko import (
+
 --- a/tests/test_kex.py
 +++ b/tests/test_kex.py
 @@ -24,7 +24,11 @@ from binascii import hexlify, unhexlify
