@@ -5,7 +5,7 @@
 
 Name:           perl-libwww-perl
 Version:        6.49
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A Perl interface to the World-Wide Web
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -174,6 +174,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.49-3
+- License Verified
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 6.49-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add understated dependency on perl(Data::Dump::Trace).

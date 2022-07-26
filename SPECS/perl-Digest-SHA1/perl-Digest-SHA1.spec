@@ -1,6 +1,6 @@
 Name:           perl-Digest-SHA1
 Version:        2.13
-Release:        30%{?dist}
+Release:        31%{?dist}
 Summary:        Digest-SHA1 Perl module
 
 License:        GPL+ or Artistic
@@ -65,6 +65,9 @@ make test
 
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 2.13-31
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

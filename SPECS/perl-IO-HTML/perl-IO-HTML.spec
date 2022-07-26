@@ -1,6 +1,6 @@
 Name:           perl-IO-HTML
 Version:        1.001
-Release:        17%{?dist}
+Release:        18%{?dist}
 Summary:        Open an HTML file with automatic character set detection
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -47,6 +47,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.001-18
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.001-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

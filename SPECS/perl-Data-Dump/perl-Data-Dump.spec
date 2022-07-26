@@ -1,6 +1,6 @@
 Name:           perl-Data-Dump
 Version:        1.23
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Pretty printing of data structures
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.23-15
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

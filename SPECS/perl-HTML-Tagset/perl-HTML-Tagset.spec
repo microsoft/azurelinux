@@ -6,7 +6,7 @@
 
 Name:           perl-HTML-Tagset
 Version:        3.20
-Release:        42%{?dist}
+Release:        43%{?dist}
 Summary:        HTML::Tagset - data tables useful in parsing HTML
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/HTML::Tagset.3pm*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 3.20-43
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.20-42
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

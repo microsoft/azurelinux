@@ -3,7 +3,7 @@
 
 Name:           perl-LWP-MediaTypes
 Version:        6.04
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Guess media type for a file or a URL
 # lib/LWP/media.types:      Public Domain
 # lib/LWP/MediaTypes.pm:    GPL+ or Artistic
@@ -74,6 +74,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.04-6
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.04-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

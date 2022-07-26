@@ -3,7 +3,7 @@
 
 Name:           perl-URI
 Version:        1.76
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -99,6 +99,9 @@ make test
 %{_mandir}/man3/URI::ldap.3*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.76-8
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.76-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

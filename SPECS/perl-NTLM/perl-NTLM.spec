@@ -1,6 +1,6 @@
 Name:           perl-NTLM
 Version:        1.09
-Release:        24%{?dist}
+Release:        25%{?dist}
 Summary:        NTLM Perl module
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.09-25
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.09-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

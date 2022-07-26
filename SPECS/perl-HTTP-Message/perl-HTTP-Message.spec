@@ -1,6 +1,6 @@
 Name:           perl-HTTP-Message
 Version:        6.22
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        HTTP style message
 # CONTRIBUTING.md:  CC0
 # other files:      GPL+ or Artistic
@@ -94,6 +94,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.22-3
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.22-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
