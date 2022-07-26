@@ -2006,6 +2006,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ctags",
+          "version": "5.9.20220619.0",
+          "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/p5.9.20220619.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "CUnit",
           "version": "2.1.3",
           "downloadUrl": "https://downloads.sourceforge.net/cunit/CUnit-2.1-3.tar.bz2"
