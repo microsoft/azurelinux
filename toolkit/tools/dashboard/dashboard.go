@@ -23,6 +23,7 @@ type stampedFile struct {
 
 var (
 	wg            sync.WaitGroup
+	barWidth      = 30
 	currProgress  = int32(0) // chose int32 instead of int to use the atomic package
 	totalProgress = int32(24)
 	isInit        = false // set to true the first time we detec the "init" file in build/timestamp folder.
@@ -66,9 +67,10 @@ func main() {
 	fmt.Println("Starting dashboard")
 	uiprogress.Start()
 	bar := uiprogress.AddBar(int(totalProgress)).AppendCompleted()
+	bar.Width = barWidth
 
 	bar.PrependFunc(func(b *uiprogress.Bar) string {
-		return fmt.Sprintf("%20s: %-35s", "Building image", "")
+		return fmt.Sprintf("%15s: %-25s", "Total", "")
 	})
 
 	SetSubBar()
@@ -161,8 +163,19 @@ func SetSubBar() {
 	for i, _ := range targetCSV {
 		currFile := targetCSV[i]
 		currFile.bar = uiprogress.AddBar(int(currFile.totalLine)).AppendCompleted()
+		currFile.bar.Width = barWidth
 		currFile.bar.PrependFunc(func(b *uiprogress.Bar) string {
-			return fmt.Sprintf("%20s: %-35s", currFile.fileName[:len(currFile.fileName)-4], currFile.lastStepDesc)
+			var tempFileName, tempLastStep string
+			tempFileName = currFile.fileName[:len(currFile.fileName)-4]
+			if len(currFile.fileName) > 15 {
+				tempFileName = tempFileName[:13] + ".."
+			}
+			if len(currFile.lastStepDesc) > 25 {
+				tempLastStep = currFile.lastStepDesc[:23] + ".."
+			} else {
+				tempLastStep = currFile.lastStepDesc
+			}
+			return fmt.Sprintf("%15s: %-25s", tempFileName, tempLastStep)
 		})
 		wg.Add(1)
 	}
