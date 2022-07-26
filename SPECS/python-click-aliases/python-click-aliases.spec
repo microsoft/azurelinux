@@ -60,7 +60,7 @@ export LANG=en_US.UTF-8
 
 %changelog
 * Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.0.1-1
-- Initial CBL-Mariner Import from openSUSE Tumbleweed (license: MIT)
+- Initial CBL-Mariner Import from openSUSE (license: same as "License" tag)
 - Adding as run dependency (Requires) for package cassandra medusa for cosmosDb.
 - License verified
 
