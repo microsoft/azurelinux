@@ -20,12 +20,6 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
 %if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-docutils
-BuildRequires:  python3-pluggy
-BuildRequires:  python3-pygments
-BuildRequires:  python3-six
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  %{_sbindir}/sshd
@@ -69,7 +63,7 @@ rm -f %{buildroot}/%{python3_sitearch}/ssh/__init__.pxd
 chmod 0755 %{buildroot}/%{python3_sitearch}/ssh/*.so
 
 %check
-%{python3} -m pip install more-itertools
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
 %pytest -v tests
 
 %files -n python3-%{modname}
@@ -89,9 +83,9 @@ Summary:        %{summary} documentation
 
 %changelog
 * Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.9.0-3
-- Initial CBL-Mariner import from Fedora 36.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as run dependency for package cassandra medusa
-- License Verified
+- License verified
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
