@@ -25,14 +25,14 @@ URL:            https://github.com/click-contrib/click-aliases
 Source0:        https://files.pythonhosted.org/packages/source/c/click-aliases/click-aliases-%{version}.tar.gz#/click-aliases-%{version}.tar.gz
 BuildArch:      noarch
 
-BuildRequires:  python3-setuptools
 BuildRequires:  fdupes
+BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 Requires:       python3-click
 %if %{with_check}
+BuildRequires:  python3-click
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  python3-click
 %endif
 
 %description
@@ -51,7 +51,7 @@ Command aliases for Click.
 %check
 export LANG=en_US.UTF-8
 # test_invalid fails with new click as the quotes in output changed from single to regular ones
-%pytest3 -k 'not test_invalid'
+%pytest -k 'not test_invalid'
 
 %files
 %doc README.md
@@ -60,7 +60,7 @@ export LANG=en_US.UTF-8
 
 %changelog
 * Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.0.1-1
-- Initial CBL-Mariner Import from OpenSuse (License: MIT)
+- Initial CBL-Mariner Import from openSUSE Tumbleweed (license: MIT)
 - Adding as run dependency (Requires) for package cassandra medusa for cosmosDb.
 - License verified
 
