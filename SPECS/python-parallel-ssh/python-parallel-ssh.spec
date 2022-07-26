@@ -91,7 +91,7 @@ rm tests/native/test_tunnel.py
 
 %changelog
 * Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.10.0-1
-- Initial CBL-Mariner import from fedora 35 (license: MIT).
+- Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Adding as run dependency for package cassandra medusa.
 - Bumping version to 2.10.0.
 - License verified
