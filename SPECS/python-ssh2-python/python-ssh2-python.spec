@@ -60,8 +60,8 @@ export HAVE_AGENT_FWD=0
 export CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}"
 export LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"
 export CXXFLAGS="${CXXFLAGS:-${RPM_OPT_FLAGS}}"
-%{__python3} setup.py build_ext --inplace
-%{__python3} -msphinx -M html doc _build
+python3 setup.py build_ext --inplace
+python3 -msphinx -M html doc _build
 
 %install
 %py3_install
@@ -89,10 +89,10 @@ ssh-add -l
 
 %changelog
 * Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.27.0-1
-- Initial CBL-Mariner import from Fedora 35
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Adding as run dependency for package cassandra medusa
 - bump version to 0.27.0
-- License Verified
+- License verified
 
 * Thu Sep 23 2021 Raphael Groner <raphgro@fedoraproject.org> - 0.26.0-1
 - bump to v0.26.0
