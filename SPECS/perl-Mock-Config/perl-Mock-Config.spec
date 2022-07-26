@@ -48,6 +48,7 @@ make test
 %changelog
 * Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 0.03-12
 - Move from SPECS-EXTENDED to SPECS
+- License verified in README
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.03-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
