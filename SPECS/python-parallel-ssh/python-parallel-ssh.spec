@@ -1,18 +1,5 @@
 %global srcname parallel-ssh
 %global debug_package %{nil}
-
-Name:           python-%{srcname}
-Version:        2.10.0
-Release:        1%{?dist}
-Summary:        Asynchronous parallel SSH library
-
-# https://github.com/ParallelSSH/parallel-ssh/pull/179
-License:        LGPLv2
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://parallel-ssh.readthedocs.io/
-Source0:        https://github.com/ParallelSSH/parallel-ssh/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
-
 %global _description \
 Library for running asynchronous parallel SSH commands over many hosts.\
 \
@@ -24,34 +11,37 @@ thousands) of hosts which would grind a system to a halt simply by having so\
 many processes/threads all wanting to execute if done with\
 multi-threading/processing.
 
+Name:           python-%{srcname}
+Version:        2.10.0
+Release:        1%{?dist}
+Summary:        Asynchronous parallel SSH library
+License:        LGPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://parallel-ssh.readthedocs.io/
+Source0:        https://github.com/ParallelSSH/parallel-ssh/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+
 %description %{_description}
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
 BuildRequires:  gcc
+BuildRequires:  libssh2-devel
+BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-Cython
-BuildRequires:  libssh2-devel
 Requires:       python3-gevent
 Requires:       python3-ssh-python
 Requires:       python3-ssh2-python
 
 %if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-docutils
-BuildRequires:  python3-pluggy
-BuildRequires:  python3-pygments
-BuildRequires:  python3-six
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-BuildRequires:  python3-coverage
-BuildRequires:  python3-pytest-cov
-BuildRequires:  sed
-BuildRequires:  python3-gevent
 BuildRequires:  openssh-clients
 BuildRequires:  openssh-server
+BuildRequires:  python3-gevent
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  sed
 %endif
 
 %description -n python3-%{srcname} %{_description}
@@ -78,7 +68,7 @@ chmod 600 tests/client_pkey
 ssh-add tests/client_pkey
 ssh-add -l
 
-%{python3} -m pip install toml more-itertools
+%{python3} -m pip install toml atomicwrites attrs docutils pluggy pygments six coverage more-itertools
 ## pip fails to install ssh2 due to mismatch in version during metadata generation. Using legacy resolved to proceed.
 %{python3} -m pip install --use-deprecated=legacy-resolver ssh2
 
@@ -101,7 +91,7 @@ rm tests/native/test_tunnel.py
 
 %changelog
 * Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.10.0-1
-- Initial CBL-Mariner import from fedora 35 (License: MIT).
+- Initial CBL-Mariner import from fedora 35 (license: MIT).
 - Adding as run dependency for package cassandra medusa.
 - Bumping version to 2.10.0.
 - License verified
