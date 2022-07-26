@@ -7,6 +7,9 @@
 # The python-diskcache package, used in some of the tests, has been retired.
 %bcond_with diskcache
 
+%global common_description %{expand: \
+Cross platform locks for threads and processes}
+
 Name:           python-fasteners
 Version:        0.17.3
 Release:        3%{?dist}
@@ -21,18 +24,16 @@ Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/fasteners-%{version}
 # “Remove futures from the requirements-test.txt”
 # Backport upstream commit 49d8f5b to remove a test dependency that is no
 # longer used and only supports Python 2.
-Patch:          %{url}/commit/49d8f5bb56157a82ff3e6128b506638a214e6d43.patch
+Patch0:         %{url}/commit/49d8f5bb56157a82ff3e6128b506638a214e6d43.patch
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python-wheel
+BuildRequires:  python3-wheel
+Requires:       python3
 %if %{with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif
-
-%global common_description %{expand: \
-Cross platform locks for threads and processes}
 
 %description
 %{common_description}
@@ -48,8 +49,6 @@ Summary:        A python package that provides useful locks
 %if %{without diskcache}
 sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 %endif
-%generate_buildrequires
-%pyproject_buildrequires -r
 
 %build
 %pyproject_wheel
@@ -68,7 +67,7 @@ sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 
 %changelog
 * Thu Jun 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.17.3-3
-- Initial CBL-Mariner import from Fedora36 (license: MIT)
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as run dependency for package cassandra medusa
 - Removing subpackage 'doc'.
 - License verified
