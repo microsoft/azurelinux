@@ -92,7 +92,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
 
 %changelog
 * Thu Jul 07 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.5.1-2
-- Initial CBL-Mariner import from OpenSUSE Tumbleweed (license: ASL 2.0)
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - Adding as run dependency for package cassandra medusa.
 - License verified
 * Fri May 13 2022 Markéta Machová <mmachova@suse.com>
