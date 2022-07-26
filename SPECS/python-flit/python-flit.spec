@@ -13,7 +13,7 @@ so long as they can be imported on Python 3.}
 Summary:        Simplified packaging of Python modules
 Name:           python-%{srcname}
 Version:        3.7.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 # ./flit/log.py under ASL 2.0 license
 # ./flit/upload.py under PSF license
 License:        BSD AND ASL 2.0 AND Python
@@ -44,8 +44,8 @@ BuildRequires:  which
 BuildRequires:  python3-requests
 BuildRequires:  python3-responses
 
-# Test deps that require flit to build:
-BuildRequires:  python3-testpath
+# Test deps that require flit to build, using 'pip3' instead:
+# BuildRequires:  python3-testpath
 %endif
 
 %description %{_description}
@@ -53,7 +53,7 @@ BuildRequires:  python3-testpath
 %package -n python3-%{srcname}
 %{?python_provide:%python_provide python3-%{srcname}}
 Summary:        %{summary}
-Requires:       python3-%{srcname}-core = %{version}-%{release}
+Requires:       python3-%{srcname}-core = %{version}
 # soft dependency: (WARNING) Cannot analyze code. Pygments package not found.
 Recommends:     python3-pygments
 
@@ -81,7 +81,7 @@ then
   ln -s "$(which python3)" "%{_bindir}/python"
 fi
 
-pip3 install more-itertools pluggy pytest tomli_w
+pip3 install more-itertools pluggy pytest testpath tomli_w
 
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
 # test_invalid_classifier fails without the list
@@ -101,6 +101,9 @@ sudo -u test %pytest -k "not test_test_writable_dir_win"
 %{_bindir}/flit
 
 %changelog
+* Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.1-3
+- Using pip3 to install 'testpath' for ptest runs.
+
 * Mon Mar 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.1-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

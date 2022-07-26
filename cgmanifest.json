@@ -1007,8 +1007,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.2.tar.gz"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.4.tar.gz"
         }
       }
     },
@@ -1697,8 +1697,8 @@
         "type": "other",
         "other": {
           "name": "conmon",
-          "version": "2.0.29",
-          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/containers/conmon/archive/v2.1.0.tar.gz"
         }
       }
     },
@@ -1737,8 +1737,8 @@
         "type": "other",
         "other": {
           "name": "containernetworking-plugins",
-          "version": "0.9.0",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.0.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.1.1.tar.gz"
         }
       }
     },
@@ -2006,6 +2006,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ctags",
+          "version": "5.9.20220619.0",
+          "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/p5.9.20220619.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "CUnit",
           "version": "2.1.3",
           "downloadUrl": "https://downloads.sourceforge.net/cunit/CUnit-2.1-3.tar.bz2"
@@ -2027,8 +2037,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.83.1",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.83.1.tar.gz"
+          "version": "7.84.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.84.0.tar.gz"
         }
       }
     },
@@ -2106,16 +2116,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dcos-cli",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dbxtool",
           "version": "8",
           "downloadUrl": "https://github.com/vathpela/dbxtool/releases/download/dbxtool-8/dbxtool-8.tar.bz2"
@@ -2129,6 +2129,16 @@
           "name": "dconf",
           "version": "0.36.0",
           "downloadUrl": "https://download.gnome.org/sources/dconf/0.36/dconf-0.36.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
@@ -3178,8 +3188,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.29",
-          "downloadUrl": "http://brick.kernel.dk/snaps/fio-3.29.tar.bz2"
+          "version": "3.30",
+          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
         }
       }
     },
@@ -3720,8 +3730,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.2",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.2.tar.xz"
+          "version": "2.33.4",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.4.tar.xz"
         }
       }
     },
@@ -5790,8 +5800,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7271,8 +7281,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7281,8 +7291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7453,6 +7463,16 @@
           "name": "ksh",
           "version": "1.0.0~beta.1",
           "downloadUrl": "https://github.com/ksh93/ksh/archive/v1.0.0-beta.1/ksh-1.0.0-beta.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubevirt",
+          "version": "0.51.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.51.0.tar.gz"
         }
       }
     },
@@ -7931,8 +7951,8 @@
         "type": "other",
         "other": {
           "name": "libcontainers-common",
-          "version": "20200727",
-          "downloadUrl": "https://github.com/containers/image/archive/v5.5.1.tar.gz"
+          "version": "20210626",
+          "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz"
         }
       }
     },
@@ -8261,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "libexif",
-          "version": "0.6.22",
-          "downloadUrl": "https://github.com/libexif/libexif/archive/libexif-0_6_22-release.tar.gz"
+          "version": "0.6.24",
+          "downloadUrl": "https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2"
         }
       }
     },
@@ -8353,6 +8373,16 @@
           "name": "libgcrypt",
           "version": "1.9.4",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgdiplus",
+          "version": "6.1",
+          "downloadUrl": "https://download.mono-project.com/sources/libgdiplus/libgdiplus-6.1.tar.gz"
         }
       }
     },
@@ -11370,6 +11400,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "maven",
+          "version": "3.8.4",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.4/source/apache-maven-3.8.4-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "maven-compiler-plugin-bootstrap",
           "version": "3.8.1",
           "downloadUrl": "http://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
@@ -12415,6 +12455,16 @@
           "name": "net-tools",
           "version": "2.10",
           "downloadUrl": "https://downloads.sourceforge.net/project/net-tools/net-tools-2.10.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "netavark",
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/containers/netavark/archive/v1.0.3/1.0.3.tar.gz"
         }
       }
     },
@@ -13906,6 +13956,16 @@
           "name": "pam",
           "version": "1.5.1",
           "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.1/Linux-PAM-1.5.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pam_krb5",
+          "version": "4.11",
+          "downloadUrl": "https://github.com/rra/pam-krb5/archive/refs/tags/upstream/4.11.tar.gz"
         }
       }
     },
@@ -19184,8 +19244,8 @@
         "type": "other",
         "other": {
           "name": "podman",
-          "version": "2.2.1",
-          "downloadUrl": "https://github.com/containers/podman/archive/v2.2.1.tar.gz"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/containers/podman/archive/v4.1.1.tar.gz"
         }
       }
     },
@@ -21455,7 +21515,7 @@
         "other": {
           "name": "python-pytest-subtests",
           "version": "0.3.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-subtests/python-pytest-subtests-0.3.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-subtests/pytest-subtests-0.3.1.tar.gz"
         }
       }
     },
@@ -21465,7 +21525,7 @@
         "other": {
           "name": "python-pytest-timeout",
           "version": "1.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-timeout/python-pytest-timeout-1.4.2.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-timeout/pytest-timeout-1.4.2.tar.gz"
         }
       }
     },
@@ -22355,7 +22415,7 @@
         "other": {
           "name": "python-whoosh",
           "version": "2.7.4",
-          "downloadUrl": "https://pypi.python.org/packages/source/W/Whoosh/Whoosh-2.7.4.tar.gz"
+          "downloadUrl": "https://github.com/mchaput/whoosh/archive/refs/tags/v2.7.4.tar.gz"
         }
       }
     },
@@ -25236,6 +25296,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sysbench",
+          "version": "1.0.20",
+          "downloadUrl": "https://github.com/akopytov/sysbench/archive/1.0.20/sysbench-1.0.20.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sysfsutils",
           "version": "2.1.0",
           "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
@@ -25906,6 +25976,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "umoci",
+          "version": "0.4.7",
+          "downloadUrl": "https://github.com/opencontainers/umoci/archive/refs/tags/v0.4.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "unbound",
           "version": "1.13.2",
           "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.13.2.tar.gz"
@@ -26227,8 +26307,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.5172",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5172.tar.gz"
+          "version": "9.0.0050",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0050.tar.gz"
         }
       }
     },
