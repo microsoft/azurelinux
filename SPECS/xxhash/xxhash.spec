@@ -7,8 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.xxhash.com/
 Source0:        https://github.com/Cyan4973/xxHash/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  make
