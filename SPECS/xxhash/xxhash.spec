@@ -71,8 +71,8 @@ doxygen
 rm %{buildroot}/%{_libdir}/libxxhash.a
 
 %check
-make check
-make test-xxhsum-c
+%make_build check
+%make_build test-xxhsum-c
 
 %ldconfig_scriptlets libs
 
