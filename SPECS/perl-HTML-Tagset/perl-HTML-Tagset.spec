@@ -1,8 +1,4 @@
-%if ! (0%{?rhel})
 %{bcond_without perl_HTML_Tagset_enables_optional_test}
-%else
-%{bcond_with perl_HTML_Tagset_enables_optional_test}
-%endif
 
 Name:           perl-HTML-Tagset
 Version:        3.20
@@ -60,6 +56,7 @@ make test
 %changelog
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 3.20-43
 - License Verified
+- Remove usage of macros not applied for CBL-Mariner
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.20-42
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

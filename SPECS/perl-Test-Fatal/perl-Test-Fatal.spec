@@ -1,12 +1,7 @@
-%if ! (0%{?rhel})
 # Run extra test
 %bcond_without perl_Test_Fatal_enables_extra_test
 # Run optional test
 %bcond_without perl_Test_Fatal_enables_optional_test
-%else
-%bcond_with perl_Test_Fatal_enables_extra_test
-%bcond_with perl_Test_Fatal_enables_optional_test
-%endif
 
 Summary:	Incredibly simple helpers for testing code with exceptions 
 Name:		perl-Test-Fatal
@@ -81,6 +76,7 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %changelog
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 0.014-17
 - License Verified
+- Remove usage of macros not applied for CBL-Mariner
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.014-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
