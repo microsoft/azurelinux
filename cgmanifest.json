@@ -25298,7 +25298,7 @@
         "other": {
           "name": "symlinks",
           "version": "1.7",
-          "downloadUrl": "http://ibiblio.org/pub/Linux/utils/file/symlinks-1.7.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
         }
       }
     },

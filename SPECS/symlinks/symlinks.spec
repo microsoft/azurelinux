@@ -1,16 +1,17 @@
-Summary: A utility which maintains a system's symbolic links
-Name: symlinks
+Summary:        A utility which maintains a system's symbolic links
+Name:           symlinks
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://ibiblio.org/pub/Linux/utils/file/
-Version: 1.7
-Release: 3%{?dist}
-License: Copyright only
+Version:        1.7
+Release:        7%{?dist}
+License:        Copyright only
+URL:            https://ibiblio.org/pub/Linux/utils/file/
 # Upstream maintainer provided tarball, ibiblio no longer allowing uploads
-Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz
+# Upstream Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 # Taken from http://packages.debian.org/changelogs/pool/main/s/symlinks/symlinks_1.2-4.2/symlinks.copyright
-Source1: symlinks-LICENSE.txt
-BuildRequires: gcc
+Source1:        symlinks-LICENSE.txt
+BuildRequires:  gcc
 
 %description
 The symlinks utility performs maintenance on symbolic links.  Symlinks
@@ -22,25 +23,38 @@ Install the symlinks package if you need a program for maintaining
 symlinks on your system.
 
 %prep
-%setup -q
-cp %{SOURCE1} .
+%autosetup -p1 -n %{name}-%{version}
+install -m 644 %{SOURCE1} %{_builddir}/%{name}-%{version}/
 
 %build
-make CFLAGS="$RPM_OPT_FLAGS $(getconf LFS_CFLAGS) %{build_ldflags}" %{?_smp_mflags}
+%make_build CFLAGS="%{optflags} $(getconf LFS_CFLAGS) %{build_ldflags}"
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
-install -m 755 symlinks $RPM_BUILD_ROOT%{_bindir}
-install -m 644 symlinks.1 $RPM_BUILD_ROOT%{_mandir}/man1
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_mandir}/man1
+install -m 755 symlinks %{buildroot}%{_bindir}
+install -m 644 symlinks.1 %{buildroot}%{_mandir}/man1
 
 %files
-%doc symlinks-LICENSE.txt
+%license symlinks-LICENSE.txt
 %{_bindir}/symlinks
 %{_mandir}/man1/symlinks.1*
 
 %changelog
+* Wed Jul 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.7-7
+- Re-import from Fedora 36 (license MIT)
+- Adding as run dependency for package cassandra medusa
+- License verified
+ 
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
