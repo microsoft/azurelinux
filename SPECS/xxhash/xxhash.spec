@@ -1,10 +1,8 @@
+Summary:        Extremely fast hash algorithm
 Name:           xxhash
 Version:        0.8.1
 Release:        3%{?dist}
-Summary:        Extremely fast hash algorithm
-#    The source for the library (xxhash.c and xxhash.h) is BSD
-#    The source for the command line tool (xxhsum.c) is GPLv2+
-License:        BSD and GPLv2+
+License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.xxhash.com/
@@ -98,7 +96,7 @@ rm %{buildroot}/%{_libdir}/libxxhash.a
 %doc doxygen/html
 
 %changelog
-* Wed Jul 6 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.8.1-3
+* Wed Jul 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.8.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as run dependency for cassandra medusa package
 - License verified
