@@ -2583,6 +2583,7 @@
                 "python-atomicwrites",
                 "python-attrs",
                 "python-bcrypt",
+                "python-cassandra-driver",
                 "python-certifi",
                 "python-cffi",
                 "python-chardet",
