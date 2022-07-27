@@ -30,6 +30,7 @@
 
 Summary:        OFED scripts
 Name:           ofed-scripts
+# Update long_release with the OFED version along with version updates
 Version:        5.6
 Release:        1%{?dist}
 License:        GPLv2
@@ -39,7 +40,6 @@ Group:          System Environment/Base
 URL:            https://www.openfabrics.org
 Source0:        https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz#/%{name}-%{version}.tar.gz
 
-%global CUSTOM_PREFIX %(if ( echo %{_prefix} | grep -E "^/usr$|^/usr/$" > /dev/null ); then echo -n '0'; else echo -n '1'; fi)
 %global debug_package %{nil}
 %global long_release OFED.5.6.1.0.3
 
@@ -52,9 +52,6 @@ OpenFabrics scripts from NVIDA %long_release
 %build
 
 %install
-%if "%{CUSTOM_PREFIX}" == "1"
-touch ofed-files
-%endif
 
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sbindir}
@@ -66,51 +63,6 @@ install -m 0755 ofed_info %{buildroot}%{_bindir}
 install -m 0755 ofed_rpm_info %{buildroot}%{_bindir}
 # Mariner not yet supported upstream
 # install -m 0755 hca_self_test.ofed %{buildroot}%{_bindir}
-
-%if "%{CUSTOM_PREFIX}" == "1"
-install -d %{buildroot}/etc/profile.d
-cat > %{buildroot}/etc/profile.d/ofed.sh << EOF
-if ! echo \${PATH} | grep -q %{_bindir} ; then
-        PATH=\${PATH}:%{_bindir}
-fi
-if ! echo \${PATH} | grep -q %{_sbindir} ; then
-        PATH=\${PATH}:%{_sbindir}
-fi
-if ! echo \${MANPATH} | grep -q %{_mandir} ; then
-        MANPATH=\${MANPATH}:%{_mandir}
-fi
-EOF
-cat > %{buildroot}/etc/profile.d/ofed.csh << EOF
-if (\$?path) then
-if ( "\${path}" !~ *%{_bindir}* ) then
-        set path = ( \$path %{_bindir} )
-endif
-if ( "\${path}" !~ *%{_sbindir}* ) then
-        set path = ( \$path %{_sbindir} )
-endif
-else
-        set path = ( %{_bindir} %{_sbindir} )
-endif
-if (\$?MANPATH) then
-if ( "\${MANPATH}" !~ *%{_mandir}* ) then
-        setenv MANPATH \${MANPATH}:%{_mandir}
-endif
-else
-        setenv MANPATH %{_mandir}:
-endif
-EOF
-
-install -d %{buildroot}/etc/ld.so.conf.d
-echo %{_libdir} > %{buildroot}/etc/ld.so.conf.d/ofed.conf
-%ifarch x86_64 ppc64
-echo "%{_prefix}/lib" >> %{buildroot}/etc/ld.so.conf.d/ofed.conf
-%endif
-echo "/etc/profile.d/ofed.sh" >> ofed-files
-echo "/etc/profile.d/ofed.csh" >> ofed-files
-echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
-
-%endif
-# End of CUSTOM_PREFIX
 
 %post
 if [ $1 -ge 1 ]; then #This package is being installed or reinstalled
@@ -167,11 +119,7 @@ if [ $1 = 0 ]; then  #Erase, not upgrade
 fi
 /sbin/ldconfig
 
-%if "%{CUSTOM_PREFIX}" == "1"
-%files -f ofed-files
-%else
 %files
-%endif
 %defattr(-,root,root)
 %license debian/copyright
 %{_bindir}/*
