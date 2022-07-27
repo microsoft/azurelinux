@@ -1007,8 +1007,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.2.tar.gz"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.4.tar.gz"
         }
       }
     },
@@ -22846,6 +22846,16 @@
           "name": "realmd",
           "version": "0.16.3",
           "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "reaper",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
         }
       }
     },
