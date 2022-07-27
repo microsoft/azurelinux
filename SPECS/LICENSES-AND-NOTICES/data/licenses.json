@@ -1482,6 +1482,7 @@
                 "python-betamax",
                 "python-blinker",
                 "python-blivet",
+                "python-botocore",
                 "python-charset-normalizer",
                 "python-cheetah",
                 "python-click",
