@@ -1,18 +1,19 @@
-Name:     xxhash
-Version:  0.8.1
-Release:  3%{?dist}
-Summary:  Extremely fast hash algorithm
+Name:           xxhash
+Version:        0.8.1
+Release:        3%{?dist}
+Summary:        Extremely fast hash algorithm
 #    The source for the library (xxhash.c and xxhash.h) is BSD
 #    The source for the command line tool (xxhsum.c) is GPLv2+
-License:  BSD and GPLv2+
+License:        BSD and GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:      http://www.xxhash.com/
-Source0:  https://github.com/Cyan4973/xxHash/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            http://www.xxhash.com/
+Source0:        https://github.com/Cyan4973/xxHash/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:	make
-BuildRequires:	gcc
-BuildRequires:	doxygen
+
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 xxHash is an Extremely fast Hash algorithm, running at RAM speed
@@ -21,9 +22,9 @@ evaluates collision, dispersion and randomness qualities of hash
 functions. Code is highly portable, and hashes are identical on all
 platforms (little / big endian).
 
-%package libs
-Summary:	Extremely fast hash algorithm - library
-License:	BSD
+%package        libs
+Summary:        Extremely fast hash algorithm - library
+License:        BSD
 
 %description libs
 xxHash is an Extremely fast Hash algorithm, running at RAM speed
@@ -32,23 +33,23 @@ evaluates collision, dispersion and randomness qualities of hash
 functions. Code is highly portable, and hashes are identical on all
 platforms (little / big endian).
 
-%package devel
-Summary:  Extremely fast hash algorithm - development files
-License:  BSD
-Requires:  %{name}-libs%{?_isa} = %{version}-%{release}
+%package        devel
+Summary:        Extremely fast hash algorithm - development files
+License:        BSD
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # By setting XXH_INLINE_ALL, xxhash may be used as a header-only library.
 # Dependent packages that use xxhash this way must BR this virtual Provide:
-Provides:  %{name}-static = %{version}-%{release}
+Provides:       %{name}-static = %{version}-%{release}
 
 %description devel
 Development files for the xxhash library
 
-%package doc
-Summary:  Extremely fast hash algorithm - documentation files
-License:  BSD
-BuildArch:  noarch
+%package        doc
+Summary:        Extremely fast hash algorithm - documentation files
+License:        BSD
+BuildArch:      noarch
 
-%description doc
+%description    doc
 Documentation files for the xxhash library
 
 %prep
@@ -98,9 +99,9 @@ rm %{buildroot}/%{_libdir}/libxxhash.a
 
 %changelog
 * Wed Jul 6 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.8.1-3
-- Initial import for CBL-Mariner from Fedora 36 (License: MIT).
-- Adding as run dependency for cassandra medusa package.
-- License Verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- Adding as run dependency for cassandra medusa package
+- License verified
 
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
