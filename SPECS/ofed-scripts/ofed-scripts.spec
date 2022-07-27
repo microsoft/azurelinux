@@ -32,23 +32,23 @@ Summary:        OFED scripts
 Name:           ofed-scripts
 Version:        5.6
 Release:        1%{?dist}
-License:        GPLv2/BSD
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.openfabrics.org
 #Source0:       https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+
 %global CUSTOM_PREFIX %(if ( echo %{_prefix} | grep -E "^/usr$|^/usr/$" > /dev/null ); then echo -n '0'; else echo -n '1'; fi)
 %global debug_package %{nil}
-%global long-release OFED.5.6.0.6.8
+%global long_release OFED.5.6.1.0.3
 
 %description
-OpenFabrics scripts
+OpenFabrics scripts from NVIDA %long_release
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
-cp debian/copyright COPYRIGHT
 
 %build
 
@@ -174,13 +174,13 @@ fi
 %files
 %endif
 %defattr(-,root,root)
-%license COPYRIGHT
+%license debian/copyright
 %{_bindir}/*
 %{_sbindir}/*
 
 %changelog
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
-- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0)
+- Initial CBL-Mariner import from NVIDIA (license: GPLv2)
 - License verified
 
 * Sun Jan 08 2017 Alaa Hleihel <alaa@mellanox.com>
