@@ -83,9 +83,9 @@ rm %{buildroot}/%{_libdir}/libxxhash.a
 %{_mandir}/man1/xxh*sum.1*
 
 %files libs
-%{_libdir}/libxxhash.so.*
 %license LICENSE
 %doc README.md
+%{_libdir}/libxxhash.so.*
 
 %files devel
 %{_includedir}/xxhash.h
