@@ -1916,6 +1916,7 @@
                 "xorg-x11-xtrans-devel",
                 "xrestop",
                 "xterm",
+                "xxhash",
                 "yajl",
                 "yaml-cpp",
                 "yasm",
