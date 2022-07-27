@@ -1,11 +1,12 @@
 Summary:        Scriptable database and system performance benchmark
 Name:           sysbench
 Version:        1.0.20
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Group:          Applications/System
 URL:            https://github.com/akopytov/sysbench/
 Source0:        https://github.com/akopytov/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         enable-python3.patch
 BuildRequires:  automake
 BuildRequires:  libaio-devel
 BuildRequires:  libtool
@@ -33,7 +34,7 @@ sysbench comes with the following bundled benchmarks:
 - mutex: a POSIX mutex benchmark
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 autoreconf -vif
@@ -58,6 +59,9 @@ rm -f %{buildroot}%{_docdir}/sysbench/manual.html
 %{_datadir}/%{name}
 
 %changelog
+* Wed Jul 27 2022 Sean Dougherty <sdougherty@microsoft.com> - 1.0.20-2
+- Added patch 'enable-python3' to fix issue with running tests on Python3.
+
 * Mon Jul 18 2022 Sean Dougherty <sdougherty@microsoft.com> - 1.0.20-1
 - Initial CBL-Mariner import from Sysbench source (license: GPLv2+)
 - License verified.
