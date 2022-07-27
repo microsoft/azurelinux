@@ -77,10 +77,10 @@ rm %{buildroot}/%{_libdir}/libxxhash.a
 %ldconfig_scriptlets libs
 
 %files
-%{_bindir}/xxh*sum
-%{_mandir}/man1/xxh*sum.1*
 %license cli/COPYING
 %doc cli/README.md
+%{_bindir}/xxh*sum
+%{_mandir}/man1/xxh*sum.1*
 
 %files libs
 %{_libdir}/libxxhash.so.*
