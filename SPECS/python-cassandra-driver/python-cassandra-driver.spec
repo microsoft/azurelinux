@@ -57,32 +57,32 @@ BuildRequires:  python3-packaging
 %{python3_sitelib}/*
 
 %changelog
-*   Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.25.0-1
--   Initial CBL-Mariner import from Photon (license: ASL 2.0)
--   Bumping version to 3.25.0
--   Adding as run dependency for package cassandra medusa.
--   License verified
-*   Fri Jun 11 2021 Ankit Jain <ankitja@vmware.com> 3.24.0-4
--   Fixed install time dependency
-*   Tue Dec 15 2020 Shreenidhi Shedi <sshedi@vmware.com> 3.24.0-3
--   Fix build with new rpm
-*   Tue Sep 29 2020 Satya Naga Vasamsetty <svasamsetty@vmware.com> 3.24.0-2
--   openssl 1.1.1
-*   Fri Jul 24 2020 Gerrit Photon <photon-checkins@vmware.com> 3.24.0-1
--   Automatic Version Bump
-*   Tue Jun 16 2020 Tapas Kundu <tkundu@vmware.com> 3.15.1-3
--   Mass removal python2
-*   Wed Dec 12 2018 Tapas Kundu <tkundu@vmware.com> 3.15.1-2
--   Fix make check
-*   Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 3.15.1-1
--   Update to version 3.15.1
-*   Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 3.10.0-5
--   Remove BuildArch
-*   Tue Sep 12 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.10.0-4
--   Do make check for python3 subpackage
-*   Wed Aug 16 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.10.0-3
--   Fix make check.
-*   Tue Jun 20 2017 Xiaolin Li <xiaolinl@vmware.com> 3.10.0-2
--   Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
-*   Thu Jun 15 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.10.0-1
--   Initial packaging for Photon
+* Wed Jun 22 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.25.0-1
+- Initial CBL-Mariner import from Photon (license: Apache2)
+- Bumping version to 3.25.0
+- Adding as run dependency for package cassandra medusa.
+- License verified
+* Fri Jun 11 2021 Ankit Jain <ankitja@vmware.com> 3.24.0-4
+- Fixed install time dependency
+* Tue Dec 15 2020 Shreenidhi Shedi <sshedi@vmware.com> 3.24.0-3
+- Fix build with new rpm
+* Tue Sep 29 2020 Satya Naga Vasamsetty <svasamsetty@vmware.com> 3.24.0-2
+- openssl 1.1.1
+* Fri Jul 24 2020 Gerrit Photon <photon-checkins@vmware.com> 3.24.0-1
+- Automatic Version Bump
+* Tue Jun 16 2020 Tapas Kundu <tkundu@vmware.com> 3.15.1-3
+- Mass removal python2
+* Wed Dec 12 2018 Tapas Kundu <tkundu@vmware.com> 3.15.1-2
+- Fix make check
+* Sun Sep 09 2018 Tapas Kundu <tkundu@vmware.com> 3.15.1-1
+- Update to version 3.15.1
+* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 3.10.0-5
+- Remove BuildArch
+* Tue Sep 12 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.10.0-4
+- Do make check for python3 subpackage
+* Wed Aug 16 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.10.0-3
+- Fix make check.
+* Tue Jun 20 2017 Xiaolin Li <xiaolinl@vmware.com> 3.10.0-2
+- Add python3-setuptools and python3-xml to python3 sub package Buildrequires.
+* Thu Jun 15 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.10.0-1
+- Initial packaging for Photon
