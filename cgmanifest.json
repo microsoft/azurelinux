@@ -19884,8 +19884,8 @@
         "type": "other",
         "other": {
           "name": "python-botocore",
-          "version": "1.23.52",
-          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.23.52.tar.gz"
+          "version": "1.27.35",
+          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.27.35.tar.gz"
         }
       }
     },
@@ -19964,8 +19964,8 @@
         "type": "other",
         "other": {
           "name": "python-click",
-          "version": "7.1.2",
-          "downloadUrl": "https://github.com/mitsuhiko/click/archive/7.1.2/python-click-7.1.2.tar.gz"
+          "version": "8.0.4",
+          "downloadUrl": "https://github.com/pallets/click/archive/refs/tags/8.0.4.tar.gz"
         }
       }
     },
@@ -21723,6 +21723,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-retrying",
+          "version": "1.3.3",
+          "downloadUrl": "https://github.com/rholder/retrying/archive/refs/tags/v1.3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-rfc3986",
           "version": "1.2.0",
           "downloadUrl": "https://pypi.python.org/packages/source/r/rfc3986/rfc3986-1.2.0.tar.gz"
@@ -22503,6 +22513,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cassandra-driver",
+          "version": "3.25.0",
+          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.25.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python3-mallard-ducktype",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/projectmallard/mallard-ducktype/archive/1.0.2/1.0.2.tar.gz"
@@ -22856,6 +22876,16 @@
           "name": "realmd",
           "version": "0.16.3",
           "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "reaper",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
         }
       }
     },
@@ -24816,6 +24846,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "skopeo",
+          "version": "1.9.1",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "slang",
           "version": "2.3.2",
           "downloadUrl": "https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
@@ -25288,7 +25328,7 @@
         "other": {
           "name": "symlinks",
           "version": "1.7",
-          "downloadUrl": "http://ibiblio.org/pub/Linux/utils/file/symlinks-1.7.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
         }
       }
     },
@@ -27472,6 +27512,16 @@
           "name": "xwud",
           "version": "1.0.5",
           "downloadUrl": "https://www.x.org/pub/individual/app/xwud-1.0.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xxhash",
+          "version": "0.8.1",
+          "downloadUrl": "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.1.tar.gz"
         }
       }
     },
