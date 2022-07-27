@@ -1,5 +1,9 @@
-# Created by pyp2rpm-1.1.0b
 %global pypi_name retrying
+
+%global _description\
+Retrying is an Apache 2.0 licensed general-purpose retrying library,\
+written in Python, to simplify the task of adding retry behavior to\
+just about anything.\
 
 Name:           python-%{pypi_name}
 Version:        1.3.3
@@ -12,23 +16,19 @@ URL:            https://github.com/rholder/retrying
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%global _description\
-Retrying is an Apache 2.0 licensed general-purpose retrying library,\
-written in Python, to simplify the task of adding retry behavior to\
-just about anything.\
-
-%description %_description
+%description %{_description}
 
 %package -n python3-%{pypi_name}
 Summary:        General-purpose retrying library in Python
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+Requires:       python3-six
+
 %if %{with_check}
 BuildRequires:  python3-six
 %endif
-Requires:       python3-six
 
-%description -n python3-%{pypi_name} %_description
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
@@ -43,16 +43,17 @@ Requires:       python3-six
 %python3 setup.py test
 
 %files -n python3-%{pypi_name}
-%doc README.rst LICENSE
+%license LICENSE
+%doc README.rst
 %{python3_sitelib}/%{pypi_name}.py*
 %{python3_sitelib}/__pycache__/%{pypi_name}.*
 %{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
 * Wed Jul 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.3-6
-- Initial CBL-Mariner import from Fedora 36.
-- Adding as run dependency for package cassandra medusa.
-- License verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- Adding as run dependency for package cassandra medusa
+- License verified
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.3-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
