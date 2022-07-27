@@ -11,7 +11,7 @@ License:        BSD
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/J/Jinja2/Jinja2-%{version}.tar.gz
 BuildRequires:  python2
 BuildRequires:  python2-libs
 BuildRequires:  python-setuptools
