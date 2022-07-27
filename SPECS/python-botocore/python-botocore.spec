@@ -68,10 +68,10 @@ rm -vr tests/functional/leak
 
 %changelog
 * Tue Jun 21 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.27.35-1
-- Initial CBL-Mariner import from fedora 36 (license: MIT)
-- Bumping version to 1.27.35.
-- Adding as Run dependency (Requires) for cassandra medusa.
-- License verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- Bumping version to 1.27.35
+- Adding as Run dependency (Requires) for cassandra medusa
+- License verified
 
 * Mon Apr 04 2022 Gwyn Ciesla <gwync@protonmail.com> - 1.24.33-1
 - 1.24.33
