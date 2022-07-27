@@ -24816,6 +24816,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "skopeo",
+          "version": "1.9.1",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "slang",
           "version": "2.3.2",
           "downloadUrl": "https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
