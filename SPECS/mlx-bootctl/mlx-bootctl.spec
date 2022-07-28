@@ -26,9 +26,7 @@
 #
 #
 
-%{!?_name: %define _name mlx-bootctl}
-%{!?_version: %define _version 1.5}
-%{!?_release: %define _release 0.g99bc4ab}
+%global extended_release 0.g99bc4ab
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -37,22 +35,12 @@
 %global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global K_SRC %{_libdir}/modules/%{KVERSION}/build
 %global moddestdir %{buildroot}%{_libdir}/modules/%{KVERSION}/kernel/
-%global kernel_version %{KVERSION}
-%global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
-
-# define release version
-%{!?src_release: %global src_release %{_release}_%{krelver}}
-%if "%{KMP}" != "1"
-%global _release1 %{src_release}
-%else
-%global _release1 %{_release}
-%endif
-%global _kmp_rel %{_release1}%{?_kmp_build_num}%{?dist}
 
 Summary:        mlx-bootctl Driver
 Name:           mlx-bootctl
+# Update extended_release with version updates
 Version:        1.5
-Release:        %{_release1}
+Release:        1%{?dist}
 License:        GPLv2 or BSD or CPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,7 +51,7 @@ BuildRequires:  kernel-devel
 BuildRequires:  kmod
 
 %description
-%{name} kernel modules
+%{name} kernel modules release %extended_release
 
 # build KMP rpms?
 %if "%{KMP}" == "1"
@@ -78,37 +66,6 @@ BuildRequires:  kmod
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %endif
-
-#
-# setup module sign scripts if paths to the keys are given
-#
-# %global WITH_MOD_SIGN %(if ( test -f "$MODULE_SIGN_PRIV_KEY" && test -f "$MODULE_SIGN_PUB_KEY" ); \
-# 	then \
-# 		echo -n '1'; \
-# 	else \
-# 		echo -n '0'; fi)
-
-# %if "%{WITH_MOD_SIGN}" == "1"
-# # call module sign script
-# %global __modsign_install_post \
-#     %{_builddir}/%{name}-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/  %{kernel_source default} || exit 1 \
-# %{nil}
-
-# %global __debug_package 1
-# %global buildsubdir %{name}-%{version}
-# # Disgusting hack alert! We need to ensure we sign modules *after* all
-# # invocations of strip occur, which is in __debug_install_post if
-# # find-debuginfo.sh runs, and __os_install_post if not.
-# #
-# %global __spec_install_post \
-#   %{?__debug_package:%{__debug_install_post}} \
-#   %{__arch_install_post} \
-#   %{__os_install_post} \
-#   %{__modsign_install_post} \
-# %{nil}
-
-# %endif # end of setup module sign scripts
-#
 
 # set modules dir
 %{!?install_mod_dir: %global install_mod_dir extra/%{name}}
@@ -186,9 +143,10 @@ fi # 1 : closed
 %endif
 
 %changelog
-* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 1.5-1
-- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
-- Lint spec to conform to Mariner 
+* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.5-1
+- Initial CBL-Mariner import from NVIDIA (license: GPLv2).
+- Lint spec to conform to Mariner
+- Remove unused module signing
 - License verified
 
 * Fri Sep 1 2017 Vladimir Sokolovsky <vlad@mellanox.com>
