@@ -14,7 +14,7 @@ Distribution:   Mariner
 
 Name:           python-requests-mock
 Version:        1.7.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A requests mocking tool for python
 
 License:        ASL 2.0
@@ -23,8 +23,13 @@ Source0:        https://pypi.io/packages/source/r/requests-mock/requests-mock-%{
 
 Patch0:         0002-Use-system-urllib3-package.patch
 Patch1:         0003-Allow-skipping-purl-tests-if-it-is-not-present.patch
+Patch2:         0001-tox-add-py39-environment.patch
 
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 requests-mock provides a simple way to do HTTP mocking at the
@@ -106,6 +111,7 @@ python-requests layer.
 %setup -q -n requests-mock-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # Remove bundled egg-info
 rm -rf requests_mock.egg-info
@@ -139,8 +145,8 @@ rm -rf requests_mock.egg-info
 %endif
 
 %if %{with python3}
-%{__python3} -m testtools.run discover
-%{__python3} -m pytest tests/pytest
+%{__python3} -m pip install tox==3.25.1
+tox -e py%{python3_version_nodots}
 %endif
 %endif
 
@@ -164,6 +170,10 @@ rm -rf requests_mock.egg-info
 
 
 %changelog
+* Tue Jul 26 2022 Muhammad Falak <mwani@microsoft.com> - 1.7.0-4
+- Introduce patch to test using tox
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
