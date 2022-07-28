@@ -10,10 +10,10 @@ URL:            http://search.cpan.org/dist/File-Which/
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
-BuildRequires:  perl-generators
-BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Env)
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Spec) >= 0.60
