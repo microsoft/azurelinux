@@ -110,7 +110,7 @@ BuildRequires: /usr/bin/perl
 %endif
 %description 
 InfiniBand "verbs", Access Layer  and ULPs.
-Utilities rpm.
+Utilities rpm with OFED release %extended_release.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
 
 
