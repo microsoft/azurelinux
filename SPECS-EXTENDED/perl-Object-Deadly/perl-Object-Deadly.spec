@@ -50,6 +50,7 @@ make test
 %changelog
 * Tue Jul 26 2022 Muhammad Falak <mwani@microsoft.com> - 0.09-35
 - Add an explicit BR on `perl(English)` to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.09-34
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
