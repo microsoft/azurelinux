@@ -26,12 +26,10 @@
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
 
-%{!?_release: %global _release OFED.5.6.0.1.6.1}
+%global extended_release OFED.5.6.0.1.6.1
+%global nvidia_version 90mlnx1
 %global kver %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-devel))
 %global ksrc %{_libdir}/modules/%{kver}/build
-%global moddestdir %{buildroot}%{_libdir}/modules/%{kver}/kernel/
-%global kernel_version %{kver}
-%global krelver %(echo -n %{kver} | sed -e 's/-/_/g')
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 # set package name
@@ -39,13 +37,14 @@
 
 Summary:        KNEM: High-Performance Intra-Node MPI Communication
 Name:           knem
-Version:        1.1.4.90mlnx1
+# Update extended_release and nvidia_version with version updates
+Version:        1.1.4
 Release:        1%{?dist}
 License:        BSD and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-Source:         https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/knem_1.1.4.90mlnx1.orig.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/%{name}_%{version}.%{nvidia_version}.orig.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Requires:       kernel
@@ -54,7 +53,8 @@ Obsoletes:      knem-mlnx < %{version}-%{release}
 
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
-See http://knem.gitlabpages.inria.fr for details.
+See http://knem.gitlabpages.inria.fr for details. 
+OFED release is %extended_release of NVIDIA version %nvidia_version of knem
 
 %global debug_package %{nil}
 
@@ -66,9 +66,6 @@ BuildRequires: %kernel_module_package_buildreqs
 %(cat > %{_builddir}/kmp.files << EOF
 %defattr(644,root,root,755)
 /lib/modules/%2-%1
-%if %{IS_RHEL_VENDOR}
-%config(noreplace) %{_sysconfdir}/depmod.d/%{_name}.conf
-%endif
 EOF)
 %(cat > %{_builddir}/preamble << EOF
 Obsoletes: kmod-knem-mlnx < %{version}-%{release}
@@ -87,7 +84,6 @@ EOF)
 %global kernel_source() %{ksrc}
 %global kernel_release() %{kver}
 %global flavors_to_build default
-%global release_full %{_release}.%{kver}.%{krelver}
 
 %package modules
 Summary: KNEM: High-Performance Intra-Node MPI Communication
@@ -96,35 +92,6 @@ Group: System Environment/Libraries
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
 %endif #end if "%{KMP}" == "1"
-
-#
-# setup module sign scripts if paths to the keys are given
-#
-# %global WITH_MOD_SIGN %(if ( test -f "$MODULE_SIGN_PRIV_KEY" && test -f "$MODULE_SIGN_PUB_KEY" ); \
-# 	then \
-# 		echo -n '1'; \
-# 	else \
-# 		echo -n '0'; fi)
-
-# %if "%{WITH_MOD_SIGN}" == "1"
-# # call module sign script
-# %global __modsign_install_post \
-#     $RPM_BUILD_DIR/knem-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
-# %{nil}
-
-# Disgusting hack alert! We need to ensure we sign modules *after* all
-# invocations of strip occur, which is in __debug_install_post if
-# find-debuginfo.sh runs, and __os_install_post if not.
-#
-# %global __spec_install_post \
-#   %{?__debug_package:%{__debug_install_post}} \
-#   %{__arch_install_post} \
-#   %{__os_install_post} \
-#   %{__modsign_install_post} \
-# %{nil}
-
-# %endif # end of setup module sign scripts
-# #
 
 %global install_mod_dir extra/%{_name}
 
@@ -230,9 +197,10 @@ fi
 %endif
 
 %changelog
-* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 1.1.4.90mlnx1-1
-- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
-- Lint spec to conform to Mariner 
+* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4-1
+- Initial CBL-Mariner import from NVIDIA (license: GPLv2).
+- Lint spec to conform to Mariner
+- Remove unused module signing
 - License verified
 
 * Mon Mar 17 2014 Alaa Hleihel <alaa@mellanox.com>
