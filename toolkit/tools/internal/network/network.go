@@ -66,6 +66,7 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 }
 
 // CheckNetworkAccess checks whether the installer environment has network access
+// This function is only executed within the ISO installation environment for kickstart-like unattended installation
 func CheckNetworkAccess() (err error, hasNetworkAccess bool) {
 	const (
 		retryAttempts = 10
