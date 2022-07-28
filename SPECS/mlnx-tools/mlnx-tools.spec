@@ -51,7 +51,6 @@ BuildRequires: python3
 
 %prep
 %autosetup -n %{name}-%{version}
-cp debian/copyright COPYRIGHT
 
 %build
 
@@ -91,7 +90,7 @@ find %{buildroot}${mlnx_python_sitelib} -type f -print | sed -e 's@%{buildroot}@
 
 %files -f mlnx-tools-files
 %doc doc/*
-%license COPYRIGHT
+%license debian/copyright
 %defattr(-,root,root,-)
 /sbin/sysctl_perf_tuning
 /sbin/mlnx_bf_configure
@@ -104,7 +103,7 @@ find %{buildroot}${mlnx_python_sitelib} -type f -print | sed -e 's@%{buildroot}@
 
 %changelog
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 5.2.0-2
-- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
+- Initial CBL-Mariner import from NVIDIA (license: GPLv2).
 - Lint spec to conform to Mariner 
 - License verified
 

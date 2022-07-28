@@ -52,9 +52,6 @@
 %global K_SRC %{_libdir}/modules/%{KVERSION}/build
 %global moddestdir %{buildroot}%{_libdir}/modules/%{KVERSION}/kernel/
 
-%global kernel_version %{KVERSION}
-%global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
-
 # Select packages to build
 
 # Kernel module packages to be included into kernel-ib
@@ -70,7 +67,7 @@
 
 %{!?_name: %global _name mlnx-ofa_kernel}
 %{!?_version: %global _version 5.6}
-%{!?_release: %global _release OFED.5.6.1.0.3.1}
+%global extended_release OFED.5.6.1.0.3.1
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 %global utils_pname %{_name}
@@ -79,8 +76,9 @@
 
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
+# Update extended_release with the OFED version along with version updates
 Version:        5.6
-Release:        OFED.5.6.1.0.3.1%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -187,35 +185,6 @@ You should probably only install this package if you want to view the
 sourecs of driver. Use the -devel package if you want to build other
 drivers against it.
 
-#
-# setup module sign scripts if paths to the keys are given
-#
-# %global WITH_MOD_SIGN %(if ( test -f "$MODULE_SIGN_PRIV_KEY" && test -f "$MODULE_SIGN_PUB_KEY" ); \
-# 	then \
-# 		echo -n '1'; \
-# 	else \
-# 		echo -n '0'; fi)
-
-# %if "%{WITH_MOD_SIGN}" == "1"
-# # call module sign script
-# %global __modsign_install_post \
-#     %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
-# %{nil}
-
-# %global __debug_package 1
-# %global buildsubdir %{_name}-%{version}
-# # Disgusting hack alert! We need to ensure we sign modules *after* all
-# # invocations of strip occur, which is in __debug_install_post if
-# # find-debuginfo.sh runs, and __os_install_post if not.
-# #
-# %global __spec_install_post \
-#   %{?__debug_package:%{__debug_install_post}} \
-#   %{__arch_install_post} \
-#   %{__os_install_post} \
-#   %{__modsign_install_post} \
-# %{nil}
-
-# %endif # end of setup module sign scripts
 %global install_mod_dir extra/%{_name}
 
 %prep
@@ -224,6 +193,7 @@ set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
+cp source/COPYING .
 
 %build
 export EXTRA_CFLAGS='-DVERSION=\"%version\"'
@@ -330,50 +300,6 @@ install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/net-interfaces %
 # TBD: move these utilities into standalone package
 install -d %{buildroot}%{_sbindir}
 
-# update /etc/init.d/openibd header
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-if [[ -f /etc/redhat-release || -f /etc/rocks-release || "$is_euler" != '' ]]; then
-perl -i -ne 'if (m@^#!/bin/bash@) {
-        print q@#!/bin/bash
-#
-# Bring up/down openib
-#
-# chkconfig: 2345 05 95
-# description: Activates/Deactivates InfiniBand Driver to \
-#              start at boot time.
-#
-### BEGIN INIT INFO
-# Provides:       openibd
-### END INIT INFO
-@;
-                 } else {
-                     print;
-                 }' %{buildroot}/etc/init.d/openibd
-fi
-
-if [ -f /etc/SuSE-release ] || [ -f /etc/SUSE-brand ]; then
-    local_fs='$local_fs'
-    openiscsi=''
-    %if %{build_oiscsi}
-        openiscsi='open-iscsi'
-    %endif
-        perl -i -ne "if (m@^#!/bin/bash@) {
-        print q@#!/bin/bash
-### BEGIN INIT INFO
-# Provides:       openibd
-# Required-Start: $local_fs
-# Required-Stop: opensmd $openiscsi
-# Default-Start:  2 3 5
-# Default-Stop: 0 1 2 6
-# Description:    Activates/Deactivates InfiniBand Driver to \
-#                 start at boot time.
-### END INIT INFO
-@;
-                 } else {
-                     print;
-                 }" %{buildroot}/etc/init.d/openibd
-fi
-
 %if %{build_ipoib}
 case $(uname -m) in
 	i[3-6]86)
@@ -406,33 +332,6 @@ fi
 %post -n %{utils_pname}
 if [ $1 -eq 1 ]; then # 1 : This package is being installed
 #############################################################################################################
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-is_kylin=`grep 'NAME=".*Kylin' /etc/os-release 2>/dev/null || :`
-if [[ -f /etc/redhat-release || -f /etc/rocks-release || -f /etc/UnionTech-release || "$is_euler" != '' || "$is_kylin" != '' ]]; then
-        /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-        /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-        /sbin/chkconfig --del openibd >/dev/null 2>&1 || true
-
-%if "%{WITH_SYSTEMD}" != "1"
-        /sbin/chkconfig --add openibd >/dev/null 2>&1 || true
-        /sbin/chkconfig openibd on >/dev/null 2>&1 || true
-%else
-        /usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-fi
-
-if [ -f /etc/SuSE-release ] || [ -f /etc/SUSE-brand ]; then
-        /sbin/chkconfig openibd off >/dev/null  2>&1 || true
-        /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-        /sbin/insserv -r openibd >/dev/null 2>&1 || true
-
-%if "%{WITH_SYSTEMD}" != "1"
-        /sbin/insserv openibd >/dev/null 2>&1 || true
-        /sbin/chkconfig openibd on >/dev/null 2>&1 || true
-%else
-        /usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-fi
 
 %if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
 /usr/sbin/update-rc.d openibd defaults || true
@@ -496,24 +395,7 @@ fi # 1 : closed
 # END of post
 
 %preun -n %{utils_pname}
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-is_kylin=`grep 'NAME=".*Kylin' /etc/os-release 2>/dev/null || :`
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
-          if [[ -f /etc/redhat-release || -f /etc/rocks-release || -f /etc/UnionTech-release || "$is_euler" != '' || "$is_kylin" != '' ]]; then
-                /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-                /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-                /sbin/chkconfig --del openibd  >/dev/null 2>&1 || true
-          fi
-          if [ -f /etc/SuSE-release ] || [ -f /etc/SUSE-brand ]; then
-                /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-                /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-                /sbin/insserv -r openibd >/dev/null 2>&1 || true
-          fi
-          if [ -f /etc/debian_version ]; then
-                if ! ( /usr/sbin/update-rc.d openibd remove > /dev/null 2>&1 ); then
-                        true
-                fi
-          fi
 %if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
 /usr/sbin/update-rc.d -f openibd remove || true
 %endif
@@ -634,9 +516,10 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
-* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 5.6-1
-- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
-- Lint spec to conform to Mariner 
+* Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
+- Initial CBL-Mariner import from NVIDIA (license: GPLv2).
+- Lint spec to conform to Mariner
+- Remove unused module signing
 - License verified
 
 * Thu Jun 18 2015 Alaa Hleihel <alaa@mellanox.com>
