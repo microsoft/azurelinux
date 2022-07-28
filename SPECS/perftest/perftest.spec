@@ -1,22 +1,22 @@
 Summary:        IB Performance tests
 Name:           perftest
+# Update extended_release with version updates
 Version:        4.5
 Release:        1%{?dist}
-License:        BSD 3-Clause, GPL v2 or later
+License:        BSD 3-Clause, GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
-#Source0:       https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/perftest_4.5.orig.tar.gz
-Source0:        perftest-%{version}.tar.gz
-%global extended-release 0.14.gd962d8c.56068 
+Source0:        https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/perftest_4.5.orig.tar.gz#/%{name}-%{version}.tar.gz
+%global         extended_release 0.14.gd962d8c.56068 
 BuildRequires:  libibumad-devel
 BuildRequires:  libibverbs-devel
 BuildRequires:  librdmacm-devel
 BuildRequires:  pciutils-devel
 
 %description
-gen3 uverbs microbenchmarks
+gen3 uverbs microbenchmarks release: %extended_release
 
 %prep
 %autosetup -p1
@@ -37,7 +37,7 @@ make DESTDIR=%{buildroot} install
 
 %changelog
 * Thu Jun 23 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.5-1
-- Initial CBL-Mariner import from NVIDIA (license: ASL 2.0)
+- Initial CBL-Mariner import from NVIDIA (license: GPLv2)
 - License verified
 
 * Wed Jan 09 2013 - idos@mellanox.com
