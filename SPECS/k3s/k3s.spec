@@ -6,8 +6,8 @@
 %define k3s_binary    k3s
 
 Name:    k3s
-Version: 1.23.6
-Release: 3%{?dist}
+Version: 1.23.8
+Release: 1%{?dist}
 Summary: Lightweight Kubernetes
 
 Group:   System Environment/Base
@@ -23,9 +23,9 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/containerd/containerd.git -b release/1.6
+# 6. git clone https://github.com/containerd/containerd.git -b release/1.5
 # 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
-# 8. git clone https://github.com/opencontainers/runc.git -b release-1.1
+# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.2
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1: %{name}-%{version}-vendor.tar.gz
@@ -46,7 +46,7 @@ Requires:      apparmor-parser
 The certified Kubernetes distribution built for IoT & Edge computing.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-k3s1
+%autosetup -p1 -n %{name}-%{version}-k3s2
 tar -xvf %{SOURCE1}
 
 %build
@@ -83,6 +83,8 @@ exit 0
 %{install_sh}
 
 %changelog
+* Fri Jul 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.8-1
+- Update to 1.23.8
 * Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
 - Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
 * Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
