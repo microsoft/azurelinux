@@ -22513,16 +22513,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-cassandra-driver",
-          "version": "3.25.0",
-          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.25.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python3-mallard-ducktype",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/projectmallard/mallard-ducktype/archive/1.0.2/1.0.2.tar.gz"
