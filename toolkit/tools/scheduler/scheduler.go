@@ -278,6 +278,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
+	learner := schedulerutils.NewLearner()
 
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
@@ -329,6 +330,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		res := <-channels.Results
 		schedulerutils.PrintBuildResult(res)
 		buildState.RecordBuildResult(res)
+		learner.RecordBuildResult(res)
 
 		if !stopBuilding {
 			if res.Err == nil {
@@ -396,7 +398,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
-
+	learner.Dump("/home/cameronbaird/Repos/main-recent2/toolkit/learner_dump.json")
 	return
 }
 

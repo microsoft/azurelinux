@@ -44,6 +44,7 @@ type BuildResult struct {
 	Node           *pkggraph.PkgNode
 	Skipped        bool
 	UsedCache      bool
+	BuildTime      float32
 }
 
 //selectNextBuildRequest selects a job based on priority:
@@ -97,7 +98,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeBuild:
-			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
+			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.BuildTime, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
@@ -121,7 +122,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, buildTime float32, err error) {
 	var missingFiles []string
 
 	baseSrpmName := node.SRPMFileName()
@@ -148,7 +149,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
 	logger.Log.Infof("Building %s", baseSrpmName)
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
+	builtFiles, logFile, buildTime, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
 	return
 }
 
@@ -190,17 +191,20 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 }
 
 // buildSRPMFile sends an SRPM to a build agent to build.
-func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile string, dependencies []string) (builtFiles []string, logFile string, err error) {
+func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile string, dependencies []string) (builtFiles []string, logFile string, buildTime float32, err error) {
 	const (
 		retryDuration = time.Second
 	)
 
+	// Time the execution of BuildPackage.
+	// Should we only take the time of the successful retry, or the sum of all attempts (current impl.)
+	start := time.Now()
 	logBaseName := filepath.Base(srpmFile) + ".log"
 	err = retry.Run(func() (buildErr error) {
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, dependencies)
 		return
 	}, buildAttempts, retryDuration)
-
+	buildTime = float32(time.Since(start).Seconds())
 	return
 }
 

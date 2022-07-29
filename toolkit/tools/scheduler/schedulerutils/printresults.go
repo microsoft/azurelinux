@@ -28,7 +28,7 @@ func PrintBuildResult(res *BuildResult) {
 		} else if res.UsedCache {
 			logger.Log.Infof("Prebuilt: %s -> %v", baseSRPMName, res.BuiltFiles)
 		} else {
-			logger.Log.Infof("Built: %s -> %v", baseSRPMName, res.BuiltFiles)
+			logger.Log.Infof("Built: %s -> %v in %f seconds!", baseSRPMName, res.BuiltFiles, res.BuildTime)
 		}
 	} else {
 		logger.Log.Debugf("Processed node %s", res.Node.FriendlyName())
