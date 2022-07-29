@@ -26,9 +26,6 @@
 #
 #
 
-# KMP is disabled by default
-%{!?KMP: %global KMP 0}
-
 %global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
 
 %{!?configure_options: %global configure_options --with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod}
@@ -68,7 +65,6 @@
 %{!?_name: %global _name mlnx-ofa_kernel}
 %{!?_version: %global _version 5.6}
 %global extended_release OFED.5.6.1.0.3.1
-%global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 %global utils_pname %{_name}
 %global devel_pname %{_name}-devel
@@ -105,26 +101,12 @@ Requires: grep
 Requires: procps
 Requires: module-init-tools
 Requires: lsof
-%if "%{KMP}" == "1"
-BuildRequires: /usr/bin/perl
-%endif
 %description 
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm with OFED release %extended_release.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
 
 
-# build KMP rpms?
-%if "%{KMP}" == "1"
-%global kernel_release() $(make -s -C %{1} kernelrelease M=$PWD)
-# prep file list for kmp rpm
-%(cat > %{_builddir}/kmp.files << EOF
-%defattr(644,root,root,755)
-/lib/modules/%2-%1
-EOF)
-%(echo "Obsoletes: kmod-mlnx-rdma-rxe, mlnx-rdma-rxe-kmp" >> %{_builddir}/preamble)
-%kernel_module_package -f %{_builddir}/kmp.files -p %{_builddir}/preamble -r %{_kmp_rel}
-%else # not KMP
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
@@ -148,11 +130,9 @@ Group: System Environment/Libraries
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
-%endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
 Version: %{_version}
-# build KMP rpms?
 Obsoletes: kernel-ib-devel
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -309,7 +289,6 @@ case $(uname -m) in
 esac
 %endif
 
-%if "%{KMP}" != "1"
 %post -n %{non_kmp_pname}
 /sbin/depmod %{KVERSION}
 # W/A for OEL6.7/7.x inbox modules get locked in memory
@@ -327,7 +306,6 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 		/sbin/dracut --force
 	fi
 fi
-%endif # end KMP=1
 
 %post -n %{utils_pname}
 if [ $1 -eq 1 ]; then # 1 : This package is being installed
@@ -468,8 +446,6 @@ update-alternatives --remove \
 %defattr(-,root,root,-)
 %license COPYING
 %doc source/ofed_scripts/82-net-setup-link.rules source/ofed_scripts/vf-net-link-name.sh
-%if "%{KMP}" == "1"
-%endif # end KMP=1
 %dir /etc/infiniband
 %config(noreplace) /etc/infiniband/openib.conf
 %config(noreplace) /etc/infiniband/mlx5.conf
@@ -501,10 +477,8 @@ update-alternatives --remove \
 %{_sbindir}/ibdev2netdev
 %endif
 
-%if "%{KMP}" != "1"
 %files -n %{non_kmp_pname}
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
-%endif
 
 %files -n %{devel_pname}
 %defattr(-,root,root,-)

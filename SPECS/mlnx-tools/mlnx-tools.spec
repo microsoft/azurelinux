@@ -41,7 +41,6 @@ Obsoletes: mlnx-ofa_kernel < 5.4, mlnx_en-utils < 5.4
 Mellanox userland tools and scripts
 
 %define debug_package %{nil}
-%global PYTHON3 1
 %define __python %{_bindir}/python3
 BuildRequires: python3
 # mlnx_tune is python2 but is not important enough to create a dependency
