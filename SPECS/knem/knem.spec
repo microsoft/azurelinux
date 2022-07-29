@@ -23,14 +23,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# KMP is disabled by default
-%{!?KMP: %global KMP 0}
-
 %global extended_release OFED.5.6.0.1.6.1
 %global nvidia_version 90mlnx1
 %global kver %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-devel))
 %global ksrc %{_libdir}/modules/%{kver}/build
-%global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 # set package name
 %{!?_name: %global _name knem}
@@ -58,29 +54,6 @@ OFED release is %extended_release of NVIDIA version %nvidia_version of knem
 
 %global debug_package %{nil}
 
-# build KMP rpms?
-%if "%{KMP}" == "1"
-%global kernel_release() $(make -C %{1} M=$PWD kernelrelease | grep -v make)
-BuildRequires: %kernel_module_package_buildreqs
-# prep file list for kmp rpm
-%(cat > %{_builddir}/kmp.files << EOF
-%defattr(644,root,root,755)
-/lib/modules/%2-%1
-EOF)
-%(cat > %{_builddir}/preamble << EOF
-Obsoletes: kmod-knem-mlnx < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-default < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-trace < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-xen < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-trace < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-ppc64 < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-ppc < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-smp < %{version}-%{release}
-Obsoletes: knem-mlnx-kmp-pae < %{version}-%{release}
-EOF)
-%{kernel_module_package -f %{_builddir}/kmp.files -p %{_builddir}/preamble -r %{_kmp_rel} }
-%else 
-
 %global kernel_source() %{ksrc}
 %global kernel_release() %{kver}
 %global flavors_to_build default
@@ -91,7 +64,7 @@ Group: System Environment/Libraries
 %description modules
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
-%endif #end if "%{KMP}" == "1"
+
 
 %global install_mod_dir extra/%{_name}
 
@@ -173,7 +146,6 @@ if (grep -qw knem /etc/sysconfig/kernel 2>/dev/null); then
 	sed -i -e 's/ knem//g' /etc/sysconfig/kernel 2>/dev/null
 fi
 
-%if "%{KMP}" != "1"
 %post modules
 depmod %{kver} -a
 
@@ -181,7 +153,6 @@ depmod %{kver} -a
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	depmod %{kver} -a
 fi
-%endif # end KMP!=1
 
 %files
 %defattr(-, root, root)
@@ -190,11 +161,8 @@ fi
 /usr/lib64/pkgconfig/knem.pc
 %config(noreplace)
 /etc/udev/rules.d/10-knem.rules
-
-%if "%{KMP}" != "1"
 %files modules
 /lib/modules/%{kver}/%{install_mod_dir}/
-%endif
 
 %changelog
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4-1
