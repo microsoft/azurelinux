@@ -57,22 +57,18 @@
 %global build_mlx5 %(if ( echo %{configure_options} | grep "with-mlx5-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
 
 %{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
-
 %{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
-
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
 
-%{!?_name: %global _name mlnx-ofa_kernel}
-%{!?_version: %global _version 5.6}
-%global extended_release OFED.5.6.1.0.3.1
+%global MLNX_OFED_VERSION 5.6-1.0.3
 
-%global utils_pname %{_name}
-%global devel_pname %{_name}-devel
-%global non_kmp_pname %{_name}-modules
+%global utils_pname %{name}
+%global devel_pname %{name}-devel
+%global non_kmp_pname %{name}-modules
 
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
-# Update extended_release with the OFED version along with version updates
+# Update OFED version along with version updates
 Version:        5.6
 Release:        1%{?dist}
 License:        GPLv2
@@ -80,7 +76,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz#/%{name}-%{version}.tgz
+Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz#/%{name}-%{version}.tgz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Obsoletes: kernel-ib
@@ -103,7 +99,7 @@ Requires: module-init-tools
 Requires: lsof
 %description 
 InfiniBand "verbs", Access Layer  and ULPs.
-Utilities rpm with OFED release %extended_release.
+Utilities rpm with OFED release %MLNX_OFED_VERSION.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
 
 
@@ -123,7 +119,7 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
-Version: %{_version}
+Version: %{version}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -132,7 +128,7 @@ Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
 
 %package -n %{devel_pname}
-Version: %{_version}
+Version: %{version}
 Obsoletes: kernel-ib-devel
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -165,10 +161,10 @@ You should probably only install this package if you want to view the
 sourecs of driver. Use the -devel package if you want to build other
 drivers against it.
 
-%global install_mod_dir extra/%{_name}
+%global install_mod_dir extra/%{name}
 
 %prep
-%autosetup -p1 -n %{_name}-%{_version}
+%autosetup -p1 -n %{name}-%{version}
 set -- *
 mkdir source
 mv "$@" source/
