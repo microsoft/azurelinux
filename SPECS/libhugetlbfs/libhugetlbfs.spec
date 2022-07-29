@@ -1,7 +1,7 @@
 Summary:        A library which provides easy access to huge pages of memory
 Name:           libhugetlbfs
 Version:        2.23
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,16 +21,11 @@ Patch3:         0003-tests_shm-perms_adjust_max_segment_size_for_bigger_hugepage
 # tests install and fix run_tests.py path for hugeadm tool call
 Patch4:         0004-tests-makefile-fix.patch
 Patch5:         0005-tests-run_tests-fix-hugeadm-path.patch
-# Patch7: huge_page_setup_helper.py Python3 conversion
-# Upstream tickets:
-# Fedora: https://bugzilla.redhat.com/show_bug.cgi?id=1598570
-# libhugetlbfs: https://github.com/libhugetlbfs/libhugetlbfs/issues/35
-Patch6:         0006-huge_page_setup_helper-python3-convert.patch
 # Fixes for downstream COVSCAN and RPMDiff execshield complaints:
-Patch7:         0007-tests-fix-covscan-SHELLCHECK_WARNING-complaints.patch
-Patch8:         0008-tests-include-missing-LDFLAGS-to-make-targets.patch
+Patch6:         0007-tests-fix-covscan-SHELLCHECK_WARNING-complaints.patch
+Patch7:         0008-tests-include-missing-LDFLAGS-to-make-targets.patch
 # __morecore feature has been removed from glibc 2.34+ so disable it
-Patch9:         0009-Disable-hugepage-backed-malloc-if-__morecore-is-not-.patch
+Patch8:         0009-Disable-hugepage-backed-malloc-if-__morecore-is-not-.patch
 %global _hardened_build 1
 %define ldscriptdir %{_datadir}/%{name}/ldscripts
 BuildRequires:  execstack
@@ -78,9 +73,6 @@ to verify the libhugetlbfs functionality and validate the library.
 
 %prep
 %autosetup -p1
-
-sed -i 's/\/usr\/bin\/python/\/usr\/bin\/python3/' huge_page_setup_helper.py
-sed -i 's/\/usr\/bin\/python/\/usr\/bin\/python3/' tests/run_tests.py
 
 %build
 # Parallel builds are not reliable
@@ -152,6 +144,9 @@ rm -fr %{buildroot}/%{_sbindir}/
 %{_libdir}/libhugetlbfs
 
 %changelog
+* Tue Jul 26 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.23-3
+- Remove patch that applies usage of python3
+
 * Fri Feb 18 2022 Vince Perri <viperri@microsoft.com> - 2.23-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Verified license

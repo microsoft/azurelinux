@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.83.1
+Version:        7.84.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -89,6 +89,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 7.84.0-1
+- Upgrade to version 7.84.0 to resolve CVE-2022-32207
+
 * Mon Jun 20 2022 Henry Beberman <henry.beberman@microsoft.com> - 7.83.1-1
 - Update to version 7.83.1
 - Address CVE-2022-27779, CVE-2022-27780, CVE-2022-27781

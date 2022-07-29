@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,20 +46,8 @@ Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
 Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
-# Add nopatches for tooling
-Patch1000:      CVE-2021-3418.nopatch
-Patch1001:      CVE-2020-14372.nopatch
-Patch1002:      CVE-2020-25632.nopatch
-Patch1003:      CVE-2020-25647.nopatch
-Patch1004:      CVE-2020-27779.nopatch
-Patch1005:      CVE-2021-20233.nopatch
-Patch1006:      CVE-2020-10713.nopatch
-Patch1007:      CVE-2020-14308.nopatch
-Patch1008:      CVE-2020-14309.nopatch
-Patch1009:      CVE-2020-14310.nopatch
-Patch1010:      CVE-2020-14311.nopatch
-Patch1011:      CVE-2020-27749.nopatch
-Patch1012:      CVE-2021-20225.nopatch
+# CVE-2021-3981
+Patch0167:      0167-restore-umask-for-grub-config.patch 
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -136,6 +124,16 @@ Provides:       %{name}-efi-x64 = %{version}-%{release}
 
 %description efi-binary
 GRUB UEFI bootloader binaries
+
+%package efi-binary-noprefix
+Summary:        GRUB UEFI image with no prefix directory set
+Group:          System Environment/Base
+%ifarch x86_64
+Provides:       %{name}-efi-x64-noprefix = %{version}-%{release}
+%endif
+
+%description efi-binary-noprefix
+GRUB UEFI bootloader binaries with no prefix directory set
 
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
@@ -240,9 +238,11 @@ cat ./sbat.csv
 install -d %{buildroot}%{_datadir}/grub2-efi
 %ifarch x86_64
 ./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi --prefix= -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2
 %endif
 %ifarch aarch64
 ./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi --prefix= -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp
 %endif
 
 # Install to efi directory
@@ -254,15 +254,20 @@ install -d $EFI_BOOT_DIR
 
 %ifarch x86_64
 GRUB_MODULE_NAME=grubx64.efi
+GRUB_PXE_MODULE_NAME=grubx64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64.efi
+GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi
 %endif
 
 %ifarch aarch64
 GRUB_MODULE_NAME=grubaa64.efi
+GRUB_PXE_MODULE_NAME=grubaa64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64.efi
+GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi
 %endif
 
 cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
+cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -307,12 +312,28 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 /boot/efi/EFI/BOOT/grubaa64.efi
 %endif
 
+%files efi-binary-noprefix
+%ifarch x86_64
+/boot/efi/EFI/BOOT/grubx64-noprefix.efi
+%endif
+%ifarch aarch64
+/boot/efi/EFI/BOOT/grubaa64-noprefix.efi
+%endif
+
 %ifarch aarch64
 %files efi
 %{_libdir}/grub/*
 %endif
 
 %changelog
+* Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-5
+- Resolve CVE-2021-3981
+- Remove specification of nopatch files in the spec file
+
+* Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
+- Create additional efi binary that has no prefix directory set
+- Add grub2-efi-binary-noprefix subpackage for efi binary with no prefix set
+
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Enable multiboot2 support for x86_64
 

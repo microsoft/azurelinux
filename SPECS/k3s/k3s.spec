@@ -7,7 +7,7 @@
 
 Name:    k3s
 Version: 1.23.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Lightweight Kubernetes
 
 Group:   System Environment/Base
@@ -30,6 +30,7 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1: %{name}-%{version}-vendor.tar.gz
 Patch0:  vendor_build.patch
+Patch1:  install.patch
 
 # K3s on Mariner is supported on x86_64 only:
 ExclusiveArch: x86_64
@@ -82,6 +83,8 @@ exit 0
 %{install_sh}
 
 %changelog
+* Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
+- Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
 * Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
 - Fixed uninstall path
 - Added exclusivity for x86_64
