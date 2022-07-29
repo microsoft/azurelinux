@@ -28,9 +28,6 @@
 
 %global extended_release 0.g99bc4ab
 
-# KMP is disabled by default
-%{!?KMP: %global KMP 0}
-
 # take kernel version or default to uname -r
 %global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global K_SRC %{_libdir}/modules/%{KVERSION}/build
@@ -53,19 +50,9 @@ BuildRequires:  kmod
 %description
 %{name} kernel modules release %extended_release
 
-# build KMP rpms?
-%if "%{KMP}" == "1"
-%global kernel_release() $(make -C %{1} kernelrelease | grep -v make)
-%(mkdir -p %{buildroot})
-%(echo '%defattr (-,root,root)' > %{buildroot}/file_list)
-%(echo '/lib/modules/%2-%1' >> %{buildroot}/file_list)
-%(echo '%{_sysconfdir}/depmod.d/zz02-%{name}-%1.conf' >> %{buildroot}/file_list)
-%{kernel_module_package -f %{buildroot}/file_list -x xen -r %{_kmp_rel} }
-%else
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
-%endif
 
 # set modules dir
 %{!?install_mod_dir: %global install_mod_dir extra/%{name}}
@@ -119,9 +106,6 @@ mod_name=${ko_name/.ko*/}
 mod_path=${module/*\/%{name}}
 mod_path=${mod_path/\/${ko_name}}
 echo "override ${mod_name} * extra/%{name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz02-%{name}.conf
-%if "%{KMP}" == "1"
-    echo "override ${mod_name} * weak-updates/%{name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz02-%{name}.conf
-%endif
 done
 /sbin/depmod -a %{KVERSION}
 
@@ -134,13 +118,11 @@ fi # 1 : closed
 %postun
 /sbin/depmod %{KVERSION}
 
-%if "%{KMP}" != "1"
 %files
 %defattr(-,root,root,-)
 %license COPYRIGHT
 /lib/modules/%{KVERSION}/
 %{_sysconfdir}/depmod.d/zz02-%{name}.conf
-%endif
 
 %changelog
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.5-1
