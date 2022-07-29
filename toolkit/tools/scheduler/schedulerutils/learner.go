@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 )
 
 type LearnerResult struct {
@@ -27,14 +28,16 @@ func NewLearner() (l *Learner) {
 }
 
 func (l *Learner) RecordBuildResult(res *BuildResult) {
-	lr := LearnerResult{
-		Name:      res.Node.RpmPath,
-		BuildTime: res.BuildTime,
-		Unblocks:  []string{"vim"},
+	if res.Node.Type == pkggraph.TypeBuild {
+		lr := LearnerResult{
+			Name:      res.Node.RpmPath,
+			BuildTime: res.BuildTime,
+			Unblocks:  []string{"vim"},
+		}
+	
+		l.Results = append(l.Results, lr)
+		logger.Log.Debugf("debuggy: %f", res.BuildTime)
 	}
-
-	l.Results = append(l.Results, lr)
-	logger.Log.Debugf("debuggy: %f", res.BuildTime)
 }
 
 func (l *Learner) Dump(path string) {
