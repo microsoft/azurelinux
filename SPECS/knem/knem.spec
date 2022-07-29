@@ -23,8 +23,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-%global extended_release OFED.5.6.0.1.6.1
+%global MLNX_OFED_VERSION OFED.5.6.0.1.6.1
 %global nvidia_version 90mlnx1
+%global BF_VERSION 3.9.0
 %global kver %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-devel))
 %global ksrc %{_libdir}/modules/%{kver}/build
 
@@ -40,7 +41,7 @@ License:        BSD and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-Source:         https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/%{name}_%{version}.%{nvidia_version}.orig.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/%{name}_%{version}.%{nvidia_version}.orig.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Requires:       kernel
@@ -50,7 +51,7 @@ Obsoletes:      knem-mlnx < %{version}-%{release}
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
 See http://knem.gitlabpages.inria.fr for details. 
-OFED release is %extended_release of NVIDIA version %nvidia_version of knem
+OFED release is %MLNX_OFED_VERSION of NVIDIA version %nvidia_version of knem
 
 %global debug_package %{nil}
 
@@ -70,11 +71,12 @@ See http://runtime.bordeaux.inria.fr/knem/ for details.
 
 
 %prep
-%autosetup -p1 -n knem-%{version}
+%autosetup -p1 -n %{name}-%{version}.%{nvidia_version}
 set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
+cp source/COPYING* .
 
 %build
 export INSTALL_MOD_DIR=%{install_mod_dir}
