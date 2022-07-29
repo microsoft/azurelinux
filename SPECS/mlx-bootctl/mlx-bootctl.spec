@@ -27,6 +27,7 @@
 #
 
 %global extended_release 0.g99bc4ab
+%global BF_VERSION 3.9.0
 
 # take kernel version or default to uname -r
 %global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
@@ -43,7 +44,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/SOURCES/%{name}-%{version}.tar.gz
+Source:         https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/SOURCES/%{name}-%{version}.tar.gz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 
