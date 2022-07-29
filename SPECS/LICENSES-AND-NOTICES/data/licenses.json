@@ -2113,7 +2113,8 @@
                 "nvidia-container-runtime",
                 "nvidia-container-toolkit",
                 "nvidia-docker2",
-                "ofed-scripts"
+                "ofed-scripts",
+                "perftest"
             ]
         },
         "OpenMamba": {
