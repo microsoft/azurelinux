@@ -100,8 +100,6 @@ Requires: lsof
 %description 
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm with OFED release %MLNX_OFED_VERSION.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
-
 
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
@@ -125,7 +123,6 @@ Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
 
 %package -n %{devel_pname}
 Version: %{version}
@@ -149,7 +146,6 @@ Summary: Infiniband Driver and ULPs kernel modules sources
 Group: System Environment/Libraries
 %description -n %{devel_pname}
 Core, HW and ULPs kernel modules sources
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz
 
 %package source
 Summary: Source of the MLNX_OFED main kernel driver

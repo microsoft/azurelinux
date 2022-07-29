@@ -26,6 +26,9 @@
 #
 #
 
+%global         MLNX_OFED_VERSION 5.6-1.0.3.3
+%global         BF_VERSION 3.9.0
+
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools
 Version:        5.2.0
@@ -35,8 +38,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Programming
 URL:            https://github.com/Mellanox/mlnx-tools
-Source0:        https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/mlnx-tools_5.2.0.orig.tar.gz#/%{name}-%{version}.tar.gz
-Obsoletes: mlnx-ofa_kernel < 5.4, mlnx_en-utils < 5.4
+Source0:        https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/%{MLNX_OFED_VERSION}/SOURCES/%{name}_%{version}.orig.tar.gz#/%{name}-%{version}.tar.gz
+Obsoletes:      mlnx-ofa_kernel < 5.4
+Obsoletes:      mlnx_en-utils < 5.4
+
 %description
 Mellanox userland tools and scripts
 
@@ -46,7 +51,6 @@ BuildRequires: python3
 # mlnx_tune is python2 but is not important enough to create a dependency
 # on python2 in a python3 system:
 %global __requires_exclude_from mlnx_tune
-
 
 %prep
 %autosetup -n %{name}-%{version}
