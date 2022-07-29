@@ -3,7 +3,7 @@ Name:           perftest
 # Update extended_release with version updates
 Version:        4.5
 Release:        1%{?dist}
-License:        BSD 3-Clause, GPLv2
+License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Networking/Diagnostic
@@ -22,12 +22,12 @@ gen3 uverbs microbenchmarks release: %extended_release
 %autosetup -p1
 
 %build
-%configure \
+%configure
 %{__make}
 chmod -x runme
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 %files
 %defattr(-, root, root)
