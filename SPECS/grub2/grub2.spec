@@ -128,9 +128,6 @@ GRUB UEFI bootloader binaries
 %package efi-binary-noprefix
 Summary:        GRUB UEFI image with no prefix directory set
 Group:          System Environment/Base
-%ifarch x86_64
-Provides:       %{name}-efi-x64-noprefix = %{version}-%{release}
-%endif
 
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
