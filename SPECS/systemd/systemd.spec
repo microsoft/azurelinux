@@ -15,6 +15,7 @@ Patch0:         fix-journald-audit-logging.patch
 # Patch for skipping the tests: test-mountpoint-util, test-mount-util, test-fileio, test-fd-util, test-repart - Some mounts are failing in chroot
 Patch1:         testsskipped.patch
 BuildRequires:  cryptsetup-devel
+BuildRequires:  dbus
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -28,16 +29,15 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
+BuildRequires:  mariner-release
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  python3-jinja2
+BuildRequires:  sudo
+BuildRequires:  tzdata
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
-BuildRequires:  dbus
-BuildRequires:  mariner-release
-BuildRequires:  tzdata
-BuildRequires:  sudo
 Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       glib
 Requires:       kmod
@@ -166,7 +166,7 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
 
 %check
-/usr/bin/dbus-uuidgen --ensure=/etc/machine-id
+%{_bindir}/dbus-uuidgen --ensure=%{_sysconfdir}/machine-id
 sudo su
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
