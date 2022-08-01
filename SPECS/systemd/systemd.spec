@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -269,6 +269,12 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Aug 01 2022 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-7
+- Add BR: dbus, mariner-release, tzdata, sudo to systemd.spec
+- Generate machine-id using dbus-uuidgen
+- Set UTF8 encoding in %check section of systemd.spec
+- Include patch testsskipped.patch to skip test-mountpoint-util, test-mount-util, test-fileio, test-fd-util, and test-repart
+
 * Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-6
 - Change build mode from "development" (default) to "release"
 
