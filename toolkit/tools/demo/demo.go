@@ -10,7 +10,13 @@ import (
 	"time"
 )
 
+var (
+	// Shared TimeStamp struct.
+	ts *TimeStamp
+)
+
 type TimeStamp struct {
+	// Name of this step
 	Name string `json:"Name"`
 	// Time we started this step, NIL if step hasn't started
 	StartTime *time.Time `json:"StartTime"`

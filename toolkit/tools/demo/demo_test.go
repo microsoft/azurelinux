@@ -23,6 +23,7 @@ import (
 // 	// Weight     float     `json:"Weight"`
 // }
 
+// Test if we can read an existing json file, add lines to it, then write it out
 func TestLoadDemo(t *testing.T) {
 	// Need to create logger since the json tools use it, will just
 	// print to console for errors.
