@@ -166,6 +166,7 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %find_lang %{name} ../%{name}.lang
 
 %check
+# Generate machine-id using dbus
 %{_bindir}/dbus-uuidgen --ensure=%{_sysconfdir}/machine-id
 sudo su
 export LC_ALL=en_US.UTF-8
