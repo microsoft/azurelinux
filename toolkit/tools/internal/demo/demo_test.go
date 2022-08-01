@@ -47,6 +47,8 @@ func TestLoadDemo(t *testing.T) {
 	}
 }
 
+// Test when we just initiliazed the TimeStamp object and request for progress, 
+// we will receive a 0.0 output.
 func TestProgressZero(t *testing.T) {
 	var ts TimeStamp
 	assert.Nil(t, ts.StartTime)
@@ -54,6 +56,8 @@ func TestProgressZero(t *testing.T) {
 	assert.Equal(t, 0.0, ts.Progress())
 }
 
+// Test that when we give the TimeStamp object an endtime, 
+// the progress will be set to 1.0.
 func TestProgressFull(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
@@ -65,41 +69,50 @@ func TestProgressFull(t *testing.T) {
 	assert.Equal(t, 1.0, ts.Progress())
 }
 
+// Test that a TimeStamp object with 4 expected steps and 
+// 2 completed steps will return a progress of 0.5.
 func TestProgressHalf(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
 	ts := TimeStamp{StartTime: &now, EndTime: nil}
 
 	ts.ExpectedSteps = 4
-	ts.Steps = []TimeStamp{{StartTime: &now, EndTime: &future},
+	ts.Steps = []TimeStamp{
+		{StartTime: &now, EndTime: &future},
 		{StartTime: &now, EndTime: &future}}
 	assert.Equal(t, 0.5, ts.Progress())
 }
 
+// Test when expectedSteps and actual steps don't align.
 func TestProgressBadGuess(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
 	ts := TimeStamp{StartTime: &now, EndTime: nil}
 
 	ts.ExpectedSteps = 1
-	ts.Steps = []TimeStamp{{StartTime: &now, EndTime: &future},
+	ts.Steps = []TimeStamp{
+		{StartTime: &now, EndTime: &future},
 		{StartTime: &now, EndTime: nil}}
-	assert.Equal(t, 0.5, ts.Progress())
+	// Works fine, because here we set maxProgress = len(ts.Steps).
+	assert.Equal(t, 0.5, ts.Progress()) 
 
+	// Outputs true. Although all steps are done we did not assign endtime to the outmost layer. 
 	ts.Steps[1].EndTime = &future
 	assert.Equal(t, 0.95, ts.Progress())
 
+	// Now setting the endtime to the outmost layer marks that the progress is done.
 	ts.EndTime = &future
 	assert.Equal(t, 1.0, ts.Progress())
 }
 
+// Test if total progress is calculated correctly when there are nested layers.
 func TestProgressNested(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
-	ts := TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2}
+	ts := TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2} // 1st layer has 2 steps
 	ts.Steps = append(ts.Steps,
-		TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2})
+		TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2}) // 1st step on 2nd layer has 2 steps
 	ts.Steps[0].Steps = append(ts.Steps[0].Steps,
-		TimeStamp{StartTime: &now, EndTime: &future, ExpectedSteps: 0})
+		TimeStamp{StartTime: &now, EndTime: &future, ExpectedSteps: 0}) // 2nd step on 2nd layer has 0 steps and is already done
 	assert.Equal(t, 0.25, ts.Progress())
 }
