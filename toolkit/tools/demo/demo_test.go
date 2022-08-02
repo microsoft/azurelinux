@@ -3,9 +3,10 @@
 
 // Parser for the image builder's configuration schemas.
 
-package demo
+package main
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -48,7 +49,88 @@ func TestLoadDemo(t *testing.T) {
 	}
 }
 
-// Test when we just initiliazed the TimeStamp object and request for progress, 
+func TestRewriteMultipleTimes(t *testing.T) {
+	logger.InitStderrLog()
+	now := time.Now()
+	ts := TimeStamp{
+		Name:          "1A",
+		StartTime:     &now,
+		EndTime:       nil,
+		ExpectedSteps: 3,
+	}
+	fmt.Printf("ts: %+v \n", ts)
+
+	err := jsonutils.WriteJSONFile("./time_test_1.json", &ts)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	var ts1 TimeStamp
+	err = jsonutils.ReadJSONFile("./time_test_1.json", &ts1)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	fmt.Printf("ts1: %+v \n", ts1)
+
+	// Some precision for time is always lost after we write to json for the first time, but the rest of the struct is the same.
+	// assert.Equal(t, ts, ts1) // false
+
+	err = jsonutils.WriteJSONFile("./time_test_1.json", &ts1)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	var ts2 TimeStamp
+	err = jsonutils.ReadJSONFile("./time_test_1.json", &ts2)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	fmt.Printf("ts2: %+v \n", ts2)
+
+	// If we write json with a struct that was read from a json, rewriting it wouldn't change it anymore. 
+	assert.Equal(t, ts1, ts2)
+}
+
+
+func TestUpdateJson(t *testing.T) {
+	logger.InitStderrLog()
+	now := time.Now()
+	ts := TimeStamp{
+		Name:          "1A",
+		StartTime:     &now,
+		EndTime:       nil,
+		ExpectedSteps: 3,
+	}
+	fmt.Printf("ts: %+v \n", ts)
+
+	err := jsonutils.WriteJSONFile("./time_test_1.json", &ts)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(time.Millisecond * 100)
+	ts.Steps = append(ts.Steps, TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2})
+	err = jsonutils.WriteJSONFile("./time_test_2.json", &ts)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(time.Millisecond * 100)
+	ts.Steps[0].Steps = append(ts.Steps[0].Steps, TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2})
+	err = jsonutils.WriteJSONFile("./time_test_3.json", &ts)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+}
+
+// Test when we just initiliazed the TimeStamp object and request for progress,
 // we will receive a 0.0 output.
 func TestProgressZero(t *testing.T) {
 	var ts TimeStamp
@@ -57,7 +139,7 @@ func TestProgressZero(t *testing.T) {
 	assert.Equal(t, 0.0, ts.Progress())
 }
 
-// Test that when we give the TimeStamp object an endtime, 
+// Test that when we give the TimeStamp object an endtime,
 // the progress will be set to 1.0.
 func TestProgressFull(t *testing.T) {
 	now := time.Now()
@@ -70,7 +152,7 @@ func TestProgressFull(t *testing.T) {
 	assert.Equal(t, 1.0, ts.Progress())
 }
 
-// Test that a TimeStamp object with 4 expected steps and 
+// Test that a TimeStamp object with 4 expected steps and
 // 2 completed steps will return a progress of 0.5.
 func TestProgressHalf(t *testing.T) {
 	now := time.Now()
@@ -95,9 +177,9 @@ func TestProgressBadGuess(t *testing.T) {
 		{StartTime: &now, EndTime: &future},
 		{StartTime: &now, EndTime: nil}}
 	// Works fine, because here we set maxProgress = len(ts.Steps).
-	assert.Equal(t, 0.5, ts.Progress()) 
+	assert.Equal(t, 0.5, ts.Progress())
 
-	// Outputs true. Although all steps are done we did not assign endtime to the outmost layer. 
+	// Outputs true. Although all steps are done we did not assign endtime to the outmost layer.
 	ts.Steps[1].EndTime = &future
 	assert.Equal(t, 0.95, ts.Progress())
 
