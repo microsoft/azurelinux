@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,7 @@ Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
+Welcome to CBL-Mariner %{mariner_release_version} (%{_arch})
 EOF
 
 %files
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Wed Jul 27 2022 Minghe Ren <mingheren@microsoft.com> - 2.0-16
+- remove issue.net kernel part as it is not showing properly by openssh
+
 * Fri Jul 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-15
 - Updating version for July update.
 

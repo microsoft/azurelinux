@@ -83,6 +83,8 @@ autoreconf -fi
 make %{?_smp_mflags}
 
 %install
+chmod ug-s bash-completion/mount
+chmod ug-s bash-completion/umount
 install -vdm 755 %{buildroot}%{_sharedstatedir}/hwclock
 make DESTDIR=%{buildroot} install
 chmod 644 %{buildroot}%{_docdir}/util-linux/getopt*.tcsh

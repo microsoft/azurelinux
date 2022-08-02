@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -229,7 +229,7 @@ mkdir %{buildroot}%{_sysconfdir}/sysconfig
 ln -sf %{_sysconfdir}/default/grub %{buildroot}%{_sysconfdir}/sysconfig/grub
 install -vdm 700 %{buildroot}/boot/%{name}
 touch %{buildroot}/boot/%{name}/grub.cfg
-chmod 600 %{buildroot}/boot/%{name}/grub.cfg
+chmod 400 %{buildroot}/boot/%{name}/grub.cfg
 rm -rf %{buildroot}%{_infodir}
 
 # Add SBAT
@@ -313,6 +313,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Thu Jul 28 2022 Minghe Ren <mingheren@microsoft.com> - 2.06-4
+- Change permission on grub.cfg to improve security
+
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Enable multiboot2 support for x86_64
 

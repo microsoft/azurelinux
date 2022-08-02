@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -217,6 +217,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Mon Jul 25 2022 Minghe Ren <mingheren@microsoft.com> - 3.2.11-39
+- Modify users.conf to imporve security
+
 * Mon Apr 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.11-38
 - Fix partioning bug
 - License verified

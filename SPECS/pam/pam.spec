@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -37,6 +37,9 @@ for developing applications that use pam.
 
 %prep
 %autosetup -n Linux-PAM-%{version}
+sed -i "/# End of/d" modules/pam_limits/limits.conf
+sed -i -e '$a*                hard    core            0\n' modules/pam_limits/limits.conf
+sed -i -e '$a# End of file' modules/pam_limits/limits.conf
 
 %build
 ./configure \
@@ -98,6 +101,9 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Thu Jul 28 2022 Minghe Ren <mingheren@microsoft.com> - 1.5.1-6
+- Modify limits.conf file to improve security
+
 * Tue Mar 22 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-5
 - Require audit-libs
 
