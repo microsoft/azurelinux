@@ -13,7 +13,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.44.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Source3:        cbl-mariner-ca-20211013.pem
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
 Patch0:         patch-%{version_upstream}-%{rt_version}.patch
+Patch1:         realtime-with-memcg.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -144,6 +145,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
+%patch1 -p1
 
 make mrproper
 
@@ -377,6 +379,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-5
+- Enable ICE in-tree driver
+- Enable CONFIG_NO_HZ_FULL
+
 * Sun Aug 07 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-4
 - Enable CONFIG_VFIO_NOIOMMU for RT Kernel
 
