@@ -77,6 +77,10 @@ chmod o-rw %{_sysconfdir}/ident.key
 %{_unitdir}/*
 
 %changelog
+* Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.4.4-6
+- Fix spec formatting
+- License Verified
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
