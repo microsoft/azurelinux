@@ -17,7 +17,7 @@ import (
 var (
 	// Shared TimeStamp struct.
 	ts TimeStamp
-	fileName = "./time_test.json"
+	fileName = "./time_demo.json"
 	shortInterval = 500
 	longInterval = 1000
 )
