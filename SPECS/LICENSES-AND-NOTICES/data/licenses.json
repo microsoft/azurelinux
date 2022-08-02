@@ -2402,6 +2402,7 @@
                 "kernel",
                 "kernel-headers",
                 "kernel-rt",
+                "kernel-hci",
                 "keyutils",
                 "kmod",
                 "krb5",

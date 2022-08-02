@@ -7310,6 +7310,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-hci",
+          "version": "5.15.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.57.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kexec-tools",
           "version": "2.0.23",
           "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.23.tar.xz"
