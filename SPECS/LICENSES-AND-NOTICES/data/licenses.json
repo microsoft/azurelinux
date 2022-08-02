@@ -2109,11 +2109,16 @@
         "NVIDIA": {
             "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
+                "knem",
                 "libnvidia-container",
+                "mlnx-ofa_kernel",
+                "mlnx-tools",
+                "mlx-bootctl",
                 "nvidia-container-runtime",
                 "nvidia-container-toolkit",
                 "nvidia-docker2",
-                "ofed-scripts"
+                "ofed-scripts",
+                "perftest"
             ]
         },
         "OpenMamba": {
