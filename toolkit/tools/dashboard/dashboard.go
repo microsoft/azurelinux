@@ -22,14 +22,14 @@ type stampedFile struct {
 }
 
 var (
-	wg            sync.WaitGroup
+	wg                sync.WaitGroup
 	dashboardProgress = uiprogress.New()
-	barWidth      = 30
-	currProgress  = int32(0) // chose int32 instead of int to use the atomic package
-	totalProgress = int32(24)
-	isInit        = false // set to true the first time we detec the "init" file in build/timestamp folder.
-	targetDir     string
-	targetCSV     = []*stampedFile{
+	barWidth          = 30
+	currProgress      = int32(0) // chose int32 instead of int to use the atomic package
+	totalProgress     = int32(24)
+	isInit            = false // set to true the first time we detec the "init" file in build/timestamp folder.
+	targetDir         string
+	targetCSV         = []*stampedFile{
 		&stampedFile{
 			fileName:     "create_worker_chroot.csv",
 			currLine:     0,
@@ -67,7 +67,7 @@ var (
 func main() {
 	fmt.Println("Starting dashboard")
 	dashboardProgress.Start()
-	bar :=  AddProgressBar(int(totalProgress)).AppendCompleted()
+	bar := AddProgressBar(int(totalProgress)).AppendCompleted()
 	bar.Width = barWidth
 
 	bar.PrependFunc(func(b *uiprogress.Bar) string {
@@ -130,6 +130,7 @@ func (file *stampedFile) getUpdate(currStat fs.FileInfo) {
 		// pop one task off the queue when it's done
 		if currNumLines == file.totalLine {
 			wg.Done()
+			dashboardProgress.Bars = dashboardProgress.Bars[:len(dashboardProgress.Bars)-1]
 		}
 	}
 }
