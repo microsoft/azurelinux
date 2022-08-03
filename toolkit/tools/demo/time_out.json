@@ -1,0 +1,96 @@
+{
+ "Name": "1A",
+ "StartTime": "2022-08-01T14:16:37.483583877-07:00",
+ "EndTime": "2022-08-01T14:21:37.483583877-07:00",
+ "ExpectedSteps": 3,
+ "Steps": [
+  {
+   "Name": "2A",
+   "StartTime": "2022-08-01T13:44:30.378776068-07:00",
+   "EndTime": "2022-08-01T13:49:30.378776068-07:00",
+   "ExpectedSteps": 0,
+   "Steps": [
+    {
+     "Name": "3A",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    },
+    {
+     "Name": "3B",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    }
+   ]
+  },
+  {
+   "Name": "2B",
+   "StartTime": null,
+   "EndTime": null,
+   "ExpectedSteps": 0,
+   "Steps": [
+    {
+     "Name": "3A",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    },
+    {
+     "Name": "3B",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    }
+   ]
+  },
+  {
+   "Name": "2A",
+   "StartTime": null,
+   "EndTime": null,
+   "ExpectedSteps": 0,
+   "Steps": [
+    {
+     "Name": "3A",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    },
+    {
+     "Name": "3B",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    }
+   ]
+  },
+  {
+   "Name": "2B",
+   "StartTime": null,
+   "EndTime": null,
+   "ExpectedSteps": 0,
+   "Steps": [
+    {
+     "Name": "3A",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    },
+    {
+     "Name": "3B",
+     "StartTime": null,
+     "EndTime": null,
+     "ExpectedSteps": 0,
+     "Steps": []
+    }
+   ]
+  }
+ ]
+}
