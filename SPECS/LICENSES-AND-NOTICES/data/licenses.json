@@ -130,6 +130,7 @@
                 "crontabs",
                 "cryptsetup",
                 "cscope",
+                "ctags",
                 "CUnit",
                 "cups",
                 "custodia",
@@ -959,6 +960,7 @@
                 "p7zip",
                 "pacrunner",
                 "pakchois",
+                "pam_krb5",
                 "pam_wrapper",
                 "papi",
                 "paps",
@@ -1601,6 +1603,7 @@
                 "python-requests-toolbelt",
                 "python-requests_ntlm",
                 "python-responses",
+                "python-retrying",
                 "python-rfc3986",
                 "python-rpm-generators",
                 "python-rpmfluff",
@@ -1914,6 +1917,7 @@
                 "xorg-x11-xtrans-devel",
                 "xrestop",
                 "xterm",
+                "xxhash",
                 "yajl",
                 "yaml-cpp",
                 "yasm",
@@ -2071,6 +2075,7 @@
                 "shim-unsigned",
                 "shim-unsigned-aarch64",
                 "shim-unsigned-x64",
+                "skopeo",
                 "span-lite",
                 "swupdate",
                 "SymCrypt",
@@ -2079,6 +2084,7 @@
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
+                "umoci",
                 "usrsctp",
                 "vala",
                 "verity-read-only-root",
@@ -2099,12 +2105,18 @@
             ]
         },
         "NVIDIA": {
-            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
+                "knem",
                 "libnvidia-container",
+                "mlnx-ofa_kernel",
+                "mlnx-tools",
+                "mlx-bootctl",
                 "nvidia-container-runtime",
                 "nvidia-container-toolkit",
-                "nvidia-docker2"
+                "nvidia-docker2",
+                "ofed-scripts",
+                "perftest"
             ]
         },
         "OpenMamba": {

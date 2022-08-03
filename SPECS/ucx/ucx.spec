@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %{!?configure_options: %global configure_options %{nil}}
 %bcond_without cma
 %bcond_with    cuda
@@ -11,14 +9,17 @@ Distribution:   Mariner
 %bcond_with    ugni
 %bcond_with    xpmem
 
-Name: ucx
-Version: 1.11.0
-Release: 2%{?dist}
-Summary: UCX is a communication library implementing high-performance messaging
+Summary:        UCX is a communication library implementing high-performance messaging
+Name:           ucx
+Version:        1.11.0
+Release:        3%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Security
+URL:            http://www.openucx.org
+Source0:        https://github.com/openucx/%{name}/releases/download/v1.11.0/ucx-1.11.0.tar.gz
 
-License: BSD
-URL: http://www.openucx.org
-Source: https://github.com/openucx/%{name}/releases/download/v1.11.0/ucx-1.11.0.tar.gz
 
 # UCX currently supports only the following architectures
 ExclusiveArch: aarch64 ppc64le x86_64
@@ -254,6 +255,10 @@ process to map the memory of another process into its virtual address space.
 
 
 %changelog
+* Tue Jul 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.11.0-3
+- Move from SPECS-EXTENDED to SPECS
+- License verified
+
 * Thu Aug 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove option to build with libibcm
