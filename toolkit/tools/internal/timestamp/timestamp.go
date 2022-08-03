@@ -83,14 +83,14 @@ func (info *TimeInfo) track() {
 	info.duration = info.endTime.Sub(info.startTime)
 }
 
-// Records a new timestamp and writes it to the corresponding csv file.
+// Records a new timestamp and writes it to the corresponding CSV file.
 func (info *TimeInfo) RecordToCSV(stepName string, actionName string) {
 	// If we have not set up TimeInfo, log a warning and do nothing.
 	if *info == (TimeInfo{}) {
 		logger.Log.Warnf("Unable to record timestamp; 'timestamp.Stamp' has not been set up for this file.")
 		return
 	}
-	// Create a new .csv file.
+	// Create a new CSV file.
 	file, err := os.OpenFile(info.filePath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		logger.Log.Warnf("Failed to open the csv file. %s\n", err)
@@ -108,7 +108,7 @@ func (info *TimeInfo) RecordToCSV(stepName string, actionName string) {
 	info.startTime = info.endTime
 }
 
-// A function that generates a new timestamp and writes it to the csv file.
+// A function that generates a new timestamp and writes it to the CSV file.
 // Also used by bldtracker.go.
 func WriteStamp(file *os.File, info *TimeInfo) {
 	var err error

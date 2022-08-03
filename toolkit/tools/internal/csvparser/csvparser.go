@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// Parses the timestamps stored in csv files and print them
+// Parses the timestamps stored in CSV files and print them
 // to the terminal at the end of the build.
 
 package csvparser
@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	timeArray [][]string // A 2-D array used to store all timestamps from csvs.
-	// A list of csv files to be parsed.
+	timeArray [][]string // A 2-D array used to store all timestamps from CSVs.
+	// A list of CSV files to be parsed.
 	files = []string{"/imageconfigvalidator.csv", "/imagepkgfetcher.csv", "/imager.csv", "/roast.csv"}
 )
 
@@ -48,7 +48,7 @@ func OutputCSVLog(parentDir string) {
 	}
 
 	// Get the start and end time from the first timestamp entry.
-	// Start time will be the ModTime for "init" if it exists, otherwise will be the first csv entry.
+	// Start time will be the ModTime for "init" if it exists, otherwise will be the first CSV entry.
 	if os.IsNotExist(err) {
 		fmt.Printf("start: %s\n", timeArray[0][4])
 		startTime, err = time.Parse(time.UnixDate, timeArray[0][4])

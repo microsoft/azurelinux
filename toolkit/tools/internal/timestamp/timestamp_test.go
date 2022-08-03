@@ -14,7 +14,6 @@ import (
 
 var (
 	info1 = New("tool 1")
-	// info2 = New("tool 2", false)
 )
 
 //TestMain found in configuration_test.go.
@@ -23,7 +22,7 @@ func initLogger() {
 	logger.InitStderrLog()
 }
 
-func Test_WritetoCSV_range(t *testing.T) {
+func Test_WritetoCSV_writeMultipleEntries(t *testing.T) {
 	initLogger()
 	InitCSV("build-time.csv")
 	Stamp.Start()
@@ -40,7 +39,7 @@ func Test_WritetoCSV_range(t *testing.T) {
 	Stamp.RecordToCSV("step 3", "action 1")
 }
 
-func Test_WritetoCSV_noSetUp(t *testing.T) {
+func Test_WritetoCSV_noSetUpTriggesrWarning(t *testing.T) {
 	initLogger()
 	Stamp.Start()
 	time.Sleep(10 * time.Millisecond)

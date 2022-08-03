@@ -22,7 +22,7 @@ var (
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
 
-	timestampFile = "boilerplate.csv" // In other go programs, use "app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()".
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String() // Need to add "--timestamp-file=boilerplate.csv" when try to run boilerplate.go.
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp.InitCSV(timestampFile)
+	timestamp.InitCSV(*timestampFile)
 
 	logger.Log.Info(hello.World())
 	timestamp.Stamp.RecordToCSV("execution", "print 'Hello, World!'")

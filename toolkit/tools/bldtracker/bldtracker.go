@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// Tool to initialize a csv file or record a new timestamp
+// Tool to initialize a CSV file or record a new timestamp
 // for shell scripts during the image-building process.
 
 package main
@@ -21,8 +21,8 @@ var (
 	scriptName   = app.Flag("script-name", "The name of the current tool.").Required().String()
 	stepName     = app.Flag("step-name", "The name of the current step.").Required().String()
 	actionName   = app.Flag("action-name", "The name of the current action.").Default("").String()
-	dirPath      = app.Flag("dir-path", "The folder that stores timestamp csvs.").Required().ExistingDir() // currently must be absolute
-	logPath      = app.Flag("log-path", "Directory for log files").Required().ExistingDir()
+	dirPath      = app.Flag("dir-path", "The folder that stores timestamp CSV.").Required().ExistingDir() // currently must be absolute
+	logFile      = app.Flag("log-file", "Directory for log files").Required().ExistingDir()
 	validModes   = []string{"n", "r"}
 	mode         = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record'('r').").Required().Enum(validModes...)
 	completePath string
@@ -31,10 +31,10 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logPath+"/chroot_timestamp.log", "trace")
+	logger.InitBestEffort(*logFile, "trace")
 
-	// Construct the csv path.
-	completePath = *dirPath + "/" + *scriptName + ".csv"
+	// Construct the CSV path.
+	completePath = filepath.Join(*dirPath, *scriptName + ".csv")
 
 	// Perform different actions based on the input "mode".
 	switch *mode {
@@ -49,11 +49,11 @@ func main() {
 	}
 }
 
-// Creates a csv specifically for the shell script mentioned in "scriptName".
+// Creates a CSV specifically for the shell script mentioned in "scriptName".
 func initialize() {
 	file, err := os.Create(completePath)
 	if err != nil {
-		logger.Log.Warnf("Unable to create file: %s", completePath)
+		logger.Log.Panicf("Unable to create file: %s", completePath)
 	}
 	file.Close()
 
@@ -61,14 +61,14 @@ func initialize() {
 	record()
 }
 
-// Records a new timestamp to the specific csv for the specified shell script.
+// Records a new timestamp to the specific CSV for the specified shell script.
 func record() {
 	file, err := os.OpenFile(completePath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		logger.Log.Warnf("Unable to open file (may not have been created): %s", completePath)
+		logger.Log.Panicf("Unable to open file (may not have been created): %s", completePath)
 	}
 	defer file.Close()
 
-	// Write the timestamp to csv file using a helper function from timestamp.go.
+	// Write the timestamp to CSV file using a helper function from timestamp.go.
 	timestamp.WriteStamp(file, timestamp.NewBldTracker(*scriptName, *stepName, *actionName, time.Now()))
 }
