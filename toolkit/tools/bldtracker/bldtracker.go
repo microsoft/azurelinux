@@ -8,6 +8,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
@@ -21,10 +22,10 @@ var (
 	scriptName   = app.Flag("script-name", "The name of the current tool.").Required().String()
 	stepName     = app.Flag("step-name", "The name of the current step.").Required().String()
 	actionName   = app.Flag("action-name", "The name of the current action.").Default("").String()
-	dirPath      = app.Flag("dir-path", "The folder that stores timestamp CSV.").Required().ExistingDir() // currently must be absolute
-	logFile      = app.Flag("log-file", "Directory for log files").Required().ExistingDir()
+	dirPath      = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
+	logFile      = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
 	validModes   = []string{"n", "r"}
-	mode         = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record' ('r').").Required().Enum(validModes...)
+	mode         = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record'('r').").Required().Enum(validModes...)
 	completePath string
 )
 
@@ -34,7 +35,7 @@ func main() {
 	logger.InitBestEffort(*logFile, "trace")
 
 	// Construct the CSV path.
-	completePath = filepath.Join(*dirPath, *scriptName + ".csv")
+	completePath = filepath.Join(*dirPath, *scriptName+".csv")
 
 	// Perform different actions based on the input "mode".
 	switch *mode {

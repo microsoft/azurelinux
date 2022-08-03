@@ -25,7 +25,7 @@ func CSVToArray(filename string) {
 	file, err := os.Open(filename)
 
 	if err != nil {
-		fmt.Println("failed to open csv file")
+		fmt.Println("failed to open CSV file")
 	}
 	defer file.Close()
 

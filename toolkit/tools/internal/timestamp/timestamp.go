@@ -93,7 +93,7 @@ func (info *TimeInfo) RecordToCSV(stepName string, actionName string) {
 	// Create a new CSV file.
 	file, err := os.OpenFile(info.filePath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		logger.Log.Warnf("Failed to open the csv file. %s\n", err)
+		logger.Log.Warnf("Failed to open the CSV file. %s\n", err)
 		return
 	}
 	defer file.Close()
