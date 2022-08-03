@@ -131,6 +131,8 @@ echo "Done installing all packages, creating $chroot_archive." | tee -a "$chroot
 
 record_timestamp "done installing all packages"
 
+record_timestamp "start packing the chroot"
+
 if command -v pigz &>/dev/null ; then
     tar -I pigz -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 else
@@ -138,5 +140,5 @@ else
 fi
 echo "Done creating $chroot_archive." | tee -a "$chroot_log"
 
-record_timestamp "done packing installations"
+record_timestamp "done packing the chroot"
 
