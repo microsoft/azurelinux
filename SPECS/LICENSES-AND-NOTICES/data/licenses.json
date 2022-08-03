@@ -2145,6 +2145,7 @@
                 "cal10n",
                 "cglib",
                 "cni",
+                "containerized-data-importer",
                 "cri-o",
                 "ecj",
                 "fillup",

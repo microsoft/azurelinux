@@ -1736,6 +1736,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "containerized-data-importer",
+          "version": "1.51.0",
+          "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.51.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "containernetworking-plugins",
           "version": "1.1.1",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.1.1.tar.gz"
