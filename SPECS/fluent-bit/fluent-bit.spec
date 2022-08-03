@@ -16,17 +16,17 @@ BuildRequires:  gcc-c++
 BuildRequires:  gnutls-devel
 BuildRequires:  graphviz
 BuildRequires:  libpq-devel
+BuildRequires:  libyaml-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
-BuildRequires:  libyaml-devel
 
 %description
 
-Fluent Bit is a fast Log Processor and Forwarder for Linux, Embedded Linux, MacOS and BSD 
+Fluent Bit is a fast Log Processor and Forwarder for Linux, Embedded Linux, MacOS and BSD
 family operating systems. It's part of the Fluentd Ecosystem and a CNCF sub-project.
 
 %package devel
@@ -40,7 +40,7 @@ Development files for %{name}
 %setup -q
 
 %build
-	
+
 %cmake\
     -DCMAKE_BUILD_TYPE=RelWithDebInfo\
     -DFLB_EXAMPLES=Off\
@@ -55,7 +55,7 @@ Development files for %{name}
     -DFLB_DEBUG=Off\
     -DFLB_TLS=On \
     -DFLB_JEMALLOC=on
- 
+
 %cmake_build
 
 %install
@@ -94,4 +94,3 @@ Development files for %{name}
 
 * Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 1.4.1-1
 - Original version for CBL-Mariner.
-
