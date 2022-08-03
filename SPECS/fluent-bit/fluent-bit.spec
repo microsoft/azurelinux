@@ -1,7 +1,7 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        1.8.12
-Release:        2%{?dist}
+Version:        1.9.6
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
+BuildRequires:  libyaml-devel
 
 %description
 
@@ -73,6 +74,10 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Wed Aug 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.9.6-1
+- Upgrade version to 1.9.6
+- Add build time dependency libyaml-devel
+
 * Thu Feb 19 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.8.12-2
 - Compile with -DFLB_JEMALLOC=on.
 
