@@ -23,6 +23,7 @@ type stampedFile struct {
 
 var (
 	wg            sync.WaitGroup
+	dashboardProgress = uiprogress.New()
 	barWidth      = 30
 	currProgress  = int32(0) // chose int32 instead of int to use the atomic package
 	totalProgress = int32(24)
@@ -65,8 +66,8 @@ var (
 
 func main() {
 	fmt.Println("Starting dashboard")
-	uiprogress.Start()
-	bar := uiprogress.AddBar(int(totalProgress)).AppendCompleted()
+	dashboardProgress.Start()
+	bar :=  AddProgressBar(int(totalProgress)).AppendCompleted()
 	bar.Width = barWidth
 
 	bar.PrependFunc(func(b *uiprogress.Bar) string {
@@ -79,6 +80,9 @@ func main() {
 	idx := strings.Index(wd, "CBL-Mariner")
 	wd = wd[0 : idx+11]
 	targetDir = wd + "/build/timestamp/"
+
+	// fmt.Println("Proceeding to for loop")
+	// fmt.Printf("%+v \n", dashboardProgress)
 
 	for {
 		time.Sleep(1 * time.Second)
@@ -160,9 +164,11 @@ func checkInit() {
 }
 
 func SetSubBar() {
+	// fmt.Println("Within SetSubBar")
+
 	for i, _ := range targetCSV {
 		currFile := targetCSV[i]
-		currFile.bar = uiprogress.AddBar(int(currFile.totalLine)).AppendCompleted()
+		currFile.bar = AddProgressBar(int(currFile.totalLine)).AppendCompleted()
 		currFile.bar.Width = barWidth
 		currFile.bar.PrependFunc(func(b *uiprogress.Bar) string {
 			var tempFileName, tempLastStep string
@@ -179,4 +185,20 @@ func SetSubBar() {
 		})
 		wg.Add(1)
 	}
+}
+
+func StartProgress() {
+	dashboardProgress.Start()
+}
+
+func StopProgress() {
+	dashboardProgress.Stop()
+}
+
+func AddProgressBar(total int) *uiprogress.Bar {
+	return dashboardProgress.AddBar(total)
+}
+
+func ListenProgress() {
+	dashboardProgress.Listen()
 }
