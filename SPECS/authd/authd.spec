@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary: A RFC 1413 ident protocol daemon
 Name: authd
 Version: 1.4.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2+
 URL: https://github.com/InfrastructureServices/authd
 Obsoletes: pidentd < 3.2
@@ -14,8 +14,11 @@ Requires(post): openssl
 Source0: https://github.com/InfrastructureServices/authd/releases/download/v1.4.4/authd-1.4.4.tar.gz
 Source1: auth.socket
 Source2: auth@.service
-BuildRequires:  gcc
-BuildRequires: openssl-devel gettext help2man systemd-units
+BuildRequires: gcc
+BuildRequires: openssl-devel 
+BuildRequires: gettext 
+BuildRequires: help2man 
+BuildRequires: systemd-units
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -74,6 +77,10 @@ chmod o-rw %{_sysconfdir}/ident.key
 %{_unitdir}/*
 
 %changelog
+* Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.4.4-6
+- Fix spec formatting
+- License Verified
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
