@@ -3,10 +3,12 @@
 
 // Parser for the image builder's configuration schemas.
 
-package main
+package demo
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -91,10 +93,9 @@ func TestRewriteMultipleTimes(t *testing.T) {
 	}
 	fmt.Printf("ts2: %+v \n", ts2)
 
-	// If we write json with a struct that was read from a json, rewriting it wouldn't change it anymore. 
+	// If we write json with a struct that was read from a json, rewriting it wouldn't change it anymore.
 	assert.Equal(t, ts1, ts2)
 }
-
 
 func TestUpdateJson(t *testing.T) {
 	logger.InitStderrLog()
@@ -123,7 +124,7 @@ func TestUpdateJson(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 100)
 	ts.Steps[0].Steps = append(ts.Steps[0].Steps, TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2})
-	err = jsonutils.WriteJSONFile("./time_test_3.json", &ts)
+	err = jsonutils.WriteJSONFile("./time_test_1.json", &ts)
 	assert.NoError(t, err)
 	if err != nil {
 		return
@@ -198,4 +199,14 @@ func TestProgressNested(t *testing.T) {
 	ts.Steps[0].Steps = append(ts.Steps[0].Steps,
 		TimeStamp{StartTime: &now, EndTime: &future, ExpectedSteps: 0}) // 2nd step on 2nd layer has 0 steps and is already done
 	assert.Equal(t, 0.25, ts.Progress())
+}
+
+func TestHomeDirs(t *testing.T) {
+	currDir, err := os.Getwd()
+	fmt.Printf(currDir)
+	parentDir := filepath.Dir(currDir)
+	fmt.Printf(parentDir)
+	if err != nil {
+		return
+	}
 }

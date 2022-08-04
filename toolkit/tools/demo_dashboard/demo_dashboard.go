@@ -1,54 +1,24 @@
 package main
 
 import (
-	"math"
+	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gosuri/uiprogress"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/demo"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 var dashboardProgress = uiprogress.New()
 
-type TimeStamp struct {
-	Name          string      `json:"Name"`
-	StartTime     *time.Time  `json:"StartTime"`
-	EndTime       *time.Time  `json:"EndTime"`
-	ExpectedSteps int         `json:"ExpectedSteps"`
-	Steps         []TimeStamp `json:"Steps"`
-}
-
-func (t *TimeStamp) Progress() float64 {
-	progress := 0.0
-	maxProgress := math.Max(float64(t.ExpectedSteps), float64(len(t.Steps)))
-
-	if t.StartTime == nil {
-		return 0.0
-	}
-
-	if t.EndTime != nil {
-		return 1.0
-	}
-
-	for _, step := range t.Steps {
-		progress += step.Progress()
-	}
-
-	if maxProgress == 0.0 {
-		return 0.0
-	} else {
-		// We don't want to mark complete until we have an end time for this
-		//   step, just max it out at 95%
-		return math.Min(progress/maxProgress, 1)
-	}
-}
-
 var progressName []string
 var progressValue []int
 var progressLevel []int
 
-func CheckProgress(ts *TimeStamp, level int) {
+func CheckProgress(ts *demo.TimeStamp, level int) {
 	progressName = append(progressName, ts.Name)
 	progressValue = append(progressValue, int(ts.Progress()*100))
 	progressLevel = append(progressLevel, level)
@@ -68,9 +38,12 @@ func main() {
 
 	dashboardProgress.Start()
 	for {
-		var ts TimeStamp
-		err := jsonutils.ReadJSONFile("/home/jameszhou/CBL-Mariner/toolkit/tools/demo/time_demo.json", &ts)
+		var ts demo.TimeStamp
+		currDir, err := os.Getwd()
+		parentDir := filepath.Dir(currDir)
+		err = jsonutils.ReadJSONFile(parentDir+"/demodata/time_demo.json", &ts)
 		if err != nil {
+			fmt.Printf("%s\n", err)
 			return
 		}
 		progressName = []string{}
