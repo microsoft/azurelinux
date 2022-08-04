@@ -1,21 +1,16 @@
-From d1dab0d44980124932b77445db14ba38c178e027 Mon Sep 17 00:00:00 2001
-From: Vince Perri <viperri@microsoft.com>
-Date: Sat, 5 Mar 2022 00:09:46 +0000
-Subject: [PATCH 08/15] net/mlx5: Lag, add support to create definers for LAG
+From 24370c627c5ebc23a136e72e287a881cd4d33d14 Mon Sep 17 00:00:00 2001
+From: Maor Gottlieb <maorg@nvidia.com>
+Date: Tue, 17 Aug 2021 10:24:05 +0300
+Subject: [PATCH 08/22] net/mlx5: Lag, add support to create definers for LAG
 
->From dc48516ec7d369c6b80bf9f14d774287b6c428aa Mon Sep 17 00:00:00 2001
->From: Maor Gottlieb <maorg@nvidia.com>
->Date: Tue, 17 Aug 2021 10:24:05 +0300
->Subject: [PATCH 08/13] net/mlx5: Lag, add support to create definers for LAG
->
->Every definer will consist of a flow table with a single hash group
->with exactly two flow table entries, one for each device port.
->The destination of these entries is the uplink vport according to the
->port state and hash policy.
->
->Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
->Reviewed-by: Mark Bloch <mbloch@nvidia.com>
->Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Every definer will consist of a flow table with a single hash group
+with exactly two flow table entries, one for each device port.
+The destination of these entries is the uplink vport according to the
+port state and hash policy.
+
+Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
  .../net/ethernet/mellanox/mlx5/core/lag/lag.c |   4 +-
  .../net/ethernet/mellanox/mlx5/core/lag/lag.h |   1 +
@@ -24,7 +19,7 @@ Subject: [PATCH 08/15] net/mlx5: Lag, add support to create definers for LAG
  4 files changed, 220 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-index cb0ff805a..3477d476a 100644
+index ce41d766e417..072df47cea03 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
 @@ -593,8 +593,10 @@ static int mlx5_handle_changeupper_event(struct mlx5_lag *ldev,
@@ -40,7 +35,7 @@ index cb0ff805a..3477d476a 100644
  	/* Determine bonding status:
  	 * A device is considered bonded if both its physical ports are slaves
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
-index 670061e60..f0e8b3412 100644
+index 670061e60d89..f0e8b3412c13 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
 @@ -33,6 +33,7 @@ struct lag_tracker {
@@ -52,7 +47,7 @@ index 670061e60..f0e8b3412 100644
  
  /* LAG data of a ConnectX card.
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
-index 6095f1049..06bc7c7db 100644
+index 6095f1049bdb..06bc7c7dbb6d 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
 @@ -4,6 +4,95 @@
@@ -273,7 +268,7 @@ index 6095f1049..06bc7c7db 100644
  		       enum netdev_lag_hash hash)
  {
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.h b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.h
-index c55736d24..1b9e2130a 100644
+index c55736d2484d..1b9e2130a0a5 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.h
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.h
 @@ -6,9 +6,22 @@
@@ -300,5 +295,5 @@ index c55736d24..1b9e2130a 100644
  
  #endif /* __MLX5_LAG_FS_H__ */
 -- 
-2.17.1
+2.25.1
 

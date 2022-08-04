@@ -28,12 +28,18 @@ Patch5:         0006-net-mlx5-Lag-set-LAG-traffic-type-mapping.patch
 Patch6:         0007-net-mlx5-Lag-set-match-mask-according-to-the-traffic.patch
 Patch7:         0008-net-mlx5-Lag-add-support-to-create-definers-for-LAG.patch
 Patch8:         0009-net-mlx5-Lag-add-support-to-create-TTC-tables-for-LA.patch
-Patch9:         0010-net-mlx5-Lag-add-support-to-create-destroy-modify.patch
+Patch9:         0010-net-mlx5-Lag-add-support-to-create-destroy-modify-po.patch
 Patch10:        0011-net-mlx5-Lag-use-steering-to-select-the-affinity-por.patch
-Patch11:        0012-net-mlx5-E-Switch-Use-dynamic-alloc-for-dest-array.patch
-Patch12:        0013-net-mlx5-E-Switch-Increase-supported-number-of.patch
-Patch13:        0014-net-mlx5-Lag-Fix-recreation-of-VF-LAG.patch
-Patch14:        0015-net-mlx5-Lag-Fix-include-paths-for-5.15.18.1-release.patch
+Patch11:        0012-net-mlx5-Lag-Fix-recreation-of-VF-LAG.patch
+Patch12:        0013-net-mlx5-Set-SMFS-as-a-default-steering-mode-if-devi.patch
+Patch13:        0014-net-mlx5e-Support-accept-action.patch
+Patch14:        0015-net-mlx5-Bridge-refactor-eswitch-instance-usage.patch
+Patch15:        0016-net-mlx5-Bridge-extract-VLAN-pop-code-to-dedicated-f.patch
+Patch16:        0017-net-mlx5-Bridge-mark-reg_c1-when-pushing-VLAN.patch
+Patch17:        0018-net-mlx5-Bridge-pop-VLAN-on-egress-table-miss.patch
+Patch18:        0019-net-mlx5-Bridge-provide-flow-source-hints.patch
+Patch19:        0020-net-mlx5-Bridge-extract-code-to-lookup-and-del-notif.patch
+Patch20:        0021-net-mlx5-Bridge-support-replacing-existing-FDB-entry.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -156,6 +162,12 @@ manipulation of eBPF programs and maps.
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
 
 make mrproper
 

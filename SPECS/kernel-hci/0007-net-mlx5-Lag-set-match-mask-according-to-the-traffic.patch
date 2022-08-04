@@ -1,27 +1,22 @@
-From f2c4f98cc68a2d7eff925f12814b5b7745339408 Mon Sep 17 00:00:00 2001
-From: Vince Perri <viperri@microsoft.com>
-Date: Sat, 5 Mar 2022 00:09:46 +0000
-Subject: [PATCH 07/15] net/mlx5: Lag, set match mask according to the traffic
+From 51d89fa01da8a845bd3705ce1bdb918e62cdc9f1 Mon Sep 17 00:00:00 2001
+From: Maor Gottlieb <maorg@nvidia.com>
+Date: Tue, 13 Jul 2021 15:30:45 +0300
+Subject: [PATCH 07/22] net/mlx5: Lag, set match mask according to the traffic
+ type bitmap
 
->From e465550b38edd71e233520d01b2d5db91d0ae077 Mon Sep 17 00:00:00 2001
->From: Maor Gottlieb <maorg@nvidia.com>
->Date: Tue, 13 Jul 2021 15:30:45 +0300
->Subject: [PATCH 07/13] net/mlx5: Lag, set match mask according to the traffic
-> type bitmap
->
->Set the related bits in the match definer mask according to the
->TT mapping.
->This mask will be used to create the match definers.
->
->Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
->Reviewed-by: Mark Bloch <mbloch@nvidia.com>
->Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Set the related bits in the match definer mask according to the
+TT mapping.
+This mask will be used to create the match definers.
+
+Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
  .../mellanox/mlx5/core/lag/port_sel.c         | 182 ++++++++++++++++++
  1 file changed, 182 insertions(+)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
-index 7b4ad49c8..6095f1049 100644
+index 7b4ad49c8438..6095f1049bdb 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
 @@ -4,6 +4,188 @@
@@ -214,5 +209,5 @@ index 7b4ad49c8..6095f1049 100644
  		       enum netdev_lag_hash hash)
  {
 -- 
-2.17.1
+2.25.1
 

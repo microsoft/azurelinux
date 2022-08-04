@@ -1,20 +1,15 @@
-From cf5fc0cf39f851e64fe3faf5737caa6c3fdd361c Mon Sep 17 00:00:00 2001
-From: Vince Perri <viperri@microsoft.com>
-Date: Sat, 5 Mar 2022 00:09:44 +0000
-Subject: [PATCH 02/15] net/mlx5: Introduce port selection namespace
+From 51e2279d7d686d1a9256e95afe7fbe368a406ae9 Mon Sep 17 00:00:00 2001
+From: Maor Gottlieb <maorg@nvidia.com>
+Date: Sun, 23 May 2021 13:34:28 +0300
+Subject: [PATCH 02/22] net/mlx5: Introduce port selection namespace
 
->From 425a563acb1d1872c0036fbcb644247640edbbc6 Mon Sep 17 00:00:00 2001
->From: Maor Gottlieb <maorg@nvidia.com>
->Date: Sun, 23 May 2021 13:34:28 +0300
->Subject: [PATCH 02/13] net/mlx5: Introduce port selection namespace
->
->Add new port selection flow steering namespace. Flow steering rules in
->this namespaceare are used to determine the physical port for egress
->packets.
->
->Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
->Reviewed-by: Mark Bloch <mbloch@nvidia.com>
->Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Add new port selection flow steering namespace. Flow steering rules in
+this namespaceare are used to determine the physical port for egress
+packets.
+
+Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
  .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  |  1 +
  .../net/ethernet/mellanox/mlx5/core/fs_core.c | 26 +++++++++++++++++++
@@ -27,7 +22,7 @@ Subject: [PATCH 02/15] net/mlx5: Introduce port selection namespace
  8 files changed, 78 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-index 7db8df64a..caefdb7df 100644
+index 7db8df64a60e..caefdb7dfefe 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
 @@ -969,6 +969,7 @@ const struct mlx5_flow_cmds *mlx5_fs_cmd_get_default(enum fs_flow_table_type typ
@@ -39,10 +34,10 @@ index 7db8df64a..caefdb7df 100644
  	default:
  		return mlx5_fs_cmd_get_stub_cmds();
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index fe501ba88..8d8696f7c 100644
+index cb3f9de3d00b..d852c6e086a0 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -2191,6 +2191,10 @@ struct mlx5_flow_namespace *mlx5_get_flow_namespace(struct mlx5_core_dev *dev,
+@@ -2222,6 +2222,10 @@ struct mlx5_flow_namespace *mlx5_get_flow_namespace(struct mlx5_core_dev *dev,
  		if (steering->fdb_root_ns)
  			return &steering->fdb_root_ns->ns;
  		return NULL;
@@ -53,7 +48,7 @@ index fe501ba88..8d8696f7c 100644
  	case MLX5_FLOW_NAMESPACE_SNIFFER_RX:
  		if (steering->sniffer_rx_root_ns)
  			return &steering->sniffer_rx_root_ns->ns;
-@@ -2596,6 +2600,7 @@ void mlx5_cleanup_fs(struct mlx5_core_dev *dev)
+@@ -2627,6 +2631,7 @@ void mlx5_cleanup_fs(struct mlx5_core_dev *dev)
  	steering->fdb_root_ns = NULL;
  	kfree(steering->fdb_sub_ns);
  	steering->fdb_sub_ns = NULL;
@@ -61,7 +56,7 @@ index fe501ba88..8d8696f7c 100644
  	cleanup_root_ns(steering->sniffer_rx_root_ns);
  	cleanup_root_ns(steering->sniffer_tx_root_ns);
  	cleanup_root_ns(steering->rdma_rx_root_ns);
-@@ -2634,6 +2639,21 @@ static int init_sniffer_rx_root_ns(struct mlx5_flow_steering *steering)
+@@ -2665,6 +2670,21 @@ static int init_sniffer_rx_root_ns(struct mlx5_flow_steering *steering)
  	return PTR_ERR_OR_ZERO(prio);
  }
  
@@ -83,7 +78,7 @@ index fe501ba88..8d8696f7c 100644
  static int init_rdma_rx_root_ns(struct mlx5_flow_steering *steering)
  {
  	int err;
-@@ -3020,6 +3040,12 @@ int mlx5_init_fs(struct mlx5_core_dev *dev)
+@@ -3051,6 +3071,12 @@ int mlx5_init_fs(struct mlx5_core_dev *dev)
  			goto err;
  	}
  
@@ -97,7 +92,7 @@ index fe501ba88..8d8696f7c 100644
  	    MLX5_CAP_FLOWTABLE_RDMA_RX(dev, table_miss_action_domain)) {
  		err = init_rdma_rx_root_ns(steering);
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-index 98240badc..79d37530a 100644
+index 98240badc342..79d37530afb3 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
 @@ -97,7 +97,8 @@ enum fs_flow_table_type {
@@ -129,7 +124,7 @@ index 98240badc..79d37530a 100644
  
  #endif
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw.c b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-index 016d26f80..ae81021b1 100644
+index 016d26f809a5..ae81021b1c68 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/fw.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
 @@ -148,6 +148,12 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
@@ -146,7 +141,7 @@ index 016d26f80..ae81021b1 100644
  		err = mlx5_core_get_caps(dev, MLX5_CAP_GENERAL_2);
  		if (err)
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 29b7297a8..5c9870538 100644
+index 4ed740994279..c47263dc08f4 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
 @@ -1385,6 +1385,7 @@ static const int types[] = {
@@ -158,7 +153,7 @@ index 29b7297a8..5c9870538 100644
  
  static void mlx5_hca_caps_free(struct mlx5_core_dev *dev)
 diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 66eaf0aa7..b2352a0fd 100644
+index 66eaf0aa7f69..b2352a0fdd23 100644
 --- a/include/linux/mlx5/device.h
 +++ b/include/linux/mlx5/device.h
 @@ -1183,6 +1183,7 @@ enum mlx5_cap_type {
@@ -191,7 +186,7 @@ index 66eaf0aa7..b2352a0fd 100644
  	MLX5_GET(odp_cap, mdev->caps.hca[MLX5_CAP_ODP]->cur, cap)
  
 diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
-index 0106c67e8..259fcc168 100644
+index 0106c67e8ccb..259fcc168340 100644
 --- a/include/linux/mlx5/fs.h
 +++ b/include/linux/mlx5/fs.h
 @@ -83,6 +83,7 @@ enum mlx5_flow_namespace_type {
@@ -203,7 +198,7 @@ index 0106c67e8..259fcc168 100644
  
  enum {
 diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 25d775764..cbfe8cf9f 100644
+index cd9d1c95129e..d20b5921d4a0 100644
 --- a/include/linux/mlx5/mlx5_ifc.h
 +++ b/include/linux/mlx5/mlx5_ifc.h
 @@ -767,6 +767,18 @@ struct mlx5_ifc_flow_table_nic_cap_bits {
@@ -243,7 +238,7 @@ index 25d775764..cbfe8cf9f 100644
  	struct mlx5_ifc_vector_calc_cap_bits vector_calc_cap;
  	struct mlx5_ifc_qos_cap_bits qos_cap;
  	struct mlx5_ifc_debug_cap_bits debug_cap;
-@@ -10398,9 +10412,16 @@ struct mlx5_ifc_dcbx_param_bits {
+@@ -10397,9 +10411,16 @@ struct mlx5_ifc_dcbx_param_bits {
  	u8         reserved_at_a0[0x160];
  };
  
@@ -262,5 +257,5 @@ index 25d775764..cbfe8cf9f 100644
  
  	u8         reserved_at_20[0x14];
 -- 
-2.17.1
+2.25.1
 
