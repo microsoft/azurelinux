@@ -12,11 +12,14 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
-var dashboardProgress = uiprogress.New()
-
-var progressName []string
-var progressValue []int
-var progressLevel []int
+var (
+	ts demo.TimeStamp
+	dashboardProgress = uiprogress.New()
+	progressName []string
+	progressValue []int
+	progressLevel []int
+	waitTime = time.Millisecond * 500
+)
 
 func CheckProgress(ts *demo.TimeStamp, level int) {
 	progressName = append(progressName, ts.Name)
@@ -31,25 +34,24 @@ func CheckProgress(ts *demo.TimeStamp, level int) {
 }
 
 func main() {
-	waitTime := time.Millisecond * 500
-	// var wg sync.WaitGroup
-
 	logger.InitStderrLog()
-
 	dashboardProgress.Start()
+
+	currDir, err := os.Getwd()
+	parentDir := filepath.Dir(currDir)
+
 	for {
-		var ts demo.TimeStamp
-		currDir, err := os.Getwd()
-		parentDir := filepath.Dir(currDir)
 		err = jsonutils.ReadJSONFile(parentDir+"/demodata/time_demo.json", &ts)
 		if err != nil {
 			fmt.Printf("%s\n", err)
 			return
 		}
+
 		progressName = []string{}
 		progressValue = []int{}
 		progressLevel = []int{}
 		CheckProgress(&ts, 0)
+
 		for i := 0; i < len(progressName); i++ {
 			name := progressName[i]
 			value := progressValue[i]
