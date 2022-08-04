@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:             freeipmi
 Version:          1.6.6
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
 URL:              http://www.gnu.org/software/freeipmi/
@@ -13,7 +13,9 @@ Source0:          http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:          bmc-watchdog.service
 Source2:          ipmidetectd.service
 Source3:          ipmiseld.service
-BuildRequires:    libgcrypt-devel texinfo systemd 
+BuildRequires:    libgcrypt-devel 
+BuildRequires:    texinfo 
+BuildRequires:    systemd 
 %{?systemd_requires}
 BuildRequires:    gcc
 
@@ -343,6 +345,10 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %dir %{_localstatedir}/cache/ipmiseld
 
 %changelog
+* Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.6.6-3
+- Fix spec formatting
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

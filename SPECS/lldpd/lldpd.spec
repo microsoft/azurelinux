@@ -1,18 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%if 0%{?el6}
-%bcond_with systemd
-%global rundir /var/run/
-%else
 %bcond_without systemd
 %global rundir /run/
-%endif
 
 %global gh_owner vincentbernat
 
 Name:     lldpd
 Version:  1.0.4
-Release:  3%{?dist}
+Release:  4%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -29,12 +24,7 @@ BuildRequires: readline-devel
 BuildRequires: check-devel
 BuildRequires: net-snmp-devel
 BuildRequires: libxml2-devel
-# EL6 needs libevent2 as the package
-%if 0%{?el6}
-BuildRequires: libevent2-devel
-%else
 BuildRequires: libevent-devel
-%endif
 
 %if 0%{?with_systemd}
 # For systemd stuff
@@ -174,6 +164,10 @@ fi
 
 
 %changelog
+* Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.0.4-4
+- License Verified
+- Remove usage of macros that do not apply for CBL-Mariner
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
