@@ -18,15 +18,17 @@ import (
 )
 
 var (
-	app          = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
-	scriptName   = app.Flag("script-name", "The name of the current tool.").Required().String()
-	stepName     = app.Flag("step-name", "The name of the current step.").Required().String()
-	actionName   = app.Flag("action-name", "The name of the current action.").Default("").String()
-	dirPath      = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
-	logFile      = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
-	validModes   = []string{"n", "r"}
-	mode         = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record'('r').").Required().Enum(validModes...)
-	completePath string
+	app            = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
+	scriptName     = app.Flag("script-name", "The name of the current tool.").Required().String()
+	stepName       = app.Flag("step-name", "The name of the current step.").Required().String()
+	actionName     = app.Flag("action-name", "The name of the current action.").Default("").String()
+	dirPath        = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
+	logFile        = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
+	initializeMode = "n"
+	recordMode     = "r"
+	validModes     = []string{initializeMode, recordMode}
+	mode           = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record'('r').").Required().Enum(validModes...)
+	completePath   string
 )
 
 func main() {
@@ -35,14 +37,14 @@ func main() {
 	logger.InitBestEffort(*logFile, "trace")
 
 	// Construct the CSV path.
-	completePath = filepath.Join(*dirPath, *scriptName+".csv")
+	completePath = filepath.Join(*dirPath, *scriptName + ".csv")
 
 	// Perform different actions based on the input "mode".
 	switch *mode {
-	case "n":
+	case initializeMode:
 		initialize()
 		break
-	case "r":
+	case recordMode:
 		record()
 		break
 	default:
