@@ -3278,8 +3278,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "1.8.12",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v1.8.12.tar.gz"
+          "version": "1.9.6",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v1.9.6.tar.gz"
         }
       }
     },
@@ -5800,8 +5800,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.55.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
+          "version": "5.15.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.57.1.tar.gz"
         }
       }
     },
@@ -7281,8 +7281,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.55.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
+          "version": "5.15.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.57.1.tar.gz"
         }
       }
     },
@@ -7291,8 +7291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.55.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
+          "version": "5.15.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.57.1.tar.gz"
         }
       }
     },
@@ -7403,6 +7403,16 @@
           "name": "kmod",
           "version": "29",
           "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-29.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "knem",
+          "version": "1.1.4",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/knem_1.1.4.90mlnx1.orig.tar.gz"
         }
       }
     },
@@ -11722,6 +11732,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mlnx-ofa_kernel",
+          "version": "5.6",
+          "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-tools",
+          "version": "5.2.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/mlnx-tools_5.2.0.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlx-bootctl",
+          "version": "1.5",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/SOURCES/mlx-bootctl-1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mm-common",
           "version": "1.0.4",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.4.tar.xz"
@@ -13493,6 +13533,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ofed-scripts",
+          "version": "5.6",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "omping",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/jfriesse/omping/releases/download/0.0.4/omping-0.0.4.tar.gz"
@@ -14156,6 +14206,16 @@
           "name": "PEGTL",
           "version": "2.8.3",
           "downloadUrl": "https://github.com/taocpp/PEGTL/archive/2.8.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perftest",
+          "version": "4.5",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/perftest_4.5.orig.tar.gz"
         }
       }
     },
@@ -19884,8 +19944,8 @@
         "type": "other",
         "other": {
           "name": "python-botocore",
-          "version": "1.27.35",
-          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.27.35.tar.gz"
+          "version": "1.23.52",
+          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.23.52.tar.gz"
         }
       }
     },
@@ -19964,8 +20024,8 @@
         "type": "other",
         "other": {
           "name": "python-click",
-          "version": "8.0.4",
-          "downloadUrl": "https://github.com/pallets/click/archive/refs/tags/8.0.4.tar.gz"
+          "version": "7.1.2",
+          "downloadUrl": "https://github.com/mitsuhiko/click/archive/7.1.2/python-click-7.1.2.tar.gz"
         }
       }
     },
@@ -22513,16 +22573,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-cassandra-driver",
-          "version": "3.25.0",
-          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.25.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python3-mallard-ducktype",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/projectmallard/mallard-ducktype/archive/1.0.2/1.0.2.tar.gz"
@@ -22876,16 +22926,6 @@
           "name": "realmd",
           "version": "0.16.3",
           "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "reaper",
-          "version": "3.1.1",
-          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
         }
       }
     },

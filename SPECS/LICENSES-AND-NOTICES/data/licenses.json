@@ -1483,7 +1483,6 @@
                 "python-betamax",
                 "python-blinker",
                 "python-blivet",
-                "python-botocore",
                 "python-charset-normalizer",
                 "python-cheetah",
                 "python-click",
@@ -2054,7 +2053,6 @@
                 "python-sphinxcontrib-websupport",
                 "python-yamlloader",
                 "R",
-                "reaper",
                 "rocksdb",
                 "rubygem-asciidoctor",
                 "rubygem-bigdecimal",
@@ -2109,12 +2107,18 @@
             ]
         },
         "NVIDIA": {
-            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
+                "knem",
                 "libnvidia-container",
+                "mlnx-ofa_kernel",
+                "mlnx-tools",
+                "mlx-bootctl",
                 "nvidia-container-runtime",
                 "nvidia-container-toolkit",
-                "nvidia-docker2"
+                "nvidia-docker2",
+                "ofed-scripts",
+                "perftest"
             ]
         },
         "OpenMamba": {
@@ -2585,7 +2589,6 @@
                 "python-atomicwrites",
                 "python-attrs",
                 "python-bcrypt",
-                "python-cassandra-driver",
                 "python-certifi",
                 "python-cffi",
                 "python-chardet",
