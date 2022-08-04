@@ -4,10 +4,8 @@
 package configuration
 
 import (
-	"os"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -131,20 +129,4 @@ func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
 	err = remarshalJSON(testNetwork, &checkedNetwork)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Network]: invalid input for device, device cannot be empty", err.Error())
-}
-
-func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
-	const networkFile = "/etc/systemd/network/10-static-eth1.network"
-	testNetwork := validNetworks[0]
-
-	err := createNetworkConfigFile(nil, testNetwork, "eth1")
-	assert.NoError(t, err)
-	t.Cleanup(func() {
-		os.Remove(networkFile)
-	})
-
-	// Check whether the contents in the network file is correct
-	testContents, err := file.ReadLines(networkFile)
-	assert.NoError(t, err)
-	assert.Equal(t, testContents, validNetworkFileContent)
 }
