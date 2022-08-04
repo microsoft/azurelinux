@@ -1,6 +1,6 @@
 Name:           perl-Test-Deep
 Version:        1.130
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Extremely flexible deep comparison
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -57,12 +57,17 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
+%license META.yml
 %doc Changes README TODO
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Deep.3*
 %{_mandir}/man3/Test::Deep::NoTest.3*
 
 %changelog
+* Thu Aug 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.130-3
+- Add `%license`
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.130-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
