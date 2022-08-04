@@ -193,7 +193,7 @@ include $(SCRIPTS_DIR)/pkggen.mk
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
 
-# Create self contained toolkit archive contianing all the required tools with:
+# Create self contained toolkit archive containing all the required tools with:
 #   package-toolkit, clean-package-toolkit
 include $(SCRIPTS_DIR)/toolkit.mk
 
