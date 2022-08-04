@@ -1406,6 +1406,7 @@
                 "perl-XML-Generator",
                 "perl-XML-Grove",
                 "perl-XML-Handler-YAWriter",
+                "perl-XML-LibXML",
                 "perl-XML-NamespaceSupport",
                 "perl-XML-Parser-Lite",
                 "perl-XML-RegExp",
