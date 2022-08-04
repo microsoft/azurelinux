@@ -4,12 +4,13 @@
 // Parses the timestamps stored in CSV files and print them
 // to the terminal at the end of the build.
 
-package csvparser
+package timestamp
 
 import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -17,7 +18,7 @@ import (
 var (
 	timeArray [][]string // A 2-D array used to store all timestamps from CSVs.
 	// A list of CSV files to be parsed.
-	files = []string{"/imageconfigvalidator.csv", "/imagepkgfetcher.csv", "/imager.csv", "/roast.csv"}
+	files []string
 )
 
 // Reads a CSV file and appends line by line to array.
@@ -41,6 +42,9 @@ func CSVToArray(filename string) {
 func OutputCSVLog(parentDir string) {
 	var startTime time.Time
 	init_file, err := os.Stat(parentDir + "/init")
+
+	// Populate the slice "files".
+	getFileName(parentDir)
 
 	// Format each file to array format.
 	for _, file := range files {
@@ -75,4 +79,26 @@ func OutputCSVLog(parentDir string) {
 		fmt.Println(timeArray[i][0] + " " + timeArray[i][1] + " took " + timeArray[i][3] + ". ")
 	}
 	fmt.Println("The full build duration was " + difference.String() + ".")
+}
+
+// Iterate through the target directory and populate the files slice with strings of file names.
+func getFileName(parentDir string) {
+	err := filepath.Walk(parentDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("Error: %s \n", err)
+			return err
+		}
+		fileName := filepath.Base(path)
+		// Skip the "init" file.
+		if fileName != "init" {
+			files = append(files, fileName)
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Printf("Fail to complete file walk: %s \n", err)
+	}
+
+	// Remove directory name.
+	files = files[1:]
 }
