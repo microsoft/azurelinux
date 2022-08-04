@@ -2,11 +2,9 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 
-%ifarch x86_64
 %define arch x86_64
 %define archdir x86
 %define config_source %{SOURCE1}
-%endif
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
@@ -19,8 +17,8 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
-Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
+Source2:        sha512hmac-openssl.sh
+Source3:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-net-mlx5-Support-partial-TTC-rules.patch
 Patch1:         0002-net-mlx5-Introduce-port-selection-namespace.patch
 Patch2:         0003-net-mlx5-Add-support-to-create-match-definer.patch
@@ -53,9 +51,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
-%ifarch x86_64
 BuildRequires:  pciutils-devel
-%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -166,7 +162,7 @@ make mrproper
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE3} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -194,9 +190,7 @@ make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{a
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
 
-%ifarch x86_64
 make -C tools turbostat cpupower
-%endif
 
 #Compile bpftool
 make -C tools/bpf/bpftool
@@ -226,9 +220,7 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
-%ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
 
 # Restrict the permission on System.map-X file
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
@@ -267,11 +259,9 @@ find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --pare
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-%ifarch x86_64
 # CONFIG_STACK_VALIDATION=y requires objtool to build external modules
 install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
 install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
-%endif
 
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
@@ -288,10 +278,8 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
-%ifarch x86_64
 # Install turbostat cpupower
 make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
-%endif
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
@@ -366,7 +354,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
-%ifarch x86_64
 %{_sbindir}/cpufreq-bench
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
@@ -378,7 +365,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_mandir}/man8/turbostat*.gz
 %{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
 %{_datadir}/bash-completion/completions/cpupower
-%endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
@@ -402,17 +388,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Add net/mlx5 patches (patch0-14) to add LAG mode
 - Set ExclusiveArch to x86_64, remove config_aarch64
 - Add CONFIG_NET_FOU=m, CONFIG_NET_FOU_IP_TUNNELS=y,
-- CONFIG_INET_DIAG=m, CONFIG_INET_TCP_DIAG=m,
-- CONFIG_IPV6_FOU=m, CONFIG_IPV6_FOU_TUNNEL=m,
-- CONFIG_NETFILTER_NETLINK_GLUE_CT=y,
-- CONFIG_NF_TABLES_NETDEV=y,
-- CONFIG_NFT_CONNLIMIT=m, CONFIG_NFT_FIB=m,
-- CONFIG_NETFILTER_XT_TARGET_AUDIT=m, CONFIG_NETFILTER_XT_TARGET_NOTRACK=m,
-- CONFIG_NETFILTER_XT_TARGET_TRACE=m, CONFIG_NETFILTER_XT_MATCH_IPCOMP=m,
-- CONFIG_IP_VS_DEBUG=y,
-- CONFIG_NFT_FIB_IPV4=m, CONFIG_NF_TABLES_ARP=y, CONFIG_NF_LOG_ARP=m,
-- CONFIG_INET_SCTP_DIAG=m,
-- CONFIG_SECURITY_SELINUX_BOOTPARAM=y
+-   CONFIG_INET_DIAG=m, CONFIG_INET_TCP_DIAG=m,
+-   CONFIG_IPV6_FOU=m, CONFIG_IPV6_FOU_TUNNEL=m,
+-   CONFIG_NETFILTER_NETLINK_GLUE_CT=y,
+-   CONFIG_NF_TABLES_NETDEV=y,
+-   CONFIG_NFT_CONNLIMIT=m, CONFIG_NFT_FIB=m,
+-   CONFIG_NETFILTER_XT_TARGET_AUDIT=m, CONFIG_NETFILTER_XT_TARGET_NOTRACK=m,
+-   CONFIG_NETFILTER_XT_TARGET_TRACE=m, CONFIG_NETFILTER_XT_MATCH_IPCOMP=m,
+-   CONFIG_IP_VS_DEBUG=y,
+-   CONFIG_NFT_FIB_IPV4=m, CONFIG_NF_TABLES_ARP=y, CONFIG_NF_LOG_ARP=m,
+-   CONFIG_INET_SCTP_DIAG=m,
+-   CONFIG_SECURITY_SELINUX_BOOTPARAM=y
 
 * Tue Jul 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.57.1-1
 - Upgrade to 5.15.57.1
