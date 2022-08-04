@@ -28,15 +28,14 @@ Distribution:   Mariner
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz
-#Source0:        %{name}-%{version}.tar.gz
-#Source1:        cdi_containers_meta
-#Source2:        cdi_containers_meta.service
+Source1:        cdi_containers_meta
+Source2:        cdi_containers_meta.service
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-BuildRequires:  golang(API) = 1.17
+BuildRequires:  golang
 ExclusiveArch:  x86_64 aarch64
 
 %description
@@ -275,7 +274,7 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
 %{_prefix}/lib/obs/service
 
 %changelog
-* Wed Aug 3 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-1
+* Thu Aug 3 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-1
 - Initial changes to build for Mariner
 - License verified
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)

@@ -1,0 +1,5 @@
+<service name="cdi_containers_meta">
+    <summary>Containers meta information for CDI (build service)</summary>
+    <description>Provides meta information that is used during the build of
+the CDI container images.</description>
+</service>
