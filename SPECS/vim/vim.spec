@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.5172
+Version:        9.0.0050
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -121,9 +121,9 @@ fi
 %{_datarootdir}/vim/vim*/scripts.vim
 %{_datarootdir}/vim/vim*/spell/*
 %{_datarootdir}/vim/vim*/syntax/*
-%exclude %{_datarootdir}/vim/vim82/syntax/nosyntax.vim
-%exclude %{_datarootdir}/vim/vim*/syntax/syntax.vim
-%exclude %{_datarootdir}/vim/vim82/autoload/dist/ft.vim
+%exclude %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
+%exclude %{_datarootdir}/vim/vim90/syntax/syntax.vim
+%exclude %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_datarootdir}/vim/vim*/tools/*
 %{_datarootdir}/vim/vim*/tutor/*
 %{_datarootdir}/vim/vim*/lang/*.vim
@@ -179,9 +179,9 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
-%{_datarootdir}/vim/vim82/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim82/syntax/syntax.vim
-%{_datarootdir}/vim/vim82/autoload/dist/ft.vim
+%{_datarootdir}/vim/vim90/syntax/nosyntax.vim
+%{_datarootdir}/vim/vim90/syntax/syntax.vim
+%{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
 %{_bindir}/view
@@ -191,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 9.0.0050-1
+- Upgrade to 9.0.0050 to fix CVEs: 2022-2257, 2022-2264, 2022-2284, 2022-2285, 2022-2286, 2022-2287
+
 * Fri Jul 08 2022 Nick Samson <nisamson@microsoft.com> - 8.2.5172-1
 - Upgrade to 8.2.5172 to fix CVEs: 2022-2207, 2022-2208, 2022-2210, 2022-2206
 
