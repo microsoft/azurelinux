@@ -1,57 +1,55 @@
+Summary:        Reference implementation of the iCalendar data type and serialization format
+Name:           libical
+Version:        3.0.9
+Release:        5%{?dist}
+License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Summary:	Reference implementation of the iCalendar data type and serialization format
-Name:		libical
-Version:	3.0.9
-Release:	4%{?dist}
-License:	LGPLv2 or MPLv2.0
-URL:		https://libical.github.io/libical/
-Source:		https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-
+URL:            https://libical.github.io/libical/
+Source:         https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:	gcc
-BuildRequires:	gcc-c++
-BuildRequires:	cmake
-BuildRequires:	pkgconfig
-BuildRequires:	pkgconfig(gobject-2.0)
-BuildRequires:	pkgconfig(gobject-introspection-1.0)
-BuildRequires:	pkgconfig(libxml-2.0)
-BuildRequires:	pkgconfig(icu-i18n)
-BuildRequires:	pkgconfig(icu-uc)
-BuildRequires:	perl(Getopt::Std)
-BuildRequires:	perl(lib)
-BuildRequires:	python3
-BuildRequires:	python3-pip
-BuildRequires:	python3-gobject
-BuildRequires:	vala
-BuildRequires: make
-Requires:	tzdata
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  make
+BuildRequires:  pkg-config
+BuildRequires:  python3
+BuildRequires:  python3-gobject
+BuildRequires:  python3-pip
+BuildRequires:  vala
+BuildRequires:  perl(Getopt::Std)
+BuildRequires:  perl(lib)
+BuildRequires:  pkgconfig(gobject-2.0)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  pkgconfig(icu-i18n)
+BuildRequires:  pkgconfig(icu-uc)
+BuildRequires:  pkgconfig(libxml-2.0)
+Requires:       tzdata
 
 %description
 Reference implementation of the iCalendar data type and serialization format
 used in dozens of calendaring and scheduling products.
 
 %package devel
-Summary:	Development files for libical
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Development files for libical
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The libical-devel package contains libraries and header files for developing
 applications that use libical.
 
 %package glib
-Summary:	GObject wrapper for libical library
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        GObject wrapper for libical library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description glib
 This package provides a GObject wrapper for libical library with support
 of GObject Introspection.
 
 %package glib-devel
-Summary:	Development files for building against %{name}-glib
-Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
-Requires:	%{name}-glib%{?_isa} = %{version}-%{release}
+Summary:        Development files for building against %{name}-glib
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-glib%{?_isa} = %{version}-%{release}
 
 %description glib-devel
 Development files needed for building things which link against %{name}-glib.
@@ -60,7 +58,7 @@ Development files needed for building things which link against %{name}-glib.
 %autosetup -p1 -S gendiff
 
 %build
-%{cmake} \
+%cmake \
   -DUSE_INTEROPERABLE_VTIMEZONES:BOOL=true \
   -DICAL_ALLOW_EMPTY_PROPERTIES:BOOL=true \
   -DGOBJECT_INTROSPECTION:BOOL=true \
@@ -125,6 +123,10 @@ make test ARGS="-V" -C %{_target_platform}
 %{_datadir}/vala/vapi/libical-glib.vapi
 
 %changelog
+* Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 3.0.9-5
+- Promote to Mariner base repo
+- Lint spec
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-4
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

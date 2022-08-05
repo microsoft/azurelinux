@@ -1,53 +1,50 @@
+Summary:        Bluetooth utilities
+Name:           bluez
+Version:        5.63
+Release:        2%{?dist}
+License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:    bluez
-Version: 5.63
-Release: 1%{?dist}
-Summary: Bluetooth utilities
-License: GPLv2+ and LGPLv2+
-URL:     http://www.bluez.org/
-
-Source0: http://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
-Source1: bluez.gitignore
-
+URL:            http://www.bluez.org/
+Source0:        http://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
+Source1:        bluez.gitignore
 # https://github.com/hadess/bluez/commits/obex-5.46
-Patch1: 0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch
+Patch1:         0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch
 # https://github.com/hadess/bluez/commits/systemd-hardening
-Patch2: 0001-build-Always-define-confdir-and-statedir.patch
-Patch3: 0002-systemd-Add-PrivateTmp-and-NoNewPrivileges-options.patch
-Patch4: 0003-systemd-Add-more-filesystem-lockdown.patch
-Patch5: 0004-systemd-More-lockdown.patch
+Patch2:         0001-build-Always-define-confdir-and-statedir.patch
+Patch3:         0002-systemd-Add-PrivateTmp-and-NoNewPrivileges-options.patch
+Patch4:         0003-systemd-Add-more-filesystem-lockdown.patch
+Patch5:         0004-systemd-More-lockdown.patch
 # Fix FTBFS with newer glib versions
-Patch6: 0002-Use-g_memdup2-everywhere.patch
+Patch6:         0002-Use-g_memdup2-everywhere.patch
 # Fix initialization problems with Logitech MX Master mice
 # https://bugzilla.redhat.com/show_bug.cgi?id=2019970
 # https://github.com/bluez/bluez/issues/220
 # Both patches have one rediff necessary to apply to 5.63
-Patch7: 0001-hog-Fix-read-order-of-attributes-rediffed.patch
-Patch8: 0002-hog-Add-input-queue-while-uhid-device-has-not-been-c-rediffed.patch
-
-BuildRequires: dbus-devel >= 1.6
-BuildRequires: glib2-devel
-BuildRequires: libell-devel >= 0.37
-BuildRequires: libical-devel
-BuildRequires: make
-BuildRequires: readline-devel
-# For bluetooth mesh
-BuildRequires: json-c-devel
-# For cable pairing
-BuildRequires: systemd-devel
+Patch7:         0001-hog-Fix-read-order-of-attributes-rediffed.patch
+Patch8:         0002-hog-Add-input-queue-while-uhid-device-has-not-been-c-rediffed.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
 # For printing
-BuildRequires: cups-devel
+BuildRequires:  cups-devel
+BuildRequires:  dbus-devel >= 1.6
+BuildRequires:  glib2-devel
+# For bluetooth mesh
+BuildRequires:  json-c-devel
+BuildRequires:  libell-devel >= 0.37
+BuildRequires:  libical-devel
 # For autoreconf
-BuildRequires: libtool automake autoconf
+BuildRequires:  libtool
+BuildRequires:  make
 # For man pages
-BuildRequires: python3-docutils
-
-Requires: dbus >= 1.6
-
+BuildRequires:  python3-docutils
+BuildRequires:  readline-devel
+# For cable pairing
+BuildRequires:  systemd-devel
+Requires:       dbus >= 1.6
 Requires(post): systemd
-Requires(preun): systemd
 Requires(postun): systemd
+Requires(preun): systemd
 
 %description
 Utilities for use in Bluetooth applications:
@@ -66,30 +63,30 @@ Utilities for use in Bluetooth applications:
 The BLUETOOTH trademarks are owned by Bluetooth SIG, Inc., U.S.A.
 
 %package cups
-Summary: CUPS printer backend for Bluetooth printers
-Requires: bluez%{?_isa} = %{version}-%{release}
-Requires: cups
+Summary:        CUPS printer backend for Bluetooth printers
+Requires:       bluez%{?_isa} = %{version}-%{release}
+Requires:       cups
 
 %description cups
 This package contains the CUPS backend
 
 %package libs
-Summary: Libraries for use in Bluetooth applications
+Summary:        Libraries for use in Bluetooth applications
 
 %description libs
 Libraries for use in Bluetooth applications.
 
 %package libs-devel
-Summary: Development libraries for Bluetooth applications
-Requires: bluez-libs%{?_isa} = %{version}-%{release}
+Summary:        Development libraries for Bluetooth applications
+Requires:       bluez-libs%{?_isa} = %{version}-%{release}
 
 %description libs-devel
 bluez-libs-devel contains development libraries and headers for
 use in Bluetooth applications.
 
 %package hid2hci
-Summary: Put HID proxying bluetooth HCI's into HCI mode
-Requires: bluez%{?_isa} = %{version}-%{release}
+Summary:        Put HID proxying bluetooth HCI's into HCI mode
+Requires:       bluez%{?_isa} = %{version}-%{release}
 
 %description hid2hci
 Most allinone PC's and bluetooth keyboard / mouse sets which include a
@@ -111,17 +108,17 @@ they are paired, this will require the use of a regular (wired) USB keyboard
 and mouse.
 
 %package mesh
-Summary: Bluetooth mesh
-Requires: bluez%{?_isa} = %{version}-%{release}
-Requires: bluez-libs%{?_isa} = %{version}-%{release}
+Summary:        Bluetooth mesh
+Requires:       bluez%{?_isa} = %{version}-%{release}
+Requires:       bluez-libs%{?_isa} = %{version}-%{release}
 
 %description mesh
 Services for bluetooth mesh
 
 %package obexd
-Summary: Object Exchange daemon for sharing content
-Requires: bluez%{?_isa} = %{version}-%{release}
-Requires: bluez-libs%{?_isa} = %{version}-%{release}
+Summary:        Object Exchange daemon for sharing content
+Requires:       bluez%{?_isa} = %{version}-%{release}
+Requires:       bluez-libs%{?_isa} = %{version}-%{release}
 
 %description obexd
 Object Exchange daemon for sharing files, contacts etc over bluetooth
@@ -137,44 +134,44 @@ autoreconf -vif
            --with-systemdsystemunitdir=%{_unitdir} \
            --with-systemduserunitdir=%{_userunitdir}
 
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 
 # "make install" fails to install avinfo
 # Red Hat Bugzilla bug #1699680
-install -m0755 tools/avinfo $RPM_BUILD_ROOT%{_bindir}
+install -m0755 tools/avinfo %{buildroot}%{_bindir}
 
 # btmgmt is not installed by "make install", but it is useful for debugging
 # some issues and to set the MAC address on HCIs which don't have their
-# MAC address configured 
-install -m0755 tools/btmgmt $RPM_BUILD_ROOT%{_bindir}
+# MAC address configured
+install -m0755 tools/btmgmt %{buildroot}%{_bindir}
 
 # Remove libtool archive
-find $RPM_BUILD_ROOT -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # Remove the cups backend from libdir, and install it in /usr/lib whatever the install
-if test -d ${RPM_BUILD_ROOT}/usr/lib64/cups ; then
-	install -D -m0755 ${RPM_BUILD_ROOT}/usr/lib64/cups/backend/bluetooth ${RPM_BUILD_ROOT}%_cups_serverbin/backend/bluetooth
-	rm -rf ${RPM_BUILD_ROOT}%{_libdir}/cups
+if test -d %{buildroot}%{_lib64dir}/cups ; then
+	install -D -m0755 %{buildroot}%{_lib64dir}/cups/backend/bluetooth %{buildroot}%{_cups_serverbin}/backend/bluetooth
+	rm -rf %{buildroot}%{_libdir}/cups
 fi
 
-rm -f ${RPM_BUILD_ROOT}/%{_sysconfdir}/udev/*.rules ${RPM_BUILD_ROOT}/usr/lib/udev/rules.d/*.rules
-install -D -p -m0644 tools/hid2hci.rules ${RPM_BUILD_ROOT}/%{_udevrulesdir}/97-hid2hci.rules
+rm -f %{buildroot}/%{_sysconfdir}/udev/*.rules %{buildroot}%{_libdir}/udev/rules.d/*.rules
+install -D -p -m0644 tools/hid2hci.rules %{buildroot}/%{_udevrulesdir}/97-hid2hci.rules
 
-install -d -m0755 $RPM_BUILD_ROOT/%{_localstatedir}/lib/bluetooth
-install -d -m0755 $RPM_BUILD_ROOT/%{_localstatedir}/lib/bluetooth/mesh
+install -d -m0755 %{buildroot}/%{_localstatedir}/lib/bluetooth
+install -d -m0755 %{buildroot}/%{_localstatedir}/lib/bluetooth/mesh
 
-mkdir -p $RPM_BUILD_ROOT/%{_libdir}/bluetooth/
+mkdir -p %{buildroot}/%{_libdir}/bluetooth/
 
 #copy bluetooth config file and setup auto enable
-install -D -p -m0644 src/main.conf ${RPM_BUILD_ROOT}/etc/bluetooth/main.conf
-install -D -p -m0644 mesh/mesh-main.conf ${RPM_BUILD_ROOT}/etc/bluetooth/mesh-main.conf
-sed -i 's/#\[Policy\]$/\[Policy\]/; s/#AutoEnable=false/AutoEnable=true/' ${RPM_BUILD_ROOT}/%{_sysconfdir}/bluetooth/main.conf
+install -D -p -m0644 src/main.conf %{buildroot}%{_sysconfdir}/bluetooth/main.conf
+install -D -p -m0644 mesh/mesh-main.conf %{buildroot}%{_sysconfdir}/bluetooth/mesh-main.conf
+sed -i 's/#\[Policy\]$/\[Policy\]/; s/#AutoEnable=false/AutoEnable=true/' %{buildroot}/%{_sysconfdir}/bluetooth/main.conf
 
 # Install the HCI emulator, useful for testing
-install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
+install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 
 #check
 #make check
@@ -248,10 +245,10 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_libexecdir}/bluetooth/btvirt
 
 %files cups
-%_cups_serverbin/backend/bluetooth
+%{_cups_serverbin}/backend/bluetooth
 
 %files hid2hci
-/usr/lib/udev/hid2hci
+%{_libdir}/udev/hid2hci
 %{_mandir}/man1/hid2hci.1*
 %{_udevrulesdir}/97-hid2hci.rules
 
@@ -274,6 +271,10 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
+* Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 5.63-2
+- Promote to Mariner base repo
+- Lint spec
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.63-1
 - Update to version 5.63 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.
@@ -778,6 +779,7 @@ Resolves: rhbz#1490911
 * Sat Jul 31 2010 Orcan Ogetbil <oget[dot]fedora[at]gmail[dot]com> 4.69-3
 - Comment out Requires: dbus-bluez-pin-helper for bootstrapping. Otherwise
   it drags in the old blueman, built against python-2.6
+
 * Fri Jul 23 2010 Bastien Nocera <bnocera@redhat.com> 4.69-2
 - Don't allow installing bluez-compat on its own
 

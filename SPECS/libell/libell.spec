@@ -1,13 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Embedded Linux library
 Name:           libell
 Version:        0.48
-Release:        1%{?dist}
-Summary:        Embedded Linux library
+Release:        2%{?dist}
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://01.org/ell
 Source0:        https://www.kernel.org/pub/linux/libs/ell/ell-%{version}.tar.xz
-
 BuildRequires:  gcc
 BuildRequires:  make
 
@@ -18,15 +17,12 @@ standard library, and libdl (for dynamic linking). While ELL is designed to be
 efficient and compact enough for use on embedded Linux platforms, it is not
 limited to resource-constrained systems.
 
-
 %package devel
 Summary:        Embedded Linux library development files
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-
 %description devel
 Headers for developing against libell.
-
 
 %prep
 %setup -q -n ell-%{version}
@@ -39,7 +35,7 @@ Headers for developing against libell.
 
 %install
 %make_install
-find %{buildroot} -type f -name "*.la" -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 
 %ldconfig_scriptlets
@@ -49,14 +45,16 @@ find %{buildroot} -type f -name "*.la" -delete
 %doc AUTHORS ChangeLog
 %{_libdir}/libell.so.*
 
-
 %files devel
 %{_includedir}/ell
 %{_libdir}/libell.so
 %{_libdir}/pkgconfig/ell.pc
 
-
 %changelog
+* Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 0.48-2
+- Promote to Mariner base repo
+- Lint spec
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-1
 - Update to version 0.48.
 - License verified.
