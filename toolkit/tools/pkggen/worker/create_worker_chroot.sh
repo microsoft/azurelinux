@@ -26,7 +26,7 @@ $bldtracker \
     --step-name="start running the script" \
     --dir-path=$timestamp_dir \
     --log-file="$chroot_log" \
-    --mode="n"
+    --mode="i"
 
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"

@@ -24,10 +24,10 @@ var (
 	actionName     = app.Flag("action-name", "The name of the current action.").Default("").String()
 	dirPath        = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
 	logFile        = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
-	initializeMode = "n"
+	initializeMode = "i"
 	recordMode     = "r"
 	validModes     = []string{initializeMode, recordMode}
-	mode           = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('n') or 'record'('r').").Required().Enum(validModes...)
+	mode           = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record'('r').").Required().Enum(validModes...)
 	completePath   string
 )
 

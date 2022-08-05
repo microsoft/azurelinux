@@ -41,6 +41,16 @@ func CSVToArray(filename string) {
 // Take list of file paths, parse, and output log to terminal.
 func OutputCSVLog(parentDir string) {
 	var startTime time.Time
+	const (
+		startEntryNum = 0
+		fileNameColumnNum = 0
+		stepNameColumnNum = 1
+		actionNameColumnNum = 2
+		durationColumnNum = 3
+		startTimeColumnNum = 4	
+		endTimeColumnNum = 5 	
+	)
+
 	init_file, err := os.Stat(parentDir + "/init")
 
 	// Populate the slice "files".
@@ -54,19 +64,19 @@ func OutputCSVLog(parentDir string) {
 	// Get the start and end time from the first timestamp entry.
 	// Start time will be the ModTime for "init" if it exists, otherwise will be the first CSV entry.
 	if os.IsNotExist(err) {
-		fmt.Printf("start: %s\n", timeArray[0][4])
-		startTime, err = time.Parse(time.UnixDate, timeArray[0][4])
+		fmt.Printf("start: %s\n", timeArray[startEntryNum][startTimeColumnNum])
+		startTime, err = time.Parse(time.UnixDate, timeArray[startEntryNum][startTimeColumnNum])
 	} else {
 		fmt.Printf("start: %s\n", init_file.ModTime().Format(time.UnixDate))
 		startTime = init_file.ModTime()
 	}
-	fmt.Printf("end: %s\n", timeArray[len(timeArray)-1][5])
+	fmt.Printf("end: %s\n", timeArray[len(timeArray)-1][endTimeColumnNum])
 
 	if err != nil {
 		fmt.Printf("Unable to parse start time for the build. \n")
 	}
 
-	endTime, err := time.Parse(time.UnixDate, timeArray[len(timeArray)-1][5])
+	endTime, err := time.Parse(time.UnixDate, timeArray[len(timeArray)-1][endTimeColumnNum])
 	if err != nil {
 		fmt.Printf("Unable to parse end time for the build. \n")
 	}
@@ -76,13 +86,14 @@ func OutputCSVLog(parentDir string) {
 
 	// Print timestamps.
 	for i := 0; i < len(timeArray); i++ {
-		fmt.Println(timeArray[i][0] + " " + timeArray[i][1] + " took " + timeArray[i][3] + ". ")
+		fmt.Println(timeArray[i][fileNameColumnNum] + " " + timeArray[i][stepNameColumnNum] + " took " + timeArray[i][durationColumnNum] + ". ")
 	}
 	fmt.Println("The full build duration was " + difference.String() + ".")
 }
 
 // Iterate through the target directory and populate the files slice with strings of file names.
 func getFileName(parentDir string) {
+	const startFileIdx = 1
 	err := filepath.Walk(parentDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			fmt.Printf("Error: %s \n", err)
@@ -100,5 +111,5 @@ func getFileName(parentDir string) {
 	}
 
 	// Remove directory name.
-	files = files[1:]
+	files = files[startFileIdx:]
 }
