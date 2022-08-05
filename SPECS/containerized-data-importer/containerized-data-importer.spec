@@ -15,11 +15,10 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
+Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.51.0
 Release:        1%{?dist}
-Summary:        Container native virtualization
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,12 +27,12 @@ URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        cdi_containers_meta
 Source2:        cdi_containers_meta.service
+BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-BuildRequires:  golang
 ExclusiveArch:  x86_64 aarch64
 
 %description
@@ -114,8 +113,8 @@ the CDI container images.
 # Note: having bar symlink'ed to DIR/src/foo/bar does not seem to work. Looks
 # like symlinks in go path are not resolved correctly. Hence the sources need
 # to be 'physically' placed into the proper location.
-%setup -n go/src/kubevirt.io/%{name} -c -T
-tar --strip-components=1 -xf %{S:0}
+%setup -q -n go/src/kubevirt.io/%{name} -c -T
+tar --strip-components=1 -xf %{SOURCE0}
 
 %build
 # Hackery to determine which registry path to use in cdi-operator.yaml
@@ -171,7 +170,7 @@ sed -i"" \
     -e "s#_REGISTRY_#${registry}#g" \
     -e "s#_PKG_VERSION_#%{version}#g" \
     -e "s#_PKG_RELEASE_#%{release}#g" \
-    %{S:1}
+    %{SOURCE1}
 
 export GOPATH=%{_builddir}/go
 export GOFLAGS="-buildmode=pie -mod=vendor"
@@ -217,8 +216,8 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 # Install cdi_containers_meta build service
 mkdir -p %{buildroot}%{_prefix}/lib/obs/service
-install -m 0755 %{S:1} %{buildroot}%{_prefix}/lib/obs/service
-install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
+install -m 0755 %{SOURCE1} %{buildroot}%{_prefix}/lib/obs/service
+install -m 0644 %{SOURCE2} %{buildroot}%{_prefix}/lib/obs/service
 
 # Add top-level node for building package graph
 %files
@@ -276,91 +275,121 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
 - Initial changes to build for Mariner
 - License verified
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
+
 * Fri Jul 15 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.51.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.51.0
+
 * Tue Jun 21 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.50.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.50.0
+
 * Tue May 31 2022 Caleb Crane <caleb.crane@suse.com>
 - Update to version 1.49.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.49.0
+
 * Mon Apr 25 2022 Caleb Crane <caleb.crane@suse.com>
 - Update to version 1.48.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.48.0
+
 * Mon Apr 11 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.47.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.47.0
+
 * Fri Apr  1 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.46.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.46.0
+
 * Thu Mar 10 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.45.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.45.0
+
 * Fri Feb  4 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Pack only cdi-{cr,operator}.yaml into the manifests RPM
+
 * Tue Feb  1 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.44.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.44.0
+
 * Thu Jan 13 2022 Guillaume GARDET <guillaume.gardet@opensuse.org>
 - Enable build on aarch64
+
 * Mon Jan 10 2022 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.43.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.43.0
+
 * Sun Dec 19 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.42.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.42.0
+
 * Fri Nov 26 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Detect SLE15 SP4 build environment
+
 * Fri Nov 12 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.41.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.41.0
+
 * Mon Oct 11 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.40.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.40.0
+
 * Tue Aug 10 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.37.1
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.37.1
+
 * Mon Jul 12 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.36.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.36.0
+
 * Wed Jun 30 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Generate meta info for containers during rpm build
+
 * Mon Jun 14 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Use registry.suse.com as the default fallback for sle
 - Rename macro registry_path to kubevirt_registry_path
 - Update to version 1.35.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.35.0
+
 * Fri Jun  4 2021 Fabian Vogt <fvogt@suse.com>
 - Add REGISTRY variable
+
 * Thu May 20 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update to version 1.34.0
   Release notes https://github.com/kubevirt/containerized-data-importer/releases/tag/v1.34.0
+
 * Thu May 20 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Disable changelog generation via tar_scm service (too verbose)
+
 * Thu Apr 29 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Include release number into docker tag
 - Add cdi_containers_meta build service
+
 * Thu Apr 29 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Set default reg_path='registry.opensuse.org/kubevirt'
 - Add _constraints file with disk requirements
 - Drop CDI_VERSION env var since its not used during the build
+
 * Wed Apr 21 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Preparation for submission to SLE15 SP2
   jsc#SLE-11089 jsc#ECO-3633
+
 * Thu Apr 15 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Drop csv-generator
+
 * Wed Apr  7 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Update registry path
+
 * Fri Mar  5 2021 Vasily Ulyanov <vasily.ulyanov@suse.com>
 - Fix import of vendor dependencies
   * Arrange the directory layout in buildroot
   * Drop manifest-build-fix.patch
   * Switch to Go 1.14 (used for upstream builds)
+
 * Fri Feb 26 2021 James Fehlig <jfehlig@suse.com>
 - Add a manifests package containing YAML manifests used to
   install CDI
   manifest-build-fix.patch
+
 * Wed Feb 24 2021 jfehlig@suse.com
 - Update to version 1.30.0:
   * Release to quay.io instead of docker (#1635)
@@ -392,6 +421,7 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
   * Add Data Volume annotations documentation (#1582)
   * core: Preallocate blank block volumes (#1559)
   * Skip test 2555 if running on openshift (#1572)
+
 * Tue Jan 26 2021 jfehlig@suse.com
 - Update to version 1.29.0:
   * Document smartclone disable feature in markdown (#1571)
@@ -449,8 +479,10 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
   * update kubevirtci (#1457)
   * Update WORKSPACE packages to non-404 ones, and add a second mirror. (#1444)
   * Don't wait for NS to deleted in test before starting next test (#1439)
+
 * Tue Oct 27 2020 James Fehlig <jfehlig@suse.com>
 - spec: Fix binary names for several CDI components
+
 * Mon Oct 26 2020 jfehlig@suse.com
 - Update to version 1.25.0:
   * Update builder image to add libnbd (#1452)
@@ -472,6 +504,7 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
   * Fix size mismatch between source and target in smart clone tests. Ceph no longer (#1421)
   * use snappy compression for cloning instead of gzip (#1419)
   * Update to k8s.io/klog/v2, used by kubernetes 1.19 (#1409)
+
 * Fri Oct 23 2020 jfehlig@suse.com
 - Update to version 1.24.0:
   * add system:authorized to groups checked for clone auth (#1415)
@@ -484,5 +517,6 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
   * Add test_id for the test cases (#1398)
   * Fix incorrect region parsing from aws s3 endpoint (#1395)
   * Add functional test for cloning if source NS has enought quota and (#1387)
+
 * Fri Oct 23 2020 James Fehlig <jfehlig@suse.com>
 - Initial attempt at packaging CDI
