@@ -1,7 +1,7 @@
 Summary:        File-Which
 Name:           perl-File-Which
 Version:        1.27
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ URL:            http://search.cpan.org/dist/File-Which/
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl(Env)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Test::More)
 BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -57,6 +60,9 @@ find %{buildroot} -name 'perllocal.pod' -delete
 
 
 %changelog
+* Wed Jul 27 2022 Muhammad Falak <mwani@microsoft.com> - 1.27-2
+- Add BR on `perl(Test::More)`, `perl(Env)` & `perl(ExtUtils::MakeMaker)` to enable ptest
+
 * Tue Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.27-1
 - Update to 1.27
 

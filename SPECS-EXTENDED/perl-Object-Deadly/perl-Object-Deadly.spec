@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Object-Deadly
 Version:        0.09
-Release:        34%{?dist}
+Release:        35%{?dist}
 Summary:        Perl module providing an object that dies whenever examined
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Object-Deadly
@@ -17,6 +17,7 @@ BuildRequires:  perl(Devel::Symdump)
 BuildRequires:  perl(Scalar::Util)
 # Tests:
 BuildRequires:  perl(Test::Exception)
+BuildRequires:  perl(English)
 BuildRequires:  perl(Test::More)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
@@ -47,6 +48,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Tue Jul 26 2022 Muhammad Falak <mwani@microsoft.com> - 0.09-35
+- Add an explicit BR on `perl(English)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.09-34
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

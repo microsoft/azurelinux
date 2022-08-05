@@ -7,7 +7,7 @@ Name:           pyproject-rpm-macros
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,15 +42,17 @@ Source901:      README.md
 Source902:      LICENSE
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-six
 BuildRequires:  python3dist(packaging)
 BuildRequires:  python3dist(pip)
-BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(tox-current-env) >= 0.0.6
 BuildRequires:  python3dist(wheel)
-# Available only in SPECS-EXTENDED:
-BuildRequires:  python3dist(toml)
 %endif
 
 Requires:       %{_bindir}/find
@@ -94,14 +96,18 @@ install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/marine
 install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/mariner/
 
 %check
+pip3 install more_itertools pytest>=3.9 toml tox
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
 %{python3} -m pytest -vv --doctest-modules
+test_status=$?
 
 # brp-compress is provided as an argument to get the right directory macro expansion
 %{python3} compare_mandata.py -f %{_rpmconfigdir}/brp-compress
-
+[[ $? -eq 0 && $test_status -eq 0 ]]
 
 %files
+%license LICENSE
+%doc README.md
 %{_rpmmacrodir}/macros.pyproject
 %{_rpmconfigdir}/mariner/pyproject_buildrequires.py
 %{_rpmconfigdir}/mariner/pyproject_convert.py
@@ -110,10 +116,10 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %{_rpmconfigdir}/mariner/pyproject_construct_toxenv.py
 %{_rpmconfigdir}/mariner/pyproject_requirements_txt.py
 
-%doc README.md
-%license LICENSE
-
 %changelog
+* Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3
+- Adding missing test dependencies.
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

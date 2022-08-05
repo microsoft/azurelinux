@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,8 +85,10 @@ Requires:       gzip
 Requires:       lua
 Requires:       mariner-rpm-macros
 Requires:       patch
+Requires:       sed
 Requires:       tar
 Requires:       unzip
+Requires:       util-linux
 Requires:       xz
 Provides:       %{name}-sign = %{version}-%{release}
 
@@ -276,6 +278,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jul 18 2022 Nan Liu <liunan@microsoft.com> - 4.17.0-9
+- Add missing dependencies to rpmbuild (sed and util-linux)
+
 * Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.17.0-8
 - Move lua runtime dependency from main rpm package.  Move to rpm-build.
 - Move python files to rpm-build package.  This removes the implied dependency on python3 by the rpm package.
