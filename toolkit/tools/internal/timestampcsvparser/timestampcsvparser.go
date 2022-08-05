@@ -4,7 +4,7 @@
 // Parses the timestamps stored in CSV files and print them
 // to the terminal at the end of the build.
 
-package timestamp
+package timestampcsvparser
 
 import (
 	"bufio"
