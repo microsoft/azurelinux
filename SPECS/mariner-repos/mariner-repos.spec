@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        15%{?dist}
+Release:        14%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -83,6 +83,7 @@ Requires: %{name} = %{version}-%{release}
 %description microsoft-preview
 %{summary}
 
+
 %install
 rm -rf $RPM_BUILD_ROOT
 export REPO_DIRECTORY="$RPM_BUILD_ROOT/etc/yum.repos.d"
@@ -153,9 +154,6 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
 
 %changelog
-*   Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 1.0-15
--   Add SRPMS repos for base, update, and coreui (all disabled by default)
-
 *   Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-14
 -   Add microsoft and microsoft-preview repo configuration packages.  
 -   These repos offer Mariner packages produced by partner teams within Microsoft on 

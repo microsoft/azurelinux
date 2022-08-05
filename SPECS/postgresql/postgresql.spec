@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.8
-Release:        1%{?dist}
+Version:        12.7
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -170,9 +170,6 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
-* Tue Jul 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 12.8-1
-- Update to v12.8 resolve CVE-2021-3677.
-
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 12.7-2
 - Patch CVE-2021-23222
 
