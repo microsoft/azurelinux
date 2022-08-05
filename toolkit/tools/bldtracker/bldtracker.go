@@ -37,7 +37,7 @@ func main() {
 	logger.InitBestEffort(*logFile, "trace")
 
 	// Construct the CSV path.
-	completePath = filepath.Join(*dirPath, *scriptName + ".csv")
+	completePath = filepath.Join(*dirPath, *scriptName+".csv")
 
 	// Perform different actions based on the input "mode".
 	switch *mode {
