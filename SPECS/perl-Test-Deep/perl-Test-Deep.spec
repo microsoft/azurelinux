@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Deep
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Deep-%{version}.tar.gz#/perl-Test-Deep-%{version}.tar.gz
+Source1:        LICENSE.PTR
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -53,11 +54,13 @@ make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
-%license META.yml
+%license LICENSE.PTR
 %doc Changes README TODO
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Deep.3*
