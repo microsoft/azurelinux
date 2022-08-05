@@ -4,15 +4,13 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        16.2.5
-Release:        4%{?dist}
+Version:        16.2.10
+Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
-# Upstream patch to fix build with snappy 1.1.9. Remove in v16.2.7
-Patch0:         %{name}-snappy-fix
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -1805,10 +1803,13 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
-* Wed Mar 9 2022 Mateusz Malisz <mamalisz@microsoft> - 16.2.5-4
+* Fri Aug 05 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.2.10-1
+- Update source to v16.2.10 to address CVE-2022-0670
+
+* Wed Mar 09 2022 Mateusz Malisz <mamalisz@microsoft.com> - 16.2.5-4
 - Add libevent as a build requires to fix build error/warning for some hostnames
 
-* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft> - 16.2.5-3
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 16.2.5-3
 - Add patch to fix build with snappy >= 1.1.9
 
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 16.2.5-2
