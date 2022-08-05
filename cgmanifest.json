@@ -2145,8 +2145,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.131.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -2475,8 +2475,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.131.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -2485,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.131.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -2495,8 +2495,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.131.1.tar.gz"
+          "version": "5.10.123.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.123.1.tar.gz"
         }
       }
     },
@@ -4585,8 +4585,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.20.0",
-          "downloadUrl": "https://nodejs.org/download/release/v14.20.0/node-v14.20.0.tar.xz"
+          "version": "14.18.3",
+          "downloadUrl": "https://nodejs.org/download/release/v14.18.3/node-v14.18.3.tar.xz"
         }
       }
     },
@@ -5655,8 +5655,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.8",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.8/postgresql-12.8.tar.bz2"
+          "version": "12.7",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.7/postgresql-12.7.tar.bz2"
         }
       }
     },
@@ -6205,8 +6205,8 @@
         "type": "other",
         "other": {
           "name": "python-jinja2",
-          "version": "2.11.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/J/Jinja2/Jinja2-2.11.3.tar.gz"
+          "version": "2.10.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/93/ea/d884a06f8c7f9b7afbc8138b762e80479fb17aedbbe2b06515a12de9378d/Jinja2-2.10.1.tar.gz"
         }
       }
     },
@@ -8625,8 +8625,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0050",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0050.tar.gz"
+          "version": "8.2.5172",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.5172.tar.gz"
         }
       }
     },
