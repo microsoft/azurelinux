@@ -24,7 +24,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
-Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        cdi_containers_meta
 Source2:        cdi_containers_meta.service
 BuildRequires:  golang
