@@ -42,13 +42,13 @@ func CSVToArray(filename string) {
 func OutputCSVLog(parentDir string) {
 	var startTime time.Time
 	const (
-		startEntryNum = 0
-		fileNameColumnNum = 0
-		stepNameColumnNum = 1
+		startEntryNum       = 0
+		fileNameColumnNum   = 0
+		stepNameColumnNum   = 1
 		actionNameColumnNum = 2
-		durationColumnNum = 3
-		startTimeColumnNum = 4	
-		endTimeColumnNum = 5 	
+		durationColumnNum   = 3
+		startTimeColumnNum  = 4
+		endTimeColumnNum    = 5
 	)
 
 	init_file, err := os.Stat(parentDir + "/init")
