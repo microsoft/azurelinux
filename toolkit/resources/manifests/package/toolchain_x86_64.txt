@@ -22,11 +22,11 @@ bzip2-1.0.6-15.cm1.x86_64.rpm
 bzip2-debuginfo-1.0.6-15.cm1.x86_64.rpm
 bzip2-devel-1.0.6-15.cm1.x86_64.rpm
 bzip2-libs-1.0.6-15.cm1.x86_64.rpm
-ca-certificates-20200720-25.cm1.noarch.rpm
-ca-certificates-base-20200720-25.cm1.noarch.rpm
-ca-certificates-legacy-20200720-25.cm1.noarch.rpm
-ca-certificates-shared-20200720-25.cm1.noarch.rpm
-ca-certificates-tools-20200720-25.cm1.noarch.rpm
+ca-certificates-20200720-26.cm1.noarch.rpm
+ca-certificates-base-20200720-26.cm1.noarch.rpm
+ca-certificates-legacy-20200720-26.cm1.noarch.rpm
+ca-certificates-shared-20200720-26.cm1.noarch.rpm
+ca-certificates-tools-20200720-26.cm1.noarch.rpm
 check-0.12.0-4.cm1.x86_64.rpm
 check-debuginfo-0.12.0-4.cm1.x86_64.rpm
 cmake-3.21.4-2.cm1.x86_64.rpm
@@ -259,7 +259,7 @@ m4-debuginfo-1.4.18-4.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
 make-debuginfo-4.2.1-5.cm1.x86_64.rpm
 mariner-check-macros-1.0-8.cm1.noarch.rpm
-mariner-release-1.0-42.cm1.noarch.rpm
+mariner-release-1.0-43.cm1.noarch.rpm
 mariner-repos-1.0-15.cm1.noarch.rpm
 mariner-repos-extras-1.0-15.cm1.noarch.rpm
 mariner-repos-extras-preview-1.0-15.cm1.noarch.rpm
