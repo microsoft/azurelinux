@@ -12,7 +12,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,8 +56,6 @@ specifically created for installing on %{buildarch} systems
 %package -n     grub2-efi-binary-noprefix
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
-%ifarch x86_64
-%endif
 
 %description -n grub2-efi-binary-noprefix
 This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
@@ -79,6 +77,9 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
+* Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-5
+- Bump release number to match grub release number
+
 * Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
 - Bump release number to match grub release number
 - Add grub2-efi-binary-noprefix subpackage for the additional efi binary with no prefix directory set

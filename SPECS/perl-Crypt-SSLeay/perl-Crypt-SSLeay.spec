@@ -3,7 +3,7 @@
 Summary:        Crypt::SSLeay - OpenSSL support for LWP
 Name:           perl-Crypt-SSLeay
 Version:        0.73_06
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://metacpan.org/release/Crypt-SSLeay
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -20,6 +20,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  perl-Path-Class
 BuildRequires:  perl-Try-Tiny
 BuildRequires:  perl(ExtUtils::CBuilder)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Bytes::Random::Secure)
 
 Provides:       perl(Crypt::SSLeay) = %{version}-%{release}
 Provides:       perl(Crypt::SSLeay::CTX) = %{version}-%{release}
@@ -64,6 +66,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jul 27 2022 Muhammad Falak <mwani@micrsofot.com> - 0.73_06-2
+- Add BR on `perl(Test::More)` & `perl(Bytes::Random::Secure)` to enable ptest
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.73_06
 - Update to 0.73_06
 - Add missing requires for ExtUtils::CBuilder.
