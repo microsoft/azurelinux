@@ -1,0 +1,16 @@
+diff -ruN a/td.gemspec b/td.gemspec
+--- a/td.gemspec	2022-07-12 14:17:54.063278628 -0700
++++ b/td.gemspec	2022-07-12 14:19:50.824670663 -0700
+@@ -10,9 +10,9 @@
+   gem.version               = TreasureData::TOOLBELT_VERSION
+   gem.authors               = ["Treasure Data, Inc."]
+   gem.email                 = "support@treasure-data.com"
+-  gem.files                 = `git ls-files`.split("\n").select { |f| !f.start_with?('dist') }
+-  gem.test_files            = `git ls-files -- {test,spec,features}/*`.split("\n")
+-  gem.executables           = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
++  gem.files                 = Dir['**/*']
++  gem.test_files            = gem.files.grep(%r{^(test|spec|features)/})
++  gem.executables           = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+   gem.require_paths         = ['lib']
+   gem.required_ruby_version = '>= 2.1'
+ 
