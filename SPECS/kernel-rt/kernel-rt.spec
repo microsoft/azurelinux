@@ -13,7 +13,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.44.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -377,6 +377,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Aug 07 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-4
+- Enable CONFIG_VFIO_NOIOMMU for RT Kernel
+
 * Fri Jul 01 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-3
 - Build turbostat and cpupower
 
