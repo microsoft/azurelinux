@@ -952,7 +952,7 @@ install -m 0644 -D udev/50-rbd.rules %{buildroot}%{_udevrulesdir}/50-rbd.rules
 set -x 
 ls -la .
 ls -la sudoers.d
-find . -name "ceph-osd-smartctl"
+cat sudoers.d/ceph-smartctl
 install -m 0600 -D sudoers.d/ceph-osd-smartctl %{buildroot}%{_sysconfdir}/sudoers.d/ceph-osd-smartctl
 
 #set up placeholder directories
