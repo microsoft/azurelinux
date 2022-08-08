@@ -22,7 +22,7 @@ var (
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
 
-	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String() // Need to add "--timestamp-file=boilerplate.csv" when try to run boilerplate.go.
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
