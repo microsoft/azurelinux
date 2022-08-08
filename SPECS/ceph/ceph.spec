@@ -975,6 +975,13 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/ceph/bootstrap-rbd
 mkdir -p %{buildroot}%{_localstatedir}/lib/ceph/bootstrap-rbd-mirror
 
 # prometheus alerts
+ls -la .
+ls -la monitoring
+ls -la monitoring/prometheus
+ls -la monitoring/prometheus/alerts
+find . -name "*ceph_default_alerts*"
+find . -name "*ceph_default*"
+find . -name "*_alerts*"
 install -m 644 -D monitoring/prometheus/alerts/ceph_default_alerts.yml %{buildroot}/etc/prometheus/ceph/ceph_default_alerts.yml
 
 #################################################################################
