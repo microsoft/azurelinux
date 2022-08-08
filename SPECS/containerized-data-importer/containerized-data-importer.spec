@@ -107,11 +107,9 @@ kubernetes installation with kubectl apply.
 tar --strip-components=1 -xf %{SOURCE0}
 
 %build
-# Hackery to determine which registry path to use in cdi-operator.yaml
-# when building the manifests
 
 export GOPATH=%{_builddir}/go
-export GOFLAGS="-buildmode=pie -mod=vendor"
+export GOFLAGS+="-buildmode=pie -mod=vendor"
 env \
 CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
@@ -127,7 +125,7 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-operator \
 	%{nil}
 
-env DOCKER_PREFIX=$reg_path DOCKER_TAG=%{version}-%{release} ./hack/build/build-manifests.sh
+./hack/build/build-manifests.sh
 
 %install
 mkdir -p %{buildroot}%{_bindir}
