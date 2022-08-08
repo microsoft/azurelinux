@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "cdi_containers_meta": "8416660c91056090b40468dba13e29768a8b67a2151096ec92501564678742ed",
-  "cdi_containers_meta.service": "d420b8ee880c5a2b7fd7205455e19614013b6ccb1c2cc694b224dc149ba1d99b",
   "containerized-data-importer-1.51.0.tar.gz": "c45c8807a8606a4c0b88813a13698fb693441c2e7b41d057c477fa5379018eb0"
  }
 }

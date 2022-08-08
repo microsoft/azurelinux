@@ -19,14 +19,12 @@ Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.51.0
 Release:        1%{?dist}
-License:        Apache-2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        cdi_containers_meta
-Source2:        cdi_containers_meta.service
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -95,14 +93,6 @@ Group:          System/Packages
 This contains the built YAML manifests used to install CDI into a
 kubernetes installation with kubectl apply.
 
-%package -n     obs-service-cdi_containers_meta
-Summary:        CDI containers meta information (build service)
-Group:          System/Packages
-
-%description -n obs-service-cdi_containers_meta
-The package provides meta information that is used during the build of
-the CDI container images.
-
 %prep
 # Unpack the sources respecting the GOPATH directory structure expected by the
 # go imports resolver. I.e. if DIR is in GOPATH then DIR/src/foo/bar can be
@@ -119,58 +109,6 @@ tar --strip-components=1 -xf %{SOURCE0}
 %build
 # Hackery to determine which registry path to use in cdi-operator.yaml
 # when building the manifests
-#
-# The 'kubevirt_registry_path' macro can be used to define an explicit path in
-# the project config, e.g.
-#
-# Macros:
-# %kubevirt_registry_path registry.opensuse.org/Virtualization/container
-# :Macros
-#
-# 'kubevirt_registry_path' can also be defined when building locally, e.g.
-#
-# osc build --define='kubevirt_registry_path registry.opensuse.org/foo/bar/baz' ...
-#
-# If 'kubevirt_registry_path' is not specified, the standard publish location for
-# SLE and openSUSE-based containers is used.
-#
-distro='%{?sle_version}:%{?is_opensuse}%{!?is_opensuse:0}'
-case "${distro}" in
-150200:0)
-    tagprefix=suse/sles/15.2
-    labelprefix=com.suse.kubevirt
-    registry=registry.suse.com
-    ;;
-150300:0)
-    tagprefix=suse/sles/15.3
-    labelprefix=com.suse.kubevirt
-    registry=registry.suse.com
-    ;;
-150400:0)
-    tagprefix=suse/sles/15.4
-    labelprefix=com.suse.kubevirt
-    registry=registry.suse.com
-    ;;
-*)
-    tagprefix=kubevirt
-    labelprefix=org.opensuse.kubevirt
-    registry=registry.opensuse.org
-    ;;
-esac
-
-%if "%{?kubevirt_registry_path}" == ""
-    reg_path="${registry}/${tagprefix}"
-%else
-    reg_path='%{kubevirt_registry_path}'
-%endif
-
-sed -i"" \
-    -e "s#_TAGPREFIX_#${tagprefix}#g" \
-    -e "s#_LABELPREFIX_#${labelprefix}#g" \
-    -e "s#_REGISTRY_#${registry}#g" \
-    -e "s#_PKG_VERSION_#%{version}#g" \
-    -e "s#_PKG_RELEASE_#%{release}#g" \
-    %{SOURCE1}
 
 export GOPATH=%{_builddir}/go
 export GOFLAGS="-buildmode=pie -mod=vendor"
@@ -214,14 +152,6 @@ mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
 install -m 0644 _out/manifests/release/cdi-operator.yaml %{buildroot}%{_datadir}/cdi/manifests/release/
 install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/manifests/release/
 
-# Install cdi_containers_meta build service
-mkdir -p %{buildroot}%{_prefix}/lib/obs/service
-install -m 0755 %{SOURCE1} %{buildroot}%{_prefix}/lib/obs/service
-install -m 0644 %{SOURCE2} %{buildroot}%{_prefix}/lib/obs/service
-
-# Add top-level node for building package graph
-%files
-
 %files api
 %license LICENSE
 %doc README.md
@@ -262,16 +192,13 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_prefix}/lib/obs/service
 %license LICENSE
 %doc README.md
 %dir %{_datadir}/cdi
+%dir %{_datadir}/cdi/manifests
+%dir %{_datadir}/cdi/manifests/release
 %{_datadir}/cdi/manifests
 
-%files -n obs-service-cdi_containers_meta
-%license LICENSE
-%doc README.md
-%dir %{_prefix}/lib/obs
-%{_prefix}/lib/obs/service
 
 %changelog
-* Thu Aug 3 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-1
+* Wed Aug 3 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-1
 - Initial changes to build for Mariner
 - License verified
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
