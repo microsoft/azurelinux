@@ -953,7 +953,7 @@ set -x
 ls -la .
 ls -la sudoers.d
 cat sudoers.d/ceph-smartctl
-install -m 0600 -D sudoers.d/ceph-osd-smartctl %{buildroot}%{_sysconfdir}/sudoers.d/ceph-osd-smartctl
+install -m 0600 -D sudoers.d/ceph-smartctl %{buildroot}%{_sysconfdir}/sudoers.d/ceph-smartctl
 
 #set up placeholder directories
 mkdir -p %{buildroot}%{_sysconfdir}/ceph
@@ -1009,6 +1009,7 @@ install -m 644 -D monitoring/prometheus/alerts/ceph_default_alerts.yml %{buildro
 %endif
 %config(noreplace) %{_sysconfdir}/logrotate.d/ceph
 %config(noreplace) %{_sysconfdir}/sysconfig/ceph
+%config(noreplace) %{_sysconfdir}/sudoers.d/ceph-smartctl
 %{_unitdir}/ceph.target
 %dir %{python3_sitelib}/ceph_volume
 %{python3_sitelib}/ceph_volume/*
@@ -1476,7 +1477,6 @@ fi
 %{_unitdir}/ceph-volume@.service
 %attr(750,ceph,ceph) %dir %{_localstatedir}/lib/ceph/osd
 %config(noreplace) %{_sysctldir}/90-ceph-osd.conf
-%{_sysconfdir}/sudoers.d/ceph-osd-smartctl
 
 %post osd
 %systemd_post ceph-osd@\*.service ceph-volume@\*.service ceph-osd.target
@@ -1809,6 +1809,9 @@ exit 0
 %changelog
 * Fri Aug 05 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.2.10-1
 - Update source to v16.2.10 to address CVE-2022-0670
+- Install ceph-smartctl instead of ceph-osd-smartctl
+- Since ceph-smartctl now seems needed for daemons of multiple subpackages, 
+    moved %files entry for ceph-smartctl from osd to base 
 
 * Wed Mar 09 2022 Mateusz Malisz <mamalisz@microsoft.com> - 16.2.5-4
 - Add libevent as a build requires to fix build error/warning for some hostnames
