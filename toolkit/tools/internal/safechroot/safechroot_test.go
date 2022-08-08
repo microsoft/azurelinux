@@ -71,7 +71,7 @@ func TestInitializeShouldCreateRoot(t *testing.T) {
 	if buildpipeline.IsRegularBuild() {
 		assert.True(t, !os.IsNotExist(err))
 	} else {
-		assert.True(t, !os.IsNotExist(err))
+		assert.True(t, os.IsNotExist(err))
 	}
 }
 
