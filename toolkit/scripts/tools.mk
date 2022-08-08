@@ -154,7 +154,7 @@ $(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOO
 else
 $(chroot_worker):
 endif
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(TIMESTAMP_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \

@@ -17,12 +17,13 @@ bldtracker=$5
 timestamp_dir=$6
 
 chroot_name="worker_chroot"
+script_name="$(basename $0)"
 chroot_builder_folder=$chroot_base/$chroot_name
 chroot_archive=$chroot_base/$chroot_name.tar.gz
 chroot_log="$log_path"/$chroot_name.log
 
 $bldtracker \
-    --script-name="$(basename $0)" \
+    --script-name=script_name \
     --step-name="start running the script" \
     --dir-path="$timestamp_dir" \
     --log-file="$chroot_log" \
@@ -52,7 +53,7 @@ install_one_toolchain_rpm () {
 
 record_timestamp () {
     $bldtracker \
-        --script-name="$(basename $0)" \
+        --script-name=script_name \
         --step-name="$1" \
         --dir-path="$timestamp_dir" \
         --log-file="$chroot_log" \
