@@ -35,7 +35,6 @@ func CSVToArray(filename string) {
 	for fileScanner.Scan() {
 		timeArray = append(timeArray, strings.Split(fileScanner.Text(), ","))
 	}
-
 }
 
 // Take list of file paths, parse, and output log to terminal.
@@ -51,14 +50,14 @@ func OutputCSVLog(parentDir string) {
 		endTimeColumnNum    = 5
 	)
 
-	init_file, err := os.Stat(parentDir + "/init")
+	init_file, err := os.Stat(filepath.Join(parentDir, "/init"))
 
 	// Populate the slice "files".
 	getFileName(parentDir)
 
 	// Format each file to array format.
 	for _, file := range files {
-		CSVToArray(parentDir + file)
+		CSVToArray(filepath.Join(parentDir, file))
 	}
 
 	// Get the start and end time from the first timestamp entry.
