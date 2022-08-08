@@ -363,7 +363,7 @@ perl-Filter-1.59-488.cm2.x86_64.rpm
 perl-Filter-Simple-0.96-488.cm2.noarch.rpm
 perl-FindBin-1.52-488.cm2.noarch.rpm
 perl-GDBM_File-1.19-488.cm2.x86_64.rpm
-perl-generators-1.11-8.cm2.noarch.rpm
+perl-generators-1.11-9.cm2.noarch.rpm
 perl-Getopt-Long-2.52-488.cm2.noarch.rpm
 perl-Getopt-Std-1.13-488.cm2.noarch.rpm
 perl-Hash-Util-0.25-488.cm2.x86_64.rpm
