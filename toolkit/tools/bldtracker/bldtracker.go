@@ -27,7 +27,7 @@ var (
 	initializeMode = "i"
 	recordMode     = "r"
 	validModes     = []string{initializeMode, recordMode}
-	mode           = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record'('r').").Required().Enum(validModes...)
+	mode           = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
 	completePath   string
 )
 

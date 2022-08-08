@@ -24,7 +24,7 @@ chroot_log="$log_path"/$chroot_name.log
 $bldtracker \
     --script-name="$(basename $0)" \
     --step-name="start running the script" \
-    --dir-path=$timestamp_dir \
+    --dir-path="$timestamp_dir" \
     --log-file="$chroot_log" \
     --mode="i"
 
@@ -54,7 +54,7 @@ record_timestamp () {
     $bldtracker \
         --script-name="$(basename $0)" \
         --step-name="$1" \
-        --dir-path=$timestamp_dir \
+        --dir-path="$timestamp_dir" \
         --log-file="$chroot_log" \
         --mode="r"
 }
