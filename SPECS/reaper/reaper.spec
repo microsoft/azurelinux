@@ -20,6 +20,8 @@ Vendor:         Microsoft Corporation
 Group:          Applications/System
 URL:            https://cassandra-reaper.io/
 Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/%{version}.tar.gz#/cassandra-reaper-%{version}.tar.gz
+# Building reaper only for x86_64 architecture for now, as build caches are x86_64 specific.
+ExclusiveArch:  x86_64
 
 # Building reaper from sources downloads artifacts related to maven/node/etc. These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
 # Below is the list of cached sources.

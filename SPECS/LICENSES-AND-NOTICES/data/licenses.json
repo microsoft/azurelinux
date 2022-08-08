@@ -2053,6 +2053,7 @@
                 "python-sphinxcontrib-websupport",
                 "python-yamlloader",
                 "R",
+                "reaper",
                 "rocksdb",
                 "rubygem-addressable",
                 "rubygem-asciidoctor",
