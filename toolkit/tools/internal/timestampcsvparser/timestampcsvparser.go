@@ -50,8 +50,6 @@ func OutputCSVLog(parentDir string) {
 		endTimeColumnNum    = 5
 	)
 
-	init_file, err := os.Stat(filepath.Join(parentDir, "/init"))
-
 	// Populate the slice "files".
 	getFileName(parentDir)
 
@@ -59,6 +57,8 @@ func OutputCSVLog(parentDir string) {
 	for _, file := range files {
 		CSVToArray(filepath.Join(parentDir, file))
 	}
+
+	init_file, err := os.Stat(filepath.Join(parentDir, "/init"))
 
 	// Get the start and end time from the first timestamp entry.
 	// Start time will be the ModTime for "init" if it exists, otherwise will be the first CSV entry.
