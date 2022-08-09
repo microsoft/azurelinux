@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        22.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -146,6 +146,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Aug 03 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-6
+- Update add-mariner-distro-support patch to add sysinit.target dependency
+
 * Tue Jul 12 2022 Muhammad Falak <mwani@microsoft.com> - 22.2-5
 - Install check requirements from `test-requirements.txt` to enable ptest
 
