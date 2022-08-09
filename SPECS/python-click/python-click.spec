@@ -24,9 +24,9 @@ comes with good defaults out of the box.
 Summary:        %{summary}
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 %if %{with_check}
-BuildRequires:  python3-pip
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pytest
 %endif
@@ -47,11 +47,11 @@ sed -i 's|pytest<7|pytest|' requirements/tests.in
 
 %install
 %{pyproject_install}
-%{pyproject_save_files} %{pypi_name}
+%pyproject_save_files %{pypi_name}
 
 %check
-%{python3} -m pip install tox attrs iniconfig pluggy py toml tox-current-env atomicwrites more-itertools six
-%tox
+%{python3} -m pip install -r requirements/tests.txt
+%pytest -v tests
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE.rst
