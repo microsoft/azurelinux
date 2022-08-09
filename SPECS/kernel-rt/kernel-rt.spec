@@ -13,7 +13,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.44.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -379,6 +379,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-6
+- Enable CONFIG_PCI_PF_STUB
+
 * Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-5
 - Enable ICE in-tree driver
 - Enable CONFIG_NO_HZ_FULL
