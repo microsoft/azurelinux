@@ -17,6 +17,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-jmespath
 BuildRequires:  python3-jsonschema
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 Requires:       python3
@@ -24,7 +25,6 @@ Requires:       python3-dateutil
 Requires:       python3-jmespath
 Requires:       python3-urllib3
 %if %{with_check}
-BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif
 
@@ -57,8 +57,10 @@ rm -vr tests/functional/leak
 %pyproject_install
 
 %check
-%{python3} -m pip install tox tox-current-env
-%tox
+# Update the tests requirement.txt using piptools compile, not using hashes
+%{python3} -m piptools compile --allow-unsafe --output-file=requirements-dev-new.txt requirements-dev.txt
+%{python3} -m pip install -r requirements-dev-new.txt
+%{python3} -m pytest
 
 %files -n python3-%{pypi_name}
 %doc README.rst
