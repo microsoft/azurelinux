@@ -27,19 +27,19 @@ Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/fasteners-%{version}
 Patch0:         %{url}/commit/49d8f5bb56157a82ff3e6128b506638a214e6d43.patch
 BuildArch:      noarch
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-wheel
-Requires:       python3
-%if %{with_check}
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-%endif
-
 %description
 %{common_description}
 
 %package -n python3-fasteners
 Summary:        A python package that provides useful locks
+
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+%if %{with_check}
+BuildRequires:  python3-pytest
+%endif
+Requires:       python3
 
 %description -n python3-fasteners
 %{common_description}
