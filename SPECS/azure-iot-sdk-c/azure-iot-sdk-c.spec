@@ -7,7 +7,7 @@ Name:           azure-iot-sdk-c
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
 Version:        2022.01.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Azure/azure-iot-sdk-c
@@ -41,6 +41,14 @@ interfaces that enable pluggability between stock and custom modules.
 To meet the wide range of device requirements in the Internet of Things space,
 the C libraries are provided in source code form to support multiple form factors,
 operating systems, tools sets, protocols and communications patterns widely in use today.
+
+%package devel
+Summary:        Azure IoT C SDK Dev
+Group:          Applications/File
+Requires:       %{name} = %{version}-%{release}
+
+%description devel
+This package contains the Azure IoT C SDK dev files
 
 %global debug_package %{nil}
 
@@ -80,12 +88,19 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 %files
 %defattr(-, root, root, -)
 %license LICENSE
-%{_includedir}/*
 %{_bindir}/tpm_device_provision
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/*
 %{_libdir}/*
 /usr/cmake/*
 
 %changelog
+*   Tue Aug 9 2022 Dallas Delaney <dadelan@microsoft.com> - 2022.08.09-10
+-   Split spec into base package and devel
+-   Bump version
+
 *   Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.01.21-1
 -   Upgrade to 2022.01.21.
 
