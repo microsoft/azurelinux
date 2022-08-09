@@ -3960,8 +3960,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.3.3",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.3.3.tar.bz2"
+          "version": "2.3.7",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.3.7.tar.bz2"
         }
       }
     },
