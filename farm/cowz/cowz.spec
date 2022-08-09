@@ -21,7 +21,7 @@ multiple cores to the hilt when compressing data
 %autosetup -n pigz-%{version}
 
 %build
-sleep 20
+sleep 2
 
 %install
 

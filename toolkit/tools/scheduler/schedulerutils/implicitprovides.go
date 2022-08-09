@@ -14,7 +14,7 @@ import (
 )
 
 // InjectMissingImplicitProvides will inject implicit provide nodes into the graph from a build result if they satisfy any unresolved nodes.
-func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (didInjectAny bool, err error) {
+func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool, learner *Learner) (didInjectAny bool, err error) {
 	for _, rpmFile := range res.BuiltFiles {
 		var (
 			provides       []string
@@ -22,6 +22,9 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		)
 
 		provides, err = rpm.QueryRPMProvides(rpmFile)
+		for _, builtFile := range provides {
+			logger.Log.Debugf("Package provided file: %s", builtFile)
+		}
 		if err != nil {
 			if res.Skipped {
 				err = fmt.Errorf("failed to query (%s) for provides. NOTE: source spec '%s' was marked to be skipped - please check if the queried RPM is present. Error: %s", rpmFile, res.Node.SpecName(), err)
@@ -38,7 +41,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile)
+			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, learner)
 			if err != nil {
 				return
 			}
@@ -53,7 +56,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 }
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
-func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
+func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string, learner *Learner) (err error) {
 	var parentNode *pkggraph.PkgNode
 
 	// Find a run node that is backed by the same rpm as the one providing the implicit provide.
@@ -72,6 +75,8 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 		return fmt.Errorf("unable to find suitable parent node for implicit provides (%s)", provides)
 	}
 
+	// Now we know that parentNode, provided by rpmFileProviding, provides the implicit node
+	learner.RecordUnblocks(provides, parentNode)
 	// Collapse the unresolved nodes into a single node backed by the new implicit provide.
 	_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
 
@@ -150,6 +155,7 @@ func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pk
 			if provideInterval.Satisfies(&nodeInterval) {
 				satisfiedBy, found := nodeToSatisfier[node]
 				if found {
+					// potentially a "wasted time" case, if the provider didn't satisfy any other implicit node or unblock something else
 					logger.Log.Warnf("Provides (%s) found that satisfies an already satisfied unresolved node (%s) by (%s)", provide, node.FriendlyName(), satisfiedBy)
 					continue
 				}
@@ -157,6 +163,7 @@ func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pk
 				logger.Log.Infof("Satisfying unresolved dynamic dependency (%s) with (%s)", node.FriendlyName(), provide)
 				matches[provide] = append(matches[provide], node)
 				nodeToSatisfier[node] = provide
+
 			}
 		}
 	}
