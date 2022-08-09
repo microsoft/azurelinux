@@ -26,6 +26,9 @@ Requires:       python3-jmespath
 Requires:       python3-urllib3
 %if %{with_check}
 BuildRequires:  python3-pytest
+BuildRequires:       python3-dateutil
+BuildRequires:       python3-jmespath
+BuildRequires:       python3-urllib3
 %endif
 
 %description
@@ -57,9 +60,7 @@ rm -vr tests/functional/leak
 %pyproject_install
 
 %check
-# Update the tests requirement.txt using piptools compile, not using hashes
-%{python3} -m piptools compile --allow-unsafe --output-file=requirements-dev-new.txt requirements-dev.txt
-%{python3} -m pip install -r requirements-dev-new.txt
+%{python3} -m pip install -r requirements.txt
 %{python3} -m pytest
 
 %files -n python3-%{pypi_name}
