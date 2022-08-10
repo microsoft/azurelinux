@@ -51,6 +51,7 @@ Command aliases for Click.
 %check
 export LANG=en_US.UTF-8
 # test_invalid fails with new click as the quotes in output changed from single to regular ones
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
 %pytest -k 'not test_invalid'
 
 %files
