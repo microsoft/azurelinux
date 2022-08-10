@@ -3,7 +3,7 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsemanage
 Version:        3.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,10 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog
+* Wed Aug 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 3.2-2
+- Do not ignore /root for genhomedircon, otherwise it will not
+  get correct labeling.
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version and rebase patch
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
