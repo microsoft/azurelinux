@@ -78,6 +78,8 @@ pip3 install pytest
 # See: https://github.com/pexpect/pexpect/issues/669
 # We can remove this once the GitHub issue is fixed and we update
 # the package to the version containing the fix.
+echo "set enable-bracketed-paste off" > .inputrc
+export INPUTRC=$PWD/.inputrc
 TRAVIS=true python3 -m pytest -v -k "not spawn_uses_env"
 
 %files -n python3-%{modname}
