@@ -42,14 +42,11 @@ BuildRequires:  gcc
 BuildRequires:  libtomcrypt-devel
 BuildRequires:  make
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 # Needed for documentation
 BuildRequires:  python3-sphinx
 Requires:       python3
-
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description
 %{_description}
