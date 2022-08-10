@@ -42,13 +42,15 @@ func NewLearner() (l *Learner) {
 func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, parentNode *pkggraph.PkgNode) {
 	logger.Log.Warnf("Dynamic dep info: %#v", dynamicDep)
 	logger.Log.Warnf("Provider of dd info: %#v", parentNode)
-	learnerRes := l.GetResult(parentNode.RpmPath)
+	var learnerRes = l.GetResult(parentNode.RpmPath)
 	learnerRes.Unblocks = append(learnerRes.Unblocks, dynamicDep.Name)
 }
 
 func (l *Learner) RecordBuildTime(res *BuildResult) {
 	if res.Node.Type == pkggraph.TypeBuild {
-		learnerRes := l.GetResult(res.Node.RpmPath)
+		logger.Log.Debugf("address of learner: %p", l)
+		var learnerRes = l.GetResult(res.Node.RpmPath)
+		logger.Log.Debugf("address of learnerRes: %p", learnerRes)
 		logger.Log.Debugf("debuggy: %#v", learnerRes)
 		learnerRes.BuildTime = res.BuildTime
 		logger.Log.Debugf("debuggy: %f", res.BuildTime)
