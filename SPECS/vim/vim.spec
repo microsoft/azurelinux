@@ -192,7 +192,7 @@ fi
 
 %changelog
 * Tue Aug 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.0.0181-1
-- Upgrade to 9.0.0181 to fix CVES: 2022-2571, 2022-2571, 2022-2580, 2022-2581.
+- Upgrade to 9.0.0181 to fix CVES: 2022-2522, 2022-2571, 2022-2580, 2022-2581.
 
 * Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 9.0.0050-1
 - Upgrade to 9.0.0050 to fix CVEs: 2022-2257, 2022-2264, 2022-2284, 2022-2285, 2022-2286, 2022-2287
