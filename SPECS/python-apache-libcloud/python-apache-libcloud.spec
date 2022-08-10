@@ -49,6 +49,7 @@ Requires:       python3-lxml
 Requires:       python3-requests
 
 %if %{with_check}
+BuildRequires:  openssh-clients
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif
