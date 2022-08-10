@@ -79,9 +79,13 @@ func (l *Learner) GetResult(rpmPath string) (res *LearnerResult) {
 	if err != nil {
 		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", rpmPath, err)
 	}
-	for _, resEntry := range l.Results {
+	for index, _ := range l.Results {
+		logger.Log.Debugf("addr of l.Results[index]: %p", &l.Results[index])
+		resEntry := &l.Results[index]
+		logger.Log.Debugf("addr of resEntry: %p", resEntry)
 		if resEntry.Rpm.FullName == rpmId.FullName {
-			res = &resEntry
+			res = resEntry
+			logger.Log.Debugf("res: %p", res)
 			break
 		}
 	}
