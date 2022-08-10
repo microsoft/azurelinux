@@ -18,12 +18,11 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-Cython
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
-
 %if %{with_check}
+BuildRequires:  openssh-clients
+BuildRequires:  openssh-server
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  %{_sbindir}/sshd
-BuildRequires:  %{_bindir}/ssh-agent
 %endif
 
 Recommends: python3-%{modname}-doc
