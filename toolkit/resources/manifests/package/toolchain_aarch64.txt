@@ -411,7 +411,7 @@ perl-NDBM_File-1.15-488.cm2.aarch64.rpm
 perl-Net-1.02-488.cm2.noarch.rpm
 perl-Net-Ping-2.74-488.cm2.noarch.rpm
 perl-NEXT-0.68-488.cm2.noarch.rpm
-perl-Object-Accessor-0.48-8.cm2.noarch.rpm
+perl-Object-Accessor-0.48-9.cm2.noarch.rpm
 perl-ODBM_File-1.17-488.cm2.aarch64.rpm
 perl-Opcode-1.50-488.cm2.aarch64.rpm
 perl-open-1.12-488.cm2.noarch.rpm
