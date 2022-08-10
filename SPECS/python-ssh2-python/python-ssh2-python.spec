@@ -24,16 +24,10 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
 %if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-docutils
-BuildRequires:  python3-pluggy
-BuildRequires:  python3-pygments
-BuildRequires:  python3-six
+BuildRequires:  openssh-clients
+BuildRequires:  openssh-server
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  %{_sbindir}/sshd
-BuildRequires:  %{_bindir}/ssh-agent
 %endif
 
 %description
@@ -73,12 +67,14 @@ rm tests/test_knownhost.py tests/test_session.py tests/test_sftp.py
 rm tests/test_channel.py
 
 # fake ssh-agent
-eval `ssh-agent`
+eval `%{_bindir}/ssh-agent`
 chmod 600 tests/unit_test_key
-ssh-add tests/unit_test_key
-ssh-add -l
+%{_bindir}/ssh-add tests/unit_test_key
+chmod 600 tests/embedded_server/rsa.key
+%{_bindir}/ssh-add tests/embedded_server/rsa.key
+%{_bindir}/ssh-add -l
 
-%{python3} -m pip install more-itertools
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
 %pytest -v tests
 
 %files -n python3-%{modname}
