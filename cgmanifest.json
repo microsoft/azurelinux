@@ -10001,8 +10001,8 @@
         "type": "other",
         "other": {
           "name": "libtirpc",
-          "version": "1.3.2",
-          "downloadUrl": "https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.2.tar.bz2"
+          "version": "1.3.3",
+          "downloadUrl": "https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.3.tar.bz2"
         }
       }
     },
