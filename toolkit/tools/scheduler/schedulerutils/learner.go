@@ -31,11 +31,13 @@ type LearnerResult struct {
 
 type Learner struct {
 	Results map[string]LearnerResult
+	ImplicitProviders map[string][]string
 }
 
 func NewLearner() (l *Learner) {
 	return &Learner{
 		Results: make(map[string]LearnerResult),
+		ImplicitProviders: make(map[string][]string),
 	}
 }
 
@@ -46,16 +48,22 @@ func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, parentNode *pkg
 	}
 
 	learnerResult, exists:= l.Results[rpmId.FullName]
-		if !exists{
-			l.Results[rpmId.FullName] = LearnerResult{
-				Rpm: rpmId,
-				BuildTime: 0,
-				ImplicitProvides:  []string{dynamicDep.Name},
-			}
-		}else{
-			learnerResult.ImplicitProvides = append(learnerResult.ImplicitProvides, dynamicDep.Name)
-			l.Results[rpmId.FullName] = learnerResult
+	if !exists{
+		l.Results[rpmId.FullName] = LearnerResult{
+			Rpm: rpmId,
+			BuildTime: 0,
+			ImplicitProvides:  []string{dynamicDep.Name},
 		}
+	}else{
+		learnerResult.ImplicitProvides = append(learnerResult.ImplicitProvides, dynamicDep.Name)
+		l.Results[rpmId.FullName] = learnerResult
+	}
+	providers, exists := l.ImplicitProviders[dynamicDep.Name]
+	if !exists{
+		l.ImplicitProviders[dynamicDep.Name] = []string{rpmId.FullName}
+	}else{
+		l.ImplicitProviders[dynamicDep.Name] = append(providers, rpmId.FullName)
+	}
 }
 
 func (l *Learner) RecordBuildTime(res *BuildResult) {
