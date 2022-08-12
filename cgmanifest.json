@@ -27687,8 +27687,8 @@
         "type": "other",
         "other": {
           "name": "xterm",
-          "version": "351",
-          "downloadUrl": "ftp://ftp.invisible-island.net/xterm/xterm-351.tgz"
+          "version": "372",
+          "downloadUrl": "https://ftp.invisible-island.net/xterm/xterm-372.tgz"
         }
       }
     },
