@@ -26,34 +26,56 @@ type RpmIdentity struct {
 type LearnerResult struct {
 	Rpm       RpmIdentity
 	BuildTime float32
-	Unblocks  []string
+	ImplicitProvides  []string
 }
 
 type Learner struct {
-	Results []LearnerResult
+	Results map[string]LearnerResult
 }
 
 func NewLearner() (l *Learner) {
 	return &Learner{
-		Results: make([]LearnerResult, 0),
+		Results: make(map[string]LearnerResult),
 	}
 }
 
 func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, parentNode *pkggraph.PkgNode) {
-	logger.Log.Warnf("Dynamic dep info: %#v", dynamicDep)
-	logger.Log.Warnf("Provider of dd info: %#v", parentNode)
-	var learnerRes = l.GetResult(parentNode.RpmPath)
-	learnerRes.Unblocks = append(learnerRes.Unblocks, dynamicDep.Name)
+	rpmId, err := ParseRpmIdentity(parentNode.RpmPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", parentNode.RpmPath, err)
+	}
+
+	learnerResult, exists:= l.Results[rpmId.FullName]
+		if !exists{
+			l.Results[rpmId.FullName] = LearnerResult{
+				Rpm: rpmId,
+				BuildTime: 0,
+				ImplicitProvides:  []string{dynamicDep.Name},
+			}
+		}else{
+			learnerResult.ImplicitProvides = append(learnerResult.ImplicitProvides, dynamicDep.Name)
+			l.Results[rpmId.FullName] = learnerResult
+		}
 }
 
 func (l *Learner) RecordBuildTime(res *BuildResult) {
 	if res.Node.Type == pkggraph.TypeBuild {
-		logger.Log.Debugf("address of learner: %p", l)
-		var learnerRes = l.GetResult(res.Node.RpmPath)
-		logger.Log.Debugf("address of learnerRes: %p", learnerRes)
-		logger.Log.Debugf("debuggy: %#v", learnerRes)
-		learnerRes.BuildTime = res.BuildTime
-		logger.Log.Debugf("debuggy: %f", res.BuildTime)
+		rpmId, err := ParseRpmIdentity(res.Node.RpmPath)
+		if err != nil {
+			logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", res.Node.RpmPath, err)
+		}
+
+		learnerResult, exists:= l.Results[rpmId.FullName]
+		if !exists{
+			l.Results[rpmId.FullName] = LearnerResult{
+				Rpm: rpmId,
+				BuildTime: res.BuildTime,
+				ImplicitProvides:  make([]string, 0),
+			}
+		}else{
+			learnerResult.BuildTime = res.BuildTime
+			l.Results[rpmId.FullName] = learnerResult
+		}
 	}
 }
 
@@ -72,33 +94,6 @@ func (l *Learner) Dump(path string) {
 		logger.Log.Errorf("Failed to write learner payload, err: %s", err)
 	}
 	file.Sync()
-}
-
-func (l *Learner) GetResult(rpmPath string) (res *LearnerResult) {
-	rpmId, err := ParseRpmIdentity(rpmPath)
-	if err != nil {
-		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", rpmPath, err)
-	}
-	for index, _ := range l.Results {
-		logger.Log.Debugf("addr of l.Results[index]: %p", &l.Results[index])
-		resEntry := &l.Results[index]
-		logger.Log.Debugf("addr of resEntry: %p", resEntry)
-		if resEntry.Rpm.FullName == rpmId.FullName {
-			res = resEntry
-			logger.Log.Debugf("res: %p", res)
-			break
-		}
-	}
-	if res == nil {
-		res = &LearnerResult{
-			Rpm:       rpmId,
-			BuildTime: -1,
-			Unblocks:  make([]string, 0),
-		}
-		res.Unblocks = append(res.Unblocks, "foobar")
-		l.Results = append(l.Results, *res)
-	}
-	return
 }
 
 func ParseRpmIdentity(fullRpmPath string) (rpmId RpmIdentity, err error) {

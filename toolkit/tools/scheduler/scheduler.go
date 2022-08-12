@@ -208,9 +208,15 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex, ignoredPackages)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
+	
+	buildAnalysis := schedulerutils.NewBuildAnalysis()
+	start := time.Now()
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
 	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels, reservedFiles, deltaBuild)
+
+	totalBuildTime := float32(time.Since(start).Seconds())
+	buildAnalysis.RecordTotalBuildTime(totalBuildTime)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -331,6 +337,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		schedulerutils.PrintBuildResult(res)
 		buildState.RecordBuildResult(res)
 		learner.RecordBuildTime(res)
+		logger.Log.Debugf("debuggy scheduler result: %#v", res)
+
 
 		if !stopBuilding {
 			if res.Err == nil {
@@ -398,7 +406,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
-	learner.Dump("/home/cameronbaird/Repos/main-recent2/toolkit/learner_dump.json")
+	learner.Dump("./learner_dump.json")
 	return
 }
 
