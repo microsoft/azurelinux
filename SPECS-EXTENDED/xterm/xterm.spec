@@ -12,8 +12,8 @@ BuildRequires:  libxkbfile-devel xorg-x11-apps
 Requires:       xterm-resize = %{version}-%{release}
 Recommends:     xorg-x11-fonts-misc
 
-Source0:        https://ftp.invisible-island.net/xterm/%{name}-%{version}.tgz
-Source1:        https://ftp.invisible-island.net/xterm/16colors.txt
+Source0:        http://ftp.invisible-island.net/archives/xterm/%{name}-%{version}.tgz
+Source1:        http://ftp.invisible-island.net/archives/xterm/16colors.txt
 
 Patch1:         xterm-defaults.patch
 Patch2:         xterm-desktop.patch
@@ -106,7 +106,7 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 * Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 372-1
 - Bump version to address CVE-2021-27135
 - Refresh all patches to apply cleanly
-- Switch url to `https` instead of `ftp`
+- Switch url to `http` instead of `ftp`
 - Cosmetic changes to spec formating
 - License verified
 
