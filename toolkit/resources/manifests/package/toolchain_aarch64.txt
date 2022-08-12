@@ -308,7 +308,7 @@ perl-DBD-SQLite-1.70-2.cm2.aarch64.rpm
 perl-DBD-SQLite-debuginfo-1.70-2.cm2.aarch64.rpm
 perl-DBI-1.643-2.cm2.aarch64.rpm
 perl-DBI-debuginfo-1.643-2.cm2.aarch64.rpm
-perl-DBIx-Simple-1.37-5.cm2.noarch.rpm
+perl-DBIx-Simple-1.37-6.cm2.noarch.rpm
 perl-DBM_Filter-0.06-488.cm2.noarch.rpm
 perl-debugger-1.60-488.cm2.noarch.rpm
 perl-debuginfo-5.34.1-488.cm2.aarch64.rpm
