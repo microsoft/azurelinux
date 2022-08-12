@@ -284,6 +284,13 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
+
+	informer := schedulerutils.LoadLearner()
+	for i, node := range(nodesToBuild){
+		weight := schedulerutils.WeighNodeCriticalPath(node, pkgGraph, goalNode, informer)
+		logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
+	}
+
 	learner := schedulerutils.NewLearner()
 
 	for {
@@ -337,7 +344,6 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		schedulerutils.PrintBuildResult(res)
 		buildState.RecordBuildResult(res)
 		learner.RecordBuildTime(res)
-		logger.Log.Debugf("debuggy scheduler result: %#v", res)
 
 
 		if !stopBuilding {
