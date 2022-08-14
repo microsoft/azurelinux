@@ -9,6 +9,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/graph/preprocessor"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -23,43 +24,13 @@ var (
 	logLevel = exe.LogLevelFlag(app)
 )
 
-func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
-	for _, node := range pkgGraph.AllNodes() {
-
-		if node.Type != pkggraph.TypeRun {
-			continue
-		}
-
-		isPrebuilt, _, missing := pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, nil)
-
-		if isPrebuilt == false {
-			logger.Log.Tracef("Can't mark %s as prebuilt, missing: %v", node.SrpmPath, missing)
-			continue
-		}
-
-		preBuiltNode := pkgGraph.CloneNode(node)
-		preBuiltNode.State = pkggraph.StateUpToDate
-		preBuiltNode.Type = pkggraph.TypePreBuilt
-
-		parentNodes := pkgGraph.To(node.ID())
-		for parentNodes.Next() {
-			parentNode := parentNodes.Node().(*pkggraph.PkgNode)
-
-			if parentNode.Type != pkggraph.TypeGoal {
-				pkgGraph.RemoveEdge(parentNode.ID(), node.ID())
-
-				logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d. For '%s'", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
-				err = pkgGraph.AddEdge(parentNode, preBuiltNode)
-
-				if err != nil {
-					logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
-					return
-				}
-			}
-		}
+func populatePreprocessorConfig() *preprocessor.Config {
+	return &preprocessor.Config{
+		InputGraphFile:  *inputGraphFile,
+		OutputGraphFile: *outputGraphFile,
+		HydratedBuild:   *hydratedBuild,
 	}
 
-	return
 }
 
 func main() {
@@ -67,25 +38,14 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	scrubbedGraph := pkggraph.NewPkgGraph()
-
-	err := pkggraph.ReadDOTGraphFile(scrubbedGraph, *inputGraphFile)
+	cfg := populatePreprocessorConfig()
+	scrubbedGraph, err := cfg.ReadAndPreprocessGraph()
 	if err != nil {
-		logger.Log.Panicf("Failed to read graph to file, %s. Error: %s", *inputGraphFile, err)
+		logger.Log.Panic(err)
 	}
-
-	if *hydratedBuild {
-		logger.Log.Debugf("Nodes before replacing prebuilt nodes: %d", len(scrubbedGraph.AllNodes()))
-		err = replaceRunNodesWithPrebuiltNodes(scrubbedGraph)
-		logger.Log.Debugf("Nodes after replacing prebuilt nodes: %d", len(scrubbedGraph.AllNodes()))
-		if err != nil {
-			logger.Log.Panicf("Failed to replace run nodes with preBuilt nodes. Error: %s", err)
-		}
-	}
-
-	err = pkggraph.WriteDOTGraphFile(scrubbedGraph, *outputGraphFile)
+	err = pkggraph.WriteDOTGraphFile(scrubbedGraph, cfg.OutputGraphFile)
 	if err != nil {
-		logger.Log.Panicf("Failed to write cache graph to file, %s. Error: %s", *outputGraphFile, err)
+		logger.Log.Panicf("Failed to write cache graph to file, %s. Error: %s", cfg.OutputGraphFile, err)
 	}
 	return
 }
