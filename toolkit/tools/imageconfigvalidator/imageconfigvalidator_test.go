@@ -13,6 +13,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/image/configvalidator"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/installutils"
 
@@ -47,7 +48,7 @@ func TestShouldSucceedValidatingDefaultConfigs(t *testing.T) {
 				fmt.Printf("Failed to validate %s\n", configPath)
 			}
 
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.NoError(t, err)
 			if err != nil {
 				fmt.Printf("Failed to validate %s\n", configPath)
@@ -62,7 +63,7 @@ func TestShouldSucceedValidatingDefaultConfigs(t *testing.T) {
 func TestShouldFailEmptyConfig(t *testing.T) {
 	config := configuration.Config{}
 
-	err := ValidateConfiguration(config)
+	err := configvalidator.ValidateConfiguration(config)
 	assert.Error(t, err)
 	assert.Equal(t, "config file must provide at least one system configuration inside the [SystemConfigs] field", err.Error())
 }
@@ -71,7 +72,7 @@ func TestShouldFailEmptySystemConfig(t *testing.T) {
 	config := configuration.Config{}
 	config.SystemConfigs = []configuration.SystemConfig{{}}
 
-	err := ValidateConfiguration(config)
+	err := configvalidator.ValidateConfiguration(config)
 	assert.Error(t, err)
 	assert.Equal(t, "invalid [SystemConfigs]: missing [Name] field", err.Error())
 }
@@ -96,7 +97,7 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 			assert.NoError(t, err)
 
 			config.Disks[0].PartitionTableType = configuration.PartitionTableType("not_a_real_partition_type")
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.Error(t, err)
 			assert.Equal(t, "invalid [Disks]: invalid [PartitionTableType]: invalid value for PartitionTableType (not_a_real_partition_type)", err.Error())
 
@@ -134,7 +135,7 @@ func TestShouldFailMissingVerityPackageWithVerityRoot(t *testing.T) {
 
 			config.SystemConfigs[0].PackageLists = newPackageList
 
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.Error(t, err)
 			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] selected, but 'verity-read-only-root' package is not included in the package lists", err.Error())
 
@@ -178,7 +179,7 @@ func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
 			// Turn on the debug flag
 			config.SystemConfigs[0].ReadOnlyVerityRoot.TmpfsOverlayDebugEnabled = true
 
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.Error(t, err)
 			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but 'verity-read-only-root-debug-tools' package is not included in the package lists", err.Error())
 
@@ -216,7 +217,7 @@ func TestShouldFailMissingFipsPackageWithFipsCmdLine(t *testing.T) {
 
 			config.SystemConfigs[0].PackageLists = newPackageList
 
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.Error(t, err)
 			assert.Equal(t, "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but 'dracut-fips' package is not included in the package lists", err.Error())
 
@@ -253,7 +254,7 @@ func TestShouldFailMissingSELinuxPackageWithSELinux(t *testing.T) {
 
 			config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
 
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.Error(t, err)
 			assert.Equal(t, "failed to validate package lists in config: [SELinux] selected, but 'selinux-policy' package is not included in the package lists", err.Error())
 
@@ -295,7 +296,7 @@ func TestShouldSucceedSELinuxPackageDefinedInline(t *testing.T) {
 
 			config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
 
-			err = ValidateConfiguration(config)
+			err = configvalidator.ValidateConfiguration(config)
 			assert.NoError(t, err)
 			return
 		}
