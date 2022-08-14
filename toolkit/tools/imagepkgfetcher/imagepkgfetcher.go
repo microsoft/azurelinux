@@ -5,18 +5,10 @@ package main
 
 import (
 	"os"
-	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/installutils"
-
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/image/pkgfetcher"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -48,105 +40,32 @@ var (
 	logLevel = exe.LogLevelFlag(app)
 )
 
+func populateImagePkgFetcherConfig() *pkgfetcher.Config {
+	return &pkgfetcher.Config{
+		ConfigFile:           *configFile,
+		OutDir:               *outDir,
+		BaseDirPath:          *baseDirPath,
+		ExistingRpmDir:       *existingRpmDir,
+		TmpDir:               *tmpDir,
+		WorkerTar:            *workertar,
+		RepoFiles:            *repoFiles,
+		UsePreviewRepo:       *usePreviewRepo,
+		DisableUpstreamRepos: *disableUpstreamRepos,
+		TlsClientCert:        *tlsClientCert,
+		TlsClientKey:         *tlsClientKey,
+		ExternalOnly:         *externalOnly,
+		InputGraph:           *inputGraph,
+		InputSummaryFile:     *inputSummaryFile,
+		OutputSummaryFile:    *outputSummaryFile,
+	}
+}
+
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	if *externalOnly && strings.TrimSpace(*inputGraph) == "" {
-		logger.Log.Fatal("input-graph must be provided if external-only is set.")
-	}
-
-	cloner := rpmrepocloner.New()
-	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
-	if err != nil {
-		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
-	}
-	defer cloner.Close()
-
-	if !*disableUpstreamRepos {
-		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
-		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-		if err != nil {
-			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
-		}
-	}
-
-	if strings.TrimSpace(*inputSummaryFile) != "" {
-		// If an input summary file was provided, simply restore the cache using the file.
-		err = repoutils.RestoreClonedRepoContents(cloner, *inputSummaryFile)
-	} else {
-		err = cloneSystemConfigs(cloner, *configFile, *baseDirPath, *externalOnly, *inputGraph)
-	}
-
-	if err != nil {
-		logger.Log.Panicf("Failed to clone RPM repo. Error: %s", err)
-	}
-
-	logger.Log.Info("Configuring downloaded RPMs as a local repository")
-	err = cloner.ConvertDownloadedPackagesIntoRepo()
-	if err != nil {
-		logger.Log.Panicf("Failed to convert downloaded RPMs into a repo. Error: %s", err)
-	}
-
-	if strings.TrimSpace(*outputSummaryFile) != "" {
-		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
-		logger.PanicOnError(err, "Failed to save cloned repo contents")
-	}
-}
-
-func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {
-	const cloneDeps = true
-
-	cfg, err := configuration.LoadWithAbsolutePaths(configFile, baseDirPath)
-	if err != nil {
-		return
-	}
-
-	packageVersionsInConfig, err := installutils.PackageNamesFromConfig(cfg)
-	if err != nil {
-		return
-	}
-
-	// Add kernel packages from KernelOptions
-	packageVersionsInConfig = append(packageVersionsInConfig, installutils.KernelPackages(cfg)...)
-
-	if externalOnly {
-		packageVersionsInConfig, err = filterExternalPackagesOnly(packageVersionsInConfig, inputGraph)
-		if err != nil {
-			return
-		}
-	}
-
-	// Add any packages required by the install tools
-	packageVersionsInConfig = append(packageVersionsInConfig, installutils.GetRequiredPackagesForInstall()...)
-
-	logger.Log.Infof("Cloning: %v", packageVersionsInConfig)
-	// The image tools don't care if a package was created locally or not, just that it exists. Disregard if it is prebuilt or not.
-	_, err = cloner.Clone(cloneDeps, packageVersionsInConfig...)
-	return
-}
-
-// filterExternalPackagesOnly returns the subset of packageVersionsInConfig that only contains external packages.
-func filterExternalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inputGraph string) (filteredPackages []*pkgjson.PackageVer, err error) {
-	dependencyGraph := pkggraph.NewPkgGraph()
-	err = pkggraph.ReadDOTGraphFile(dependencyGraph, inputGraph)
-	if err != nil {
-		return
-	}
-
-	for _, pkgVer := range packageVersionsInConfig {
-		pkgNode, _ := dependencyGraph.FindBestPkgNode(pkgVer)
-
-		// There are two ways an external package will be represented by pkgNode.
-		// 1) pkgNode may be nil. This is possible if the package is never consumed during the build phase,
-		//    which means it will not be in the graph.
-		// 2) pkgNode will be of 'StateUnresolved'. This will be the case if a local package has it listed as
-		//    a Requires or BuildRequires.
-		if pkgNode == nil || pkgNode.RunNode.State == pkggraph.StateUnresolved {
-			filteredPackages = append(filteredPackages, pkgVer)
-		}
-	}
-
-	return
+	cfg := populateImagePkgFetcherConfig()
+	err := pkgfetcher.FetchPkgsAndCreateRepo(cfg)
+	logger.PanicOnError(err, "Failed to save cloned repo contents")
 }
