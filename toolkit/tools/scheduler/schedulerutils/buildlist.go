@@ -7,19 +7,19 @@ import (
 	"bufio"
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/installutils"
 )
 
 // CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
 // The build list is a superset of:
-//	- packagesNamesToBuild,
-//	- packagesNamesToRebuild,
-//	- local packages listed in the image config, and
-//	- kernels in the image config (if built locally).
+//   - packagesNamesToBuild,
+//   - packagesNamesToRebuild,
+//   - local packages listed in the image config, and
+//   - kernels in the image config (if built locally).
 func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []string, inputGraphFile, imageConfig, baseDirPath string) (packageVersToBuild []*pkgjson.PackageVer, err error) {
 	packageVersToBuild = convertPackageNamesIntoPackageVers(packagesNamesToBuild)
 	packageVersToBuild = append(packageVersToBuild, convertPackageNamesIntoPackageVers(packagesNamesToRebuild)...)
