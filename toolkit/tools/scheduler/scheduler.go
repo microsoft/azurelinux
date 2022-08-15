@@ -208,7 +208,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex, ignoredPackages)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
-	
+
 	buildAnalysis := schedulerutils.NewBuildAnalysis()
 	start := time.Now()
 
@@ -286,8 +286,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	informer := schedulerutils.LoadLearner()
-	for i, node := range(nodesToBuild){
-		weight := schedulerutils.WeighNodeCriticalPath(node, pkgGraph, goalNode, informer)
+	for i, node := range nodesToBuild {
+		weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
 		logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
 	}
 
@@ -344,7 +344,6 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		schedulerutils.PrintBuildResult(res)
 		buildState.RecordBuildResult(res)
 		learner.RecordBuildTime(res)
-
 
 		if !stopBuilding {
 			if res.Err == nil {

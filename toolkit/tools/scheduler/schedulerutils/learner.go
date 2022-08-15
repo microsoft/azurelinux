@@ -5,6 +5,9 @@ package schedulerutils
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -24,44 +27,56 @@ type RpmIdentity struct {
 }
 
 type LearnerResult struct {
-	Rpm       RpmIdentity
-	BuildTime float32
-	ImplicitProvides  []string
+	Rpm              RpmIdentity
+	BuildTime        float32
+	ImplicitProvides []string
 }
 
 type Learner struct {
-	Results map[string]LearnerResult
+	Results           map[string]LearnerResult
 	ImplicitProviders map[string][]string
 }
 
 func NewLearner() (l *Learner) {
 	return &Learner{
-		Results: make(map[string]LearnerResult),
+		Results:           make(map[string]LearnerResult),
 		ImplicitProviders: make(map[string][]string),
 	}
 }
 
-func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, parentNode *pkggraph.PkgNode) {
-	rpmId, err := ParseRpmIdentity(parentNode.RpmPath)
+func LoadLearner() (l *Learner) {
+	l = NewLearner()
+
+	content, err := ioutil.ReadFile("./learner_dump.json") // the file is currently assumed to be in the local toolkit directory
 	if err != nil {
-		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", parentNode.RpmPath, err)
+		fmt.Println("Err")
+	}
+	json.Unmarshal(content, l)
+
+	return
+}
+
+func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, provider *pkggraph.PkgNode) {
+	rpmId, err := ParseRpmIdentity(provider.RpmPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", provider.RpmPath, err)
 	}
 
-	learnerResult, exists:= l.Results[rpmId.FullName]
-	if !exists{
+	learnerResult, exists := l.Results[rpmId.FullName]
+	if !exists {
 		l.Results[rpmId.FullName] = LearnerResult{
-			Rpm: rpmId,
-			BuildTime: 0,
-			ImplicitProvides:  []string{dynamicDep.Name},
+			Rpm:              rpmId,
+			BuildTime:        0,
+			ImplicitProvides: []string{dynamicDep.Name},
 		}
-	}else{
+	} else {
 		learnerResult.ImplicitProvides = append(learnerResult.ImplicitProvides, dynamicDep.Name)
 		l.Results[rpmId.FullName] = learnerResult
 	}
 	providers, exists := l.ImplicitProviders[dynamicDep.Name]
-	if !exists{
+	if !exists {
 		l.ImplicitProviders[dynamicDep.Name] = []string{rpmId.FullName}
-	}else{
+	} else {
 		l.ImplicitProviders[dynamicDep.Name] = append(providers, rpmId.FullName)
 	}
 }
@@ -73,18 +88,51 @@ func (l *Learner) RecordBuildTime(res *BuildResult) {
 			logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", res.Node.RpmPath, err)
 		}
 
-		learnerResult, exists:= l.Results[rpmId.FullName]
-		if !exists{
+		learnerResult, exists := l.Results[rpmId.FullName]
+		if !exists {
 			l.Results[rpmId.FullName] = LearnerResult{
-				Rpm: rpmId,
-				BuildTime: res.BuildTime,
-				ImplicitProvides:  make([]string, 0),
+				Rpm:              rpmId,
+				BuildTime:        res.BuildTime,
+				ImplicitProvides: make([]string, 0),
 			}
-		}else{
+		} else {
 			learnerResult.BuildTime = res.BuildTime
 			l.Results[rpmId.FullName] = learnerResult
 		}
 	}
+}
+
+func (l *Learner) GetExpectedBuildTime(rpmPath string) (buildTime float64) {
+	logger.Log.Debugf("debuggy! %s", rpmPath)
+	rpmId, err := ParseRpmIdentity(rpmPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", rpmPath, err)
+	}
+
+	buildTime = float64(l.Results[rpmId.FullName].BuildTime)
+	return
+}
+
+// weighsIndividualNode determines the "weight" of a node by summing all build times
+// between the goal node and the individual node
+func (l *Learner) WeighNodeCriticalPath(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode) float64 {
+	if node == goalNode {
+		return 0.0
+	}
+
+	if node.Type != pkggraph.TypeBuild {
+		return 0.0
+	}
+
+	maxWeight := 0.0
+	dependents := pkgGraph.To(node.ID())
+	for dependents.Next() {
+		dependent := dependents.Node().(*pkggraph.PkgNode)
+		maxWeight = math.Max(maxWeight, l.WeighNodeCriticalPath(dependent, pkgGraph, goalNode))
+	}
+	nodeBuildTime := l.GetExpectedBuildTime(node.RpmPath)
+	return nodeBuildTime + maxWeight
+
 }
 
 func (l *Learner) Dump(path string) {
