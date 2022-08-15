@@ -11,9 +11,9 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/primitives/navigationbar"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
 )
 
 // Resource constants.

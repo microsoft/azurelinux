@@ -7,11 +7,11 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/diskview/autopartitionwidget"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/diskview/manualpartitionwidget"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/views/diskview/autopartitionwidget"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/attendedinstaller/views/diskview/manualpartitionwidget"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagegen/diskutils"
 )
 
 // UI constants.
