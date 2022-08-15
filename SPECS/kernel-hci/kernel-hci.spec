@@ -17,8 +17,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
-Source2:        sha512hmac-openssl.sh
-Source3:        cbl-mariner-ca-20211013.pem
+Source2:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-net-mlx5-Support-partial-TTC-rules.patch
 Patch1:         0002-net-mlx5-Introduce-port-selection-namespace.patch
 Patch2:         0003-net-mlx5-Add-support-to-create-match-definer.patch
@@ -174,7 +173,7 @@ make mrproper
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE3} certs/mariner.pem
+cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
