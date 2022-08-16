@@ -1,9 +1,21 @@
-diff -up xterm-328/minstall.in.man-paths xterm-328/minstall.in
---- xterm-328/minstall.in.man-paths	2016-10-25 00:29:20.000000000 +0200
-+++ xterm-328/minstall.in	2017-06-01 16:36:26.544065282 +0200
-@@ -138,6 +138,11 @@ USE_chr1=`echo "$USE_name" | sed -e 's/^
+From bd87b44049dd383d6139b2b756dbfc3167ad4937 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 12 Aug 2022 07:34:42 +0530
+Subject: [PATCH 3/3] xterm man paths
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ minstall.in | 8 ++++++++
+ xterm.man   | 7 +++----
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/minstall.in b/minstall.in
+index cd15775..0228db7 100644
+--- a/minstall.in
++++ b/minstall.in
+@@ -141,6 +141,11 @@ USE_chr1=`echo "$USE_name" | sed -e 's/^.//'`
  USE_Name=${USE_chr0}${USE_chr1}
- USE_NAME=`echo "$USE_name" | tr '[a-z]' '[A-Z]'`
+ USE_NAME=`echo "$USE_name" | tr "$lower" "$upper"`
  
 +fontpath=/usr/share/X11/fonts
 +xorgcfgdir=/etc/X11
@@ -11,22 +23,23 @@ diff -up xterm-328/minstall.in.man-paths xterm-328/minstall.in
 +X_MANSECT=7
 +
  sed	-e 's%__vendorversion__%"X Window System"%' \
- 	-e 's%__app_version__%Patch\ \#'$PATCH_NUM% \
- 	-e 's%__app_date__%'$PATCH_YMD% \
-@@ -163,6 +168,9 @@ sed	-e 's%__vendorversion__%"X Window Sy
- 	-e s%fIwtmp'\\%fI'$WTMP_NAME'\\%g' \
- 	-e s%/etc/wtmp%$WTMP_PATH%g \
+ 	-e 's%__app_version__%Patch\ \#'"$PATCH_NUM"% \
+ 	-e 's%__app_date__%'"$PATCH_YMD"% \
+@@ -166,6 +171,9 @@ sed	-e 's%__vendorversion__%"X Window System"%' \
+ 	-e "s%/etc/utmp%$UTMP_PATH%g" \
+ 	-e 's%fIwtmp\\%fI'$WTMP_NAME'\\%g' \
+ 	-e "s%/etc/wtmp%$WTMP_PATH%g" \
++	-e s%__fontpath__%$fontpath%g \
++	-e s%__xorgcfgdir__%$xorgcfgdir%g \
++	-e s%__xorgcfgfil__%$xorgcfgfil%g \
  	-e 's%/\\(\*\*%/*%g' \
-+ 	-e s%__fontpath__%$fontpath%g \
-+ 	-e s%__xorgcfgdir__%$xorgcfgdir%g \
-+ 	-e s%__xorgcfgfil__%$xorgcfgfil%g \
- 	$OLD_FILE >$NEW_FILE
+ 	"$OLD_FILE" >$NEW_FILE
  # diff -u $OLD_FILE $NEW_FILE
- 
-diff -up xterm-328/xterm.man.man-paths xterm-328/xterm.man
---- xterm-328/xterm.man.man-paths	2017-05-31 00:57:12.000000000 +0200
-+++ xterm-328/xterm.man	2017-06-01 16:33:16.493512367 +0200
-@@ -2328,19 +2328,18 @@ Since X11R6, bitmap fonts have been scal
+diff --git a/xterm.man b/xterm.man
+index f5f510f..fdc4990 100644
+--- a/xterm.man
++++ b/xterm.man
+@@ -2551,19 +2551,18 @@ Since X11R6, bitmap fonts have been scaled.
  The font server claims to provide the bold font that \fI\*n\fP requests,
  but the result is not always readable.
  XFree86 introduced a feature which can be used to suppress the scaling.
@@ -49,3 +62,6 @@ diff -up xterm-328/xterm.man.man-paths xterm-328/xterm.man
  .NE
  .IP
  Depending on your configuration, the font server may have its own configuration
+-- 
+2.37.1
+
