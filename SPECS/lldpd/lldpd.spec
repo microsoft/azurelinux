@@ -3,16 +3,14 @@ Distribution:   Mariner
 %bcond_without systemd
 %global rundir /run/
 
-%global gh_owner vincentbernat
-
 Name:     lldpd
-Version:  1.0.4
-Release:  4%{?dist}
+Version:  1.0.14
+Release:  1%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
-URL:      https://%{gh_owner}.github.io/%{name}/
-Source0:  https://media.luffy.cx/files/lldpd/lldpd-%{version}.tar.gz
+URL:      https://lldpd.github.io/
+Source0:  https://github.com/lldpd/lldpd/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:  %{name}-fedora.service
 Source2:  %{name}-tmpfiles
 Source3:  %{name}-fedora.sysconfig
@@ -145,7 +143,7 @@ fi
 %{_mandir}/man8/lldpctl.8*
 %{_mandir}/man8/%{name}.8*
 %{_libdir}/liblldpctl.so.4
-%{_libdir}/liblldpctl.so.4.8.0
+%{_libdir}/liblldpctl.so.4.*
 %dir %{rundir}%{name}
 %dir %{rundir}%{name}/chroot
 %if 0%{?with_systemd}
@@ -164,6 +162,9 @@ fi
 
 
 %changelog
+* Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.14-1
+- Bump version to address CVE-2020-27827
+
 * Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.0.4-4
 - License Verified
 - Remove usage of macros that do not apply for CBL-Mariner
