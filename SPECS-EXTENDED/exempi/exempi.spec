@@ -1,7 +1,7 @@
 Summary:	Library for easy parsing of XMP metadata
 Name:		exempi
 Version:	2.6.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	BSD
 URL:		http://libopenraw.freedesktop.org/wiki/Exempi
 Source0:	https://gitlab.freedesktop.org/libopenraw/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
@@ -64,6 +64,9 @@ rm -rf %{buildroot}%{_libdir}/*.a
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Aug 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.6.1-2
+- Bump to rebuild with zlib 1.2.1-2 (fixes CVE-2022-37434)
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.1-1
 - Updating to version 2.6.1.
 - License verified.
