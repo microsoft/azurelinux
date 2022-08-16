@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "lldpd-1.0.4.tar.gz": "5319bc032fabf1008d5d91e280276aa7f1bbfbb70129d8526cd4526d7c22724f",
+  "lldpd-1.0.14.tar.gz": "e36400051a10ebaf3f9ef50fe471ba55308aab61d6310873f6fdd4a0938d211b",
   "lldpd-el6.init": "cb4605c38e690044aacaeba5f7c45786e43ee2c6d30fab04f99857926b63aef3",
   "lldpd-el7.service": "6bb64180b449a0152bce6b4603a204b28b5c73870c9339cad71987aab9d97f14",
   "lldpd-fedora.service": "b3d1fa3bb2091e2155ead44608af9cef6d1dc1293dfc95e49b4a1c04a86eed04",
