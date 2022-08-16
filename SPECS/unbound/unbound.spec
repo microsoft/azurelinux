@@ -1,14 +1,13 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.13.2
-Release:        2%{?dist}
+Version:        1.16.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
-#Source0:       https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz
-Source0:        %{name}-release-%{version}.tar.gz
+Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 BuildRequires:  expat-devel
 BuildRequires:  libevent-devel
@@ -97,6 +96,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.16.2-1
+- Bump version to address CVE-2022-30698
+
 * Fri Jul 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.13.2-2
 - Build with libevent
 
