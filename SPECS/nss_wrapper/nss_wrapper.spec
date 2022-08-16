@@ -1,16 +1,12 @@
+Name:           nss_wrapper
+Version:        1.1.12
+Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:           nss_wrapper
-Version:        1.1.11
-Release:        2%{?dist}
-
 License:        BSD
 Summary:        A wrapper for the user, group and hosts NSS API
-Url:            https://cwrap.org/
-
+URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
-Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc
-Source2:        nss_wrapper.keyring
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -45,7 +41,6 @@ This package doesn't have a devel package cause this project is for
 development/testing.
 
 %prep
-gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 
 %build
@@ -87,6 +82,11 @@ popd
 %{_mandir}/man1/nss_wrapper.1*
 
 %changelog
+* Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.1.12-1
+- Bumping version to 1.1.12
+- Remove gpg signature check.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.11-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
