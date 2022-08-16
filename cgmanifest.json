@@ -10811,8 +10811,8 @@
         "type": "other",
         "other": {
           "name": "lldpd",
-          "version": "1.0.4",
-          "downloadUrl": "https://media.luffy.cx/files/lldpd/lldpd-1.0.4.tar.gz"
+          "version": "1.0.14",
+          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.14/lldpd-1.0.14.tar.gz"
         }
       }
     },
