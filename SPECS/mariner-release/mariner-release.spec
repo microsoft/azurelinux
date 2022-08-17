@@ -1,7 +1,7 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
-Release:       43%{?dist}
+Release:       44%{?dist}
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -67,6 +67,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+*   Tue Aug 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-44
+-   Updating version for August update 2.
 *   Wed Aug 04 2022 Andrew Phelps <anphel@microsoft.com> - 1.0-43
 -   Updating version for August update.
 *   Fri Jul 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.0-42
