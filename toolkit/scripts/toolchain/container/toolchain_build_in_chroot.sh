@@ -1048,14 +1048,14 @@ popd
 rm -rf cpio-2.13
 touch /logs/status_cpio_complete
 
-echo libarchive-3.6.0
-tar xf libarchive-3.6.0.tar.gz
-pushd libarchive-3.6.0
+echo libarchive-3.6.1
+tar xf libarchive-3.6.1.tar.gz
+pushd libarchive-3.6.1
 ./configure --prefix=/usr --disable-static
 make -j$(nproc)
 make install
 popd
-rm -rf libarchive-3.6.0
+rm -rf libarchive-3.6.1
 touch /logs/status_libarchive_complete
 
 echo lua-5.4.3

@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -339,6 +339,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Mon Aug 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-20
+- Bumping "Release" to sync spec versions across branches.
+
 * Wed Jul 13 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.1.1k-19
 - Removed portion of load-default-engines test causing unit test failure
 
