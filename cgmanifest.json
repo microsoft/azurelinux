@@ -26157,8 +26157,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022b",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022b.tar.gz"
+          "version": "2022c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022c.tar.gz"
         }
       }
     },
