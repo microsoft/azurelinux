@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.14.5
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -80,6 +80,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.14.5-15
+- Bump to rebuild with golang 1.18.5-1
+
 * Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.14.5-14
 - Bumping release to rebuild with golang 1.18.3
 
