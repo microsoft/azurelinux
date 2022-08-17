@@ -1,0 +1,42 @@
+From 7c2a3bdde0a1316771fdd07ff03413f00383f70e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=B6ren=20Tempel?= <soeren@soeren-tempel.net>
+Date: Tue, 2 Aug 2022 18:23:32 +0200
+Subject: [PATCH] ash: fix use-after-free in bash pattern substitution
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+function                                             old     new   delta
+subevalvar                                          1566    1564      -2
+
+Backported by @mfrw from upstream on 2022-08-10
+Applies on v1.35.0 cleanly
+
+Signed-off-by: Sören Tempel <soeren@soeren-tempel.net>
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ shell/ash.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/shell/ash.c b/shell/ash.c
+index 105edd4c8..55c1034f5 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -7357,6 +7357,13 @@ subevalvar(char *start, char *str, int strloc,
+ 				idx = loc;
+ 			}
+ 
++			/* The STPUTC invocations above may resize and move the
++			 * stack via realloc(3). Since repl is a pointer into the
++			 * stack, we need to reconstruct it relative to stackblock().
++			 */
++			if (slash_pos >= 0)
++				repl = (char *)stackblock() + strloc + slash_pos + 1;
++
+ 			//bb_error_msg("repl:'%s'", repl);
+ 			for (loc = (char*)repl; *loc; loc++) {
+ 				char *restart_detect = stackblock();
+-- 
+2.37.1
+
