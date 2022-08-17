@@ -1,14 +1,13 @@
 Summary:        software font engine.
 Name:           freetype
-Version:        2.11.1
-Release:        2%{?dist}
+Version:        2.12.1
+Release:        1%{?dist}
 License:        BSD WITH advertising OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-27404.patch
 BuildRequires:  libtool
 BuildRequires:  zlib-devel
 
@@ -55,6 +54,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Aug 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.12.1-1
+- Updating to version 2.12.1 to address CVEs: 2022-27405 and 2022-27406.
+
 * Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.11.1-2
 - Add patch to address CVE-2022-27404.
 

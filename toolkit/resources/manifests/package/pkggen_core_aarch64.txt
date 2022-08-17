@@ -7,8 +7,8 @@ glibc-iconv-2.28-23.cm1.aarch64.rpm
 glibc-lang-2.28-23.cm1.aarch64.rpm
 glibc-nscd-2.28-23.cm1.aarch64.rpm
 glibc-tools-2.28-23.cm1.aarch64.rpm
-zlib-1.2.12-1.cm1.aarch64.rpm
-zlib-devel-1.2.12-1.cm1.aarch64.rpm
+zlib-1.2.12-2.cm1.aarch64.rpm
+zlib-devel-1.2.12-2.cm1.aarch64.rpm
 file-5.38-1.cm1.aarch64.rpm
 file-devel-5.38-1.cm1.aarch64.rpm
 file-libs-5.38-1.cm1.aarch64.rpm
@@ -58,7 +58,7 @@ findutils-lang-4.6.0-8.cm1.aarch64.rpm
 gettext-0.19.8.1-5.cm1.aarch64.rpm
 gzip-1.9-5.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
-mariner-release-1.0-43.cm1.noarch.rpm
+mariner-release-1.0-44.cm1.noarch.rpm
 patch-2.7.6-7.cm1.aarch64.rpm
 util-linux-2.32.1-7.cm1.aarch64.rpm
 util-linux-devel-2.32.1-7.cm1.aarch64.rpm
@@ -130,9 +130,9 @@ libsolv-0.7.20-1.cm1.aarch64.rpm
 libsolv-devel-0.7.20-1.cm1.aarch64.rpm
 libssh2-1.9.0-1.cm1.aarch64.rpm
 libssh2-devel-1.9.0-1.cm1.aarch64.rpm
-curl-7.76.0-9.cm1.aarch64.rpm
-curl-devel-7.76.0-9.cm1.aarch64.rpm
-curl-libs-7.76.0-9.cm1.aarch64.rpm
+curl-7.84.0-1.cm1.aarch64.rpm
+curl-devel-7.84.0-1.cm1.aarch64.rpm
+curl-libs-7.84.0-1.cm1.aarch64.rpm
 tdnf-2.1.0-6.cm1.aarch64.rpm
 tdnf-cli-libs-2.1.0-6.cm1.aarch64.rpm
 tdnf-devel-2.1.0-6.cm1.aarch64.rpm
