@@ -1,15 +1,15 @@
-%global	gem_name      rake
+%global gem_name      rake
 Summary:        Rake is a Make-like program implemented in Ruby
 Name:           rubygem-%{gem_name}
 Version:        13.0.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ruby.github.io/rake/
 Source0:        https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-
 BuildArch:      noarch
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 BuildRequires:  ruby
 BuildRequires:  ruby(release)
@@ -22,7 +22,7 @@ BuildRequires:  rubygem(minitest) >= 5
 Rake is a Make-like program implemented in Ruby. Tasks and dependencies are
 specified in standard Ruby syntax.
 
-%package	doc
+%package  doc
 Summary:        Documentation for %{name}
 
 BuildArch:      noarch
@@ -75,6 +75,9 @@ popd
 %doc %{gem_instdir}/*.rdoc
 
 %changelog
+* Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-5
+- Add provides.
+
 * Wed May 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-4
 - Add executable.
 
