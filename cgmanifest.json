@@ -1875,7 +1875,7 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.10",
+          "version": "1.17.13",
           "downloadUrl": "https://golang.org/dl/go1.17.13.src.tar.gz"
         }
       }
