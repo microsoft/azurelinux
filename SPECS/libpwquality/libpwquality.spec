@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/libpwquality/libpwquality/
 Source0:        https://github.com/libpwquality/libpwquality/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Patch0:         mariner_fedramp_security.patch
 %global _pwqlibdir %{_libdir}
 %global _moduledir %{_libdir}/security
 %global _secconfdir %{_sysconfdir}/security
@@ -51,7 +52,6 @@ pronounceable passwords from Python applications.
 
 %prep
 %setup -q
-sed -i "s/# minclass = 0/minclass = 4/g" src/pwquality.conf
 
 %build
 [ -f %{_bindir}/python3 ] || ln -s %{_bindir}/python3 /bin/python
@@ -109,7 +109,7 @@ mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d
 
 %changelog
 * Fri Jul 22 2022 Minghe Ren <mingheren@microsoft.com> - 1.4.4-2
-- Ensure password creation requirements are configured
+- Aadd new FedRAMP patch file to ensure password creation requirements are configured
 
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.4.4-1
 - Upgrade to version 1.4.4

@@ -1,0 +1,10 @@
+diff -ruN a/modules/pam_limits/limits.conf b/modules/pam_limits/limits.conf
+--- a/modules/pam_limits/limits.conf	2020-11-25 08:57:02.000000000 -0800
++++ b/modules/pam_limits/limits.conf	2022-08-11 17:20:24.865371976 -0700
+@@ -57,5 +57,6 @@
+ #@faculty        hard    nproc           50
+ #ftp             hard    nproc           0
+ #@student        -       maxlogins       4
++*                hard    core            0
+ 
+ # End of file

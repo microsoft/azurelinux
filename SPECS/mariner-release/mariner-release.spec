@@ -63,7 +63,7 @@ EOF
 
 %changelog
 * Wed Jul 27 2022 Minghe Ren <mingheren@microsoft.com> - 2.0-16
-- remove issue.net kernel part as it is not showing properly by openssh
+- remove issue.net kernel part as sshd doesn't support the old-style telnet escape sequences
 
 * Fri Jul 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-15
 - Updating version for July update.

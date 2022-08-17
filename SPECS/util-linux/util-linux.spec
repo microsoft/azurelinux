@@ -83,8 +83,6 @@ autoreconf -fi
 make %{?_smp_mflags}
 
 %install
-chmod ug-s bash-completion/mount
-chmod ug-s bash-completion/umount
 install -vdm 755 %{buildroot}%{_sharedstatedir}/hwclock
 make DESTDIR=%{buildroot} install
 chmod 644 %{buildroot}%{_docdir}/util-linux/getopt*.tcsh
@@ -116,6 +114,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %dir %{_prefix}%{_var}/run/uuidd
 %dir %{_sharedstatedir}/libuuid
 /bin/*
+%attr(0755,root,root) /bin/mount
+%attr(0755,root,root) /bin/umount
 /sbin/*
 %{_bindir}/*
 %{_sbindir}/*
@@ -151,6 +151,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %changelog
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 2.37.4-4
 - Modify su to improve security
+- Change file permission on mount and umount to improve security
 
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.4-3
 - Enable su tool and related PAM config

@@ -13,6 +13,14 @@ The filesystem package is one of the basic packages that is installed
 on a Linux system. Filesystem contains the basic directory
 layout for a Linux operating system, including the correct permissions
 for the directories. This version is for a system configured with systemd.
+
+%package fedramp
+Summary:        Provide with config files needed for FedRAMP
+Requires:       %{name} = %{version}-%{release}
+
+%description    fedramp
+Provide with multiple configuration files in /etc/modprobe.d/ to meet FedRAMP standerds
+
 %prep
 %build
 %install
@@ -579,17 +587,6 @@ return 0
 %config(noreplace) /etc/profile
 %dir /etc/modprobe.d
 %config(noreplace) /etc/modprobe.d/usb.conf
-%config(noreplace) /etc/modprobe.d/squashfs.conf
-%config(noreplace) /etc/modprobe.d/usb-storage.conf
-%config(noreplace) /etc/modprobe.d/cramfs.conf
-%config(noreplace) /etc/modprobe.d/freevxfs.conf
-%config(noreplace) /etc/modprobe.d/hfs.conf
-%config(noreplace) /etc/modprobe.d/hfsplus.conf
-%config(noreplace) /etc/modprobe.d/jffs2.conf
-%config(noreplace) /etc/modprobe.d/dccp.conf
-%config(noreplace) /etc/modprobe.d/sctp.conf
-%config(noreplace) /etc/modprobe.d/rds.conf
-%config(noreplace) /etc/modprobe.d/tipc.conf
 %dir /etc/sysconfig
 %config(noreplace) /etc/sysconfig/clock
 %config(noreplace) /etc/sysconfig/console
@@ -693,9 +690,23 @@ return 0
 /usr/lib64
 /usr/local/lib64
 
+%files fedramp
+%config(noreplace) /etc/modprobe.d/squashfs.conf
+%config(noreplace) /etc/modprobe.d/usb-storage.conf
+%config(noreplace) /etc/modprobe.d/cramfs.conf
+%config(noreplace) /etc/modprobe.d/freevxfs.conf
+%config(noreplace) /etc/modprobe.d/hfs.conf
+%config(noreplace) /etc/modprobe.d/hfsplus.conf
+%config(noreplace) /etc/modprobe.d/jffs2.conf
+%config(noreplace) /etc/modprobe.d/dccp.conf
+%config(noreplace) /etc/modprobe.d/sctp.conf
+%config(noreplace) /etc/modprobe.d/rds.conf
+%config(noreplace) /etc/modprobe.d/tipc.conf
+
 %changelog
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.1-11
 - Update etc/modprobe.d/ folder to include new multiple config files and imporve security
+- Add subpackage fedramp to include all the new config files
 
 * Thu Jun 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1-10
 - Mark /proc and /sys as %%ghost

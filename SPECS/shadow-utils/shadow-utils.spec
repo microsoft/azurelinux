@@ -117,6 +117,7 @@ for FUNCTION in FAIL_DELAY               \
                 CRACKLIB_DICTPATH        \
                 PASS_CHANGE_TRIES        \
                 PASS_ALWAYS_WARN         \
+                CHFN_AUTH                \
                 ENVIRON_FILE
 do
     sed -i "s/^${FUNCTION}/# &/" %{buildroot}%{_sysconfdir}/login.defs
@@ -162,7 +163,7 @@ chmod 000 %{_sysconfdir}/shadow
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*
-/bin/passwd
+%attr(0755,root,root) /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
 %attr(0000,root,root) %config(noreplace,missingok) %ghost %{_sysconfdir}/shadow
 

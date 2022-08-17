@@ -137,7 +137,7 @@ make %{?_smp_mflags} check
 %dir %{_sysconfdir}/cron.weekly
 %dir %{_sysconfdir}/cron.monthly
 
-%attr(755,root,root) %{_bindir}/crontab
+%attr(4755,root,root) %{_bindir}/crontab
 %attr(755,root,root) %{_bindir}/cronnext
 %{_bindir}/run-parts
 %{_sbindir}/crond

@@ -1,0 +1,12 @@
+diff -ruN a/src/pwquality.conf b/src/pwquality.conf
+--- a/src/pwquality.conf	2020-08-03 03:30:48.000000000 -0700
++++ b/src/pwquality.conf	2022-08-10 16:32:34.661140651 -0700
+@@ -31,7 +31,7 @@
+ #
+ # The minimum number of required classes of characters for the new
+ # password (digits, uppercase, lowercase, others).
+-# minclass = 0
++minclass = 4
+ #
+ # The maximum number of allowed consecutive same characters in the new password.
+ # The check is disabled if the value is 0.
