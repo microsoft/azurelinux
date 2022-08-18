@@ -39,9 +39,6 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 * Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
 - Upgrade to 5.15.60.2 to fix arm64 builds
 
-* Wed Aug 17 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.60.1-1
-- Upgrade to 5.15.60.1
-
 * Tue Aug 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-3
 - Bump release number to match kernel release
 
