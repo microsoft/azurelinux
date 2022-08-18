@@ -94,7 +94,6 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./cpio_extern_nocommon.patch", \
        "./CVE-2021-38185.patch", \
-       "./CVE-2021-36690.patch", \
        "$LFS/tools/" ]
 
 USER root
