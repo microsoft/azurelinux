@@ -1,4 +1,4 @@
-Summary:        Pacakge for Mariner to meet FedRAMP rules
+Summary:        Package for Mariner to meet FedRAMP rules
 Name:           fedramp
 Version:        1.0
 Release:        1%{?dist}
