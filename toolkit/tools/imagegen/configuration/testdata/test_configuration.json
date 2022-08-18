@@ -1,6 +1,7 @@
 {
     "Disks": [
         {
+            "ID": "disk1",
             "PartitionTableType": "gpt",
             "MaxSize": 1024,
             "TargetDisk": {
@@ -53,6 +54,7 @@
             ]
         },
         {
+            "ID": "disk2",
             "PartitionTableType": "mbr",
             "MaxSize": 4096,
             "TargetDisk": {
@@ -107,6 +109,7 @@
         {
             "Name": "SmallerDisk",
             "IsDefault": true,
+            "PrimaryDisk": "disk1",
             "PartitionSettings": [
                 {
                     "ID": "MyBoot",

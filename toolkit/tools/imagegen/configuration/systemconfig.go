@@ -39,6 +39,7 @@ type SystemConfig struct {
 	RemoveRpmDb          bool               `json:"RemoveRpmDb"`
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot `json:"ReadOnlyVerityRoot"`
 	HidepidDisabled      bool               `json:"HidepidDisabled"`
+	PrimaryDisk          string             `json:"PrimaryDisk,omitempty"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which

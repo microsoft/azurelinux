@@ -101,11 +101,6 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 		return
 	}
 
-	if len(config.Disks) > 1 {
-		err = fmt.Errorf("this program currently only supports one disk")
-		return
-	}
-
 	numberOfArtifacts := 0
 	for _, disk := range config.Disks {
 		numberOfArtifacts += len(disk.Artifacts)
