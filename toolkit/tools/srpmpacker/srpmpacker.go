@@ -844,6 +844,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	fileHydrationState := make(map[string]bool)
 
 	// Only consult the current build system's arch
+	// We don't care about the target arch since SRPMs should be packaged in an architecture agnostic manner
 	arch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
 		return

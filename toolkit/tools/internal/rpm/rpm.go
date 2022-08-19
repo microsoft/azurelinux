@@ -5,8 +5,8 @@ package rpm
 
 import (
 	"fmt"
-	"runtime"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"

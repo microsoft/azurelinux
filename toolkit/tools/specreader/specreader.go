@@ -39,19 +39,19 @@ type parseResult struct {
 }
 
 var (
-	app       = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
-	specsDir  = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	output    = exe.OutputFlag(app, "Output file to export the JSON")
-	workers   = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
-	buildDir  = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
-	srpmsDir  = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
-	rpmsDir   = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
-	distTag   = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
+	app        = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
+	specsDir   = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	output     = exe.OutputFlag(app, "Output file to export the JSON")
+	workers    = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
+	buildDir   = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
+	srpmsDir   = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
+	rpmsDir    = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
+	distTag    = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	workerTar  = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
 	targetArch = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
-	runCheck  = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
+	runCheck   = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
+	logFile    = exe.LogFileFlag(app)
+	logLevel   = exe.LogLevelFlag(app)
 )
 
 func main() {
@@ -110,8 +110,10 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFil
 	}
 
 	if chroot != nil {
+		logger.Log.Info("Parsing SPECs inside a chroot environment")
 		err = chroot.Run(doParse)
 	} else {
+		logger.Log.Info("Parsing SPECs in the host environment")
 		err = doParse()
 	}
 
