@@ -26,7 +26,6 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
