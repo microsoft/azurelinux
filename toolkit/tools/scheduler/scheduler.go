@@ -70,6 +70,8 @@ var (
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
 	reservedFileListFile = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
 	deltaBuild           = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
+	updateLearnings      = app.Flag("update-learnings", "Enable buildtime/dynamic dep learning during builds.").Bool()
+	informBuild          = app.Flag("inform-build", "Enable informed build using previous learnings to speed up package builds.").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -284,12 +286,14 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
-
-	informer := schedulerutils.LoadLearner()
-	for i, node := range nodesToBuild {
-		weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
-		logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
+	if(*informBuild){
+		informer := schedulerutils.LoadLearner()
+		for i, node := range nodesToBuild {
+			weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
+			logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
+		}
 	}
+	
 
 	learner := schedulerutils.NewLearner()
 

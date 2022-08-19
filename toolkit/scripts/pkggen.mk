@@ -211,6 +211,8 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
+		$(if $(filter y,$(UPDATE_LEARNING)),--update-learnings) \
+		$(if $(filter y,$(INFORM_BUILD)),--inform-build) \
 		$(logging_command) && \
 	touch $@
 
