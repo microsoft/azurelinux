@@ -23,7 +23,7 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/containerd/containerd.git -b release/1.5
+# 6. git clone https://github.com/k3s-io/containerd -b v1.5.13-k3s1
 # 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
 # 8. git clone https://github.com/opencontainers/runc.git -b v1.1.2
 # 9. popd
