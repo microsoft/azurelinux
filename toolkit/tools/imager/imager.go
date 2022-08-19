@@ -350,7 +350,7 @@ func setupDisks(outputDir, diskName string, liveInstallFlag bool, disks []config
 				return
 			}
 		} else {
-			diskSpecificName = fmt.Sprintf("", diskName, i)
+			diskSpecificName = fmt.Sprintf("%s%d", diskName, i)
 			diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskSpecificName, disks[i], rootEncryption, readOnlyRootConfig)
 			diskDevPaths = append(diskDevPaths, diskDevPath)
 			isLoopDevice = true
