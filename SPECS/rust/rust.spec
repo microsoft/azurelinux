@@ -3,12 +3,12 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2022-01-13
-%define stage0_version 1.58.0
+%define release_date 2022-05-19
+%define stage0_version 1.61.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.59.0
+Version:        1.62.1
 Release:        1%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
@@ -19,7 +19,7 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source1:        %{name}-%{version}-src-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
@@ -120,6 +120,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Thu Aug 18 2022 Chris Co <chrco@microsoft.com> - 1.62.1-1
+- Updating to version 1.62.1
+
 * Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
 - Updating to version 1.59.0 to fix CVE-2022-21658.
 - Updating build instructions to fix tests.
