@@ -15,13 +15,18 @@ Source0:        %{name}-%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
 #   5. tar  --sort=name \
-#           --mtime="2022-08-10 00:00Z" \
+#           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
 BuildRequires:  patch
+Requires: %{name}-acmesolver
+Requires: %{name}-cainjector
+Requires: %{name}-controller
+Requires: %{name}-cmctl
+Requires: %{name}-webhook
 
 %description
 cert-manager is a Kubernetes add-on to automate the management and issuance
@@ -63,6 +68,7 @@ Webhook component providing API validation, mutation and conversion functionalit
 %autosetup -p1
 %setup -q -T -D -a 1
 
+%build
 go build -o bin/acmesolver cmd/acmesolver/main.go
 go build -o bin/cainjector cmd/cainjector/main.go
 go build -o bin/controller cmd/controller/main.go
@@ -77,33 +83,30 @@ install -D -m0755 bin/controller %{buildroot}%{_bindir}/
 install -D -m0755 bin/cmctl %{buildroot}%{_bindir}/
 install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 
+%files
+
 %files acmesolver
-%license LICENSE
-%license LICENSES
+%license LICENSE LICENSES
 %doc README.md
 %{_bindir}/acmesolver
 
 %files cainjector
-%license LICENSE
-%license LICENSES
+%license LICENSE LICENSES
 %doc README.md
 %{_bindir}/cainjector
 
 %files controller
-%license LICENSE
-%license LICENSES
+%license LICENSE LICENSES
 %doc README.md
 %{_bindir}/controller
 
 %files cmctl
-%license LICENSE
-%license LICENSES
+%license LICENSE LICENSES
 %doc README.md
 %{_bindir}/cmctl
 
 %files webhook
-%license LICENSE
-%license LICENSES
+%license LICENSE LICENSES
 %doc README.md
 %{_bindir}/webhook
 
