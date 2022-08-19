@@ -345,7 +345,7 @@ perl-ExtUtils-Miniperl-1.10-488.cm2.noarch.rpm
 perl-ExtUtils-MM-Utils-7.44-488.cm2.noarch.rpm
 perl-ExtUtils-ParseXS-3.43-488.cm2.noarch.rpm
 perl-Fcntl-1.14-488.cm2.x86_64.rpm
-perl-Fedora-VSP-0.001-18.cm2.noarch.rpm
+perl-Fedora-VSP-0.001-19.cm2.noarch.rpm
 perl-fields-2.27-488.cm2.noarch.rpm
 perl-File-Basename-2.85-488.cm2.noarch.rpm
 perl-File-Compare-1.100.600-488.cm2.noarch.rpm
