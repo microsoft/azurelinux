@@ -34,6 +34,7 @@ func (c *ChrootAgent) Initialize(config *BuildAgentConfig) (err error) {
 // BuildPackage builds a given file and returns the output files or error.
 // - inputFile is the SRPM to build.
 // - logName is the file name to save the package build log to.
+// - outArch is the target architecture to build for.
 // - dependencies is a list of dependencies that need to be installed before building.
 func (c *ChrootAgent) BuildPackage(inputFile, logName, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
 	// On success, pkgworker will print a comma-seperated list of all RPMs built to stdout.
