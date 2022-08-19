@@ -22,44 +22,44 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
 BuildRequires:  patch
-Requires: %{name}-acmesolver
-Requires: %{name}-cainjector
-Requires: %{name}-controller
-Requires: %{name}-cmctl
-Requires: %{name}-webhook
+Requires:       %{name}-acmesolver
+Requires:       %{name}-cainjector
+Requires:       %{name}-cmctl
+Requires:       %{name}-controller
+Requires:       %{name}-webhook
 
 %description
 cert-manager is a Kubernetes add-on to automate the management and issuance
 of TLS certificates from various issuing sources.
 
 %package acmesolver
-Summary: cert-manager's acmesolver binary
+Summary:        cert-manager's acmesolver binary
 
 %description acmesolver
 HTTP server used to solve ACME challenges.
 
 %package cainjector
-Summary: cert-manager's cainjector binary
+Summary:        cert-manager's cainjector binary
 
 %description cainjector
 cert-manager CA injector is a Kubernetes addon to automate the injection of CA data into
 webhooks and APIServices from cert-manager certificates.
 
 %package controller
-Summary: cert-manager's controller binary
+Summary:        cert-manager's controller binary
 
 %description controller
 cert-manager is a Kubernetes addon to automate the management and issuance of
 TLS certificates from various issuing sources.
 
 %package cmctl
-Summary: cert-manager's cmctl binary
+Summary:        cert-manager's cmctl binary
 
 %description cmctl
 cmctl is a CLI tool manage and configure cert-manager resources for Kubernetes
 
 %package webhook
-Summary: cert-manager's webhook binary
+Summary:        cert-manager's webhook binary
 
 %description webhook
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
