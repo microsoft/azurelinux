@@ -1547,8 +1547,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "22.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v22.0.tar.gz"
+          "version": "26.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v26.0.tar.gz"
         }
       }
     },
