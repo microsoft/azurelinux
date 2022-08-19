@@ -4,7 +4,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
 Patch0:         refuse-manual-stop.patch
 License:        GPLv2+
@@ -166,6 +166,9 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0-17
+-   Bump to rebuild with golang 1.18.5-1
+
 *   Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 3.0-16
 -   Bumping release to rebuild with golang 1.18.3
 *   Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 3.0-15

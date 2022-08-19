@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.8
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.8-9
+- Bump to rebuild with golang 1.18.5-1
+
 * Tue Jun 07 2022 Andrew Phelps <anphel@microsoft.com> - 0.8.8-8
 - Bumping release to rebuild with golang 1.18.3
 
