@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
@@ -337,6 +338,7 @@ func setupDisks(outputDir, diskName string, liveInstallFlag bool, disks []config
 	var (
 		diskDevPath      string
 		diskSpecificName string
+		splitFile        []string
 	)
 
 	for i := 0; i < len(disks); i++ {
@@ -350,7 +352,8 @@ func setupDisks(outputDir, diskName string, liveInstallFlag bool, disks []config
 				return
 			}
 		} else {
-			diskSpecificName = fmt.Sprintf("%s%d", diskName, i)
+			splitFile = strings.Split(diskName, ".")
+			diskSpecificName = fmt.Sprintf("%s%d.%s", splitFile[0], i, splitFile[1])
 			diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskSpecificName, disks[i], rootEncryption, readOnlyRootConfig)
 			diskDevPaths = append(diskDevPaths, diskDevPath)
 			isLoopDevice = true
