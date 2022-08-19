@@ -6,11 +6,11 @@ Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM)
 Name:           cloud-hypervisor
 Version:        26.0
 Release:        1%{?dist}
-License:        ASL 2.0 or BSD-3-clause
-URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
-Group:          Applications/System
+License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
@@ -36,7 +36,7 @@ Requires: glibc
 Requires: libgcc
 Requires: libcap
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
@@ -73,7 +73,6 @@ cp %{SOURCE2} .cargo/
 %endif
 
 %install
-rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 install -D -m755  ./target/%{rust_def_target}/release/cloud-hypervisor %{buildroot}%{_bindir}
 install -D -m755  ./target/%{rust_def_target}/release/ch-remote %{buildroot}%{_bindir}
@@ -133,10 +132,6 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_net %{ca
 cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{cargo_offline}
 %endif
 
-
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %{_bindir}/ch-remote
@@ -151,7 +146,6 @@ rm -rf %{buildroot}
 %endif
 %license LICENSE-APACHE
 %license LICENSE-BSD-3-Clause
-
 
 %changelog
 * Thu Aug 18 2022 Chris Co <chrco@microsoft.com> - 26.0-1
