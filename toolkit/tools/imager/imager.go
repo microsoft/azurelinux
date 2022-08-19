@@ -555,7 +555,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	}
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
-	// TODO add extrat config to specify bloatloader to use
+	// TODO add extrat config to specify bootloader to use
 	if !isRootFS {
 		err = configureDiskBootloader(systemConfig, installChroot, diskDevPaths[0], installMap, encryptedRoot, readOnlyRoot)
 		if err != nil {
@@ -601,6 +601,11 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	const bootMountPoint = "/boot"
 
 	var rootDevice string
+
+	fmt.Printf("#######################")
+	for key, value := range installMap {
+		fmt.Printf("%s value is %v\n", key, value)
+	}
 
 	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, ok := installMap[bootMountPoint]
