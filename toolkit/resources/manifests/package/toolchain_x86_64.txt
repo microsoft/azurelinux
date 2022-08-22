@@ -232,9 +232,9 @@ libstdc++-devel-9.1.0-7.cm1.x86_64.rpm
 libtasn1-4.14-2.cm1.x86_64.rpm
 libtasn1-debuginfo-4.14-2.cm1.x86_64.rpm
 libtasn1-devel-4.14-2.cm1.x86_64.rpm
-libtirpc-1.1.4-4.cm1.x86_64.rpm
-libtirpc-debuginfo-1.1.4-4.cm1.x86_64.rpm
-libtirpc-devel-1.1.4-4.cm1.x86_64.rpm
+libtirpc-1.1.4-5.cm1.x86_64.rpm
+libtirpc-debuginfo-1.1.4-5.cm1.x86_64.rpm
+libtirpc-devel-1.1.4-5.cm1.x86_64.rpm
 libtool-2.4.6-8.cm1.x86_64.rpm
 libtool-debuginfo-2.4.6-8.cm1.x86_64.rpm
 libxml2-2.9.14-1.cm1.x86_64.rpm
