@@ -150,6 +150,7 @@ sudo -u test make check && userdel test
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
 - Bump version
 - Run `%check` section via a non-root user to enable ptest
+- License verified
 
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 1.3.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
