@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0181
+Version:        9.0.0228
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -191,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Fri Aug 19 2022 Olivia Crain <oliviacrain@microsoft.com> - 9.0.0228-1
+- Upgrade to 9.0.0228 to fix CVEs: 2022-2571, 2022-2580, 2022-2581, 2022-2598, 2022-2816, 2022-2817, 2022-2819
+
 * Tue Aug 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.0.0181-1
 - Upgrade to 9.0.0181 to fix CVEs: 2022-2522, 2022-2571, 2022-2580, 2022-2581.
 
