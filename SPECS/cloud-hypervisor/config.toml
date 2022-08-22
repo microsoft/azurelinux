@@ -1,0 +1,41 @@
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."https://github.com/cloud-hypervisor/kvm-bindings"]
+git = "https://github.com/cloud-hypervisor/kvm-bindings"
+branch = "ch-v0.5.0-tdx"
+replace-with = "vendored-sources"
+
+[source."https://github.com/cloud-hypervisor/versionize_derive"]
+git = "https://github.com/cloud-hypervisor/versionize_derive"
+branch = "ch"
+replace-with = "vendored-sources"
+
+[source."https://github.com/firecracker-microvm/micro-http"]
+git = "https://github.com/firecracker-microvm/micro-http"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/kvm-ioctls"]
+git = "https://github.com/rust-vmm/kvm-ioctls"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/mshv"]
+git = "https://github.com/rust-vmm/mshv"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/vfio"]
+git = "https://github.com/rust-vmm/vfio"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/vm-fdt"]
+git = "https://github.com/rust-vmm/vm-fdt"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
