@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.4.1
-Release:       5%{?dist}
+Version:       3.9.3
+Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -14,7 +14,7 @@ Source0:       %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
-#   1. wget https://github.com/helm/helm/archive/v3.4.1.tar.gz -O %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/helm/helm/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
@@ -25,8 +25,6 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-Patch0:        CVE-2021-21303.patch
-Patch1:        CVE-2021-32690.patch
 BuildRequires: golang >= 1.15.5
 
 %description
@@ -54,6 +52,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 
 %changelog
+* Mon Aug 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 3.9.3-1
+- Update helm version to 3.9.3
+
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 3.4.1-5
 - Bump release to rebuild with golang 1.18.3
 - License verified
