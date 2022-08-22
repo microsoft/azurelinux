@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
@@ -101,16 +100,17 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	logger.Log.Infof("Building system configuration (%s)", systemConfig.Name)
 
 	const (
-		assetsMountPoint    = "/installer"
-		localRepoMountPoint = "/mnt/cdrom/RPMS"
-		repoFileMountPoint  = "/etc/yum.repos.d"
-		setupRoot           = "/setuproot"
-		installRoot         = "/installroot"
-		rootID              = "rootfs"
-		defaultDiskIndex    = 0
-		defaultTempDiskName = "disk.raw"
-		existingChrootDir   = false
-		leaveChrootOnDisk   = false
+		assetsMountPoint         = "/installer"
+		localRepoMountPoint      = "/mnt/cdrom/RPMS"
+		repoFileMountPoint       = "/etc/yum.repos.d"
+		setupRoot                = "/setuproot"
+		installRoot              = "/installroot"
+		rootID                   = "rootfs"
+		defaultDiskIndex         = 0
+		defaultTempDiskName      = "disk"
+		defaultTempDiskExtension = "raw"
+		existingChrootDir        = false
+		leaveChrootOnDisk        = false
 	)
 
 	var (
@@ -126,6 +126,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		mountPointToOverlayMap map[string]*installutils.Overlay
 		extraMountPoints       []*safechroot.MountPoint
 		extraDirectories       []string
+		defaultTempDiskNames   []string
 	)
 
 	// Get list of packages to install into image
@@ -157,8 +158,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 		}
 	} else {
+		for i, _ := range disks {
+			defaultTempDiskNames = append(defaultTempDiskNames, fmt.Sprintf("%s%d.%s", defaultTempDiskName, i, defaultTempDiskExtension))
+		}
 		logger.Log.Info("Creating raw disk in build directory")
-		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisks(buildDir, defaultTempDiskName, *liveInstallFlag, disks, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
+		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisks(buildDir, defaultTempDiskNames, *liveInstallFlag, disks, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
 		if err != nil {
 			return
 		}
@@ -330,63 +334,68 @@ func setupRootFS(outputDir, installRoot string) (extraMountPoints []*safechroot.
 	return
 }
 
-func setupDisks(outputDir, diskName string, liveInstallFlag bool, disks []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPaths []string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isLoopDevice bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
+func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disks []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPaths []string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isLoopDevice bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	const (
 		realDiskType = "path"
 	)
 
-	var (
-		diskDevPath      string
-		diskSpecificName string
-		splitFile        []string
-	)
-
-	for i := 0; i < len(disks); i++ {
-		// Only on eof thsese will be used by all disks defined
-		if disks[i].TargetDisk.Type == realDiskType {
-			if liveInstallFlag {
-				diskDevPath := disks[i].TargetDisk.Value
-				partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, disks[i], rootEncryption, readOnlyRootConfig)
-			} else {
-				err = fmt.Errorf("target Disk Type is set but --live-install option is not set. Please check your config or enable the --live-install option")
-				return
-			}
+	// Only on eof thsese will be used by all disks defined
+	if disks[0].TargetDisk.Type == realDiskType {
+		if liveInstallFlag {
+			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisks(diskNames, disks, rootEncryption, readOnlyRootConfig)
 		} else {
-			splitFile = strings.Split(diskName, ".")
-			diskSpecificName = fmt.Sprintf("%s%d.%s", splitFile[0], i, splitFile[1])
-			diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskSpecificName, disks[i], rootEncryption, readOnlyRootConfig)
-			diskDevPaths = append(diskDevPaths, diskDevPath)
-			isLoopDevice = true
+			err = fmt.Errorf("target Disk Type is set but --live-install option is not set. Please check your config or enable the --live-install option")
+			return
 		}
+	} else {
+		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisks(outputDir, diskNames, disks, rootEncryption, readOnlyRootConfig)
+		isLoopDevice = true
 	}
 	return
 }
 
-func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPath string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
+func setupLoopDeviceDisks(outputDir string, diskNames []string, diskConfigs []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPaths []string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	defer func() {
 		// Detach the loopback device on failure
-		if err != nil && diskDevPath != "" {
-			detachErr := diskutils.DetachLoopbackDevice(diskDevPath)
-			if detachErr != nil {
-				logger.Log.Errorf("Failed to detach loopback device on failed initialization. Error: %s", detachErr)
+		if err != nil && len(diskDevPaths) != 0 {
+			for _, diskDevPath := range diskDevPaths {
+				detachErr := diskutils.DetachLoopbackDevice(diskDevPath)
+				if detachErr != nil {
+					logger.Log.Errorf("Failed to detach loopback device on failed initialization. Error: %s", detachErr)
+				}
 			}
 		}
 	}()
 
-	// Create Raw Disk File
-	rawDisk, err := diskutils.CreateEmptyDisk(outputDir, diskName, diskConfig)
+	var (
+		diskDevPath     string
+		rawDisk         string
+		specifcDiskName string
+		seperateFile    []string
+	)
+
+	for i, diskConfig := range diskConfigs {
+
+		specifcDiskName = fmt.Sprintf("%s%d.%s", seperateFile[0], i, seperateFile[1])
+		rawDisk, err := diskutils.CreateEmptyDisk(outputDir, specifcDiskName, diskConfig)
+		if err != nil {
+			logger.Log.Errorf("Failed to create empty disk file in (%s)", outputDir)
+			break
+		}
+
+		diskDevPath, err = diskutils.SetupLoopbackDevice(rawDisk)
+		if err != nil {
+			logger.Log.Errorf("Failed to mount raw disk (%s) as a loopback device", rawDisk)
+			break
+		}
+		diskDevPaths = append(diskDevPaths, diskDevPath)
+	}
+
 	if err != nil {
-		logger.Log.Errorf("Failed to create empty disk file in (%s)", outputDir)
 		return
 	}
 
-	diskDevPath, err = diskutils.SetupLoopbackDevice(rawDisk)
-	if err != nil {
-		logger.Log.Errorf("Failed to mount raw disk (%s) as a loopback device", rawDisk)
-		return
-	}
-
-	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
+	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisks(diskDevPaths, diskConfigs, rootEncryption, readOnlyRootConfig)
 	if err != nil {
 		logger.Log.Errorf("Failed to setup loopback disk partitions (%s)", rawDisk)
 		return
@@ -395,25 +404,28 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 	return
 }
 
-func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
+func setupRealDisks(diskDevPaths []string, diskConfigs []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	const (
 		defaultBlockSize = diskutils.MiB
 		noMaxSize        = 0
 	)
 
-	// Set up partitions
-	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
+	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPaths, diskConfigs, rootEncryption, readOnlyRootConfig)
 	if err != nil {
-		logger.Log.Errorf("Failed to create partitions on disk (%s)", diskDevPath)
+		logger.Log.Errorf("Failed to create partitions on disk (%s)", diskDevPaths[i])
 		return
 	}
 
-	// Apply firmware
-	err = diskutils.ApplyRawBinaries(diskDevPath, diskConfig)
-	if err != nil {
-		logger.Log.Errorf("Failed to add add raw binaries to disk (%s)", diskDevPath)
-		return
+	for i, diskDevPath := range diskDevPaths {
+		// Apply firmware
+		err = diskutils.ApplyRawBinaries(diskDevPath, diskConfigs[i])
+		if err != nil {
+			logger.Log.Errorf("Failed to add add raw binaries to disk (%s)", diskDevPaths[i])
+			return
+		}
 	}
+
+	// Set up partitions
 
 	return
 }
