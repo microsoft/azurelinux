@@ -64,15 +64,8 @@ func TestInitializeShouldCreateRoot(t *testing.T) {
 
 	defer chroot.Close(defaultLeaveOnDisk)
 
-	// when Docker based pipeline:
-	// - chroot name are static and pre-defined
-	// - chroot folders are re-cycled
 	_, err = os.Stat(chroot.RootDir())
-	if buildpipeline.IsRegularBuild() {
-		assert.True(t, !os.IsNotExist(err))
-	} else {
-		assert.True(t, !os.IsNotExist(err))
-	}
+	assert.True(t, !os.IsNotExist(err))
 }
 
 func TestCloseShouldRemoveRoot(t *testing.T) {

@@ -2,7 +2,7 @@
 Summary:        YAML Ain't Markup Language (tm)
 Name:           perl-YAML
 Version:        1.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML/
@@ -12,6 +12,16 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(CPAN)
+BuildRequires:  perl(CPAN::Meta)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl-debugger
+%endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B::Deparse)
 Requires:       perl(Carp)
@@ -105,6 +115,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/YAML::Types.3*
 
 %changelog
+* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.30-2
+- Add BR on `perl(ExtUtils::MakeMaker)` & `cpan` to enable ptest
+
 * Thu Apr 14 2022 Mateusz Malisz <mateusz.malisz@microsoft.com> - 1.30-1
 - Updated to 1.30
 

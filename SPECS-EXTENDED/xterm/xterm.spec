@@ -1,23 +1,23 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: Terminal emulator for the X Window System
-Name: xterm
-Version: 351
-Release: 3%{?dist}
-URL: https://invisible-island.net/xterm
-License: MIT
-BuildRequires: gcc pkgconfig ncurses-devel libutempter-devel
-BuildRequires: libXft-devel libXaw-devel libXext-devel desktop-file-utils
-BuildRequires: libxkbfile-devel xorg-x11-apps
-Requires: xterm-resize = %{version}-%{release}
-Recommends: xorg-x11-fonts-misc
+Summary:        Terminal emulator for the X Window System
+Name:           xterm
+Version:        372
+Release:        1%{?dist}
+URL:            https://invisible-island.net/xterm
+License:        MIT
+BuildRequires:  gcc pkgconfig ncurses-devel libutempter-devel
+BuildRequires:  libXft-devel libXaw-devel libXext-devel desktop-file-utils
+BuildRequires:  libxkbfile-devel xorg-x11-apps
+Requires:       xterm-resize = %{version}-%{release}
+Recommends:     xorg-x11-fonts-misc
 
-Source0: ftp://ftp.invisible-island.net/xterm/%{name}-%{version}.tgz
-Source1: ftp://ftp.invisible-island.net/xterm/16colors.txt
+Source0:        http://ftp.invisible-island.net/archives/xterm/%{name}-%{version}.tgz
+Source1:        http://ftp.invisible-island.net/archives/xterm/16colors.txt
 
-Patch1: xterm-defaults.patch
-Patch2: xterm-desktop.patch
-Patch3: xterm-man-paths.patch
+Patch1:         xterm-defaults.patch
+Patch2:         xterm-desktop.patch
+Patch3:         xterm-man-paths.patch
 
 %bcond_with trace
 
@@ -103,6 +103,13 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 %{_mandir}/man1/resize.1*
 
 %changelog
+* Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 372-1
+- Bump version to address CVE-2021-27135
+- Refresh all patches to apply cleanly
+- Switch url to `http` instead of `ftp`
+- Cosmetic changes to spec formating
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 351-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
