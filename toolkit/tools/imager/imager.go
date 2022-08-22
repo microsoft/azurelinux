@@ -158,7 +158,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 		}
 	} else {
-		logger.Log.Infof("configs (%d)", len(disks))
 		for i, _ := range disks {
 			defaultTempDiskNames = append(defaultTempDiskNames, fmt.Sprintf("%s%d.%s", defaultTempDiskName, i, defaultTempDiskExtension))
 			logger.Log.Infof("rootfs files (%s)", defaultTempDiskNames[i])
@@ -340,8 +339,24 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 	const (
 		realDiskType = "path"
 	)
+	var (
+		DiskType = realDiskType
+	)
 
-	// Only on eof thsese will be used by all disks defined
+	logger.Log.Infof("configs (%d)", len(disks))
+
+	for i, disk := range disks {
+		if i == 0 {
+			DiskType = disk.TargetDisk.Type
+			continue
+		}
+		if disk.TargetDisk.Type != DiskType {
+			err = fmt.Errorf("Only one disk type can be specified found (%s) and (%s)", DiskType, disk.TargetDisk.Type)
+			return
+		}
+
+	}
+
 	if disks[0].TargetDisk.Type == realDiskType {
 		if liveInstallFlag {
 			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisks(diskNames, disks, rootEncryption, readOnlyRootConfig)
