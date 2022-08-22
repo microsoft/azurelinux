@@ -410,6 +410,7 @@ func setupRealDisks(diskDevPaths []string, diskConfigs []configuration.Disk, roo
 		noMaxSize        = 0
 	)
 
+	// Set up partitions
 	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPaths, diskConfigs, rootEncryption, readOnlyRootConfig)
 	if err != nil {
 		logger.Log.Errorf("Failed to create partitions on disk (%s)", diskDevPaths[i])
@@ -424,8 +425,6 @@ func setupRealDisks(diskDevPaths []string, diskConfigs []configuration.Disk, roo
 			return
 		}
 	}
-
-	// Set up partitions
 
 	return
 }
