@@ -30,7 +30,6 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1: %{name}-%{version}-vendor.tar.gz
 Patch0:  vendor_build.patch
-Patch1:  install.patch
 
 # K3s on Mariner is supported on x86_64 only:
 ExclusiveArch: x86_64
