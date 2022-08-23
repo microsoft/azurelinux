@@ -52,9 +52,8 @@ Source2:        kata-osbuilder.sh
 Source3:        kata-osbuilder-generate.service
 Source4:        15-dracut.conf
 Source5:        50-kata
-Patch0:         0001-Add-credscan-suppression-for-false-positives.patch
-Patch1:         0002-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
-Patch2:         0003-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
+Patch0:         0002-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
+Patch1:         0003-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
