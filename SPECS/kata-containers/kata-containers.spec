@@ -254,7 +254,7 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
-* Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.4.0-1
+* Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora37 (license: MIT).
 - License verified.
 
