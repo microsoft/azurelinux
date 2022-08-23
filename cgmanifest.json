@@ -27850,8 +27850,8 @@
         "type": "other",
         "other": {
           "name": "ypbind",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/thkukuk/ypbind-mt/archive/v2.6.1.tar.gz"
+          "version": "2.7.2",
+          "downloadUrl": "https://github.com/thkukuk/ypbind-mt/archive/v2.7.2.tar.gz#/ypbind-mt-v2.7.2.tar.gz"
         }
       }
     },
