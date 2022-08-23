@@ -27,7 +27,7 @@ var (
 			{
 				ID: "Partition1",
 				Flags: []PartitionFlag{
-					"bios_grub",
+					"grub",
 				},
 				Start:  1,
 				End:    9,
@@ -46,7 +46,7 @@ var (
 			{
 				ID: "Partition1",
 				Flags: []PartitionFlag{
-					"bios_grub",
+					"grub",
 				},
 				Start:  1,
 				End:    9,

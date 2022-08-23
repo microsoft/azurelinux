@@ -22,6 +22,7 @@ const (
 	kickstartPartitionFsType  = "--fstype"
 	kickstartPartitionGrow    = "--grow"
 	biosbootPartition         = "biosboot"
+	efibootPartition		  = "/boot/efi"
 
 	onDiskInputErrorMsg = "--ondisk/--ondrive must not be empty"
 	fsTypeInputErrorMsg = "--fstype must not be empty"
@@ -72,29 +73,34 @@ func populatepartCmdProcessMap() {
 }
 
 func processPartitionTableType() (err error) {
-	// In kickstart installation scenario, the partition table type is set to
-	// MBR by default. The Anaconda installer has this config "--gpt" that indicates
-	// whether the users prefer creation of GPT disk label or not. The value of "--gpt"
-	// is a bool where "True" indicates using GPT and "False" if not, which means using MBR.
-	// This config is set as a boot option within /proc/cmdline, which will be parsed by anaconda
-	// during installation process. Thus, Mariner will also pick the same design to reach compatibility
-	// with kickstart scenario
-
-	// Please note that this code is only executed during kickstart installation, when "IsKickStartBoot" is set to true.
-	// Mariner installer currently does not allow direct specification of disk and partition layout within
-	// the image config file for kickstart installation. So any disk/partition setting you make in the image config file
-	// will be overwritten if you enable kickstart installation mode.
-	isGPTPartitionTable, err := GetKernelCmdLineValue("--gpt")
-	if err != nil {
-		return err
-	}
-
-	if strings.TrimSpace(isGPTPartitionTable) == "True" {
+	systemBootType := SystemBootType()
+	if systemBootType == "efi" {
 		disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
 	} else {
-		disks[latestDiskIndex].PartitionTableType = PartitionTableTypeMbr
-	}
+		// In kickstart installation scenario, the partition table type is set to
+		// MBR by default. The Anaconda installer has this config "--gpt" that indicates
+		// whether the users prefer creation of GPT disk label or not. The value of "--gpt"
+		// is a bool where "True" indicates using GPT and "False" if not, which means using MBR.
+		// This config is set as a boot option within /proc/cmdline, which will be parsed by anaconda
+		// during installation process. Thus, Mariner will also pick the same design to reach compatibility
+		// with kickstart scenario
 
+		// Please note that this code is only executed during kickstart installation, when "IsKickStartBoot" is set to true.
+		// Mariner installer currently does not allow direct specification of disk and partition layout within
+		// the image config file for kickstart installation. So any disk/partition setting you make in the image config file
+		// will be overwritten if you enable kickstart installation mode.
+		isGPTPartitionTable, err := GetKernelCmdLineValue("--gpt")
+		if err != nil {
+			return err
+		}
+
+		if strings.TrimSpace(isGPTPartitionTable) == "True" {
+			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+		} else {
+			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeMbr
+		}
+	}
+	
 	return
 }
 
@@ -160,7 +166,7 @@ func processPartitionFsType(inputFsType string) (err error) {
 	fstype := strings.TrimSpace(inputFsType)
 	if fstype == "" {
 		return fmt.Errorf(fsTypeInputErrorMsg)
-	} else if fstype == biosbootPartition {
+	} else if fstype == biosbootPartition || fstype == efibootPartition {
 		newDiskPartition.FsType = "fat32"
 	} else if fstype == "swap" {
 		newDiskPartition.FsType = "linux-swap"
@@ -184,9 +190,16 @@ func processMountPoint(inputMountPoint string, partitionNumber int) (err error) 
 	newDiskPartition.ID = fmt.Sprintf("Partition%d", partitionNumber)
 	newDiskPartitionSetting.ID = fmt.Sprintf("Partition%d", partitionNumber)
 
-	if mountPoint == biosbootPartition {
-		newDiskPartition.Flags = append(newDiskPartition.Flags, PartitionFlagBiosGrub)
-		newDiskPartitionSetting.MountPoint = ""
+	if mountPoint == efibootPartition {
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("efi")  
+		if err != nil {
+			return
+		}
+	} else if mountPoint == biosbootPartition {
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("legacy")  
+		if err != nil {
+			return
+		}
 	} else if mountPoint == "swap" {
 		newDiskPartitionSetting.MountPoint = ""
 	} else {
