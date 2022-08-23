@@ -258,16 +258,17 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		// Copy disk artifact if necessary.
-		// if !isRootFS {
-		// 	for i, disk := range disks {
-		// 		input := filepath.Join(buildDir, defaultTempDiskName)
-		// 		output := filepath.Join(outputDir, fmt.Sprintf("disk%d.raw", i))
-		// 		err = file.Copy(input, output)
-		// 		if err != nil {
-		// 			return
-		// 		}
-		// 	}
-		// }
+		if !isRootFS {
+			for _, defaultTempDiskName := range defaultTempDiskNames {
+				input := filepath.Join(buildDir, defaultTempDiskName)
+				output := filepath.Join(outputDir, defaultTempDiskName)
+				err = file.Copy(input, output)
+				if err != nil {
+					logger.Log.Errorf("Unable to copy file (%s) to (%s)", input, output)
+					return
+				}
+			}
+		}
 	} else {
 		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPaths, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		if err != nil {
