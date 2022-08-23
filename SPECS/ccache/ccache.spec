@@ -1,7 +1,7 @@
 Name:           ccache
 Summary:        Compiler Cache
-Version:        4.6.2
-Release:        1%{?dist}
+Version:        4.6
+Release:        2%{?dist}
 License:        BeOpen and BSD and GPLv3+ and (Patrick Powell's and Holger Weiss' license) and Public Domain and Python and zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,8 +47,7 @@ popd
 %{_libdir}/*
 
 %changelog
-*   Mon Aug 22 2022 Andrew Phelps <anphel@microsoft.com> 4.6.2-1
--   Upgrade to version 4.6.2
+*   Mon Aug 22 2022 Andrew Phelps <anphel@microsoft.com> 4.6-2
 -   Create symlinks to ccache
 *   Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> 4.6-1
 -   Upgrade to version 4.6
