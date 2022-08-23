@@ -255,7 +255,7 @@ fi
 
 %changelog
 * Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
-- Initial CBL-Mariner import from Fedora37 (license: MIT).
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-1.2
