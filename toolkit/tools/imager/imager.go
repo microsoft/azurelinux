@@ -385,16 +385,13 @@ func setupLoopDeviceDisks(outputDir string, diskNames []string, diskConfigs []co
 	}()
 
 	var (
-		diskDevPath     string
-		rawDisk         string
-		specifcDiskName string
-		seperateFile    []string
+		diskDevPath string
+		rawDisk     string
 	)
 
 	for i, diskConfig := range diskConfigs {
 
-		specifcDiskName = fmt.Sprintf("%s%d.%s", seperateFile[0], i, seperateFile[1])
-		rawDisk, err := diskutils.CreateEmptyDisk(outputDir, specifcDiskName, diskConfig)
+		rawDisk, err := diskutils.CreateEmptyDisk(outputDir, diskNames[i], diskConfig)
 		if err != nil {
 			logger.Log.Errorf("Failed to create empty disk file in (%s)", outputDir)
 			break
