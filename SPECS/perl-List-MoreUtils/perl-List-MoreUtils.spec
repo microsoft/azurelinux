@@ -12,9 +12,9 @@ Distribution:   Mariner
 
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Exporter-Tiny
 BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker)
 %if %{with_check}
 BuildRequires:  perl(Math::Trig)
 BuildRequires:  perl(Test::More)
