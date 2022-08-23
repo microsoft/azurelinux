@@ -17,13 +17,13 @@ Distribution:   Mariner
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
-BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::CBuilder)
 BuildRequires:  perl(ExtUtils::Install)
 BuildRequires:  perl(ExtUtils::Manifest)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(blib)
 BuildRequires:  perl(lib)
+BuildRequires:  perl-generators
 %if %{with_check}
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(CPAN::Meta::YAML)
@@ -95,7 +95,7 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %{_mandir}/man3/*
 
 %changelog
-* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 0.4231-2
+* Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 0.4231-2
 - Add BR on `perl(ExtUtils::*)` & `cpan` to enable ptest
 
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4231-1
