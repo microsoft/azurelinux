@@ -7240,6 +7240,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kata-containers",
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/2.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
