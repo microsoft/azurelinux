@@ -229,7 +229,7 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
-* Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-4
+* Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-5
 - Add patch to fsync passwd file (systemd #24324)
 
 * Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-4
