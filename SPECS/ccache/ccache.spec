@@ -46,16 +46,16 @@ popd
 %{_libdir}/*
 
 %changelog
-* Mon Aug 22 2022 Andrew Phelps <anphel@microsoft.com> 4.6-2
+* Mon Aug 22 2022 Andrew Phelps <anphel@microsoft.com> - 4.6-2
 - Create symlinks to ccache
 
-* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> 4.6-1
+* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.6-1
 - Upgrade to version 4.6
 - Enable check tests
 
-* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6-2
+* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-2
 - License verified.
 - Added 'Vendor' and 'Distribution' tags.
 
-* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 3.6-1
+* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 3.6-1
 - Original version for CBL-Mariner.
