@@ -11,7 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/brianmario/yajl-ruby
 Source0:        https://github.com/brianmario/yajl-ruby/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0:         fix-file_list.patch
-Patch0:         CVE-2022-24795.patch
+Patch1:         CVE-2022-24795.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
