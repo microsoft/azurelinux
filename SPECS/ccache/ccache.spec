@@ -32,6 +32,8 @@ for n in cc gcc g++ c++ ; do
     ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/$n
     ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/%{_host}-$n
 done
+ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang
+ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang++
 
 %check
 pushd build
@@ -48,6 +50,7 @@ popd
 %changelog
 * Mon Aug 22 2022 Andrew Phelps <anphel@microsoft.com> - 4.6-2
 - Create symlinks to ccache
+- Lint spec
 
 * Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.6-1
 - Upgrade to version 4.6
