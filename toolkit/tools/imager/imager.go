@@ -357,7 +357,7 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 
 	}
 
-	if disks[0].TargetDisk.Type == realDiskType {
+	if DiskType == realDiskType {
 		if liveInstallFlag {
 			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisks(diskNames, disks, rootEncryption, readOnlyRootConfig)
 		} else {
