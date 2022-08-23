@@ -37,7 +37,7 @@ Helm is a tool that streamlines installing and managing Kubernetes applications.
 tar -xf %{SOURCE1} --no-same-owner
 export VERSION=%{version}
 for cmd in cmd/* ; do
-    go build -tags '' -ldflags '-w -s -X helm.sh/helm/v3/internal/version.version=v$VERSION -X helm.sh/helm/v3/internal/version.metadata= -X helm.sh/helm/v3/internal/version.gitCommit= -X helm.sh/helm/v3/internal/version.gitTreeState=clean ' \
+    go build -tags '' -ldflags '-w -s -X helm.sh/helm/v3/internal/version.version=v%{version} -X helm.sh/helm/v3/internal/version.metadata= -X helm.sh/helm/v3/internal/version.gitCommit= -X helm.sh/helm/v3/internal/version.gitTreeState=clean ' \
     -mod=vendor -v -o $(basename $cmd) ./$cmd
 done
 
@@ -54,6 +54,7 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %changelog
 * Mon Aug 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 3.9.3-1
 - Update helm version to 3.9.3
+- Fix version info not displaying correct version.
 
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 3.4.1-5
 - Bump release to rebuild with golang 1.18.3
