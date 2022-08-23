@@ -96,7 +96,7 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 
 %changelog
 * Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 0.4231-2
-- Add BR on `perl(ExtUtils::*)` & `cpan` to enable ptest
+- Add BR on `perl(ExtUtils::*)` & `perl(CPAN::*)` to enable ptest
 
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4231-1
 - Update to 0.4231
