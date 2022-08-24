@@ -23,6 +23,7 @@ type Disk struct {
 	Artifacts          []Artifact         `json:"Artifacts"`
 	Partitions         []Partition        `json:"Partitions"`
 	RawBinaries        []RawBinary        `json:"RawBinaries"`
+	ID                 string             `json:"ID,omitempty"`
 }
 
 // checkOverlappingPartitions checks that start and end positions of the defined partitions don't overlap.

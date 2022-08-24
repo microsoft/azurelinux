@@ -160,7 +160,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	} else {
 		for i, _ := range disks {
 			defaultTempDiskNames = append(defaultTempDiskNames, fmt.Sprintf("%s%d.%s", defaultTempDiskName, i, defaultTempDiskExtension))
-			logger.Log.Infof("rootfs files (%s)", defaultTempDiskNames[i])
 		}
 		logger.Log.Info("Creating raw disk in build directory")
 		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisks(buildDir, defaultTempDiskNames, *liveInstallFlag, disks, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
@@ -238,7 +237,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		err = setupChroot.Run(func() error {
-			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPaths, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
+			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPaths, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild, disks)
 		})
 		if err != nil {
 			logger.Log.Error("Failed to build image")
@@ -270,7 +269,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			}
 		}
 	} else {
-		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPaths, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
+		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPaths, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild, disks)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
@@ -514,7 +513,20 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	})
 	return
 }
-func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPaths []string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
+
+func findPrimaryDisk(diskDevPaths []string, disks []configuration.Disk, systemConfig configuration.SystemConfig) (primaryDiskLocation string) {
+	if len(disks) == 1 {
+		return diskDevPaths[1]
+	}
+	for i, disk := range disks {
+		if disk.ID == systemConfig.PrimaryDisk {
+			return diskDevPaths[i]
+		}
+	}
+	return ""
+}
+
+func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPaths []string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool, disks []configuration.Disk) (err error) {
 	const (
 		installRoot       = "/installroot"
 		verityWorkingDir  = "verityworkingdir"
@@ -583,7 +595,11 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	// TODO add extrat config to specify bootloader to use
 	if !isRootFS {
-		err = configureDiskBootloader(systemConfig, installChroot, diskDevPaths[0], installMap, encryptedRoot, readOnlyRoot)
+
+		var primaryDisk = findPrimaryDisk(diskDevPaths, disks, systemConfig)
+
+		logger.Log.Infof("configuring bootloader for %s", primaryDisk)
+		err = configureDiskBootloader(systemConfig, installChroot, primaryDisk, installMap, encryptedRoot, readOnlyRoot)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
