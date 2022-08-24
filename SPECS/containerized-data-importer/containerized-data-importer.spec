@@ -37,11 +37,12 @@ Provides:       cdi = %{version}-%{release}
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
 
-%package        apiserver
+%package        api
 Summary:        CDI API server
 Group:          System/Packages
+Provides:       cdi-apiserver = %{version}-%{release}
 
-%description    apiserver
+%description    api
 The containerized-data-importer-api package provides the kubernetes API extension for CDI
 
 %package        cloner
@@ -151,7 +152,7 @@ mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
 install -m 0644 _out/manifests/release/cdi-operator.yaml %{buildroot}%{_datadir}/cdi/manifests/release/
 install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/manifests/release/
 
-%files apiserver
+%files api
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-apiserver
@@ -199,7 +200,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %changelog
 * Mon Aug 22 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-2
 - Shorthand nomenclature for containerized-data-importer (cdi)
-- Renamed api to apiserver
+- Provide api as apiserver
 
 * Wed Aug 3 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-1
 - Initial changes to build for Mariner
