@@ -32,8 +32,7 @@ Requires:       python3-libs
 Python 3 version.
 
 %prep
-%setup -q -n lxml-%{version}
-%patch0 -p1
+%autosetup -p1 -n lxml-%{version}
 
 %build
 python3 setup.py build
