@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        41%{?dist}
+Release:        42%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,8 @@ Patch1006:      CVE-2021-3947.nopatch
 Patch1007:      CVE-2022-1050.nopatch
 # CVE-2021-20295 only affects RedHat's particular release of QEMU
 Patch1008:      CVE-2021-20295.nopatch
+Patch1009:      CVE-2022-35414.patch
+
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -207,6 +209,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Wed Aug 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.2.0-42
+- Patch CVE-2022-35414
+
 * Wed Jul 06 2022 Nick Samson <nisamson@microsoft.com> - 4.2.0-41
 - Patch CVE-2021-4206
 
