@@ -82,6 +82,8 @@ Patch1006:      CVE-2021-3947.nopatch
 Patch1007:      CVE-2022-1050.nopatch
 # CVE-2021-20295 only affects RedHat's particular release of QEMU
 Patch1008:      CVE-2021-20295.nopatch
+Patch1009:      CVE-2022-35414.patch
+
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
