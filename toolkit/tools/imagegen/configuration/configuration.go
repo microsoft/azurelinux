@@ -232,6 +232,7 @@ func CheckInvalidMultiDiskConfig(config *Config) (err error) {
 			}
 		}
 	}
+	return err
 }
 
 // IsValid returns an error if the Config is not valid
