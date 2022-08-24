@@ -80,10 +80,9 @@ rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license Copyright
 %{_docdir}/*
 %{_libdir}/libxml*
-%{_libdir}/xml2Conf.sh
 %{_bindir}/*
 %{_datadir}/aclocal/*
 %{_datadir}/gtk-doc/*
@@ -100,7 +99,6 @@ rm -rf %{buildroot}/*
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_mandir}/man3/*
 %{_libdir}/pkgconfig/libxml-2.0.pc
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
