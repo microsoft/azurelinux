@@ -34,7 +34,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
-* Tue Aug 23 2022 Nicolas Guibourge <nehaagarwal@microsoft.com> - 1.3.1-2
+* Tue Aug 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.3.1-2
 - Fix CVE-2022-24795.
 
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3.1-1
