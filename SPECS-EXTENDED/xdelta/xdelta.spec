@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: A binary file delta generator
 Name: xdelta
 Version: 3.1.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: ASL 2.0
 Source0: https://github.com/jmacd/xdelta-devel/releases/download/v%{version}/xdelta3-%{version}.tar.gz
 URL: http://xdelta.org/
@@ -12,6 +12,9 @@ URL: http://xdelta.org/
 BuildRequires:  gcc, gcc-c++
 BuildRequires: ncompress
 BuildRequires: xz-devel
+%if %{with_check}
+BuildRequires: sudo
+%endif
 
 # Man page day fixes
 # ~> proposal: http://code.google.com/p/xdelta/issues/detail?id=158
@@ -49,7 +52,8 @@ ln -s xdelta3.1 xdelta.1
 popd
 
 %check
-./xdelta3 test
+useradd test
+sudo -u test ./xdelta3 test && userdel test
 
 %files
 %doc README.md COPYING
@@ -57,6 +61,10 @@ popd
 %{_mandir}/man1/xdelta*
 
 %changelog
+* Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 3.1.0-11
+- Run the `%check` section via a non-root user to fix ptest build
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

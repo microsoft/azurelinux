@@ -7,7 +7,7 @@
 
 Name:    k3s
 Version: 1.23.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Lightweight Kubernetes
 
 Group:   System Environment/Base
@@ -83,6 +83,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.23.6-4
+- Bump release to rebuild against Go 1.18.5
+
 * Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
 - Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
 * Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
