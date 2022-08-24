@@ -23,7 +23,6 @@ const (
 	kickstartPartitionGrow    = "--grow"
 	biosbootPartition         = "biosboot"
 	efibootPartition          = "/boot/efi"
-	efibootPartitionFsType    = "efi"
 
 	onDiskInputErrorMsg = "--ondisk/--ondrive must not be empty"
 	fsTypeInputErrorMsg = "--fstype must not be empty"
@@ -209,7 +208,7 @@ func processPartitionFsType(inputFsType string) (err error) {
 	fstype := strings.TrimSpace(inputFsType)
 	if fstype == "" {
 		return fmt.Errorf(fsTypeInputErrorMsg)
-	} else if fstype == biosbootPartition || fstype == efibootPartitionFsType {
+	} else if fstype == biosbootPartition || fstype == "efi" {
 		newDiskPartition.FsType = "fat32"
 	} else if fstype == "swap" {
 		newDiskPartition.FsType = "linux-swap"
