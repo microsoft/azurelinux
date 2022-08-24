@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.9.3
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -52,6 +52,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.3-2
+- Bump release to rebuild against Go 1.18.5
+
 * Mon Aug 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 3.9.3-1
 - Update helm version to 3.9.3
 - Fix version info not displaying correct version.
