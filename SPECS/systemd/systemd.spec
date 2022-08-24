@@ -12,6 +12,8 @@ Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
 Patch0:         fix-journald-audit-logging.patch
+# Can be removed once we update systemd to a version containing the following commit:
+# https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
 Patch1:         add-fsync-sysusers-passwd.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
