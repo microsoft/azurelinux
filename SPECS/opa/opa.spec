@@ -5,7 +5,7 @@
 Summary:        Open source, general-purpose policy engine
 Name:           opa
 Version:        0.31.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -63,6 +63,9 @@ install -D -p -m 0644 _man/*         %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.31.0-3
+- Bump release to rebuild against Go 1.18.5
+
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.31.0-2
 - Bump release to rebuild with golang 1.18.3
 
