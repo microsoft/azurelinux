@@ -42,7 +42,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -54,6 +54,7 @@ Source4:        15-dracut.conf
 Source5:        50-kata
 Patch0:         0002-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
 Patch1:         0003-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
+Patch2:         match-Guest-and-Host-cgroup-setup.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -253,6 +254,9 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Aug 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-2
+- Add patch for match-Guest-and-Host-cgroup-setup.
+
 * Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
