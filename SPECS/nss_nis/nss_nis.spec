@@ -64,7 +64,8 @@ make check
 
 %changelog
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3.1-13
-- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- License verified
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

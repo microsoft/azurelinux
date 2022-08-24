@@ -84,6 +84,7 @@ make DESTDIR="$RPM_BUILD_ROOT" INSTALL_PROGRAM=install install
 %changelog
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 4.2.3-14
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- License verified
 
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
