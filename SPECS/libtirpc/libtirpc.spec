@@ -1,13 +1,14 @@
 Summary:        Libraries for Transport Independent RPC
 Name:           libtirpc
 Version:        1.1.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Group:          System Environment/Libraries
 URL:            https://git.linux-nfs.org/?p=steved/libtirpc.git
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2021-46828.patch
 
 BuildRequires:  krb5-devel
 BuildRequires:  automake
@@ -68,6 +69,9 @@ make install DESTDIR=%{buildroot}
 %{_libdir}/*.la
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1.4-5
+- Add upstream patch for CVE-2021-46828
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.4-4
 - Added %%license line automatically
 
