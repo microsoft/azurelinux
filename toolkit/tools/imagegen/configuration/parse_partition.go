@@ -23,6 +23,7 @@ const (
 	kickstartPartitionGrow    = "--grow"
 	biosbootPartition         = "biosboot"
 	efibootPartition		  = "/boot/efi"
+	efibootPartitionFsType	  = "efi"
 
 	onDiskInputErrorMsg = "--ondisk/--ondrive must not be empty"
 	fsTypeInputErrorMsg = "--fstype must not be empty"
@@ -39,9 +40,51 @@ var (
 	newDiskPartition        *Partition
 	newDiskPartitionSetting *PartitionSetting
 	shouldFillDiskSpace     bool
+	partitionTableType  	PartitionTableType
 )
 
-func initializePrerequisitesForParser() {
+// ParseKickStartPartitionScheme parses a kickstart-generated partition file and
+// construct the Disk and PartitionSetting information
+func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpartitionSettings []PartitionSetting, err error) {
+	file, err := os.Open(partitionFile)
+	if err != nil {
+		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
+		return
+	}
+	defer file.Close()
+
+	// Check if the file is empty
+	_, err = file.Stat()
+	if err != nil {
+		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
+		return
+	}
+
+	err = initializePrerequisitesForParser()
+	if err != nil {
+		logger.Log.Errorf("Error initialzing parameters of the parser (%s)", err)
+		return
+	}
+
+	scanner := bufio.NewScanner(file)
+	partitionNumber := 1
+
+	for scanner.Scan() {
+		parseCmd := scanner.Text()
+		err = parsePartitionFlags(parseCmd, partitionNumber)
+		if err != nil {
+			return
+		}
+
+		partitionNumber = partitionNumber + 1
+	}
+
+	retdisks = disks
+	retpartitionSettings = partitionSettings
+	return
+}
+
+func initializePrerequisitesForParser() (err error) {
 	// Create a mapping between the disk path and the index of the disk in the
 	// Disk array so that when we parse through the partition commands, we can
 	// determine which disk the parition instruction is targeted
@@ -59,6 +102,10 @@ func initializePrerequisitesForParser() {
 
 	// Create a mapping of partition flags and corresponding processing functions
 	populatepartCmdProcessMap()
+
+	// Determine the partition table type by checking the system boot type and kernel commandline
+	err = processPartitionTableType()
+	return
 }
 
 func populatepartCmdProcessMap() {
@@ -75,7 +122,7 @@ func populatepartCmdProcessMap() {
 func processPartitionTableType() (err error) {
 	systemBootType := SystemBootType()
 	if systemBootType == "efi" {
-		disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+		partitionTableType = PartitionTableTypeGpt
 	} else {
 		// In kickstart installation scenario, the partition table type is set to
 		// MBR by default. The Anaconda installer has this config "--gpt" that indicates
@@ -95,9 +142,9 @@ func processPartitionTableType() (err error) {
 		}
 
 		if strings.TrimSpace(isGPTPartitionTable) == "True" {
-			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeGpt
+			partitionTableType = PartitionTableTypeGpt
 		} else {
-			disks[latestDiskIndex].PartitionTableType = PartitionTableTypeMbr
+			partitionTableType = PartitionTableTypeMbr
 		}
 	}
 	
@@ -120,12 +167,8 @@ func processDisk(inputDiskValue string) (err error) {
 			disks = append(disks, Disk{})
 		}
 
-		// Determine the partition table type of the disk
-		err = processPartitionTableType()
-		if err != nil {
-			logger.Log.Errorf("Error setting partition table type")
-			return
-		}
+		// Set the partition table type for the disk
+		disks[latestDiskIndex].PartitionTableType = partitionTableType
 
 		// Set TargetDisk and TargetDiskType for unattended installation
 		disks[latestDiskIndex].TargetDisk.Type = "path"
@@ -166,7 +209,7 @@ func processPartitionFsType(inputFsType string) (err error) {
 	fstype := strings.TrimSpace(inputFsType)
 	if fstype == "" {
 		return fmt.Errorf(fsTypeInputErrorMsg)
-	} else if fstype == biosbootPartition || fstype == efibootPartition {
+	} else if fstype == biosbootPartition || fstype == efibootPartitionFsType {
 		newDiskPartition.FsType = "fat32"
 	} else if fstype == "swap" {
 		newDiskPartition.FsType = "linux-swap"
@@ -191,12 +234,12 @@ func processMountPoint(inputMountPoint string, partitionNumber int) (err error) 
 	newDiskPartitionSetting.ID = fmt.Sprintf("Partition%d", partitionNumber)
 
 	if mountPoint == efibootPartition {
-		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("efi")  
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("efi", partitionTableType)  
 		if err != nil {
 			return
 		}
 	} else if mountPoint == biosbootPartition {
-		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("legacy")  
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("legacy", partitionTableType)  
 		if err != nil {
 			return
 		}
@@ -264,42 +307,5 @@ func parseFlag(partitionFlag string, partitionNumber int) (err error) {
 		}
 	}
 
-	return
-}
-
-// ParseKickStartPartitionScheme parses a kickstart-generated partition file and
-// construct the Disk and PartitionSetting information
-func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpartitionSettings []PartitionSetting, err error) {
-	file, err := os.Open(partitionFile)
-	if err != nil {
-		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
-		return
-	}
-	defer file.Close()
-
-	// Check if the file is empty
-	_, err = file.Stat()
-	if err != nil {
-		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
-		return
-	}
-
-	initializePrerequisitesForParser()
-
-	scanner := bufio.NewScanner(file)
-	partitionNumber := 1
-
-	for scanner.Scan() {
-		parseCmd := scanner.Text()
-		err = parsePartitionFlags(parseCmd, partitionNumber)
-		if err != nil {
-			return
-		}
-
-		partitionNumber = partitionNumber + 1
-	}
-
-	retdisks = disks
-	retpartitionSettings = partitionSettings
 	return
 }

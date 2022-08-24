@@ -113,14 +113,21 @@ func SystemBootType() (bootType string) {
 
 // BootPartitionConfig returns the partition flags and mount point that should be used
 // for a given boot type.
-func BootPartitionConfig(bootType string) (mountPoint, mountOptions string, flags []PartitionFlag, err error) {
+func BootPartitionConfig(bootType string, partitionTableType PartitionTableType) (mountPoint, mountOptions string, flags []PartitionFlag, err error) {
 	switch bootType {
 	case "efi":
 		flags = []PartitionFlag{PartitionFlagESP, PartitionFlagBoot}
 		mountPoint = "/boot/efi"
 		mountOptions = "umask=0077"
 	case "legacy":
-		flags = []PartitionFlag{PartitionFlagGrub}
+		if partitionTableType == PartitionTableTypeGpt {
+			flags = []PartitionFlag{PartitionFlagGrub}	
+		} else if partitionTableType == PartitionTableTypeMbr {
+			flags = []PartitionFlag{PartitionFlagBoot}
+		} else {
+			err = fmt.Errorf("unknown partition table type (%s)", partitionTableType)
+		}
+
 		mountPoint = ""
 		mountOptions = ""
 	default:
