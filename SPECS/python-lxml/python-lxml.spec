@@ -2,7 +2,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
