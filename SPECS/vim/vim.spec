@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0050
-Release:        2%{?dist}
+Version:        9.0.0232
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -196,6 +196,11 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Fri Aug 19 2022 Andrew Phelps <anphel@microsoft.com> - 9.0.0232-1
+- Upgrade to 9.0.0232 to fix: CVE-2022-2522, CVE-2022-2571, CVE-2022-2580, CVE-2022-2581,
+  CVE-2022-2598, CVE-2022-2816, CVE-2022-2817, CVE-2022-2819, CVE-2022-2845, CVE-2022-2849,
+  CVE-2022-2862, CVE-2022-2874, CVE-2022-2889
+
 * Mon Jul 18 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 9.0.0050-2
 - Add sed requires as vim has an implicit dependency on sed in the post-install script.
 

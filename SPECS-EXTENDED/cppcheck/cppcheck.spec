@@ -3,7 +3,7 @@
 
 Name:           cppcheck
 Version:        2.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -98,8 +98,7 @@ install -D -p -m 755 htmlreport/cppcheck-htmlreport %{buildroot}%{_bindir}/cppch
 
 
 %check
-cd objdir-%{_target_platform}/bin
-./testrunner -g -q
+./bin/testrunner -g -q
 
 %files
 %doc AUTHORS
@@ -121,6 +120,9 @@ cd objdir-%{_target_platform}/bin
 %{_bindir}/cppcheck-htmlreport
 
 %changelog
+* Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.7-2
+- Fix `testrunner` binary path to enable ptest
+
 * Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-1
 - Updating to version 2.7 using Fedora 36 (license: MIT) specs for guidance.
 - License verified.
