@@ -10,6 +10,7 @@ Distribution:   Mariner
 
 URL:            https://lxml.de
 Source0:        https://github.com/lxml/lxml/releases/download/lxml-%{version}/lxml-%{version}.tar.gz
+Patch0:         CVE-2022-2309.patch
 
 BuildRequires:  libxslt-devel
 BuildRequires:  libxml2-devel
@@ -32,6 +33,7 @@ Python 3 version.
 
 %prep
 %setup -q -n lxml-%{version}
+%patch0 -p1
 
 %build
 python3 setup.py build
@@ -57,6 +59,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Aug 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.7.1-2
+-   Fix CVE-2022-2309.
 *   Mon Dec 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.7.1-1
 -   Update to 4.7.1 to fix CVE-2021-43818
 *   Thu Aug 05 2021 Andrew Phelps <anphel@microsoft.com> 4.6.3-1
