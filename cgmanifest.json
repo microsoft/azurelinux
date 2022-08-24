@@ -3735,8 +3735,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.14",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.14/libxml2-v2.9.14.tar.gz"
+          "version": "2.10.0",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.0/libxml2-v2.10.0.tar.gz"
         }
       }
     },
@@ -6295,8 +6295,8 @@
         "type": "other",
         "other": {
           "name": "python-lxml",
-          "version": "4.7.1",
-          "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.7.1/lxml-4.7.1.tar.gz"
+          "version": "4.9.1",
+          "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.9.1/lxml-4.9.1.tar.gz"
         }
       }
     },

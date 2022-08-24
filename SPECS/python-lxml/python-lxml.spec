@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        XML and HTML with Python
 Name:           python-lxml
-Version:        4.7.1
+Version:        4.9.1
 Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD AND GPLv2+
@@ -57,6 +57,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Aug 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.9.1-1
+-   Upgrade to to fix CVE-2022-2309
 *   Mon Dec 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.7.1-1
 -   Update to 4.7.1 to fix CVE-2021-43818
 *   Thu Aug 05 2021 Andrew Phelps <anphel@microsoft.com> 4.6.3-1

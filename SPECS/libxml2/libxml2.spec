@@ -2,7 +2,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Libxml2
 Name:           libxml2
-Version:        2.9.14
+Version:        2.10.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -105,6 +105,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Wed Aug 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.10.0-1
+- Updating to version 2.10.0 to fix CVE-2022-2309.
+
 * Mon Jun 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.9.14-1
 - Updating to version 2.9.14 to fix CVE-2022-29824.
 
