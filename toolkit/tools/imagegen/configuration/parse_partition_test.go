@@ -15,8 +15,8 @@ var (
 	invalidSizePartitionCommand   = "part / --fstype=ext4 --size=abcd --ondisk=/dev/sda"
 
 	validLegacyBootPartitionCommand = "part biosboot --fstype=biosboot --size=8 --ondisk=/dev/sda"
-	validUEFIBootPartitionCommand = "part /boot/efi --fstype=efi --size=8 --ondisk=/dev/sda"
-	validPartitionCommand2 = "part / --fstype=ext4 --size=800 --ondisk=/dev/sda"
+	validUEFIBootPartitionCommand   = "part /boot/efi --fstype=efi --size=8 --ondisk=/dev/sda"
+	validPartitionCommand2          = "part / --fstype=ext4 --size=800 --ondisk=/dev/sda"
 
 	validTestParserDisk_LegacyPartition = Disk{
 		PartitionTableType: "mbr",
@@ -48,7 +48,7 @@ var (
 				ID: "Partition1",
 				Flags: []PartitionFlag{
 					"esp",
-                    "boot",
+					"boot",
 				},
 				Start:  1,
 				End:    9,
@@ -93,7 +93,7 @@ var (
 				ID: "Partition1",
 				Flags: []PartitionFlag{
 					"esp",
-                    "boot",
+					"boot",
 				},
 				Start:  1,
 				End:    9,
@@ -124,8 +124,8 @@ var (
 	validTestParserPartitionSettings_UEFIPartitions = []PartitionSetting{
 		{
 			ID:              "Partition1",
-			MountPoint:   	 "/boot/efi",
-            MountOptions : 	 "umask=0077",
+			MountPoint:      "/boot/efi",
+			MountOptions:    "umask=0077",
 			MountIdentifier: GetDefaultMountIdentifier(),
 		},
 		{

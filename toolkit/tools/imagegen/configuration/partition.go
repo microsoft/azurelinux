@@ -121,7 +121,7 @@ func BootPartitionConfig(bootType string, partitionTableType PartitionTableType)
 		mountOptions = "umask=0077"
 	case "legacy":
 		if partitionTableType == PartitionTableTypeGpt {
-			flags = []PartitionFlag{PartitionFlagGrub}	
+			flags = []PartitionFlag{PartitionFlagGrub}
 		} else if partitionTableType == PartitionTableTypeMbr {
 			flags = []PartitionFlag{PartitionFlagBoot}
 		} else {

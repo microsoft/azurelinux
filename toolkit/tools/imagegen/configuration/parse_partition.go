@@ -22,8 +22,8 @@ const (
 	kickstartPartitionFsType  = "--fstype"
 	kickstartPartitionGrow    = "--grow"
 	biosbootPartition         = "biosboot"
-	efibootPartition		  = "/boot/efi"
-	efibootPartitionFsType	  = "efi"
+	efibootPartition          = "/boot/efi"
+	efibootPartitionFsType    = "efi"
 
 	onDiskInputErrorMsg = "--ondisk/--ondrive must not be empty"
 	fsTypeInputErrorMsg = "--fstype must not be empty"
@@ -40,7 +40,7 @@ var (
 	newDiskPartition        *Partition
 	newDiskPartitionSetting *PartitionSetting
 	shouldFillDiskSpace     bool
-	partitionTableType  	PartitionTableType
+	partitionTableType      PartitionTableType
 )
 
 // ParseKickStartPartitionScheme parses a kickstart-generated partition file and
@@ -147,7 +147,7 @@ func processPartitionTableType() (err error) {
 			partitionTableType = PartitionTableTypeMbr
 		}
 	}
-	
+
 	return
 }
 
@@ -234,12 +234,12 @@ func processMountPoint(inputMountPoint string, partitionNumber int) (err error) 
 	newDiskPartitionSetting.ID = fmt.Sprintf("Partition%d", partitionNumber)
 
 	if mountPoint == efibootPartition {
-		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("efi", partitionTableType)  
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("efi", partitionTableType)
 		if err != nil {
 			return
 		}
 	} else if mountPoint == biosbootPartition {
-		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("legacy", partitionTableType)  
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("legacy", partitionTableType)
 		if err != nil {
 			return
 		}
