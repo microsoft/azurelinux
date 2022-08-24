@@ -516,7 +516,7 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 
 func findPrimaryDisk(diskDevPaths []string, disks []configuration.Disk, systemConfig configuration.SystemConfig) (primaryDiskLocation string) {
 	if len(disks) == 1 {
-		return diskDevPaths[1]
+		return diskDevPaths[0]
 	}
 	for i, disk := range disks {
 		if disk.ID == systemConfig.PrimaryDisk {
