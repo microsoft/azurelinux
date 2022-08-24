@@ -225,7 +225,7 @@ func CheckInvalidMultiDiskConfig(config *Config) (err error) {
 			} else {
 				for _, disk := range config.Disks {
 					if disk.ID == sysConfig.PrimaryDisk {
-						continue
+						return err
 					}
 				}
 				return fmt.Errorf("[SystemConfig] '%s' no matching DiskID found for PrimaryDisk '%s'", sysConfig.Name, sysConfig.PrimaryDisk)
