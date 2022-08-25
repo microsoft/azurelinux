@@ -228,7 +228,18 @@ func CheckInvalidMultiDiskConfig(config *Config) (err error) {
 						return err
 					}
 				}
-				return fmt.Errorf("[SystemConfig] '%s' no matching DiskID found for PrimaryDisk '%s'", sysConfig.Name, sysConfig.PrimaryDisk)
+				return fmt.Errorf("[SystemConfig] '%s' no matching disk ID found for PrimaryDisk '%s'", sysConfig.Name, sysConfig.PrimaryDisk)
+			}
+		}
+	}
+	return err
+}
+
+func CheckMismatchedDiskTypes(config *Config) (err error) {
+	if len(config.Disks) > 1 {
+		for i := 1; i < len(config.Disks); i++ {
+			if config.Disks[0].TargetDisk.Type != config.Disks[i].TargetDisk.Type {
+				return fmt.Errorf("[Disk] '%d' has a target type of '%s' while [Disk] '0' has a target type of '%s', ensure all disk target types match", i, config.Disks[i].TargetDisk.Type, config.Disks[0].TargetDisk.Type)
 			}
 		}
 	}
@@ -261,6 +272,11 @@ func (c *Config) IsValid() (err error) {
 	}
 
 	err = checkInvalidMountIdentifiers(c)
+	if err != nil {
+		return fmt.Errorf("invalid [Config]: %w", err)
+	}
+
+	err = CheckMismatchedDiskTypes(c)
 	if err != nil {
 		return fmt.Errorf("invalid [Config]: %w", err)
 	}
