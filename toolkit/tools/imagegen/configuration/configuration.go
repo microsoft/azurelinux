@@ -235,7 +235,7 @@ func CheckInvalidMultiDiskConfig(config *Config) (err error) {
 	return err
 }
 
-func CheckMismatchedDiskTypes(config *Config) (err error) {
+func checkMismatchedDiskTypes(config *Config) (err error) {
 	if len(config.Disks) > 1 {
 		for i := 1; i < len(config.Disks); i++ {
 			if config.Disks[0].TargetDisk.Type != config.Disks[i].TargetDisk.Type {
@@ -276,7 +276,7 @@ func (c *Config) IsValid() (err error) {
 		return fmt.Errorf("invalid [Config]: %w", err)
 	}
 
-	err = CheckMismatchedDiskTypes(c)
+	err = checkMismatchedDiskTypes(c)
 	if err != nil {
 		return fmt.Errorf("invalid [Config]: %w", err)
 	}

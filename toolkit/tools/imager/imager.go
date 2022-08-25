@@ -644,11 +644,6 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 
 	var rootDevice string
 
-	fmt.Printf("#######################")
-	for key, value := range installMap {
-		fmt.Printf("%s value is %v\n", key, value)
-	}
-
 	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, ok := installMap[bootMountPoint]
 	bootPrefix := ""
