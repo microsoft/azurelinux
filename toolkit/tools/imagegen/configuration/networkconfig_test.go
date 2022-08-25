@@ -143,9 +143,14 @@ func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
 	// /etc/systemd/network may not exist. For this test case, manually create this directory
 	// if it does not exist
 	exists, err := file.DirExists(networkFileDir)
-	if err != nil || !exists {
+	assert.NoError(t, err)
+	if !exists {
 		err = os.Mkdir(networkFileDir, os.ModePerm)
 		assert.NoError(t, err)
+		t.Cleanup(func() {
+			err = os.RemoveAll(networkFileDir)
+			assert.NoError(t, err)
+		})
 	}
 
 	testNetwork := validNetworks[0]
