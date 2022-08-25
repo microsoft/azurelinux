@@ -1,27 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Name Service Switch (NSS) module using NIS
 Name:           nss_nis
 Version:        3.1
 Release:        13%{?dist}
-Summary:        Name Service Switch (NSS) module using NIS
 License:        LGPLv2+
-Url:            https://github.com/thkukuk/libnss_nis
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/thkukuk/libnss_nis
 Source:         https://github.com/thkukuk/libnss_nis/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 # https://github.com/systemd/systemd/issues/7074
 # https://bugzilla.redhat.com/show_bug.cgi?id=1829572
 Source2:        nss_nis.conf
-
-BuildRequires: make
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  libnsl2-devel
 BuildRequires:  libtirpc-devel
-BuildRequires:  autoconf, automake, libtool
+BuildRequires:  libtool
+BuildRequires:  make
 BuildRequires:  systemd
-
 # I'd recommend an explicit conflict with different versions of the package
 # to ensure that 64bit and 32bit packages are equal and compatible
 Conflicts:      %{name} < %{version}-%{release}
-
 
 %description
 The nss_nis Name Service Switch module uses the Network Information System (NIS)
@@ -58,7 +56,6 @@ make check
 %{_libdir}/libnss_nis.so.2.0.0
 %{_unitdir}/systemd-logind.service.d/*
 %{_unitdir}/systemd-userdbd.service.d/*
-
 
 %license COPYING
 

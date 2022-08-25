@@ -1,40 +1,42 @@
+Summary:        The NIS daemon which binds NIS clients to an NIS domain
+Name:           ypbind
+Version:        2.7.2
+Release:        10%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: The NIS daemon which binds NIS clients to an NIS domain
-Name: ypbind
-Version: 2.7.2
-Release: 10%{?dist}
-License: GPLv2
-Source0: https://github.com/thkukuk/ypbind-mt/archive/v%{version}.tar.gz#/ypbind-mt-%{version}.tar.gz
-Url: http://www.linux-nis.org/nis/ypbind-mt/index.html
+URL:            https://github.com/thkukuk/ypbind-mt
+Source0:        https://github.com/thkukuk/ypbind-mt/archive/v%{version}.tar.gz#/ypbind-mt-%{version}.tar.gz
 #Source1: ypbind.init
-Source2: nis.sh
-Source3: ypbind.service
-Source4: ypbind-pre-setdomain
-Source5: ypbind-post-waitbind
+Source2:        nis.sh
+Source3:        ypbind.service
+Source4:        ypbind-pre-setdomain
+Source5:        ypbind-post-waitbind
 # Fedora-specific patch. Renaming 'ypbind' package to proper
 # 'ypbind-mt' would allow us to drop it.
-Patch1: ypbind-1.11-gettextdomain.patch
+Patch1:         ypbind-1.11-gettextdomain.patch
 # Not sent to upstream.
-Patch2: ypbind-2.5-helpman.patch
+Patch2:         ypbind-2.5-helpman.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  dbus-glib-devel
+BuildRequires:  docbook-style-xsl
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  libnsl2-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libxslt
+BuildRequires:  make
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+# New nss_nis package in F25+
+Requires:       nss_nis
+Requires:       rpcbind
+Requires:       yp-tools >= 4.2.2-2
 # This is for /bin/systemctl
 Requires(post): systemd
-Requires(preun): systemd
 Requires(postun): systemd
-Requires: rpcbind
-Requires: yp-tools >= 4.2.2-2
-# New nss_nis package in F25+
-Requires: nss_nis
-BuildRequires: make
-BuildRequires:  gcc
-BuildRequires: dbus-glib-devel, docbook-style-xsl
-BuildRequires: systemd
-BuildRequires: systemd-devel
-BuildRequires: autoconf, automake
-BuildRequires: gettext-devel
-BuildRequires: libtirpc-devel
-BuildRequires: libnsl2-devel
-BuildRequires: libxslt
+Requires(preun): systemd
 
 %description
 The Network Information Service (NIS) is a system that provides
@@ -62,9 +64,9 @@ autoreconf -fiv
 
 %build
 %ifarch s390 s390x
-export CFLAGS="$RPM_OPT_FLAGS -fPIC"
+export CFLAGS="%{optflags} -fPIC"
 %else
-export CFLAGS="$RPM_OPT_FLAGS -fpic"
+export CFLAGS="%{optflags} -fpic"
 %endif
 export LDFLAGS="$LDFLAGS -pie -Wl,-z,relro,-z,now"
 
@@ -77,17 +79,17 @@ export LDFLAGS="$LDFLAGS -pie -Wl,-z,relro,-z,now"
 %install
 %make_install
 
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/yp/binding
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
-install -m 644 etc/yp.conf $RPM_BUILD_ROOT%{_sysconfdir}/yp.conf
-install -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d/nis.sh
-install -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/ypbind.service
-install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-pre-setdomain
-install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-post-waitbind
+mkdir -p %{buildroot}%{_localstatedir}/yp/binding
+mkdir -p %{buildroot}%{_sysconfdir}/dhcp/dhclient.d
+mkdir -p %{buildroot}%{_unitdir}
+mkdir -p %{buildroot}%{_libexecdir}
+install -m 644 etc/yp.conf %{buildroot}%{_sysconfdir}/yp.conf
+install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/dhcp/dhclient.d/nis.sh
+install -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/ypbind.service
+install -m 755 %{SOURCE4} %{buildroot}%{_libexecdir}/ypbind-pre-setdomain
+install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 
-%{find_lang} %{name}
+%find_lang %{name}
 
 %post
 %systemd_post %{name}.service
@@ -110,7 +112,7 @@ install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-post-waitbind
 %license COPYING
 
 %changelog
-* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com - 3:2.7.2-10
+* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3:2.7.2-10
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
 
