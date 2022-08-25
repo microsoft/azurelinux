@@ -14,7 +14,6 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 )
 
 type RpmIdentity struct {
@@ -56,7 +55,7 @@ func LoadLearner() (l *Learner) {
 	return
 }
 
-func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, provider *pkggraph.PkgNode) {
+func (l *Learner) RecordUnblocks(dynamicDep string, provider *pkggraph.PkgNode) {
 	rpmId, err := ParseRpmIdentity(provider.RpmPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to parse rpm identity for fullRpmPath: %s \n err: %s", provider.RpmPath, err)
@@ -67,17 +66,17 @@ func (l *Learner) RecordUnblocks(dynamicDep *pkgjson.PackageVer, provider *pkggr
 		l.Results[rpmId.FullName] = LearnerResult{
 			Rpm:              rpmId,
 			BuildTime:        0,
-			ImplicitProvides: []string{dynamicDep.Name},
+			ImplicitProvides: []string{dynamicDep},
 		}
 	} else {
-		learnerResult.ImplicitProvides = append(learnerResult.ImplicitProvides, dynamicDep.Name)
+		learnerResult.ImplicitProvides = append(learnerResult.ImplicitProvides, dynamicDep)
 		l.Results[rpmId.FullName] = learnerResult
 	}
-	providers, exists := l.ImplicitProviders[dynamicDep.Name]
+	providers, exists := l.ImplicitProviders[dynamicDep]
 	if !exists {
-		l.ImplicitProviders[dynamicDep.Name] = []string{rpmId.FullName}
+		l.ImplicitProviders[dynamicDep] = []string{rpmId.FullName}
 	} else {
-		l.ImplicitProviders[dynamicDep.Name] = append(providers, rpmId.FullName)
+		l.ImplicitProviders[dynamicDep] = append(providers, rpmId.FullName)
 	}
 }
 

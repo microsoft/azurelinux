@@ -1,7 +1,7 @@
 %global debug_package   %{nil}
 
 Summary:        Parallel Implementation of GZIP
-Name:           chickenz
+Name:           hogz
 Version:        2.6
 Release:        2%{?dist}
 License:        zlib
@@ -10,8 +10,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.zlib.net/pigz
 Source0:        https://github.com/madler/pigz/archive/v%{version}.tar.gz#/pigz-%{version}.tar.gz
-BuildRequires: /usr/bin/pork
-BuildRequires: /usr/bin/hogroast
+BuildRequires: goatz
 
 %description
 pigz, which stands for parallel implementation of gzip, is a fully
@@ -22,14 +21,19 @@ multiple cores to the hilt when compressing data
 %autosetup -n pigz-%{version}
 
 %build
-sleep 1
+sleep 3
+echo "oink oink" > pork
+echo "I am in pain" > hogroast
 
 %install
-
-
+mkdir -p %{buildroot}%{_bindir}/
+install -p -m 755 pork %{buildroot}%{_bindir}/
+install -p -m 755 hogroast %{buildroot}%{_bindir}/
 
 %files
 %license README
+%{_bindir}/pork
+%{_bindir}/hogroast
 
 %changelog
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-2

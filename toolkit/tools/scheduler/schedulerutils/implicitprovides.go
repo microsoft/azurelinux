@@ -13,6 +13,10 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 )
 
+var (
+	resolvedImplicits []string = []string{}
+)
+
 // InjectMissingImplicitProvides will inject implicit provide nodes into the graph from a build result if they satisfy any unresolved nodes.
 func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool, learner *Learner) (didInjectAny bool, err error) {
 	for _, rpmFile := range res.BuiltFiles {
@@ -24,6 +28,12 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		provides, err = rpm.QueryRPMProvides(rpmFile)
 		for _, builtFile := range provides {
 			logger.Log.Debugf("Package provided file: %s", builtFile)
+			for _, implicit := range resolvedImplicits {
+				if builtFile == implicit {
+					logger.Log.Debugf("builtFile %s found in the list of already resolved implicits. Recording in learner.", builtFile)
+					learner.RecordUnblocks(implicit, res.Node)
+				}
+			}
 		}
 		if err != nil {
 			if res.Skipped {
@@ -58,7 +68,8 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
 func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string, learner *Learner) (err error) {
 	var parentNode *pkggraph.PkgNode
-
+	resolvedImplicits = append(resolvedImplicits, provides.Name)
+	logger.Log.Debugf("resolved implicit %s", provides.Name)
 	// Find a run node that is backed by the same rpm as the one providing the implicit provide.
 	// Make this node the parent node for the new implicit provide node.
 	// - By making a run node the parent node, it will inherit the identical runtime dependencies of the already setup node.
@@ -76,7 +87,7 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 	}
 
 	// Now we know that parentNode, provided by rpmFileProviding, provides the implicit node
-	learner.RecordUnblocks(provides, parentNode)
+	learner.RecordUnblocks(provides.Name, parentNode)
 	// Collapse the unresolved nodes into a single node backed by the new implicit provide.
 	_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
 
