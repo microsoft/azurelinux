@@ -161,6 +161,9 @@ popd
 # Install the CRI-O config drop-in file
 install -m 0644 -D -t %{buildroot}%{_sysconfdir}/crio/crio.conf.d %{SOURCE5}
 
+# Copy the configuration-clh.toml to default
+cp %{buildroot}%{_datadir}/kata-containers/defaults/configuration-clh.toml %{buildroot}%{_datadir}/kata-containers/defaults/configuration.toml
+
 # Disable the image= option, so we use initrd= by default
 # The kernels kata-osbuilder creates are in /var/cache now, see rhbz#1792216
 sed -i -e 's|^kernel = "%{_datadir}|kernel = "%{katacache}|' \

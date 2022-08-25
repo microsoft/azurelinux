@@ -1,12 +1,12 @@
-diff -ruN a/src/runtime/virtcontainers/clh.go b/src/runtime/virtcontainers/clh.go
---- a/src/runtime/virtcontainers/clh.go	2022-08-16 14:41:20.000000000 -0700
-+++ b/src/runtime/virtcontainers/clh.go	2022-08-24 10:38:46.602122094 -0700
-@@ -259,6 +259,8 @@
- 	{"panic", "1"},         // upon kernel panic wait 1 second before reboot
- 	{"no_timer_check", ""}, // do not Check broken timer IRQ resources
- 	{"noreplace-smp", ""},  // do not replace SMP instructions
-+	{"systemd.legacy_systemd_cgroup_controller", "yes"},	// match the Mariner Host
-+	{"systemd.unified_cgroup_hierarchy", "0"}, // match the Mariner Host
- }
+diff -ruN a/src/runtime/arch/amd64-options.mk b/src/runtime/arch/amd64-options.mk
+--- a/src/runtime/arch/amd64-options.mk	2022-08-16 14:41:20.000000000 -0700
++++ b/src/runtime/arch/amd64-options.mk	2022-08-24 17:28:14.113345432 -0700
+@@ -6,7 +6,7 @@
+ # Intel x86-64 settings
  
- var clhDebugKernelParams = []Param{
+ MACHINETYPE := q35
+-KERNELPARAMS :=
++KERNELPARAMS := systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0
+ MACHINEACCELERATORS :=
+ CPUFEATURES := pmu=off
+ 
