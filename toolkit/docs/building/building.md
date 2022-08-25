@@ -516,9 +516,9 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > - at least one of the RPM packages mentioned in the manifest file, or
 > - the script responsible for building the chroot.
 
-#### `HYDRATED_BUILD=...`]
+#### `HYDRATED_BUILD=...`
 
-##### `HYDRATED_BUILD=`**`y`**]
+##### `HYDRATED_BUILD=`**`y`**
 
 > If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
 
@@ -526,16 +526,15 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 > Normal build. No hydrated RPMs will be used.
 
-#### `DELTA_BUILD=...`]
+#### `DELTA_BUILD=...`
 
-##### `DELTA_BUILD=`**`y`**]
+##### `DELTA_BUILD=`**`y`**
 
 > Delta build. Used for fast delta builds where published packages are pre-populated and only new or added packages are built.
 
 ##### `DELTA_BUILD=`**`n`** *(default)*
 
 > Normal build.
-
 
 ## All Build Targets
 
@@ -636,6 +635,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
+| SRPM_PACK_LIST                |                                                                                                        | List of spec basenames to build into SRPMs. If empty, all specs under `$(SPECS_DIR)` will be packed.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 
 ---

@@ -13,7 +13,7 @@ There is a limited support for (deprecated) optparse objects, too.
 
 Name:           argparse-manpage
 Version:        1.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{sum Python}
 BuildArch:      noarch
 
@@ -23,7 +23,7 @@ Source0:        %pypi_source
 
 BuildRequires: python3-setuptools python3-devel
 %if %{with_check}
-BuildRequires: python3-pytest python3-six
+BuildRequires: python3-pip
 %endif
 Requires: python3-%{name} = %{version}-%{release}
 
@@ -49,7 +49,8 @@ Summary:        %{sum Python 3}
 
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitearch} %__python3 -m pytest
+pip3 install pytest==7.1.2 six==1.16.0
+%__python3 -m pytest
 
 
 %files
@@ -66,6 +67,10 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} %__python3 -m pytest
 
 
 %changelog
+* Tue May 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.5-3
+- Drop BR on pytest, six & pip install deps to enable ptest
+- License verified
+
 * Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Remove python2 support, distro specific macros

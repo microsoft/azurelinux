@@ -14,6 +14,9 @@ Source3:        99-dhcp-en.network
 Patch0:         fix-journald-audit-logging.patch
 # Patch for skipping the tests: test-mountpoint-util, test-mount-util, test-fileio, test-fd-util, test-repart - Some mounts are failing in chroot
 Patch1:         testsskipped.patch
+# Can be removed once we update systemd to a version containing the following commit:
+# https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
+Patch2:         add-fsync-sysusers-passwd.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  dbus
 BuildRequires:  docbook-dtd-xml
@@ -270,6 +273,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-7
+- Add patch to fsync passwd file (systemd #24324)
+
 * Mon Aug 01 2022 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-7
 - Add BR: dbus, mariner-release, tzdata, sudo to systemd.spec
 - Generate machine-id using dbus-uuidgen
@@ -318,7 +324,7 @@ systemctl preset-all
 
 * Wed Jul 28 2021 Henry Li <lihl@microsoft.com> - 239-40
 - Enable building systemd-sysusers
-- Ship systemd-sysusers and related conf files from systemd package 
+- Ship systemd-sysusers and related conf files from systemd package
 
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch
