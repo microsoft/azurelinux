@@ -287,6 +287,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 	learner := schedulerutils.NewLearner()
+	var highPriorityProviders map[*pkggraph.PkgNode]bool
 	if *informBuild {
 		learner = schedulerutils.LoadLearner()
 		// informer := schedulerutils.LoadLearner()
@@ -294,13 +295,14 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		// 	weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
 		// 	logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
 		// }
-		learner.InformGraph(pkgGraph, graphMutex, useCachedImplicit, goalNode)
+		highPriorityProviders = learner.InformGraph(pkgGraph, graphMutex, useCachedImplicit, goalNode)
 	}
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache, deltaBuild)
+		//TODO pass in set of high pri nodes and compare request to set
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache, deltaBuild, highPriorityProviders)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
@@ -321,7 +323,12 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			case pkggraph.TypeRemote:
 				fallthrough
 			case pkggraph.TypeBuild:
-				fallthrough
+				priorityLevel := learner.DeterminePriority(pkgGraph, req.Node, goalNode, highPriorityProviders, learner)
+				if priorityLevel >= 10{
+					channels.PriorityRequests <- req
+				}else{
+					channels.Requests <- req
+				}
 			default:
 				channels.Requests <- req
 			}
