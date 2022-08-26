@@ -18,6 +18,46 @@ var (
 )
 
 // InjectMissingImplicitProvides will inject implicit provide nodes into the graph from a build result if they satisfy any unresolved nodes.
+func ProbeImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool, learner *Learner) (didInjectAny bool, err error) {
+	for _, rpmFile := range res.BuiltFiles {
+		var (
+			provides       []string
+			provideToNodes map[*pkgjson.PackageVer][]*pkggraph.PkgNode
+		)
+
+		provides, err = rpm.QueryRPMProvides(rpmFile)
+		for _, builtFile := range provides {
+			for _, implicit := range resolvedImplicits {
+				if builtFile == implicit {
+					logger.Log.Debugf("builtFile %s found in the list of already resolved implicits. Recording in learner.", builtFile)
+					learner.RecordUnblocks(implicit, res.Node)
+				}
+			}
+		}
+		if err != nil {
+			return
+		}
+
+		packageProvides := parseProvides(provides)
+		provideToNodes, err = matchProvidesToUnresolvedNodes(packageProvides, pkgGraph, useCachedImplicit)
+		if err != nil {
+			return
+		}
+
+		for provide, nodes := range provideToNodes {
+			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, learner, false)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	// Make sure the graph is still a directed acyclic graph (DAG) after manipulating it.
+	err = pkgGraph.MakeDAG()
+	return
+}
+
+// InjectMissingImplicitProvides will inject implicit provide nodes into the graph from a build result if they satisfy any unresolved nodes.
 func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool, learner *Learner) (didInjectAny bool, err error) {
 	for _, rpmFile := range res.BuiltFiles {
 		var (
@@ -28,12 +68,6 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		provides, err = rpm.QueryRPMProvides(rpmFile)
 		for _, builtFile := range provides {
 			logger.Log.Debugf("Package provided file: %s", builtFile)
-			for _, implicit := range resolvedImplicits {
-				if builtFile == implicit {
-					logger.Log.Debugf("builtFile %s found in the list of already resolved implicits. Recording in learner.", builtFile)
-					learner.RecordUnblocks(implicit, res.Node)
-				}
-			}
 		}
 		if err != nil {
 			if res.Skipped {
@@ -51,7 +85,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, learner)
+			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, learner, true)
 			if err != nil {
 				return
 			}
@@ -66,9 +100,8 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 }
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
-func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string, learner *Learner) (err error) {
+func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string, learner *Learner, collapse bool) (err error) {
 	var parentNode *pkggraph.PkgNode
-	resolvedImplicits = append(resolvedImplicits, provides.Name)
 	logger.Log.Debugf("resolved implicit %s", provides.Name)
 	// Find a run node that is backed by the same rpm as the one providing the implicit provide.
 	// Make this node the parent node for the new implicit provide node.
@@ -86,10 +119,14 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 		return fmt.Errorf("unable to find suitable parent node for implicit provides (%s)", provides)
 	}
 
-	// Now we know that parentNode, provided by rpmFileProviding, provides the implicit node
-	learner.RecordUnblocks(provides.Name, parentNode)
 	// Collapse the unresolved nodes into a single node backed by the new implicit provide.
-	_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
+	if collapse {
+		_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
+	} else { // we are running the learner pass
+		// Now we know that parentNode, provided by rpmFileProviding, provides the implicit node
+		learner.RecordUnblocks(provides.Name, parentNode)
+		resolvedImplicits = append(resolvedImplicits, provides.Name)
+	}
 
 	return
 }

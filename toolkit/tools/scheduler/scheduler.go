@@ -286,14 +286,13 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
-	if(*informBuild){
+	if *informBuild {
 		informer := schedulerutils.LoadLearner()
 		for i, node := range nodesToBuild {
 			weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
 			logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
 		}
 	}
-	
 
 	learner := schedulerutils.NewLearner()
 
@@ -353,6 +352,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			if res.Err == nil {
 				// If the graph has already been optimized and is now solvable without any additional information
 				// then skip processing any new implicit provides.
+				schedulerutils.ProbeImplicitProvides(res, pkgGraph, useCachedImplicit, learner)
+
 				if !isGraphOptimized {
 					var (
 						didOptimize bool
