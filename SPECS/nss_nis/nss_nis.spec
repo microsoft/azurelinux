@@ -52,12 +52,13 @@ make check
 
 
 %files
+%license COPYING
 %{_libdir}/libnss_nis.so.2
 %{_libdir}/libnss_nis.so.2.0.0
 %{_unitdir}/systemd-logind.service.d/*
 %{_unitdir}/systemd-userdbd.service.d/*
 
-%license COPYING
+
 
 %changelog
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3.1-13

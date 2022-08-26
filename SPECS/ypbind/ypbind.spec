@@ -101,6 +101,7 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 %systemd_postun_with_restart %{name}.service
 
 %files -f %{name}.lang
+%license COPYING
 %{_sbindir}/*
 %{_mandir}/*/*
 %{_libexecdir}/*
@@ -109,7 +110,7 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 %config(noreplace) %{_sysconfdir}/yp.conf
 %dir %{_localstatedir}/yp/binding
 %doc README NEWS
-%license COPYING
+
 
 %changelog
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3:2.7.2-10
