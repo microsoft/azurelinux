@@ -22,6 +22,7 @@
 
 %global runtime_make_vars       QEMUPATH=%{qemupath} \\\
                                 KERNELTYPE="compressed" \\\
+                                KERNELPARAMS="systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0" \\\
                                 DEFSHAREDFS="virtio-fs" \\\
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
                                 DEFVIRTIOFSCACHESIZE=0 \\\
@@ -52,9 +53,9 @@ Source2:        kata-osbuilder.sh
 Source3:        kata-osbuilder-generate.service
 Source4:        15-dracut.conf
 Source5:        50-kata
-Patch0:         0002-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
-Patch1:         0003-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
-Patch2:         match-Guest-and-Host-cgroup-setup.patch
+Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
+Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
+Patch2:         expose-devices-from-kata.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -258,7 +259,8 @@ fi
 
 %changelog
 * Wed Aug 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-2
-- Add patch for match-Guest-and-Host-cgroup-setup.
+- Add kernel config to match guest and host cgroup setup.
+- Add patch to expose devices from kata.
 
 * Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
