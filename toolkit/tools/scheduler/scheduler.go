@@ -296,7 +296,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	}
 
 	learner := schedulerutils.NewLearner()
-	learner.InformGraph(pkgGraph, graphMutex, useCachedImplicit)
+	learner.InformGraph(pkgGraph, graphMutex, useCachedImplicit, goalNode)
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 

@@ -15,6 +15,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 )
 
 type RpmIdentity struct {
@@ -34,13 +35,13 @@ type LearnerResult struct {
 
 type Learner struct {
 	Results           map[string]LearnerResult
-	ImplicitProviders map[string][]string
+	ImplicitProviders map[string][]pkgjson.PackageVer
 }
 
 func NewLearner() (l *Learner) {
 	return &Learner{
 		Results:           make(map[string]LearnerResult),
-		ImplicitProviders: make(map[string][]string),
+		ImplicitProviders: make(map[string][]pkgjson.PackageVer),
 	}
 }
 
@@ -56,14 +57,44 @@ func LoadLearner() (l *Learner) {
 	return
 }
 
-func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool) {
+func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool, goalNode *pkggraph.PkgNode) {
+	LoadLearner()
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 	implicitPackagesToUnresolvedNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
-	for name, node := range implicitPackagesToUnresolvedNodes {
-		logger.Log.Debugf("Mapping of %s to %v", name, node)
+	for name, unresolvedNode := range implicitPackagesToUnresolvedNodes {
+		logger.Log.Debugf("Mapping of %s to %v", name, unresolvedNode)
+
+		//TODO save packageVer for nani variable
+		if val, ok := l.ImplicitProviders[name]; ok{
+			minPathWeight := math.MaxFloat32
+			var optimalProvider *pkggraph.PkgNode
+			//determine provider with shortest historical build time according to learning payload.
+			for _, provider := range val {
+				lookUpNode, err := pkgGraph.FindBestPkgNode(&provider)
+				if err != nil {
+					logger.Log.Warnf("Failed to find implicit provider defined by learnings in graph. err: %s", err)
+				}
+				providerWeight := l.WeighNodeCriticalPath(lookUpNode.BuildNode, pkgGraph, goalNode)
+				if providerWeight < minPathWeight {
+					optimalProvider = lookUpNode.RunNode
+					minPathWeight = providerWeight
+				}
+			}
+			if optimalProvider == nil {
+				logger.Log.Warnf("No optimal provider was found from learnings from providers: %v", val)
+			}
+
+			pkgGraph.CreateCollapsedNode(nani, optimalProvider, unresolvedNode)
+
+		}
 	}
+	//map of ip string to the unresolved node
+	//take ip string and poll learning payload
+		//get list of providers for this ip
+		//for each provider evaluate critical path weight
+		//resolve unresolved node with the lightest provider
 }
 
 func (l *Learner) RecordUnblocks(dynamicDep string, provider *pkggraph.PkgNode) {
@@ -85,9 +116,9 @@ func (l *Learner) RecordUnblocks(dynamicDep string, provider *pkggraph.PkgNode) 
 	}
 	providers, exists := l.ImplicitProviders[dynamicDep]
 	if !exists {
-		l.ImplicitProviders[dynamicDep] = []string{rpmId.FullName}
+		l.ImplicitProviders[dynamicDep] = []pkgjson.PackageVer{*provider.VersionedPkg}
 	} else {
-		l.ImplicitProviders[dynamicDep] = append(providers, rpmId.FullName)
+		l.ImplicitProviders[dynamicDep] = append(providers, *provider.VersionedPkg)
 	}
 }
 
