@@ -121,6 +121,8 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 
 	// Collapse the unresolved nodes into a single node backed by the new implicit provide.
 	if collapse {
+		logger.Log.Infof("optimalProviderRunNode: %p", parentNode)
+		logger.Log.Infof("unresolvedNode[0]: %p", nodes[0])
 		_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
 	} else { // we are running the learner pass
 		// Now we know that parentNode, provided by rpmFileProviding, provides the implicit node

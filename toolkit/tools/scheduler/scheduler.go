@@ -286,17 +286,16 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
-	if *informBuild {
-
-		informer := schedulerutils.LoadLearner()
-		for i, node := range nodesToBuild {
-			weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
-			logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
-		}
-	}
-
 	learner := schedulerutils.NewLearner()
-	learner.InformGraph(pkgGraph, graphMutex, useCachedImplicit, goalNode)
+	if *informBuild {
+		learner = schedulerutils.LoadLearner()
+		// informer := schedulerutils.LoadLearner()
+		// for i, node := range nodesToBuild {
+		// 	weight := informer.WeighNodeCriticalPath(node, pkgGraph, goalNode)
+		// 	logger.Log.Debugf("debuggy! node %d rpm path: %s weight: %f", i, node.RpmPath, weight)
+		// }
+		learner.InformGraph(pkgGraph, graphMutex, useCachedImplicit, goalNode)
+	}
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
@@ -417,7 +416,9 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
-	learner.Dump("./learner_dump.json")
+	if *updateLearnings {
+		learner.Dump("./learner_dump.json")
+	}
 	return
 }
 

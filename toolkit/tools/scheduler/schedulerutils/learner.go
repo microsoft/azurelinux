@@ -58,43 +58,65 @@ func LoadLearner() (l *Learner) {
 }
 
 func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool, goalNode *pkggraph.PkgNode) {
-	LoadLearner()
+	logger.Log.Info(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+					⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀
+					⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧⠀⠀⠀⠀
+					⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇⠀⠀⠀
+					⠀⠀⠀⠀⢀⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀⠀⠀
+					⠀⠀⠀⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇⠀⠀
+					⠀⠀⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁⠀⠀
+					⠀⠀⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃⠀⠀⠀
+					⠀⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⠀⠀⠀
+					⠀⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀⠀⠀
+					⠀⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀⠀⠀
+					⠀⠀⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇⠀⠀
+					⠀⠀⠀⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀⠀⣠⣾⣿⣿⡇⠀⠀
+					⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀
+					⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀⠀⠀⠀
+					⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠁`)
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 	implicitPackagesToUnresolvedNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
 	for name, unresolvedNode := range implicitPackagesToUnresolvedNodes {
 		logger.Log.Debugf("Mapping of %s to %v", name, unresolvedNode)
-
-		//TODO save packageVer for nani variable
-		if val, ok := l.ImplicitProviders[name]; ok{
+		if providers, ok := l.ImplicitProviders[name]; ok {
 			minPathWeight := math.MaxFloat32
-			var optimalProvider *pkggraph.PkgNode
+			var optimalProvider pkgjson.PackageVer
+			var optimalProviderRunNode *pkggraph.PkgNode
 			//determine provider with shortest historical build time according to learning payload.
-			for _, provider := range val {
+			for _, provider := range providers {
 				lookUpNode, err := pkgGraph.FindBestPkgNode(&provider)
 				if err != nil {
 					logger.Log.Warnf("Failed to find implicit provider defined by learnings in graph. err: %s", err)
+					continue
 				}
-				providerWeight := l.WeighNodeCriticalPath(lookUpNode.BuildNode, pkgGraph, goalNode)
+				providerWeight := l.WeighCriticalPathToLeaf(lookUpNode.BuildNode, pkgGraph)
 				if providerWeight < minPathWeight {
-					optimalProvider = lookUpNode.RunNode
+					logger.Log.Infof("Found new best provider for %s: %v with expected total buildtime %f", name, lookUpNode.BuildNode, providerWeight)
 					minPathWeight = providerWeight
+					optimalProvider = provider
+					optimalProviderRunNode = lookUpNode.RunNode
 				}
 			}
-			if optimalProvider == nil {
-				logger.Log.Warnf("No optimal provider was found from learnings from providers: %v", val)
-			}
+			//logger.Log.Info("Settled on optimal provider %v with expected build time of %f", optimalProviderRunNode, minPathWeight)
+			// if optimalProviderRunNode == nil {
+			// 	logger.Log.Warnf("No optimal provider was found from learnings from providers: %v", providers)
+			// }
 
-			pkgGraph.CreateCollapsedNode(nani, optimalProvider, unresolvedNode)
-
+			logger.Log.Infof("Collapsing node %v into runnode with parent %v and PackageVer %v", unresolvedNode, optimalProviderRunNode, optimalProvider)
+			// unresolvedNode (the implicit node) will be collapsed into a run node,
+			// with a dependency on the already existing optimalProviderRunNode (and therefore it's subtree)
+			logger.Log.Infof("optimalProviderRunNode: %p", optimalProviderRunNode)
+			logger.Log.Infof("unresolvedNode[0]: %p", unresolvedNode[0])
+			pkgGraph.CreateCollapsedNode(&optimalProvider, optimalProviderRunNode, unresolvedNode)
 		}
 	}
 	//map of ip string to the unresolved node
 	//take ip string and poll learning payload
-		//get list of providers for this ip
-		//for each provider evaluate critical path weight
-		//resolve unresolved node with the lightest provider
+	//get list of providers for this ip
+	//for each provider evaluate critical path weight
+	//resolve unresolved node with the lightest provider
 }
 
 func (l *Learner) RecordUnblocks(dynamicDep string, provider *pkggraph.PkgNode) {
@@ -154,14 +176,11 @@ func (l *Learner) GetExpectedBuildTime(rpmPath string) (buildTime float64) {
 	return
 }
 
+// todo: make it check for a cached/already built node, evaluate cost as 0
 // weighsIndividualNode determines the "weight" of a node by summing all build times
 // between the goal node and the individual node
-func (l *Learner) WeighNodeCriticalPath(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode) float64 {
+func (l *Learner) WeighCriticalPathToGoal(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode) float64 {
 	if node == goalNode {
-		return 0.0
-	}
-
-	if node.Type != pkggraph.TypeBuild {
 		return 0.0
 	}
 
@@ -169,11 +188,45 @@ func (l *Learner) WeighNodeCriticalPath(node *pkggraph.PkgNode, pkgGraph *pkggra
 	dependents := pkgGraph.To(node.ID())
 	for dependents.Next() {
 		dependent := dependents.Node().(*pkggraph.PkgNode)
-		maxWeight = math.Max(maxWeight, l.WeighNodeCriticalPath(dependent, pkgGraph, goalNode))
+		maxWeight = math.Max(maxWeight, l.WeighCriticalPathToGoal(dependent, pkgGraph, goalNode))
 	}
-	nodeBuildTime := l.GetExpectedBuildTime(node.RpmPath)
-	return nodeBuildTime + maxWeight
+	var nodeBuildTime float64
+	if node.Type == pkggraph.TypeBuild {
+		nodeBuildTime = l.GetExpectedBuildTime(node.RpmPath)
+	} else {
+		nodeBuildTime = 0
+	}
 
+	return nodeBuildTime + maxWeight
+}
+
+func (l *Learner) WeighCriticalPathToLeaf(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph) float64 {
+	// if node == goalNode {
+	// 	return 0.0
+	// }
+
+	maxWeight := 0.0
+	dependencies := pkgGraph.From(node.ID())
+
+	// case leaf node
+	if dependencies.Len() == 0 {
+		if node.Type != pkggraph.TypeBuild {
+			return 0.0
+		}
+		return l.GetExpectedBuildTime(node.RpmPath)
+	}
+
+	for dependencies.Next() {
+		dependency := dependencies.Node().(*pkggraph.PkgNode)
+		maxWeight = math.Max(maxWeight, l.WeighCriticalPathToLeaf(dependency, pkgGraph))
+	}
+	var nodeBuildTime float64
+	if node.Type == pkggraph.TypeBuild {
+		nodeBuildTime = l.GetExpectedBuildTime(node.RpmPath)
+	} else {
+		nodeBuildTime = 0
+	}
+	return nodeBuildTime + maxWeight
 }
 
 func (l *Learner) Dump(path string) {
