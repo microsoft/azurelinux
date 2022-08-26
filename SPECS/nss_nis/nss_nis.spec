@@ -58,8 +58,6 @@ make check
 %{_unitdir}/systemd-logind.service.d/*
 %{_unitdir}/systemd-userdbd.service.d/*
 
-
-
 %changelog
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3.1-13
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)

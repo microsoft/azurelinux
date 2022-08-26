@@ -111,10 +111,10 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 %dir %{_localstatedir}/yp/binding
 %doc README NEWS
 
-
 %changelog
-* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3:2.7.2-10
+* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.7.2-10
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- Removed epoch
 - License verified
 
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.7.2-9
