@@ -14,12 +14,12 @@ on a Linux system. Filesystem contains the basic directory
 layout for a Linux operating system, including the correct permissions
 for the directories. This version is for a system configured with systemd.
 
-%package fedramp
-Summary:        Provide with config files needed for FedRAMP
+%package asc
+Summary:        Provide with config files needed for Azure Security Baseline
 Requires:       %{name} = %{version}-%{release}
 
-%description    fedramp
-Provide with multiple configuration files in /etc/modprobe.d/ to meet FedRAMP standerds
+%description    asc
+Provide with multiple configuration files in /etc/modprobe.d/ to meet Azure Security Baseline
 
 %prep
 %build
@@ -690,7 +690,7 @@ return 0
 /usr/lib64
 /usr/local/lib64
 
-%files fedramp
+%files asc
 %config(noreplace) /etc/modprobe.d/squashfs.conf
 %config(noreplace) /etc/modprobe.d/usb-storage.conf
 %config(noreplace) /etc/modprobe.d/cramfs.conf

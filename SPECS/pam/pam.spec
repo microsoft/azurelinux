@@ -1,11 +1,10 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
-Patch0:         mariner_fedramp_security.patch
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -99,9 +98,6 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
-* Thu Jul 28 2022 Minghe Ren <mingheren@microsoft.com> - 1.5.1-6
-- Add new fedramp patch file to modify limits.conf file to improve security
-
 * Tue Mar 22 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-5
 - Require audit-libs
 

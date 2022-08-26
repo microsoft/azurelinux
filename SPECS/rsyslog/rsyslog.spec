@@ -128,6 +128,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %check
 %make_build check
 
+%pre
+groupadd --system syslog
+useradd --system --comment 'System Logging'  --gid syslog --shell /bin/false syslog
+
 %post
 /sbin/ldconfig
 %systemd_post rsyslog.service
@@ -158,6 +162,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 8.2204.1-2
 - Modify rsyslog.conf to improve security
+- Add syslog user to own the log files
 
 * Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 8.2204.1-1
 - Update to v8.2204.1 to address CVE-2022-24903

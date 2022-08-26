@@ -1946,6 +1946,7 @@
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
                 "application-gateway-kubernetes-ingress",
+                "asc",
                 "azcopy",
                 "azure-iot-sdk-c",
                 "azure-storage-cpp",
@@ -1972,7 +1973,6 @@
                 "dtc",
                 "espeak-ng",
                 "espeakup",
-                "fedramp",
                 "flannel",
                 "fluent-bit",
                 "freefont",
