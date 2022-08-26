@@ -11,6 +11,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -53,6 +54,16 @@ func LoadLearner() (l *Learner) {
 	json.Unmarshal(content, l)
 
 	return
+}
+
+func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool) {
+	// acquire a writer lock since this routine will collapse nodes
+	graphMutex.Lock()
+	defer graphMutex.Unlock()
+	implicitPackagesToUnresolvedNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
+	for name, node := range implicitPackagesToUnresolvedNodes {
+		logger.Log.Debugf("Mapping of %s to %v", name, node)
+	}
 }
 
 func (l *Learner) RecordUnblocks(dynamicDep string, provider *pkggraph.PkgNode) {
