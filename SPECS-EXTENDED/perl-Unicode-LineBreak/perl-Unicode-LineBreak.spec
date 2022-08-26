@@ -119,6 +119,7 @@ make test
 %changelog
 * Thu Aug 25 2022 Muhammad Falak <mwani@micrsofot.com> - 2019.001-7
 - Add BR on `perl(FindBin)` to fix ptest build
+- License verified
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 2019.001-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
