@@ -2019,6 +2019,7 @@
                 "libxml++",
                 "livepatching",
                 "lld",
+                "local-path-provisioner",
                 "lsb-release",
                 "lttng-consume",
                 "mariner-release",
