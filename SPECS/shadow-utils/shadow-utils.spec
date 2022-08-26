@@ -177,7 +177,7 @@ chmod 000 %{_sysconfdir}/shadow
 
 %changelog
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-11
-- Update login-defs, system-auth, system-password, passwd to improve security 
+- Update login-defs, system-auth, passwd to improve security 
 
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-10
 - Remove su binary which is now provided by util-linux

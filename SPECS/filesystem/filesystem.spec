@@ -705,7 +705,7 @@ return 0
 
 %changelog
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.1-11
-- Update etc/modprobe.d/ folder to include new multiple config files and imporve security
+- Update etc/modprobe.d/ folder to include new multiple config files and improve security
 - Add subpackage fedramp to include all the new config files
 
 * Thu Jun 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1-10
