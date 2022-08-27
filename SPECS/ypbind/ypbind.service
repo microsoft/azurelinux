@@ -13,7 +13,7 @@ NotifyAccess=all
 EnvironmentFile=-/etc/sysconfig/network
 EnvironmentFile=-/etc/sysconfig/ypbind
 ExecStartPre=/usr/libexec/ypbind-pre-setdomain
-ExecStartPre=-/usr/sbin/setsebool allow_ypbind=1 
+ExecStartPre=-/bin/bash -c 'selinuxenabled && /usr/sbin/setsebool allow_ypbind=1'
 ExecStart=/usr/sbin/ypbind -n $OTHER_YPBIND_OPTS
 ExecStartPost=/usr/libexec/ypbind-post-waitbind
 PrivateTmp=true

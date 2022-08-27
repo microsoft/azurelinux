@@ -1,25 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Name Service Switch (NSS) module using NIS
 Name:           nss_nis
 Version:        3.1
-Release:        6%{?dist}
-Summary:        Name Service Switch (NSS) module using NIS
+Release:        13%{?dist}
 License:        LGPLv2+
-Url:            https://github.com/thkukuk/libnss_nis
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/thkukuk/libnss_nis
 Source:         https://github.com/thkukuk/libnss_nis/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 # https://github.com/systemd/systemd/issues/7074
 # https://bugzilla.redhat.com/show_bug.cgi?id=1829572
 Source2:        nss_nis.conf
-
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  libnsl2-devel
 BuildRequires:  libtirpc-devel
-BuildRequires:  autoconf, automake, libtool
+BuildRequires:  libtool
+BuildRequires:  make
 BuildRequires:  systemd
-
-%ifarch x86_64
-Recommends: (nss_nis(x86-32) if glibc(x86-32))
-%endif
+# I'd recommend an explicit conflict with different versions of the package
+# to ensure that 64bit and 32bit packages are equal and compatible
+Conflicts:      %{name} < %{version}-%{release}
 
 %description
 The nss_nis Name Service Switch module uses the Network Information System (NIS)
@@ -52,17 +52,42 @@ make check
 
 
 %files
+%license COPYING
 %{_libdir}/libnss_nis.so.2
 %{_libdir}/libnss_nis.so.2.0.0
 %{_unitdir}/systemd-logind.service.d/*
 %{_unitdir}/systemd-userdbd.service.d/*
 
-
-%license COPYING
-
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 3.1-13
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- License verified
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Nov 12 2021 Björn Esser <besser82@fedoraproject.org> - 3.1-10
+- Rebuild(libnsl2)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 21 2020 Filip Januš <fjanus@redhat.com> - 3.1-8
+- recommandation of 32 bit-version doesn't work properly
+- remove recommandation of 32 bit-version
+
+* Tue Sep 22 2020 Filip Januš <fjanus@redhat.com> - 3.1-7
+- improve recommandation of 32 bit-version
+- resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1803161
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sun May 10 2020 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.1-5
 - Make sure that systemd-userdbd.service can access the network too (#1829572)

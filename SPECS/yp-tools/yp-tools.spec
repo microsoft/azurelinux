@@ -1,22 +1,27 @@
+%global __filter_GLIBC_PRIVATE 1
+Summary:        NIS (or YP) client programs
+Name:           yp-tools
+Version:        4.2.3
+Release:        14%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: NIS (or YP) client programs
-Name: yp-tools
-Version: 4.2.3
-Release: 9%{?dist}
-License: GPLv2
-Source: https://github.com/thkukuk/yp-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch1: yp-tools-2.12-hash.patch
-Patch2: yp-tools-2.12-crypt.patch
-Patch3: yp-tools-2.12-adjunct.patch
-Patch4: yp-tools-4.2.2-strict-prototypes.patch
-Patch5: yp-tools-4.2.3-yppasswd.patch
-Url: https://github.com/thkukuk/yp-tools
-BuildRequires: autoconf, automake, gettext-devel, libtool, libtirpc-devel, libnsl2-devel
-Requires: ypbind >= 2.4-2
-Requires: glibc
-
-%global __filter_GLIBC_PRIVATE 1
+URL:            https://github.com/thkukuk/yp-tools
+Source:         https://github.com/thkukuk/yp-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch1:         yp-tools-2.12-hash.patch
+Patch2:         yp-tools-2.12-crypt.patch
+Patch3:         yp-tools-2.12-adjunct.patch
+Patch4:         yp-tools-4.2.2-strict-prototypes.patch
+Patch5:         yp-tools-4.2.3-yppasswd.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gettext-devel
+BuildRequires:  libnsl2-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libtool
+BuildRequires:  make
+Requires:       glibc
+Requires:       ypbind >= 2.4-2
 
 %description
 The Network Information Service (NIS) is a system which provides
@@ -39,15 +44,14 @@ every machine running NIS client programs.  If you need an NIS server,
 you'll need to install the ypserv package on one machine on the network.
 
 %package devel
-Summary: NIS (or YP) client programs
-Requires: yp-tools
+Summary:        NIS (or YP) client programs
+Requires:       yp-tools
 
 %description devel
 Install yp-tools-devel package for developing applications that use yp-tools
 
-
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 %patch1 -p1 -b .hash
 %patch2 -p1 -b .crypt
 %patch3 -p1 -b .adjunct
@@ -66,26 +70,42 @@ export CFLAGS="$CFLAGS %{optflags} -Wno-cast-function-type"
 %make_build
 
 %install
-make DESTDIR="$RPM_BUILD_ROOT" INSTALL_PROGRAM=install install
+make DESTDIR=%{buildroot} INSTALL_PROGRAM=install install
 
-%find_lang %name
+%find_lang %{name}
 
 %files -f %{name}.lang
-%doc AUTHORS COPYING README ChangeLog NEWS etc/nsswitch.conf
+%license COPYING
+%doc AUTHORS README ChangeLog NEWS etc/nsswitch.conf
 %doc THANKS
 %{_bindir}/*
 
-
 %{_mandir}/*/*
 %{_sbindir}/*
-/var/yp/nicknames
+%{_var}/yp/nicknames
 
 %changelog
-* Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 4.2.3-9
-- Remove epoch
+* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 4.2.3-14
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.3-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Nov 12 2021 Björn Esser <besser82@fedoraproject.org> - 4.2.3-11
+- Rebuild(libnsl2)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
