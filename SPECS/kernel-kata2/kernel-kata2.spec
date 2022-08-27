@@ -126,7 +126,7 @@ if [ -s config_diff ]; then
 fi
 
 %build
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+make KCFLAGS="-W" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
@@ -288,6 +288,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Fri Aug 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-5
+- Creating kernel configuration specifically for kata uvm purposes
+
 * Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
 - Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
 - Add CONFIG_IKHEADERS=m to enable eBPF standard tracers.
