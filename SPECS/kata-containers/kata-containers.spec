@@ -76,6 +76,7 @@ Requires:       busybox
 Requires:       dracut
 Requires:       kernel
 Requires:       qemu-kvm-core >= 4.2.0-4
+Requires:       qemu-virtiofsd
 Requires:       %{_libexecdir}/virtiofsd
 
 Conflicts:      kata-agent
