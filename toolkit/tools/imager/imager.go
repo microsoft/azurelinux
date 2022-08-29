@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -33,6 +34,7 @@ var (
 	outputDir       = app.Flag("output-dir", "Path to directory to place final image.").ExistingDir()
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
+	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 	logFile         = exe.LogFileFlag(app)
 	logLevel        = exe.LogLevelFlag(app)
 )
@@ -62,6 +64,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp.InitCSV(*timestampFile)
 
 	if *emitProgress {
 		installutils.EnableEmittingProgress()
@@ -91,9 +94,10 @@ func main() {
 		}
 	}
 
+	timestamp.Stamp.RecordToCSV("Setting up", "")
+
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
 	logger.PanicOnError(err, "Failed to build system configuration")
-
 }
 
 func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configuration.Disk, outputDir, buildDir string) (err error) {
@@ -191,6 +195,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	}
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
+	timestamp.Stamp.RecordToCSV("buildSystemConfig", "install packages into image")
 
 	// Create Parition to Mountpoint map
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
@@ -268,6 +273,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 	}
+	timestamp.Stamp.RecordToCSV("buildSystemConfig", "Create Parition to Mountpoint map")
 
 	// Cleanup encrypted disks
 	if systemConfig.Encryption.Enable {
@@ -277,6 +283,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 	}
+	timestamp.Stamp.RecordToCSV("buildSystemConfig", "Cleanup encrypted disks")
 
 	return
 }

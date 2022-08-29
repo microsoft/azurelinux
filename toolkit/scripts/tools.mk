@@ -14,6 +14,7 @@ $(call create_folder,$(BUILD_DIR)/tools)
 
 # List of go utilities in tools/ directory
 go_tool_list = \
+	bldtracker \
 	boilerplate \
 	depsearch \
 	grapher \
@@ -145,14 +146,15 @@ worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chr
 worker_chroot_deps := \
 	$(worker_chroot_manifest) \
 	$(worker_chroot_rpm_paths) \
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh \
+	$(go-bldtracker)
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
 $(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 else
 $(chroot_worker):
 endif
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \

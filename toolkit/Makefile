@@ -73,6 +73,7 @@ BUILD_SPECS_DIR  ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
 STATUS_FLAGS_DIR ?= $(BUILD_DIR)/make_status
 CHROOT_DIR       ?= $(BUILD_DIR)/worker/chroot
 IMAGEGEN_DIR     ?= $(BUILD_DIR)/imagegen
+TIMESTAMP_DIR    ?= $(BUILD_DIR)/timestamp
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
@@ -196,6 +197,9 @@ include $(SCRIPTS_DIR)/imggen.mk
 # Create self contained toolkit archive contianing all the required tools with:
 #   package-toolkit, clean-package-toolkit
 include $(SCRIPTS_DIR)/toolkit.mk
+
+# Set up for the timestamp feature
+include $(SCRIPTS_DIR)/timestamp.mk
 
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points

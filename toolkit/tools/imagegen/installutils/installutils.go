@@ -26,6 +26,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 const (
@@ -360,6 +361,9 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 
 		packageList = append(packageList, packages...)
 	}
+
+	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Package names from config")
+
 	return
 }
 

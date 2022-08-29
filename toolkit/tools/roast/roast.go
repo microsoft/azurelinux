@@ -15,6 +15,8 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestampcsvparser"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/roast/formats"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -51,12 +53,15 @@ var (
 	workers = app.Flag("workers", "Number of concurrent goroutines to convert with.").Default(defaultWorkerCount).Int()
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
+
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp.InitCSV(*timestampFile)
 
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
@@ -87,10 +92,13 @@ func main() {
 		logger.Log.Panicf("Failed loading image configuration. Error: %s", err)
 	}
 
+	timestamp.Stamp.Start()
 	err = generateImageArtifacts(*workers, inDirPath, outDirPath, *releaseVersion, *imageTag, tmpDirPath, config)
 	if err != nil {
 		logger.Log.Panic(err)
 	}
+	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "finishing up")
+	timestampcsvparser.OutputCSVLog(filepath.Dir(*timestampFile))
 }
 
 func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag, tmpDir string, config configuration.Config) (err error) {
@@ -118,6 +126,8 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 
 	convertRequests := make(chan *convertRequest, numberOfArtifacts)
 	convertedResults := make(chan *convertResult, numberOfArtifacts)
+
+	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "set up")
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
@@ -148,6 +158,8 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	}
 
 	close(convertRequests)
+
+	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "convert requests")
 
 	failedArtifacts := []string{}
 	for i := 0; i < numberOfArtifacts; i++ {

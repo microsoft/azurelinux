@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 // RestoreClonedRepoContents restores a cloner's repo contents using a JSON file at `srcFile`.
@@ -86,6 +87,8 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 			return fmt.Errorf("package mismatch, have (%v), expected (%v)", clonedPkg, expectedPkg)
 		}
 	}
+
+	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Verify cloned repo contents")
 
 	return
 }
