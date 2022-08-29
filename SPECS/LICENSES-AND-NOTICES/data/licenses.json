@@ -488,6 +488,7 @@
                 "js-jquery",
                 "jsoncpp",
                 "Judy",
+                "kata-containers",
                 "kde-filesystem",
                 "kde-settings",
                 "kdump-anaconda-addon",

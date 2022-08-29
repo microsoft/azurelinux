@@ -1,12 +1,12 @@
 Summary:        Libxml2
 Name:           libxml2
-Version:        2.9.14
+Version:        2.10.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/General Libraries
-URL:            https://www.xmlsoft.org/
+URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
@@ -59,10 +59,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license Copyright
 %{_docdir}/*
 %{_libdir}/libxml*
-%{_libdir}/xml2Conf.sh
 %{_bindir}/*
 %{_datadir}/aclocal/*
 %{_datadir}/gtk-doc/*
@@ -75,11 +74,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_mandir}/man3/*
 %{_libdir}/pkgconfig/libxml-2.0.pc
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Mon Aug 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.10.0-1
+- Updating to version 2.10.0 to fix CVE-2022-2309.
+
 * Mon May 23 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.9.14-1
 - Updating to version 2.9.14 to fix CVE-2022-29824.
 

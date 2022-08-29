@@ -1,41 +1,42 @@
+Summary:        The NIS daemon which binds NIS clients to an NIS domain
+Name:           ypbind
+Version:        2.7.2
+Release:        10%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: The NIS daemon which binds NIS clients to an NIS domain
-Name: ypbind
-Version: 2.6.1
-Release: 4%{?dist}
-License: GPLv2
-Source0: https://github.com/thkukuk/ypbind-mt/archive/v%{version}.tar.gz#/ypbind-mt-%{version}.tar.gz
-Url: https://github.com/thkukuk/ypbind-mt
+URL:            https://github.com/thkukuk/ypbind-mt
+Source0:        https://github.com/thkukuk/ypbind-mt/archive/v%{version}.tar.gz#/ypbind-mt-%{version}.tar.gz
 #Source1: ypbind.init
-Source2: nis.sh
-Source3: ypbind.service
-Source4: ypbind-pre-setdomain
-Source5: ypbind-post-waitbind
+Source2:        nis.sh
+Source3:        ypbind.service
+Source4:        ypbind-pre-setdomain
+Source5:        ypbind-post-waitbind
 # Fedora-specific patch. Renaming 'ypbind' package to proper
 # 'ypbind-mt' would allow us to drop it.
-Patch1: ypbind-1.11-gettextdomain.patch
+Patch1:         ypbind-1.11-gettextdomain.patch
 # Not sent to upstream.
-Patch2: ypbind-2.5-helpman.patch
-Patch3: ypbind-systemdso.patch
-Patch4: ypbind-2.4-gettext_version.patch
+Patch2:         ypbind-2.5-helpman.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  dbus-glib-devel
+BuildRequires:  docbook-style-xsl
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  libnsl2-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libxslt
+BuildRequires:  make
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+# New nss_nis package in F25+
+Requires:       nss_nis
+Requires:       rpcbind
+Requires:       yp-tools >= 4.2.2-2
 # This is for /bin/systemctl
 Requires(post): systemd
-Requires(preun): systemd
 Requires(postun): systemd
-Requires: rpcbind
-Requires: yp-tools >= 4.2.2-2
-# New nss_nis package in F25+
-Requires: nss_nis
-BuildRequires:  gcc
-BuildRequires: dbus-glib-devel, docbook-style-xsl
-BuildRequires: systemd
-BuildRequires: systemd-devel
-BuildRequires: autoconf, automake
-BuildRequires: gettext-devel
-BuildRequires: libtirpc-devel
-BuildRequires: libnsl2-devel
-BuildRequires: libxslt
+Requires(preun): systemd
 
 %description
 The Network Information Service (NIS) is a system that provides
@@ -58,16 +59,14 @@ also need to install the ypserv package to a machine on your network.
 %setup -q -n ypbind-mt-%{version}
 %patch1 -p1 -b .gettextdomain
 %patch2 -p1 -b .helpman
-#%patch3 -p1 -b .systemdso
-%patch4 -b .gettext_version
 
 autoreconf -fiv
 
 %build
 %ifarch s390 s390x
-export CFLAGS="$RPM_OPT_FLAGS -fPIC"
+export CFLAGS="%{optflags} -fPIC"
 %else
-export CFLAGS="$RPM_OPT_FLAGS -fpic"
+export CFLAGS="%{optflags} -fpic"
 %endif
 export LDFLAGS="$LDFLAGS -pie -Wl,-z,relro,-z,now"
 
@@ -80,17 +79,17 @@ export LDFLAGS="$LDFLAGS -pie -Wl,-z,relro,-z,now"
 %install
 %make_install
 
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/yp/binding
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
-install -m 644 etc/yp.conf $RPM_BUILD_ROOT%{_sysconfdir}/yp.conf
-install -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d/nis.sh
-install -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/ypbind.service
-install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-pre-setdomain
-install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-post-waitbind
+mkdir -p %{buildroot}%{_localstatedir}/yp/binding
+mkdir -p %{buildroot}%{_sysconfdir}/dhcp/dhclient.d
+mkdir -p %{buildroot}%{_unitdir}
+mkdir -p %{buildroot}%{_libexecdir}
+install -m 644 etc/yp.conf %{buildroot}%{_sysconfdir}/yp.conf
+install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/dhcp/dhclient.d/nis.sh
+install -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/ypbind.service
+install -m 755 %{SOURCE4} %{buildroot}%{_libexecdir}/ypbind-pre-setdomain
+install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 
-%{find_lang} %{name}
+%find_lang %{name}
 
 %post
 %systemd_post %{name}.service
@@ -102,6 +101,7 @@ install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-post-waitbind
 %systemd_postun_with_restart %{name}.service
 
 %files -f %{name}.lang
+%license COPYING
 %{_sbindir}/*
 %{_mandir}/*/*
 %{_libexecdir}/*
@@ -110,11 +110,42 @@ install -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_libexecdir}/ypbind-post-waitbind
 %config(noreplace) %{_sysconfdir}/yp.conf
 %dir %{_localstatedir}/yp/binding
 %doc README NEWS
-%license COPYING
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3:2.6.1-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.7.2-10
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- Removed epoch
+- License verified
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.7.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.7.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Nov 12 2021 Björn Esser <besser82@fedoraproject.org> - 3:2.7.2-7
+- Rebuild(libnsl2)
+
+* Tue Sep 28 2021 Marek Kulik <mkulik@redhat.com> - 3:2.7.2-6
+- Fix setsebool message in logs, resolves: #1882069
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.7.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3:2.7.2-4
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.7.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.7.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Apr 20 2020 Filip Januš <fjanus@redhat.com> - 2.7.2-1
+- Update version to 2.7.2
+- Resolves: #1796030
+- Removing obsolete patches
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3:2.6.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
