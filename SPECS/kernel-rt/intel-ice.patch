@@ -1,0 +1,289 @@
+From 35c4c8a14d10a40d9fcee5591bd24f82fdc55620 Mon Sep 17 00:00:00 2001
+From: xfoukas <xefouk@microsoft.com>
+Date: Sun, 28 Aug 2022 17:49:37 +0100
+Subject: [PATCH] ice: Fix VSIs unable to share unicast MAC
+
+This is a backport of the ice driver fix discussed here:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/drivers/net/ethernet/intel?id=5c8e3c7ff3e7bd7b938659be704f75cc746b697f
+
+This patch allows multiple VFs to have the same unicast MAC address.
+---
+ drivers/net/ethernet/intel/ice/ice_switch.c   | 147 +-----------------
+ drivers/net/ethernet/intel/ice/ice_type.h     |   2 -
+ .../net/ethernet/intel/ice/ice_virtchnl_pf.c  |  39 -----
+ 3 files changed, 1 insertion(+), 187 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index 3b6c1420aa7b..fe8e1eaf17ee 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -1639,20 +1639,14 @@ ice_remove_rule_internal(struct ice_hw *hw, u8 recp_id,
+  */
+ enum ice_status ice_add_mac(struct ice_hw *hw, struct list_head *m_list)
+ {
+-	struct ice_aqc_sw_rules_elem *s_rule, *r_iter;
+ 	struct ice_fltr_list_entry *m_list_itr;
+-	struct list_head *rule_head;
+-	u16 total_elem_left, s_rule_size;
+ 	struct ice_switch_info *sw;
+ 	struct mutex *rule_lock; /* Lock to protect filter rule list */
+ 	enum ice_status status = 0;
+-	u16 num_unicast = 0;
+-	u8 elem_sent;
+ 
+ 	if (!m_list || !hw)
+ 		return ICE_ERR_PARAM;
+ 
+-	s_rule = NULL;
+ 	sw = hw->switch_info;
+ 	rule_lock = &sw->recp_list[ICE_SW_LKUP_MAC].filt_rule_lock;
+ 	list_for_each_entry(m_list_itr, m_list, list_entry) {
+@@ -1673,17 +1667,7 @@ enum ice_status ice_add_mac(struct ice_hw *hw, struct list_head *m_list)
+ 		if (m_list_itr->fltr_info.lkup_type != ICE_SW_LKUP_MAC ||
+ 		    is_zero_ether_addr(add))
+ 			return ICE_ERR_PARAM;
+-		if (is_unicast_ether_addr(add) && !hw->ucast_shared) {
+-			/* Don't overwrite the unicast address */
+-			mutex_lock(rule_lock);
+-			if (ice_find_rule_entry(hw, ICE_SW_LKUP_MAC,
+-						&m_list_itr->fltr_info)) {
+-				mutex_unlock(rule_lock);
+-				return ICE_ERR_ALREADY_EXISTS;
+-			}
+-			mutex_unlock(rule_lock);
+-			num_unicast++;
+-		} else if (is_multicast_ether_addr(add) ||
++		if (is_multicast_ether_addr(add) ||
+ 			   (is_unicast_ether_addr(add) && hw->ucast_shared)) {
+ 			m_list_itr->status =
+ 				ice_add_rule_internal(hw, ICE_SW_LKUP_MAC,
+@@ -1693,89 +1677,6 @@ enum ice_status ice_add_mac(struct ice_hw *hw, struct list_head *m_list)
+ 		}
+ 	}
+ 
+-	mutex_lock(rule_lock);
+-	/* Exit if no suitable entries were found for adding bulk switch rule */
+-	if (!num_unicast) {
+-		status = 0;
+-		goto ice_add_mac_exit;
+-	}
+-
+-	rule_head = &sw->recp_list[ICE_SW_LKUP_MAC].filt_rules;
+-
+-	/* Allocate switch rule buffer for the bulk update for unicast */
+-	s_rule_size = ICE_SW_RULE_RX_TX_ETH_HDR_SIZE;
+-	s_rule = devm_kcalloc(ice_hw_to_dev(hw), num_unicast, s_rule_size,
+-			      GFP_KERNEL);
+-	if (!s_rule) {
+-		status = ICE_ERR_NO_MEMORY;
+-		goto ice_add_mac_exit;
+-	}
+-
+-	r_iter = s_rule;
+-	list_for_each_entry(m_list_itr, m_list, list_entry) {
+-		struct ice_fltr_info *f_info = &m_list_itr->fltr_info;
+-		u8 *mac_addr = &f_info->l_data.mac.mac_addr[0];
+-
+-		if (is_unicast_ether_addr(mac_addr)) {
+-			ice_fill_sw_rule(hw, &m_list_itr->fltr_info, r_iter,
+-					 ice_aqc_opc_add_sw_rules);
+-			r_iter = (struct ice_aqc_sw_rules_elem *)
+-				((u8 *)r_iter + s_rule_size);
+-		}
+-	}
+-
+-	/* Call AQ bulk switch rule update for all unicast addresses */
+-	r_iter = s_rule;
+-	/* Call AQ switch rule in AQ_MAX chunk */
+-	for (total_elem_left = num_unicast; total_elem_left > 0;
+-	     total_elem_left -= elem_sent) {
+-		struct ice_aqc_sw_rules_elem *entry = r_iter;
+-
+-		elem_sent = min_t(u8, total_elem_left,
+-				  (ICE_AQ_MAX_BUF_LEN / s_rule_size));
+-		status = ice_aq_sw_rules(hw, entry, elem_sent * s_rule_size,
+-					 elem_sent, ice_aqc_opc_add_sw_rules,
+-					 NULL);
+-		if (status)
+-			goto ice_add_mac_exit;
+-		r_iter = (struct ice_aqc_sw_rules_elem *)
+-			((u8 *)r_iter + (elem_sent * s_rule_size));
+-	}
+-
+-	/* Fill up rule ID based on the value returned from FW */
+-	r_iter = s_rule;
+-	list_for_each_entry(m_list_itr, m_list, list_entry) {
+-		struct ice_fltr_info *f_info = &m_list_itr->fltr_info;
+-		u8 *mac_addr = &f_info->l_data.mac.mac_addr[0];
+-		struct ice_fltr_mgmt_list_entry *fm_entry;
+-
+-		if (is_unicast_ether_addr(mac_addr)) {
+-			f_info->fltr_rule_id =
+-				le16_to_cpu(r_iter->pdata.lkup_tx_rx.index);
+-			f_info->fltr_act = ICE_FWD_TO_VSI;
+-			/* Create an entry to track this MAC address */
+-			fm_entry = devm_kzalloc(ice_hw_to_dev(hw),
+-						sizeof(*fm_entry), GFP_KERNEL);
+-			if (!fm_entry) {
+-				status = ICE_ERR_NO_MEMORY;
+-				goto ice_add_mac_exit;
+-			}
+-			fm_entry->fltr_info = *f_info;
+-			fm_entry->vsi_count = 1;
+-			/* The book keeping entries will get removed when
+-			 * base driver calls remove filter AQ command
+-			 */
+-
+-			list_add(&fm_entry->list_entry, rule_head);
+-			r_iter = (struct ice_aqc_sw_rules_elem *)
+-				((u8 *)r_iter + s_rule_size);
+-		}
+-	}
+-
+-ice_add_mac_exit:
+-	mutex_unlock(rule_lock);
+-	if (s_rule)
+-		devm_kfree(ice_hw_to_dev(hw), s_rule);
+ 	return status;
+ }
+ 
+@@ -2123,38 +2024,6 @@ ice_cfg_dflt_vsi(struct ice_hw *hw, u16 vsi_handle, bool set, u8 direction)
+ 	return status;
+ }
+ 
+-/**
+- * ice_find_ucast_rule_entry - Search for a unicast MAC filter rule entry
+- * @hw: pointer to the hardware structure
+- * @recp_id: lookup type for which the specified rule needs to be searched
+- * @f_info: rule information
+- *
+- * Helper function to search for a unicast rule entry - this is to be used
+- * to remove unicast MAC filter that is not shared with other VSIs on the
+- * PF switch.
+- *
+- * Returns pointer to entry storing the rule if found
+- */
+-static struct ice_fltr_mgmt_list_entry *
+-ice_find_ucast_rule_entry(struct ice_hw *hw, u8 recp_id,
+-			  struct ice_fltr_info *f_info)
+-{
+-	struct ice_switch_info *sw = hw->switch_info;
+-	struct ice_fltr_mgmt_list_entry *list_itr;
+-	struct list_head *list_head;
+-
+-	list_head = &sw->recp_list[recp_id].filt_rules;
+-	list_for_each_entry(list_itr, list_head, list_entry) {
+-		if (!memcmp(&f_info->l_data, &list_itr->fltr_info.l_data,
+-			    sizeof(f_info->l_data)) &&
+-		    f_info->fwd_id.hw_vsi_id ==
+-		    list_itr->fltr_info.fwd_id.hw_vsi_id &&
+-		    f_info->flag == list_itr->fltr_info.flag)
+-			return list_itr;
+-	}
+-	return NULL;
+-}
+-
+ /**
+  * ice_remove_mac - remove a MAC address based filter rule
+  * @hw: pointer to the hardware structure
+@@ -2179,7 +2048,6 @@ enum ice_status ice_remove_mac(struct ice_hw *hw, struct list_head *m_list)
+ 	rule_lock = &hw->switch_info->recp_list[ICE_SW_LKUP_MAC].filt_rule_lock;
+ 	list_for_each_entry_safe(list_itr, tmp, m_list, list_entry) {
+ 		enum ice_sw_lkup_type l_type = list_itr->fltr_info.lkup_type;
+-		u8 *add = &list_itr->fltr_info.l_data.mac.mac_addr[0];
+ 		u16 vsi_handle;
+ 
+ 		if (l_type != ICE_SW_LKUP_MAC)
+@@ -2191,19 +2059,6 @@ enum ice_status ice_remove_mac(struct ice_hw *hw, struct list_head *m_list)
+ 
+ 		list_itr->fltr_info.fwd_id.hw_vsi_id =
+ 					ice_get_hw_vsi_num(hw, vsi_handle);
+-		if (is_unicast_ether_addr(add) && !hw->ucast_shared) {
+-			/* Don't remove the unicast address that belongs to
+-			 * another VSI on the switch, since it is not being
+-			 * shared...
+-			 */
+-			mutex_lock(rule_lock);
+-			if (!ice_find_ucast_rule_entry(hw, ICE_SW_LKUP_MAC,
+-						       &list_itr->fltr_info)) {
+-				mutex_unlock(rule_lock);
+-				return ICE_ERR_DOES_NOT_EXIST;
+-			}
+-			mutex_unlock(rule_lock);
+-		}
+ 		list_itr->status = ice_remove_rule_internal(hw,
+ 							    ICE_SW_LKUP_MAC,
+ 							    list_itr);
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index d33d1906103c..b9b654de97c0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -841,8 +841,6 @@ struct ice_hw {
+ 	/* INTRL granularity in 1 us */
+ 	u8 intrl_gran;
+ 
+-	u8 ucast_shared;	/* true if VSIs can share unicast addr */
+-
+ #define ICE_PHY_PER_NAC		1
+ #define ICE_MAX_QUAD		2
+ #define ICE_NUM_QUAD_TYPE	2
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index 9d4d58757e04..cdbd30bcbead 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -4605,39 +4605,6 @@ ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi)
+ 	return 0;
+ }
+ 
+-/**
+- * ice_unicast_mac_exists - check if the unicast MAC exists on the PF's switch
+- * @pf: PF used to reference the switch's rules
+- * @umac: unicast MAC to compare against existing switch rules
+- *
+- * Return true on the first/any match, else return false
+- */
+-static bool ice_unicast_mac_exists(struct ice_pf *pf, u8 *umac)
+-{
+-	struct ice_sw_recipe *mac_recipe_list =
+-		&pf->hw.switch_info->recp_list[ICE_SW_LKUP_MAC];
+-	struct ice_fltr_mgmt_list_entry *list_itr;
+-	struct list_head *rule_head;
+-	struct mutex *rule_lock; /* protect MAC filter list access */
+-
+-	rule_head = &mac_recipe_list->filt_rules;
+-	rule_lock = &mac_recipe_list->filt_rule_lock;
+-
+-	mutex_lock(rule_lock);
+-	list_for_each_entry(list_itr, rule_head, list_entry) {
+-		u8 *existing_mac = &list_itr->fltr_info.l_data.mac.mac_addr[0];
+-
+-		if (ether_addr_equal(existing_mac, umac)) {
+-			mutex_unlock(rule_lock);
+-			return true;
+-		}
+-	}
+-
+-	mutex_unlock(rule_lock);
+-
+-	return false;
+-}
+-
+ /**
+  * ice_set_vf_mac
+  * @netdev: network interface device structure
+@@ -4670,12 +4637,6 @@ int ice_set_vf_mac(struct net_device *netdev, int vf_id, u8 *mac)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (ice_unicast_mac_exists(pf, mac)) {
+-		netdev_err(netdev, "Unicast MAC %pM already exists on this PF. Preventing setting VF %u unicast MAC address to %pM\n",
+-			   mac, vf_id, mac);
+-		return -EINVAL;
+-	}
+-
+ 	mutex_lock(&vf->cfg_lock);
+ 
+ 	/* VF is notified of its new MAC via the PF's response to the
+-- 
+2.34.1
+

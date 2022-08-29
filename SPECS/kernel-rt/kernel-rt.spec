@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt46
+%global rt_version rt48
 %define uname_r %{version}-%{rt_version}-%{release}
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
 
@@ -12,8 +12,8 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.44.1
-Release:        6%{?dist}
+Version:        5.15.55.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Source3:        cbl-mariner-ca-20211013.pem
 # Also, remember to bump the global rt_version macro above ^
 Patch0:         patch-%{version_upstream}-%{rt_version}.patch
 Patch1:         realtime-with-memcg.patch
+Patch2:         intel-ice.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -379,6 +380,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Aug 28 2022 Xenofon Foukas <xefouk@microsoft.com> - 5.15.55.1-1
+- Update source to 5.15.55.1
+- Add ice patch for VF unicast MAC sharing
+
 * Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-6
 - Enable CONFIG_PCI_PF_STUB
 
