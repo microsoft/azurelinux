@@ -19,6 +19,8 @@ sodiff is a process which looks for new versions of `.so` files and provides a l
 To provide a list of packages that need to be rebuilt, simply run `sodiff-check` target. The target will fail if no packages has been built. In that case, one can run `fake-built-packages-list` target before making a sodiff check. This will allow to analyze all RPMs except just the locally built ones.
 
 ### Implementation
+ - sodiff uses RPM repositories to obtain package information. The RPM repositories included by default come from the base Mariner .repo files. They are concatenated and packaged during toolkit generation.
+ - Optional .repo files can be passed added by specifying them with `SODIFF_OPTIONAL_SOURCES` variable. The location of .repo files is relative to the `$(SPECS_DIR)/mariner-repos/` directory.
 
 ### Artifacts
 The artifacts are available in the `$(SODIFF_OUTPUT_FOLDER)`, which is `build/sodiff` by default.
