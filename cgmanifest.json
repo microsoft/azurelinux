@@ -22294,8 +22294,8 @@
         "type": "other",
         "other": {
           "name": "python-tornado",
-          "version": "6.0.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/tornado/tornado-6.0.3.tar.gz"
+          "version": "6.2.0",
+          "downloadUrl": "https://github.com/tornadoweb/tornado/archive/refs/tags/v6.2.0.tar.gz"
         }
       }
     },
