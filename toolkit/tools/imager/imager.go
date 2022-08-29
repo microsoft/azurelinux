@@ -593,7 +593,6 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	}
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
-	// TODO add extrat config to specify bootloader to use
 	if !isRootFS {
 
 		var primaryDisk = findPrimaryDisk(diskDevPaths, disks, systemConfig)
