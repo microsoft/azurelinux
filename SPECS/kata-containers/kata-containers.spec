@@ -221,15 +221,11 @@ fi
 %{_prefix}/local/bin/containerd-shim-kata-v2
 %{_prefix}/local/bin/kata-monitor
 %{_prefix}/local/bin/kata-runtime
-%{katadefaults}/configuration-acrn.toml
-%{katadefaults}/configuration-clh.toml
-%{katadefaults}/configuration-fc.toml
-%{katadefaults}/configuration-qemu.toml
+%{katadefaults}/configuration*.toml
 %dir %{katalibexecdir}
 %{katalibexecdir}/VERSION
 %dir %{katadatadir}
 %dir %{katadefaults}
-%{katadefaults}/configuration.toml
 %{_datadir}/bash-completion/completions/kata-runtime
 %license LICENSE
 %doc CONTRIBUTING.md
