@@ -8,8 +8,8 @@
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.57.1
-Release:        3%{?dist}
+Version:        5.15.60.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -393,10 +393,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Tue Aug 09 2022 Vince Perri <viperri@microsoft.com> - 5.15.57.1-1
+* Tue Aug 29 2022 Vince Perri <viperri@microsoft.com> - 5.15.57.1-1
 - Rename package to kernel-hci
 - Remove no-vmw-sta from kernel command-line to remove vmware extension
-- Add net/mlx5 patches (patch0-14) to add LAG mode
+- Add net/mlx5 patches (patches 0-14) to add LAG mode
 - Set ExclusiveArch to x86_64, remove config_aarch64
 - Add CONFIG_NET_FOU=m, CONFIG_NET_FOU_IP_TUNNELS=y,
 -   CONFIG_NET_CLS_FLOWER=m,
@@ -411,6 +411,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 -   CONFIG_IP_VS_DEBUG=y,
 -   CONFIG_NFT_FIB_IPV4=m, CONFIG_NF_TABLES_ARP=y, CONFIG_NF_LOG_ARP=m,
 -   CONFIG_SECURITY_SELINUX_BOOTPARAM=y
+
+* Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
+- Upgrade to 5.15.60.2 to fix arm64 builds
 
 * Tue Aug 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-3
 - Turn on CONFIG_SECURITY_LANDLOCK
