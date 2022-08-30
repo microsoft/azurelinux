@@ -2517,8 +2517,7 @@
         "Rancher": {
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
-                "k3s",
-                "k3s-1.23.8"
+                "k3s"
             ]
         },
         "Sysbench source": {
