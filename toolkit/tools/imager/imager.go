@@ -359,7 +359,10 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 
 	if DiskType == realDiskType {
 		if liveInstallFlag {
-			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisks(diskNames, disks, rootEncryption, readOnlyRootConfig)
+			for _, disk := range disks {
+				diskDevPaths = append(diskDevPaths, disk.TargetDisk.Value)
+			}
+			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisks(diskDevPaths, disks, rootEncryption, readOnlyRootConfig)
 		} else {
 			err = fmt.Errorf("target Disk Type is set but --live-install option is not set. Please check your config or enable the --live-install option")
 			return
