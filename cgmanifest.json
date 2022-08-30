@@ -2578,8 +2578,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "21.11",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.tar.xz"
+          "version": "21.11.2",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.2.tar.xz"
         }
       }
     },
@@ -22304,8 +22304,8 @@
         "type": "other",
         "other": {
           "name": "python-tornado",
-          "version": "6.0.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/tornado/tornado-6.0.3.tar.gz"
+          "version": "6.2.0",
+          "downloadUrl": "https://github.com/tornadoweb/tornado/archive/refs/tags/v6.2.0.tar.gz"
         }
       }
     },
