@@ -28,7 +28,6 @@ Source3:        cbl-mariner-ca-20211013.pem
 # Also, remember to bump the global rt_version macro above ^
 Patch0:         patch-%{version_upstream}-%{rt_version}.patch
 Patch1:         realtime-with-memcg.patch
-Patch2:         intel-ice.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
