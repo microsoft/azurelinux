@@ -9,8 +9,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
-	"syscall"
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
@@ -21,18 +19,18 @@ import (
 
 const (
 	initializeMode = "i"
-	recordMode = "r"
+	recordMode     = "r"
 )
 
 var (
-	app            = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
-	scriptName     = app.Flag("script-name", "The name of the current tool.").Required().String()
-	stepName       = app.Flag("step-name", "The name of the current step.").Required().String()
-	actionName     = app.Flag("action-name", "The name of the current action.").Default("").String()
-	dirPath        = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
-	logFile        = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
-	validModes     = []string{initializeMode, recordMode}
-	mode           = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
+	app        = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
+	scriptName = app.Flag("script-name", "The name of the current tool.").Required().String()
+	stepName   = app.Flag("step-name", "The name of the current step.").Required().String()
+	actionName = app.Flag("action-name", "The name of the current action.").Default("").String()
+	dirPath    = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
+	logFile    = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
+	validModes = []string{initializeMode, recordMode}
+	mode       = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
 )
 
 func main() {
@@ -75,24 +73,6 @@ func record(completePath string) {
 		logger.Log.Panicf("Unable to open file (may not have been created): %s", completePath)
 	}
 	defer file.Close()
-
-// Records a new timestamp to the specific CSV for the specified shell script.
-func record(completePath string) {
-	file, err := os.OpenFile(completePath, os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		logger.Log.Panicf("Unable to open file (may not have been created): %s", completePath)
-	}
-	defer file.Close()
-	// Create a new csv writer.
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	// err = writer.Write([]string{info.toolName, info.stepName, info.actionName, info.duration.String()})
-	err = writer.Write([]string{*scriptName, *stepName, *actionName, time.Now().Format(time.UnixDate)})
-	if err != nil {
-		fmt.Printf("Unable to write to file: %s", *filePath)
-	}
-}
 
 	// Write the timestamp to CSV file using a helper function from timestamp.go.
 	timestamp.WriteStamp(file, timestamp.NewBldTracker(*scriptName, *stepName, *actionName, time.Now()))

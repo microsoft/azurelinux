@@ -195,7 +195,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	}
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
-	timestamp.Stamp.RecordToCSV("Build System Config", "install packages into image")
+	timestamp.Stamp.RecordToCSV("buildSystemConfig", "install packages into image")
 
 	// Create Parition to Mountpoint map
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
@@ -273,7 +273,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 	}
-	timestamp.Stamp.RecordToCSV("Build system config", "Create Parition to Mountpoint map")
+	timestamp.Stamp.RecordToCSV("buildSystemConfig", "Create Parition to Mountpoint map")
 
 	// Cleanup encrypted disks
 	if systemConfig.Encryption.Enable {
@@ -283,7 +283,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 	}
-	timestamp.Stamp.RecordToCSV("Finish up build system config", "Cleanup encrypted disks")
+	timestamp.Stamp.RecordToCSV("buildSystemConfig", "Cleanup encrypted disks")
 
 	return
 }

@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	ts demo.TimeStamp
+	ts                demo.TimeStamp
 	dashboardProgress = uiprogress.New()
-	progressName []string
-	progressValue []int
-	progressLevel []int
-	waitTime = time.Millisecond * 500
+	progressName      []string
+	progressValue     []int
+	progressLevel     []int
+	waitTime          = time.Millisecond * 500
 )
 
 func CheckProgress(ts *demo.TimeStamp, level int) {

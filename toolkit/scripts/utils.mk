@@ -39,12 +39,6 @@ define print_warning
 { echo "$1" ; $(if $(filter y,$(STOP_ON_WARNING)),exit 1 ;) }
 endef
 
-######## TIMESTAMP Functions ########
-
-$(call create_folder,$(TIMESTAMP_DIR)) 
-$(shell rm -rf $(TIMESTAMP_DIR)/*)
-$(shell touch $(TIMESTAMP_DIR)/init)
-
 ######## VARIABLE DEPENDENCY TRACKING ########
 
 # List of variables to watch for changes.
