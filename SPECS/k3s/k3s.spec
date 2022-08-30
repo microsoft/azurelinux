@@ -6,8 +6,8 @@
 %define k3s_binary    k3s
 
 Name:    k3s
-Version: 1.23.6
-Release: 4%{?dist}
+Version: 1.24.3
+Release: 1%{?dist}
 Summary: Lightweight Kubernetes
 
 Group:   System Environment/Base
@@ -23,14 +23,13 @@ Source0: https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.ta
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/containerd/containerd.git -b release/1.6
+# 6. git clone https://github.com/k3s.io/containerd.git -b 1.5.13-k3s1
 # 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
-# 8. git clone https://github.com/opencontainers/runc.git -b release-1.1
+# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.3
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1: %{name}-%{version}-vendor.tar.gz
 Patch0:  vendor_build.patch
-Patch1:  install.patch
 
 # K3s on Mariner is supported on x86_64 only:
 ExclusiveArch: x86_64
@@ -83,9 +82,10 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue Aug 30 2022 Animesh Garg <animeshgarg@microsoft.com> 1.24.3-1
+- Updated k3s to 1.24.3
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.23.6-4
 - Bump release to rebuild against Go 1.18.5
-
 * Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
 - Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
 * Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
