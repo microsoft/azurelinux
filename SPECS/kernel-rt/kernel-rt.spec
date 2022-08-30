@@ -381,7 +381,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Sun Aug 28 2022 Xenofon Foukas <xefouk@microsoft.com> - 5.15.55.1-1
 - Update source to 5.15.55.1
-- Add ice patch for VF unicast MAC sharing
 
 * Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-6
 - Enable CONFIG_PCI_PF_STUB
