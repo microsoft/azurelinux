@@ -29,7 +29,7 @@
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        18.11.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Epoch:          2
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
@@ -40,6 +40,7 @@ Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
 Patch0:         app-pie.patch
 Patch1:         fcf-protection.patch
 Patch2:         dpdk-rte-ether-align.patch
+Patch3:         CVE-2022-2132.patch
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
 BuildRequires:  libnuma-devel
@@ -294,6 +295,9 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
+* Mon Aug 29 2022 Jon Slobodzian <joslobo@microsoft.com> 2:18.11.2-6
+- Patch for CVE-2022-2132
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2:18.11.2-5
 - Include tools to build and remove unpackaged_files_terminate_build
 
