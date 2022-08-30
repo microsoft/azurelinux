@@ -5,7 +5,7 @@
 %define uninstall_sh  %{util_path}/setup/uninstall.sh
 %define k3s_binary    k3s
 
-Name:    k3s1.23
+Name:    k3s
 Version: 1.23.8
 Release: 1%{?dist}
 Summary: Lightweight Kubernetes
