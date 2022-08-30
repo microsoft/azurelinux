@@ -1,9 +1,8 @@
-%global __remake_config 1
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.21.0
 Release:        2%{?dist}
-License:        GPLv2+ OR BSD
+License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -11,41 +10,33 @@ URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
 Patch4:         add-default-link-flags-for-shared-libraries.patch
 Patch6:         replace-mlxfwreset-with-mstfwreset-in-mstflint-message.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  boost-devel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  libcurl-devel
 BuildRequires:  libibmad-devel
 BuildRequires:  libstdc++-devel
+BuildRequires:  libtool
 BuildRequires:  libxml2-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 Requires:       python3
-ExcludeArch:    s390 s390x %{arm}
-%if %{__remake_config}
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
-%endif
 
 %description
 This package contains firmware update tool, vpd dump and register dump tools
 for network adapters based on Mellanox Technologies chips.
 
 %prep
-%setup -q
-
-%patch4 -p1
-%patch6 -p1
+%autosetup -p1
 
 find . -type f -iname '*.[ch]' -exec chmod a-x '{}' ';'
 find . -type f -iname '*.cpp' -exec chmod a-x '{}' ';'
 
 %build
-%if %{__remake_config}
 ./autogen.sh
-%endif
 %configure --enable-fw-mgr
 %make_build
 
@@ -57,6 +48,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -type f -name '*.a' -delete
 
 %files
+%license COPYING
 %doc README
 %{_bindir}/*
 %{_sysconfdir}/mstflint
