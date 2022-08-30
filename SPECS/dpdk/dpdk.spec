@@ -295,7 +295,7 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
-* Mon Aug 29 2022 Jon Slobodzian <joslobo@microsoft.com> 2:18.11.2-6
+* Mon Aug 29 2022 Jon Slobodzian <joslobo@microsoft.com> - 2:18.11.2-6
 - Patch for CVE-2022-2132
 
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2:18.11.2-5
