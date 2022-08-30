@@ -111,6 +111,7 @@ as L2 and L3 forwarding.
 %patch1 -p1
 %endif
 %patch2 -p1
+%patch3 -p1
 
 %build
 %{set_build_flags}
