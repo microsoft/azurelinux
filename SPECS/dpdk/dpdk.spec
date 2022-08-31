@@ -28,8 +28,8 @@
 %bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
-Version:        18.11.2
-Release:        6%{?dist}
+Version:        18.11.11
+Release:        1%{?dist}
 Epoch:          2
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
@@ -296,7 +296,7 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %endif
 
 %changelog
-* Mon Aug 29 2022 Jon Slobodzian <joslobo@microsoft.com> - 2:18.11.2-6
+* Mon Aug 29 2022 Jon Slobodzian <joslobo@microsoft.com> - 2:18.11.11-1
 - Patch for CVE-2022-2132
 
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2:18.11.2-5
