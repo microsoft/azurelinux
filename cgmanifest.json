@@ -5810,8 +5810,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "version": "5.15.63.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
@@ -7301,8 +7301,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "version": "5.15.63.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
@@ -7311,8 +7311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "version": "5.15.63.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
@@ -26597,8 +26597,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0232",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0232.tar.gz"
+          "version": "9.0.0325",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0325.tar.gz"
         }
       }
     },
