@@ -1,5 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%global debug_package %{nil}
 %define uname_r %{version}-%{release}
 
 %ifarch x86_64
@@ -8,17 +9,10 @@
 %define config_source %{SOURCE1}
 %endif
 
-%ifarch aarch64
-%global __provides_exclude_from %{_libdir}/debug/.build-id/
-%define arch arm64
-%define archdir arm64
-%define config_source %{SOURCE2}
-%endif
-
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-kata2
 Version:        5.15.48.1
-Release:        19%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +20,6 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
-Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 BuildRequires:  audit-devel
@@ -50,6 +43,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+ExclusiveArch: x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -66,34 +60,6 @@ Requires(postun): coreutils
 
 %description
 The kernel package contains the Linux kernel.
-
-%package devel
-Summary:        Kernel Dev
-Group:          System Environment/Kernel
-Requires:       kernel = %{version}-%{release}
-Requires:       gawk
-Requires:       python3
-Obsoletes:      linux-dev
-
-%description devel
-This package contains the Linux kernel dev files
-
-%package docs
-Summary:        Kernel docs
-Group:          System Environment/Kernel
-Requires:       python3
-
-%description docs
-This package contains the Linux kernel doc files
-
-%package tools
-Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
-Group:          System/Tools
-Requires:       kernel = %{version}-%{release}
-Requires:       audit
-
-%description tools
-This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
@@ -128,167 +94,23 @@ fi
 %build
 make KCFLAGS="-W" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
-%define __modules_install_post \
-for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
-    ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
-    rm -f $MODULE.{sig,dig} \
-    xz $MODULE \
-    done \
-%{nil}
-
-# We want to compress modules after stripping. Extra step is added to
-# the default __spec_install_post.
-%define __spec_install_post\
-    %{?__debug_package:%{__debug_install_post}}\
-    %{__arch_install_post}\
-    %{__os_install_post}\
-    %{__modules_install_post}\
-%{nil}
-
 %install
-install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 700 %{buildroot}/boot
-install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
-install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
 %ifarch x86_64
-install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 install -vm 600 arch/x86/boot/compressed/vmlinux.bin %{buildroot}/boot/vmlinux.bin
 %endif
-
-%ifarch aarch64
-install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot/dtb/fsl-imx8mq-evk.dtb
-%endif
-
-# Restrict the permission on System.map-X file
-install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
-install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
-cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
-# `perf test vmlinux` needs it
-ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
-
-cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
-# GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=128M
-mariner_linux=vmlinuz-%{uname_r}
-mariner_initrd=initrd.img-%{uname_r}
-EOF
-chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
-
-# hmac sign the kernel for FIPS
-%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
-
-# Register myself to initramfs
-mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
-cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
-EOF
-
-#    Cleanup dangling symlinks
-rm -rf %{buildroot}/lib/modules/%{uname_r}/source
-rm -rf %{buildroot}/lib/modules/%{uname_r}/build
-
-find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-%ifarch x86_64
-# CONFIG_STACK_VALIDATION=y requires objtool to build external modules
-install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
-install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
-%endif
-
-cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
-
-%ifarch aarch64
-cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-%endif
-
-# disable (JOBS=1) parallel build to fix this issue:
-# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
-# Linux version that was affected is 4.4.26
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
-
-# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
-rm -vf %{buildroot}%{_bindir}/trace
-
-%triggerin -- initramfs
-mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
-touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
-
-%triggerun -- initramfs
-rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initrd.img-%{uname_r}
-echo "initrd of kernel %{uname_r} removed" >&2
-
-%postun
-if [ ! -e /boot/mariner.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
-     fi
-fi
-
-%post
-/sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %files
 %defattr(-,root,root)
 %license COPYING
-%exclude %dir /usr/lib/debug
-/boot/System.map-%{uname_r}
-/boot/config-%{uname_r}
-/boot/vmlinuz-%{uname_r}
-/boot/.vmlinuz-%{uname_r}.hmac
 /boot/vmlinux.bin
-%config(noreplace) /boot/linux-%{uname_r}.cfg
-%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
-%defattr(0644,root,root)
-
-%files docs
-%defattr(-,root,root)
-%{_defaultdocdir}/linux-%{uname_r}/*
-
-%files devel
-%defattr(-,root,root)
-%{_prefix}/src/linux-headers-%{uname_r}
-
-%files tools
-%defattr(-,root,root)
-%{_libexecdir}
-%exclude %dir %{_libdir}/debug
-%ifarch x86_64
-%{_lib64dir}/traceevent
-%{_lib64dir}/libperf-jvmti.so
-%endif
-%ifarch aarch64
-%{_libdir}/traceevent
-%{_libdir}/libperf-jvmti.so
-%endif
-%{_bindir}
-%{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
-%{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
-%{_includedir}/perf/perf_dlfilter.h
-
-%ifarch aarch64
-%files dtb
-/boot/dtb/fsl-imx8mq-evk.dtb
-%endif
 
 %changelog
-* Fri Aug 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-5
+* Tue Aug 30 2022 Chris Co <chrco@microsoft.com> - 5.15.48.1-7
+- Trim spec to only necessary components for UVM
+
+* Fri Aug 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-6
 - Creating kernel configuration specifically for kata uvm purposes
 
 * Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
