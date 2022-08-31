@@ -1226,8 +1226,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "18.11.2",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
+          "version": "18.11.11",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.11.tar.xz"
         }
       }
     },
