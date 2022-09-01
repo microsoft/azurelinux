@@ -408,7 +408,7 @@ texinfo-6.5-7.cm1.x86_64.rpm
 texinfo-debuginfo-6.5-7.cm1.x86_64.rpm
 unzip-6.0-18.cm1.x86_64.rpm
 unzip-debuginfo-6.0-18.cm1.x86_64.rpm
-util-linux-2.32.1-7.cm1.x86_64.rpm
+util-linux-2.37.3-1.cm1.x86_64.rpm
 util-linux-debuginfo-2.32.1-7.cm1.x86_64.rpm
 util-linux-devel-2.32.1-7.cm1.x86_64.rpm
 util-linux-lang-2.32.1-7.cm1.x86_64.rpm

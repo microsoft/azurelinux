@@ -60,7 +60,7 @@ gzip-1.9-5.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
 mariner-release-1.0-44.cm1.noarch.rpm
 patch-2.7.6-7.cm1.aarch64.rpm
-util-linux-2.32.1-7.cm1.aarch64.rpm
+util-linux-2.37.3-1.cm1.aarch64.rpm
 util-linux-devel-2.32.1-7.cm1.aarch64.rpm
 util-linux-libs-2.32.1-7.cm1.aarch64.rpm
 tar-1.32-2.cm1.aarch64.rpm

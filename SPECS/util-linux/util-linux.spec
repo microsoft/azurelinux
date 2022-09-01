@@ -1,14 +1,13 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.32.1
-Release:        7%{?dist}
+Version:        2.37.3
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.32/%{name}-%{version}.tar.xz
-Patch0:         CVE-2021-37600.patch
 Patch1:         CVE-2022-0563.patch
 
 BuildRequires:  libselinux-devel
@@ -116,6 +115,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.3-1
+- Upgrade to 2.37.3
+
 *   Mon Apr 18 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.32.1-7
 -   Backport patch for CVE-2022-0563.
 
