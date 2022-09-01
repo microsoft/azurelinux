@@ -19,6 +19,35 @@
     done
 )
 
+# Install patch if the INSTALLED kernel matches.
+# No-op for initial (empty) livepatch.
+%define install_if_should() \
+installed_kernel_version="$(ls /boot | grep -oP "(?<=vmlinuz-).*cm\d$")" \
+if [[ -f "%{livepatch_module_path}" && "$installed_kernel_version" == "%{kernel_full_version}" ]] \
+then \
+    kpatch install %{livepatch_module_path} \
+fi
+
+# Load patch, if the RUNNING kernel matches.
+# No-op for initial (empty) livepatch.
+%define load_if_should() \
+if [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_full_version}" ]] \
+then \
+    kpatch load %{livepatch_module_path} \
+fi
+
+%define uninstall_if_should() \
+if kpatch list | grep -qP "%{livepatch_name} \(%{kernel_full_version}\)" \
+then \
+    kpatch uninstall %{livepatch_name} \
+fi
+
+%define unload_if_should() \
+if kpatch list | grep -qP "%{livepatch_name} \[enabled\]" \
+then \
+    kpatch unload %{livepatch_name} \
+fi
+
 Summary:        Set of livepatches for kernel %{kernel_full_version}
 Name:           livepatch-%{kernel_full_version}
 Version:        1.0.0
@@ -106,22 +135,29 @@ install -dm 755 %{buildroot}%{livepatch_install_dir}
 %endif
 
 %post
-if [[ -f "%{livepatch_module_path}" ]]
-then
-    kpatch load %{livepatch_module_path}
-    kpatch install %{livepatch_module_path}
-fi
+%load_if_should
+%install_if_should
 
 %preun
-if kpatch list | grep -qP "%{livepatch_name} \(%{kernel_full_version}\)"
+# $1 == 0 - package uninstall
+# $1 == 1 - old package removal during an update
+#
+# No-op for updates: %%post for the new package ran first and set everything correctly.
+if [[ $1 -eq 0 ]]
 then
-    kpatch uninstall %{livepatch_name}
+    %uninstall_if_should
+    %unload_if_should
 fi
 
-if kpatch list | grep -qP "%{livepatch_name} \[enabled\]"
-then
-    kpatch unload %{livepatch_name}
-fi
+# Re-enable patch on rollbacks to previous kernel.
+# Previous kernel is still running, do NOT attempt to load the livepatch.
+%triggerin -- kernel = %{kernel_full_version}
+%install_if_should
+
+# Prevent the patch from being loaded after a reboot to a different kernel.
+# Previous kernel is still running, do NOT unload the livepatch.
+%triggerin -- kernel > %{kernel_full_version}, kernel < %{kernel_full_version}
+%uninstall_if_should
 
 %files
 %defattr(-,root,root)
