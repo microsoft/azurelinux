@@ -7332,7 +7332,7 @@
         "other": {
           "name": "kernel-hci",
           "version": "5.15.63.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
