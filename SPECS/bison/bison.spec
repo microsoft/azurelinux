@@ -1,7 +1,7 @@
 Summary:        Contains a parser generator
 Name:           bison
-Version:        3.1
-Release:        4%{?dist}
+Version:        3.5.4
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/bison
 Group:          System Environment/Base
@@ -48,6 +48,9 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.4-1
+- Upgrade to 3.5.4
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 3.1-4
 - Remove yacc command for compatibility with byacc package
 - Remove sha hash

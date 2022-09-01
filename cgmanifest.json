@@ -366,8 +366,8 @@
         "type": "other",
         "other": {
           "name": "bison",
-          "version": "3.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/bison/bison-3.1.tar.xz"
+          "version": "3.5.4",
+          "downloadUrl": "http://ftp.gnu.org/gnu/bison/bison-3.5.4.tar.xz"
         }
       }
     },
