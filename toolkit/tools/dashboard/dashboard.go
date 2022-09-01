@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/gosuri/uiprogress"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 type stampedFile struct {
@@ -22,6 +25,9 @@ type stampedFile struct {
 }
 
 var (
+	app     = kingpin.New("dashboard", "A tool that monitors a CBL-Mariner build live.")
+	dirPath = app.Flag("build-dir", "The build directory of the CBL-Mariner build to track.").Required().ExistingDir()
+
 	wg                sync.WaitGroup
 	dashboardProgress = uiprogress.New()
 	barWidth          = 30
@@ -31,7 +37,7 @@ var (
 	targetDir         string
 	targetCSV         = []*stampedFile{
 		&stampedFile{
-			fileName:     "create_worker_chroot.csv",
+			fileName:     "create_worker_chroot.sh.csv",
 			currLine:     0,
 			totalLine:    5,
 			lastStepDesc: "",
@@ -65,7 +71,16 @@ var (
 )
 
 func main() {
+	app.Version(exe.ToolkitVersion)
+	kingpin.MustParse(app.Parse(os.Args[1:]))
+	targetDir = path.Join(*dirPath, "timestamp")
+
 	fmt.Println("Starting dashboard")
+	fmt.Println("Will scan for:")
+	for _, f := range targetCSV {
+		path := path.Join(targetDir, f.fileName)
+		fmt.Println(path)
+	}
 	dashboardProgress.Start()
 	bar := AddProgressBar(int(totalProgress)).AppendCompleted()
 	bar.Width = barWidth
@@ -75,11 +90,6 @@ func main() {
 	})
 
 	SetSubBar()
-
-	wd, _ := os.Getwd()
-	idx := strings.Index(wd, "CBL-Mariner")
-	wd = wd[0 : idx+11]
-	targetDir = wd + "/build/timestamp/"
 
 	// fmt.Println("Proceeding to for loop")
 	// fmt.Printf("%+v \n", dashboardProgress)
@@ -104,8 +114,9 @@ func main() {
 		// Check update for each target file.
 		for i, _ := range targetCSV {
 			currFile := targetCSV[i]
+			path := path.Join(targetDir, currFile.fileName)
 			// Check if the file exists.
-			currStat, err := os.Stat(targetDir + currFile.fileName)
+			currStat, err := os.Stat(path)
 			if os.IsNotExist(err) {
 				continue
 			}

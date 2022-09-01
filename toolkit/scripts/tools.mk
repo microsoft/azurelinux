@@ -16,6 +16,8 @@ $(call create_folder,$(BUILD_DIR)/tools)
 go_tool_list = \
 	bldtracker \
 	boilerplate \
+	dashboard \
+	dashboard_v2 \
 	depsearch \
 	grapher \
 	graphpkgfetcher \
@@ -112,6 +114,13 @@ $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 	cd $(TOOLS_DIR) && go tool cover -html=$(BUILD_DIR)/tools/all_tools.coverage -o $@
 go-test-coverage: $(test_coverage_report)
 	@echo Coverage report available at: $(test_coverage_report)
+
+.PHONY: dashboard dashboard_v2
+dashboard: $(go-dashboard)
+	$(go-dashboard) --build-dir="$(BUILD_DIR)" || true
+
+dashboard_v2: $(go-dashboard_v2)
+	$(go-dashboard_v2) --build-dir="$(BUILD_DIR)" || true
 
 ######## CHROOT TOOLS ########
 

@@ -1,0 +1,1 @@
+To preserve test output, comment out the call to `cleanupFiles()` in the `TestMain()`.

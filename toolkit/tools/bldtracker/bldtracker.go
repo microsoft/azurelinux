@@ -28,7 +28,8 @@ var (
 	stepName   = app.Flag("step-name", "The name of the current step.").Required().String()
 	actionName = app.Flag("action-name", "The name of the current action.").Default("").String()
 	dirPath    = app.Flag("dir-path", "The folder that stores timestamp CSVs.").Required().ExistingDir() // currently must be absolute
-	logFile    = app.Flag("log-file", "Directory for log files").Required().ExistingFile()
+	logFile    = exe.LogFileFlag(app)
+	logLevel   = exe.LogLevelFlag(app)
 	validModes = []string{initializeMode, recordMode}
 	mode       = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
 )
@@ -36,10 +37,11 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, "trace")
+	logger.InitBestEffort(*logFile, *logLevel)
 
 	// Construct the CSV path.
 	completePath := filepath.Join(*dirPath, *scriptName+".csv")
+	logger.Log.Warnf("Printing log to '%s'", completePath)
 
 	// Perform different actions based on the input "mode".
 	switch *mode {

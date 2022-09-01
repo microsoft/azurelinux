@@ -9,14 +9,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/demo"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/dashboard_v2"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 var (
 	// Shared TimeStamp struct.
-	ts            demo.TimeStamp
+	ts            dashboard_v2.TimeStamp
 	fileName      = "./time_demo.json"
 	shortInterval = 500
 	longInterval  = 1000
@@ -35,7 +35,7 @@ func main() {
 
 	logger.InitStderrLog()
 	now := time.Now()
-	ts = demo.TimeStamp{Name: "1A", StartTime: &now, EndTime: nil, ExpectedSteps: 3}
+	ts = dashboard_v2.TimeStamp{Name: "1A", StartTime: &now, EndTime: nil, ExpectedSteps: 3}
 	err := jsonutils.WriteJSONFile(fileName, &ts)
 	if err != nil {
 		fmt.Printf("unable to write to json file\n")
@@ -82,10 +82,10 @@ func main() {
 
 }
 
-func appendStep(steps *[]demo.TimeStamp, unitTime int, name string, expectedSteps int) {
+func appendStep(steps *[]dashboard_v2.TimeStamp, unitTime int, name string, expectedSteps int) {
 	time.Sleep(time.Millisecond * time.Duration(unitTime))
 	now := time.Now()
-	*steps = append(*steps, demo.TimeStamp{Name: name, StartTime: &now, EndTime: nil, ExpectedSteps: expectedSteps})
+	*steps = append(*steps, dashboard_v2.TimeStamp{Name: name, StartTime: &now, EndTime: nil, ExpectedSteps: expectedSteps})
 	err := jsonutils.WriteJSONFile(fileName, &ts)
 	if err != nil {
 		fmt.Printf("unable to write to json file\n")
@@ -93,7 +93,7 @@ func appendStep(steps *[]demo.TimeStamp, unitTime int, name string, expectedStep
 	}
 }
 
-func finishStep(steps *[]demo.TimeStamp, unitTime int) {
+func finishStep(steps *[]dashboard_v2.TimeStamp, unitTime int) {
 	time.Sleep(time.Millisecond * time.Duration(unitTime))
 	now := time.Now()
 	(*steps)[len(*steps)-1].EndTime = &now
