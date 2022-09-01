@@ -35,6 +35,7 @@ version_release_matching_groups = [
 version_matching_groups = [
     frozenset([
         "SPECS/hyperv-daemons/hyperv-daemons.spec",
+        "SPECS/kernel-hci/kernel-hci.spec",
         "SPECS/kernel/kernel.spec"
     ]),
     frozenset([
