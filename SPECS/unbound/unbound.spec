@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.10.0
-Release:        4%{?dist}
+Version:        1.16.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,9 +11,7 @@ URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        %{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 # CVE-2020-12662.patch also fixes CVE-2020-12663
-Patch0:         CVE-2020-12662.patch
 Patch1:         CVE-2020-12663.nopatch
-Patch2:         CVE-2020-28935.patch
 BuildRequires:  expat-devel
 BuildRequires:  systemd
 Requires:       systemd
@@ -91,6 +89,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.16.2-1
+- Upgrade to 1.16.2
+
 *  Mon Dec 21 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.10.0-4
 -  Fix CVE-2020-28935.
 
