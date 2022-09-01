@@ -42,7 +42,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -216,7 +216,10 @@ fi
 %{_prefix}/local/bin/containerd-shim-kata-v2
 %{_prefix}/local/bin/kata-monitor
 %{_prefix}/local/bin/kata-runtime
+%ifarch x86_64
+# acrn is not available for arm64 architecture
 %{katadefaults}/configuration-acrn.toml
+%endif
 %{katadefaults}/configuration-clh.toml
 %{katadefaults}/configuration-fc.toml
 %{katadefaults}/configuration-qemu.toml
@@ -253,6 +256,9 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Aug 31 2022 Andrew Phelps <anphel@microsoft.com> - 2.5.0-2
+- Fix arm64 build issue by excluding configuration-acrn.toml
+
 * Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
