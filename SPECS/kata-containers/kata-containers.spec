@@ -11,8 +11,6 @@
 # https://github.com/rust-lang/rust/issues/47714
 %undefine _strict_symbol_defs_build
 
-%global katadatadir             %{_datadir}/kata-containers
-%global katadefaults            %{katadatadir}/defaults
 %global katacache               %{_localstatedir}/cache
 %global katalibexecdir          %{_libexecdir}/kata-containers
 %global katalocalstatecachedir  %{katacache}/kata-containers
@@ -29,13 +27,11 @@
                                 DEFSANDBOXCGROUPONLY=true \\\
                                 SKIP_GO_VERSION_CHECK=y \\\
                                 MACHINETYPE=%{machinetype} \\\
-                                SCRIPTS_DIR=%{_bindir} \\\
                                 DESTDIR=%{buildroot} \\\
                                 PREFIX=/usr \\\
-                                DEFAULTSDIR=%{katadefaults} \\\
-                                CONFDIR=%{katadefaults} \\\
                                 FEATURE_SELINUX="yes" \\\
-                                DEFENABLEANNOTATIONS=['\\\".*\\\"']
+                                DEFENABLEANNOTATIONS=['\\\".*\\\"'] \\\
+                                DEFAULT_HYPERVISOR=cloud-hypervisor
 
 %global agent_make_vars         LIBC=gnu \\\
                                 DESTDIR=%{buildroot}%{kataagentdir}
@@ -55,7 +51,8 @@ Source4:        15-dracut.conf
 Source5:        50-kata
 Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
 Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
-Patch2:         expose-devices-from-kata.patch
+Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
+Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -76,7 +73,6 @@ Requires:       busybox
 Requires:       dracut
 Requires:       kernel
 Requires:       qemu-kvm-core >= 4.2.0-4
-Requires:       qemu-virtiofsd
 Requires:       %{_libexecdir}/virtiofsd
 
 Conflicts:      kata-agent
@@ -163,17 +159,8 @@ popd
 # Install the CRI-O config drop-in file
 install -m 0644 -D -t %{buildroot}%{_sysconfdir}/crio/crio.conf.d %{SOURCE5}
 
-# Copy the configuration-clh.toml to default
-cp %{buildroot}%{_datadir}/kata-containers/defaults/configuration-clh.toml %{buildroot}%{_datadir}/kata-containers/defaults/configuration.toml
-
 # Disable the image= option, so we use initrd= by default
 # The kernels kata-osbuilder creates are in /var/cache now, see rhbz#1792216
-sed -i -e 's|^kernel = "%{_datadir}|kernel = "%{katacache}|' \
-       -e 's|^image = "%{_datadir}/kata-containers/kata-containers.img"|initrd = "%{katacache}/kata-containers/kata-containers-initrd.img"|' \
-       %{buildroot}%{_datadir}/kata-containers/defaults/configuration.toml
-
-# Enable vsock as transport instead of virtio-serial
-sed -i -e 's/^#use_vsock =/use_vsock =/' %{buildroot}%{_datadir}/kata-containers/defaults/configuration.toml
 
 # Make symlinks in /usr/local/bin to /usr/bin where kata expects to find binaries
 mkdir -p %{buildroot}%{_prefix}/local/bin
@@ -222,11 +209,10 @@ fi
 %{_prefix}/local/bin/containerd-shim-kata-v2
 %{_prefix}/local/bin/kata-monitor
 %{_prefix}/local/bin/kata-runtime
-%{katadefaults}/configuration*.toml
+%dir %{_datadir}/defaults/kata-containers/
+%{_datadir}/defaults/kata-containers/configuration*.toml
 %dir %{katalibexecdir}
 %{katalibexecdir}/VERSION
-%dir %{katadatadir}
-%dir %{katadefaults}
 %{_datadir}/bash-completion/completions/kata-runtime
 %license LICENSE
 %doc CONTRIBUTING.md
