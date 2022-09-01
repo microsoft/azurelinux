@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "openvswitch-2.15.1.tar.gz": "5c7baed537364d43af36c15dde298c95d35cb2cb3204b4d3fe9b0fc73c97f16d"
- }
+  "Signatures": {
+    "openvswitch-2.17.0.tar.gz": "e03bfab7ca82d81a7d3a36de4f390a3b5210e3f39657671f922877cd4ea6dc73"
+  }
 }

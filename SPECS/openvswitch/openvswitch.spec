@@ -5,7 +5,7 @@
 
 Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
-Version:        2.15.1
+Version:        2.17.0
 Release:        1%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -181,6 +181,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/vtep-ctl.8.gz
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.0-1
+- Upgrade to 2.17.0
+
 * Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.15.1-1
 - Updating to version 2.15.1 to fix CVE-2021-36980.
 - Removing no longer present OVN components and subpackages:
