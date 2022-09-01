@@ -1846,8 +1846,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.6.14",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
+          "version": "3.7.7",
+          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.7/gnutls-3.7.7.tar.xz"
         }
       }
     },
