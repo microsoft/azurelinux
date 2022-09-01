@@ -4676,8 +4676,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.16.6",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.16.6/numpy-1.16.6.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.0.dev0/numpy-1.16.6.tar.gz"
         }
       }
     },
