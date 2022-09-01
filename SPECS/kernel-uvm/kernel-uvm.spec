@@ -21,7 +21,6 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -67,10 +66,6 @@ The kernel package contains the Linux kernel.
 make mrproper
 
 cp %{config_source} .config
-
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
-sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
