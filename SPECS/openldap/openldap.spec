@@ -1,8 +1,8 @@
 %global _default_patch_fuzz 2
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
-Version:        2.4.57
-Release:        3%{?dist}
+Version:        2.6.2
+Release:        1%{?dist}
 License:        OpenLDAP
 URL:            https://www.openldap.org/
 Group:          System Environment/Security
@@ -14,7 +14,6 @@ Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-r
 Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
 Patch2:         CVE-2015-3276.patch
-Patch3:         CVE-2021-27212.patch
 Requires:       openssl >= 1.0.1, cyrus-sasl >= 2.1
 BuildRequires:  cyrus-sasl >= 2.1
 BuildRequires:  openssl-devel >= 1.0.1
@@ -78,6 +77,9 @@ rm -rf %{buildroot}/*
 /etc/openldap/*
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.2-1
+- Upgrade to 2.6.2
+
 *   Wed Jan 05 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.4.57-3
 -   Set --enable-dynamic to disable rpath in ldap tools
 *   Thu Feb 25 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.57-2
