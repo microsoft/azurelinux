@@ -13,8 +13,8 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        16.2.0
-Release:        4%{?dist}
+Version:        16.2.10
+Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -1803,6 +1803,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.2.10-1
+- Upgrade to 16.2.10
+
 *   Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> 16.2.0-4
 -   Use _topdir instead of hard-coded value /usr/src/mariner
 
