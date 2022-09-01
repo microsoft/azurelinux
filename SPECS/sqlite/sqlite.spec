@@ -1,7 +1,7 @@
 %define sourcever 3340100
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
-Version:        3.34.1
+Version:        3.39.2
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -86,6 +86,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.39.2-1
+- Upgrade to 3.39.2
+
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.34.1-1
 - Update to 3.34.1 to fix CVE-2021-20227
 - Remove Obsoletes tags
