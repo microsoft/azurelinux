@@ -1,7 +1,7 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.1.3
-Release:        5%{?dist}
+Version:        3.2.5
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
@@ -58,6 +58,9 @@ make %{?_smp_mflags} check
 %{_libdir}/systemd/system/rsyncd.service
 %{_sysconfdir}/rsyncd.conf
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.5-1
+- Upgrade to 3.2.5
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.1.3-5
 - Added %%license line automatically
 
