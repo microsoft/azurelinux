@@ -15,7 +15,7 @@
 
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.14.0
+Version:        3.15.0
 Release:        1%{?dist}
 License:        BSD
 Group:          Development/Libraries
@@ -214,6 +214,9 @@ mv %{m2_cache_tarball_name} %{buildroot}%{_prefix}
 %{_libdir}/java/protobuf/*.jar
 
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0-1
+- Upgrade to 3.15.0
+
 * Mon Jun 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.14.0-1
 - Updating to version 3.14.0 to satisfy requirements from 'grpc' and 'collectd'.
 - Adding steps for re-building Maven cache.

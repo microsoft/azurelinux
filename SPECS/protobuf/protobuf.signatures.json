@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "protobuf-3.14.0.tar.gz": "d0f5f605d0d656007ce6c8b5a82df3037e1d8fe8b121ed42e536f569dec16113",
-  "protobuf-3.14.0-m2.tar.gz": "cde3be31710f80bfd594f652fcb28c43afefb16f70a15895086ff5f386b555aa"
- }
+  "Signatures": {
+    "protobuf-3.14.0-m2.tar.gz": "cde3be31710f80bfd594f652fcb28c43afefb16f70a15895086ff5f386b555aa",
+    "protobuf-3.15.0.tar.gz": "dccfe0b4bb2f3c9dc1d8ebbd95f5b527668defda17b7996fc9b2f24fb187b81c"
+  }
 }

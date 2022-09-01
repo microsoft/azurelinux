@@ -5696,8 +5696,8 @@
         "type": "other",
         "other": {
           "name": "protobuf",
-          "version": "3.14.0",
-          "downloadUrl": "https://github.com/protocolbuffers/protobuf/archive/v3.14.0/protobuf-3.14.0-all.tar.gz"
+          "version": "3.15.0",
+          "downloadUrl": "https://github.com/protocolbuffers/protobuf/archive/v3.15.0-rc1/protobuf-3.14.0-all.tar.gz"
         }
       }
     },
