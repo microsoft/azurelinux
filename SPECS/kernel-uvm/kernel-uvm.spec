@@ -1,5 +1,4 @@
 %global security_hardening none
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %global debug_package %{nil}
 %define uname_r %{version}-%{release}
 
@@ -20,7 +19,6 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
-Source3:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
