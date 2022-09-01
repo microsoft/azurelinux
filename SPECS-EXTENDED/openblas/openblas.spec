@@ -656,7 +656,6 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %changelog
 * Mon Aug 29 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.21-1
 - Update to 0.3.21.
-- License verified.
 
 * Tue Apr 05 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.3.9-5
 - Do not build Fortran.
