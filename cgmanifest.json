@@ -1726,8 +1726,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.58.0",
-          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.58/glib-2.58.0.tar.xz"
+          "version": "2.63.6",
+          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.63/glib-2.63.6.tar.xz"
         }
       }
     },
