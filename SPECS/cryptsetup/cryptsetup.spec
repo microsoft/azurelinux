@@ -2,8 +2,8 @@
 
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
-Version:        2.3.3
-Release:        2%{?dist}
+Version:        2.4.3
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -130,6 +130,9 @@ rm -rf %{buildroot}/%{_libdir}/*.la
 %clean
  
 %changelog
+* Thu Sep 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.3-1
+- Upgrade to 2.4.3
+
 * Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.3.3-2
 - Fix Source0 URL.
 

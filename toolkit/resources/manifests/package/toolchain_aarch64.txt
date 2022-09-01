@@ -46,7 +46,7 @@ cracklib-python-2.9.7-3.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-debuginfo-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-devel-0.11.1-6.cm1.aarch64.rpm
-cryptsetup-2.3.3-2.cm1.aarch64.rpm
+cryptsetup-2.4.3-1.cm1.aarch64.rpm
 cryptsetup-debuginfo-2.3.3-2.cm1.aarch64.rpm
 cryptsetup-devel-2.3.3-2.cm1.aarch64.rpm
 cryptsetup-libs-2.3.3-2.cm1.aarch64.rpm
