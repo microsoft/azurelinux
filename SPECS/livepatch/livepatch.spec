@@ -6,7 +6,7 @@
 
 # Kpatch module names allow only alphanumeric characters and '_'.
 %define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
-%define livepatch_install_dir /usr/lib/livepatch/%{kernel_full_version}
+%define livepatch_install_dir /usr/lib/livepatching/%{kernel_full_version}
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_name}.ko
 
 %define patches_description \
@@ -97,6 +97,8 @@ BuildRequires:  rpm-build
 
 Requires(post):  kpatch
 Requires(preun): kpatch
+
+Provides:       livepatch = %{kernel_full_version}
 
 %description
 A set of kernel livepatches addressing CVEs present in Mariner's

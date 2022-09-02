@@ -1,0 +1,70 @@
+#!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+kernel_package_name=kernel
+patch_package_name=livepatch
+
+install_livepatch() {
+    local kernel_version
+    kernel_version="$1"
+
+    if ! tdnf -q list available "$patch_package_name = $kernel_version" >/dev/null
+    then
+        echo "No livepatches available for kernel version ($kernel_version)."
+    elif ! tdnf -q list installed "$patch_package_name = $kernel_version" >/dev/null
+    then
+        echo "Installing livepatch for kernel version ($kernel_version)."
+
+        tdnf -q install -y "$patch_package_name = $kernel_version" >/dev/null
+    else
+        echo "Livepatch for kernel version ($kernel_version) already installed."
+    fi
+}
+
+read_installed_kernel_version() {
+    tdnf -q list installed $kernel_package_name | head -1 | grep -oP "(?<=\s)\d\S+"
+}
+
+read_running_kernel_version() {
+    uname -r
+}
+
+wait_for_kernel_change() {
+    local new_kernel_version
+
+    echo "Waiting for RPM database changes."
+
+    while inotifywait -e close_write /var/lib/rpm/rpmdb.sqlite &>/dev/null
+    do
+        echo "Change detected, checking if different kernel got installed."
+
+        new_kernel_version=$(read_installed_kernel_version)
+        if [[ "$installed_kernel_version" != "$new_kernel_version" ]]
+        then
+            echo "Detected new kernel version ($new_kernel_version)."
+
+            installed_kernel_version=$new_kernel_version
+            return 0
+        fi
+
+        echo "No changes to the kernel. Going back to waiting."
+    done    
+}
+
+running_kernel_version=$(read_running_kernel_version)
+installed_kernel_version=$(read_installed_kernel_version)
+
+cat <<EOF
+Running kernel:   $running_kernel_version.
+Installed kernel: $installed_kernel_version.
+Checking for available livepatches.
+EOF
+
+install_livepatch "$running_kernel_version"
+install_livepatch "$installed_kernel_version"
+
+while wait_for_kernel_change
+do
+    install_livepatch "$installed_kernel_version"
+done

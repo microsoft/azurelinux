@@ -2007,6 +2007,7 @@
                 "libuv",
                 "libxml++",
                 "livepatch",
+                "livepatching-subscription",
                 "lld",
                 "lsb-release",
                 "lttng-consume",

@@ -39,6 +39,7 @@ ignore_no_source_tarball=" \
   javapackages-tools-meta \
   kde-filesystem \
   kf5 \
+  livepatching-subscription \
   lua-rpm-macros \
   mariner-repos \
   mariner-rpm-macros \

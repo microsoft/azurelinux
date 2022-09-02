@@ -2106,16 +2106,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dcos-cli",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dbxtool",
           "version": "8",
           "downloadUrl": "https://github.com/vathpela/dbxtool/releases/download/dbxtool-8/dbxtool-8.tar.bz2"
@@ -2129,6 +2119,16 @@
           "name": "dconf",
           "version": "0.36.0",
           "downloadUrl": "https://download.gnome.org/sources/dconf/0.36/dconf-0.36.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dcos-cli",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/dcos/dcos-cli/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },

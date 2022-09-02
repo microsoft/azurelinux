@@ -1,0 +1,7 @@
+[Unit]
+Description=Subscribe to kernel livepatching
+After=network.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=/lib/livepatching/livepatching.systemd
