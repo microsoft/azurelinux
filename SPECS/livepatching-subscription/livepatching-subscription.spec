@@ -48,7 +48,7 @@ install -D -m 744 %{SOURCE1} %{buildroot}%{livepatching_lib_path}/livepatching.s
 %systemd_post livepatching.service
 
 %postun
-%systemd_postun livepatching.service
+%systemd_postun_with_restart livepatching.service
 
 %files
 %defattr(-,root,root)
