@@ -42,7 +42,7 @@ install -vdm755 %{buildroot}%{_unitdir}
 install -D -m 644 %{SOURCE0} %{buildroot}%{_unitdir}/livepatching.service
 
 install -vdm755 %{buildroot}%{livepatching_lib_path}
-install -D -m 644 %{SOURCE1} %{buildroot}%{livepatching_lib_path}/livepatching.systemd
+install -D -m 744 %{SOURCE1} %{buildroot}%{livepatching_lib_path}/livepatching.systemd
 
 %post
 %systemd_post livepatching.service

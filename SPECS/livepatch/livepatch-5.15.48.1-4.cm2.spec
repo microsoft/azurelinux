@@ -166,6 +166,7 @@ fi
 %files
 %defattr(-,root,root)
 %if %{builds_module}
+%dir %{livepatch_install_dir}
 %{livepatch_module_path}
 %endif
 
