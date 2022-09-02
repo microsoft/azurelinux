@@ -22,7 +22,7 @@
 # Install patch if the INSTALLED kernel matches.
 # No-op for initial (empty) livepatch.
 %define install_if_should() \
-installed_kernel_version="$(ls /boot | grep -oP "(?<=vmlinuz-).*cm\d$")" \
+installed_kernel_version="$(realpath /boot/mariner.cfg | grep -oP "(?<=linux-).*(?=\.cfg)")" \
 if [[ -f "%{livepatch_module_path}" && "$installed_kernel_version" == "%{kernel_full_version}" ]] \
 then \
     kpatch install %{livepatch_module_path} \
@@ -95,6 +95,8 @@ BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-build
 
+Requires:       coreutils
+Requires(post): coreutils
 Requires(post): kpatch
 Requires(preun): kpatch
 

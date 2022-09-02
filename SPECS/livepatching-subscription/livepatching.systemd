@@ -2,28 +2,28 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-kernel_package_name=kernel
-patch_package_name=livepatch
-
 install_livepatch() {
     local kernel_version
-    kernel_version="$1"
+    local patch_package
 
-    if ! tdnf -q list available "$patch_package_name = $kernel_version" >/dev/null
+    kernel_version="$1"
+    patch_package="livepatch = $kernel_version"
+
+    if ! tdnf -q list available "$patch_package" >/dev/null
     then
         echo "No livepatches available for kernel version ($kernel_version)."
-    elif ! tdnf -q list installed "$patch_package_name = $kernel_version" >/dev/null
+    elif ! tdnf -q list installed "$patch_package" >/dev/null
     then
         echo "Installing livepatch for kernel version ($kernel_version)."
 
-        tdnf -q install -y "$patch_package_name = $kernel_version" >/dev/null
+        tdnf -q install -y "$patch_package" >/dev/null
     else
         echo "Livepatch for kernel version ($kernel_version) already installed."
     fi
 }
 
 read_installed_kernel_version() {
-    tdnf -q list installed $kernel_package_name | head -1 | grep -oP "(?<=\s)\d\S+"
+    realpath /boot/mariner.cfg | grep -oP "(?<=linux-).*(?=\.cfg)"
 }
 
 read_running_kernel_version() {
@@ -40,31 +40,31 @@ wait_for_kernel_change() {
         echo "Change detected, checking if different kernel got installed."
 
         new_kernel_version=$(read_installed_kernel_version)
-        if [[ "$installed_kernel_version" != "$new_kernel_version" ]]
+        if [[ "$INSTALLED_KERNEL_VERSION" != "$new_kernel_version" ]]
         then
             echo "Detected new kernel version ($new_kernel_version)."
 
-            installed_kernel_version=$new_kernel_version
+            INSTALLED_KERNEL_VERSION=$new_kernel_version
             return 0
         fi
 
         echo "No changes to the kernel. Going back to waiting."
-    done    
+    done
 }
 
-running_kernel_version=$(read_running_kernel_version)
-installed_kernel_version=$(read_installed_kernel_version)
+RUNNING_KERNEL_VERSION=$(read_running_kernel_version)
+INSTALLED_KERNEL_VERSION=$(read_installed_kernel_version)
 
 cat <<EOF
-Running kernel:   $running_kernel_version.
-Installed kernel: $installed_kernel_version.
+Running kernel:   $RUNNING_KERNEL_VERSION.
+Installed kernel: $INSTALLED_KERNEL_VERSION.
 Checking for available livepatches.
 EOF
 
-install_livepatch "$running_kernel_version"
-install_livepatch "$installed_kernel_version"
+install_livepatch "$RUNNING_KERNEL_VERSION"
+install_livepatch "$INSTALLED_KERNEL_VERSION"
 
 while wait_for_kernel_change
 do
-    install_livepatch "$installed_kernel_version"
+    install_livepatch "$INSTALLED_KERNEL_VERSION"
 done
