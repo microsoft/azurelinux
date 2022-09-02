@@ -58,7 +58,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
-Source1:        config
+Source1:        config-%{kernel_full_version}
 Source2:        mariner.pem
 
 # Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
