@@ -17,7 +17,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 ExclusiveArch:  x86_64
