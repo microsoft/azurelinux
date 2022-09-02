@@ -9,16 +9,21 @@ install_livepatch() {
     kernel_version="$1"
     patch_package="livepatch = $kernel_version"
 
+    echo "Checking if a livepatch is available for kernel version ($kernel_version)."
     if ! tdnf -q list available "$patch_package" >/dev/null
     then
         echo "No livepatches available for kernel version ($kernel_version)."
-    elif ! tdnf -q list installed "$patch_package" >/dev/null
+        return 0
+    fi
+
+    echo "Livepatch available for kernel version ($kernel_version). Checking if it's already installed."
+    if tdnf -q list installed "$patch_package" >/dev/null
     then
+        echo "Livepatch for kernel version ($kernel_version) already installed."
+    else
         echo "Installing livepatch for kernel version ($kernel_version)."
 
         tdnf -q install -y "$patch_package" >/dev/null
-    else
-        echo "Livepatch for kernel version ($kernel_version) already installed."
     fi
 }
 

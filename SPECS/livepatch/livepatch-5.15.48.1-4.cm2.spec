@@ -19,11 +19,14 @@
     done
 )
 
+%define patch_installed kpatch list | grep -qP "%{livepatch_name} \(%{kernel_full_version}\)"
+%define patch_loaded    kpatch list | grep -qP "%{livepatch_name} \[enabled\]"
+
 # Install patch if the INSTALLED kernel matches.
 # No-op for initial (empty) livepatch.
 %define install_if_should() \
 installed_kernel_version="$(realpath /boot/mariner.cfg | grep -oP "(?<=linux-).*(?=\.cfg)")" \
-if [[ -f "%{livepatch_module_path}" && "$installed_kernel_version" == "%{kernel_full_version}" ]] \
+if [[ -f "%{livepatch_module_path}" && "$installed_kernel_version" == "%{kernel_full_version}" && ! %{patch_installed} ]] \
 then \
     kpatch install %{livepatch_module_path} \
 fi
@@ -31,19 +34,19 @@ fi
 # Load patch, if the RUNNING kernel matches.
 # No-op for initial (empty) livepatch.
 %define load_if_should() \
-if [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_full_version}" ]] \
+if [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_full_version}" && ! %{patch_loaded} ]] \
 then \
     kpatch load %{livepatch_module_path} \
 fi
 
 %define uninstall_if_should() \
-if kpatch list | grep -qP "%{livepatch_name} \(%{kernel_full_version}\)" \
+if %{patch_installed} \
 then \
     kpatch uninstall %{livepatch_name} \
 fi
 
 %define unload_if_should() \
-if kpatch list | grep -qP "%{livepatch_name} \[enabled\]" \
+if %{patch_loaded} \
 then \
     kpatch unload %{livepatch_name} \
 fi
