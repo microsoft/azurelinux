@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0232
+Version:        9.0.0325
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -196,6 +196,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Mon Aug 29 2022 Henry Beberman <henry.beberman@microsoft.com> - 9.0.0325-1
+- Upgrade to 9.0.0325 to fix: CVE-2022-2980, CVE-2022-2982, CVE-2022-2923, CVE-2022-2946
+
 * Fri Aug 19 2022 Andrew Phelps <anphel@microsoft.com> - 9.0.0232-1
 - Upgrade to 9.0.0232 to fix: CVE-2022-2522, CVE-2022-2571, CVE-2022-2580, CVE-2022-2581,
   CVE-2022-2598, CVE-2022-2816, CVE-2022-2817, CVE-2022-2819, CVE-2022-2845, CVE-2022-2849,

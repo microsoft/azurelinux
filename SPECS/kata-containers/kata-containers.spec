@@ -39,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        5%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -241,9 +241,12 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
-* Wed Aug 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-2
+* Wed Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
 - Add kernel config to match guest and host cgroup setup.
 - Add patch to expose devices from kata.
+
+* Wed Aug 31 2022 Andrew Phelps <anphel@microsoft.com> - 2.5.0-2
+- Fix arm64 build issue by excluding configuration-acrn.toml
 
 * Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).

@@ -2578,8 +2578,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "21.11",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.tar.xz"
+          "version": "21.11.2",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.2.tar.xz"
         }
       }
     },
@@ -5810,8 +5810,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "version": "5.15.63.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
@@ -7301,8 +7301,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "version": "5.15.63.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
@@ -7311,8 +7311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.60.2.tar.gz"
+          "version": "5.15.63.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
       }
     },
@@ -11391,8 +11391,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.8",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.8.tar.gz"
+          "version": "10.6.9",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.9.tar.gz"
         }
       }
     },
@@ -12095,6 +12095,16 @@
           "name": "msr-tools",
           "version": "1.3",
           "downloadUrl": "https://01.org/sites/default/files/downloads/msr-tools/msr-tools-1.3.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mstflint",
+          "version": "4.21.0",
+          "downloadUrl": "https://github.com/Mellanox/mstflint/releases/download/v4.21.0-1/mstflint-4.21.0-1.tar.gz"
         }
       }
     },
@@ -22294,8 +22304,8 @@
         "type": "other",
         "other": {
           "name": "python-tornado",
-          "version": "6.0.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/tornado/tornado-6.0.3.tar.gz"
+          "version": "6.2.0",
+          "downloadUrl": "https://github.com/tornadoweb/tornado/archive/refs/tags/v6.2.0.tar.gz"
         }
       }
     },
@@ -26587,8 +26597,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0232",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0232.tar.gz"
+          "version": "9.0.0325",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0325.tar.gz"
         }
       }
     },
@@ -26608,7 +26618,7 @@
         "other": {
           "name": "virglrenderer",
           "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-0.9.1/virglrenderer-virglrenderer-0.9.1.tar.gz"
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/0.9.1/virglrenderer-0.9.1.tar.gz"
         }
       }
     },
@@ -27860,8 +27870,8 @@
         "type": "other",
         "other": {
           "name": "ypbind",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/thkukuk/ypbind-mt/archive/v2.6.1.tar.gz"
+          "version": "2.7.2",
+          "downloadUrl": "https://github.com/thkukuk/ypbind-mt/archive/v2.7.2.tar.gz"
         }
       }
     },
