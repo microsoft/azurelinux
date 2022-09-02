@@ -35,7 +35,7 @@ pull newer versions of the livepatch for that kernel.
 %prep
 
 %install
-install -vdm755 %{buildroot}/lib/systemd/system-preset
+install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "enable livepatching.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-livepatching.preset
 
 install -vdm755 %{buildroot}%{_unitdir}
