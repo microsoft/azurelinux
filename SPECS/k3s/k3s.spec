@@ -81,21 +81,28 @@ exit 0
 %changelog
 * Tue Aug 30 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.24.3-1
 - Updated k3s to 1.24.3
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.23.6-4
 - Bump release to rebuild against Go 1.18.5
+
 * Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
 - Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
+
 * Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
 - Fixed uninstall path
 - Added exclusivity for x86_64
+
 * Thu Jun 23 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
 - Switched to building using the upstream k3s tarball and a separate vendor tarball
+
 * Tue May 24 2022 Manuel Huber <mahuber@microsoft.com> 1.23.6-1
 - Changes to install phase on Mariner
+
 * Fri May 20 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
 - License verified
 - Initial changes to build for Mariner
 - Initial CBL-Mariner import from Rancher (license: ASL 2.0).
+
 * Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
 - Initial version
 
