@@ -26,7 +26,7 @@
 # No-op for initial (empty) livepatch.
 %define install_if_should() \
 installed_kernel_version="$(realpath /boot/mariner.cfg | grep -oP "(?<=linux-).*(?=\.cfg)")" \
-if [[ -f "%{livepatch_module_path}" && "$installed_kernel_version" == "%{kernel_full_version}" && ! %{patch_installed} ]] \
+if [[ -f "%{livepatch_module_path}" && "$installed_kernel_version" == "%{kernel_full_version}" ]] && ! %{patch_installed} \
 then \
     kpatch install %{livepatch_module_path} \
 fi
@@ -34,7 +34,7 @@ fi
 # Load patch, if the RUNNING kernel matches.
 # No-op for initial (empty) livepatch.
 %define load_if_should() \
-if [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_full_version}" && ! %{patch_loaded} ]] \
+if [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_full_version}" ]] && ! %{patch_loaded} \
 then \
     kpatch load %{livepatch_module_path} \
 fi
