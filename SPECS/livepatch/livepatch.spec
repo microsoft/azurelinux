@@ -6,7 +6,7 @@
 
 # Kpatch module names allow only alphanumeric characters and '_'.
 %define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
-%define livepatch_install_dir /usr/lib/livepatching/%{kernel_full_version}
+%define livepatch_install_dir %{_libdir}/livepatching/%{kernel_full_version}
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_name}.ko
 
 %define patches_description \
@@ -95,7 +95,7 @@ BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-build
 
-Requires(post):  kpatch
+Requires(post): kpatch
 Requires(preun): kpatch
 
 Provides:       livepatch = %{kernel_full_version}
@@ -106,7 +106,7 @@ kernel version %{kernel_full_version}.
 %{patches_description}
 
 %prep
-%setup -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{kernel_version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{kernel_version}
 
 cp %{SOURCE1} .config
 cp %{SOURCE2} certs/mariner.pem
