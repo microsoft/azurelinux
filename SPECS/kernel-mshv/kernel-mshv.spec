@@ -8,8 +8,8 @@
 %define config_source %{SOURCE1}
 %endif
 
-Summary:        Mariner kernel that has dom0 support and works with hypervisor
-Name:           kernel-dom0
+Summary:        Mariner kernel that has dom0 support and works with MSHV
+Name:           kernel-mshv
 Version:        5.15.34.1
 Release:        1%{?dist}
 License:        GPLv2
@@ -44,34 +44,34 @@ Requires(post): coreutils
 Requires(postun): coreutils
 
 %description
-The Mariner kernel that has dom0 support and works with hypervisor
+The Mariner kernel that has dom0 support and works with MSHV
 
 %package devel
-Summary:        Dom0 Dev
+Summary:        MSHV kernel Dev
 Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
 
 %description devel
-This package contains the Dom0 kernel dev files
+This package contains the MSHV kernel dev files
 
 %package docs
-Summary:        Dom0 docs
+Summary:        MSHV kernel docs
 Group:          System Environment/Kernel
 Requires:       python3
 
 %description docs
-This package contains the Dom0 kernel doc files
+This package contains the MSHV kernel doc files
 
 %package tools
-Summary:        This package contains the 'perf' performance analysis tools for Dom0 kernel
+Summary:        This package contains the 'perf' performance analysis tools for MSHV kernel
 Group:          System/Tools
 Requires:       %{name} = %{version}-%{release}
 Requires:       audit
 
 %description tools
-This package contains the 'perf' performance analysis tools for Dom0 kernel.
+This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
 %autosetup
