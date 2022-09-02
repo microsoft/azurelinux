@@ -1,25 +1,26 @@
-%define livepatching_lib_path /usr/lib/livepatching
+%define livepatching_lib_path %{_libdir}/livepatching
 
 Summary:        Retain livepatches across kernel upgrades
 Name:           livepatching-subscription
 Version:        1.0.0
 Release:        1%{?dist}
 License:        MIT
-URL:            https://aka.ms/cbl-mariner
-Group:          Applications/Text
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/Text
+URL:            https://aka.ms/cbl-mariner
 Source0:        livepatching.service
 Source1:        livepatching.systemd
 
+ExclusiveArch:  x86_64
+
 BuildRequires:  systemd
 
-Requires: coreutils
-Requires: grep
-Requires: inotify-tools
-Requires: systemd
-Requires: tdnf
-
+Requires:       coreutils
+Requires:       grep
+Requires:       inotify-tools
+Requires:       systemd
+Requires:       tdnf
 Requires(post): grep
 Requires(post): inotify-tools
 Requires(post): systemd
