@@ -46,6 +46,14 @@ install -D -m 744 %{SOURCE1} %{buildroot}%{livepatching_lib_path}/livepatching.s
 
 %post
 %systemd_post livepatching.service
+# Only start on initial installation. Upgrade restarts handled by %%postun.
+if [ $1 -eq 1 ]
+then
+    systemctl start livepatching.service >/dev/null 2>&1 || :
+fi
+
+%preun
+%systemd_preun livepatching.service
 
 %postun
 %systemd_postun_with_restart livepatching.service
