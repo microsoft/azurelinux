@@ -19,8 +19,8 @@
     done
 )
 
-%define patch_installed kpatch list | grep -qP "%{livepatch_name} \(%{kernel_full_version}\)"
-%define patch_loaded    kpatch list | grep -qP "%{livepatch_name} \[enabled\]"
+%define patch_installed kpatch list | grep -qP "%{livepatch_name} \\(%{kernel_full_version}\\)"
+%define patch_loaded    kpatch list | grep -qP "%{livepatch_name} \\[enabled\\]"
 
 # Install patch if the INSTALLED kernel matches.
 # No-op for initial (empty) livepatch.
