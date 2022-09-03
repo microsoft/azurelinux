@@ -549,6 +549,6 @@ func extractWorkerTar(chroot string, workerTar string) (err error) {
 	}
 
 	logger.Log.Debugf("Using (%s) to extract tar", gzipTool)
-	_, _, err = shell.Execute("tar", "-I", gzipTool, "-xf", workerTar, "-C", chroot)
+	_, _, err = shell.Execute("tar", "-xf", workerTar, "-C", chroot)
 	return
 }

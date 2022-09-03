@@ -8,8 +8,6 @@
 
 ######## MISC. MAKEFILE DEFINES ########
 
-# Check if we have pigz available to speed up archive commands
-ARCHIVE_TOOL ?= $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )
 # Host and target architecture
 build_arch := $(shell uname -m)
 
