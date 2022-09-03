@@ -1,6 +1,6 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.24.3
+Version:        1.23.8
 Release:        1%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
@@ -15,13 +15,13 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/k3s.io/containerd.git -b 1.5.13-k3s1
+# 6. git clone https://github.com/k3s-io/containerd -b v1.5.13-k3s1
 # 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
-# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.3
+# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.2
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         vendor_build.patch
+Patch0:         vendor_build-1.23.8.patch
 %global debug_package %{nil}
 %define install_path  /usr/local/bin
 %define util_path     %{_datadir}/k3s
@@ -42,7 +42,7 @@ ExclusiveArch:  x86_64
 The certified Kubernetes distribution built for IoT & Edge computing.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-k3s1
+%autosetup -p1 -n %{name}-%{version}-k3s2
 tar -xvf %{SOURCE1}
 
 %build
@@ -79,11 +79,8 @@ exit 0
 %{install_sh}
 
 %changelog
-* Tue Aug 30 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.24.3-1
-- Updated k3s to 1.24.3
-
-* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.23.6-4
-- Bump release to rebuild against Go 1.18.5
+* Fri Jul 29 2022 Lior Lustgarten <lilustga@microsoft.com> - 1.23.8-1
+- Update to 1.23.8
 
 * Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
 - Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
@@ -105,4 +102,3 @@ exit 0
 
 * Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
 - Initial version
-
