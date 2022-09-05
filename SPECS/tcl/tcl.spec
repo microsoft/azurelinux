@@ -1,4 +1,3 @@
-%define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Tool Command Language - the language and library.
 Name:           tcl
 Version:        8.6.12
@@ -9,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://tcl.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
+%define majorver %(echo %{version} | cut -d. -f1-2)
 BuildRequires:  cmake
 Provides:       tcl(abi) = %{majorver}
 Provides:       tcl-tcldict = %{version}
