@@ -1,6 +1,6 @@
 [Unit]
 Description=Subscribe to kernel livepatching
-After=network.target network-online.target
+Before=kpatch.service
 
 [Service]
 Type=simple

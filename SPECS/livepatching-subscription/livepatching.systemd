@@ -2,7 +2,37 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-install_livepatch() {
+install_patch_after_kernel_change() {
+    local installable_patch="livepatch-$RUNNING_KERNEL_VERSION"
+    local patch_module_name
+    local patch_module_path
+
+    echo "Making sure patch is installed after a kernel reboot."
+
+    if [[ "$RUNNING_KERNEL_VERSION" != "$INSTALLED_KERNEL_VERSION" ]]
+    then
+        echo "Running kernel ($RUNNING_KERNEL_VERSION) different than installed kernel ($INSTALLED_KERNEL_VERSION). Nothing to do."
+        return 0
+    fi
+
+    if ! rpm --quiet -q --whatprovides "$installable_patch"
+    then
+        echo "No livepatch package installed for running kernel ($RUNNING_KERNEL_VERSION)."
+        return 0
+    fi
+
+    patch_module_path=$(rpm -ql --whatprovides "$installable_patch" | grep "ko$")
+    patch_module_name=$(basename "$patch_module_path" | cut -d. -f1)
+    if patch_installed "$patch_module_name"
+    then
+        echo "Patch already installed for the running kernel ($RUNNING_KERNEL_VERSION)."
+        return 0
+    fi
+
+    kpatch install "$patch_module_path"
+}
+
+install_livepatch_package() {
     local kernel_version
     local patch_package
 
@@ -25,6 +55,10 @@ install_livepatch() {
 
         tdnf -q install -y "$patch_package" >/dev/null
     fi
+}
+
+patch_installed() {
+    kpatch list | grep -qP "$1.*$RUNNING_KERNEL_VERSION"
 }
 
 read_installed_kernel_version() {
@@ -63,13 +97,14 @@ INSTALLED_KERNEL_VERSION=$(read_installed_kernel_version)
 cat <<EOF
 Running kernel:   $RUNNING_KERNEL_VERSION.
 Installed kernel: $INSTALLED_KERNEL_VERSION.
-Checking for available livepatches.
 EOF
 
-install_livepatch "$RUNNING_KERNEL_VERSION"
-install_livepatch "$INSTALLED_KERNEL_VERSION"
+install_patch_after_kernel_change
+
+install_livepatch_package "$RUNNING_KERNEL_VERSION"
+install_livepatch_package "$INSTALLED_KERNEL_VERSION"
 
 while wait_for_kernel_change
 do
-    install_livepatch "$INSTALLED_KERNEL_VERSION"
+    install_livepatch_package "$INSTALLED_KERNEL_VERSION"
 done

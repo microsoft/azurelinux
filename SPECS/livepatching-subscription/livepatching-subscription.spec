@@ -18,14 +18,17 @@ BuildRequires:  systemd
 
 Requires:       coreutils
 Requires:       grep
+Requires:       kpatch
 Requires:       inotify-tools
 Requires:       systemd
 Requires:       tdnf
 Requires(post): grep
+Requires(post): kpatch
 Requires(post): inotify-tools
 Requires(post): systemd
 Requires(post): tdnf
 Requires(postun): systemd
+Requires(preun): systemd
 
 %description
 This package allows your system to retain livepatching across kernel upgrades.
