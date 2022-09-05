@@ -18,16 +18,19 @@ BuildRequires:  systemd
 
 Requires:       coreutils
 Requires:       grep
-Requires:       kpatch
 Requires:       inotify-tools
+Requires:       kpatch
 Requires:       systemd
 Requires:       tdnf
+
 Requires(post): grep
-Requires(post): kpatch
 Requires(post): inotify-tools
+Requires(post): kpatch
 Requires(post): systemd
 Requires(post): tdnf
+
 Requires(postun): systemd
+
 Requires(preun): systemd
 
 %description
