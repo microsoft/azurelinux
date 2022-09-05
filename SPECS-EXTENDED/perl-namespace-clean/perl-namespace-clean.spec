@@ -94,6 +94,7 @@ make test
 %changelog
 * Thu Sep 01 2022 Muhammad Falak <mwani@microsoft.com> - 0.27-15
 - Add BR on perl-debugger to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.27-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
