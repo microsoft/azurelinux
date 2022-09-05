@@ -1,12 +1,12 @@
-%define kernel_version 5.15.48.1
-%define kernel_release 4%{?dist}
-%define kernel_full_version %{kernel_version}-%{kernel_release}
+%define kernel_version_release 5.15.48.1-4.cm2
+%define kernel_version %(echo %{kernel_version_release} | grep -oP "^[^-]+")
+%define kernel_release %(echo %{kernel_version_release} | grep -oP "(?<=-).+")
 
 %define builds_module %([[ -n "$(echo "%{patches}" | grep -oP "CVE-\\d+-\\d+(?=\\.patch)")" ]] && echo 1 || echo 0)
 
 # Kpatch module names allow only alphanumeric characters and '_'.
 %define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
-%define livepatch_install_dir %{_libdir}/livepatching/%{kernel_full_version}
+%define livepatch_install_dir %{_libdir}/livepatching/%{kernel_version_release}
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_name}.ko
 
 %define patches_description \
@@ -19,13 +19,13 @@
     done
 )
 
-%define patch_applicable_for_kernel [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_full_version}" ]]
-%define patch_installed kpatch list | grep -qP "%{livepatch_name}.*%{kernel_full_version}"
+%define patch_applicable_for_kernel [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_version_release}" ]]
+%define patch_installed kpatch list | grep -qP "%{livepatch_name}.*%{kernel_version_release}"
 %define patch_loaded    kpatch list | grep -qP "%{livepatch_name}.*enabled"
 
 # Install patch if the RUNNING kernel matches.
 # No-op for initial (empty) livepatch.
-%define install_if_should() \
+%define install_if_should \
 if %{patch_applicable_for_kernel} && ! %{patch_installed} \
 then \
     kpatch install %{livepatch_module_path} \
@@ -33,26 +33,26 @@ fi
 
 # Load patch, if the RUNNING kernel matches.
 # No-op for initial (empty) livepatch.
-%define load_if_should() \
+%define load_if_should \
 if %{patch_applicable_for_kernel} && ! %{patch_loaded} \
 then \
     kpatch load %{livepatch_module_path} \
 fi
 
-%define uninstall_if_should() \
+%define uninstall_if_should \
 if %{patch_installed} \
 then \
     kpatch uninstall %{livepatch_name} \
 fi
 
-%define unload_if_should() \
+%define unload_if_should \
 if %{patch_loaded} \
 then \
     kpatch unload %{livepatch_name} \
 fi
 
-Summary:        Set of livepatches for kernel %{kernel_full_version}
-Name:           livepatch-%{kernel_full_version}
+Summary:        Set of livepatches for kernel %{kernel_version_release}
+Name:           livepatch-%{kernel_version_release}
 Version:        1.0.0
 Release:        1%{?dist}
 License:        MIT
@@ -61,7 +61,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
-Source1:        config-%{kernel_full_version}
+Source1:        config-%{kernel_version_release}
 Source2:        mariner.pem
 
 # Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
@@ -84,8 +84,8 @@ BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  kbd
-BuildRequires:  kernel-debuginfo = %{kernel_full_version}
-BuildRequires:  kernel-headers = %{kernel_full_version}
+BuildRequires:  kernel-debuginfo = %{kernel_version_release}
+BuildRequires:  kernel-headers = %{kernel_version_release}
 BuildRequires:  kmod-devel
 BuildRequires:  kpatch-build
 BuildRequires:  libdnet-devel
@@ -105,12 +105,14 @@ Requires(post): kpatch
 
 Requires(preun): kpatch
 
-Provides:       livepatch = %{kernel_full_version}
+Provides:       livepatch = %{kernel_version_release}
 
 %description
 A set of kernel livepatches addressing CVEs present in Mariner's
-kernel version %{kernel_full_version}.
+kernel version %{kernel_version_release}.
 %{patches_description}
+
+%if %{builds_module}
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{kernel_version}
@@ -122,7 +124,6 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{kernel_release}"/' .config
 
 %build
-%if %{builds_module}
     # Building cumulative patch.
     for patch in %{patches}
     do
@@ -131,16 +132,15 @@ sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{kernel_release}"/' .con
 
     kpatch-build -ddd \
         --sourcedir . \
-        --vmlinux %{_libdir}/debug/lib/modules/%{kernel_full_version}/vmlinux \
+        --vmlinux %{_libdir}/debug/lib/modules/%{kernel_version_release}/vmlinux \
         --name %{livepatch_name} \
         %{livepatch_name}.patch
-%endif
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
+install -m 744 %{livepatch_name}.ko %{buildroot}%{livepatch_module_path}
 
-%if %{builds_module}
-    install -m 744 %{livepatch_name}.ko %{buildroot}%{livepatch_module_path}
+# endif builds_module
 %endif
 
 %post
@@ -152,13 +152,13 @@ install -dm 755 %{buildroot}%{livepatch_install_dir}
 %unload_if_should
 
 # Re-enable patch on rollbacks to supported kernel.
-%triggerin -- kernel = %{kernel_full_version}
+%triggerin -- kernel = %{kernel_version_release}
 %load_if_should
 %install_if_should
 
 # Prevent the patch from being loaded after a reboot to a different kernel.
 # Previous kernel is still running, do NOT unload the livepatch.
-%triggerin -- kernel > %{kernel_full_version}, kernel < %{kernel_full_version}
+%triggerin -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
 %uninstall_if_should
 
 %files
