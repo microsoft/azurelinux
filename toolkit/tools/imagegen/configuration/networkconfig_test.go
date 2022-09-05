@@ -134,17 +134,35 @@ func TestShouldFailParsingInvalidDevice_Network(t *testing.T) {
 }
 
 func TestShouldPassCreatingNetworkFile_Network(t *testing.T) {
-	const networkFile = "/etc/systemd/network/10-static-eth1.network"
+	const (
+		networkFileDir  = "/etc/systemd/network"
+		testNetworkFile = "/etc/systemd/network/10-static-eth1.network"
+	)
+
+	// Some systems may not have systemd-networkd service configured, and thus
+	// /etc/systemd/network may not exist. For this test case, manually create this directory
+	// if it does not exist
+	exists, err := file.DirExists(networkFileDir)
+	assert.NoError(t, err)
+	if !exists {
+		err = os.Mkdir(networkFileDir, os.ModePerm)
+		assert.NoError(t, err)
+		t.Cleanup(func() {
+			err = os.RemoveAll(networkFileDir)
+			assert.NoError(t, err)
+		})
+	}
+
 	testNetwork := validNetworks[0]
 
-	err := createNetworkConfigFile(nil, testNetwork, "eth1")
+	err = createNetworkConfigFile(nil, testNetwork, "eth1")
 	assert.NoError(t, err)
 	t.Cleanup(func() {
-		os.Remove(networkFile)
+		os.Remove(testNetworkFile)
 	})
 
 	// Check whether the contents in the network file is correct
-	testContents, err := file.ReadLines(networkFile)
+	testContents, err := file.ReadLines(testNetworkFile)
 	assert.NoError(t, err)
 	assert.Equal(t, testContents, validNetworkFileContent)
 }

@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           perl-File-Find-Object-Rule
 Version:        0.0312
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Alternative interface to File::Find::Object
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/File-Find-Object-Rule
@@ -40,6 +40,7 @@ BuildRequires:  perl(File::Path)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::More)
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -76,6 +77,10 @@ perl Build.PL --installdirs=vendor
 %{_mandir}/man3/File::Find::Object::Rule::Procedural.3*
 
 %changelog
+* Tue Jul 26 2022 Muhammad Falak <mwani@microsoft.com> - 0.0312-3
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0312-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 

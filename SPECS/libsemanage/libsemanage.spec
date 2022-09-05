@@ -3,7 +3,7 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsemanage
 Version:        3.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,9 +53,9 @@ needed for developing applications that manipulate binary policies.
 
 %package python3
 Summary:        semanage python 3 bindings for libsemanage
-Provides:       python3-%{name} = %{version}-%{release}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       libselinux-python3 >= %{libselinuxver}
+Provides:       python3-%{name} = %{version}-%{release}
 
 %description python3
 The libsemanage-python3 package contains the python 3 bindings for developing
@@ -108,6 +108,10 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog
+* Wed Aug 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 3.2-2
+- Do not ignore /root for genhomedircon, otherwise it will not
+- get correct labeling.
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version and rebase patch
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream

@@ -1,0 +1,49 @@
+From daa66ed62c79684219088cc0361d5b316d5d1295 Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Tue, 2 Aug 2022 12:41:18 +0200
+Subject: [PATCH] ash: fix use-after-free in pattern substituon code
+
+Patch by soeren@soeren-tempel.net
+
+The idx variable points to a value in the stack string (as managed
+by STPUTC). STPUTC may resize this stack string via realloc(3). If
+this happens, the idx pointer needs to be updated. Otherwise,
+dereferencing idx may result in a use-after free.
+
+function                                             old     new   delta
+subevalvar                                          1562    1566      +4
+
+Backported by @mfrw from upstream on 2022-08-10
+Applies on v1.35.0 cleanly
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ shell/ash.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/shell/ash.c b/shell/ash.c
+index c731a333b..105edd4c8 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -7324,13 +7324,15 @@ subevalvar(char *start, char *str, int strloc,
+ 				if (idx >= end)
+ 					break;
+ 				STPUTC(*idx, expdest);
++				if (stackblock() != restart_detect)
++					goto restart;
+ 				if (quotes && (unsigned char)*idx == CTLESC) {
+ 					idx++;
+ 					len++;
+ 					STPUTC(*idx, expdest);
++					if (stackblock() != restart_detect)
++						goto restart;
+ 				}
+-				if (stackblock() != restart_detect)
+-					goto restart;
+ 				idx++;
+ 				len++;
+ 				rmesc++;
+-- 
+2.37.1
+

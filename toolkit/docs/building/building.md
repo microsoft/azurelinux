@@ -140,7 +140,7 @@ Depending on hardware, rebuilding the toolchain can take several hours. The foll
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
-sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 ```
 
 ## **Package Stage**
@@ -160,7 +160,7 @@ The following command rebuilds all CBL-Mariner packages.
 ```bash
 # Build ALL packages
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y
 ```
 
 ### **Rebuild Minimal Required Packages**
@@ -169,11 +169,11 @@ The following command rebuilds packages for the basic VHD.
 
 ```bash
 # Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8"
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64"
 ```
 
 Note that the image build commands in [Build Images](#build-images) will **automatically** build _only_ the packages required by a selected image configuration and then builds the image.
@@ -188,13 +188,13 @@ All images are generated in the `out/images` folder.
 
 ```bash
 # To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 
 # To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
-sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
 
 # To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
-sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 
 ### ISO Images
@@ -314,7 +314,7 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
-SOURCE_URL         ?=
+SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
@@ -516,9 +516,9 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > - at least one of the RPM packages mentioned in the manifest file, or
 > - the script responsible for building the chroot.
 
-#### `HYDRATED_BUILD=...`]
+#### `HYDRATED_BUILD=...`
 
-##### `HYDRATED_BUILD=`**`y`**]
+##### `HYDRATED_BUILD=`**`y`**
 
 > If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
 
@@ -526,16 +526,15 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 > Normal build. No hydrated RPMs will be used.
 
-#### `DELTA_BUILD=...`]
+#### `DELTA_BUILD=...`
 
-##### `DELTA_BUILD=`**`y`**]
+##### `DELTA_BUILD=`**`y`**
 
 > Delta build. Used for fast delta builds where published packages are pre-populated and only new or added packages are built.
 
 ##### `DELTA_BUILD=`**`n`** *(default)*
 
 > Normal build.
-
 
 ## All Build Targets
 
@@ -636,6 +635,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
+| SRPM_PACK_LIST                |                                                                                                        | List of spec basenames to build into SRPMs. If empty, all specs under `$(SPECS_DIR)` will be packed.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 
 ---

@@ -994,7 +994,6 @@ cd /sources
 echo sqlite-autoconf-3360000
 tar xf sqlite-autoconf-3360000.tar.gz
 pushd sqlite-autoconf-3360000
-patch -Np1 -i /tools/CVE-2021-36690.patch
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \
@@ -1048,14 +1047,14 @@ popd
 rm -rf cpio-2.13
 touch /logs/status_cpio_complete
 
-echo libarchive-3.6.0
-tar xf libarchive-3.6.0.tar.gz
-pushd libarchive-3.6.0
+echo libarchive-3.6.1
+tar xf libarchive-3.6.1.tar.gz
+pushd libarchive-3.6.1
 ./configure --prefix=/usr --disable-static
 make -j$(nproc)
 make install
 popd
-rm -rf libarchive-3.6.0
+rm -rf libarchive-3.6.1
 touch /logs/status_libarchive_complete
 
 echo lua-5.4.3

@@ -16,35 +16,35 @@
 #
 
 # commonver - version from containers/common
-%define commonver 0.14.6
+%define commonver 0.44.0
 # podman - version from containers/podman
-%define podmanver 2.0.3
+%define podmanver 3.3.1
 # storagever - version from containers/storage
-%define storagever 1.20.2
+%define storagever 1.36.0
 # imagever - version from containers/image
-%define imagever 5.5.1
+%define imagever 5.16.0
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
-Version:        20200727
-Release:        2%{?dist}
-License:        ASL 2.0 AND GPLv3+
+Version:        20210626
+Release:        1%{?dist}
+License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Management
 URL:            https://github.com/containers
-#Source0:       https://github.com/containers/image/archive/v5.5.1.tar.gz
+#Source0:       https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz
 Source0:        %{name}-image-%{imagever}.tar.gz
-#Source1:       https://github.com/containers/storage/archive/v1.20.2.tar.gz
+#Source1:       https://github.com/containers/storage/archive/refs/tags/v1.36.0.tar.gz
 Source1:        %{name}-storage-%{storagever}.tar.gz
 Source2:        LICENSE
 Source3:        policy.json
 Source4:        storage.conf
 Source5:        mounts.conf
 Source6:        registries.conf
-#Source7:       https://github.com/containers/podman/archive/v2.0.3.tar.gz
+#Source7:       https://github.com/containers/podman/archive/refs/tags/v3.3.1.tar.gz
 Source7:        %{name}-podman-%{podmanver}.tar.gz
 Source8:        default.yaml
-#Source9:       https://github.com/containers/common/archive/v0.14.6.tar.gz
+#Source9:       https://github.com/containers/common/archive/refs/tags/v0.44.0.tar.gz
 Source9:        %{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
 BuildRequires:  go-go-md2man
@@ -90,7 +90,6 @@ rename '.md' '.1' docs/*
 cd ..
 # compile subset of containers/podman manpages
 cd podman-%{podmanver}
-go-md2man -in docs/source/markdown/containers-mounts.conf.5.md -out docs/source/markdown/containers-mounts.conf.5
 go-md2man -in pkg/hooks/docs/oci-hooks.5.md -out pkg/hooks/docs/oci-hooks.5
 cd ..
 
@@ -113,8 +112,8 @@ install -D -m 0644 %{SOURCE6} %{buildroot}/%{_sysconfdir}/containers/registries.
 install -D -m 0644 %{SOURCE8} %{buildroot}/%{_sysconfdir}/containers/registries.d/default.yaml
 sed -e 's-@LIBEXECDIR@-%{_libexecdir}-g' -i %{SOURCE10}
 install -D -m 0644 %{SOURCE10} %{buildroot}/%{_datadir}/containers/containers.conf
-install -D -m 0644 podman-%{podmanver}/seccomp.json %{buildroot}/%{_datadir}/containers/seccomp.json
-install -D -m 0644 podman-%{podmanver}/seccomp.json %{buildroot}/%{_sysconfdir}/containers/seccomp.json
+install -D -m 0644 common-%{commonver}/pkg/seccomp/seccomp.json %{buildroot}/%{_datadir}/containers/seccomp.json
+install -D -m 0644 common-%{commonver}/pkg/seccomp/seccomp.json %{buildroot}/%{_sysconfdir}/containers/seccomp.json
 
 install -d %{buildroot}/%{_mandir}/man1
 install -d %{buildroot}/%{_mandir}/man5
@@ -122,8 +121,7 @@ install -D -m 0644 image-%{imagever}/docs/*.1 %{buildroot}/%{_mandir}/man1/
 install -D -m 0644 image-%{imagever}/docs/*.5 %{buildroot}/%{_mandir}/man5/
 install -D -m 0644 storage-%{storagever}/docs/*.1 %{buildroot}/%{_mandir}/man1/
 install -D -m 0644 storage-%{storagever}/docs/*.5 %{buildroot}/%{_mandir}/man5/
-install -D -m 0644 podman-%{podmanver}/pkg/hooks/docs/oci-hooks.5 %{buildroot}/%{_mandir}/man5/
-install -D -m 0644 podman-%{podmanver}/docs/source/markdown/containers-mounts.conf.5 %{buildroot}/%{_mandir}/man5/
+install -D -m 0644 common-%{commonver}/docs/containers-mounts.conf.5 %{buildroot}/%{_mandir}/man5/
 install -D -m 0644 common-%{commonver}/docs/containers.conf.5 %{buildroot}/%{_mandir}/man5/
 
 %post
@@ -160,6 +158,11 @@ fi
 %license LICENSE
 
 %changelog
+* Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 20210626-1
+- Upgrade version to 20210626 and License information.
+- Remove oci-hook man5 tar conflicting with podman package.
+- Updated conf files with latest version.
+
 * Thu Aug 19 2021 Henry Li <lihl@microsoft.com> - 20200727-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License Verified

@@ -1,0 +1,21 @@
+diff --git a/src/os/getenv_s.c b/src/os/getenv_s.c
+--- a/src/os/getenv_s.c
++++ b/src/os/getenv_s.c
+@@ -119,12 +119,14 @@ EXPORT errno_t _getenv_s_chk(size_t *restrict len, char *restrict dest,
+     buf = getenv(name);
+ #endif
+
+-    if (unlikely(buf == NULL)) {
+-        char errstr[128] = "getenv_s: ";
++    if (buf == NULL) {
++#ifdef SAFECLIB_STR_NULL_SLACK
++        memset(dest, 0, dmax);
++#else
++        *dest = '\0';
++#endif
+         if (len)
+             *len = 0;
+-        strcat(errstr, strerror(errno));
+-        handle_error(dest, dmax, errstr, -1);
+         return -1;
+     }

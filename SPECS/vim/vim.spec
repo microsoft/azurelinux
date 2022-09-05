@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.5172
-Release:        2%{?dist}
+Version:        9.0.0325
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
+Requires(post): sed
 Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
 
@@ -125,9 +126,9 @@ fi
 %{_datarootdir}/vim/vim*/scripts.vim
 %{_datarootdir}/vim/vim*/spell/*
 %{_datarootdir}/vim/vim*/syntax/*
-%exclude %{_datarootdir}/vim/vim82/syntax/nosyntax.vim
-%exclude %{_datarootdir}/vim/vim*/syntax/syntax.vim
-%exclude %{_datarootdir}/vim/vim82/autoload/dist/ft.vim
+%exclude %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
+%exclude %{_datarootdir}/vim/vim90/syntax/syntax.vim
+%exclude %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_datarootdir}/vim/vim*/tools/*
 %{_datarootdir}/vim/vim*/tutor/*
 %{_datarootdir}/vim/vim*/lang/*.vim
@@ -183,9 +184,9 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
-%{_datarootdir}/vim/vim82/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim82/syntax/syntax.vim
-%{_datarootdir}/vim/vim82/autoload/dist/ft.vim
+%{_datarootdir}/vim/vim90/syntax/nosyntax.vim
+%{_datarootdir}/vim/vim90/syntax/syntax.vim
+%{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
 %{_bindir}/view
@@ -195,6 +196,20 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Mon Aug 29 2022 Henry Beberman <henry.beberman@microsoft.com> - 9.0.0325-1
+- Upgrade to 9.0.0325 to fix: CVE-2022-2980, CVE-2022-2982, CVE-2022-2923, CVE-2022-2946
+
+* Fri Aug 19 2022 Andrew Phelps <anphel@microsoft.com> - 9.0.0232-1
+- Upgrade to 9.0.0232 to fix: CVE-2022-2522, CVE-2022-2571, CVE-2022-2580, CVE-2022-2581,
+  CVE-2022-2598, CVE-2022-2816, CVE-2022-2817, CVE-2022-2819, CVE-2022-2845, CVE-2022-2849,
+  CVE-2022-2862, CVE-2022-2874, CVE-2022-2889
+
+* Mon Jul 18 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 9.0.0050-2
+- Add sed requires as vim has an implicit dependency on sed in the post-install script.
+
+* Tue Jul 12 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 9.0.0050-1
+- Upgrade to 9.0.0050 to fix CVEs: 2022-2257, 2022-2264, 2022-2284, 2022-2285, 2022-2286, 2022-2287
+
 * Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.2.5172-2
 - Fix unversioned python shebang in demoserver.py example script
 

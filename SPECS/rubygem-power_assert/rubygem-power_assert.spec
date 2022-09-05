@@ -2,13 +2,14 @@
 Summary:        Power Assert for Ruby
 Name:           rubygem-%{gem_name}
 Version:        2.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(power_assert) = %{version}-%{release}
@@ -27,9 +28,6 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-#add BSDL and COPYING files to buildroot from Source0
-cp BSDL %{buildroot}%{gem_instdir}/
-cp COPYING %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
@@ -38,6 +36,9 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Jul 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-3
+- Added missing lib files
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-2
 - Add provides
 

@@ -27,8 +27,6 @@ cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch 
 cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container/linker-script-readonly-keyword-support.patch
 # RPM LD_FLAGS patch
 cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
-# sqlite CVE-2021-36690 patch
-cp -v $MARINER_SPECS_DIR/sqlite/CVE-2021-36690.patch ./container/CVE-2021-36690.patch
 
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
@@ -77,6 +75,5 @@ rm -vf ./container/CVE-2021-38185.patch
 rm -vf ./container/linker-script-readonly-keyword-support.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
-rm -vf ./container/CVE-2021-36690.patch
 
 echo Raw toolchain build complete

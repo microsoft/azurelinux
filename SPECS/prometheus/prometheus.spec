@@ -3,7 +3,7 @@
 
 Name:           prometheus
 Version:        2.36.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Prometheus monitoring system and time series database
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -142,6 +142,9 @@ fi
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.36.0-3
+- Bump release to rebuild against Go 1.18.5
+
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 2.36.0-2
 - Bump release to rebuild with golang 1.18.3
 

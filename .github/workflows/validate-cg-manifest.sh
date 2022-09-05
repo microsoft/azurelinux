@@ -60,6 +60,10 @@ ignore_signed_package=" \
   kernel-signed-x86_64 \
   shim"
 
+# Specs where cgmanifest validation has known issues checking URLs.
+ignore_known_issues=" \
+  virglrenderer"
+
 alt_source_tag="Source9999"
 
 rm -f bad_registrations.txt
@@ -104,7 +108,7 @@ do
   fi
 
   # Skipping specs from the ignore lists.
-  if echo "$ignore_multiple_sources $ignore_signed_package $ignore_no_source_tarball" | grep -P "(^|\s)$name($|\s)" > /dev/null
+  if echo "$ignore_multiple_sources $ignore_signed_package $ignore_no_source_tarball $ignore_known_issues" | grep -P "(^|\s)$name($|\s)" > /dev/null
   then
     echo "    $name is being ignored, skipping"
     continue

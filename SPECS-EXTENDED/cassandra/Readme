@@ -8,7 +8,7 @@
 4. cd /usr/src/apache-cassandra-<version>-src
 5. Run "export JAVA_HOME=/usr/lib/jvm/msopenjdk-11"
 6. Run export ANT_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
-7. Run "sudo ant clean ant -v clean jar -Drelease=true -Duse.jdk11=true"
+7. Run "sudo ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true"
 8. Once build completed successfully take build cache as below.
 9. cd ~/.m2
 9. sudo tar --sort=name \
