@@ -22,6 +22,12 @@ install_patch_after_kernel_change() {
     fi
 
     patch_module_path=$(rpm -ql --whatprovides "$installable_patch" | grep "ko$")
+    if [[ ! -f "$patch_module_path" ]]
+    then
+        echo "Initial (empty) livepatch installed for kernel ($RUNNING_KERNEL_VERSION) - no livepatch module to install."
+        return 0
+    fi
+
     patch_module_name=$(basename "$patch_module_path" | cut -d. -f1)
     if patch_installed "$patch_module_name"
     then
@@ -94,15 +100,21 @@ wait_for_kernel_change() {
 RUNNING_KERNEL_VERSION=$(read_running_kernel_version)
 INSTALLED_KERNEL_VERSION=$(read_installed_kernel_version)
 
-cat <<EOF
-Running kernel:   $RUNNING_KERNEL_VERSION.
-Installed kernel: $INSTALLED_KERNEL_VERSION.
-EOF
+echo "Running kernel:   $RUNNING_KERNEL_VERSION."
+echo "Installed kernel: $INSTALLED_KERNEL_VERSION."
 
 install_patch_after_kernel_change
 
+# Letting systemd know the service finished its startup and kpatch can now run.
+systemd-notify --ready
+
 install_livepatch_package "$RUNNING_KERNEL_VERSION"
-install_livepatch_package "$INSTALLED_KERNEL_VERSION"
+
+if [[ "$RUNNING_KERNEL_VERSION" != "$INSTALLED_KERNEL_VERSION" ]]
+then
+    echo "Kernel will change after reboot ($RUNNING_KERNEL_VERSION -> $INSTALLED_KERNEL_VERSION). Installing patches for post-reboot kernel."
+    install_livepatch_package "$INSTALLED_KERNEL_VERSION"
+fi
 
 while wait_for_kernel_change
 do

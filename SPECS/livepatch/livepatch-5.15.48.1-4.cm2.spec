@@ -99,8 +99,10 @@ BuildRequires:  python3-devel
 BuildRequires:  rpm-build
 
 Requires:       coreutils
+
 Requires(post): coreutils
 Requires(post): kpatch
+
 Requires(preun): kpatch
 
 Provides:       livepatch = %{kernel_full_version}
@@ -148,6 +150,11 @@ install -dm 755 %{buildroot}%{livepatch_install_dir}
 %preun
 %uninstall_if_should
 %unload_if_should
+
+# Re-enable patch on rollbacks to supported kernel.
+%triggerin -- kernel = %{kernel_full_version}
+%load_if_should
+%install_if_should
 
 # Prevent the patch from being loaded after a reboot to a different kernel.
 # Previous kernel is still running, do NOT unload the livepatch.
