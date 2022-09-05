@@ -2,11 +2,11 @@ Summary:        C library for manipulating tar files
 Name:           libtar
 Version:        1.2.20
 Release:        9%{?dist}
-URL:            https://github.com/tklauser/libtar/
 License:        BSD
-Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            https://github.com/tklauser/libtar/
 #Source0:       https://github.com/tklauser/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # This patch appears to replicate Fedora's ' libtar-1.2.11-bz729009.patch'
@@ -34,7 +34,7 @@ The litar-devel package contains libraries and header files for
 developing applications that use libtar.
 
 %prep
-%setup
+%setup -q
 %autopatch -p1
 autoreconf -iv
 
@@ -75,15 +75,21 @@ chmod +x %{buildroot}/%{_libdir}/libtar.so.*
 
 *   Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.2.20-7
 -   Updated Source0, URL, removed sha1 line. License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.20-6
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Thu Nov 02 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-5
 -   Fix CVE-2013-4420
+
 *   Thu Jun 29 2017 Chang Lee <changlee@vmware.com> 1.2.20-4
 -   Removed %check due to no test existence.
+
 *   Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.2.20-3
 -   Ensure non empty debuginfo
+
 *   Fri Mar 10 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-2
 -   Provides libtar.so.0()(64bit).
+
 *   Fri Mar 03 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-1
 -   Initial packaging for Photon
