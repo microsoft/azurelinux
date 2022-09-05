@@ -1,0 +1,24 @@
+--- libtar-1.2.11/lib/libtar.h.deref	2009-12-30 16:37:03.790121122 +0100
++++ libtar-1.2.11/lib/libtar.h	2009-12-30 16:37:35.521246633 +0100
+@@ -172,6 +172,7 @@ int th_write(TAR *t);
+ #define TH_ISDIR(t)	((t)->th_buf.typeflag == DIRTYPE \
+ 			 || S_ISDIR((mode_t)oct_to_int((t)->th_buf.mode)) \
+ 			 || ((t)->th_buf.typeflag == AREGTYPE \
++			     && strlen((t)->th_buf.name) \
+ 			     && ((t)->th_buf.name[strlen((t)->th_buf.name) - 1] == '/')))
+ #define TH_ISFIFO(t)	((t)->th_buf.typeflag == FIFOTYPE \
+ 			 || S_ISFIFO((mode_t)oct_to_int((t)->th_buf.mode)))
+--- libtar-1.2.11/lib/util.c.deref	2003-01-07 02:41:00.000000000 +0100
++++ libtar-1.2.11/lib/util.c	2009-12-30 17:35:51.860121660 +0100
+@@ -148,9 +148,7 @@ oct_to_int(char *oct)
+ {
+ 	int i;
+ 
+-	sscanf(oct, "%o", &i);
+-
+-	return i;
++	return sscanf(oct, "%o", &i) == 1 ? i : 0;
+ }
+ 
+ 
+
