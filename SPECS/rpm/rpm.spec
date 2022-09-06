@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,8 @@ Requires:       rpm-libs = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 Patch1: define-RPM_LD_FLAGS.patch
+Patch1000:     CVE-2021-3521.patch     # Fixed in rpm-1.18.0 with 3 commits ending at https://github.com/rpm-software-management/rpm/commit/bd36c5dc9fb6d90c46fbfed8c2d67516fc571ec8
+Patch1001:     CVE-2021-35938.patch    # Fixed in rpm-1.18.0 with 32 commits ending at https://github.com/rpm-software-management/rpm/commit/6dd62720fe84f7e2ad902c915b952fc0b29e3dcd
 
 %description
 RPM package manager
@@ -278,6 +280,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.0-10
+- Patch CVE-2021-35938 and CVE-2021-3521
+
 * Mon Jul 18 2022 Nan Liu <liunan@microsoft.com> - 4.17.0-9
 - Add missing dependencies to rpmbuild (sed and util-linux)
 
