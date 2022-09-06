@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.17.0
-Release:        9%{?dist}
+Version:        4.18.0
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -278,6 +278,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 06 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.18.0-1
+- Upgrade to 4.18.0
+
 * Mon Jul 18 2022 Nan Liu <liunan@microsoft.com> - 4.17.0-9
 - Add missing dependencies to rpmbuild (sed and util-linux)
 

@@ -524,7 +524,7 @@ python3-tools-3.9.13-5.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-debuginfo-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
-rpm-4.17.0-9.cm2.x86_64.rpm
+rpm-4.18.0-1.cm2.x86_64.rpm
 rpm-build-4.17.0-9.cm2.x86_64.rpm
 rpm-build-libs-4.17.0-9.cm2.x86_64.rpm
 rpm-debuginfo-4.17.0-9.cm2.x86_64.rpm
