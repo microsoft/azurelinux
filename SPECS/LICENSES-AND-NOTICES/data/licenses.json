@@ -2492,6 +2492,7 @@
                 "kernel",
                 "kernel-headers",
                 "kernel-rt",
+                "kernel-uvm",
                 "keyutils",
                 "kmod",
                 "krb5",
