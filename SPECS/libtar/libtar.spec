@@ -1,7 +1,7 @@
 Summary:        C library for manipulating tar files
 Name:           libtar
 Version:        1.2.20
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,6 @@ Patch3:         libtar-1.2.20-CVE-2021-33643-CVE-2021-33644.patch
 Patch4:         libtar-1.2.20-CVE-2021-33645-CVE-2021-33646.patch
 Patch5:         libtar-1.2.20-fix-resource-leaks.patch
 Patch6:         libtar-1.2.20-static-analysis.patch
-Provides:       libtar.so.0()(64bit)
 
 %description
 libtar is a library for manipulating tar files from within C programs.
@@ -30,7 +29,7 @@ Group:          Development/Libraries
 Requires:       libtar = %{version}-%{release}
 
 %description    devel
-The litar-devel package contains libraries and header files for
+The libtar-devel package contains libraries and header files for
 developing applications that use libtar.
 
 %prep
@@ -45,6 +44,7 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 chmod +x %{buildroot}/%{_libdir}/libtar.so.*
+find %{buildroot} -type f -name "*.la" -delete -print
 
 #%check
 #Commented out %check due to no test existence
@@ -63,9 +63,12 @@ chmod +x %{buildroot}/%{_libdir}/libtar.so.*
 %{_includedir}/*
 %{_mandir}/man3/*
 %{_libdir}/libtar.so
-%{_libdir}/libtar.la
 
 %changelog
+* Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.20-10
+- Remove undesirable .la files
+- Rely on generators to provide libtar.so.0()(64bit)
+
 * Mon Sep 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.20-9
 - Add various CVE and correctness patches from Fedora 37
 - Fixes CVE-2021-33643, CVE-2021-33644, CVE-2021-33645, CVE-2021-33646
@@ -73,23 +76,23 @@ chmod +x %{buildroot}/%{_libdir}/libtar.so.*
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.20-8
 - Added %%license line automatically
 
-*   Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.2.20-7
--   Updated Source0, URL, removed sha1 line. License verified.
+* Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 1.2.20-7
+- Updated Source0, URL, removed sha1 line. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.20-6
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.20-6
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Nov 02 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-5
--   Fix CVE-2013-4420
+* Thu Nov 02 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-5
+- Fix CVE-2013-4420
 
-*   Thu Jun 29 2017 Chang Lee <changlee@vmware.com> 1.2.20-4
--   Removed %check due to no test existence.
+* Thu Jun 29 2017 Chang Lee <changlee@vmware.com> 1.2.20-4
+- Removed %check due to no test existence.
 
-*   Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.2.20-3
--   Ensure non empty debuginfo
+* Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.2.20-3
+- Ensure non empty debuginfo
 
-*   Fri Mar 10 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-2
--   Provides libtar.so.0()(64bit).
+* Fri Mar 10 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-2
+- Provides libtar.so.0()(64bit).
 
-*   Fri Mar 03 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-1
--   Initial packaging for Photon
+* Fri Mar 03 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-1
+- Initial packaging for Photon
