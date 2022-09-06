@@ -24,7 +24,7 @@
                                 DEFSHAREDFS="virtio-fs" \\\
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
                                 DEFVIRTIOFSCACHESIZE=0 \\\
-                                DEFSANDBOXCGROUPONLY=true \\\
+                                DEFSANDBOXCGROUPONLY=false \\\
                                 SKIP_GO_VERSION_CHECK=y \\\
                                 MACHINETYPE=%{machinetype} \\\
                                 DESTDIR=%{buildroot} \\\
@@ -39,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -241,6 +241,9 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Sep 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-4
+- Set DEFSANDBOXCGROUPONLY="false".
+
 * Wed Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
 - Add kernel config to match guest and host cgroup setup.
 - Add patch to expose devices from kata.
