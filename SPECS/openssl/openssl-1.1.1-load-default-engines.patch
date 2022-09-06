@@ -1,20 +1,3 @@
-diff --git a/crypto/engine/eng_all.c b/crypto/engine/eng_all.c
-index b675ed7892..b7abf3d61f 100644
---- a/crypto/engine/eng_all.c
-+++ b/crypto/engine/eng_all.c
-@@ -10,6 +10,12 @@
- #include "internal/cryptlib.h"
- #include "eng_local.h"
- 
-+ __attribute__((constructor))
-+void ENGINE_static_initializer(void)
-+{
-+    OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_DYNAMIC, NULL);
-+}
-+
- void ENGINE_load_builtin_engines(void)
- {
-     /* Some ENGINEs need this */
 diff --git a/crypto/init.c b/crypto/init.c
 index 1b0d523bea..86e31c193e 100644
 --- a/crypto/init.c

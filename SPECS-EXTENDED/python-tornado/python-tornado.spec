@@ -3,13 +3,13 @@ Distribution:   Mariner
 %global srcname tornado
 
 Name:           python-%{srcname}
-Version:        6.0.3
-Release:        2%{?dist}
+Version:        6.2.0
+Release:        1%{?dist}
 Summary:        Scalable, non-blocking web server and tools
 
 License:        ASL 2.0
 URL:            http://www.tornadoweb.org
-Source0:        %{pypi_source}
+Source0:        https://github.com/tornadoweb/%{srcname}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
 # Do not turn DeprecationWarning in tornado module into Exception
 # fixes FTBFS with Python 3.8
@@ -73,12 +73,16 @@ export ASYNC_TEST_TIMEOUT=10
 %license LICENSE
 %doc README.rst
 %{python3_sitearch}/%{srcname}/
-%{python3_sitearch}/%{srcname}-%{version}-*.egg-info
+%{python3_sitearch}/%{srcname}-*.egg-info
 
 %files doc
 %doc demos
 
 %changelog
+* Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-1
+- Bump version
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.0.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

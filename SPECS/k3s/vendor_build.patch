@@ -1,21 +1,30 @@
+From bf8717d49b3b396d74096322b32186b3a8e6b3d9 Mon Sep 17 00:00:00 2001
+From: Lior Lustgarten <lilustg@microsoft.com>
+Date: Thu, 21 Jul 2022 13:20:43 -0700
+Subject: [PATCH 1/2] enable vendor build
+
+---
+ scripts/build       | 30 +++++++++++++++++++-----------
+ scripts/package-cli |  2 +-
+ 2 files changed, 20 insertions(+), 12 deletions(-)
+
 diff --git a/scripts/build b/scripts/build
-index 809285e9f14..c80dd4b6bce 100755
+index b25156f91e..82bfc46d99 100755
 --- a/scripts/build
 +++ b/scripts/build
-@@ -98,15 +98,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
+@@ -103,15 +103,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
      echo Building cni
      TMPDIR=$(mktemp -d)
      trap cleanup EXIT
 -    WORKDIR=$TMPDIR/src/github.com/containernetworking/plugins
 -    git clone -b $VERSION_CNIPLUGINS https://github.com/rancher/plugins.git $WORKDIR
 -    cd $WORKDIR
--    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o $INSTALLBIN/cni
 +    WORKDIR=$TMPDIR/src/github.com/containernetworking
 +    mkdir -p $WORKDIR
 +    ls
 +    cp -r vendor/plugins $WORKDIR
 +    cd $WORKDIR/plugins
-+    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
+     GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
  )
  fi
  
@@ -25,7 +34,7 @@ index 809285e9f14..c80dd4b6bce 100755
  ln -s k3s ./bin/k3s-agent
  ln -s k3s ./bin/k3s-server
  ln -s k3s ./bin/k3s-etcd-snapshot
-@@ -119,16 +121,22 @@ ln -s k3s ./bin/ctr
+@@ -125,16 +127,22 @@ ln -s k3s ./bin/ctr
  export GOPATH=$(pwd)/build
  
  echo Building containerd
@@ -55,17 +64,76 @@ index 809285e9f14..c80dd4b6bce 100755
  popd
 -cp -vf ./build/src/github.com/opencontainers/runc/runc ./bin/
 +cp -vf ./$RUNC_DIR/runc/runc ./bin/
-\ No newline at end of file
 diff --git a/scripts/package-cli b/scripts/package-cli
-index c96a2cae515..737674c1840 100755
+index 4dc2c80db1..d813ec8959 100755
 --- a/scripts/package-cli
 +++ b/scripts/package-cli
-@@ -59,7 +59,7 @@ LDFLAGS="
-     -w -s
+@@ -60,7 +60,7 @@ LDFLAGS="
  "
+ TAGS="urfave_cli_no_docs"
  STATIC="-extldflags '-static'"
--CGO_ENABLED=0 "${GO}" build -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
-+CGO_ENABLED=0 "${GO}" build -mod=vendor -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
+-CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
++CGO_ENABLED=0 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
  
  stat ${CMD_NAME}
  
+-- 
+2.25.1
+
+
+From a4cbc923a6ac449f7be4d2c839598b7fa10706ae Mon Sep 17 00:00:00 2001
+From: Lior Lustgarten <lilustg@microsoft.com>
+Date: Thu, 21 Jul 2022 18:06:07 -0700
+Subject: [PATCH 2/2] Adds install fix for vhdx
+
+---
+ package/rpm/install.sh | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
+
+diff --git a/package/rpm/install.sh b/package/rpm/install.sh
+index ed0b4fbba6..a3a07cc601 100755
+--- a/package/rpm/install.sh
++++ b/package/rpm/install.sh
+@@ -43,12 +43,8 @@ set -e
+ #     Commit of k3s to download from temporary cloud storage.
+ #     * (for developer & QA use)
+ #
+-#   - INSTALL_K3S_BIN_DIR
+-#     Directory to install k3s binary, links, and uninstall script to, or use
+-#     /usr/local/bin as the default
+-#
+ #   - INSTALL_K3S_BIN_DIR_READ_ONLY
+-#     If set to true will not write files to INSTALL_K3S_BIN_DIR, forces
++#     If set to true will not write files to BIN_DIR, forces
+ #     setting INSTALL_K3S_SKIP_DOWNLOAD=true
+ #
+ #   - INSTALL_K3S_SYSTEMD_DIR
+@@ -114,15 +110,8 @@ fatal()
+ 
+ # --- fatal if no systemd or openrc ---
+ verify_system() {
+-    if [ -x /sbin/openrc-run ]; then
+-        HAS_OPENRC=true
+-        return
+-    fi
+-    if [ -d /run/systemd ]; then
+-        HAS_SYSTEMD=true
+-        return
+-    fi
+-    fatal 'Can not find systemd or openrc to use as a process supervisor for k3s'
++    HAS_SYSTEMD=true
++    return
+ }
+ 
+ # --- add quotes to command arguments ---
+@@ -219,7 +208,7 @@ setup_env() {
+     fi
+ 
+     # --- use binary install directory if defined or create default ---
+-    BIN_DIR=${INSTALL_K3S_BIN_DIR:-/usr/local/bin}
++    BIN_DIR=/usr/local/bin
+     DATA_DIR=/var/lib/rancher/k3s
+ 
+     # --- set related files from system name ---
+-- 
+2.25.1

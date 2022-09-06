@@ -1,7 +1,7 @@
 Summary:        SSL sockets with IO::Socket interface
 Name:           perl-IO-Socket-SSL
 Version:        2.074
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/IO-Socket-SSL
@@ -12,7 +12,12 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Net-SSLeay
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(FindBin)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Config)
@@ -65,6 +70,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 2.074-2
+- Add BR on `perl(ExtUtils::MakeMaker)` & check deps to enable ptest
+
 * Tue Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.074-1
 - Update to 2.074
 

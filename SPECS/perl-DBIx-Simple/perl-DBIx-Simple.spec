@@ -2,7 +2,7 @@
 Summary:        Easy-to-use OO interface to DBI
 Name:           perl-DBIx-Simple
 Version:        1.37
-Release:        5%{?dist}
+Release:        6%{?dist}
 # License not mentioned in any of the source files and CPAN web page explicitly says it's unknown.
 License:        Unknown
 Group:          Development/Libraries
@@ -14,6 +14,11 @@ BuildArch:      noarch
 BuildRequires:  perl-DBI >= 1.21
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+%endif
+
 Requires:       perl-libs
 Requires:       perl-Object-Accessor
 Requires:       perl-DBI >= 1.21
@@ -53,6 +58,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.37-6
+- Add BR on `perl(Test::More)` to fix ptest
+
 *   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.37-5
 -   Adding 'BuildRequires: perl-generators'.
 

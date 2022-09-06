@@ -2,7 +2,7 @@
 Summary:        JSON serializing/deserializing, done correctly and fast
 Name:           perl-JSON-XS
 Version:        4.03
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
@@ -14,6 +14,12 @@ BuildRequires:  perl-Canary-Stability
 BuildRequires:  perl-common-sense
 BuildRequires:  perl-generators
 BuildRequires:  perl-Types-Serialiser
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Tie::Array)
+%endif
 
 Requires:  perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:  perl-Canary-Stability
@@ -54,6 +60,9 @@ make test
 %{_mandir}/man[13]/*
 
 %changelog
+* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 4.03-2
+- Add BR on `perl(ExtUtils::MakeMaker)` & `perl(Test::*)` to enable ptest
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.03-1
 - Update to version 4.03
 

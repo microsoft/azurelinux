@@ -1,13 +1,14 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        21.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
+Patch0:         fix-mypy-tests.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
@@ -26,7 +27,7 @@ Requires:       python3
 Attributes without boilerplate.
 
 %prep
-%autosetup -n attrs-%{version}
+%autosetup -p1 -n attrs-%{version}
 
 %build
 %py3_build
@@ -44,6 +45,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 21.4.0-2
+- Add upstream patch to fix mypy tests
+
 * Wed Apr 13 2022 Olivia Crain <oliviacrain@microsoft.com> - 21.4.0-1
 - Upgrade to latest upstream version
 - Simplify test setup and requirements

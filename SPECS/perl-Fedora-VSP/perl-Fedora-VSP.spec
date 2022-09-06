@@ -2,7 +2,7 @@
 Summary:        Perl version normalization for RPM
 Name:           perl-Fedora-VSP
 Version:        0.001
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,10 @@ BuildRequires:  perl
 Provides:       perl(Fedora::VSP) = %{version}
 %else
 BuildRequires:  perl-generators
+%endif
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test::More)
 %endif
 
 BuildArch:      noarch
@@ -46,6 +50,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 0.001-19
+- Add BR on `perl(Test::More)` to fix ptest
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 0.001-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
