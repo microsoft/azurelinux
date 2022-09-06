@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.13
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
 Patch1:         CVE-2015-20107.patch
+Patch2:         CVE-2021-28861.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -300,6 +301,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Aug 31 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.13-5
+- Add CVE-2021-28861 patch from upstream
+
 * Tue Aug 30 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.13-4
 - Add CVE-2015-20107 patch from upstream
 

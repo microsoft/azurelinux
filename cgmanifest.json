@@ -7231,8 +7231,18 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.23.6",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.6+k3s1.tar.gz"
+          "version": "1.23.8",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.8+k3s1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "k3s",
+          "version": "1.24.3",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.3+k3s1.tar.gz"
         }
       }
     },
@@ -7333,6 +7343,16 @@
           "name": "kernel-rt",
           "version": "5.15.44.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.44.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-uvm",
+          "version": "5.15.48.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
         }
       }
     },
@@ -26628,7 +26648,7 @@
         "other": {
           "name": "virglrenderer",
           "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-0.9.1/virglrenderer-virglrenderer-0.9.1.tar.gz"
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/0.9.1/virglrenderer-0.9.1.tar.gz"
         }
       }
     },
