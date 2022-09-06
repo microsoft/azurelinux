@@ -1,6 +1,21 @@
---- libtar-1.2.11/lib/libtar.h.deref	2009-12-30 16:37:03.790121122 +0100
-+++ libtar-1.2.11/lib/libtar.h	2009-12-30 16:37:35.521246633 +0100
-@@ -172,6 +172,7 @@ int th_write(TAR *t);
+From 560911b694055b0c677431cf85d4d0d5ebd1a3fd Mon Sep 17 00:00:00 2001
+From: Huzaifa Sidhpurwala <huzaifas@fedoraproject.org>
+Date: Tue, 15 Oct 2013 14:39:05 +0200
+Subject: [PATCH] Fix invalid memory de-reference issue
+
+Bug: https://bugzilla.redhat.com/551415
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ lib/libtar.h | 1 +
+ lib/util.c   | 4 +---
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/lib/libtar.h b/lib/libtar.h
+index 3b46a13..616ca8f 100644
+--- a/lib/libtar.h
++++ b/lib/libtar.h
+@@ -173,6 +173,7 @@ int th_write(TAR *t);
  #define TH_ISDIR(t)	((t)->th_buf.typeflag == DIRTYPE \
  			 || S_ISDIR((mode_t)oct_to_int((t)->th_buf.mode)) \
  			 || ((t)->th_buf.typeflag == AREGTYPE \
@@ -8,8 +23,10 @@
  			     && ((t)->th_buf.name[strlen((t)->th_buf.name) - 1] == '/')))
  #define TH_ISFIFO(t)	((t)->th_buf.typeflag == FIFOTYPE \
  			 || S_ISFIFO((mode_t)oct_to_int((t)->th_buf.mode)))
---- libtar-1.2.11/lib/util.c.deref	2003-01-07 02:41:00.000000000 +0100
-+++ libtar-1.2.11/lib/util.c	2009-12-30 17:35:51.860121660 +0100
+diff --git a/lib/util.c b/lib/util.c
+index 31e8315..11438ef 100644
+--- a/lib/util.c
++++ b/lib/util.c
 @@ -148,9 +148,7 @@ oct_to_int(char *oct)
  {
  	int i;
@@ -21,4 +38,5 @@
  }
  
  
-
+-- 
+2.11.4.GIT
