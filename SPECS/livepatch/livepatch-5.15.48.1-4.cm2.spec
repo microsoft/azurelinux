@@ -99,6 +99,7 @@ BuildRequires:  python3-devel
 BuildRequires:  rpm-build
 
 Requires:       coreutils
+Requires:       livepatching-filesystem
 
 Requires(post): coreutils
 Requires(post): kpatch
