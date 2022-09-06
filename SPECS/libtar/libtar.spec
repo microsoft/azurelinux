@@ -15,7 +15,11 @@ Patch0:         libtar-gen-debuginfo.patch
 Patch1:         libtar-CVE-2013-4420.patch
 # CVE patches + other fixes from Redhat
 Patch2:         libtar-1.2.11-mem-deref.patch
+# CVE-2021-33643
+# CVE-2021-33644
 Patch3:         libtar-1.2.20-CVE-2021-33643-CVE-2021-33644.patch
+# CVE-2021-33645
+# CVE-2021-33646
 Patch4:         libtar-1.2.20-CVE-2021-33645-CVE-2021-33646.patch
 Patch5:         libtar-1.2.20-fix-resource-leaks.patch
 Patch6:         libtar-1.2.20-static-analysis.patch
@@ -68,6 +72,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.20-10
 - Remove undesirable .la files
 - Rely on generators to provide libtar.so.0()(64bit)
+- Add CVE comments to correctly track CVE status
 
 * Mon Sep 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.20-9
 - Add various CVE and correctness patches from Fedora 37
