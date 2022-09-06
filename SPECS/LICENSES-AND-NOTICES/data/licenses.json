@@ -2493,6 +2493,7 @@
                 "kernel-headers",
                 "kernel-mshv",
                 "kernel-rt",
+                "kernel-uvm",
                 "keyutils",
                 "kmod",
                 "krb5",
@@ -2829,7 +2830,8 @@
         "Rancher": {
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
-                "k3s"
+                "k3s",
+                "k3s-1.23.8"
             ]
         },
         "Sysbench source": {

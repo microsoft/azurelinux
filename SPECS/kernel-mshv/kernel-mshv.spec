@@ -8,7 +8,7 @@
 %define config_source %{SOURCE1}
 %endif
 
-Summary:        Mariner kernel that has dom0 support and works with MSHV
+Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.34.1
 Release:        1%{?dist}
@@ -44,7 +44,7 @@ Requires(post): coreutils
 Requires(postun): coreutils
 
 %description
-The Mariner kernel that has dom0 support and works with MSHV
+The Mariner kernel that has MSHV Host support
 
 %package devel
 Summary:        MSHV kernel Dev
@@ -84,7 +84,6 @@ cp %{SOURCE1} .config
 cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
-cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=%{arch} olddefconfig
 
@@ -236,7 +235,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Thu Aug 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-1
-- Trim spec to only necessary components for dom0.
+- Trim spec to only necessary components for MSHV Host support kernel.
 
 * Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
 - Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
