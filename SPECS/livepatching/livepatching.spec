@@ -76,6 +76,7 @@ fi
 
 %postun subscription
 %systemd_postun_with_restart livepatching.service
+systemctl try-restart livepatching.service >/dev/null 2>&1 || :
 
 %files filesystem
 %defattr(-,root,root)
