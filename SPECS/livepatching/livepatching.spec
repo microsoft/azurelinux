@@ -20,13 +20,13 @@ BuildRequires:  systemd
 %{summary}
 
 %package filesystem
-Summary:        Basic directory layout for livepatch packages.
+Summary:        Basic directory layout for livepatching packages.
 
 %description filesystem
 %{summary}
 
 %package subscription
-Summary:        Retain livepatches across kernel upgrades
+Summary:        Retain livepatches across kernel upgrades.
 
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       coreutils
@@ -47,7 +47,7 @@ Requires(postun): systemd
 Requires(preun): systemd
 
 %description subscription
-This package allows your system to retain livepatching across kernel upgrades.
+This package allows your system to retain livepatches across kernel upgrades.
 Once a livepatch for the new kernel is installed, it does NOT automatically
 pull newer versions of the livepatch for that kernel.
 
