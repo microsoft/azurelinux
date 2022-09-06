@@ -15,17 +15,21 @@ Source2:        brp-strip-unneeded
 Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+Patch0: remove-docs-from-makefile.patch
+Patch1: define-RPM_LD_FLAGS.patch
+Patch1000:     CVE-2021-3521.patch     # Fixed in rpm-1.18.0 with 3 commits ending at https://github.com/rpm-software-management/rpm/commit/bd36c5dc9fb6d90c46fbfed8c2d67516fc571ec8
+Patch1001:     CVE-2021-35938.patch    # Fixed in rpm-1.18.0 with 32 commits ending at https://github.com/rpm-software-management/rpm/commit/6dd62720fe84f7e2ad902c915b952fc0b29e3dcd
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
-BuildRequires:  openssl-devel
 BuildRequires:  file-devel
 BuildRequires:  gettext
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
+BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  sqlite-devel
@@ -36,11 +40,6 @@ Requires:       libarchive
 Requires:       libselinux
 Requires:       lua-libs
 Requires:       rpm-libs = %{version}-%{release}
-
-Patch0: remove-docs-from-makefile.patch
-Patch1: define-RPM_LD_FLAGS.patch
-Patch1000:     CVE-2021-3521.patch     # Fixed in rpm-1.18.0 with 3 commits ending at https://github.com/rpm-software-management/rpm/commit/bd36c5dc9fb6d90c46fbfed8c2d67516fc571ec8
-Patch1001:     CVE-2021-35938.patch    # Fixed in rpm-1.18.0 with 32 commits ending at https://github.com/rpm-software-management/rpm/commit/6dd62720fe84f7e2ad902c915b952fc0b29e3dcd
 
 %description
 RPM package manager
