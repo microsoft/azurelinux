@@ -1,7 +1,7 @@
 %define livepatching_lib_path %{_libdir}/livepatching
 
-Summary:        Retain livepatches across kernel upgrades
-Name:           livepatching-subscription
+Summary:        Set of core livepatching packages for Mariner.
+Name:           livepatching
 Version:        1.0.0
 Release:        1%{?dist}
 License:        MIT
@@ -16,6 +16,19 @@ BuildArch:      noarch
 
 BuildRequires:  systemd
 
+%description
+%{summary}
+
+%package filesystem
+Summary:        Basic directory layout for livepatch packages.
+
+%description filesystem
+%{summary}
+
+%package subscription
+Summary:        Retain livepatches across kernel upgrades
+
+Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       coreutils
 Requires:       grep
 Requires:       inotify-tools
@@ -33,7 +46,7 @@ Requires(postun): systemd
 
 Requires(preun): systemd
 
-%description
+%description subscription
 This package allows your system to retain livepatching across kernel upgrades.
 Once a livepatch for the new kernel is installed, it does NOT automatically
 pull newer versions of the livepatch for that kernel.
@@ -50,7 +63,7 @@ install -D -m 644 %{SOURCE0} %{buildroot}%{_unitdir}/livepatching.service
 install -vdm755 %{buildroot}%{livepatching_lib_path}
 install -D -m 744 %{SOURCE1} %{buildroot}%{livepatching_lib_path}/livepatching.systemd
 
-%post
+%post subscription
 %systemd_post livepatching.service
 # Only start on initial installation. Upgrade restarts handled by %%postun.
 if [ $1 -eq 1 ]
@@ -58,13 +71,17 @@ then
     systemctl start livepatching.service >/dev/null 2>&1 || :
 fi
 
-%preun
+%preun subscription
 %systemd_preun livepatching.service
 
-%postun
+%postun subscription
 %systemd_postun_with_restart livepatching.service
 
-%files
+%files filesystem
+%defattr(-,root,root)
+%dir %{livepatching_lib_path}
+
+%files subscription
 %defattr(-,root,root)
 %{_libdir}/systemd/system-preset/50-livepatching.preset
 %{_unitdir}/livepatching.service

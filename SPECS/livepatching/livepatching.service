@@ -1,5 +1,5 @@
 [Unit]
-Description=Subscribe to kernel livepatching across kernel updates
+Description=Subscribe to kernel livepatches across kernel updates
 Before=kpatch.service
 
 [Service]

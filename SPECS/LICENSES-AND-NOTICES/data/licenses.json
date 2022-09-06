@@ -2015,7 +2015,7 @@
                 "libsafec",
                 "libuv",
                 "libxml++",
-                "livepatching-subscription",
+                "livepatching",
                 "lld",
                 "lsb-release",
                 "lttng-consume",
