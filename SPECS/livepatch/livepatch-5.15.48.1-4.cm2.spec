@@ -64,13 +64,10 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config-%{kernel_version_release}
 Source2:        mariner.pem
 
-# Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
-%if !%{builds_module}
-%global debug_package %{nil}
-%endif
-
 ExclusiveArch:  x86_64
 
+# Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
+%if %{builds_module}
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -97,6 +94,10 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-build
+%else
+%global debug_package %{nil}
+# endif builds_module
+%endif
 
 Requires:       coreutils
 Requires:       livepatching-filesystem
