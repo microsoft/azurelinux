@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary: Library for accessing various audio file formats
 Name: audiofile
 Version: 0.3.6
-Release: 26%{?dist}
+Release: 27%{?dist}
 # library is LGPL / the two programs GPL / see README
 License: LGPLv2+ and GPLv2+
 Source: http://audiofile.68k.org/%{name}-%{version}.tar.gz
@@ -72,7 +72,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %check
 %if %{make_check}
-make check
+#make check
 %endif
 
 
@@ -95,6 +95,10 @@ make check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 07 2022 Muhammad Falak <mwani@microsoft.com> - 0.3.6-27
+- Drop check section as it produces a 35GB log file breaking ptest
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.3.6-26
 - Remove epoch
 
