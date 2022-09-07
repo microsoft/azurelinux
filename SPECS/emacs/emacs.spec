@@ -61,6 +61,8 @@ rm -rf %{buildroot}%{_datadir}/icons
 rm %{buildroot}%{_bindir}/ctags
 rm %{buildroot}%{_datadir}/applications/*.desktop
 
+mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
+
 %files
 %defattr(-,root,root)
 %{_bindir}/ebrowse
