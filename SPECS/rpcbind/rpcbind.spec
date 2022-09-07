@@ -92,7 +92,7 @@ fi
 
 %changelog
 * Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.5-5
-- Add portman to provides
+- Add portmap to provides
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.5-4
 - Removing the explicit %%clean stage.
