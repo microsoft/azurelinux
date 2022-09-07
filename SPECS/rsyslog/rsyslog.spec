@@ -34,6 +34,7 @@ Requires:       libestr
 Requires:       libfastjson
 Requires:       libgcrypt
 Requires:       librelp
+Requires:       shadow-utils
 Requires:       systemd
 Provides:       %{name}-crypto = %{version}-%{release}
 Provides:       %{name}-elasticsearch = %{version}-%{release}
