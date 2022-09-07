@@ -14,6 +14,7 @@ BuildRequires:  glibc-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  systemd-devel
 BuildRequires:  gnutls-devel
+Requires:       %{name}-filesystem = %{version}-%{release}
 
 %description
 Emacs is a powerful, customizable, self-documenting, modeless text
