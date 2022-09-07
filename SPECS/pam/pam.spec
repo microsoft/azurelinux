@@ -36,7 +36,7 @@ This package contains libraries, header files and documentation
 for developing applications that use pam.
 
 %prep
-%autosetup -p1 -n Linux-PAM-%{version}
+%autosetup -n Linux-PAM-%{version}
 
 %build
 ./configure \

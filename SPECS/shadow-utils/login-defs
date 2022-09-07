@@ -190,8 +190,6 @@ KILLCHAR        025
 # 022 is the default value, but 027, or even 077, could be considered
 # for increased privacy. There is no One True Answer here: each sysadmin
 # must make up their mind.
-# Security patch for CCE-14847-8, msid: 29
-# The default umask for all users should be set to 077 in login.defs
 UMASK           022
 
 #

@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        7%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -258,9 +258,6 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
-* Wed Jul 21 2022 Minghe Ren <mingheren@microsoft.com> - 250.3-7
-- Modify 50-security-hardening.conf to imporve security
-
 * Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-6
 - Change build mode from "development" (default) to "release"
 
