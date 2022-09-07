@@ -11,6 +11,7 @@ URL:            http://tcl.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
 BuildRequires:  cmake
 Provides:       tcl(abi) = %{majorver}
+Provides:       tcl-tcldict = %{version}
 
 %description
 Tcl provides a powerful platform for creating integration applications that
@@ -99,6 +100,8 @@ make test
 %changelog
 * Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 8.6.12-2
 - Add provides for tcl(abi)
+- Add provides for tcl-tcldict
+- Replace ./configure and make invocations with macros.
 
 * Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 8.6.12-1
 - Update to 8.6.12
