@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,8 @@ Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 # CVE-2021-3981
 Patch0167:      0167-restore-umask-for-grub-config.patch 
+# Fix to reset the global errno to success upon success.
+Patch0170:      0170-fix-memory-alloc-errno-reset.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -323,6 +325,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Wed Sep 07 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.06-6
+- Port internal patch for reseting grub_errno on success (George mileka <gmileka@microsoft.com>).
+
 * Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-5
 - Resolve CVE-2021-3981
 - Remove specification of nopatch files in the spec file
