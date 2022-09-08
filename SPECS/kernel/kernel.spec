@@ -636,6 +636,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Sep 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
+- Upgrade to 5.10.139.1
+
 * Wed Sep 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
 - Upgrade to 5.10.139.1
 
