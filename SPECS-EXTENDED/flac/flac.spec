@@ -9,8 +9,8 @@ Distribution:   Mariner
 
 Summary: An encoder/decoder for the Free Lossless Audio Codec
 Name: flac
-Version: 1.3.3
-Release: 3%{?dist}
+Version: 1.3.4
+Release: 1%{?dist}
 License: BSD and GPLv2+ and GFDL
 Source0: https://downloads.xiph.org/releases/flac/flac-%{version}.tar.xz
 URL: https://www.xiph.org/flac/
@@ -24,6 +24,10 @@ Source1: xmms-flac.desktop
 %ifarch %{ix86}
 # 2.0 supports symbol visibility
 BuildRequires: nasm >= 2.0
+%endif
+
+%if %{with_check}
+BuildRequires: sudo
 %endif
 
 %description
@@ -111,7 +115,9 @@ rm %{buildroot}%{xmms_inputdir}/*.la
 %endif
 
 %check
-make check
+useradd test
+chown -R test:test .
+sudo -u test make check && userdel test
 
 %ldconfig_scriptlets libs
 
@@ -141,6 +147,11 @@ make check
 %endif
 
 %changelog
+* Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
+- Bump version
+- Run `%check` section via a non-root user to enable ptest
+- License verified
+
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 1.3.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable xmms which depends on x11 related components

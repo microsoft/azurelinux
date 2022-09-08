@@ -1,6 +1,0 @@
-index 0a3e3fd..43ab1fa 100644
---- a/uid_wrapper-config.cmake.in
-+++ b/uid_wrapper-config.cmake.in
-@@ -1 +1 @@
--set(UID_WRAPPER_LIBRARY @CMAKE_INSTALL_LIBDIR@/@UID_WRAPPER_LIB@)
-+set(UID_WRAPPER_LIBRARY @CMAKE_INSTALL_FULL_LIBDIR@/@UID_WRAPPER_LIB@)

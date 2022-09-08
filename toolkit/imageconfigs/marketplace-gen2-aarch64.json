@@ -60,7 +60,8 @@
                 "packagelists/azurevm-packages.json"
             ],
             "AdditionalFiles": {
-                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg"
+                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
+                "additionalconfigs/chrony.cfg": "/etc/chrony.conf"
             },
             "PostInstallScripts": [
                 {

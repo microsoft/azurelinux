@@ -3,14 +3,14 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2022-01-13
-%define stage0_version 1.58.0
+%define release_date 2022-05-19
+%define stage0_version 1.61.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.59.0
-Release:        1%{?dist}
-License:        ASL 2.0 AND MIT
+Version:        1.62.1
+Release:        2%{?dist}
+License:        ASL 2.0 OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -19,14 +19,13 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source1:        %{name}-%{version}-src-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -34,11 +33,10 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
-
-%if %{with_check}
-BuildRequires:  python3-xml
-%endif
-
+# rustc uses a C compiler to invoke the linker, and links to glibc in most cases
+Requires:       binutils
+Requires:       gcc
+Requires:       glibc-devel
 Provides:       cargo = %{version}-%{release}
 
 %description
@@ -76,7 +74,13 @@ mv %{SOURCE7} "$BUILD_CACHE_DIR"
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
+sh ./configure \
+    --prefix=%{_prefix} \
+    --enable-extended \
+    --tools="cargo,rustfmt" \
+    --release-channel="stable" \
+    --release-description="CBL-Mariner %{version}-%{release}"
+
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
@@ -93,7 +97,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %ldconfig_scriptlets
 
 %files
-%license LICENSE-MIT
+%license LICENSE-MIT LICENSE-APACHE COPYRIGHT
 %doc CONTRIBUTING.md README.md RELEASES.md
 %{_bindir}/rustc
 %{_bindir}/rustdoc
@@ -120,6 +124,16 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.62.1-2
+- Breaking change: Configure as a stable release, which disables unstable features
+- Add runtime requirements on gcc, binutils, glibc-devel
+- Package ASL 2.0 license, additional copyright information
+- Fix licensing info- dual-licensed, not multiply-licensed
+- License verified
+
+* Thu Aug 18 2022 Chris Co <chrco@microsoft.com> - 1.62.1-1
+- Updating to version 1.62.1
+
 * Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
 - Updating to version 1.59.0 to fix CVE-2022-21658.
 - Updating build instructions to fix tests.

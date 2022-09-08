@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.35.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,10 @@ Source1:        busybox-static.config
 Source2:        busybox-petitboot.config
 Patch0:         busybox-1.31.1-stime-fix.patch
 Patch1:         CVE-2022-28391.patch
+Patch2:         awk-input-numbers-are-never-octal-or-hex-only-progra.patch
+Patch3:         CVE-2022-30065.patch
+Patch4:         ash-fix-use-after-free-in-pattern-substituon-code.patch
+Patch5:         ash-fix-use-after-free-in-bash-pattern-substitution.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  libselinux-devel >= 1.27.7-2
@@ -128,6 +132,12 @@ install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.pet
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Wed Aug 10 2022 Muhammad Falak <mwani@microsoft.com> - 1.35.0-3
+- Patch CVE-2022-30065
+- Introduce patch for: awk: input numbers are never octal or hex
+- Introduce patch for: use-after-free in pattern substituon code
+- Introduce patch for: use-after-free in bash pattern substitution
+
 * Fri May 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-2
 - Patch CVE-2022-28391.
 

@@ -7,13 +7,14 @@
 Summary:        Color daemon
 Name:           colord
 Version:        1.4.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.freedesktop.org/software/colord/
 Source0:        https://www.freedesktop.org/software/colord/releases/%{name}-%{version}.tar.xz
 Source1:        %{name}-LGPLv2.txt
+Patch0:         CVE-2021-42523.patch
 BuildRequires:  bash-completion
 BuildRequires:  color-filesystem
 BuildRequires:  dbus-devel
@@ -87,7 +88,7 @@ Summary:        Data files for installed tests
 Data files for installed tests.
 
 %prep
-%setup -q
+%autosetup -p1
 cp %{SOURCE1} COPYING-LGPLv2.txt
 
 %build
@@ -233,6 +234,9 @@ exit 0
 %{_datadir}/installed-tests/colord/*
 
 %changelog
+* Thu Sep 01 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.4.4-9
+- Patch CVE-2021-42523 to remove unused error_msg pointers.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-8
 - License verified, added LGPLv2 license text
 - Lint spec

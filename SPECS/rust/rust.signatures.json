@@ -1,12 +1,12 @@
 {
  "Signatures": {
-  "cargo-1.58.0-aarch64-unknown-linux-gnu.tar.gz": "68e2e7493af55c5792636c2b2b0b497b1e43b12eb2e91da71e92426701884c24",
-  "cargo-1.58.0-x86_64-unknown-linux-gnu.tar.gz": "940aa91ad2de39c18749e8d789d88846de2debbcf6207247225b42c6c3bf731a",
-  "rust-1.59.0-cargo.tar.gz": "8d2076b86d6cafe4181bf0738cc52e4490c5c0bcffffd86c087dfc710acae198",
-  "rust-std-1.58.0-aarch64-unknown-linux-gnu.tar.gz": "3a1283a2dce7abf2816dc70d622215f5769c416abf3e94dd94dd6a5d1109f506",
-  "rust-std-1.58.0-x86_64-unknown-linux-gnu.tar.gz": "0517b0cb57a311bbe1997e9b87fc6bae1f9e1eadec4f7d97374740f17f890842",
-  "rustc-1.58.0-aarch64-unknown-linux-gnu.tar.gz": "34d8fdaec504efe6e9448ad5a118ac0e7ef3bd9a8f6c49ea68204f2f9a9dae4e",
-  "rustc-1.58.0-x86_64-unknown-linux-gnu.tar.gz": "94e3a5e6dca2ae2516d6496568b6791b9501ac500c3e5faf6f42baaead41d404",
-  "rustc-1.59.0-src.tar.xz": "375996ead731cab2203ec10a66a3c4568ab6997d7e5d3ae597658164fe27be3d"
+  "cargo-1.61.0-aarch64-unknown-linux-gnu.tar.gz": "0d31d5a050e41f8b56c920527538886db96c09824a8ff619d0fc4c410dbf7e5a",
+  "cargo-1.61.0-x86_64-unknown-linux-gnu.tar.gz": "c6e108e13ef5e08e71d70685861590f8683090368cab1f4eacfe97677333b2c7",
+  "rust-1.62.1-src-cargo.tar.gz": "dd1e50effae87bd784daaf6ac9e1326c27c300ccabae4c73551d18e56456c0bb",
+  "rust-std-1.61.0-aarch64-unknown-linux-gnu.tar.gz": "2cc8cfc5cc60e0c6a473bb609b54251c561d8d12a986fda8a7ca86dc1d36b4df",
+  "rust-std-1.61.0-x86_64-unknown-linux-gnu.tar.gz": "27383bf7b39d2ff1298fc0dfcd70ac70e1c01e70d7d0c60a2002c266a25b2015",
+  "rustc-1.61.0-aarch64-unknown-linux-gnu.tar.gz": "cec2afb78b5f0d3303cd6629232dcbd9f9dfa0d5e99b8ca0a95b77d570b1d591",
+  "rustc-1.61.0-x86_64-unknown-linux-gnu.tar.gz": "708a8f8b9ebda188e133695a12c96ef7875723bb3ad2ed2a2b6a20ebfcd57ff3",
+  "rustc-1.62.1-src.tar.xz": "02066a93c2f6596cc046a897d5716c86e3607c1cd0f54db9a867ae8c8265072e"
  }
 }
