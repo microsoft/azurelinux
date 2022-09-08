@@ -23,13 +23,13 @@ BuildRequires:  pcre2-devel
 BuildRequires:  pkgconf
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+Requires:       %{name}-connector-c
+Requires(postun): shadow-utils
+Requires(pre):  shadow-utils
+Conflicts:      mysql
 %if %{with_check}
 BuildRequires:  perl(Test::More)
 %endif
-Requires:       %{name}-connector-c
-Conflicts:      mysql
-Requires(pre):  shadow-utils
-Requires(postun): shadow-utils
 
 %description
 MariaDB Server is one of the most popular database servers in the world. It’s made by the original developers of MySQL and guaranteed to stay open source. Notable users include Wikipedia, WordPress.com and Google.
