@@ -127,7 +127,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--repo-file=$(imggen_local_repo) \
 		--assets $(assets_dir) \
 		--output-dir $(imager_disk_output_dir) \
-		--timestamp-file=$(TIMESTAMP_DIR)/imager.csv && \
+		--timestamp-file=$(TIMESTAMP_DIR)/imager.json && \
 	touch $@
 
 # Sometimes files will have been deleted, that is fine so long as we were able to detect the change
@@ -145,7 +145,7 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/roast.log \
 		--image-tag=$(IMAGE_TAG) \
-		--timestamp-file=$(TIMESTAMP_DIR)/roast.csv
+		--timestamp-file=$(TIMESTAMP_DIR)/roast.json
 
 $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))

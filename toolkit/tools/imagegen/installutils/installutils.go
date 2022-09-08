@@ -27,6 +27,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 )
 
 const (
@@ -381,6 +382,8 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
 // - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
 func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
+	timestamp_v2.StartMeasuringEvent("populating install root", 3)
+	defer timestamp_v2.StopMeasurement()
 	const (
 		filesystemPkg = "filesystem"
 	)
@@ -431,6 +434,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
 
+	timestamp_v2.StartMeasuringEvent("installing packages", totalPackages)
 	// Install filesystem package first
 	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
 	if err != nil {
@@ -454,6 +458,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 			return
 		}
 	}
+	timestamp_v2.StopMeasurement()
 
 	// Copy additional files
 	err = copyAdditionalFiles(installChroot, config)
@@ -553,6 +558,8 @@ func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err er
 
 // TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
 func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesInstalled, totalPackages int, reportProgress bool) (packagesInstalled int, err error) {
+	timestamp_v2.StartMeasuringEvent("installing "+packageName, 0)
+	defer timestamp_v2.StopMeasurement()
 	var (
 		releaseverCliArg string
 	)
@@ -1543,6 +1550,8 @@ func updateUserPassword(installRoot, username, password string) (err error) {
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
 func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {
+	timestamp_v2.StartMeasuringEvent("SELinux", 0)
+	defer timestamp_v2.StopMeasurement()
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", systemConfig.KernelCommandLine.SELinux)
 
 	err = selinuxUpdateConfig(systemConfig, installChroot)
@@ -1868,6 +1877,8 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 
 func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
 	ReportAction("Copying additional files")
+	timestamp_v2.StartMeasuringEvent("Copying additional files", 0)
+	defer timestamp_v2.StopMeasurement()
 
 	for srcFile, dstFile := range config.AdditionalFiles {
 		fileToCopy := safechroot.FileToCopy{
@@ -1915,6 +1926,8 @@ func RunPreInstallScripts(config configuration.SystemConfig) (err error) {
 }
 
 func runPostInstallScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	timestamp_v2.StartMeasuringEvent("post install scripts", 0)
+	defer timestamp_v2.StopMeasurement()
 	const squashErrors = false
 
 	for _, script := range config.PostInstallScripts {

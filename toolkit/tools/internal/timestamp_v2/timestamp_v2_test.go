@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -31,12 +32,34 @@ func runAsserts(t *testing.T, ts *TimeStamp, err error) {
 	assert.NoError(t, err)
 }
 
+func timestampHasEquivalentTiming(a, b TimeStamp) bool {
+	var st, et, elap bool
+	if a.StartTime != nil && b.StartTime != nil {
+		st = a.StartTime.Equal(*b.StartTime)
+	} else {
+		st = a.StartTime == b.StartTime
+	}
+
+	if a.EndTime != nil && b.EndTime != nil {
+		et = a.StartTime.Equal(*b.StartTime)
+	} else {
+		et = a.EndTime == b.EndTime
+	}
+
+	elap = a.ElapsedSeconds == b.ElapsedSeconds
+	return st && et && elap
+}
+
 func cleanupFiles() {
-	files, err := filepath.Glob("./testout/*.json")
+	files1, err := filepath.Glob("./testout/*.json")
 	if err != nil {
 		logger.Log.Panicf("Failed to tidy up timestamp tests: '%s'", err.Error())
 	}
-	for _, file := range files {
+	files2, err := filepath.Glob("./testout/*.lock")
+	if err != nil {
+		logger.Log.Panicf("Failed to tidy up timestamp tests: '%s'", err.Error())
+	}
+	for _, file := range append(files1, files2...) {
 		err = os.Remove(file)
 		if err != nil {
 			logger.Log.Panicf("Failed to tidy up timestamp tests: '%s'", err.Error())
@@ -125,13 +148,82 @@ func TestInitManager(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func holdLock(t *testing.T, path string, timeToHoldMillis int) {
+	logger.Log.Warnf("Routine Start")
+	fd, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0664)
+	assert.NoError(t, err)
+	err = waitOnFileLock(fd, 0)
+	defer unlockFileLock(fd)
+	assert.NoError(t, err)
+	time.Sleep(time.Duration(timeToHoldMillis) * time.Millisecond)
+	logger.Log.Warnf("Routine End")
+}
+
+func TestLockingCooperative(t *testing.T) {
+	path := "./testout/" + t.Name() + ".lock"
+	fd1, err := os.Create(path)
+	assert.NoError(t, err)
+	fd2, err := os.Create(path)
+	assert.NoError(t, err)
+
+	err = waitOnFileLock(fd1, 0)
+	assert.NoError(t, err)
+	unlockFileLock(fd1)
+	err = waitOnFileLock(fd2, 0)
+	assert.NoError(t, err)
+	fd2.Close()
+}
+
+func TestLockingAlreadyLocked(t *testing.T) {
+	path := "./testout/" + t.Name() + ".lock"
+	fd1, err := os.Create(path)
+	assert.NoError(t, err)
+	fd2, err := os.Create(path)
+	assert.NoError(t, err)
+
+	err = waitOnFileLock(fd1, 0)
+	defer unlockFileLock(fd1)
+	assert.NoError(t, err)
+
+	err = waitOnFileLock(fd2, 100)
+	assert.EqualError(t, err, "failed to secure timing data lock after 100 milliseconds- resource temporarily unavailable")
+	logger.Log.Warnf("Test end")
+}
+
+func TestGainsLock(t *testing.T) {
+	path := "./testout/" + t.Name() + ".lock"
+	go holdLock(t, path, 300)
+	time.Sleep(100 * time.Millisecond)
+
+	fd1, err := os.Create(path)
+	assert.NoError(t, err)
+	err = waitOnFileLock(fd1, 300)
+	defer unlockFileLock(fd1)
+	assert.NoError(t, err)
+}
+
+func TestBlocksParallelAccess(t *testing.T) {
+	path := "./testout/" + t.Name() + ".json"
+	ts, err := StartTiming(t.Name(), path, 0)
+	runAsserts(t, ts, err)
+
+	go holdLock(t, path, 300)
+	time.Sleep(150 * time.Millisecond)
+
+	ts, err = ReadOnlyTimingData(path)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't lock timing file (./testout/TestBlocksParallelAccess.json): failed to secure timing data lock after 100 milliseconds- resource temporarily unavailable")
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
 func TestInitManagerDoubleStart(t *testing.T) {
 	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
 	runAsserts(t, ts, err)
 	ts, err = StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
 	assert.EqualError(t, err, "already recording timing data for tool 'TestInitManagerDoubleStart' into file (./testout/"+t.Name()+".json)")
 	assert.NotNil(t, ts)
-	assert.Equal(t, ts, StampMgr.Root)
+	assert.Equal(t, ts, StampMgr.root)
 	err = EndTiming()
 	assert.NoError(t, err)
 }
@@ -164,13 +256,13 @@ func TestManagerBasic2(t *testing.T) {
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("child3", 0)
 	runAsserts(t, ts, err)
-	progress := StampMgr.Root.Progress()
+	progress := StampMgr.root.Progress()
 	assert.Equal(t, 2.0/3.0, progress)
 	ts, err = StopMeasurement()
 	runAsserts(t, ts, err)
 	ts, err = StopMeasurement()
 	runAsserts(t, ts, err)
-	progress = StampMgr.Root.Progress()
+	progress = StampMgr.root.Progress()
 	assert.Equal(t, 0.95, progress)
 	err = EndTiming()
 	assert.NoError(t, err)
@@ -187,9 +279,9 @@ func TestOverPopMeasurements(t *testing.T) {
 	ts, err = StopMeasurement()
 	assert.EqualError(t, err, "can't stop measuring the root timestamp 'TestOverPopMeasurements', call EndTiming() instead")
 	assert.NotNil(t, ts)
-	assert.Equal(t, ts, StampMgr.Root)
+	assert.Equal(t, ts, StampMgr.root)
 
-	assert.Equal(t, 0.95, StampMgr.Root.Progress())
+	assert.Equal(t, 0.95, StampMgr.root.Progress())
 	err = EndTiming()
 	assert.NoError(t, err)
 }
@@ -243,6 +335,10 @@ func TestStopRoot(t *testing.T) {
 	assert.EqualError(t, err, "can't stop measuring the root timestamp 'TestStopRoot', call EndTiming() instead")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
+	ts, err = StopMeasurementByPath(t.Name())
+	assert.EqualError(t, err, "can't stop measuring the root timestamp 'TestStopRoot', call EndTiming() instead")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
 	err = EndTiming()
 	assert.NoError(t, err)
 }
@@ -267,6 +363,21 @@ func TestStopIsActiveNode(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestActiveIsRootAfterStopStart(t *testing.T) {
+	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	runAsserts(t, root, err)
+	time.Sleep(10 * time.Millisecond)
+	err = EndTiming()
+	assert.NoError(t, err)
+	ts, err := ResumeTiming("./testout/" + t.Name() + ".json")
+	runAsserts(t, ts, err)
+	newActive, err := GetActiveTimeNode()
+	runAsserts(t, newActive, err)
+	assert.True(t, timestampHasEquivalentTiming(*root, *newActive))
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
 func TestStopMiddleNode(t *testing.T) {
 	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
 	runAsserts(t, root, err)
@@ -282,6 +393,54 @@ func TestStopMiddleNode(t *testing.T) {
 	active, err := GetActiveTimeNode()
 	runAsserts(t, active, err)
 	assert.Equal(t, c, active)
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestStopCleanup(t *testing.T) {
+	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	runAsserts(t, root, err)
+	a, err := StartMeasuringEvent("A", 0)
+	runAsserts(t, a, err)
+	b1_specific_stop, err := StartMeasuringEvent("B1", 0)
+	runAsserts(t, b1_specific_stop, err)
+	b2, err := StartMeasuringEventWithParent(a, "B2", 0)
+	runAsserts(t, b2, err)
+	b3, err := StartMeasuringEventWithParent(a, "B3", 0)
+	runAsserts(t, b3, err)
+	c1, err := StartMeasuringEvent("C1", 0)
+	runAsserts(t, c1, err)
+	c2, err := StartMeasuringEventWithParent(b1_specific_stop, "C2", 0)
+	runAsserts(t, c2, err)
+	c3, err := StartMeasuringEventWithParent(b1_specific_stop, "C3", 0)
+	runAsserts(t, c3, err)
+
+	time.Sleep(time.Millisecond * 50)
+
+	ts, err := StopMeasurementSpecific(b1_specific_stop)
+	runAsserts(t, ts, err)
+
+	time.Sleep(time.Millisecond * 50)
+
+	err = EndTiming()
+	assert.NoError(t, err)
+
+	assert.Equal(t, root.EndTime, a.EndTime)
+	assert.Equal(t, root.EndTime, b2.EndTime)
+	assert.Equal(t, root.EndTime, b3.EndTime)
+
+	// Children of b1 should inherit its end time when we clean up
+	assert.NotEqual(t, root.EndTime, b1_specific_stop.EndTime)
+	assert.Equal(t, b1_specific_stop.EndTime, c1.EndTime)
+	assert.Equal(t, b1_specific_stop.EndTime, c2.EndTime)
+	assert.Equal(t, b1_specific_stop.EndTime, c3.EndTime)
+
+	// Everything else should inherit the root node's end time
+	rootElapsed := root.ElapsedSeconds
+	assert.NotEqual(t, -1.0, root.ElapsedSeconds)
+	assert.Equal(t, rootElapsed, a.ElapsedSeconds)
+	assert.Equal(t, rootElapsed, b2.ElapsedSeconds)
+	assert.Equal(t, rootElapsed, b3.ElapsedSeconds)
 }
 
 func TestGetActiveNode(t *testing.T) {
@@ -309,6 +468,9 @@ func TestGetActiveNode(t *testing.T) {
 	c, err := StartMeasuringEventWithParent(a, "b", 0)
 	runAsserts(t, c, err)
 	assert.Equal(t, b, active)
+
+	err = EndTiming()
+	assert.NoError(t, err)
 }
 
 func TestSearchByPath(t *testing.T) {
@@ -363,6 +525,105 @@ func TestSearchByPath(t *testing.T) {
 	search, err = GetNodeByPath("TestSearchByPath/A/B/C_2")
 	assert.EqualError(t, err, "could not find node for path 'TestSearchByPath/A/B/C_2'")
 	assert.Nil(t, search)
+
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestAddByPath(t *testing.T) {
+	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	runAsserts(t, root, err)
+	a, err := StartMeasuringEvent("A", 1)
+	runAsserts(t, a, err)
+	ts, err := StartMeasuringEventByPath(t.Name()+"/A/B/C///", 3)
+	runAsserts(t, ts, err)
+
+	new_a, err := GetNodeByPath(t.Name() + "/A")
+	runAsserts(t, new_a, err)
+	assert.Equal(t, a, new_a)
+	new_c, err := GetNodeByPath(t.Name() + "/A/B/C")
+	runAsserts(t, new_c, err)
+	assert.Equal(t, 3, new_c.ExpectedSteps)
+
+	ts, err = StopMeasurementByPath(t.Name() + "/A/B/C")
+	runAsserts(t, ts, err)
+	assert.NotNil(t, new_c.EndTime)
+	assert.GreaterOrEqual(t, new_c.ElapsedSeconds, 0.0)
+
+	ts, err = StopMeasurementByPath("invalid/path")
+	assert.EqualError(t, err, "could not find measurement 'invalid/path' by path")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
+
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestWriteAndRecover(t *testing.T) {
+	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	runAsserts(t, root, err)
+	a, err := StartMeasuringEvent("A", 0)
+	runAsserts(t, a, err)
+	b, err := StartMeasuringEvent("B", 0)
+	runAsserts(t, b, err)
+	c, err := StartMeasuringEvent("C", 0)
+	runAsserts(t, c, err)
+	err = EndTiming()
+	assert.NoError(t, err)
+
+	root_real := *root
+	a_real := *a
+	b_real := *b
+	c_real := *c
+
+	root2, err := ResumeTiming("./testout/" + t.Name() + ".json")
+	runAsserts(t, root2, err)
+	new_root, err := GetNodeByPath(t.Name())
+	assert.NoError(t, err)
+	new_a, err := GetNodeByPath(t.Name() + "/A")
+	assert.NoError(t, err)
+	new_b, err := GetNodeByPath(t.Name() + "/A/B")
+	assert.NoError(t, err)
+	new_c, err := GetNodeByPath(t.Name() + "/A/B/C")
+	assert.NoError(t, err)
+	assert.True(t, timestampHasEquivalentTiming(*new_root, root_real))
+	assert.True(t, timestampHasEquivalentTiming(*new_a, a_real))
+	assert.True(t, timestampHasEquivalentTiming(*new_b, b_real))
+	assert.True(t, timestampHasEquivalentTiming(*new_c, c_real))
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+var workerParentTS *TimeStamp
+
+func worker(t *testing.T, wait *sync.WaitGroup, task string) {
+	defer wait.Done()
+	ts, err := StartMeasuringEventWithParent(workerParentTS, task, 0)
+	runAsserts(t, ts, err)
+	ts, err = StartMeasuringEventWithParent(ts, "2", 0)
+	runAsserts(t, ts, err)
+	StopMeasurementSpecific(ts)
+}
+
+func TestWorkers(t *testing.T) {
+	var wait sync.WaitGroup
+	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	runAsserts(t, root, err)
+	workerParentTS = root
+	for _, task := range []string{"A", "B", "C", "D"} {
+		wait.Add(1)
+		go worker(t, &wait, task)
+
+	}
+	wait.Wait()
+	ts, err := GetNodeByPath(t.Name() + "/A/2")
+	runAsserts(t, ts, err)
+	ts, err = GetNodeByPath(t.Name() + "/B/2")
+	runAsserts(t, ts, err)
+	ts, err = GetNodeByPath(t.Name() + "/C/2")
+	runAsserts(t, ts, err)
+	ts, err = GetNodeByPath(t.Name() + "/D/2")
+	runAsserts(t, ts, err)
 }
 
 func TestRewriteMultipleTimes(t *testing.T) {

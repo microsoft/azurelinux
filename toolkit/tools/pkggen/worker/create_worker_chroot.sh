@@ -27,15 +27,40 @@ chroot_log="$log_path"/$chroot_name.log
 
 $bldtracker \
     --script-name=$script_name \
-    --step-name="start running the script" \
-    --dir-path="$timestamp_dir" \
     --log-file="$chroot_log" \
-    --mode="i"
+    --out-path="$timestamp_dir/chroot.json" \
+    --expected-steps="2" \
+    --mode="init"
+
+start_record_timestamp () {
+    path="$1"
+    steps="$2"
+    [[ -z "$steps" ]] && steps=0
+    $bldtracker \
+        --script-name=$script_name \
+        --log-file="$chroot_log" \
+        --out-path="$timestamp_dir/chroot.json" \
+        --step-path="$path" \
+        --expected-steps="$steps" \
+        --mode="record"
+}
+
+stop_record_timestamp () {
+    path="$1"
+    $bldtracker \
+        --script-name=$script_name \
+        --log-file="$chroot_log" \
+        --out-path="$timestamp_dir/chroot.json" \
+        --step-path="$path" \
+        --mode="stop"
+}
 
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
 
     echo "Adding RPM to worker chroot: $1." | tee -a "$chroot_log"
+
+    start_record_timestamp "install packages/install rpm files/$1" 0
 
     full_rpm_path=$(find "$rpm_path" -name "$1" -type f 2>>"$chroot_log")
     if [ ! $? -eq 0 ] || [ -z "$full_rpm_path" ]
@@ -52,16 +77,10 @@ install_one_toolchain_rpm () {
         echo "Elevated install failed for package $1, aborting. $error_msg_tail" | tee -a "$chroot_log"
         exit 1
     fi
+
+    stop_record_timestamp "install packages/install rpm files/$1"
 }
 
-record_timestamp () {
-    $bldtracker \
-        --script-name=$script_name \
-        --step-name="$1" \
-        --dir-path="$timestamp_dir" \
-        --log-file="$chroot_log" \
-        --mode="r"
-}
 
 rm -rf "$chroot_builder_folder"
 rm -f "$chroot_archive"
@@ -72,15 +91,16 @@ mkdir -p "$log_path"
 ORIGINAL_HOME=$HOME
 HOME=/root
 
-record_timestamp "start adding RPMs to worker chroot"
+start_record_timestamp "install packages" 4
+start_record_timestamp "install packages/install rpm files" $(cat "$packages" | wc -l)
 
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
 
-record_timestamp "finish adding RPMs to worker chroot"
+stop_record_timestamp "install packages/install rpm files"
 
-record_timestamp "start adding RPM DB entries"
+start_record_timestamp "install packages/adding RPM DB entries"
 
 TEMP_DB_PATH=/temp_db
 echo "Setting up a clean RPM database before the Berkeley DB -> SQLite conversion under '$TEMP_DB_PATH'." | tee -a "$chroot_log"
@@ -98,17 +118,17 @@ while read -r package || [ -n "$package" ]; do
     chroot "$chroot_builder_folder" rm $package
 done < "$packages"
 
-record_timestamp "finish adding RPM DB entries"
+stop_record_timestamp "install packages/adding RPM DB entries"
 
-record_timestamp "start overwriting old RPM database"
+start_record_timestamp "install packages/overwriting old RPM database"
 
 echo "Overwriting old RPM database with the results of the conversion." | tee -a "$chroot_log"
 chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
 chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
 
-record_timestamp "finish overwriting old RPM database"
+stop_record_timestamp "install packages/overwriting old RPM database"
 
-record_timestamp "start importing GPG keys"
+start_record_timestamp "install packages/importing GPG keys"
 
 echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
 for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
@@ -117,7 +137,7 @@ do
     chroot "$chroot_builder_folder" rpm --import "$gpg_key"
 done
 
-record_timestamp "finish importing GPG keys"
+stop_record_timestamp "install packages/importing GPG keys"
 
 HOME=$ORIGINAL_HOME
 
@@ -133,9 +153,9 @@ fi
 
 echo "Done installing all packages, creating $chroot_archive." | tee -a "$chroot_log"
 
-record_timestamp "done installing all packages"
+stop_record_timestamp "install packages"
 
-record_timestamp "start packing the chroot"
+start_record_timestamp "packing the chroot"
 
 if command -v pigz &>/dev/null ; then
     tar -I pigz -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
@@ -144,5 +164,10 @@ else
 fi
 echo "Done creating $chroot_archive." | tee -a "$chroot_log"
 
-record_timestamp "done packing the chroot"
+stop_record_timestamp "packing the chroot"
 
+$bldtracker \
+    --script-name=$script_name \
+    --log-file="$chroot_log" \
+    --out-path="$timestamp_dir/chroot.json" \
+    --mode="finish"

@@ -17,7 +17,6 @@ go_tool_list = \
 	bldtracker \
 	boilerplate \
 	dashboard \
-	dashboard_v2 \
 	depsearch \
 	grapher \
 	graphpkgfetcher \

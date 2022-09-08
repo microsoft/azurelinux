@@ -19,6 +19,9 @@ type TimeStamp struct {
 	StartTime *time.Time `json:"StartTime"`
 	// Time we ended this step, NIL if step hasn't ended
 	EndTime *time.Time `json:"EndTime"`
+	// Calculated once completed, should be -1 if uninitialized. To the nearest 10 milliseconds
+	ElapsedSeconds float64 `json:"ElapsedSeconds"`
+
 	// Roughly how many sub-steps do we expect this step to take?
 	// Can use this to estimate the progress bar. If its wrong... just update
 	// it as we go along.
@@ -29,7 +32,8 @@ type TimeStamp struct {
 	// Maybe we can scale each sub-step somehow?
 	// Weight float32 `json:"Weight"`
 
-	parent *TimeStamp
+	parent   *TimeStamp
+	finished bool
 }
 
 var (
@@ -48,12 +52,16 @@ func createTimeStamp(name string, startTime time.Time, expectedSteps int) (newTS
 		return
 	}
 
-	ts := TimeStamp{Name: name, StartTime: &startTime, EndTime: nil, ExpectedSteps: expectedSteps}
+	ts := TimeStamp{Name: name, StartTime: &startTime, EndTime: nil, ExpectedSteps: expectedSteps, ElapsedSeconds: -1, finished: false}
 	return &ts, err
 }
 
 // AddStep adds a sub-step to a specific parent step while guessing how many sub-steps there will be
 func (t *TimeStamp) addStepWithExpected(name string, startTime time.Time, expectedSteps int) (newTS *TimeStamp, err error) {
+	if t.finished {
+		return &TimeStamp{}, fmt.Errorf("parent timestamp has already completed measurement, can't add another substep")
+	}
+
 	newTS, err = createTimeStamp(name, startTime, expectedSteps)
 	if err == nil {
 		newTS.parent = t
@@ -64,8 +72,12 @@ func (t *TimeStamp) addStepWithExpected(name string, startTime time.Time, expect
 	return
 }
 
-func (t *TimeStamp) completeTimeStamp(time time.Time) {
-	t.EndTime = &time
+func (t *TimeStamp) completeTimeStamp(stopTime time.Time) {
+	t.EndTime = &stopTime
+	t.finished = true
+	if t.StartTime != nil {
+		t.ElapsedSeconds = t.EndTime.Sub(*t.StartTime).Round(time.Millisecond * 10).Seconds()
+	}
 }
 
 func (t *TimeStamp) searchSubSteps(name string) (match *TimeStamp) {
@@ -75,6 +87,16 @@ func (t *TimeStamp) searchSubSteps(name string) (match *TimeStamp) {
 		}
 	}
 	return nil
+}
+
+func (t *TimeStamp) Path() string {
+	path := t.Name
+	node := t
+	for node.parent != nil {
+		path = node.parent.Name + "/" + path
+		node = node.parent
+	}
+	return path
 }
 
 func (t *TimeStamp) Progress() float64 {

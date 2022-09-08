@@ -15,8 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestampcsvparser"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/roast/formats"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -28,6 +27,7 @@ type convertRequest struct {
 	inputPath   string
 	isInputFile bool
 	artifact    configuration.Artifact
+	timestamp   *timestamp_v2.TimeStamp
 }
 
 type convertResult struct {
@@ -61,7 +61,8 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp.InitCSV(*timestampFile)
+	timestamp_v2.StartTiming("roast", *timestampFile, 0)
+	defer timestamp_v2.EndTiming()
 
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
@@ -92,17 +93,16 @@ func main() {
 		logger.Log.Panicf("Failed loading image configuration. Error: %s", err)
 	}
 
-	timestamp.Stamp.Start()
 	err = generateImageArtifacts(*workers, inDirPath, outDirPath, *releaseVersion, *imageTag, tmpDirPath, config)
 	if err != nil {
 		logger.Log.Panic(err)
 	}
-	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "finishing up")
-	timestampcsvparser.OutputCSVLog(filepath.Dir(*timestampFile))
 }
 
 func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag, tmpDir string, config configuration.Config) (err error) {
 	const defaultSystemConfig = 0
+	timestamp_v2.StartMeasuringEvent("generate artifacts", 1)
+	defer timestamp_v2.StopMeasurement()
 
 	err = os.MkdirAll(tmpDir, os.ModePerm)
 	if err != nil {
@@ -127,7 +127,7 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	convertRequests := make(chan *convertRequest, numberOfArtifacts)
 	convertedResults := make(chan *convertResult, numberOfArtifacts)
 
-	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "set up")
+	artifactTimeStampRoot, _ := timestamp_v2.StartMeasuringEvent("convert artifacts", 1)
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
@@ -137,10 +137,12 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	for i, disk := range config.Disks {
 		for _, artifact := range disk.Artifacts {
 			inputName, isFile := diskArtifactInput(i, disk)
+			ts, _ := timestamp_v2.StartMeasuringEventWithParent(artifactTimeStampRoot, "converting "+inputName, 0)
 			convertRequests <- &convertRequest{
 				inputPath:   filepath.Join(inDir, inputName),
 				isInputFile: isFile,
 				artifact:    artifact,
+				timestamp:   ts,
 			}
 		}
 
@@ -148,10 +150,12 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 			for _, artifact := range partition.Artifacts {
 				// Currently only process 1 system config
 				inputName, isFile := partitionArtifactInput(i, j, &artifact, retrievePartitionSettings(&config.SystemConfigs[defaultSystemConfig], partition.ID))
+				ts, _ := timestamp_v2.StartMeasuringEventWithParent(artifactTimeStampRoot, "converting "+inputName, 0)
 				convertRequests <- &convertRequest{
 					inputPath:   filepath.Join(inDir, inputName),
 					isInputFile: isFile,
 					artifact:    artifact,
+					timestamp:   ts,
 				}
 			}
 		}
@@ -159,7 +163,7 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 
 	close(convertRequests)
 
-	timestamp.Stamp.RecordToCSV("generateImageArtifacts", "convert requests")
+	timestamp_v2.StopMeasurementSpecific(artifactTimeStampRoot)
 
 	failedArtifacts := []string{}
 	for i := 0; i < numberOfArtifacts; i++ {
@@ -249,6 +253,7 @@ func artifactConverterWorker(convertRequests chan *convertRequest, convertedResu
 		}
 
 		convertedResults <- result
+		timestamp_v2.StopMeasurementSpecific(req.timestamp)
 	}
 }
 
