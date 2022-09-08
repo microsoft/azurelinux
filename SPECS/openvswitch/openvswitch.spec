@@ -13,7 +13,7 @@ Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://www.openvswitch.org/
 Source0:        https://www.openvswitch.org/releases/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-3905
+Patch0:         CVE-2021-3905.patch
 BuildRequires:  gcc >= 4.0.0
 BuildRequires:  libcap-ng
 BuildRequires:  libcap-ng-devel
