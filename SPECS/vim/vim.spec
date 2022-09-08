@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0348
+Version:        9.0.0360
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -191,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Sep 08 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 9.0.0360-1
+- Upgrade to 9.0.0360 to fix CVE-2022-3099
+
 * Tue Sep 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 9.0.0348-1
 - Upgrade to 9.0.0348 to fix CVE-2022-3016 and CVE-2022-3037
 
