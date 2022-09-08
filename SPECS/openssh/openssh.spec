@@ -146,16 +146,17 @@ sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 120/' %{buildroot}%{_syscon
 sed -i 's/#ClientAliveCountMax 0/ClientAliveCountMax 0/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 
 echo "" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i '$a# Ensure SSH LoginGraceTime is set to one minute or less\nLoginGraceTime 60' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-
-echo "" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i '$a# Ensure SSH access is limited' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i '$a#AllowUsers <userlist>' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i '$aDenyUsers <userlist>' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i '$a#DenyGroups <grouplist>' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+cat << EOF >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
+# Ensure SSH LoginGraceTime is set to one minute or less
+LoginGraceTime 60
+# Ensure SSH access is limited
+#AllowUsers <userlist>
+DenyUsers <userlist>
+#DenyGroups <grouplist>
+EOF
 
 sed -i 's/# no default banner path/# default banner path/g' %{buildroot}%{_sysconfdir}/ssh/sshd_config
-sed -i 's/#Banner none/Banner \/etc\/issue.net/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+sed -i 's|#Banner none|Banner /etc/issue.net|' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 
 # Configure to use strong MACs
 echo "MACs hmac-sha2-512,hmac-sha2-256" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config

@@ -34,8 +34,8 @@ Requires:       libestr
 Requires:       libfastjson
 Requires:       libgcrypt
 Requires:       librelp
-Requires:       shadow-utils
 Requires:       systemd
+Requires(pre):  shadow-utils
 Provides:       %{name}-crypto = %{version}-%{release}
 Provides:       %{name}-elasticsearch = %{version}-%{release}
 Provides:       %{name}-gnutls = %{version}-%{release}
@@ -143,6 +143,12 @@ useradd --system --comment 'System Logging'  --gid syslog --shell /bin/false sys
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart rsyslog.service
+if getent passwd syslog >/dev/null; then
+    userdel syslog
+fi
+if getent group syslog >/dev/null; then
+    groupdel syslog
+fi
 
 %files
 %defattr(-,root,root)
