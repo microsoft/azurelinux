@@ -1357,8 +1357,8 @@
         "type": "other",
         "other": {
           "name": "cert-manager",
-          "version": "1.5.3",
-          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.5.3.tar.gz"
+          "version": "1.7.3",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.7.3.tar.gz"
         }
       }
     },
@@ -2578,8 +2578,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "21.11",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.tar.xz"
+          "version": "21.11.2",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.2.tar.xz"
         }
       }
     },
@@ -4030,8 +4030,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.10",
-          "downloadUrl": "https://golang.org/dl/go1.17.10.src.tar.gz"
+          "version": "1.17.13",
+          "downloadUrl": "https://golang.org/dl/go1.17.13.src.tar.gz"
         }
       }
     },
@@ -4040,8 +4040,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.3",
-          "downloadUrl": "https://golang.org/dl/go1.18.3.src.tar.gz"
+          "version": "1.18.5",
+          "downloadUrl": "https://golang.org/dl/go1.18.5.src.tar.gz"
         }
       }
     },
@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.14",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.14/libxml2-v2.9.14.tar.gz"
+          "version": "2.10.0",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.0/libxml2-v2.10.0.tar.gz"
         }
       }
     },
@@ -11732,16 +11732,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mlocate",
-          "version": "0.26",
-          "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mlnx-ofa_kernel",
           "version": "5.6",
           "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz"
@@ -11755,6 +11745,16 @@
           "name": "mlnx-tools",
           "version": "5.2.0",
           "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/mlnx-tools_5.2.0.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlocate",
+          "version": "0.26",
+          "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
         }
       }
     },
@@ -20974,8 +20974,8 @@
         "type": "other",
         "other": {
           "name": "python-lxml",
-          "version": "4.8.0",
-          "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.8.0/lxml-4.8.0.tar.gz"
+          "version": "4.9.1",
+          "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.9.1/lxml-4.9.1.tar.gz"
         }
       }
     },
@@ -22823,16 +22823,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "reaper",
-          "version": "3.1.1",
-          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ragel",
           "version": "7.0.4",
           "downloadUrl": "https://github.com/adrian-thurston/ragel/archive/7.0.4.tar.gz"
@@ -22946,6 +22936,16 @@
           "name": "realmd",
           "version": "0.16.3",
           "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "reaper",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
         }
       }
     },
@@ -26577,8 +26577,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0050",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0050.tar.gz"
+          "version": "9.0.0325",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0325.tar.gz"
         }
       }
     },
@@ -26598,7 +26598,7 @@
         "other": {
           "name": "virglrenderer",
           "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-0.9.1/virglrenderer-virglrenderer-0.9.1.tar.gz"
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/0.9.1/virglrenderer-0.9.1.tar.gz"
         }
       }
     },

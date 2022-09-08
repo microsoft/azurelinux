@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.13.0-3
+- Bump release to rebuild against Go 1.18.5
+
 * Mon Jul 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.13.0-2
 - Bump release due to bump in fish to 3.5.0.
 
