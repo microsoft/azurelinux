@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/component-detection-manifest.json",
   "Registrations": [
     {
       "component": {
@@ -595,8 +596,8 @@
         "type": "other",
         "other": {
           "name": "ceph",
-          "version": "16.2.0",
-          "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.0.tar.gz"
+          "version": "16.2.10",
+          "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.10.tar.gz"
         }
       }
     },
@@ -1225,8 +1226,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "18.11.2",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
+          "version": "18.11.11",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.11.tar.xz"
         }
       }
     },
@@ -2045,8 +2046,8 @@
         "type": "other",
         "other": {
           "name": "gzip",
-          "version": "1.9",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gzip/gzip-1.9.tar.xz"
+          "version": "1.12",
+          "downloadUrl": "http://ftp.gnu.org/gnu/gzip/gzip-1.12.tar.xz"
         }
       }
     },
@@ -8625,8 +8626,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0228",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0228.tar.gz"
+          "version": "9.0.0360",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0360.tar.gz"
         }
       }
     },

@@ -36,8 +36,11 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Tue Aug 30 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
+* Thu Sep 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
 - Upgrade to 5.10.139.1
+
+* Thu Sep 01 2022 Chris Co <chrco@microsoft.com> - 5.10.134.1-2
+- Bump release number to match kernel release
 
 * Tue Aug 23 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.134.1-1
 - Upgrade to 5.10.134.1

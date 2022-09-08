@@ -270,7 +270,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
-* Tue Aug 30 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
+* Thu Sep 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
 - Upgrade to 5.10.139.1
 
 * Tue Aug 23 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.134.1-1

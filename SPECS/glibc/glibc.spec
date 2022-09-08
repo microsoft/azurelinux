@@ -6,7 +6,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,7 @@ Patch21:        glibc-2.28_pthread_cond_wait.patch
 Patch22:        glibc-2.28__sockaddr_un_set.patch
 Patch23:        CVE-2022-23218.patch
 Patch24:        CVE-2022-23219.patch
+Patch25:        CVE-2021-3999.patch
 Requires:       filesystem
 Provides:       rtld(GNU_HASH)
 Provides:       /sbin/ldconfig
@@ -325,6 +326,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 31 2022 Minghe Ren <mingheren@microsoft.com> - 2.28-24
+- Add patch for CVE-2021-3999
+
 * Mon Feb 14 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.28-23
 - Patch CVE-2022-23218, CVE-2022-23219
 - glibc-2.28__sockaddr_un_set.patch (required for CVE patches)
