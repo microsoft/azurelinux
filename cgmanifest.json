@@ -2046,8 +2046,8 @@
         "type": "other",
         "other": {
           "name": "gzip",
-          "version": "1.9",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gzip/gzip-1.9.tar.xz"
+          "version": "1.12",
+          "downloadUrl": "http://ftp.gnu.org/gnu/gzip/gzip-1.12.tar.xz"
         }
       }
     },
