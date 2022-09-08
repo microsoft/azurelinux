@@ -1,6 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global make_check 1
 
 Summary: Library for accessing various audio file formats
 Name: audiofile
@@ -69,11 +68,11 @@ other resources you can use to develop Audio File applications.
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
-
+# Disable check temporarily
+# BUG(@mfrw): [41224018]
+# The check section produces a ~35Gb log file which breaks Ptest pipeline
 %check
-%if %{make_check}
 #make check
-%endif
 
 
 %ldconfig_scriptlets
@@ -96,6 +95,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %changelog
 * Wed Sep 07 2022 Muhammad Falak <mwani@microsoft.com> - 0.3.6-27
+- Drop macro `%make_check`
 - Drop check section as it produces a 35GB log file breaking ptest
 - License verified
 
