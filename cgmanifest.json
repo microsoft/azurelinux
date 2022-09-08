@@ -12192,6 +12192,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "multus",
+          "version": "3.8",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v3.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "munge",
           "version": "0.5.13",
           "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.13/munge-0.5.13.tar.xz"
