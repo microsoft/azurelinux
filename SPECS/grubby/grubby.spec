@@ -1,7 +1,7 @@
 Summary:        Command line tool for updating bootloader configs
 Name:           grubby
 Version:        8.40
-Release:        43%{?dist}
+Release:        44%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,6 +93,7 @@ and zipl (s390) boot loaders. It is primarily designed to be used from
 scripts which install new kernels and need to find information about the
 current boot environment.
 
+
 %files
 %license COPYING
 %dir %{_libexecdir}/grubby
@@ -117,6 +118,9 @@ current boot environment.
 %{_mandir}/man8/*.8*
 
 %changelog
+* Wed Sep 07 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.40.44
+- Add post install creation of grubenv file using grub2-editenv command
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.40-43
 - Removing redundant "#Source0" comment.
 
