@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.6.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,8 @@ BuildRequires:  perl(Test::More)
 %endif
 Requires:       %{name}-connector-c
 Conflicts:      mysql
+Requires(pre):  shadow-utils
+Requires(postun): shadow-utils
 
 %description
 MariaDB Server is one of the most popular database servers in the world. It’s made by the original developers of MySQL and guaranteed to stay open source. Notable users include Wikipedia, WordPress.com and Google.
@@ -457,6 +459,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Wed Sep 07 2022 Andrew Phelps <anphel@microsoft.com> - 10.6.9-2
+- Add shadow-utils pre/postun requirements
+
 * Tue Aug 30 2022 Henry Beberman <henry.beberman@microsoft.com> - 10.6.9-1
 - Upgrade to v10.6.9 to address CVE-2022-32091, CVE-2022-32081
 
