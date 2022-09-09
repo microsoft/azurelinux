@@ -7450,6 +7450,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "klipper-lb",
+          "version": "0.3.5",
+          "downloadUrl": "https://github.com/k3s-io/klipper-lb/archive/refs/tags/v0.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kmod",
           "version": "29",
           "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-29.tar.xz"

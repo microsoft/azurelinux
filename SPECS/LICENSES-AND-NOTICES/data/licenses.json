@@ -1998,6 +1998,7 @@
                 "jx",
                 "keda",
                 "kernel-signed",
+                "klipper-lb",
                 "KeysInUse-OpenSSL",
                 "kpatch",
                 "kubernetes-1.18.14",
