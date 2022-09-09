@@ -16,7 +16,7 @@ Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version
 # How to re-build this file:
 # 1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. tar -xf %%{name}-%%{version}.tar.gz
-# 3. cd %%{name}-%%{version}-k3s1
+# 3. cd %%{name}-%%{version}
 # 4. go mod vendor
 # 5. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 
