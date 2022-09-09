@@ -2295,6 +2295,7 @@
                 "libvdpau",
                 "lynx",
                 "maven-parent",
+                "multus",
                 "objectweb-anttask",
                 "objectweb-asm",
                 "objenesis",
