@@ -12,7 +12,7 @@ URL:            https://aka.ms/cbl-mariner
 Source0:        livepatching.service
 Source1:        livepatching.systemd
 
-BuildArch:      noarch
+ExclusiveArch:  x86_64
 
 BuildRequires:  systemd
 
