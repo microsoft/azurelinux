@@ -973,6 +973,21 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
+//InstallGrubEnv installs an empty grubenv f
+func InstallGrubEnv(installRoot string) (err error) {
+	const(
+		assetGrubEnvFile = "/installer/grub2/grubenv"
+		grubEnvFile      = "boot/grub2/grubenv"
+	)
+	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
+	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	if err != nil{
+		return
+	}
+	
+	return
+}
+
 // InstallGrubCfg installs the main grub config to the boot partition
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
