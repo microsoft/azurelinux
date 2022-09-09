@@ -7530,6 +7530,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kube-vip-cloud-provider",
+          "version": "0.0.2",
+          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kubevirt",
           "version": "0.51.0",
           "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.51.0.tar.gz"
