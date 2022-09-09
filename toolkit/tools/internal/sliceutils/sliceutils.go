@@ -55,3 +55,21 @@ func StringsSetToSlice(inputSet map[string]bool) []string {
 
 	return outputSlice[:index]
 }
+
+// RemoveDuplicateStrings will remove duplicate entries from a string slice
+func RemoveDuplicateStrings(packList []string) (deduplicatedPackList []string) {
+	var (
+		packListSet = make(map[string]struct{})
+		exists      = struct{}{}
+	)
+
+	for _, entry := range packList {
+		packListSet[entry] = exists
+	}
+
+	for entry := range packListSet {
+		deduplicatedPackList = append(deduplicatedPackList, entry)
+	}
+
+	return
+}

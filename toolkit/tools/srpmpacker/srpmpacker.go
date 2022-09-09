@@ -4,7 +4,6 @@
 package main
 
 import (
-	"bufio"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -28,6 +27,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/srpm"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -173,59 +173,11 @@ func main() {
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
-	packList, err := parsePackListFile(*packListFile)
+	packList, err := srpm.ParsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
 	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
-}
-
-// removeDuplicateStrings will remove duplicate entries from a string slice
-func removeDuplicateStrings(packList []string) (deduplicatedPackList []string) {
-	var (
-		packListSet = make(map[string]struct{})
-		exists      = struct{}{}
-	)
-
-	for _, entry := range packList {
-		packListSet[entry] = exists
-	}
-
-	for entry := range packListSet {
-		deduplicatedPackList = append(deduplicatedPackList, entry)
-	}
-
-	return
-}
-
-// parsePackListFile will parse a list of packages to pack if one is specified.
-// Duplicate list entries in the file will be removed.
-func parsePackListFile(packListFile string) (packList []string, err error) {
-	if packListFile == "" {
-		return
-	}
-
-	file, err := os.Open(packListFile)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line != "" {
-			packList = append(packList, line)
-		}
-	}
-
-	if len(packList) == 0 {
-		err = fmt.Errorf("cannot have empty pack list (%s)", packListFile)
-	}
-
-	packList = removeDuplicateStrings(packList)
-
-	return
 }
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
@@ -235,7 +187,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	originalOutDir := outDir
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir)
+		chroot, buildDir, outDir, specsDir, err = srpm.CreateChroot(workerTar, buildDir, outDir, specsDir)
 		if err != nil {
 			return
 		}
@@ -272,7 +224,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 
-	specFiles, err := findSPECFiles(specsDir, packList)
+	specFiles, err := srpm.FindSPECFiles(specsDir, packList)
 	if err != nil {
 		return
 	}
@@ -283,108 +235,6 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 	}
 
 	err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
-	return
-}
-
-// findSPECFiles finds all SPEC files that should be considered for packing.
-// Takes into consideration a packList if provided.
-func findSPECFiles(specsDir string, packList []string) (specFiles []string, err error) {
-	if len(packList) == 0 {
-		specSearch := filepath.Join(specsDir, "**/*.spec")
-		specFiles, err = filepath.Glob(specSearch)
-	} else {
-		for _, specName := range packList {
-			var specFile []string
-
-			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
-			specFile, err = filepath.Glob(specSearch)
-
-			// If a SPEC is in the pack list, it must be packed.
-			if err != nil {
-				return
-			}
-			if len(specFile) != 1 {
-				if strings.HasPrefix(specName, "msopenjdk-11") {
-					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
-					continue
-				} else {
-					err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
-					return
-				}
-			}
-
-			specFiles = append(specFiles, specFile[0])
-		}
-	}
-
-	return
-}
-
-// createChroot creates a chroot to pack SRPMs inside of.
-func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
-	const (
-		chrootName       = "srpmpacker_chroot"
-		existingDir      = false
-		leaveFilesOnDisk = false
-
-		outMountPoint    = "/output"
-		specsMountPoint  = "/specs"
-		buildDirInChroot = "/build"
-	)
-
-	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(outDir, outMountPoint, "", safechroot.BindMountPointFlags, ""),
-		safechroot.NewMountPoint(specsDir, specsMountPoint, "", safechroot.BindMountPointFlags, ""),
-	}
-
-	extraDirectories := []string{
-		buildDirInChroot,
-	}
-
-	newBuildDir = buildDirInChroot
-	newOutDir = outMountPoint
-	newSpecsDir = specsMountPoint
-
-	chrootDir := filepath.Join(buildDir, chrootName)
-	chroot = safechroot.NewChroot(chrootDir, existingDir)
-
-	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints)
-	if err != nil {
-		return
-	}
-
-	defer func() {
-		if err != nil {
-			closeErr := chroot.Close(leaveFilesOnDisk)
-			if closeErr != nil {
-				logger.Log.Errorf("Failed to close chroot, err: %s", closeErr)
-			}
-		}
-	}()
-
-	// If this is container build then the bind mounts will not have been created.
-	if !buildpipeline.IsRegularBuild() {
-		// Copy in all of the SPECs so they can be packed.
-		specsInChroot := filepath.Join(chroot.RootDir(), newSpecsDir)
-		err = directory.CopyContents(specsDir, specsInChroot)
-		if err != nil {
-			return
-		}
-
-		// Copy any prepacked srpms so they will not be repacked.
-		srpmsInChroot := filepath.Join(chroot.RootDir(), newOutDir)
-		err = directory.CopyContents(outDir, srpmsInChroot)
-		if err != nil {
-			return
-		}
-	}
-
-	// Networking support is needed to download sources.
-	files := []safechroot.FileToCopy{
-		{Src: "/etc/resolv.conf", Dest: "/etc/resolv.conf"},
-	}
-
-	err = chroot.AddFiles(files...)
 	return
 }
 

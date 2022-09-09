@@ -30,6 +30,7 @@ go_tool_list = \
 	rpmssnapshot \
 	scheduler \
 	specreader \
+	srpmdownloader \
 	srpmpacker \
 	validatechroot \
 
