@@ -130,8 +130,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %make_build check
 
 %pre
-groupadd --system syslog
+if ! (getent passwd syslog >/dev/null); then
+    groupadd --system syslog
+fi
+if ! (getent passwd syslog >/dev/null); then
 useradd --system --comment 'System Logging'  --gid syslog --shell /bin/false syslog
+fi
 
 %post
 /sbin/ldconfig
