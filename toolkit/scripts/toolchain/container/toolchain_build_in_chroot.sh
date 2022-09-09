@@ -1106,7 +1106,7 @@ popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
 
-RPM_WITH_VERSION=rpm-4.17.0
+RPM_WITH_VERSION=rpm-4.17.1.1
 RPM_FOLDER="$RPM_WITH_VERSION"-release
 echo $RPM_WITH_VERSION
 tar xf "$RPM_WITH_VERSION"-release.tar.gz
