@@ -29,8 +29,10 @@ Patch1:         openblas-0.2.5-libname.patch
 # Don't use constructor priorities on too old architectures
 Patch2:         openblas-0.2.15-constructor.patch
 # Fix SBGEMM test to work with INTERFACE64
+# patch imported from Fedora 
 Patch3:         openblas-0.3.21-sbgemm-test.patch
 # Supply the proper flags to the test makefile
+# patch imported from Fedora 
 Patch4:         openblas-0.3.11-tests.patch
 # keep this patch to build from a containerized environment
 Patch5:         No-Fortran-Build.patch
@@ -43,9 +45,7 @@ BuildRequires:  perl-devel
 BuildRequires:  multilib-rpm-config
 
 # Rblas library is no longer necessary
-%if 0%{?fedora} >= 31 || 0%{?rhel} >= 8
 Obsoletes:      %{name}-Rblas < %{version}-%{release}
-%endif
 
 # Do we have execstack?
 %if 0%{?rhel} == 7
@@ -63,17 +63,9 @@ BuildRequires:  /usr/bin/execstack
 
 # LAPACK
 %if %{with system_lapack}
-%if 0%{?rhel} == 5 || 0%{?rhel} == 6
-BuildRequires:  lapack-devel
-%else
 BuildRequires:  lapack-static
-%endif
 # Do we have LAPACKE? (Needs at least lapack 3.4.0)
-%if 0%{?fedora}
 %global lapacke 1
-%else
-%global lapacke 0
-%endif
 
 %else
 # Use bundled LAPACK
