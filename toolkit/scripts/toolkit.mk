@@ -41,7 +41,7 @@ package-toolkit: go-tools
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	rm -rf $(toolkit_build_dir)/out && \
-	tar -cvp -f $(toolkit_archive) -C $(toolkit_build_dir)/.. $(notdir $(toolkit_build_dir))
+	tar -I $(ARCHIVE_TOOL) -cvp -f $(toolkit_archive) -C $(toolkit_build_dir)/.. $(notdir $(toolkit_build_dir))
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv

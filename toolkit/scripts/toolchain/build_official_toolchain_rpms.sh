@@ -52,7 +52,7 @@ pushd $MARINER_BUILD_DIR/toolchain
 if [[ ! -d "$LFS/usr" ]]
 then
     echo "$LFS not populated with chroot environment yet, unpacking tarball"
-    tar -xf toolchain_from_container.tar.gz --checkpoint=100000 --checkpoint-action=echo="%T"
+    tar -xzf toolchain_from_container.tar.gz --checkpoint=100000 --checkpoint-action=echo="%T"
 fi
 popd
 
