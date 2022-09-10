@@ -9,8 +9,8 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.62.1
-Release:        1%{?dist}
-License:        ASL 2.0 AND MIT
+Release:        2%{?dist}
+License:        ASL 2.0 OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -33,11 +33,10 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
-
-%if %{with_check}
-BuildRequires:  python3-xml
-%endif
-
+# rustc uses a C compiler to invoke the linker, and links to glibc in most cases
+Requires:       binutils
+Requires:       gcc
+Requires:       glibc-devel
 Provides:       cargo = %{version}-%{release}
 
 %description
@@ -75,7 +74,13 @@ mv %{SOURCE7} "$BUILD_CACHE_DIR"
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
+sh ./configure \
+    --prefix=%{_prefix} \
+    --enable-extended \
+    --tools="cargo,rustfmt" \
+    --release-channel="stable" \
+    --release-description="CBL-Mariner %{version}-%{release}"
+
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
@@ -92,7 +97,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %ldconfig_scriptlets
 
 %files
-%license LICENSE-MIT
+%license LICENSE-MIT LICENSE-APACHE COPYRIGHT
 %doc CONTRIBUTING.md README.md RELEASES.md
 %{_bindir}/rustc
 %{_bindir}/rustdoc
@@ -119,6 +124,13 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.62.1-2
+- Breaking change: Configure as a stable release, which disables unstable features
+- Add runtime requirements on gcc, binutils, glibc-devel
+- Package ASL 2.0 license, additional copyright information
+- Fix licensing info- dual-licensed, not multiply-licensed
+- License verified
+
 * Thu Aug 18 2022 Chris Co <chrco@microsoft.com> - 1.62.1-1
 - Updating to version 1.62.1
 
