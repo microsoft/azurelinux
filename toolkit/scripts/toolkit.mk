@@ -18,8 +18,10 @@ mariner_repos_dir = $(SPECS_DIR)/mariner-repos
 toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
 toolkit_archive   = $(OUT_DIR)/toolkit-$(toolkit_version).tar.gz
 toolkit_remove_archive = $(OUT_DIR)/toolkit-*.tar.gz
+toolkit_out_dir = $(OUT_DIR)/toolkit
 toolkit_build_dir = $(BUILD_DIR)/toolkit
 toolkit_repos_dir = $(toolkit_build_dir)/repos
+toolkit_rpms_snapshot = $(toolkit_out_dir)/rpms.snapshot
 toolkit_tools_dir = $(toolkit_build_dir)/tools/toolkit_bins
 toolkit_release_file = $(toolkit_build_dir)/version.txt
 
@@ -30,7 +32,7 @@ clean-package-toolkit:
 	rm -f $(toolkit_remove_archive)
 	rm -rf $(toolkit_build_dir)
 
-package-toolkit: go-tools
+package-toolkit: go-tools $(toolkit_rpms_snapshot)
 	rm -rf $(toolkit_build_dir) && \
 	mkdir -p $(toolkit_build_dir) && \
 	mkdir -p $(toolkit_repos_dir) && \
@@ -39,9 +41,17 @@ package-toolkit: go-tools
 	cp $(mariner_repos_dir)/*.repo $(toolkit_repos_dir) && \
 	cp $(toolkit_component_extra_files) $(toolkit_build_dir) && \
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
+	cp $(toolkit_rpms_snapshot) $(toolkit_build_dir) && \
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	rm -rf $(toolkit_build_dir)/out && \
 	tar -I $(ARCHIVE_TOOL) -cvp -f $(toolkit_archive) -C $(toolkit_build_dir)/.. $(notdir $(toolkit_build_dir))
+
+$(toolkit_rpms_snapshot): $(chroot_worker) $(SPECS_DIR)
+	$(SCRIPTS_DIR)/rpms_snapshot.sh \
+		-c "$(chroot_worker)" \
+		-s "$(SPECS_DIR)" \
+		-t "$(DIST_TAG)" \
+		-o "$(toolkit_rpms_snapshot)"
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv
