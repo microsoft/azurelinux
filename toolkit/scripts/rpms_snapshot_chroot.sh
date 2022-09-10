@@ -46,8 +46,8 @@ echo "SPECS_DIR: $SPECS_DIR."
 
 grep -LP "^\s*(Exclusive|Exclude)Arch:" "$SPECS_DIR"/**/*.spec > "$TEMP_FILE"
 
-EXLUDE_ARCH_SPECS=$(grep -lP "^\s*ExcludeArch:" "$SPECS_DIR"/**/*.spec)
-for spec in $EXLUDE_ARCH_SPECS
+EXCLUDE_ARCH_SPECS=$(grep -lP "^\s*ExcludeArch:" "$SPECS_DIR"/**/*.spec)
+for spec in $EXCLUDE_ARCH_SPECS
 do
     if ! rpmspec -q -D "dist $DIST_TAG" -D "with_check 1" --queryformat="[%{EXCLUDEARCH} ]\n" --srpm "$spec" 2>/dev/null | grep -qP "\b$CURRENT_ARCH\b"
     then
@@ -55,8 +55,8 @@ do
     fi
 done
 
-EXLUSIVE_ARCH_SPECS=$(grep -lP "^\s*ExclusiveArch:" "$SPECS_DIR"/**/*.spec)
-for spec in $EXLUSIVE_ARCH_SPECS
+EXCLUSIVE_ARCH_SPECS=$(grep -lP "^\s*ExclusiveArch:" "$SPECS_DIR"/**/*.spec)
+for spec in $EXCLUSIVE_ARCH_SPECS
 do
     if rpmspec -q -D "dist $DIST_TAG" -D "with_check 1" --queryformat="[%{EXCLUSIVEARCH} ]\n" --srpm "$spec" 2>/dev/null | grep -qP "\b$CURRENT_ARCH\b"
     then
