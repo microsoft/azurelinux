@@ -1,0 +1,401 @@
+From 82c53e4b7f720012a391d8f6e5da9ee3c4f22bed Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Thu, 6 May 2021 18:34:45 -0400
+Subject: [PATCH] Validate and require subkey binding signatures on PGP public
+ keys
+
+All subkeys must be followed by a binding signature by the primary key
+as per the OpenPGP RFC, enforce the presence and validity in the parser.
+
+The implementation is as kludgey as they come to work around our
+simple-minded parser structure without touching API, to maximise
+backportability. Store all the raw packets internally as we decode them
+to be able to access previous elements at will, needed to validate ordering
+and access the actual data. Add testcases for manipulated keys whose
+import previously would succeed.
+
+Combined with:
+5ff86764b17f31535cb247543a90dd739076ec38
+b5e8bc74b2b05aa557f663fe227b94d2bc64fbd8
+9f03f42e2614a68f589f9db8fe76287146522c0c
+b6dffb6dc5ffa2ddc389743f0507876cab341315 (mem-leak fix)
+ae3d2d234ae47ff85229d3fce97a266fa1aa5a61 (use-after-free fix)
+
+Fixes CVE-2021-3521.
+---
+ rpmio/rpmpgp.c                                | 122 +++++++++++++++---
+ sign/rpmgensig.c                              |   2 +-
+ tests/Makefile.am                             |   3 +
+ tests/data/keys/CVE-2021-3521-badbind.asc     |  25 ++++
+ .../data/keys/CVE-2021-3521-nosubsig-last.asc |  25 ++++
+ tests/data/keys/CVE-2021-3521-nosubsig.asc    |  37 ++++++
+ tests/rpmsigdig.at                            |  28 ++++
+ 7 files changed, 224 insertions(+), 18 deletions(-)
+ create mode 100644 tests/data/keys/CVE-2021-3521-badbind.asc
+ create mode 100644 tests/data/keys/CVE-2021-3521-nosubsig-last.asc
+ create mode 100644 tests/data/keys/CVE-2021-3521-nosubsig.asc
+
+diff --git a/rpmio/rpmpgp.c b/rpmio/rpmpgp.c
+index 46cd0f31a..bd4992ec7 100644
+--- a/rpmio/rpmpgp.c
++++ b/rpmio/rpmpgp.c
+@@ -511,7 +511,7 @@ pgpDigAlg pgpDigAlgFree(pgpDigAlg alg)
+     return NULL;
+ }
+ 
+-static int pgpPrtSigParams(pgpTag tag, uint8_t pubkey_algo, uint8_t sigtype,
++static int pgpPrtSigParams(pgpTag tag, uint8_t pubkey_algo,
+ 		const uint8_t *p, const uint8_t *h, size_t hlen,
+ 		pgpDigParams sigp)
+ {
+@@ -524,10 +524,8 @@ static int pgpPrtSigParams(pgpTag tag, uint8_t pubkey_algo, uint8_t sigtype,
+ 	int mpil = pgpMpiLen(p);
+ 	if (p + mpil > pend)
+ 	    break;
+-	if (sigtype == PGPSIGTYPE_BINARY || sigtype == PGPSIGTYPE_TEXT) {
+-	    if (sigalg->setmpi(sigalg, i, p))
+-		break;
+-	}
++	if (sigalg->setmpi(sigalg, i, p))
++	    break;
+ 	p += mpil;
+     }
+ 
+@@ -600,7 +598,7 @@ static int pgpPrtSig(pgpTag tag, const uint8_t *h, size_t hlen,
+ 	}
+ 
+ 	p = ((uint8_t *)v) + sizeof(*v);
+-	rc = pgpPrtSigParams(tag, v->pubkey_algo, v->sigtype, p, h, hlen, _digp);
++	rc = pgpPrtSigParams(tag, v->pubkey_algo, p, h, hlen, _digp);
+     }	break;
+     case 4:
+     {   pgpPktSigV4 v = (pgpPktSigV4)h;
+@@ -658,7 +656,7 @@ static int pgpPrtSig(pgpTag tag, const uint8_t *h, size_t hlen,
+ 	if (p > (h + hlen))
+ 	    return 1;
+ 
+-	rc = pgpPrtSigParams(tag, v->pubkey_algo, v->sigtype, p, h, hlen, _digp);
++	rc = pgpPrtSigParams(tag, v->pubkey_algo, p, h, hlen, _digp);
+     }	break;
+     default:
+ 	rpmlog(RPMLOG_WARNING, _("Unsupported version of key: V%d\n"), version);
+@@ -999,36 +997,127 @@ unsigned int pgpDigParamsAlgo(pgpDigParams digp, unsigned int algotype)
+     return algo;
+ }
+ 
++static pgpDigParams pgpDigParamsNew(uint8_t tag)
++{
++    pgpDigParams digp = xcalloc(1, sizeof(*digp));
++    digp->tag = tag;
++    return digp;
++}
++
++static int hashKey(DIGEST_CTX hash, const struct pgpPkt *pkt, int exptag)
++{
++    int rc = -1;
++    if (pkt->tag == exptag) {
++	uint8_t head[] = {
++	    0x99,
++	    (pkt->blen >> 8),
++	    (pkt->blen     ),
++	};
++
++	rpmDigestUpdate(hash, head, 3);
++	rpmDigestUpdate(hash, pkt->body, pkt->blen);
++	rc = 0;
++    }
++    return rc;
++}
++
++static int pgpVerifySelf(pgpDigParams key, pgpDigParams selfsig,
++			const struct pgpPkt *all, int i)
++{
++    int rc = -1;
++    DIGEST_CTX hash = NULL;
++
++    switch (selfsig->sigtype) {
++    case PGPSIGTYPE_SUBKEY_BINDING:
++	hash = rpmDigestInit(selfsig->hash_algo, 0);
++	if (hash) {
++	    rc = hashKey(hash, &all[0], PGPTAG_PUBLIC_KEY);
++	    if (!rc)
++		rc = hashKey(hash, &all[i-1], PGPTAG_PUBLIC_SUBKEY);
++	}
++	break;
++    default:
++	/* ignore types we can't handle */
++	rc = 0;
++	break;
++    }
++
++    if (hash && rc == 0)
++	rc = pgpVerifySignature(key, selfsig, hash);
++
++    rpmDigestFinal(hash, NULL, NULL, 0);
++
++    return rc;
++}
++
+ int pgpPrtParams(const uint8_t * pkts, size_t pktlen, unsigned int pkttype,
+ 		 pgpDigParams * ret)
+ {
+     const uint8_t *p = pkts;
+     const uint8_t *pend = pkts + pktlen;
+     pgpDigParams digp = NULL;
+-    struct pgpPkt pkt;
++    pgpDigParams selfsig = NULL;
++    int i = 0;
++    int alloced = 16; /* plenty for normal cases */
++    struct pgpPkt *all = xmalloc(alloced * sizeof(*all));
+     int rc = -1; /* assume failure */
++    int expect = 0;
++    int prevtag = 0;
+ 
+     while (p < pend) {
+-	if (decodePkt(p, (pend - p), &pkt))
++	struct pgpPkt *pkt = &all[i];
++	if (decodePkt(p, (pend - p), pkt))
+ 	    break;
+ 
+ 	if (digp == NULL) {
+-	    if (pkttype && pkt.tag != pkttype) {
++	    if (pkttype && pkt->tag != pkttype) {
+ 		break;
+ 	    } else {
+-		digp = xcalloc(1, sizeof(*digp));
+-		digp->tag = pkt.tag;
++		digp = pgpDigParamsNew(pkt->tag);
+ 	    }
+ 	}
+ 
+-	if (pgpPrtPkt(&pkt, digp))
++	if (expect) {
++	    if (pkt->tag != expect)
++		break;
++	    selfsig = pgpDigParamsNew(pkt->tag);
++	}
++
++	if (pgpPrtPkt(pkt, selfsig ? selfsig : digp))
+ 	    break;
+ 
+-	p += (pkt.body - pkt.head) + pkt.blen;
++	if (selfsig) {
++	    /* subkeys must be followed by binding signature */
++	    int xx = 1; /* assume failure */
++
++	    if (!(prevtag == PGPTAG_PUBLIC_SUBKEY &&
++		  selfsig->sigtype != PGPSIGTYPE_SUBKEY_BINDING))
++		xx = pgpVerifySelf(digp, selfsig, all, i);
++
++	    selfsig = pgpDigParamsFree(selfsig);
++	    if (xx)
++		break;
++	    expect = 0;
++	}
++
++	if (pkt->tag == PGPTAG_PUBLIC_SUBKEY)
++	    expect = PGPTAG_SIGNATURE;
++	prevtag = pkt->tag;
++
++	i++;
++	p += (pkt->body - pkt->head) + pkt->blen;
++	if (pkttype == PGPTAG_SIGNATURE)
++	    break;
++
++	if (alloced <= i) {
++	    alloced *= 2;
++	    all = xrealloc(all, alloced * sizeof(*all));
++	}
+     }
+ 
+-    rc = (digp && (p == pend)) ? 0 : -1;
++    rc = (digp && (p == pend) && expect == 0) ? 0 : -1;
+ 
++    free(all);
+     if (ret && rc == 0) {
+ 	*ret = digp;
+     } else {
+@@ -1063,8 +1152,7 @@ int pgpPrtParamsSubkeys(const uint8_t *pkts, size_t pktlen,
+ 		digps = xrealloc(digps, alloced * sizeof(*digps));
+ 	    }
+ 
+-	    digps[count] = xcalloc(1, sizeof(**digps));
+-	    digps[count]->tag = PGPTAG_PUBLIC_SUBKEY;
++	    digps[count] = pgpDigParamsNew(PGPTAG_PUBLIC_SUBKEY);
+ 	    /* Copy UID from main key to subkey */
+ 	    digps[count]->userid = xstrdup(mainkey->userid);
+ 
+diff --git a/sign/rpmgensig.c b/sign/rpmgensig.c
+index 771d01098..b33fe996c 100644
+--- a/sign/rpmgensig.c
++++ b/sign/rpmgensig.c
+@@ -409,7 +409,7 @@ static int haveSignature(rpmtd sigtd, Header h)
+ 	pgpPrtParams(oldtd.data, oldtd.count, PGPTAG_SIGNATURE, &sig2);
+ 	if (pgpDigParamsCmp(sig1, sig2) == 0)
+ 	    rc = 1;
+-	pgpDigParamsFree(sig2);
++	sig2 = pgpDigParamsFree(sig2);
+     }
+     pgpDigParamsFree(sig1);
+     rpmtdFreeData(&oldtd);
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 5f5207e56..309347262 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -87,6 +87,9 @@ EXTRA_DIST += data/SPECS/hello-config-buildid.spec
+ EXTRA_DIST += data/SPECS/hello-cd.spec
+ EXTRA_DIST += data/keys/rpm.org-rsa-2048-test.pub
+ EXTRA_DIST += data/keys/rpm.org-rsa-2048-test.secret
++EXTRA_DIST += data/keys/CVE-2021-3521-badbind.asc
++EXTRA_DIST += data/keys/CVE-2021-3521-nosubsig.asc
++EXTRA_DIST += data/keys/CVE-2021-3521-nosubsig-last.asc
+ EXTRA_DIST += data/macros.testfile
+ 
+ # testsuite voodoo
+diff --git a/tests/data/keys/CVE-2021-3521-badbind.asc b/tests/data/keys/CVE-2021-3521-badbind.asc
+new file mode 100644
+index 000000000..aea00f9d7
+--- /dev/null
++++ b/tests/data/keys/CVE-2021-3521-badbind.asc
+@@ -0,0 +1,25 @@
++-----BEGIN PGP PUBLIC KEY BLOCK-----
++Version: rpm-4.17.90 (NSS-3)
++
++mQENBFjmORgBCAC7TMEk6wnjSs8Dr4yqSScWdU2pjcqrkTxuzdWvowcIUPZI0w/g
++HkRqGd4apjvY2V15kjL10gk3QhFP3pZ/9p7zh8o8NHX7aGdSGDK7NOq1eFaErPRY
++91LW9RiZ0lbOjXEzIL0KHxUiTQEmdXJT43DJMFPyW9fkCWg0OltiX618FUdWWfI8
++eySdLur1utnqBvdEbCUvWK2RX3vQZQdvEBODnNk2pxqTyV0w6VPQ96W++lF/5Aas
++7rUv3HIyIXxIggc8FRrnH+y9XvvHDonhTIlGnYZN4ubm9i4y3gOkrZlGTrEw7elQ
++1QeMyG2QQEbze8YjpTm4iLABCBrRfPRaQpwrABEBAAG0IXJwbS5vcmcgUlNBIHRl
++c3RrZXkgPHJzYUBycG0ub3JnPokBNwQTAQgAIQUCWOY5GAIbAwULCQgHAgYVCAkK
++CwIEFgIDAQIeAQIXgAAKCRBDRFkeGWTF/MxxCACnjqFL+MmPh9W9JQKT2DcLbBzf
++Cqo6wcEBoCOcwgRSk8dSikhARoteoa55JRJhuMyeKhhEAogE9HRmCPFdjezFTwgB
++BDVBpO2dZ023mLXDVCYX3S8pShOgCP6Tn4wqCnYeAdLcGg106N4xcmgtcssJE+Pr
++XzTZksbZsrTVEmL/Ym+R5w5jBfFnGk7Yw7ndwfQsfNXQb5AZynClFxnX546lcyZX
++fEx3/e6ezw57WNOUK6WT+8b+EGovPkbetK/rGxNXuWaP6X4A/QUm8O98nCuHYFQq
+++mvNdsCBqGf7mhaRGtpHk/JgCn5rFvArMDqLVrR9hX0LdCSsH7EGE+bR3r7wuQEN
++BFjmORgBCACk+vDZrIXQuFXEYToZVwb2attzbbJJCqD71vmZTLsW0QxuPKRgbcYY
++zp4K4lVBnHhFrF8MOUOxJ7kQWIJZMZFt+BDcptCYurbD2H4W2xvnWViiC+LzCMzz
++iMJT6165uefL4JHTDPxC2fFiM9yrc72LmylJNkM/vepT128J5Qv0gRUaQbHiQuS6
++Dm/+WRnUfx3i89SV4mnBxb/Ta93GVqoOciWwzWSnwEnWYAvOb95JL4U7c5J5f/+c
++KnQDHsW7sIiIdscsWzvgf6qs2Ra1Zrt7Fdk4+ZS2f/adagLhDO1C24sXf5XfMk5m
++L0OGwZSr9m5s17VXxfspgU5ugc8kBJfzABEBAAE=
++=WCfs
++-----END PGP PUBLIC KEY BLOCK-----
++
+diff --git a/tests/data/keys/CVE-2021-3521-nosubsig-last.asc b/tests/data/keys/CVE-2021-3521-nosubsig-last.asc
+new file mode 100644
+index 000000000..aea00f9d7
+--- /dev/null
++++ b/tests/data/keys/CVE-2021-3521-nosubsig-last.asc
+@@ -0,0 +1,25 @@
++-----BEGIN PGP PUBLIC KEY BLOCK-----
++Version: rpm-4.17.90 (NSS-3)
++
++mQENBFjmORgBCAC7TMEk6wnjSs8Dr4yqSScWdU2pjcqrkTxuzdWvowcIUPZI0w/g
++HkRqGd4apjvY2V15kjL10gk3QhFP3pZ/9p7zh8o8NHX7aGdSGDK7NOq1eFaErPRY
++91LW9RiZ0lbOjXEzIL0KHxUiTQEmdXJT43DJMFPyW9fkCWg0OltiX618FUdWWfI8
++eySdLur1utnqBvdEbCUvWK2RX3vQZQdvEBODnNk2pxqTyV0w6VPQ96W++lF/5Aas
++7rUv3HIyIXxIggc8FRrnH+y9XvvHDonhTIlGnYZN4ubm9i4y3gOkrZlGTrEw7elQ
++1QeMyG2QQEbze8YjpTm4iLABCBrRfPRaQpwrABEBAAG0IXJwbS5vcmcgUlNBIHRl
++c3RrZXkgPHJzYUBycG0ub3JnPokBNwQTAQgAIQUCWOY5GAIbAwULCQgHAgYVCAkK
++CwIEFgIDAQIeAQIXgAAKCRBDRFkeGWTF/MxxCACnjqFL+MmPh9W9JQKT2DcLbBzf
++Cqo6wcEBoCOcwgRSk8dSikhARoteoa55JRJhuMyeKhhEAogE9HRmCPFdjezFTwgB
++BDVBpO2dZ023mLXDVCYX3S8pShOgCP6Tn4wqCnYeAdLcGg106N4xcmgtcssJE+Pr
++XzTZksbZsrTVEmL/Ym+R5w5jBfFnGk7Yw7ndwfQsfNXQb5AZynClFxnX546lcyZX
++fEx3/e6ezw57WNOUK6WT+8b+EGovPkbetK/rGxNXuWaP6X4A/QUm8O98nCuHYFQq
+++mvNdsCBqGf7mhaRGtpHk/JgCn5rFvArMDqLVrR9hX0LdCSsH7EGE+bR3r7wuQEN
++BFjmORgBCACk+vDZrIXQuFXEYToZVwb2attzbbJJCqD71vmZTLsW0QxuPKRgbcYY
++zp4K4lVBnHhFrF8MOUOxJ7kQWIJZMZFt+BDcptCYurbD2H4W2xvnWViiC+LzCMzz
++iMJT6165uefL4JHTDPxC2fFiM9yrc72LmylJNkM/vepT128J5Qv0gRUaQbHiQuS6
++Dm/+WRnUfx3i89SV4mnBxb/Ta93GVqoOciWwzWSnwEnWYAvOb95JL4U7c5J5f/+c
++KnQDHsW7sIiIdscsWzvgf6qs2Ra1Zrt7Fdk4+ZS2f/adagLhDO1C24sXf5XfMk5m
++L0OGwZSr9m5s17VXxfspgU5ugc8kBJfzABEBAAE=
++=WCfs
++-----END PGP PUBLIC KEY BLOCK-----
++
+diff --git a/tests/data/keys/CVE-2021-3521-nosubsig.asc b/tests/data/keys/CVE-2021-3521-nosubsig.asc
+new file mode 100644
+index 000000000..3a2e7417f
+--- /dev/null
++++ b/tests/data/keys/CVE-2021-3521-nosubsig.asc
+@@ -0,0 +1,37 @@
++-----BEGIN PGP PUBLIC KEY BLOCK-----
++Version: rpm-4.17.90 (NSS-3)
++
++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
++E4XX4jtDmdZPreZALsiB
++=rRop
++-----END PGP PUBLIC KEY BLOCK-----
++
+diff --git a/tests/rpmsigdig.at b/tests/rpmsigdig.at
+index 09fcdd525..a74f400ae 100644
+--- a/tests/rpmsigdig.at
++++ b/tests/rpmsigdig.at
+@@ -212,6 +212,34 @@ UNW2iqnN3BA7guhOv6OMiROF1+I7Q5nWT63mQC7IgQ==
+ [])
+ AT_CLEANUP
+ 
++AT_SETUP([rpmkeys --import invalid keys])
++AT_KEYWORDS([rpmkeys import])
++RPMDB_INIT
++
++AT_CHECK([
++runroot rpmkeys --import /data/keys/CVE-2021-3521-badbind.asc
++],
++[1],
++[],
++[error: /data/keys/CVE-2021-3521-badbind.asc: key 1 import failed.]
++)
++AT_CHECK([
++runroot rpmkeys --import /data/keys/CVE-2021-3521-nosubsig.asc
++],
++[1],
++[],
++[error: /data/keys/CVE-2021-3521-nosubsig.asc: key 1 import failed.]
++)
++
++AT_CHECK([
++runroot rpmkeys --import /data/keys/CVE-2021-3521-nosubsig-last.asc
++],
++[1],
++[],
++[error: /data/keys/CVE-2021-3521-nosubsig-last.asc: key 1 import failed.]
++)
++AT_CLEANUP
++
+ # ------------------------------
+ # Test pre-built package verification
+ AT_SETUP([rpmkeys -K <signed> 1])
+-- 
+2.34.1
+
