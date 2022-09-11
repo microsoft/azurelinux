@@ -1,13 +1,13 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.17.1.1
-Release:        1%{?dist}
+Version:        4.18.0
+Release:        0.rc1.1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
-Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-release.tar.gz
+Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-rc1.tar.gz
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 # The license for the files below is the same as for RPM as they have originally came from rpm.
@@ -17,10 +17,7 @@ Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOUR
 Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 Patch0:         remove-docs-from-makefile.patch
 Patch1:         define-RPM_LD_FLAGS.patch
-# Fixed in rpm-1.18.0 with 32 commits ending at https://github.com/rpm-software-management/rpm/commit/6dd62720fe84f7e2ad902c915b952fc0b29e3dcd
-# CVE-2021-35938
-# CVE-2021-35939
-Patch1001:      CVE-2021-35938-CVE-2021-35939.patch
+Patch2:         4.18.0-rc1-bugfix.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  debugedit
@@ -117,7 +114,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 Python3 rpm.
 
 %prep
-%autosetup -n rpm-%{name}-%{version}-release -p1
+%autosetup -n rpm-%{name}-%{version}-rc1 -p1
 
 %build
 # pass -L opts to gcc as well to prioritize it over standard libs
@@ -208,6 +205,7 @@ popd
 %{_libdir}/rpm/rpm.daily
 %{_libdir}/rpm/rpm.log
 %{_libdir}/rpm/rpm.supp
+%{_libdir}/rpm/rpmuncompress
 %{_libdir}/rpm/rpm2cpio.sh
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
@@ -234,10 +232,12 @@ popd
 
 %files build
 %{_bindir}/rpmbuild
+%{_bindir}/rpmlua
 %{_bindir}/rpmsign
 %{_bindir}/rpmspec
 %{_libdir}/rpm/macros.*
 %{_libdir}/rpm/find-lang.sh
+%{_libdir}/rpm/rpm_macros_provides.sh
 %{_libdir}/rpm/find-provides
 %{_libdir}/rpm/find-requires
 %{_libdir}/rpm/brp-*
@@ -281,8 +281,8 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.1.1-1
-- Patch CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
+* Fri Sep 09 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-0.rc1.1
+- Update to 4.18.0 rc1 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
 
 * Mon Jul 18 2022 Nan Liu <liunan@microsoft.com> - 4.17.0-9
 - Add missing dependencies to rpmbuild (sed and util-linux)
