@@ -63,6 +63,7 @@ KDCPROXY_ASN1MOD=asn1crypto %{__python3} -m pytest
 %changelog
 * Tue Aug 30 2022 Muhammad Falak <mwani@microsoft.com> - 0.4.2-5
 - Add BR on python-pip and drop BR on pytest to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
