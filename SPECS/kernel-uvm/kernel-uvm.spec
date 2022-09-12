@@ -93,7 +93,7 @@ install -vdm 700 %{buildroot}/boot
 %ifarch x86_64
 install -vm 600 arch/x86/boot/compressed/vmlinux.bin %{buildroot}/boot/vmlinux.bin
 mkdir -p %{buildroot}/lib/modules/%{name}
-cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/
+cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
 
 %files
