@@ -10,7 +10,7 @@ Distribution:   Mariner
 Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 #Note that the source file should be renamed to the format {name}-%{version}.tar.gz
 
-# Steps to manually created vendor tarball, no download link.
+# Steps to manually create the vendor tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # Adding the vendor folder and creating a tarball
 # How to re-build this file:
