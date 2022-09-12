@@ -8,8 +8,8 @@ Release:        5%{?dist}
 Summary:        MS-KKDCP (kerberos proxy) WSGI module
 
 License:        MIT
-URL:            https://github.com/npmccallum/%{realname}
-Source0:        https://github.com/npmccallum/%{realname}/archive/%{realname}-%{version}.tar.gz#/python-%{realname}-%{version}.tar.gz
+URL:            https://github.com/latchset/%{realname}
+Source0:        https://github.com/latchset/%{realname}/releases/download/v%{version}/%{realname}-%{version}.tar.gz#/python-%{realname}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  git

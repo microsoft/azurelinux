@@ -20915,7 +20915,7 @@
         "other": {
           "name": "python-kdcproxy",
           "version": "0.4.2",
-          "downloadUrl": "https://github.com/npmccallum/kdcproxy/archive/kdcproxy-0.4.2.tar.gz"
+          "downloadUrl": "https://github.com/latchset/kdcproxy/releases/download/v0.4.2/kdcproxy-0.4.2.tar.gz"
         }
       }
     },
