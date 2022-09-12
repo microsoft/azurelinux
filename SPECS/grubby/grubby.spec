@@ -1,7 +1,7 @@
 Summary:        Command line tool for updating bootloader configs
 Name:           grubby
 Version:        8.40
-Release:        43%{?dist}
+Release:        44%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Patch0010:      0010-Fix-GCC-warnings-about-possible-string-truncations-a.patch
 Patch0011:      0011-Fix-stringop-overflow-warning.patch
 Patch0012:      0012-Fix-maybe-uninitialized-warning.patch
 Patch0013:      0013-Fix-build-RPM-416.patch
+Patch0014:      0014-Fix-build-RPM-418.patch
 
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
@@ -117,6 +118,9 @@ current boot environment.
 %{_mandir}/man8/*.8*
 
 %changelog
+* Sun Sep 11 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.40.44
+- Support rpm 4.18.0
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.40-43
 - Removing redundant "#Source0" comment.
 

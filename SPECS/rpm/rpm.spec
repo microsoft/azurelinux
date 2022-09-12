@@ -18,6 +18,7 @@ Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOUR
 Patch0:         remove-docs-from-makefile.patch
 Patch1:         define-RPM_LD_FLAGS.patch
 Patch2:         4.18.0-rc1-bugfix.patch
+Patch3:         fix_RPM_GNUC_DEPRECATED_headers.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  debugedit
