@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.48.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -92,14 +92,20 @@ install -vdm 700 %{buildroot}/boot
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/compressed/vmlinux.bin %{buildroot}/boot/vmlinux.bin
+mkdir -p %{buildroot}/lib/modules/%{name}
+cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/
 %endif
 
 %files
 %defattr(-,root,root)
 %license COPYING
 /boot/vmlinux.bin
+/lib/modules/%{name}
 
 %changelog
+* Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-8
+- Create modules folder and copy vmlinux
+
 * Tue Aug 30 2022 Chris Co <chrco@microsoft.com> - 5.15.48.1-7
 - Trim spec to only necessary components for UVM
 
