@@ -87,6 +87,7 @@ perl Build.PL installdirs=vendor
 %changelog
 * Thu Sep 01 2022 Muhammad Falak <mwani@microsoft.com> - 3.000002-6
 - Add BR on `perl(blib)` to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.000002-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
