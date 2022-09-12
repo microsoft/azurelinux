@@ -50,7 +50,7 @@ function cleanup {
 
     if mount -v | grep -q "$TEMP_CHROOT_SPECS_DIR"
     then
-        sudo umount -q "$TEMP_CHROOT_SPECS_DIR"
+        sudo umount "$TEMP_CHROOT_SPECS_DIR"
     fi
 
     rm -rf "$TEMP_DIR"
