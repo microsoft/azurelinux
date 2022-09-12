@@ -49,11 +49,18 @@ Summary:        Header files for glibc
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-headers = %{version}-%{release}
-Provides:       %{name}-static = %{version}-%{release}
-Provides:       %{name}-static%{?_isa} = %{version}-%{release}
 
 %description devel
 These are the header files of glibc.
+
+%package static
+Summary:        Static glibc library and runtimes
+Group:          Applications/System
+Requires:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-static%{?_isa} = %{version}-%{release}
+
+%description static
+These are the static artefacts for glibc.
 
 %package lang
 Summary:        Additional language files for glibc
@@ -288,9 +295,15 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 # TODO: Excluding for now to remove dependency on PERL
 # /usr/bin/mtrace
-%{_lib64dir}/*.a
-%{_lib64dir}/*.o
+%{_lib64dir}/{g,M,S}crt1.o
+%{_lib64dir}/crti.o
+%{_lib64dir}/crtn.o
 %{_includedir}/*
+
+%files static
+%defattr(-,root,root)
+%{_lib64dir}/{,r,gr}crt1.o
+%{_lib64dir}/*.a
 
 %files -f %{name}.lang lang
 %defattr(-,root,root)

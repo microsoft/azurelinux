@@ -12,7 +12,8 @@ BuildRequires:  cmake
 BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
-BuildRequires:  glibc-devel >= 2.34-3
+BuildRequires:  glibc-devel
+BuildRequires:  glibc-static >= 2.35-2
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
