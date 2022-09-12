@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.8
+Version:        10.6.9
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -457,6 +457,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Tue Aug 30 2022 Henry Beberman <henry.beberman@microsoft.com> - 10.6.9-1
+- Upgrade to v10.6.9 to address CVE-2022-32091, CVE-2022-32081
+
 * Fri May 20 2022 Chris Co <chrco@microsoft.com> - 10.6.8-1
 - Upgrade to v10.6.8 to address CVE-2022-27448, CVE-2022-27449,
   CVE-2022-27451, CVE-2022-27457, CVE-2022-27458
