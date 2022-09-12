@@ -40,13 +40,16 @@ toolkit_tools_dir = $(toolkit_prep_dir)/tools/toolkit_bins
 toolkit_archive_versioned_compressed   = $(OUT_DIR)/toolkit-$(toolkit_version).tar.gz
 rpms_snapshot = $(OUT_DIR)/$(rpms_snapshot_name)
 
-.PHONY: package-toolkit clean-package-toolkit
+.PHONY: package-toolkit rpms-snapshot clean-package-toolkit clean-rpms-snapshot
 
-clean: clean-package-toolkit
+clean: clean-package-toolkit clean-rpms-snapshot
+
 clean-package-toolkit:
 	rm -f $(toolkit_remove_archive)
-	rm -f $(rpms_snapshot)
 	rm -rf $(toolkit_build_dir)
+
+clean-rpms-snapshot:
+	rm -f $(rpms_snapshot)
 	rm -rf $(rpms_snapshot_build_dir)
 
 package-toolkit: $(toolkit_archive_versioned_compressed)
@@ -70,6 +73,9 @@ $(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_componen
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
 	rm -rf $(toolkit_prep_dir)/out && \
 	tar -cvp -f $(toolkit_archive) -C $(dir $(toolkit_prep_dir)) $(notdir $(toolkit_prep_dir))
+
+rpms-snapshot: $(rpms_snapshot)
+	@echo "RPMs snapshot generated under '$(rpms_snapshot)'."
 
 $(rpms_snapshot): $(rpms_snapshot_per_specs) $(depend_SPECS_DIR)
 	cp $(rpms_snapshot_per_specs) $(rpms_snapshot)
