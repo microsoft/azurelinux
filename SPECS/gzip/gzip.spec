@@ -1,6 +1,6 @@
 Summary:        Programs for compressing and decompressing files
 Name:           gzip
-Version:        1.11
+Version:        1.12
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -42,6 +42,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Monday Sep 12 2022 Nan Liu <liunan@microsoft.com> 1.12-1
+- Upgrade to 1.12 to fix CVE-2022-1271
+
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.11-1
 - Update to version 1.11
 
