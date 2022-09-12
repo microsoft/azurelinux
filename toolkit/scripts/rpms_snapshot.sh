@@ -23,13 +23,13 @@ done
 
 if [[ ! -f "$CHROOT_TAR" ]]
 then
-    echo "Must pass a path to the worker chroot tarball."
+    echo "'$CHROOT_TAR' is not a patch to the worker chroot tarball."
     exit 1
 fi
 
 if [[ ! -d "$SPECS_DIR" ]]
 then
-    echo "Must pass a path to the specs directory."
+    echo "'$SPECS_DIR' is not a path to the specs directory."
     exit 1
 fi
 
@@ -57,7 +57,8 @@ function cleanup {
 }
 trap cleanup EXIT SIGINT SIGTERM
 
-TEMP_CHROOT_SPECS_DIR="$TEMP_DIR/SPECS"
+SPECS_DIR_NAME="$(basename "$SPECS_DIR")"
+TEMP_CHROOT_SPECS_DIR="$TEMP_DIR/$SPECS_DIR_NAME"
 
 ARCHIVE_TOOL=gzip
 if command -v pigz &>/dev/null
@@ -75,6 +76,6 @@ mkdir -p "$(dirname "$OUTPUT_FILE_PATH")"
 mkdir "$TEMP_CHROOT_SPECS_DIR"
 sudo mount --bind "$SPECS_DIR" "$TEMP_CHROOT_SPECS_DIR"
 
-chroot "$TEMP_DIR" ./rpms_snapshot_chroot.sh -s "SPECS" -t "$DIST_TAG" -o rpms.snapshot
+chroot "$TEMP_DIR" ./rpms_snapshot_chroot.sh -s "$SPECS_DIR_NAME" -t "$DIST_TAG" -o rpms.snapshot
 
 mv "$TEMP_DIR/rpms.snapshot" "$OUTPUT_FILE_PATH"

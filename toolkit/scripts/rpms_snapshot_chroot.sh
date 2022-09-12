@@ -21,7 +21,7 @@ done
 
 if [[ ! -d "$SPECS_DIR" ]]
 then
-    echo "Must pass a path to the specs directory."
+    echo "'$SPECS_DIR' is not a path to the specs directory."
     exit 1
 fi
 
