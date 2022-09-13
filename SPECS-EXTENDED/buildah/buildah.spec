@@ -40,7 +40,7 @@ BuildRequires: device-mapper-devel
 BuildRequires: golang
 BuildRequires: git
 BuildRequires: glib2-devel
-BuildRequires: glibc-static
+BuildRequires: glibc-static >= 2.35-2
 BuildRequires: go-md2man
 BuildRequires: go-rpm-macros
 BuildRequires: gpgme-devel

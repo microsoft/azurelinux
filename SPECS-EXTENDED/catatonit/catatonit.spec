@@ -13,7 +13,7 @@ BuildRequires: automake
 BuildRequires: file
 BuildRequires: gcc
 BuildRequires: git
-BuildRequires: glibc-static
+BuildRequires: glibc-static >= 2.35-2
 BuildRequires: libtool
 BuildRequires: make
 

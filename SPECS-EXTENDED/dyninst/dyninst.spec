@@ -30,7 +30,8 @@ BuildRequires: libtirpc-devel
 BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
-BuildRequires: gcc-gfortran glibc-static libstdc++-static libxml2-devel
+BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
+BuildRequires: glibc-static >= 2.35-2
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:

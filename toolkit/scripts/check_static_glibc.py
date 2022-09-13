@@ -40,7 +40,7 @@ def check_spec(path, glibc_version):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Tool for checking if an RPM spec file follows CBL-Mariner's guidelines.")
+        description="Tool for checking if an RPM spec file correctly handles dependencies for statically linked glibc.")
     parser.add_argument('specs',
                         metavar='spec_path',
                         nargs='+',

@@ -50,8 +50,7 @@ BuildRequires:  go-md2man
 BuildRequires:  golang
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-devel
-BuildRequires:  glibc-static
+BuildRequires:  glibc-static >= 2.35-2
 BuildRequires:  git
 BuildRequires:  go-rpm-macros
 BuildRequires:  gpgme-devel
