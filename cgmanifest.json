@@ -7611,8 +7611,8 @@
         "type": "other",
         "other": {
           "name": "lasso",
-          "version": "2.6.0",
-          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.6.0.tar.gz"
+          "version": "2.8.0",
+          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.8.0.tar.gz"
         }
       }
     },
