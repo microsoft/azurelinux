@@ -7341,8 +7341,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.44.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.44.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7611,8 +7611,8 @@
         "type": "other",
         "other": {
           "name": "lasso",
-          "version": "2.6.0",
-          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.6.0.tar.gz"
+          "version": "2.8.0",
+          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.8.0.tar.gz"
         }
       }
     },
@@ -12192,6 +12192,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "multus",
+          "version": "3.8",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v3.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "munge",
           "version": "0.5.13",
           "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.13/munge-0.5.13.tar.xz"
@@ -13644,8 +13654,8 @@
         "type": "other",
         "other": {
           "name": "openblas",
-          "version": "0.3.9",
-          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.9/openblas-0.3.9.tar.gz"
+          "version": "0.3.21",
+          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.21/openblas-0.3.21.tar.gz"
         }
       }
     },
@@ -19444,8 +19454,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.2",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.2/postgresql-14.2.tar.bz2"
+          "version": "14.5",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.5/postgresql-14.5.tar.bz2"
         }
       }
     },
@@ -20905,7 +20915,7 @@
         "other": {
           "name": "python-kdcproxy",
           "version": "0.4.2",
-          "downloadUrl": "https://github.com/npmccallum/kdcproxy/archive/kdcproxy-0.4.2.tar.gz"
+          "downloadUrl": "https://github.com/latchset/kdcproxy/releases/download/v0.4.2/kdcproxy-0.4.2.tar.gz"
         }
       }
     },
@@ -22624,8 +22634,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.13",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tar.xz"
+          "version": "3.9.14",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
         }
       }
     },
@@ -23635,8 +23645,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/lostisland/faraday/archive/refs/tags/v1.10.0.tar.gz"
+          "version": "2.5.2",
+          "downloadUrl": "https://github.com/lostisland/faraday/archive/refs/tags/v2.5.2.tar.gz"
         }
       }
     },

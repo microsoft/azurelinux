@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt46
+%global rt_version rt48
 %define uname_r %{version}-%{rt_version}-%{release}
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
 
@@ -12,8 +12,8 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.44.1
-Release:        6%{?dist}
+Version:        5.15.55.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -379,6 +379,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Aug 28 2022 Xenofon Foukas <xefouk@microsoft.com> - 5.15.55.1-1
+- Update source to 5.15.55.1
+
 * Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-6
 - Enable CONFIG_PCI_PF_STUB
 
