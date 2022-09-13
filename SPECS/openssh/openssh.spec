@@ -149,10 +149,6 @@ echo "" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
 cat << EOF >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
 # Ensure SSH LoginGraceTime is set to one minute or less
 LoginGraceTime 60
-# Ensure SSH access is limited
-#AllowUsers <userlist>
-DenyUsers <userlist>
-#DenyGroups <grouplist>
 EOF
 
 sed -i 's/# no default banner path/# default banner path/g' %{buildroot}%{_sysconfdir}/ssh/sshd_config
