@@ -24,8 +24,6 @@ BuildRequires:  pkgconf
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-connector-c
-Requires(postun): shadow-utils
-Requires(pre):  shadow-utils
 Conflicts:      mysql
 %if %{with_check}
 BuildRequires:  perl(Test::More)
@@ -40,6 +38,8 @@ MariaDB turns data into structured information in a wide array of applications, 
 Summary:        MariaDB server
 Requires:       %{name}-errmsg = %{version}-%{release}
 Requires:       mariadb-connector-c-config
+Requires(postun): shadow-utils
+Requires(pre):  shadow-utils
 
 %description      server
 The MariaDB server and related files
