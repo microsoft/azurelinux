@@ -861,15 +861,15 @@ popd
 rm -rf groff-1.22.3
 touch /logs/status_groff_complete
 
-echo Gzip-1.11
-tar xf gzip-1.11.tar.xz
-pushd gzip-1.11
+echo Gzip-1.12
+tar xf gzip-1.12.tar.xz
+pushd gzip-1.12
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 #mv -v /usr/bin/gzip /bin
 popd
-rm -rf gzip-1.11
+rm -rf gzip-1.21
 touch /logs/status_gzip_complete
 
 echo Libpipeline-1.5.0

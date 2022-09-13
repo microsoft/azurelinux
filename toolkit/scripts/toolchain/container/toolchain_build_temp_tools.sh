@@ -453,14 +453,14 @@ rm -rf grep-3.7
 
 touch $LFS/logs/temptoolchain/status_grep_complete
 
-echo Gzip-1.11
-tar xf gzip-1.11.tar.xz
-pushd gzip-1.11
+echo Gzip-1.12
+tar xf gzip-1.12.tar.xz
+pushd gzip-1.12
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf gzip-1.11
+rm -rf gzip-1.12
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
 
