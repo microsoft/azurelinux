@@ -869,7 +869,7 @@ make -j$(nproc)
 make install
 #mv -v /usr/bin/gzip /bin
 popd
-rm -rf gzip-1.21
+rm -rf gzip-1.12
 touch /logs/status_gzip_complete
 
 echo Libpipeline-1.5.0
