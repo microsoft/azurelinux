@@ -244,7 +244,7 @@ func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string, extra
 		return
 	}
 
-	if buildArch != outArch {
+	if buildArch != outArch && "noarch" != outArch {
 		tuple := outArch + "-" + vendor + "-" + os
 		logger.Log.Debugf("Applying RPM target tuple (%s)", tuple)
 		extraArgs = append(extraArgs, TargetArgument, tuple)
