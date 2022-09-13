@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gzip
-Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 %if %{with_check}
 BuildRequires:  less
 %endif
