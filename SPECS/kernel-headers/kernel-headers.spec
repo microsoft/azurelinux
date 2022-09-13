@@ -36,6 +36,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Sep 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.142.1-1
+- Upgrade to 5.10.142.1
+
 * Mon Sep 12 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.142.1-1
 - Upgrade to 5.10.142.1
 
