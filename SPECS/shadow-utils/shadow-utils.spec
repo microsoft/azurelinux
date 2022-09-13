@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
 install -vdm 755 %{buildroot}/bin
 install -vdm755 %{buildroot}%{_sysconfdir}/default
 mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
+chmod ug-s %{buildroot}/bin/passwd
 install -vm644 %{SOURCE12} %{buildroot}%{_sysconfdir}/default/useradd
 install -vm644 %{SOURCE13} %{buildroot}%{_sysconfdir}/login.defs
 ln -s useradd %{buildroot}%{_sbindir}/adduser
@@ -116,7 +117,7 @@ for FUNCTION in FAIL_DELAY               \
                 CRACKLIB_DICTPATH        \
                 PASS_CHANGE_TRIES        \
                 PASS_ALWAYS_WARN         \
-                CHFN_AUTH ENCRYPT_METHOD \
+                CHFN_AUTH                \
                 ENVIRON_FILE
 do
     sed -i "s/^${FUNCTION}/# &/" %{buildroot}%{_sysconfdir}/login.defs
@@ -162,7 +163,7 @@ chmod 000 %{_sysconfdir}/shadow
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*
-/bin/passwd
+%attr(0755,root,root) /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
 %attr(0000,root,root) %config(noreplace,missingok) %ghost %{_sysconfdir}/shadow
 
@@ -175,6 +176,9 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-11
+- Update login-defs, system-auth, passwd to improve security 
+
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-10
 - Remove su binary which is now provided by util-linux
 - Update BuildRequires to ensure man pages build

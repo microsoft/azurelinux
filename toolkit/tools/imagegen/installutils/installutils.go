@@ -42,7 +42,7 @@ const (
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
-	bootDirectoryFileMode = 0600
+	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
 	shadowFile            = "/etc/shadow"
 )
