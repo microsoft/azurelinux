@@ -2493,6 +2493,7 @@
                 "kbd",
                 "keepalived",
                 "kernel",
+                "kernel-hci",
                 "kernel-headers",
                 "kernel-mshv",
                 "kernel-rt",
