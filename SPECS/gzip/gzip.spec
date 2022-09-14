@@ -42,7 +42,7 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
-* Monday Sep 12 2022 Nan Liu <liunan@microsoft.com> 1.12-1
+* Mon Sep 12 2022 Nan Liu <liunan@microsoft.com> 1.12-1
 - Upgrade to 1.12 to fix CVE-2022-1271
 
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.11-1
