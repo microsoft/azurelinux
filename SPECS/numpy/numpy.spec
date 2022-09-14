@@ -1,4 +1,4 @@
-%global py_install_args "--build_src"
+%global py_install_args "build_src"
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.22.3
