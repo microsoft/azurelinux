@@ -10,7 +10,7 @@ Version:        1.1.0
 Release:        5%{?dist}
 License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/outcome
-Source0:        %{url}archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
