@@ -10,7 +10,7 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.34.1
+Version:        5.15.57.1
 Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
@@ -84,7 +84,7 @@ cp %{SOURCE1} .config
 cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
-sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
+sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-hvl1.m2"/' .config
 make LC_ALL=  ARCH=%{arch} olddefconfig
 
 %build
@@ -234,6 +234,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Sep 13 2022 Chris Co <chrco@microsoft.com> - 5.15.57.1-1
+- Update to 5.15.57.1 of mshv kernel
+
 * Thu Aug 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-1
 - Trim spec to only necessary components for MSHV Host support kernel.
 
