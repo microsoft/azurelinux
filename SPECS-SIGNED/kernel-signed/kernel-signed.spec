@@ -147,6 +147,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Wed Sep 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.142.1-1
+- Upgrade to 5.10.142.1
+
 * Tue Sep 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.142.1-1
 - Upgrade to 5.10.142.1
 
