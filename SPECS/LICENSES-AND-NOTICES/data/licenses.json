@@ -1569,6 +1569,7 @@
                 "python-pexpect",
                 "python-pluggy",
                 "python-podman-api",
+                "python-poetry-core",
                 "python-process-tests",
                 "python-productmd",
                 "python-ptyprocess",
