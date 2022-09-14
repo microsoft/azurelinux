@@ -2000,6 +2000,7 @@
                 "keda",
                 "kernel-signed",
                 "KeysInUse-OpenSSL",
+                "klipper-lb",
                 "kpatch",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
