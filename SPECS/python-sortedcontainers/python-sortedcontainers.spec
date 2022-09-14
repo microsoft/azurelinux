@@ -7,7 +7,7 @@ Release:        6%{?dist}
 Summary:        Pure Python sorted container types
 License:        ASL 2.0
 URL:            https://pypi.python.org/pypi/%{srcname}
-Source0:        https://github.com/grantjenks/python-sortedcontainers/archive/v%{version}#/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/grantjenks/python-sortedcontainers/archive/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %global _description \
