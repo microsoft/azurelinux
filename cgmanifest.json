@@ -22513,6 +22513,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cassandra-driver",
+          "version": "3.25.0",
+          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.25.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-webencodings",
           "version": "0.5.1",
           "downloadUrl": "https://github.com/gsnedders/python-webencodings/archive/v0.5.1/webencodings-0.5.1.tar.gz"
