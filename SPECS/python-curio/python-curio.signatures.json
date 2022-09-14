@@ -1,5 +1,5 @@
 {
-    "Signatures": {
-        "python-curio-1.4.tar.gz": "57edce81c837f3c2cf42fbb346dee26e537d1659e6605269fb13bd179e068744"
-    }
+ "Signatures": {
+  "curio-1.5.tar.gz": "6dbd30691f64300e7a4591280dd973cd8136b3884c9be81e2c3c82f64a4f3c96"
+ }
 }
