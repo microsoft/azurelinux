@@ -33,6 +33,6 @@ install entry %{buildroot}%{_bindir}/entry
 %{_bindir}/entry
 
 %changelog
-* Mon Sep 13 2022 Vinayak Gupta <guptavinayak@microsoft.com> 0.3.5-1
+* Tue Sep 13 2022 Vinayak Gupta <guptavinayak@microsoft.com> 0.3.5-1
 - Original version for CBL-Mariner
 - License Verified
