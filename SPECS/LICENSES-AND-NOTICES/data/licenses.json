@@ -1566,6 +1566,7 @@
                 "python-openstackdocstheme",
                 "python-os-service-types",
                 "python-oslo-sphinx",
+                "python-outcome",
                 "python-pexpect",
                 "python-pluggy",
                 "python-podman-api",
