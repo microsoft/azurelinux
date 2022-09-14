@@ -12,7 +12,7 @@
 
 Name:           reaper
 Version:        3.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 License:        ASL 2.0
 Distribution:   Mariner
@@ -47,6 +47,8 @@ BuildRequires:  maven
 BuildRequires:  msopenjdk-11
 BuildRequires:  nodejs
 BuildRequires:  python3
+BuildRequires:  systemd-rpm-macros
+Requires:       msopenjdk-11
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 Provides:       reaper = %{version}-%{release}
@@ -55,7 +57,7 @@ Provides:       reaper = %{version}-%{release}
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 %prep
-%autosetup -n cassandra-%{name}-%{version}
+%autosetup -n %{srcdir}
 
 %build
 export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
@@ -111,59 +113,78 @@ popd
 mvn -DskipTests package -o
 
 %install
-mkdir -p %{buildroot}%{_datadir}/cassandra-reaper
-mkdir -p %{buildroot}%{_prefix}/local/bin
+mkdir -p %{buildroot}%{_datadir}/cassandra-%{name}
+mkdir -p %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_sysconfdir}/init.d
-mkdir -p %{buildroot}%{_sysconfdir}/cassandra-reaper
-mkdir -p %{buildroot}%{_sysconfdir}/cassandra-reaper/configs
+mkdir -p %{buildroot}%{_sysconfdir}/cassandra-%{name}
+mkdir -p %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
-mkdir -p %{buildroot}/lib/systemd/system/
-mkdir -p %{buildroot}%{_datadir}/licenses/reaper
+mkdir -p %{buildroot}%{_unitdir}
+mkdir -p %{buildroot}%{_datadir}/licenses/%{name}
 cd %{_builddir}/%{srcdir}/src/packaging
 
-cp resource/cassandra-reaper.yaml %{buildroot}%{_sysconfdir}/cassandra-reaper/
-cp resource/cassandra-reaper*.yaml %{buildroot}%{_sysconfdir}/cassandra-reaper/configs
-cp resource/cassandra-reaper-ssl.properties %{buildroot}%{_sysconfdir}/cassandra-reaper/configs
-cp ../server/target/cassandra-reaper-%{version}.jar %{buildroot}%{_datadir}/cassandra-reaper
-cp bin/* %{buildroot}%{_prefix}/local/bin/
+cp resource/cassandra-reaper.yaml %{buildroot}%{_sysconfdir}/cassandra-%{name}/
+cp resource/cassandra-reaper*.yaml %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
+cp resource/cassandra-reaper-ssl.properties %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
+cp ../server/target/cassandra-reaper-%{version}.jar %{buildroot}%{_datadir}/cassandra-%{name}
+cp bin/* %{buildroot}%{_sbindir}
 cp etc/bash_completion.d/spreaper %{buildroot}%{_sysconfdir}/bash_completion.d/
-cp debian/reaper.init %{buildroot}%{_sysconfdir}/init.d/cassandra-reaper
-cp debian/cassandra-reaper.service %{buildroot}/lib/systemd/system/cassandra-reaper.service
-chmod 7555 %{buildroot}%{_sysconfdir}/init.d/cassandra-reaper
+cp debian/reaper.init %{buildroot}%{_sysconfdir}/init.d/cassandra-%{name}
 
-cp %{_builddir}/%{srcdir}/LICENSE.txt %{buildroot}%{_datadir}/licenses/reaper
+# modify service unit ExecStart to point to binary copied under /sbin. This fixes permission errors when
+# starting reaper service as custom user.
+sed 's/\(^ExecStart\)\(.*$\)/\1=\/sbin\/cassandra-reaper/' < debian/cassandra-%{name}.service > debian/cassandra-%{name}.new.service
+cp debian/cassandra-%{name}.new.service %{buildroot}/%{_unitdir}/cassandra-%{name}.service
+chmod 0644 %{buildroot}/%{_unitdir}/cassandra-%{name}.service
+chmod 7555 %{buildroot}%{_sysconfdir}/init.d/cassandra-%{name}
+
+cp %{_builddir}/%{srcdir}/LICENSE.txt %{buildroot}%{_datadir}/licenses/%{name}
 
 %pre
-if id -u reaper; then
-  echo "skipping user"
-else
-  %{_sbindir}/groupadd reaper || true
-  %{_sbindir}/useradd -r -g reaper -s /sbin/nologin -d %{_localstatedir}/empty -c 'cassandra-reaper' reaper || true
-fi
+getent group reaper > /dev/null || groupadd -r reaper
+getent passwd reaper > /dev/null || useradd -r -g reaper -s /sbin/nologin -d /var/empty -c 'cassandra reaper user' reaper || :
 
 %post
-mkdir -p %{_localstatedir}/log/cassandra-reaper/
-touch %{_localstatedir}/log/cassandra-reaper/reaper.log
-chown -R reaper: %{_localstatedir}/log/cassandra-reaper/
+mkdir -p %{_localstatedir}/log/cassandra-%{name}/
+touch %{_localstatedir}/log/cassandra-%{name}/reaper.log
+chown -R reaper: %{_localstatedir}/log/cassandra-%{name}/
+%systemd_post cassandra-%{name}.service
+
+%preun
+%systemd_preun cassandra-%{name}.service
+
+%postun
+%systemd_postun_with_restart cassandra-%{name}.service
+if [ $1 -eq 0 ] ; then
+    /usr/sbin/userdel reaper
+fi
 
 %files
 %license LICENSE.txt
-%{_sysconfdir}/cassandra-reaper/cassandra-reaper.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper-astra.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper-cassandra-sidecar.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper-cassandra-ssl.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper-cassandra.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper-memory.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper.yaml
-%{_sysconfdir}/cassandra-reaper/configs/cassandra-reaper-ssl.properties
-%{_datadir}/cassandra-reaper/cassandra-reaper-%{version}.jar
-%{_prefix}/local/bin/cassandra-reaper
-%{_prefix}/local/bin/spreaper
+%{_sysconfdir}/cassandra-%{name}/cassandra-reaper.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper-astra.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper-cassandra-sidecar.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper-cassandra-ssl.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper-cassandra.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper-memory.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper.yaml
+%{_sysconfdir}/cassandra-%{name}/configs/cassandra-reaper-ssl.properties
+%{_datadir}/cassandra-%{name}/cassandra-reaper-%{version}.jar
+%{_sbindir}/cassandra-%{name}
+%{_sbindir}/spreaper
 %{_sysconfdir}/bash_completion.d/spreaper
-%{_sysconfdir}/init.d/cassandra-reaper
-/lib/systemd/system/cassandra-reaper.service
+%{_sysconfdir}/init.d/cassandra-%{name}
+%{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Tue Sep 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-2
+- Adding Runtime requirement on msopenjdk.
+- Fix adding cassandra reaper custom user/group
+- Fix issues with starting unit service due to permission errors when executing binaries copied
+  to /usr/local/bin (by default, subdir bin does not allow any other user/group to access except root)
+  Copying reaper binaries to /usr/sbin instead.
+- Add post steps during uninstallation to stop service and remove custom user/group.
+
 * Mon Jun 13 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified
