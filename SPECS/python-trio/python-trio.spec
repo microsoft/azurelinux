@@ -1,15 +1,4 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
-# what it's called on pypi
-%global srcname trio
-# what it's imported as
-%global libname %{srcname}
-# name of egg info directory
-%global eggname %{srcname}
-# package name fragment
-%global pkgname %{srcname}
+%global pypi_name trio
 
 %global common_description %{expand:
 The Trio project's goal is to produce a production-quality, permissively
@@ -23,41 +12,42 @@ attempts to distinguish itself with an obsessive focus on usability and
 correctness.  Concurrency is complicated; we try to make it easy to get things
 right.}
 
-%bcond_with  tests
-
-Name:           python-%{pkgname}
-Version:        0.16.0
-Release:        3%{?dist}
 Summary:        A friendly Python library for async concurrency and I/O
+Name:           python-%{pypi_name}
+Version:        0.21.0
+Release:        1%{?dist}
 License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/trio
-Source0:        https://files.pythonhosted.org/packages/source/t/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
 
-%package -n python3-%{pkgname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
+
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with tests}
+%if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  python3-pyOpenSSL
-BuildRequires:  python3-trustme
-BuildRequires:  python3-attrs
-BuildRequires:  python3-sortedcontainers
-BuildRequires:  python3-async-generator
-BuildRequires:  python3-idna
-BuildRequires:  python3-outcome
-BuildRequires:  python3-sniffio
 %endif
-%{?python_provide:%python_provide python3-%{pkgname}}
+Requires:       python3-async-generator
+Requires:       python3-attrs
+Requires:       python3-cffi
+Requires:       python3-idna
+Requires:       python3-outcome
+Requires:       python3-sniffio
+Requires:       python3-sortedcontainers
 
-%description -n python3-%{pkgname} %{common_description}
+%{?python_provide:%python_provide python3-%{pypi_name}}
+
+%description -n python3-%{pypi_name} %{common_description}
 
 %prep
-%autosetup -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
+%autosetup -n %{pypi_name}-%{version}
+rm -rf %{pypi_name}.egg-info
 
 %build
 %py3_build
@@ -65,18 +55,22 @@ rm -rf %{eggname}.egg-info
 %install
 %py3_install
 
-%if %{with tests}
 %check
-%pytest --verbose trio/_core/tests
-%endif
+%{python3} -m pip install -r test-requirements.txt
+%pytest -v trio/_core/tests
+%pytest -v trio/tests
 
-%files -n python3-%{pkgname}
+%files -n python3-%{pypi_name}
 %license LICENSE LICENSE.MIT LICENSE.APACHE2
 %doc README.rst
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
+%{python3_sitelib}/%{pypi_name}
+%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Sep 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.21.0-1
+- Move from SPECS-EXTENDED to SPECS
+- Bump version to 0.21.0
+- Enabling test section
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.16.0-3
 - Updated source URL.
 - License verified.
