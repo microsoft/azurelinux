@@ -43,8 +43,9 @@ This package includes a version of f2py that works properly with NumPy.
 %autosetup -p1
 
 %build
-%py3_build
+%py3_build -- %py_install_args
 
+# build_src args to add the numpy missing header files
 %install
 %py3_install -- %py_install_args
 
