@@ -42,6 +42,6 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
-* Tue Sep 06 2022 Vinayak Gupta <guptavinayak@microsoft.com> 0.0.2-1
+* Tue Sep 06 2022 Vinayak Gupta <guptavinayak@microsoft.com> - 0.0.2-1
 - Original version for CBL-Mariner
 - License Verified
