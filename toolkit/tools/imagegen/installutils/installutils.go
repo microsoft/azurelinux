@@ -982,6 +982,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
 	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
 	if err != nil{
+		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
 		return
 	}
 	
