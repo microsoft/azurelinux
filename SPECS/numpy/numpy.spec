@@ -1,3 +1,4 @@
+%global py_install_args "--build_src"
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.22.3
@@ -45,7 +46,7 @@ This package includes a version of f2py that works properly with NumPy.
 %py3_build
 
 %install
-%py3_install
+%py3_install -- %py_install_args
 
 %check
 pip3 install nose pytest
