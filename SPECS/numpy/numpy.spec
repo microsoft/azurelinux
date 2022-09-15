@@ -1,4 +1,3 @@
-%global py_install_args "--build_src"
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.22.3
@@ -45,6 +44,9 @@ This package includes a version of f2py that works properly with NumPy.
 %build
 %py3_build
 
+# using py3_install macro, numpy header files are missing. --skip-build arg is removed essentially with this change.
+# https://github.com/numpy/numpy/issues/16005
+# changes imported from Fedora.
 %install
 %{__python3} setup.py install --root %{buildroot}
 
@@ -64,6 +66,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %pyt
 %{_bindir}/f2py%{python3_version}
 
 %changelog
+* Thu Sep 15 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.22.0-2
+- replaced py3_install macro to include numpy_dist files. --skip-build arg is removed essentially with the py3_install macro removal.
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.22.3-1
 - Upgrade to latest upstream version
 - Consolidate python requirements
