@@ -709,7 +709,7 @@ return 0
 
 %changelog
 * Thu Sep 14 2022 Thara Gopinath <tgopinath@microsoft.com> - 1.1-12
-- Create missing systemd user and group accounts
+- Add the 'systemd-coredump' and 'systemd-oom' user and group accounts.
 
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.1-11
 - Update etc/modprobe.d/ folder to include new multiple config files and improve security
