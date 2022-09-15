@@ -39,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -53,6 +53,7 @@ Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
 Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
 Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
 Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
+Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -241,6 +242,9 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Thu Sep 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-6
+- Add patch to avoid memory hotplug timeout.
+
 * Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-5
 - Generate initrd on reload.
 
