@@ -14,15 +14,18 @@ toolkit_component_extra_files = \
 
 mariner_repos_dir = $(PROJECT_ROOT)/SPECS/mariner-repos
 mariner_repos_files = $(wildcard $(mariner_repos_dir)/*.repo)
-rpms_snapshot_name = rpms.snapshot
+rpms_snapshot_log = rpms_snapshot.log
+rpms_snapshot_name = rpms_snapshot.json
 specs_dir_name = $(notdir $(SPECS_DIR))
 toolkit_remove_archive = $(OUT_DIR)/toolkit-*.tar*
 toolkit_root_files = $(wildcard $(toolkit_root)/*)
 toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
 
 # Build files
-rpms_snapshot_build_dir = $(BUILD_DIR)/rpms_snapshots
-rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/rpms_$(specs_dir_name).snapshot
+rpms_snapshot_dir_name = rpms_snapshots
+rpms_snapshot_build_dir = $(BUILD_DIR)/$(rpms_snapshot_dir_name)
+rpms_snapshot_logs_dir = $(LOGS_DIR)/$(rpms_snapshot_dir_name)
+rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
 
 toolkit_build_dir   = $(BUILD_DIR)/toolkit_prep
 toolkit_archive   = $(toolkit_build_dir)/toolkit.tar
@@ -35,6 +38,9 @@ toolkit_rpms_snapshot_file = $(toolkit_prep_dir)/$(rpms_snapshot_name)
 toolkit_rpms_snapshot_file_relative_path = $(toolkit_rpms_snapshot_file:$(toolkit_build_dir)/%=%)
 toolkit_repos_dir = $(toolkit_prep_dir)/repos
 toolkit_tools_dir = $(toolkit_prep_dir)/tools/toolkit_bins
+
+$(call create_folder,"$(rpms_snapshot_build_dir)")
+$(call create_folder,"$(toolkit_prep_dir)")
 
 # Outputs
 toolkit_archive_versioned_compressed   = $(OUT_DIR)/toolkit-$(toolkit_version).tar.gz
@@ -86,7 +92,10 @@ $(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(LOCAL_SPECS) $
 		--input="$(SPECS_DIR)" \
 		--output="$(rpms_snapshot_per_specs)" \
 		--build-dir="$(rpms_snapshot_build_dir)" \
-		--worker-tar="$(chroot_worker)"
+		--dist-tag=$(DIST_TAG) \
+		--worker-tar="$(chroot_worker)" \
+		--log-level=$(LOG_LEVEL) \
+		--log-file="$(rpms_snapshot_logs_dir)/$(rpms_snapshot_log)"
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv

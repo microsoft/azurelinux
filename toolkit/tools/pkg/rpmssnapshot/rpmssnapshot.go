@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
@@ -17,6 +18,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
+const chrootOutputFilePath = "/snapshot.json"
 const chrootSpecDirPath = "/SPECS"
 
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
@@ -71,11 +73,19 @@ func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distT
 	}
 	defer s.cleanUp()
 
+	logger.Log.Infof("Generating RPMs snapshot into (%s).", outputFilePath)
+
 	err = s.chroot.Run(func() error {
-		return s.generateSnapshotInChroot(outputFilePath, distTag)
+		return s.generateSnapshotInChroot(distTag)
 	})
 	if err != nil {
 		return
+	}
+
+	chrootOutputFileFullPath := filepath.Join(s.chroot.RootDir(), chrootOutputFilePath)
+	err = file.Move(chrootOutputFileFullPath, outputFilePath)
+	if err != nil {
+		logger.Log.Errorf("Failed to retrieve the snapshot from the chroot. Error: %v.", err)
 	}
 
 	return
@@ -89,25 +99,25 @@ func (s *SnapshotGenerator) cleanUp() {
 	}
 }
 
-func (s *SnapshotGenerator) generateSnapshotInChroot(outputFilePath, distTag string) (err error) {
+func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error) {
 	var (
 		allBuiltRPMs []string
 		repoContents repocloner.RepoContents
 		specPaths    []string
 	)
 
-	logger.Log.Infof("Generating RPMs snapshot into (%s).", outputFilePath)
 	logger.Log.Debugf("Chroot directory: %s.", s.chrootDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", distTag)
 	logger.Log.Debugf("Specs directory %s.", chrootSpecDirPath)
 
 	defines := s.buildDefines(distTag)
-
 	specPaths, err = s.buildCompatibleSpecsList(defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to build a list of specs inside (%s). Error: %v.", chrootSpecDirPath, err)
+		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", chrootSpecDirPath, err)
 		return
 	}
+
+	logger.Log.Infof("Found %d compatible specs.", len(specPaths))
 
 	allBuiltRPMs, err = s.parseSpecs(specPaths, defines)
 	if err != nil {
@@ -115,22 +125,24 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(outputFilePath, distTag str
 		return
 	}
 
+	logger.Log.Infof("The specs build %d packages in total.", len(allBuiltRPMs))
+
 	repoContents, err = s.convertResultsToRepoContents(allBuiltRPMs)
 	if err != nil {
 		logger.Log.Errorf("Failed to convert RPMs list to a packages summary file. Error: %v.", err)
 		return
 	}
 
-	err = jsonutils.WriteJSONFile(outputFilePath, repoContents)
+	err = jsonutils.WriteJSONFile(chrootOutputFilePath, repoContents)
 	if err != nil {
-		logger.Log.Errorf("Failed to save results into (%s). Error: %v.", outputFilePath, err)
+		logger.Log.Errorf("Failed to save results into (%s). Error: %v.", chrootOutputFilePath, err)
 	}
 
 	return
 }
 
 func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
-	const runCheck = false
+	const runCheck = true
 
 	defines := rpm.DefaultDefines(runCheck)
 	defines[rpm.DistTagDefine] = distTag
