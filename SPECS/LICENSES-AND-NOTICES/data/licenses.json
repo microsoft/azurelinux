@@ -2001,6 +2001,7 @@
                 "kernel-signed",
                 "KeysInUse-OpenSSL",
                 "kpatch",
+                "kube-vip-cloud-provider",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
                 "kubernetes-1.19.7",
