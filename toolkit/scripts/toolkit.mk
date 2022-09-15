@@ -14,7 +14,6 @@ toolkit_component_extra_files = \
 
 mariner_repos_dir = $(PROJECT_ROOT)/SPECS/mariner-repos
 mariner_repos_files = $(wildcard $(mariner_repos_dir)/*.repo)
-rpms_snapshot_log = rpms_snapshot.log
 rpms_snapshot_name = rpms_snapshot.json
 specs_dir_name = $(notdir $(SPECS_DIR))
 toolkit_remove_archive = $(OUT_DIR)/toolkit-*.tar*
@@ -24,7 +23,7 @@ toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
 # Build files
 rpms_snapshot_dir_name = rpms_snapshots
 rpms_snapshot_build_dir = $(BUILD_DIR)/$(rpms_snapshot_dir_name)
-rpms_snapshot_logs_dir = $(LOGS_DIR)/$(rpms_snapshot_dir_name)
+rpms_snapshot_logs_path = $(LOGS_DIR)/$(rpms_snapshot_dir_name)/rpms_snapshot.log
 rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
 
 toolkit_build_dir   = $(BUILD_DIR)/toolkit_prep
@@ -95,7 +94,7 @@ $(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(LOCAL_SPECS) $
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \
-		--log-file="$(rpms_snapshot_logs_dir)/$(rpms_snapshot_log)"
+		--log-file="$(rpms_snapshot_logs_path)"
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv
