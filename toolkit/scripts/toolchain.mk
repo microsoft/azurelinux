@@ -106,7 +106,7 @@ $(toolchain_spec_list): $(toolchain_files)
 # sudo make hydrate-toolchain TOOLCHAIN_CONTAINER_ARCHIVE=~/cache/toolchain_from_container.tar.gz TOOLCHAIN_ARCHIVE=~/cache/toolchain_built_rpms_all.tar.gz TOOLCHAIN_SOURCE_ARCHIVE=~/cache/toolchain_source.tar.gz
 compress-toolchain:
 	tar -I $(ARCHIVE_TOOL) -cvp --exclude='SOURCES' -f $(raw_toolchain) -C $(toolchain_build_dir) populated_toolchain
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(final_toolchain) -C $(toolchain_build_dir) built_rpms_all
+	tar -cvp -f $(final_toolchain) -C $(toolchain_build_dir) built_rpms_all
 	$(if $(CACHE_DIR), cp $(raw_toolchain) $(final_toolchain) $(CACHE_DIR))
 
 # After hydrating the toolchain run
@@ -119,7 +119,7 @@ hydrate-toolchain:
 	sudo cp $(TOOLCHAIN_CONTAINER_ARCHIVE) $(raw_toolchain)
 	tar -I $(ARCHIVE_TOOL) -xf $(TOOLCHAIN_CONTAINER_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
 	sudo cp $(TOOLCHAIN_ARCHIVE) $(final_toolchain)
-	tar -I $(ARCHIVE_TOOL) -xf $(TOOLCHAIN_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	tar -xf $(TOOLCHAIN_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
 	sudo touch $(final_toolchain)
 	sudo mkdir -vp $(RPMS_DIR)/noarch
 	sudo mkdir -vp $(RPMS_DIR)/$(build_arch)
@@ -229,7 +229,7 @@ ifneq (,$(selected_toolchain_archive))
 # Our manifest files should always track the contents of the freshly built archives exactly
 $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_toolchain_archive)
 	@echo Validating contents of toolchain against manifest...
-	tar -I $(ARCHIVE_TOOL) -tf $(selected_toolchain_archive) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_contents) && \
+	tar -tf $(selected_toolchain_archive) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_contents) && \
 	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
 	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
@@ -252,7 +252,7 @@ $(toolchain_local_temp)%: ;
 $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(shell find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $(toolchain_local_temp) && \
 	rm -f $(toolchain_local_temp)/* && \
-	tar -I $(ARCHIVE_TOOL) -xf $(selected_toolchain_archive) -C $(toolchain_local_temp) --strip-components 1 && \
+	tar -xf $(selected_toolchain_archive) -C $(toolchain_local_temp) --strip-components 1 && \
 	touch $(toolchain_local_temp)/* && \
 	touch $@
 

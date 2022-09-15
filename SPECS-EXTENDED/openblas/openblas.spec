@@ -1,6 +1,6 @@
 %bcond_with system_lapack
 # Version of bundled lapack
-%global lapackver 3.9.0
+%global lapackver 3.9.1
 
 # DO NOT "CLEAN UP" OR MODIFY THIS SPEC FILE WITHOUT ASKING THE
 # MAINTAINER FIRST!
@@ -14,8 +14,8 @@
 # "obsoleted" features are still kept in the spec.
 
 Name:           openblas
-Version:        0.3.9
-Release:        5%{?dist}
+Version:        0.3.21
+Release:        1%{?dist}
 Summary:        An optimized BLAS library based on GotoBLAS2
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -28,20 +28,24 @@ Patch0:         openblas-0.2.15-system_lapack.patch
 Patch1:         openblas-0.2.5-libname.patch
 # Don't use constructor priorities on too old architectures
 Patch2:         openblas-0.2.15-constructor.patch
+# Fix SBGEMM test to work with INTERFACE64
+# patch imported from Fedora 
+Patch3:         openblas-0.3.21-sbgemm-test.patch
 # Supply the proper flags to the test makefile
-Patch3:         openblas-0.3.7-tests.patch
-
-# Fix C++ compatibility (BZ #1820131)
-Patch4:         https://github.com/xianyi/OpenBLAS/commit/ee2e758278b5d82b7242f505ea694f082ef65879.patch
-
+# patch imported from Fedora 
+Patch4:         openblas-0.3.11-tests.patch
 # keep this patch to build from a containerized environment
 Patch5:         No-Fortran-Build.patch
 
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  perl-devel
 BuildRequires:  multilib-rpm-config
+
+# Rblas library is no longer necessary
+Obsoletes:      %{name}-Rblas < %{version}-%{release}
 
 # Do we have execstack?
 %if 0%{?rhel} == 7
@@ -57,8 +61,17 @@ BuildRequires:  multilib-rpm-config
 BuildRequires:  /usr/bin/execstack
 %endif
 
-BuildRequires:  lapack-devel
+# LAPACK
+%if %{with system_lapack}
+BuildRequires:  lapack-static
+# Do we have LAPACKE? (Needs at least lapack 3.4.0)
 %global lapacke 1
+
+%else
+# Use bundled LAPACK
+%global lapacke 1
+Provides:       bundled(lapack) = %{lapackver}
+%endif
 
 # Build 64-bit interface binaries?
 %if 0%{?__isa_bits} == 64
@@ -86,12 +99,6 @@ Computational Science, ISCAS. http://www.rdcps.ac.cn
 
 
 %description
-%{base_description}
-
-%package Rblas
-Summary:        A version of OpenBLAS for R to use as libRblas
-
-%description Rblas
 %{base_description}
 
 %package serial
@@ -231,8 +238,8 @@ cd OpenBLAS-%{version}
 %if 0%{?rhel} == 5
 %patch2 -p1 -b .constructor
 %endif
-%patch3 -p1 -b .tests
-%patch4 -p1 -b .cplusplus
+%patch3 -p1 -b .sbgem
+%patch4 -p1 -b .tests
 %patch5 -p1
 
 # Fix source permissions
@@ -244,7 +251,6 @@ rm -rf lapack-netlib
 %endif
 
 # Make serial, threaded and OpenMP versions; as well as 64-bit versions
-# Also make an libRblas.so
 cd ..
 cp -ar OpenBLAS-%{version} openmp
 cp -ar OpenBLAS-%{version} threaded
@@ -253,13 +259,7 @@ for d in {serial,threaded,openmp}64{,_}; do
     cp -ar OpenBLAS-%{version} $d
 done
 %endif
-cp -ar OpenBLAS-%{version} Rblas
 mv OpenBLAS-%{version} serial
-
-# Hackup Rblas Makefiles
-sed -i 's|.so.$(MAJOR_VERSION)|.so|g' Rblas/Makefile
-sed -i 's|.so.$(MAJOR_VERSION)|.so|g' Rblas/exports/Makefile
-sed -i 's|@ln -fs $(LIBSONAME) $(LIBPREFIX).so|#@ln -fs $(LIBSONAME) $(LIBPREFIX).so|g' Rblas/Makefile
 
 %if %{with system_lapack}
 # Setup 32-bit interface LAPACK
@@ -337,6 +337,9 @@ rm -rf netliblapack64
 %endif
 
 %build
+# openblas fails to build with LTO due to undefined symbols.  These could
+# well be the result of the assembly code used in this package
+%define _lto_cflags %{nil}
 %if !%{lapacke}
 LAPACKE="NO_LAPACKE=1"
 %endif
@@ -386,8 +389,6 @@ FCOMMON="%{optflags} -fPIC -frecursive"
 %endif
 # Use Fedora linker flags
 export LDFLAGS="%{__global_ldflags}"
-
-make -C Rblas      $TARGET USE_THREAD=0 USE_LOCKING=1 USE_OPENMP=0 FC=gfortran CC=gcc COMMON_OPT="$COMMON" FCOMMON_OPT="$FCOMMON" $NMAX LIBPREFIX="libRblas" LIBSONAME="libRblas.so" $AVX $LAPACKE INTERFACE64=0
 
 # Declare some necessary build flags
 COMMON="%{optflags} -fPIC"
@@ -447,10 +448,6 @@ if [[ "$suffix" != "" ]]; then
 else
    sname=${slibname}
 fi
-
-# Install the Rblas library
-mkdir -p %{buildroot}%{_libdir}/R/lib/
-install -p -m 755 Rblas/libRblas.so %{buildroot}%{_libdir}/R/lib/
 
 # Install the OpenMP library
 olibname=`echo ${slibname} | sed "s|lib%{name}|lib%{name}o|g"`
@@ -555,9 +552,6 @@ ln -sf ${pname64_}.so lib%{name}p64_.so.0
 for lib in %{buildroot}%{_libdir}/libopenblas*.so; do
  execstack -c $lib
 done
-for lib in %{buildroot}%{_libdir}/R/lib/libRblas*.so; do
- execstack -c $lib
-done
 %endif
 
 # Get rid of generated CMake config
@@ -568,8 +562,6 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %ldconfig_scriptlets
 
 %ldconfig_scriptlets openmp
-
-%ldconfig_scriptlets Rblas
 
 %ldconfig_scriptlets threads
 
@@ -640,9 +632,6 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p64_.so
 %endif
 
-%files Rblas
-%{_libdir}/R/lib/libRblas.so
-
 %files static
 %{_libdir}/lib%{name}.a
 %{_libdir}/lib%{name}o.a
@@ -657,6 +646,9 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %endif
 
 %changelog
+* Mon Aug 29 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.21-1
+- Update to 0.3.21.
+
 * Tue Apr 05 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.3.9-5
 - Do not build Fortran.
 - License verified.

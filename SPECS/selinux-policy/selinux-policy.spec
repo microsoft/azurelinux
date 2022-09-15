@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -246,7 +246,9 @@ if [ -s %{_sysconfdir}/selinux/config ]; then \
      if [ "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT} ]; then \
         [ -f ${FILE_CONTEXT}.pre ] || cp -f ${FILE_CONTEXT} ${FILE_CONTEXT}.pre; \
      fi; \
-     touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
+     if [ -d %{_sysconfdir}/selinux/%{1} ]; then \
+        touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
+     fi; \
 fi;
 %define postInstall() \
 . %{_sysconfdir}/selinux/config; \
@@ -344,6 +346,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Sep 14 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-11
+- Fix issue with preinst on systems that do not have selinux-policy.
+
 * Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-10
 - Fixed denials during coredump.
 - Allow NoNewPerms transition from init scripts/systemd unit commands.
