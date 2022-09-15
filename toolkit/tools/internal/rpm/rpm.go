@@ -208,30 +208,6 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
-// ReadArchitecture returns the value of the '_arch' macro as seen by 'rpm'.
-func ReadArchitecture() (string, error) {
-	const architectureMacro = "_arch"
-
-	results, err := ReadMacro(architectureMacro)
-	if err != nil {
-		return "", err
-	}
-
-	return results[0], nil
-}
-
-// ReadMacro returns the value of an 'rpm' macro.
-func ReadMacro(macro string) (results []string, err error) {
-	fullMacro := fmt.Sprintf("%%%s", macro)
-
-	results, err = executeRpmCommand(rpmProgram, "--eval", fullMacro)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 // BuildRPMFromSRPM builds an RPM from the given SRPM file
 func BuildRPMFromSRPM(srpmFile string, defines map[string]string, extraArgs ...string) (err error) {
 	const (

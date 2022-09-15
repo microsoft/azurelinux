@@ -92,7 +92,6 @@ func (s *SnapshotGenerator) cleanUp() {
 func (s *SnapshotGenerator) generateSnapshotInChroot(outputFilePath, distTag string) (err error) {
 	var (
 		allBuiltRPMs []string
-		architecture string
 		repoContents repocloner.RepoContents
 		specPaths    []string
 	)
@@ -104,13 +103,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(outputFilePath, distTag str
 
 	defines := s.buildDefines(distTag)
 
-	architecture, err = rpm.ReadArchitecture()
-	if err != nil {
-		logger.Log.Errorf("Failed to read architecture. Error: %v.", err)
-		return
-	}
-
-	specPaths, err = s.buildSpecsList(architecture, defines)
+	specPaths, err = s.buildCompatibleSpecsList(defines)
 	if err != nil {
 		logger.Log.Errorf("Failed to build a list of specs inside (%s). Error: %v.", chrootSpecDirPath, err)
 		return
@@ -129,6 +122,9 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(outputFilePath, distTag str
 	}
 
 	err = jsonutils.WriteJSONFile(outputFilePath, repoContents)
+	if err != nil {
+		logger.Log.Errorf("Failed to save results into (%s). Error: %v.", outputFilePath, err)
+	}
 
 	return
 }
@@ -142,7 +138,44 @@ func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
 	return defines
 }
 
-func (s *SnapshotGenerator) buildSpecsList(architecture string, defines map[string]string) (specPaths []string, err error) {
+func (s *SnapshotGenerator) buildAllSpecsList() (specPaths []string, err error) {
+	specFilesGlob := filepath.Join(chrootSpecDirPath, "**", "*.spec")
+
+	specPaths, err = filepath.Glob(specFilesGlob)
+	if err != nil {
+		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
+	}
+
+	return
+}
+func (s *SnapshotGenerator) buildCompatibleSpecsList(defines map[string]string) (specPaths []string, err error) {
+	var allSpecFilePaths []string
+
+	allSpecFilePaths, err = s.buildAllSpecsList()
+	if err != nil {
+		return
+	}
+
+	return s.filterCompatibleSpecs(allSpecFilePaths, defines)
+}
+func (s *SnapshotGenerator) filterCompatibleSpecs(allSpecFilePaths []string, defines map[string]string) (specPaths []string, err error) {
+	var specCompatible bool
+
+	for _, specFilePath := range allSpecFilePaths {
+		specDirPath := filepath.Dir(specFilePath)
+
+		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, defines)
+		if err != nil {
+			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+			return
+		}
+
+		if specCompatible {
+			specPaths = append(specPaths, specFilePath)
+		}
+	}
+
+	return
 }
 
 func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) (repoContents repocloner.RepoContents, err error) {

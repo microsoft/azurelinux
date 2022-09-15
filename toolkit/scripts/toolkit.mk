@@ -80,13 +80,13 @@ rpms-snapshot: $(rpms_snapshot)
 $(rpms_snapshot): $(rpms_snapshot_per_specs) $(depend_SPECS_DIR)
 	cp $(rpms_snapshot_per_specs) $(rpms_snapshot)
 
-$(rpms_snapshot_per_specs): $(chroot_worker) $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR)
+$(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR)
 	@mkdir -p "$(rpms_snapshot_build_dir)"
-	$(SCRIPTS_DIR)/rpms_snapshot.sh \
-		-c "$(chroot_worker)" \
-		-s "$(SPECS_DIR)" \
-		-t "$(DIST_TAG)" \
-		-o "$(rpms_snapshot_per_specs)"
+	$(go-rpmssnapshot) \
+		--input="$(SPECS_DIR)" \
+		--output="$(rpms_snapshot_per_specs)" \
+		--build-dir="$(rpms_snapshot_build_dir)" \
+		--worker-tar="$(chroot_worker)"
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv

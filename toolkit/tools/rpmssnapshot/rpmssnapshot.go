@@ -18,11 +18,12 @@ import (
 var (
 	app = kingpin.New("rpmsspnapshot", "A tool to generate a snapshot of all RPMs expected to be built from given specs folder.")
 
-	buildDirPath       = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
 	specsDirPath       = exe.InputStringFlag(app, "Path to specs directory.")
 	outputSnapshotPath = exe.OutputFlag(app, "Path to the generated snapshot.")
-	distTag            = app.Flag("dist-tag", "The distribution tag.").Required().String()
-	workerTar          = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
+
+	buildDirPath = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
+	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
+	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
