@@ -57,7 +57,7 @@ set -e
 #
 cd /sources
 
-KERNEL_VERSION="5.10.139.1"
+KERNEL_VERSION="5.10.142.1"
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
