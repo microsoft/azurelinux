@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND MIT AND BSD AND ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,18 +81,18 @@ install -vdm700 %{buildroot}%{_localstatedir}/spool/cron
 install -vdm755 %{buildroot}%{_sysconfdir}/sysconfig/
 install -vm644 crond.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/crond
 
-install -vdm755 %{buildroot}%{_sysconfdir}/cron.d/
+install -vdm700 %{buildroot}%{_sysconfdir}/cron.d/
 install -vm644 contrib/0hourly %{buildroot}%{_sysconfdir}/cron.d/0hourly
 install -vm644 contrib/dailyjobs %{buildroot}%{_sysconfdir}/cron.d/dailyjobs
 
-install -vdm755 %{buildroot}%{_sysconfdir}/cron.hourly
+install -vdm700 %{buildroot}%{_sysconfdir}/cron.hourly
 install -vm755 contrib/0anacron %{buildroot}%{_sysconfdir}/cron.hourly/0anacron
 
-install -vdm755 %{buildroot}%{_sysconfdir}/cron.daily
-install -vdm755 %{buildroot}%{_sysconfdir}/cron.weekly
-install -vdm755 %{buildroot}%{_sysconfdir}/cron.monthly
+install -vdm700 %{buildroot}%{_sysconfdir}/cron.daily
+install -vdm700 %{buildroot}%{_sysconfdir}/cron.weekly
+install -vdm700 %{buildroot}%{_sysconfdir}/cron.monthly
 
-install -vm644 contrib/anacrontab %{buildroot}%{_sysconfdir}/anacrontab
+install -vm600 contrib/anacrontab %{buildroot}%{_sysconfdir}/anacrontab
 
 touch %{buildroot}%{_sysconfdir}/cron.deny
 
@@ -166,6 +166,9 @@ make %{?_smp_mflags} check
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cron.d/dailyjobs
 
 %changelog
+* Thu Jul 21 2022 Minghe Ren <mingheren@microsoft.com> - 1.5.7-2
+- Change file permission to improve security
+
 * Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.7-1
 - Upgrade to version 1.5.7
 
