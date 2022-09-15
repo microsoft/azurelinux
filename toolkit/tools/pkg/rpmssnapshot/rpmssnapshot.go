@@ -18,8 +18,10 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
-const chrootOutputFilePath = "/snapshot.json"
-const chrootSpecDirPath = "/SPECS"
+const (
+	chrootOutputFilePath = "/snapshot.json"
+	chrootSpecDirPath    = "/SPECS"
+)
 
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
 // Examples:
@@ -52,16 +54,13 @@ const (
 
 type SnapshotGenerator struct {
 	chroot        *safechroot.Chroot
-	chrootDirPath string
+	buildDirPath  string
 	workerTarPath string
 }
 
 func New(buildDirPath, workerTarPath string) *SnapshotGenerator {
-	const chrootName = "rpmssnapshot_chroot"
-	chrootDirPath := filepath.Join(buildDirPath, chrootName)
-
 	return &SnapshotGenerator{
-		chrootDirPath: chrootDirPath,
+		buildDirPath:  buildDirPath,
 		workerTarPath: workerTarPath,
 	}
 }
@@ -73,7 +72,9 @@ func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distT
 	}
 	defer s.cleanUp()
 
-	logger.Log.Infof("Generating RPMs snapshot into (%s).", outputFilePath)
+	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", specsDirPath)
+
+	logger.Log.Debugf("Distribution tag: %s.", distTag)
 
 	err = s.chroot.Run(func() error {
 		return s.generateSnapshotInChroot(distTag)
@@ -91,6 +92,37 @@ func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distT
 	return
 }
 
+func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
+	const runCheck = true
+
+	defines := rpm.DefaultDefines(runCheck)
+	defines[rpm.DistTagDefine] = distTag
+
+	return defines
+}
+
+func (s *SnapshotGenerator) buildAllSpecsList() (specPaths []string, err error) {
+	specFilesGlob := filepath.Join(chrootSpecDirPath, "**", "*.spec")
+
+	specPaths, err = filepath.Glob(specFilesGlob)
+	if err != nil {
+		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
+	}
+
+	return
+}
+
+func (s *SnapshotGenerator) buildCompatibleSpecsList(defines map[string]string) (specPaths []string, err error) {
+	var allSpecFilePaths []string
+
+	allSpecFilePaths, err = s.buildAllSpecsList()
+	if err != nil {
+		return
+	}
+
+	return s.filterCompatibleSpecs(allSpecFilePaths, defines)
+}
+
 func (s *SnapshotGenerator) cleanUp() {
 	const leaveFilesOnDisk = false
 
@@ -99,16 +131,54 @@ func (s *SnapshotGenerator) cleanUp() {
 	}
 }
 
+func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) (repoContents repocloner.RepoContents, err error) {
+	repoContents = repocloner.RepoContents{
+		Repo: []*repocloner.RepoPackage{},
+	}
+
+	for _, builtRPM := range allBuiltRPMs {
+		matches := rpmSpecBuiltRPMRegex.FindStringSubmatch(builtRPM)
+		if len(matches) != rpmSpecBuiltRPMRegexMatchesCount {
+			return repoContents, fmt.Errorf("RPM package name (%s) doesn't match the regular expression (%s)", builtRPM, rpmSpecBuiltRPMRegex.String())
+		}
+
+		repoContents.Repo = append(repoContents.Repo, &repocloner.RepoPackage{
+			Name:         matches[rpmSpecBuiltRPMRegexNameIndex],
+			Version:      matches[rpmSpecBuiltRPMRegexVersionIndex],
+			Distribution: matches[rpmSpecBuiltRPMRegexDistributionIndex],
+			Architecture: matches[rpmSpecBuiltRPMRegexArchitectureIndex],
+		})
+	}
+
+	return
+}
+
+func (s *SnapshotGenerator) filterCompatibleSpecs(allSpecFilePaths []string, defines map[string]string) (specPaths []string, err error) {
+	var specCompatible bool
+
+	for _, specFilePath := range allSpecFilePaths {
+		specDirPath := filepath.Dir(specFilePath)
+
+		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, defines)
+		if err != nil {
+			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+			return
+		}
+
+		if specCompatible {
+			specPaths = append(specPaths, specFilePath)
+		}
+	}
+
+	return
+}
+
 func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error) {
 	var (
 		allBuiltRPMs []string
 		repoContents repocloner.RepoContents
 		specPaths    []string
 	)
-
-	logger.Log.Debugf("Chroot directory: %s.", s.chrootDirPath)
-	logger.Log.Debugf("Distribution tag: %s.", distTag)
-	logger.Log.Debugf("Specs directory %s.", chrootSpecDirPath)
 
 	defines := s.buildDefines(distTag)
 	specPaths, err = s.buildCompatibleSpecsList(defines)
@@ -141,91 +211,22 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 	return
 }
 
-func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
-	const runCheck = true
-
-	defines := rpm.DefaultDefines(runCheck)
-	defines[rpm.DistTagDefine] = distTag
-
-	return defines
-}
-
-func (s *SnapshotGenerator) buildAllSpecsList() (specPaths []string, err error) {
-	specFilesGlob := filepath.Join(chrootSpecDirPath, "**", "*.spec")
-
-	specPaths, err = filepath.Glob(specFilesGlob)
-	if err != nil {
-		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
-	}
-
-	return
-}
-func (s *SnapshotGenerator) buildCompatibleSpecsList(defines map[string]string) (specPaths []string, err error) {
-	var allSpecFilePaths []string
-
-	allSpecFilePaths, err = s.buildAllSpecsList()
-	if err != nil {
-		return
-	}
-
-	return s.filterCompatibleSpecs(allSpecFilePaths, defines)
-}
-func (s *SnapshotGenerator) filterCompatibleSpecs(allSpecFilePaths []string, defines map[string]string) (specPaths []string, err error) {
-	var specCompatible bool
-
-	for _, specFilePath := range allSpecFilePaths {
-		specDirPath := filepath.Dir(specFilePath)
-
-		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
-			return
-		}
-
-		if specCompatible {
-			specPaths = append(specPaths, specFilePath)
-		}
-	}
-
-	return
-}
-
-func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) (repoContents repocloner.RepoContents, err error) {
-	repoContents = repocloner.RepoContents{
-		Repo: []*repocloner.RepoPackage{},
-	}
-
-	for _, builtRPM := range allBuiltRPMs {
-		matches := rpmSpecBuiltRPMRegex.FindStringSubmatch(builtRPM)
-		if len(matches) != rpmSpecBuiltRPMRegexMatchesCount {
-			return repoContents, fmt.Errorf("RPM package name (%s) doesn't match the regular expression (%s)", builtRPM, rpmSpecBuiltRPMRegex.String())
-		}
-
-		repoContents.Repo = append(repoContents.Repo, &repocloner.RepoPackage{
-			Name:         matches[rpmSpecBuiltRPMRegexNameIndex],
-			Version:      matches[rpmSpecBuiltRPMRegexVersionIndex],
-			Distribution: matches[rpmSpecBuiltRPMRegexDistributionIndex],
-			Architecture: matches[rpmSpecBuiltRPMRegexArchitectureIndex],
-		})
-	}
-
-	return
-}
-
 func (s *SnapshotGenerator) initializeChroot(specsDirPath string) (err error) {
-	const existingDir = false
+	const (
+		existingDir = false
+		chrootName  = "rpmssnapshot_chroot"
+	)
+
+	chrootDirPath := filepath.Join(s.buildDirPath, chrootName)
+	s.chroot = safechroot.NewChroot(chrootDirPath, existingDir)
 
 	extraDirectories := []string{}
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(specsDirPath, chrootSpecDirPath, "", safechroot.BindMountPointFlags, ""),
 	}
-
-	s.chroot = safechroot.NewChroot(s.chrootDirPath, existingDir)
-
 	err = s.chroot.Initialize(s.workerTarPath, extraDirectories, extraMountPoints)
 	if err != nil {
-		logger.Log.Errorf("Failed to initialize chroot from (%s) inside (%s). Error: %v.", s.workerTarPath, s.chrootDirPath, err)
-		return
+		logger.Log.Errorf("Failed to initialize chroot (%s) inside (%s). Error: %v.", s.workerTarPath, chrootDirPath, err)
 	}
 
 	return
