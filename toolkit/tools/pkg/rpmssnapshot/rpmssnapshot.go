@@ -58,6 +58,7 @@ type SnapshotGenerator struct {
 	workerTarPath string
 }
 
+// New creates an unitialized RPMs snapshot generator.
 func New(buildDirPath, workerTarPath string) *SnapshotGenerator {
 	return &SnapshotGenerator{
 		buildDirPath:  buildDirPath,
@@ -65,6 +66,7 @@ func New(buildDirPath, workerTarPath string) *SnapshotGenerator {
 	}
 }
 
+// GenerateSnapshot generates a snapshot of all packages built from the specs inside the input directory.
 func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distTag string) (err error) {
 	err = s.initializeChroot(specsDirPath)
 	if err != nil {
@@ -92,15 +94,6 @@ func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distT
 	return
 }
 
-func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
-	const runCheck = true
-
-	defines := rpm.DefaultDefines(runCheck)
-	defines[rpm.DistTagDefine] = distTag
-
-	return defines
-}
-
 func (s *SnapshotGenerator) buildAllSpecsList() (specPaths []string, err error) {
 	specFilesGlob := filepath.Join(chrootSpecDirPath, "**", "*.spec")
 
@@ -121,6 +114,15 @@ func (s *SnapshotGenerator) buildCompatibleSpecsList(defines map[string]string) 
 	}
 
 	return s.filterCompatibleSpecs(allSpecFilePaths, defines)
+}
+
+func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
+	const runCheck = true
+
+	defines := rpm.DefaultDefines(runCheck)
+	defines[rpm.DistTagDefine] = distTag
+
+	return defines
 }
 
 func (s *SnapshotGenerator) cleanUp() {
@@ -189,9 +191,9 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 
 	logger.Log.Infof("Found %d compatible specs.", len(specPaths))
 
-	allBuiltRPMs, err = s.parseSpecs(specPaths, defines)
+	allBuiltRPMs, err = s.readBuiltRPMs(specPaths, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to parse specs. Error: %v.", err)
+		logger.Log.Errorf("Failed to extract built RPMs from specs. Error: %v.", err)
 		return
 	}
 
@@ -232,7 +234,7 @@ func (s *SnapshotGenerator) initializeChroot(specsDirPath string) (err error) {
 	return
 }
 
-func (s *SnapshotGenerator) parseSpecs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
+func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
 	var builtRPMs []string
 
 	for _, specPath := range specPaths {
