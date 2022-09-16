@@ -67,7 +67,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %pyt
 
 %changelog
 * Thu Sep 15 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.22.3-2
-- replaced py3_install macro to include numpy header files. --skip-build arg is removed essentially with the py3_install macro removal.
+- Replaced py3_install macro to include numpy header files. --skip-build arg is removed essentially with the py3_install macro removal.
 
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.22.3-1
 - Upgrade to latest upstream version
