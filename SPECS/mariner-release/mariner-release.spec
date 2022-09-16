@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Fri Sep 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.21
+- Updating version for September update 2.
+
 * Thu Sep 08 2022 Minghe Ren <mingheren@microsoft.com> - 2.0-20
 - remove issue.net kernel part as sshd doesn't support the old-style telnet escape sequences
 
