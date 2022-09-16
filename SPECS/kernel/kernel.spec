@@ -18,7 +18,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.67.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -391,6 +391,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
+- Enable CONFIG_NETFILTER_XT_TARGET_TRACE as a module
+
 * Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
 - Upgrade to 5.15.67.1
 
