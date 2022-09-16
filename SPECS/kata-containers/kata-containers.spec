@@ -169,18 +169,6 @@ ln -sf %{_bindir}/containerd-shim-kata-v2 %{buildroot}%{_prefix}/local/bin/conta
 ln -sf %{_bindir}/kata-monitor %{buildroot}%{_prefix}/local/bin/kata-monitor
 ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 
-# We could be run in a mock chroot, where uname will report
-# different kernel than what we have installed in the chroot.
-# So we need to determine a valid kernel version to test against.
-for kernelpath in /lib/modules/*/vmlinu*; do
-    KVERSION="$(echo $kernelpath | cut -d "/" -f 4)"
-    break
-done
-TEST_MODE=1 %{buildroot}%{kataosbuilderdir}/kata-osbuilder.sh \
-    -o %{buildroot}%{kataosbuilderdir} \
-    -k "$KVERSION" \
-    -a %{buildroot}
-
 %preun
 %systemd_preun kata-osbuilder-generate.service
 
@@ -189,17 +177,6 @@ TEST_MODE=1 %{buildroot}%{kataosbuilderdir}/kata-osbuilder.sh \
 
 %post
 %systemd_post kata-osbuilder-generate.service
-# Skip running this on Fedora CoreOS / Red Hat CoreOS
-if test -w %{katalocalstatecachedir}; then
-    TMPOUT="$(mktemp -t kata-rpm-post-XXXXXX.log)"
-    echo "Creating kata appliance initrd..."
-    %{kataosbuilderdir}/kata-osbuilder.sh > ${TMPOUT} 2>&1
-    if test "$?" != "0" ; then
-        echo "Building failed. Here is the log details:"
-        cat ${TMPOUT}
-        exit 1
-    fi
-fi
 
 %files
 # runtime
