@@ -39,6 +39,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 * Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
 - Upgrade to 5.15.67.1
 
+* Thu Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
+- Bump release number to match kernel release
+
 * Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
 - Bump release number to match kernel release
 
