@@ -90,3 +90,85 @@ index d4dd4b89d..8d0d76869 100644
 -- 
 2.17.1
 
+From f78be76a00878183da86d5e37ddbe421c5fe028c Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Wed, 14 Sep 2022 13:13:24 +0300
+Subject: [PATCH] Fix a memory leak in the new directory dance in ensureDir()
+
+This would leak the path whenever we already had the directory open.
+Which happens a lot. Oops.
+---
+ lib/fsm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/fsm.c b/lib/fsm.c
+index 129054067..7987abbc9 100644
+--- a/lib/fsm.c
++++ b/lib/fsm.c
+@@ -374,8 +374,6 @@ static int fsmDoMkDir(rpmPlugins plugins, int dirfd, const char *dn,
+ static int ensureDir(rpmPlugins plugins, const char *p, int owned, int create,
+ 		    int quiet, int *dirfdp)
+ {
+-    char *path = xstrdup(p);
+-    char *dp = path;
+     char *sp = NULL, *bn;
+     char *apath = NULL;
+     int oflags = O_RDONLY;
+@@ -387,6 +385,9 @@ static int ensureDir(rpmPlugins plugins, const char *p, int owned, int create,
+     int dirfd = fsmOpenat(-1, "/", oflags, 1);
+     int fd = dirfd; /* special case of "/" */
+ 
++    char *path = xstrdup(p);
++    char *dp = path;
++
+     while ((bn = strtok_r(dp, "/", &sp)) != NULL) {
+ 	fd = fsmOpenat(dirfd, bn, oflags, 1);
+ 	/* assemble absolute path for plugins benefit, sigh */
+-- 
+2.17.1
+
+From af08077fb4c60dee516948ce7bf9bed91de62119 Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Tue, 13 Sep 2022 10:26:05 +0300
+Subject: [PATCH] Fix possible descriptor leak in fsmOpenat()
+
+For the very unlikely case when openat() succeeded but fstatat()
+doesn't, the directory descriptor may be leaved opened. Rearrange
+the code a bit to ensure it'll always get closed when appropriate.
+
+Suggested-by: Pavel Kopylov <pkopylov@cloudlinux.com>
+Suggested-by: Dmitry Antipov <dantipov@cloudlinux.com>
+---
+ lib/fsm.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/lib/fsm.c b/lib/fsm.c
+index 18fe0c04c..129054067 100644
+--- a/lib/fsm.c
++++ b/lib/fsm.c
+@@ -313,14 +313,16 @@ static int fsmOpenat(int dirfd, const char *path, int flags, int dir)
+      */
+     if (fd < 0 && errno == ELOOP && flags != sflags) {
+ 	int ffd = openat(dirfd, path, flags);
+-	if (ffd >= 0 && fstatat(dirfd, path, &lsb, AT_SYMLINK_NOFOLLOW) == 0) {
+-	    if (fstat(ffd, &sb) == 0) {
+-		if (lsb.st_uid == 0 || lsb.st_uid == sb.st_uid) {
+-		    fd = ffd;
+-		} else {
+-		    close(ffd);
++	if (ffd >= 0) {
++	    if (fstatat(dirfd, path, &lsb, AT_SYMLINK_NOFOLLOW) == 0) {
++		if (fstat(ffd, &sb) == 0) {
++		    if (lsb.st_uid == 0 || lsb.st_uid == sb.st_uid) {
++			fd = ffd;
++		    }
+ 		}
+ 	    }
++	    if (ffd != fd)
++		close(ffd);
+ 	}
+     }
+ 
+-- 
+2.17.1
+
