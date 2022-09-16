@@ -23216,7 +23216,7 @@
         "other": {
           "name": "rpm",
           "version": "4.18.0-rc1",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.18.0-rc1.tar.gz"
+          "downloadUrl": "http://ftp.rpm.org/releases/testing/rpm-4.18.0-rc1.tar.bz2"
         }
       }
     },

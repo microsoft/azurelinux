@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
-Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-rc1.tar.gz
+Source0:        http://ftp.rpm.org/releases/testing/%{name}-%{version}-rc1.tar.bz2
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 # The license for the files below is the same as for RPM as they have originally came from rpm.
