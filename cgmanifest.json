@@ -23215,7 +23215,7 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.18.0-rc1",
+          "version": "4.18.0",
           "downloadUrl": "http://ftp.rpm.org/releases/testing/rpm-4.18.0-rc1.tar.bz2"
         }
       }
