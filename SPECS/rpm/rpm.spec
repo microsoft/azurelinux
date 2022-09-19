@@ -115,7 +115,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 Python3 rpm.
 
 %prep
-%autosetup -n rpm-%{name}-%{version}-rc1 -p1
+%autosetup -n %{name}-%{version}-rc1 -p1
 
 %build
 # pass -L opts to gcc as well to prioritize it over standard libs
