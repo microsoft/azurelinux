@@ -4450,8 +4450,8 @@
         "type": "other",
         "other": {
           "name": "gzip",
-          "version": "1.11",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz"
+          "version": "1.12",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.12.tar.xz"
         }
       }
     },

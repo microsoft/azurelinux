@@ -61,7 +61,7 @@ gawk-5.1.0-2.cm2.aarch64.rpm
 findutils-4.8.0-3.cm2.aarch64.rpm
 findutils-lang-4.8.0-3.cm2.aarch64.rpm
 gettext-0.21-2.cm2.aarch64.rpm
-gzip-1.11-1.cm2.aarch64.rpm
+gzip-1.12-1.cm2.aarch64.rpm
 make-4.3-2.cm2.aarch64.rpm
 patch-2.7.6-7.cm2.aarch64.rpm
 libcap-ng-0.8.2-2.cm2.aarch64.rpm
