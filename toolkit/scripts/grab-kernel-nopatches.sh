@@ -37,6 +37,14 @@ pushd $TMP_DIR
 SUBDIR=$(echo "${ZIP_URL}" | grep -o -P '(?<=KernelCVEPatch%2F).*(?=&%24format)')
 curl "$ZIP_URL" --header "Authorization:Basic ${Placeholder}" --retry 3 -o artifacts.zip
 unzip artifacts.zip
-for f in ./${SUBDIR}/*.nopatch; do cp $f ${BASE_PATH}/SPECS/kernel; done
+echo "========================"
+echo "|Link to nopatched CVEs|"
+echo "========================"
+for f in ./${SUBDIR}/*.nopatch
+do
+    CVENAME=$(echo "${f}" | cut -d'/' -f3- | rev | cut -d'.' -f2- | rev)
+    echo "- https://nvd.nist.gov/vuln/detail/${CVENAME}"
+    cp $f ${BASE_PATH}/SPECS/kernel
+done
 popd
 rm -r $TMP_DIR
