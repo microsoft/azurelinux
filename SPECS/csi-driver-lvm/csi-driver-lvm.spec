@@ -3,9 +3,9 @@ Name:           csi-driver-lvm
 Version:        0.4.1
 Release:        1%{?dist}
 License:        MIT
-URL:            https://github.com/metal-stack/csi-driver-lvm
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://github.com/metal-stack/csi-driver-lvm
 #Source0:       https://github.com/metal-stack/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}-govendorcached.tar.gz
 # Below is a manually created tarball, no download link.
@@ -29,11 +29,12 @@ csi-driver-lvm utilizes local storage of Kubernetes nodes to provide persistent 
 
 %build
 make %{?_smp_mflags}
+
 %files
 %license LICENSE
 %doc README.md
 
 %changelog
-* Thu Sep 08 2022 Lanze Liu <lanzeliu@microsoft.com> 0.4.1.1
+* Thu Sep 19 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.4.1-1
 - Initial version of package csi-driver-lvm
 - License Verified
