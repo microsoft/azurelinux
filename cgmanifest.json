@@ -1007,8 +1007,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.4.tar.gz"
+          "version": "1.4.5",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.5.tar.gz"
         }
       }
     },
