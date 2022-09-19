@@ -7,7 +7,8 @@
 # Kpatch module names allow only alphanumeric characters and '_'.
 %define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
 %define livepatch_install_dir %{_libdir}/livepatching/%{kernel_version_release}
-%define livepatch_module_path %{livepatch_install_dir}/%{livepatch_name}.ko
+%define livepatch_module_name %{livepatch_name}.ko
+%define livepatch_module_path %{livepatch_install_dir}/%{livepatch_module_name}
 
 %define patches_description \
 %(
@@ -140,7 +141,7 @@ sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{kernel_release}"/' .con
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
-install -m 744 %{livepatch_name}.ko %{buildroot}%{livepatch_module_path}
+install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
 
 # endif builds_module
 %endif
