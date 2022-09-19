@@ -75,7 +75,7 @@ func (n *Network) IsValid() (err error) {
 	return
 }
 
-// ConfigureNetwork performs network configuration during the kickstart unattended installation process
+// ConfigureNetwork performs network configuration during the installation process
 func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfig) (err error) {
 	const squashErrors = false
 	var dnsUpdate bool

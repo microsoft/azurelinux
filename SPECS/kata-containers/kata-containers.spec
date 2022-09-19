@@ -11,8 +11,6 @@
 # https://github.com/rust-lang/rust/issues/47714
 %undefine _strict_symbol_defs_build
 
-%global katadatadir             %{_datadir}/kata-containers
-%global katadefaults            %{katadatadir}/defaults
 %global katacache               %{_localstatedir}/cache
 %global katalibexecdir          %{_libexecdir}/kata-containers
 %global katalocalstatecachedir  %{katacache}/kata-containers
@@ -22,19 +20,18 @@
 
 %global runtime_make_vars       QEMUPATH=%{qemupath} \\\
                                 KERNELTYPE="compressed" \\\
+                                KERNELPARAMS="systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0" \\\
                                 DEFSHAREDFS="virtio-fs" \\\
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
                                 DEFVIRTIOFSCACHESIZE=0 \\\
-                                DEFSANDBOXCGROUPONLY=true \\\
+                                DEFSANDBOXCGROUPONLY=false \\\
                                 SKIP_GO_VERSION_CHECK=y \\\
                                 MACHINETYPE=%{machinetype} \\\
-                                SCRIPTS_DIR=%{_bindir} \\\
                                 DESTDIR=%{buildroot} \\\
                                 PREFIX=/usr \\\
-                                DEFAULTSDIR=%{katadefaults} \\\
-                                CONFDIR=%{katadefaults} \\\
                                 FEATURE_SELINUX="yes" \\\
-                                DEFENABLEANNOTATIONS=['\\\".*\\\"']
+                                DEFENABLEANNOTATIONS=['\\\".*\\\"'] \\\
+                                DEFAULT_HYPERVISOR=cloud-hypervisor
 
 %global agent_make_vars         LIBC=gnu \\\
                                 DESTDIR=%{buildroot}%{kataagentdir}
@@ -42,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        1%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -52,8 +49,10 @@ Source2:        kata-osbuilder.sh
 Source3:        kata-osbuilder-generate.service
 Source4:        15-dracut.conf
 Source5:        50-kata
-Patch0:         0002-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
-Patch1:         0003-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
+Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
+Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
+Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
+Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -162,12 +161,6 @@ install -m 0644 -D -t %{buildroot}%{_sysconfdir}/crio/crio.conf.d %{SOURCE5}
 
 # Disable the image= option, so we use initrd= by default
 # The kernels kata-osbuilder creates are in /var/cache now, see rhbz#1792216
-sed -i -e 's|^kernel = "%{_datadir}|kernel = "%{katacache}|' \
-       -e 's|^image = "%{_datadir}/kata-containers/kata-containers.img"|initrd = "%{katacache}/kata-containers/kata-containers-initrd.img"|' \
-       %{buildroot}%{_datadir}/kata-containers/defaults/configuration.toml
-
-# Enable vsock as transport instead of virtio-serial
-sed -i -e 's/^#use_vsock =/use_vsock =/' %{buildroot}%{_datadir}/kata-containers/defaults/configuration.toml
 
 # Make symlinks in /usr/local/bin to /usr/bin where kata expects to find binaries
 mkdir -p %{buildroot}%{_prefix}/local/bin
@@ -216,15 +209,10 @@ fi
 %{_prefix}/local/bin/containerd-shim-kata-v2
 %{_prefix}/local/bin/kata-monitor
 %{_prefix}/local/bin/kata-runtime
-%{katadefaults}/configuration-acrn.toml
-%{katadefaults}/configuration-clh.toml
-%{katadefaults}/configuration-fc.toml
-%{katadefaults}/configuration-qemu.toml
+%dir %{_datadir}/defaults/kata-containers/
+%{_datadir}/defaults/kata-containers/configuration*.toml
 %dir %{katalibexecdir}
 %{katalibexecdir}/VERSION
-%dir %{katadatadir}
-%dir %{katadefaults}
-%{katadefaults}/configuration.toml
 %{_datadir}/bash-completion/completions/kata-runtime
 %license LICENSE
 %doc CONTRIBUTING.md
@@ -253,6 +241,19 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-5
+- Generate initrd on reload.
+
+* Tue Sep 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-4
+- Set DEFSANDBOXCGROUPONLY="false".
+
+* Wed Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
+- Add kernel config to match guest and host cgroup setup.
+- Add patch to expose devices from kata.
+
+* Wed Aug 31 2022 Andrew Phelps <anphel@microsoft.com> - 2.5.0-2
+- Fix arm64 build issue by excluding configuration-acrn.toml
+
 * Fri Aug 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

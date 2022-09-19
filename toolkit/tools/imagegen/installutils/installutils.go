@@ -42,7 +42,7 @@ const (
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
-	bootDirectoryFileMode = 0600
+	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
 	shadowFile            = "/etc/shadow"
 )
@@ -388,13 +388,13 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
 
 	if len(config.PackageRepos) > 0 {
-		if config.IsKickStartBoot && config.IsIsoInstall {
+		if config.IsIsoInstall {
 			err = configuration.UpdatePackageRepo(installChroot, config)
 			if err != nil {
 				return
 			}
 		} else {
-			return fmt.Errorf("custom package repos should not be specified unless performing kickstart ISO installation")
+			return fmt.Errorf("custom package repos should not be specified unless performing ISO installation")
 		}
 	}
 
@@ -497,11 +497,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		generateContainerManifests(installChroot)
 	}
 
-	if config.IsKickStartBoot {
-		err = configuration.ConfigureNetwork(installChroot, config)
-		if err != nil {
-			return
-		}
+	err = configuration.ConfigureNetwork(installChroot, config)
+	if err != nil {
+		return
 	}
 
 	// Run post-install scripts from within the installroot chroot

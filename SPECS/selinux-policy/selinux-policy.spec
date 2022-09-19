@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,13 @@ Patch40:        0040-usermanage-Add-sysctl-access-for-groupadd-to-get-num.patch
 Patch41:        0041-systemd-systemd-cgroups-reads-kernel.cap_last_cap-sy.patch
 Patch42:        0042-kernel-hv_utils-shutdown-on-systemd-systems.patch
 Patch43:        0043-Container-Minor-fixes-from-interactive-container-use.patch
+Patch44:        0044-systemd-Minor-coredump-fixes.patch
+Patch45:        0045-rpm-Minor-fixes.patch
+Patch46:        0046-init-Allow-nnp-nosuid-transitions-from-systemd-initr.patch
+Patch47:        0047-selinuxutil-Semanage-reads-policy-for-export.patch
+Patch48:        0048-sysnetwork-ifconfig-searches-debugfs.patch
+Patch49:        0049-usermanage-Add-dac_read_search-to-useradd.patch
+Patch50:        0050-Temp-kubernetes-fix.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -239,7 +246,9 @@ if [ -s %{_sysconfdir}/selinux/config ]; then \
      if [ "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT} ]; then \
         [ -f ${FILE_CONTEXT}.pre ] || cp -f ${FILE_CONTEXT} ${FILE_CONTEXT}.pre; \
      fi; \
-     touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
+     if [ -d %{_sysconfdir}/selinux/%{1} ]; then \
+        touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
+     fi; \
 fi;
 %define postInstall() \
 . %{_sysconfdir}/selinux/config; \
@@ -337,6 +346,15 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Sep 14 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-11
+- Fix issue with preinst on systems that do not have selinux-policy.
+
+* Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-10
+- Fixed denials during coredump.
+- Allow NoNewPerms transition from init scripts/systemd unit commands.
+- Minor fixes in semanage, ifconfig, rpm, and useradd.
+- Fix incorrect label for kubernetes runtime dir when created by initrc_t.
+
 * Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-9
 - Fixes for interactive container use.
 

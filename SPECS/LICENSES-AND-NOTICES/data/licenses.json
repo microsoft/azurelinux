@@ -820,6 +820,7 @@
                 "mokutil",
                 "mpage",
                 "mrtg",
+                "mstflint",
                 "mt-st",
                 "mtdev",
                 "mtools",
@@ -1953,6 +1954,7 @@
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
                 "application-gateway-kubernetes-ingress",
+                "asc",
                 "azcopy",
                 "azure-iot-sdk-c",
                 "azure-storage-cpp",
@@ -1999,6 +2001,7 @@
                 "kernel-signed",
                 "KeysInUse-OpenSSL",
                 "kpatch",
+                "kube-vip-cloud-provider",
                 "kubernetes-1.18.14",
                 "kubernetes-1.18.17",
                 "kubernetes-1.19.7",
@@ -2014,6 +2017,7 @@
                 "libsafec",
                 "libuv",
                 "libxml++",
+                "livepatching",
                 "lld",
                 "lsb-release",
                 "lttng-consume",
@@ -2293,6 +2297,7 @@
                 "libvdpau",
                 "lynx",
                 "maven-parent",
+                "multus",
                 "objectweb-anttask",
                 "objectweb-asm",
                 "objenesis",
@@ -2489,8 +2494,11 @@
                 "kbd",
                 "keepalived",
                 "kernel",
+                "kernel-hci",
                 "kernel-headers",
+                "kernel-mshv",
                 "kernel-rt",
+                "kernel-uvm",
                 "keyutils",
                 "kmod",
                 "krb5",
@@ -2827,7 +2835,8 @@
         "Rancher": {
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
-                "k3s"
+                "k3s",
+                "k3s-1.23.8"
             ]
         },
         "Sysbench source": {

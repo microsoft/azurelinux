@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -143,6 +143,16 @@ sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' %{buildroot}%{
 sed -i 's/#PrintMotd yes/PrintMotd no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 120/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+sed -i 's/#ClientAliveCountMax 0/ClientAliveCountMax 0/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+
+echo "" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
+cat << EOF >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
+# Ensure SSH LoginGraceTime is set to one minute or less
+LoginGraceTime 60
+EOF
+
+sed -i 's/# no default banner path/# default banner path/g' %{buildroot}%{_sysconfdir}/ssh/sshd_config
+sed -i 's|#Banner none|Banner /etc/issue.net|' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 
 # Configure to use strong MACs
 echo "MACs hmac-sha2-512,hmac-sha2-256" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
@@ -251,6 +261,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Jul 26 2022 Minghe Ren <mingheren@microsoft.com> - 8.8p1-7
+- Update sshd_config to imporve SSH security
+
 * Fri Apr 22 2022 Chris Co <chrco@microsoft.com> - 8.8p1-6
 - Use strong MACs for ssh and sshd
 - Use strong encryption ciphers for ssh and sshd

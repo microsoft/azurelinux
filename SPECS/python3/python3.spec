@@ -11,8 +11,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.13
-Release:        3%{?dist}
+Version:        3.9.14
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,8 @@ Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
+Patch1:         CVE-2015-20107.patch
+
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -298,6 +300,15 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Sep 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-1
+- Update to 3.9.14 to resolve security issues including CVE-2020-10735
+
+* Wed Aug 31 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.13-5
+- Add CVE-2021-28861 patch from upstream
+
+* Tue Aug 30 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.13-4
+- Add CVE-2015-20107 patch from upstream
+
 * Tue Jul 12 2022 Olivia Crain <oliviacrain> - 3.9.13-3
 - Update cgi3 patch to use versioned python shebang 
 
