@@ -1,8 +1,8 @@
 %define version_tag %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Python templating language
 Name:           python-mako
-Version:        1.1.5
-Release:        2%{?dist}
+Version:        1.2.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/mako-render3
 
 %changelog
+* Mon Sep 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.2-1
+- Upgrade to 1.2.2
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-2
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 
