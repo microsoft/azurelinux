@@ -62,7 +62,7 @@ Summary:        %{summary}
 %description -n python3-%{pypi_name} %{_description}
 
 %prep
-%autosetup -p1 -n %{pypi_name}-%{version}
+%autosetup -p1 -n libcloud-%{version}
 sed -i '/^#!/d' demos/gce_demo.py
 chmod a-x demos/gce_demo.py
 # Setup tests
