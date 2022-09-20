@@ -1,7 +1,7 @@
+Summary:        A comprehensive, portable cryptographic toolkit
 Name:           libtomcrypt
 Version:        1.18.2
 Release:        9%{?dist}
-Summary:        A comprehensive, portable cryptographic toolkit
 License:        Public Domain OR WTFPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,7 @@ developing applications that use %{name}.
 %setup -q
 
 %build
-%set_build_flags
+%{set_build_flags}
 export PREFIX="%{_prefix}"
 export INCPATH="%{_includedir}"
 export LIBPATH="%{_libdir}"
