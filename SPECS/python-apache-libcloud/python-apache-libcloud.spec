@@ -19,35 +19,32 @@
 Apache Libcloud is a standard Python library that abstracts away \
 differences among multiple cloud provider APIs.
 %global pypi_name apache-libcloud
-
+Summary:        Abstraction over multiple cloud provider APIs
 Name:           python-apache-libcloud
 Version:        3.5.1
 Release:        2%{?dist}
-Summary:        Abstraction over multiple cloud provider APIs
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://libcloud.apache.org
 Source0:        https://github.com/apache/libcloud/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
-BuildArch:      noarch
 Patch1:         gce_image_projects.patch
 Patch2:         ec2_create_node.patch
 # PATCH-FIX-UPSTREAM https://github.com/Kami/libcloud/commit/e62bb28cdbd685203d44a9a4028f311ea155476c Use unittest.mock library from stdlib instead of using 3rd party mock dependency.
 Patch3:         mock.patch
-
 BuildRequires:  fdupes
 BuildRequires:  libvirt-python3
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-lockfile
 BuildRequires:  python3-lxml
 BuildRequires:  python3-paramiko
 BuildRequires:  python3-pyOpenSSL
 BuildRequires:  python3-requests-mock
 BuildRequires:  python3-setuptools
-BuildRequires:  pyproject-rpm-macros
 Requires:       python3-lxml
 Requires:       python3-requests
-
+BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  openssh-clients
 BuildRequires:  python3-pip
@@ -96,6 +93,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - Adding as run dependency for package cassandra medusa.
 - License verified
+
 * Fri May 13 2022 Markéta Machová <mmachova@suse.com>
 - update to 3.5.1
   * Support for Python 3.5 which has been EOL for more than a year now has been removed.
@@ -107,12 +105,15 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   * Also run unit tests under Python 3.10 + Pyjion on CI/CD.
 - added upstream patch mock.patch and drop mock requirement
 - rebase all other patches
+
 * Thu Dec  9 2021 pgajdos@suse.com
 - pytest-runner is not required for build
+
 * Mon Nov 15 2021 Andreas Stieger <andreas.stieger@gmx.de>
 - update to 3.4.1:
   * fix a regresion preventing installation under Python 3.5
   * revert requests minimum version required
+
 * Sun Nov 14 2021 Andreas Stieger <andreas.stieger@gmx.de>
 - update to 3.4.0:
   * Improvements and more flexibility in the failed HTTP requests
@@ -124,9 +125,11 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     driver
   * Support for using external cache for OpenStack auth tokens
 - add upstream signing key and validate source signature
+
 * Mon Feb  1 2021 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Skip "OvhTests::test_list_nodes_invalid_region" compute test when building
   RPM package since this tests requires internet connection.
+
 * Fri Jan 29 2021 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Update to 3.3.1:
   * Compute
@@ -140,6 +143,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   * Storage
     + [Google Cloud Storage] Fix a bug and make sure we also correctly handle scenario in get_object() method when the object size is returned in x-goog-stored-content-length and not content-length header. @RunOrVeith. (GITHUB-1544, GITHUB-1547)
     + [Google Cloud Storage] Update get_object() method and ensure object.size attribute is an integer and not a string. This way it’s consistent with list_objects() method. (GITHUB-1547)
+
 * Fri Jan 29 2021 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Update to 3.3.0:
   * Common
@@ -178,18 +182,23 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     + [AuroraDNS] Throw correct exception on 403 authorization failed API error. (GITHUB-1521, GITHUB-1522) [Freek Dijkstra - @macfreek]
     + [Linode] Add support for Linode’s API v4. (GITHUB-1504) [Dimitris Galanis - @dimgal1]
     + [CloudFlare] Update driver so it correctly throws RecordAlreadyExists error on various error responses which represent this error. [Tomaz Muraus - @Kami]
+
 * Tue Nov  3 2020 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Fix bcond macros on SPEC file to properly manage Python 2 and Python 3 builds.
+
 * Fri Oct 30 2020 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Skip conflictive 'ParamikoSSHClientTests.test_key_file_non_pem_format_error' test
   since our SLE python-paramiko package already has OpenSSH support on version < 2.7.0
+
 * Fri Oct 30 2020 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Add pyOpenSSL as build dependency to allow tests to pass on SLE15 family
+
 * Wed Oct 28 2020 Pablo Suárez Hernández <pablo.suarezhernandez@suse.com>
 - Do not build Python2 subpackage since 3.2.0 does not support Python2
 - Adjust skipped SSH unit tests when paramiko <= 2.7.0
 - Add:
   * skip-some-tests-for-older-paramiko-versions.patch
+
 * Wed Oct 21 2020 Steve Kowalik <steven.kowalik@suse.com>
 - Update to 3.2.0:
   * [OpenStack] Add ex_get_network() to the OpenStack driver to make it possible to retrieve a single network by using the ID.
@@ -213,6 +222,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   * [AWS S3] Make sure driver works correctly for objects with ~ in the name.
   * [CloudFlare] Update driver to include the whole error chain the thrown exception message field.
   * [Gandi Live] Don't throw if extra['rrset_ttl'] argument is not passed to the create_record method. (GITHUB-1463) [Tomaz Muraus]
+
 * Wed May 27 2020 Steve Kowalik <steven.kowalik@suse.com>
 - Update to v3.0.0:
   * Make sure auth_user_info variable on the OpenStack identify connection class is populated when using auth version 3.x_password and 3.x_oidc_access_token.
@@ -232,23 +242,29 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   * Add new stdout and stderr attribute to SSHCommandTimeoutError class.
   * [OpenStack] Fix auto assignment of volume device when using device name auto in the attach_volume method. (GITHUB-1444) [Joshua Hesketh - @jhesketh]
 - Refresh patches gce_image_projects.patch and ec2_create_node.patch.
+
 * Thu Mar 12 2020 Tomáš Chvátal <tchvatal@suse.com>
 - Fix build without python2
+
 * Thu Mar  5 2020 Niels Abspoel <aboe76@gmail.com>
 - update to 2.8.1
   for the changelog see:
   https://libcloud.readthedocs.io/en/stable/changelog.html#changes-in-apache-libcloud-v2-8-1
+
 * Fri Feb 21 2020 Sean Marlow <sean.marlow@suse.com>
 - Add gce_image_projects.patch to update the current list of SUSE
   image projects in GCE.
+
 * Thu Feb 20 2020 James Fehlig <jfehlig@suse.com>
 - Stop building for python2
+
 * Thu Jan 16 2020 Marketa Calabkova <mcalabkova@suse.com>
 - update to 2.8.0
   * Distribution now includes py.typed file which signals mypy that
     this package contains type annotations
   * Fix get_driver() bug / regression not working if the provider
     argument was a string and not a Provider ENUM.
+
 * Fri Dec 13 2019 Thomas Bechtold <tbechtold@suse.com>
 - update to 2.7.0:
   - Test code with Python 3.8 and advertise that we also support Python 3.8.
@@ -274,12 +290,15 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - [S3] Update the driver to throw more user-friendly error message if user is
     using driver for a region X, but trying to upload / download object to / from
     a region Y.
+
 * Wed Sep 18 2019 Tomáš Chvátal <tchvatal@suse.com>
 - Update to 2.6.0:
   * Many various cloud fixes and tweaks for future python releases
   * See CHANGES.rst
+
 * Thu May 16 2019 ranand@suse.com
 - Skip failing ElasticContainerDriverTestCase, with invalid URL
+
 * Mon Feb 25 2019 John Vandenberg <jayvdb@gmail.com>
 - Activate test suite, deselecting one set of tests which ssh to localhost
 - Remove image_projects.patch merged upstream
@@ -340,37 +359,47 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     + [S3] Add Amazon S3 (cn-northwest-1) Storage Driver
   * Other
     + Fixed spelling in 2.0 changes documentation
+
 * Fri Sep 28 2018 Sean Marlow <sean.marlow@suse.com>
 - Add ec2_create_node.patch to allow for instance type strings
   in create_node method.
+
 * Tue Aug 14 2018 sean.marlow@suse.com
 - Cleanup RPM warnings.
 - Add image_projects.patch with updated list of latest image
   projects.
+
 * Wed Jun  6 2018 jengelh@inai.de
 - Use noun phrase in summary.
+
 * Thu May 10 2018 toddrme2178@gmail.com
 - Make sure ssl is available
+
 * Wed May  2 2018 tchvatal@suse.com
 - Version update to 2.3.0:
   * For the changes see CHANGES.rst as it is too long
   * many various bugfixes
 - Drop no longer applying patch fix-backports-usage.patch
+
 * Sat Sep 30 2017 mc@suse.com
 - fix build on SLE12 by using python-backports
 - reduce warnings
+
 * Tue May 16 2017 jmatejek@suse.com
 - convert to singlespec
 - update requires
 - update source url
+
 * Sun Apr 30 2017 aboe76@gmail.com
 - Updated to apache libcloud 2.0.0
   for the changelog see:
   https://github.com/apache/libcloud/blob/trunk/CHANGES.rst#changes-in-apache-libcloud-200
+
 * Tue Oct 18 2016 aboe76@gmail.com
 - Updated to apache libcloud 1.3.0
   for the changelog see:
   https://github.com/apache/libcloud/blob/trunk/CHANGES.rst#changes-in-apache-libcloud-130
+
 * Wed Jan 20 2016 aboe76@gmail.com
 - Updated to apache libcloud 0.20.1
 - General:
@@ -395,19 +424,23 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - Make sure ttl attribute is correctly parsed and added to the Record extra dictionary.
     (GITHUB-675) [Wido den Hollander]
   - Improve unit tests of Aurora DNS driver (GITHUB-679) [Wido den Hollander]
+
 * Thu Dec 17 2015 aboe76@gmail.com
 - Updated to apache libcloud 0.20.0
   - new requirement: python-backports.ssl_match_hostname
   for the changelog see:
   https://libcloud.readthedocs.org/en/latest/changelog.html#changes-with-apache-libcloud-0-20-0
+
 * Sun Nov  1 2015 aboe76@gmail.com
 - Updated to apache libcloud 0.19.0
   for the changelog see:
   https://github.com/apache/libcloud/blob/trunk/CHANGES.rst#changes-with-apache-libcloud-0190
+
 * Thu Aug 13 2015 aboe76@gmail.com
 - Updated to apache libcloud 0.18.0
   for the changelog see:
   https://github.com/apache/libcloud/blob/v0.18.0/CHANGES.rst#changes-with-apache-libcloud-0180
+
 * Wed Feb 18 2015 aboe76@gmail.com
 - Updated to Apache Libcloud 0.17.0
 - skipped 0.16.0 but the changes are listed here also.
@@ -504,6 +537,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - New driver for Softlayer DNS service. (GITHUB-413, LIBCLOUD-640) [Vanč Levstik]
   - Fix a bug with ex_create_multi_value_record method in the Route53 driver only returning a single record. (GITHUB-431, LIBCLOUD-650) [Itxaka Serrano]
   - Various fixes in the Google DNS driver. (GITHUB-378) [Franck Cuny]
+
 * Mon Jul 21 2014 aboe76@gmail.com
 - Updated to Apache Libcloud 0.15.1
 - Compute:
@@ -523,6 +557,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     this exception was silently swallowed and ignored. [Tomaz Muraus]
 - DNS:
   - Include a better message in the exception which is thrown when a request in the Rackspace driver ends up in an ERROR state. [Tomaz Muraus]
+
 * Wed Jun 25 2014 aboe76@gmail.com
 - Updated to Apache LibCloud 0.15.0
 - Package:
@@ -596,6 +631,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - Fix update_record method in the Route56 driver so it works correctly for records with multiple values. [Tomaz Muraus]
   - Add ex_create_multi_value_record method to the Route53 driver which allows user to create a record with multiple values with a single call. [Tomaz Muraus]
   - Add new driver for Google DNS. (GITHUB-269) [Franck Cuny]
+
 * Sun Feb  9 2014 aboe76@gmail.com
 - Changes with Apache Libcloud 0.14.1
 - Compute:
@@ -619,6 +655,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - Update Route53 driver so it supports handling records with multiple values (e.g. MX). (LIBCLOUD-504, GITHUB-237) [Chris DeRamus]
   - Update Route53 driver to better handle SRV records. [Tomaz Muraus]
   - Update Route53 driver, make sure “ttl” attribute in the Record extra dictionary is always an int. [Tomaz Muraus]
+
 * Sat Jan 25 2014 aboe76@gmail.com
 - Big release 0.14.0
 - General:
@@ -781,12 +818,15 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     export Libcloud Zone to BIND zone format. (LIBCLOUD-398) [Tomaz Muraus]
   - Update issue with inexistent zone / record handling in the get_zone and get_record
     method in the Linode driver. Those issues were related to changes in the Linode API. (LIBCLOUD-425) [Jon Chen]
+
 * Thu Jan  2 2014 aboe76@gmail.com
 - Updated to 0.13.3 (bnc#857209)
 - Security fix release, for destroying nodes on digitalOcean
   'data_scrub' method is always invoked
+
 * Thu Oct 24 2013 speilicke@suse.com
 - Require python-setuptools instead of distribute (upstreams merged)
+
 * Sun Sep 22 2013 aboe76@gmail.com
 - Updated to 0.13.2
 - General:
@@ -810,6 +850,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - Modify values in the Record 'extra' dictionary attribute in the Zerigo DNS
     driver to be set to None instead of an empty string ('') if a value for
     the provided key is not set.
+
 * Thu Sep  5 2013 aboe76@gmail.com
 - Updated to 0.13.1
 - General Changes:
@@ -823,6 +864,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   - Fix a regression with calling encode_container_name instead of
     encode_object_name on object name in get_object method.
   - Ensure that AWS S3 multipart upload works for small iterators.
+
 * Mon Jul  1 2013 aboe76@gmail.com
 - Updated to 0.13.0
 - General changes:
@@ -883,6 +925,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     in the get_container and get_object method.
 - load balancer changes:
   - Add ex_list_current_usage method to the Rackspace driver.
+
 * Tue May  7 2013 aboe76@gmail.com
 - Updated to 0.12.4
 - Fix a regression in Softlayer driver caused by the xmlrpclib changes.
@@ -895,6 +938,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
   which is a multiple of four for ex_vm_memory kwarg in create_node method.
 - Fix a regression with removed ex_force_service_region constructor kwarg in
   the CloudFiles driver.
+
 * Mon Apr 15 2013 aboe76@gmail.com
 - Updated to 0.12.3
 - Fix Python 3.x related regressions
@@ -907,6 +951,7 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
 - Fix a regression in ParamikoSSHClient
 - Allow user to specify 'priority' extra argument when creating a MX or SRV
   record.
+
 * Tue Feb 19 2013 aboe76@gmail.com
 - updated to 0.12.1
 - Changes with Apache Libcloud 0.12.1:
@@ -1060,11 +1105,14 @@ rm -r %{buildroot}%{python3_sitelib}/libcloud/test
     [John Carr]
   - Add new driver for AWS Elastic Load Balancing service. (LIBCLOUD-169)
     [John Carr]
+
 * Wed Jan 30 2013 aboe76@gmail.com
 - Updated spec file copyright to Suse
+
 * Mon Jan 28 2013 toddrme2178@gmail.com
 - Cleanup spec file
 - Fix rpmlint errors
 - Rename package to match spec file
+
 * Tue Jan 22 2013 aboe76@gmail.com
 - initial upload version 0.11.4
