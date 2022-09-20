@@ -23,29 +23,27 @@ pieces that are extremely critical to performance (e.g. block ciphers) are
 implemented as C extensions.
 Note: all modules are installed under the Cryptodome package to avoid conflicts
 with the PyCrypto library.}
-
+Summary:        A self-contained cryptographic library for Python
 Name:           python-%{srcname}
 Version:        3.15.0
 Release:        2%{?dist}
-Summary:        A self-contained cryptographic library for Python
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # PyCrypto-based code is public domain, further PyCryptodome contributions are
 # BSD
-License:        BSD and Public Domain
+License:        BSD AND Public Domain
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.pycryptodome.org/
 Source0:        https://github.com/Legrandin/pycryptodome/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # Use external libtomcrypt library
 Patch0:         %{name}-3.15.0-use_external_libtomcrypt.patch
-
 BuildRequires:  gcc
 BuildRequires:  libtomcrypt-devel
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
 # Needed for documentation
 BuildRequires:  python3-sphinx
+BuildRequires:  python3-wheel
 Requires:       python3
 
 %description
