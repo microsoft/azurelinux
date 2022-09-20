@@ -82,7 +82,7 @@ kernel version %{kernel_version_release}.
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
-install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
+install -m 744 %{SOURCE0} %{buildroot}%{livepatch_module_path}
 
 %post
 %load_if_should
@@ -107,5 +107,4 @@ install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
 %dir %{livepatch_install_dir}
 %{livepatch_module_path}
 
-%changelog
-@CHANGELOG_ENTRIES@
+@CHANGELOG@

@@ -20,42 +20,10 @@
     done
 )
 
-%define patch_applicable_for_kernel [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_version_release}" ]]
-%define patch_installed kpatch list | grep -qP "%{livepatch_name}.*%{kernel_version_release}"
-%define patch_loaded    kpatch list | grep -qP "%{livepatch_name}.*enabled"
-
-# Install patch if the RUNNING kernel matches.
-# No-op for initial (empty) livepatch.
-%define install_if_should \
-if %{patch_applicable_for_kernel} && ! %{patch_installed} \
-then \
-    kpatch install %{livepatch_module_path} \
-fi
-
-# Load patch, if the RUNNING kernel matches.
-# No-op for initial (empty) livepatch.
-%define load_if_should \
-if %{patch_applicable_for_kernel} && ! %{patch_loaded} \
-then \
-    kpatch load %{livepatch_module_path} \
-fi
-
-%define uninstall_if_should \
-if %{patch_installed} \
-then \
-    kpatch uninstall %{livepatch_name} \
-fi
-
-%define unload_if_should \
-if %{patch_loaded} \
-then \
-    kpatch unload %{livepatch_name} \
-fi
-
 Summary:        Set of livepatches for kernel %{kernel_version_release}
 Name:           livepatch-%{kernel_version_release}
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +32,8 @@ URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
 Source1:        config-%{kernel_version_release}
 Source2:        mariner.pem
+Patch0:         CVE-2022-32250.nopatch
+Patch1:         CVE-2022-34918.patch
 
 ExclusiveArch:  x86_64
 
@@ -100,14 +70,6 @@ BuildRequires:  rpm-build
 # endif builds_module
 %endif
 
-Requires:       coreutils
-Requires:       livepatching-filesystem
-
-Requires(post): coreutils
-Requires(post): kpatch
-
-Requires(preun): kpatch
-
 Provides:       livepatch = %{kernel_version_release}
 
 %description
@@ -127,17 +89,18 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{kernel_release}"/' .config
 
 %build
-    # Building cumulative patch.
-    for patch in %{patches}
-    do
-        [[ "$patch" == *.patch ]] && cat "$patch" >> %{livepatch_name}.patch
-    done
+# Building cumulative patch.
+all_patches_file=all.patch
+for patch in %{patches}
+do
+    [[ "$patch" == *.patch ]] && cat "$patch" >> $all_patches_file
+done
 
-    kpatch-build -ddd \
-        --sourcedir . \
-        --vmlinux %{_libdir}/debug/lib/modules/%{kernel_version_release}/vmlinux \
-        --name %{livepatch_name} \
-        %{livepatch_name}.patch
+kpatch-build -ddd \
+    --sourcedir . \
+    --vmlinux %{_libdir}/debug/lib/modules/%{kernel_version_release}/vmlinux \
+    --name %{livepatch_name} \
+    $all_patches_file
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
@@ -145,24 +108,6 @@ install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
 
 # endif builds_module
 %endif
-
-%post
-%load_if_should
-%install_if_should
-
-%preun
-%uninstall_if_should
-%unload_if_should
-
-# Re-enable patch on rollbacks to supported kernel.
-%triggerin -- kernel = %{kernel_version_release}
-%load_if_should
-%install_if_should
-
-# Prevent the patch from being loaded after a reboot to a different kernel.
-# Previous kernel is still running, do NOT unload the livepatch.
-%triggerin -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
-%uninstall_if_should
 
 %files
 %defattr(-,root,root)
