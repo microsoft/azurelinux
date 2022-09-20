@@ -26,11 +26,6 @@ BuildRequires:  uid_wrapper
 BuildRequires:  zlib-devel
 Requires:       %{name}-config = %{version}-%{release}
 Recommends:     crypto-policies
-%ifarch aarch64 x86_64
-Provides:       libssh_threads.so.4()(64bit)
-%else
-Provides:       libssh_threads.so.4
-%endif
 
 %description
 The ssh library was designed to be used by programmers needing a working SSH
