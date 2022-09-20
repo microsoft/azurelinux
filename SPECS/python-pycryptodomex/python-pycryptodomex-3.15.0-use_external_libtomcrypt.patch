@@ -1,0 +1,36 @@
+diff -up ./setup.py.bak ./setup.py
+--- ./setup.py.bak	2022-06-22 20:21:37.000000000 +0200
++++ ./setup.py	2022-06-23 11:09:44.260182023 +0200
+@@ -369,10 +369,12 @@ ext_modules = [
+     Extension("Crypto.Cipher._raw_des",
+         include_dirs=['src/', 'src/libtom/'],
+         sources=["src/DES.c"],
++        extra_link_args=["-ltomcrypt"],
+         py_limited_api=True),
+     Extension("Crypto.Cipher._raw_des3",
+         include_dirs=['src/', 'src/libtom/'],
+         sources=["src/DES3.c"],
++        extra_link_args=["-ltomcrypt"],
+         py_limited_api=True),
+     Extension("Crypto.Util._cpuid_c",
+         include_dirs=['src/'],
+@@ -417,6 +419,7 @@ ext_modules = [
+     Extension("Crypto.Cipher._Salsa20",
+         include_dirs=['src/', 'src/libtom/'],
+         sources=["src/Salsa20.c"],
++        extra_link_args=["-ltomcrypt"],
+         py_limited_api=True),
+     Extension("Crypto.Cipher._chacha20",
+         include_dirs=['src/'],
+diff -up ./src/DES.c.bak ./src/DES.c
+--- ./src/DES.c.bak	2022-06-22 20:21:37.000000000 +0200
++++ ./src/DES.c	2022-06-23 11:10:58.166711358 +0200
+@@ -39,7 +39,7 @@ FAKE_INIT(raw_des3)
+ 
+ /* Include the actial DES implementation */
+ #define LTC_NO_PROTOTYPES
+-#include "libtom/tomcrypt_des.c"
++#include <tomcrypt.h>
+ 
+ struct block_state {
+     symmetric_key sk;
