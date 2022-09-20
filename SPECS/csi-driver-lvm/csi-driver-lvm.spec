@@ -36,5 +36,5 @@ make %{?_smp_mflags}
 
 %changelog
 * Thu Sep 19 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.4.1-1
-- Initial version of package csi-driver-lvm
+- Original version for CBL-Mariner
 - License Verified
