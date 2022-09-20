@@ -79,6 +79,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue Sep 20 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.25.0-1
+- Updated k3s to 1.25.0
+
 * Tue Aug 30 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.24.3-1
 - Updated k3s to 1.24.3
 
