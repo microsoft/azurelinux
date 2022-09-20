@@ -1,15 +1,14 @@
+Summary:        A library implementing the SSH protocol
 Name:           libssh
 Version:        0.9.6
 Release:        1%{?dist}
-Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
-URL:            https://www.libssh.org
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://www.libssh.org
 Source0:        https://git.libssh.org/projects/libssh.git/snapshot/%{name}-%{version}.tar.gz
 Source1:        libssh_client.config
 Source2:        libssh_server.config
-
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  gnupg2
@@ -17,19 +16,16 @@ BuildRequires:  krb5-devel
 BuildRequires:  libcmocka-devel
 BuildRequires:  nmap-ncat
 BuildRequires:  nss_wrapper
-BuildRequires:  openssh-devel
+BuildRequires:  openssl-devel
 BuildRequires:  openssh-server
-BuildRequires:  openssl-clients
+BuildRequires:  openssh-clients
 BuildRequires:  pam_wrapper
-BuildRequires:  pkgconfig
+BuildRequires:  pkg-config
 BuildRequires:  socket_wrapper
 BuildRequires:  uid_wrapper
 BuildRequires:  zlib-devel
-
 Requires:       %{name}-config = %{version}-%{release}
-
 Recommends:     crypto-policies
-
 %ifarch aarch64 x86_64
 Provides:       libssh_threads.so.4()(64bit)
 %else
@@ -54,8 +50,8 @@ applications that use %{name}.
 
 %package config
 Summary:        Configuration files for %{name}
-BuildArch:      noarch
 Obsoletes:      %{name} < 0.9.0-3
+BuildArch:      noarch
 
 %description config
 The %{name}-config package provides the default configuration files for %{name}.
@@ -120,7 +116,7 @@ popd
 %files devel
 %{_includedir}/libssh/
 # own this to avoid dep on cmake -- rex
-%dir  %{_libdir}/cmake/
+%dir %{_libdir}/cmake/
 %{_libdir}/cmake/libssh/
 %{_libdir}/pkgconfig/libssh.pc
 %{_libdir}/libssh.so
