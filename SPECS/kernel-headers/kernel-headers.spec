@@ -1,6 +1,6 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.67.1
+Version:        5.15.68.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -36,6 +36,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Sep 20 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.68.1-1
+- Upgrade to 5.15.68.1
+
 * Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
 - Upgrade to 5.15.67.1
 
