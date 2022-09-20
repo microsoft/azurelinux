@@ -126,8 +126,8 @@ grep-3.7-2.cm2.aarch64.rpm
 grep-debuginfo-3.7-2.cm2.aarch64.rpm
 grep-lang-3.7-2.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
-gzip-1.11-1.cm2.aarch64.rpm
-gzip-debuginfo-1.11-1.cm2.aarch64.rpm
+gzip-1.12-1.cm2.aarch64.rpm
+gzip-debuginfo-1.12-1.cm2.aarch64.rpm
 intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.aarch64.rpm
