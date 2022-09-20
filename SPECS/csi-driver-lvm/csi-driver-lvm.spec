@@ -33,6 +33,7 @@ make %{?_smp_mflags}
 %files
 %license LICENSE
 %doc README.md
+%{_bindir}/csi-driver-lvm
 
 %changelog
 * Thu Sep 19 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.4.1-1
