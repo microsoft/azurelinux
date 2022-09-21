@@ -313,9 +313,9 @@ rm -rf m4-1.4.19
 
 touch $LFS/logs/temptoolchain/status_m4_complete
 
-echo Ncurses-6.3
-tar xf ncurses-6.3-20220612.tgz
-pushd ncurses-6.3-20220612
+echo Ncurses-6.2
+tar xf ncurses-6.2.tar.gz
+pushd ncurses-6.2
 sed -i s/mawk// configure
 ./configure --prefix=/tools \
             --with-shared   \
@@ -327,7 +327,7 @@ make -j$(nproc)
 make install
 ln -s libncursesw.so /tools/lib/libncurses.so
 popd
-rm -rf ncurses-6.3-20220612
+rm -rf ncurses-6.2
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
 
