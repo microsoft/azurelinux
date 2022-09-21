@@ -57,5 +57,9 @@ do
     sed -i -E "s/^(Release:\s*).*/\1$release%{?dist}/" "$spec_path"
     changelog_header=$(date "+%a %b %d %Y $user_name <$user_email> - $epoch$version-$release")
     changelog_indents=$(grep -m 1 -P "^\*.*@.*>" "$spec_path" | sed -E "s/^\*(\s+).*/\1/")
+    if [[ -z "$changelog_indents" ]]
+    then
+        changelog_indents=" "
+    fi
     sed -i -E "/\s*^%changelog.*/a *$changelog_indents$changelog_header\n-$changelog_indents$changelog_message\n" "$spec_path"
 done
