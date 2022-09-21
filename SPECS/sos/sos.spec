@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
-Version:        4.2
+Version:        4.4
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -68,6 +68,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Thu Sep 15 2022 Nan Liu <liunan@microsoft.com> - 4.4-1
+- Update to version 4.4 to fix CVE-2022-2806
+
 * Thu Dec 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2-1
 - Update to version 4.2
 
