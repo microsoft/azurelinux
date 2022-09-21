@@ -62,4 +62,6 @@ do
         changelog_indents=" "
     fi
     sed -i -E "/\s*^%changelog.*/a *$changelog_indents$changelog_header\n-$changelog_indents$changelog_message\n" "$spec_path"
+    # Remove excessive empty lines, if present.
+    sed -i -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$spec_path"
 done
