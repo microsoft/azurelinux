@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.9.0
-Release:        3%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,12 +28,12 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         nvidia-container-toolkit-1.9.0.patch
+#Patch0:         nvidia-container-toolkit-1.9.0.patch
 BuildRequires:  golang
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook
 Provides: nvidia-container-runtime
 Provides: nvidia-container-runtime-hook
-Requires: libnvidia-container-tools >= 1.9.0, libnvidia-container-tools < 2.0.0
+Requires: libnvidia-container-tools >= 1.11.0, libnvidia-container-tools < 2.0.0
 
 %description
 Provides a OCI hook to enable GPU support in containers.

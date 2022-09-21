@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime
 Name:           nvidia-container-runtime
-Version:        3.9.0
+Version:        3.11.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -10,7 +10,7 @@ URL:            https://github.com/NVIDIA/nvidia-container-runtime
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Obsoletes: nvidia-container-runtime < 2.0.0
-Requires: nvidia-container-toolkit >= 1.9.0, nvidia-container-toolkit < 2.0.0
+Requires: nvidia-container-toolkit >= 1.11.0, nvidia-container-toolkit < 2.0.0
 Requires:       libseccomp
 # NVIDIA now includes the runtime within the toolkit installs itself.
 # Previously there were independent installs of the runtime and the toolkit
