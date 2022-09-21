@@ -1,0 +1,93 @@
+--- arpwatch-2.1a10/arpwatch.c	Sat Oct 14 05:07:35 2000
++++ arpwatch-2.1a10/arpwatch.c	Sun Jun 10 16:22:57 2001
+@@ -62,7 +62,7 @@
+ #include <string.h>
+ #include <syslog.h>
+ #include <unistd.h>
+-
++#include <pwd.h>
+ #include <pcap.h>
+ 
+ #include "gnuc.h"
+@@ -141,6 +141,25 @@
+ int	sanity_fddi(struct fddi_header *, struct ether_arp *, int);
+ __dead	void usage(void) __attribute__((volatile));
+ 
++void dropprivileges(const char* user)
++{
++	struct passwd* pw;
++	pw = getpwnam( user );
++	if ( pw ) {
++		if ( initgroups(pw->pw_name, NULL) != 0 || setgid(pw->pw_gid) != 0 ||
++				 setuid(pw->pw_uid) != 0 ) {
++			syslog(LOG_ERR, "Couldn't change to '%.32s' uid=%d gid=%d", user,
++						 pw->pw_uid, pw->pw_gid);
++			exit(1);
++		}
++	}
++	else {
++		syslog(LOG_ERR, "Couldn't find user '%.32s' in /etc/passwd", user);
++		exit(1);
++	}
++	syslog(LOG_DEBUG, "Running as uid=%d gid=%d", getuid(), getgid());
++}
++
+ int
+ main(int argc, char **argv)
+ {
+@@ -153,6 +172,7 @@
+ 	register char *interface, *rfilename;
+ 	struct bpf_program code;
+ 	char errbuf[PCAP_ERRBUF_SIZE];
++	char* serveruser = NULL;
+ 
+ 	if (argv[0] == NULL)
+ 		prog = "arpwatch";
+@@ -170,7 +190,7 @@
+ 	interface = NULL;
+ 	rfilename = NULL;
+ 	pd = NULL;
+-	while ((op = getopt(argc, argv, "df:i:n:Nr:")) != EOF)
++	while ((op = getopt(argc, argv, "df:i:n:Nr:u:")) != EOF)
+ 		switch (op) {
+ 
+ 		case 'd':
+@@ -202,6 +222,16 @@
+ 			rfilename = optarg;
+ 			break;
+ 
++		case 'u':
++			if ( optarg ) {
++				serveruser = strdup(optarg);
++			}
++			else {
++				fprintf(stderr, "%s: Need username after -u\n", prog);
++				usage();
++			}
++			break;
++
+ 		default:
+ 			usage();
+ 		}
+@@ -283,8 +313,11 @@
+ 	 * Revert to non-privileged user after opening sockets
+ 	 * (not needed on most systems).
+ 	 */
+-	setgid(getgid());
+-	setuid(getuid());
++	/*setgid(getgid());*/
++	/*setuid(getuid());*/
++	if ( serveruser ) {
++		dropprivileges( serveruser );
++	}
+ 
+ 	/* Must be ethernet or fddi */
+ 	linktype = pcap_datalink(pd);
+@@ -751,6 +784,6 @@
+ 
+ 	(void)fprintf(stderr, "Version %s\n", version);
+ 	(void)fprintf(stderr, "usage: %s [-dN] [-f datafile] [-i interface]"
+-	    " [-n net[/width]] [-r file]\n", prog);
++	    " [-n net[/width]] [-r file] [-u username]\n", prog);
+ 	exit(1);
+ }

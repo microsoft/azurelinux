@@ -1,0 +1,10 @@
+--- arpwatch-2.1a15/configure.nolocalpcap	2006-06-21 22:32:38.000000000 +0200
++++ arpwatch-2.1a15/configure	2006-11-09 15:04:35.000000000 +0100
+@@ -4956,6 +4956,7 @@
+     places=`ls .. | sed -e 's,/$,,' -e 's,^,../,' | \
+ 	egrep '/libpcap-[0-9]*\.[0-9]*(\.[0-9]*)?([ab][0-9]*)?$'`
+     for dir in $places ../libpcap libpcap ; do
++	    break
+ 	    basedir=`echo $dir | sed -e 's/[ab][0-9]*$//'`
+ 	    if test $lastdir = $basedir ; then
+ 		    		    continue;
