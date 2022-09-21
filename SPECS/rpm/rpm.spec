@@ -1,13 +1,13 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.0
-Release:        0.rc1.1%{?dist}
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
-Source0:        http://ftp.rpm.org/releases/testing/%{name}-%{version}-rc1.tar.bz2
+Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 # The license for the files below is the same as for RPM as they have originally came from rpm.
@@ -17,8 +17,7 @@ Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOUR
 Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 Patch0:         remove-docs-from-makefile.patch
 Patch1:         define-RPM_LD_FLAGS.patch
-Patch2:         4.18.0-rc1-bugfix.patch
-Patch3:         fix_RPM_GNUC_DEPRECATED_headers.patch
+Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  debugedit
@@ -115,7 +114,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 Python3 rpm.
 
 %prep
-%autosetup -n %{name}-%{version}-rc1 -p1
+%autosetup -n %{name}-%{version} -p1
 
 %build
 # pass -L opts to gcc as well to prioritize it over standard libs
@@ -282,8 +281,8 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Fri Sep 09 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-0.rc1.1
-- Update to 4.18.0 rc1 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
+* Wed Sep 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-1
+- Update to 4.18.0 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
 
 * Mon Jul 18 2022 Nan Liu <liunan@microsoft.com> - 4.17.0-9
 - Add missing dependencies to rpmbuild (sed and util-linux)
