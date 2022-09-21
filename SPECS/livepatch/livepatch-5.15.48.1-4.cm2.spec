@@ -1,4 +1,4 @@
-%define kernel_version_release 5.15.48.1-4.cm2
+%define kernel_version_release @KERNEL_VERSION_RELEASE@
 %define kernel_version %(echo %{kernel_version_release} | grep -oP "^[^-]+")
 %define kernel_release %(echo %{kernel_version_release} | grep -oP "(?<=-).+")
 
@@ -23,7 +23,7 @@
 Summary:        Set of livepatches for kernel %{kernel_version_release}
 Name:           livepatch-%{kernel_version_release}
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        0%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,9 +31,7 @@ Group:          System Environment/Base
 URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
 Source1:        config-%{kernel_version_release}
-Source2:        mariner.pem
-Patch0:         CVE-2022-32250.nopatch
-Patch1:         CVE-2022-34918.patch
+Source2:        mariner-%{kernel_version_release}.pem
 
 ExclusiveArch:  x86_64
 
@@ -117,6 +115,3 @@ install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
 %endif
 
 %changelog
-* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
-- Original version for CBL-Mariner.
-- License verified.
