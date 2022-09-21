@@ -42,7 +42,7 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
-* Mon Sep 19 2022 Betty Lakes <bettylakes@microsoft.com> - 1.12-1
+* Tue Sep 20 2022 Betty Lakes <bettylakes@microsoft.com> - 1.12-1
 - Upgrade to 1.12
 
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.11-1
