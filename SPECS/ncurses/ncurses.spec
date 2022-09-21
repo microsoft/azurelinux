@@ -233,8 +233,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
-* Fri Jun 17 2022 Jon Slobodzian <joslobo@microsoft.com> - 6.3-2
+* Tue Sep 20 2022 Jon Slobodzian <joslobo@microsoft.com> - 6.3-2
 - Update to version 6.3-20220612 to fix CVE-2022-29458
+- Cherry-picked from Mariner 1.0
 
 * Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 6.3-1
 - Update to version 6.3
