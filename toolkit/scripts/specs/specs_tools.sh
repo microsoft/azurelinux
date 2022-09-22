@@ -92,6 +92,8 @@ create_new_file_from_template() {
 
     echo "Creating a new file under \"$target_path\" from template \"$template_path\"."
 
+    mkdir -p "$(dirname "$target_path")"
+
     cp "$template_path" "$target_path"
 
     for key in "${!placeholders[@]}"
