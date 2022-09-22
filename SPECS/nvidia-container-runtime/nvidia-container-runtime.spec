@@ -32,6 +32,10 @@ containers.
 
 
 %changelog
+* Wed Sep 21 2022 Henry Li <lihl@microsoft.com> - 3.11.0-1
+- Upgrade to version 3.11.0
+- Add nvidia-container-toolkit minimum version 1.11.0 dependency
+
 * Wed Mar 30 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.9.0-1
 - Bumped version to 3.9.0
 - Package is officially included in toolkit install, this is a meta package

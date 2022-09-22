@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "libnvidia-container-1.9.0.tar.gz": "5eb7c6de853307970a53e9f65cc61be7c0ceae315c175fb0a2271c5669dbf33f",
+  "libnvidia-container-1.11.0.tar.gz": "ff09fa96615d26b2484588bbd5a8e435fa9c2d931838c3de48c990892960d6b7",
   "nvidia-modprobe-495.44.tar.gz": "ae6e9c7e6b43368945c28f6b8b6d0d7cc36ee7e1be8955a009a1cb189e46de92"
  }
 }
