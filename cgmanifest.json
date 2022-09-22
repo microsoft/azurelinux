@@ -21074,8 +21074,8 @@
         "type": "other",
         "other": {
           "name": "python-mako",
-          "version": "1.1.5",
-          "downloadUrl": "https://github.com/sqlalchemy/mako/archive/refs/tags/rel_1_1_5.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/sqlalchemy/mako/archive/refs/tags/rel_1_2_2.tar.gz"
         }
       }
     },
