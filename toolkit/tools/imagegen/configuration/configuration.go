@@ -332,7 +332,7 @@ func (c *Config) convertToAbsolutePaths(baseDirPath string) {
 		convertPackageListPaths(baseDirPath, systemConfig)
 		convertPreInstallScriptsPaths(baseDirPath, systemConfig)
 		convertPostInstallScriptsPaths(baseDirPath, systemConfig)
-		convertPostPostInstallScriptsPaths(baseDirPath, systemConfig)
+		convertFinalizeImageScriptsPaths(baseDirPath, systemConfig)
 		convertSSHPubKeys(baseDirPath, systemConfig)
 	}
 }

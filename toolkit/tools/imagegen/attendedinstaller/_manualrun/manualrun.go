@@ -52,6 +52,15 @@ func main() {
 						Args: "--input abc --output cba",
 					},
 				},
+				FinalizeImageScripts: []configuration.InstallScript{
+					configuration.InstallScript{
+						Path: "arglessScript.sh",
+					},
+					configuration.InstallScript{
+						Path: "thisOneNeedsArguments.sh",
+						Args: "--input abc --output cba",
+					},
+				},
 			},
 			configuration.SystemConfig{
 				Name: "Developer",
@@ -68,6 +77,15 @@ func main() {
 					"/root/.bashrc":    "/root/.bashrc",
 				},
 				PostInstallScripts: []configuration.InstallScript{
+					configuration.InstallScript{
+						Path: "arglessScript.sh",
+					},
+					configuration.InstallScript{
+						Path: "thisOneNeedsArguments.sh",
+						Args: "--input abc --output cba",
+					},
+				},
+				FinalizeImageScripts: []configuration.InstallScript{
 					configuration.InstallScript{
 						Path: "arglessScript.sh",
 					},
@@ -93,6 +111,15 @@ func main() {
 				},
 				ReadOnlyVerityRoot: verityConfig,
 				PostInstallScripts: []configuration.InstallScript{
+					configuration.InstallScript{
+						Path: "arglessScript.sh",
+					},
+					configuration.InstallScript{
+						Path: "thisOneNeedsArguments.sh",
+						Args: "--input abc --output cba",
+					},
+				},
+				FinalizeImageScripts: []configuration.InstallScript{
 					configuration.InstallScript{
 						Path: "arglessScript.sh",
 					},

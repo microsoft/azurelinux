@@ -469,7 +469,7 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 }
 
 func cleanupExtraFiles() (err error) {
-	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, sshPubKeysTempDirectory}
+	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, finalizeImageScriptTempDirectory, sshPubKeysTempDirectory}
 
 	for _, dir := range dirsToRemove {
 		logger.Log.Infof("Cleaning up directory %s", dir)
