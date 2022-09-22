@@ -497,9 +497,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		generateContainerManifests(installChroot)
 	}
 
-	err = configuration.ConfigureNetwork(installChroot, config)
-	if err != nil {
-		return
+	if len(config.Networks) > 0 {
+		err = configuration.ConfigureNetwork(installChroot, config)
+		if err != nil {
+			return
+		}
 	}
 
 	// Run post-install scripts from within the installroot chroot
