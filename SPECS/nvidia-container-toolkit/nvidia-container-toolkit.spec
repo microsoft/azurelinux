@@ -37,6 +37,19 @@ Requires: libnvidia-container-tools >= 1.11.0, libnvidia-container-tools < 2.0.0
 %description
 Provides a OCI hook to enable GPU support in containers.
 
+# The BASE package consists of the NVIDIA Container Runtime and the NVIDIA Container Toolkit CLI.
+# This allows the package to be installed on systems where no NVIDIA Container CLI is available.
+%package base
+Summary: NVIDIA Container Toolkit Base
+Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
+Provides: nvidia-container-runtime
+# Since this package allows certain components of the NVIDIA Container Toolkit to be installed separately
+# it conflicts with older versions of the nvidia-container-toolkit package that also provide these files.
+Conflicts: nvidia-container-toolkit <= 1.10.0-1
+
+%description base
+Provides tools such as the NVIDIA Container Runtime and NVIDIA Container Toolkit CLI to enable GPU support in containers.
+
 %prep
 %autosetup -p1
 tar -xvf %{SOURCE1}
@@ -71,11 +84,14 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %files
 %license LICENSE
 %{_bindir}/nvidia-container-runtime-hook
-%{_bindir}/nvidia-container-runtime
-%{_bindir}/nvidia-ctk
-%config %{_sysconfdir}/nvidia-container-runtime/config.toml
 %{_libexecdir}/oci/hooks.d/oci-nvidia-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
+
+%files base
+%license LICENSE
+%config %{_sysconfdir}/nvidia-container-runtime/config.toml
+%{_bindir}/nvidia-container-runtime
+%{_bindir}/nvidia-ctk
 
 %changelog
 * Wed Sep 21 2022 Henry Li <lihl@microsoft.com> - 1.11.0-1
@@ -85,6 +101,7 @@ rm -f %{_bindir}/nvidia-container-toolkit
 - Build and install nvidia-ctk binary
 - Use config.toml.rpm-yum, which replaces config.toml.centos
 - Add nlibnvidia-container-tools minimum version 1.11.0 dependency
+- Add the nvidia-container-runtime-toolkit-base package
 
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.9.0-3
 - Bump release to rebuild against Go 1.18.5
