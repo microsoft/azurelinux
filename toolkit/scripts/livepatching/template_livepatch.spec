@@ -15,8 +15,17 @@
     echo "Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):"
     for patch in %{patches}
     do
-        cve_number=$(basename "${patch%.*}")
-        [[ "$patch" == *.patch ]] && echo "*$cve_number" || echo "\!$cve_number: $(cat "$patch")"
+        patch_file=$(basename "$patch")
+
+        cve_number="${patch_file%.*}"
+        patch_suffix="${patch_file#*.}"
+
+        if [ "$patch_suffix" = "patch" ]
+        then
+            echo "*$cve_number"
+        else
+            echo "\!$cve_number: $(cat "$patch")"
+        fi
     done
 )
 

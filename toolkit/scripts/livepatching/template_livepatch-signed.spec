@@ -10,16 +10,6 @@
 %define livepatch_module_name %{livepatch_name}.ko
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_module_name}
 
-%define patches_description \
-%(
-    echo "Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):"
-    for patch in @PATCHED_CVES@
-    do
-        cve_number=$(basename "${patch%.*}")
-        [[ "$patch" == *.patch ]] && echo "*$cve_number" || echo "\!$cve_number: $(cat "$patch")"
-    done
-)
-
 %define patch_applicable_for_kernel [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_version_release}" ]]
 %define patch_installed kpatch list | grep -qP "%{livepatch_name}.*%{kernel_version_release}"
 %define patch_loaded    kpatch list | grep -qP "%{livepatch_name}.*enabled"
@@ -76,9 +66,7 @@ Requires(preun): kpatch
 Provides:       livepatch = %{kernel_version_release}
 
 %description
-A set of kernel livepatches addressing CVEs present in Mariner's
-kernel version %{kernel_version_release}.
-%{patches_description}
+@DESCRIPTION@
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}

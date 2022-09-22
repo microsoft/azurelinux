@@ -140,6 +140,16 @@ parsed_spec_read_tags() {
     done
 }
 
+spec_query_srpm() {
+    local query_format
+    local spec_path
+
+    spec_path="$1"
+    query_format="$2"
+
+    mariner_rpmspec -q --queryformat="$query_format" --srpm "$spec_path" 2>/dev/null
+}
+
 spec_read_release_number() {
     spec_read_tag_skip_macros "$1" "Release"
 }

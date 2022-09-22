@@ -20,8 +20,7 @@ fi
 
 KERNEL_VERSION_RELEASE="$(grep -oP "(?<=kernel_version_release ).*" "$LIVEPATCH_SPEC_PATH")"
 
-declare -a PATCHED_CVES
-parsed_spec_read_patches "$LIVEPATCH_SPEC_PATH" PATCHED_CVES
+DESCRIPTION="$(spec_query_srpm "$LIVEPATCH_SPEC_PATH" "%{DESCRIPTION}\n")"
 
 RELEASE_TAG="$(spec_read_release_tag "$LIVEPATCH_SPEC_PATH")"
 
@@ -30,7 +29,7 @@ CHANGELOG="$(dump_changelog "$LIVEPATCH_SPEC_PATH")"
 # shellcheck disable=SC2034  # Variable used indirectly inside 'create_new_file_from_template'.
 declare -A TEMPLATE_PLACEHOLDERS=(
     ["@KERNEL_VERSION_RELEASE@"]="$KERNEL_VERSION_RELEASE"
-    ["@PATCHED_CVES@"]="${PATCHED_CVES[@]}"
+    ["@DESCRIPTION@"]="$DESCRIPTION"
     ["@RELEASE_TAG@"]="$RELEASE_TAG"
     ["@CHANGELOG@"]="$CHANGELOG"
 )
