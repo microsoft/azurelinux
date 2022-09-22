@@ -5,8 +5,8 @@
 set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-SCRIPT_FOLDER="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 COMMON_SCRIPTS_FOLDER="$REPO_ROOT/toolkit/scripts"
+SCRIPT_FOLDER="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 
 export PATH="$PATH:$COMMON_SCRIPTS_FOLDER"
 

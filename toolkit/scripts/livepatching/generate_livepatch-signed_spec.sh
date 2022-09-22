@@ -5,10 +5,13 @@
 set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
+COMMON_SCRIPTS_FOLDER="$REPO_ROOT/toolkit/scripts"
 SCRIPT_FOLDER="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 
+export PATH="$PATH:$COMMON_SCRIPTS_FOLDER"
+
 # shellcheck source=../../../toolkit/scripts/specs/specs_tools.sh
-source "$REPO_ROOT/toolkit/scripts/specs/specs_tools.sh"
+source "$COMMON_SCRIPTS_FOLDER/specs/specs_tools.sh"
 
 LIVEPATCH_SPEC_PATH="$1"
 
@@ -36,3 +39,5 @@ declare -A TEMPLATE_PLACEHOLDERS=(
 
 LIVEPATCH_SIGNED_SPEC_PATH="$REPO_ROOT/SPECS-SIGNED/livepatch-signed/livepatch-signed-$KERNEL_VERSION_RELEASE.spec"
 create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch-signed.spec" "$LIVEPATCH_SIGNED_SPEC_PATH" TEMPLATE_PLACEHOLDERS
+
+# Licensing and cgmanifest.json update skipped - already handled by the unsigned version.
