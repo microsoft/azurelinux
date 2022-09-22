@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.34.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          Development/Tools
@@ -117,6 +117,8 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
+mkdir -p %{buildroot}/boot/efi
+install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz-%{uname_r}
 %endif
 
 # Restrict the permission on System.map-X file
@@ -203,6 +205,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+/boot/efi/vmlinuz-%{uname_r}
 %config(noreplace) /boot/linux-%{uname_r}.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
@@ -234,6 +237,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Wed Sep 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-2
+- Copy vmlinuz to /boot/efi partition.
+
 * Thu Aug 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-1
 - Trim spec to only necessary components for MSHV Host support kernel.
 

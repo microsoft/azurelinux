@@ -27,6 +27,7 @@ go_tool_list = \
 	liveinstaller \
 	pkgworker \
 	roast \
+	rpmssnapshot \
 	scheduler \
 	specreader \
 	srpmpacker \

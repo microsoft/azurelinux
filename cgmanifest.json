@@ -1007,8 +1007,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.4.tar.gz"
+          "version": "1.4.5",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.5.tar.gz"
         }
       }
     },
@@ -3440,8 +3440,8 @@
         "type": "other",
         "other": {
           "name": "fribidi",
-          "version": "1.0.10",
-          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.10/fribidi-1.0.10.tar.xz"
+          "version": "1.0.12",
+          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz"
         }
       }
     },
@@ -4450,8 +4450,8 @@
         "type": "other",
         "other": {
           "name": "gzip",
-          "version": "1.11",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz"
+          "version": "1.12",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.12.tar.xz"
         }
       }
     },
@@ -5810,8 +5810,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.63.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
+          "version": "5.15.67.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.67.1.tar.gz"
         }
       }
     },
@@ -7311,6 +7311,16 @@
         "type": "other",
         "other": {
           "name": "kernel",
+          "version": "5.15.67.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.67.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-hci",
           "version": "5.15.63.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
         }
@@ -7321,8 +7331,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.63.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.63.1.tar.gz"
+          "version": "5.15.67.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.67.1.tar.gz"
         }
       }
     },
@@ -7341,8 +7351,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.44.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.44.1.tar.gz"
+          "version": "5.15.55.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
         }
       }
     },
@@ -7530,6 +7540,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kube-vip-cloud-provider",
+          "version": "0.0.2",
+          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kubevirt",
           "version": "0.51.0",
           "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.51.0.tar.gz"
@@ -7611,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "lasso",
-          "version": "2.6.0",
-          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.6.0.tar.gz"
+          "version": "2.8.0",
+          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.8.0.tar.gz"
         }
       }
     },
@@ -7831,8 +7851,8 @@
         "type": "other",
         "other": {
           "name": "libbpf",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v0.4.0.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.0.0.tar.gz"
         }
       }
     },
@@ -8831,8 +8851,8 @@
         "type": "other",
         "other": {
           "name": "libjpeg-turbo",
-          "version": "2.1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.2.tar.gz"
+          "version": "2.1.4",
+          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.4.tar.gz"
         }
       }
     },
@@ -9311,8 +9331,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.9.0",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.9.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.11.0.tar.gz"
         }
       }
     },
@@ -12083,8 +12103,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.18.1",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.18.1-1-fips/go.20220414.3.src.tar.gz"
+          "version": "1.19.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.1-1/go.20220906.5.src.tar.gz"
         }
       }
     },
@@ -12185,6 +12205,16 @@
           "name": "mtx",
           "version": "1.3.12",
           "downloadUrl": "http://downloads.sourceforge.net/mtx/mtx-1.3.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "multus",
+          "version": "3.8",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v3.8.tar.gz"
         }
       }
     },
@@ -12504,7 +12534,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.3",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.3.tar.gz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.3-20220612.tgz"
         }
       }
     },
@@ -12943,8 +12973,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-runtime",
-          "version": "3.9.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.9.0.tar.gz"
+          "version": "3.11.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.11.0.tar.gz"
         }
       }
     },
@@ -12953,8 +12983,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.9.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.9.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.11.0.tar.gz"
         }
       }
     },
@@ -13644,8 +13674,8 @@
         "type": "other",
         "other": {
           "name": "openblas",
-          "version": "0.3.9",
-          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.9/openblas-0.3.9.tar.gz"
+          "version": "0.3.21",
+          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.21/openblas-0.3.21.tar.gz"
         }
       }
     },
@@ -19444,8 +19474,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.2",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.2/postgresql-14.2.tar.bz2"
+          "version": "14.5",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.5/postgresql-14.5.tar.bz2"
         }
       }
     },
@@ -20905,7 +20935,7 @@
         "other": {
           "name": "python-kdcproxy",
           "version": "0.4.2",
-          "downloadUrl": "https://github.com/npmccallum/kdcproxy/archive/kdcproxy-0.4.2.tar.gz"
+          "downloadUrl": "https://github.com/latchset/kdcproxy/releases/download/v0.4.2/kdcproxy-0.4.2.tar.gz"
         }
       }
     },
@@ -22624,8 +22654,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.13",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tar.xz"
+          "version": "3.9.14",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
         }
       }
     },
@@ -23205,8 +23235,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.17.0",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz"
+          "version": "4.18.0",
+          "downloadUrl": "http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.0.tar.bz2"
         }
       }
     },
@@ -23635,8 +23665,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/lostisland/faraday/archive/refs/tags/v1.10.0.tar.gz"
+          "version": "2.5.2",
+          "downloadUrl": "https://github.com/lostisland/faraday/archive/refs/tags/v2.5.2.tar.gz"
         }
       }
     },
@@ -25267,8 +25297,8 @@
         "type": "other",
         "other": {
           "name": "sos",
-          "version": "4.2",
-          "downloadUrl": "https://github.com/sosreport/sos/archive/4.2.tar.gz"
+          "version": "4.4",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.4.tar.gz"
         }
       }
     },
@@ -26627,8 +26657,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0325",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0325.tar.gz"
+          "version": "9.0.0404",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0404.tar.gz"
         }
       }
     },

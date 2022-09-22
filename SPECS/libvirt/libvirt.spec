@@ -9,7 +9,7 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        7.10.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,7 +17,6 @@ Group:          Virtualization/Libraries
 URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
 
-BuildRequires:  %{_bindir}/qemu-img
 BuildRequires:  audit-libs-devel
 BuildRequires:  augeas
 BuildRequires:  bash-completion
@@ -57,6 +56,7 @@ BuildRequires:  parted
 BuildRequires:  polkit
 BuildRequires:  python3-devel
 BuildRequires:  python3-docutils
+BuildRequires:  qemu-img
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
 BuildRequires:  sanlock-devel
@@ -221,7 +221,7 @@ iptables and ip6tables capabilities
 %package daemon-driver-qemu
 Summary:        QEMU driver plugin for the libvirtd daemon
 
-Requires:       %{_bindir}/qemu-img
+Requires:       qemu-img
 Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       bzip2
@@ -269,7 +269,7 @@ parted and more.
 %package daemon-driver-storage-core
 Summary:        Storage driver plugin including base backends for the libvirtd daemon
 
-Requires:       %{_bindir}/qemu-img
+Requires:       qemu-img
 Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       nfs-utils
@@ -1053,6 +1053,9 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Thu Sep 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.10.0-4
+- Change qemu-img BR from binary to package
+
 * Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-3
 - Re-enabling '*-glusterfs' subpackage.
 - Bringing back dependency on 'lzop' and 'radvd'.
