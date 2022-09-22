@@ -40,4 +40,11 @@ declare -A TEMPLATE_PLACEHOLDERS=(
 LIVEPATCH_SIGNED_SPEC_PATH="$REPO_ROOT/SPECS-SIGNED/livepatch-signed/livepatch-signed-$KERNEL_VERSION_RELEASE.spec"
 create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch-signed.spec" "$LIVEPATCH_SIGNED_SPEC_PATH" TEMPLATE_PLACEHOLDERS
 
-# Licensing and cgmanifest.json update skipped - already handled by the unsigned version.
+# Cgmanifest.json update skipped - already handled by the unsigned version.
+
+echo "Updating licensing info."
+
+license_map.py --no_check --update \
+    SPECS/LICENSES-AND-NOTICES/data/licenses.json \
+    SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+    "$LIVEPATCH_SIGNED_SPEC_PATH"
