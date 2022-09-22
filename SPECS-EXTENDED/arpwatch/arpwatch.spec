@@ -7,7 +7,7 @@ Distribution:   Mariner
 
 Name: arpwatch
 Version: 2.1a15
-Release: 51%{?dist}
+Release: 52%{?dist}
 Summary: Network monitoring tools for tracking IP addresses on a network
 License: BSD with advertising
 URL: http://ee.lbl.gov/
@@ -159,6 +159,10 @@ fi
 %attr(0644,-,arpwatch) %verify(not md5 size mtime) %config(noreplace) %{_vararpwatch}/ethercodes.dat
 
 %changelog
+* Thu Sep 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.1a15-52
+- Change installed user uid,gid to _vargid, _varuid (currently 777) to
+	prevent conflict with other conflicting system users
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.1a15-51
 - License verified
 
