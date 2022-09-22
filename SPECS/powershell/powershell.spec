@@ -1,6 +1,6 @@
 Summary:        PowerShell is an automation and configuration management platform.
 Name:           powershell
-Version:        7.2.2
+Version:        7.2.6
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ ln -s /opt/microsoft/powershell/7/pwsh %{buildroot}%{_bindir}/pwsh
 %license /opt/microsoft/powershell/7/LICENSE.txt
 
 %changelog
+* Mon Sep 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.2.6-1
+- Upgrade to 7.2.6
+
 *   Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> 7.2.2-1
 -   Update version to 7.2.2.
 *   Mon Dec 27 2021 Henry Beberman <henry.beberman@microsoft.com> 7.2.1-1
