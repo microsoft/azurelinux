@@ -1,6 +1,6 @@
 {
     "Name": "1A",
-    "ExpectedSteps": 3,
+    "ExpectedWeight": 3.0,
     "StartTime": "2022-07-28T16:58:57.371298211-07:00",
     "Steps": [
         {

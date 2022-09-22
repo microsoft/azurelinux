@@ -162,6 +162,9 @@ all: toolchain go-tools chroot-tools
 # Variable prerequisite tracking
 include $(SCRIPTS_DIR)/utils.mk
 
+# Set up for the timestamp feature
+include $(SCRIPTS_DIR)/timestamp.mk
+
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
@@ -197,9 +200,6 @@ include $(SCRIPTS_DIR)/imggen.mk
 # Create self contained toolkit archive contianing all the required tools with:
 #   package-toolkit, clean-package-toolkit
 include $(SCRIPTS_DIR)/toolkit.mk
-
-# Set up for the timestamp feature
-include $(SCRIPTS_DIR)/timestamp.mk
 
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points

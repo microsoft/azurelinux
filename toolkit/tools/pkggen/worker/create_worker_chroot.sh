@@ -17,43 +17,19 @@ bldtracker=$5
 timestamp_dir=$6
 
 chroot_name="worker_chroot"
-script_name="$(basename $0)"
+timestamp_script="$(realpath "$(dirname $0)/../../../scripts/timestamp.sh")"
 chroot_builder_folder=$chroot_base/$chroot_name
 chroot_archive=$chroot_base/$chroot_name.tar.gz
 chroot_log="$log_path"/$chroot_name.log
+chroot_timing_log="$log_path"/${chroot_name}_timestamp.log
 
 #set -x
 #set -e
+TIMESTAMP_FILE_PATH=$timestamp_dir/chroot.json
+BLDTRACKER=$bldtracker
+source $timestamp_script
 
-$bldtracker \
-    --script-name=$script_name \
-    --log-file="$chroot_log" \
-    --out-path="$timestamp_dir/chroot.json" \
-    --expected-steps="2" \
-    --mode="init"
-
-start_record_timestamp () {
-    path="$1"
-    steps="$2"
-    [[ -z "$steps" ]] && steps=0
-    $bldtracker \
-        --script-name=$script_name \
-        --log-file="$chroot_log" \
-        --out-path="$timestamp_dir/chroot.json" \
-        --step-path="$path" \
-        --expected-steps="$steps" \
-        --mode="record"
-}
-
-stop_record_timestamp () {
-    path="$1"
-    $bldtracker \
-        --script-name=$script_name \
-        --log-file="$chroot_log" \
-        --out-path="$timestamp_dir/chroot.json" \
-        --step-path="$path" \
-        --mode="stop"
-}
+begin_timestamp 2
 
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
@@ -91,8 +67,8 @@ mkdir -p "$log_path"
 ORIGINAL_HOME=$HOME
 HOME=/root
 
-start_record_timestamp "install packages" 4
-start_record_timestamp "install packages/install rpm files" $(cat "$packages" | wc -l)
+start_record_timestamp "install packages" 4 10.0
+start_record_timestamp "install packages/install rpm files" $(cat "$packages" | wc -l) $(cat "$packages" | wc -l) # Set weight to # of packages to install
 
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
@@ -166,8 +142,4 @@ echo "Done creating $chroot_archive." | tee -a "$chroot_log"
 
 stop_record_timestamp "packing the chroot"
 
-$bldtracker \
-    --script-name=$script_name \
-    --log-file="$chroot_log" \
-    --out-path="$timestamp_dir/chroot.json" \
-    --mode="finish"
+finish_timestamp

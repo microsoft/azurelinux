@@ -155,13 +155,16 @@ worker_chroot_deps := \
 	$(worker_chroot_manifest) \
 	$(worker_chroot_rpm_paths) \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh \
-	$(go-bldtracker)
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
-$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
-else
-$(chroot_worker):
+$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE) | $(go-bldtracker)
 endif
+$(chroot_worker):
+	$(timestamper_download_script) \
+		$(timestamper_tool) \
+		"$(TIMESTAMP_DIR)/download_toolchain.json" \
+		"ending" \
+		"complete" 2>/dev/null && \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)

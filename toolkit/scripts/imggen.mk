@@ -75,7 +75,7 @@ $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(de
 	$(go-imageconfigvalidator) \
 		--input=$(CONFIG_FILE) \
 		--dir=$(CONFIG_BASE_DIR) \
-		--timestamp-file=$(TIMESTAMP_DIR)/imageconfigvalidator.csv && \
+		--timestamp-file=$(TIMESTAMP_DIR)/imageconfigvalidator.json && \
 	touch $@
 
 
@@ -105,7 +105,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
 		--output-dir=$(local_and_external_rpm_cache) \
-		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.csv 
+		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.json 
 
 make-raw-image: $(imager_disk_output_dir)
 $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
@@ -166,7 +166,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
 		--output-dir=$(external_rpm_cache) \
-		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.csv 
+		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.json 
 
 # Stand alone target to build just the initrd, should not be used in conjunction with other targets. Use the 'iso' target instead.
 initrd: $(go-liveinstaller) $(go-imager)

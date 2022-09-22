@@ -7,6 +7,7 @@ package timestamp_v2
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sync"
@@ -18,16 +19,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// type TimeStamp struct {
-// 	Name          string      `json:"Name"`
-// 	StartTime     time.Time   `json:"StartTime"`
-// 	EndTime       time.Time   `json:"StartTime"`
-// 	ExpectedSteps int         `json:"ExpectedSteps"`
-// 	Steps         []TimeStamp `json:"Steps"`
-// 	// Weight     float     `json:"Weight"`
-// }
-
 func runAsserts(t *testing.T, ts *TimeStamp, err error) {
+	// This is a helper function, report the caller's line number  instead of this function's
+	t.Helper()
 	assert.NotNil(t, ts)
 	assert.NoError(t, err)
 }
@@ -71,6 +65,7 @@ func TestMain(m *testing.M) {
 	// Need to create logger since the json tools use it, will just
 	// print to console for errors.
 	logger.InitStderrLog()
+	logger.SetStderrLogLevel("trace")
 	ret := m.Run()
 
 	// To preserve the output .json files for debugging, comment out the following line.
@@ -104,12 +99,44 @@ func TestCreateTimeStamp(t *testing.T) {
 	runAsserts(t, ts, err)
 }
 
+func TestInheritMeasurement(t *testing.T) {
+	root, err := createTimeStamp("name", time.Now(), 0)
+	runAsserts(t, root, err)
+	time.Sleep(50 * time.Millisecond)
+
+	A, err := root.addStep("A", time.Now(), 0)
+	runAsserts(t, A, err)
+	time.Sleep(50 * time.Millisecond)
+
+	err = root.InheritMeasurements()
+	assert.EqualError(t, err, "could not inherit time, no substeps are completed")
+
+	B, err := A.addStep("B", time.Now(), 0)
+	runAsserts(t, B, err)
+	B.completeTimeStamp(time.Now())
+
+	err = root.InheritMeasurements()
+	assert.NoError(t, err)
+	assert.Equal(t, root.EndTime, B.EndTime)
+
+	time.Sleep(50 * time.Millisecond)
+	root.EndTime = nil
+	A2, err := root.addStep("A2", time.Now(), 0)
+	time.Sleep(50 * time.Millisecond)
+	A2.completeTimeStamp(time.Now())
+	runAsserts(t, A2, err)
+
+	err = root.InheritMeasurements()
+	assert.NoError(t, err)
+	assert.Equal(t, root.EndTime, A2.EndTime)
+}
+
 func TestInvalidPathSeparator(t *testing.T) {
 	ts, err := createTimeStamp("invalid/path/name", time.Now(), 0)
 	assert.EqualError(t, err, "can't create a timestamp object with a path containing /")
 	assert.Nil(t, ts)
 
-	ts, err = StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err = BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("invalid/path/name", 0)
 	assert.EqualError(t, err, "failed to create a timestamp object 'invalid/path/name': can't create a timestamp object with a path containing /")
@@ -121,13 +148,13 @@ func TestInvalidPathSeparator(t *testing.T) {
 
 func TestInvalidExpected(t *testing.T) {
 	ts, err := createTimeStamp("name", time.Now(), -10)
-	assert.EqualError(t, err, "can't create a timestamp object with negative expected steps")
+	assert.EqualError(t, err, "can't create a timestamp object with negative expected weight")
 	assert.Nil(t, ts)
 
-	ts, err = StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err = BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("name", -10)
-	assert.EqualError(t, err, "failed to create a timestamp object 'name': can't create a timestamp object with negative expected steps")
+	assert.EqualError(t, err, "failed to create a timestamp object 'name': can't create a timestamp object with negative expected weight")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 	err = EndTiming()
@@ -136,23 +163,65 @@ func TestInvalidExpected(t *testing.T) {
 
 func TestCreateSubStep(t *testing.T) {
 	root := &TimeStamp{Name: "Root", parent: nil}
-	ts, err := root.addStepWithExpected("1", time.Now(), 0)
+	ts, err := root.addStep("1", time.Now(), 0)
 	runAsserts(t, ts, err)
 }
 
+func TestCreateSubstepAlreadyDone(t *testing.T) {
+	root := &TimeStamp{Name: "Root", parent: nil}
+	root.completeTimeStamp(time.Now())
+	ts, err := root.addStep("1", time.Now(), 0)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "parent timestamp has already completed measurement, can't add another substep")
+}
+
 func TestInitManager(t *testing.T) {
-	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	time.Sleep(100 * time.Microsecond)
 	err = EndTiming()
 	assert.NoError(t, err)
 }
 
-func holdLock(t *testing.T, path string, timeToHoldMillis int) {
+func holdAtomicOrphan(t *testing.T, name, path string, millisToHold int) {
+	ts, err := BeginTiming(name, path, 0, true)
+	runAsserts(t, ts, err)
+	orphanedStampMgr := StampMgr
+	// Remove the current stamp manager so we can try to make a new one
+	StampMgr = nil
+	_ = orphanedStampMgr
+
+	time.Sleep(time.Duration(millisToHold) * time.Millisecond)
+}
+
+func holdAtomicRelease(t *testing.T, name, path string, millisToHold int) {
+	ts, err := BeginTiming(name, path, 0, true)
+	runAsserts(t, ts, err)
+	time.Sleep(time.Duration(millisToHold) * time.Millisecond)
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestAtomic(t *testing.T) {
+	go holdAtomicOrphan(t, t.Name(), "./testout/"+t.Name()+"_1.json", blockTimeMilliseconds*3)
+	time.Sleep(blockTimeMilliseconds * 1 * time.Millisecond)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+"_1.json", 0, true)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't lock timestamp file: failed to secure timing data lock after 250 milliseconds- resource temporarily unavailable")
+
+	go holdAtomicRelease(t, t.Name(), "./testout/"+t.Name()+"_2.json", blockTimeMilliseconds*1)
+	time.Sleep(blockTimeMilliseconds * 3 * time.Millisecond)
+	ts, err = BeginTiming(t.Name(), "./testout/"+t.Name()+"_2.json", 0, true)
+	runAsserts(t, ts, err)
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func holdLock(t *testing.T, path string, timeToHoldMillis int, exclusive bool) {
 	logger.Log.Warnf("Routine Start")
 	fd, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0664)
 	assert.NoError(t, err)
-	err = waitOnFileLock(fd, 0)
+	err = waitOnFileLock(fd, 0, exclusive)
 	defer unlockFileLock(fd)
 	assert.NoError(t, err)
 	time.Sleep(time.Duration(timeToHoldMillis) * time.Millisecond)
@@ -166,10 +235,10 @@ func TestLockingCooperative(t *testing.T) {
 	fd2, err := os.Create(path)
 	assert.NoError(t, err)
 
-	err = waitOnFileLock(fd1, 0)
+	err = waitOnFileLock(fd1, 0, true)
 	assert.NoError(t, err)
 	unlockFileLock(fd1)
-	err = waitOnFileLock(fd2, 0)
+	err = waitOnFileLock(fd2, 0, true)
 	assert.NoError(t, err)
 	fd2.Close()
 }
@@ -181,47 +250,65 @@ func TestLockingAlreadyLocked(t *testing.T) {
 	fd2, err := os.Create(path)
 	assert.NoError(t, err)
 
-	err = waitOnFileLock(fd1, 0)
+	err = waitOnFileLock(fd1, 0, true)
 	defer unlockFileLock(fd1)
 	assert.NoError(t, err)
 
-	err = waitOnFileLock(fd2, 100)
+	err = waitOnFileLock(fd2, 100, true)
 	assert.EqualError(t, err, "failed to secure timing data lock after 100 milliseconds- resource temporarily unavailable")
 	logger.Log.Warnf("Test end")
 }
 
 func TestGainsLock(t *testing.T) {
 	path := "./testout/" + t.Name() + ".lock"
-	go holdLock(t, path, 300)
+	fd1, err := os.Create(path)
+	go holdLock(t, path, 300, true)
 	time.Sleep(100 * time.Millisecond)
 
-	fd1, err := os.Create(path)
 	assert.NoError(t, err)
-	err = waitOnFileLock(fd1, 300)
+	err = waitOnFileLock(fd1, 300, true)
 	defer unlockFileLock(fd1)
 	assert.NoError(t, err)
 }
 
-func TestBlocksParallelAccess(t *testing.T) {
-	path := "./testout/" + t.Name() + ".json"
-	ts, err := StartTiming(t.Name(), path, 0)
-	runAsserts(t, ts, err)
+func TestAllowSharedLock(t *testing.T) {
+	path := "./testout/" + t.Name() + ".lock"
+	fd1, err := os.Create(path)
+	assert.NoError(t, err)
 
-	go holdLock(t, path, 300)
-	time.Sleep(150 * time.Millisecond)
+	go holdLock(t, path, 300, false)
+	time.Sleep(100 * time.Millisecond)
 
-	ts, err = ReadOnlyTimingData(path)
-	assert.NotNil(t, ts)
-	assert.EqualError(t, err, "can't lock timing file (./testout/TestBlocksParallelAccess.json): failed to secure timing data lock after 100 milliseconds- resource temporarily unavailable")
-	err = EndTiming()
+	err = waitOnFileLock(fd1, 0, false)
 	assert.NoError(t, err)
 }
 
+func TestBlocksParallelExclusiveAccess(t *testing.T) {
+	path := "./testout/" + t.Name() + ".json"
+
+	go holdLock(t, path, blockTimeMilliseconds*3, true)
+	time.Sleep(blockTimeMilliseconds * time.Millisecond)
+
+	ts, err := BeginTiming(t.Name(), path, 0, false)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't lock timestamp file: failed to secure timing data lock after 250 milliseconds- resource temporarily unavailable")
+
+	time.Sleep(blockTimeMilliseconds * 2 * time.Millisecond)
+	go holdLock(t, path, blockTimeMilliseconds*3, false)
+	time.Sleep(blockTimeMilliseconds * time.Millisecond)
+
+	ts, err = BeginTiming(t.Name(), path, 0, false)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't lock timestamp file: failed to secure timing data lock after 250 milliseconds- resource temporarily unavailable")
+
+	_ = EndTiming()
+}
+
 func TestInitManagerDoubleStart(t *testing.T) {
-	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
-	ts, err = StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
-	assert.EqualError(t, err, "already recording timing data for tool 'TestInitManagerDoubleStart' into file (./testout/"+t.Name()+".json)")
+	ts, err = BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
+	assert.EqualError(t, err, "already recording timing data for a tool into file (./testout/"+t.Name()+".json)")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, StampMgr.root)
 	err = EndTiming()
@@ -229,7 +316,7 @@ func TestInitManagerDoubleStart(t *testing.T) {
 }
 
 func TestManagerBasic1(t *testing.T) {
-	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("M1", 0)
 	runAsserts(t, ts, err)
@@ -240,7 +327,7 @@ func TestManagerBasic1(t *testing.T) {
 }
 
 func TestManagerBasic2(t *testing.T) {
-	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("M1", 0)
 	runAsserts(t, ts, err)
@@ -269,7 +356,7 @@ func TestManagerBasic2(t *testing.T) {
 }
 
 func TestOverPopMeasurements(t *testing.T) {
-	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("M1", 0)
 	runAsserts(t, ts, err)
@@ -289,13 +376,13 @@ func TestOverPopMeasurements(t *testing.T) {
 func TestStopWithoutStarting(t *testing.T) {
 	EndTiming() // Make sure we aren't running a timing manager
 	err := EndTiming()
-	assert.EqualError(t, err, "timestamping not initialized yet, can't stop timing")
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 }
 
 func TestStartMeasurementWithoutStarting(t *testing.T) {
 	EndTiming() // Make sure we aren't running a timing manager
 	ts, err := StartMeasuringEvent("M1", 0)
-	assert.EqualError(t, err, "timestamping not initialized yet, can't record data for 'M1'")
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 }
@@ -311,14 +398,14 @@ func TestStopMeasurementWithoutStarting(t *testing.T) {
 func TestParentNotStartedYet(t *testing.T) {
 	EndTiming() // Make sure we aren't running a timing manager
 	ts, err := StartMeasuringEventWithParent(&TimeStamp{}, "parent", 0)
-	assert.EqualError(t, err, "timestamping not initialized yet, can't record data for 'parent'")
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 }
 
 func TestNilParent(t *testing.T) {
 	var nilTS *TimeStamp = nil
-	ts, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEventWithParent(nilTS, "nil", 0)
 	assert.EqualError(t, err, "invalid timestamp parent, can't add sub-step 'nil'")
@@ -329,7 +416,7 @@ func TestNilParent(t *testing.T) {
 }
 
 func TestStopRoot(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	ts, err := StopMeasurementSpecific(root)
 	assert.EqualError(t, err, "can't stop measuring the root timestamp 'TestStopRoot', call EndTiming() instead")
@@ -346,13 +433,13 @@ func TestStopRoot(t *testing.T) {
 func TestStopNoMgr(t *testing.T) {
 	EndTiming() // Make sure we aren't running a timing manager
 	ts, err := StopMeasurementSpecific(&TimeStamp{Name: "Not_empty"})
-	assert.EqualError(t, err, "timestamping not initialized yet, can't record data for 'Not_empty'")
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 }
 
 func TestStopIsActiveNode(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	active, err := StartMeasuringEvent("activenode", 0)
 	runAsserts(t, active, err)
@@ -364,12 +451,12 @@ func TestStopIsActiveNode(t *testing.T) {
 }
 
 func TestActiveIsRootAfterStopStart(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	time.Sleep(10 * time.Millisecond)
 	err = EndTiming()
 	assert.NoError(t, err)
-	ts, err := ResumeTiming("./testout/" + t.Name() + ".json")
+	ts, err := ResumeTiming(t.Name(), "./testout/"+t.Name()+".json", false, false)
 	runAsserts(t, ts, err)
 	newActive, err := GetActiveTimeNode()
 	runAsserts(t, newActive, err)
@@ -379,7 +466,7 @@ func TestActiveIsRootAfterStopStart(t *testing.T) {
 }
 
 func TestStopMiddleNode(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	a, err := StartMeasuringEvent("A", 0)
 	runAsserts(t, a, err)
@@ -398,7 +485,7 @@ func TestStopMiddleNode(t *testing.T) {
 }
 
 func TestStopCleanup(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	a, err := StartMeasuringEvent("A", 0)
 	runAsserts(t, a, err)
@@ -446,11 +533,11 @@ func TestStopCleanup(t *testing.T) {
 func TestGetActiveNode(t *testing.T) {
 	EndTiming() // Make sure we aren't running a timing manager
 	ts, err := GetActiveTimeNode()
-	assert.EqualError(t, err, "timestamping not initialized yet, can't get active node")
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, &TimeStamp{}, ts)
 
-	ts, err = StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	ts, err = BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, ts, err)
 	a, err := StartMeasuringEvent("a", 0)
 	runAsserts(t, a, err)
@@ -476,11 +563,11 @@ func TestGetActiveNode(t *testing.T) {
 func TestSearchByPath(t *testing.T) {
 	EndTiming() // Make sure we aren't running a timing manager
 	ts, err := GetNodeByPath("not/a/real/path")
-	assert.EqualError(t, err, "timestamping not initialized yet, can't get search for node 'not/a/real/path'")
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, &TimeStamp{}, ts)
 
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	a, err := StartMeasuringEvent("A", 0)
 	runAsserts(t, a, err)
@@ -531,21 +618,21 @@ func TestSearchByPath(t *testing.T) {
 }
 
 func TestAddByPath(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	a, err := StartMeasuringEvent("A", 1)
 	runAsserts(t, a, err)
-	ts, err := StartMeasuringEventByPath(t.Name()+"/A/B/C///", 3)
-	runAsserts(t, ts, err)
+	c, err := StartMeasuringEventByPath(t.Name()+"/A/B/C///", 3)
+	runAsserts(t, c, err)
 
 	new_a, err := GetNodeByPath(t.Name() + "/A")
 	runAsserts(t, new_a, err)
 	assert.Equal(t, a, new_a)
 	new_c, err := GetNodeByPath(t.Name() + "/A/B/C")
 	runAsserts(t, new_c, err)
-	assert.Equal(t, 3, new_c.ExpectedSteps)
+	assert.Equal(t, 3.0, new_c.ExpectedWeight)
 
-	ts, err = StopMeasurementByPath(t.Name() + "/A/B/C")
+	ts, err := StopMeasurementByPath(t.Name() + "/A/B/C")
 	runAsserts(t, ts, err)
 	assert.NotNil(t, new_c.EndTime)
 	assert.GreaterOrEqual(t, new_c.ElapsedSeconds, 0.0)
@@ -555,12 +642,56 @@ func TestAddByPath(t *testing.T) {
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 
+	assert.Equal(t, c.ExpectedWeight, 3.0)
+
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestAddByPathMutipleRecordings(t *testing.T) {
+	path := "./testout/" + t.Name() + ".json"
+	ts, err := BeginTiming(t.Name(), path, 0, false)
+	runAsserts(t, ts, err)
+	ts, err = StartMeasuringEventByPath(t.Name()+"/A", 0)
+	runAsserts(t, ts, err)
+	ts, err = StopMeasurementByPath(t.Name() + "/A")
+	runAsserts(t, ts, err)
+
+	//Need to manually clear the locks here since we didn't end timing normally
+	unlockFileLock(StampMgr.dataFileDescriptor)
+	StampMgr = nil
+
+	ts, err = ResumeTiming(t.Name(), "./testout/"+t.Name()+".json", false, false)
+	runAsserts(t, ts, err)
+	ts, err = StartMeasuringEventByPath(t.Name()+"/B", 0)
+	runAsserts(t, ts, err)
+	// Intentionally don't stop /B
+
+	//Need to manually clear the locks here since we didn't end timing normally
+	unlockFileLock(StampMgr.dataFileDescriptor)
+	StampMgr = nil
+
+	ts, err = ResumeTiming(t.Name(), "./testout/"+t.Name()+".json", false, false)
+	runAsserts(t, ts, err)
+	c, err := StartMeasuringEventByPath(t.Name()+"/C", 0)
+	runAsserts(t, c, err)
+	ts, err = StopMeasurementByPath(t.Name() + "/C")
+	runAsserts(t, ts, err)
+
+	a, err := GetNodeByPath(t.Name() + "/A")
+	runAsserts(t, a, err)
+	b, err := GetNodeByPath(t.Name() + "/B")
+	runAsserts(t, b, err)
+	assert.True(t, a.finished)
+	assert.False(t, b.finished)
+	assert.True(t, c.finished)
+
 	err = EndTiming()
 	assert.NoError(t, err)
 }
 
 func TestWriteAndRecover(t *testing.T) {
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	a, err := StartMeasuringEvent("A", 0)
 	runAsserts(t, a, err)
@@ -576,7 +707,7 @@ func TestWriteAndRecover(t *testing.T) {
 	b_real := *b
 	c_real := *c
 
-	root2, err := ResumeTiming("./testout/" + t.Name() + ".json")
+	root2, err := ResumeTiming(t.Name(), "./testout/"+t.Name()+".json", false, false)
 	runAsserts(t, root2, err)
 	new_root, err := GetNodeByPath(t.Name())
 	assert.NoError(t, err)
@@ -594,6 +725,20 @@ func TestWriteAndRecover(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestResumeEmptyFile(t *testing.T) {
+	ts, err := ResumeTiming(t.Name(), "./testout/"+t.Name()+".json", false, false)
+	assert.EqualError(t, err, "can't read existing timing file (./testout/TestResumeEmptyFile.json): open ./testout/TestResumeEmptyFile.json: no such file or directory")
+	assert.NotNil(t, ts)
+	assert.ErrorIs(t, err, fs.ErrNotExist)
+}
+
+func TestResumeEmptyFileCreate(t *testing.T) {
+	ts, err := ResumeTiming(t.Name(), "./testout/"+t.Name()+".json", true, false)
+	runAsserts(t, ts, err)
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
 var workerParentTS *TimeStamp
 
 func worker(t *testing.T, wait *sync.WaitGroup, task string) {
@@ -607,7 +752,7 @@ func worker(t *testing.T, wait *sync.WaitGroup, task string) {
 
 func TestWorkers(t *testing.T) {
 	var wait sync.WaitGroup
-	root, err := StartTiming(t.Name(), "./testout/"+t.Name()+".json", 0)
+	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	workerParentTS = root
 	for _, task := range []string{"A", "B", "C", "D"} {
@@ -629,10 +774,10 @@ func TestWorkers(t *testing.T) {
 func TestRewriteMultipleTimes(t *testing.T) {
 	now := time.Now()
 	ts := TimeStamp{
-		Name:          "1A",
-		StartTime:     &now,
-		EndTime:       nil,
-		ExpectedSteps: 3,
+		Name:           "1A",
+		StartTime:      &now,
+		EndTime:        nil,
+		ExpectedWeight: 3.0,
 	}
 	fmt.Printf("ts: %+v \n", ts)
 
@@ -674,10 +819,10 @@ func TestRewriteMultipleTimes(t *testing.T) {
 func TestUpdateJson(t *testing.T) {
 	now := time.Now()
 	ts := TimeStamp{
-		Name:          "1A",
-		StartTime:     &now,
-		EndTime:       nil,
-		ExpectedSteps: 3,
+		Name:           "1A",
+		StartTime:      &now,
+		EndTime:        nil,
+		ExpectedWeight: 3.0,
 	}
 	fmt.Printf("ts: %+v \n", ts)
 
@@ -688,7 +833,7 @@ func TestUpdateJson(t *testing.T) {
 	}
 
 	time.Sleep(time.Millisecond * 100)
-	ts.Steps = append(ts.Steps, &TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2})
+	ts.Steps = append(ts.Steps, &TimeStamp{StartTime: &now, EndTime: nil, ExpectedWeight: 2})
 	err = jsonutils.WriteJSONFile("./testout/"+t.Name()+".json", &ts)
 	assert.NoError(t, err)
 	if err != nil {
@@ -696,7 +841,7 @@ func TestUpdateJson(t *testing.T) {
 	}
 
 	time.Sleep(time.Millisecond * 100)
-	ts.Steps[0].Steps = append(ts.Steps[0].Steps, &TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2})
+	ts.Steps[0].Steps = append(ts.Steps[0].Steps, &TimeStamp{StartTime: &now, EndTime: nil, ExpectedWeight: 2})
 	err = jsonutils.WriteJSONFile("./testout/"+t.Name()+".json", &ts)
 	assert.NoError(t, err)
 	if err != nil {
@@ -731,25 +876,25 @@ func TestProgressFull(t *testing.T) {
 func TestProgressHalf(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
-	ts := TimeStamp{StartTime: &now, EndTime: nil}
+	ts := TimeStamp{StartTime: &now, EndTime: nil, Weight: 1.0}
 
-	ts.ExpectedSteps = 4
+	ts.ExpectedWeight = 4.0
 	ts.Steps = []*TimeStamp{
-		{StartTime: &now, EndTime: &future},
-		{StartTime: &now, EndTime: &future}}
+		{StartTime: &now, EndTime: &future, Weight: 1.0},
+		{StartTime: &now, EndTime: &future, Weight: 1.0}}
 	assert.Equal(t, 0.5, ts.Progress())
 }
 
-// Test when expectedSteps and actual steps don't align.
+// Test when ExpectedWeight and actual steps don't align.
 func TestProgressBadGuess(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
 	ts := TimeStamp{StartTime: &now, EndTime: nil}
 
-	ts.ExpectedSteps = 1
+	ts.ExpectedWeight = 1.0
 	ts.Steps = []*TimeStamp{
-		{StartTime: &now, EndTime: &future},
-		{StartTime: &now, EndTime: nil}}
+		{StartTime: &now, EndTime: &future, Weight: 1.0},
+		{StartTime: &now, EndTime: nil, Weight: 1.0}}
 	// Works fine, because here we set maxProgress = len(ts.Steps).
 	assert.Equal(t, 0.5, ts.Progress())
 
@@ -766,10 +911,24 @@ func TestProgressBadGuess(t *testing.T) {
 func TestProgressNested(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Minute * 5)
-	ts := TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2} // 1st layer has 2 steps
+	ts := TimeStamp{StartTime: &now, EndTime: nil, ExpectedWeight: 2.0, Weight: 1.0} // 1st layer has 2 steps
 	ts.Steps = append(ts.Steps,
-		&TimeStamp{StartTime: &now, EndTime: nil, ExpectedSteps: 2}) // 1st step on 2nd layer has 2 steps
+		&TimeStamp{StartTime: &now, EndTime: nil, ExpectedWeight: 2.0, Weight: 1.0}) // 1st step on 2nd layer has 2 steps
 	ts.Steps[0].Steps = append(ts.Steps[0].Steps,
-		&TimeStamp{StartTime: &now, EndTime: &future, ExpectedSteps: 0}) // 2nd step on 2nd layer has 0 steps and is already done
+		&TimeStamp{StartTime: &now, EndTime: &future, ExpectedWeight: 0.0, Weight: 1.0}) // 2nd step on 2nd layer has 0 steps and is already done
 	assert.Equal(t, 0.25, ts.Progress())
+}
+
+func TestWeights(t *testing.T) {
+	now := time.Now()
+	future := now.Add(time.Minute * 5)
+	ts := TimeStamp{StartTime: &now, EndTime: nil, ExpectedWeight: 2.0, Weight: 1.0} // 1st layer has 2 steps
+	ts.Steps = append(ts.Steps,
+		&TimeStamp{StartTime: &now, EndTime: nil, ExpectedWeight: 2.0, Weight: 2}) // 1st step on 2nd layer has 2 steps
+	ts.Steps[0].Steps = append(ts.Steps[0].Steps,
+		&TimeStamp{StartTime: &now, EndTime: &future, ExpectedWeight: 0.0, Weight: 1}) // 2nd step on 2nd layer has 0 steps and is already done
+
+	ts.Steps = append(ts.Steps,
+		&TimeStamp{StartTime: &now, EndTime: &future, ExpectedWeight: 2.0, Weight: 6}) // 2st step on 2nd layer is done
+	assert.Equal(t, (7.0 / 8.0), ts.Progress())
 }

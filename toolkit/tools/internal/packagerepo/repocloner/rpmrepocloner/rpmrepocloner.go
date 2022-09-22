@@ -19,7 +19,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 )
 
 const (
@@ -267,7 +267,15 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 // The cloner will mark any package that locally built by setting preBuilt = true
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
+	if timestamp_v2.StampMgr != nil {
+		timestamp_v2.StartMeasuringEvent("Cloning packages", float64(len(packagesToClone)))
+		defer timestamp_v2.StopMeasurement()
+	}
 	for _, pkg := range packagesToClone {
+		if timestamp_v2.StampMgr != nil {
+			timestamp_v2.StartMeasuringEvent(pkg.Name, 0)
+		}
+
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
 		downloadDir := chrootDownloadDir
@@ -299,9 +307,11 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		if err != nil {
 			return
 		}
-	}
 
-	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Done cloning")
+		if timestamp_v2.StampMgr != nil {
+			timestamp_v2.StopMeasurement()
+		}
+	}
 
 	return
 }

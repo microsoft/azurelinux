@@ -64,9 +64,8 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.StartTiming("imager", *timestampFile, 3)
+	timestamp_v2.BeginTiming("imager", *timestampFile, 3, false)
 	defer timestamp_v2.EndTiming()
-	//timestamp.InitCSV(*timestampFile)
 
 	if *emitProgress {
 		installutils.EnableEmittingProgress()
@@ -98,8 +97,6 @@ func main() {
 		}
 		timestamp_v2.StopMeasurement()
 	}
-
-	//timestamp.Stamp.RecordToCSV("Setting up", "")
 
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
 	logger.PanicOnError(err, "Failed to build system configuration")
@@ -205,7 +202,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	}
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
-	//timestamp.Stamp.RecordToCSV("buildSystemConfig", "install packages into image")
 
 	// Create Parition to Mountpoint map
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
@@ -536,7 +532,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		setupChrootPackages = append(setupChrootPackages, verityPackages...)
 	}
 
-	timestamp_v2.StartMeasuringEvent("install chroot packages", len(setupChrootPackages))
+	timestamp_v2.StartMeasuringEvent("install chroot packages", float64(len(setupChrootPackages)))
 	for _, setupChrootPackage := range setupChrootPackages {
 		_, err = installutils.TdnfInstall(setupChrootPackage, rootDir)
 		if err != nil {

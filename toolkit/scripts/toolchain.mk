@@ -25,6 +25,7 @@ toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
+timestamper_download_script = $(SCRIPTS_DIR)/toolchain_download_timestamp.sh
 toolchain_files = \
 	$(shell find $(SCRIPTS_DIR)/toolchain -name *.sh) \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
@@ -136,13 +137,15 @@ hydrate-toolchain:
 
 # Output:
 # out/toolchain/toolchain_from_container.tar.gz
-$(raw_toolchain): $(toolchain_files)
+$(raw_toolchain): $(toolchain_files) | $(timestamper_tool)
 	@echo "Building raw toolchain"
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./create_toolchain_in_container.sh \
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
-			$(SOURCE_URL)
+			$(SOURCE_URL) \
+			$(timestamper_tool) \
+			$(TIMESTAMP_DIR)/create_toolchain_in_container.json
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -188,7 +191,7 @@ endif
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
-$(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
+$(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag | $(go-bldtracker)
 	@echo "Building base packages"
 	# Clean the existing chroot if not doing an incremental build
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
@@ -205,7 +208,9 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
-			$(toolchain_from_repos) && \
+			$(toolchain_from_repos) \
+			$(go-bldtracker) \
+			$(TIMESTAMP_DIR) && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
@@ -275,10 +280,17 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
+
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN) | $(timestamper_tool)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
+	$(timestamper_download_script) \
+		$(timestamper_tool) \
+		"$(TIMESTAMP_DIR)/download_toolchain.json" \
+		$$rpm_filename \
+		"record" \
+		$$(wc -w < $(TOOLCHAIN_MANIFEST)) && \
 	echo "Downloading toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
@@ -295,5 +307,20 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
 		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
 		$(call print_error,\nToolchain download failed. See above errors for more details.) \
-	}
+	} && \
+	$(timestamper_download_script) \
+		$(timestamper_tool) \
+		"$(TIMESTAMP_DIR)/download_toolchain.json" \
+		$$rpm_filename \
+		"stop" || \
+	true
+
+
+toolchain: | $(timestamper_tool)
+	$(timestamper_download_script) \
+		$(timestamper_tool) \
+		"$(TIMESTAMP_DIR)/download_toolchain.json" \
+		"ending" \
+		"complete" || \
+	true
 endif

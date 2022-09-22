@@ -7,8 +7,8 @@
 package main
 
 import (
+	"fmt"
 	"os"
-	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -25,31 +25,33 @@ const (
 )
 
 var (
-	app           = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
-	scriptName    = app.Flag("script-name", "The name of the current tool.").Required().String()
-	stepPath      = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
-	expectedSteps = app.Flag("expected-steps", "Expected number of substeps for this new step").Default("0").Int()
-	outPath       = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute
-	logFile       = exe.LogFileFlag(app)
-	logLevel      = exe.LogLevelFlag(app)
-	validModes    = []string{initializeMode, recordMode, stopMode, finishMode, watchMode}
-	mode          = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
+	app                     = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
+	scriptName              = app.Flag("script-name", "The name of the current tool.").Required().String()
+	stepPath                = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
+	expectedWeight          = app.Flag("expected-weight", "Expected number of substeps/weight for this new step").Default("0").Float64()
+	weight                  = app.Flag("weight", "How much weight will this step have relative to others, defaults to 1.0").Default("1.0").Float64()
+	outPath                 = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute
+	logLevel                = exe.LogLevelFlag(app)
+	validModes              = []string{initializeMode, recordMode, stopMode, finishMode, watchMode}
+	mode                    = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
+	createIfMIssing         = app.Flag("create-if-missing", "Regardless of mode, create a file if its missing").Bool()
+	createIfMissingExpected = app.Flag("create-if-missing-expected", "How much weight should the missing root expect").Default("0").Float64()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	setupLogger(*logLevel)
 
 	//logger.Log.Warnf("Printing log to '%s'", *outPath)
 
 	// Perform different actions based on the input "mode".
 	switch *mode {
 	case initializeMode:
-		initialize(*outPath, *scriptName, *expectedSteps)
+		initialize(*outPath, *scriptName, *expectedWeight)
 
 	case recordMode:
-		record(*outPath, *scriptName, *stepPath, *expectedSteps)
+		record(*outPath, *scriptName, *stepPath, *expectedWeight, *weight, *createIfMIssing, *createIfMissingExpected)
 
 	case stopMode:
 		stop(*outPath, *scriptName, *stepPath)
@@ -65,27 +67,48 @@ func main() {
 	}
 }
 
+func setupLogger(logLevelStr string) {
+	if logLevelStr == "" {
+		logLevelStr = "info"
+	}
+	logger.InitStderrLog()
+	logger.SetStderrLogLevel(logLevelStr)
+}
+
 // Creates a CSV specifically for the shell script mentioned in "scriptName".
-func initialize(completePath, toolName string, expectedSteps int) {
-	timestamp_v2.StartTiming(toolName, completePath, expectedSteps)
+func initialize(completePath, toolName string, expectedWeight float64) {
+	timestamp_v2.BeginTiming(toolName, completePath, expectedWeight, true)
 }
 
 // Records a new timestamp to the specific CSV for the specified shell script.
-func record(completePath, toolName, path string, expectedSteps int) {
-	_, err := timestamp_v2.ResumeTiming(completePath)
+func record(completePath, toolName, path string, expectedWeight float64, weight float64, createIfMIssing bool, createIfMissingExpected float64) {
+	logger.Log.Tracef("Try to start measure %s...\n", path)
+	root, err := timestamp_v2.ResumeTiming(toolName, completePath, createIfMIssing, true)
+	if createIfMIssing {
+		root.ExpectedWeight = createIfMissingExpected
+	}
+	logger.Log.Tracef("... start %s...\n", path)
 	if err != nil {
-		logger.Log.Errorf("Failed to record timestamp: %s", err)
+		logger.Log.Errorf("Failed to resume timestamp: %s", err)
+		return
 	}
 
 	fullPath := toolName + "/" + path
-	_, err = timestamp_v2.StartMeasuringEventByPath(fullPath, expectedSteps)
+	ts, err := timestamp_v2.StartMeasuringEventByPath(fullPath, expectedWeight)
+	if weight != ts.Weight {
+		ts.SetWeight(weight)
+		timestamp_v2.FlushData()
+	}
 	if err != nil {
 		logger.Log.Errorf("Failed to record timestamp: %s", err)
 	}
+	logger.Log.Tracef("... done start %s\n", path)
 }
 
 func stop(completePath, toolName, path string) {
-	_, err := timestamp_v2.ResumeTiming(completePath)
+	logger.Log.Tracef("Try to stop measure %s...\n", path)
+	_, err := timestamp_v2.ResumeTiming(toolName, completePath, false, true)
+	logger.Log.Tracef("... stop %s...\n", path)
 	if err != nil {
 		logger.Log.Errorf("Failed to record timestamp: %s", err)
 	}
@@ -95,10 +118,11 @@ func stop(completePath, toolName, path string) {
 	if err != nil {
 		logger.Log.Errorf("Failed to record timestamp: %s", err)
 	}
+	logger.Log.Tracef("... done stop %s\n", path)
 }
 
 func finish(completePath, toolName string) {
-	_, err := timestamp_v2.ResumeTiming(completePath)
+	_, err := timestamp_v2.ResumeTiming(toolName, completePath, false, true)
 	if err != nil {
 		logger.Log.Errorf("Failed to record timestamp: %s", err)
 	}
@@ -107,13 +131,10 @@ func finish(completePath, toolName string) {
 }
 
 func watch(completePath string) {
-	for {
-		ts, err := timestamp_v2.ReadOnlyTimingData(completePath)
-		if err != nil {
-			logger.Log.Errorf("Failed to record timestamp: %s", err)
-		} else {
-			logger.Log.Warnf("Progress: %f", ts.Progress()*100)
-		}
-		time.Sleep(time.Second)
+	ts, err := timestamp_v2.ReadTimingData(completePath)
+	if err != nil {
+		logger.Log.Errorf("Failed to record timestamp: %s", err)
+	} else {
+		fmt.Printf("%d", int(ts.Progress()*100))
 	}
 }

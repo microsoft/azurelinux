@@ -8,8 +8,20 @@ set -e
 MARINER_BUILD_DIR=$1
 MARINER_SPECS_DIR=$2
 MARINER_SOURCE_URL=$3
+#  Time stamp components
+# =====================================================
+BLDTRACKER=$4
+TIMESTAMP_FILE_PATH=$5
+source "$(dirname $0)/../timestamp.sh"
+
+begin_timestamp 6
+
+start_record_timestamp "verify toolchain"
 
 ./toolchain_verify.sh $MARINER_BUILD_DIR
+
+stop_record_timestamp "verify toolchain"
+start_record_timestamp "cleanup docker"
 
 # Cleanup
 docker images -a
@@ -17,6 +29,9 @@ docker ps -a
 # docker system prune -f
 # docker rmi $(docker images -a -q)
 # docker rmi $(docker history marinertoolchain -q)
+
+stop_record_timestamp "cleanup docker"
+start_record_timestamp "configure files"
 
 # CPIO patch
 cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
@@ -41,10 +56,16 @@ EOF
 # Generate toolchain-local-wget-list
 cat ./container/toolchain-sha256sums | awk -v env_src=${MARINER_SOURCE_URL} '{print env_src"/"$2}' > ./container/toolchain-local-wget-list
 
+stop_record_timestamp "configure files"
+start_record_timestamp "get container ready"
+
 echo Building temp toolchain in container
 export tag=$(date +'%y%m%d.%H%M')
 docker build --tag marinertoolchain:${tag} ./container
 docker tag marinertoolchain:${tag} marinertoolchain:latest
+
+stop_record_timestamp "get container ready"
+start_record_timestamp "build raw toolchain" 0 100
 
 # Now build final raw toolchain as root, which requires --privileged for the chroot
 echo Building raw toolchain in container
@@ -53,6 +74,9 @@ docker stop marinertoolchain-container
 docker rm marinertoolchain-container
 set -e
 docker run -t --privileged --name marinertoolchain-container marinertoolchain:latest
+
+stop_record_timestamp "build raw toolchain"
+start_record_timestamp "cleanup files"
 
 echo Finished building toolchain, extracting from container...
 pushd $MARINER_BUILD_DIR/toolchain
@@ -76,4 +100,8 @@ rm -vf ./container/linker-script-readonly-keyword-support.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
 
+stop_record_timestamp "cleanup files"
+
 echo Raw toolchain build complete
+
+finish_timestamp

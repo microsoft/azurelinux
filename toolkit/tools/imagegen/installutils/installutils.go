@@ -26,7 +26,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 )
 
@@ -363,8 +362,6 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 		packageList = append(packageList, packages...)
 	}
 
-	timestamp.Stamp.RecordToCSV("Clone RPM repo", "Package names from config")
-
 	return
 }
 
@@ -434,7 +431,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
 
-	timestamp_v2.StartMeasuringEvent("installing packages", totalPackages)
+	timestamp_v2.StartMeasuringEvent("installing packages", float64(totalPackages))
 	// Install filesystem package first
 	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
 	if err != nil {

@@ -6,7 +6,7 @@
 //
 // Basic automatic stack based...
 ///
-//    timestamp_v2.StartTiming("tool", 4) //User readable tool name, and expected number of sub steps
+//    timestamp_v2.BeginTiming("tool", 4) //User readable tool name, and expected number of sub steps
 //    timestamp_v2.StampMgr.StartMeasuringEvent("step", 1)			//starts measuring 'tool/step'
 //        ...
 //        timestamp_v2.StampMgr.StartMeasuringEvent("substep", 1)	//starts measuring 'tool/step/substep'
@@ -47,6 +47,31 @@ var (
 	StampMgr *TimeStampManager = nil // A shared TimeInfo object that is by default empty; will log an warning if the empty object is called.
 )
 
+const (
+	blockTimeMilliseconds = 250 // Maximum time to wait for a contested file
+)
+
+// This code should be callable from anywhere, regardless of if a logger is configured
+func failsafeLoggerErrorf(format string, args ...interface{}) {
+	if logger.Log != nil {
+		logger.Log.Errorf(format, args...)
+	}
+}
+
+// This code should be callable from anywhere, regardless of if a logger is configured
+func failsafeLoggerWarnf(format string, args ...interface{}) {
+	if logger.Log != nil {
+		logger.Log.Errorf(format, args...)
+	}
+}
+
+// This code should be callable from anywhere, regardless of if a logger is configured
+func failsafeLoggerTracef(format string, args ...interface{}) {
+	if logger.Log != nil {
+		logger.Log.Tracef(format, args...)
+	}
+}
+
 // A TimeStampManager tracks an active set of timing measurements, allowing nested sub-steps to be added easily. The root of the timing tree
 // is stored in `root`. The most recent node added through StartMeasuringEvent() is recorded in `activeNode`.
 type TimeStampManager struct {
@@ -55,17 +80,19 @@ type TimeStampManager struct {
 	dataFilePath       string     // Path to the output .json file
 	dataFileDescriptor *os.File   // Used to coordinate access to the file via flock
 	lock               sync.Mutex // Mutex for controlling writes to the data
+	isAtomic           bool       // This manager is operating in exclusive mode, no other manager may edit its file while it exists
 }
 
 // newStampMgr creates a new instance of the global stamp manager object with a root timing node `rootNode`. The root node may
 //	already contain timing information and nested steps if resuming from disk.
 //
 //	The currently active node will always point to the root node upon creation, regardless of any pre-existing data branching from the root.
-func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescriptor *os.File) (newMgr *TimeStampManager) {
+func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescriptor *os.File, atomicMode bool) (newMgr *TimeStampManager) {
 	newMgr = &TimeStampManager{
 		dataFilePath:       outputFilePath,
 		dataFileDescriptor: outputFileDescriptor,
 		root:               rootNode,
+		isAtomic:           atomicMode,
 	}
 	newMgr.activeNode = newMgr.root
 	return
@@ -75,8 +102,13 @@ func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescripto
 // On managing to aquire the lock it will return a file descriptor which must be used to release the lock on the file using unlockFileLock().
 // If the lock could not be acquired the function will return a nil file descriptor. The function will create a *.lock file adjacent to the
 // locked file. Cleaning up this file if required is the responsibility of the caller.
-func waitOnFileLock(flockFile *os.File, blockMillis int64) (err error) {
-	lockMode := unix.LOCK_EX | unix.LOCK_NB
+func waitOnFileLock(flockFile *os.File, blockMillis int64, exclusive bool) (err error) {
+	lockMode := unix.LOCK_NB
+	if exclusive {
+		lockMode |= unix.LOCK_EX
+	} else {
+		lockMode |= unix.LOCK_SH
+	}
 	if flockFile == nil {
 		err = fmt.Errorf("failed to open timing data lock on nil file descriptor")
 		return
@@ -93,37 +125,46 @@ func waitOnFileLock(flockFile *os.File, blockMillis int64) (err error) {
 
 	if err != nil {
 		err = fmt.Errorf("failed to secure timing data lock after %d milliseconds- %w", blockMillis, err)
-		flockFile.Close()
-		flockFile = nil
+	} else {
+		if exclusive {
+			failsafeLoggerTracef("waitOnFileLock: LOCK EXCLUSIVE\n")
+		} else {
+			failsafeLoggerTracef("waitOnFileLock: LOCK SHARED\n")
+		}
 	}
 
 	return
 }
 
+func relaxToSharedLock(flockFile *os.File) (err error) {
+	err = unix.Flock(int(flockFile.Fd()), unix.LOCK_SH)
+	if err != nil {
+		failsafeLoggerErrorf("failed to relax timing data lock - %s", err.Error())
+	} else {
+		failsafeLoggerTracef("waitOnFileLock: RELAX TO SHARED\n")
+	}
+	return
+}
+
 // unlockFileLock will release the synchronization lock around a file. The file descriptor passed in should be created by calling
 // waitOnFileLock().
-func unlockFileLock(flockFile *os.File) {
+func unlockFileLock(flockFile *os.File) (err error) {
 	lockMode := unix.LOCK_UN
 
-	err := unix.Flock(int(flockFile.Fd()), lockMode)
+	err = unix.Flock(int(flockFile.Fd()), lockMode)
 	if err != nil {
-		logger.Log.Errorf("failed to release timing data lock - %s", err.Error())
-		return
+		failsafeLoggerErrorf("failed to release timing data lock - %s", err.Error())
+	} else {
+		failsafeLoggerTracef("waitOnFileLock: RELEASE")
 	}
+	return
 }
 
 // updateFile will write the current state of the manager's timing data back to file. It locks the file prior to writing.
 func (mgr *TimeStampManager) updateFile() {
-	err := waitOnFileLock(mgr.dataFileDescriptor, 100)
-
-	if err != nil {
-		logger.Log.Warnf("Failed to secure timestamp file '%s' ('%s')", mgr.dataFilePath, err)
-	} else {
-		defer unlockFileLock(mgr.dataFileDescriptor)
-	}
-	err = jsonutils.WriteJSONDescriptor(mgr.dataFileDescriptor, &(mgr.root))
+	err := jsonutils.WriteJSONDescriptor(mgr.dataFileDescriptor, &(mgr.root))
 	if err != nil && logger.Log != nil {
-		logger.Log.Warnf("Failed to store timestamp data into file '%s' ('%s')", mgr.dataFilePath, err)
+		logger.Log.Warnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
 	}
 }
 
@@ -153,156 +194,217 @@ func pathSearchInternal(path string) (node *TimeStamp) {
 	return
 }
 
-// StartTiming will begin collecting fresh timing data for a high level component 'toolName' into the file at `outputFile`.
-// This function synchronizes with ReadOnlyTimingData(), ResumeTiming(), EndTiming() to ensure there is no data partially
+func ensureNoManager() (err error) {
+	if StampMgr != nil {
+		err = fmt.Errorf("already recording timing data for a tool into file (%s)", StampMgr.dataFilePath)
+		failsafeLoggerWarnf(err.Error())
+	}
+	return
+}
+
+func ensureExclusiveFileLock(fd *os.File) (err error) {
+	err = waitOnFileLock(fd, blockTimeMilliseconds, true)
+	if err != nil {
+		err = fmt.Errorf("can't lock timestamp file: %w", err)
+		failsafeLoggerWarnf(err.Error())
+	}
+	return
+}
+
+func ensureExistsManager() (err error) {
+	if StampMgr == nil {
+		err = fmt.Errorf("timestamping not initialized yet, can't record data")
+		failsafeLoggerWarnf(err.Error())
+	}
+	return
+}
+
+// BeginTiming will begin collecting fresh timing data for a high level component 'toolName' into the file at `outputFile`.
+// This function synchronizes with ReadTimingData(), ResumeTiming(), EndTiming() to ensure there is no data partially
 // written to the file. Expected steps is used to inform the dashboarding tools how many substeps the root node is expecting to have.
 // The function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty timestamp object instead.
-func StartTiming(toolName, outputFile string, expectedSteps int) (node *TimeStamp, err error) {
-	if StampMgr != nil {
-		err = fmt.Errorf("already recording timing data for tool '%s' into file (%s)", toolName, outputFile)
-		logger.Log.Warn(err.Error())
+func BeginTiming(toolName, outputFile string, expectedWeight float64, atomicOperation bool) (node *TimeStamp, err error) {
+	fmt.Println("BeginTiming")
+	if err = ensureNoManager(); err != nil {
 		return StampMgr.activeNode, err
-	}
-
-	// Create a new instance of the StampMgr global and initialize it with an empty root node.
-	root, err := createTimeStamp(toolName, time.Now(), expectedSteps)
-	if err != nil {
-		err = fmt.Errorf("unable to initialize timing root %s: %s", toolName, err)
-		logger.Log.Warn(err.Error())
-		return &TimeStamp{}, err
 	}
 
 	// Create a file to write data to
 	outFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_RDWR, 0664)
 	if err != nil {
-		err = fmt.Errorf("unable to create file %s: %s", outputFile, err)
-		logger.Log.Warn(err.Error())
+		err = fmt.Errorf("unable to create file %s: %w", outputFile, err)
+		failsafeLoggerWarnf(err.Error())
+		return &TimeStamp{}, err
+	}
+	// We will not close the file handle here, we will use it for synchronization going forwards.
+
+	// We will keep a shared lock on this file until we are done with timing.
+	if err = ensureExclusiveFileLock(outFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	// If we are locking this manager in atomic mode, never relax our lock on the file until the process ends or the manager is stopped.
+	if !atomicOperation {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("BeginTiming: %s", deferErr.Error())
+			}
+		}()
+	}
+
+	// Create a new instance of the StampMgr global and initialize it with an empty root node.
+	root, err := createTimeStamp(toolName, time.Now(), expectedWeight)
+	if err != nil {
+		err = fmt.Errorf("unable to initialize timing root %s: %w", toolName, err)
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
-	StampMgr = newStampMgr(root, outputFile, outFileDescriptor)
+	StampMgr = newStampMgr(root, outputFile, outFileDescriptor, atomicOperation)
 	StampMgr.updateFile()
 	return StampMgr.activeNode, err
 }
 
-// ReadOnlyTimingData will read out any existing timing data contained in the json file. This function synchronizes with
-// StartTiming(), ResumeTiming(), EndTiming() to ensure there is no data partially written to the file. The tool will NEVER return
+// restoreNode recursively re-establishes the parent/child links for nodes read from disk and checks if they have been completed
+func (ts *TimeStamp) restoreNode() {
+	ts.finished = ts.StartTime != nil && ts.EndTime != nil
+	for _, child := range ts.Steps {
+		child.parent = ts
+		child.restoreNode()
+	}
+}
+
+// ResumeTiming will begin appending timing data for a high level component 'toolName' into the file at `outputFile`.
+// This function synchronizes with ReadTimingData(), BeginTiming(), EndTiming()  to ensure there is no data partially
+// written to the file. The function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty
+// timestamp object instead. This function will NOT update the currently active node, it will remain pointing to the root node.
+func ResumeTiming(toolName, existingTimingFile string, createIfMissing bool, atomicOperation bool) (node *TimeStamp, err error) {
+	var existingroot *TimeStamp = &TimeStamp{}
+
+	if err = ensureNoManager(); err != nil {
+		return StampMgr.activeNode, err
+	}
+
+	flags := os.O_RDWR
+	if createIfMissing {
+		flags |= os.O_CREATE
+	}
+
+	// Recover an existing timing
+	outFileDescriptor, err := os.OpenFile(existingTimingFile, flags, 0664)
+	if err != nil {
+		err = fmt.Errorf("can't read existing timing file (%s): %w", existingTimingFile, err)
+		failsafeLoggerWarnf(err.Error())
+		return &TimeStamp{}, err
+	}
+	// We will not close the file handle here, we will use it for synchronization going forwards.
+
+	if err = ensureExclusiveFileLock(outFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	// If we are locking this manager in atomic mode, never relax our lock on the file until the process ends or the manager is stopped.
+	if !atomicOperation {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("ResumeTiming: %s", deferErr.Error())
+			}
+		}()
+	}
+
+	startFresh := false
+	err = jsonutils.ReadJSONDescriptor(outFileDescriptor, existingroot)
+	if err != nil {
+		// JSON library doesn't use static errors, must check message for equivalence instead of errors.Is()
+		if err.Error() == "unexpected end of JSON input" && createIfMissing {
+			startFresh = true
+			err = nil
+		} else {
+			err = fmt.Errorf("can't recover existing timing data (%s): %w", existingTimingFile, err)
+			failsafeLoggerWarnf(err.Error())
+			return &TimeStamp{}, err
+		}
+	}
+
+	if startFresh {
+		// We couldn't load the node from JSON, make a new one
+		existingroot, err = createTimeStamp(toolName, time.Now(), 1)
+		if err != nil {
+			err = fmt.Errorf("unable to initialize timing root %s: %w", toolName, err)
+			failsafeLoggerWarnf(err.Error())
+			return &TimeStamp{}, err
+		}
+	} else {
+		// We are keeping the node we loaded from JSON.
+		existingroot.restoreNode()
+	}
+
+	StampMgr = newStampMgr(existingroot, existingTimingFile, outFileDescriptor, atomicOperation)
+	return StampMgr.activeNode, err
+}
+
+// ReadTimingData will read out any existing timing data contained in the json file. This function synchronizes with
+// BeginTiming(), ResumeTiming(), EndTiming() to ensure there is no data partially written to the file. The tool will NEVER return
 // a nil TimeStamp pointer, in event of an error it will return an empty timestamp object instead.
 // This function is read-only and will not affect the currently active StampMgr instance in any way. The  Manager does not
 // need to be started to call this function.
-func ReadOnlyTimingData(existingTimingFile string) (node *TimeStamp, err error) {
+func ReadTimingData(existingTimingFile string) (node *TimeStamp, err error) {
 	var existingroot TimeStamp
 	// Recover an existing timing
 	file, err := os.Open(existingTimingFile)
 	if err != nil {
 		err = fmt.Errorf("can't read timing file (%s): %w", existingTimingFile, err)
-		logger.Log.Warn(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 	defer file.Close()
 
-	err = waitOnFileLock(file, 100)
-	if err != nil {
-		err = fmt.Errorf("can't lock timing file (%s): %w", existingTimingFile, err)
-		logger.Log.Warn(err.Error())
+	// We will hold a shared lock only while reading the data, then release it completely
+	if err = waitOnFileLock(file, 100, false); err != nil {
 		return &TimeStamp{}, err
 	}
-	defer unlockFileLock(file)
+	defer func() {
+		if deferErr := unlockFileLock(file); deferErr != nil {
+			failsafeLoggerErrorf("ReadTimingData: %s", deferErr.Error())
+		}
+	}()
 
 	err = jsonutils.ReadJSONDescriptor(file, &existingroot)
 	if err != nil {
 		err = fmt.Errorf("can't recover existing timing data (%s): %w", existingTimingFile, err)
-		logger.Log.Warn(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 	return &existingroot, nil
 }
 
-// ResumeTiming will begin appending timing data for a high level component 'toolName' into the file at `outputFile`.
-// This function synchronizes with ReadOnlyTimingData(), StartTiming(), EndTiming()  to ensure there is no data partially
-// written to the file. The function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty
-// timestamp object instead. This function will NOT update the currently active node, it will remain pointing to the root node.
-func ResumeTiming(existingTimingFile string) (node *TimeStamp, err error) {
-	var existingroot TimeStamp
-
-	if StampMgr != nil {
-		err = fmt.Errorf("already recording timing data for a tool into file (%s)", existingTimingFile)
-		logger.Log.Warn(err.Error())
-		return StampMgr.activeNode, err
-	}
-
-	// Recover an existing timing
-	outFileDescriptor, err := os.OpenFile(existingTimingFile, os.O_CREATE|os.O_RDWR, 0664)
-	if err != nil {
-		err = fmt.Errorf("can't read timing file (%s)", existingTimingFile)
-		logger.Log.Warn(err.Error())
-		return &TimeStamp{}, err
-	}
-	// We will not close the file handle here, we will use it for synchronization going forwards.
-
-	err = waitOnFileLock(outFileDescriptor, 100)
-	if err != nil {
-		err = fmt.Errorf("can't lock timing file (%s)", existingTimingFile)
-		logger.Log.Warn(err.Error())
-		return &TimeStamp{}, err
-	}
-	defer unlockFileLock(outFileDescriptor)
-
-	err = jsonutils.ReadJSONDescriptor(outFileDescriptor, &existingroot)
-	if err != nil {
-		err = fmt.Errorf("can't recover existing timing data (%s): %w", existingTimingFile, err)
-		logger.Log.Warn(err.Error())
-		return &TimeStamp{}, err
-	}
-
-	StampMgr = newStampMgr(&existingroot, existingTimingFile, outFileDescriptor)
-	return StampMgr.activeNode, err
-}
-
-// finishAllMeasurements will recursively scan the timing data tree starting from `node` and ensure that all child nodes
-// have a finish time. This finish time will be inherited from its parent if it is currently nil. A warning message will
-// be printed about any such node that is found. The initial node passed in must either have a valid end time, or have a
-// parent with one.
-func finishAllMeasurements(node *TimeStamp) (err error) {
-	if node.EndTime == nil {
-		if node.parent.EndTime == nil {
-			return fmt.Errorf("could not finalize orphaned times for node '%s' since it has no parent with an end time", node.Name)
-		} else {
-			logger.Log.Warnf("Found orphaned node '%s' with incomplete timing", node.Path())
-			node.completeTimeStamp(*node.parent.EndTime)
-		}
-	}
-	for _, subStep := range node.Steps {
-		err = finishAllMeasurements(subStep)
-		if err != nil {
-			return err
-		}
-	}
-	return
-}
-
 // End timing will finalize a set of measurements into the file used to start the measurements. Any nodes that are currently
 // still incomplete will be recursively completed based on their parent's end time. This function synchronizes with
-// ReadOnlyTimingData(), StartTiming(), ResumeTiming()  to ensure there is no data partially written to the file. Timing
+// ReadTimingData(), BeginTiming(), ResumeTiming()  to ensure there is no data partially written to the file. Timing
 // may be picked back up again by calling ResumeTiming(), however the active timestamp node WILL be reset back to the root.
 func EndTiming() (err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't stop timing")
-		logger.Log.Warn(err.Error())
+	if err = ensureExistsManager(); err != nil {
 		return err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return
+	}
+	// We fully unlock the file at the end of measurements
 
 	StampMgr.root.completeTimeStamp(time.Now())
-	err = finishAllMeasurements(StampMgr.root)
+	err = StampMgr.root.FinishAllMeasurements()
 	if err != nil {
-		logger.Log.Warn(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return err
 	}
 
 	StampMgr.updateFile()
-
+	err = unlockFileLock(StampMgr.dataFileDescriptor)
+	if err != nil {
+		failsafeLoggerErrorf("StopMeasurementSpecific: %s", err.Error())
+		return
+	}
 	StampMgr.dataFileDescriptor.Close()
 	StampMgr = nil
 
@@ -315,19 +417,28 @@ func EndTiming() (err error) {
 // may not include the character "/" since that is used to parse path based timing commands. The function will return
 // the newly created timestamp. This function will also update the currently active node in the manager. The function will
 // NEVER return a nil TimeStamp pointer, in event of an error it will return an empty timestamp object instead.
-func StartMeasuringEvent(name string, expectedSteps int) (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't record data for '%s'", name)
-		logger.Log.Warnf(err.Error())
+func StartMeasuringEvent(name string, expectedWeight float64) (node *TimeStamp, err error) {
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StartMeasuringEvent: %s", deferErr.Error())
+			}
+		}()
+	}
 
 	currentParent := StampMgr.activeNode
-	newNode, err := currentParent.addStepWithExpected(name, time.Now(), expectedSteps)
+	newNode, err := currentParent.addStep(name, time.Now(), expectedWeight)
 	if err != nil {
-		err = fmt.Errorf("failed to create a timestamp object '%s': %s", name, err)
+		err = fmt.Errorf("failed to create a timestamp object '%s': %w", name, err)
 		return &TimeStamp{}, err
 	}
 	StampMgr.activeNode = newNode
@@ -340,21 +451,31 @@ func StartMeasuringEvent(name string, expectedSteps int) (node *TimeStamp, err e
 // 2) It will NEVER update the manager's currently active node, even if the parent is the active node.
 // The function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty timestamp object
 // instead.
-func StartMeasuringEventWithParent(parent *TimeStamp, name string, expectedSteps int) (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't record data for '%s'", name)
-		logger.Log.Warnf(err.Error())
+func StartMeasuringEventWithParent(parent *TimeStamp, name string, expectedWeight float64) (node *TimeStamp, err error) {
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StartMeasuringEventWithParent: %s", deferErr.Error())
+			}
+		}()
+	}
+
 	if parent == nil {
 		err = fmt.Errorf("invalid timestamp parent, can't add sub-step '%s'", name)
-		logger.Log.Warnf(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
-
-	node, err = parent.addStepWithExpected(name, time.Now(), expectedSteps)
+	node, err = parent.addStep(name, time.Now(), expectedWeight)
 	StampMgr.updateFile()
 	return node, err
 }
@@ -366,14 +487,23 @@ func StartMeasuringEventWithParent(parent *TimeStamp, name string, expectedSteps
 // 2) It will NEVER update the manager's currently active node, even if the parent is the active node.
 // The function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty timestamp object
 // instead.
-func StartMeasuringEventByPath(path string, expectedSteps int) (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't get search for node '%s'", path)
-		logger.Log.Warnf(err.Error())
+func StartMeasuringEventByPath(path string, expectedWeight float64) (node *TimeStamp, err error) {
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StartMeasuringEventByPath: %s", deferErr.Error())
+			}
+		}()
+	}
 
 	path = strings.Trim(path, pathSeparator)
 	pathComponents := strings.Split(path, pathSeparator)
@@ -383,7 +513,7 @@ func StartMeasuringEventByPath(path string, expectedSteps int) (node *TimeStamp,
 
 	if pathComponents[0] != StampMgr.root.Name {
 		err = fmt.Errorf("timestamp root miss-match ('%s', expected '%s')", pathComponents[0], StampMgr.root.Name)
-		logger.Log.Warnf(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -396,13 +526,14 @@ func StartMeasuringEventByPath(path string, expectedSteps int) (node *TimeStamp,
 		}
 		next := cur.searchSubSteps(pathComponent)
 		if next == nil {
-			thisNodeExpectedSteps := 0
+			thisNodeExpectedWeight := 1.0
+			// Set a default of 1 for expected weight except for the leaf node.
 			if i == len(pathComponents)-2 {
-				thisNodeExpectedSteps = expectedSteps
+				thisNodeExpectedWeight = expectedWeight
 			}
-			next, err = cur.addStepWithExpected(pathComponent, time.Now(), thisNodeExpectedSteps)
+			next, err = cur.addStep(pathComponent, time.Now(), thisNodeExpectedWeight)
 			if err != nil {
-				logger.Log.Warnf(err.Error())
+				failsafeLoggerWarnf(err.Error())
 				return &TimeStamp{}, err
 			}
 		}
@@ -417,18 +548,27 @@ func StartMeasuringEventByPath(path string, expectedSteps int) (node *TimeStamp,
 // Will return the newly updated active node. The function will NEVER return a nil TimeStamp pointer, in event of an
 // error it will return an empty timestamp object instead.
 func StopMeasurement() (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't record data")
-		logger.Log.Warnf(err.Error())
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StopMeasurement: %s", deferErr.Error())
+			}
+		}()
+	}
 
 	// We don't want to ever stop measuring the root until we call EndTiming().
 	if StampMgr.activeNode == StampMgr.root {
 		err = fmt.Errorf("can't stop measuring the root timestamp '%s', call EndTiming() instead", StampMgr.root.Name)
-		logger.Log.Warnf(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return StampMgr.root, err
 	}
 
@@ -444,18 +584,27 @@ func StopMeasurement() (node *TimeStamp, err error) {
 // WILL update the managers active node. Will return the (possibly updated) active node. The function will NEVER return a
 // nil TimeStamp pointer, in event of an error it will return an empty timestamp object instead.
 func StopMeasurementSpecific(currentNode *TimeStamp) (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't record data for '%s'", currentNode.Name)
-		logger.Log.Warnf(err.Error())
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StopMeasurementSpecific: %s", deferErr.Error())
+			}
+		}()
+	}
 
 	// We don't want to ever stop measuring the root until we call EndTiming().
 	if currentNode == StampMgr.root {
 		err = fmt.Errorf("can't stop measuring the root timestamp '%s', call EndTiming() instead", StampMgr.root.Name)
-		logger.Log.Warnf(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -474,25 +623,34 @@ func StopMeasurementSpecific(currentNode *TimeStamp) (node *TimeStamp, err error
 // the managers active node. Will return the (possibly updated) active node. The function will NEVER return a nil
 // TimeStamp pointer, in event of an error it will return an empty timestamp object instead.
 func StopMeasurementByPath(path string) (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't record data for '%s'", path)
-		logger.Log.Warnf(err.Error())
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return &TimeStamp{}, err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StopMeasurementByPath: %s", deferErr.Error())
+			}
+		}()
+	}
 
 	currentNode := pathSearchInternal(path)
 	if currentNode == nil {
 		err = fmt.Errorf("could not find measurement '%s' by path", path)
-		logger.Log.Warnf(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
 	// We don't want to ever stop measuring the root until we call EndTiming().
 	if currentNode == StampMgr.root {
 		err = fmt.Errorf("can't stop measuring the root timestamp '%s', call EndTiming() instead", StampMgr.root.Name)
-		logger.Log.Warnf(err.Error())
+		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -506,15 +664,37 @@ func StopMeasurementByPath(path string) (node *TimeStamp, err error) {
 	return StampMgr.activeNode, err
 }
 
+// FlushData triggers a manual dump of data to disk if possible.
+func FlushData() (err error) {
+	if err := ensureExistsManager(); err != nil {
+		return err
+	}
+
+	StampMgr.lock.Lock()
+	defer StampMgr.lock.Unlock()
+	if err = ensureExclusiveFileLock(StampMgr.dataFileDescriptor); err != nil {
+		return err
+	}
+	if !StampMgr.isAtomic {
+		defer func() {
+			if deferErr := relaxToSharedLock(StampMgr.dataFileDescriptor); deferErr != nil {
+				failsafeLoggerErrorf("StopMeasurementByPath: %s", deferErr.Error())
+			}
+		}()
+	}
+
+	StampMgr.updateFile()
+	return
+}
+
 // GetActiveTimeNode returns the node that should next have sub-steps added to it for single threaded operations. The
 // function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty timestamp object
 // instead.
 func GetActiveTimeNode() (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't get active node")
-		logger.Log.Warnf(err.Error())
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
 
@@ -524,11 +704,10 @@ func GetActiveTimeNode() (node *TimeStamp, err error) {
 // GetNodeByPath returns the node that matches the path passed in. The function will NEVER return a nil TimeStamp pointer,
 // in event of an error it will return an empty timestamp object instead.
 func GetNodeByPath(path string) (node *TimeStamp, err error) {
-	if StampMgr == nil {
-		err = fmt.Errorf("timestamping not initialized yet, can't get search for node '%s'", path)
-		logger.Log.Warnf(err.Error())
+	if err = ensureExistsManager(); err != nil {
 		return &TimeStamp{}, err
 	}
+
 	StampMgr.lock.Lock()
 	defer StampMgr.lock.Unlock()
 

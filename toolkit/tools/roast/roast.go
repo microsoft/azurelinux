@@ -61,7 +61,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.StartTiming("roast", *timestampFile, 0)
+	timestamp_v2.BeginTiming("roast", *timestampFile, 0, false)
 	defer timestamp_v2.EndTiming()
 
 	if *workers <= 0 {
