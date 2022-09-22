@@ -2,7 +2,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -x
 set -e
 
 # $1 = TARGET_SPEC
@@ -13,7 +12,7 @@ function copy_local_tarball {
 
 # $1 = spec name
 function remove_local_tarball {
-    rm $WORKSPACE/SPECS/$1/$TARBALL_NAME
+    rm $SPECS_DIR/$1/$TARBALL_NAME
 }
 
 function clean {
@@ -58,7 +57,7 @@ function update_spec {
 }
 
 function find_old_version {
-    FILE=$WORKSPACE/SPECS/kernel/kernel.spec
+    FILE=$SPECS_DIR/kernel/kernel.spec
     LINE=$(grep "Version:" $FILE)
     OLD_VERSION=${LINE:16}
 }
@@ -67,7 +66,7 @@ function update_configs {
     CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-rt/config kernel-hci/config"
     for configfile in $CONFIG_FILE
     do
-        FILE=$WORKSPACE/SPECS/$configfile
+        FILE=$SPECS_DIR/$configfile
         BASE=${FILE%/*}
         SPEC=${configfile%/*}
         SIGNATURE_FILE="$BASE/$SPEC.signatures.json"
@@ -80,6 +79,19 @@ function update_configs {
         FULL_SIGNATURE_ENTRY="  \"$CONFIG_ONLY\": \"$SHA256\""
         FILE_PATTERN=$CONFIG_ONLY
         sed -i "s/  \"$FILE_PATTERN\": \".*\"/$FULL_SIGNATURE_ENTRY/" $SIGNATURE_FILE
+    done
+}
+
+function update_livepatches {
+    $LIVEPATCHING_SCRIPTS_DIR/generate_livepatch_spec.sh
+
+    update_livepatches_signed
+}
+
+function update_livepatches_signed {
+    for livepatch_spec in "$SPECS_DIR/livepatch/"livepatch-*.spec
+    do
+        $LIVEPATCHING_SCRIPTS_DIR/generate_livepatch-signed_spec.sh "$livepatch_spec"
     done
 }
 
@@ -235,16 +247,17 @@ fi
 # Create globals
 TAG="rolling-lts/mariner-2/$VERSION"
 TMPDIR="tmp-dir"
-SPECS="kernel-headers kernel hyperv-daemons"
 DEFAULT_URL="https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/"
 DEFAULT_EXTENSION=".tar.gz"
 FULL_URL=$DEFAULT_URL$TAG$DEFAULT_EXTENSION
+LIVEPATCHING_SCRIPTS_DIR="$WORKSPACE/toolkit/scripts/livepatching"
 TARBALL_NAME="kernel-$VERSION$DEFAULT_EXTENSION"
 DOWNLOAD_FILE_PATH=$TMPDIR/$TARBALL_NAME
 SPECS="kernel-headers kernel hyperv-daemons"
+SPECS_DIR="$WORKSPACE/SPECS"
+SPECS_SIGNED_DIR="$WORKSPACE/SPECS-SIGNED"
 SIGNED_SPECS="kernel-signed"
 NEW_RELEASE_NUMBER="Release:        1%{?dist}"
-CHANGELOG_ENTRY="Update source to $NEW_KERNEL_VERSION"
 FILE_SIGNATURE_PATTERN="kernel-"
 
 # Go through needed specs
@@ -256,15 +269,15 @@ fi
 
 for spec in $SPECS
 do
-    TARGET_SPEC=$WORKSPACE/SPECS/$spec/$spec.spec
-    TARGET_SIGNATUREJSON=$WORKSPACE/SPECS/$spec/$spec.signatures.json
+    TARGET_SPEC=$SPECS_DIR/$spec/$spec.spec
+    TARGET_SIGNATUREJSON=$SPECS_DIR/$spec/$spec.signatures.json
     copy_local_tarball $TARGET_SPEC
     update_spec $TARGET_SPEC
     update_signature $TARGET_SIGNATUREJSON
 done
 for spec in $SIGNED_SPECS
 do
-    TARGET_SPEC=$WORKSPACE/SPECS-SIGNED/$spec/$spec.spec
+    TARGET_SPEC=$SPECS_SIGNED_DIR/$spec/$spec.spec
     update_spec $TARGET_SPEC
 done
 update_configs
@@ -272,6 +285,7 @@ update_configs
 # Update toolchain related files
 update_toolchain
 update_cgmanifest
+update_livepatches
 print_metadata
 #clean
 
