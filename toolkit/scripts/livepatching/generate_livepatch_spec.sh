@@ -9,7 +9,10 @@ SCRIPT_FOLDER="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 COMMON_SCRIPTS_FOLDER="$REPO_ROOT/toolkit/scripts"
 
 # shellcheck source=../../../toolkit/scripts/rpmops.sh
-source "$REPO_ROOT/toolkit/scripts/rpmops.sh"
+source "$COMMON_SCRIPTS_FOLDER/rpmops.sh"
+
+# shellcheck source=../../../toolkit/scripts/specs/specs_tools.sh
+source "$COMMON_SCRIPTS_FOLDER/specs/specs_tools.sh"
 
 KERNEL_SPECS_DIR="$REPO_ROOT/SPECS/kernel"
 KERNEL_CONFIG_PATH="$KERNEL_SPECS_DIR/config"
@@ -19,14 +22,15 @@ KERNEL_PUBLIC_KEY_FILE="$(basename "$KERNEL_PUBLIC_KEY_PATH")"
 KERNEL_SIGNATURES_PATH="$KERNEL_SPECS_DIR/kernel.signatures.json"
 KERNEL_SPEC_PATH="$KERNEL_SPECS_DIR/kernel.spec"
 
-LIVEPATCH_SPECS_DIR="$REPO_ROOT/SPECS/livepatch"
-
-KERNEL_VERSION="$(mariner_rpmspec -q --queryformat="%{VERSION}\n" --srpm "$KERNEL_SPEC_PATH" 2>/dev/null)"
+KERNEL_VERSION="$(spec_read_version "$KERNEL_SPEC_PATH")"
 KERNEL_VERSION_RELEASE="$(mariner_rpmspec -q --queryformat="%{VERSION}-%{RELEASE}\n" --srpm "$KERNEL_SPEC_PATH" 2>/dev/null)"
 
-echo "Generating empty livepatch spec for kernel ($KERNEL_VERSION_RELEASE) under ($LIVEPATCH_SPECS_DIR)."
+LIVEPATCH_SPECS_DIR="$REPO_ROOT/SPECS/livepatch"
+LIVEPATCH_SPEC_PATH="$LIVEPATCH_SPECS_DIR/livepatch-$KERNEL_VERSION_RELEASE.spec"
 
-mkdir -p "$REPO_ROOT/SPECS/livepatch"
+echo "Generating empty livepatch spec for kernel ($KERNEL_VERSION_RELEASE) under ($LIVEPATCH_SPEC_PATH)."
+
+mkdir -p "$LIVEPATCH_SPECS_DIR"
 
 LIVEPATCH_CONFIG_FILE_NAME="config-$KERNEL_VERSION_RELEASE"
 LIVEPATCH_PUBLIC_KEY_FILE="mariner-$KERNEL_VERSION_RELEASE.pem"
@@ -52,10 +56,10 @@ jq -n \
     '{"Signatures": {($config_name): $config_hash, ($kernel_name): $kernel_hash, ($pem_name): $pem_hash}}' \
     > "$LIVEPATCH_SPECS_DIR/livepatch-$KERNEL_VERSION_RELEASE.signatures.json"
 
-LIVEPATCH_SPEC_NAME="livepatch-$KERNEL_VERSION_RELEASE.spec"
-LIVEPATCH_SPEC_PATH="$LIVEPATCH_SPECS_DIR/$LIVEPATCH_SPEC_NAME"
+# shellcheck disable=SC2034  # Variable used indirectly inside 'create_new_file_from_template'.
+declare -A TEMPLATE_PLACEHOLDERS=(
+    ["@KERNEL_VERSION_RELEASE@"]="$KERNEL_VERSION_RELEASE"
+)
+create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch.spec" "$LIVEPATCH_SPEC_PATH" TEMPLATE_PLACEHOLDERS
 
-echo "Generating the new livepatch spec ($LIVEPATCH_SPEC_NAME)."
-
-sed "s/@KERNEL_VERSION_RELEASE@/$KERNEL_VERSION_RELEASE/" "$SCRIPT_FOLDER/template_livepatch.spec" > "$LIVEPATCH_SPEC_PATH"
 "$COMMON_SCRIPTS_FOLDER"/update_spec.sh "Original version for CBL-Mariner.\n- License verified." "$LIVEPATCH_SPEC_PATH" 1>/dev/null
