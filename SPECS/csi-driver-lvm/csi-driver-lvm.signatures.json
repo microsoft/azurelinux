@@ -1,5 +1,6 @@
 {
     "Signatures": {
-        "csi-driver-lvm-0.4.1-govendorcached.tar.gz": "d040ca0ad6244270100c821372604ef19e7e7eee243424fa0eafc94a4ceb280f"
+        "csi-driver-lvm-0.5.0.tar.gz": "59515adba2fe78dce9be1ea66dd228eac0eb72549744bf7c683ec667626ecdc3",
+        "csi-driver-lvm-0.5.0-gocached.tar.gz": "0ab9640762ef2db2fbee7029618c30d6955400f8de62aeac711ad28d973a8629"
     }
 }
