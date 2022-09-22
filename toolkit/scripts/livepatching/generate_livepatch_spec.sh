@@ -8,8 +8,7 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 SCRIPT_FOLDER="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 COMMON_SCRIPTS_FOLDER="$REPO_ROOT/toolkit/scripts"
 
-# shellcheck source=../../../toolkit/scripts/rpmops.sh
-source "$COMMON_SCRIPTS_FOLDER/rpmops.sh"
+export PATH="$PATH:$COMMON_SCRIPTS_FOLDER"
 
 # shellcheck source=../../../toolkit/scripts/specs/specs_tools.sh
 source "$COMMON_SCRIPTS_FOLDER/specs/specs_tools.sh"
@@ -62,4 +61,15 @@ declare -A TEMPLATE_PLACEHOLDERS=(
 )
 create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch.spec" "$LIVEPATCH_SPEC_PATH" TEMPLATE_PLACEHOLDERS
 
-"$COMMON_SCRIPTS_FOLDER"/update_spec.sh "Original version for CBL-Mariner.\n- License verified." "$LIVEPATCH_SPEC_PATH" 1>/dev/null
+update_spec.sh "Original version for CBL-Mariner.\n- License verified." "$LIVEPATCH_SPEC_PATH" 1>/dev/null
+
+echo "Updating licensing info."
+
+license_map.py --no_check --update \
+    SPECS/LICENSES-AND-NOTICES/data/licenses.json \
+    SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+    "$LIVEPATCH_SPEC_PATH"
+
+echo "Updating the cgmanifest.json."
+
+update_cgmanifest.py last "$REPO_ROOT/cgmanifest.json" "$LIVEPATCH_SPEC_PATH"
