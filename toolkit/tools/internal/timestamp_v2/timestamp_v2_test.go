@@ -65,7 +65,7 @@ func TestMain(m *testing.M) {
 	// Need to create logger since the json tools use it, will just
 	// print to console for errors.
 	logger.InitStderrLog()
-	logger.SetStderrLogLevel("trace")
+	//logger.SetStderrLogLevel("trace")
 	ret := m.Run()
 
 	// To preserve the output .json files for debugging, comment out the following line.
@@ -74,7 +74,7 @@ func TestMain(m *testing.M) {
 }
 
 // Test if we can read an existing json file, add lines to it, then write it out
-func TestLoadDemo(t *testing.T) {
+func TestLoadDemoAndWrite(t *testing.T) {
 	var timestamp TimeStamp
 	err := jsonutils.ReadJSONFile("./testdata/time.json", &timestamp)
 	assert.NoError(t, err)
@@ -146,6 +146,33 @@ func TestInvalidPathSeparator(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestInvalidFilePathStart(t *testing.T) {
+	ts, err := BeginTiming(t.Name(), "/a/path/that/shouldnt/exist", 0, false)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "unable to create file /a/path/that/shouldnt/exist: open /a/path/that/shouldnt/exist: no such file or directory")
+	assert.Nil(t, StampMgr)
+
+	ts, err = ResumeTiming(t.Name(), "/a/path/that/shouldnt/exist", false, false)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't read existing timing file (/a/path/that/shouldnt/exist): open /a/path/that/shouldnt/exist: no such file or directory")
+	assert.Nil(t, StampMgr)
+
+	ts, err = ReadTimingData("/a/path/that/shouldnt/exist")
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't read existing timing file (/a/path/that/shouldnt/exist): open /a/path/that/shouldnt/exist: no such file or directory")
+}
+
+func TestCorruptFile(t *testing.T) {
+	ts, err := ResumeTiming(t.Name(), "./testdata/corrupt.json", false, false)
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't recover existing timing data (./testdata/corrupt.json): unexpected end of JSON input")
+	assert.Nil(t, StampMgr)
+
+	ts, err = ReadTimingData("./testdata/corrupt.json")
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't recover existing timing data (./testdata/corrupt.json): unexpected end of JSON input")
+}
+
 func TestInvalidExpected(t *testing.T) {
 	ts, err := createTimeStamp("name", time.Now(), -10)
 	assert.EqualError(t, err, "can't create a timestamp object with negative expected weight")
@@ -155,6 +182,23 @@ func TestInvalidExpected(t *testing.T) {
 	runAsserts(t, ts, err)
 	ts, err = StartMeasuringEvent("name", -10)
 	assert.EqualError(t, err, "failed to create a timestamp object 'name': can't create a timestamp object with negative expected weight")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
+
+	ts, err = StartMeasuringEventByPath(t.Name()+"/path", -10)
+	assert.EqualError(t, err, "failed to create a timestamp object 'TestInvalidExpected/path': can't create a timestamp object with negative expected weight")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
+
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestInvalidRoot(t *testing.T) {
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
+	runAsserts(t, ts, err)
+	ts, err = StartMeasuringEventByPath("not_the_root"+"/path", 0)
+	assert.EqualError(t, err, "timestamp root miss-match ('not_the_root', expected 'TestInvalidRoot')")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 	err = EndTiming()
@@ -241,6 +285,11 @@ func TestLockingCooperative(t *testing.T) {
 	err = waitOnFileLock(fd2, 0, true)
 	assert.NoError(t, err)
 	fd2.Close()
+}
+
+func TestNilLock(t *testing.T) {
+	err := waitOnFileLock(nil, 0, true)
+	assert.EqualError(t, err, "failed to open timing data lock on nil file descriptor")
 }
 
 func TestLockingAlreadyLocked(t *testing.T) {
@@ -385,19 +434,30 @@ func TestStartMeasurementWithoutStarting(t *testing.T) {
 	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
-}
 
-func TestStopMeasurementWithoutStarting(t *testing.T) {
-	EndTiming() // Make sure we aren't running a timing manager
-	ts, err := StopMeasurement()
+	ts, err = StartMeasuringEventWithParent(&TimeStamp{}, "parent", 0)
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
+
+	ts, err = StartMeasuringEventByPath("a/path", 0)
 	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
 }
 
-func TestParentNotStartedYet(t *testing.T) {
-	EndTiming() // Make sure we aren't running a timing manager
-	ts, err := StartMeasuringEventWithParent(&TimeStamp{}, "parent", 0)
+func TestStopMeasurementWithoutStarting(t *testing.T) {
+	ts, err := StopMeasurement()
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
+
+	ts, err = StopMeasurementSpecific(&TimeStamp{})
+	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
+	assert.NotNil(t, ts)
+	assert.Equal(t, ts, &TimeStamp{})
+
+	ts, err = StopMeasurementByPath("a/path")
 	assert.EqualError(t, err, "timestamping not initialized yet, can't record data")
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts, &TimeStamp{})
@@ -485,6 +545,16 @@ func TestStopMiddleNode(t *testing.T) {
 }
 
 func TestStopCleanup(t *testing.T) {
+	// root
+	//  |
+	//  A----------------
+	//  |           |   |
+	//  B1-------   B2  B3
+	//  |   |   |
+	//  C1  C2  C3
+
+	// Stop B1, but leave the rest orphaned
+
 	root, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
 	runAsserts(t, root, err)
 	a, err := StartMeasuringEvent("A", 0)
@@ -523,11 +593,10 @@ func TestStopCleanup(t *testing.T) {
 	assert.Equal(t, b1_specific_stop.EndTime, c3.EndTime)
 
 	// Everything else should inherit the root node's end time
-	rootElapsed := root.ElapsedSeconds
 	assert.NotEqual(t, -1.0, root.ElapsedSeconds)
-	assert.Equal(t, rootElapsed, a.ElapsedSeconds)
-	assert.Equal(t, rootElapsed, b2.ElapsedSeconds)
-	assert.Equal(t, rootElapsed, b3.ElapsedSeconds)
+	assert.Equal(t, root.EndTime, a.EndTime)
+	assert.Equal(t, root.EndTime, b2.EndTime)
+	assert.Equal(t, root.EndTime, b3.EndTime)
 }
 
 func TestGetActiveNode(t *testing.T) {
@@ -737,6 +806,65 @@ func TestResumeEmptyFileCreate(t *testing.T) {
 	runAsserts(t, ts, err)
 	err = EndTiming()
 	assert.NoError(t, err)
+}
+
+func TestReadTiming(t *testing.T) {
+	ts, err := ReadTimingData("./testdata/time.json")
+	runAsserts(t, ts, err)
+	assert.Equal(t, "1A", ts.Name)
+}
+
+func TestReadTimingMissing(t *testing.T) {
+	ts, err := ReadTimingData("not_a_file.json")
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "can't read existing timing file (not_a_file.json): open not_a_file.json: no such file or directory")
+}
+
+func TestReadParallel(t *testing.T) {
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
+	runAsserts(t, ts, err)
+	a, err := StartMeasuringEvent("A", 0)
+	runAsserts(t, a, err)
+	ts, err = StopMeasurement()
+	runAsserts(t, ts, err)
+
+	ts, err = ReadTimingData("./testout/" + t.Name() + ".json")
+	runAsserts(t, ts, err)
+
+	assert.True(t, timestampHasEquivalentTiming(*a, *ts.Steps[0]))
+
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestFlush(t *testing.T) {
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, false)
+	runAsserts(t, ts, err)
+	err = FlushData()
+	assert.NoError(t, err)
+
+	err = EndTiming()
+	assert.NoError(t, err)
+}
+
+func TestCheckExists(t *testing.T) {
+	return
+}
+
+func TestReadBlocking(t *testing.T) {
+	ts, err := BeginTiming(t.Name(), "./testout/"+t.Name()+".json", 0, true)
+	runAsserts(t, ts, err)
+
+	ts, err = ReadTimingData("./testout/" + t.Name() + ".json")
+	assert.NotNil(t, ts)
+	assert.EqualError(t, err, "failed to secure timing data lock after 250 milliseconds- resource temporarily unavailable")
+
+	err = EndTiming()
+	assert.NoError(t, err)
+
+	ts, err = ReadTimingData("./testout/" + t.Name() + ".json")
+	runAsserts(t, ts, err)
+
 }
 
 var workerParentTS *TimeStamp
