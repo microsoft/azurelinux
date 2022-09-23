@@ -79,7 +79,7 @@ rm -rf %{buildroot}%{_mandir}
 
 %changelog
 * Mon Aug 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-4
-- Adding missing dependency on "elfutils" and "awk".
+- Adding missing dependency on "awk" and "binutils".
 
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-3
 - Add Mariner-specific steps to 'kpatch-build'.
