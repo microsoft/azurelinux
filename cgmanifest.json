@@ -10860,6 +10860,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "local-path-provisioner",
+          "version": "0.0.21",
+          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lldpad",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/intel/openlldp/archive/v1.1.tar.gz"
