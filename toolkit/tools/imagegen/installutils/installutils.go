@@ -975,17 +975,17 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 
 //InstallGrubEnv installs an empty grubenv f
 func InstallGrubEnv(installRoot string) (err error) {
-	const(
+	const (
 		assetGrubEnvFile = "/installer/grub2/grubenv"
 		grubEnvFile      = "boot/grub2/grubenv"
 	)
 	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
 	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
-	if err != nil{
+	if err != nil {
 		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
 		return
 	}
-	
+
 	return
 }
 
