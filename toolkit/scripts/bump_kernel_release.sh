@@ -2,8 +2,15 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -x
 set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+COMMON_SCRIPTS_FOLDER="$REPO_ROOT/toolkit/scripts"
+
+export PATH="$PATH:$COMMON_SCRIPTS_FOLDER"
+
+# shellcheck source=../../toolkit/scripts/specs/specs_tools.sh
+source "$COMMON_SCRIPTS_FOLDER/specs/specs_tools.sh"
 
 # $1 = TARGET_SPEC
 function copy_local_tarball {
@@ -13,7 +20,7 @@ function copy_local_tarball {
 
 # $1 = spec name
 function remove_local_tarball {
-    rm $WORKSPACE/SPECS/$1/$TARBALL_NAME
+    rm $SPECS_DIR/$1/$TARBALL_NAME
 }
 
 function clean {
@@ -45,7 +52,7 @@ function create_new_changelog_entry {
     NEW_CHANGELOG_LINE=$((CHANGELOG_LINE+1))
     NEW_CHANGELOG_DATE=$(date +"%a %b %d %Y")
     NEW_CHANGELOG_HEADER="* $NEW_CHANGELOG_DATE $USER_NAME <$USER_EMAIL> - $VERSION-1"
-    NEW_CHANGELOG_ENTRY="- Update source to $VERSION"
+    NEW_CHANGELOG_ENTRY="- Bump release number to match kernel release"
     FULL_CHANGELOG_ENTRY="$NEW_CHANGELOG_HEADER\n$NEW_CHANGELOG_ENTRY\n"
     sed -i "${NEW_CHANGELOG_LINE}i${FULL_CHANGELOG_ENTRY}" $1
 }
@@ -58,7 +65,7 @@ function update_spec {
 }
 
 function find_old_version {
-    FILE=$WORKSPACE/SPECS/kernel/kernel.spec
+    FILE=$SPECS_DIR/kernel/kernel.spec
     LINE=$(grep "Version:" $FILE)
     OLD_VERSION=${LINE:16}
 }
@@ -67,7 +74,7 @@ function update_configs {
     CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-rt/config kernel-hci/config"
     for configfile in $CONFIG_FILE
     do
-        FILE=$WORKSPACE/SPECS/$configfile
+        FILE=$SPECS_DIR/$configfile
         BASE=${FILE%/*}
         SPEC=${configfile%/*}
         SIGNATURE_FILE="$BASE/$SPEC.signatures.json"
@@ -80,6 +87,19 @@ function update_configs {
         FULL_SIGNATURE_ENTRY="  \"$CONFIG_ONLY\": \"$SHA256\""
         FILE_PATTERN=$CONFIG_ONLY
         sed -i "s/  \"$FILE_PATTERN\": \".*\"/$FULL_SIGNATURE_ENTRY/" $SIGNATURE_FILE
+    done
+}
+
+function update_livepatches {
+    "$LIVEPATCHING_SCRIPTS_DIR"/generate_livepatch_spec.sh
+
+    update_livepatches_signed
+}
+
+function update_livepatches_signed {
+    for livepatch_spec in "$SPECS_DIR/livepatch/"livepatch-*.spec
+    do
+        "$LIVEPATCHING_SCRIPTS_DIR"/generate_livepatch-signed_spec.sh "$livepatch_spec"
     done
 }
 
@@ -134,23 +154,24 @@ function update_toolchain_dockerfile {
     sed -i "s#$PATTERN#$REPLACE#" $FILE
 }
 
-function update_toolchain_pkglist {
-    PKGLIST_FOLDER=$WORKSPACE/toolkit/resources/manifests/package/
-    PKGLIST="pkggen_core_aarch64.txt pkggen_core_x86_64.txt toolchain_aarch64.txt toolchain_x86_64.txt"
-    for pkg in $PKGLIST
-    do
-        file=$PKGLIST_FOLDER/$pkg
-        PATTERN="kernel-headers-.*"
-        REPLACE="kernel-headers-$VERSION-1.cm2.noarch.rpm"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-    done
+function update_manifests {
+    local kernel_release_number
+    local kernel_spec_path
+    local package_manifests_dir
+
+    echo "Updating package manifests."
+
+    kernel_spec_path="$REPO_ROOT/SPECS/kernel/kernel.spec"
+    kernel_release_number="$(spec_read_release_number "$kernel_spec_path")"
+    package_manifests_dir="$REPO_ROOT/toolkit/resources/manifests/package"
+    sed -i -E "s/(kernel-headers-.*)\d+(\.cm.*)/\1$kernel_release_number\2/" "$package_manifests_dir"/{pkggen,toolchain}*.txt
 }
 
 function update_toolchain {
     #update_toolchain_md5sum
     update_toolchain_sha256sum
     update_toolchain_scripts
-    update_toolchain_pkglist
+    update_manifests
     update_toolchain_dockerfile
 }
 
@@ -180,99 +201,14 @@ function print_metadata {
     echo sha256 = $SHA256
 }
 
+SPECS_DIR_PATH="$REPO_ROOT/SPECS"
+SPECS_SIGNED_DIR_PATH="$REPO_ROOT/SPECS-SIGNED"
+SPECS_TO_BUMP="$SPECS_DIR_PATH/kernel-headers/kernel-headers.spec $SPECS_SIGNED_DIR_PATH/kernel-signed/kernel-signed.spec"
 
-function usage() { 
-    echo "Update sources for kernel" 
-    echo "v : Version you are updating to (ex. 5.10.37.1)" 
-    echo "u : Your name"
-    echo "e : Your email"
-    echo "w : Absoulte path to your workspace for your update - no quotes\n"
-
-    echo "example usage: ./toolkit/scripts/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
-
-    exit 1 
-}
-
-
-##### MAIN #####
-
-#TODO
-# error checking : bad tag on cbl-mariner-linux-kernel,
-# trigger build or config checker?
-# replace old version
-# handle kernel-rt patch automatically
-
-# Take arguments
-#WORKSPACE=~/repos/CBL-Mariner-Kernel
-while getopts "v:u:e:w:" OPTIONS; do
-  case "${OPTIONS}" in
-    v ) VERSION=$OPTARG ;;
-    u ) USER_NAME=$OPTARG ;;
-    e ) USER_EMAIL=$OPTARG ;;
-    w ) WORKSPACE=$OPTARG ;;
-    * ) usage 
-        ;;
-  esac
-done
-
-if [[ -z $VERSION ]]; then
-    echo "Missing -v"
-    usage
-fi
-if [[ -z $USER_NAME ]]; then
-    echo "Missing -u"
-    usage
-fi
-if [[ -z $USER_EMAIL ]]; then
-    echo "Missing -e"
-    usage
-fi
-if [[ -z $WORKSPACE ]]; then
-    echo "Missing -w"
-    usage
-fi
-
-# Create globals
-TAG="rolling-lts/mariner-2/$VERSION"
-TMPDIR="tmp-dir"
-SPECS="kernel-headers kernel hyperv-daemons"
-DEFAULT_URL="https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/"
-DEFAULT_EXTENSION=".tar.gz"
-FULL_URL=$DEFAULT_URL$TAG$DEFAULT_EXTENSION
-TARBALL_NAME="kernel-$VERSION$DEFAULT_EXTENSION"
-DOWNLOAD_FILE_PATH=$TMPDIR/$TARBALL_NAME
-SPECS="kernel-headers kernel hyperv-daemons"
-SIGNED_SPECS="kernel-signed"
-NEW_RELEASE_NUMBER="Release:        1%{?dist}"
-CHANGELOG_ENTRY="Update source to $NEW_KERNEL_VERSION"
-FILE_SIGNATURE_PATTERN="kernel-"
-
-# Go through needed specs
-find_old_version
-download
-if [ $? -gt 0 ]; then
-    return
-fi
-
-for spec in $SPECS
+for spec_to_bump in $SPECS_TO_BUMP
 do
-    TARGET_SPEC=$WORKSPACE/SPECS/$spec/$spec.spec
-    TARGET_SIGNATUREJSON=$WORKSPACE/SPECS/$spec/$spec.signatures.json
-    copy_local_tarball $TARGET_SPEC
-    update_spec $TARGET_SPEC
-    update_signature $TARGET_SIGNATUREJSON
+    update_spec.sh "Bump release number to match kernel release." "$spec_to_bump"
 done
-for spec in $SIGNED_SPECS
-do
-    TARGET_SPEC=$WORKSPACE/SPECS-SIGNED/$spec/$spec.spec
-    update_spec $TARGET_SPEC
-done
-update_configs
 
-# Update toolchain related files
-update_toolchain
-update_cgmanifest
-print_metadata
-#clean
-
-echo "WARNING: update is not complete; this script does not update the rt patch in kernel-rt.spec, you must do this manually!"
+update_manifests
+"$COMMON_SCRIPTS_FOLDER"/livepatching/update_livepatches.sh

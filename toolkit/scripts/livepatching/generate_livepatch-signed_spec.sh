@@ -21,6 +21,8 @@ then
     exit 1
 fi
 
+echo "Generating signed spec for ($LIVEPATCH_SPEC_PATH)."
+
 KERNEL_VERSION_RELEASE="$(grep -oP "(?<=kernel_version_release ).*" "$LIVEPATCH_SPEC_PATH")"
 
 DESCRIPTION="$(spec_query_srpm "$LIVEPATCH_SPEC_PATH" "%{DESCRIPTION}\n")"
