@@ -1,6 +1,6 @@
 Summary:        Container storage interface for logical volume management
 Name:           csi-driver-lvm
-Version:        0.5.0
+Version:        0.4.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -13,36 +13,36 @@ Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{vers
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
-#   5. go mod edit -go=1.17
-#   6. go mod tidy
-#   7. tar  --sort=name \
-#           --mtime="2022-09-18 00:00Z" \
+#   5. tar  --sort=name \
+#           --mtime="2022-09-22 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-gocached.tar.gz .
-Source1: %{name}-%{version}-gocached.tar.gz
+#           -cf %%{name}-%%{version}-govendor.tar.gz vendor
+Source1: %{name}-%{version}-govendor.tar.gz
 BuildRequires: golang
 
 %description
 csi-driver-lvm utilizes local storage of Kubernetes nodes to provide persistent storage for pods
 
 %prep
-%setup -q
-tar -xvf %{SOURCE1}
+%autosetup
+%setup -q -T -D -a 1
 
 %build
 %make_build
 
 %install
-install -d %{buildroot}%{_bindir}
-install csi-driver-lvm %{buildroot}%{_bindir}/csi-driver-lvm
+mkdir -p %{buildroot}%{_bindir}
+install -D -m0755 bin/csi-lvmplugin-provisioner %{buildroot}%{_bindir}/
+install -D -m0755 bin/lvmplugin %{buildroot}%{_bindir}/
 
 %files
 %license LICENSE
 %doc README.md
-%{_bindir}/csi-driver-lvm
+%{_bindir}/csi-lvmplugin-provisioner
+%{_bindir}/lvmplugin
 
 %changelog
-* Thu Sep 22 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.5.0-1
+* Thu Sep 23 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.4.1-1
 - Original version for CBL-Mariner
 - License Verified
