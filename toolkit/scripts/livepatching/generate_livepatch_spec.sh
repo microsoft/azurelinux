@@ -31,12 +31,12 @@ echo "Generating empty livepatch spec for kernel ($KERNEL_VERSION_RELEASE) under
 
 mkdir -p "$LIVEPATCH_SPECS_DIR"
 
-LIVEPATCH_CONFIG_FILE_NAME="config-$KERNEL_VERSION_RELEASE"
+LIVEPATCH_CONFIG_FILE="config-$KERNEL_VERSION_RELEASE"
 LIVEPATCH_PUBLIC_KEY_FILE="mariner-$KERNEL_VERSION_RELEASE.pem"
 
-echo "Copying kernel config ($LIVEPATCH_CONFIG_FILE_NAME) and trusted key ($LIVEPATCH_PUBLIC_KEY_FILE)."
+echo "Copying kernel config ($LIVEPATCH_CONFIG_FILE) and trusted key ($LIVEPATCH_PUBLIC_KEY_FILE)."
 
-cp "$KERNEL_CONFIG_PATH" "$LIVEPATCH_SPECS_DIR/$LIVEPATCH_CONFIG_FILE_NAME"
+cp "$KERNEL_CONFIG_PATH" "$LIVEPATCH_SPECS_DIR/$LIVEPATCH_CONFIG_FILE"
 cp "$KERNEL_PUBLIC_KEY_PATH" "$LIVEPATCH_SPECS_DIR/$LIVEPATCH_PUBLIC_KEY_FILE"
 
 echo "Generating signatures."
@@ -47,7 +47,7 @@ KERNEL_HASH="$(jq -r ".Signatures.\"$KERNEL_TARBALL_FILE\"" "$KERNEL_SIGNATURES_
 PUBLIC_KEY_HASH="$(jq -r ".Signatures.\"$KERNEL_PUBLIC_KEY_FILE\"" "$KERNEL_SIGNATURES_PATH")"
 jq -n \
     --arg config_hash "$CONFIG_HASH" \
-    --arg config_name "$LIVEPATCH_CONFIG_FILE_NAME" \
+    --arg config_name "$LIVEPATCH_CONFIG_FILE" \
     --arg kernel_hash "$KERNEL_HASH" \
     --arg kernel_name "$KERNEL_TARBALL_FILE" \
     --arg pem_hash "$PUBLIC_KEY_HASH" \
