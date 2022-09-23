@@ -14,16 +14,14 @@ source "$COMMON_SCRIPTS_FOLDER/specs/specs_tools.sh"
 
 function update_manifests {
     local kernel_release_number
-    local kernel_spec_path
     local package_manifests_dir
 
     kernel_release_number="$1"
 
     echo "Updating package manifests."
 
-    kernel_spec_path="$REPO_ROOT/SPECS/kernel/kernel.spec"
     package_manifests_dir="$REPO_ROOT/toolkit/resources/manifests/package"
-    sed -i -E "s/(kernel-headers-.*)\d+(\.cm.*)/\1$KERNEL_RELEASE_NUMBER\2/" "$package_manifests_dir"/{pkggen,toolchain}*.txt
+    sed -i -E "s/(kernel-headers-.*-)[0-9]+(\.cm.*)/\1$kernel_release_number\2/" "$package_manifests_dir"/{pkggen,toolchain}*.txt
 }
 
 function bump_spec_releases {
@@ -41,14 +39,14 @@ function bump_spec_releases {
     for spec_to_bump in $specs_to_bump
     do
         spec_release_number="$(spec_read_release_number "$spec_to_bump")"
-        if [[ "$kernel_release_number" != "$spec_release_number "]]
+        if [[ "$kernel_release_number" != "$spec_release_number" ]]
         then
             update_spec.sh "Bump release number to match kernel release." "$spec_to_bump"
         fi
     done
 }
 
-KERNEL_RELEASE_NUMBER="$(spec_read_release_number "$kernel_spec_path")"
+KERNEL_RELEASE_NUMBER="$(spec_read_release_number "$REPO_ROOT/SPECS/kernel/kernel.spec")"
 
 bump_spec_releases "$KERNEL_RELEASE_NUMBER"
 update_manifests "$KERNEL_RELEASE_NUMBER"
