@@ -18,8 +18,8 @@ Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{vers
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
-Source1: %{name}-%{version}-govendor.tar.gz
-BuildRequires: golang
+Source1:        %{name}-%{version}-govendor.tar.gz
+BuildRequires:  golang
 
 %description
 csi-driver-lvm utilizes local storage of Kubernetes nodes to provide persistent storage for pods
