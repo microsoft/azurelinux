@@ -32,6 +32,8 @@ function bump_spec_releases {
 
     kernel_release_number="$1"
 
+    echo "Bumping kernel specs releases to ($kernel_release_number)."
+
     specs_dir_path="$REPO_ROOT/SPECS"
     specs_signed_dir_path="$REPO_ROOT/SPECS-SIGNED"
 
