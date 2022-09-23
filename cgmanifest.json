@@ -1436,8 +1436,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.6",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_6/expat-2.4.6.tar.bz2"
+          "version": "2.4.9",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-2.4.9.tar.bz2"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.142.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.142.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.142.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.142.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.142.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.142.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.142.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.142.1.tar.gz"
         }
       }
     },
@@ -3036,8 +3036,8 @@
         "type": "other",
         "other": {
           "name": "libjpeg-turbo",
-          "version": "2.1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.2.tar.gz"
+          "version": "2.1.4",
+          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.4.tar.gz"
         }
       }
     },
@@ -5666,8 +5666,8 @@
         "type": "other",
         "other": {
           "name": "powershell",
-          "version": "7.2.2",
-          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.2/powershell-7.2.2-linux-x64.tar.gz"
+          "version": "7.2.6",
+          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.6/powershell-7.2.6-linux-x64.tar.gz"
         }
       }
     },
@@ -8626,8 +8626,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0360",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0360.tar.gz"
+          "version": "9.0.0404",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0404.tar.gz"
         }
       }
     },

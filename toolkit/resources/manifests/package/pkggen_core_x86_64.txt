@@ -1,5 +1,5 @@
 filesystem-1.1-7.cm1.x86_64.rpm
-kernel-headers-5.10.134.1-2.cm1.noarch.rpm
+kernel-headers-5.10.142.1-1.cm1.noarch.rpm
 glibc-2.28-24.cm1.x86_64.rpm
 glibc-devel-2.28-24.cm1.x86_64.rpm
 glibc-i18n-2.28-24.cm1.x86_64.rpm
@@ -58,7 +58,7 @@ findutils-lang-4.6.0-8.cm1.x86_64.rpm
 gettext-0.19.8.1-5.cm1.x86_64.rpm
 gzip-1.12-1.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
-mariner-release-1.0-45.cm1.noarch.rpm
+mariner-release-1.0-46.cm1.noarch.rpm
 patch-2.7.6-7.cm1.x86_64.rpm
 util-linux-2.32.1-7.cm1.x86_64.rpm
 util-linux-devel-2.32.1-7.cm1.x86_64.rpm
@@ -93,9 +93,9 @@ elfutils-libelf-0.176-4.cm1.x86_64.rpm
 elfutils-libelf-devel-0.176-4.cm1.x86_64.rpm
 elfutils-libelf-devel-static-0.176-4.cm1.x86_64.rpm
 elfutils-libelf-lang-0.176-4.cm1.x86_64.rpm
-expat-2.4.6-1.cm1.x86_64.rpm
-expat-devel-2.4.6-1.cm1.x86_64.rpm
-expat-libs-2.4.6-1.cm1.x86_64.rpm
+expat-2.4.9-1.cm1.x86_64.rpm
+expat-devel-2.4.9-1.cm1.x86_64.rpm
+expat-libs-2.4.9-1.cm1.x86_64.rpm
 libpipeline-1.5.0-4.cm1.x86_64.rpm
 libpipeline-devel-1.5.0-4.cm1.x86_64.rpm
 gdbm-1.18-3.cm1.x86_64.rpm
@@ -117,12 +117,12 @@ libcap-ng-0.7.9-3.cm1.x86_64.rpm
 libdb-5.3.28-6.cm1.x86_64.rpm
 libdb-devel-5.3.28-6.cm1.x86_64.rpm
 libdb-docs-5.3.28-6.cm1.x86_64.rpm
-rpm-4.14.2-14.cm1.x86_64.rpm
-rpm-build-4.14.2-14.cm1.x86_64.rpm
-rpm-build-libs-4.14.2-14.cm1.x86_64.rpm
-rpm-devel-4.14.2-14.cm1.x86_64.rpm
-rpm-lang-4.14.2-14.cm1.x86_64.rpm
-rpm-libs-4.14.2-14.cm1.x86_64.rpm
+rpm-4.14.2-15.cm1.x86_64.rpm
+rpm-build-4.14.2-15.cm1.x86_64.rpm
+rpm-build-libs-4.14.2-15.cm1.x86_64.rpm
+rpm-devel-4.14.2-15.cm1.x86_64.rpm
+rpm-lang-4.14.2-15.cm1.x86_64.rpm
+rpm-libs-4.14.2-15.cm1.x86_64.rpm
 cpio-2.13-3.cm1.x86_64.rpm
 cpio-lang-2.13-3.cm1.x86_64.rpm
 e2fsprogs-libs-1.44.6-4.cm1.x86_64.rpm
