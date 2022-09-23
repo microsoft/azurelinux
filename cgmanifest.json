@@ -19764,8 +19764,8 @@
         "type": "other",
         "other": {
           "name": "pyflakes",
-          "version": "2.1.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyflakes/pyflakes-2.1.1.tar.gz"
+          "version": "2.5.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyflakes/pyflakes-2.5.0.tar.gz"
         }
       }
     },
