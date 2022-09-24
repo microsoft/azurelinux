@@ -30,6 +30,7 @@ const (
 	chrootRpmBuildRoot      = "/usr/src/mariner"
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
+	chrootcCacheDir         = "/ccache-prototype"
 )
 
 var (
@@ -143,8 +144,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 
 	overlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(chroot.RootDir(), overlaySource, chrootLocalRpmsDir, rpmDirPath, chrootLocalRpmsDir, overlayWorkDir)
 	rpmCacheMount := safechroot.NewMountPoint(*cacheDir, chrootLocalRpmsCacheDir, "", safechroot.BindMountPointFlags, "")
-	mountPoints := []*safechroot.MountPoint{overlayMount, rpmCacheMount}
-	extraDirs := append(overlayExtraDirs, chrootLocalRpmsCacheDir)
+	cCacheMount := safechroot.NewMountPoint("/blobfusetmp/ccache-mount", chrootcCacheDir, "", safechroot.BindMountPointFlags, "")
+	mountPoints := []*safechroot.MountPoint{overlayMount, rpmCacheMount, cCacheMount}
+	extraDirs := append(overlayExtraDirs, chrootLocalRpmsCacheDir, chrootcCacheDir)
 
 	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
 	if err != nil {
@@ -180,6 +182,14 @@ func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string
 
 	// install any additional packages, such as build dependencies.
 	err = tdnfInstall(packagesToInstall)
+	if err != nil {
+		return
+	}
+
+	// install ccache
+	ccachePkgName := []string{"ccache"}
+	logger.Log.Infof("USE_CCACHE: installing ccache package (%s).", ccachePkgName[0])
+	err = tdnfInstall(ccachePkgName)
 	if err != nil {
 		return
 	}
