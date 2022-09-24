@@ -41,6 +41,7 @@ URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
 Source1:        config-%{kernel_version_release}
 Source2:        mariner-%{kernel_version_release}.pem
+@PATCHES@
 
 ExclusiveArch:  x86_64
 
