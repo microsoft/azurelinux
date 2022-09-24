@@ -69,7 +69,7 @@
                 }
             ],
             "KernelOptions": {
-                "default": "kernel"
+                "default": "kernel-azure"
             },
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=ttyS0"
