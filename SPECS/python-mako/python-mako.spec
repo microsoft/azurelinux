@@ -1,8 +1,8 @@
 %define version_tag %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Python templating language
 Name:           python-mako
-Version:        1.1.5
-Release:        2%{?dist}
+Version:        1.2.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,7 +35,7 @@ into Python modules for maximum performance. Mako’s syntax and API borrows fro
 many others, including Django templates, Cheetah, Myghty, and Genshi.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n mako-rel_%{version_tag}
 
 %build
 %py3_build
@@ -56,6 +56,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/mako-render3
 
 %changelog
+* Thu Sep 22 2022 Betty Lakes <bettylakes@microsoft.com> - 1.2.2-1
+- Update version to 1.2.2 to address CVE-2022-40023
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-2
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

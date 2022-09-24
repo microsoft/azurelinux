@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           pyflakes
 # WARNING: When updating pyflakes, check not to break flake8!
-Version:        2.1.1
-Release:        7%{?dist}
+Version:        2.5.0
+Release:        1%{?dist}
 Summary:        A simple program which checks Python source files for errors
 
 License:        MIT
@@ -75,6 +75,10 @@ ln -s pyflakes-3.1 %{buildroot}%{_mandir}/man1/pyflakes.1
 %{_mandir}/man1/pyflakes.1*
 
 %changelog
+* Thu Sep 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.5.0-1
+- Bump version to 2.5.0
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.1-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

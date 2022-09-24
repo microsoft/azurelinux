@@ -42,7 +42,7 @@ const (
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
-	bootDirectoryFileMode = 0600
+	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
 	shadowFile            = "/etc/shadow"
 )
@@ -388,13 +388,13 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
 
 	if len(config.PackageRepos) > 0 {
-		if config.IsKickStartBoot && config.IsIsoInstall {
+		if config.IsIsoInstall {
 			err = configuration.UpdatePackageRepo(installChroot, config)
 			if err != nil {
 				return
 			}
 		} else {
-			return fmt.Errorf("custom package repos should not be specified unless performing kickstart ISO installation")
+			return fmt.Errorf("custom package repos should not be specified unless performing ISO installation")
 		}
 	}
 
@@ -497,7 +497,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		generateContainerManifests(installChroot)
 	}
 
-	if config.IsKickStartBoot {
+	if len(config.Networks) > 0 {
 		err = configuration.ConfigureNetwork(installChroot, config)
 		if err != nil {
 			return
@@ -972,6 +972,22 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 		logger.Log.Warnf("Failed to append crypttab")
 		return
 	}
+	return
+}
+
+//InstallGrubEnv installs an empty grubenv f
+func InstallGrubEnv(installRoot string) (err error) {
+	const (
+		assetGrubEnvFile = "/installer/grub2/grubenv"
+		grubEnvFile      = "boot/grub2/grubenv"
+	)
+	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
+	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	if err != nil {
+		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
+		return
+	}
+
 	return
 }
 

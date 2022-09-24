@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.57.1
-Release:        3%{?dist}
+Version:        5.15.67.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -222,7 +222,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=128M
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=256M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -391,6 +391,33 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Sep 22 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-4
+- Enable SCSI logging facility
+
+* Tue Sep 20 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-3
+- Enable 32-bit time syscall support
+
+* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
+- Enable CONFIG_NETFILTER_XT_TARGET_TRACE as a module
+
+* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
+- Upgrade to 5.15.67.1
+
+* Tue Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
+- Setting vfat module in kernel config to Y to be baked in
+
+* Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
+- Adjust crashkernel param to crash, dump memory to a file, and recover correctly
+
+* Tue Sep 06 2022 Nikola Bojanic <t-nbojanic@microsoft.com> - 5.15.63.1-2
+- Enable CRIU support: https://criu.org/Linux_kernel
+
+* Mon Aug 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.63.1-1
+- Upgrade to 5.15.63.1
+
+* Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
+- Upgrade to 5.15.60.2 to fix arm64 builds
+
 * Tue Aug 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-3
 - Turn on CONFIG_SECURITY_LANDLOCK
 

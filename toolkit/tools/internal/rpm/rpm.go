@@ -189,8 +189,11 @@ func QuerySPEC(specFile, sourceDir, queryFormat string, defines map[string]strin
 }
 
 // QuerySPECForBuiltRPMs queries a SPEC file with queryFormat. Returns only the subpackages, which generate a .rpm file.
-func QuerySPECForBuiltRPMs(specFile, sourceDir, queryFormat string, defines map[string]string) (result []string, err error) {
-	const builtRPMsSwitch = "--builtrpms"
+func QuerySPECForBuiltRPMs(specFile, sourceDir string, defines map[string]string) (result []string, err error) {
+	const (
+		builtRPMsSwitch = "--builtrpms"
+		queryFormat     = ""
+	)
 
 	return QuerySPEC(specFile, sourceDir, queryFormat, defines, builtRPMsSwitch)
 }

@@ -19,8 +19,8 @@
 %global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        0.51.0
-Release:        2%{?dist}
+Version:        0.55.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -205,6 +205,9 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Sep 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.55.1-1
+- Upgrade to 0.55.1
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.51.0-2
 - Bump release to rebuild against Go 1.18.5
 

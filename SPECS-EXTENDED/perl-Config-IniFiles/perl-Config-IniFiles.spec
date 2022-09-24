@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Config-IniFiles
 Version:        3.000002
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A module for reading .ini-style configuration files
 # LICENSE:                              GPL+ or Artistic
 # lib/Config/IniFiles.pm:               GPL+ or Artistic
@@ -32,17 +32,20 @@ BuildRequires:  perl(List::Util) >= 1.33
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(vars)
 # Tests:
-BuildRequires:  perl(base)
+%if %{with_check}
 BuildRequires:  perl(English)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(parent)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(base)
+BuildRequires:  perl(blib)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(parent)
+%endif
 BuildArch:      noarch
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Not autodetected. Found in lib/Config/IniFiles.pm:2761
@@ -82,6 +85,10 @@ perl Build.PL installdirs=vendor
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Thu Sep 01 2022 Muhammad Falak <mwani@microsoft.com> - 3.000002-6
+- Add BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.000002-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.44.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,7 +50,6 @@ Patch2:         libguestfs-file-5.40.patch
 
 BuildRequires:  %{_bindir}/ping
 BuildRequires:  %{_bindir}/pod2text
-BuildRequires:  %{_bindir}/qemu-img
 BuildRequires:  %{_bindir}/wget
 # Build requirements for the appliance.
 #
@@ -236,7 +235,7 @@ BuildRequires:  zfs-fuse
 %endif
 
 # For core disk-create API.
-Requires:       %{_bindir}/qemu-img
+Requires:       qemu-img
 # The daemon dependencies are not included automatically, because it
 # is buried inside the appliance, so list them here.
 Requires:       augeas-libs >= 1.7.0
@@ -1235,6 +1234,10 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Thu Sep 01 2022 Andrew Phelps <anphel@microsoft.com> - 1.44.0-8
+- Remove duplicate BR on qemu-img
+- Change runtime requires from qemu-img binary to qemu-img package
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.44.0-7
 - Bump release to rebuild against Go 1.18.5
 
