@@ -1,10 +1,11 @@
 Name:           mlocate
 Version:        0.26
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An utility for finding files by name.
 License:        GPL-2.0
 URL:            https://pagure.io/mlocate
 Source0:        http://releases.pagure.org/mlocate/%{name}-%{version}.tar.xz
+Patch0:         0001-tests-updatedb-reduce-heirarchy-to-300-from-950.patch
 %define sha1    %{name}=c6e6d81b25359c51c545f4b8ba0f3b469227fcbc
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +23,7 @@ much.
 
 %prep
 %setup -q -n %{name}-%{version}
+%patch0 -p1
 
 %build
 %configure \
@@ -48,6 +50,9 @@ mv %{buildroot}/%{_mandir}/man1/locate.1 %{buildroot}/%{_mandir}/man1/%{name}.1
 %{_localstatedir}/*
 
 %changelog
+* Mon Sep 26 2022 Muhammad Falak <mwani@microsoft.com> - 0.26-5
+- Introduce patch to fix deep heirarchy test
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.26-4
 - Added %%license line automatically
 
