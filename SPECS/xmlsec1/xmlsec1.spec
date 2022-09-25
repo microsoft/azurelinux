@@ -1,13 +1,13 @@
 Summary:        Library providing support for "XML Signature" and "XML Encryption" standards
 Name:           xmlsec1
-Version:        1.2.26
-Release:        8%{?dist}
+Version:        1.2.34
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.aleksey.com/xmlsec/
-Source0:        %{url}/download/older-releases/%{name}-%{version}.tar.gz
+Source0:        %{url}/download/%{name}-%{version}.tar.gz
 BuildRequires:  gnutls-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
@@ -65,13 +65,13 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %license COPYING
 
 %{_libdir}/libxmlsec1.so.1
-%{_libdir}/libxmlsec1.so.1.2.26
+%{_libdir}/libxmlsec1.so.%{version}
 %{_libdir}/libxmlsec1.so
 %{_libdir}/libxmlsec1-nss.so.1
-%{_libdir}/libxmlsec1-nss.so.1.2.26
+%{_libdir}/libxmlsec1-nss.so.%{version}
 %{_libdir}/libxmlsec1-nss.so
 %{_libdir}/libxmlsec1-openssl.so.1
-%{_libdir}/libxmlsec1-openssl.so.1.2.26
+%{_libdir}/libxmlsec1-openssl.so.%{version}
 %{_libdir}/libxmlsec1-openssl.so
 %{_libdir}/libxmlsec1-gnutls*
 %{_libdir}/libxmlsec1-gcrypt*
@@ -82,7 +82,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %{_bindir}/xmlsec1-config
 %{_includedir}/xmlsec1/xmlsec/*.h
-%{_includedir}/xmlsec1/xmlsec/private/*.h
 %{_includedir}/xmlsec1/xmlsec/nss/*.h
 %{_includedir}/xmlsec1/xmlsec/openssl/*.h
 %{_includedir}/xmlsec1/xmlsec/gcrypt/*
@@ -102,6 +101,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man1/xmlsec1-config.1.gz
 
 %changelog
+* Fri Sep 23 2022 Andrew Phelps <anphel@microsoft.com> - 1.2.34-1
+- Update to version 1.2.34
+
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.26-8
 - Add nss as an explicit requirement.
 
