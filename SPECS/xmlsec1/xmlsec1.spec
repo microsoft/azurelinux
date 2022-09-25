@@ -13,16 +13,16 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  nss-devel
-%if %{with_check}
-BuildRequires:  nss-tools
-%endif
 Requires:       libltdl
-Requires:       nss
 Requires:       libxml2
+Requires:       nss
 Provides:       %{name}-gcrypt = %{release}-%{version}
 Provides:       %{name}-gnutls = %{release}-%{version}
 Provides:       %{name}-openssl = %{release}-%{version}
 Provides:       %{name}-nss = %{release}-%{version}
+%if %{with_check}
+BuildRequires:  nss-tools
+%endif
 
 %description
 XML Security Library is a C library based on LibXML2  and OpenSSL.
