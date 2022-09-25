@@ -27498,8 +27498,8 @@
         "type": "other",
         "other": {
           "name": "xmlsec1",
-          "version": "1.2.26",
-          "downloadUrl": "https://www.aleksey.com/xmlsec//download/older-releases/xmlsec1-1.2.26.tar.gz"
+          "version": "1.2.34",
+          "downloadUrl": "https://www.aleksey.com/xmlsec/download/xmlsec1-1.2.34.tar.gz"
         }
       }
     },
