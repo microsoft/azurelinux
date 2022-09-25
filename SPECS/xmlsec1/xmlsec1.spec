@@ -13,6 +13,9 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  nss-devel
+%if %{with_check}
+BuildRequires:  nss-tools
+%endif
 Requires:       libltdl
 Requires:       nss
 Requires:       libxml2
@@ -103,6 +106,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %changelog
 * Fri Sep 23 2022 Andrew Phelps <anphel@microsoft.com> - 1.2.34-1
 - Update to version 1.2.34
+- Add nss-tools to fix check tests
 
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.26-8
 - Add nss as an explicit requirement.
