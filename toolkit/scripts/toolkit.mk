@@ -56,7 +56,7 @@ clean-package-toolkit:
 clean-rpms-snapshot:
 	rm -f $(rpms_snapshot)
 	rm -rf $(rpms_snapshot_build_dir)
-	rm -r $(rpms_snapshot_logs_path)
+	rm -f $(rpms_snapshot_logs_path)
 
 package-toolkit: $(toolkit_archive_versioned_compressed)
 	@echo "Toolkit packed under '$(toolkit_archive_versioned_compressed)'."
