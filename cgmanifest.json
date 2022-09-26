@@ -1436,8 +1436,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.6",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_6/expat-2.4.6.tar.bz2"
+          "version": "2.4.9",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-2.4.9.tar.bz2"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.144.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.144.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.144.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.134.1.tar.gz"
+          "version": "5.10.144.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
         }
       }
     },
@@ -3036,8 +3036,8 @@
         "type": "other",
         "other": {
           "name": "libjpeg-turbo",
-          "version": "2.1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.2.tar.gz"
+          "version": "2.1.4",
+          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.4.tar.gz"
         }
       }
     },
@@ -5666,8 +5666,8 @@
         "type": "other",
         "other": {
           "name": "powershell",
-          "version": "7.2.2",
-          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.2/powershell-7.2.2-linux-x64.tar.gz"
+          "version": "7.2.6",
+          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.6/powershell-7.2.6-linux-x64.tar.gz"
         }
       }
     },
@@ -6316,8 +6316,8 @@
         "type": "other",
         "other": {
           "name": "python-mako",
-          "version": "1.0.7",
-          "downloadUrl": "https://files.pythonhosted.org/packages/eb/f3/67579bb486517c0d49547f9697e36582cd19dafb5df9e687ed8e22de57fa/Mako-1.0.7.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/6d/f2/8ad2ec3d531c97c4071572a4104e00095300e278a7449511bee197ca22c9/Mako-1.2.2.tar.gz"
         }
       }
     },
@@ -8476,8 +8476,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022c.tar.gz"
+          "version": "2022d",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022d.tar.gz"
         }
       }
     },
@@ -8626,8 +8626,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0360",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0360.tar.gz"
+          "version": "9.0.0404",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0404.tar.gz"
         }
       }
     },

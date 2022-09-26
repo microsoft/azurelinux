@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.134.1
-Release:        2%{?dist}
+Version:        5.10.144.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,7 +17,6 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         0003-export-mmput_async.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -394,7 +393,6 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
-%patch1 -p1
 
 %build
 make mrproper
@@ -636,6 +634,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Sep 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.144.1-1
+- Upgrade to 5.10.144.1
+
+* Wed Sep 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.142.1-1
+- Upgrade to 5.10.142.1
+
+* Thu Sep 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.139.1-1
+- Upgrade to 5.10.139.1
+
 * Thu Sep 01 2022 Chris Co <chrco@microsoft.com> - 5.10.134.1-2
 - Enable 32-bit time syscall support
 
