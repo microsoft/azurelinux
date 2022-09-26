@@ -372,8 +372,9 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
-* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.3.36-1
-- Upgrade to 10.3.36
+* Mon Sep 26 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 10.3.36-1
+- Upgrade to 10.3.36 to fix 3 CVEs:
+- CVE-2018-25032, CVE-2022-32091, CVE-2022-38791
 
 * Tue May 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 10.3.35-1
 - Upgrade to latest 10.3.X release to fix 20 CVEs:
