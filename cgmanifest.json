@@ -7250,6 +7250,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "k3s",
+          "version": "1.25.0",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.0+k3s1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kata-containers",
           "version": "2.5.0",
           "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/2.5.0.tar.gz"
@@ -27498,8 +27508,8 @@
         "type": "other",
         "other": {
           "name": "xmlsec1",
-          "version": "1.2.26",
-          "downloadUrl": "https://www.aleksey.com/xmlsec//download/older-releases/xmlsec1-1.2.26.tar.gz"
+          "version": "1.2.34",
+          "downloadUrl": "https://www.aleksey.com/xmlsec/download/xmlsec1-1.2.34.tar.gz"
         }
       }
     },
