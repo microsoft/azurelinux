@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "mariadb-10.3.35.tar.gz": "0bdc95ae4afd2af3c73b87577e3f21143b82695a0f13f8827d9649a0dcee1837"
- }
+  "Signatures": {
+    "mariadb-10.3.36.tar.gz": "cdb11d1bd9fe94dbb477f837cf483e0341bce80b0cc187faef39241a4c16b549"
+  }
 }
