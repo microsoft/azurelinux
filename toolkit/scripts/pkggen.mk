@@ -76,7 +76,8 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
-		--output $@
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+	        --output $@
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies

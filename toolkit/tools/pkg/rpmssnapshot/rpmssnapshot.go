@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"runtime"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
@@ -158,10 +159,15 @@ func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) 
 func (s *SnapshotGenerator) filterCompatibleSpecs(allSpecFilePaths []string, defines map[string]string) (specPaths []string, err error) {
 	var specCompatible bool
 
+	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		return
+	}
+
 	for _, specFilePath := range allSpecFilePaths {
 		specDirPath := filepath.Dir(specFilePath)
 
-		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, defines)
+		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
 		if err != nil {
 			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
 			return
@@ -237,12 +243,17 @@ func (s *SnapshotGenerator) initializeChroot(specsDirPath string) (err error) {
 func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
 	var builtRPMs []string
 
+	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		return
+	}
+
 	for _, specPath := range specPaths {
 		logger.Log.Debugf("Parsing spec (%s).", specPath)
 
 		specDirPath := filepath.Dir(specPath)
 
-		builtRPMs, err = rpm.QuerySPECForBuiltRPMs(specPath, specDirPath, defines)
+		builtRPMs, err = rpm.QuerySPECForBuiltRPMs(specPath, specDirPath, buildArch, defines)
 		if err != nil {
 			logger.Log.Errorf("Failed to query built RPMs from (%s). Error: %v.", specPath, err)
 			return

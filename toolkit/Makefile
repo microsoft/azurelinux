@@ -49,6 +49,7 @@ USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 DELTA_BUILD                     ?= n
+TARGET_ARCH                     ?=
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
