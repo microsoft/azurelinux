@@ -212,6 +212,25 @@ A sample PreInstallScripts entry pointing to two install scripts where one has i
 ],
 ```
 
+### FinalizeImageScripts
+
+There are customer requests that can be run on a rootfs just before it is converted to an image.
+
+FinalizeImageScripts is an array of file paths and the corresponding input arguments. Mariner tooling currently has the capability to execute the finalize script and parse the commands inside /tmp/finalizeimage.
+
+A sample FinalizeImageScripts entry pointing to two install scripts where one has input arguments and the other doesn't:
+``` json
+"FinalizeImageScripts":[
+    {
+        "Path": "arglessPreScript.sh"
+    },
+    {
+        "Path": "PreScriptWithArguments.sh",
+        "Args": "--input abc --output cba"
+    }
+],
+```
+
 ### Networks
 
 The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config. 
