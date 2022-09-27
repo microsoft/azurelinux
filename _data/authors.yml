@@ -13,6 +13,10 @@ Rachel Menge and Cameron Baird:
   name: "Rachel Menge and Cameron Baird"
   bio: "Rachel and Cameron are software engineers with Microsoft working on the Mariner Team"
   avatar: "/assets/images/profile/bio-photo.jpg"
+Rachel:
+  name: "Rachel Menge"
+  bio: "Rachel is a software engineer with Microsoft working on the Mariner Team"
+  avatar: "/assets/images/profile/bio-photo.jpg"
 juan_manuel_rey:
   name: "Juan Manuel Rey"
   bio: "Unix Geek. Sysadmin by heart. Creating more problems than solving them in Microsoft Azure engineering."
