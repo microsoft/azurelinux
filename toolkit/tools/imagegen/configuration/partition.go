@@ -14,6 +14,11 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 )
 
+const (
+	EFIPartitionType    = "efi"
+	LegacyPartitionType = "legacy"
+)
+
 // Partition defines the size, name and file system type
 // for a partition.
 // "Start" and "End" fields define the offset from the beginning of the disk in MBs.
@@ -103,9 +108,9 @@ func SystemBootType() (bootType string) {
 
 	exist, _ := file.DirExists(efiFirmwarePath)
 	if exist {
-		bootType = "efi"
+		bootType = EFIPartitionType
 	} else {
-		bootType = "legacy"
+		bootType = LegacyPartitionType
 	}
 
 	return
@@ -115,11 +120,11 @@ func SystemBootType() (bootType string) {
 // for a given boot type.
 func BootPartitionConfig(bootType string, partitionTableType PartitionTableType) (mountPoint, mountOptions string, flags []PartitionFlag, err error) {
 	switch bootType {
-	case "efi":
+	case EFIPartitionType:
 		flags = []PartitionFlag{PartitionFlagESP, PartitionFlagBoot}
 		mountPoint = "/boot/efi"
-		mountOptions = "umask=0077"
-	case "legacy":
+		mountOptions = "umask=0077,nodev"
+	case LegacyPartitionType:
 		if partitionTableType == PartitionTableTypeGpt {
 			flags = []PartitionFlag{PartitionFlagGrub}
 		} else if partitionTableType == PartitionTableTypeMbr {

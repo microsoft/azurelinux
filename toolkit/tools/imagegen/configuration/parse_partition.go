@@ -120,7 +120,7 @@ func populatepartCmdProcessMap() {
 
 func processPartitionTableType() (err error) {
 	systemBootType := SystemBootType()
-	if systemBootType == "efi" {
+	if systemBootType == EFIPartitionType {
 		partitionTableType = PartitionTableTypeGpt
 	} else {
 		// In kickstart installation scenario, the partition table type is set to
@@ -208,7 +208,7 @@ func processPartitionFsType(inputFsType string) (err error) {
 	fstype := strings.TrimSpace(inputFsType)
 	if fstype == "" {
 		return fmt.Errorf(fsTypeInputErrorMsg)
-	} else if fstype == biosbootPartition || fstype == "efi" {
+	} else if fstype == biosbootPartition || fstype == EFIPartitionType {
 		newDiskPartition.FsType = "fat32"
 	} else if fstype == "swap" {
 		newDiskPartition.FsType = "linux-swap"
@@ -233,12 +233,12 @@ func processMountPoint(inputMountPoint string, partitionNumber int) (err error) 
 	newDiskPartitionSetting.ID = fmt.Sprintf("Partition%d", partitionNumber)
 
 	if mountPoint == efibootPartition {
-		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("efi", partitionTableType)
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig(EFIPartitionType, partitionTableType)
 		if err != nil {
 			return
 		}
 	} else if mountPoint == biosbootPartition {
-		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig("legacy", partitionTableType)
+		newDiskPartitionSetting.MountPoint, newDiskPartitionSetting.MountOptions, newDiskPartition.Flags, err = BootPartitionConfig(LegacyPartitionType, partitionTableType)
 		if err != nil {
 			return
 		}

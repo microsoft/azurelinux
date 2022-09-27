@@ -125,7 +125,7 @@ var (
 		{
 			ID:              "Partition1",
 			MountPoint:      "/boot/efi",
-			MountOptions:    "umask=0077",
+			MountOptions:    "umask=0077,nodev",
 			MountIdentifier: GetDefaultMountIdentifier(),
 		},
 		{
