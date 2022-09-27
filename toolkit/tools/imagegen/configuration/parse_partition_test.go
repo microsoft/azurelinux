@@ -16,6 +16,7 @@ var (
 
 	validLegacyBootPartitionCommand = "part biosboot --fstype=biosboot --size=8 --ondisk=/dev/sda"
 	validUEFIBootPartitionCommand   = "part /boot/efi --fstype=efi --size=8 --ondisk=/dev/sda"
+	validEFIPartitionCommand        = "part /boot --fstype=ext4 --size=512 --ondisk=/dev/sda"
 	validPartitionCommand2          = "part / --fstype=ext4 --size=800 --ondisk=/dev/sda"
 
 	validTestParserDisk_LegacyPartition = Disk{
@@ -102,7 +103,13 @@ var (
 			{
 				ID:     "Partition2",
 				Start:  9,
-				End:    809,
+				End:    521,
+				FsType: "ext4",
+			},
+			{
+				ID:     "Partition3",
+				Start:  521,
+				End:    1321,
 				FsType: "ext4",
 			},
 		},
@@ -130,6 +137,11 @@ var (
 		},
 		{
 			ID:              "Partition2",
+			MountPoint:      "/boot",
+			MountIdentifier: GetDefaultMountIdentifier(),
+		},
+		{
+			ID:              "Partition3",
 			MountPoint:      "/",
 			MountIdentifier: GetDefaultMountIdentifier(),
 		},
@@ -192,7 +204,7 @@ func TestShouldSucceedParsingOneValidPartitionCommand(t *testing.T) {
 	}
 }
 
-func TestShouldSucceedParsingTwoValidPartitionCommands(t *testing.T) {
+func TestShouldSucceedParsingMultipleValidPartitionCommands(t *testing.T) {
 	err := initializePrerequisitesForParser()
 	assert.NoError(t, err)
 
@@ -201,13 +213,18 @@ func TestShouldSucceedParsingTwoValidPartitionCommands(t *testing.T) {
 	if systemBootType == "efi" {
 		err = parsePartitionFlags(validUEFIBootPartitionCommand, 1)
 		assert.NoError(t, err)
-		err = parsePartitionFlags(validPartitionCommand2, 2)
+		err = parsePartitionFlags(validEFIPartitionCommand, 2)
+		assert.NoError(t, err)
+		err = parsePartitionFlags(validPartitionCommand2, 3)
 		assert.NoError(t, err)
 
 		assert.Equal(t, validTestParserDisk_UEFIPartitions, disks[0])
 
 		assert.Equal(t, validTestParserPartitionSettings_UEFIPartitions[0], partitionSettings[0])
 		assert.Equal(t, validTestParserPartitionSettings_UEFIPartitions[1], partitionSettings[1])
+		assert.Equal(t, validTestParserPartitionSettings_UEFIPartitions[2], partitionSettings[2])
+
+		assert.Equal(t, 3, len(partitionSettings))
 	}
 
 	if systemBootType == "legacy" {
@@ -220,8 +237,9 @@ func TestShouldSucceedParsingTwoValidPartitionCommands(t *testing.T) {
 
 		assert.Equal(t, validTestParserPartitionSettings_LegacyPartitions[0], partitionSettings[0])
 		assert.Equal(t, validTestParserPartitionSettings_LegacyPartitions[1], partitionSettings[1])
+
+		assert.Equal(t, 2, len(partitionSettings))
 	}
 
 	assert.Equal(t, 1, len(disks))
-	assert.Equal(t, 2, len(partitionSettings))
 }
