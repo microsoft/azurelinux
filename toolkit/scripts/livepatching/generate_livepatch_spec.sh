@@ -85,6 +85,12 @@ LIVEPATCH_PUBLIC_KEY_FILE="mariner-$KERNEL_VERSION_RELEASE.pem"
 LIVEPATCH_SPECS_DIR="$REPO_ROOT/SPECS/livepatch"
 LIVEPATCH_SPEC_PATH="$LIVEPATCH_SPECS_DIR/livepatch-$KERNEL_VERSION_RELEASE.spec"
 
+if [[ -f "$LIVEPATCH_SPEC_PATH" ]]
+then
+    echo "Livepatch spec ($LIVEPATCH_SPEC_PATH) alread exists. Exiting."
+    exit 0
+fi
+
 echo "Generating empty livepatch spec for kernel ($KERNEL_VERSION_RELEASE) under ($LIVEPATCH_SPEC_PATH)."
 
 mkdir -p "$LIVEPATCH_SPECS_DIR"
