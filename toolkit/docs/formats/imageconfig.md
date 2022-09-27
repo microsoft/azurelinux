@@ -214,11 +214,11 @@ A sample PreInstallScripts entry pointing to two install scripts where one has i
 
 ### FinalizeImageScripts
 
-There are customer requests that can be run on a rootfs just before it is converted to an image.
+FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized.
 
-FinalizeImageScripts is an array of file paths and the corresponding input arguments. Mariner tooling currently has the capability to execute the finalize script and parse the commands inside /tmp/finalizeimage.
+FinalizeImageScripts is an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image.
 
-A sample FinalizeImageScripts entry pointing to two install scripts where one has input arguments and the other doesn't:
+Below is a sample FinalizeImageScripts entry pointing to two install scripts, where the first script has no input arguments and the second one has arguments:
 ``` json
 "FinalizeImageScripts":[
     {
