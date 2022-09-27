@@ -1,5 +1,6 @@
 {
-  "Registrations": [
+  "$schema": "https://json.schemastore.org/component-detection-manifest.json",
+  "registrations": [
     {
       "component": {
         "type": "other",
@@ -28086,5 +28087,5 @@
       }
     }
   ],
-  "Version": 1
+  "version": 1
 }
