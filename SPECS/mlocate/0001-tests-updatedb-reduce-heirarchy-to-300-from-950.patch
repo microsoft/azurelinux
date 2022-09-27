@@ -1,0 +1,35 @@
+From f9651b4baa2db99fcb98955327a7fc45786fa43f Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 23 Sep 2022 15:35:40 +0530
+Subject: [PATCH] tests: updatedb: reduce heirarchy to 100 from 950
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ tests/updatedb.at | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/updatedb.at b/tests/updatedb.at
+index fd07466..ac2336f 100644
+--- a/tests/updatedb.at
++++ b/tests/updatedb.at
+@@ -249,7 +249,7 @@ AT_KEYWORDS([updatedb])
+ mkdir d
+ (
+   cd d
+-  for depth in $(seq 1 950); do
++  for depth in $(seq 1 100); do
+     # $PSW and $OLDPWD eventually become larger than ARG_MAX
+     PWD= OLDPWD= mkdir "depth$depth-abcdefghijklmnopqrstuvwxyz"
+     # bash's cd complains if the path is too long
+@@ -259,7 +259,7 @@ mkdir d
+ 
+ AT_CHECK([updatedb -U "$(pwd)/d" -o db -l 0])
+ AT_CHECK([locate -d db / -c], ,
+-[951
++[101
+ ])
+ 
+ AT_CLEANUP
+-- 
+2.37.3
+
