@@ -1,7 +1,7 @@
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        2.0.0-preview.3
-Release:        2%{?dist}
+Version:        2.0.0.preview.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,5 +58,5 @@ install -D -m 0755 ./blobfuse2 %{buildroot}%{_bindir}/blobfuse2
 %{_bindir}/blobfuse2
 
 %changelog
-* Tue Sep 27 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0-preview.3-1
+* Tue Sep 27 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
 - Original version for CBL-Mariner.
