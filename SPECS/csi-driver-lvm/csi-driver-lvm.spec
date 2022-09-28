@@ -1,7 +1,7 @@
 Summary:        Container storage interface for logical volume management
 Name:           csi-driver-lvm
 Version:        0.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,9 +20,23 @@ Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{vers
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
+Requires:       %{name}-csi-lvmplugin-provisioner
+Requires:       %{name}-lvmplugin
 
 %description
-csi-driver-lvm utilizes local storage of Kubernetes nodes to provide persistent storage for pods
+csi-driver-lvm utilizes local storage of Kubernetes nodes to provide persistent storage for pods.
+
+%package csi-lvmplugin-provisioner
+Summary:        csi-driver-lvm's csi-lvmplugin-provisioner binary
+
+%description csi-lvmplugin-provisioner
+Provisioner of csi driver to utilizes local storage of Kubernetes nodes to provide persistent storage for pods.
+
+%package lvmplugin
+Summary:        csi-driver-lvm's lvmplugin binary
+
+%description lvmplugin
+lvmplugin collects the size of logical volumes (LV) and free space inside a volume group (VG) from Linux' Logical Volume Manager (LVM).
 
 %prep
 %autosetup
@@ -37,12 +51,21 @@ install -D -m0755 bin/csi-lvmplugin-provisioner %{buildroot}%{_bindir}/
 install -D -m0755 bin/lvmplugin %{buildroot}%{_bindir}/
 
 %files
+
+%files csi-lvmplugin-provisioner
 %license LICENSE
 %doc README.md
 %{_bindir}/csi-lvmplugin-provisioner
+
+%files lvmplugin
+%license LICENSE
+%doc README.md
 %{_bindir}/lvmplugin
 
 %changelog
+* Tue Sep 27 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.4.1-2
+- Split binaries into separate packages
+
 * Thu Sep 23 2022 Lanze Liu <lanzeliu@microsoft.com> - 0.4.1-1
 - Original version for CBL-Mariner
 - License Verified
