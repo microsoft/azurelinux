@@ -30,6 +30,8 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 
 BuildRequires:  golang >= 1.16
 BuildRequires:  fuse3-devel
+BuildRequires:  cmake
+BuildRequires:  gcc
 Requires:       fuse3
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
