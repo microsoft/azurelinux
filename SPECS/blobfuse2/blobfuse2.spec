@@ -54,7 +54,7 @@ export GOPATH=%{our_gopath}
 go build -buildmode=pie -mod=vendor
 
 %install
-install -D -m 0755 ./blobfuse2 %{buildroot}%{_bindir}/blobfuse2
+install -D -m 0755 blobfuse2 %{buildroot}%{_bindir}/blobfuse2
 
 %files
 %defattr(-,root,root,-)
