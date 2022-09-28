@@ -1,6 +1,9 @@
+%define preview_suffix preview.3
+%define blobfuse2_version 2.0.0
+
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        2.0.0.preview.3
+Version:        %{blobfuse2_version}.%{preview_suffix}
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -43,7 +46,7 @@ Linux FUSE kernel module, and implements the filesystem operations using
 the Azure Storage REST APIs.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n azure-storage-fuse-%{name}-%{blobfuse2_version}-%{preview_suffix}
 
 %build
 tar --no-same-owner -xf %{SOURCE1}
