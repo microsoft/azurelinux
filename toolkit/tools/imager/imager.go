@@ -650,11 +650,5 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		return
 	}
 
-	err = installutils.InstallGrubEnv(installChroot.RootDir())
-	if err != nil {
-		err = fmt.Errorf("failed to install grubenv file: %s", err)
-		return
-	}
-
 	return
 }
