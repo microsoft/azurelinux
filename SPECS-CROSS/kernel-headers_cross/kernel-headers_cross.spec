@@ -51,8 +51,8 @@
 
 Summary:        Linux API header files
 Name:           %{_cross_name}-kernel-headers
-Version:        5.15.48.1
-Release:        1%{?dist}
+Version:        5.15.57.1
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          System Environment/Kernel
