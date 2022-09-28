@@ -1,0 +1,139 @@
+From 4f97bfb7590a10b6e8b267dc1f595a57a8d9659f Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Wed, 15 Jun 2022 10:51:00 -0700
+Subject: [PATCH] Adjustments for CBL-Mariner.
+
+---
+ kpatch-build/kpatch-build | 61 ++++++++++++++++++++-------------------
+ 1 file changed, 31 insertions(+), 30 deletions(-)
+
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index 634095d..7766e0d 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -205,21 +205,6 @@ rhel_kernel_version_gte() {
+         [  "${ARCHVERSION}" = "$(echo -e "${ARCHVERSION}\\n$1" | sort -rV | head -n1)" ]
+ }
+ 
+-# klp.arch relocations were supported prior to v5.8
+-# and prior to 4.18.0-240.el8
+-use_klp_arch()
+-{
+-	if kernel_is_rhel; then
+-		! rhel_kernel_version_gte 4.18.0-240.el8
+-	else
+-		! kernel_version_gte 5.8.0
+-	fi
+-}
+-
+-rhel_kernel_version_gte() {
+-        [  "${ARCHVERSION}" = "$(echo -e "${ARCHVERSION}\\n$1" | sort -rV | head -n1)" ]
+-}
+-
+ # klp.arch relocations were supported prior to v5.8
+ # and prior to 4.18.0-284.el8
+ use_klp_arch()
+@@ -638,13 +623,23 @@ if [[ $DEBUG -eq 1 ]] || [[ $DEBUG -ge 3 ]]; then
+ 	set -o xtrace
+ fi
+ 
++# Don't check external file.
++# shellcheck disable=SC1090
++if [[ -z "$USERSRCDIR" ]] && [[ -f "$RELEASE_FILE" ]]; then
++	source "$RELEASE_FILE"
++	DISTRO="$ID"
++fi
++
+ if [[ -n "$SRCRPM" ]]; then
+ 	if  [[ -n "$ARCHVERSION" ]]; then
+ 		warn "--archversion is incompatible with --sourcerpm"
+ 		exit 1
+ 	fi
+ 	rpmname="$(basename "$SRCRPM")"
+-	ARCHVERSION="${rpmname%.src.rpm}.$(uname -m)"
++	ARCHVERSION="${rpmname%.src.rpm}"
++	if [[ "$DISTRO" != mariner ]]; then
++		ARCHVERSION="${ARCHVERSION}.$(uname -m)"
++	fi
+ 	ARCHVERSION="${ARCHVERSION#kernel-}"
+ 	ARCHVERSION="${ARCHVERSION#alt-}"
+ fi
+@@ -699,20 +694,15 @@ fi
+ KVER="${ARCHVERSION%%-*}"
+ if [[ "$ARCHVERSION" =~ - ]]; then
+ 	KREL="${ARCHVERSION##*-}"
+-	KREL="${KREL%.*}"
++	if [[ "$DISTRO" != mariner ]]; then
++		KREL="${KREL%.*}"
++	fi
+ fi
+ [[ "$ARCHVERSION" =~ .el7a. ]] && ALT="-alt"
+ 
+ [[ -z "$TARGETS" ]] && TARGETS="vmlinux modules"
+ 
+-# Don't check external file.
+-# shellcheck disable=SC1090
+-if [[ -z "$USERSRCDIR" ]] && [[ -f "$RELEASE_FILE" ]]; then
+-	source "$RELEASE_FILE"
+-	DISTRO="$ID"
+-fi
+-
+-if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]]; then
++if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
+ 	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
+ 	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
+ 
+@@ -748,9 +738,8 @@ elif [[ -n "$OOT_MODULE" ]]; then
+ 	fi
+ elif [[ -e "$KERNEL_SRCDIR"/.config ]] && [[ -e "$VERSIONFILE" ]] && [[ "$(cat "$VERSIONFILE")" = "$ARCHVERSION" ]]; then
+ 	echo "Using cache at $KERNEL_SRCDIR"
+-
+ else
+-	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]]; then
++	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = mariner ]]; then
+ 
+ 		echo "Fedora/Red Hat distribution detected"
+ 
+@@ -760,6 +749,9 @@ else
+ 		if [[ -z "$SRCRPM" ]]; then
+ 			if [[ "$DISTRO" = fedora ]]; then
+ 				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
++			elif [[ "$DISTRO" = mariner ]]; then
++				source "$RELEASE_FILE"
++				wget -P "$TEMPDIR" "https://packages.microsoft.com/cbl-mariner/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
+ 			else
+ 				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
+ 				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die
+@@ -773,17 +765,26 @@ else
+ 		rpmbuild -D "_topdir $RPMTOPDIR" -bp --nodeps "--target=$(uname -m)" "$RPMTOPDIR"/SPECS/kernel$ALT.spec 2>&1 | logger ||
+ 			die "rpmbuild -bp failed.  you may need to run 'yum-builddep kernel' first."
+ 
+-		mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
++		if [[ "$DISTRO" = mariner ]]; then
++			mv "$RPMTOPDIR"/BUILD/CBL-Mariner-Linux-Kernel-* "$KERNEL_SRCDIR" 2>&1 | logger || die
++		else
++			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
++		fi
+ 		rm -rf "$RPMTOPDIR"
+ 		rm -rf "$KERNEL_SRCDIR/.git"
+ 
+-		if [[ "$ARCHVERSION" == *-* ]]; then
++		if [[ "$DISTRO" != mariner ]] && [[ "$ARCHVERSION" == *-* ]]; then
+ 			sed -i "s/^EXTRAVERSION.*/EXTRAVERSION = -${ARCHVERSION##*-}/" "$KERNEL_SRCDIR/Makefile" || die
+ 		fi
+ 
+ 		echo "$ARCHVERSION" > "$VERSIONFILE" || die
+ 
+-		[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
++		if [[ "$DISTRO" = mariner ]]; then
++			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/new_config"
++			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-$KREL\"/" "$CONFIGFILE"
++		else
++			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
++		fi
+ 
+ 		(cd "$KERNEL_SRCDIR" && make mrproper 2>&1 | logger) || die
+ 
+-- 
+2.34.1
+
