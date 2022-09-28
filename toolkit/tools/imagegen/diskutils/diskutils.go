@@ -662,40 +662,6 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	return
 }
 
-// SystemBootType returns the current boot type of the system being ran on.
-func SystemBootType() (bootType string) {
-	// If a system booted with EFI, /sys/firmware/efi will exist
-	const efiFirmwarePath = "/sys/firmware/efi"
-
-	exist, _ := file.DirExists(efiFirmwarePath)
-	if exist {
-		bootType = "efi"
-	} else {
-		bootType = "legacy"
-	}
-
-	return
-}
-
-// BootPartitionConfig returns the partition flags and mount point that should be used
-// for a given boot type.
-func BootPartitionConfig(bootType string) (mountPoint, mountOptions string, flags []configuration.PartitionFlag, err error) {
-	switch bootType {
-	case "efi":
-		flags = []configuration.PartitionFlag{configuration.PartitionFlagESP, configuration.PartitionFlagBoot}
-		mountPoint = "/boot/efi"
-		mountOptions = "umask=0077"
-	case "legacy":
-		flags = []configuration.PartitionFlag{configuration.PartitionFlagGrub}
-		mountPoint = ""
-		mountOptions = ""
-	default:
-		err = fmt.Errorf("unknown boot type (%s)", bootType)
-	}
-
-	return
-}
-
 func createExtendedPartition(diskDevPath string, partitionTableType string, partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string) (err error) {
 	// Create a new partition object for extended partition
 	extendedPartition := configuration.Partition{}

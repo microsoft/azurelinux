@@ -10,6 +10,13 @@ import (
 	"fmt"
 	"unicode"
 	"unicode/utf16"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+)
+
+const (
+	EFIPartitionType    = "efi"
+	LegacyPartitionType = "legacy"
 )
 
 // Partition defines the size, name and file system type
@@ -91,5 +98,46 @@ func (p *Partition) UnmarshalJSON(b []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to parse [Partition]: %w", err)
 	}
+	return
+}
+
+// SystemBootType returns the current boot type of the system being ran on.
+func SystemBootType() (bootType string) {
+	// If a system booted with EFI, /sys/firmware/efi will exist
+	const efiFirmwarePath = "/sys/firmware/efi"
+
+	exist, _ := file.DirExists(efiFirmwarePath)
+	if exist {
+		bootType = EFIPartitionType
+	} else {
+		bootType = LegacyPartitionType
+	}
+
+	return
+}
+
+// BootPartitionConfig returns the partition flags and mount point that should be used
+// for a given boot type.
+func BootPartitionConfig(bootType string, partitionTableType PartitionTableType) (mountPoint, mountOptions string, flags []PartitionFlag, err error) {
+	switch bootType {
+	case EFIPartitionType:
+		flags = []PartitionFlag{PartitionFlagESP, PartitionFlagBoot}
+		mountPoint = "/boot/efi"
+		mountOptions = "umask=0077,nodev"
+	case LegacyPartitionType:
+		if partitionTableType == PartitionTableTypeGpt {
+			flags = []PartitionFlag{PartitionFlagGrub}
+		} else if partitionTableType == PartitionTableTypeMbr {
+			flags = []PartitionFlag{PartitionFlagBoot}
+		} else {
+			err = fmt.Errorf("unknown partition table type (%s)", partitionTableType)
+		}
+
+		mountPoint = ""
+		mountOptions = ""
+	default:
+		err = fmt.Errorf("unknown boot type (%s)", bootType)
+	}
+
 	return
 }
