@@ -2,7 +2,7 @@
 Summary:        Python templating language
 Name:           python-mako
 Version:        1.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,8 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-libs
+Requires:       python3-pygments
+Requires:       python3-markupsafe
 
 %description -n python3-mako
 A super-fast templating language that borrows the best ideas from the existing templating languages.
@@ -56,6 +58,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/mako-render3
 
 %changelog
+* Wed Sep 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.2.2-2
+- Add missing run time dependencies (python3-pygments and python3-markupsafe)
+
 * Thu Sep 22 2022 Betty Lakes <bettylakes@microsoft.com> - 1.2.2-1
 - Update version to 1.2.2 to address CVE-2022-40023
 
