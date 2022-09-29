@@ -72,29 +72,32 @@ function cleanup {
 }
 trap cleanup EXIT
 
-echo 'Starting MariaDB source tarball creation'
+echo '-- Perl-XML-SAX source tarball creation'
 cd $TEMPDIR
-git clone --depth 1 https://github.com/MariaDB/server.git -b mariadb-$PKG_VERSION
-pushd server
-git submodule update --depth 1 --init --recursive 
-popd
-mv server mariadb-$1
-
-if [[ -n $SRC_TARBALL ]]; then
-    TARBALL_NAME="$(basename $SRC_TARBALL)"
-else
-    TARBALL_NAME="mariadb-$PKG_VERSION.tar.gz"
+if [ -z "$SRC_TARBALL" ]; then
+    echo "download source tarball"
+    TARBALL_NAME="XML-SAX-$PKG_VERSION.tar.gz"
+    wget "http://www.cpan.org/authors/id/G/GR/GRANTM/$TARBALL_NAME"
+    SRC_TARBALL="$TEMPDIR/$TARBALL_NAME"
 fi
+tar -xzf $SRC_TARBALL
 
-NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
+# xmltest.xml could not be distributed due to copyright
+rm XML-SAX-$PKG_VERSION/testfiles/xmltest.xml
+rm XML-SAX-$PKG_VERSION/t/16large.t
+sed -i -e '/testfiles\/xmltest.xml/ d' XML-SAX-$PKG_VERSION/MANIFEST
+sed -i -e '/t\/16large.t/ d' XML-SAX-$PKG_VERSION/MANIFEST
 
+# make sure new tarball file does not exist and create new tarball
+NEW_TARBALL="$OUT_FOLDER/$(basename $SRC_TARBALL)"
+rm -f $NEW_TARBALL
 # Create a reproducible tarball
 # Credit to https://reproducible-builds.org/docs/archives/ for instructions
 # Do not update mtime value for new versions- keep the same value for ease of
 # reproducing old tarball versions in the future if necessary
+echo "Create $NEW_TARBALL tarball"
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -zcf $NEW_TARBALL mariadb-$1
+    -zcf $NEW_TARBALL  XML-SAX-$PKG_VERSION
 
-echo "Source tarball $NEW_TARBALL successfully created!"
