@@ -63,11 +63,6 @@ if [ -z "$PKG_VERSION" ]; then
     exit 1
 fi
 
-if [ -z "$SRC_TARBALL" ]; then
-    echo "--srcTarball parameter cannot be empty"
-    exit 1
-fi
-
 echo "-- create temp folder"
 TEMPDIR=$(mktemp -d)
 function cleanup {
@@ -78,6 +73,12 @@ trap cleanup EXIT
 
 echo '-- Perl-XML-SAX source tarball creation'
 cd $TEMPDIR
+if [ -z "$SRC_TARBALL" ]; then
+    echo "download source tarball"
+    TARBALL_NAME="XML-SAX-$PKG_VERSION.tar.gz"
+    wget "http://www.cpan.org/authors/id/G/GR/GRANTM/$TARBALL_NAME"
+    SRC_TARBALL="$TEMPDIR/$TARBALL_NAME"
+fi
 tar -xzf $SRC_TARBALL
 
 # xmltest.xml could not be distributed due to copyright
@@ -89,6 +90,13 @@ sed -i -e '/t\/16large.t/ d' XML-SAX-$PKG_VERSION/MANIFEST
 # make sure new tarball file does not exist and create new tarball
 NEW_TARBALL="$OUT_FOLDER/$(basename $SRC_TARBALL)"
 rm -f $NEW_TARBALL
+# Create a reproducible tarball
+# Credit to https://reproducible-builds.org/docs/archives/ for instructions
+# Do not update mtime value for new versions- keep the same value for ease of
+# reproducing old tarball versions in the future if necessary
 echo "Create $NEW_TARBALL tarball"
-tar -czf $NEW_TARBALL XML-SAX-$VERSION
+tar --sort=name --mtime="2021-11-10 00:00Z" \
+    --owner=0 --group=0 --numeric-owner \
+    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    -zcf $NEW_TARBALL  XML-SAX-$PKG_VERSION
 
