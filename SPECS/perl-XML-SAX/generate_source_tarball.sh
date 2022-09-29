@@ -81,10 +81,10 @@ cd $TEMPDIR
 tar -xzf $SRC_TARBALL
 
 # xmltest.xml could not be distributed due to copyright
-rm XML-SAX-$VERSION/testfiles/xmltest.xml
-rm XML-SAX-$VERSION/t/16large.t
-sed -i -e '/testfiles\/xmltest.xml/ d' XML-SAX-$VERSION/MANIFEST
-sed -i -e '/t\/16large.t/ d' XML-SAX-$VERSION/MANIFEST
+rm XML-SAX-$PKG_VERSION/testfiles/xmltest.xml
+rm XML-SAX-$PKG_VERSION/t/16large.t
+sed -i -e '/testfiles\/xmltest.xml/ d' XML-SAX-$PKG_VERSION/MANIFEST
+sed -i -e '/t\/16large.t/ d' XML-SAX-$PKG_VERSION/MANIFEST
 
 # make sure new tarball file does not exist and create new tarball
 NEW_TARBALL="$OUT_FOLDER/$(basename $SRC_TARBALL)"
