@@ -214,7 +214,7 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
-* Thur Sep 29 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.2.0-44
+* Thu Sep 29 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.2.0-44
 - Patch CVE-2022-2962
 
 * Tue Sep 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.2.0-43
