@@ -62,7 +62,7 @@ Patch44:        CVE-2021-3748.patch
 Patch45:        CVE-2021-3638.patch
 Patch46:        CVE-2021-3750.patch
 Patch47:        CVE-2021-4206.patch
-Patch48:        CVE-2022-2962.patch
+Patch48:        0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
@@ -215,7 +215,8 @@ fi
 
 %changelog
 * Thu Sep 29 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.2.0-44
-- Patch CVE-2022-2962
+- Add 0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
+- Add CVE-2022-2962.nopatch
 
 * Tue Sep 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.2.0-43
 - Nopatch CVE-2022-0358.
