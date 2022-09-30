@@ -3,7 +3,7 @@
 
 Name:           python-mako
 Version:        1.0.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Python templating language
 License:        MIT
 Group:          Development/Languages/Python
@@ -74,7 +74,7 @@ popd
 %{_bindir}/mako-render3
 
 %changelog
-*   Thu Sep 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.7-4
+*   Thu Sep 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.7-5
 -   Adding a patch for CVE-2022-40023.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.0.7-4
 -   Added %%license line automatically
