@@ -39,8 +39,7 @@ Requires:       python3-libs
 %description -n python3-mako
 Python 3 version.
 %prep
-%setup -n Mako-%{version}
-rm -rf ../p3dir
+%autosetup -p1 -n Mako-%{version}
 cp -a . ../p3dir
 
 %build
