@@ -40,7 +40,7 @@ BuildRequires: device-mapper-devel
 BuildRequires: golang
 BuildRequires: git
 BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.35-2
+BuildRequires: glibc-static >= 2.35-3
 BuildRequires: go-md2man
 BuildRequires: go-rpm-macros
 BuildRequires: gpgme-devel
@@ -147,7 +147,7 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 
 %changelog
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.18.0-5
-- Rebuilt for glibc-static 2.35-2
+- Rebuilt for glibc-static 2.35-3
 
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.0-4
 - Bump release to rebuild against Go 1.18.5

@@ -31,7 +31,7 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.35-2
+BuildRequires: glibc-static >= 2.35-3
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -195,7 +195,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 
 %changelog
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 10.1.0-8
-- Rebuilt for glibc-static 2.35-2
+- Rebuilt for glibc-static 2.35-3
 
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-7
 - Adding a patch to enable compilation for GCC 11.

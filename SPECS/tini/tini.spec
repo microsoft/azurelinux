@@ -13,7 +13,7 @@ BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-2
+BuildRequires:  glibc-static >= 2.35-3
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
@@ -67,7 +67,7 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 
 %changelog
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-8
-- Rebuilt for glibc-static 2.35-2
+- Rebuilt for glibc-static 2.35-3
 
 * Mon Feb 21 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-7
 - Re-enable `tini-static` package
