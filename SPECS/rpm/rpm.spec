@@ -67,6 +67,7 @@ Requires:       zstd-libs
 Shared libraries librpm and librpmio
 
 %package build-libs
+Requires:       %{name}-libs = %{version}-%{release}
 Summary:        Librpmbuild.so.* libraries needed to build rpms.
 
 %description build-libs
@@ -108,8 +109,8 @@ These are the additional language files of rpm.
 %package -n     python3-rpm
 Summary:        Python 3 bindings for rpm.
 Group:          Development/Libraries
-Requires:       %{name}-build-libs >= %{version}-%{release}
-Requires:       %{name}-libs >= %{version}-%{release}
+Requires:       %{name}-build-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       python3
 Provides:       %{name}-python3 = %{version}-%{release}
 
@@ -285,7 +286,7 @@ popd
 
 %changelog
 * Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 4.18.0-2
-- Create versioned dependency from `python3-rpm` -> `rpm-libs` to ensure ABI compatibility
+- Create versioned dependencies from `python3-rpm` -> `rpm-build-libs` -> `rpm-libs` to ensure ABI compatibility
 
 * Wed Sep 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-1
 - Update to 4.18.0 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
