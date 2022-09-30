@@ -1,3 +1,6 @@
+# This package refers to PyJWT(https://github.com/jpadilla/pyjwt)
+# Not to be confused with python-jwt(https://github.com/davedoesdev/python-jwt)
+
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 # what it's called on pypi
 %global srcname PyJWT
