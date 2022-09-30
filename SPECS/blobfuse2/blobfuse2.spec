@@ -58,7 +58,7 @@ go build -buildmode=pie -mod=vendor -o %{blobfuse2_health_monitor} ./tools/healt
 %install
 install -D -m 0755 ./blobfuse2 %{buildroot}%{_bindir}/blobfuse2
 install -D -m 0755 ./%{blobfuse2_health_monitor} %{buildroot}%{_bindir}/%{blobfuse2_health_monitor}
-install -D -m 0644 ./baseConfig.yaml %{buildroot}%{_datadir}/baseConfig.yaml
+install -D -m 0644 ./setup/baseConfig.yaml %{buildroot}%{_datadir}/baseConfig.yaml
 install -D -m 0644 ./sampleFileCacheConfig.yaml %{buildroot}%{_datadir}/sampleFileCacheConfig.yaml
 install -D -m 0644 ./sampleStreamingConfig.yaml %{buildroot}%{_datadir}/sampleStreamingConfig.yaml
 install -D -m 0755 ./tools/postinstall.sh %{buildroot}%{_datadir}/postinstall.sh
