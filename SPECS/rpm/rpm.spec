@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -284,6 +284,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 4.18.0-2
+- Create versioned dependency from `python3-rpm` -> `rpm-libs` to ensure ABI compatibility
+
 * Wed Sep 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-1
 - Update to 4.18.0 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
 
