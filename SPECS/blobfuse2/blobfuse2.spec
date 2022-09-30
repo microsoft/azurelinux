@@ -63,7 +63,7 @@ install -D -m 0644 ./sampleFileCacheConfig.yaml %{buildroot}%{_datadir}/sampleFi
 install -D -m 0644 ./sampleStreamingConfig.yaml %{buildroot}%{_datadir}/sampleStreamingConfig.yaml
 install -D -m 0755 ./tools/postinstall.sh %{buildroot}%{_datadir}/postinstall.sh
 install -D -m 0644 ./setup/11-blobfuse2.conf %{buildroot}%{_sysconfdir}/rsyslog.d/11-blobfuse2.conf
-install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrotate.d/blobfuse2-logrotate
+install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrotate.d/blobfuse2
 
 %files
 %defattr(-,root,root,-)
@@ -76,7 +76,7 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_datadir}/sampleStreamingConfig.yaml
 %{_datadir}/postinstall.sh
 %{_sysconfdir}/rsyslog.d/11-blobfuse2.conf
-%{_sysconfdir}/logrotate.d/blobfuse2-logrotate
+%{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
 * Tue Sep 27 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
