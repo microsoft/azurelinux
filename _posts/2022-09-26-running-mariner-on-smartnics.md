@@ -38,7 +38,7 @@ NVIDIA DOCA software framework uses images called BFBs to flash the BlueField DP
 ![BFB image Layout and Boot Flow diagram](/CBL-Mariner/assets/images/bfb-flow.png)
 
 
-NVIDIA maintains a set of BFB tools used to create BFB images: [github.com/Mellanox/bfb-build](https://github.com/Mellanox/bfb-build) (generic) and [github.com/Mellanox/bfb-mariner](https://github.com/Mellanox/bfb-mariner) (for Mariner 2.0) and is coordinating with CBL-Mariner developers to integrate these tools with CBL-Mariner on the CBL-Mariner-DPU repository. 
+NVIDIA maintains a set of BFB tools used to create BFB images: [github.com/Mellanox/bfb-build](https://github.com/Mellanox/bfb-build) (generic) and [github.com/Mellanox/bfb-mariner](https://github.com/Mellanox/bfb-mariner) (for Mariner 2.0) and is coordinating with CBL-Mariner developers to integrate these tools with CBL-Mariner on the CBL-Mariner-SmartNIC repository. 
 
 These tools utilize the CBL-Mariner ARM64 container. A Dockerfile first creates the container and installs the needed DPURPMs. Create-bfb then constructs the BFB by establishing the grub configs, initial systemd scripts, rebuilding the initramfs, creating a workspace with the kernel, firmware and initramfs, and then calling the mlx-mkbfb tool. Mlx-mkbfb packages everything in the workspace as a bfb.
 
@@ -54,7 +54,7 @@ To build a BFB, all you need to do is clone the repository and run sudo ./bfb-bu
 
 ## Future Improvements
 
-This is an active repository so potential future improvements include adding more customizability for which RPMs are included in the BFB, using CBL-Mariner’s given grub configs so that features such as kernel lockdown are enabled by default and enabling Secure boot for extra security. If you have any suggestions or run across issues, please file them on the CBL-Mariner-DPU issues page.
+This is an active repository so potential future improvements include adding more customizability for which RPMs are included in the BFB, using CBL-Mariner’s given grub configs so that features such as kernel lockdown are enabled by default and enabling Secure boot for extra security. If you have any suggestions or run across issues, please file them on the CBL-Mariner-SmartNIC issues page.
 
 To get started, simply run the following command on your Linux machine:
 
