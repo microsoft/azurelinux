@@ -26,9 +26,9 @@ BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  gettext
 BuildRequires:  libarchive-devel
-BuildRequires:  libtool
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel
+BuildRequires:  libtool
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
@@ -67,8 +67,8 @@ Requires:       zstd-libs
 Shared libraries librpm and librpmio
 
 %package build-libs
-Requires:       %{name}-libs = %{version}-%{release}
 Summary:        Librpmbuild.so.* libraries needed to build rpms.
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description build-libs
 %{summary}
@@ -155,7 +155,7 @@ popd
 sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 
 # Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python3:' %{SOURCE5}
+sed -i '1 s:.*:#!%{_bindir}/python3:' %{SOURCE5}
 
 %check
 make check TESTSUITEFLAGS=-j%{_smp_build_ncpus}
