@@ -13,7 +13,7 @@ We are excited to share the new CBL-Mariner based repository for SmartNICs, [CBL
  
 ## A Brief Background on SmartNICs 
 
-Smart Network Interface Cards(SmartNICs), also known as DPUs or IPUs, vary between vendors, but in general what makes SmartNICs "Smart" is that they have CPU core complex that will run its own OS separate from the host system. The CPU can be in the form of a DPU and can be used to offload and/or accelerate key functions and stacks from the host. In the case of networking, this includes the packet processing and filtering, virtualization, load balancing, and data path optimization. These features allow SmartNICs to offload networking tasks from the host CPU, therefore acclerating networking and improving security. The SmartNIC also enables users to extend network policy rules to  Single Root I/O Virtualization (SR-IOV) through Generic Flow Table (GFT) offload. Several  
+Smart Network Interface Cards(SmartNICs), also known as DPUs or IPUs, vary between vendors, but in general what makes SmartNICs "Smart" is that they have CPU core complex that will run its own OS separate from the host system. The CPU can be in the form of a DPU and can be used to offload and/or accelerate key functions and stacks from the host. In the case of networking, this includes the packet processing and filtering, virtualization, load balancing, and data path optimization. These features allow SmartNICs to offload networking tasks from the host CPU, therefore acclerating networking and improving security. The SmartNIC also enables users to extend network policy rules to Single Root I/O Virtualization (SR-IOV) through Generic Flow Table (GFT) offload.
 
 
 ## CBL-Mariner-SmartNIC Overview
