@@ -20,11 +20,13 @@ Patch1:         define-RPM_LD_FLAGS.patch
 Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  awk
 BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  gettext
 BuildRequires:  libarchive-devel
+BuildRequires:  libtool
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  lua-devel
@@ -106,7 +108,8 @@ These are the additional language files of rpm.
 %package -n     python3-rpm
 Summary:        Python 3 bindings for rpm.
 Group:          Development/Libraries
-Requires:       %{name}-build-libs
+Requires:       %{name}-build-libs >= %{version}-%{release}
+Requires:       %{name}-libs >= %{version}-%{release}
 Requires:       python3
 Provides:       %{name}-python3 = %{version}-%{release}
 
