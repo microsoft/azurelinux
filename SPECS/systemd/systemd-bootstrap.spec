@@ -16,7 +16,7 @@ Patch0:         fix-journald-audit-logging.patch
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
 Patch1:         add-fsync-sysusers-passwd.patch
 # Patch2 can be removed once we update systemd to a version containing the following commit:
-# https://github.com/systemd/systemd/commit/d74da762a3b1edbb7935c3b3a229db601f734125
+# https://github.com/systemd/systemd/commit/d5cb053cd93d516f516e0b748271b55f9dfb3a29
 Patch2:         gpt-auto-devno-not-determined.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
