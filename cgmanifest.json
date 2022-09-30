@@ -11913,8 +11913,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.12",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.12.tar.gz"
+          "version": "20.10.14",
+          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.14.tar.gz"
         }
       }
     },
