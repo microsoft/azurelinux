@@ -69,9 +69,6 @@ git lfs install --system
 %preun
 git lfs uninstall
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %doc LICENSE.md README.md
