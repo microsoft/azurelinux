@@ -1,3 +1,4 @@
+%global debug_package %{nil}
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.1.4
@@ -34,7 +35,6 @@ BuildRequires: rubygem-ronn
 BuildRequires: tar
 BuildRequires: git
 Requires:      git
-%global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
 %description
