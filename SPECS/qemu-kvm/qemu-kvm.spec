@@ -215,8 +215,8 @@ fi
 
 %changelog
 * Thu Sep 29 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.2.0-44
-- Add 0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
-- Add CVE-2022-2962.nopatch
+- Disable tulip device emulation from QEMU to address CVE-2022-2962
+- Nopatch CVE-2022-2962
 
 * Tue Sep 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.2.0-43
 - Nopatch CVE-2022-0358.
