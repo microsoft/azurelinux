@@ -2442,6 +2442,7 @@
                 "gdbm",
                 "gettext",
                 "git",
+                "git-lfs",
                 "glib",
                 "glib-networking",
                 "glibc",

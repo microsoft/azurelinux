@@ -1,21 +1,21 @@
+%global gem_name mustache
+Summary:        Mustache is a framework-agnostic way to render logic-free views
+Name:           rubygem-%{gem_name}
+Version:        1.1.1
+Release:        4%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global gem_name mustache
-Name: rubygem-%{gem_name}
-Version: 1.1.1
-Release: 3%{?dist}
-Summary: Mustache is a framework-agnostic way to render logic-free views
-License: MIT
-URL: https://github.com/mustache/mustache
-Source0: https://github.com/mustache/mustache/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+URL:            https://github.com/mustache/mustache
+Source0:        https://github.com/mustache/mustache/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Fix test race condition.
 # https://github.com/mustache/mustache/pull/258
-Patch0: rubygem-mustache-1.1.1-Fix-test-race-condition.patch
-BuildRequires: ruby(release)
-BuildRequires: rubygems-devel
-BuildRequires: ruby
-BuildRequires: rubygem(minitest)
-BuildArch: noarch
+Patch0:         rubygem-mustache-1.1.1-Fix-test-race-condition.patch
+BuildRequires:  ruby(release)
+BuildRequires:  rubygems-devel
+BuildRequires:  ruby
+BuildRequires:  rubygem-minitest
+BuildArch:      noarch
 
 %description
 Inspired by ctemplate, Mustache is a framework-agnostic way to render
@@ -30,10 +30,10 @@ consisting of ERB or HAML with random helpers and arbitrary logic,
 your views are broken into two parts: a Ruby class and an HTML
 template.
 
-%package doc
-Summary: Documentation for %{name}
-Requires: %{name} = %{version}-%{release}
-BuildArch: noarch
+%package       doc
+Summary:       Documentation for %{name}
+Requires:      %{name} = %{version}-%{release}
+BuildArch:     noarch
 
 %description doc
 Documentation for %{name}.
@@ -99,6 +99,9 @@ popd
 %{gem_instdir}/test
 
 %changelog
+* Wed Sep 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.1-4
+- Cleanup SPEC file and move to SPECS directory from Extended.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.1-3
 - License verified.
 - Build from .tar.gz source.

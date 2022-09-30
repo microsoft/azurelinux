@@ -7,7 +7,7 @@
 Summary:       A Fast, Enjoyable HTML Parser for Ruby
 Name:          rubygem-%{gem_name}
 Version:       0.8.6
-Release:       35%{?dist}
+Release:       36%{?dist}
 # ext/fast_xs/FastXsService.java is licensed under ASL 2.0
 License:       MIT AND ASL 2.0
 Vendor:        Microsoft Corporation
@@ -27,7 +27,7 @@ BuildRequires:	ragel
 # Others
 BuildRequires:	rubygem(rake-compiler)
 BuildRequires:	ruby-devel
-BuildRequires:  rubygem(test-unit)
+BuildRequires:  rubygem-test-unit
 BuildRequires:  ruby
 Requires:	ruby(rubygems)
 Provides:	rubygem(%{gem_name}) = %{version}-%{release}
@@ -119,7 +119,7 @@ popd
 %{gem_instdir}/[a-l]*/
 %{gem_cache}
 %{gem_spec}
-%exclude %{gem_dir}/extensions/
+%{gem_dir}/extensions/
 
 %files doc
 %{gem_instdir}/Rakefile
@@ -128,6 +128,9 @@ popd
 %{gem_docdir}/
 
 %changelog
+* Wed Sep 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.8.6-36
+- Include gem hpricot extensions and move to SPECS directory from Extended.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.8.6-35
 - Build from .tar.gz source.
 
