@@ -1,5 +1,6 @@
 %define preview_suffix preview.3
 %define blobfuse2_version 2.0.0
+%define blobfuse2_health_monitor bfusemon
 
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
@@ -52,15 +53,30 @@ the Azure Storage REST APIs.
 tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 go build -buildmode=pie -mod=vendor -o %{name}
+go build -buildmode=pie -mod=vendor -o %{blobfuse2_health_monitor} ./tools/health-monitor/
 
 %install
 install -D -m 0755 ./blobfuse2 %{buildroot}%{_bindir}/blobfuse2
+install -D -m 0755 ./%{blobfuse2_health_monitor} %{buildroot}%{_bindir}/%{blobfuse2_health_monitor}
+install -D -m 0644 ./baseConfig.yaml %{buildroot}%{_datadir}/baseConfig.yaml
+install -D -m 0644 ./sampleFileCacheConfig.yaml %{buildroot}%{_datadir}/sampleFileCacheConfig.yaml
+install -D -m 0644 ./sampleStreamingConfig.yaml %{buildroot}%{_datadir}/sampleStreamingConfig.yaml
+install -D -m 0755 ./tools/postinstall.sh %{buildroot}%{_datadir}/postinstall.sh
+install -D -m 0644 ./setup/11-blobfuse2.conf %{buildroot}%{_sysconfdir}/rsyslog.d/11-blobfuse2.conf
+install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrotate.d/blobfuse2-logrotate
 
 %files
 %defattr(-,root,root,-)
 %license LICENSE
 %doc NOTICE README.md
 %{_bindir}/blobfuse2
+%{_bindir}/%{blobfuse2_health_monitor}
+%{_datadir}/baseConfig.yaml
+%{_datadir}/sampleFileCacheConfig.yaml
+%{_datadir}/sampleStreamingConfig.yaml
+%{_datadir}/postinstall.sh
+%{_sysconfdir}/rsyslog.d/11-blobfuse2.conf
+%{_sysconfdir}/logrotate.d/blobfuse2-logrotate
 
 %changelog
 * Tue Sep 27 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
