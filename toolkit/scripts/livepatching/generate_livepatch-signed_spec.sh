@@ -45,7 +45,8 @@ declare -A TEMPLATE_PLACEHOLDERS=(
     ["@CHANGELOG@"]="$CHANGELOG"
 )
 
-LIVEPATCH_SIGNED_SPEC_PATH="$REPO_ROOT/SPECS-SIGNED/livepatch-signed/livepatch-$KERNEL_VERSION_RELEASE-signed.spec"
+LIVEPATCH_SIGNED_NAME="livepatch-$KERNEL_VERSION_RELEASE-signed"
+LIVEPATCH_SIGNED_SPEC_PATH="$REPO_ROOT/SPECS-SIGNED/$LIVEPATCH_SIGNED_NAME/$LIVEPATCH_SIGNED_NAME.spec"
 create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch-signed.spec" "$LIVEPATCH_SIGNED_SPEC_PATH" TEMPLATE_PLACEHOLDERS
 
 # Cgmanifest.json update skipped - already handled by the unsigned version.
