@@ -1,14 +1,13 @@
 %global debug_package %{nil}
 %global gem_name ronn
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Missing BR rubygem(contest), necessary for running the test suite in %%check.
-
+Summary:        Manual authoring tool
 Name:           rubygem-%{gem_name}
 Version:        0.7.3
-Release:        17%{?dist}
-Summary:        Manual authoring tool
+Release:        18%{?dist}
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/rtomayko/ronn
 Source0:        https://github.com/rtomayko/ronn/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -72,6 +71,9 @@ rm -rf %{buildroot}%{gem_instdir}/{INSTALLING,Rakefile,test,man,ronn.gemspec,con
 %{gem_docdir}
 
 %changelog
+* Wed Sep 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.7.3-18
+- Cleanup SPEC file and move to SPECS directory from Extended.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.3-17
 - License verified
 - Build from .tar.gz source.
