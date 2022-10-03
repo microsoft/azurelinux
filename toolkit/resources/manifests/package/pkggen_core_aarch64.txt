@@ -6,7 +6,6 @@ glibc-i18n-2.35-3.cm2.aarch64.rpm
 glibc-iconv-2.35-3.cm2.aarch64.rpm
 glibc-lang-2.35-3.cm2.aarch64.rpm
 glibc-nscd-2.35-3.cm2.aarch64.rpm
-glibc-static-2.35-3.cm2.aarch64.rpm
 glibc-tools-2.35-3.cm2.aarch64.rpm
 zlib-1.2.12-2.cm2.aarch64.rpm
 zlib-devel-1.2.12-2.cm2.aarch64.rpm
