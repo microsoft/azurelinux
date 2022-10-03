@@ -7871,8 +7871,8 @@
         "type": "other",
         "other": {
           "name": "libbpf",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.0.0.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.0.1.tar.gz"
         }
       }
     },
