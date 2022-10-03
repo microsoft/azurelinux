@@ -73,10 +73,10 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %doc NOTICE README.md
 %{_bindir}/blobfuse2
 %{_bindir}/%{blobfuse2_health_monitor}
-%{_datadir}/baseConfig.yaml
-%{_datadir}/sampleFileCacheConfig.yaml
-%{_datadir}/sampleStreamingConfig.yaml
-%{_datadir}/postinstall.sh
+%{_datadir}/blobfuse2/baseConfig.yaml
+%{_datadir}/blobfuse2/sampleFileCacheConfig.yaml
+%{_datadir}/blobfuse2/sampleStreamingConfig.yaml
+%{_datadir}/blobfuse2/postinstall.sh
 %{_sysconfdir}/rsyslog.d/11-blobfuse2.conf
 %{_sysconfdir}/logrotate.d/blobfuse2
 
