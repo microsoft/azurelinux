@@ -77,6 +77,7 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
-* Tue Sep 27 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
-- Original version for CBL-Mariner.
+* Mon Oct 03 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
+- Add blobfuse2 spec
 - License verified
+- Original version for CBL-Mariner
