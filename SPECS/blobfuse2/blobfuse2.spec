@@ -1,7 +1,3 @@
-%define preview_suffix preview.3
-%define blobfuse2_version 2.0.0
-%define blobfuse2_health_monitor bfusemon
-
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
 Version:        %{blobfuse2_version}.%{preview_suffix}
@@ -31,19 +27,21 @@ Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{ve
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-
-BuildRequires:  golang >= 1.16
-BuildRequires:  fuse3-devel
-BuildRequires:  cmake
-BuildRequires:  gcc
-Requires:       fuse3
+%define preview_suffix preview.3
+%define blobfuse2_version 2.0.0
+%define blobfuse2_health_monitor bfusemon
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
+BuildRequires:  cmake
+BuildRequires:  fuse3-devel
+BuildRequires:  gcc
+BuildRequires:  golang >= 1.16
+Requires:       fuse3
 
 %description
-Blobfuse2 provides a virtual filesystem backed by the Azure Storage. 
-It uses the libfuse open source library (fuse3) to communicate with the 
-Linux FUSE kernel module, and implements the filesystem operations using 
+Blobfuse2 provides a virtual filesystem backed by the Azure Storage.
+It uses the libfuse open source library (fuse3) to communicate with the
+Linux FUSE kernel module, and implements the filesystem operations using
 the Azure Storage REST APIs.
 
 %prep
@@ -81,3 +79,4 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %changelog
 * Tue Sep 27 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
 - Original version for CBL-Mariner.
+- License verified
