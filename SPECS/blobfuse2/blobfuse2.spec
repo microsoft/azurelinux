@@ -13,8 +13,7 @@ Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
 # Below is the Github URL where blobfuse2 is accessible. This needs to be defined until blobfuse2 GAs since the version
 # string in spec files does not allow - 
-#Source0:       https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}-%{preview_suffix}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}-%{preview_suffix}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
