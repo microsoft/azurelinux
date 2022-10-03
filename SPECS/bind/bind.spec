@@ -1,4 +1,3 @@
-
 %global        bind_dir          %{_var}/named
 %global        chroot_prefix     %{bind_dir}/chroot
 %global        chroot_create_directories /dev /run/named %{_localstatedir}/{log,named,tmp} \\\
