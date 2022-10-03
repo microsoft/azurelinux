@@ -1,6 +1,6 @@
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        %{blobfuse2_version}.%{preview_suffix}
+Version:        2.0.0.preview.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
