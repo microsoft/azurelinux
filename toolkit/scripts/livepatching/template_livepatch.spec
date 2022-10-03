@@ -10,6 +10,38 @@
 %define livepatch_module_name %{livepatch_name}.ko
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_module_name}
 
+%define patch_applicable_for_kernel [[ -f "%{livepatch_module_path}" && "$(uname -r)" == "%{kernel_version_release}" ]]
+%define patch_installed kpatch list | grep -qP "%{livepatch_name}.*%{kernel_version_release}"
+%define patch_loaded    kpatch list | grep -qP "%{livepatch_name}.*enabled"
+
+# Install patch if the RUNNING kernel matches.
+# No-op for initial (empty) livepatch.
+%define install_if_should \
+if %{patch_applicable_for_kernel} && ! %{patch_installed} \
+then \
+    kpatch install %{livepatch_module_path} \
+fi
+
+# Load patch, if the RUNNING kernel matches.
+# No-op for initial (empty) livepatch.
+%define load_if_should \
+if %{patch_applicable_for_kernel} && ! %{patch_loaded} \
+then \
+    kpatch load %{livepatch_module_path} \
+fi
+
+%define uninstall_if_should \
+if %{patch_installed} \
+then \
+    kpatch uninstall %{livepatch_name} \
+fi
+
+%define unload_if_should \
+if %{patch_loaded} \
+then \
+    kpatch unload %{livepatch_name} \
+fi
+
 %define patches_description \
 %(
     echo "Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):"
@@ -45,6 +77,13 @@ Source2:        mariner-%{kernel_version_release}.pem
 
 ExclusiveArch:  x86_64
 
+Provides:       livepatch = %{kernel_version_release}
+
+%description
+A set of kernel livepatches addressing CVEs present in Mariner's
+kernel version %{kernel_version_release}.
+%{patches_description}
+
 # Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
 %if %{builds_module}
 BuildRequires:  audit-devel
@@ -73,19 +112,14 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-build
-%else
-%global debug_package %{nil}
-# endif builds_module
-%endif
 
-Provides:       livepatch = %{kernel_version_release}
+Requires:       coreutils
+Requires:       livepatching-filesystem
 
-%description
-A set of kernel livepatches addressing CVEs present in Mariner's
-kernel version %{kernel_version_release}.
-%{patches_description}
+Requires(post): coreutils
+Requires(post): kpatch
 
-%if %{builds_module}
+Requires(preun): kpatch
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{kernel_version}
@@ -114,14 +148,36 @@ kpatch-build -ddd \
 install -dm 755 %{buildroot}%{livepatch_install_dir}
 install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
 
-# endif builds_module
-%endif
+%post
+%load_if_should
+%install_if_should
+
+%preun
+%uninstall_if_should
+%unload_if_should
+
+# Re-enable patch on rollbacks to supported kernel.
+%triggerin -- kernel = %{kernel_version_release}
+%load_if_should
+%install_if_should
+
+# Prevent the patch from being loaded after a reboot to a different kernel.
+# Previous kernel is still running, do NOT unload the livepatch.
+%triggerin -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
+%uninstall_if_should
 
 %files
 %defattr(-,root,root)
-%if %{builds_module}
 %dir %{livepatch_install_dir}
 %{livepatch_module_path}
+
+# else builds_module
+%else
+%global debug_package %{nil}
+
+%files
+
+# endif builds_module
 %endif
 
 %changelog
