@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Patch1:         define-RPM_LD_FLAGS.patch
 Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  awk
 BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
@@ -27,6 +28,7 @@ BuildRequires:  gettext
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel
+BuildRequires:  libtool
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
@@ -66,6 +68,7 @@ Shared libraries librpm and librpmio
 
 %package build-libs
 Summary:        Librpmbuild.so.* libraries needed to build rpms.
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description build-libs
 %{summary}
@@ -106,7 +109,8 @@ These are the additional language files of rpm.
 %package -n     python3-rpm
 Summary:        Python 3 bindings for rpm.
 Group:          Development/Libraries
-Requires:       %{name}-build-libs
+Requires:       %{name}-build-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       python3
 Provides:       %{name}-python3 = %{version}-%{release}
 
@@ -151,7 +155,7 @@ popd
 sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 
 # Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python3:' %{SOURCE5}
+sed -i '1 s:.*:#!%{_bindir}/python3:' %{SOURCE5}
 
 %check
 make check TESTSUITEFLAGS=-j%{_smp_build_ncpus}
@@ -281,6 +285,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 4.18.0-2
+- Create versioned dependencies from `python3-rpm` -> `rpm-build-libs` -> `rpm-libs` to ensure ABI compatibility
+
 * Wed Sep 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-1
 - Update to 4.18.0 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
 
