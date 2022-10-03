@@ -13,7 +13,7 @@ BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-3
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed

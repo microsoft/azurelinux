@@ -33,7 +33,7 @@ def check_spec(path, glibc_version):
                 print(f"Specfile {spec.name} (at {path}):")
                 for issue in issues:
                     print(issue)
-                print(f"  Suggestion: Use `glibc-static >= {glibc_version}`")
+                print(f"  Suggestion: Use `glibc-static >= {glibc_version}%{{?dist}}`")
                 print()
                 return False
     return True

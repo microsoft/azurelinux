@@ -31,7 +31,7 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.35-3
+BuildRequires: glibc-static >= 2.35-3%{?dist}
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
