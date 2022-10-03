@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
-Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}-%{preview_suffix}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
