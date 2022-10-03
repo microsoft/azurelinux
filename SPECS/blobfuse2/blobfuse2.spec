@@ -11,6 +11,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
+# Below is the Github URL where blobfuse2 is accessible. This needs to be defined until blobfuse2 GAs since the version
+# string in spec files does not allow - 
+#Source0:       https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}-%{preview_suffix}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
@@ -31,9 +34,6 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-# Below is the Github URL where blobfuse2 is accessible. This needs to be defined until blobfuse2 GAs since the version
-# string in spec files does not allow - 
-Source2: https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}-%{preview_suffix}.tar.gz
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  cmake
