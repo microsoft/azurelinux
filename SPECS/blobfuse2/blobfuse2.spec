@@ -60,10 +60,10 @@ go build -buildmode=pie -mod=vendor -o %{blobfuse2_health_monitor} ./tools/healt
 %install
 install -D -m 0755 ./blobfuse2 %{buildroot}%{_bindir}/blobfuse2
 install -D -m 0755 ./%{blobfuse2_health_monitor} %{buildroot}%{_bindir}/%{blobfuse2_health_monitor}
-install -D -m 0644 ./setup/baseConfig.yaml %{buildroot}%{_datadir}/baseConfig.yaml
-install -D -m 0644 ./sampleFileCacheConfig.yaml %{buildroot}%{_datadir}/sampleFileCacheConfig.yaml
-install -D -m 0644 ./sampleStreamingConfig.yaml %{buildroot}%{_datadir}/sampleStreamingConfig.yaml
-install -D -m 0755 ./tools/postinstall.sh %{buildroot}%{_datadir}/postinstall.sh
+install -D -m 0644 ./setup/baseConfig.yaml %{buildroot}%{_datadir}/blobfuse2/baseConfig.yaml
+install -D -m 0644 ./sampleFileCacheConfig.yaml %{buildroot}%{_datadir}/blobfuse2/sampleFileCacheConfig.yaml
+install -D -m 0644 ./sampleStreamingConfig.yaml %{buildroot}%{_datadir}/blobfuse2/sampleStreamingConfig.yaml
+install -D -m 0755 ./tools/postinstall.sh %{buildroot}%{_datadir}/blobfuse2/postinstall.sh
 install -D -m 0644 ./setup/11-blobfuse2.conf %{buildroot}%{_sysconfdir}/rsyslog.d/11-blobfuse2.conf
 install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrotate.d/blobfuse2
 
