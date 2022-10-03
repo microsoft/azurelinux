@@ -1,13 +1,17 @@
+%define preview_suffix preview.3	
+%define blobfuse2_version 2.0.0	
+%define blobfuse2_health_monitor bfusemon
+
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        2.0.0.preview.3
+Version:        %{blobfuse2_version}.%{preview_suffix}
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
-Source0:        https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0-preview.3.tar.gz
+Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -27,9 +31,6 @@ Source0:        https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-%define preview_suffix preview.3
-%define blobfuse2_version 2.0.0
-%define blobfuse2_health_monitor bfusemon
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  cmake
