@@ -1,3 +1,6 @@
+%global debug_package %{nil}
+
+%define our_gopath %{_topdir}/.gopath
 %define preview_suffix preview.3	
 %define blobfuse2_version 2.0.0	
 %define blobfuse2_health_monitor bfusemon
@@ -33,8 +36,6 @@ Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{bl
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-%global debug_package %{nil}
-%define our_gopath %{_topdir}/.gopath
 BuildRequires:  cmake
 BuildRequires:  fuse3-devel
 BuildRequires:  gcc
