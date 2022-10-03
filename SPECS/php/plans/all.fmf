@@ -1,0 +1,6 @@
+summary: Test plan with all beakerlib tests
+discover:
+    how: fmf
+    url: https://src.fedoraproject.org/tests/php.git
+execute:
+    how: tmt

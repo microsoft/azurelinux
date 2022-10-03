@@ -1,0 +1,35 @@
+diff -up ./scripts/phpize.in.headers ./scripts/phpize.in
+--- ./scripts/phpize.in.headers	2019-07-23 10:05:11.000000000 +0200
++++ ./scripts/phpize.in	2019-07-23 10:18:13.648098089 +0200
+@@ -165,6 +165,15 @@ phpize_autotools()
+   $PHP_AUTOHEADER || exit 1
+ }
+ 
++phpize_check_headers()
++{
++  if test ! -f $includedir/main/php.h; then
++    echo "Can't find PHP headers in $includedir"
++    echo "The php-devel package is required for use of this command."
++    exit 1
++  fi
++}
++
+ # Main script
+ 
+ case "$1" in
+@@ -183,12 +192,15 @@ case "$1" in
+ 
+   # Version
+   --version|-v)
++    phpize_check_headers
+     phpize_print_api_numbers
+     exit 0
+   ;;
+ 
+   # Default
+   *)
++     phpize_check_headers
++
+      phpize_check_configm4 0
+ 
+      phpize_check_build_files
