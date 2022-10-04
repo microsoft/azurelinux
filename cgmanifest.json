@@ -2136,8 +2136,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.53",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.53.tar.bz2"
+          "version": "2.2.12",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.2.12.tar.bz2"
         }
       }
     },
