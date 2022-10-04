@@ -386,15 +386,6 @@ diff -ruN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.ser
 diff -ruN a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
 --- a/systemd/cloud-init.service.tmpl   2022-05-18 08:23:24.000000000 -0700
 +++ b/systemd/cloud-init.service.tmpl   2022-08-23 16:21:56.556071614 -0700
-@@ -1,7 +1,7 @@
- ## template:jinja
- [Unit]
- Description=Initial cloud-init job (metadata service crawler)
--{% if variant not in ["photon", "rhel"] %}
-+{% if variant not in ["mariner", "photon", "rhel"] %}
- DefaultDependencies=no
- {% endif %}
- Wants=cloud-init-local.service
 @@ -26,11 +26,9 @@
  Before=network-online.target
  Before=sshd-keygen.service
