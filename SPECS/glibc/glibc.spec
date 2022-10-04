@@ -209,6 +209,14 @@ popd
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 
+# Determine which static libs are needed in `glibc-devel` - the rest will be put
+# into `glibc-static`.  We need to keep the static shims for function that's now
+# in `libc.so` (since 2.34 - see https://developers.redhat.com/articles/2021/12/17/why-glibc-234-removed-libpthread)
+# and the "statically linked bit" of `libc.so` (called `libc_nonshared.a`)
+static_libs_in_devel_pattern="lib\(c_nonshared\|pthread\|dl\|rt\|g\|util\|mcheck\).a"
+ls -1 %{buildroot}%{_lib64dir}/*.a | grep -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > devel.filelist
+ls -1 %{buildroot}%{_lib64dir}/*.a | grep -v -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > static.filelist
+
 %check
 cd %{_builddir}/glibc-build
 make %{?_smp_mflags} check ||:
@@ -291,19 +299,20 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_datadir}/i18n/charmaps/*.gz
 %{_datadir}/i18n/locales/*
 
-%files devel
+%files devel -f devel.filelist
 %defattr(-,root,root)
 # TODO: Excluding for now to remove dependency on PERL
 # /usr/bin/mtrace
+# C Runtime files for `-pie`, `-no-pie` and profiled executables as well as for shared libs
 %{_lib64dir}/{g,M,S}crt1.o
-%{_lib64dir}/crti.o
-%{_lib64dir}/crtn.o
+# C Runtime files needed for all targets
+%{_lib64dir}/crt{i,n}.o
 %{_includedir}/*
 
-%files static
+%files static -f static.filelist
 %defattr(-,root,root)
+# C Runtime files for `-static`, `-static-pie` and profiled `-static-pie`
 %{_lib64dir}/{,r,gr}crt1.o
-%{_lib64dir}/*.a
 
 %files -f %{name}.lang lang
 %defattr(-,root,root)
