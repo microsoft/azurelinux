@@ -1087,8 +1087,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.13.0",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.13.0.tar.gz"
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.16.0.tar.gz"
         }
       }
     },
