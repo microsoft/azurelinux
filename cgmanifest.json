@@ -1356,6 +1356,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cereal",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/USCiLab/cereal/archive/v1.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cert-manager",
           "version": "1.7.3",
           "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.7.3.tar.gz"
