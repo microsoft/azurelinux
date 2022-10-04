@@ -74,15 +74,9 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config-%{kernel_version_release}
 Source2:        mariner-%{kernel_version_release}.pem
 @PATCHES@
-
 ExclusiveArch:  x86_64
 
 Provides:       livepatch = %{kernel_version_release}
-
-%description
-A set of kernel livepatches addressing CVEs present in Mariner's
-kernel version %{kernel_version_release}.
-%{patches_description}
 
 # Must be kept below the "Patch" tags to correctly evaluate %%builds_module.
 %if %{builds_module}
@@ -120,6 +114,11 @@ Requires(post): coreutils
 Requires(post): kpatch
 
 Requires(preun): kpatch
+
+%description
+A set of kernel livepatches addressing CVEs present in Mariner's
+%{kernel_version_release} kernel.
+%{patches_description}
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{kernel_version}
@@ -174,6 +173,10 @@ install -m 744 %{livepatch_module_name} %{buildroot}%{livepatch_module_path}
 # else builds_module
 %else
 %global debug_package %{nil}
+
+%description
+Empty package enabling subscription to future kernel livepatches
+addressing CVEs present in Mariner's %{kernel_version_release} kernel.
 
 %files
 
