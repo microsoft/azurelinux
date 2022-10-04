@@ -1016,6 +1016,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blobfuse2",
+          "version": "2.0.0.preview.3",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0-preview.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bluez",
           "version": "5.63",
           "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
