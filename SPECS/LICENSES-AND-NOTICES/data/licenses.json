@@ -94,6 +94,7 @@
                 "catch",
                 "catch1",
                 "celt051",
+                "cereal",
                 "certmonger",
                 "cgdcbxd",
                 "chan",
@@ -2839,8 +2840,8 @@
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "k3s",
-                "k3s-1.24.3",
-                "k3s-1.23.8"
+                "k3s-1.23.8",
+                "k3s-1.24.3"
             ]
         },
         "Sysbench source": {
