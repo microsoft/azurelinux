@@ -4490,8 +4490,8 @@
         "type": "other",
         "other": {
           "name": "haproxy",
-          "version": "2.4.13",
-          "downloadUrl": "http://www.haproxy.org/download/2.4/src/haproxy-2.4.13.tar.gz"
+          "version": "2.5.2",
+          "downloadUrl": "http://www.haproxy.org/download/2.5/src/haproxy-2.5.2.tar.gz"
         }
       }
     },

@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "haproxy-2.4.13.tar.gz": "4788fe975fe7e521746f826c25e80bc95cd15983e2bafa33e43bff23a3fe5ba1"
- }
+  "Signatures": {
+    "haproxy-2.5.2.tar.gz": "2de3424fd7452be1c1c13d5e0994061285055c57046b1cb3c220d67611d0da7e"
+  }
 }

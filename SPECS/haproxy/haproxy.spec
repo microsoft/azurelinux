@@ -1,6 +1,6 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
-Version:        2.4.13
+Version:        2.5.2
 Release:        1%{?dist}
 License:        GPLv2+
 URL:            http://www.haproxy.org
@@ -58,6 +58,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Tue Oct 04 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.2-1
+- Upgrade to 2.5.2
+
 *   Thu Feb 24 2022 Minghe Ren <mingheren@microsoft.com> 2.4.13-1
 -   Update to 2.4.13
 -   License verified
