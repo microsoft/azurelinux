@@ -81,6 +81,12 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 * Tue Oct 04 2022 Muhammad Falak <mwani@microsoft.com> - 0.16.0-1
 - Bump version to 0.16.0
 
+* Wed Aug 17 2022 Muhammad Falak <mwani@microsoft.com> - 0.15.0-1
+- Bump version to 0.15.0
+
+* Tue Mar 08 2022 Muhammad Falak <mwani@microsoft.com> - 0.14.1-1
+- Bump version to 0.14.1
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.13.0-2
 - Disable building of shared libraries
 
