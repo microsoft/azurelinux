@@ -11,9 +11,9 @@ import sys
 
 def get_glibc_version():
     glibc_spec = Spec.from_file("SPECS/glibc/glibc.spec")
-    epoch_prefix = "{}:".format(glibc_spec.epoch) if glibc_spec.epoch else ""
+    epoch_prefix = f"{glibc_spec.epoch}:" if glibc_spec.epoch else ""
     release_without_dist = glibc_spec.release.replace("%{?dist}", "")
-    release_suffix = "-{}".format(release_without_dist)
+    release_suffix = f"-{release_without_dist}"
     glibc_version = epoch_prefix + glibc_spec.version + release_suffix
     return glibc_version
 
@@ -23,9 +23,9 @@ def check_spec(path, glibc_version):
         if br.name == "glibc-static":
             issues = []
             if not br.version:
-                issues.append(f"  * Does not specify a minimum version for its `glibc-static` BuildRequires")
+                issues.append("  * Does not specify a minimum version for its `glibc-static` BuildRequires")
             if br.version and br.version != glibc_version:
-                issues.append(f"  * Does not specify the latest `glibc-static` version in its BuildRequires")
+                issues.append("  * Does not specify the latest `glibc-static` version in its BuildRequires")
             if br.operator and br.operator != ">=":
                 issues.append(f"  * Uses bad BuildRequire `glibc-static` comparison operator `{br.operator}`")
 
@@ -33,7 +33,7 @@ def check_spec(path, glibc_version):
                 print(f"Specfile {spec.name} (at {path}):")
                 for issue in issues:
                     print(issue)
-                print(f"  Suggestion: Use `glibc-static >= {glibc_version}%{{?dist}}`")
+                print(f"  Use: `BuildRequires: glibc-static >= {glibc_version}%{{?dist}}`")
                 print()
                 return False
     return True
