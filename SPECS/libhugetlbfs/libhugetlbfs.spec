@@ -1,7 +1,7 @@
 Summary:        A library which provides easy access to huge pages of memory
 Name:           libhugetlbfs
 Version:        2.23
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,28 +62,17 @@ segment remapping behavior. hugectl sets environment variables for using huge
 pages and then execs the target program. hugeadm gives easy access to huge page
 pool size control. pagesize lists page sizes available on the machine.
 
-%package tests
-Summary:        Test cases to help on validating the library environment
-Group:          Development/Libraries
-Requires:       %{name}-utils = %{version}-%{release}
-
-%description tests
-This packages contains a number of testcases that will help developers
-to verify the libhugetlbfs functionality and validate the library.
-
 %prep
 %autosetup -p1
 
 %build
-# Parallel builds are not reliable
-make all BUILDTYPE=NATIVEONLY V=1
+%make_build libs tools BUILDTYPE=NATIVEONLY V=1
 
 %install
 make install PREFIX=%{_prefix} LIB64="%{_lib}" DESTDIR=%{buildroot} LDSCRIPTDIR=%{ldscriptdir} BUILDTYPE=NATIVEONLY
 make install-helper PREFIX=%{_prefix} LIB64="%{_lib}" DESTDIR=%{buildroot} LDSCRIPTDIR=%{ldscriptdir} BUILDTYPE=NATIVEONLY
-make install-tests PREFIX=%{_prefix} LIB64="%{_lib}" DESTDIR=%{buildroot} LDSCRIPTDIR=%{ldscriptdir} BUILDTYPE=NATIVEONLY
-mkdir -p -m755 %{buildroot}%{_sysconfdir}/security/limits.d
-touch %{buildroot}%{_sysconfdir}/security/limits.d/hugepages.conf
+#mkdir -p -m755 %{buildroot}%{_sysconfdir}/security/limits.d
+#touch %{buildroot}%{_sysconfdir}/security/limits.d/hugepages.conf
 
 # clear execstack flag
 execstack --clear-execstack %{buildroot}/%{_libdir}/libhugetlbfs.so
@@ -91,7 +80,6 @@ execstack --clear-execstack %{buildroot}/%{_libdir}/libhugetlbfs_privutils.so
 
 # remove statically built libraries:
 rm -f %{buildroot}/%{_libdir}/*.a
-rm -f %{buildroot}/%{_libdir}/libhugetlbfs/tests/*/*.link*
 # remove unused sbin directory
 rm -fr %{buildroot}/%{_sbindir}/
 
@@ -101,9 +89,7 @@ rm -fr %{buildroot}/%{_sbindir}/
 %{_libdir}/libhugetlbfs.so*
 %{_libdir}/libhugetlbfs_privutils.so*
 %{_datadir}/%{name}/
-
 %{_mandir}/man7/libhugetlbfs.7.gz
-
 %ghost %config(noreplace) %{_sysconfdir}/security/limits.d/hugepages.conf
 %doc README HOWTO NEWS
 %license LGPL-2.1
@@ -129,21 +115,17 @@ rm -fr %{buildroot}/%{_sbindir}/
 %{_bindir}/hugectl
 %{_bindir}/pagesize
 %{_bindir}/huge_page_setup_helper.py
-%exclude %{_bindir}/cpupcstat
-%exclude %{_bindir}/oprofile_map_events.pl
-%exclude %{_bindir}/oprofile_start.sh
 %{_mandir}/man8/hugeedit.8.gz
 %{_mandir}/man8/hugectl.8.gz
 %{_mandir}/man8/hugeadm.8.gz
 %{_mandir}/man1/pagesize.1.gz
 %{_mandir}/man1/ld.hugetlbfs.1.gz
-%exclude %{_mandir}/man8/cpupcstat.8.gz
-%exclude %{_libdir}/perl5/TLBC
-
-%files tests
-%{_libdir}/libhugetlbfs
 
 %changelog
+* Wed Oct 05 2022 Andy Caldwell <andycaldwell@microsoft.com> - 2.23.4
+- Remove unused `libhugetlbfs-tests` package
+- Allows building without `glibc-static`
+
 * Tue Jul 26 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.23-3
 - Remove patch that applies usage of python3
 
