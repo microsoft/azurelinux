@@ -41,7 +41,7 @@ function generate_livepatch_signatures {
         --arg pem_hash "$public_key_hash" \
         --arg pem_name "$LIVEPATCH_PUBLIC_KEY_FILE" \
         '{"Signatures": {($config_name): $config_hash, ($kernel_name): $kernel_hash, ($pem_name): $pem_hash}}' \
-        > "$LIVEPATCH_SPECS_DIR/livepatch-$KERNEL_VERSION_RELEASE.signatures.json"
+        > "$LIVEPATCH_SPECS_DIR/$LIVEPATCH_NAME.signatures.json"
 }
 
 function generate_livepatch_spec {
@@ -82,8 +82,9 @@ KERNEL_VERSION_RELEASE="$(spec_query_srpm "$KERNEL_SPEC_PATH" "%{VERSION}-%{RELE
 
 LIVEPATCH_CONFIG_FILE="config-$KERNEL_VERSION_RELEASE"
 LIVEPATCH_PUBLIC_KEY_FILE="mariner-$KERNEL_VERSION_RELEASE.pem"
-LIVEPATCH_SPECS_DIR="$REPO_ROOT/SPECS/livepatch"
-LIVEPATCH_SPEC_PATH="$LIVEPATCH_SPECS_DIR/livepatch-$KERNEL_VERSION_RELEASE.spec"
+LIVEPATCH_NAME="livepatch-$KERNEL_VERSION_RELEASE"
+LIVEPATCH_SPECS_DIR="$REPO_ROOT/SPECS/$LIVEPATCH_NAME"
+LIVEPATCH_SPEC_PATH="$LIVEPATCH_SPECS_DIR/$LIVEPATCH_NAME.spec"
 
 if [[ -f "$LIVEPATCH_SPEC_PATH" ]]
 then
