@@ -1474,6 +1474,7 @@
                 "pyparted",
                 "pyproject-rpm-macros",
                 "pyserial",
+                "python-absl-py",
                 "python-aiodns",
                 "python-aiohttp",
                 "python-alsa",
