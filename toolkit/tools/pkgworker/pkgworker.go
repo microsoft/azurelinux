@@ -48,6 +48,7 @@ var (
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
 	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
+	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -82,7 +83,7 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck, *packagesToInstall)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
 
 	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
@@ -104,7 +105,7 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 	return
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string) (builtRPMs []string, err error) {
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
 
@@ -159,7 +160,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	}
 
 	err = chroot.Run(func() (err error) {
-		return buildRPMFromSRPMInChroot(srpmFileInChroot, runCheck, defines, packagesToInstall)
+		return buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall)
 	})
 	if err != nil {
 		return
@@ -171,7 +172,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	return
 }
 
-func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string]string, packagesToInstall []string) (err error) {
+func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines map[string]string, packagesToInstall []string) (err error) {
 	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
@@ -195,9 +196,9 @@ func buildRPMFromSRPMInChroot(srpmFile string, runCheck bool, defines map[string
 
 	// Build the SRPM
 	if runCheck {
-		err = rpm.BuildRPMFromSRPM(srpmFile, defines)
+		err = rpm.BuildRPMFromSRPM(srpmFile, outArch, defines)
 	} else {
-		err = rpm.BuildRPMFromSRPM(srpmFile, defines, "--nocheck")
+		err = rpm.BuildRPMFromSRPM(srpmFile, outArch, defines, "--nocheck")
 	}
 
 	return

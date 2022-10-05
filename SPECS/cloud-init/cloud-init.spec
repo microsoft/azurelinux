@@ -15,6 +15,7 @@ Patch1:         CVE-2022-2084.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
+BuildRequires:  mariner-release 
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi

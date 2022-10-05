@@ -76,7 +76,8 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
-		--output $@
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+	        --output $@
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
@@ -217,17 +218,17 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-rpms:
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
+	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-srpms:
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
+	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=))
-	@echo Updating missing RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
-	tar -I $(ARCHIVE_TOOL) -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
+	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

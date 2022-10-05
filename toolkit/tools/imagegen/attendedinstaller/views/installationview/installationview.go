@@ -151,6 +151,7 @@ func (iv *InstallationView) applyConfiguration(sysConfig *configuration.SystemCo
 	sysConfig.ReadOnlyVerityRoot = selectedConfig.ReadOnlyVerityRoot
 	sysConfig.AdditionalFiles = selectedConfig.AdditionalFiles
 	sysConfig.PostInstallScripts = selectedConfig.PostInstallScripts
+	sysConfig.FinalizeImageScripts = selectedConfig.FinalizeImageScripts
 }
 
 func (iv *InstallationView) populateInstallOptions() (err error) {

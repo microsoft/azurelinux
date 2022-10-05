@@ -201,7 +201,7 @@ UMASK           022
 #       PASS_WARN_AGE   Number of days warning given before a password expires.
 #
 PASS_MAX_DAYS   99999
-PASS_MIN_DAYS   0
+PASS_MIN_DAYS   7
 # PASS_MIN_LEN  5
 PASS_WARN_AGE   7
 
@@ -317,7 +317,9 @@ CHFN_RESTRICT           rwh
 # Note: If you use PAM, it is recommended to use a value consistent with
 # the PAM modules configuration.
 #
-# ENCRYPT_METHOD SHA512
+# Security patch for CCE-14063-2, msid: 157.7, 157.11
+# Encryption must be used in shadow file
+ENCRYPT_METHOD SHA512
 
 #
 # Only works if ENCRYPT_METHOD is set to SHA256 or SHA512.

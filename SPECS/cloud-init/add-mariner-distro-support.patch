@@ -359,45 +359,6 @@ index 6951a0e3..411065f9 100644
     # Other config here will be given to the distro class and/or path classes
     paths:
        cloud_dir: /var/lib/cloud/
-diff -ruN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
---- a/systemd/cloud-init-local.service.tmpl     2022-05-18 08:23:24.000000000 -0700
-+++ b/systemd/cloud-init-local.service.tmpl     2022-08-23 16:23:57.854218334 -0700
-@@ -1,9 +1,7 @@
- ## template:jinja
- [Unit]
- Description=Initial cloud-init job (pre-networking)
--{% if variant in ["ubuntu", "unknown", "debian", "rhel" ] %}
- DefaultDependencies=no
--{% endif %}
- Wants=network-pre.target
- After=hv_kvp_daemon.service
- After=systemd-remount-fs.service
-@@ -21,10 +19,8 @@
- Before=firewalld.target
- Conflicts=shutdown.target
- {% endif %}
--{% if variant in ["ubuntu", "unknown", "debian"] %}
- Before=sysinit.target
- Conflicts=shutdown.target
--{% endif %}
- RequiresMountsFor=/var/lib/cloud
- {% if variant == "rhel" %}
- ConditionPathExists=!/etc/cloud/cloud-init.disabled
-diff -ruN a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
---- a/systemd/cloud-init.service.tmpl   2022-05-18 08:23:24.000000000 -0700
-+++ b/systemd/cloud-init.service.tmpl   2022-08-23 16:21:56.556071614 -0700
-@@ -26,11 +26,9 @@
- Before=network-online.target
- Before=sshd-keygen.service
- Before=sshd.service
--{% if variant in ["ubuntu", "unknown", "debian"] %}
- Before=sysinit.target
- Before=shutdown.target
- Conflicts=shutdown.target
--{% endif %}
- {% if variant in ["suse"] %}
- Before=shutdown.target
- Conflicts=shutdown.target
 diff --git a/templates/hosts.mariner.tmpl b/templates/hosts.mariner.tmpl
 new file mode 100644
 index 00000000..2e956382

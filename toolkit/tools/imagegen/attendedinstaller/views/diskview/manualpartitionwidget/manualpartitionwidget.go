@@ -414,7 +414,7 @@ func (mp *ManualPartitionWidget) populateTable() (err error) {
 		mp.partitionTable.SetCell(tableHeaderRow, i, cell)
 	}
 
-	bootPartitionMountPoint, _, _, err := diskutils.BootPartitionConfig(mp.bootType)
+	bootPartitionMountPoint, _, _, err := configuration.BootPartitionConfig(mp.bootType, mp.cfg.Disks[0].PartitionTableType)
 	if err != nil {
 		return
 	}
@@ -526,7 +526,7 @@ func (mp *ManualPartitionWidget) unmarshalPartitionTable() (err error) {
 		bootPartitionIndex = 0
 	)
 
-	_, bootMountOptions, bootFlags, err := diskutils.BootPartitionConfig(mp.bootType)
+	_, bootMountOptions, bootFlags, err := configuration.BootPartitionConfig(mp.bootType, partitionTableType)
 	if err != nil {
 		return
 	}

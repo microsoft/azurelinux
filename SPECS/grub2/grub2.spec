@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,8 @@ Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 # CVE-2021-3981
 Patch0167:      0167-restore-umask-for-grub-config.patch 
+# Fix to reset the global errno to success upon success.
+Patch0170:      0170-fix-memory-alloc-errno-reset.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -224,7 +226,7 @@ mkdir %{buildroot}%{_sysconfdir}/sysconfig
 ln -sf %{_sysconfdir}/default/grub %{buildroot}%{_sysconfdir}/sysconfig/grub
 install -vdm 700 %{buildroot}/boot/%{name}
 touch %{buildroot}/boot/%{name}/grub.cfg
-chmod 600 %{buildroot}/boot/%{name}/grub.cfg
+chmod 400 %{buildroot}/boot/%{name}/grub.cfg
 rm -rf %{buildroot}%{_infodir}
 
 # Add SBAT
@@ -323,6 +325,12 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Wed Sep 07 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.06-7
+- Port internal patch for reseting grub_errno on success (George mileka <gmileka@microsoft.com>).
+
+* Thu Jul 28 2022 Minghe Ren <mingheren@microsoft.com> - 2.06-6
+- Change permission on grub.cfg to improve security
+
 * Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-5
 - Resolve CVE-2021-3981
 - Remove specification of nopatch files in the spec file

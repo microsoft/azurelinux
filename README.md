@@ -27,7 +27,7 @@ You can try CBL-Mariner with the following ISO Image:
 
 After downloading the ISO, use these instructions to install and use in a Hyper-V VM.
 
-Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking here or create a new feature request by clicking here. For additional information refer to the support.md file.
+Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/CBL-Mariner/issues) or create a new feature request by clicking [here](https://github.com/microsoft/CBL-Mariner/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/CBL-Mariner/blob/2.0/SUPPORT.md) file.
 
 # Trademarks
 

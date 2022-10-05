@@ -1,6 +1,6 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.24.3
+Version:        1.25.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
@@ -15,9 +15,9 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/k3s.io/containerd.git -b 1.5.13-k3s1
+# 6. git clone https://github.com/k3s.io/containerd.git -b 1.5.13-k3s2
 # 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
-# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.3
+# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.4
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
@@ -79,6 +79,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue Sep 20 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.25.0-1
+- Updated k3s to 1.25.0
+
 * Tue Aug 30 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.24.3-1
 - Updated k3s to 1.24.3
 

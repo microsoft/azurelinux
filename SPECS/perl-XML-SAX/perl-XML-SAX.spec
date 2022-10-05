@@ -1,7 +1,7 @@
 Summary:        SAX parser access API for Perl
 Name:           perl-XML-SAX
 Version:        1.02
-Release:        5%{?dist}
+Release:        6%{?dist}
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -9,13 +9,16 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/XML-SAX
 # Original source
 # http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-%%{version}.tar.gz
-Source0:        %{_mariner_sources_url}/XML-SAX-%{version}-nopatents.tar.gz
-# XML-SAX contains patented code that we cannot ship. Therefore we use
-# this script to remove the patented code before shipping it.
-# Download the upstream tarball and invoke this script while in the
-# tarball's directory:
-# ./generate-tarball.sh %%{version}
-Source1: generate-tarball.sh
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !!! Attention XML-SAX contains patented code that cannot ship !!!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Use 'generate_source_tarball.sh' script to generate the source tarball:
+#  -1 download the upstream tarball 
+#  -2 invoke 'generate_source_tarball.sh' while in the tarball's directory
+#  -3 upload the generated tarball to src tarball server
+#
+Source0:        %{_mariner_sources_url}/XML-SAX-%{version}.tar.gz
 
 # Fix rt#20126
 Patch0:         perl-XML-SAX-0.99-rt20126.patch
@@ -121,6 +124,9 @@ rm -rf "%{perl_vendorlib}/XML/SAX/ParserDetails.ini.backup" || :
 
 
 %changelog
+* Thu Sep 29 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.02-6
+- Change source tarball name.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.02-5
 - Updated source URL.
 - License verified.

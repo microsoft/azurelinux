@@ -46,7 +46,7 @@ echo Full CBL-Mariner toolchain build complete
 rm -rvf $MARINER_BUILD_DIR/toolchain/built_rpms_all
 mv -v $MARINER_BUILD_DIR/toolchain/built_rpms/ $MARINER_BUILD_DIR/toolchain/built_rpms_all
 pushd $MARINER_BUILD_DIR/toolchain
-tar czvf toolchain_built_rpms_all.tar.gz built_rpms_all
+tar cvf toolchain_built_rpms_all.tar.gz built_rpms_all
 popd
 # Output:
 # out/toolchain/built_rpms_all
@@ -54,7 +54,7 @@ popd
 
 echo Creating toolchain source RPM archive
 pushd $MARINER_BUILD_DIR/toolchain
-tar -C ./populated_toolchain/usr/src/mariner -czvf toolchain_built_srpms_all.tar.gz SRPMS
+tar -C ./populated_toolchain/usr/src/mariner -cvf toolchain_built_srpms_all.tar.gz SRPMS
 popd
 
 echo Printing list of built toolchain RPMS:

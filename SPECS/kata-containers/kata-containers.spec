@@ -39,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -241,6 +241,9 @@ fi
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-5
+- Generate initrd on reload.
+
 * Tue Sep 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-4
 - Set DEFSANDBOXCGROUPONLY="false".
 

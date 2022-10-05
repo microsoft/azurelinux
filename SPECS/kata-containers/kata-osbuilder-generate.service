@@ -4,7 +4,7 @@ Description=Generate Kata appliance image for host kernel
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/kata-containers/osbuilder/kata-osbuilder.sh -c -k kernel-uvm
-ExecReload=/usr/libexec/kata-containers/osbuilder/kata-osbuilder.sh
+ExecReload=/usr/libexec/kata-containers/osbuilder/kata-osbuilder.sh -c -k kernel-uvm
 
 [Install]
 WantedBy=kubelet.service

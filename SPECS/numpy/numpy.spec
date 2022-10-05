@@ -1,7 +1,7 @@
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.22.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # The custom license is inside numpy/core/src/multiarray/dragon4.c.
 License:        BSD AND ZLIB custom
 Vendor:         Microsoft Corporation
@@ -44,8 +44,11 @@ This package includes a version of f2py that works properly with NumPy.
 %build
 %py3_build
 
+# using py3_install macro, numpy header files are missing. --skip-build arg is removed essentially with this change.
+# https://github.com/numpy/numpy/issues/16005
+# changes imported from Fedora.
 %install
-%py3_install
+%{__python3} setup.py install --root %{buildroot}
 
 %check
 pip3 install nose pytest
@@ -63,6 +66,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %pyt
 %{_bindir}/f2py%{python3_version}
 
 %changelog
+* Thu Sep 15 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.22.3-2
+- Replaced py3_install macro to include numpy header files. --skip-build arg is removed essentially with the py3_install macro removal.
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.22.3-1
 - Upgrade to latest upstream version
 - Consolidate python requirements

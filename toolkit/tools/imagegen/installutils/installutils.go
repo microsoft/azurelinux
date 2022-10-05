@@ -42,7 +42,7 @@ const (
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
-	bootDirectoryFileMode = 0600
+	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
 	shadowFile            = "/etc/shadow"
 )
@@ -497,9 +497,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		generateContainerManifests(installChroot)
 	}
 
-	err = configuration.ConfigureNetwork(installChroot, config)
-	if err != nil {
-		return
+	if len(config.Networks) > 0 {
+		err = configuration.ConfigureNetwork(installChroot, config)
+		if err != nil {
+			return
+		}
 	}
 
 	// Run post-install scripts from within the installroot chroot
@@ -1938,6 +1940,47 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 			err = os.Remove(scriptPath)
 			if err != nil {
 				logger.Log.Errorf("Failed to cleanup post-install script (%s). Error: %s", scriptPath, err)
+			}
+
+			return err
+		})
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	const squashErrors = false
+
+	for _, script := range config.FinalizeImageScripts {
+		// Copy the script from this chroot into the install chroot before running it
+		scriptPath := script.Path
+		fileToCopy := safechroot.FileToCopy{
+			Src:  scriptPath,
+			Dest: scriptPath,
+		}
+
+		installChroot.AddFiles(fileToCopy)
+		if err != nil {
+			return
+		}
+
+		ReportActionf("Running finalize image script: %s", path.Base(script.Path))
+		logger.Log.Infof("Running finalize image script: %s", script.Path)
+		err = installChroot.UnsafeRun(func() error {
+			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", scriptPath, script.Args))
+
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(scriptPath)
+			if err != nil {
+				logger.Log.Errorf("Failed to cleanup finalize image script (%s). Error: %s", scriptPath, err)
 			}
 
 			return err

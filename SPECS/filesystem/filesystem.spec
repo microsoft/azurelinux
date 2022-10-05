@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      10%{?dist}
+Release:      11%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -13,6 +13,14 @@ The filesystem package is one of the basic packages that is installed
 on a Linux system. Filesystem contains the basic directory
 layout for a Linux operating system, including the correct permissions
 for the directories. This version is for a system configured with systemd.
+
+%package asc
+Summary:        Provide with config files needed for Azure Security Baseline
+Requires:       %{name} = %{version}-%{release}
+
+%description    asc
+Provide with multiple configuration files in /etc/modprobe.d/ to meet Azure Security Baseline
+
 %prep
 %build
 %install
@@ -412,6 +420,116 @@ install uhci_hcd /sbin/modprobe ehci_hcd ; /sbin/modprobe -i uhci_hcd ; true
 
 # End /etc/modprobe.d/usb.conf
 EOF
+
+# Security patch for CCE-14118-4, msid: 6.6 
+# Disable the installation and use of file systems that are not required (squashfs)
+cat > %{buildroot}/etc/modprobe.d/squashfs.conf <<- "EOF"
+# Begin /etc/modprobe.d/squashfs.conf
+
+install squashfs /bin/true
+
+# End /etc/modprobe.d/squashfs.conf
+EOF
+
+# Security patch for msid: 1.1.21.1 
+# Ensure mounting of USB storage devices is disabled
+cat > %{buildroot}/etc/modprobe.d/usb-storage.conf <<- "EOF"
+# Begin /etc/modprobe.d/usb-storage.conf
+
+install usb-storage /bin/true
+
+# End /etc/modprobe.d/usb-storage.conf
+EOF
+
+# Security patch for msid: 6.1 
+# Disable the installation and use of file systems that are not required (cramfs)
+cat > %{buildroot}/etc/modprobe.d/cramfs.conf <<- "EOF"
+# Begin /etc/modprobe.d/cramfs.conf
+
+install cramfs /bin/true
+
+# End /etc/modprobe.d/cramfs.conf
+EOF
+
+# Security patch for msid: 6.2 
+# Disable the installation and use of file systems that are not required (freevxfs)
+cat > %{buildroot}/etc/modprobe.d/freevxfs.conf <<- "EOF"
+# Begin /etc/modprobe.d/freevxfs.conf
+
+install freevxfs /bin/true
+
+# End /etc/modprobe.d/freevxfs.conf
+EOF
+
+# Security patch for msid: 6.3 
+# Disable the installation and use of file systems that are not required (hfs)
+cat > %{buildroot}/etc/modprobe.d/hfs.conf <<- "EOF"
+# Begin /etc/modprobe.d/hfs.conf
+
+install hfs /bin/true
+
+# End /etc/modprobe.d/hfs.conf
+EOF
+
+# Security patch for msid: 6.4 
+# Disable the installation and use of file systems that are not required (hfsplus)
+cat > %{buildroot}/etc/modprobe.d/hfsplus.conf <<- "EOF"
+# Begin /etc/modprobe.d/hfsplus.conf
+
+install hfsplus /bin/true
+
+# End /etc/modprobe.d/hfsplus.conf
+EOF
+
+# Security patch for msid: 6.5 
+# Disable the installation and use of file systems that are not required (jffs2)
+cat > %{buildroot}/etc/modprobe.d/jffs2.conf <<- "EOF"
+# Begin /etc/modprobe.d/jffs2.conf
+
+install jffs2 /bin/true
+
+# End /etc/modprobe.d/jffs2.conf
+EOF
+
+# Security patch for msid: 54
+# Ensure DCCP is disabled
+cat > %{buildroot}/etc/modprobe.d/dccp.conf <<- "EOF"
+# Begin /etc/modprobe.d/dccp.conf
+
+install dccp /bin/true
+
+# End /etc/modprobe.d/dccp.conf
+EOF
+
+# Security patch for msid: 55
+# Ensure SCTP is disabled
+cat > %{buildroot}/etc/modprobe.d/sctp.conf <<- "EOF"
+# Begin /etc/modprobe.d/sctp.conf
+
+install sctp /bin/true
+
+# End /etc/modprobe.d/sctp.conf
+EOF
+
+# Security patch for msid: 56
+# Disable support for RDS
+cat > %{buildroot}/etc/modprobe.d/rds.conf <<- "EOF"
+# Begin /etc/modprobe.d/rds.conf
+
+install rds /bin/true
+
+# End /etc/modprobe.d/rds.conf
+EOF
+
+# Security patch for msid: 57
+# Ensure TIPC is disabled
+cat > %{buildroot}/etc/modprobe.d/tipc.conf <<- "EOF"
+# Begin /etc/modprobe.d/tipc.conf
+
+install tipc /bin/true
+
+# End /etc/modprobe.d/tipc.conf
+EOF
 #
 #		chapter 9.1. The End
 #
@@ -572,7 +690,24 @@ return 0
 /usr/lib64
 /usr/local/lib64
 
+%files asc
+%config(noreplace) /etc/modprobe.d/squashfs.conf
+%config(noreplace) /etc/modprobe.d/usb-storage.conf
+%config(noreplace) /etc/modprobe.d/cramfs.conf
+%config(noreplace) /etc/modprobe.d/freevxfs.conf
+%config(noreplace) /etc/modprobe.d/hfs.conf
+%config(noreplace) /etc/modprobe.d/hfsplus.conf
+%config(noreplace) /etc/modprobe.d/jffs2.conf
+%config(noreplace) /etc/modprobe.d/dccp.conf
+%config(noreplace) /etc/modprobe.d/sctp.conf
+%config(noreplace) /etc/modprobe.d/rds.conf
+%config(noreplace) /etc/modprobe.d/tipc.conf
+
 %changelog
+* Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.1-11
+- Update etc/modprobe.d/ folder to include new multiple config files and improve security
+- Add subpackage asc to include all the new config files
+
 * Thu Jun 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1-10
 - Mark /proc and /sys as %%ghost
 - Create /proc and /sys as a pretransaction step

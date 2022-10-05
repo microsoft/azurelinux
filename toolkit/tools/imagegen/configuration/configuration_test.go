@@ -476,6 +476,15 @@ var expectedConfiguration Config = Config{
 					Args: "--input abc --output cba",
 				},
 			},
+			FinalizeImageScripts: []InstallScript{
+				{
+					Path: "arglessScript.sh",
+				},
+				{
+					Path: "thisOneNeedsArguments.sh",
+					Args: "--input abc --output cba",
+				},
+			},
 			Networks: []Network{
 				{
 					BootProto: "dhcp",
