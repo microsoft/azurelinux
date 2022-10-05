@@ -73,6 +73,7 @@ BuildRequires:  rust
 Requires:       busybox
 Requires:       dracut
 Requires:       kernel
+Requires:       libseccomp
 Requires:       qemu-kvm-core >= 4.2.0-4
 Requires:       %{_libexecdir}/virtiofsd
 
@@ -220,7 +221,7 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 
 %changelog
 * Thu Sep 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-6
-- Add patch to avoid memory hotplug timeout.
+- Add patch to avoid memory hotplug timeout, add libseccomp.
 
 * Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-5
 - Generate initrd on reload.
