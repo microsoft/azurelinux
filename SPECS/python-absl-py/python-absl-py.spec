@@ -7,6 +7,8 @@ URL:            https://github.com/abseil/abseil-py/
 Source0:        %{url}/archive/v%{version}/abseil-py-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 
 %global common_description %{expand:
 This repository is a collection of Python library code for building Python
