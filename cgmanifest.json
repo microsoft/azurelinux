@@ -26967,8 +26967,8 @@
         "type": "other",
         "other": {
           "name": "wireshark",
-          "version": "3.4.14",
-          "downloadUrl": "https://2.na.dl.wireshark.org/src/all-versions/wireshark-3.4.14.tar.xz"
+          "version": "3.4.16",
+          "downloadUrl": "https://2.na.dl.wireshark.org/src/all-versions/wireshark-3.4.16.tar.xz"
         }
       }
     },
