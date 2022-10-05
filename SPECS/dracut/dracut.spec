@@ -66,8 +66,7 @@ cp %{SOURCE1} .
 %build
 %configure \
     --systemdsystemunitdir=%{_unitdir} \
-    --bashcompletiondir=$(pkg-config \
-    --variable=completionsdir bash-completion) \
+    --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
     --libdir=%{_libdir} \
     --disable-documentation
 
