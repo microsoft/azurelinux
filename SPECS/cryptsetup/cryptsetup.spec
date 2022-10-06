@@ -120,7 +120,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc docs/examples/*
 %{_includedir}/libcryptsetup.h
 %{_libdir}/libcryptsetup.so
-%{_libdir}/pkg-config/libcryptsetup.pc
+%{_libdir}/pkgconfig/libcryptsetup.pc
 
 %files libs -f cryptsetup.lang
 %{!?_licensedir:%global license %%doc}
