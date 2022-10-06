@@ -1,6 +1,6 @@
 Name:           python-absl-py
 Version:        1.2.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Abseil Python Common Libraries
 License:        ASL 2.0
 URL:            https://github.com/abseil/abseil-py
@@ -72,7 +72,7 @@ PYTHONPATH='%{buildroot}/%{python3_sitelib}'; export PYTHONPATH
 
 
 %changelog
-* Wed Oct 5 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.13.0-2
+* Wed Oct 5 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.2.0-1
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 
