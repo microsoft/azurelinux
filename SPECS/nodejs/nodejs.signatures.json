@@ -1,6 +1,6 @@
 {
- "Signatures": {
-    "node-v14.20.0-clean.tar.xz": "ef614adf3a42e8aedefd374c3cd6f1510c3ee8d5cd3e6ea959763fe64c41adbb",
-    "clean-source-tarball.sh": "ab579872ec2f4e85a00fc1651b40a26876012256c722c3701ef3cdcb378c93d5"
- }
+  "Signatures": {
+    "clean-source-tarball.sh": "ab579872ec2f4e85a00fc1651b40a26876012256c722c3701ef3cdcb378c93d5",
+    "node-v14.20.1-clean.tar.xz": "365057ea661923cbfa71bdd7a8d0ace9ddff8d22d431ad92355f8433cecff14d"
+  }
 }
