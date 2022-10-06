@@ -46,11 +46,11 @@ cracklib-python-2.9.7-3.cm1.x86_64.rpm
 createrepo_c-0.11.1-6.cm1.x86_64.rpm
 createrepo_c-debuginfo-0.11.1-6.cm1.x86_64.rpm
 createrepo_c-devel-0.11.1-6.cm1.x86_64.rpm
-cryptsetup-2.3.3-2.cm1.x86_64.rpm
-cryptsetup-debuginfo-2.3.3-2.cm1.x86_64.rpm
-cryptsetup-devel-2.3.3-2.cm1.x86_64.rpm
-cryptsetup-libs-2.3.3-2.cm1.x86_64.rpm
-cryptsetup-reencrypt-2.3.3-2.cm1.x86_64.rpm
+cryptsetup-2.3.7-1.cm1.x86_64.rpm
+cryptsetup-debuginfo-2.3.7-1.cm1.x86_64.rpm
+cryptsetup-devel-2.3.7-1.cm1.x86_64.rpm
+cryptsetup-libs-2.3.7-1.cm1.x86_64.rpm
+cryptsetup-reencrypt-2.3.7-1.cm1.x86_64.rpm
 curl-7.84.0-1.cm1.x86_64.rpm
 curl-debuginfo-7.84.0-1.cm1.x86_64.rpm
 curl-devel-7.84.0-1.cm1.x86_64.rpm
