@@ -3,7 +3,7 @@ Version:        1.2.0
 Release:        2
 Summary:        Abseil Python Common Libraries
 License:        ASL 2.0
-URL:            https://github.com/abseil/abseil-py/
+URL:            https://github.com/abseil/abseil-py
 Source0:        %{url}/archive/v%{version}/abseil-py-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
@@ -23,27 +23,19 @@ Features:
   • Testing utilities}
 
 %description %{common_description}
-
-
 %package -n     python3-absl-py
 Summary:        %{summary}
-
 %py_provides python3-absl
-
 %description -n python3-absl-py %{common_description}
 
 
 %prep
 %autosetup -n abseil-py-%{version}
-
-
 %generate_buildrequires
 %pyproject_buildrequires
 
-
 %build
 %pyproject_wheel
-
 
 %install
 %pyproject_install
@@ -82,7 +74,7 @@ PYTHONPATH='%{buildroot}/%{python3_sitelib}'; export PYTHONPATH
 %changelog
 * Wed Oct 5 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.13.0-2
 - License verified
-- Initial import from Fedora
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
 
 * Tue Jun 15 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.13.0-1
 - Update to 0.13.0; closes RHBZ#1972146
