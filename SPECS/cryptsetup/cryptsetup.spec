@@ -1,4 +1,3 @@
-%global         urlversion  2.3
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.3.7
@@ -10,6 +9,7 @@ Group:          Applications/System
 URL:            https://gitlab.com/cryptsetup/cryptsetup
 Source0:        https://www.kernel.org/pub/linux/utils/cryptsetup/v%{urlversion}/%{name}-%{version}.tar.xz
 Patch0:         cryptsetup-add-system-library-paths.patch
+%global         urlversion  2.3
 BuildRequires:  device-mapper-devel
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
@@ -29,7 +29,7 @@ disk encryption using dm-crypt kernel module.
 Summary:        Headers and libraries for using encrypted file systems
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkg-config
+Requires:       pkgconfig
 Provides:       cryptsetup-luks-devel = %{version}-%{release}
 
 %description devel
@@ -130,6 +130,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %ghost %dir /run/cryptsetup
 
 %clean
+
 
 
 %changelog
