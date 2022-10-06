@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -127,9 +127,7 @@ rm -f %{buildroot}%{_var}/log/README
 rm -f %{buildroot}/%{_libdir}/modprobe.d/README
 rm -f %{buildroot}/lib/systemd/network/80-wifi-ap.network.example
 rm -f %{buildroot}/lib/systemd/network/80-wifi-station.network.example
-mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
-mkdir -p %{buildroot}%{_localstatedir}/log
-ln -sfv %{_localstatedir}/opt/journal/log %{buildroot}%{_localstatedir}/log/journal
+mkdir -p %{buildroot}%{_localstatedir}/log/journal
 
 find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
@@ -216,8 +214,7 @@ systemctl preset-all
 %{_datadir}/polkit-1
 %{_datadir}/systemd
 %{_datadir}/zsh/*
-%dir %{_localstatedir}/opt/journal/log
-%{_localstatedir}/log/journal
+%dir %{_localstatedir}/log/journal
 
 %files rpm-macros
 %{_libdir}/rpm
@@ -234,6 +231,9 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-7
+- Fixing default log location.
+
 * Tue Sep 27 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-6
 - Add patch to improve fs detection in gpt-auto (systemd #22506)
 
