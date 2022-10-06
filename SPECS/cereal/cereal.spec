@@ -9,7 +9,7 @@ Version:        1.3.2
 Release:        1%{?dist}
 Summary:        A header-only C++11 serialization library
 License:        BSD
-Url:            http://uscilab.github.io/cereal/
+Url:            https://uscilab.github.io/cereal/
 Source0:        https://github.com/USCiLab/cereal/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
