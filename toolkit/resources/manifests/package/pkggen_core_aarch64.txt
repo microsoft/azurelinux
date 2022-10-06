@@ -232,7 +232,7 @@ ca-certificates-tools-2.0.0-7.cm2.noarch.rpm
 ca-certificates-base-2.0.0-7.cm2.noarch.rpm
 ca-certificates-2.0.0-7.cm2.noarch.rpm
 dwz-0.14-1.cm2.aarch64.rpm
-unzip-6.0-19.cm2.aarch64.rpm
+unzip-6.0-20.cm2.aarch64.rpm
 python3-3.9.14-1.cm2.aarch64.rpm
 python3-devel-3.9.14-1.cm2.aarch64.rpm
 python3-libs-3.9.14-1.cm2.aarch64.rpm
