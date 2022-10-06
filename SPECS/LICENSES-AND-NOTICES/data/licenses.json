@@ -1481,6 +1481,7 @@
                 "python-alsa",
                 "python-argcomplete",
                 "python-astroid",
+                "python-astunparse",
                 "python-async-generator",
                 "python-augeas",
                 "python-azure-sdk",
