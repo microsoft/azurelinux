@@ -1,13 +1,12 @@
 Summary:        Libbpf library
 Name:           libbpf
-Version:        1.0.0
+Version:        1.0.1
 Release:        1%{?dist}
 License:        LGPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/%{name}/%{name}
-#Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  elfutils-devel
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
@@ -51,6 +50,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_libdir}/pkgconfig/libbpf.pc
 
 %changelog
+* Mon Oct 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.1-1
+- Bump version to 1.0.1
+
 * Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.0-1
 - Bump version to 1.0.0
 

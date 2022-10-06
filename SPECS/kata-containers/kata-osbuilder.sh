@@ -245,8 +245,8 @@ update_config()
     local image_osbuilder_dir="${IMAGE_TOPDIR}/osbuilder-images"
     local image_dir="${image_osbuilder_dir}/$KVERSION"
     local initrd_dest_path="${image_dir}/${DISTRO}-kata-${KVERSION}.initrd"
-    sed -i -e "s|kernel = \"/usr/share/kata-containers/vmlinux.container\"|kernel = \"/boot/vmlinux.bin\"|" /usr/share/defaults/kata-containers/configuration.toml
-    sed -i -e "s|image = \"/usr/share/kata-containers/kata-containers.img\"|initrd = \"$initrd_dest_path\"|" /usr/share/defaults/kata-containers/configuration.toml
+    sed -i -e "s|kernel = .*$|kernel = \"/boot/vmlinux.bin\"|" /usr/share/defaults/kata-containers/configuration.toml
+    sed -i -e "s|image = .*$|initrd = \"$initrd_dest_path\"|" /usr/share/defaults/kata-containers/configuration.toml
 }
 
 

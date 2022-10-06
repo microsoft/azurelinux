@@ -1016,6 +1016,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blobfuse2",
+          "version": "2.0.0.preview.3",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0-preview.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bluez",
           "version": "5.63",
           "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
@@ -7881,8 +7891,8 @@
         "type": "other",
         "other": {
           "name": "libbpf",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.0.0.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.0.1.tar.gz"
         }
       }
     },
@@ -11923,8 +11933,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.12",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.12.tar.gz"
+          "version": "20.10.14",
+          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.14.tar.gz"
         }
       }
     },
@@ -26697,8 +26707,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0598",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0598.tar.gz"
+          "version": "9.0.0614",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0614.tar.gz"
         }
       }
     },
