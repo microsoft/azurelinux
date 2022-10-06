@@ -16,9 +16,9 @@ BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
-Conflicts:      toybox
 # util-linux contains su, which conflicts with shadow-utils < 4.9-10 that also contained su
 Conflicts:      shadow-utils < 4.9-10
+Conflicts:      toybox
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
