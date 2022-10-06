@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.8
+Version:        12.12
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
-Patch0:         CVE-2021-23222.patch
 
 # Common libraries needed
 BuildRequires:  krb5-devel
@@ -170,6 +169,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Thu Oct 06 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 12.12-1
+- Upgrade to 12.12
+
 * Tue Jul 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 12.8-1
 - Update to v12.8 resolve CVE-2021-3677.
 
