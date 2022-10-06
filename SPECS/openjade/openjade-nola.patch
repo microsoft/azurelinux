@@ -1,0 +1,12 @@
+diff -urNp openjade-1.3.2-orig/jade/Makefile.sub openjade-1.3.2/jade/Makefile.sub
+--- openjade-1.3.2-orig/jade/Makefile.sub	2002-11-15 23:46:50.000000000 +0100
++++ openjade-1.3.2/jade/Makefile.sub	2009-02-13 11:52:30.000000000 +0100
+@@ -4,7 +4,7 @@ OBJS=jade.o SgmlFOTBuilder.o RtfFOTBuild
+ INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove -I$(srcdir)/../style
+ # XLIBS=../style/libostyle.a ../spgrove/libospgrove.a ../grove/libogrove.a \
+ #   ../lib/libosp.a
+-XLIBS=../style/libostyle.a ../spgrove/libospgrove.a ../grove/libogrove.a $(splibdir)/libosp.a
++XLIBS=../style/libostyle.a ../spgrove/libospgrove.a ../grove/libogrove.a $(splibdir)/libosp.so
+ GENSRCS=JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
+  HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx  TeXFOTBuilder_inst.cxx \
+  TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx

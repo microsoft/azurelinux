@@ -1,3 +1,0 @@
-[Unit]
-Wants=php-fpm.service
-

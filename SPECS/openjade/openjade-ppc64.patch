@@ -1,0 +1,27 @@
+--- openjade-1.3.1/Makefile.prog.in.sopwith	2002-01-22 06:57:53.000000000 -0500
++++ openjade-1.3.1/Makefile.prog.in	2003-02-11 16:59:44.000000000 -0500
+@@ -1,3 +1,4 @@
++
+ #
+ #  Makefile.prog.in - Makerules for bilding programs
+ #
+@@ -11,15 +12,17 @@
+ LINKFLAGS = @LINKFLAGS@
+ 
+ ALL_LIBS = $(XLIBS) $(LIBS)
++LT_LIBS = $(shell echo $(XLIBS) | sed 's/\.a/.la/g')
++LT_ALL_LIBS = $(shell echo $(ALL_LIBS) | sed 's/\.a/.la/g')
+ Makefile.lt:
+-	echo 'LT_LIBS='`echo $(ALL_LIBS)|sed 's/\.a/.la/g'` >Makefile.lt
++	echo > Makefile.lt
+ 
+ PROG:=$(shell echo "$(PROG)" | sed '@program_transform_name@')
+ 
+ all: $(PROG)
+ 
+ $(PROG): $(OBJS) $(COBJS) $(LT_LIBS)
+-	$(LIBTOOL) --mode=link $(CXX) $(LINKFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(COBJS) $(LT_LIBS)
++	$(LIBTOOL) --mode=link $(CXX) $(LINKFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(COBJS) $(LT_ALL_LIBS)
+ 
+ install: $(PROG)
+ 	-test -d $(DESTDIR)$(bindir) || \

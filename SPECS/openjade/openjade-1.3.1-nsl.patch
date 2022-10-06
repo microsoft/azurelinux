@@ -1,0 +1,21 @@
+--- openjade-1.3.1/config/configure.in.lr	2003-09-12 08:03:22.000000000 -0600
++++ openjade-1.3.1/config/configure.in	2003-09-12 08:03:44.000000000 -0600
+@@ -156,7 +156,6 @@
+     then
+         AC_MSG_RESULT(yes)
+ 	AC_DEFINE(SP_HAVE_SOCKET)
+-	AC_CHECK_LIB(nsl,main,LIBS="$LIBS -lnsl")
+ 	AC_CHECK_LIB(socket,main,LIBS="$LIBS -lsocket")
+ 	AC_MSG_CHECKING(h_errno in netdb.h)
+ 	AC_EGREP_HEADER(h_errno,netdb.h,
+--- openjade-1.3.1/configure.lr	2003-09-12 08:35:55.000000000 -0600
++++ openjade-1.3.1/configure	2003-09-12 08:36:07.000000000 -0600
+@@ -5530,7 +5530,7 @@
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lnsl  $LIBS"
++LIBS="-lXXXnsl  $LIBS"
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+ #include "confdefs.h"

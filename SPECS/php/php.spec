@@ -1,7 +1,6 @@
 %{!?_httpd_confdir:    %{expand: %%global _httpd_confdir %%{_sysconfdir}/httpd/conf.d}}
 %{!?_httpd_modconfdir: %{expand: %%global _httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d}}
 %{!?_httpd_moddir:     %{expand: %%global _httpd_moddir %%{_libdir}/httpd/modules}}
-
 # Fedora spec file for php
 #
 # License: MIT
@@ -9,45 +8,37 @@
 #
 # Please preserve changelog entries
 #
-
 # API/ABI check
 %global apiver      20210902
 %global zendver     20210902
 %global pdover      20170320
-
 # Adds -z now to the linker flags
 %global _hardened_build 1
-
 # version used for php embedded library soname
 %global embed_version 8.1
-
 %global mysql_sock %(mysql_config --socket 2>/dev/null || echo %{_sharedstatedir}/mysql/mysql.sock)
-
 # Regression tests take a long time, you can skip 'em with this
 #global runselftest 0
 %{!?runselftest: %global runselftest 1}
-
 # Use the arch-specific mysql_config binary to avoid mismatch with the
 # arch detection heuristic used by bindir/mysql_config.
 %global mysql_config %{_libdir}/mysql/mysql_config
-
-
 %global with_zts      1
-%global with_firebird 1
-%global with_imap     1
 %global with_firebird 0
 %global with_imap     0
 %global with_freetds  1
 %global with_sodium   1
 %global with_pspell   1
 %global with_lmdb     1
+%global with_db4      1
+%global with_tidy     1
+%global with_qdbm     0
 %global upver        8.1.11
 #global rcver        RC1
-
-Summary: PHP scripting language for creating dynamic web sites
-Name: php
-Version: %{upver}%{?rcver:~%{rcver}}
-Release: 1%{?dist}
+Summary:        PHP scripting language for creating dynamic web sites
+Name:           php
+Version:        %{upver}%{?rcver:~%{rcver}}
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -55,121 +46,103 @@ Release: 1%{?dist}
 # ext/date/lib is MIT
 # Zend/zend_sort is NCSA
 # Zend/asm is Boost
-License: PHP and Zend and BSD and MIT and ASL 1.0 and NCSA and Boost
-URL: http://www.php.net/
-
-Source0: https://www.php.net/distributions/php-%{upver}%{?rcver}.tar.xz
-Source1: php.conf
-Source2: php.ini
-Source3: macros.php
-Source4: php-fpm.conf
-Source5: php-fpm-www.conf
-Source6: php-fpm.service
-Source7: php-fpm.logrotate
-Source9: php.modconf
-Source12: php-fpm.wants
-Source13: nginx-fpm.conf
-Source14: nginx-php.conf
+License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.php.net/
+Source0:        https://www.php.net/distributions/php-%{upver}%{?rcver}.tar.xz
+Source1:        php.conf
+Source2:        php.ini
+Source3:        macros.php
+Source4:        php-fpm.conf
+Source5:        php-fpm-www.conf
+Source6:        php-fpm.service
+Source7:        php-fpm.logrotate
+Source9:        php.modconf
+Source12:       php-fpm.wants
+Source13:       nginx-fpm.conf
+Source14:       nginx-php.conf
 # See https://secure.php.net/gpg-keys.php
-Source20: https://www.php.net/distributions/php-keyring.gpg
-Source21: https://www.php.net/distributions/php-%{upver}%{?rcver}.tar.xz.asc
+Source20:       https://www.php.net/distributions/php-keyring.gpg
+Source21:       https://www.php.net/distributions/php-%{upver}%{?rcver}.tar.xz.asc
 # Configuration files for some extensions
-Source50: 10-opcache.ini
-Source51: opcache-default.blacklist
-Source53: 20-ffi.ini
-
+Source50:       10-opcache.ini
+Source51:       opcache-default.blacklist
+Source53:       20-ffi.ini
 # Build fixes
-Patch1: php-7.4.0-httpd.patch
-Patch5: php-7.2.0-includedir.patch
-Patch6: php-8.0.0-embed.patch
-Patch8: php-8.1.0-libdb.patch
-
+Patch1:         php-7.4.0-httpd.patch
+Patch5:         php-7.2.0-includedir.patch
+Patch6:         php-8.0.0-embed.patch
+Patch8:         php-8.1.0-libdb.patch
 # Functional changes
 # Use system nikic/php-parser
-Patch41: php-8.1.0-parser.patch
+Patch41:        php-8.1.0-parser.patch
 # use system tzdata
-Patch42: php-8.1.0-systzdata-v22.patch
+Patch42:        php-8.1.0-systzdata-v22.patch
 # See http://bugs.php.net/53436
-Patch43: php-7.4.0-phpize.patch
+Patch43:        php-7.4.0-phpize.patch
 # Use -lldap_r for OpenLDAP
-Patch45: php-7.4.0-ldap_r.patch
+Patch45:        php-7.4.0-ldap_r.patch
 # drop "Configure command" from phpinfo output
 # and only use gcc (instead of full version)
-Patch47: php-8.1.0-phpinfo.patch
-
+Patch47:        php-8.1.0-phpinfo.patch
 # Upstream fixes (100+)
-
 # Security fixes (200+)
-
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
-Patch300: php-7.4.0-datetests.patch
-
-
-BuildRequires: gnupg2
-BuildRequires: bzip2-devel
-BuildRequires: pkgconfig(libcurl)  >= 7.29.0
-BuildRequires: httpd-devel >= 2.0.46-1
-BuildRequires: pam-devel
-# to ensure we are using httpd with filesystem feature (see #1081453)
-BuildRequires: httpd-filesystem
-# to ensure we are using nginx with filesystem feature (see #1142298)
-BuildRequires: nginx-filesystem
-BuildRequires: libstdc++-devel
-# no pkgconfig to avoid compat-openssl10
-BuildRequires: openssl-devel >= 1.0.2
-BuildRequires: pkgconfig(sqlite3) >= 3.7.4
-BuildRequires: pkgconfig(zlib) >= 1.2.0.4
-BuildRequires: smtpdaemon
-BuildRequires: pkgconfig(libedit)
-BuildRequires: pkgconfig(libpcre2-8) >= 10.30
-BuildRequires: pkgconfig(libxcrypt)
-BuildRequires: bzip2
-BuildRequires: perl-interpreter
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: make
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: libtool
-BuildRequires: libtool-ltdl-devel
-BuildRequires: systemtap-sdt-devel
+Patch300:       php-7.4.0-datetests.patch
 # used for tests
-BuildRequires: /bin/ps
-BuildRequires: tzdata
-
-%if %{with zts}
-Provides: php-zts = %{version}-%{release}
-Provides: php-zts%{?_isa} = %{version}-%{release}
-%endif
-
-# To ensure correct /var/lib/php/session ownership:
-Requires(pre): httpd-filesystem
-# php engine for Apache httpd webserver
-Provides: php(httpd)
-# mod_php is deprecated, no package should requires php or mod_php
-# all packages must requires used SAPI (cli, fpm, embded..)
-# and used extrensions (mysqli, mbstring, xmlwriter...)
-Provides: deprecated()
-%else
+BuildRequires:  /bin/ps
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  bzip2
+BuildRequires:  bzip2-devel
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  gnupg2
+BuildRequires:  httpd-devel >= 2.0.46-1
+# to ensure we are using httpd with filesystem feature (see #1081453)
+BuildRequires:  httpd-filesystem
+BuildRequires:  libstdc++-devel
+BuildRequires:  libtool
+BuildRequires:  libtool-ltdl-devel
+BuildRequires:  make
+# to ensure we are using nginx with filesystem feature (see #1142298)
+BuildRequires:  nginx-filesystem
+# no pkgconfig to avoid compat-openssl10
+BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  pam-devel
+BuildRequires:  perl-interpreter
+BuildRequires:  pkg-config
+BuildRequires:  smtpdaemon
+BuildRequires:  systemtap-sdt-devel
+BuildRequires:  tzdata
+BuildRequires:  pkgconfig(libcurl) >= 7.29.0
+BuildRequires:  pkgconfig(libedit)
+BuildRequires:  pkgconfig(libpcre2-8) >= 10.30
+BuildRequires:  pkgconfig(libxcrypt)
+BuildRequires:  pkgconfig(sqlite3) >= 3.7.4
+BuildRequires:  pkgconfig(zlib) >= 1.2.0.4
+Requires:       php-common%{?_isa} = %{version}-%{release}
 # preserve old behavior
-Recommends: httpd
-%endif
-Requires: php-common%{?_isa}     = %{version}-%{release}
+Recommends:     httpd
 # For backwards-compatibility, pull the "php" command
-Recommends: php-cli%{?_isa}      = %{version}-%{release}
+Recommends:     php-cli%{?_isa} = %{version}-%{release}
 # httpd have threaded MPM by default
-Recommends: php-fpm%{?_isa}      = %{version}-%{release}
+Recommends:     php-fpm%{?_isa} = %{version}-%{release}
 # as "php" is now mostly a meta-package, commonly used extensions
 # reduce diff with "dnf module install php"
-Recommends: php-mbstring%{?_isa} = %{version}-%{release}
-Recommends: php-opcache%{?_isa}  = %{version}-%{release}
-Recommends: php-pdo%{?_isa}      = %{version}-%{release}
-%if %{with sodium}
-Recommends: php-sodium%{?_isa}   = %{version}-%{release}
+Recommends:     php-mbstring%{?_isa} = %{version}-%{release}
+Recommends:     php-opcache%{?_isa} = %{version}-%{release}
+Recommends:     php-pdo%{?_isa} = %{version}-%{release}
+Recommends:     php-xml%{?_isa} = %{version}-%{release}
+%if %{with_zts}
+Provides:       php-zts = %{version}-%{release}
+Provides:       php-zts%{?_isa} = %{version}-%{release}
 %endif
-Recommends: php-xml%{?_isa}      = %{version}-%{release}
-
+%if %{with_sodium}
+Recommends:     php-sodium%{?_isa} = %{version}-%{release}
+%endif
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -178,123 +151,154 @@ offers built-in database integration for several commercial and
 non-commercial database management systems, so writing a
 database-enabled webpage with PHP is fairly simple. The most common
 use of PHP coding is probably as a replacement for CGI scripts.
-%if %{with modphp}
-The php package contains the module (often referred to as mod_php)
-which adds support for the PHP language to Apache HTTP Server when
-running in prefork mode. This module is deprecated.
-%endif
+#%if %{with_modphp}
+#The php package contains the module (often referred to as mod_php)
+#which adds support for the PHP language to Apache HTTP Server when
+#running in prefork mode. This module is deprecated.
+#%endif
 
 %package cli
-Summary: Command-line interface for PHP
+Summary:        Command-line interface for PHP
 # sapi/cli/ps_title.c is PostgreSQL
-License: PHP and Zend and BSD and MIT and ASL 1.0 and NCSA and PostgreSQL
-Requires: php-common%{?_isa} = %{version}-%{release}
-Provides: php-cgi = %{version}-%{release}, php-cgi%{?_isa} = %{version}-%{release}
-Provides: php-pcntl, php-pcntl%{?_isa}
-Provides: php-readline, php-readline%{?_isa}
+License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND PostgreSQL
+Requires:       php-common%{?_isa} = %{version}-%{release}
+Provides:       php-cgi = %{version}-%{release}
+Provides:       php-cgi%{?_isa} = %{version}-%{release}
+Provides:       php-pcntl
+Provides:       php-pcntl%{?_isa}
+Provides:       php-readline
+Provides:       php-readline%{?_isa}
 
 %description cli
 The php-cli package contains the command-line interface
-executing PHP scripts, /usr/bin/php, and the CGI interface.
-
+executing PHP scripts, %{_bindir}/php, and the CGI interface.
 
 %package dbg
-Summary: The interactive PHP debugger
-Requires: php-common%{?_isa} = %{version}-%{release}
+Summary:        The interactive PHP debugger
+License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description dbg
 The php-dbg package contains the interactive PHP debugger.
 
-
 %package fpm
-Summary: PHP FastCGI Process Manager
-BuildRequires: libacl-devel
-BuildRequires: systemd-devel
-Requires: php-common%{?_isa} = %{version}-%{release}
-%{?systemd_requires}
-# To ensure correct /var/lib/php/session ownership:
-Requires(pre): httpd-filesystem
+Summary:        PHP FastCGI Process Manager
+License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
+BuildRequires:  libacl-devel
+BuildRequires:  systemd-devel
 # For php.conf in /etc/httpd/conf.d
 # and version 2.4.10 for proxy support in SetHandler
-Requires: httpd-filesystem >= 2.4.10
-# php engine for Apache httpd webserver
-Provides: php(httpd)
+Requires:       httpd-filesystem >= 2.4.10
 # for /etc/nginx ownership
-Requires: nginx-filesystem
+Requires:       nginx-filesystem
+Requires:       php-common%{?_isa} = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
+# To ensure correct /var/lib/php/session ownership:
+Requires(pre):  httpd-filesystem
+# php engine for Apache httpd webserver
+Provides:       php(httpd)
+%{?systemd_requires}
+
 %description fpm
 PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI
 implementation with some additional features useful for sites of
 any size, especially busier sites.
 
 %package common
-Summary: Common files for PHP
+Summary:        Common files for PHP
 # All files licensed under PHP version 3.01, except
 # fileinfo is licensed under PHP version 3.0
 # regex, libmagic are licensed under BSD
-License: PHP and BSD
+License:        PHP AND BSD
 # ABI/API check - Arch specific
-Provides: php(api) = %{apiver}-%{__isa_bits}
-Provides: php(zend-abi) = %{zendver}-%{__isa_bits}
-Provides: php(language) = %{version}, php(language)%{?_isa} = %{version}
+Provides:       php(api) = %{apiver}-%{__isa_bits}
+Provides:       php(zend-abi) = %{zendver}-%{__isa_bits}
+Provides:       php(language) = %{version}
+Provides:       php(language)%{?_isa} = %{version}
 # Provides for all builtin/shared modules:
-Provides: php-bz2, php-bz2%{?_isa}
-Provides: php-calendar, php-calendar%{?_isa}
-Provides: php-core = %{version}, php-core%{?_isa} = %{version}
-Provides: php-ctype, php-ctype%{?_isa}
-Provides: php-curl, php-curl%{?_isa}
-Provides: php-date, php-date%{?_isa}
-Provides: bundled(timelib)
-Provides: php-exif, php-exif%{?_isa}
-Provides: php-fileinfo, php-fileinfo%{?_isa}
-Provides: bundled(libmagic) = 5.29
-Provides: php-filter, php-filter%{?_isa}
-Provides: php-ftp, php-ftp%{?_isa}
-Provides: php-gettext, php-gettext%{?_isa}
-Provides: php-hash, php-hash%{?_isa}
-Provides: php-mhash = %{version}, php-mhash%{?_isa} = %{version}
-Provides: php-iconv, php-iconv%{?_isa}
-Obsoletes: php-json < 8
-Provides: php-json = %{version}, php-json%{?_isa} = %{version}
-Provides: php-libxml, php-libxml%{?_isa}
-Provides: php-openssl, php-openssl%{?_isa}
-Provides: php-phar, php-phar%{?_isa}
-Provides: php-pcre, php-pcre%{?_isa}
-Provides: php-reflection, php-reflection%{?_isa}
-Provides: php-session, php-session%{?_isa}
-Provides: php-sockets, php-sockets%{?_isa}
-Provides: php-spl, php-spl%{?_isa}
-Provides: php-standard = %{version}, php-standard%{?_isa} = %{version}
-Provides: php-tokenizer, php-tokenizer%{?_isa}
-Provides: php-zlib, php-zlib%{?_isa}
+Provides:       php-bz2
+Provides:       php-bz2%{?_isa}
+Provides:       php-calendar
+Provides:       php-calendar%{?_isa}
+Provides:       php-core = %{version}
+Provides:       php-core%{?_isa} = %{version}
+Provides:       php-ctype
+Provides:       php-ctype%{?_isa}
+Provides:       php-curl
+Provides:       php-curl%{?_isa}
+Provides:       php-date
+Provides:       php-date%{?_isa}
+Provides:       bundled(timelib)
+Provides:       php-exif
+Provides:       php-exif%{?_isa}
+Provides:       php-fileinfo
+Provides:       php-fileinfo%{?_isa}
+Provides:       bundled(libmagic) = 5.29
+Provides:       php-filter
+Provides:       php-filter%{?_isa}
+Provides:       php-ftp
+Provides:       php-ftp%{?_isa}
+Provides:       php-gettext
+Provides:       php-gettext%{?_isa}
+Provides:       php-hash
+Provides:       php-hash%{?_isa}
+Provides:       php-mhash = %{version}
+Provides:       php-mhash%{?_isa} = %{version}
+Provides:       php-iconv
+Provides:       php-iconv%{?_isa}
+Obsoletes:      php-json < 8
+Provides:       php-json = %{version}
+Provides:       php-json%{?_isa} = %{version}
+Provides:       php-libxml
+Provides:       php-libxml%{?_isa}
+Provides:       php-openssl
+Provides:       php-openssl%{?_isa}
+Provides:       php-phar
+Provides:       php-phar%{?_isa}
+Provides:       php-pcre
+Provides:       php-pcre%{?_isa}
+Provides:       php-reflection
+Provides:       php-reflection%{?_isa}
+Provides:       php-session
+Provides:       php-session%{?_isa}
+Provides:       php-sockets
+Provides:       php-sockets%{?_isa}
+Provides:       php-spl
+Provides:       php-spl%{?_isa}
+Provides:       php-standard = %{version}
+Provides:       php-standard%{?_isa} = %{version}
+Provides:       php-tokenizer
+Provides:       php-tokenizer%{?_isa}
+Provides:       php-zlib
+Provides:       php-zlib%{?_isa}
 
 %description common
 The php-common package contains files used by both the php
 package and the php-cli package.
 
 %package devel
-Summary: Files needed for building PHP extensions
-Requires: php-cli%{?_isa} = %{version}-%{release}
+Summary:        Files needed for building PHP extensions
+License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
 # always needed to build extension
-Requires: autoconf
-Requires: automake
-Requires: make
-Requires: gcc
-Requires: gcc-c++
-Requires: libtool
+Requires:       autoconf
+Requires:       automake
+Requires:       gcc
+Requires:       gcc-c++
 # see "php-config --libs"
-Requires: krb5-devel%{?_isa}
-Requires: libxml2-devel%{?_isa}
-Requires: openssl-devel%{?_isa} >= 1.0.2
-Requires: pcre2-devel%{?_isa}
-Requires: zlib-devel%{?_isa}
-%if %{with zts}
-Provides: php-zts-devel = %{version}-%{release}
-Provides: php-zts-devel%{?_isa} = %{version}-%{release}
+Requires:       krb5-devel%{?_isa}
+Requires:       libtool
+Requires:       libxml2-devel%{?_isa}
+Requires:       make
+Requires:       openssl-devel%{?_isa} >= 1.0.2
+Requires:       pcre2-devel%{?_isa}
+Requires:       php-cli%{?_isa} = %{version}-%{release}
+Requires:       zlib-devel%{?_isa}
+Recommends:     php-nikic-php-parser4 >= 4.13.0
+%if %{with_zts}
+Provides:       php-zts-devel = %{version}-%{release}
+Provides:       php-zts-devel%{?_isa} = %{version}-%{release}
 %endif
-Recommends: php-nikic-php-parser4 >= 4.13.0
-
 
 %description devel
 The php-devel package contains the files needed for building PHP
@@ -302,13 +306,13 @@ extensions. If you need to compile your own PHP extensions, you will
 need to install this package.
 
 %package opcache
-Summary:   The Zend OPcache
-License:   PHP
-Requires:  php-common%{?_isa} = %{version}-%{release}
-Provides:  php-pecl-zendopcache = %{version}
-Provides:  php-pecl-zendopcache%{?_isa} = %{version}
-Provides:  php-pecl(opcache) = %{version}
-Provides:  php-pecl(opcache)%{?_isa} = %{version}
+Summary:        The Zend OPcache
+License:        PHP
+Requires:       php-common%{?_isa} = %{version}-%{release}
+Provides:       php-pecl-zendopcache = %{version}
+Provides:       php-pecl-zendopcache%{?_isa} = %{version}
+Provides:       php-pecl(opcache) = %{version}
+Provides:       php-pecl(opcache)%{?_isa} = %{version}
 
 %description opcache
 The Zend OPcache provides faster PHP execution through opcode caching and
@@ -317,16 +321,17 @@ bytecode in the shared memory. This eliminates the stages of reading code from
 the disk and compiling it on future access. In addition, it applies a few
 bytecode optimization patterns that make code execution faster.
 
-%if %{with imap}
+%if %{with_imap}
 %package imap
-Summary: A module for PHP applications that use IMAP
+Summary:        A module for PHP applications that use IMAP
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: pkgconfig(krb5)
-BuildRequires: pkgconfig(krb5-gssapi)
-BuildRequires: openssl-devel >= 1.0.2
-BuildRequires: libc-client-devel
+License:        PHP
+BuildRequires:  libc-client-devel
+BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(krb5)
+BuildRequires:  pkgconfig(krb5-gssapi)
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description imap
 The php-imap module will add IMAP (Internet Message Access Protocol)
@@ -335,13 +340,14 @@ messages on mail servers. PHP is an HTML-embedded scripting language.
 %endif
 
 %package ldap
-Summary: A module for PHP applications that use LDAP
+Summary:        A module for PHP applications that use LDAP
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: pkgconfig(libsasl2)
-BuildRequires: openldap-devel
-BuildRequires: openssl-devel >= 1.0.2
+License:        PHP
+BuildRequires:  openldap-devel
+BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(libsasl2)
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description ldap
 The php-ldap adds Lightweight Directory Access Protocol (LDAP)
@@ -350,15 +356,17 @@ services over the Internet. PHP is an HTML-embedded scripting
 language.
 
 %package pdo
-Summary: A database access abstraction module for PHP applications
+Summary:        A database access abstraction module for PHP applications
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
+License:        PHP
+Requires:       php-common%{?_isa} = %{version}-%{release}
 # ABI/API check - Arch specific
-Provides: php-pdo-abi  = %{pdover}-%{__isa_bits}
-Provides: php(pdo-abi) = %{pdover}-%{__isa_bits}
-Provides: php-sqlite3, php-sqlite3%{?_isa}
-Provides: php-pdo_sqlite, php-pdo_sqlite%{?_isa}
+Provides:       php-pdo-abi = %{pdover}-%{__isa_bits}
+Provides:       php(pdo-abi) = %{pdover}-%{__isa_bits}
+Provides:       php-sqlite3
+Provides:       php-sqlite3%{?_isa}
+Provides:       php-pdo_sqlite
+Provides:       php-pdo_sqlite%{?_isa}
 
 %description pdo
 The php-pdo package contains a dynamic shared object that will add
@@ -367,14 +375,15 @@ a common interface for accessing MySQL, PostgreSQL or other
 databases.
 
 %package mysqlnd
-Summary: A module for PHP applications that use MySQL databases
+Summary:        A module for PHP applications that use MySQL databases
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-pdo%{?_isa} = %{version}-%{release}
-Provides: php_database
-Provides: php-mysqli = %{version}-%{release}
-Provides: php-mysqli%{?_isa} = %{version}-%{release}
-Provides: php-pdo_mysql, php-pdo_mysql%{?_isa}
+License:        PHP
+Requires:       php-pdo%{?_isa} = %{version}-%{release}
+Provides:       php_database
+Provides:       php-mysqli = %{version}-%{release}
+Provides:       php-mysqli%{?_isa} = %{version}-%{release}
+Provides:       php-pdo_mysql
+Provides:       php-pdo_mysql%{?_isa}
 
 %description mysqlnd
 The php-mysqlnd package contains a dynamic shared object that will add
@@ -386,15 +395,16 @@ this package and the php package.
 This package use the MySQL Native Driver
 
 %package pgsql
-Summary: A PostgreSQL database module for PHP
+Summary:        A PostgreSQL database module for PHP
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-pdo%{?_isa} = %{version}-%{release}
-Provides: php_database
-Provides: php-pdo_pgsql, php-pdo_pgsql%{?_isa}
-BuildRequires: krb5-devel
-BuildRequires: openssl-devel >= 1.0.2
-BuildRequires: libpq-devel
+License:        PHP
+BuildRequires:  krb5-devel
+BuildRequires:  libpq-devel
+BuildRequires:  openssl-devel >= 1.0.2
+Requires:       php-pdo%{?_isa} = %{version}-%{release}
+Provides:       php_database
+Provides:       php-pdo_pgsql
+Provides:       php-pdo_pgsql%{?_isa}
 
 %description pgsql
 The php-pgsql package add PostgreSQL database support to PHP.
@@ -405,15 +415,20 @@ PostgreSQL, you should install this package in addition to the main
 php package.
 
 %package process
-Summary: Modules for PHP script using system process interfaces
+Summary:        Modules for PHP script using system process interfaces
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-Provides: php-posix, php-posix%{?_isa}
-Provides: php-shmop, php-shmop%{?_isa}
-Provides: php-sysvsem, php-sysvsem%{?_isa}
-Provides: php-sysvshm, php-sysvshm%{?_isa}
-Provides: php-sysvmsg, php-sysvmsg%{?_isa}
+License:        PHP
+Requires:       php-common%{?_isa} = %{version}-%{release}
+Provides:       php-posix
+Provides:       php-posix%{?_isa}
+Provides:       php-shmop
+Provides:       php-shmop%{?_isa}
+Provides:       php-sysvsem
+Provides:       php-sysvsem%{?_isa}
+Provides:       php-sysvshm
+Provides:       php-sysvshm%{?_isa}
+Provides:       php-sysvmsg
+Provides:       php-sysvmsg%{?_isa}
 
 %description process
 The php-process package contains dynamic shared objects which add
@@ -421,14 +436,15 @@ support to PHP using system interfaces for inter-process
 communication.
 
 %package odbc
-Summary: A module for PHP applications that use ODBC databases
+Summary:        A module for PHP applications that use ODBC databases
 # All files licensed under PHP version 3.01, except
 # pdo_odbc is licensed under PHP version 3.0
-License: PHP
-Requires: php-pdo%{?_isa} = %{version}-%{release}
-Provides: php_database
-Provides: php-pdo_odbc, php-pdo_odbc%{?_isa}
-BuildRequires: unixODBC-devel
+License:        PHP
+BuildRequires:  unixODBC-devel
+Requires:       php-pdo%{?_isa} = %{version}-%{release}
+Provides:       php_database
+Provides:       php-pdo_odbc
+Provides:       php-pdo_odbc%{?_isa}
 
 %description odbc
 The php-odbc package contains a dynamic shared object that will add
@@ -440,26 +456,28 @@ applications, you will need to install this package and the php
 package.
 
 %package soap
-Summary: A module for PHP applications that use the SOAP protocol
+Summary:        A module for PHP applications that use the SOAP protocol
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: pkgconfig(libxml-2.0)
+License:        PHP
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(libxml-2.0)
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description soap
 The php-soap package contains a dynamic shared object that will add
 support to PHP for using the SOAP web services protocol.
 
-%if %{with firebird}
+%if %{with_firebird}
 %package pdo-firebird
-Summary: PDO driver for Interbase/Firebird databases
+Summary:        PDO driver for Interbase/Firebird databases
 # All files licensed under PHP version 3.01
-License: PHP
+License:        PHP
 # for fb_config command
 BuildRequires:  firebird-devel
-Requires: php-pdo%{?_isa} = %{version}-%{release}
-Provides: php_database
-Provides: php-pdo_firebird, php-pdo_firebird%{?_isa}
+Requires:       php-pdo%{?_isa} = %{version}-%{release}
+Provides:       php_database
+Provides:       php-pdo_firebird
+Provides:       php-pdo_firebird%{?_isa}
 
 %description pdo-firebird
 The php-pdo-firebird package contains the PDO driver for
@@ -467,11 +485,12 @@ Interbase/Firebird databases.
 %endif
 
 %package snmp
-Summary: A module for PHP applications that query SNMP-managed devices
+Summary:        A module for PHP applications that query SNMP-managed devices
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}, net-snmp
-BuildRequires: net-snmp-devel
+License:        PHP
+BuildRequires:  net-snmp-devel
+Requires:       net-snmp
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description snmp
 The php-snmp package contains a dynamic shared object that will add
@@ -480,19 +499,26 @@ scripting language. If you need SNMP support for PHP applications, you
 will need to install this package and the php package.
 
 %package xml
-Summary: A module for PHP applications which use XML
+Summary:        A module for PHP applications which use XML
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-Provides: php-dom, php-dom%{?_isa}
-Provides: php-domxml, php-domxml%{?_isa}
-Provides: php-simplexml, php-simplexml%{?_isa}
-Provides: php-xmlreader, php-xmlreader%{?_isa}
-Provides: php-xmlwriter, php-xmlwriter%{?_isa}
-Provides: php-xsl, php-xsl%{?_isa}
-BuildRequires: pkgconfig(libxslt)  >= 1.1
-BuildRequires: pkgconfig(libexslt)
-BuildRequires: pkgconfig(libxml-2.0)  >= 2.7.6
+License:        PHP
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(libexslt)
+BuildRequires:  pkgconfig(libxml-2.0) >= 2.7.6
+BuildRequires:  pkgconfig(libxslt) >= 1.1
+Requires:       php-common%{?_isa} = %{version}-%{release}
+Provides:       php-dom
+Provides:       php-dom%{?_isa}
+Provides:       php-domxml
+Provides:       php-domxml%{?_isa}
+Provides:       php-simplexml
+Provides:       php-simplexml%{?_isa}
+Provides:       php-xmlreader
+Provides:       php-xmlreader%{?_isa}
+Provides:       php-xmlwriter
+Provides:       php-xmlwriter%{?_isa}
+Provides:       php-xsl
+Provides:       php-xsl%{?_isa}
 
 %description xml
 The php-xml package contains dynamic shared objects which add support
@@ -500,93 +526,96 @@ to PHP for manipulating XML documents using the DOM tree,
 and performing XSL transformations on XML documents.
 
 %package mbstring
-Summary: A module for PHP applications which need multi-byte string handling
+Summary:        A module for PHP applications which need multi-byte string handling
 # All files licensed under PHP version 3.01, except
 # libmbfl is licensed under LGPLv2
 # ucgendat is licensed under OpenLDAP
-License: PHP and LGPLv2 and OpenLDAP
-BuildRequires: pkgconfig(oniguruma) >= 6.8
-Provides: bundled(libmbfl) = 1.3.2
-Requires: php-common%{?_isa} = %{version}-%{release}
+License:        PHP AND LGPLv2 AND OpenLDAP
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(oniguruma) >= 6.8
+Requires:       php-common%{?_isa} = %{version}-%{release}
+Provides:       bundled(libmbfl) = 1.3.2
 
 %description mbstring
 The php-mbstring package contains a dynamic shared object that will add
 support for multi-byte string handling to PHP.
 
 %package gd
-Summary: A module for PHP applications for using the gd graphics library
+Summary:        A module for PHP applications for using the gd graphics library
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: pkgconfig(gdlib) >= 2.1.1
+License:        PHP
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(gdlib) >= 2.1.1
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description gd
 The php-gd package contains a dynamic shared object that will add
 support for using the gd graphics library to PHP.
 
 %package bcmath
-Summary: A module for PHP applications for using the bcmath library
+Summary:        A module for PHP applications for using the bcmath library
 # All files licensed under PHP version 3.01, except
 # libbcmath is licensed under LGPLv2+
-License: PHP and LGPLv2+
-Requires: php-common%{?_isa} = %{version}-%{release}
+License:        PHP AND LGPLv2+
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description bcmath
 The php-bcmath package contains a dynamic shared object that will add
 support for using the bcmath library to PHP.
 
 %package gmp
-Summary: A module for PHP applications for using the GNU MP library
+Summary:        A module for PHP applications for using the GNU MP library
 # All files licensed under PHP version 3.01
-License: PHP
-BuildRequires: gmp-devel
-Requires: php-common%{?_isa} = %{version}-%{release}
+License:        PHP
+BuildRequires:  gmp-devel
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description gmp
 These functions allow you to work with arbitrary-length integers
 using the GNU MP library.
 
 %package dba
-Summary: A database abstraction layer module for PHP applications
+Summary:        A database abstraction layer module for PHP applications
 # All files licensed under PHP version 3.01
-License: PHP
-%if %{with db4}
-BuildRequires: libdb-devel
+License:        PHP
+BuildRequires:  tokyocabinet-devel
+Requires:       php-common%{?_isa} = %{version}-%{release}
+%if %{with_db4}
+BuildRequires:  libdb-devel
 %endif
-BuildRequires: tokyocabinet-devel
-%if %{with lmdb}
-BuildRequires: lmdb-devel
+%if %{with_lmdb}
+BuildRequires:  lmdb-devel
 %endif
-%if %{with qdbm}
-BuildRequires: qdbm-devel
+%if %{with_qdbm}
+BuildRequires:  qdbm-devel
 %endif
-Requires: php-common%{?_isa} = %{version}-%{release}
 
 %description dba
 The php-dba package contains a dynamic shared object that will add
 support for using the DBA database abstraction layer to PHP.
 
-%if %{with tidy}
+%if %{with_tidy}
 %package tidy
-Summary: Standard PHP module provides tidy library support
+Summary:        Standard PHP module provides tidy library support
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: libtidy-devel
+License:        PHP
+BuildRequires:  libtidy-devel
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description tidy
 The php-tidy package contains a dynamic shared object that will add
 support for using the tidy library to PHP.
 %endif
 
-%if %{with freetds}
+%if %{with_freetds}
 %package pdo-dblib
-Summary: PDO driver for Microsoft SQL Server and Sybase databases
+Summary:        PDO driver for Microsoft SQL Server and Sybase databases
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-pdo%{?_isa} = %{version}-%{release}
-BuildRequires: freetds-devel
-Provides: php-pdo_dblib, php-pdo_dblib%{?_isa}
+License:        PHP
+BuildRequires:  freetds-devel
+Requires:       php-pdo%{?_isa} = %{version}-%{release}
+Provides:       php-pdo_dblib
+Provides:       php-pdo_dblib%{?_isa}
 
 %description pdo-dblib
 The php-pdo-dblib package contains a dynamic shared object
@@ -595,23 +624,24 @@ PHP to Microsoft SQL Server and Sybase databases through the FreeTDS library.
 %endif
 
 %package embedded
-Summary: PHP library for embedding in applications
-Requires: php-common%{?_isa} = %{version}-%{release}
+Summary:        PHP library for embedding in applications
+License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
+Requires:       php-common%{?_isa} = %{version}-%{release}
 # doing a real -devel package for just the .so symlink is a bit overkill
-Provides: php-embedded-devel = %{version}-%{release}
-Provides: php-embedded-devel%{?_isa} = %{version}-%{release}
+Provides:       php-embedded-devel = %{version}-%{release}
+Provides:       php-embedded-devel%{?_isa} = %{version}-%{release}
 
 %description embedded
 The php-embedded package contains a library which can be embedded
 into applications to provide PHP scripting language support.
 
-%if %{with pspell}
+%if %{with_pspell}
 %package pspell
-Summary: A module for PHP applications for using pspell interfaces
+Summary:        A module for PHP applications for using pspell interfaces
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: aspell-devel >= 0.50.0
+License:        PHP
+BuildRequires:  aspell-devel >= 0.50.0
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description pspell
 The php-pspell package contains a dynamic shared object that will add
@@ -619,40 +649,42 @@ support for using the pspell library to PHP.
 %endif
 
 %package intl
-Summary: Internationalization extension for PHP applications
+Summary:        Internationalization extension for PHP applications
 # All files licensed under PHP version 3.01
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: pkgconfig(icu-i18n) >= 50.1
-BuildRequires: pkgconfig(icu-io)   >= 50.1
-BuildRequires: pkgconfig(icu-uc)   >= 50.1
+License:        PHP
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(icu-i18n) >= 50.1
+BuildRequires:  pkgconfig(icu-io) >= 50.1
+BuildRequires:  pkgconfig(icu-uc) >= 50.1
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description intl
 The php-intl package contains a dynamic shared object that will add
 support for using the ICU library to PHP.
 
 %package enchant
-Summary: Enchant spelling extension for PHP applications
+Summary:        Enchant spelling extension for PHP applications
 # All files licensed under PHP version 3.0
-License: PHP
-Requires: php-common%{?_isa} = %{version}-%{release}
-BuildRequires: pkgconfig(enchant-2)
+License:        PHP
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(enchant-2)
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description enchant
 The php-enchant package contains a dynamic shared object that will add
 support for using the enchant library to PHP.
 
-%if %{with sodium}
+%if %{with_sodium}
 %package sodium
-Summary: Wrapper for the Sodium cryptographic library
+Summary:        Wrapper for the Sodium cryptographic library
 # All files licensed under PHP version 3.0.1
-License: PHP
+License:        PHP
+BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(libsodium) >= 1.0.9
-
-Requires: php-common%{?_isa} = %{version}-%{release}
-Obsoletes: php-pecl-libsodium2 < 3
-Provides:  php-pecl(libsodium)         = %{version}
-Provides:  php-pecl(libsodium)%{?_isa} = %{version}
+Requires:       php-common%{?_isa} = %{version}-%{release}
+Obsoletes:      php-pecl-libsodium2 < 3
+Provides:       php-pecl(libsodium) = %{version}
+Provides:       php-pecl(libsodium)%{?_isa} = %{version}
 
 %description sodium
 The php-sodium package provides a simple,
@@ -661,12 +693,13 @@ low-level PHP extension for the libsodium cryptographic library.
 
 
 %package ffi
-Summary: Foreign Function Interface
+Summary:        Foreign Function Interface
 # All files licensed under PHP version 3.0.1
-License: PHP
-Group: System Environment/Libraries
+License:        PHP
+Group:          System Environment/Libraries
+BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(libffi)
-Requires: php-common%{?_isa} = %{version}-%{release}
+Requires:       php-common%{?_isa} = %{version}-%{release}
 
 %description ffi
 FFI is one of the features that made Python and LuaJIT very useful for fast
@@ -676,11 +709,8 @@ scripting language and therefore develop “system code” more productively.
 For PHP, FFI opens a way to write PHP extensions and bindings to C libraries
 in pure PHP.
 
-
 %prep
-%{?gpgverify:%{gpgverify} --keyring='%{SOURCE20}' --signature='%{SOURCE21}' --data='%{SOURCE0}'}
-
-%setup -q -n php-%{upver}%{?rcver}
+%setup -q
 
 %patch1 -p1 -b .mpmcheck
 %patch5 -p1 -b .includedir
@@ -690,9 +720,9 @@ in pure PHP.
 %patch41 -p1 -b .syslib
 %patch42 -p1 -b .systzdata
 %patch43 -p1 -b .headers
-%if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
+
 %patch45 -p1 -b .ldap_r
-%endif
+
 %patch47 -p1 -b .phpinfo
 
 # upstream patches
@@ -715,10 +745,10 @@ cp ext/date/lib/LICENSE.rst timelib_LICENSE
 
 # Multiple builds for multiple SAPIs
 mkdir build-cgi build-embedded \
-%if %{with modphp}
-    build-apache \
-%endif
-%if %{with zts}
+#%if %{with_modphp}
+#    build-apache \
+#%endif
+%if %{with_zts}
     build-zts build-ztscli \
 %endif
     build-fpm
@@ -793,9 +823,9 @@ cp %{SOURCE50} %{SOURCE51} %{SOURCE53} .
 %define _lto_cflags %{nil}
 
 # Set build date from https://reproducible-builds.org/specs/source-date-epoch/
-export SOURCE_DATE_EPOCH=$(date +%s -r NEWS)
+export SOURCE_DATE_EPOCH=$(date +%{s} -r NEWS)
 export PHP_UNAME=$(uname)
-export PHP_BUILD_SYSTEM=$(cat /etc/redhat-release | sed -e 's/ Beta//')
+export PHP_BUILD_SYSTEM=$(cat %{_sysconfdir}/redhat-release | sed -e 's/ Beta//')
 %if 0%{?vendor:1}
 export PHP_BUILD_PROVIDER="%{vendor}"
 %endif
@@ -810,7 +840,7 @@ cat `aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m
 touch configure.ac
 ./buildconf --force
 
-CFLAGS=$(echo $RPM_OPT_FLAGS -fno-strict-aliasing -Wno-pointer-sign | sed 's/-mstackrealign//')
+CFLAGS=$(echo %{optflags} -fno-strict-aliasing -Wno-pointer-sign | sed 's/-mstackrealign//')
 export CFLAGS
 
 # Install extension modules in %%{_libdir}/php/modules.
@@ -840,7 +870,7 @@ ln -sf ../configure
 %configure \
     --enable-rtld-now \
     --cache-file=../config.cache \
-    --with-libdir=%{_lib} \
+    --with-libdir=/lib \
     --with-config-file-path=%{_sysconfdir} \
     --with-config-file-scan-dir=%{_sysconfdir}/php.d \
     --disable-debug \
@@ -881,7 +911,7 @@ build --libdir=%{_libdir}/php \
       --enable-pcntl \
       --enable-opcache \
       --enable-phpdbg \
-%if %{with imap}
+%if %{with_imap}
       --with-imap=shared --with-imap-ssl \
 %endif
       --enable-mbstring=shared \
@@ -894,14 +924,14 @@ build --libdir=%{_libdir}/php \
       --with-bz2=shared \
       --enable-ctype=shared \
       --enable-dba=shared \
-%if %{with db4}
+%if %{with_db4}
                           --with-db4=%{_prefix} \
 %endif
                           --with-tcadb=%{_prefix} \
-%if %{with lmdb}
+%if %{with_lmdb}
                           --with-lmdb=%{_prefix} \
 %endif
-%if %{with qdbm}
+%if %{with_qdbm}
                           --with-qdbm=%{_prefix} \
 %endif
       --enable-exif=shared \
@@ -914,7 +944,7 @@ build --libdir=%{_libdir}/php \
       --enable-mysqlnd=shared \
       --with-mysqli=shared,mysqlnd \
       --with-mysql-sock=%{mysql_sock} \
-%if %{with firebird}
+%if %{with_firebird}
       --with-pdo-firebird=shared \
 %endif
       --enable-dom=shared \
@@ -931,17 +961,17 @@ build --libdir=%{_libdir}/php \
       --with-pdo-mysql=shared,mysqlnd \
       --with-pdo-pgsql=shared,%{_prefix} \
       --with-pdo-sqlite=shared \
-%if %{with freetds}
+%if %{with_freetds}
       --with-pdo-dblib=shared,%{_prefix} \
 %endif
       --with-sqlite3=shared \
       --without-readline \
       --with-libedit \
-%if %{with pspell}
+%if %{with_pspell}
       --with-pspell=shared \
 %endif
       --enable-phar=shared \
-%if %{with tidy}
+%if %{with_tidy}
       --with-tidy=shared,%{_prefix} \
 %endif
       --enable-sysvmsg=shared --enable-sysvshm=shared --enable-sysvsem=shared \
@@ -950,7 +980,7 @@ build --libdir=%{_libdir}/php \
       --with-unixODBC=shared,%{_prefix} \
       --enable-fileinfo=shared \
       --with-ffi=shared \
-%if %{with sodium}
+%if %{with_sodium}
       --with-sodium=shared \
 %else
       --without-sodium \
@@ -974,16 +1004,17 @@ without_shared="--without-gd \
       --disable-shmop --disable-sockets --disable-tokenizer \
       --disable-sysvmsg --disable-sysvshm --disable-sysvsem"
 
-%if %{with modphp}
+#%if %{with_modphp}
 # Build Apache module, and the CLI SAPI, /usr/bin/php
-pushd build-apache
-build --with-apxs2=%{_httpd_apxs} \
-      --libdir=%{_libdir}/php \
-      --without-mysqli \
-      --disable-pdo \
-      ${without_shared}
-popd
-%endif
+#pushd build-apache
+#build --with-apxs2=%{_bindir}/apxs \
+#      --with-apu=%{_bindir}/apu-1-config \
+#      --libdir=%{_libdir}/php \
+#      --without-mysqli \
+#      --disable-pdo \
+#      ${without_shared}
+#popd
+#%endif
 
 # Build php-fpm
 pushd build-fpm
@@ -1004,7 +1035,7 @@ build --enable-embed \
       ${without_shared}
 popd
 
-%if %{with zts}
+%if %{with_zts}
 # Build a special thread-safe (mainly for modules)
 pushd build-ztscli
 
@@ -1017,7 +1048,7 @@ build --includedir=%{_includedir}/php-zts \
       --with-config-file-scan-dir=%{_sysconfdir}/php-zts.d \
       --enable-pcntl \
       --enable-opcache \
-%if %{with imap}
+%if %{with_imap}
       --with-imap=shared --with-imap-ssl \
 %endif
       --enable-mbstring=shared \
@@ -1030,14 +1061,14 @@ build --includedir=%{_includedir}/php-zts \
       --with-bz2=shared \
       --enable-ctype=shared \
       --enable-dba=shared \
-%if %{with db4}
+%if %{with_db4}
                           --with-db4=%{_prefix} \
 %endif
                           --with-tcadb=%{_prefix} \
-%if %{with lmdb}
+%if %{with_lmdb}
                           --with-lmdb=%{_prefix} \
 %endif
-%if %{with qdbm}
+%if %{with_qdbm}
                           --with-qdbm=%{_prefix} \
 %endif
       --with-gettext=shared \
@@ -1051,7 +1082,7 @@ build --includedir=%{_includedir}/php-zts \
       --with-mysqli=shared,mysqlnd \
       --with-mysql-sock=%{mysql_sock} \
       --enable-mysqlnd-threading \
-%if %{with firebird}
+%if %{with_firebird}
       --with-pdo-firebird=shared \
 %endif
       --enable-dom=shared \
@@ -1068,17 +1099,17 @@ build --includedir=%{_includedir}/php-zts \
       --with-pdo-mysql=shared,mysqlnd \
       --with-pdo-pgsql=shared,%{_prefix} \
       --with-pdo-sqlite=shared \
-%if %{with freetds}
+%if %{with_freetds}
       --with-pdo-dblib=shared,%{_prefix} \
 %endif
       --with-sqlite3=shared \
       --without-readline \
       --with-libedit \
-%if %{with pspell}
+%if %{with_pspell}
       --with-pspell=shared \
 %endif
       --enable-phar=shared \
-%if %{with tidy}
+%if %{with_tidy}
       --with-tidy=shared,%{_prefix} \
 %endif
       --enable-sysvmsg=shared --enable-sysvshm=shared --enable-sysvsem=shared \
@@ -1087,7 +1118,7 @@ build --includedir=%{_includedir}/php-zts \
       --with-unixODBC=shared,%{_prefix} \
       --enable-fileinfo=shared \
       --with-ffi=shared \
-%if %{with sodium}
+%if %{with_sodium}
       --with-sodium=shared \
 %else
       --without-sodium \
@@ -1103,12 +1134,12 @@ popd
 
 %check
 : Ensure proper NTS/ZTS build
-$RPM_BUILD_ROOT%{_bindir}/php     -n -v | grep NTS
-%if %{with zts}
-$RPM_BUILD_ROOT%{_bindir}/zts-php -n -v | grep ZTS
+%{buildroot}%{_bindir}/php     -n -v | grep NTS
+%if %{with_zts}
+%{buildroot}%{_bindir}/zts-php -n -v | grep ZTS
 %endif
 
-%if %runselftest
+%if %{runselftest}
 cd build-fpm
 
 # Run tests, using the CLI SAPI
@@ -1133,94 +1164,94 @@ unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %endif
 
 %install
-%if %{with zts}
+%if %{with_zts}
 # Install the extensions for the ZTS version
 make -C build-ztscli install \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
+     INSTALL_ROOT=%{buildroot}
 %endif
 
 # Install the version for embedded script language in applications + php_embed.h
 make -C build-embedded install-sapi install-headers \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
+     INSTALL_ROOT=%{buildroot}
 
 # Install the php-fpm binary
 make -C build-fpm install-fpm \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
+     INSTALL_ROOT=%{buildroot}
 
 # Install everything from the CGI SAPI build
 make -C build-cgi install \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
+     INSTALL_ROOT=%{buildroot}
 
 # Use php-config from embed SAPI to reduce used libs
-install -m 755 build-embedded/scripts/php-config $RPM_BUILD_ROOT%{_bindir}/php-config
+install -m 755 build-embedded/scripts/php-config %{buildroot}%{_bindir}/php-config
 
 # Install the default configuration file
-install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/
-install -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+install -m 755 -d %{buildroot}%{_sysconfdir}/
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/php.ini
 
 # For third-party packaging:
-install -m 755 -d $RPM_BUILD_ROOT%{_datadir}/php/preload
+install -m 755 -d %{buildroot}%{_datadir}/php/preload
 
-%if %{with modphp}
+#%if %{with_modphp}
 # install the DSO
-install -m 755 -d $RPM_BUILD_ROOT%{_httpd_moddir}
-install -m 755 build-apache/libs/libphp.so $RPM_BUILD_ROOT%{_httpd_moddir}
-%endif
+#install -m 755 -d $RPM_BUILD_ROOT%{_httpd_moddir}
+#install -m 755 build-apache/libs/libphp.so $RPM_BUILD_ROOT%{_httpd_moddir}
+#%endif
 
 # Apache config fragment
 # Dual config file with httpd >= 2.4 (fedora >= 18)
-%if %{with modphp}
-install -D -m 644 %{SOURCE9} $RPM_BUILD_ROOT%{_httpd_modconfdir}/20-php.conf
-%endif
-install -D -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_httpd_confdir}/php.conf
+#%if %{with_modphp}
+#install -D -m 644 %{SOURCE9} $RPM_BUILD_ROOT%{_httpd_modconfdir}/20-php.conf
+#%endif
+install -D -m 644 %{SOURCE1} %{buildroot}%{_httpd_confdir}/php.conf
 
-install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/php.d
-%if %{with zts}
-install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/php-zts.d
+install -m 755 -d %{buildroot}%{_sysconfdir}/php.d
+%if %{with_zts}
+install -m 755 -d %{buildroot}%{_sysconfdir}/php-zts.d
 %endif
-install -m 755 -d $RPM_BUILD_ROOT%{_sharedstatedir}/php
-install -m 755 -d $RPM_BUILD_ROOT%{_sharedstatedir}/php/peclxml
-install -m 700 -d $RPM_BUILD_ROOT%{_sharedstatedir}/php/session
-install -m 700 -d $RPM_BUILD_ROOT%{_sharedstatedir}/php/wsdlcache
-install -m 700 -d $RPM_BUILD_ROOT%{_sharedstatedir}/php/opcache
+install -m 755 -d %{buildroot}%{_sharedstatedir}/php
+install -m 755 -d %{buildroot}%{_sharedstatedir}/php/peclxml
+install -m 700 -d %{buildroot}%{_sharedstatedir}/php/session
+install -m 700 -d %{buildroot}%{_sharedstatedir}/php/wsdlcache
+install -m 700 -d %{buildroot}%{_sharedstatedir}/php/opcache
 
-install -m 755 -d $RPM_BUILD_ROOT%{_docdir}/pecl
-install -m 755 -d $RPM_BUILD_ROOT%{_datadir}/tests/pecl
+install -m 755 -d %{buildroot}%{_docdir}/pecl
+install -m 755 -d %{buildroot}%{_datadir}/tests/pecl
 
 # PHP-FPM stuff
 # Log
-install -m 755 -d $RPM_BUILD_ROOT%{_localstatedir}/log/php-fpm
-install -m 755 -d $RPM_BUILD_ROOT/run/php-fpm
+install -m 755 -d %{buildroot}%{_localstatedir}/log/php-fpm
+install -m 755 -d %{buildroot}/run/php-fpm
 # Config
-install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.d
-install -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf
-install -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.d/www.conf
-mv $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf.default .
-mv $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.d/www.conf.default .
+install -m 755 -d %{buildroot}%{_sysconfdir}/php-fpm.d
+install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/php-fpm.conf
+install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/php-fpm.d/www.conf
+mv %{buildroot}%{_sysconfdir}/php-fpm.conf.default .
+mv %{buildroot}%{_sysconfdir}/php-fpm.d/www.conf.default .
 # install systemd unit files and scripts for handling server startup
-install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/php-fpm.service.d
-install -Dm 644 %{SOURCE6}  $RPM_BUILD_ROOT%{_unitdir}/php-fpm.service
-install -Dm 644 %{SOURCE12} $RPM_BUILD_ROOT%{_unitdir}/httpd.service.d/php-fpm.conf
-install -Dm 644 %{SOURCE12} $RPM_BUILD_ROOT%{_unitdir}/nginx.service.d/php-fpm.conf
+install -m 755 -d %{buildroot}%{_sysconfdir}/systemd/system/php-fpm.service.d
+install -Dm 644 %{SOURCE6}  %{buildroot}%{_unitdir}/php-fpm.service
+install -Dm 644 %{SOURCE12} %{buildroot}%{_unitdir}/httpd.service.d/php-fpm.conf
+install -Dm 644 %{SOURCE12} %{buildroot}%{_unitdir}/nginx.service.d/php-fpm.conf
 # LogRotate
-install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/php-fpm
+install -m 755 -d %{buildroot}%{_sysconfdir}/logrotate.d
+install -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/php-fpm
 # Nginx configuration
-install -D -m 644 %{SOURCE13} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/conf.d/php-fpm.conf
-install -D -m 644 %{SOURCE14} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/default.d/php.conf
+install -D -m 644 %{SOURCE13} %{buildroot}%{_sysconfdir}/nginx/conf.d/php-fpm.conf
+install -D -m 644 %{SOURCE14} %{buildroot}%{_sysconfdir}/nginx/default.d/php.conf
 
-TESTCMD="$RPM_BUILD_ROOT%{_bindir}/php --no-php-ini"
+TESTCMD="%{buildroot}%{_bindir}/php --no-php-ini"
 # Ensure all provided extensions are really there
 for mod in core date filter hash libxml openssl pcntl pcre readline reflection session spl standard zlib
 do
      $TESTCMD --modules | grep -qi $mod
 done
 
-TESTCMD="$TESTCMD --define extension_dir=$RPM_BUILD_ROOT%{_libdir}/php/modules"
+TESTCMD="$TESTCMD --define extension_dir=%{buildroot}%{_libdir}/php/modules"
 
 # Generate files lists and stub .ini files for each subpackage
 for mod in pgsql odbc ldap snmp \
-%if %{with imap}
+%if %{with_imap}
     imap \
 %endif
     mysqlnd mysqli \
@@ -1230,22 +1261,22 @@ for mod in pgsql odbc ldap snmp \
     sqlite3 \
     enchant phar fileinfo intl \
     ffi \
-%if %{with tidy}
+%if %{with_tidy}
     tidy \
 %endif
-%if %{with pspell}
+%if %{with_pspell}
     pspell \
 %endif
     curl \
-%if %{with sodium}
+%if %{with_sodium}
     sodium \
 %endif
     posix shmop sysvshm sysvsem sysvmsg xml \
     pdo pdo_mysql pdo pdo_pgsql pdo_odbc pdo_sqlite \
-%if %{with firebird}
+%if %{with_firebird}
     pdo_firebird \
 %endif
-%if %{with freetds}
+%if %{with_freetds}
     pdo_dblib \
 %endif
     xmlreader xmlwriter
@@ -1269,17 +1300,17 @@ do
 
     # some extensions have their own config file
     if [ -f ${ini} ]; then
-      cp -p ${ini} $RPM_BUILD_ROOT%{_sysconfdir}/php.d/${ini}
-%if %{with zts}
-      cp -p ${ini} $RPM_BUILD_ROOT%{_sysconfdir}/php-zts.d/${ini}
+      cp -p ${ini} %{buildroot}%{_sysconfdir}/php.d/${ini}
+%if %{with_zts}
+      cp -p ${ini} %{buildroot}%{_sysconfdir}/php-zts.d/${ini}
 %endif
     else
-      cat > $RPM_BUILD_ROOT%{_sysconfdir}/php.d/${ini} <<EOF
+      cat > %{buildroot}%{_sysconfdir}/php.d/${ini} <<EOF
 ; Enable ${mod} extension module
 extension=${mod}
 EOF
-%if %{with zts}
-      cat > $RPM_BUILD_ROOT%{_sysconfdir}/php-zts.d/${ini} <<EOF
+%if %{with_zts}
+      cat > %{buildroot}%{_sysconfdir}/php-zts.d/${ini} <<EOF
 ; Enable ${mod} extension module
 extension=${mod}
 EOF
@@ -1288,7 +1319,7 @@ EOF
     cat > files.${mod} <<EOF
 %{_libdir}/php/modules/${mod}.so
 %config(noreplace) %{_sysconfdir}/php.d/${ini}
-%if %{with zts}
+%if %{with_zts}
 %{_libdir}/php-zts/modules/${mod}.so
 %config(noreplace) %{_sysconfdir}/php-zts.d/${ini}
 %endif
@@ -1323,34 +1354,34 @@ cat files.curl files.phar files.fileinfo \
     files.tokenizer > files.common
 
 # The default Zend OPcache blacklist file
-install -m 644 %{SOURCE51} $RPM_BUILD_ROOT%{_sysconfdir}/php.d/opcache-default.blacklist
-%if %{with zts}
-install -m 644 %{SOURCE51} $RPM_BUILD_ROOT%{_sysconfdir}/php-zts.d/opcache-default.blacklist
+install -m 644 %{SOURCE51} %{buildroot}%{_sysconfdir}/php.d/opcache-default.blacklist
+%if %{with_zts}
+install -m 644 %{SOURCE51} %{buildroot}%{_sysconfdir}/php-zts.d/opcache-default.blacklist
 sed -e '/blacklist_filename/s/php.d/php-zts.d/' \
-    -i $RPM_BUILD_ROOT%{_sysconfdir}/php-zts.d/10-opcache.ini
+    -i %{buildroot}%{_sysconfdir}/php-zts.d/10-opcache.ini
 %endif
 
 # Install the macros file:
 sed -e "s/@PHP_APIVER@/%{apiver}-%{__isa_bits}/" \
     -e "s/@PHP_ZENDVER@/%{zendver}-%{__isa_bits}/" \
     -e "s/@PHP_PDOVER@/%{pdover}-%{__isa_bits}/" \
-    -e "s/@PHP_VERSION@/%{upver}/" \
-%if ! %{with zts}
+    -e "s/@PHP_VERSION@/%{version}/" \
+%if ! %{with_zts}
     -e "/zts/d" \
 %endif
     < %{SOURCE3} > macros.php
 install -m 644 -D macros.php \
-           $RPM_BUILD_ROOT%{_rpmmacrodir}/macros.php
+           %{buildroot}%{_rpmmacrodir}/macros.php
 
 # Remove unpackaged files
-rm -rf $RPM_BUILD_ROOT%{_libdir}/php/modules/*.a \
-       $RPM_BUILD_ROOT%{_libdir}/php-zts/modules/*.a \
-       $RPM_BUILD_ROOT%{_bindir}/{phptar} \
-       $RPM_BUILD_ROOT%{_datadir}/pear \
-       $RPM_BUILD_ROOT%{_bindir}/zts-phar* \
-       $RPM_BUILD_ROOT%{_mandir}/man1/zts-phar* \
-       $RPM_BUILD_ROOT%{_libdir}/libphp.a \
-       $RPM_BUILD_ROOT%{_libdir}/libphp.la
+rm -rf %{buildroot}%{_libdir}/php/modules/*.a \
+       %{buildroot}%{_libdir}/php-zts/modules/*.a \
+       %{buildroot}%{_bindir}/{phptar} \
+       %{buildroot}%{_datadir}/pear \
+       %{buildroot}%{_bindir}/zts-phar* \
+       %{buildroot}%{_mandir}/man1/zts-phar* \
+       %{buildroot}%{_libdir}/libphp.a \
+       %{buildroot}%{_libdir}/libphp.la
 
 # Remove irrelevant docs
 rm -f README.{Zeus,QNX,CVS-RULES}
@@ -1366,16 +1397,15 @@ rm -f README.{Zeus,QNX,CVS-RULES}
 %transfiletriggerin fpm -- %{_sysconfdir}/php-fpm.d %{_sysconfdir}/php.d
 systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
-
 %files
-%if %{with modphp}
-%{_httpd_moddir}/libphp.so
-%config(noreplace) %{_httpd_modconfdir}/20-php.conf
-%attr(0770,root,apache) %dir %{_sharedstatedir}/php/session
-%attr(0770,root,apache) %dir %{_sharedstatedir}/php/wsdlcache
-%attr(0770,root,apache) %dir %{_sharedstatedir}/php/opcache
-%config(noreplace) %{_httpd_confdir}/php.conf
-%endif
+#%if %{with_modphp}
+#%{_httpd_moddir}/libphp.so
+#%config(noreplace) %{_httpd_modconfdir}/20-php.conf
+#%attr(0770,root,apache) %dir %{_sharedstatedir}/php/session
+#%attr(0770,root,apache) %dir %{_sharedstatedir}/php/wsdlcache
+#%attr(0770,root,apache) %dir %{_sharedstatedir}/php/opcache
+#%config(noreplace) %{_httpd_confdir}/php.conf
+#%endif
 
 %files common -f files.common
 %doc EXTENSIONS NEWS UPGRADING* README.REDIST.BINS *md docs
@@ -1387,7 +1417,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_sysconfdir}/php.d
 %dir %{_libdir}/php
 %dir %{_libdir}/php/modules
-%if %{with zts}
+%if %{with_zts}
 %dir %{_sysconfdir}/php-zts.d
 %dir %{_libdir}/php-zts
 %dir %{_libdir}/php-zts/modules
@@ -1401,7 +1431,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 %files cli
 %{_bindir}/php
-%if %{with zts}
+%if %{with_zts}
 %{_bindir}/zts-php
 %{_mandir}/man1/zts-php.1*
 %endif
@@ -1420,7 +1450,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %doc sapi/phpdbg/CREDITS
 %{_bindir}/phpdbg
 %{_mandir}/man1/phpdbg.1*
-%if %{with zts}
+%if %{with_zts}
 %{_bindir}/zts-phpdbg
 %{_mandir}/man1/zts-phpdbg.1*
 %endif
@@ -1454,7 +1484,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %{_bindir}/php-config
 %{_includedir}/php
 %{_libdir}/php/build
-%if %{with zts}
+%if %{with_zts}
 %{_bindir}/zts-php-config
 %{_bindir}/zts-phpize
 %{_includedir}/php-zts
@@ -1470,49 +1500,67 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %{_libdir}/libphp-%{embed_version}.so
 
 %files pgsql -f files.pgsql
+
 %files odbc -f files.odbc
-%if %{with imap}
+%if %{with_imap}
 %files imap -f files.imap
 %endif
+
 %files ldap -f files.ldap
+
 %files snmp -f files.snmp
+
 %files xml -f files.xml
+
 %files mbstring -f files.mbstring
 %license libmbfl_LICENSE
+
 %files gd -f files.gd
+
 %files soap -f files.soap
+
 %files bcmath -f files.bcmath
 %license libbcmath_LICENSE
+
 %files gmp -f files.gmp
+
 %files dba -f files.dba
+
 %files pdo -f files.pdo
-%if %{with tidy}
+%if %{with_tidy}
 %files tidy -f files.tidy
 %endif
-%if %{with freetds}
+
+%if %{with_freetds}
 %files pdo-dblib -f files.pdo_dblib
 %endif
-%if %{with pspell}
+
+%if %{with_pspell}
 %files pspell -f files.pspell
 %endif
+
 %files intl -f files.intl
+
 %files process -f files.process
-%if %{with firebird}
+%if %{with_firebird}
 %files pdo-firebird -f files.pdo_firebird
 %endif
+
 %files enchant -f files.enchant
+
 %files mysqlnd -f files.mysqlnd
+
 %files opcache -f files.opcache
 %config(noreplace) %{_sysconfdir}/php.d/opcache-default.blacklist
-%if %{with zts}
+%if %{with_zts}
 %config(noreplace) %{_sysconfdir}/php-zts.d/opcache-default.blacklist
 %endif
-%if %{with sodium}
+%if %{with_sodium}
 %files sodium -f files.sodium
 %endif
+
 %files ffi -f files.ffi
 %dir %{_datadir}/php/preload
-
 
 %changelog
 * Wed Sep 28 2022 Remi Collet <remi@remirepo.net> - 8.1.11-1
