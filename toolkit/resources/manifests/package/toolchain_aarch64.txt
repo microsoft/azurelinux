@@ -408,11 +408,11 @@ texinfo-6.5-7.cm1.aarch64.rpm
 texinfo-debuginfo-6.5-7.cm1.aarch64.rpm
 unzip-6.0-18.cm1.aarch64.rpm
 unzip-debuginfo-6.0-18.cm1.aarch64.rpm
-util-linux-2.34.4-5.cm1.aarch64.rpm
-util-linux-debuginfo-2.34.4-5.cm1.aarch64.rpm
-util-linux-devel-2.34.4-5.cm1.aarch64.rpm
-util-linux-lang-2.34.4-5.cm1.aarch64.rpm
-util-linux-libs-2.34.4-5.cm1.aarch64.rpm
+util-linux-2.37.4-5.cm1.aarch64.rpm
+util-linux-debuginfo-2.37.4-5.cm1.aarch64.rpm
+util-linux-devel-2.37.4-5.cm1.aarch64.rpm
+util-linux-lang-2.37.4-5.cm1.aarch64.rpm
+util-linux-libs-2.37.4-5.cm1.aarch64.rpm
 veritysetup-2.3.3-2.cm1.aarch64.rpm
 wget-1.21.2-1.cm1.aarch64.rpm
 wget-debuginfo-1.21.2-1.cm1.aarch64.rpm

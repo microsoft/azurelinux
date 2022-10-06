@@ -969,12 +969,12 @@ popd
 rm -rf procps-ng-3.3.15
 touch /logs/status_procpsng_complete
 
-echo util-linux-2.34.4
-tar xf util-linux-2.34.4.tar.xz
-pushd util-linux-2.34.4
+echo util-linux-2.37.4
+tar xf util-linux-2.37.4.tar.xz
+pushd util-linux-2.37.4
 mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
-            --docdir=/usr/share/doc/util-linux-2.34.4 \
+            --docdir=/usr/share/doc/util-linux-2.37.4 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -989,7 +989,7 @@ mkdir -pv /var/lib/hwclock
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.34.4
+rm -rf util-linux-2.37.4
 touch /logs/status_util-linux_complete
 
 #
