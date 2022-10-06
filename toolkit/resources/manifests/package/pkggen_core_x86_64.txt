@@ -60,9 +60,9 @@ gzip-1.12-1.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
 mariner-release-1.0-46.cm1.noarch.rpm
 patch-2.7.6-7.cm1.x86_64.rpm
-util-linux-2.32.1-7.cm1.x86_64.rpm
-util-linux-devel-2.32.1-7.cm1.x86_64.rpm
-util-linux-libs-2.32.1-7.cm1.x86_64.rpm
+util-linux-2.34.4-5.cm1.x86_64.rpm
+util-linux-devel-2.34.4-5.cm1.x86_64.rpm
+util-linux-libs-2.34.4-5.cm1.x86_64.rpm
 tar-1.32-2.cm1.x86_64.rpm
 xz-5.2.4-3.cm1.x86_64.rpm
 xz-devel-5.2.4-3.cm1.x86_64.rpm

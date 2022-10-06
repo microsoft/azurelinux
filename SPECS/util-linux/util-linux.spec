@@ -146,6 +146,11 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Thu Oct 06 2022 Bala <balakumaran.kannan@microsoft.com> - 2.37.4-5
+- Port to 1.0-dev from main
+- Build without audit support
+- Avoid CVE-2021-3995 found in older versions
+
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 2.37.4-4
 - Modify su to improve security
 - Change file permission on mount and umount to improve security
