@@ -29,7 +29,7 @@ disk encryption using dm-crypt kernel module.
 Summary:        Headers and libraries for using encrypted file systems
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkgconfig
+Requires:       pkg-config
 Provides:       cryptsetup-luks-devel = %{version}-%{release}
 
 %description devel
@@ -120,7 +120,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc docs/examples/*
 %{_includedir}/libcryptsetup.h
 %{_libdir}/libcryptsetup.so
-%{_libdir}/pkgconfig/libcryptsetup.pc
+%{_libdir}/pkg-config/libcryptsetup.pc
 
 %files libs -f cryptsetup.lang
 %{!?_licensedir:%global license %%doc}
@@ -136,6 +136,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Thu Oct 06 2022 Bala <balakumaran.kannan@microsoft.com> - 2.3.7-1
 - Upgrade to version 2.7.7 to fix CVE-2021-4122
+- Rename pkgconfig to pkg-config
 
 * Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.3.3-2
 - Fix Source0 URL.
