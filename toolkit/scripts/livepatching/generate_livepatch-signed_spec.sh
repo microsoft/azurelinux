@@ -21,9 +21,15 @@ then
     exit 1
 fi
 
+if ! grep -qP "Patch.*:.*CVE.*\.patch$" "$LIVEPATCH_SPEC_PATH"
+then
+    echo "Spec ($LIVEPATCH_SPEC_PATH) doesn't build any patch modules. Skipping signed spec generation."
+    exit 0
+fi
+
 echo "Generating signed spec for ($LIVEPATCH_SPEC_PATH)."
 
-KERNEL_VERSION_RELEASE="$(grep -oP "(?<=kernel_version_release ).*" "$LIVEPATCH_SPEC_PATH")"
+KERNEL_VERSION_RELEASE="$(grep -oP "(?<=define kernel_version_release ).*" "$LIVEPATCH_SPEC_PATH")"
 
 DESCRIPTION="$(spec_query_srpm "$LIVEPATCH_SPEC_PATH" "%{DESCRIPTION}\n")"
 
@@ -39,7 +45,8 @@ declare -A TEMPLATE_PLACEHOLDERS=(
     ["@CHANGELOG@"]="$CHANGELOG"
 )
 
-LIVEPATCH_SIGNED_SPEC_PATH="$REPO_ROOT/SPECS-SIGNED/livepatch-signed/livepatch-signed-$KERNEL_VERSION_RELEASE.spec"
+LIVEPATCH_SIGNED_NAME="livepatch-$KERNEL_VERSION_RELEASE-signed"
+LIVEPATCH_SIGNED_SPEC_PATH="$REPO_ROOT/SPECS-SIGNED/$LIVEPATCH_SIGNED_NAME/$LIVEPATCH_SIGNED_NAME.spec"
 create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch-signed.spec" "$LIVEPATCH_SIGNED_SPEC_PATH" TEMPLATE_PLACEHOLDERS
 
 # Cgmanifest.json update skipped - already handled by the unsigned version.

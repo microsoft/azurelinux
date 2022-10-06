@@ -11,7 +11,7 @@ echo "Updating livepatch specs."
 
 "$SCRIPT_FOLDER"/generate_livepatch_spec.sh
 
-for livepatch_spec in "$SPECS_DIR/livepatch/"livepatch-*.spec
+for livepatch_spec in "$SPECS_DIR"/livepatch-*/*.spec
 do
     "$SCRIPT_FOLDER"/generate_livepatch-signed_spec.sh "$livepatch_spec"
 done
