@@ -26897,8 +26897,8 @@
         "type": "other",
         "other": {
           "name": "wayland",
-          "version": "1.20.0",
-          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-1.20.0.tar.xz"
+          "version": "1.21.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.21.0/downloads/wayland-1.21.0.tar.xz"
         }
       }
     },
