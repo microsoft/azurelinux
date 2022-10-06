@@ -4,7 +4,6 @@
 %define __os_install_post %{nil}
 
 %define _use_internal_dependency_generator 0
-%global _unpackaged_files_terminate_build 0
 
 # Globals which should be in a macro file.
 # These should be set programatically in the future.
@@ -239,7 +238,7 @@ cd ../gcc-%{version}
 %license COPYING-mpfr
 %license COPYING-gmp
 %license COPYING.LESSER-mpc
-# %%exclude /opt/cross/aarch64-mariner-linux-gnu/share/man/man1/aarch64-mariner-linux-gnu-lto-dump.1
+%exclude /opt/cross/aarch64-mariner-linux-gnu/share/man/man1/aarch64-mariner-linux-gnu-lto-dump.1
 #%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 #%%{_lib}/cpp
 # Executables

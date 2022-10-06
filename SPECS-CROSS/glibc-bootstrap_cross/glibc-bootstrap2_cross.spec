@@ -218,20 +218,14 @@ cd %{_builddir}/%{name}-build
             libc_cv_c_cleanup=yes \
             CXX=arch64-mariner-linux-gnu-gcc
 
-# echo "dallas 1"
-# file /usr/src/mariner/BUILD/aarch64-mariner-linux-gnu-glibc-bootstrap2-build/support/links-dso-program.o
-# rm /usr/src/mariner/BUILD/aarch64-mariner-linux-gnu-glibc-bootstrap2-build/support/links-dso-program.o
-# echo "dallas 2"
-
 make %{?_smp_mflags} DESTDIR=$TEMP_SYSROOT
-# make %{?_smp_mflags} DESTDIR=$TEMP_SYSROOT CXX=/opt/cross/aarch64-mariner-linux-gnu/bin/
 
 # Sometimes we have false "out of memory" make error
 # just rerun/continue make to workaroung it.
 #make %%{?_smp_mflags} || make %%{?_smp_mflags} || make %%{?_smp_mflags}
 
 %install
-export PATH="/opt/cross/aarch64-mariner-linux-gnu/bin":$PATH
+export PATH="%{_cross_prefix}%{_bindir}":$PATH
 cd %{_builddir}/%{name}-build
 make %{?_smp_mflags} DESTDIR="%{buildroot}%{_cross_sysroot}" install
 
@@ -357,7 +351,6 @@ cd ../glibc-%{version}
 
 #%%{_lib64dir}/*.so
 %{_cross_sysroot}/sbin/ldconfig
-# %%{_cross_sysroot}%{_sbindir}/zdump
 %{_cross_sysroot}%{_sbindir}/zic
 %{_cross_sysroot}%{_sbindir}/iconvconfig
 %{_cross_sysroot}%{_bindir}/*

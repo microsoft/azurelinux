@@ -133,7 +133,8 @@ rm -rf %{buildroot}/%{_cross_infodir}
 %{_cross_prefix}%{_bindir}/%{_tuple_name}strip
 
 %{_cross_prefix}%{_cross_libdir}/ldscripts/*
-%{_crossdir}%{_cross_libdir}/bfd-plugins/libdep.so
+#%%{_cross_prefix}%{_cross_libdir}/bfd-plugins/libdep.so
+"/opt/cross/aarch64-mariner-linux-gnu/lib/bfd-plugins/libdep.so"
 
 %{_cross_prefix}%{_mandir}/man1/%{_tuple_name}readelf.1
 %{_cross_prefix}%{_mandir}/man1/%{_tuple_name}windmc.1

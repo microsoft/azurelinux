@@ -1,7 +1,6 @@
 %global security_hardening nofortify
 %global debug_package %{nil}
 %global set_build_flags %{nil}
-%global _unpackaged_files_terminate_build 0
 
 # Globals which should be in a macro file.
 # These should be set programatically in the future.
@@ -246,7 +245,7 @@ rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
 %license COPYING-mpfr
 %license COPYING-gmp
 %license COPYING.LESSER-mpc
-# %%exclude /opt/cross/aarch64-mariner-linux-gnu/share/man/man1/aarch64-mariner-linux-gnu-lto-dump.1
+%exclude /opt/cross/aarch64-mariner-linux-gnu/share/man/man1/aarch64-mariner-linux-gnu-lto-dump.1
 #%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 #%%{_lib}/cpp
 # Executables
