@@ -2,16 +2,15 @@
 # debuginfo package for the empty main package.
 %global debug_package %{nil}
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A header-only C++11 serialization library
 Name:           cereal
 Version:        1.3.2
 Release:        1%{?dist}
-Summary:        A header-only C++11 serialization library
 License:        BSD
-Url:            https://uscilab.github.io/cereal/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://uscilab.github.io/cereal/
 Source0:        https://github.com/USCiLab/cereal/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 BuildRequires:  gcc-c++
 BuildRequires:  boost-devel
 BuildRequires:  cmake >= 3.0
@@ -40,7 +39,7 @@ This package contains development headers and libraries for the cereal library
 %setup -q
 
 %build
-%{cmake} -DSKIP_PORTABILITY_TEST=ON -DWITH_WERROR=OFF
+%cmake -DSKIP_PORTABILITY_TEST=ON -DWITH_WERROR=OFF
 %cmake_build
 
 %install
