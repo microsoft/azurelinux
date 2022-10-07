@@ -46,11 +46,11 @@ cracklib-python-2.9.7-3.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-debuginfo-0.11.1-6.cm1.aarch64.rpm
 createrepo_c-devel-0.11.1-6.cm1.aarch64.rpm
-cryptsetup-2.3.3-2.cm1.aarch64.rpm
-cryptsetup-debuginfo-2.3.3-2.cm1.aarch64.rpm
-cryptsetup-devel-2.3.3-2.cm1.aarch64.rpm
-cryptsetup-libs-2.3.3-2.cm1.aarch64.rpm
-cryptsetup-reencrypt-2.3.3-2.cm1.aarch64.rpm
+cryptsetup-2.3.7-1.cm1.aarch64.rpm
+cryptsetup-debuginfo-2.3.7-1.cm1.aarch64.rpm
+cryptsetup-devel-2.3.7-1.cm1.aarch64.rpm
+cryptsetup-libs-2.3.7-1.cm1.aarch64.rpm
+cryptsetup-reencrypt-2.3.7-1.cm1.aarch64.rpm
 curl-7.84.0-1.cm1.aarch64.rpm
 curl-debuginfo-7.84.0-1.cm1.aarch64.rpm
 curl-devel-7.84.0-1.cm1.aarch64.rpm
@@ -144,7 +144,7 @@ gtest-devel-1.11.0-1.cm1.aarch64.rpm
 gtk-doc-1.29-6.cm1.noarch.rpm
 gzip-1.12-1.cm1.aarch64.rpm
 gzip-debuginfo-1.12-1.cm1.aarch64.rpm
-integritysetup-2.3.3-2.cm1.aarch64.rpm
+integritysetup-2.3.7-1.cm1.aarch64.rpm
 intltool-0.51.0-7.cm1.noarch.rpm
 itstool-2.0.6-3.cm1.noarch.rpm
 json-c-0.14-3.cm1.aarch64.rpm
@@ -413,7 +413,7 @@ util-linux-debuginfo-2.32.1-7.cm1.aarch64.rpm
 util-linux-devel-2.32.1-7.cm1.aarch64.rpm
 util-linux-lang-2.32.1-7.cm1.aarch64.rpm
 util-linux-libs-2.32.1-7.cm1.aarch64.rpm
-veritysetup-2.3.3-2.cm1.aarch64.rpm
+veritysetup-2.3.7-1.cm1.aarch64.rpm
 wget-1.21.2-1.cm1.aarch64.rpm
 wget-debuginfo-1.21.2-1.cm1.aarch64.rpm
 which-2.21-7.cm1.aarch64.rpm
