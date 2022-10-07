@@ -135,7 +135,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Thu Oct 06 2022 Bala <balakumaran.kannan@microsoft.com> - 2.3.7-1
-- Upgrade to version 2.7.7 to fix CVE-2021-4122
+- Upgrade to version 2.3.7 to fix CVE-2021-4122
 - Rename pkgconfig to pkg-config
 
 * Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.3.3-2
