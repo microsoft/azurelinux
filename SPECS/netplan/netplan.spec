@@ -12,7 +12,7 @@
 
 
 Name:           netplan
-Version:        0.95
+Version:        0.105
 Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
@@ -25,16 +25,16 @@ Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  bash-completion-devel
-BuildRequires:  libgcc-devel
-BuildRequires:  bash-devel
-BuildRequires:  systemd-devel
-BuildRequires:  glib-devel
-BuildRequires:  libyaml-devel
-BuildRequires:  util-linux-devel
+BuildRequires:  pkgconfig(bash-completion)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  pkgconfig(systemd)
+BuildRequires:  pkgconfig(yaml-0.1)
+BuildRequires:  pkgconfig(uuid)
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  systemd-rpm-macros
 # For tests
-BuildRequires:  iproute
 BuildRequires:  python%{python3_pkgversion}-coverage
 BuildRequires:  python%{python3_pkgversion}-netifaces
 BuildRequires:  python%{python3_pkgversion}-pycodestyle
@@ -46,9 +46,9 @@ Requires:       python%{python3_pkgversion}-PyYAML
 # 'ip' command is used in netplan apply subcommand
 Requires:       iproute
 
-# netplan supports either systemd or NetworkManager as backends to configure the network
-Requires:       systemd
-Requires:       wpa_supplicant
+# Provide the package name that Ubuntu uses for it too...
+Provides:       %{ubuntu_name} = %{version}-%{release}
+Provides:       %{ubuntu_name}%{?_isa} = %{version}-%{release}
 
 %description
 netplan reads network configuration from /etc/netplan/*.yaml which are written by administrators,
@@ -76,38 +76,50 @@ sed -e "s/man8/man5/g" -i Makefile
 %build
 %make_build CFLAGS="%{optflags}"
 
-
 %install
-%make_install ROOTPREFIX=%{_prefix}
+%make_install ROOTPREFIX=%{_prefix} LIBDIR=%{_libdir} LIBEXECDIR=%{_libexecdir}
 
 # Pre-create the config directory
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
-# Invalid symlink. Make it correct symlink
-rm -r %{buildroot}%{_systemdgeneratordir}/%{name}
-ln -s %{_libdir}/netplan/generate %{buildroot}%{_systemdgeneratordir}/%{name}
+
+# Generate Netplan default renderer configuration
+cat > %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-networkd.yaml <<EOF
+network:
+  renderer: networkd
+EOF
+
+%post
+/sbin/ldconfig
+%postun
+/sbin/ldconfig
 
 %check
 make check
 
 %files
 %license COPYING
-%doc debian/changelog
 %doc %{_docdir}/%{name}/
 %{_sbindir}/%{name}
 %{_datadir}/%{name}/
-%{_unitdir}/%{name}*.service
+%{_datadir}/dbus-1/system-services/io.netplan.Netplan.service
+%{_datadir}/dbus-1/system.d/io.netplan.Netplan.conf
 %{_systemdgeneratordir}/%{name}
 %{_mandir}/man5/%{name}.5*
-%dir %attr(0755, root, root) %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/%{name}
 %{_prefix}/lib/%{name}/
 %{_datadir}/bash-completion/completions/%{name}
+%{_includedir}/%{name}/
+%{_libdir}/libnetplan.so
+%{_libdir}/libnetplan.so.*
 
 
 %changelog
-* Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.95-1
-- Initial CBL-Mariner import from Netplan source (license: GPLv3)
-- License verified
-- Update netplan to Netplan
+* Thu Aug 18 2022 Lukas Märdian <slyon@ubuntu.com> - 0.105-0
+- Update to 0.105
+
+* Sun Feb 20 2022 Neal Gompa <ngompa13@gmail.com> - 0.104-0
+- Update to 0.104
+- Resync with Fedora spec
 
 * Fri Dec 14 2018 Mathieu Trudel-Lapierre <mathieu.trudel-lapierre@canonical.com> - 0.95
 - Update to 0.95
