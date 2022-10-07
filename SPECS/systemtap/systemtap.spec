@@ -9,13 +9,13 @@
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
 Version:        4.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/System
 URL:            https://sourceware.org/systemtap/
-Source0:        https://sourceware.org/systemtap/ftp/releases/systemtap-%{version}.tar.gz
+Source0:        https://sourceware.org/systemtap/ftp/releases/%{name}-%{version}.tar.gz
 BuildRequires:  elfutils-devel
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glibc-devel
@@ -176,10 +176,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/stap-server
 mkdir -p %{buildroot}%{_sysconfdir}/stap-server/conf.d
 mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
 install -m 644 initscript/config.stap-server %{buildroot}%{_sysconfdir}/sysconfig/stap-server
-mkdir -p %{buildroot}%{_localstatedir}/log
-mkdir -p %{buildroot}%{_localstatedir}/opt/stap-server/log
-ln -sfv %{_localstatedir}/opt/stap-server/log %{buildroot}%{_localstatedir}/log/stap-server
-touch %{buildroot}%{_localstatedir}/opt/stap-server/log/log
+mkdir -p %{buildroot}%{_localstatedir}/log/stap-server
+touch %{buildroot}%{_localstatedir}/log/stap-server/log
 mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
 install -m 644 initscript/logrotate.stap-server %{buildroot}%{_sysconfdir}/logrotate.d/stap-server
 
@@ -343,15 +341,17 @@ fi
 %dir %{_sysconfdir}/stap-server
 %dir %{_sysconfdir}/stap-server/conf.d
 %config(noreplace) %{_sysconfdir}/sysconfig/stap-server
-%dir %attr(0755,stap-server,stap-server) %{_localstatedir}/opt/stap-server/log
-%attr(0755,stap-server,stap-server) %{_localstatedir}/log/stap-server
-%ghost %config %attr(0644,stap-server,stap-server) %{_localstatedir}/opt/stap-server/log/log
+%dir %attr(0755,stap-server,stap-server) %{_localstatedir}/log/stap-server
+%ghost %config(noreplace) %attr(0644,stap-server,stap-server) %{_localstatedir}/log/stap-server/log
 %{_mandir}/man7/error::*.7stap*
 %{_mandir}/man7/warning::debuginfo.7stap*
 %{_mandir}/man8/stap-server.8*
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5-2
+- Fixing default log location.
+
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.5-1
 - Update to version 4.5.
 

@@ -307,6 +307,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() {
 	im.copyAndRenamePackagesJSONs(configFilesAbsDirPath)
 	im.copyAndRenamePreInstallScripts(configFilesAbsDirPath)
 	im.copyAndRenamePostInstallScripts(configFilesAbsDirPath)
+	im.copyAndRenameFinalizeImageScripts(configFilesAbsDirPath)
 	im.copyAndRenameSSHPublicKeys(configFilesAbsDirPath)
 	im.saveConfigJSON(configFilesAbsDirPath)
 }
@@ -374,6 +375,22 @@ func (im *IsoMaker) copyAndRenamePostInstallScripts(configFilesAbsDirPath string
 			isoScriptRelativeFilePath := im.copyFileToConfigRoot(configFilesAbsDirPath, postInstallScriptsSubDirName, localScriptAbsFilePath.Path)
 
 			systemConfig.PostInstallScripts[i].Path = isoScriptRelativeFilePath
+		}
+	}
+}
+
+// copyAndRenameFinalizeImageScripts will copy all finalize-image scripts into an
+// ISO directory to make them available to the installer.
+// Each file gets placed in a separate directory to avoid potential name conflicts and
+// the config gets updated with the new ISO paths.
+func (im *IsoMaker) copyAndRenameFinalizeImageScripts(configFilesAbsDirPath string) {
+	const finalizeImageScriptsSubDirName = "finalizeimagescripts"
+
+	for _, systemConfig := range im.config.SystemConfigs {
+		for i, localScriptAbsFilePath := range systemConfig.FinalizeImageScripts {
+			isoScriptRelativeFilePath := im.copyFileToConfigRoot(configFilesAbsDirPath, finalizeImageScriptsSubDirName, localScriptAbsFilePath.Path)
+
+			systemConfig.FinalizeImageScripts[i].Path = isoScriptRelativeFilePath
 		}
 	}
 }

@@ -1,7 +1,7 @@
 Summary:        Data for network services and protocols
 Name:           iana-etc
 Version:        20211115
-Release:        1%{?dist}
+Release:        2%{?dist}
 # IANA base information is Public Domain
 # Scripts used to translate original XML data into the necessary format are MIT
 License:        MIT
@@ -15,6 +15,14 @@ BuildArch:      noarch
 
 %description
 The iana-etc package provides data for network services and protocols.
+
+%package doc
+Summary:        Original IANA XML data for %{name}
+License:        Public Domain
+Requires:       %{name} = %{version}-%{release}
+
+%description doc
+Original IANA XML data for %{name}
 
 %prep
 %autosetup
@@ -34,11 +42,16 @@ install -vm 644 services %{buildroot}%{_sysconfdir}/services
 
 %files
 %license LICENSE
-%doc protocol-numbers.xml service-names-port-numbers.xml
 %config %{_sysconfdir}/protocols
 %config %{_sysconfdir}/services
 
+%files doc
+%doc protocol-numbers.xml service-names-port-numbers.xml
+
 %changelog
+* Mon Sep 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 20211115-2
+- Separate documents into separate package to reduce base package size
+
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 20211115-1
 - Switch to new upstream source used by LFS and upgrade to latest
 - Use new release version corresponding to IANA source update dates

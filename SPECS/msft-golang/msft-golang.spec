@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           msft-golang
 Version:        1.19.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,8 +53,6 @@ export GOROOT="`pwd`"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
 rm -f  %{gopath}/src/runtime/*.c
-# Remove the explicit version once `microsoft/go#262` is resolved.
-echo 'go%{version}-1-fips' > VERSION
 pushd src
 ./make.bash --no-clean
 popd
@@ -117,6 +115,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Sat Sep 24 2022 Muhammad Falak <mwani@microsoft.com> - 1.19.1-2
+- Drop the explict VERSION in build
+
 * Thu Sep 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
 - Uograde to version to 1.19.1
 

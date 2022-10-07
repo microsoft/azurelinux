@@ -332,6 +332,7 @@ func (c *Config) convertToAbsolutePaths(baseDirPath string) {
 		convertPackageListPaths(baseDirPath, systemConfig)
 		convertPreInstallScriptsPaths(baseDirPath, systemConfig)
 		convertPostInstallScriptsPaths(baseDirPath, systemConfig)
+		convertFinalizeImageScriptsPaths(baseDirPath, systemConfig)
 		convertSSHPubKeys(baseDirPath, systemConfig)
 	}
 }
@@ -366,6 +367,12 @@ func convertPreInstallScriptsPaths(baseDirPath string, systemConfig *SystemConfi
 func convertPostInstallScriptsPaths(baseDirPath string, systemConfig *SystemConfig) {
 	for i, postInstallScript := range systemConfig.PostInstallScripts {
 		systemConfig.PostInstallScripts[i].Path = file.GetAbsPathWithBase(baseDirPath, postInstallScript.Path)
+	}
+}
+
+func convertFinalizeImageScriptsPaths(baseDirPath string, systemConfig *SystemConfig) {
+	for i, finalizeImageScript := range systemConfig.FinalizeImageScripts {
+		systemConfig.FinalizeImageScripts[i].Path = file.GetAbsPathWithBase(baseDirPath, finalizeImageScript.Path)
 	}
 }
 

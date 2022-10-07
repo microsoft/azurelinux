@@ -975,22 +975,6 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
-//InstallGrubEnv installs an empty grubenv f
-func InstallGrubEnv(installRoot string) (err error) {
-	const (
-		assetGrubEnvFile = "/installer/grub2/grubenv"
-		grubEnvFile      = "boot/grub2/grubenv"
-	)
-	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
-	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
-	if err != nil {
-		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
-		return
-	}
-
-	return
-}
-
 // InstallGrubCfg installs the main grub config to the boot partition
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
@@ -1956,6 +1940,47 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 			err = os.Remove(scriptPath)
 			if err != nil {
 				logger.Log.Errorf("Failed to cleanup post-install script (%s). Error: %s", scriptPath, err)
+			}
+
+			return err
+		})
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	const squashErrors = false
+
+	for _, script := range config.FinalizeImageScripts {
+		// Copy the script from this chroot into the install chroot before running it
+		scriptPath := script.Path
+		fileToCopy := safechroot.FileToCopy{
+			Src:  scriptPath,
+			Dest: scriptPath,
+		}
+
+		installChroot.AddFiles(fileToCopy)
+		if err != nil {
+			return
+		}
+
+		ReportActionf("Running finalize image script: %s", path.Base(script.Path))
+		logger.Log.Infof("Running finalize image script: %s", script.Path)
+		err = installChroot.UnsafeRun(func() error {
+			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", scriptPath, script.Args))
+
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(scriptPath)
+			if err != nil {
+				logger.Log.Errorf("Failed to cleanup finalize image script (%s). Error: %s", scriptPath, err)
 			}
 
 			return err

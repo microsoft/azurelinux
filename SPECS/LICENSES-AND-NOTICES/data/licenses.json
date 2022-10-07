@@ -94,6 +94,7 @@
                 "catch",
                 "catch1",
                 "celt051",
+                "cereal",
                 "certmonger",
                 "cgdcbxd",
                 "chan",
@@ -1474,11 +1475,13 @@
                 "pyparted",
                 "pyproject-rpm-macros",
                 "pyserial",
+                "python-absl-py",
                 "python-aiodns",
                 "python-aiohttp",
                 "python-alsa",
                 "python-argcomplete",
                 "python-astroid",
+                "python-astunparse",
                 "python-async-generator",
                 "python-augeas",
                 "python-azure-sdk",
@@ -1960,6 +1963,7 @@
                 "azure-storage-cpp",
                 "bazel",
                 "blobfuse",
+                "blobfuse2",
                 "bmon",
                 "bpftrace",
                 "ccache",
@@ -1972,6 +1976,7 @@
                 "coredns-1.8.0",
                 "coredns-1.8.4",
                 "coredns-1.8.6",
+                "csi-driver-lvm",
                 "dbus-x11",
                 "dcos-cli",
                 "debugedit",
@@ -2441,6 +2446,7 @@
                 "gdbm",
                 "gettext",
                 "git",
+                "git-lfs",
                 "glib",
                 "glib-networking",
                 "glibc",
@@ -2837,8 +2843,8 @@
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "k3s",
-                "k3s-1.24.3",
-                "k3s-1.23.8"
+                "k3s-1.23.8",
+                "k3s-1.24.3"
             ]
         },
         "Sysbench source": {
