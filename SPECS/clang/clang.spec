@@ -38,7 +38,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -137,6 +137,7 @@ cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
       -DLLVM_ENABLE_EH=ON \
       -DLLVM_ENABLE_RTTI=ON \
       -DCLANG_LINK_CLANG_DYLIB=ON \
+      -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
       -Wno-dev ..
 
 %make_build
@@ -215,6 +216,9 @@ make clang-check
 %{_datadir}/clang/clang-rename.py*
 
 %changelog
+* Fri 07 Oct 2022 Andy Caldwell <andycaldwell@microsoft.com> - 12.0.1-4
+- Enable `-pie` executables by default
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 12.0.1-3
 - Enable clang tools to link against libclang_shared.so
 
