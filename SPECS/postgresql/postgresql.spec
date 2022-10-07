@@ -170,7 +170,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Thu Oct 06 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 12.12-1
-- Upgrade to 12.12
+- Upgrade to 12.12 to fix CVE-2022-1552
 
 * Tue Jul 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 12.8-1
 - Update to v12.8 resolve CVE-2021-3677.
