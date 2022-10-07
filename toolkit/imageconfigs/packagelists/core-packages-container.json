@@ -1,6 +1,5 @@
 {
     "packages": [
-        "core-packages-container",
-        "php"
+        "core-packages-container"
     ]
 }
