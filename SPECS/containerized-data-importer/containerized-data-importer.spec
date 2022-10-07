@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.51.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 ExclusiveArch:  x86_64 aarch64
+Provides:       cdi = %{version}-%{release}
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
@@ -39,6 +40,7 @@ Containerized-Data-Importer (CDI) is a persistent storage management add-on for 
 %package        api
 Summary:        CDI API server
 Group:          System/Packages
+Provides:       cdi-apiserver = %{version}-%{release}
 
 %description    api
 The containerized-data-importer-api package provides the kubernetes API extension for CDI
@@ -196,6 +198,10 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 
 %changelog
+* Mon Aug 22 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-3
+- Shorthand nomenclature for containerized-data-importer (cdi)
+- Provide api as apiserver
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.51.0-2
 - Bump release to rebuild against Go 1.18.5
 

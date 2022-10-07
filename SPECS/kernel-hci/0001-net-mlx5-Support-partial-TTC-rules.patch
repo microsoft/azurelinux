@@ -1,0 +1,59 @@
+From 0e58c6a23fbf91122d0ab14eccf47e642e8f48ab Mon Sep 17 00:00:00 2001
+From: Maor Gottlieb <maorg@nvidia.com>
+Date: Sun, 4 Jul 2021 15:16:21 +0300
+Subject: [PATCH 01/22] net/mlx5: Support partial TTC rules
+
+Add bitmasks to ttc_params to indicate if rule is valid or not.
+It will allow to create TTC table with support only in part of the
+traffic types.
+In later patches which introduce the steering based LAG port selection,
+TTC will be created with only part of the rules according to the hash
+type.
+
+Signed-off-by: Maor Gottlieb <maorg@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c | 4 ++++
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.h | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+index 749d17c0057d..b63dec24747a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+@@ -247,6 +247,8 @@ static int mlx5_generate_ttc_table_rules(struct mlx5_core_dev *dev,
+ 	for (tt = 0; tt < MLX5_NUM_TT; tt++) {
+ 		struct mlx5_ttc_rule *rule = &rules[tt];
+ 
++		if (test_bit(tt, params->ignore_dests))
++			continue;
+ 		rule->rule = mlx5_generate_ttc_rule(dev, ft, &params->dests[tt],
+ 						    ttc_rules[tt].etype,
+ 						    ttc_rules[tt].proto);
+@@ -266,6 +268,8 @@ static int mlx5_generate_ttc_table_rules(struct mlx5_core_dev *dev,
+ 		if (!mlx5_tunnel_proto_supported_rx(dev,
+ 						    ttc_tunnel_rules[tt].proto))
+ 			continue;
++		if (test_bit(tt, params->ignore_tunnel_dests))
++			continue;
+ 		trules[tt] = mlx5_generate_ttc_rule(dev, ft,
+ 						    &params->tunnel_dests[tt],
+ 						    ttc_tunnel_rules[tt].etype,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.h
+index ce95be8f8382..85fef0cd1c07 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.h
+@@ -43,7 +43,9 @@ struct ttc_params {
+ 	struct mlx5_flow_namespace *ns;
+ 	struct mlx5_flow_table_attr ft_attr;
+ 	struct mlx5_flow_destination dests[MLX5_NUM_TT];
++	DECLARE_BITMAP(ignore_dests, MLX5_NUM_TT);
+ 	bool   inner_ttc;
++	DECLARE_BITMAP(ignore_tunnel_dests, MLX5_NUM_TUNNEL_TT);
+ 	struct mlx5_flow_destination tunnel_dests[MLX5_NUM_TUNNEL_TT];
+ };
+ 
+-- 
+2.25.1
+

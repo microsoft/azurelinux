@@ -2,7 +2,7 @@
 Summary:        Provide the stuff missing in List::Util
 Name:           perl-List-MoreUtils
 Version:        0.430
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
@@ -12,8 +12,14 @@ Distribution:   Mariner
 
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Exporter-Tiny
 BuildRequires:  perl-generators
+%if %{with_check}
+BuildRequires:  perl(Math::Trig)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Tie::Array)
+%endif
 
 Requires:       perl-Exporter-Tiny
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -54,6 +60,9 @@ make test
 %{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 0.430-2
+- Add BR on `perl-{(Math::Trig),(Test::More),(Tie::Array)}` to enable ptest
+
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.430-1
 - Update to 0.430
 

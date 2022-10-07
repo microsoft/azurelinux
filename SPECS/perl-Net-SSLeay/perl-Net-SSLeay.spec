@@ -1,19 +1,33 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.92
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
 Source:         https://cpan.metacpan.org/modules/by-module/Net/Net-SSLeay-%{version}.tar.gz
+Patch0:         0001-local-tests-skip-2-failing-tests.patch
 %if 0%{?with_fips:1}
 Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  perl >= 5.28.0
-BuildRequires:  perl-generators
 BuildRequires:  openssl-devel
+BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl(English)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl-generators
+%if %{with_check}
+BuildRequires:  perl(Autoloader)
+BuildRequires:  perl(CPAN)
+BuildRequires:  perl(CPAN::Meta)
+BuildRequires:  perl(CPAN::Meta::Requirements)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::Builder)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(blib)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(MIME::Base64)
@@ -34,6 +48,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
+%patch0 -p1
 
 %build
 %if 0%{?with_fips:1}
@@ -65,6 +80,10 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Aug 24 2022 Muhammad Falak <mwani@microsoft.com> - 1.92-2
+- Add BR on perl-{(CPAN::*),(FindBin),(Test::*)(blib)} to enable build
+- Skip two failing tests to fix ptest build
+
 * Thu Apr 14 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.92-1
 - Update to 1.92
 

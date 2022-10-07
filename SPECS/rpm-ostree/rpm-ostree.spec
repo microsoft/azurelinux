@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2022.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ BuildRequires:  ostree-devel
 BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-pygments
 BuildRequires:  rpm-devel
 BuildRequires:  rust
 BuildRequires:  sqlite-devel
@@ -153,6 +154,10 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2022.1-2
+- Bump package to rebuild with stable Rust compiler
+- Add missing dependency on python3-pygments (needed to build docs)
+
 * Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 2022.1-1
 - Upgrade to version 2022.1
 - Remove patches that no longer apply

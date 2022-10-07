@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -243,6 +243,7 @@ Patch5:         0002-virtiofsd-Do-not-support-blocking-flock.patch
 # acpi: fix QEMU crash when started with SLIC table
 # https://bugzilla.redhat.com/show_bug.cgi?id=2072303
 Patch6:         0001-acpi-fix-QEMU-crash-when-started-with-SLIC-table.patch
+Patch7:         0001-ebpf-replace-deprecated-bpf_program__set_socket_filt.patch
 # CVE-2022-0358 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/48302d4eb628ff0bea4d7e92cbf6b726410eb4c3
 # From https://bugzilla.redhat.com/show_bug.cgi?id=2046202
 Patch1000:      CVE-2022-0358.patch
@@ -2285,6 +2286,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-8
+- Introduce patch from upstream to fix build with libbpf 1.0.0
+
 * Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-7
 - Patched CVE-2021-4158
 

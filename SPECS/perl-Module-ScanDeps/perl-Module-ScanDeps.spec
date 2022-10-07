@@ -2,7 +2,7 @@
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
 Version:        1.31
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
@@ -11,7 +11,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-generators
+%if %{with_check}
+BuildRequires:  perl(CPAN)
+BuildRequires:  perl(CPAN::Meta)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Test::More)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B)
@@ -57,6 +64,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Aug 23 2020 Muhammad Falak <mwani@microsoft.com> - 1.31-2
+- Add BR on `perl-{(CPAN::*),(FindBin),(Test::More)}` to enable ptest
+
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.31-1
 - Update to 1.31
 

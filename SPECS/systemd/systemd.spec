@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,9 @@ Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
 Patch0:         fix-journald-audit-logging.patch
+# Can be removed once we update systemd to a version containing the following commit:
+# https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
+Patch1:         add-fsync-sysusers-passwd.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -258,6 +261,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-7
+- Add patch to fsync passwd file (systemd #24324)
+
 * Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-6
 - Change build mode from "development" (default) to "release"
 
@@ -300,7 +306,7 @@ systemctl preset-all
 
 * Wed Jul 28 2021 Henry Li <lihl@microsoft.com> - 239-40
 - Enable building systemd-sysusers
-- Ship systemd-sysusers and related conf files from systemd package 
+- Ship systemd-sysusers and related conf files from systemd package
 
 * Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch

@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        14.2
-Release:        2%{?dist}
+Version:        14.5
+Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -172,6 +172,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Wed Sep 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.5-1
+- Upgrade to 14.5
+
 * Fri Apr 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 14.2-2
 - Add provides, obsoletes for libpq and libpq-devel packages
 

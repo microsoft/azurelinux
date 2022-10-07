@@ -8,7 +8,7 @@
 Summary:        An SVG library based on cairo
 Name:           librsvg2
 Version:        2.50.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -111,6 +111,9 @@ rm -vrf %{buildroot}%{_docdir}
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.50.3-3
+- Bump package to rebuild with stable Rust compiler
+
 * Thu Jul 08 2021 Vinicius Jarina <vinja@microsoft.com> - 2.50.3-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.

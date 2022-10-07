@@ -1,7 +1,7 @@
 Summary:        FUSE adapter - Azure Storage Blobs
 Name:           blobfuse
-Version:        1.4.4
-Release:        2%{?dist}
+Version:        1.4.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ install -p -m 755 build/blobfuse %{buildroot}%{_bindir}/
 %{_bindir}/blobfuse
 
 %changelog
+* Sat Sep 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.4.5-1
+- Bump version to 1.4.5
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.4.4-2
 - Bump release to rebuild against Go 1.18.5
 

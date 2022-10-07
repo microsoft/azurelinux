@@ -119,6 +119,14 @@ ifeq ($(USE_PREVIEW_REPO),y)
    endif
 endif
 
+ifneq ($(strip $(SRPM_PACK_LIST)),)
+LOCAL_SPECS = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
+else # Empty pack list, build all under $(SPECS_DIR)
+LOCAL_SPECS = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
+endif
+
+LOCAL_SPEC_DIRS = $(foreach spec,$(LOCAL_SPECS),$(dir $(spec)))
+
 CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=

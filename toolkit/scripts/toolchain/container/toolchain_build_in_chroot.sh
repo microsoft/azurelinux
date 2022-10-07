@@ -994,7 +994,6 @@ cd /sources
 echo sqlite-autoconf-3360000
 tar xf sqlite-autoconf-3360000.tar.gz
 pushd sqlite-autoconf-3360000
-patch -Np1 -i /tools/CVE-2021-36690.patch
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \

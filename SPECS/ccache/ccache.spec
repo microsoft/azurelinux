@@ -1,13 +1,12 @@
-Name:           ccache
 Summary:        Compiler Cache
+Name:           ccache
 Version:        4.6
-Release:        1%{?dist}
-License:        BeOpen and BSD and GPLv3+ and (Patrick Powell's and Holger Weiss' license) and Public Domain and Python and zlib
+Release:        2%{?dist}
+License:        BeOpen AND BSD AND GPLv3+ AND (Patrick Powell's AND Holger Weiss' license) AND Public Domain AND Python AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ccache.dev
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
-
 BuildRequires:  cmake
 
 %description
@@ -28,6 +27,13 @@ popd
 pushd build
 %make_install
 popd
+install -dm 755 %{buildroot}%{_libdir}/ccache
+for n in cc gcc g++ c++ ; do
+    ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/$n
+    ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/%{_host}-$n
+done
+ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang
+ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang++
 
 %check
 pushd build
@@ -38,13 +44,21 @@ popd
 %license LICENSE.adoc
 %doc README.md
 %{_bindir}/ccache
+%dir %{_libdir}/ccache/
+%{_libdir}/*
 
 %changelog
-*   Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> 4.6-1
--   Upgrade to version 4.6
--   Enable check tests
-*   Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6-2
--   License verified.
--   Added 'Vendor' and 'Distribution' tags.
-*   Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 3.6-1
--   Original version for CBL-Mariner.
+* Mon Aug 22 2022 Andrew Phelps <anphel@microsoft.com> - 4.6-2
+- Create symlinks to ccache
+- Lint spec
+
+* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.6-1
+- Upgrade to version 4.6
+- Enable check tests
+
+* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-2
+- License verified.
+- Added 'Vendor' and 'Distribution' tags.
+
+* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 3.6-1
+- Original version for CBL-Mariner.

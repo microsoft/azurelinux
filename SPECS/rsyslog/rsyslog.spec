@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2204.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ Requires:       libfastjson
 Requires:       libgcrypt
 Requires:       librelp
 Requires:       systemd
+Requires(pre):  shadow-utils
 Provides:       %{name}-crypto = %{version}-%{release}
 Provides:       %{name}-elasticsearch = %{version}-%{release}
 Provides:       %{name}-gnutls = %{version}-%{release}
@@ -128,6 +129,14 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %check
 %make_build check
 
+%pre
+if ! (getent passwd syslog >/dev/null); then
+    groupadd --system syslog
+fi
+if ! (getent passwd syslog >/dev/null); then
+useradd --system --comment 'System Logging'  --gid syslog --shell /bin/false syslog
+fi
+
 %post
 /sbin/ldconfig
 %systemd_post rsyslog.service
@@ -138,6 +147,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart rsyslog.service
+if getent passwd syslog >/dev/null; then
+    userdel syslog
+fi
+if getent group syslog >/dev/null; then
+    groupdel syslog
+fi
 
 %files
 %defattr(-,root,root)
@@ -156,6 +171,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 8.2204.1-2
+- Modify rsyslog.conf to improve security
+- Add syslog user to own the log files
+
 * Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 8.2204.1-1
 - Update to v8.2204.1 to address CVE-2022-24903
 - Add more robust macro for Source4 url (prebuilt docs tar)
