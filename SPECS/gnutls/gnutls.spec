@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnutls.org
 Source0:        ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/%{name}-%{version}.tar.xz
@@ -31,6 +31,7 @@ Requires:       gc
 Patch0:         CVE-2020-24659.patch
 Patch1:         CVE-2021-20231.patch
 Patch2:         CVE-2021-20232.patch
+Patch3:         CVE-2021-4209.patch
 
 %description
 GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them. It provides a simple C language application programming interface (API) to access the secure communications protocols as well as APIs to parse and write X.509, PKCS #12, OpenPGP and other required structures. It is aimed to be portable and efficient with focus on security and interoperability.
@@ -102,6 +103,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 07 2022 Bala <balakumaran.kannan@microsoft.com> - 3.6.14-7
+- Add patc to fix CVE-2021-4209
+
 *   Tue Apr 13 2021 Rachel Menge <rachelmengem@microsoft.com> - 3.6.14-6
 -   Bump release to rebuild with new nettle (3.7.2)
 *   Mon Mar 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 3.6.14-5
