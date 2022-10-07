@@ -1,12 +1,14 @@
 %global pypi_name astunparse
 
+Summary:        An AST unparser for Python
 Name:           python-%{pypi_name}
 Version:        1.6.3
 Release:        10%{?dist}
-Summary:        An AST unparser for Python
 # Primarily under the terms of BSD
 # The unparse and the test_unparse modules are under the PSF license.
-License:        PSF
+License:        BSD AND PSF
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/simonpercivall/astunparse
 Source0:        %{pypi_source}
 
@@ -43,7 +45,7 @@ distribution; under Tools/parser in Python 3.
 %py3_install
 
 %check
-%{__python3} setup.py test
+python3 setup.py test
 
 %files -n python3-%{pypi_name}
 %license LICENSE
@@ -52,7 +54,7 @@ distribution; under Tools/parser in Python 3.
 %{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
-* Thu oct 06 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.6.3-10
+* Thu Oct 06 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.6.3-10
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
 
