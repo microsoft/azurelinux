@@ -3,8 +3,6 @@
 %{!?_httpd_moddir:     %{expand: %%global _httpd_moddir %%{_libdir}/httpd/modules}}
 # Fedora spec file for php
 #
-# License: MIT
-# http://opensource.org/licenses/MIT
 #
 # Please preserve changelog entries
 #
@@ -12,10 +10,10 @@
 %global apiver      20210902
 %global zendver     20210902
 %global pdover      20170320
-# Adds -z now to the linker flags
-%global _hardened_build 1
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 # version used for php embedded library soname
-%global embed_version 8.1
+%global embed_version %{majmin}
 %global mysql_sock %(mysql_config --socket 2>/dev/null || echo %{_sharedstatedir}/mysql/mysql.sock)
 # Regression tests take a long time, you can skip 'em with this
 #global runselftest 0
