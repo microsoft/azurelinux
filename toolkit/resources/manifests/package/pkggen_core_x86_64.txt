@@ -1,5 +1,5 @@
 filesystem-1.1-7.cm1.x86_64.rpm
-kernel-headers-5.10.144.1-1.cm1.noarch.rpm
+kernel-headers-5.10.145.1-1.cm1.noarch.rpm
 glibc-2.28-24.cm1.x86_64.rpm
 glibc-devel-2.28-24.cm1.x86_64.rpm
 glibc-i18n-2.28-24.cm1.x86_64.rpm
@@ -58,7 +58,7 @@ findutils-lang-4.6.0-8.cm1.x86_64.rpm
 gettext-0.19.8.1-5.cm1.x86_64.rpm
 gzip-1.12-1.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
-mariner-release-1.0-46.cm1.noarch.rpm
+mariner-release-1.0-47.cm1.noarch.rpm
 patch-2.7.6-7.cm1.x86_64.rpm
 util-linux-2.32.1-7.cm1.x86_64.rpm
 util-linux-devel-2.32.1-7.cm1.x86_64.rpm
@@ -163,7 +163,7 @@ libffi-3.2.1-12.cm1.x86_64.rpm
 libtasn1-4.14-2.cm1.x86_64.rpm
 p11-kit-0.23.22-1.cm1.x86_64.rpm
 p11-kit-trust-0.23.22-1.cm1.x86_64.rpm
-ca-certificates-shared-20200720-26.cm1.noarch.rpm
-ca-certificates-tools-20200720-26.cm1.noarch.rpm
-ca-certificates-base-20200720-26.cm1.noarch.rpm
+ca-certificates-shared-20200720-27.cm1.noarch.rpm
+ca-certificates-tools-20200720-27.cm1.noarch.rpm
+ca-certificates-base-20200720-27.cm1.noarch.rpm
 libselinux-3.2-1.cm1.x86_64.rpm

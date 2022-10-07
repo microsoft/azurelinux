@@ -946,8 +946,8 @@
         "type": "other",
         "other": {
           "name": "cryptsetup",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.3/cryptsetup-2.3.3.tar.xz"
+          "version": "2.3.7",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.3/cryptsetup-2.3.7.tar.xz"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.144.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
+          "version": "5.10.145.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.144.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
+          "version": "5.10.145.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.144.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
+          "version": "5.10.145.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.144.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.144.1.tar.gz"
+          "version": "5.10.145.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
         }
       }
     },
@@ -4206,8 +4206,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.3.35",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.35.tar.gz"
+          "version": "10.3.36",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.3.36.tar.gz"
         }
       }
     },
@@ -4526,8 +4526,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.41.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.41.0/nghttp2-1.41.0.tar.xz"
+          "version": "1.50.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.50.0/nghttp2-1.50.0.tar.xz"
         }
       }
     },
@@ -4586,8 +4586,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.20.0",
-          "downloadUrl": "https://nodejs.org/download/release/v14.20.0/node-v14.20.0.tar.xz"
+          "version": "14.20.1",
+          "downloadUrl": "https://nodejs.org/download/release/v14.20.1/node-v14.20.1.tar.xz"
         }
       }
     },
@@ -5656,8 +5656,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.8",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.8/postgresql-12.8.tar.bz2"
+          "version": "12.12",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.12/postgresql-12.12.tar.bz2"
         }
       }
     },
@@ -8626,8 +8626,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0404",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0404.tar.gz"
+          "version": "9.0.0614",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0614.tar.gz"
         }
       }
     },
