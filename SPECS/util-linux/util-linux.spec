@@ -8,16 +8,12 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
-Source1:        runuser
-Source2:        runuser-l
-Source3:        su
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
 # util-linux contains su, which conflicts with shadow-utils < 4.9-10 that also contained su
-Conflicts:      shadow-utils < 4.9-10
 Conflicts:      toybox
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
@@ -72,6 +68,7 @@ autoreconf -fi
     --disable-nologin \
     --disable-chfn-chsh \
     --disable-login \
+    --disable-su \
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
@@ -121,9 +118,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
 %{_docdir}/util-linux/getopt*
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser-l
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -150,6 +144,8 @@ rm -rf %{buildroot}/lib/systemd/system
 - Port to 1.0-dev from main
 - Build without audit support
 - Avoid CVE-2021-3995 found in older versions
+- Remove su tool as it is provided by shadow-utils
+- Remove runuser tool
 
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 2.37.4-4
 - Modify su to improve security
