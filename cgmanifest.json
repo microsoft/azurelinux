@@ -4586,8 +4586,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.20.0",
-          "downloadUrl": "https://nodejs.org/download/release/v14.20.0/node-v14.20.0.tar.xz"
+          "version": "14.20.1",
+          "downloadUrl": "https://nodejs.org/download/release/v14.20.1/node-v14.20.1.tar.xz"
         }
       }
     },
