@@ -6,7 +6,7 @@ Summary:        SGML and XML document type definitions for DocBook
 Name:           docbook-dtds
 Version:        1.0
 Release:        78%{?dist}
-License:        Copyright only
+License:        MIT-Advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.oasis-open.org/docbook/

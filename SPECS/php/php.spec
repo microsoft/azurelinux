@@ -62,9 +62,6 @@ Source9:        php.modconf
 Source12:       php-fpm.wants
 Source13:       nginx-fpm.conf
 Source14:       nginx-php.conf
-# See https://secure.php.net/gpg-keys.php
-Source20:       https://www.php.net/distributions/php-keyring.gpg
-Source21:       https://www.php.net/distributions/php-%{upver}%{?rcver}.tar.xz.asc
 # Configuration files for some extensions
 Source50:       10-opcache.ini
 Source51:       opcache-default.blacklist
@@ -106,6 +103,7 @@ BuildRequires:  httpd-filesystem
 BuildRequires:  libstdc++-devel
 BuildRequires:  libtool
 BuildRequires:  libtool-ltdl-devel
+BuildRequires:  libxcrypt-devel
 BuildRequires:  make
 # to ensure we are using nginx with filesystem feature (see #1142298)
 BuildRequires:  nginx-filesystem
@@ -120,7 +118,7 @@ BuildRequires:  tzdata
 BuildRequires:  pkgconfig(libcurl) >= 7.29.0
 BuildRequires:  pkgconfig(libedit)
 BuildRequires:  pkgconfig(libpcre2-8) >= 10.30
-BuildRequires:  pkgconfig(libxcrypt)
+#BuildRequires:  pkgconfig(libxcrypt)
 BuildRequires:  pkgconfig(sqlite3) >= 3.7.4
 BuildRequires:  pkgconfig(zlib) >= 1.2.0.4
 Requires:       php-common%{?_isa} = %{version}-%{release}
@@ -744,14 +742,14 @@ cp ext/bcmath/libbcmath/LICENSE libbcmath_LICENSE
 cp ext/date/lib/LICENSE.rst timelib_LICENSE
 
 # Multiple builds for multiple SAPIs
-mkdir build-cgi build-embedded \
+mkdir build-cgi build-embedded
 #%if %{with_modphp}
-#    build-apache \
+#    mkdir build-apache
 #%endif
 %if %{with_zts}
-    build-zts build-ztscli \
+    mkdir build-zts build-ztscli
 %endif
-    build-fpm
+    mkdir build-fpm
 
 # ----- Manage known as failed test -------
 # affected by systzdata patch
@@ -823,9 +821,9 @@ cp %{SOURCE50} %{SOURCE51} %{SOURCE53} .
 %define _lto_cflags %{nil}
 
 # Set build date from https://reproducible-builds.org/specs/source-date-epoch/
-export SOURCE_DATE_EPOCH=$(date +%{s} -r NEWS)
+export SOURCE_DATE_EPOCH=$(date +%s -r NEWS)
 export PHP_UNAME=$(uname)
-export PHP_BUILD_SYSTEM=$(cat %{_sysconfdir}/redhat-release | sed -e 's/ Beta//')
+export PHP_BUILD_SYSTEM=$(cat /etc/redhat-release | sed -e 's/ Beta//')
 %if 0%{?vendor:1}
 export PHP_BUILD_PROVIDER="%{vendor}"
 %endif
@@ -882,7 +880,6 @@ ln -sf ../configure
     --with-openssl \
     --with-system-ciphers \
     --with-external-pcre \
-    --with-external-libcrypt \
 %ifarch s390 s390x sparc64 sparcv9 riscv64
     --without-pcre-jit \
 %endif
@@ -900,6 +897,7 @@ if test $? != 0; then
   : configure failed
   exit 1
 fi
+#    --with-external-libcrypt \
 
 %make_build
 }
