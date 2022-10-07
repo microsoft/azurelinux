@@ -1,3 +1,6 @@
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 %global debug_package %{nil}
 
 %define kernel_version_release @KERNEL_VERSION_RELEASE@
@@ -43,7 +46,7 @@ then \
 fi
 
 Summary:        Set of livepatches for kernel %{kernel_version_release}
-Name:           livepatch-%{kernel_version_release}
+Name:           livepatch-%{kernel_version_release}-signed
 Version:        1.0.0
 Release:        @RELEASE_TAG@
 License:        MIT
@@ -55,6 +58,12 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 
 ExclusiveArch:  x86_64
 
+%description
+@DESCRIPTION@
+
+%package -n     livepatch-%{kernel_version_release}
+Summary:        %{summary}
+
 Requires:       coreutils
 Requires:       livepatching-filesystem
 
@@ -65,32 +74,32 @@ Requires(preun): kpatch
 
 Provides:       livepatch = %{kernel_version_release}
 
-%description
+%description -n livepatch-%{kernel_version_release}
 @DESCRIPTION@
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
 install -m 744 %{SOURCE0} %{buildroot}%{livepatch_module_path}
 
-%post
+%post -n livepatch-%{kernel_version_release}
 %load_if_should
 %install_if_should
 
-%preun
+%preun -n livepatch-%{kernel_version_release}
 %uninstall_if_should
 %unload_if_should
 
 # Re-enable patch on rollbacks to supported kernel.
-%triggerin -- kernel = %{kernel_version_release}
+%triggerin -n livepatch-%{kernel_version_release} -- kernel = %{kernel_version_release}
 %load_if_should
 %install_if_should
 
 # Prevent the patch from being loaded after a reboot to a different kernel.
 # Previous kernel is still running, do NOT unload the livepatch.
-%triggerin -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
+%triggerin -n livepatch-%{kernel_version_release} -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
 %uninstall_if_should
 
-%files
+%files -n livepatch-%{kernel_version_release}
 %defattr(-,root,root)
 %dir %{livepatch_install_dir}
 %{livepatch_module_path}
