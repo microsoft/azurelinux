@@ -2,7 +2,7 @@ Summary:        Norman Walsh's modular stylesheets for DocBook
 Name:           docbook-style-dsssl
 Version:        1.79
 Release:        31%{?dist}
-License:        MIT-Advertising
+License:        MIT with Advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://docbook.sourceforge.net/

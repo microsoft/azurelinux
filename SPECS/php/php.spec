@@ -897,7 +897,6 @@ if test $? != 0; then
   : configure failed
   exit 1
 fi
-#    --with-external-libcrypt \
 
 %make_build
 }
@@ -1561,6 +1560,10 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Friday Oct 7 2022 Osama Esmail <osamaesmail@microsoft.com> 8.1.11-2 
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
 * Wed Sep 28 2022 Remi Collet <remi@remirepo.net> - 8.1.11-1
 - Update to 8.1.11 - http://www.php.net/releases/8_1_11.php
 
