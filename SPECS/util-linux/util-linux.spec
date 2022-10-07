@@ -89,9 +89,6 @@ install -d %{buildroot}%{_sharedstatedir}/libuuid
 %find_lang %{name}
 
 install -vdm755 %{buildroot}%{_sysconfdir}/pam.d
-install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
-install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
-install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
