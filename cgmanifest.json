@@ -20003,6 +20003,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-astunparse",
+          "version": "1.6.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/astunparse/astunparse-1.6.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-async-generator",
           "version": "1.10",
           "downloadUrl": "https://files.pythonhosted.org/packages/ce/b6/6fa6b3b598a03cba5e80f829e0dadbb49d7645f523d209b2fb7ea0bbb02a/async_generator-1.10.tar.gz"
