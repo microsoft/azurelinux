@@ -98,42 +98,42 @@ make %{?_smp_mflags} check
 
 %changelog
 * Fri Oct 07 2022 Bala <balakumaran.kannan@microsoft.com> - 3.6.14-7
-- Add patc to fix CVE-2021-4209
+- Add patch to fix CVE-2021-4209
 
-*   Tue Apr 13 2021 Rachel Menge <rachelmengem@microsoft.com> - 3.6.14-6
--   Bump release to rebuild with new nettle (3.7.2)
+* Tue Apr 13 2021 Rachel Menge <rachelmengem@microsoft.com> - 3.6.14-6
+- Bump release to rebuild with new nettle (3.7.2)
 
-*   Mon Mar 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 3.6.14-5
--   Apply patch for CVE-2021-20231 and CVE-2021-20231 from upstream.
+* Mon Mar 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 3.6.14-5
+- Apply patch for CVE-2021-20231 and CVE-2021-20231 from upstream.
 
-*   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.6.14-4
--   Fix check tests.
+* Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 3.6.14-4
+- Fix check tests.
 
-*   Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3
--   Apply patch for CVE-2020-24659 from upstream.
--   Switch setup to autosetup.
+* Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.14-3
+- Apply patch for CVE-2020-24659 from upstream.
+- Switch setup to autosetup.
 
-*   Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6.14-2
--   Updating certificate bundle path to include full set of trust information.
+* Wed Oct 07 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6.14-2
+- Updating certificate bundle path to include full set of trust information.
 
-*   Fri Aug 21 2020 Andrew Phelps <anphel@microsoft.com> 3.6.14-1
--   Update to version 3.6.14 for CVE-2020-13777
+* Fri Aug 21 2020 Andrew Phelps <anphel@microsoft.com> 3.6.14-1
+- Update to version 3.6.14 for CVE-2020-13777
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.6.8-3
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.6.8-3
+- Added %%license line automatically
 
-*   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6.8-2
--   Removing *Requires for "ca-certificates".
--   Adding a certs directory through "--with-default-trust-store-dir" at compile time.
+* Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6.8-2
+- Removing *Requires for "ca-certificates".
+- Adding a certs directory through "--with-default-trust-store-dir" at compile time.
 
-*   Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.8-1
--   Update to 3.6.8. Source0 URL updated. License verified.
+* Mon Mar 16 2020 Henry Beberman <henry.beberman@microsoft.com> 3.6.8-1
+- Update to 3.6.8. Source0 URL updated. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.6.3-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.6.3-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Apr 15 2019 Keerthana K <keerthanak@vmware.com> 3.6.3-3
--   Fix CVE-2019-3829, CVE-2019-3836
+* Mon Apr 15 2019 Keerthana K <keerthanak@vmware.com> 3.6.3-3
+- Fix CVE-2019-3829, CVE-2019-3836
 
 *   Wed Oct 03 2018 Tapas Kundu <tkundu@vmware.com> 3.6.3-2
 -   Including default-priority in the RPM packaging.
