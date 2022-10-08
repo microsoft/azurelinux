@@ -66,7 +66,6 @@
 
 %__os_install_post_leave_signatures    \
     %{_rpmconfigdir}/brp-compress \
-    %{_rpmconfigdir}/brp-strip %{__strip} \
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
@@ -75,6 +74,7 @@
 
 %__os_install_post    \
     %{__os_install_post_leave_signatures} \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
     %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{nil}
