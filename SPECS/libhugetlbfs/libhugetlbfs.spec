@@ -26,6 +26,7 @@ Patch6:         0007-tests-fix-covscan-SHELLCHECK_WARNING-complaints.patch
 Patch7:         0008-tests-include-missing-LDFLAGS-to-make-targets.patch
 # __morecore feature has been removed from glibc 2.34+ so disable it
 Patch8:         0009-Disable-hugepage-backed-malloc-if-__morecore-is-not-.patch
+Patch9:         0010-only-link-libhugetlbfs-statically.patch
 %global _hardened_build 1
 %define ldscriptdir %{_datadir}/%{name}/ldscripts
 BuildRequires:  execstack
@@ -62,17 +63,25 @@ segment remapping behavior. hugectl sets environment variables for using huge
 pages and then execs the target program. hugeadm gives easy access to huge page
 pool size control. pagesize lists page sizes available on the machine.
 
+%package tests
+Summary:        Test cases to help on validating the library environment
+Group:          Development/Libraries
+Requires:       %{name}-utils = %{version}-%{release}
+
+%description tests
+This packages contains a number of testcases that will help developers
+to verify the libhugetlbfs functionality and validate the library.
+
 %prep
 %autosetup -p1
 
 %build
-%make_build libs tools BUILDTYPE=NATIVEONLY V=1
+%make_build all BUILDTYPE=NATIVEONLY V=1
 
 %install
 make install PREFIX=%{_prefix} LIB64="%{_lib}" DESTDIR=%{buildroot} LDSCRIPTDIR=%{ldscriptdir} BUILDTYPE=NATIVEONLY
 make install-helper PREFIX=%{_prefix} LIB64="%{_lib}" DESTDIR=%{buildroot} LDSCRIPTDIR=%{ldscriptdir} BUILDTYPE=NATIVEONLY
-#mkdir -p -m755 %{buildroot}%{_sysconfdir}/security/limits.d
-#touch %{buildroot}%{_sysconfdir}/security/limits.d/hugepages.conf
+make install-tests PREFIX=%{_prefix} LIB64="%{_lib}" DESTDIR=%{buildroot} LDSCRIPTDIR=%{ldscriptdir} BUILDTYPE=NATIVEONLY
 
 # clear execstack flag
 execstack --clear-execstack %{buildroot}/%{_libdir}/libhugetlbfs.so
@@ -121,10 +130,12 @@ rm -fr %{buildroot}/%{_sbindir}/
 %{_mandir}/man1/pagesize.1.gz
 %{_mandir}/man1/ld.hugetlbfs.1.gz
 
+%files tests
+%{_libdir}/libhugetlbfs
+
 %changelog
 * Wed Oct 05 2022 Andy Caldwell <andycaldwell@microsoft.com> - 2.23.4
-- Remove unused `libhugetlbfs-tests` package
-- Allows building without `glibc-static`
+- Allow building without `glibc-static`
 
 * Tue Jul 26 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.23-3
 - Remove patch that applies usage of python3
