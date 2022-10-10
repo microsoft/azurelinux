@@ -52,14 +52,6 @@ ignore_no_source_tarball=" \
   web-assets \
   "
 
-# Specs for signed packages. Their unsigned versions should already be included in the manifest.
-ignore_signed_package=" \
-  grub2-efi-binary-signed-aarch64 \
-  grub2-efi-binary-signed-x86_64 \
-  kernel-signed-aarch64 \
-  kernel-signed-x86_64 \
-  shim"
-
 # Specs where cgmanifest validation has known issues checking URLs.
 ignore_known_issues=" \
   virglrenderer"
@@ -90,6 +82,13 @@ do
   spec="$WORK_DIR/$(basename "$original_spec")"
   cp "$original_spec" "$spec"
 
+  # Skipping specs for signed packages. Their unsigned versions should already be included in the manifest.
+  if echo "$original_spec" | grep -q "SPECS-SIGNED"
+  then
+    echo "    $spec is being ignored (reason: signed package), skipping"
+    continue
+  fi
+
   # Pre-processing alternate sources (commented-out "Source" lines with full URLs), if present. Currently we only care about the first source.
   # First, we replace "%%" with "%" in the alternate source's line.
   sed -Ei "/^#\s*Source0?:.*%%.*/s/%%/%/g" "$spec"
@@ -108,9 +107,9 @@ do
   fi
 
   # Skipping specs from the ignore lists.
-  if echo "$ignore_multiple_sources $ignore_signed_package $ignore_no_source_tarball $ignore_known_issues" | grep -P "(^|\s)$name($|\s)" > /dev/null
+  if echo "$ignore_multiple_sources $ignore_no_source_tarball $ignore_known_issues" | grep -qP "(^|\s)$name($|\s)"
   then
-    echo "    $name is being ignored, skipping"
+    echo "    $name is being ignored (reason: explicitly ignored package), skipping"
     continue
   fi
 
