@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/cisco/libacvp
-Source0:        https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/cisco/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         openssl.patch
 Patch1:         non-static-configure.patch
 BuildRequires:  autoconf
