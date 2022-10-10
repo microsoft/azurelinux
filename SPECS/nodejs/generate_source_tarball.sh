@@ -1,10 +1,19 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
+# Quit on failure
 set -e
 
+#
+# The nodejs source tarball contains a copy of the OpenSSL source tree.
+# OpenSSL contains patented algorithms that should not be distributed
+# as part of the SRPM. Since we use the shared OpenSSL libraries, we 
+# can just remove the entire OpenSSL source tree from the tarball.
+
+PKG_VERSION=""
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PKG_VERSION=""
 
 # parameters:
 #
@@ -65,36 +74,44 @@ if [ -z "$PKG_VERSION" ]; then
 fi
 
 echo "-- create temp folder"
-TEMPDIR=$(mktemp -d)
+tmpdir=$(mktemp -d)
 function cleanup {
-    echo "+++ cleanup -> remove $TEMPDIR"
-    rm -rf $TEMPDIR
+    echo "+++ cleanup -> remove $tmpdir"
+    rm -rf $tmpdir
 }
 trap cleanup EXIT
 
-echo 'Starting MariaDB source tarball creation'
-cd $TEMPDIR
-git clone --depth 1 https://github.com/MariaDB/server.git -b mariadb-$PKG_VERSION
-pushd server
-git submodule update --depth 1 --init --recursive 
-popd
-mv server mariadb-$1
+pushd $tmpdir > /dev/null
+
+namever="node-v${PKG_VERSION}"
 
 if [[ -n $SRC_TARBALL ]]; then
-    TARBALL_NAME="$(basename $SRC_TARBALL)"
+    upstream_tarball_name="$SRC_TARBALL"
+    clean_tarball_name="$OUT_FOLDER/$(basename $SRC_TARBALL)"
 else
-    TARBALL_NAME="mariadb-$PKG_VERSION.tar.gz"
+    upstream_tarball_name="${namever}.tar.xz"
+    clean_tarball_name="$OUT_FOLDER/${namever}-clean.tar.xz"
+    download_url="https://nodejs.org/download/release/v${PKG_VERSION}/${upstream_tarball_name}"
+
+    echo "Downloading upstream source tarball..."
+    curl -s -O $download_url
 fi
 
-NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
+echo "Unpacking upstream source tarball..."
+tar -xf $upstream_tarball_name
+
+echo "Removing bad vendored dependencies from source tree..."
+rm -rf ./$namever/deps/openssl/openssl
 
 # Create a reproducible tarball
 # Credit to https://reproducible-builds.org/docs/archives/ for instructions
 # Do not update mtime value for new versions- keep the same value for ease of
 # reproducing old tarball versions in the future if necessary
+echo "Repacking source tarball..."
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -zcf $NEW_TARBALL mariadb-$1
+    -cJf $clean_tarball_name ./$namever
 
-echo "Source tarball $NEW_TARBALL successfully created!"
+popd > /dev/null
+echo "Clean nodejs source tarball available at $clean_tarball_name"
