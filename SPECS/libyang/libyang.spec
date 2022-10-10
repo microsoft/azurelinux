@@ -9,7 +9,7 @@ Summary:        YANG data modeling language library
 Name:           libyang
 Version:        2.0.231
 Release:        1%{?dist}
-License:        BSD-3-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/CESNET/libyang
