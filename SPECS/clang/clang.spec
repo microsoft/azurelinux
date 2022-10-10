@@ -137,7 +137,6 @@ cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
       -DLLVM_ENABLE_EH=ON \
       -DLLVM_ENABLE_RTTI=ON \
       -DCLANG_LINK_CLANG_DYLIB=ON \
-      -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
       -Wno-dev ..
 
 %make_build

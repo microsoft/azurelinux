@@ -304,15 +304,15 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 # TODO: Excluding for now to remove dependency on PERL
 # /usr/bin/mtrace
 # C Runtime files for `-pie`, `-no-pie` and profiled executables as well as for shared libs
-%{_lib64dir}/{g,M,S}crt1.o
+%{_lib64dir}/{,g,M,S}crt1.o
 # C Runtime files needed for all targets
 %{_lib64dir}/crt{i,n}.o
 %{_includedir}/*
 
 %files static -f static.filelist
 %defattr(-,root,root)
-# C Runtime files for `-static`, `-static-pie` and profiled `-static-pie`
-%{_lib64dir}/{,r,gr}crt1.o
+# C Runtime files for `-static-pie` and profiled `-static-pie`
+%{_lib64dir}/{r,gr}crt1.o
 
 %files -f %{name}.lang lang
 %defattr(-,root,root)
