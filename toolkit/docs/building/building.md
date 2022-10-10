@@ -15,7 +15,6 @@
 - [Further Reading](#further-reading)
  - [Packages](#packages)
    - [Working on Packages](#working-on-packages)
-      - [DOWNLOAD_SRPMS](#download_srpms)
       - [Force Rebuilds](#force-rebuilds)
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
@@ -28,15 +27,11 @@
       - [URLS and Repos](#urls-and-repos)
       - [`SOURCE_URL=...`](#source_url)
       - [`PACKAGE_URL_LIST=...`](#package_url_list)
-      - [`SRPM_URL_LIST=...`](#srpm_url_list)
       - [`REPO_LIST=...`](#repo_list)
       - [Build Enable/Disable Flags](#build-enabledisable-flags)
       - [`REBUILD_TOOLCHAIN=...`](#rebuild_toolchain)
         - [`REBUILD_TOOLCHAIN=`**`n`** *(default)*](#rebuild_toolchainn-default)
         - [`REBUILD_TOOLCHAIN=`**`y`**](#rebuild_toolchainy)
-      - [`DOWNLOAD_SRPMS=...`](#download_srpms-1)
-        - [`DOWNLOAD_SRPMS=`**`n`** *(default)*](#download_srpmsn-default)
-        - [`DOWNLOAD_SRPMS=`**`y`**](#download_srpmsy)
       - [`USE_PREVIEW_REPO=...`](#use_preview_repo)
         - [`USE_PREVIEW_REPO=`**`n`** *(default)*](#use_preview_repon-default)
         - [`USE_PREVIEW_REPO=`**`y`**](#use_preview_repoy)
@@ -244,10 +239,6 @@ sudo make build-packages SPECS_DIR="/my/packages/SPECS" -j$(nproc)
 
 The build system will attempt to minimize rebuilds, but sometimes it is useful to force packages to rebuild, or ignore missing packages. Say you want to iterate on the `nano` package, but the `ncurses-devel` package is broken (`ncurses-devel` is a dependency of `nano`)...
 
-#### DOWNLOAD_SRPMS
-
-When `DOWNLOAD_SRPMS=y` is set, the local sources and spec files will not be used, and changes will not be reflected in the final packages.
-
 #### Force Rebuilds
 
 Adding `PACKAGE_REBUILD_LIST="nano"` will tell the build system to always rebuild `nano.spec` even if it thinks the rpm file is up to date.
@@ -286,7 +277,6 @@ Direct file downloads are by default pulled from:
 ```makefile
 SOURCE_URL         ?=
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
-SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 ```
 
 While `tdnf` uses a list of repo files:
@@ -309,19 +299,17 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Mariner source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided. Core Mariner source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
 SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
-SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
 ```
 
 ```makefile
-DOWNLOAD_SRPMS         ?= n
 REBUILD_TOOLCHAIN      ?= n
 REBUILD_PACKAGES       ?= y
 REBUILD_TOOLS          ?= n
@@ -346,7 +334,6 @@ sudo make go-tools REBUILD_TOOLS=y
 #  then rebuild the toolchain properly using the provided sources
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
 sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
@@ -356,7 +343,6 @@ sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y RE
 # Complete rebuild of all tool, package, and image files from source.
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
 sudo make image PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
@@ -377,10 +363,6 @@ If that is not desired all remote sources can be disabled by clearing the follow
 #### `PACKAGE_URL_LIST=...`
 
 > Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
-
-#### `SRPM_URL_LIST=...`
-
-> Space seperated list of URLs to download packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
 
 #### `REPO_LIST=...`
 
@@ -423,16 +405,6 @@ If that is not desired all remote sources can be disabled by clearing the follow
 ##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`y`**
 
 > If performing an incremental toolchain build (`INCREMENTAL_TOOLCHAIN=y`), attempt to pull as many RPMs listed in the arch-specific toolchain manifest from the repos listed in `$(PACKAGE_URL_LIST)`. These RPMs will used as a cache to avoid rebuilding already-built SRPMs.
-
-#### `DOWNLOAD_SRPMS=...`
-
-##### `DOWNLOAD_SRPMS=`**`n`** *(default)*
-
-> Pack SRPMs to be built from local SPECs. Will retrieve sources from the SPEC's folder if available, and will download missing sources from `$(SOURCE_URL)`.
-
-##### `DOWNLOAD_SRPMS=`**`y`**
-
-> Download official pre-packed SRPMs from `$(SRPM_URL)`. Use this option if `$(SOURCE_URL)` is not available.
 
 #### `USE_PREVIEW_REPO=...`
 
@@ -650,7 +622,6 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | REBUILD_TOOLS                 | n                                                                                                      | Build the go tools locally or take them from the SDK?
 | TOOLCHAIN_ARCHIVE             |                                                                                                        | Instead of downloading toolchain *.rpms, extract them from here (see `REBUILD_TOOLCHAIN`).
 | PACKAGE_ARCHIVE               |                                                                                                        | Use with `make hydrate-rpms` to populate a set of rpms from an archive.
-| DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
 | USE_PREVIEW_REPO              | n                                                                                                      | Pull missing packages from the upstream preview repository in addition to the base repository?
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 
@@ -661,7 +632,6 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                  | Description
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                                                                                          | URL to request package sources from
-| SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space seperated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
 | PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`                 | Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store

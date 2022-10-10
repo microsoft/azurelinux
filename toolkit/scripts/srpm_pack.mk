@@ -50,30 +50,6 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 	@echo Finished updating $@
 
-ifeq ($(DOWNLOAD_SRPMS),y)
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR)
-	for spec in $(LOCAL_SPECS); do \
-		spec_file=$${spec} && \
-		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
-		for url in $(SRPM_URL_LIST); do \
-			wget $${url}/$${srpm_file} \
-				-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
-				--no-verbose \
-				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
-				$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-				&& \
-			touch $(BUILD_SRPMS_DIR)/$${srpm_file} && \
-			break; \
-		done || $(call print_error,Loop in $@ failed) ; \
-		{ [ -f $(BUILD_SRPMS_DIR)/$${srpm_file} ] || \
-			$(call print_error,Failed to download $${srpm_file});  } \
-	done || $(call print_error,Loop in $@ failed) ; \
-	touch $@
-
-# Since all the SRPMs are being downloaded by the "input-srpms" target there is no need to differentiate toolchain srpms.
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
-	@touch $@
-else
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
@@ -108,4 +84,3 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) && \
 	touch $@
-endif
