@@ -10830,6 +10830,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libyang",
+          "version": "2.0.231",
+          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.0.231.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libyubikey",
           "version": "1.13",
           "downloadUrl": "http://opensource.yubico.com/yubico-c/releases/libyubikey-1.13.tar.gz"
