@@ -1,17 +1,16 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 Version:        14.20.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/nodejs/node
-# Source0 has a vendored OpenSSL source tree with patented algorithms.
-# Use Source1 to create a clean and reproducible source tarball.
-#Source0:       https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
-Source0:        node-v%{version}-clean.tar.xz
-Source1:        clean-source-tarball.sh
+# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball 
+# !!!! because it contains patented algorithms.
+# !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
+Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         patch_tls_nodejs14.patch
 Patch1:         remove_unsupported_tlsv13_ciphers.patch
 BuildRequires:  coreutils >= 8.22
@@ -80,6 +79,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Mon Oct 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 14.20.1-2
+- Change src tarball generation mechanism so it is usable by autoupgrade tools
+
 * Thu Oct 06 2022 Jon Slobodzian <joslobo@microsoft.com> - 14.20.1-1
 - Upgrade to 14.20.1 to fix CVE-2022-32213, CVE-2022-32214, and CVE-2022-35256
 - Note the previous version was believed to be fixed for 32213 and 32214 but the
