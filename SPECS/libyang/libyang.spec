@@ -1,10 +1,3 @@
-# valgrind finds invalid writes in libcmocka on arm and power
-# see bug #1699304 for more information
-%ifarch %{arm} ppc64le
-%global run_valgrind_tests OFF
-%else
-%global run_valgrind_tests ON
-%endif
 Summary:        YANG data modeling language library
 Name:           libyang
 Version:        2.0.231
@@ -59,7 +52,7 @@ pushd build
    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
    -DCMAKE_BUILD_TYPE=RELWITHDEBINFO \
    -DENABLE_LYD_PRIV=ON \
-   -DENABLE_VALGRIND_TESTS=%{run_valgrind_tests} ..
+   -DENABLE_VALGRIND_TESTS=ON ..
 %make_build
 make doc
 
