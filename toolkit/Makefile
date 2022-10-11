@@ -49,6 +49,7 @@ USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 DELTA_BUILD                     ?= n
+TARGET_ARCH                     ?=
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -118,6 +119,14 @@ ifeq ($(USE_PREVIEW_REPO),y)
       $(warning )
    endif
 endif
+
+ifneq ($(strip $(SRPM_PACK_LIST)),)
+LOCAL_SPECS = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
+else # Empty pack list, build all under $(SPECS_DIR)
+LOCAL_SPECS = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
+endif
+
+LOCAL_SPEC_DIRS = $(foreach spec,$(LOCAL_SPECS),$(dir $(spec)))
 
 CA_CERT     ?=
 TLS_CERT    ?=

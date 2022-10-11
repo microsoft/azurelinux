@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,9 +12,12 @@ Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
 Patch0:         fix-journald-audit-logging.patch
-# Can be removed once we update systemd to a version containing the following commit:
+# Patch1 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
 Patch1:         add-fsync-sysusers-passwd.patch
+# Patch2 can be removed once we update systemd to a version containing the following commit:
+# https://github.com/systemd/systemd/commit/d5cb053cd93d516f516e0b748271b55f9dfb3a29
+Patch2:         gpt-auto-devno-not-determined.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -148,9 +151,7 @@ rm -f %{buildroot}%{_var}/log/README
 rm -f %{buildroot}/%{_libdir}/modprobe.d/README
 rm -f %{buildroot}/lib/systemd/network/80-wifi-ap.network.example
 rm -f %{buildroot}/lib/systemd/network/80-wifi-station.network.example
-mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
-mkdir -p %{buildroot}%{_localstatedir}/log
-ln -sfv %{_localstatedir}/opt/journal/log %{buildroot}%{_localstatedir}/log/journal
+mkdir -p %{buildroot}%{_localstatedir}/log/journal
 
 find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
@@ -241,8 +242,7 @@ systemctl preset-all
 %{_datadir}/polkit-1
 %{_datadir}/systemd
 %{_datadir}/zsh/*
-%dir %{_localstatedir}/opt/journal/log
-%{_localstatedir}/log/journal
+%dir %{_localstatedir}/log/journal
 
 %files rpm-macros
 %{_libdir}/rpm
@@ -261,6 +261,12 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-9
+- Fixing default log location.
+
+* Tue Sep 27 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-8
+- Add patch to improve fs detection in gpt-auto (systemd #22506)
+
 * Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-7
 - Add patch to fsync passwd file (systemd #24324)
 

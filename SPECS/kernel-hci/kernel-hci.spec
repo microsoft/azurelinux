@@ -8,7 +8,7 @@
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.63.1
+Version:        5.15.72.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -243,7 +243,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 crashkernel=128M
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 crashkernel=256M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -393,6 +393,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
+- Upgrade to 5.15.72.1
+
+* Wed Oct 5 2022 Vince Perri <viperri@microsoft.com> - 5.15.70.1-1
+- Synchronize with mainline kernel:
+-   Upgrade to 5.15.70.1
+-   Enable SCSI logging facility (CONFIG_SCSI_LOGGING=y)
+-   Enable 32-bit time syscall support (CONFIG_COMPAT_32BIT_TIME=y)
+-   Setting vfat module in kernel config to Y to be baked in (CONFIG_FAT_FS=y, CONFIG_VFAT_FS=y)
+-   Adjust crashkernel param to crash, dump memory to a file, and recover correctly (crashkernel=256M)
+
 * Wed Aug 31 2022 Vince Perri <viperri@microsoft.com> - 5.15.63.1-1
 - Rename kernel package to kernel-hci
 - Remove no-vmw-sta from kernel command-line to remove vmware extension

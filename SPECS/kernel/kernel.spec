@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.63.1
-Release:        4%{?dist}
+Version:        5.15.72.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -391,6 +391,27 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
+- Upgrade to 5.15.72.1
+
+* Tue Sep 27 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.70.1-1
+- Upgrade to 5.15.70.1
+
+* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.69.1-1
+- Upgrade to 5.15.69.1
+
+* Thu Sep 22 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-4
+- Enable SCSI logging facility
+
+* Tue Sep 20 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-3
+- Enable 32-bit time syscall support
+
+* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
+- Enable CONFIG_NETFILTER_XT_TARGET_TRACE as a module
+
+* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
+- Upgrade to 5.15.67.1
+
 * Tue Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
 - Setting vfat module in kernel config to Y to be baked in
 

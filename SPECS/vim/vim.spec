@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0325
+Version:        9.0.0614
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -196,6 +196,18 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Tue Oct 04 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0614-1
+- Upgrade to 9.0.0614
+
+* Fri Sep 30 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0598-1
+- Upgrade to 9.0.0598
+
+* Thu Sep 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0490-1
+- Upgrade to 9.0.0490
+
+* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0404-1
+- Upgrade to 9.0.0404
+
 * Mon Aug 29 2022 Henry Beberman <henry.beberman@microsoft.com> - 9.0.0325-1
 - Upgrade to 9.0.0325 to fix: CVE-2022-2980, CVE-2022-2982, CVE-2022-2923, CVE-2022-2946
 
