@@ -6,7 +6,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://dynalabs.de/mxp/malaga/
-Source0:        https://git.stg.centos.org/source-git/malaga/blob/c8s/f/SPECS/malaga-%{version}.tgz
+#Source0:        https://git.stg.centos.org/source-git/malaga/blob/c8s/f/SPECS/malaga-%{version}.tgz
 # Fix map_file symbol conflict with samba. Upstream can be considered
 # inactive but as libvoikko >= 2.2 doesn't use libmalaga anymore, these kind
 # of problems won't probably come up. The only executables in Fedora which

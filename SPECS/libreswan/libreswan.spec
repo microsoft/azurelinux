@@ -26,7 +26,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -193,6 +193,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Tue Oct 11 2022 Osama Esmail <osamaesmail@microsoft.com> - 4.7-4
+- Removed with_check macro
+
 * Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.7-3
 - Move from SPECS-EXTENDED to SPECS
 
