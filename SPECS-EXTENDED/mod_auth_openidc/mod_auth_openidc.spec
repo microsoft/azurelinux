@@ -16,8 +16,8 @@ Distribution:   Mariner
 %global httpd_pkg_cache_dir /var/cache/httpd/mod_auth_openidc
 
 Name:		mod_auth_openidc
-Version:	2.4.2.1
-Release:	2%{?dist}
+Version:	2.4.9.4
+Release:	1%{?dist}
 Summary:	OpenID Connect auth module for Apache HTTP Server
 
 License:	ASL 2.0
@@ -95,6 +95,9 @@ install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/cache
 %dir %attr(0700, apache, apache) %{httpd_pkg_cache_dir}/cache
 
 %changelog
+* Tue Oct 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.9.4-1
+- Upgrade to 2.4.9.4
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
