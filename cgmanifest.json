@@ -3168,8 +3168,8 @@
         "type": "other",
         "other": {
           "name": "fetchmail",
-          "version": "6.4.8",
-          "downloadUrl": "http://downloads.sourceforge.net/fetchmail/fetchmail-6.4.8.tar.xz"
+          "version": "6.4.22",
+          "downloadUrl": "http://downloads.sourceforge.net/fetchmail/fetchmail-6.4.22.tar.xz"
         }
       }
     },
