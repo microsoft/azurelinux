@@ -15,8 +15,8 @@ Distribution:   Mariner
 %global debug_package %{nil}
 
 Name:           mod_wsgi
-Version:        4.6.8
-Release:        3%{?dist}
+Version:        4.9.3
+Release:        1%{?dist}
 Summary:        A WSGI interface for Python web applications in Apache
 License:        ASL 2.0
 URL:            https://modwsgi.readthedocs.io/
@@ -157,6 +157,9 @@ ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 %endif
 
 %changelog
+* Tue Oct 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.3-1
+- Upgrade to 4.9.3
+
 * Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 4.6.8-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix condition checking to apply for CBL-Mariner
