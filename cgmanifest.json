@@ -11372,7 +11372,6 @@
         "other": {
           "name": "malaga",
           "version": "7.12",
-          "downloadUrl": "https://git.stg.centos.org/source-git/malaga/blob/c8s/f/SPECS/malaga-7.12.tgz"
         }
       }
     },
