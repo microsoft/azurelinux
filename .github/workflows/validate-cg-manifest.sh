@@ -154,9 +154,9 @@ do
       # Parsing output instead of using error codes because 'wget' returns code 8 for FTP, even if the file exists.
       # Sample HTTP(S) output:  Remote file exists.
       # Sample FTP output:      File ‘time-1.9.tar.gz’ exists.
-      if ! wget --spider --timeout=1 --tries=10 "${manifesturl}" 2>&1 | grep -qP "^(Remote file|File ‘.*’) exists\.$"
+      if ! wget --spider --timeout=2 --tries=10 "${manifesturl}" 2>&1 | grep -qP "^(Remote file|File ‘.*’) exists\.$"
       then
-        echo $(wget --spider --timeout=1 --tries=10 "${manifesturl}" 2>&1)
+        echo $(wget --spider --timeout=2 --tries=10 "${manifesturl}" 2>&1)
         echo "Registration for $name:$version has invalid URL '$manifesturl' (could not download)"  >> bad_registrations.txt
       fi
     fi
