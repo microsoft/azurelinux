@@ -33,11 +33,9 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 Url:            https://libreswan.org/
 Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-%if %{with_check}
 Source3:        https://download.libreswan.org/cavs/ikev1_dsa.fax.bz2
 Source4:        https://download.libreswan.org/cavs/ikev1_psk.fax.bz2
 Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
-%endif
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison

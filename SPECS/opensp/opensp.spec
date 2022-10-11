@@ -1,4 +1,3 @@
-%define _module_build 1
 Summary:        SGML and XML parser
 Name:           opensp
 Version:        1.5.2

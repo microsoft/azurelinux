@@ -10,7 +10,7 @@ License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.html-tidy.org/
-Source0:        https://gitlab.com/sulinos/resources/tidy-html5/-/archive/5.7.28/tidy-html5-5.7.28.tar.gz
+Source0:        https://gitlab.com/sulinos/resources/tidy-html5/-/archive/%{version}/tidy-html5-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 ## upstream patches

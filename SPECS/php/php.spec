@@ -113,7 +113,6 @@ BuildRequires:  tzdata
 BuildRequires:  pkgconfig(libcurl) >= 7.29.0
 BuildRequires:  pkgconfig(libedit)
 BuildRequires:  pkgconfig(libpcre2-8) >= 10.30
-#BuildRequires:  pkgconfig(libxcrypt)
 BuildRequires:  pkgconfig(sqlite3) >= 3.7.4
 BuildRequires:  pkgconfig(zlib) >= 1.2.0.4
 Requires:       php-common%{?_isa} = %{version}-%{release}
@@ -803,7 +802,7 @@ cp %{SOURCE50} %{SOURCE51} %{SOURCE53} .
 %build
 # This package fails to build with LTO due to undefined symbols.  LTO
 # was disabled in OpenSuSE as well, but with no real explanation why
-# beyond the undefined symbols.  It really shold be investigated further.
+# beyond the undefined symbols.  It really should be investigated further.
 # Disable LTO
 %define _lto_cflags %{nil}
 
@@ -1357,16 +1356,6 @@ rm -f README.{Zeus,QNX,CVS-RULES}
 # Raised by new pool installation or new extension installation
 %transfiletriggerin fpm -- %{_sysconfdir}/php-fpm.d %{_sysconfdir}/php.d
 systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
-
-%files
-#%if %{with_modphp}
-#%{_httpd_moddir}/libphp.so
-#%config(noreplace) %{_httpd_modconfdir}/20-php.conf
-#%attr(0770,root,apache) %dir %{_sharedstatedir}/php/session
-#%attr(0770,root,apache) %dir %{_sharedstatedir}/php/wsdlcache
-#%attr(0770,root,apache) %dir %{_sharedstatedir}/php/opcache
-#%config(noreplace) %{_httpd_confdir}/php.conf
-#%endif
 
 %files common -f files.common
 %doc EXTENSIONS NEWS UPGRADING* README.REDIST.BINS *md docs
