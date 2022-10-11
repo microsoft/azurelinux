@@ -11372,7 +11372,7 @@
         "other": {
           "name": "malaga",
           "version": "7.12",
-          "downloadUrl": "https://code.launchpad.net/ubuntu/+archive/primary/+sourcefiles/malaga/7.12-7.1/malaga_7.12.orig.tar.gz"
+          "downloadUrl": "https://dynalabs.de/mxp/assets/malaga-7.12.tgz"
         }
       }
     },
