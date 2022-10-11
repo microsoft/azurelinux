@@ -1,13 +1,16 @@
 Summary:        Kpatch tooling
 Name:           kpatch
 Version:        0.9.6
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/dynup/kpatch
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         mariner_update.patch
+
+ExclusiveArch:  x86_64
 
 BuildRequires:  binutils
 BuildRequires:  dnf-utils
@@ -17,7 +20,8 @@ BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  kernel-headers
 
-ExclusiveArch:  x86_64
+Requires:       binutils
+Requires:       gawk
 
 %description
 Kpatch is a Linux dynamic kernel patching infrastructure which allows you to patch
@@ -31,9 +35,11 @@ It gives more control over uptime without sacrificing security or stability.
 Summary:        Tools for building livepatches with kpatch.
 Group:          Development/Tools
 
+Requires:       mariner-release
 Requires:       numactl-devel
 Requires:       openssl
 Requires:       patch
+Requires:       perl
 Requires:       rpm-build
 Requires:       wget
 
@@ -41,7 +47,7 @@ Requires:       wget
 %{summary}
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %make_build
@@ -72,6 +78,12 @@ rm -rf %{buildroot}%{_mandir}
 %{_bindir}/kpatch-build
 
 %changelog
+* Mon Aug 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-4
+- Adding missing dependency on "awk" and "binutils".
+
+* Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-3
+- Add Mariner-specific steps to 'kpatch-build'.
+
 * Fri Jun 17 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.9.6-2
 - Fix ARM64 build break (exclusive to AMD64)
 

@@ -15,7 +15,6 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
@@ -207,7 +206,7 @@ func calamaresInstall(templateConfigFile string, args imagerArguments) (err erro
 	launchScript := filepath.Join(calamaresDir, "mariner-install.sh")
 	skuDir := filepath.Join(calamaresDir, "mariner-skus")
 
-	bootType := diskutils.SystemBootType()
+	bootType := configuration.SystemBootType()
 	logger.Log.Infof("Boot type detected: %s", bootType)
 
 	mouseHandlers, err := findMouseHandlers()

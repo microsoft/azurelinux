@@ -1,7 +1,7 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.13.0
-Release:        2%{?dist}
+Version:        0.16.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,15 +11,19 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
+BuildRequires:  cereal-devel
 BuildRequires:  clang-devel
 BuildRequires:  cmake
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  git
+BuildRequires:  libbpf-devel
+BuildRequires:  libpcap-devel
 BuildRequires:  llvm-devel >= 12.0.1-1
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
+BuildRequires:  vim-extra
 BuildRequires:  zlib-devel
 Requires:       bcc
 Requires:       binutils
@@ -74,6 +78,15 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Tue Oct 04 2022 Muhammad Falak <mwani@microsoft.com> - 0.16.0-1
+- Bump version to 0.16.0
+
+* Wed Aug 17 2022 Muhammad Falak <mwani@microsoft.com> - 0.15.0-1
+- Bump version to 0.15.0
+
+* Tue Mar 08 2022 Muhammad Falak <mwani@microsoft.com> - 0.14.1-1
+- Bump version to 0.14.1
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.13.0-2
 - Disable building of shared libraries
 
