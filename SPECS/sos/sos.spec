@@ -7,7 +7,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sosreport/sos
-#Source0:       https://github.com/sosreport/sos/archive/%%{version}.tar.gz
+#Source0:       https://github.com/sosreport/sos/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         CVE-2022-2806.patch
 BuildRequires:  gettext
