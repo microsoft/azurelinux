@@ -144,11 +144,6 @@ offers built-in database integration for several commercial and
 non-commercial database management systems, so writing a
 database-enabled webpage with PHP is fairly simple. The most common
 use of PHP coding is probably as a replacement for CGI scripts.
-#%if %{with_modphp}
-#The php package contains the module (often referred to as mod_php)
-#which adds support for the PHP language to Apache HTTP Server when
-#running in prefork mode. This module is deprecated.
-#%endif
 
 %package cli
 Summary:        Command-line interface for PHP
@@ -738,9 +733,6 @@ cp ext/date/lib/LICENSE.rst timelib_LICENSE
 
 # Multiple builds for multiple SAPIs
 mkdir build-cgi build-embedded
-#%if %{with_modphp}
-#    mkdir build-apache
-#%endif
 %if %{with_zts}
     mkdir build-zts build-ztscli
 %endif
@@ -996,18 +988,6 @@ without_shared="--without-gd \
       --disable-shmop --disable-sockets --disable-tokenizer \
       --disable-sysvmsg --disable-sysvshm --disable-sysvsem"
 
-#%if %{with_modphp}
-# Build Apache module, and the CLI SAPI, /usr/bin/php
-#pushd build-apache
-#build --with-apxs2=%{_bindir}/apxs \
-#      --with-apu=%{_bindir}/apu-1-config \
-#      --libdir=%{_libdir}/php \
-#      --without-mysqli \
-#      --disable-pdo \
-#      ${without_shared}
-#popd
-#%endif
-
 # Build php-fpm
 pushd build-fpm
 build --enable-fpm \
@@ -1184,17 +1164,6 @@ install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/php.ini
 # For third-party packaging:
 install -m 755 -d %{buildroot}%{_datadir}/php/preload
 
-#%if %{with_modphp}
-# install the DSO
-#install -m 755 -d $RPM_BUILD_ROOT%{_httpd_moddir}
-#install -m 755 build-apache/libs/libphp.so $RPM_BUILD_ROOT%{_httpd_moddir}
-#%endif
-
-# Apache config fragment
-# Dual config file with httpd >= 2.4 (fedora >= 18)
-#%if %{with_modphp}
-#install -D -m 644 %{SOURCE9} $RPM_BUILD_ROOT%{_httpd_modconfdir}/20-php.conf
-#%endif
 install -D -m 644 %{SOURCE1} %{buildroot}%{_httpd_confdir}/php.conf
 
 install -m 755 -d %{buildroot}%{_sysconfdir}/php.d
@@ -1555,9 +1524,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
-* Friday Oct 7 2022 Osama Esmail <osamaesmail@microsoft.com> 8.1.11-2 
+* Fri Oct  7 2022 Osama Esmail <osamaesmail@microsoft.com> 8.1.11-2 
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- TODO: Update this.
+- Replaced conditional flags with global variables
+- Replaced/deleted extraneous macros
+- Downloaded php-keyring.gpg and php-8.1.11.tar.xz.asc
+- Use Mariner's libxcrypt-devel instead of Fedora using system libxcrypt
+- Replaced %{_bindir} with /bin, %{_sysconfdir} with /etc, %{_lib} with /lib
+- Removed all mod-php support
 - License verified.
 
 * Wed Sep 28 2022 Remi Collet <remi@remirepo.net> - 8.1.11-1
