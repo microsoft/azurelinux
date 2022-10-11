@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:			opencryptoki
 Summary:		Implementation of the PKCS#11 (Cryptoki) specification v2.11
-Version:		3.13.0
-Release:		2%{?dist}
+Version:		3.17.0
+Release:		1%{?dist}
 License:		CPL
 URL:			https://github.com/opencryptoki/opencryptoki
 Source0:		https://github.com/opencryptoki/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -306,6 +306,9 @@ fi
 
 
 %changelog
+* Tue Oct 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.17.0-1
+- Upgrade to 3.17.0
+
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 3.13.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove libitm-devel from build requirement because gcc already includes the necessary binaries it covers
