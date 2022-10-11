@@ -21,8 +21,8 @@ Distribution:   Mariner
 
 Summary: A text mode mail user agent
 Name: mutt
-Version: 2.0.5
-Release: 3%{?dist}
+Version: 2.2.3
+Release: 1%{?dist}
 # The entire source code is GPLv2+ except
 # pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
 License: GPLv2+ and Public Domain
@@ -215,6 +215,9 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 
 
 %changelog
+* Tue Oct 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.3-1
+- Upgrade to 2.2.3
+
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 2.0.5-3
 - Remove epoch
 
