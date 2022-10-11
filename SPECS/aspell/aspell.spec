@@ -16,6 +16,7 @@ Source:         ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
 Patch2:         aspell-0.60.7-mp.patch
+Patch3:         aspell-0.60.8-objstack.patch
 BuildRequires:  chrpath
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -47,6 +48,7 @@ and header files needed for Aspell development.
 %patch0 -p1 -b .fc
 %patch1 -p1 -b .mlib
 %patch2 -p1 -b .ai
+%patch3 -p1 -b .obs
 iconv -f iso-8859-2 -t utf-8 < manual/aspell.info > manual/aspell.info.aux
 mv manual/aspell.info.aux manual/aspell.info
 
@@ -114,8 +116,9 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
-* Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.60.8-6
+* Fri Oct 07 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.60.8-6
 - Moved from SPECS-EXTENDED to SPECS
+- Added patch for CVE-2019-25051
 - License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.60.8-5

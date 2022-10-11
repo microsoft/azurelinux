@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "hunspell",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/v1.7.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/hunspell/hunspell/releases/download/v1.7.1/hunspell-1.7.1.tar.gz"
         }
       }
     },

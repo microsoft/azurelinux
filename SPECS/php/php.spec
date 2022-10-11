@@ -13,7 +13,6 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
 # version used for php embedded library soname
-%global embed_version %{majmin}
 %global mysql_sock %(mysql_config --socket 2>/dev/null || echo %{_sharedstatedir}/mysql/mysql.sock)
 # Regression tests take a long time, you can skip 'em with this
 #global runselftest 0
@@ -31,12 +30,10 @@
 %global with_db4      1
 %global with_tidy     1
 %global with_qdbm     0
-%global upver        8.1.11
-#global rcver        RC1
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        %{upver}%{?rcver:~%{rcver}}
-Release:        1%{?dist}
+Version:        8.1.11
+Release:        2%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -48,7 +45,7 @@ License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.php.net/
-Source0:        https://www.php.net/distributions/php-%{upver}%{?rcver}.tar.xz
+Source0:        https://www.php.net/distributions/php-%{version}.tar.xz
 Source1:        php.conf
 Source2:        php.ini
 Source3:        macros.php
@@ -106,7 +103,7 @@ BuildRequires:  make
 # to ensure we are using nginx with filesystem feature (see #1142298)
 BuildRequires:  nginx-filesystem
 # no pkgconfig to avoid compat-openssl10
-BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  pkg-config
@@ -286,7 +283,7 @@ Requires:       krb5-devel%{?_isa}
 Requires:       libtool
 Requires:       libxml2-devel%{?_isa}
 Requires:       make
-Requires:       openssl-devel%{?_isa} >= 1.0.2
+Requires:       openssl-devel%{?_isa}
 Requires:       pcre2-devel%{?_isa}
 Requires:       php-cli%{?_isa} = %{version}-%{release}
 Requires:       zlib-devel%{?_isa}
@@ -323,7 +320,7 @@ Summary:        A module for PHP applications that use IMAP
 # All files licensed under PHP version 3.01
 License:        PHP
 BuildRequires:  libc-client-devel
-BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(krb5)
 BuildRequires:  pkgconfig(krb5-gssapi)
@@ -340,7 +337,7 @@ Summary:        A module for PHP applications that use LDAP
 # All files licensed under PHP version 3.01
 License:        PHP
 BuildRequires:  openldap-devel
-BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(libsasl2)
 Requires:       php-common%{?_isa} = %{version}-%{release}
@@ -396,7 +393,7 @@ Summary:        A PostgreSQL database module for PHP
 License:        PHP
 BuildRequires:  krb5-devel
 BuildRequires:  libpq-devel
-BuildRequires:  openssl-devel >= 1.0.2
+BuildRequires:  openssl-devel
 Requires:       php-pdo%{?_isa} = %{version}-%{release}
 Provides:       php_database
 Provides:       php-pdo_pgsql
@@ -764,9 +761,9 @@ rm ext/zlib/tests/004-mb.phpt
 
 # Safety check for API version change.
 pver=$(sed -n '/#define PHP_VERSION /{s/.* "//;s/".*$//;p}' main/php_version.h)
-if test "x${pver}" != "x%{upver}%{?rcver}"; then
-   : Error: Upstream PHP version is now ${pver}, expecting %{upver}%{?rcver}.
-   : Update the version/rcver macros and rebuild.
+if test "x${pver}" != "x%{version}"; then
+   : Error: Upstream PHP version is now ${pver}, expecting %{version}.
+   : Update the version macros and rebuild.
    exit 1
 fi
 
@@ -1492,7 +1489,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 %files embedded
 %{_libdir}/libphp.so
-%{_libdir}/libphp-%{embed_version}.so
+%{_libdir}/libphp-%{majmin}.so
 
 %files pgsql -f files.pgsql
 
@@ -1560,6 +1557,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %changelog
 * Friday Oct 7 2022 Osama Esmail <osamaesmail@microsoft.com> 8.1.11-2 
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- TODO: Update this.
 - License verified.
 
 * Wed Sep 28 2022 Remi Collet <remi@remirepo.net> - 8.1.11-1

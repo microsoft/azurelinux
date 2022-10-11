@@ -1,15 +1,13 @@
 %define double_profiling_build 1
 Summary:        A spell checker and morphological analyzer library
 Name:           hunspell
-Version:        1.7.0
-Release:        8%{?dist}
-License:        (LGPLv2+ OR GPLv2+ OR MPLv1.1) AND BSD
+Version:        1.7.1
+Release:        1%{?dist}
+License:        LGPLv2+ OR GPLv2+ OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/hunspell/hunspell
-Source0:        https://github.com/hunspell/hunspell/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         0001-invalid-read-memory-access-624.patch
-Patch1:         hunspell-1.7.0-print-format.patch
+Source0:        https://github.com/hunspell/hunspell/releases/download/v%{version}/hunspell-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc-c++
@@ -41,8 +39,6 @@ Includes and definitions for developing with hunspell
 
 %prep
 %setup -q
-%patch0 -p1 -b .CVE-2019-16707
-%patch1 -p2
 
 %build
 autoreconf -vfi
@@ -77,7 +73,6 @@ make distclean
 %{profileuse} %configure $configureflags
 make %{?_smp_mflags}
 %endif
-cd po && make %{?_smp_mflags} update-gmo && cd ..
 
 %check
 %ifarch %{ix86} x86_64
@@ -124,8 +119,10 @@ mkdir %{buildroot}/%{_datadir}/myspell
 %{_mandir}/man5/hunspell.5.gz
 
 %changelog
-* Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.7.0-8
+* Mon Oct 10 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.7.1-1
 - Moved from SPECS-EXTENDED to SPECS
+- Upgraded from 1.7.0 to 1.7.1 to address CVE-2019-16707
+- Removed patches
 
 * Wed Jun 22 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.0-7
 - Patch for the print format issue.
