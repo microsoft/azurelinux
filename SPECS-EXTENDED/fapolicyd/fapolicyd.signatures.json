@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "fapolicyd-1.0.2.tar.gz": "97a4ac276ec03418c937706b0b6e1187756494331aaf5fdf2cc343d8641a0064",
-  "fapolicyd-selinux-0.3.tar.gz": "98c437dcbed0067141adb842ebe0afeff7fd969d60bf46b636d8ad580ca89b99"
- }
+  "Signatures": {
+    "fapolicyd-selinux-0.3.tar.gz": "98c437dcbed0067141adb842ebe0afeff7fd969d60bf46b636d8ad580ca89b99",
+    "fapolicyd-1.1.2.tar.gz": "a8dcd1cb3868e205c696ff267f3fc1e61b2dcf1d011e5016003854962c5d775e"
+  }
 }

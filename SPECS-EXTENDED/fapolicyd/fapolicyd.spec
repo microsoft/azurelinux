@@ -8,8 +8,8 @@ Distribution:   Mariner
 
 Summary: Application Whitelisting Daemon
 Name: fapolicyd
-Version: 1.0.2
-Release: 3%{?dist}
+Version: 1.1.2
+Release: 1%{?dist}
 License: GPLv3+
 URL: http://people.redhat.com/sgrubb/fapolicyd
 Source0: https://people.redhat.com/sgrubb/fapolicyd/%{name}-%{version}.tar.gz
@@ -186,6 +186,9 @@ fi
 
 
 %changelog
+* Tue Oct 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-1
+- Upgrade to 1.1.2
+
 * Thu Aug 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.2-3
 - Disable selinux subpackage build
 
