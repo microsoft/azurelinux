@@ -2023,6 +2023,7 @@
                 "libsafec",
                 "libuv",
                 "libxml++",
+                "livepatch-5.15.72.1-1.cm2",
                 "livepatching",
                 "lld",
                 "local-path-provisioner",
