@@ -2,13 +2,14 @@
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
 Version:        4.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sosreport/sos
 #Source0:       https://github.com/sosreport/sos/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         CVE-2022-2806.patch
 BuildRequires:  gettext
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -28,7 +29,7 @@ diagnostic purposes and debugging. Sos is commonly used to help
 support technicians and developers.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 python3 setup.py build
@@ -68,6 +69,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Tue Oct 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.1-4
+- Patch CVE-2022-2806
+
 * Wed May 12 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-3
 - Fix build break due to doubly-packaged license/doc files
 
