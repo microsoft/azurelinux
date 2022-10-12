@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2204.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,8 @@ Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
+Source4:        rsyslog.logrotate
+Source5:        rsyslog-warn.logrotate
 # Upstream only publishes built docs for base_version.0
 Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
 BuildRequires:  autogen
@@ -119,10 +121,13 @@ install -vd %{buildroot}%{_libdir}/systemd/system/
 install -vd %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -vd %{buildroot}%{_docdir}/%{name}/html
 install -vdm 755 %{buildroot}/%{_sysconfdir}/rsyslog.d
+install -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
 rm -f %{buildroot}/lib/systemd/system/rsyslog.service
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/rsyslog.conf
+install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
+install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog-warn
 cp -r docs/* %{buildroot}%{_docdir}/%{name}/html
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -166,11 +171,16 @@ fi
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
 %dir %attr(0755, root, root) %{_sysconfdir}/rsyslog.d
+%config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
+%config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog-warn
 
 %files doc
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Wed Oct 12 2022 Nan Liu <liunan@microsoft.com> - 8.2204.1-3
+- Add rsyslog and rsyslog-warn configuration files to /etc/logrotate.d
+
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 8.2204.1-2
 - Modify rsyslog.conf to improve security
 - Add syslog user to own the log files
