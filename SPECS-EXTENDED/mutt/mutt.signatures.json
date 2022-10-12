@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "mutt-2.0.5.tar.gz": "e21d5aec0d3110f89d390929e56a38794a94f5843120d9ff59b21da78fd0004d",
-  "mutt_ldap_query": "a158e05786e43652c15f4838699462425a78f49f55e6a53b6a95f91e279a6b03"
- }
+  "Signatures": {
+    "mutt_ldap_query": "a158e05786e43652c15f4838699462425a78f49f55e6a53b6a95f91e279a6b03",
+    "mutt-2.2.3.tar.gz": "978addcdab454f447ed7d1de84b5767e714c30714285bf82e4a1745071d18d89"
+  }
 }
