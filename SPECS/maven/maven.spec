@@ -15,7 +15,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,8 +24,8 @@ URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz#/apache-%{name}-%{version}-src.tar.gz
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 1.0 maven rpm to provide the mvn binary for the build.
-Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.x86_64.rpm
-Source2: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.aarch64.rpm
+Source1: %{_mariner_sources_url}/maven-3.5.4-13.cm1.x86_64.rpm
+Source2: %{_mariner_sources_url}/maven-3.5.4-13.cm1.aarch64.rpm
 
 # CBL-Mariner build are without network connection. Hence, we need to generate build caches as tarballs to build
 # rpms in offline mode.
@@ -133,6 +133,9 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/README.txt
 
 %changelog
+* Wed Oct 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.4-3
+- Replacing hard-coded source URL with the '_mariner_sources_url' macro.
+
 * Wed Jul 20 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-2
 - Adding both x86_64 and aarch64 1.0 maven rpm as sources.
 
