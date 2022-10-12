@@ -6,12 +6,12 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://dynalabs.de/mxp/malaga/
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/malaga-%{version}.tgz
+Source0:        https://dynalabs.de/mxp/assets/malaga-7.12.tgz
 # Fix map_file symbol conflict with samba. Upstream can be considered
 # inactive but as libvoikko >= 2.2 doesn't use libmalaga anymore, these kind
 # of problems won't probably come up. The only executables in Fedora which
 # link to libmalaga currently are the malaga tools.
-Patch0:         malaga-rename-map_file.diff
+Patch0:         malaga-rename-map_file.patch
 # Malshow needs to be linked with -lm as Fedora's ld doesn't do implicit
 # linking anymore
 Patch1:         malaga-malshow-lm.patch
