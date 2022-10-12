@@ -1,2 +1,0 @@
-Failed to get name from 'SPECS/tokyocabinet/tokyocabinet.spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:
-rpmspec: --load=/home/osama/mariner-dev/CBL-Mariner/SPECS/mariner-rpm-macros/macros: unknown option
