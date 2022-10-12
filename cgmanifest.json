@@ -12113,8 +12113,8 @@
         "type": "other",
         "other": {
           "name": "mod_wsgi",
-          "version": "4.6.8",
-          "downloadUrl": "https://github.com/GrahamDumpleton/mod_wsgi/archive/4.6.8.tar.gz"
+          "version": "4.9.3",
+          "downloadUrl": "https://github.com/GrahamDumpleton/mod_wsgi/archive/4.9.3.tar.gz"
         }
       }
     },
