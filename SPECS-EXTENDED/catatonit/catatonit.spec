@@ -3,7 +3,7 @@ Distribution:   Mariner
 
 Name: catatonit
 Version: 0.1.7
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: A signal-forwarding process manager for containers
 License: GPLv3+
 URL: https://github.com/openSUSE/catatonit
@@ -13,7 +13,7 @@ BuildRequires: automake
 BuildRequires: file
 BuildRequires: gcc
 BuildRequires: git
-BuildRequires: glibc-static
+BuildRequires: glibc-static >= 2.35-3%{?dist}
 BuildRequires: libtool
 BuildRequires: make
 
@@ -61,6 +61,9 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %{_libexecdir}/podman/%{name}
 
 %changelog
+* Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.1.7-6
+- Rebuilt for glibc-static 2.35-3
+
 * Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.7-1
 - Updating to 0.1.7 using Fedora 35 spec (license: MIT) for guidance.
 - License verified.

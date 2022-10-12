@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,8 @@ URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
 Patch1:         CVE-2015-20107.patch
+# Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
+Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -300,6 +302,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Oct 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-2
+- Backport patch which allows cloud-init (among other programs) to use `import crypt` sucessfully when in FIPS mode
+
 * Wed Sep 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-1
 - Update to 3.9.14 to resolve security issues including CVE-2020-10735
 

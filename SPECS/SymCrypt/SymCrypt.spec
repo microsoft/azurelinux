@@ -8,13 +8,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt
-#Source0:       https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-#Source1        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz
-Source1:        jitterentropy-library-3.3.1.tar.gz
+Source0:        https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz#/jitterentropy-library-3.3.1.tar.gz
 BuildRequires:  cmake
 %ifarch aarch64
-BuildRequires:  clang
+BuildRequires:  clang >= 12.0.1-4
 %endif
 BuildRequires:  gcc
 BuildRequires:  make
@@ -64,6 +62,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Fri Oct 07 2022 Andy Caldwell <andycaldwell@microsoft.com> - 102.0.0-2
+- Update `clang` on aarch64 builds to enable `-pie`
+
 * Mon Jun 06 2022 Samuel Lee <saml@microsoft.com> - 102.0.0-1
 - Update SymCrypt to v102.0.0 to improve performance of FIPS self-tests
 
