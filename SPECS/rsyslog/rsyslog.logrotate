@@ -2,7 +2,6 @@
 {
     rotate 7
     daily
-    size 50M
     missingok
     notifempty
     delaycompress
@@ -28,7 +27,7 @@
 /var/log/messages
 {
     rotate 4
-    daily
+    weekly
     size 50M
     missingok
     notifempty
