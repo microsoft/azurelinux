@@ -27,7 +27,7 @@
 %global with_sodium   1
 %global with_pspell   1
 %global with_lmdb     1
-%global with_db4      1
+%global with_db4      0
 %global with_tidy     1
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
