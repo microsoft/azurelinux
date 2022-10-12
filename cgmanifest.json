@@ -26128,7 +26128,7 @@
         "other": {
           "name": "tokyocabinet",
           "version": "1.4.48",
-          "downloadUrl": "https://github.com/maiha/tokyocabinet/archive/refs/heads/v48.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tokyocabinet-1.4.48.tar.gz"
         }
       }
     },
