@@ -2338,6 +2338,7 @@
                 "servletapi5",
                 "slf4j",
                 "snakeyaml",
+                "sriov-network-device-plugin",
                 "trilead-ssh2",
                 "xalan-j2",
                 "xbean",
