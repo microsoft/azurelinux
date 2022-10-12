@@ -8,8 +8,8 @@ projects, ensuring you have the right stack everywhere.}
 
 Name:           %{pypi_name}
 Summary:        Python dependency management and packaging made easy
-Version:        1.0.10
-Release:        2%{?dist}
+Version:        1.1.9
+Release:        1%{?dist}
 License:        MIT
 
 URL:            https://poetry.eustace.io/
@@ -70,6 +70,9 @@ Requires:       python3dist(lockfile)
 
 
 %changelog
+* Wed Oct 12 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.9-1
+- Upgrade to 1.1.9
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.10-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
