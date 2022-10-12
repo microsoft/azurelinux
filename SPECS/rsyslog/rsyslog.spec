@@ -13,10 +13,10 @@ Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
-Source4:        rsyslog.logrotate
-Source5:        rsyslog-warn.logrotate
 # Upstream only publishes built docs for base_version.0
 Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
+Source5:        rsyslog.logrotate
+Source6:        rsyslog-warn.logrotate
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -126,8 +126,8 @@ rm -f %{buildroot}/lib/systemd/system/rsyslog.service
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/rsyslog.conf
-install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
-install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog-warn
+install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
+install -p -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog-warn
 cp -r docs/* %{buildroot}%{_docdir}/%{name}/html
 find %{buildroot} -type f -name "*.la" -delete -print
 
