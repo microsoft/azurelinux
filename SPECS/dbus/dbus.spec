@@ -1,7 +1,7 @@
 %{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
 Summary:        DBus for systemd
 Name:           dbus
-Version:        1.14.0
+Version:        1.15.2
 Release:        1%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
@@ -82,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Wed Oct 12 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.15.2-1
+- Upgrade to 1.15.2
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 1.14.0-1
 - Upgrade to version 1.14.0
 - License verified
