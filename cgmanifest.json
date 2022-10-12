@@ -26337,8 +26337,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022d",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022d.tar.gz"
+          "version": "2022e",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022e.tar.gz"
         }
       }
     },
