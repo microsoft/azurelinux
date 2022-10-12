@@ -1,6 +1,6 @@
 Summary:        DBus for systemd
 Name:           dbus-x11
-Version:        1.14.0
+Version:        1.15.2
 Release:        1%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
@@ -29,6 +29,9 @@ until the Mariner dbus package is built with x11 libraries.
 %files
 
 %changelog
+* Wed Oct 12 2022 Henry Li <lihl@microsoft.com> - 1.15.2-1
+- Update version to match with dbus version
+
 * Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-1
 - Updating version to be in-sync with "dbus".
 
