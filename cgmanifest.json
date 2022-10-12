@@ -2439,7 +2439,7 @@
         "other": {
           "name": "docbook-dtds",
           "version": "1.0",
-          "downloadUrl": "http://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip"
+          "downloadUrl": "https://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip"
         }
       }
     },
@@ -4710,8 +4710,8 @@
         "type": "other",
         "other": {
           "name": "hunspell",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/v1.7.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/hunspell/hunspell/releases/download/v1.7.1/hunspell-1.7.1.tar.gz"
         }
       }
     },
@@ -11392,7 +11392,7 @@
         "other": {
           "name": "malaga",
           "version": "7.12",
-          "downloadUrl": "http://home.arcor.de/bjoern-beutel/malaga/malaga-7.12.tgz"
+          "downloadUrl": "https://dynalabs.de/mxp/assets/malaga-7.12.tgz"
         }
       }
     },
@@ -19254,8 +19254,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "7.4.14",
-          "downloadUrl": "https://www.php.net/distributions/php-7.4.14.tar.xz"
+          "version": "8.1.11",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.11.tar.xz"
         }
       }
     },
@@ -26038,7 +26038,7 @@
         "other": {
           "name": "tidy",
           "version": "5.7.28",
-          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.7.28.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tidy-html5-5.7.28.tar.gz"
         }
       }
     },
@@ -26148,7 +26148,7 @@
         "other": {
           "name": "tokyocabinet",
           "version": "1.4.48",
-          "downloadUrl": "http://fallabs.com/tokyocabinet/tokyocabinet-1.4.48.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tokyocabinet-1.4.48.tar.gz"
         }
       }
     },
