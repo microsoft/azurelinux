@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,11 +49,18 @@ Summary:        Header files for glibc
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-headers = %{version}-%{release}
-Provides:       %{name}-static = %{version}-%{release}
-Provides:       %{name}-static%{?_isa} = %{version}-%{release}
 
 %description devel
 These are the header files of glibc.
+
+%package static
+Summary:        Static glibc library and runtimes
+Group:          Applications/System
+Requires:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-static%{?_isa} = %{version}-%{release}
+
+%description static
+These are the static artefacts for glibc.
 
 %package lang
 Summary:        Additional language files for glibc
@@ -202,6 +209,14 @@ popd
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 
+# Determine which static libs are needed in `glibc-devel` - the rest will be put
+# into `glibc-static`.  We need to keep the static shims for function that's now
+# in `libc.so` (since 2.34 - see https://developers.redhat.com/articles/2021/12/17/why-glibc-234-removed-libpthread)
+# and the "statically linked bit" of `libc.so` (called `libc_nonshared.a`)
+static_libs_in_devel_pattern="lib\(c_nonshared\|pthread\|dl\|rt\|g\|util\|mcheck\).a"
+ls -1 %{buildroot}%{_lib64dir}/*.a | grep -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > devel.filelist
+ls -1 %{buildroot}%{_lib64dir}/*.a | grep -v -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > static.filelist
+
 %check
 cd %{_builddir}/glibc-build
 make %{?_smp_mflags} check ||:
@@ -284,18 +299,28 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_datadir}/i18n/charmaps/*.gz
 %{_datadir}/i18n/locales/*
 
-%files devel
+%files devel -f devel.filelist
 %defattr(-,root,root)
 # TODO: Excluding for now to remove dependency on PERL
 # /usr/bin/mtrace
-%{_lib64dir}/*.a
-%{_lib64dir}/*.o
+# C Runtime files for `-pie`, `-no-pie` and profiled executables as well as for shared libs
+%{_lib64dir}/{,g,M,S}crt1.o
+# C Runtime files needed for all targets
+%{_lib64dir}/crt{i,n}.o
 %{_includedir}/*
+
+%files static -f static.filelist
+%defattr(-,root,root)
+# C Runtime files for `-static-pie` and profiled `-static-pie`
+%{_lib64dir}/{r,gr}crt1.o
 
 %files -f %{name}.lang lang
 %defattr(-,root,root)
 
 %changelog
+* Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 2.35-3
+- Split `glibc-static` into an actual package containing static libraries and runtime
+
 * Mon May 02 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.35-2
 - To remove leading spaces in /etc/nsswitch.conf, use tabs instead of spaces
 

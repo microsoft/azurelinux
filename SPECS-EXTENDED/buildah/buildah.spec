@@ -31,7 +31,7 @@ Distribution:   Mariner
 
 Name: %{repo}
 Version: 1.18.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: A command line tool used for creating OCI Images
 License: ASL 2.0
 URL: https://%{name}.io
@@ -40,7 +40,7 @@ BuildRequires: device-mapper-devel
 BuildRequires: golang
 BuildRequires: git
 BuildRequires: glib2-devel
-BuildRequires: glibc-static
+BuildRequires: glibc-static >= 2.35-3%{?dist}
 BuildRequires: go-md2man
 BuildRequires: go-rpm-macros
 BuildRequires: gpgme-devel
@@ -146,6 +146,9 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.18.0-5
+- Rebuilt for glibc-static 2.35-3
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.0-4
 - Bump release to rebuild against Go 1.18.5
 

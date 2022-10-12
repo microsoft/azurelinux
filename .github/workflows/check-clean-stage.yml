@@ -20,13 +20,13 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           git fetch origin ${{ github.base_ref }}
-          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
 
       - name: Get base commit for Pushes
         if: ${{ github.event_name == 'push' }}
         run: |
           git fetch origin ${{ github.event.before }}
-          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
 
       - name: Check the modified spec files
         run: |
