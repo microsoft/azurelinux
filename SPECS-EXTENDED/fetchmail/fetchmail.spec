@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary: A remote mail retrieval and forwarding utility
 Name: fetchmail
-Version: 6.4.8
-Release: 2%{?dist}
+Version: 6.4.22
+Release: 1%{?dist}
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 Source1: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz.asc
 # systemd service file
@@ -63,6 +63,9 @@ rm -f $RPM_BUILD_ROOT%{python3_sitelib}/__pycache__/fetchmailconf*
 %config(noreplace) %attr(0600, mail, mail) %{_sysconfdir}/fetchmailrc.example
 
 %changelog
+* Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.4.22-1
+- Upgrade to 6.4.22
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.8-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
