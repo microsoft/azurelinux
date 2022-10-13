@@ -12,8 +12,8 @@ Distribution:   Mariner
 %define semodule_version 0.0.4
 
 Name:           usbguard
-Version:        1.0.0
-Release:        2%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 Summary:        A tool for implementing USB device usage policy
 License:        GPLv2+
 ## Not installed
@@ -267,6 +267,9 @@ fi
 %endif
 
 %changelog
+* Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.0-1
+- Upgrade to 1.1.0
+
 * Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disabling the 'selinux' subpackage to remove BR on 'policy-selinux'.
