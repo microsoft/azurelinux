@@ -51,6 +51,7 @@
         "openssh-server",
         "openssl",
         "mariner-release",
+        "mariner-repos",
         "mdadm",
         "parted",
         "pciutils",
