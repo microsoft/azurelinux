@@ -26148,7 +26148,7 @@
         "other": {
           "name": "tokyocabinet",
           "version": "1.4.48",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tokyocabinet-1.4.48.tar.gz"
+          "downloadUrl": "http://fallabs.com/tokyocabinet/tokyocabinet-1.4.48.tar.gz"
         }
       }
     },
