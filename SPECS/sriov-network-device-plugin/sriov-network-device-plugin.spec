@@ -33,7 +33,7 @@ resources in the form of SR-IOV virtual functions and PCI physical functions
 %setup -q -T -D -a 1
 
 %build
-make
+make build
 
 %install
 install -D -m0755 build/sriovdp %{buildroot}%{_bindir}/sriovdp
