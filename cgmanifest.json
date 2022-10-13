@@ -13784,8 +13784,8 @@
         "type": "other",
         "other": {
           "name": "opencryptoki",
-          "version": "3.13.0",
-          "downloadUrl": "https://github.com/opencryptoki/opencryptoki/archive/v3.13.0/opencryptoki-3.13.0.tar.gz"
+          "version": "3.17.0",
+          "downloadUrl": "https://github.com/opencryptoki/opencryptoki/archive/v3.17.0/opencryptoki-3.17.0.tar.gz"
         }
       }
     },
