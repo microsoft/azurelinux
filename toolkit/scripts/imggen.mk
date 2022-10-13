@@ -38,7 +38,7 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
-imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*')
+imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
 ifeq ($(build_arch),aarch64)
 initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
