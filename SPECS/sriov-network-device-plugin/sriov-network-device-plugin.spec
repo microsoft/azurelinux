@@ -21,7 +21,7 @@ Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tag
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 
 Source1:       %{name}-%{version}-govendor.tar.gz
-
+Patch0:         sriovdp.patch
 BuildRequires:  golang
 
 %description
@@ -29,7 +29,7 @@ sriov-network-device-plugin is Kubernetes device plugin for discovering and adve
 resources in the form of SR-IOV virtual functions and PCI physical functions 
 
 %prep
-%autosetup
+%autosetup -p1
 %setup -q -T -D -a 1
 
 %build
