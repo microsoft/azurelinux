@@ -204,7 +204,7 @@ $(toolchain_rpms):
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
 	for url in $(PACKAGE_URL_LIST); do \
-		wget $$url/$$rpm_filename \
+		wget -nv --no-clobber $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
 			-a $$log_file && \
