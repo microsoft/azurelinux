@@ -103,9 +103,9 @@ hydrate-toolchain:
 	$(if $(TOOLCHAIN_ARCHIVE),,$(error Must set TOOLCHAIN_ARCHIVE=))
 	sudo mkdir -vp $(toolchain_build_dir)
 	sudo cp $(TOOLCHAIN_CONTAINER_ARCHIVE) $(raw_toolchain)
-	tar -I $(ARCHIVE_TOOL) -xf $(TOOLCHAIN_CONTAINER_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	tar -xf $(TOOLCHAIN_CONTAINER_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
 	sudo cp $(TOOLCHAIN_ARCHIVE) $(final_toolchain)
-	tar -I $(ARCHIVE_TOOL) -xf $(TOOLCHAIN_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	tar -xf $(TOOLCHAIN_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
 	sudo touch $(final_toolchain)
 	sudo mkdir -vp $(RPMS_DIR)/noarch
 	sudo mkdir -vp $(RPMS_DIR)/$(build_arch)
@@ -169,7 +169,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
 	@echo Extracting RPM $@ from toolchain && \
 	if [ ! -f $@ -o $(final_toolchain) -nt $@ ]; then \
 		mkdir -p $(dir $@) && \
-		tar -I $(ARCHIVE_TOOL) -xvf $(final_toolchain) -C $(dir $@) --strip-components 1 built_rpms_all/$(notdir $@) && \
+		tar -xvf $(final_toolchain) -C $(dir $@) --strip-components 1 built_rpms_all/$(notdir $@) && \
 		touch $@ ; \
 	fi || $(call print_error, $@ failed) ;
 else
@@ -181,7 +181,7 @@ $(toolchain_local_temp): $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
 $(toolchain_local_temp)%: ;
 $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(TOOLCHAIN_ARCHIVE) $(shell find $(toolchain_local_temp)/* 2>/dev/null)
 	mkdir -p $(BUILD_DIR)/toolchain_temp/ && \
-	tar -I $(ARCHIVE_TOOL) -xvf $(TOOLCHAIN_ARCHIVE) -C $(BUILD_DIR)/toolchain_temp/ --strip-components 1 && \
+	tar -xvf $(TOOLCHAIN_ARCHIVE) -C $(BUILD_DIR)/toolchain_temp/ --strip-components 1 && \
 	touch $(BUILD_DIR)/toolchain_temp/* && \
 	touch $@
 
