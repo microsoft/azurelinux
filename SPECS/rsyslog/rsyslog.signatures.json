@@ -2,7 +2,9 @@
  "Signatures": {
   "50-rsyslog-journald.conf": "c4c875396276951b491e799e9cdb5a090b2ca82a754967c7f310888373e51c40",
   "rsyslog-8.37.0.tar.gz": "9e8125951375e5a37cd360a30e6b952edd69e691f7f3f56e52695cb71f894bfd",
+  "rsyslog-warn.logrotate": "41607f7531f0d659e56e1bf28a05ff7465c8fd79f8b50c184ab8d9898fd874ca",
   "rsyslog.conf": "f2d5b52fb527306452cdebb4a5fe549d89136063a65cc06d862dcf55c3489baf",
+  "rsyslog.logrotate": "67eae95f6304cd47961cc4b169b422c9543e87ea39805a0a391cefa362c5867e",
   "rsyslog.service": "df62c9fa758079016e3b73f39d3b5952dce1e0c14a063c7a776b86eeba405153"
  }
 }
