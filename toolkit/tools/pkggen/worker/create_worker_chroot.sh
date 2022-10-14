@@ -22,7 +22,7 @@ chroot_log="$log_path"/$chroot_name.log
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
 
-    echo "Adding RPM to worker chroot: $1."  | tee -a "$chroot_log"
+    echo "Adding RPM to worker chroot: $1." | tee -a "$chroot_log"
 
     full_rpm_path=$(find "$rpm_path" -name "$1" -type f 2>>"$chroot_log")
     if [ ! $? -eq 0 ] || [ -z "$full_rpm_path" ]
@@ -53,6 +53,39 @@ HOME=/root
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
+
+# If the host machine rpm version is >= 4.16 (such as Mariner 2.0), it will create an "sqlite" rpm database backend incompatible with Mariner 1.0 (which uses "bdb")
+# To resolve this, enter the 1.0 chroot after the packages are installed, and use the older rpm tool in the chroot to re-create the database in "bdb" format.
+HOST_RPM_VERSION="$(rpm --version)"
+HOST_RPM_DB_BACKEND="$(rpm -E '%{_db_backend}')"
+echo "Current host machine has '$HOST_RPM_VERSION' and backend rpm database '$HOST_RPM_DB_BACKEND'" | tee -a "$chroot_log"
+
+if [[ "$HOST_RPM_DB_BACKEND" == "bdb" ]]; then
+    echo "The host rpm database backend version is 'bdb', which is compatible with Mariner 1.0. Not rebuilding the database." | tee -a "$chroot_log"
+else
+    echo "The host rpm database backend version is '$HOST_RPM_DB_BACKEND'. Rebuilding a 'bdb' database to be compatible with Mariner 1.0" | tee -a "$chroot_log"
+    TEMP_DB_PATH="/temp_db"
+
+    # These nodes are required in the chroot for certain tools (most importantly, the NSS library initialization required by rpm)
+    mkdir -pv $chroot_builder_folder/dev
+    mknod -m 600 $chroot_builder_folder/dev/console c 5 1
+    mknod -m 666 $chroot_builder_folder/dev/null c 1 3
+    mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
+
+    chroot "$chroot_builder_folder" mkdir -pv "$TEMP_DB_PATH"
+    chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"
+    # Populating the bdb database with package info.
+    while read -r package || [ -n "$package" ]; do
+        full_rpm_path=$(find "$rpm_path" -name "$package" -type f 2>>"$chroot_log")
+        cp $full_rpm_path $chroot_builder_folder/$package
+        echo "Adding RPM DB entry to worker chroot: $package." | tee -a "$chroot_log"
+        chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
+        chroot "$chroot_builder_folder" rm $package
+    done < "$packages"
+    echo "Overwriting old RPM database with the results of the conversion." | tee -a "$chroot_log"
+    chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
+    chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
+fi
 
 HOME=$ORIGINAL_HOME
 
