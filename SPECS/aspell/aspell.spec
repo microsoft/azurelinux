@@ -1,7 +1,7 @@
 Summary:        Spell checker
 Name:           aspell
 Version:        0.60.8
-Release:        6%{?dist}
+Release:        7%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
@@ -16,7 +16,7 @@ Source:         ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
 Patch2:         aspell-0.60.7-mp.patch
-Patch3:         aspell-0.60.8-objstack.patch
+Patch3:         CVE-2019-25051.patch
 BuildRequires:  chrpath
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -116,6 +116,10 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
+* Fri Oct 14 2022 Henry Li <lihl@microsoft.com> - 0.60.8-7
+- Rename aspell-0.60.8-objstack.patch to CVE-2019-25051.patch to make the CVE
+  scanner tool recognize the fix patch
+
 * Fri Oct 07 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.60.8-6
 - Moved from SPECS-EXTENDED to SPECS
 - Added patch for CVE-2019-25051
