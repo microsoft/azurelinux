@@ -414,7 +414,8 @@ func (mp *ManualPartitionWidget) populateTable() (err error) {
 		mp.partitionTable.SetCell(tableHeaderRow, i, cell)
 	}
 
-	bootPartitionMountPoint, _, _, err := configuration.BootPartitionConfig(mp.bootType, "gpt")
+	// Hardcode to GPT only for now since all image configurations within Mariner are using GPT partition table type 
+	bootPartitionMountPoint, _, _, err := configuration.BootPartitionConfig(mp.bootType, configuration.PartitionTableTypeGpt)
 	if err != nil {
 		return
 	}
