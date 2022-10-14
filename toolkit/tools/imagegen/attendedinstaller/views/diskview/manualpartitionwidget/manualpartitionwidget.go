@@ -414,7 +414,7 @@ func (mp *ManualPartitionWidget) populateTable() (err error) {
 		mp.partitionTable.SetCell(tableHeaderRow, i, cell)
 	}
 
-	bootPartitionMountPoint, _, _, err := configuration.BootPartitionConfig(mp.bootType, mp.cfg.Disks[0].PartitionTableType)
+	bootPartitionMountPoint, _, _, err := configuration.BootPartitionConfig(mp.bootType, "gpt")
 	if err != nil {
 		return
 	}
