@@ -67,10 +67,10 @@ else
     TEMP_DB_PATH="/temp_db"
 
     # These nodes are required in the chroot for certain tools (most importantly, the NSS library initialization required by rpm)
-    sudo mkdir -pv $chroot_builder_folder/dev
-    sudo mknod -m 600 $chroot_builder_folder/dev/console c 5 1
-    sudo mknod -m 666 $chroot_builder_folder/dev/null c 1 3
-    sudo mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
+    mkdir -pv $chroot_builder_folder/dev
+    mknod -m 600 $chroot_builder_folder/dev/console c 5 1
+    mknod -m 666 $chroot_builder_folder/dev/null c 1 3
+    mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
 
     chroot "$chroot_builder_folder" mkdir -pv "$TEMP_DB_PATH"
     chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"
