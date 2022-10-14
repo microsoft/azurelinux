@@ -29,8 +29,8 @@ sriov-network-device-plugin is Kubernetes device plugin for discovering and adve
 resources in the form of SR-IOV virtual functions and PCI physical functions 
 
 %prep
-%autosetup 
-%setup -q #-T -D -a 1
+# %autosetup 
+%setup # -q -T -D -a 1
 
 %build
 make build
