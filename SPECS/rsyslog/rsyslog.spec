@@ -61,8 +61,8 @@ rm -f %{buildroot}/lib/systemd/system/rsyslog.service
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/rsyslog.conf
-install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
-install -p -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog-warn
+install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
+install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog-warn
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
