@@ -20,7 +20,7 @@ Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tag
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 
-Source1:       %{name}-%{version}-govendor.tar.gz
+# Source1:       %{name}-%{version}-govendor.tar.gz
 Patch0:         sriovdp.patch
 BuildRequires:  golang
 
@@ -30,7 +30,7 @@ resources in the form of SR-IOV virtual functions and PCI physical functions
 
 %prep
 %autosetup -p1
-%setup -q -T -D -a 1
+%setup -q #-T -D -a 1
 
 %build
 make build
