@@ -77,10 +77,9 @@ if [[ "$HOST_RPM_DB_BACKEND" == "$GUEST_RPM_DB_BACKEND" ]]; then
 else
     echo "The host rpm db ('$HOST_RPM_DB_BACKEND') differs from the guest ('$GUEST_RPM_DB_BACKEND'). Rebuilding database for compatibility" | tee -a "$chroot_log"
     TEMP_DB_PATH="/temp_db"
-    echo "Setting up a clean RPM database before the Berkeley DB -> SQLite conversion under '$TEMP_DB_PATH'." | tee -a "$chroot_log"
     chroot "$chroot_builder_folder" mkdir -p "$TEMP_DB_PATH"
     chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"
-    # Popularing the SQLite database with package info.
+    # Populating the SQLite database with package info.
     while read -r package || [ -n "$package" ]; do
         full_rpm_path=$(find "$rpm_path" -name "$package" -type f 2>>"$chroot_log")
         cp $full_rpm_path $chroot_builder_folder/$package
