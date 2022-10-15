@@ -16,7 +16,7 @@ Distribution:   Mariner
 
 Name:           mod_wsgi
 Version:        4.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A WSGI interface for Python web applications in Apache
 License:        ASL 2.0
 URL:            https://modwsgi.readthedocs.io/
@@ -157,6 +157,9 @@ ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 %endif
 
 %changelog
+* Fri Oct 14 2022 Henry Li <lihl@microsoft.com> - 4.9.3-2
+- License verified
+
 * Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.3-1
 - Upgrade to 4.9.3
 
