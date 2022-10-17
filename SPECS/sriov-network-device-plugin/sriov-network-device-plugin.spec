@@ -31,6 +31,7 @@ install -D -m0755 images/entrypoint.sh %{buildroot}%{_bindir}/entrypoint.sh
 %{_bindir}/entrypoint.sh
 
 %changelog
-* Thu Sep 23 2022 Aditya Dubey <adityadubey@microsoft.com> - 3.3-1
-- Original version for CBL-Mariner
-- License Verified
+* Fri Sep 23 2022 Aditya Dubey <adityadubey@microsoft.com> - 3.3-1
+- License verified
+- Initial changes to build for Mariner
+- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
