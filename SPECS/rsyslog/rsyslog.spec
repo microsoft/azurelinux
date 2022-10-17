@@ -16,7 +16,6 @@ Source3:        rsyslog.conf
 # Upstream only publishes built docs for base_version.0
 Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
 Source5:        rsyslog.logrotate
-Source6:        rsyslog-warn.logrotate
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -127,7 +126,6 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/rsyslog.conf
 install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
-install -p -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog-warn
 cp -r docs/* %{buildroot}%{_docdir}/%{name}/html
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -172,14 +170,13 @@ fi
 %{_sysconfdir}/rsyslog.conf
 %dir %attr(0755, root, root) %{_sysconfdir}/rsyslog.d
 %config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
-%config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog-warn
 
 %files doc
 %doc %{_docdir}/%{name}/html
 
 %changelog
 * Wed Oct 12 2022 Nan Liu <liunan@microsoft.com> - 8.2204.1-3
-- Add rsyslog and rsyslog-warn configuration files to /etc/logrotate.d
+- Add rsyslog configuration file to /etc/logrotate.d
 
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 8.2204.1-2
 - Modify rsyslog.conf to improve security
