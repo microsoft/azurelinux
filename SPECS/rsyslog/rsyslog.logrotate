@@ -7,7 +7,7 @@
 {
     rotate 4
     weekly
-    size 50M
+    maxsize 50M
     missingok
     notifempty
     compress
