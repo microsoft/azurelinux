@@ -64,15 +64,19 @@
 %_use_internal_dependency_generator 1
 %_build_id_links alldebug
 
-%__os_install_post    \
+%__os_install_post_leave_signatures    \
     %{_rpmconfigdir}/brp-compress \
-    %{_rpmconfigdir}/brp-strip %{__strip} \
-    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
-    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
     find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
+    %{nil}
+
+%__os_install_post    \
+    %{__os_install_post_leave_signatures} \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
+    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
+    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
