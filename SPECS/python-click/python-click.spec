@@ -10,7 +10,7 @@
 Summary:        Simple wrapper around optparse for powerful command line utilities
 Name:           python-%{pypi_name}
 Version:        7.1.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            https://github.com/mitsuhiko/click
 #Source0:       https://github.com/mitsuhiko/click/archive/%{version}/%{pypi_name}-%{version}.tar.gz
@@ -57,6 +57,9 @@ pytest -v tests
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
 %changelog
+* Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsft.com> - 7.1.2-6
+- Migrate the package to Mariner Core.
+
 * Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 7.1.2-5
 - Drop BR on pytest & pip install latest deps to enable ptest
 - License verified
