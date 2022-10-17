@@ -1,4 +1,4 @@
-Summary:        Plugin for discovering and advertising networking resources 
+Summary:        Plugin for discovering and advertising networking resources
 Name:           sriov-network-device-plugin
 Version:        3.3
 Release:        1%{?dist}
@@ -11,7 +11,7 @@ Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tag
 BuildRequires:  golang
 
 %description
-sriov-network-device-plugin is Kubernetes device plugin for discovering and advertising networking 
+sriov-network-device-plugin is Kubernetes device plugin for discovering and advertising networking
 resources in the form of SR-IOV virtual functions and PCI physical functions 
 
 %prep
