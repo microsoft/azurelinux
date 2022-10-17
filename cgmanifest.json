@@ -20733,6 +20733,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-google-auth-oauthlib",
+          "version": "0.5.3",
+          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-greenlet",
           "version": "1.1.2",
           "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/1.1.2/greenlet-1.1.2.tar.gz"
