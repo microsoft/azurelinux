@@ -6851,8 +6851,8 @@
         "type": "other",
         "other": {
           "name": "iw",
-          "version": "5.4",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-5.4.tar.xz"
+          "version": "5.9",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-5.9.tar.xz"
         }
       }
     },
@@ -27017,8 +27017,8 @@
         "type": "other",
         "other": {
           "name": "wireless-regdb",
-          "version": "2019.06.03",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2019.06.03.tar.xz"
+          "version": "2022.08.12",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2022.08.12.tar.xz"
         }
       }
     },
