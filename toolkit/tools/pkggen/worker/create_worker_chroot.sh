@@ -90,14 +90,14 @@ else
     echo "Overwriting old RPM database with the results of the conversion." | tee -a "$chroot_log"
     chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
     chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
-
-    echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
-    for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
-    do
-        echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
-        chroot "$chroot_builder_folder" rpm --import "$gpg_key"
-    done
 fi
+
+echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
+for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
+do
+    echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
+    chroot "$chroot_builder_folder" rpm --import "$gpg_key"
+done
 
 HOME=$ORIGINAL_HOME
 
