@@ -41,7 +41,8 @@ rm -rf %{pypi_name}.egg-info
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v tests
+pip3 install pytest
+PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v tests
 
 %files -n python3-%{pypi_name}
 %license LICENSE
