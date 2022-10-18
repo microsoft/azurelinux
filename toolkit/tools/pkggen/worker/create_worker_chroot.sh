@@ -71,7 +71,7 @@ HOST_RPM_DB_BACKEND="$(rpm -E '%{_db_backend}')"
 GUEST_RPM_VERSION="$(chroot "$chroot_builder_folder" rpm --version)"
 GUEST_RPM_DB_BACKEND="$(chroot "$chroot_builder_folder" rpm -E '%{_db_backend}')"
 echo "Current host '$HOST_RPM_VERSION' with rpm db '$HOST_RPM_DB_BACKEND', guest has '$GUEST_RPM_VERSION' with rpm db '$GUEST_RPM_DB_BACKEND'" | tee -a "$chroot_log"
-#HOST_RPM_DB_BACKEND="hack"
+
 if [[ "$HOST_RPM_DB_BACKEND" == "$GUEST_RPM_DB_BACKEND" ]]; then
     echo "The host rpm db '$HOST_RPM_DB_BACKEND' matches the guest. Not rebuilding the database." | tee -a "$chroot_log"
 else
