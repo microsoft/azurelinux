@@ -19,9 +19,6 @@ BuildRequires:  python3-requests-oauthlib
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-pytest
 BuildRequires:  python3-mock
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description
 This library provides oauthlib integration with google-auth.
@@ -44,8 +41,7 @@ rm -rf %{pypi_name}.egg-info
 %py3_install
 
 %check
-pip3 install pytest
-PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v tests
+PYTHONPATH=%{buildroot}%{python3_sitelib} pytest%{python3_version} -v tests
 
 %files -n python3-%{pypi_name}
 %license LICENSE
