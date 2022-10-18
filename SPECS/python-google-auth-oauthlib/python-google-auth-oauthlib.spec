@@ -19,6 +19,9 @@ BuildRequires:  python3-requests-oauthlib
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-pytest
 BuildRequires:  python3-mock
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 This library provides oauthlib integration with google-auth.
