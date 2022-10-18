@@ -20725,7 +20725,7 @@
         "other": {
           "name": "python-google-auth-oauthlib",
           "version": "0.5.3",
-          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
         }
       }
     },
