@@ -12,7 +12,7 @@ Feel free to delete sections of the template which do not apply to your PR, or a
 - [ ] Packages depending on static components modified in this PR (Golang, `*-static` subpackages, etc.) have had their `Release` tag incremented.
 - [ ] Package tests (%check section) have been verified with RUN_CHECK=y for existing SPEC files, or added to new SPEC files
 - [ ] All package sources are available
-- [ ] cgmanifest files are up-to-date and sorted (`./cgmanifest.json`, `./toolkit/tools/cgmanifest.json`, `./toolkit/scripts/toolchain/cgmanifest.json`, `.github/workflows/cgmanifest.json`)
+- [ ] cgmanifest files are up-to-date and sorted (`./cgmanifest.json`, `./toolkit/scripts/toolchain/cgmanifest.json`, `.github/workflows/cgmanifest.json`)
 - [ ] LICENSE-MAP files are up-to-date (`./SPECS/LICENSES-AND-NOTICES/data/licenses.json`, `./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md`, `./SPECS/LICENSES-AND-NOTICES/LICENSE-EXCEPTIONS.PHOTON`)
 - [ ] All source files have up-to-date hashes in the `*.signatures.json` files
 - [ ] `sudo make go-tidy-all` and `sudo make go-test-coverage` pass
