@@ -1896,6 +1896,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cpptest",
+          "version": "1.1.2",
+          "downloadUrl": "https://downloads.sourceforge.net/cpptest/cpptest-1.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cppunit",
           "version": "1.15.1",
           "downloadUrl": "https://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz"
