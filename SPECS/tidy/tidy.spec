@@ -10,7 +10,7 @@ License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.html-tidy.org/
-Source0:        https://github.com/htacg/%{upname}/archive/%{version}.tar.gz
+Source0:        https://github.com/htacg/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
