@@ -71,7 +71,7 @@ Python language bindings for gRPC.
 CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
 
 mkdir -p cmake/build
-cd cmake/build
+pushd cmake/build
 cmake ../.. -DgRPC_INSTALL=ON                \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
@@ -84,13 +84,15 @@ cmake ../.. -DgRPC_INSTALL=ON                \
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
+popd
 %py3_build
 
 
 %install
-cd cmake/build
+pushd cmake/build
 %make_install
 find %{buildroot} -name '*.cmake' -delete
+popd
 %py3_install
 
 %files
