@@ -55,6 +55,8 @@ clean-package-toolkit:
 
 clean-rpms-snapshot:
 	rm -f $(rpms_snapshot)
+	@echo Verifying no mountpoints present in $(rpms_snapshot_build_dir)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(rpms_snapshot_build_dir)" && \
 	rm -rf $(rpms_snapshot_build_dir)
 	rm -f $(rpms_snapshot_logs_path)
 
