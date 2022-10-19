@@ -697,7 +697,7 @@ For PHP, FFI opens a way to write PHP extensions and bindings to C libraries
 in pure PHP.
 
 %prep
-%setup -q
+%setup -q -n php-%{version}
 
 %patch1 -p1 -b .mpmcheck
 %patch5 -p1 -b .includedir
