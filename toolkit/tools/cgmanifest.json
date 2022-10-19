@@ -113,7 +113,7 @@
                 "Type": "Go",
                 "Go": {
                     "Name": "github.com/ulikunitz/xz",
-                    "Version": "v0.5.7"
+                    "Version": "v0.5.10"
                 }
             }
         },
