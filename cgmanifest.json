@@ -26037,8 +26037,8 @@
         "type": "other",
         "other": {
           "name": "tidy",
-          "version": "5.7.28",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tidy-html5-5.7.28.tar.gz"
+          "version": "5.8.0",
+          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.8.0.tar.gz#/tidy-html5-5.8.0.tar.gz"
         }
       }
     },
