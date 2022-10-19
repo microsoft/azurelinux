@@ -3,7 +3,7 @@
 
 %global debug_package %{nil}
 
-%define kernel_version_release @KERNEL_VERSION_RELEASE@
+%define kernel_version_release 5.15.48.1-4.cm2
 %define kernel_version %(echo %{kernel_version_release} | grep -oP "^[^-]+")
 %define kernel_release %(echo %{kernel_version_release} | grep -oP "(?<=-).+")
 
@@ -50,7 +50,7 @@ fi
 Summary:        Set of livepatches for kernel %{kernel_version_release}
 Name:           %{livepatch_unsigned_name}-signed
 Version:        1.0.0
-Release:        @RELEASE_TAG@
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,7 +61,11 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 ExclusiveArch:  x86_64
 
 %description
-@DESCRIPTION@
+A set of kernel livepatches addressing CVEs present in Mariner's
+5.15.48.1-4.cm2 kernel.
+
+Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):
+*CVE-2022-34918
 
 %package -n     %{livepatch_unsigned_name}
 Summary:        %{summary}
@@ -77,7 +81,11 @@ Requires(preun): kpatch
 Provides:       livepatch = %{kernel_version_release}
 
 %description -n %{livepatch_unsigned_name}
-@DESCRIPTION@
+A set of kernel livepatches addressing CVEs present in Mariner's
+5.15.48.1-4.cm2 kernel.
+
+Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):
+*CVE-2022-34918
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
@@ -106,4 +114,10 @@ install -m 744 %{SOURCE0} %{buildroot}%{livepatch_module_path}
 %dir %{livepatch_install_dir}
 %{livepatch_module_path}
 
-@CHANGELOG@
+%changelog
+* Sat Oct 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
+- Patching CVE-2022-34918.
+
+* Sat Oct 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
+- Original version for CBL-Mariner.
+- License verified.
