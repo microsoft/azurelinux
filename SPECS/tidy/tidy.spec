@@ -97,6 +97,7 @@ rm -fv %{buildroot}%{_libdir}/libtidy.a
 - libtidys.a -> libtidy.a
 - Added make
 - Reverted source URL change
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
 
 * Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 5.7.28-5
 - Moved from SPECS-EXTENDED to SPECS
