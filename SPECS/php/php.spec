@@ -1357,6 +1357,8 @@ rm -f README.{Zeus,QNX,CVS-RULES}
 %transfiletriggerin fpm -- %{_sysconfdir}/php-fpm.d %{_sysconfdir}/php.d
 systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
+%files
+
 %files common -f files.common
 %doc EXTENSIONS NEWS UPGRADING* README.REDIST.BINS *md docs
 %license LICENSE TSRM_LICENSE ZEND_LICENSE BOOST_LICENSE
