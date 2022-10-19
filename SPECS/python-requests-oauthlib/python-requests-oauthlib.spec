@@ -113,6 +113,7 @@ rm -rf %{distname}.egg-info
 %changelog
 * Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsft.com> - 1.2.0-8
 - Migrate the package to Mariner Core.
+- License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.2.0-7
 - Remove epoch
