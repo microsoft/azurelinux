@@ -43,7 +43,7 @@ $(call create_folder,$(rpmbuilding_logs_dir))
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache
-clean-workplan:
+clean-workplan: clean-cache
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-cache:
