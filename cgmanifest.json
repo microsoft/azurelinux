@@ -26038,7 +26038,7 @@
         "other": {
           "name": "tidy",
           "version": "5.8.0",
-          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.8.0.tar.gz#/tidy-html5-5.8.0.tar.gz"
+          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.8.0.tar.gz"
         }
       }
     },
