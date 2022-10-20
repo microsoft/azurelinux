@@ -1,49 +1,45 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %if !0%{?bootstrap} && (0%{?fedora} || 0%{?rhel} > 6)
 %global tests 1
 %global python3 python%{python3_pkgversion}
 %endif
-
-Name:    lensfun
-Version: 0.3.2
-Summary: Library to rectify defects introduced by photographic lenses
-Release: 26%{?dist}
-
-License: LGPLv3 and CC-BY-SA
-URL: http://lensfun.sourceforge.net/
-Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-
+Summary:        Library to rectify defects introduced by photographic lenses
+Name:           lensfun
+Version:        0.3.2
+Release:        26%{?dist}
+License:        LGPLv3 AND CC-BY-SA
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://lensfun.sourceforge.net/
+Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 ## upstream patches
-Patch1: 0001-Only-require-glib-2.40-when-tests-are-build-without-.patch
-Patch38: 0038-Only-use-proper-C-new-and-delete-syntax-for-object-c.patch
-Patch58: 0058-Use-database-in-source-directory-while-running-tests.patch
-Patch59: 0059-Patch-47-respect-DESTDIR-when-installing-python-stuf.patch
-Patch60: 0060-Various-CMake-patches-from-the-mailing-list.patch
-Patch113: 0113-Added-std-namespace-to-isnan.patch
-
-## upstream patches (master branch)
-Patch866: 0866-Pull-isnan-into-std-namespace-include-cmath-not-math.patch
-
+Patch1:         0001-Only-require-glib-2.40-when-tests-are-build-without-.patch
+Patch38:        0038-Only-use-proper-C-new-and-delete-syntax-for-object-c.patch
+Patch58:        0058-Use-database-in-source-directory-while-running-tests.patch
+Patch59:        0059-Patch-47-respect-DESTDIR-when-installing-python-stuf.patch
+Patch60:        0060-Various-CMake-patches-from-the-mailing-list.patch
+Patch113:       0113-Added-std-namespace-to-isnan.patch
 ## upstreamable patches
 # install manpages only when INSTALL_HELPER_SCRIPTS=ON
-Patch200: lensfun-0.3.2-INSTALL_HELPER_SCRIPTS.patch
-
-BuildRequires: cmake >= 2.8
-BuildRequires: doxygen
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: pkgconfig(glib-2.0) 
-BuildRequires: pkgconfig(libpng) 
-BuildRequires: pkgconfig(zlib)
-%if 0%{?python3:1}
-BuildRequires: python3 python3-devel
-%else
-Obsoletes: lensfun-python3 < %{version}-%{release}
-Obsoletes: lensfun-tools < %{version}-%{release}
-%endif
+Patch200:       lensfun-0.3.2-INSTALL_HELPER_SCRIPTS.patch
+## upstream patches (master branch)
+Patch866:       0866-Pull-isnan-into-std-namespace-include-cmath-not-math.patch
 # for rst2man, if INSTALL_HELPER_SCRIPTS != OFF
-BuildRequires: /usr/bin/rst2man
+BuildRequires:  %{_bindir}/rst2man
+BuildRequires:  cmake >= 2.8
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(libpng)
+BuildRequires:  pkgconfig(zlib)
+%if 0%{?python3:1}
+BuildRequires:  python3
+BuildRequires:  python3-devel
+%else
+Obsoletes:      lensfun-python3 < %{version}-%{release}
+Obsoletes:      lensfun-tools < %{version}-%{release}
+%endif
 
 %description
 The lensfun library provides an open source database of photographic lenses and
@@ -54,31 +50,34 @@ distortion, transversal (also known as lateral) chromatic aberrations,
 vignetting and color contribution of a lens.
 
 %package devel
-Summary: Development toolkit for %{name}
-License: LGPLv3
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development toolkit for %{name}
+License:        LGPLv3
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description devel
 This package contains library and header files needed to build applications
 using lensfun.
 
 %package tools
-Summary: Tools for managing %{name} data
-License: LGPLv3
-Requires: python3-lensfun = %{version}-%{release}
+Summary:        Tools for managing %{name} data
+License:        LGPLv3
+Requires:       python3-lensfun = %{version}-%{release}
+
 %description tools
 This package contains tools to fetch lens database updates and manage lens
 adapters in lensfun.
 
 %package -n python3-lensfun
-Summary:  Python3 lensfun bindings
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Python3 lensfun bindings
+License:        LGPLv3 AND CC-BY-SA
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 %if 0%{?rhel} == 7
 ## pkgname changed in epel7 from python34- to python36-
-Obsoletes: python34-lensfun < %{version}-%{release}
+Obsoletes:      python34-lensfun < %{version}-%{release}
 %endif
+
 %description -n python3-lensfun
 %{summary}.
-
 
 %prep
 %setup -q
@@ -96,7 +95,7 @@ Obsoletes: python34-lensfun < %{version}-%{release}
 
 %if 0%{?python3:1}
 sed -i.shbang \
-  -e "s|^#!/usr/bin/env python3$|#!%{__python3}|g" \
+  -e "s|^#!%{_bindir}/env python3$|#!python3|g" \
   apps/lensfun-add-adapter \
   apps/lensfun-update-data
 %endif
@@ -105,7 +104,7 @@ sed -i.shbang \
 %build
 mkdir %{_target_platform}
 pushd %{_target_platform}
-%{cmake} .. \
+%cmake .. \
   -DBUILD_DOC:BOOL=ON \
   -DBUILD_TESTS:BOOL=%{?tests:ON}%{!?tests:OFF} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -122,7 +121,7 @@ make doc -C %{_target_platform}
 make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 # create/own /var/lib/lensfun-updates
-mkdir -p %{buildroot}/var/lib/lensfun-updates
+mkdir -p %{buildroot}%{_sharedstatedir}/lensfun-updates
 
 ## unpackaged files
 # omit g-lensfun-update-data because it needs gksudo which we don't ship
@@ -147,7 +146,7 @@ popd
 %{_datadir}/lensfun/
 %{_libdir}/liblensfun.so.%{version}
 %{_libdir}/liblensfun.so.1*
-%dir /var/lib/lensfun-updates/
+%dir %{_sharedstatedir}/lensfun-updates/
 
 %files devel
 %{_pkgdocdir}/*.css
