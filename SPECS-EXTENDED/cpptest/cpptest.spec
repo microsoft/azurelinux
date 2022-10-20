@@ -1,16 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A portable and powerful and simple unit testing framework for C++
 Name:           cpptest
 Version:        1.1.2
 Release:        20%{?dist}
-Summary:        A portable and powerful and simple unit testing framework for C++
-
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://%{name}.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  doxygen
 BuildRequires:  make
 
 %description
@@ -26,25 +25,25 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
 %setup -q
 #%patch0 -p1
 %build
-export CXXFLAGS="-std=c++14 $RPM_OPT_FLAGS"
+export CXXFLAGS="-std=c++14 %{optflags}"
 %configure --disable-static --enable-doc
 %make_build
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+make install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
 %ldconfig_scriptlets
 
 %files
-%doc NEWS COPYING AUTHORS ChangeLog
+%license COPYING
+%doc NEWS AUTHORS ChangeLog
 %{_libdir}/*.so.*
-%{_datadir}/doc/cpptest
+%{_docdir}/cpptest
 
 %files devel
 %doc doc/html
@@ -52,9 +51,8 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
-
 %changelog
-* Tue Oct 19 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.2-20
+* Wed Oct 19 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.2-20
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Switch to `%make_build` instead of `make`
 - License verified
