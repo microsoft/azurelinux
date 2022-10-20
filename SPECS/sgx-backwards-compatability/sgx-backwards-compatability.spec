@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 Source0:        99-sgx-backwards-compatability.rules
+Source1:        LICENSE
 
 Requires(pre):  %{_sbindir}/groupadd
 Requires(post): systemd-udev
@@ -29,8 +30,10 @@ fi
 %install
 mkdir -p %{buildroot}/etc/udev/rules.d
 install %{SOURCE0} %{buildroot}/etc/udev/rules.d/99-sgx-backwards-compatability.rules
+cp %{SOURCE1} LICENSE
 
 %files
+%license LICENSE
 /etc/udev/rules.d/99-sgx-backwards-compatability.rules
 
 %post
@@ -40,3 +43,4 @@ udevadm trigger --subsystem-match=misc
 * Tue Oct 18 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner
 - Initial version of the sgx-backwards-compatability package
+- License verified
