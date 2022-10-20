@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
 #Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
-Source0:        grpc-1.42.0-with-submodules.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        grpc-1.42.0-with-submodules.tar.gz
 
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
