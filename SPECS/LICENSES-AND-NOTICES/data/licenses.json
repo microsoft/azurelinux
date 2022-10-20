@@ -7,7 +7,7 @@
     ],
     "licenses": {
         "CentOS": {
-            "license": "[GPLv2 License](https://www.centos.org/legal/#licensing-policy)",
+            "license": "[MIT](https://www.centos.org/legal/#licensing-policy)",
             "specs": [
                 "crash-ptdump-command",
                 "delve",
