@@ -33,7 +33,7 @@ developing applications that use %{name}.
 %build
 export CXXFLAGS="-std=c++14 $RPM_OPT_FLAGS"
 %configure --disable-static --enable-doc
-make %{?_smp_mflags} V=1
+%make_build
 
 
 %install
@@ -56,6 +56,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %changelog
 * Tue Oct 19 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.2-20
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Switch to `%make_build` instead of `make`
 - License verified
 
 * Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-19
