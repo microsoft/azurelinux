@@ -1,24 +1,23 @@
-Vendor:           Microsoft Corporation
-Distribution:     Mariner
-Name:             libcroco
-Summary:          A CSS2 parsing library
-Version:          0.6.13
-Release:          6%{?dist}
-License:          LGPLv2
-Url:              https://gitlab.gnome.org/Archive/libcroco
-Source:           https://gitlab.gnome.org/Archive/libcroco/-/archive/%{version}/%{name}-%{version}.tar.xz
-
-BuildRequires:    gcc
-BuildRequires:    pkgconfig
-BuildRequires:    glib2-devel
-BuildRequires:    libxml2-devel
+Summary:        A CSS2 parsing library
+Name:           libcroco
+Version:        0.6.13
+Release:        6%{?dist}
+License:        LGPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://gitlab.gnome.org/Archive/libcroco
+Source:         https://gitlab.gnome.org/Archive/libcroco/-/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.xz
+BuildRequires:  gcc
+BuildRequires:  glib2-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  pkgconfig
 
 %description
 CSS2 parsing and manipulation library for GNOME
 
 %package devel
-Summary:          Libraries and include files for developing with libcroco
-Requires:         %{name}%{_isa} = %{version}-%{release}
+Summary:        Libraries and include files for developing with libcroco
+Requires:       %{name}%{_isa} = %{version}-%{release}
 
 %description devel
 This package provides the necessary development libraries and include
@@ -33,7 +32,7 @@ make %{?_smp_mflags} CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 %install
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make check
