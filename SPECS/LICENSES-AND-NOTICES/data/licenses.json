@@ -126,6 +126,7 @@
                 "cpp-hocon",
                 "cppcheck",
                 "cpprest",
+                "cpptest",
                 "cpuid",
                 "criu",
                 "crontabs",
