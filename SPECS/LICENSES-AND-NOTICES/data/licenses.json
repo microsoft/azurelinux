@@ -1978,7 +1978,6 @@
                 "coredns-1.8.4",
                 "coredns-1.8.6",
                 "csi-driver-lvm",
-                "dbus-x11",
                 "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",
