@@ -1515,7 +1515,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
-* Fri Oct 07 2022 Osama Esmail <osamaesmail@microsoft.com> - 8.1.11-2 
+* Fri Oct 07 2022 Osama Esmail <osamaesmail@microsoft.com> - 8.1.11-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Replaced conditional flags with global variables
 - Replaced/deleted extraneous macros
