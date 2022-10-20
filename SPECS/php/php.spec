@@ -106,7 +106,7 @@ BuildRequires:  nginx-filesystem
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  perl-interpreter
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  smtpdaemon
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  tzdata
@@ -315,7 +315,7 @@ Summary:        A module for PHP applications that use IMAP
 License:        PHP
 BuildRequires:  libc-client-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(krb5)
 BuildRequires:  pkgconfig(krb5-gssapi)
 Requires:       php-common%{?_isa} = %{version}-%{release}
@@ -332,7 +332,7 @@ Summary:        A module for PHP applications that use LDAP
 License:        PHP
 BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libsasl2)
 Requires:       php-common%{?_isa} = %{version}-%{release}
 
@@ -446,7 +446,7 @@ package.
 Summary:        A module for PHP applications that use the SOAP protocol
 # All files licensed under PHP version 3.01
 License:        PHP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libxml-2.0)
 Requires:       php-common%{?_isa} = %{version}-%{release}
 
@@ -489,7 +489,7 @@ will need to install this package and the php package.
 Summary:        A module for PHP applications which use XML
 # All files licensed under PHP version 3.01
 License:        PHP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libexslt)
 BuildRequires:  pkgconfig(libxml-2.0) >= 2.7.6
 BuildRequires:  pkgconfig(libxslt) >= 1.1
@@ -518,7 +518,7 @@ Summary:        A module for PHP applications which need multi-byte string handl
 # libmbfl is licensed under LGPLv2
 # ucgendat is licensed under OpenLDAP
 License:        PHP AND LGPLv2 AND OpenLDAP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(oniguruma) >= 6.8
 Requires:       php-common%{?_isa} = %{version}-%{release}
 Provides:       bundled(libmbfl) = 1.3.2
@@ -531,7 +531,7 @@ support for multi-byte string handling to PHP.
 Summary:        A module for PHP applications for using the gd graphics library
 # All files licensed under PHP version 3.01
 License:        PHP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(gdlib) >= 2.1.1
 Requires:       php-common%{?_isa} = %{version}-%{release}
 
@@ -639,7 +639,7 @@ support for using the pspell library to PHP.
 Summary:        Internationalization extension for PHP applications
 # All files licensed under PHP version 3.01
 License:        PHP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(icu-i18n) >= 50.1
 BuildRequires:  pkgconfig(icu-io) >= 50.1
 BuildRequires:  pkgconfig(icu-uc) >= 50.1
@@ -653,7 +653,7 @@ support for using the ICU library to PHP.
 Summary:        Enchant spelling extension for PHP applications
 # All files licensed under PHP version 3.0
 License:        PHP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(enchant-2)
 Requires:       php-common%{?_isa} = %{version}-%{release}
 
@@ -666,7 +666,7 @@ support for using the enchant library to PHP.
 Summary:        Wrapper for the Sodium cryptographic library
 # All files licensed under PHP version 3.0.1
 License:        PHP
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libsodium) >= 1.0.9
 Requires:       php-common%{?_isa} = %{version}-%{release}
 Obsoletes:      php-pecl-libsodium2 < 3
@@ -684,7 +684,7 @@ Summary:        Foreign Function Interface
 # All files licensed under PHP version 3.0.1
 License:        PHP
 Group:          System Environment/Libraries
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libffi)
 Requires:       php-common%{?_isa} = %{version}-%{release}
 
@@ -1515,7 +1515,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
-* Fri Oct  7 2022 Osama Esmail <osamaesmail@microsoft.com> 8.1.11-2 
+* Fri Oct 07 2022 Osama Esmail <osamaesmail@microsoft.com> - 8.1.11-2 
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Replaced conditional flags with global variables
 - Replaced/deleted extraneous macros
