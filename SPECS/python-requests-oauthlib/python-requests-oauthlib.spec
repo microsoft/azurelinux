@@ -1,70 +1,33 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
-%bcond_with python2
-%bcond_without python3
-
 %global distname requests-oauthlib
 %global modname requests_oauthlib
 
-Name:               python-requests-oauthlib
-Version:            1.2.0
-Release:            8%{?dist}
-Summary:            OAuthlib authentication support for Requests.
-
-License:            ISC
-URL:                http://pypi.python.org/pypi/requests-oauthlib
-Source0:            https://github.com/requests/requests-oauthlib/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildArch:          noarch
+Summary:        OAuthlib authentication support for Requests.
+Name:           python-requests-oauthlib
+Version:        1.2.0
+Release:        8%{?dist}
+License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://pypi.python.org/pypi/requests-oauthlib
+Source0:        https://github.com/requests/requests-oauthlib/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 This project provides first-class OAuth library support for python-request.
 
-%if %{with python2}
-%package -n python2-%{distname}
-%if 0%{?python_provide:1}
-%python_provide python2-%{distname}
-%else
-Provides: python-%{distname} = %{version}-%{release}
-%endif
-
-Summary:            OAuthlib authentication support for Requests.
-
-BuildRequires:      python2-devel
-BuildRequires:      python2-setuptools
-
-BuildRequires:      python2-oauthlib >= 0.6.2
-BuildRequires:      python2-requests >= 2.0.0
-
-BuildRequires:      python2-mock
-
-Requires:           python2-oauthlib
-Requires:           python2-requests >= 2.0.0
-
-%description -n python2-%{distname}
-This project provides first-class OAuth library support for python-request.
-%endif # with python2
-
-%if %{with python3}
 %package -n python3-%{distname}
 %{?python_provide:%python_provide python3-%{distname}}
-Summary:            OAuthlib authentication support for Requests.
-
-BuildRequires:      python3-devel
-BuildRequires:      python3-setuptools
-
-BuildRequires:      python3-oauthlib >= 0.6.2
-BuildRequires:      python3-requests >= 2.0.0
-
-BuildRequires:      python3-mock
-
-Requires:           python3-oauthlib
-Requires:           python3-requests
+Summary:        OAuthlib authentication support for Requests.
+BuildRequires:  python3-devel
+BuildRequires:  python3-mock
+BuildRequires:  python3-oauthlib >= 0.6.2
+BuildRequires:  python3-requests >= 2.0.0
+BuildRequires:  python3-setuptools
+Requires:       python3-oauthlib
+Requires:       python3-requests
 
 %description -n python3-%{distname}
 This project provides first-class OAuth library support for python-request.
-%endif
 
 %prep
 %autosetup -n %{distname}-%{version}
@@ -74,41 +37,24 @@ rm -rf %{distname}.egg-info
 
 
 %build
-%if %{with python2}
-%py2_build
-%endif # with python2
-%if %{with python3}
 %py3_build
-%endif
+
 
 %install
-%if %{with python2}
-%py2_install
-%endif # with python2
-%if %{with python3}
 %py3_install
-%endif
+
 
 # Upstream doesn't actually ship the tests with the tarball.
 # https://github.com/requests/requests-oauthlib/pull/91
 #%%check
 #%%{__python2} setup.py test
 
-%if %{with python2}
-%files -n python2-%{distname}
-%doc README.rst HISTORY.rst requirements.txt AUTHORS.rst
-%license LICENSE
-%{python2_sitelib}/%{modname}/
-%{python2_sitelib}/%{modname}-%{version}*
-%endif # with python2
 
-%if %{with python3}
 %files -n python3-%{distname}
 %doc README.rst HISTORY.rst requirements.txt AUTHORS.rst
 %license LICENSE
 %{python3_sitelib}/%{modname}/
 %{python3_sitelib}/%{modname}-%{version}*
-%endif
 
 %changelog
 * Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsft.com> - 1.2.0-8
