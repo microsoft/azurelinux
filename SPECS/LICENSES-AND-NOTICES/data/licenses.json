@@ -1529,6 +1529,7 @@
                 "python-funcsigs",
                 "python-genshi",
                 "python-google-auth",
+                "python-google-auth-oauthlib",
                 "python-greenlet",
                 "python-gssapi",
                 "python-hacking",
