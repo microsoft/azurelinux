@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://fallabs.com/tokyocabinet/
-Source:         http://fallabs.com/tokyocabinet/tokyocabinet-%{version}.tar.gz
+Source:         http://fallabs.com/tokyocabinet/tokyocabinet-%{version}.tar.gz 
 Patch0:         tokyocabinet-fedora.patch
 Patch1:         tokyocabinet-manhelp.patch
 BuildRequires:  autoconf
