@@ -20,7 +20,9 @@ Requires:       xz
 # In real-life situations systemd will always be present and thus installed.
 Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
-# De-entagle SPECS-EXTENDED dependency
+
+# NOTE: We currently do not build with X11 support.
+# build with X11 support in the future.
 Provides:       %{name}-x11
 
 %description
