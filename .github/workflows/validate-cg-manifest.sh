@@ -50,6 +50,7 @@ ignore_no_source_tarball=" \
   qt5-rpm-macros \
   verity-read-only-root \
   web-assets \
+  sgx-backwards-compatability \
   "
 
 # Specs where cgmanifest validation has known issues checking URLs.
