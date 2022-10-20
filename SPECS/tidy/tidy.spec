@@ -94,8 +94,8 @@ rm -fv %{buildroot}%{_libdir}/libtidy.a
 %changelog
 * Tue Oct 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 5.8.0-5
 - Upgraded from 5.7.28 to 5.8.0
-- libtidys.a -> libtidy.a
-- Added make
+- Changed libtidys.a to libtidy.a
+- Added make to our upgrade since tidy uses it now.
 - Reverted source URL change
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 
