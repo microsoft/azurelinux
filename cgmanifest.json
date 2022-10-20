@@ -1896,6 +1896,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cpptest",
+          "version": "1.1.2",
+          "downloadUrl": "https://downloads.sourceforge.net/cpptest/cpptest-1.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cppunit",
           "version": "1.15.1",
           "downloadUrl": "https://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz"
@@ -26057,8 +26067,8 @@
         "type": "other",
         "other": {
           "name": "tidy",
-          "version": "5.7.28",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tidy-html5-5.7.28.tar.gz"
+          "version": "5.8.0",
+          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.8.0.tar.gz"
         }
       }
     },
@@ -26168,7 +26178,7 @@
         "other": {
           "name": "tokyocabinet",
           "version": "1.4.48",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/tokyocabinet-1.4.48.tar.gz"
+          "downloadUrl": "http://fallabs.com/tokyocabinet/tokyocabinet-1.4.48.tar.gz"
         }
       }
     },
