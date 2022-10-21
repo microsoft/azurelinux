@@ -27,7 +27,7 @@ Summary:        %{summary}
 %autosetup -p1 -n gast-%{version}
 
 
-%{generate_buildrequires}
+%generate_buildrequires
 %{pyproject_buildrequires} -t
 
 
