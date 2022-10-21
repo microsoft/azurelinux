@@ -1644,6 +1644,7 @@
                 "python-systemd",
                 "python-tempita",
                 "python-templated-dictionary",
+                "python-termcolor",
                 "python-testrepository",
                 "python-testresources",
                 "python-testscenarios",
