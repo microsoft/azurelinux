@@ -224,7 +224,7 @@ NOTE: ISOs require additional packaging and build steps (such as the creation of
 
 The following builds an ISO with an interactive UI and selectable image configurations.
 ```bash
-# To build a Mariner ISO Image (ISO folder: ../out/images/full)
+# To build a CBL-Mariner ISO Image (ISO folder: ../out/images/full)
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
@@ -607,7 +607,7 @@ Since the summary files are regenerated every build, if you wish to reproduce a 
 | Image Build                   | `$(IMAGEGEN_DIR)/{imagename}/image_deps.json`                                                          | Generated every image build. Can be saved and used later with the `IMAGE_CACHE_SUMMARY` variable to reproduce an image build. Contains **all (both external and local)** packages required to build the image.
 | Initrd Build                  | `$(IMAGEGEN_DIR)/iso_initrd/image_deps.json`                                                           | Generated every initrd and ISO build. Can be saved and used later with the `INITRD_CACHE_SUMMARY` variable to reproduce an initrd build. Contains **all (both external and local)** packages required to build the image. However, unless you modified the initrd image packages JSON or have your own version of its PMC packages locally, all the required packages are external.
 
-**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core Mariner's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
+**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core CBL-Mariner's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
 
 ### Building From Summaries
 
