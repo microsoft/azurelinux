@@ -13,10 +13,8 @@ Requires(pre):  %{_sbindir}/groupadd
 Requires(post): systemd-udev
 
 %description
-A main-line kernel with SGX support will expose dev nodes to flat files.
-Instead of /dev/sgx/enclave and /dev/sgx/provision exposed by the DCAP 
-driver, the kernel exposes those at /dev/sgx_enclave and /dev/sgx_provision.
-Custom udev rules to create a link from /dev/sgx/{enclave,provision} to /dev/sgx_{enclave,provision} 
+This package applies custom udev rules to create symlinks
+from /dev/sgx/{enclave,provision} to /dev/sgx_{enclave,provision}
 
 %prep
 
@@ -40,7 +38,7 @@ cp %{SOURCE1} LICENSE
 udevadm trigger --subsystem-match=misc
 
 %changelog
-* Tue Oct 18 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.0.0-1
+* Tue Oct 20 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner
 - Initial version of the sgx-backwards-compatability package
 - License verified
