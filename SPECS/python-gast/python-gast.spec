@@ -14,6 +14,7 @@ URL:            https://github.com/serge-sans-paille/gast/
 Source0:        %{url}/archive/%{version}/gast-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-packaging
 BuildArch:      noarch
 
 %description %{_description}
@@ -26,22 +27,21 @@ Summary:        %{summary}
 %prep
 %autosetup -p1 -n gast-%{version}
 
-
 %generate_buildrequires
-%{pyproject_buildrequires} -t
+%pyproject_buildrequires -t
 
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} gast
+%pyproject_install
+%pyproject_save_files gast
 
 
 %check
-%{tox}
+%tox
 
 
 %files -n python3-gast -f %{pyproject_files}
