@@ -10,7 +10,7 @@ Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/serge-sans-paille/gast/
+URL:            https://github.com/serge-sans-paille/gast
 Source0:        %{url}/archive/%{version}/gast-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
