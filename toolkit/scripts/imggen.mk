@@ -5,9 +5,9 @@ $(call create_folder,$(IMAGEGEN_DIR))
 
 # Resources
 config_name              = $(notdir $(CONFIG_FILE:%.json=%))
-config_other_files       = $(if $(CONFIG_FILE),$(shell find $(CONFIG_BASE_DIR)))
+config_other_files       = $(if $(CONFIG_FILE),$(call shell_real_build_only, find $(CONFIG_BASE_DIR)))
 assets_dir               = $(RESOURCES_DIR)/assets/
-assets_files             = $(shell find $(assets_dir))
+assets_files             = $(call shell_real_build_only, find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
@@ -21,7 +21,7 @@ ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
 ova_vmxtemplate          = $(assets_dir)/ova/vmx-template
 
 # Built RPMs
-imggen_rpms = $(shell find $(RPMS_DIR) -type f -name '*.rpm')
+imggen_rpms = $(call shell_real_build_only, find $(RPMS_DIR) -type f -name '*.rpm')
 
 # Imagegen workspace and cache
 imggen_config_dir                    = $(IMAGEGEN_DIR)/$(config_name)
@@ -38,7 +38,7 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
-imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*')
+imager_disk_output_files = $(call shell_real_build_only, find $(imager_disk_output_dir) -not -name '*:*')
 ifeq ($(build_arch),aarch64)
 initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
@@ -96,6 +96,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		--log-file=$(LOGS_DIR)/imggen/imagepkgfetcher.log \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
+		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tdnf-worker=$(chroot_worker) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \

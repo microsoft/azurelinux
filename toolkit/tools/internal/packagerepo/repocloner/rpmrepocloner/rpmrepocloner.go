@@ -6,12 +6,14 @@ package rpmrepocloner
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
@@ -24,6 +26,7 @@ import (
 const (
 	allRepoIDs             = "*"
 	builtRepoID            = "local-repo"
+	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
@@ -70,6 +73,7 @@ type RpmRepoCloner struct {
 	chroot         *safechroot.Chroot
 	usePreviewRepo bool
 	cloneDir       string
+	//metadataIsCached bool
 }
 
 // New creates a new RpmRepoCloner
@@ -82,20 +86,24 @@ func New() *RpmRepoCloner {
 //  - tmpDir is the directory to create a chroot
 //  - workerTar is the path to the worker tar used to seed the chroot
 //  - existingRpmsDir is the directory with prebuilt RPMs
+//  - prebuiltRpmsDir is the directory with toolchain RPMs
 //  - usePreviewRepo if set, the upstream preview repository will be used.
 //  - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
 		bindFsType = ""
 		bindData   = ""
 
-		chrootLocalRpmsDir = "/localrpms"
+		chrootLocalRpmsDir      = "/localrpms"
+		chrootLocalToolchainDir = "/toolchainrpms"
 
-		overlayWorkDirectory  = "/overlaywork/workdir"
-		overlayUpperDirectory = "/overlaywork/upper"
-		overlaySource         = "overlay"
+		overlayWorkDirectoryRpms       = "/overlaywork/workdir_rpms"
+		overlayUpperDirectoryRpms      = "/overlaywork/upper_rpms"
+		overlayWorkDirectoryToolchain  = "/overlaywork/workdir_toolchain"
+		overlayUpperDirectoryToolchain = "/overlaywork/upper_toolchain"
+		overlaySource                  = "overlay"
 	)
 
 	r.usePreviewRepo = usePreviewRepo
@@ -137,10 +145,17 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	//
 	// 2) Mount the directory to download RPMs into as a bind, allowing the chroot to write
 	// files into it.
-	overlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalRpmsDir, existingRpmsDir, overlayUpperDirectory, overlayWorkDirectory)
+	outRpmsOverlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalRpmsDir, existingRpmsDir, overlayUpperDirectoryRpms, overlayWorkDirectoryRpms)
 	extraMountPoints := []*safechroot.MountPoint{
-		overlayMount,
+		outRpmsOverlayMount,
 		safechroot.NewMountPoint(destinationDir, chrootDownloadDir, bindFsType, safechroot.BindMountPointFlags, bindData),
+	}
+
+	// Optionally include the special toolchain package directory if it is provided
+	if len(chrootLocalToolchainDir) > 0 {
+		toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainRpmsDir, overlayUpperDirectoryToolchain, overlayWorkDirectoryToolchain)
+		extraMountPoints = append(extraMountPoints, toolchainRpmsOverlayMount)
+		overlayExtraDirs = append(overlayExtraDirs, toolchainRpmsOverlayExtraDirs...)
 	}
 
 	// Also request that /overlaywork is created before any chroot mounts happen so the overlay can
@@ -155,6 +170,9 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	// use overlay so cache repo must be explicitly initialized.
 	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
 	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir}
+	if len(chrootLocalToolchainDir) > 0 {
+		reposToInitialize = append(reposToInitialize, chrootLocalToolchainDir)
+	}
 	for _, repoToInitialize := range reposToInitialize {
 		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
 		err = r.initializeMountedChrootRepo(repoToInitialize)
@@ -203,15 +221,34 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// In order to simulate repository priority, concatenate all requested repofiles into a single file.
 	// TDNF will read the file top-down. It will then parse the results into a linked list, meaning
 	// the first repo entry in the file is the first to be checked.
-	const chrootRepoFile = "/etc/yum.repos.d/allrepos.repo"
+	const (
+		chrootRepoDir  = "/etc/yum.repos.d/"
+		chrootRepoFile = "allrepos.repo"
+	)
 
-	fullRepoFilePath := filepath.Join(r.chroot.RootDir(), chrootRepoFile)
+	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
+	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
 
-	// Create the directory for the repo file
-	err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
+	// Get a list of the existing repofiles that are part of the chroot, if any
+	existingRepoFiles := []fs.DirEntry{}
+	hasRepoDir, err := file.DirExists(fullRepoDirPath)
 	if err != nil {
-		logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
+		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
 		return
+	}
+	if hasRepoDir {
+		existingRepoFiles, err = os.ReadDir(fullRepoDirPath)
+		if err != nil {
+			logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
+			return
+		}
+	} else {
+		// Create the directory for the repo file since there wasn't already one there
+		err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
+		if err != nil {
+			logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
+			return
+		}
 	}
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
@@ -224,6 +261,20 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Assume the order of repoDefinitions indicates their relative priority.
 	for _, repoFilePath := range repoDefinitions {
 		err = appendRepoFile(repoFilePath, dstFile)
+		if err != nil {
+			return
+		}
+	}
+
+	// Add each previously existing repofile to the end of the new file, then delete the original.
+	// We want to try our custom mounted repos before reaching out to the upstream servers.
+	for _, repoFile := range existingRepoFiles {
+		path := filepath.Join(fullRepoDirPath, repoFile.Name())
+		err = appendRepoFile(path, dstFile)
+		if err != nil {
+			return
+		}
+		err = os.Remove(path)
 		if err != nil {
 			return
 		}
@@ -261,6 +312,37 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 	})
 }
 
+// updateCache will pull all the available metadata for all configured repos, then mark the repo cache
+// as up-to-date so no further operations will require accessing the upstream repositories. It will however
+// always update the local fetcher repository to scan for any newly downloaded packages. It is not necessary
+// update the output folder. Tdnf will attempt to download a package, and find that package is already present
+// in the output folder, so it will be skipped with the message '<pkg> package already downloaded'.
+func (r *RpmRepoCloner) updateCache() (err error) {
+	// if !r.metadataIsCached {
+	// 	var releaseverCliArg string
+	// 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	// 	if err != nil {
+	// 		return
+	// 	}
+
+	// 	args := []string{
+	// 		"--refresh",
+	// 		"--enablerepo=*",
+	// 		releaseverCliArg,
+	// 		"makecache",
+	// 	}
+
+	// 	logger.Log.Infof("Gather RPM cache for cloner")
+	// 	err = shell.ExecuteLive(false, "tdnf", args...)
+	// 	if err != nil {
+	// 		logger.Log.Errorf("Failed to generate RPM cache, tdnf error: '%s'", err)
+	// 		return
+	// 	}
+	// 	r.metadataIsCached = true
+	// }
+	return
+}
+
 // Clone clones the provided list of packages.
 // If cloneDeps is set, package dependencies will also be cloned.
 // It will automatically resolve packages that describe a provide or file from a package.
@@ -276,6 +358,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
+			// "--cacheonly",
 			"--destdir",
 			downloadDir,
 			pkgName,
@@ -289,8 +372,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
-			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+			// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
+			repoOrderList := []string{toolchainRepoId, builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -320,16 +403,23 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		"provides",
 		provideQuery,
 		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
+		// "--cacheonly",
 		releaseverCliArg,
 	}
 
 	foundPackages := make(map[string]bool)
-	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
+	repoOrderList := []string{toolchainRepoId, builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
 	for _, repoID := range repoOrderList {
 		logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
 		err = r.chroot.Run(func() (err error) {
+			// Update the metadata cache if it hasn't yet been updated, then rely excursively on that metadata.
+			err = r.updateCache()
+			if err != nil {
+				return
+			}
+
 			completeArgs := append(baseArgs, fmt.Sprintf("--enablerepo=%s", repoID))
 
 			if !r.usePreviewRepo {
@@ -488,6 +578,12 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		return false, fmt.Errorf("enabledRepoOrder cannot be empty")
 	}
 
+	// Update the metadata cache if it hasn't yet been updated, then rely excursively on that metadata.
+	err = r.updateCache()
+	if err != nil {
+		return
+	}
+
 	// Disable all repos first so we can gradually enable them below.
 	// TDNF processes enable/disable repo requests in the order that they are passed.
 	// So if `--disablerepo=foo` and then `--enablerepo=foo` are passed, `foo` will be enabled.
@@ -548,7 +644,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		}
 
 		if err == nil {
-			preBuilt = (repoID == builtRepoID)
+			preBuilt = (repoID == toolchainRepoId || repoID == builtRepoID)
 			break
 		}
 	}

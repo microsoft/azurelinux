@@ -6,6 +6,7 @@ package schedulerutils
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -101,8 +102,9 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inpu
 	return
 }
 
-// ReadReservedFilesList updates the list of reserved files from the manifest file passed in.
-func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
+// ReadReservedPackageManifest updates the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
+// Entries will be returned in the form '<rpm>-<version>-<release>.rpm' with any preceding path removed.
+func ReadReservedPackageManifest(path string) (reservedFiles []string, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		logger.Log.Errorf("Failed to open file manifest %s with error %s", path, err)
@@ -112,7 +114,8 @@ func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		reservedFiles = append(reservedFiles, scanner.Text())
+		strippedPath := filepath.Base(scanner.Text())
+		reservedFiles = append(reservedFiles, strippedPath)
 	}
 
 	err = scanner.Err()
@@ -122,4 +125,16 @@ func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
 	}
 
 	return reservedFiles, nil
+}
+
+// rpmsToFind should be an absolute path to the expected RPM, while toolchainRPMs is a list of '<name>-<version>-<release>.rpm'.
+func IsToolchainRPM(rpmPath string, reservedRPMs []string) bool {
+	base := filepath.Base(rpmPath)
+	for _, reservedRPM := range reservedRPMs {
+		reservedBase := filepath.Base(reservedRPM)
+		if reservedBase == base {
+			return true
+		}
+	}
+	return false
 }

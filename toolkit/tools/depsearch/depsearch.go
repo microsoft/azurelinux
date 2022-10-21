@@ -251,7 +251,7 @@ func formatNode(n *pkggraph.PkgNode, verbosity int) string {
 func isFilteredFile(path, filterFile string) bool {
 	if len(filterFile) > 0 {
 		if len(reservedFiles) == 0 {
-			reservedFileList, err := schedulerutils.ReadReservedFilesList(filterFile)
+			reservedFileList, err := schedulerutils.ReadReservedPackageManifest(filterFile)
 			if err != nil {
 				logger.Log.Fatalf("Failed to load filter file '%s': %s", filterFile, err)
 			}

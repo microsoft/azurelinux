@@ -23,6 +23,25 @@ define create_folder
 $(shell if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
 endef
 
+# Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
+# Make will automatically create the MAKEFLAGS variable which contains each of the flags, non-build commmands will include -n
+# which is the short form of --dry-run.
+#
+# $1 - The full command to run, if we are not doing --dry-run
+ifeq (n,$(findstring n,$(firstword $(MAKEFLAGS))))
+define shell_real_build_only
+endef
+else # ifeq (n,$(findstring...
+define shell_real_build_only
+$(shell $1)
+endef
+endif # ifeq (n,$(findstring...
+
+myvar = $(call shell_real_build_only, ls)
+
+foobar:
+	echo '$(myvar)'
+
 # Echos a message to console, then calls "exit 1"
 # Of the form: { echo "MSG" ; exit 1 ; }
 #

@@ -65,15 +65,16 @@ OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 
 # Sub-folder defines
-LOGS_DIR         ?= $(BUILD_DIR)/logs
-PKGBUILD_DIR     ?= $(BUILD_DIR)/pkg_artifacts
-CACHED_RPMS_DIR  ?= $(BUILD_DIR)/rpm_cache
-BUILD_SRPMS_DIR  ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
-MACRO_DIR        ?= $(BUILD_DIR)/macros
-BUILD_SPECS_DIR  ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
-STATUS_FLAGS_DIR ?= $(BUILD_DIR)/make_status
-CHROOT_DIR       ?= $(BUILD_DIR)/worker/chroot
-IMAGEGEN_DIR     ?= $(BUILD_DIR)/imagegen
+LOGS_DIR           ?= $(BUILD_DIR)/logs
+PKGBUILD_DIR       ?= $(BUILD_DIR)/pkg_artifacts
+CACHED_RPMS_DIR    ?= $(BUILD_DIR)/rpm_cache
+BUILD_SRPMS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
+MACRO_DIR          ?= $(BUILD_DIR)/macros
+BUILD_SPECS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
+STATUS_FLAGS_DIR   ?= $(BUILD_DIR)/make_status
+CHROOT_DIR         ?= $(BUILD_DIR)/worker/chroot
+IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
+TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
@@ -89,13 +90,6 @@ TOOLCHAIN_MANIFESTS_DIR      ?= $(MANIFESTS_DIR)/package
 RPMS_DIR        ?= $(OUT_DIR)/RPMS
 SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
-
-# If toolchain RPMs are being rebuilt locally, they belong with the other RPMs
-ifeq ($(REBUILD_TOOLCHAIN),y)
-   toolchain_rpms_dir := $(RPMS_DIR)
-else
-   toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache
-endif
 
 # External source server
 SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
@@ -120,38 +114,9 @@ ifeq ($(USE_PREVIEW_REPO),y)
    endif
 endif
 
-ifneq ($(strip $(SRPM_PACK_LIST)),)
-LOCAL_SPECS = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
-else # Empty pack list, build all under $(SPECS_DIR)
-LOCAL_SPECS = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
-endif
-
-LOCAL_SPEC_DIRS = $(foreach spec,$(LOCAL_SPECS),$(dir $(spec)))
-
 CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
-
-# Build defines
-DIST_TAG           ?= .cm2
-# Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
-BUILD_NUMBER       ?= $(shell runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD)
-# an empty BUILD_NUMBER breaks the build later on
-ifeq ($(BUILD_NUMBER),)
-   BUILD_NUMBER = non-git
-endif
-RELEASE_MAJOR_ID   ?= 2.0
-# use minor ID defined in file (if exist) otherwise define it
-# note this file must be single line
-ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
-   RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
-else
-   RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
-endif
-RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
-
-# Image tag - empty by default. Does not apply to the initrd.
-IMAGE_TAG          ?=
 
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
@@ -169,6 +134,9 @@ all: toolchain go-tools chroot-tools
 # Misc function defines
 # Variable prerequisite tracking
 include $(SCRIPTS_DIR)/utils.mk
+
+# Set the variables for build number, distro tag, etc
+include $(SCRIPTS_DIR)/build_tag.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests

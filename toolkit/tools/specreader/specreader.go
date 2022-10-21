@@ -23,6 +23,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"github.com/jinzhu/copier"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -39,19 +40,21 @@ type parseResult struct {
 }
 
 var (
-	app        = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
-	specsDir   = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	output     = exe.OutputFlag(app, "Output file to export the JSON")
-	workers    = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
-	buildDir   = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
-	srpmsDir   = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
-	rpmsDir    = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
-	distTag    = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	workerTar  = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
-	targetArch = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
-	runCheck   = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
-	logFile    = exe.LogFileFlag(app)
-	logLevel   = exe.LogLevelFlag(app)
+	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
+	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	output                  = exe.OutputFlag(app, "Output file to export the JSON")
+	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
+	buildDir                = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
+	srpmsDir                = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
+	rpmsDir                 = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
+	toolchainManifest       = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
+	existingToolchainRpmDir = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	distTag                 = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	workerTar               = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
+	targetArch              = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
+	runCheck                = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
+	logFile                 = exe.LogFileFlag(app)
+	logLevel                = exe.LogLevelFlag(app)
 )
 
 func main() {
@@ -63,13 +66,23 @@ func main() {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
 
-	err := parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *distTag, *output, *workerTar, *workers, *runCheck)
+	var toolchainRPMs []string
+	var err error
+	toolchainManifest := *toolchainManifest
+	if len(toolchainManifest) > 0 {
+		toolchainRPMs, err = schedulerutils.ReadReservedPackageManifest(toolchainManifest)
+		if err != nil {
+			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifest, err)
+		}
+	}
+
+	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, toolchainRPMs, *existingToolchainRpmDir, *distTag, *output, *workerTar, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
 // parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFile, workerTar string, workers int, runCheck bool) (err error) {
+func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir string, toolchainRPMs []string, toolchainDir, distTag, outputFile, workerTar string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -93,13 +106,13 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, distTag, outputFil
 		var parseError error
 
 		if *targetArch == "" {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, buildArch, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, distTag, buildArch, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("Failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, *targetArch, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, distTag, *targetArch, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("Failed to parse cross specs (%w)", parseError)
 				return err
@@ -182,7 +195,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 }
 
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, arch string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, distTag, arch string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
@@ -208,7 +221,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag, arch string, workers int, 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, runCheck, arch)
+		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch)
 	}
 
 	for _, specFile := range specFiles {
@@ -268,7 +281,7 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 // readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available filehandles.
-func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir string, runCheck bool, arch string) {
+func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string) {
 	const (
 		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
@@ -320,7 +333,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		// Find every package that the spec provides
 		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, defines, rpm.QueryBuiltRPMHeadersArgument)
 		if err == nil && len(queryResults) != 0 {
-			providerList, err = parseProvides(rpmsDir, srpmPath, queryResults)
+			providerList, err = parseProvides(rpmsDir, toolchainDir, toolchainRPMs, srpmPath, queryResults)
 			if err != nil {
 				result.err = err
 				results <- result
@@ -373,7 +386,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 // Require: requiresb
 // Arch: noarch
 // The return is an array of Package structures, one for each Provides in the spec (implicit and explicit).
-func parseProvides(rpmsDir, srpmPath string, list []string) (providerlist []*pkgjson.Package, err error) {
+func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPath string, list []string) (providerlist []*pkgjson.Package, err error) {
 	var (
 		reqlist      []*pkgjson.PackageVer
 		packagearch  string
@@ -442,12 +455,18 @@ func parseProvides(rpmsDir, srpmPath string, list []string) (providerlist []*pkg
 				return
 			}
 
+			isToolchain := schedulerutils.IsToolchainRPM(rpmPath, toolchainRPMs)
+			if isToolchain {
+				rpmPath = convertToToolchainRpmPath(rpmPath, packagearch, toolchainDir)
+			}
+
 			providerPkgVer := &pkgjson.Package{
 				Provides:     newProviderVer[0],
 				SrpmPath:     srpmPath,
 				RpmPath:      rpmPath,
 				Architecture: packagearch,
 				Requires:     reqlist,
+				IsToolchain:  isToolchain,
 			}
 
 			providerlist = append(providerlist, providerPkgVer)
@@ -605,4 +624,13 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 	}
 
 	return
+}
+
+// convertToToolchainRpmPath updates the .rpm path to point the the toolchain directory rather than the normal out/RPMs
+// directory
+func convertToToolchainRpmPath(currentRpmPath, arch string, toolchainDir string) (toolchainPath string) {
+	dir := filepath.Join(toolchainDir, arch)
+	toolchainPath = filepath.Join(dir, filepath.Base(currentRpmPath))
+	logger.Log.Errorf("Toolchain changing %s to %s", currentRpmPath, toolchainPath)
+	return toolchainPath
 }

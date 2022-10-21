@@ -47,14 +47,15 @@ var (
 	inputGraphFile  = exe.InputFlag(app, "Path to the DOT graph file to build.")
 	outputGraphFile = exe.OutputFlag(app, "Path to save the built DOT graph file.")
 
-	outputCSVFile = app.Flag("output-build-state-csv-file", "Path to save the CSV file.").Required().String()
-	workDir       = app.Flag("work-dir", "The directory to create the build folder").Required().String()
-	workerTar     = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	repoFile      = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
-	rpmDir        = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
-	srpmDir       = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
-	cacheDir      = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
-	buildLogsDir  = app.Flag("build-logs-dir", "Directory to store package build logs").Required().ExistingDir()
+	outputCSVFile    = app.Flag("output-build-state-csv-file", "Path to save the CSV file.").Required().String()
+	workDir          = app.Flag("work-dir", "The directory to create the build folder").Required().String()
+	workerTar        = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	repoFile         = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
+	rpmDir           = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
+	toolchainDirPath = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	srpmDir          = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
+	cacheDir         = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
+	buildLogsDir     = app.Flag("build-logs-dir", "Directory to store package build logs").Required().ExistingDir()
 
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
 	baseDirPath = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
@@ -68,7 +69,7 @@ var (
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
-	reservedFileListFile = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
+	toolchainManifest    = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
 	deltaBuild           = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
@@ -101,7 +102,7 @@ func main() {
 	}
 
 	ignoredPackages := exe.ParseListArgument(*ignoredPackages)
-	reservedFileListFile := *reservedFileListFile
+	toolchainManifest := *toolchainManifest
 
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
@@ -118,23 +119,24 @@ func main() {
 		logger.Log.Fatalf("Unable to generate package build list, error: %s", err)
 	}
 
-	var reservedFiles []string
-	if len(reservedFileListFile) > 0 {
-		reservedFiles, err = schedulerutils.ReadReservedFilesList(reservedFileListFile)
+	var toolchainPackages []string
+	if len(toolchainManifest) > 0 {
+		toolchainPackages, err = schedulerutils.ReadReservedPackageManifest(toolchainManifest)
 		if err != nil {
-			logger.Log.Fatalf("unable to read reserved file list %s: %s", reservedFileListFile, err)
+			logger.Log.Fatalf("unable to read reserved file list %s: %s", toolchainManifest, err)
 		}
 	}
 
 	// Setup a build agent to handle build requests from the scheduler.
 	buildAgentConfig := &buildagents.BuildAgentConfig{
-		Program:   *buildAgentProgram,
-		CacheDir:  *cacheDir,
-		RepoFile:  *repoFile,
-		RpmDir:    *rpmDir,
-		SrpmDir:   *srpmDir,
-		WorkDir:   *workDir,
-		WorkerTar: *workerTar,
+		Program:      *buildAgentProgram,
+		CacheDir:     *cacheDir,
+		RepoFile:     *repoFile,
+		RpmDir:       *rpmDir,
+		ToolchainDir: *toolchainDirPath,
+		SrpmDir:      *srpmDir,
+		WorkDir:      *workDir,
+		WorkerTar:    *workerTar,
 
 		DistTag:              *distTag,
 		DistroReleaseVersion: *distroReleaseVersion,
@@ -166,7 +168,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, reservedFiles, *deltaBuild)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, *toolchainDirPath, toolchainPackages, *deltaBuild)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
 	}
@@ -194,7 +196,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages, reservedFiles []string, deltaBuild bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages []string, toolchainDir string, toolchainPackages []string, deltaBuild bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -210,7 +212,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels, reservedFiles, deltaBuild)
+	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels, toolchainPackages, deltaBuild)
 
 	if builtGraph != nil {
 		graphMutex.RLock()

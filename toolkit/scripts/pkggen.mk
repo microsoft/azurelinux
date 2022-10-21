@@ -17,14 +17,15 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-build_specs     = $(shell find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
-pkggen_rpms     = $(shell find $(RPMS_DIR)/*  2>/dev/null )
+pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
 # Pkggen workspace
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
+parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_files        = $(shell find $(CACHED_RPMS_DIR)/)
+rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
@@ -39,11 +40,11 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-spec-parse graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
-clean: clean-workplan clean-cache
-clean-workplan:
+clean: clean-workplan clean-cache clean-spec-parse
+clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-cache:
@@ -52,6 +53,10 @@ clean-cache:
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
 	rm -rf $(cache_working_dir)
+clean-spec-parse:
+	@echo Verifying no mountpoints present in $(parse_working_dir)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
+	rm -rf $(parse_working_dir)
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
@@ -65,13 +70,18 @@ analyze-built-graph: $(go-graphanalytics)
 		exit 1; \
 	fi
 
+
+.PHONY:specs
+specs: $(specs_file)
 # Parse all specs in $(BUILD_SPECS_DIR) and generate a specs.json file encoding all dependency information
 $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
 	$(go-specreader) \
 		--dir $(BUILD_SPECS_DIR) \
-		--build-dir $(BUILD_DIR)/spec_parsing \
+		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
+		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
+		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
@@ -117,12 +127,13 @@ ifeq ($(STOP_ON_FETCH_FAIL),y)
 graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) | $(toolchain_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
 		--rpm-dir=$(RPMS_DIR) \
+		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
@@ -136,6 +147,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--output=$(cached_file) && \
 	touch $@
 
+foo: $(preprocessed_file)
 $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 	$(go-graphPreprocessor) \
 		--input=$(cached_file) \
@@ -169,10 +181,6 @@ clean-compress-srpms:
 	rm -rf $(srpms_archive)
 
 ifeq ($(REBUILD_PACKAGES),y)
-# If we are responsible for building a toolchain, make sure those RPMs are also present in the output directory
-ifeq ($(REBUILD_TOOLCHAIN),y)
-$(RPMS_DIR): $(toolchain_rpms)
-endif
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@touch $@
 	@echo Finished updating $@
@@ -181,7 +189,8 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -191,6 +200,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--worker-tar="$(chroot_worker)" \
 		--repo-file="$(pkggen_local_repo)" \
 		--rpm-dir="$(RPMS_DIR)" \
+		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
@@ -205,7 +215,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		--reserved-file-list-file="$(TOOLCHAIN_MANIFEST)" \
+		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
