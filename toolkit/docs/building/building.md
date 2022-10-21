@@ -187,7 +187,7 @@ sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh"
 ```
 Note that this process will download dependencies from packages.microsoft.com and rebuild just the SPEC files indicated by the SRPM_PACK_LIST
 
-After building a package you may choose to rebuild it or build additional packages.  The optional REFRESH_WORKER_CHROOT=n option (default is y) will avoid rebuilding the worker chroot saving some additional build overhead
+After building a package you may choose to rebuild it or build additional packages.  The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
 
 ```bash
 # Clean and rebuild targetted packages
