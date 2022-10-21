@@ -100,22 +100,22 @@ Prepare your system by installing the necessary prerequisites [here](prerequisit
 
 ## **Clone and Sync To Stable Commit**
 
-Clone the 1.0-stable build of CBL-Mariner as shown here.
+Clone the 2.0-stable build of CBL-Mariner as shown here.
 
 ```bash
 # Get the source code
 git clone https://github.com/microsoft/CBL-Mariner.git
 cd CBL-Mariner/toolkit
 
-# Checkout the desired release branch. The 1.0-stable tag tracks the most recent successful release of the 1.0 branch.
-git checkout 1.0-stable
+# Checkout the desired release branch. The 2.0-stable tag tracks the most recent successful release of the 2.0 branch.
+git checkout 2.0-stable
 ```
 
-**IMPORTANT:** The 1.0-stable tag always points to the latest known good build of CBL-Mariner. At this time, only the Mariner 1.0 branch is buildable.  This branch is continually updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  Fixes may be applied to this branch at any time.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 1.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 1.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
+**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of CBL-Mariner. At this time, only the Mariner 2.0 branch is buildable.  This branch is continually updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  Fixes may be applied to this branch at any time.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 2.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
 
-It is also possible to build an older version of CBL-Mariner from the 1.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 1.0-stable label above.
+It is also possible to build an older version of CBL-Mariner from the 2.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 2.0-stable label above.
 
-Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 1.0 branch.
+Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 2.0 branch.
 
 **NOTE: All subsequent commands are assumed to be executed from inside the toolkit directory.**
 
@@ -180,7 +180,7 @@ Note that the image build commands in [Build Images](#build-images) will **autom
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/1.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
 All images are generated in the `out/images` folder.
 
@@ -596,7 +596,7 @@ To reproduce a build, there are four constraints:
 
 1. The local SPEC files must be the same. That is, you cannot reproduce a build having modified any of the local SPEC files since when the summary files were generated.
 2. What is being built must be the same. That is, if the summary files were generated from an image build then the reproduced build must be building the exact same image configuration.
-3. The toolkit version must be the same. That is, if the summary files were generated from a `1.0` toolkit, then the reproduced build must be done using the `1.0` toolkit.
+3. The toolkit version must be the same. That is, if the summary files were generated from a `2.0` toolkit, then the reproduced build must be done using the `2.0` toolkit.
 4. The builds must be from clean. Both the build that generated the summary files and the reproduced build must be done from a clean state, otherwise there may be leftover files that affect the summary files. The only exception is the mentioned case of using external packages not present in the PMC repository - in this case you'll need to pre-populate the local cache with these packages after cleaning your repository, but before running the build.
 
 If the above constraints are met then a build can be reproduced from summary files.
