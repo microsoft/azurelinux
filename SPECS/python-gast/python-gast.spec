@@ -15,6 +15,8 @@ Source0:        %{url}/archive/%{version}/gast-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 BuildArch:      noarch
 
 %description %{_description}
