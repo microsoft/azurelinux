@@ -17,7 +17,7 @@ When security vulnerabilities arise, CBL-Mariner supports both a package-based u
 
 # Getting Started with CBL-Mariner: 
 Build
-Instructions for building CBL-Mariner may be found here: Toolkit Documentation.
+Instructions for building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md).
 
 ISO
 You can try CBL-Mariner with the following ISO Image: 
@@ -38,7 +38,7 @@ Any Linux distribution, including CBL-Mariner, benefits from contributions by th
 
 1) The [Photon OS Project](https://vmware.github.io/photon/) for SPEC files originating from the Photon distribution.   
 
-2) [The Fedora Project](https://start.fedoraproject.org/) for SPEC files, particularly with respect to QT, DNF and several of their dependencies. 
+2) [The Fedora Project](https://start.fedoraproject.org/) for SPEC files, particularly with respect to Qt, DNF and content in the SPECS-EXTENDED folder. 
 
 3) [GNU](https://www.gnu.org/) and the [Free Software Foundation](https://www.fsf.org/)
 
