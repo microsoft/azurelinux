@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,6 @@ the audit subsystem in the Linux 2.6 kernel.
 %package        libs
 Summary:        Runtime libs
 License:        LGPLv2+
-Requires:       %{name} = %{version}-%{release}
 
 %description    libs
 Runtime libs
@@ -45,13 +44,12 @@ The libraries and header files needed for audit development.
 Summary:        Python3 bindings for libaudit
 License:        LGPLv2+
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 Provides:       audit-libs-python3 = %{version}-%{release}
 
 %description -n python3-audit
-The python3-audit package contains the python2 bindings for libaudit
+The python3-audit package contains the python3 bindings for libaudit
 and libauparse.
 
 %prep
@@ -118,12 +116,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/syslog.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/audisp-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/au-remote.conf
-%config(noreplace) %attr(640,root,root) %{_sysconfdir}/libaudit.conf
 %{_datadir}/%{name}/sample-rules/*
 
 %files libs
 %license COPYING
 %{_libdir}/*.so.*
+%config(noreplace) %attr(640,root,root) %{_sysconfdir}/libaudit.conf
 
 %files devel
 %defattr(-,root,root)
@@ -138,6 +136,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.6-7
+- Remove requirement on base package from libs subpackage
+- Move %%{_sysconfdir}/libaudit.conf to libs subpackage
+
 * Mon Apr 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.6-6
 - Add BR on systemd-bootstrap-rpm-macros for correctness
 

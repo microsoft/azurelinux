@@ -57,7 +57,7 @@ COPY [ "./toolchain-sha256sums", \
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.41.1.tar.gz -O kernel-5.15.41.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz -O kernel-5.15.48.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
@@ -94,7 +94,6 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "./cpio_extern_nocommon.patch", \
        "./CVE-2021-38185.patch", \
-       "./CVE-2021-36690.patch", \
        "$LFS/tools/" ]
 
 USER root

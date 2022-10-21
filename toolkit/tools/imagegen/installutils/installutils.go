@@ -42,7 +42,7 @@ const (
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
-	bootDirectoryFileMode = 0600
+	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
 	shadowFile            = "/etc/shadow"
 )
@@ -370,11 +370,13 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - installMap is a map of mountpoints to physical device paths
 // - mountPointToFsTypeMap is a map of mountpoints to filesystem type
 // - mountPointToMountArgsMap is a map of mountpoints to mount options
+// - partIDToDevPathMap is a map of partition IDs to physical device paths
+// - partIDToFsTypeMap is a map of partition IDs to filesystem type
 // - isRootFS specifies if the installroot is either backed by a directory (rootfs) or a raw disk
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
 // - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
 	const (
 		filesystemPkg = "filesystem"
 	)
@@ -384,6 +386,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
+
+	if len(config.PackageRepos) > 0 {
+		if config.IsIsoInstall {
+			err = configuration.UpdatePackageRepo(installChroot, config)
+			if err != nil {
+				return
+			}
+		} else {
+			return fmt.Errorf("custom package repos should not be specified unless performing ISO installation")
+		}
+	}
 
 	// Initialize RPM Database so we can install RPMs into the installroot
 	err = initializeRpmDatabase(installRoot, diffDiskBuild)
@@ -446,7 +459,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !isRootFS {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, encryptedRoot, hidepidEnabled)
+		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, hidepidEnabled)
 		if err != nil {
 			return
 		}
@@ -482,6 +495,13 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		// When the RemoveRpmDb flag is true, generate a list of installed packages since they cannot be queiried at runtime
 		logger.Log.Info("Generating manifest with package information since RemoveRpmDb is enabled.")
 		generateContainerManifests(installChroot)
+	}
+
+	if len(config.Networks) > 0 {
+		err = configuration.ConfigureNetwork(installChroot, config)
+		if err != nil {
+			return
+		}
 	}
 
 	// Run post-install scripts from within the installroot chroot
@@ -641,7 +661,7 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -649,7 +669,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, hidepidEnabled)
+	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
 	if err != nil {
 		return
 	}
@@ -811,7 +831,7 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, hidepidEnabled bool) (err error) {
+func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -837,6 +857,20 @@ func updateFstab(installRoot string, config configuration.SystemConfig, installM
 			return
 		}
 	}
+
+	// Add swap entry if there is one
+	for partID, fstype := range partIDToFsTypeMap {
+		if fstype == "linux-swap" {
+			swapPartitionPath, exists := partIDToDevPathMap[partID]
+			if exists {
+				err = addEntryToFstab(installRoot, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
+				if err != nil {
+					return
+				}
+			}
+		}
+	}
+
 	return
 }
 
@@ -845,6 +879,8 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 		fstabPath        = "/etc/fstab"
 		rootfsMountPoint = "/"
 		defaultOptions   = "defaults"
+		swapFsType       = "swap"
+		swapOptions      = "sw"
 		readOnlyOptions  = "ro"
 		defaultDump      = "0"
 		disablePass      = "0"
@@ -861,6 +897,10 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 		}
 	} else {
 		options = mountArgs
+	}
+
+	if fsType == swapFsType {
+		options = swapOptions
 	}
 
 	fullFstabPath := filepath.Join(installRoot, fstabPath)
@@ -1900,6 +1940,47 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 			err = os.Remove(scriptPath)
 			if err != nil {
 				logger.Log.Errorf("Failed to cleanup post-install script (%s). Error: %s", scriptPath, err)
+			}
+
+			return err
+		})
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	const squashErrors = false
+
+	for _, script := range config.FinalizeImageScripts {
+		// Copy the script from this chroot into the install chroot before running it
+		scriptPath := script.Path
+		fileToCopy := safechroot.FileToCopy{
+			Src:  scriptPath,
+			Dest: scriptPath,
+		}
+
+		installChroot.AddFiles(fileToCopy)
+		if err != nil {
+			return
+		}
+
+		ReportActionf("Running finalize image script: %s", path.Base(script.Path))
+		logger.Log.Infof("Running finalize image script: %s", script.Path)
+		err = installChroot.UnsafeRun(func() error {
+			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", scriptPath, script.Args))
+
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(scriptPath)
+			if err != nil {
+				logger.Log.Errorf("Failed to cleanup finalize image script (%s). Error: %s", scriptPath, err)
 			}
 
 			return err

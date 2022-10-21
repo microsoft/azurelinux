@@ -10,7 +10,7 @@ jobs:
 
   build:
     name: Check Package CGManifests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
 
     - name: Check out code
@@ -20,14 +20,14 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         git fetch origin ${{ github.base_ref }}
-        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
+        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
         echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
 
     - name: Get base commit for Pushes
       if: ${{ github.event_name == 'push' }}
       run: |
         git fetch origin ${{ github.event.before }}
-        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
+        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
         echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
     - name: Get the changed files

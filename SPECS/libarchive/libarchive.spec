@@ -1,6 +1,6 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
-Version:        3.6.0
+Version:        3.6.1
 Release:        1%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
@@ -60,6 +60,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jun 13 2022 Muhammad Falak <mwani@microsoft.com> - 3.6.1-1
+- Bump version to 3.6.1 to address CVE-2022-26280
+
 * Tue Mar 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.6.0-1
 - Upgrading to v3.6.0
 

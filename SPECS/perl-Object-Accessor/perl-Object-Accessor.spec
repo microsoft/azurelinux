@@ -1,7 +1,7 @@
 Summary:        Interface to create per object accessors
 Name:           perl-Object-Accessor
 Version:        0.48
-Release:        8%{?dist}
+Release:        9%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Object-Accessor
@@ -13,6 +13,14 @@ BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Params::Check)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Tie::Scalar)
+BuildRequires:  perl(deprecate)
+%endif
+
 Requires:       perl-libs
 Requires:       perl(deprecate)
 
@@ -45,6 +53,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 0.48-9
+- Add BR on `perl(ExtUtils::MakeMaker)` & other check deps to enable ptest
+
 *   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-8
 -   Adding 'BuildRequires: perl-generators'.
 

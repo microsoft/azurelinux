@@ -1,0 +1,148 @@
+From e2952dfaff67f3641d3a6d3226753356170ff808 Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Sat, 8 Jan 2022 22:42:35 +0100
+Subject: [PATCH] awk: input numbers are never octal or hex (only program
+ consts can be)
+
+function                                             old     new   delta
+next_token                                           825     930    +105
+getvar_i                                             114     129     +15
+nextchar                                              49      53      +4
+my_strtod                                            138       -    -138
+------------------------------------------------------------------------------
+(add/remove: 0/1 grow/shrink: 3/0 up/down: 124/-138)          Total: -14 bytes
+
+Backported by @mfrw from upstream on 2022-08-10
+Applies on v1.35.0 cleanly
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ editors/awk.c       | 29 ++++++++++++++++++++++-------
+ testsuite/awk.tests | 12 +++++++++++-
+ 2 files changed, 33 insertions(+), 8 deletions(-)
+
+diff --git a/editors/awk.c b/editors/awk.c
+index f6314ac72..079d0bde5 100644
+--- a/editors/awk.c
++++ b/editors/awk.c
+@@ -848,7 +848,7 @@ static char *nextword(char **s)
+ static char nextchar(char **s)
+ {
+ 	char c, *pps;
+-
++ again:
+ 	c = *(*s)++;
+ 	pps = *s;
+ 	if (c == '\\')
+@@ -859,8 +859,11 @@ static char nextchar(char **s)
+ 	 */
+ 	if (c == '\\' && *s == pps) { /* unrecognized \z? */
+ 		c = *(*s); /* yes, fetch z */
+-		if (c)
+-			(*s)++; /* advance unless z = NUL */
++		if (c) { /* advance unless z = NUL */
++			(*s)++;
++			if (c == '\n') /* \<newline>? eat it */
++				goto again;
++		}
+ 	}
+ 	return c;
+ }
+@@ -882,7 +885,13 @@ static ALWAYS_INLINE int isalnum_(int c)
+ static double my_strtod(char **pp)
+ {
+ 	char *cp = *pp;
+-	if (ENABLE_DESKTOP && cp[0] == '0') {
++	return strtod(cp, pp);
++}
++#if ENABLE_DESKTOP
++static double my_strtod_or_hexoct(char **pp)
++{
++	char *cp = *pp;
++	if (cp[0] == '0') {
+ 		/* Might be hex or octal integer: 0x123abc or 07777 */
+ 		char c = (cp[1] | 0x20);
+ 		if (c == 'x' || isdigit(cp[1])) {
+@@ -901,6 +910,9 @@ static double my_strtod(char **pp)
+ 	}
+ 	return strtod(cp, pp);
+ }
++#else
++# define my_strtod_or_hexoct(p) my_strtod(p)
++#endif
+ 
+ /* -------- working with variables (set/get/copy/etc) -------- */
+ 
+@@ -1014,6 +1026,7 @@ static double getvar_i(var *v)
+ 		if (s && *s) {
+ 			debug_printf_eval("getvar_i: '%s'->", s);
+ 			v->number = my_strtod(&s);
++			/* ^^^ hex/oct NOT allowed here! */
+ 			debug_printf_eval("%f (s:'%s')\n", v->number, s);
+ 			if (v->type & VF_USER) {
+ //TODO: skip_spaces() also skips backslash+newline, is it intended here?
+@@ -1125,10 +1138,10 @@ static uint32_t next_token(uint32_t expected)
+ 		if (*p == '\0') {
+ 			tc = TC_EOF;
+ 			debug_printf_parse("%s: token found: TC_EOF\n", __func__);
+-		} else if (*p == '\"') {
++		} else if (*p == '"') {
+ 			/* it's a string */
+ 			char *s = t_string = ++p;
+-			while (*p != '\"') {
++			while (*p != '"') {
+ 				char *pp;
+ 				if (*p == '\0' || *p == '\n')
+ 					syntax_error(EMSG_UNEXP_EOS);
+@@ -1166,7 +1179,8 @@ static uint32_t next_token(uint32_t expected)
+ 		} else if (*p == '.' || isdigit(*p)) {
+ 			/* it's a number */
+ 			char *pp = p;
+-			t_double = my_strtod(&pp);
++			t_double = my_strtod_or_hexoct(&pp);
++			/* ^^^ awk only allows hex/oct consts in _program_, not in _input_ */
+ 			p = pp;
+ 			if (*p == '.')
+ 				syntax_error(EMSG_UNEXP_TOKEN);
+@@ -3503,6 +3517,7 @@ static var *evaluate(node *op, var *res)
+ 				i = (Ld == 0);
+ 				break;
+ 			}
++			debug_printf_eval("COMPARE result: %d\n", (i == 0) ^ (opn & 1));
+ 			setvar_i(res, (i == 0) ^ (opn & 1));
+ 			break;
+ 		}
+diff --git a/testsuite/awk.tests b/testsuite/awk.tests
+index bcaafe8fd..93e25d8c1 100755
+--- a/testsuite/awk.tests
++++ b/testsuite/awk.tests
+@@ -102,9 +102,13 @@ testing "awk unused function args are evaluated" \
+ optional DESKTOP
+ testing "awk hex const 1" "awk '{ print or(0xffffffff,1) }'" "4294967295\n" "" "\n"
+ testing "awk hex const 2" "awk '{ print or(0x80000000,1) }'" "2147483649\n" "" "\n"
+-testing "awk oct const"   "awk '{ print or(01234,1) }'"      "669\n"         "" "\n"
++testing "awk oct const"   "awk '{ print or(01234,1) }'"      "669\n"        "" "\n"
+ SKIP=
+ 
++# check that "hex/oct integer" heuristic doesn't kick in on input
++# (must be done only when parsing program text)
++testing "awk input is never oct" "awk '{ print \$1, \$1+1 }'" "011 12\n"    "" "011\n"
++
+ # check that "hex/oct integer" heuristic doesn't kick in on 00NN.NNN
+ testing "awk floating const with leading zeroes" \
+ 	"awk '{ printf \"%f %f\n\", \"000.123\", \"009.123\" }'" \
+@@ -469,4 +473,10 @@ testing 'awk printf %% prints one %' \
+ 	"%\n" \
+ 	'' ''
+ 
++testing 'awk backslash+newline eaten with no trace' \
++	"awk 'BEGIN { printf \"Hello\\
++ world\n\" }'" \
++	"Hello world\n" \
++	'' ''
++
+ exit $FAILCOUNT
+-- 
+2.37.1
+

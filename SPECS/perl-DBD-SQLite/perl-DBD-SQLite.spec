@@ -2,7 +2,7 @@
 Summary:        SQLite DBI Driver
 Name:           perl-DBD-SQLite
 Version:        1.70
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
@@ -12,8 +12,16 @@ Distribution:   Mariner
 BuildRequires:  sqlite-devel >= 3.22.0
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-DBI
-Requires:       perl-DBI
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Digest::MD5)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Time::HiRes)
+%endif
+
+Requires:       perl-DBI
 Requires:       perl-libs
 
 Provides:       perl(DBD::SQLite) = %{version}-%{release}
@@ -55,6 +63,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.70-2
+- Add BR on `perl(Test::More)` & `perl(Digest::MD5)` to fix ptest
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.70-1
 - Update to 1.70
 

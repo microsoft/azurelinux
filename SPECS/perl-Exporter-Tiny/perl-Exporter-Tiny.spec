@@ -2,7 +2,7 @@
 Summary:        An exporter with the features of Sub::Exporter but only core dependencies
 Name:           perl-Exporter-Tiny
 Version:        1.002002
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Exporter-Tiny/
@@ -12,6 +12,10 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
@@ -58,6 +62,9 @@ make test
 %{_mandir}/man3/Exporter::Tiny::Manual*
 
 %changelog
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.002002-2
+- Add BR on `perl(Test::More)` to fix ptest build
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.002002-1
 - Update to 1.002002
 

@@ -6,6 +6,7 @@ Miscellaneous Topics
     - [Config Tracking](#Config-Tracking)
     - [Folder Dependencies](#Folder-Dependencies)
     - [Go Tools Compiling](#Go-Tools-Compiling)
+- [Distroless Images](#distroless-images)
 
 ## Chroot
 The change root (`chroot`) operation in linux instructs the kernel to enter a folder, and reset the root folder (`/`) to the current location.
@@ -141,5 +142,19 @@ Each go tool will run a self test when it is built, if test files are available.
 
 ##### `$(go_common_files)`
 This variable tracks all shared files which may be used by any go tool. Shared packages are found in `./tools/internal/` while the `./tools/go.mod` and `./tools/go.sum` files track external dependencies for the go tools. If any of these files change all the go tools will rebuild.
+
+## Distroless images
+
+### RPM manifest file
+Mariner distroless container images do not contain an RPM database. In order for Secure Composition Analysis tools to detect the contents of a Mariner distroless container image, the file `/var/lib/rpmmanifest/container-manifest-2` contains the output of the following command:
+
+```bash
+rpm --query --all --query-format "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t%{EPOCH}\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n"
+```
+
+Note: The output of the above command also includes the `gpg-pubkey` which is not an RPM package. In order to filter it out, the output of the above command can be piped (i.e., `|`) to the following command: 
+```bash
+grep -v gpg-pubkey
+```
 
 ## Prev: [Image Generation](4_image_generation.md)

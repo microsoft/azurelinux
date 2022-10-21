@@ -1,4 +1,4 @@
-From 8f232dac49cbb143a30a5c807f9085f3ef251f0e Mon Sep 17 00:00:00 2001
+From 1cbffe7e8b5bced9134abbae23a2a20c83d39a6a Mon Sep 17 00:00:00 2001
 From: Petr Mensik <pemensik@redhat.com>
 Date: Thu, 21 Jan 2021 10:46:20 +0100
 Subject: [PATCH] Enable custom pkcs11 native build
@@ -9,7 +9,7 @@ pkcs11 libraries as a new copy of libdns and libns.
  bin/Makefile.in                  |  2 +-
  bin/confgen/Makefile.in          |  2 +-
  bin/dnssec-pkcs11/Makefile.in    | 39 +++++++++++++++++---------------
- bin/named-pkcs11/Makefile.in     | 33 ++++++++++++++-------------
+ bin/named-pkcs11/Makefile.in     | 31 +++++++++++++------------
  configure.ac                     | 19 ++++++++++++++++
  lib/Makefile.in                  |  2 +-
  lib/dns-pkcs11/Makefile.in       | 22 +++++++++---------
@@ -17,7 +17,7 @@ pkcs11 libraries as a new copy of libdns and libns.
  lib/ns-pkcs11/Makefile.in        | 26 ++++++++++-----------
  lib/ns-pkcs11/tests/Makefile.in  | 12 +++++-----
  make/includes.in                 |  7 ++++++
- 11 files changed, 101 insertions(+), 71 deletions(-)
+ 11 files changed, 100 insertions(+), 70 deletions(-)
 
 diff --git a/bin/Makefile.in b/bin/Makefile.in
 index 9ad7f62..094775a 100644
@@ -151,7 +151,7 @@ index ace0e5a..e0f6a00 100644
  	dnssec-importkey.@O@ ${OBJS} ${LIBS}
  
 diff --git a/bin/named-pkcs11/Makefile.in b/bin/named-pkcs11/Makefile.in
-index 98125dd..518a75f 100644
+index debb906..ecfdb6c 100644
 --- a/bin/named-pkcs11/Makefile.in
 +++ b/bin/named-pkcs11/Makefile.in
 @@ -37,13 +37,14 @@ DBDRIVER_LIBS =
@@ -222,7 +222,7 @@ index 98125dd..518a75f 100644
  	export MAKE_SYMTABLE="yes"; \
  	export BASEOBJS="${OBJS} ${UOBJS}"; \
  	${FINALBUILDCMD}
-@@ -180,11 +181,11 @@ statschannel.@O@: bind9.xsl.h
+@@ -170,11 +171,11 @@ statschannel.@O@: bind9.xsl.h
  installdirs:
  	$(SHELL) ${top_srcdir}/mkinstalldirs ${DESTDIR}${sbindir}
  
@@ -238,10 +238,10 @@ index 98125dd..518a75f 100644
  @DLZ_DRIVER_RULES@
  
 diff --git a/configure.ac b/configure.ac
-index da99e85..55680ea 100644
+index e405eaf..efaa5a7 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1251,12 +1251,14 @@ AC_SUBST(USE_GSSAPI)
+@@ -1269,12 +1269,14 @@ AC_SUBST(USE_GSSAPI)
  AC_SUBST(DST_GSSAPI_INC)
  AC_SUBST(DNS_GSSAPI_LIBS)
  DNS_CRYPTO_LIBS="$DNS_GSSAPI_LIBS"
@@ -256,7 +256,7 @@ index da99e85..55680ea 100644
  
  #
  # was --with-lmdb specified?
-@@ -2327,6 +2329,8 @@ AC_SUBST(BIND9_DNS_BUILDINCLUDE)
+@@ -2345,6 +2347,8 @@ AC_SUBST(BIND9_DNS_BUILDINCLUDE)
  AC_SUBST(BIND9_NS_BUILDINCLUDE)
  AC_SUBST(BIND9_BIND9_BUILDINCLUDE)
  AC_SUBST(BIND9_IRS_BUILDINCLUDE)
@@ -265,7 +265,7 @@ index da99e85..55680ea 100644
  if test "X$srcdir" != "X"; then
  	BIND9_ISC_BUILDINCLUDE="-I${BIND9_TOP_BUILDDIR}/lib/isc/include"
  	BIND9_ISCCC_BUILDINCLUDE="-I${BIND9_TOP_BUILDDIR}/lib/isccc/include"
-@@ -2335,6 +2339,8 @@ if test "X$srcdir" != "X"; then
+@@ -2353,6 +2357,8 @@ if test "X$srcdir" != "X"; then
  	BIND9_NS_BUILDINCLUDE="-I${BIND9_TOP_BUILDDIR}/lib/ns/include"
  	BIND9_BIND9_BUILDINCLUDE="-I${BIND9_TOP_BUILDDIR}/lib/bind9/include"
  	BIND9_IRS_BUILDINCLUDE="-I${BIND9_TOP_BUILDDIR}/lib/irs/include"
@@ -274,7 +274,7 @@ index da99e85..55680ea 100644
  else
  	BIND9_ISC_BUILDINCLUDE=""
  	BIND9_ISCCC_BUILDINCLUDE=""
-@@ -2343,6 +2349,8 @@ else
+@@ -2361,6 +2367,8 @@ else
  	BIND9_NS_BUILDINCLUDE=""
  	BIND9_BIND9_BUILDINCLUDE=""
  	BIND9_IRS_BUILDINCLUDE=""
@@ -283,7 +283,7 @@ index da99e85..55680ea 100644
  fi
  
  AC_SUBST_FILE(BIND9_MAKE_INCLUDES)
-@@ -2798,8 +2806,11 @@ AC_CONFIG_FILES([
+@@ -2816,8 +2824,11 @@ AC_CONFIG_FILES([
  	bin/delv/Makefile
  	bin/dig/Makefile
  	bin/dnssec/Makefile
@@ -295,7 +295,7 @@ index da99e85..55680ea 100644
  	bin/nsupdate/Makefile
  	bin/pkcs11/Makefile
  	bin/plugins/Makefile
-@@ -2861,6 +2872,10 @@ AC_CONFIG_FILES([
+@@ -2879,6 +2890,10 @@ AC_CONFIG_FILES([
  	lib/dns/include/dns/Makefile
  	lib/dns/include/dst/Makefile
  	lib/dns/tests/Makefile
@@ -306,7 +306,7 @@ index da99e85..55680ea 100644
  	lib/irs/Makefile
  	lib/irs/include/Makefile
  	lib/irs/include/irs/Makefile
-@@ -2893,6 +2908,10 @@ AC_CONFIG_FILES([
+@@ -2911,6 +2926,10 @@ AC_CONFIG_FILES([
  	lib/ns/include/Makefile
  	lib/ns/include/ns/Makefile
  	lib/ns/tests/Makefile
@@ -314,19 +314,19 @@ index da99e85..55680ea 100644
 +	lib/ns-pkcs11/include/Makefile
 +	lib/ns-pkcs11/include/ns/Makefile
 +	lib/ns-pkcs11/tests/Makefile
- 	lib/samples/Makefile
- 	lib/samples/Makefile-postinstall
  	make/Makefile
+ 	make/mkdep
+ 	unit/unittest.sh
 diff --git a/lib/Makefile.in b/lib/Makefile.in
-index ffa2d5a..6fbc192 100644
+index 833964e..058ba2f 100644
 --- a/lib/Makefile.in
 +++ b/lib/Makefile.in
 @@ -15,7 +15,7 @@ top_srcdir =	@top_srcdir@
  # Attempt to disable parallel processing.
  .NOTPARALLEL:
  .NO_PARALLEL:
--SUBDIRS =	isc isccc dns ns isccfg bind9 irs samples
-+SUBDIRS =	isc isccc dns dns-pkcs11 ns ns-pkcs11 isccfg bind9 irs samples
+-SUBDIRS =	isc isccc dns ns isccfg bind9 irs
++SUBDIRS =	isc isccc dns dns-pkcs11 ns ns-pkcs11 isccfg bind9 irs
  TARGETS =
  
  @BIND9_MAKE_RULES@
@@ -401,7 +401,7 @@ index 58bda3c..d6a45df 100644
  	rm -f include/dns/rdatastruct.h
  	rm -f dnstap.pb-c.c dnstap.pb-c.h
 diff --git a/lib/dns-pkcs11/tests/Makefile.in b/lib/dns-pkcs11/tests/Makefile.in
-index 3bb5e01..c96fe7d 100644
+index da91394..aadb73f 100644
 --- a/lib/dns-pkcs11/tests/Makefile.in
 +++ b/lib/dns-pkcs11/tests/Makefile.in
 @@ -15,15 +15,15 @@ VERSION=@BIND9_VERSION@
@@ -537,4 +537,5 @@ index b8317d3..b73b0c4 100644
 +	-I${top_srcdir}/lib/ns-pkcs11/include
 +
 -- 
-2.26.3
+2.31.1
+

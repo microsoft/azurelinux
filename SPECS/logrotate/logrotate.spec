@@ -1,7 +1,7 @@
 Summary:        Logrotate
 Name:           logrotate
-Version:        3.18.1
-Release:        2%{?dist}
+Version:        3.20.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 %ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 
 %changelog
+* Mon Jun 13 2022 Muhammad Falak <mwani@microsoft.com> - 3.20.1-1
+- Bump version to 3.20.1 to address CVE-2022-1348
+
 * Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.18.1-2
 - Reenable systemd hardening configs ProtectClock, ProtectHostname, and ProtectKernelLogs
 

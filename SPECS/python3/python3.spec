@@ -1,14 +1,18 @@
 %global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
 %global __brp_python_bytecompile %{nil}
+# Automating the extraction of these alternate version strings has proven to be tricky,
+# with regards to tooling available in the toolchain build environment.
+# These will be manually maintained for the time being.
 %global majmin 3.9
+%global majmin_nodots 39
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
 %global pip_version 22.0.4
 %global setuptools_version 58.1.0
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.12
-Release:        1%{?dist}
+Version:        3.9.14
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +20,10 @@ Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
+Patch1:         CVE-2015-20107.patch
+# Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
+Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
+
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -37,6 +45,8 @@ Provides:       %{_bindir}/python
 Provides:       /bin/python
 Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
+Provides:       python%{majmin} = %{version}-%{release}
+Provides:       python%{majmin_nodots} = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  iana-etc
 BuildRequires:  tzdata
@@ -59,6 +69,8 @@ Requires:       sqlite-libs
 # python3-xml was provided as a separate package in Mariner 1.0
 # We fold this into the libs subpackage in Mariner 2.0
 Provides:       %{name}-xml = %{version}-%{release}
+Provides:       python%{majmin}-libs = %{version}-%{release}
+Provides:       python%{majmin_nodots}-libs = %{version}-%{release}
 
 %description    libs
 The python interpreter can be embedded into applications wanting to
@@ -70,6 +82,8 @@ Summary:        Python module interface for NCurses Library
 Group:          Applications/System
 Requires:       ncurses
 Requires:       %{name}-libs = %{version}-%{release}
+Provides:       python%{majmin}-curses = %{version}-%{release}
+Provides:       python%{majmin_nodots}-curses = %{version}-%{release}
 
 %description    curses
 The python3-curses package provides interface for ncurses library.
@@ -80,6 +94,8 @@ Group:          Development/Libraries
 Requires:       expat-devel >= 2.1.0
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-setuptools = %{version}-%{release}
+Provides:       python%{majmin}-devel = %{version}-%{release}
+Provides:       python%{majmin_nodots}-devel = %{version}-%{release}
 
 %description    devel
 The Python programming language's interpreter can be extended with
@@ -96,6 +112,8 @@ documentation.
 Summary:        A collection of development tools included with Python.
 Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
+Provides:       python%{majmin}-tools = %{version}-%{release}
+Provides:       python%{majmin_nodots}-tools = %{version}-%{release}
 
 %description    tools
 The Python package includes several development tools that are used
@@ -127,6 +145,8 @@ setuptools is a collection of enhancements to the Python distutils that allow yo
 Summary:        Regression tests package for Python.
 Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
+Provides:       python%{majmin}-test = %{version}-%{release}
+Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 
 %description test
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
@@ -181,6 +201,9 @@ pip3 install --no-cache-dir --no-index --ignore-installed \
     setuptools-%{setuptools_version}-py3-none-any.whl \
     pip-%{pip_version}-py3-none-any.whl
 popd
+
+# Windows executables get installed by pip and setuptools- we don't need these.
+find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
 # Install pathfix.py to bindir
 cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
@@ -279,6 +302,28 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Oct 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-2
+- Backport patch which allows cloud-init (among other programs) to use `import crypt` sucessfully when in FIPS mode
+
+* Wed Sep 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-1
+- Update to 3.9.14 to resolve security issues including CVE-2020-10735
+
+* Wed Aug 31 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.13-5
+- Add CVE-2021-28861 patch from upstream
+
+* Tue Aug 30 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.13-4
+- Add CVE-2015-20107 patch from upstream
+
+* Tue Jul 12 2022 Olivia Crain <oliviacrain> - 3.9.13-3
+- Update cgi3 patch to use versioned python shebang 
+
+* Fri Jul 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-2
+- Remove Windows executables from pip, setuptools subpackages
+- Add provides in the style of python39-%%{subpackage}, python3.9-%%{subpackage} for all packages except pip, setuptools 
+
+* Mon Jun 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-1
+- Upgrade to latest maintenance release for the 3.9 series
+
 * Tue Apr 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.12-1
 - Upgrade to latest maintenance release for the 3.9 series
 

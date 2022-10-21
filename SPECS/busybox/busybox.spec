@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.35.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,18 +11,17 @@ Source1:        busybox-static.config
 Source2:        busybox-petitboot.config
 Patch0:         busybox-1.31.1-stime-fix.patch
 Patch1:         CVE-2022-28391.patch
+Patch2:         awk-input-numbers-are-never-octal-or-hex-only-progra.patch
+Patch3:         CVE-2022-30065.patch
+Patch4:         ash-fix-use-after-free-in-pattern-substituon-code.patch
+Patch5:         ash-fix-use-after-free-in-bash-pattern-substitution.patch
 BuildRequires:  gcc
-BuildRequires:  glibc-devel
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
 # libbb/hash_md5_sha.c
 # https://bugzilla.redhat.com/1024549
 Provides:       bundled(md5-drepper2)
-# This package used to include a bundled copy of uClibc, but we now
-# use the system copy.
-%ifnarch aarch64
-BuildRequires:  uclibc-devel
-%endif
 
 %package petitboot
 Summary:        Version of busybox configured for use with petitboot
@@ -44,45 +43,22 @@ better suited to normal use.
 %autosetup -p1
 
 %build
-# create static busybox - the executable is kept as busybox-static
-# We use uclibc instead of system glibc, uclibc is several times
-# smaller, this is important for static build.
-# uclibc can't be built on ppc64,s390,ia64, we set $arch to "" in this case
-arch=`uname -m | sed -e 's/i.86/i386/' -e 's/armv7l/arm/' -e 's/armv5tel/arm/' -e 's/aarch64//' -e 's/ppc64le//' -e 's/ppc64//' -e 's/powerpc64//' -e 's/ppc//' -e 's/ia64//' -e 's/s390.*//'`
 
 cp %{SOURCE1} .config
 # set all new options to defaults
 yes "" | make oldconfig
-# gcc needs to be convinced to use neither system headers, nor libs,
-# nor startfiles (i.e. crtXXX.o files)
-# Also turn the stack protector off, otherwise the program segfaults.
-if test "$arch"; then \
-    mv .config .config1 && \
-    grep -v \
-       -e ^CONFIG_FEATURE_HAVE_RPC \
-       -e ^CONFIG_FEATURE_MOUNT_NFS \
-       -e ^CONFIG_FEATURE_INETD_RPC \
-       -e ^CONFIG_SELINUX \
-       .config1 >.config && \
-    yes "" | make oldconfig && \
-    cat .config && \
-    make V=1 \
-        EXTRA_CFLAGS="-g -isystem %{_includedir}/uClibc -fno-stack-protector" \
-        CFLAGS_busybox="-static -nostartfiles -L%{_libdir}/uClibc %{_libdir}/uClibc/crt1.o %{_libdir}/uClibc/crti.o %{_libdir}/uClibc/crtn.o"; \
-else \
-    mv .config .config1 && \
-    grep -v \
-        -e ^CONFIG_FEATURE_HAVE_RPC \
-        -e ^CONFIG_FEATURE_MOUNT_NFS \
-        -e ^CONFIG_FEATURE_INETD_RPC \
-        .config1 >.config && \
-    echo "# CONFIG_FEATURE_HAVE_RPC is not set" >>.config && \
-    echo "# CONFIG_FEATURE_MOUNT_NFS is not set" >>.config && \
-    echo "# CONFIG_FEATURE_INETD_RPC is not set" >>.config && \
-    yes "" | make oldconfig && \
-    cat .config && \
-    make V=1 CC="gcc %{optflags}"; \
-fi
+mv .config .config1
+grep -v \
+     -e ^CONFIG_FEATURE_HAVE_RPC \
+     -e ^CONFIG_FEATURE_MOUNT_NFS \
+     -e ^CONFIG_FEATURE_INETD_RPC \
+     .config1 >.config
+echo "# CONFIG_FEATURE_HAVE_RPC is not set" >>.config
+echo "# CONFIG_FEATURE_MOUNT_NFS is not set" >>.config
+echo "# CONFIG_FEATURE_INETD_RPC is not set" >>.config
+yes "" | make oldconfig
+cat .config
+make V=1 CC="gcc %{optflags}"
 cp busybox_unstripped busybox.static
 cp docs/busybox.1 docs/busybox.static.1
 
@@ -92,18 +68,8 @@ make clean
 cp %{SOURCE2} .config
 # set all new options to defaults
 yes "" | make oldconfig
-# -g is needed for generation of debuginfo.
-# (Don't want to use full-blown $RPM_OPT_FLAGS for this,
-# it makes binary much bigger: -O2 instead of -Os, many other options)
-if test "$arch"; then \
-    cat .config && \
-    make V=1 \
-        EXTRA_CFLAGS="-g -isystem %{_includedir}/uClibc" \
-        CFLAGS_busybox="-static -nostartfiles -L%{_libdir}/uClibc %{_libdir}/uClibc/crt1.o %{_libdir}/uClibc/crti.o %{_libdir}/uClibc/crtn.o"; \
-else \
-    cat .config && \
-    make V=1 CC="gcc %{optflags}"; \
-fi
+cat .config
+make V=1 CC="gcc %{optflags}"
 cp busybox_unstripped busybox.petitboot
 cp docs/busybox.1 docs/busybox.petitboot.1
 
@@ -128,6 +94,15 @@ install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.pet
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Fri Oct 07 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.35.0-4
+- Build with `glibc-static` on all platforms
+
+* Wed Aug 10 2022 Muhammad Falak <mwani@microsoft.com> - 1.35.0-3
+- Patch CVE-2022-30065
+- Introduce patch for: awk: input numbers are never octal or hex
+- Introduce patch for: use-after-free in pattern substituon code
+- Introduce patch for: use-after-free in bash pattern substitution
+
 * Fri May 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-2
 - Patch CVE-2022-28391.
 

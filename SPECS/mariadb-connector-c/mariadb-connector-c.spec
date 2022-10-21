@@ -3,12 +3,12 @@
 Summary:        The MariaDB Native Client library (C driver)
 Name:           mariadb-connector-c
 Version:        3.1.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://mariadb.org/
-Source0:        https://downloads.mariadb.org/interstitial/connector-c-%{version}/%{name}-%{version}-src.tar.gz
+Source0:        https://archive.mariadb.org/connector-c-%{version}/%{name}-%{version}-src.tar.gz
 Source2:        my.cnf
 Source3:        client.cnf
 Patch0:         cmake_3.21.4_fix.patch
@@ -20,7 +20,7 @@ BuildRequires:  krb5-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
-Requires:       %{_sysconfdir}/my.cnf
+Requires:       %{name}-config = %{version}-%{release}
 # More information: https://mariadb.com/kb/en/mariadb/building-connectorc-from-source/
 Patch1:         testsuite.patch
 
@@ -194,6 +194,9 @@ popd
 #      NEW:         PR submitted, problem explained, waiting on upstream response
 
 %changelog
+* Fri Jun 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.10-5
+- Change Requires to -config package to resolve /etc/my.cnf conflict
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 3.1.10-4
 - Remove testsuite conditionals
 - License verified

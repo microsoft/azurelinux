@@ -14,12 +14,18 @@
 SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
-
-local_specs = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
-local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
-local_sources = $(shell find $(SPECS_DIR)/ -name '*')
+SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
+
+ifneq ($(strip $(SRPM_PACK_LIST)),)
+$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
+	@echo $(strip $(SRPM_PACK_LIST)) | tr " " "\n" > $(srpm_pack_list_file)
+else # Empty pack list, build all under $(SPECS_DIR)
+$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
+	@touch $@
+endif
 
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
@@ -45,8 +51,8 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo Finished updating $@
 
 ifeq ($(DOWNLOAD_SRPMS),y)
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
-	for spec in $(local_specs); do \
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR)
+	for spec in $(LOCAL_SPECS); do \
 		spec_file=$${spec} && \
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
 		for url in $(SRPM_URL_LIST); do \
@@ -68,7 +74,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(SPECS_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -81,7 +87,8 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		--log-file=$(LOGS_DIR)/pkggen/srpms/srpmpacker.log \
+		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
+		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) && \
 	touch $@
 

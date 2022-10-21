@@ -1,7 +1,7 @@
 Summary:        Google's C++ gtest framework
 Name:           gtest
-Version:        1.11.0
-Release:        2%{?dist}
+Version:        1.12.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_prefix}/src/gmock/
 
 %changelog
+* Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.1-1
+- Updating to 1.12.1.
+
 * Tue Mar 15 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.0-2
 - Add missing Requires in devel packages.
 

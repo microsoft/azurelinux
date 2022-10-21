@@ -1,36 +1,24 @@
 
-Summary: Exif and Iptc metadata manipulation library
-Name:    exiv2
-Version: 0.27.2
-%global internal_ver %{version}
-Release: 3%{?dist}
-
-License: GPLv2+
+Summary:        Exif and Iptc metadata manipulation library
+Name:           exiv2
+Version:        0.27.5
+Release:        1%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:     http://www.exiv2.org/
-%if 0%{?beta:1}
-Source0: https://github.com/Exiv2/%{name}/archive/v%{version}-%{beta}.tar.gz
-%else
-Source0: http://exiv2.org/builds/%{name}-%{version}-Source.tar.gz
-%endif
-
-## upstream patches
-
-## upstreamable patches
-
-BuildRequires: cmake
-BuildRequires: expat-devel
-BuildRequires: gcc-c++
-BuildRequires: gettext
-BuildRequires: pkgconfig
-BuildRequires: pkgconfig(libcurl)
-BuildRequires: pkgconfig(libssh)
-BuildRequires: zlib-devel
-# docs
-BuildRequires: doxygen graphviz libxslt
-
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+URL:            http://www.exiv2.org/
+Source0:        https://github.com/Exiv2/exiv2/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  cmake
+BuildRequires:  curl-devel
+BuildRequires:  doxygen
+BuildRequires:  expat-devel
+BuildRequires:  gcc-c++
+BuildRequires:  gettext
+BuildRequires:  graphviz
+BuildRequires:  libssh2-devel
+BuildRequires:  libxslt
+BuildRequires:  zlib-devel
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
 A command line utility to access image metadata, allowing one to:
@@ -44,38 +32,34 @@ A command line utility to access image metadata, allowing one to:
 * extract, insert and delete Exif metadata (including thumbnails),
   Iptc metadata and Jpeg comments
 
-%package devel
-Summary: Header files, libraries and development documentation for %{name}
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+%package      devel
+Summary:        Header files, libraries and development documentation for %{name}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # FIXME/TODO: probably overlinking --rex
 # exiv2/exiv2Config.cmake:  INTERFACE_LINK_LIBRARIES "/usr/lib64/libexpat.so"
-Requires: expat-devel%{?_isa} 
-%description devel
+Requires:       expat-devel%{?_isa}
+
+%description  devel
 %{summary}.
 
-%package libs
-Summary: Exif and Iptc metadata manipulation library
-# not strictly required, but convenient and expected
-%if 0%{?rhel} && 0%{?rhel} <= 7
-Requires: %{name} = %{version}-%{release}
-%else
-Recommends: %{name} = %{version}-%{release}
-%endif
-%description libs
+%package      libs
+Summary:        Exif and Iptc metadata manipulation library
+Recommends:     %{name} = %{version}-%{release}
+
+%description  libs
 A C++ library to access image metadata, supporting full read and write access
 to the Exif and Iptc metadata, Exif MakerNote support, extract and delete
 methods for Exif thumbnails, classes to access Ifd and so on.
 
-%package doc
-Summary: Api documentation for %{name}
-BuildArch: noarch
-%description doc
+%package      doc
+Summary:        Api documentation for %{name}
+BuildArch:      noarch
+
+%description  doc
 %{summary}.
 
-
 %prep
-%autosetup -n %{name}-%{version}-%{?beta}%{!?beta:Source} -p1
-
+%autosetup -p1
 
 %build
 
@@ -96,12 +80,10 @@ make install/fast DESTDIR=%{buildroot}
 
 ## unpackaged files
 rm -fv %{buildroot}%{_libdir}/libexiv2.la
-#rm -fv %{buildroot}%{_libdir}/pkgconfig/exiv2.lsm
-
 
 %check
 export PKG_CONFIG_PATH="%{buildroot}%{_libdir}/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
-test "$(pkg-config --modversion exiv2)" = "%{internal_ver}"
+test "$(pkg-config --modversion exiv2)" = "%{version}"
 test "$(pkg-config --variable=libdir exiv2)" = "%{_libdir}"
 test -x %{buildroot}%{_libdir}/libexiv2.so
 
@@ -118,7 +100,7 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 %files libs
 %{_libdir}/libexiv2.so.27*
-%{_libdir}/libexiv2.so.%{internal_ver}
+%{_libdir}/libexiv2.so.%{version}
 
 %files devel
 %{_includedir}/exiv2/
@@ -133,6 +115,10 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 
 %changelog
+* Thu Jun 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.27.5-1
+- Fixing CVEs
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.27.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

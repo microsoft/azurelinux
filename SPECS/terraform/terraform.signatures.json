@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "terraform-1.1.7-vendor.tar.gz": "4a50a15f58c7e0467f0f7fe69f80ba55d68954138815a07af9cb96b59c76ad31",
-  "terraform-1.1.7.tar.gz": "7651b69a2196de4393195cef4a03171c83aa50581f1019bca3f17cf05db5335b"
+  "terraform-1.3.2-vendor.tar.gz": "f559dd2f984522cd72c266e027ab35867db112d43e14dfbe58e8be053e7d9a41",
+  "terraform-1.3.2.tar.gz": "51c41c40bcd87b917046b786cf6d32d3b2b5f6c5fc4cb84121944efc9be54cc0"
  }
 }

@@ -446,6 +446,18 @@ var expectedConfiguration Config = Config{
 					StartupCommand: "/usr/bin/somescript",
 				},
 			},
+			PackageRepos: []PackageRepo{
+				{
+					Name:    "repo1",
+					BaseUrl: "https://repo1.com",
+					Install: false,
+				},
+				{
+					Name:    "repo2",
+					BaseUrl: "https://repo2.com",
+					Install: false,
+				},
+			},
 			PreInstallScripts: []InstallScript{
 				{
 					Path: "arglessPreScript.sh",
@@ -462,6 +474,28 @@ var expectedConfiguration Config = Config{
 				{
 					Path: "thisOneNeedsArguments.sh",
 					Args: "--input abc --output cba",
+				},
+			},
+			FinalizeImageScripts: []InstallScript{
+				{
+					Path: "arglessScript.sh",
+				},
+				{
+					Path: "thisOneNeedsArguments.sh",
+					Args: "--input abc --output cba",
+				},
+			},
+			Networks: []Network{
+				{
+					BootProto: "dhcp",
+					GateWay:   "192.168.20.4",
+					Ip:        "192.169.20.148",
+					NetMask:   "255.255.255.0",
+					OnBoot:    false,
+					NameServers: []string{
+						"192.168.30.23",
+					},
+					Device: "eth0",
 				},
 			},
 			Encryption: RootEncryption{

@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2022a
+Version:        2022e
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -45,6 +45,18 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Wed Oct 12 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022e-1
+- Update to version  "2022e".
+
+* Mon Sep 26 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022d-1
+- Update to version  "2022d".
+
+* Tue Aug 16 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022c-1
+- Update to version  "2022c".
+
+* Thu Aug 11 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022b-1
+- Update to version  "2022b".
+
 * Fri May 06 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022a-1
 - Update to version  "2022a".
 

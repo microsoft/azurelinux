@@ -2,7 +2,7 @@
 
 Summary:        XML and HTML with Python
 Name:           python-lxml
-Version:        4.8.0
+Version:        4.9.1
 Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
@@ -53,6 +53,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Mon Aug 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.9.1-1
+- Upgrade to to fix CVE-2022-2309
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-1
 - Upgrade to latest upstream version
 - Fixes CVE-2018-19787, CVE-2020-27783, CVE-2021-28957, CVE-2021-43818

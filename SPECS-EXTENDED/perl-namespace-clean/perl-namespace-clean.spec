@@ -8,7 +8,7 @@
 Name:		perl-namespace-clean
 Summary:	Keep your namespace tidy
 Version:	0.27
-Release:	14%{?dist}
+Release:	15%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,14 +34,17 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(vars)
 BuildRequires:	perl(warnings)
 # Test Suite
+%if %{with_check}
 BuildRequires:	perl(Config)
 BuildRequires:	perl(DB)
 BuildRequires:	perl(File::Glob)
 BuildRequires:	perl(FindBin)
 BuildRequires:	perl(IPC::Open2)
+BuildRequires:	perl(Test::More)
 BuildRequires:	perl(lib)
 BuildRequires:	perl(sort)
-BuildRequires:	perl(Test::More)
+BuildRequires:	perl-debugger
+%endif
 %if %{with perl_namespace_clean_enables_optional_test}
 # Optional Tests
 BuildRequires:	perl(Variable::Magic)
@@ -89,6 +92,10 @@ make test
 %{_mandir}/man3/namespace::clean.3*
 
 %changelog
+* Thu Sep 01 2022 Muhammad Falak <mwani@microsoft.com> - 0.27-15
+- Add BR on perl-debugger to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.27-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

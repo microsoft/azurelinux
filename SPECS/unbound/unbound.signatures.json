@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "unbound-release-1.13.2.tar.gz": "110d63dc7c4ad08dbad22af581ac26bf1a4f1778461c1708a4b382ec234ce872",
+  "unbound-release-1.16.3.tar.gz": "df6359aadca02148f3ad0cc08edc7bdd031fb1dec73f0c51ed82bfec502bcb56",
   "unbound.service": "563389e2bf92e13541d68c7bcac6bc6635931aa86509d45393864d24aacc7147"
  }
 }

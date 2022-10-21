@@ -2,7 +2,7 @@
 Summary:        Internationalization library for Perl, compatible with gettext
 Name:           perl-libintl-perl
 Version:        1.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/libintl-perl/
@@ -11,6 +11,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test)
+%endif
+
 Requires:       perl-libs
 Requires:       perl(Carp)
 Requires:       perl(Encode::Alias)
@@ -198,6 +203,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.32-2
+- Add BR on `perl(ExtUtils::MakeMaker)` & `perl(Test)` to enable ptest
+
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.32-1
 - Update to 1.32
 

@@ -3,7 +3,7 @@
 Summary:        Unicode-aware Pure Python Expect-like module
 Name:           python-%{modname}
 Version:        4.8.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,19 +68,19 @@ python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 
 %check
 export PYTHONIOENCODING=UTF-8
-# workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1914843
-# upstream: https://github.com/pexpect/pexpect/issues/669
-# There's a patch upstream that we can presumable remove this after
-# it merges and is released.
-# Thx for the suggestion Miro: https://www.spinics.net/lists/fedora-devel/msg283026.html
-echo "set enable-bracketed-paste off" > .inputrc
-export INPUTRC=$PWD/.inputrc
 
 python3 ./tools/display-sighandlers.py
 python3 ./tools/display-terminalinfo.py
 
 pip3 install pytest
-TRAVIS=true python3 -m pytest -v
+
+# Disabling broken "spawn_uses_env" test.
+# See: https://github.com/pexpect/pexpect/issues/669
+# We can remove this once the GitHub issue is fixed and we update
+# the package to the version containing the fix.
+echo "set enable-bracketed-paste off" > .inputrc
+export INPUTRC=$PWD/.inputrc
+TRAVIS=true python3 -m pytest -v -k "not spawn_uses_env"
 
 %files -n python3-%{modname}
 %license LICENSE
@@ -89,6 +89,9 @@ TRAVIS=true python3 -m pytest -v
 %{python3_sitelib}/%{modname}-*.egg-info
 
 %changelog
+* Tue Aug 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.0-11
+- Disabling flaky "spawn_uses_env" test.
+
 * Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-10
 - Fix package tests by using pip to install testing requirements
 - Fix package tests by taking sys_executable patch from upstream

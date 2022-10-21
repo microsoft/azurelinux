@@ -54,12 +54,12 @@ jobs:
           sudo make go-test-coverage | grep "no test files"
           echo Missing $noTestCount Go Tests!
         fi
-    
+
     - name: Evaluate test coverage
       run: |
         pushd toolkit
         sudo make go-test-coverage
-    
+
     - name: Upload test coverage
       uses: actions/upload-artifact@v2.1.4
       with:

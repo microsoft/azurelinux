@@ -1,15 +1,41 @@
+%global patchlevel     20220612
+
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
-Version:        6.2
-Release:        6%{?dist}
+Version:        6.3
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://invisible-island.net/ncurses/
-Source0:        https://invisible-mirror.net/archives/%{name}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-39537.patch
+#
+# Please note that it is very important to select the ncurses package 
+# with the highest available patch level in the name when fixing CVE's
+#
+# For example, the original 6.3 ncurses release is available here:
+# https://invisible-mirror.net/archives/ncurses/ncurses-6.3.tar.gz
+#
+# However there are rollling patch versions of the package available under this folder:
+# https://invisible-mirror.net/archives/ncurses/current/
+#
+# So, when upgrading choose the appropriate patch version
+# Also note that at least one CVE on NIST had unusual matching rules 
+# where the patch number is not specified in the version,
+# but was described in the textual description.
+#
+# Description showed:
+#   ncurses 6.3 before patch 20220416 has an out-of-bounds....
+#
+# Matching rules showed:
+#   cpe:2.3:a:gnu:ncurses:*:*:*:*:*:*:*:*  	    Up to (excluding)  6.3
+#   cpe:2.3:a:gnu:ncurses:6.3:-:*:*:*:*:*:*     [and this line says including 6.3?!]
+# 
+# Use a nopatch file to clear the CVE after choosing the correct patch level
+#
+Source0:        https://invisible-mirror.net/archives/%{name}/current/%{name}-%{version}-%{patchlevel}.tgz
 Requires:       %{name}-libs = %{version}-%{release}
+
 
 %description
 The Ncurses package contains libraries for terminal-independent
@@ -45,7 +71,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains all terminfo files
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}-%{patchlevel}
 
 %build
 common_options="\
@@ -207,6 +233,13 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+* Tue Sep 20 2022 Jon Slobodzian <joslobo@microsoft.com> - 6.3-2
+- Update to version 6.3-20220612 to fix CVE-2022-29458
+- Cherry-picked from Mariner 1.0
+
+* Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 6.3-1
+- Update to version 6.3
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2-6
 - Patch CVE-2021-39537
 - Change FTP source url to HTTPS mirror

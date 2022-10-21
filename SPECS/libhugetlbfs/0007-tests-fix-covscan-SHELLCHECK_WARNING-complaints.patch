@@ -1,0 +1,212 @@
+From 815072b9163cae73671baae448f974cc8f8a84be Mon Sep 17 00:00:00 2001
+From: Rafael Aquini <aquini@redhat.com>
+Date: Sun, 12 Apr 2020 21:08:01 -0400
+Subject: [PATCH] tests: fix covscan SHELLCHECK_WARNING complaints
+
+Signed-off-by: Rafael Aquini <aquini@redhat.com>
+---
+ tests/counters.sh                      |  2 +-
+ tests/fadvise_reserve.sh               |  2 +-
+ tests/fallocate_align.sh               |  2 +-
+ tests/fallocate_basic.sh               |  2 +-
+ tests/fallocate_stress.sh              |  2 +-
+ tests/madvise_reserve.sh               |  2 +-
+ tests/mremap-expand-slice-collision.sh |  2 +-
+ tests/mremap-fixed-huge-near-normal.sh |  2 +-
+ tests/mremap-fixed-normal-near-huge.sh |  2 +-
+ tests/quota.sh                         |  2 +-
+ tests/readahead_reserve.sh             |  2 +-
+ tests/wrapper-utils.sh                 | 18 +++++++++---------
+ 12 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/tests/counters.sh b/tests/counters.sh
+index e3ffabe..27bfca3 100755
+--- a/tests/counters.sh
++++ b/tests/counters.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # Huge page overcommit was not available until 2.6.24
+-compare_kvers `uname -r` "2.6.24"
++compare_kvers "$(uname -r)" "2.6.24"
+ if [ $? -eq 1 ]; then
+ 	EXP_RC=$RC_FAIL
+ else
+diff --git a/tests/fadvise_reserve.sh b/tests/fadvise_reserve.sh
+index 74496ec..ff96003 100755
+--- a/tests/fadvise_reserve.sh
++++ b/tests/fadvise_reserve.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # fadvise is known broken before 2.6.30
+-compare_kvers `uname -r` "2.6.30"
++compare_kvers "$(uname -r)" "2.6.30"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL (assumed) kernel bug"
+ 	exit $RC_FAIL
+diff --git a/tests/fallocate_align.sh b/tests/fallocate_align.sh
+index 5105151..4397cd3 100755
+--- a/tests/fallocate_align.sh
++++ b/tests/fallocate_align.sh
+@@ -5,7 +5,7 @@
+ #
+ # hugetlbfs fallocate support was not available until 4.3
+ #
+-compare_kvers `uname -r` "4.3.0"
++compare_kvers "$(uname -r)" "4.3.0"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL no fallocate support in kernels before 4.3.0"
+ 	exit $RC_FAIL
+diff --git a/tests/fallocate_basic.sh b/tests/fallocate_basic.sh
+index 904dfd6..1af6196 100755
+--- a/tests/fallocate_basic.sh
++++ b/tests/fallocate_basic.sh
+@@ -5,7 +5,7 @@
+ #
+ # hugetlbfs fallocate support was not available until 4.3
+ #
+-compare_kvers `uname -r` "4.3.0"
++compare_kvers "$(uname -r)" "4.3.0"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL no fallocate support in kernels before 4.3.0"
+ 	exit $RC_FAIL
+diff --git a/tests/fallocate_stress.sh b/tests/fallocate_stress.sh
+index 622084f..3b5b70a 100755
+--- a/tests/fallocate_stress.sh
++++ b/tests/fallocate_stress.sh
+@@ -5,7 +5,7 @@
+ #
+ # hugetlbfs fallocate support was not available until 4.3
+ #
+-compare_kvers `uname -r` "4.3.0"
++compare_kvers "$(uname -r)" "4.3.0"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL no fallocate support in kernels before 4.3.0"
+ 	exit $RC_FAIL
+diff --git a/tests/madvise_reserve.sh b/tests/madvise_reserve.sh
+index cfe582d..eb289d6 100755
+--- a/tests/madvise_reserve.sh
++++ b/tests/madvise_reserve.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # madvise is known broken before 2.6.30
+-compare_kvers `uname -r` "2.6.30"
++compare_kvers "$(uname -r)" "2.6.30"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL (assumed) kernel bug"
+ 	exit $RC_FAIL
+diff --git a/tests/mremap-expand-slice-collision.sh b/tests/mremap-expand-slice-collision.sh
+index 8c9d98a..dd4eba3 100755
+--- a/tests/mremap-expand-slice-collision.sh
++++ b/tests/mremap-expand-slice-collision.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # mremap-expand-slice-collision is known broken before 2.6.33
+-compare_kvers `uname -r` "2.6.33"
++compare_kvers "$(uname -r)" "2.6.33"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL (assumed) kernel bug"
+ 	exit $RC_FAIL
+diff --git a/tests/mremap-fixed-huge-near-normal.sh b/tests/mremap-fixed-huge-near-normal.sh
+index 4b89c35..22fde79 100755
+--- a/tests/mremap-fixed-huge-near-normal.sh
++++ b/tests/mremap-fixed-huge-near-normal.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # mremap-fixed-huge-near-normal is known broken before 2.6.33
+-compare_kvers `uname -r` "2.6.33"
++compare_kvers "$(uname -r)" "2.6.33"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL (assumed) kernel bug"
+ 	exit $RC_FAIL
+diff --git a/tests/mremap-fixed-normal-near-huge.sh b/tests/mremap-fixed-normal-near-huge.sh
+index 9ed058f..45b8f26 100755
+--- a/tests/mremap-fixed-normal-near-huge.sh
++++ b/tests/mremap-fixed-normal-near-huge.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # mremap-fixed-normal-near-huge is known broken before 2.6.33
+-compare_kvers `uname -r` "2.6.33"
++compare_kvers "$(uname -r)" "2.6.33"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL (assumed) kernel bug"
+ 	exit $RC_FAIL
+diff --git a/tests/quota.sh b/tests/quota.sh
+index 398d442..55c764a 100755
+--- a/tests/quota.sh
++++ b/tests/quota.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # There are known bugs in quota accounting prior to 2.6.24
+-compare_kvers `uname -r` "2.6.24"
++compare_kvers "$(uname -r)" "2.6.24"
+ if [ $? -eq 1 ]; then
+ 	EXP_RC=$RC_FAIL
+ else
+diff --git a/tests/readahead_reserve.sh b/tests/readahead_reserve.sh
+index 5ab7400..861ef5a 100755
+--- a/tests/readahead_reserve.sh
++++ b/tests/readahead_reserve.sh
+@@ -3,7 +3,7 @@
+ . wrapper-utils.sh
+ 
+ # readahead is known broken before 2.6.30
+-compare_kvers `uname -r` "2.6.30"
++compare_kvers "$(uname -r)" "2.6.30"
+ if [ $? -eq 1 ]; then
+ 	echo "FAIL (assumed) kernel bug"
+ 	exit $RC_FAIL
+diff --git a/tests/wrapper-utils.sh b/tests/wrapper-utils.sh
+index 2f6451d..79e7ed1 100644
+--- a/tests/wrapper-utils.sh
++++ b/tests/wrapper-utils.sh
+@@ -1,12 +1,12 @@
+ #!/bin/bash
+ 
+ # Standard return codes
+-RC_PASS=0
+-RC_CONFIG=1
+-RC_FAIL=2
+-RC_XFAIL=3
+-RC_XPASS=4
+-RC_BUG=99
++export RC_PASS=0
++export RC_CONFIG=1
++export RC_FAIL=2
++export RC_XFAIL=3
++export RC_XPASS=4
++export RC_BUG=99
+ 
+ function unexpected_pass()
+ {
+@@ -28,10 +28,10 @@ function check_rc()
+ 	EXP_RC=$1
+ 	ACT_RC=$2
+ 
+-	if [ $ACT_RC -eq $RC_PASS -a $EXP_RC -ne $RC_PASS ]; then
++	if [[ ($ACT_RC -eq $RC_PASS) && ($EXP_RC -ne $RC_PASS) ]]; then
+ 		unexpected_pass
+ 		return $RC_XPASS
+-	elif [ $EXP_RC -ne $RC_PASS -a $EXP_RC -eq $ACT_RC ]; then
++	elif [[ ($EXP_RC -ne $RC_PASS) && ($EXP_RC -eq $ACT_RC) ]]; then
+ 		expected_fail
+ 		return $RC_XFAIL
+ 	else
+@@ -47,7 +47,7 @@ function exec_and_check()
+ 	EXP_RC=$1
+ 	shift
+ 
+-	OUTPUT=`$@`
++	OUTPUT=$("$@")
+ 	check_rc $EXP_RC $?
+ 	RC=$?
+ 	echo $OUTPUT
+-- 
+2.25.2
+

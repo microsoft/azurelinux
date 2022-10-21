@@ -1,16 +1,16 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.13.2
+Version:        1.16.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
-#Source0:       https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz
-Source0:        %{name}-release-%{version}.tar.gz
+Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 BuildRequires:  expat-devel
+BuildRequires:  libevent-devel
 BuildRequires:  python3-devel
 BuildRequires:  swig
 BuildRequires:  systemd
@@ -54,12 +54,14 @@ unbound dns server docs
     --disable-static \
     --with-pythonmodule \
     --with-pyunbound \
+    --with-libevent \
     PYTHON=%{python3}
 %make_build
 
 %install
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
+make DESTDIR=%{buildroot} unbound-event-install
 install -vdm755 %{buildroot}%{_unitdir}
 install -pm 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 
@@ -94,6 +96,15 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Wed Oct 12 2022 Henry Li <lihl@microsoft.com> - 1.16.3-1
+- Upgrade to version 1.16.3 to resolve CVE-2022-3204
+
+* Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.16.2-1
+- Bump version to address CVE-2022-30698
+
+* Fri Jul 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.13.2-2
+- Build with libevent
+
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.2-1
 - Update to version 1.13.2.
 

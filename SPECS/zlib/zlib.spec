@@ -1,13 +1,15 @@
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.2.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://www.zlib.net/
 License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.zlib.net/%{name}-%{version}.tar.xz
+Patch0:         CVE-2022-37434.patch
+Patch1:         Fix-extra-field-processing-bug-that-dereferences-NULL.patch
 %description
 Compression and decompression routines
 %package    devel
@@ -17,8 +19,10 @@ Provides:   zlib-static = %{version}-%{release}
 %description    devel
 It contains the libraries and header files to create applications
 for handling compiled objects.
+
 %prep
-%setup -q
+%autosetup -p1
+
 %build
 ./configure \
     --prefix=%{_prefix}
@@ -47,6 +51,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
+* Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.2.12-2
+- Introduce patches from upstrea to address CVE-2022-37434
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.2.12-1
 - Upgrade to 1.12.2 to fix CVE-2018-25032
 - License verified

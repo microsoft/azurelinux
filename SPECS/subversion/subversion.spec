@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
-Version:        1.14.1
-Release:        3%{?dist}
+Version:        1.14.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,9 @@ sudo -u test make check && userdel test -r -f
 %{_mandir}/man3/SVN*
 
 %changelog
+* Mon Jun 06 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.2-1
+- Updating to 1.14.2 to fix CVE-2021-28544.
+
 * Mon Apr 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.14.1-3
 - Fix duplicate packaging of libsvn_swig_perl so
 

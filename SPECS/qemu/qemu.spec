@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        3%{?dist}
+Release:        9%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -243,6 +243,7 @@ Patch5:         0002-virtiofsd-Do-not-support-blocking-flock.patch
 # acpi: fix QEMU crash when started with SLIC table
 # https://bugzilla.redhat.com/show_bug.cgi?id=2072303
 Patch6:         0001-acpi-fix-QEMU-crash-when-started-with-SLIC-table.patch
+Patch7:         0001-ebpf-replace-deprecated-bpf_program__set_socket_filt.patch
 # CVE-2022-0358 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/48302d4eb628ff0bea4d7e92cbf6b726410eb4c3
 # From https://bugzilla.redhat.com/show_bug.cgi?id=2046202
 Patch1000:      CVE-2022-0358.patch
@@ -255,6 +256,12 @@ Patch1002:      CVE-2022-1050.patch
 # CVE-2022-26354 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/8d1b247f3748ac4078524130c6d7ae42b6140aaf
 Patch1003:      CVE-2022-26354.patch
 Patch1004:      CVE-2022-26353.patch
+Patch1005:      CVE-2021-4206.patch
+Patch1006:      CVE-2022-35414.patch
+# CVE-2021-4158 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9bd6565ccee68f72d5012e24646e12a1c662827e
+Patch1007:      CVE-2021-4158.patch
+# CVE-2022-2962 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/36a894aeb64a2e02871016da1c37d4a4ca109182
+Patch1008:      0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -1663,9 +1670,12 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc32
 rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
-# Provided by package ipxe
+
+%ifarch aarch64
 rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
 rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
+%endif
+
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
 # Provided by package seabios
@@ -2098,6 +2108,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/%{name}/multiboot_dma.bin
 %{_datadir}/%{name}/pvh.bin
 %{_datadir}/%{name}/qboot.rom
+%{_datadir}/%{name}/pxe*rom
+%{_datadir}/%{name}/efi*rom
 %if %{need_qemu_kvm}
 %{_bindir}/qemu-kvm
 %{_mandir}/man1/qemu-kvm.1*
@@ -2276,6 +2288,24 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Tue Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
+- Adress CVE-2022-2962
+
+* Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-8
+- Introduce patch from upstream to fix build with libbpf 1.0.0
+
+* Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-7
+- Patched CVE-2021-4158
+
+* Tue Aug 23 2022 Nicolas Guibourge <mwani@microsoft.com> - 6.2.0-6
+- address CVE-2022-35414
+
+* Fri Jul 01 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-5
+- Ship efi*rom & pxe*rom rom files
+
+* Wed Jun 15 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-4
+- Address CVE-2021-4206
+
 * Fri May 20 2022 Chris Co <chrco@microsoft.com> - 6.2.0-3
 - Patched CVE-2022-26353
 

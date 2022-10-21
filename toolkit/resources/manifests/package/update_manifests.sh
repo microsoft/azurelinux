@@ -237,6 +237,7 @@ generate_pkggen_core () {
         grep "^gzip-" $TmpPkgGen
         grep "^make-" $TmpPkgGen
         grep "^patch-" $TmpPkgGen
+        grep "^libcap-ng-" $TmpPkgGen
         grep "^util-linux-" $TmpPkgGen
         grep "^tar-" $TmpPkgGen
         grep "^xz-" $TmpPkgGen
@@ -245,7 +246,6 @@ generate_pkggen_core () {
         grep "^flex-" $TmpPkgGen
         grep "^bison-" $TmpPkgGen
         grep "^popt-" $TmpPkgGen
-        grep "^nspr-" $TmpPkgGen
         grep "^sqlite-" $TmpPkgGen
         grep "^elfutils-" $TmpPkgGen
         grep "^expat-" $TmpPkgGen
@@ -317,11 +317,8 @@ generate_toolchain
 # Create a temp file that can be edited to remove the unnecessary files
 cp "$ToolchainManifest" $TmpPkgGen
 
-# Remove all *-debuginfo except openssl
-R=$(grep openssl-debuginfo "$ToolchainManifest")
+# Remove all *-debuginfo subpackages
 sed -i '/debuginfo/d' $TmpPkgGen
-# Add the openssl-debuginfo file back
-echo "$R" >> $TmpPkgGen
 
 # Modify the temp file by removing other unneeded packages
 remove_packages_for_pkggen_core

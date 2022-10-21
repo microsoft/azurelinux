@@ -1,0 +1,63 @@
+# Downloading files during build time is not allowed
+# apply pre-downloaded reaper-build-cache which is
+# required for reaper to build based on maven pom.xml
+# Generate reaper-build-cache when ever update to latest version.
+# Cassandra reaper caches entails below items:
+# a. /root/.m2 - maven build cache
+# b. /root/.npm - npm caches
+# c. /root/.cache - bower caches
+# d. /usr/local - Current nodejs/npm versions cause build to fail due to incompatible node-sass/node-gyp version dependencies added in reaper's sources - package.json. This requires downgraded nodejs version of 14.18.0 and corresponding npm v6 that needs to be installed.
+# e. <sources>/src/ui/bower_components - bower artifacts built in sources directory
+# f. <sources>/src/ui/node_modules - npm-install related modeuls built in sources directory
+1. Boot up Mariner Core 2.0
+2. Refer to reaper spec and install all build required dependenices.
+3. Download reaper sources and extract under /usr/src
+4. cd /usr/src/cassandra-reaper-<version>
+5. Run "export JAVA_HOME=/usr/lib/jvm/msopenjdk-11"
+6. Run "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jvm/msopenjdk-11/lib/jli"
+7. Run "sudo npm install -g bower"
+8. Run "sudo npm install -g n"
+9. Run "sudo n 14.18.0"
+10. One can check versions for bower/node/npm.
+11. Run "mvn -DskipTests clean package"
+12. Once build is completed successfully, take build cache as below
+13. cd /root
+14. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-bower-cache-<version>.tar.gz .cache
+14. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-m2-cache-<version>.tar.gz .m2
+16. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-npm-cache-<version>.tar.gz .npm
+17. cd /usr/src/cassandra-reaper-<version>/src/ui
+18. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-bower-components-<version>.tar.gz bower_components
+19. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-srcui-node-modules-<version>.tar.gz node_modules
+20. cd /usr/local/lib
+21. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-local-lib-node-modules-<version>.tar.gz node_modules
+22. cd /usr/local/
+23. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf reaper-local-<version>.tar.gz n
+24. Update latest build cache signatures in reaper signature json and update to sources server.

@@ -148,7 +148,7 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 		rootMountPoint    = "/"
 	)
 
-	bootMountPoint, bootMountOptions, bootFlags, err := diskutils.BootPartitionConfig(ap.bootType)
+	bootMountPoint, bootMountOptions, bootFlags, err := configuration.BootPartitionConfig(ap.bootType, partitionTableType)
 	if err != nil {
 		logger.Log.Panic(err)
 	}

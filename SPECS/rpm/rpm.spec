@@ -1,13 +1,13 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.17.0
-Release:        8%{?dist}
+Version:        4.18.0
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
-Source0:        https://github.com/rpm-software-management/rpm/archive/%{name}-%{version}-release.tar.gz
+Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
 Source1:        brp-strip-debug-symbols
 Source2:        brp-strip-unneeded
 # The license for the files below is the same as for RPM as they have originally came from rpm.
@@ -15,17 +15,22 @@ Source2:        brp-strip-unneeded
 Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+Patch0:         remove-docs-from-makefile.patch
+Patch1:         define-RPM_LD_FLAGS.patch
+Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  awk
 BuildRequires:  debugedit
 BuildRequires:  elfutils-devel
-BuildRequires:  openssl-devel
 BuildRequires:  file-devel
 BuildRequires:  gettext
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel
+BuildRequires:  libtool
 BuildRequires:  lua-devel
+BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  sqlite-devel
@@ -36,9 +41,6 @@ Requires:       libarchive
 Requires:       libselinux
 Requires:       lua-libs
 Requires:       rpm-libs = %{version}-%{release}
-
-Patch0: remove-docs-from-makefile.patch
-Patch1: define-RPM_LD_FLAGS.patch
 
 %description
 RPM package manager
@@ -66,6 +68,7 @@ Shared libraries librpm and librpmio
 
 %package build-libs
 Summary:        Librpmbuild.so.* libraries needed to build rpms.
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description build-libs
 %{summary}
@@ -85,8 +88,10 @@ Requires:       gzip
 Requires:       lua
 Requires:       mariner-rpm-macros
 Requires:       patch
+Requires:       sed
 Requires:       tar
 Requires:       unzip
+Requires:       util-linux
 Requires:       xz
 Provides:       %{name}-sign = %{version}-%{release}
 
@@ -104,7 +109,8 @@ These are the additional language files of rpm.
 %package -n     python3-rpm
 Summary:        Python 3 bindings for rpm.
 Group:          Development/Libraries
-Requires:       %{name}-build-libs
+Requires:       %{name}-build-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       python3
 Provides:       %{name}-python3 = %{version}-%{release}
 
@@ -112,7 +118,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 Python3 rpm.
 
 %prep
-%autosetup -n rpm-%{name}-%{version}-release -p1
+%autosetup -n %{name}-%{version} -p1
 
 %build
 # pass -L opts to gcc as well to prioritize it over standard libs
@@ -149,7 +155,7 @@ popd
 sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 
 # Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python3:' %{SOURCE5}
+sed -i '1 s:.*:#!%{_bindir}/python3:' %{SOURCE5}
 
 %check
 make check TESTSUITEFLAGS=-j%{_smp_build_ncpus}
@@ -203,6 +209,7 @@ popd
 %{_libdir}/rpm/rpm.daily
 %{_libdir}/rpm/rpm.log
 %{_libdir}/rpm/rpm.supp
+%{_libdir}/rpm/rpmuncompress
 %{_libdir}/rpm/rpm2cpio.sh
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
@@ -229,10 +236,12 @@ popd
 
 %files build
 %{_bindir}/rpmbuild
+%{_bindir}/rpmlua
 %{_bindir}/rpmsign
 %{_bindir}/rpmspec
 %{_libdir}/rpm/macros.*
 %{_libdir}/rpm/find-lang.sh
+%{_libdir}/rpm/rpm_macros_provides.sh
 %{_libdir}/rpm/find-provides
 %{_libdir}/rpm/find-requires
 %{_libdir}/rpm/brp-*
@@ -276,6 +285,15 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 4.18.0-2
+- Create versioned dependencies from `python3-rpm` -> `rpm-build-libs` -> `rpm-libs` to ensure ABI compatibility
+
+* Wed Sep 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.18.0-1
+- Update to 4.18.0 to resolve CVE-2021-35938, CVE-2021-35939, and CVE-2021-3521
+
+* Mon Jul 18 2022 Nan Liu <liunan@microsoft.com> - 4.17.0-9
+- Add missing dependencies to rpmbuild (sed and util-linux)
+
 * Tue May 24 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.17.0-8
 - Move lua runtime dependency from main rpm package.  Move to rpm-build.
 - Move python files to rpm-build package.  This removes the implied dependency on python3 by the rpm package.

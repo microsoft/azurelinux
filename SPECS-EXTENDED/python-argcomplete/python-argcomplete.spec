@@ -7,7 +7,7 @@ Distribution:   Mariner
 Name:          python-%{modname}
 Summary:       Bash tab completion for argparse
 Version:       1.10.0
-Release:       5%{?dist}
+Release:       6%{?dist}
 License:       ASL 2.0
 URL:           https://github.com/kislyuk/argcomplete
 Source0:       %pypi_source argcomplete
@@ -84,6 +84,10 @@ install -p -m0644 %{buildroot}%{python3_sitelib}/%{modname}/bash_completion.d/py
 %{_sysconfdir}/bash_completion.d/python-argcomplete.sh
 
 %changelog
+* Mon Jul 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.10.0-6
+- Bump release due to bump in fish to 3.5.0.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

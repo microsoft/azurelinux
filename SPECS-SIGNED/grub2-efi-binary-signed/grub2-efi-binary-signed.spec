@@ -2,15 +2,17 @@
 %ifarch x86_64
 %global buildarch x86_64
 %global grubefiname grubx64.efi
+%global grubpxeefiname grubx64-noprefix.efi
 %endif
 %ifarch aarch64
 %global buildarch aarch64
 %global grubefiname grubaa64.efi
+%global grubpxeefiname grubaa64-noprefix.efi
 %endif
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        3%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,7 +30,9 @@ URL:            https://www.gnu.org/software/grub
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 Source0:        grub2-efi-binary-%{version}-%{release}.%{buildarch}.rpm
-Source1:        %{grubefiname}
+Source1:        grub2-efi-binary-noprefix-%{version}-%{release}.%{buildarch}.rpm
+Source2:        %{grubefiname}
+Source3:        %{grubpxeefiname}
 
 %description
 This package contains the GRUB EFI image signed for secure boot. The package is
@@ -49,18 +53,43 @@ Provides:       grub2-efi-x64 = %{version}-%{release}
 This package contains the GRUB EFI image signed for secure boot. The package is
 specifically created for installing on %{buildarch} systems
 
+%package -n     grub2-efi-binary-noprefix
+Summary:        GRand Unified Bootloader
+Group:          Applications/System
+
+%description -n grub2-efi-binary-noprefix
+This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
+specifically created for installing on %{buildarch} systems
+
 %prep
 
 %build
 
 %install
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
-cp %{SOURCE1} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
+cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
+cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %files -n grub2-efi-binary
 /boot/efi/EFI/BOOT/%{grubefiname}
 
+%files -n grub2-efi-binary-noprefix
+/boot/efi/EFI/BOOT/%{grubpxeefiname}
+
 %changelog
+* Thu Sep 08 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.06-7
+- Bump release number to match grub release number
+
+* Thu Jul 28 2022 Minghe Ren <mingheren@microsoft.com> - 2.06-6
+- Bump release number to match grub release number
+
+* Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 2.06-5
+- Bump release number to match grub release number
+
+* Fri Jul 08 2022 Henry Li <lihl@microsoft.com> - 2.06-4
+- Bump release number to match grub release number
+- Add grub2-efi-binary-noprefix subpackage for the additional efi binary with no prefix directory set
+
 * Mon Feb 28 2022 Henry Li <lihl@microsoft.com> - 2.06-3
 - Bump release number to match grub release number
 

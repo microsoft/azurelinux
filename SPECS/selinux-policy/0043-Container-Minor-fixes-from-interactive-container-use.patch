@@ -1,0 +1,106 @@
+From 15d7214f7675e96440abb01a2db2ea2df78902b4 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Tue, 19 Jul 2022 19:29:16 +0000
+Subject: [PATCH 43/43] Container: Minor fixes from interactive container use.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/filesystem.if  | 19 +++++++++++++++++++
+ policy/modules/kernel/kernel.te      |  4 ++++
+ policy/modules/services/container.te |  7 ++++++-
+ 3 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
+index b3e5817b1..4913e969d 100644
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -906,6 +906,25 @@ interface(`fs_watch_cgroup_files',`
+ 	allow $1 cgroup_t:file watch;
+ ')
+ 
++########################################
++## <summary>
++##     Read cgroup symlnks.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`fs_read_cgroup_symlinks',`
++	gen_require(`
++		type cgroup_t;
++	')
++
++	read_lnk_files_pattern($1, cgroup_t, cgroup_t)
++	dev_search_sysfs($1)
++')
++
+ ########################################
+ ## <summary>
+ ##     Create cgroup lnk_files.
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 00d49136c..55abaa062 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -99,6 +99,10 @@ type proc_kcore_t, proc_type;
+ neverallow ~{ can_dump_kernel kern_unconfined } proc_kcore_t:file ~{ getattr mounton };
+ genfscon proc /kcore gen_context(system_u:object_r:proc_kcore_t,mls_systemhigh)
+ 
++optional_policy(`
++	container_mountpoint(proc_kcore_t)
++')
++
+ optional_policy(`
+ 	init_mountpoint(proc_kcore_t)
+ ')
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index 709f2e214..0b62f1de8 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -364,6 +364,9 @@ allow container_engine_domain self:icmp_socket create_socket_perms;
+ allow container_engine_domain self:netlink_route_socket create_netlink_socket_perms;
+ allow container_engine_domain self:packet_socket create_socket_perms;
+ 
++allow container_engine_domain container_devpts_t:chr_file { rw_chr_file_perms setattr };
++term_create_pty(container_engine_domain, container_devpts_t)
++
+ allow container_engine_domain container_port_t:tcp_socket name_bind;
+ 
+ dontaudit container_engine_domain container_domain:process { noatsecure rlimitinh siginh };
+@@ -426,6 +429,7 @@ fs_mount_xattr_fs(container_engine_domain)
+ fs_remount_xattr_fs(container_engine_domain)
+ fs_unmount_xattr_fs(container_engine_domain)
+ fs_relabelfrom_xattr_fs(container_engine_domain)
++fs_get_xattr_fs_quotas(container_engine_domain)
+ 
+ fs_getattr_cgroup(container_engine_domain)
+ fs_manage_cgroup_dirs(container_engine_domain)
+@@ -434,6 +438,7 @@ fs_watch_cgroup_files(container_engine_domain)
+ fs_mount_cgroup(container_engine_domain)
+ fs_remount_cgroup(container_engine_domain)
+ fs_mounton_cgroup(container_engine_domain)
++fs_read_cgroup_symlinks(container_engine_domain)
+ 
+ fs_list_hugetlbfs(container_engine_domain)
+ 
+@@ -445,6 +450,7 @@ kernel_read_network_state(container_engine_domain)
+ kernel_read_system_state(container_engine_domain)
+ kernel_rw_net_sysctls(container_engine_domain)
+ kernel_dontaudit_search_kernel_sysctl(container_engine_domain)
++kernel_getattr_core_if(container_engine_domain)
+ 
+ selinux_get_fs_mount(container_engine_domain)
+ selinux_mount_fs(container_engine_domain)
+@@ -453,7 +459,6 @@ selinux_unmount_fs(container_engine_domain)
+ seutil_read_config(container_engine_domain)
+ seutil_read_default_contexts(container_engine_domain)
+ 
+-term_create_pty(container_engine_domain, container_devpts_t)
+ term_mount_devpts(container_engine_domain)
+ term_relabel_pty_fs(container_engine_domain)
+ 
+-- 
+2.25.1
+

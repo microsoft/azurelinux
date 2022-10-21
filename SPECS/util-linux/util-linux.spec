@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.37.2
-Release:        5%{?dist}
+Version:        2.37.4
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,13 +10,17 @@ URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/a
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
 Source1:        runuser
 Source2:        runuser-l
+Source3:        su
 BuildRequires:  audit-devel
+BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
+# util-linux contains su, which conflicts with shadow-utils < 4.9-10 that also contained su
+Conflicts:      shadow-utils < 4.9-10
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
@@ -70,7 +74,6 @@ autoreconf -fi
     --disable-nologin \
     --disable-chfn-chsh \
     --disable-login \
-    --disable-su \
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
@@ -94,6 +97,7 @@ install -d %{buildroot}%{_sharedstatedir}/libuuid
 install -vdm755 %{buildroot}%{_sysconfdir}/pam.d
 install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
+install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
@@ -110,6 +114,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %dir %{_prefix}%{_var}/run/uuidd
 %dir %{_sharedstatedir}/libuuid
 /bin/*
+%attr(0755,root,root) /bin/mount
+%attr(0755,root,root) /bin/umount
 /sbin/*
 %{_bindir}/*
 %{_sbindir}/*
@@ -120,6 +126,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_docdir}/util-linux/getopt*
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser-l
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -142,10 +149,23 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Tue May 03 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.36.2-5
+* Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 2.37.4-4
+- Modify su to improve security
+- Change file permission on mount and umount to improve security
+
+* Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.4-3
+- Enable su tool and related PAM config
+
+* Mon Jun 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.37.4-2
+- Add Buildrequires libcap-ng-devel to build setpriv
+
+* Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37.4-1
+- Updating to 2.37.4 to fix CVE-2022-0563.
+
+* Tue May 03 2022 Sriram Nambakam <snambakam@microsoft.com> - 2.37.2-5
 - Split libraries into the util-linux-libs package
 
-* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.2-4
+* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.37.2-4
 - Add Debian's PAM configs for runuser tool
 - Add build require on pam-devel so we have the pam headers
 

@@ -2,7 +2,7 @@
 +++ b/Lib/cgi.py	2015-02-05 18:03:52.273922307 -0800
 @@ -1,13 +1,5 @@
 -#! /usr/local/bin/python
-+#! /usr/bin/python
++#! /usr/bin/python3
  
 -# NOTE: the above "/usr/local/bin/python" is NOT a mistake.  It is
 -# intentionally NOT "/usr/bin/env python".  On many systems

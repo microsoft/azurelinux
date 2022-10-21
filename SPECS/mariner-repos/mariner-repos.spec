@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -214,6 +214,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-8
+- Add SRPM and Debuginfo repos to existing base, extended, and preview subpackages
+
 * Tue Apr 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-7
 - Add support for extended debuginfo repositories for Mariner 2.0
 

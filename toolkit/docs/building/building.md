@@ -55,6 +55,9 @@
       - [`HYDRATED_BUILD=...`](#hydrated_build)
         - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
         - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
+      - [`DELTA_BUILD=...`](#delta_build)
+        - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
+        - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -137,7 +140,7 @@ Depending on hardware, rebuilding the toolchain can take several hours. The foll
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
-sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 ```
 
 ## **Package Stage**
@@ -157,7 +160,7 @@ The following command rebuilds all CBL-Mariner packages.
 ```bash
 # Build ALL packages
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y
 ```
 
 ### **Rebuild Minimal Required Packages**
@@ -166,11 +169,11 @@ The following command rebuilds packages for the basic VHD.
 
 ```bash
 # Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8"
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64"
 ```
 
 Note that the image build commands in [Build Images](#build-images) will **automatically** build _only_ the packages required by a selected image configuration and then builds the image.
@@ -185,13 +188,13 @@ All images are generated in the `out/images` folder.
 
 ```bash
 # To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 
 # To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
-sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
 
-# To build a Mariner Container Image (Container Folder: ../out/images/core-container/*.tar.gz
-sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+# To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 
 ### ISO Images
@@ -311,7 +314,7 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
-SOURCE_URL         ?=
+SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
@@ -400,6 +403,26 @@ If that is not desired all remote sources can be disabled by clearing the follow
 ##### `REBUILD_TOOLCHAIN=`**`y`**
 
 > Bootstrap the toolchain from the host environment in a docker container. The toolchain consists of those packages which are required to build all other packages (*gcc, tdnf, etc*)
+
+#### `INCREMENTAL_TOOLCHAIN=...`
+
+##### `INCREMENTAL_TOOLCHAIN=`**`n`** *(default)*
+
+> If rebuilding the toolchain (`REBUILD_TOOLCHAIN=y`), perform a full build of the final toolchain packages. No RPMs from (a) previous failed builds or (b) upstream package repos will be reused.
+
+##### `INCREMENTAL_TOOLCHAIN=`**`y`**
+
+> Do not clear out the toolchain build chroot before performing a build of the final toolchain packages. RPMs within the toolchain build chroot will be used as a cache to avoid rebuilding already-built SRPMs. These RPMs can be seeded by (a) previous failed builds or (b) upstream package repos.
+
+#### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
+
+##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`n`** *(default)*
+
+> If performing an incremental toolchain build (`INCREMENTAL_TOOLCHAIN=y`), do not attempt to pull any packages from `$(PACKAGE_URL_LIST)`.
+
+##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`y`**
+
+> If performing an incremental toolchain build (`INCREMENTAL_TOOLCHAIN=y`), attempt to pull as many RPMs listed in the arch-specific toolchain manifest from the repos listed in `$(PACKAGE_URL_LIST)`. These RPMs will used as a cache to avoid rebuilding already-built SRPMs.
 
 #### `DOWNLOAD_SRPMS=...`
 
@@ -493,15 +516,25 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > - at least one of the RPM packages mentioned in the manifest file, or
 > - the script responsible for building the chroot.
 
-#### `HYDRATED_BUILD=...`]
+#### `HYDRATED_BUILD=...`
 
-##### `HYDRATED_BUILD=`**`y`**]
+##### `HYDRATED_BUILD=`**`y`**
 
 > If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
 
 ##### `HYDRATED_BUILD=`**`n`** *(default)*
 
 > Normal build. No hydrated RPMs will be used.
+
+#### `DELTA_BUILD=...`
+
+##### `DELTA_BUILD=`**`y`**
+
+> Delta build. Used for fast delta builds where published packages are pre-populated and only new or added packages are built.
+
+##### `DELTA_BUILD=`**`n`** *(default)*
+
+> Normal build.
 
 ## All Build Targets
 
@@ -602,6 +635,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
+| SRPM_PACK_LIST                |                                                                                                        | List of spec basenames to build into SRPMs. If empty, all specs under `$(SPECS_DIR)` will be packed.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
 
 ---
@@ -611,6 +645,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
 | REBUILD_TOOLCHAIN             | n                                                                                                      | Bootstrap the toolchain packages locally or download them?
+| ALLOW_TOOLCHAIN_DOWNLOAD_FAIL | n                                                                                                      | Allow for partial rehydration of the toolchain from `$(PACKAGE_URL_LIST)`? Only applicable if `REBUILD_TOOLCHAIN=y` and `INCREMENTAL_TOOLCHAIN=y`.
 | REBUILD_PACKAGES              | y                                                                                                      | Build packages locally or download them? Only packages with a local spec file will be built.
 | REBUILD_TOOLS                 | n                                                                                                      | Build the go tools locally or take them from the SDK?
 | TOOLCHAIN_ARCHIVE             |                                                                                                        | Instead of downloading toolchain *.rpms, extract them from here (see `REBUILD_TOOLCHAIN`).
@@ -653,6 +688,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 | REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
+| TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
 
 ---
 

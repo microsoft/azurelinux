@@ -1380,6 +1380,19 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	}
 	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 
+	// This is a common error for developers, print this so they can try to fix it themselves.
+	// Circular dependencies in the core repo may be resolved by using toolchain RPMs which won't be rebuilt, BUT
+	// if we aren't doing a full rebuild with REBUILD_TOOLCHAIN=y those RPMs may not be available in ./out/RPMS so
+	// we should prompt the user to pull the full set of toolchain RPMs, and then copy them over to ./out/RPMS.
+	logger.Log.Warn("╔════════════════════════════════════════════════════════════════════════════════════════════════╗")
+	logger.Log.Warn("║ Are you building the core repo (ie github.com/microsoft/CBL-Mariner) ?                         ║")
+	logger.Log.Warn("║ Are you working with a prebuilt or online toolchain (ie REBUILD_TOOLCHAIN != 'y') ?            ║")
+	logger.Log.Warn("║ Some toolchain packages create dependency cycles which can only be resolved by referencing     ║")
+	logger.Log.Warn("║    pre-built .rpm files  in `./out/RPMS`.                                                      ║")
+	logger.Log.Warn("║ Try running `make toolchain` and `make copy-toolchain-rpms` ***with your current arguments***  ║")
+	logger.Log.Warn("║     first! This will copy the toolchain .rpm files from the cache into `./out/RPMS`            ║")
+	logger.Log.Warn("╚════════════════════════════════════════════════════════════════════════════════════════════════╝")
+
 	return fmt.Errorf("cycles detected in dependency graph")
 }
 
@@ -1420,7 +1433,7 @@ func findAllRPMS(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) 
 
 		if !isFile {
 			logger.Log.Debugf("Did not find (%s)", rpm)
-			missingRpms = append(missingRpms, "rpm")
+			missingRpms = append(missingRpms, rpm)
 		}
 	}
 	foundAllRpms = len(missingRpms) == 0

@@ -1,7 +1,7 @@
 Summary:        Manages IPv4 and IPv6 addresses and subnets
 Name:           perl-NetAddr-IP
 Version:        4.079
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/NetAddr-IP
@@ -10,6 +10,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl
 BuildRequires:  perl-generators
+BuildRequires:  perl(Autoloader)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Math::BigInt)
@@ -46,6 +51,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 4.079-6
+- Add BR on `perl-{(Autoloader), (Test::More)}` to enable ptest
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.079-5
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

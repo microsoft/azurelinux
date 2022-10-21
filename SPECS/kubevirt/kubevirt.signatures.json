@@ -1,0 +1,6 @@
+{
+  "Signatures": {
+    "disks-images-provider.yaml": "5aed2075600b4332812ebf39fd31053442578880b7686dfb6459b94624314dad",
+    "kubevirt-0.55.1.tar.gz": "f9a05eb480875cfb958b20706361bd9a58bd3cdd2e971d37d62d17454bb39160"
+  }
+}

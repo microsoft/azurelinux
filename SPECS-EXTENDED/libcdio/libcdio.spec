@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: libcdio
 Version: 2.0.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: CD-ROM input and control library
 License: GPLv3+
 URL: http://www.gnu.org/software/libcdio/
@@ -16,6 +16,7 @@ BuildRequires: ncurses-devel
 BuildRequires: help2man
 BuildRequires: gettext-devel
 BuildRequires: chrpath
+Patch0: fix_format_security.patch
 
 
 # ABI compatibility package dropped in F23
@@ -38,6 +39,7 @@ This package contains header files and libraries for %{name}.
 
 %prep
 %setup -q
+%patch0 -p1
 
 iconv -f ISO88591 -t utf-8 -o THANKS.utf8 THANKS && mv THANKS.utf8 THANKS
 
@@ -121,6 +123,10 @@ make check
 
 
 %changelog
+* Tue Jun 21 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.0-8
+- Add patch to fix build error with ncurses 6.3
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

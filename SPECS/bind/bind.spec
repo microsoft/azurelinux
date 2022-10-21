@@ -6,10 +6,11 @@
 ## The order of libs is important. See lib/Makefile.in for details
 %define bind_export_libs isc dns isccfg irs
 %{!?_export_dir:%global _export_dir /bind9-export/}
+
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.15
-Release:        4%{?dist}
+Version:        9.16.29
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,10 +31,6 @@ Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
 Source14:       setup-named-softhsm.sh
 Source15:       named-chroot.files
-# CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
-Patch0:         CVE-2019-6470.nopatch
-# CVE-2020-8623 only impacts package built with "--enable-native-pkcs11"
-Patch1:         CVE-2020-8623.nopatch
 Patch9:         bind-9.14-config-pkcs11.patch
 Patch10:        bind-9.10-dist-native-pkcs11.patch
 
@@ -434,12 +431,16 @@ fi;
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
+%config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
+%{_sysconfdir}/rwtab.d/named
+%{_tmpfilesdir}/named.conf
 %{_sbindir}/named-journalprint
 %{_sbindir}/named-checkconf
 %{_bindir}/named-rrchecker
 %{_bindir}/mdig
 %{_sbindir}/named
+
 %{_sbindir}/rndc*
 %{_libexecdir}/generate-rndc-key.sh
 %{_mandir}/man1/mdig.1*
@@ -472,8 +473,9 @@ fi;
 %ghost %config(noreplace) %{_sysconfdir}/rndc.conf
 # ^- The default rndc.conf which uses rndc.key is in named's default internal config -
 # so rndc.conf is not necessary.
-%defattr(-,named,named,-)
 %dir /run/named
+%config(noreplace) %verify(not link) %{_sysconfdir}/named.conf
+%config(noreplace) %verify(not link) %{_sysconfdir}/named.rfc1912.zones
 
 %files dlz-filesystem
 %{_libdir}/{named,bind}/dlz_filesystem_dynamic.so
@@ -609,10 +611,15 @@ fi;
 %{_mandir}/man8/named-checkzone.8*
 %{_mandir}/man8/named-compilezone.8*
 %{_mandir}/man8/named-nzd2nzf.8*
-%{_sysconfdir}/*
-%{_tmpfilesdir}/named.conf
 
 %changelog
+* Mon Sep 12 2022 Olivia Crain <oliviacrain@microsoft.com - 9.16.29-2
+- Move named tmpfiles configuration to base package from utils subpackage
+- Move files under %%{_sysconfdir} in utils subpackage to base package 
+
+* Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.29-1
+- Updating to 9.16.29 to fix CVE-2021-25219.
+
 * Mon Apr 04 2022 Henry Li <lihl@microsoft.com> - 9.16.15-4
 - Remove trusted-key.key which works with +sigchase, a deprecated feature
 - License Verified

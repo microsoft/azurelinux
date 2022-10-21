@@ -1,18 +1,16 @@
 # For bootstrapping sphinxcontrib-websupport
 %bcond_without docs
 
-%global mod_name Whoosh
-
 Name:           python-whoosh
 Version:        2.7.4
-Release:        20%{?dist}
-Summary:        Fast, pure-Python full text indexing, search, and spell checking library 
+Release:        21%{?dist}
+Summary:        Fast, pure-Python full text indexing, search, and spell checking library
 
-License:        BSD 
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://pythonhosted.org/Whoosh/
-Source0:        https://pypi.python.org/packages/source/W/%{mod_name}/%{mod_name}-%{version}.tar.gz#/python-%{mod_name}-%{version}.tar.gz
+URL:            https://github.com/mchaput/whoosh
+Source0:        https://github.com/mchaput/whoosh/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -45,7 +43,7 @@ functionality to their applications and websites. Every part of how Whoosh
 works can be extended or replaced to meet your needs exactly.
 
 %prep
-%setup -q -n %{mod_name}-%{version}
+%setup -q -n whoosh-%{version}
 # pytest 4
 sed -i 's/\[pytest\]/\[tool:pytest\]/' setup.cfg
 
@@ -62,6 +60,7 @@ rm -rf docs/html/.doctrees
 %py3_install
 
 %check
+%{__python3} -m pip install wheel
 %{__python3} setup.py test
 
 %files -n python%{python3_pkgversion}-whoosh
@@ -74,6 +73,10 @@ rm -rf docs/html/.doctrees
 %{python3_sitelib}/*.egg-info/
 
 %changelog
+* Fri Jul 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.4-21
+- Install `wheel` package in %check section to enable build
+- Switch to github tarball
+
 * Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.4-20
 - Add an explicit BR on `pip` to enable ptest
 - License verified

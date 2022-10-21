@@ -1,7 +1,7 @@
 Summary:        RPC program number mapper
 Name:           rpcbind
 Version:        1.2.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
@@ -18,6 +18,8 @@ Requires:       systemd
 Requires(pre):  /usr/sbin/useradd /usr/sbin/userdel /usr/sbin/groupadd /usr/sbin/groupdel /bin/false
 Requires(preun):/usr/sbin/userdel /usr/sbin/groupdel
 Requires(post): /bin/chown
+
+Provides:       portmap = %{version}-%{release}
 
 %description
 The rpcbind program is a replacement for portmap. It is required for import or export of Network File System (NFS) shared directories. The rpcbind utility is a server that converts RPC program numbers into universal addresses
@@ -89,6 +91,9 @@ fi
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
 %changelog
+* Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.5-5
+- Add portmap to provides
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.5-4
 - Removing the explicit %%clean stage.
 - License verified.

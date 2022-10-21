@@ -9,17 +9,17 @@
 %_lib               lib
 %_lib64             lib64
 %_prefix            /usr
-%_exec_prefix       /usr
-%_bindir            /usr/bin
-%_sbindir           /usr/sbin
+%_exec_prefix       %{_prefix}
+%_bindir            %{_exec_prefix}/bin
+%_sbindir           %{_exec_prefix}/sbin
 %_libdir            /usr/%{_lib}
 %_lib64dir          /usr/%{_lib64}
-%_libexecdir        /usr/libexec
-%_datadir           /usr/share
-%_docdir            /usr/share/doc
-%_includedir        /usr/include
-%_infodir           /usr/share/info
-%_mandir            /usr/share/man
+%_libexecdir        %{_exec_prefix}/libexec
+%_datadir           %{_prefix}/share
+%_docdir            %{_datadir}/doc
+%_includedir        %{_prefix}/include
+%_infodir           %{_datadir}/info
+%_mandir            %{_datadir}/man
 %_oldincludedir     /usr/include
 %_sharedstatedir    /var/lib
 %_var               /var
@@ -64,15 +64,19 @@
 %_use_internal_dependency_generator 1
 %_build_id_links alldebug
 
-%__os_install_post    \
+%__os_install_post_leave_signatures    \
     %{_rpmconfigdir}/brp-compress \
-    %{_rpmconfigdir}/brp-strip %{__strip} \
-    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
-    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
     find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
+    %{nil}
+
+%__os_install_post    \
+    %{__os_install_post_leave_signatures} \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
+    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
+    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\

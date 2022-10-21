@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "nss_wrapper-1.1.11.tar.gz": "fb45332e7fb4d85d3ea829ed18172366196c17cbd32ef690a7e1309f0c37b4e0",
-  "nss_wrapper-1.1.11.tar.gz.asc": "cf87b785ff2a816523a885ff3982888344c8635095ce6b35e5d495243c1cfd8b",
-  "nss_wrapper.keyring": "3861ac6763ff3edf0bbbb05fe890962a5dbcd99b2e00fae16687fd480c7fab0f"
- }
-}

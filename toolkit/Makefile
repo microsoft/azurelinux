@@ -9,17 +9,19 @@
 ######## DEFINITIONS ########
 
 # Build targets
-ifndef CONFIG_FILE
-$(warning CONFIG_FILE is empty, defaulting to toolkit's core-efi.json unless CONFIG_FILE="" was set explicitly.)
+ifeq ($(origin CONFIG_FILE), undefined)
+CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
+$(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
 endif
-CONFIG_FILE            ?= $(toolkit_root)/imageconfigs/core-efi.json
 CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
 PACKAGE_IGNORE_LIST    ?=
+SRPM_PACK_LIST         ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
+ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
 DOWNLOAD_SRPMS                  ?= n
@@ -46,6 +48,8 @@ CLEANUP_PACKAGE_BUILDS          ?= y
 USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
+DELTA_BUILD                     ?= n
+TARGET_ARCH                     ?=
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -94,7 +98,7 @@ else
 endif
 
 # External source server
-SOURCE_URL         ?=
+SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
@@ -116,13 +120,22 @@ ifeq ($(USE_PREVIEW_REPO),y)
    endif
 endif
 
+ifneq ($(strip $(SRPM_PACK_LIST)),)
+LOCAL_SPECS = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
+else # Empty pack list, build all under $(SPECS_DIR)
+LOCAL_SPECS = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
+endif
+
+LOCAL_SPEC_DIRS = $(foreach spec,$(LOCAL_SPECS),$(dir $(spec)))
+
 CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
 
 # Build defines
 DIST_TAG           ?= .cm2
-BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
+# Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
+BUILD_NUMBER       ?= $(shell runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD)
 # an empty BUILD_NUMBER breaks the build later on
 ifeq ($(BUILD_NUMBER),)
    BUILD_NUMBER = non-git

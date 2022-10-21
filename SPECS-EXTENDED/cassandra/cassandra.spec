@@ -3,8 +3,8 @@
 
 Summary:        Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store
 Name:           cassandra
-Version:        4.0.3
-Release:        2%{?dist}
+Version:        4.0.6
+Release:        1%{?dist}
 URL:            http://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
@@ -15,7 +15,7 @@ Source1:        cassandra.service
 # Refer to Readme file for detailed
 # instructions to regenerate cassandra-build-cache
 # whenever updating to newer version.
-Source2:        cassandra-build-cache-4.0.3.tar.gz
+Source2:        cassandra-build-cache-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 BuildRequires:  ant
@@ -141,6 +141,13 @@ fi
 %exclude %{_var}/opt/cassandra/build/lib
 
 %changelog
+* Thu Sep 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.6-1
+- Upgrade version to 4.0.6.
+
+* Thu Aug 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.5-1
+- Upgrade version to 4.0.5.
+- Update Readme file.
+
 * Tue May 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.3-2
 - Fix package install uninstall issues and cleanup build cache.
 

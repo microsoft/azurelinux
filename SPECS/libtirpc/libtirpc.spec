@@ -1,6 +1,6 @@
 Summary:        Libraries for Transport Independent RPC
 Name:           libtirpc
-Version:        1.3.2
+Version:        1.3.3
 Release:        1%{?dist}
 License:        BSD
 Group:          System Environment/Libraries
@@ -68,6 +68,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Wed Aug 10 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.3-1
+- Bump verison to address CVE-2021-46828
+
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.3.2-1
 - Update to version 1.3.2
 

@@ -1,7 +1,7 @@
 Summary:        RPM Perl dependencies generators
 Name:           perl-generators
 Version:        1.11
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ BuildRequires:  perl
 BuildRequires:  sed
 %if %{with_check}
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Fedora::VSP)
 BuildRequires:  perl(Test::More)
 %endif
 
@@ -60,6 +61,9 @@ make test
 %{_rpmconfigdir}/fileattrs/perl*.attr
 
 %changelog
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.11-9
+- Add BR on `perl(Fedora::VSP)` to fix ptest build
+
 * Fri Apr 01 2022 Andrew Phelps <anphel@microsoft.com> - 1.11-8
 - Fix perl BR
 

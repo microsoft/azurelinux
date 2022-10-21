@@ -1,7 +1,7 @@
 Summary:        Minimal try/catch with proper preservation of $@
 Name:           perl-Try-Tiny
 Version:        0.30
-Release:        7%{?dist}
+Release:        8%{?dist}
 URL:            https://metacpan.org/release/Try-Tiny
 License:        MIT
 Group:          Development/Libraries
@@ -10,9 +10,12 @@ Distribution:   Mariner
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Sub::Util)
@@ -43,6 +46,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 0.30-8
+- Add BR on `perl(Test::More)` to fix ptest build
+
 *   Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.30-7
 -   Add missing BuildRequires for ExtUtils::MakeMaker
 

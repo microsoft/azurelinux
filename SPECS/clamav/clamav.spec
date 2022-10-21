@@ -1,19 +1,23 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.104.2
-Release:        1%{?dist}
+Version:        0.105.0
+Release:        3%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.clamav.net
 Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
-
+# Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
+Source1:        %{name}-%{name}-%{version}-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gdb
+BuildRequires:  git
 BuildRequires:  json-c-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
@@ -24,13 +28,14 @@ BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
+BuildRequires:  rust
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
-
 Requires:       openssl
 Requires:       zlib
-
+Requires(pre):  shadow-utils
+Requires(postun): shadow-utils
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-lib = %{version}-%{release}
 
@@ -41,40 +46,69 @@ of utilities including a flexible and scalable multi-threaded daemon, a command
 line scanner and an advanced tool for automatic database updates.
 
 %prep
-%autosetup
+# Setup .cargo directory
+mkdir -p $HOME
+pushd $HOME
+tar xf %{SOURCE1} --no-same-owner
+popd
+%autosetup -n clamav-clamav-%{version}
 
 %build
-mkdir -p build
-cd build
-
+export CARGO_NET_OFFLINE=true
 # Notes:
-# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages 
+# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages
 #   which provides the necessary pieces to build 'clamav-milter'
 # - systemd should be enabled because default value is off
-cmake .. \
-    -D CMAKE_INSTALL_LIBDIR=%{buildroot}%{_libdir} \
-    -D CMAKE_INSTALL_BINDIR=%{buildroot}%{_bindir} \
-    -D CMAKE_INSTALL_SBINDIR=%{buildroot}%{_sbindir} \
-    -D CMAKE_INSTALL_MANDIR=%{buildroot}%{_mandir} \
-    -D CMAKE_INSTALL_DOCDIR=%{buildroot}%{_docdir} \
-    -D CMAKE_INSTALL_INCLUDEDIR=%{buildroot}%{_includedir} \
-    -D SYSTEMD_UNIT_DIR=%{buildroot}%{_libdir}/systemd/system \
-    -D APP_CONFIG_DIRECTORY=%{buildroot}%{_sysconfdir}/clamav \
-    -D DATABASE_DIRECTORY=%{buildroot}%{_sharedstatedir}/clamav \
+cmake \
+    -D CMAKE_INSTALL_LIBDIR=%{_libdir} \
+    -D CMAKE_INSTALL_BINDIR=%{_bindir} \
+    -D CMAKE_INSTALL_SBINDIR=%{_sbindir} \
+    -D CMAKE_INSTALL_MANDIR=%{_mandir} \
+    -D CMAKE_INSTALL_DOCDIR=%{_docdir} \
+    -D CMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
+    -D SYSTEMD_UNIT_DIR=%{_libdir}/systemd/system \
+    -D APP_CONFIG_DIRECTORY=%{_sysconfdir}/clamav \
+    -D DATABASE_DIRECTORY=%{_sharedstatedir}/clamav \
     -D ENABLE_SYSTEMD=ON \
     -D ENABLE_MILTER=OFF \
     -D ENABLE_EXAMPLES=OFF
-cmake --build .
+%cmake_build
 
 %check
 cd build
 ctest --verbose
 
 %install
-cd build
-cmake --build . --target install
+%cmake_install
 # do not install html doc ('clamav' cmake has no flag to specify that => remove the doc)
 rm -rf %{buildroot}%{_docdir}
+mkdir -p %{buildroot}%{_sharedstatedir}/clamav
+
+### freshclam config processing (from Fedora)
+sed -ri \
+    -e 's!^Example!#Example!' \
+    -e 's!^#?(UpdateLogFile )!#\1!g;' %{buildroot}%{_sysconfdir}/clamav/freshclam.conf.sample
+
+mv %{buildroot}%{_sysconfdir}/clamav/freshclam.conf{.sample,}
+# Can contain HTTPProxyPassword (bugz#1733112)
+chmod 600 %{buildroot}%{_sysconfdir}/clamav/freshclam.conf
+
+%pre
+if ! getent group clamav >/dev/null; then
+    groupadd -r clamav
+fi
+if ! getent passwd clamav >/dev/null; then
+    useradd -g clamav -d %{_sharedstatedir}/clamav\
+        -s /bin/false -M -r clamav
+fi
+
+%postun
+if getent passwd clamav >/dev/null; then
+    userdel clamav
+fi
+if getent group clamav >/dev/null; then
+    groupdel clamav
+fi
 
 %files
 %defattr(-,root,root)
@@ -86,12 +120,26 @@ rm -rf %{buildroot}%{_docdir}
 %{_bindir}/*
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
+%{_sysconfdir}/clamav/freshclam.conf
 %{_includedir}/*.h
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
+%dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Wed Sep 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.105.0-3
+- Add pre/postun requirements on shadow-utils
+
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.105.0-2
+- Bump package to rebuild with stable Rust compiler
+
+* Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 0.105.0-1
+- Upgrade to version 0.105.0
+
+* Wed Jun 08 2022 Tom Fay <tomfay@microsoft.com> - 0.104.2-2
+- Fix freshclam DB download
+
 * Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.104.2-1
 - Upgrade to 0.104.2
 

@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Filesystem and Disk management
 URL:            https://sourceforge.net/projects/gptfdisk/
 Source0:        https://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz
+Patch0:         fix-format-security.patch
 BuildRequires:  gcc
 BuildRequires:  libuuid-devel
 BuildRequires:  make
@@ -23,7 +24,7 @@ Master Boot Record (MBR). The main program, gdisk, has an inteface similar to th
 classic fdisk program.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 export CXXFLAGS="%{optflags} -D_FILE_OFFSET_BITS=64"
@@ -44,6 +45,9 @@ install -m644 *.8 %{buildroot}%{_mandir}/man8
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.8-2
+- Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
+
 * Wed Feb 16 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.8-1
 - Upgrade to latest upstream version
 - Translate Makefile patch to %%install section instructions for easier maintenance

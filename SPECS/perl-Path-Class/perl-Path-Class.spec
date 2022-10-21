@@ -1,7 +1,7 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Path-Class
 Version:        0.37
-Release:        8%{?dist}
+Release:        9%{?dist}
 URL:            http://search.cpan.org/~kwilliams/Path-Class-0.37/
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -13,6 +13,11 @@ BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Perl::OSType)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Copy)
@@ -48,6 +53,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jul 27 2022 Muhammad Falak <mwani@microsoft.com> - 0.37-9
+- Add BR on perl-{(Test),(Test::More),(Perl::OSType)} to enable ptest
+
 * Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.37-8
 - Add missing BuildRequires for ExtUtils::MakeMaker
 

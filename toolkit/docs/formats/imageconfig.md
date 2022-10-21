@@ -212,6 +212,46 @@ A sample PreInstallScripts entry pointing to two install scripts where one has i
 ],
 ```
 
+### FinalizeImageScripts
+
+FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized.
+
+FinalizeImageScripts is an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image.
+
+Below is a sample FinalizeImageScripts entry pointing to two install scripts, where the first script has no input arguments and the second one has arguments:
+``` json
+"FinalizeImageScripts":[
+    {
+        "Path": "arglessPreScript.sh"
+    },
+    {
+        "Path": "PreScriptWithArguments.sh",
+        "Args": "--input abc --output cba"
+    }
+],
+```
+
+### Networks
+
+The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config. 
+
+A sample Networks entry pointing to one network configuration:
+``` json
+    "Networks":[
+    {
+        "BootProto": "dhcp",
+        "GateWay":   "192.168.20.4",
+        "Ip":        "192.169.20.148",
+        "NetMask":   "255.255.255.0",
+        "OnBoot":    false,
+        "NameServers": [
+            "192.168.30.23"
+        ],
+        "Device": "eth0"
+    }
+],
+```
+
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.

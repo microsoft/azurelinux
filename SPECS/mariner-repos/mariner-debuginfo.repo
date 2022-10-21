@@ -1,4 +1,4 @@
-[mariner-official-debuginfo]
+[mariner-official-base-debug]
 name=CBL-Mariner Official Debuginfo $releasever $basearch
 baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/debuginfo/$basearch
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY

@@ -1,7 +1,7 @@
 Summary:        Library to program and control the FTDI USB controller
 Name:           libftdi
 Version:        1.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,7 +12,6 @@ Patch0:         libftdi-1.5-fix_pkgconfig_path.patch
 
 BuildRequires:  boost-devel
 BuildRequires:  cmake
-BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  libconfuse-devel
@@ -73,7 +72,7 @@ sed -i -e 's/GROUP="plugdev"/TAG+="uaccess"/g' packages/99-libftdi.rules
 
 
 %build
-%cmake -DSTATICLIBS=off -DFTDIPP=on -DPYTHON_BINDINGS=on -DDOCUMENTATION=on -DLIB_SUFFIX:STRING="" .
+%cmake -DSTATICLIBS=off -DFTDIPP=on -DPYTHON_BINDINGS=on -DDOCUMENTATION=off -DLIB_SUFFIX:STRING="" .
 %cmake_build
 
 %install
@@ -137,6 +136,9 @@ rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 %ldconfig_scriptlets c++
 
 %changelog
+* Fri Jul 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-2
+- Disabling doc building due to unstable builds.
+
 * Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-1
 - Updating to 1.5 using Fedora 36 (license: MIT) for guidance.
 - License verified.

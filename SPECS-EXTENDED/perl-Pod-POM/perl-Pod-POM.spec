@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           perl-Pod-POM
 Version:        2.01
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Object-oriented interface to Perl POD documents
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Pod-POM
@@ -23,6 +23,7 @@ BuildRequires:  perl(parent)
 BuildRequires:  perl(Text::Wrap)
 # Tests:
 BuildRequires:  perl(File::Slurper)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(YAML::Tiny)
@@ -71,6 +72,10 @@ PERL_HASH_SEED=0 make test
 
 
 %changelog
+* Thu Jul 28 2022 Muhammad Falak <mwani@microsoft.com> - 2.01-16
+- Add an explicit BR on `perl(FindBin)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.01-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "pam_wrapper-1.1.3.tar.gz": "4feedd788c6fa36516f6d6060482cd86455998d72849eb5f539de48915bdc5f3",
-  "pam_wrapper-1.1.3.tar.gz.asc": "74dae686d8a727c9a560cc956e830ef28d0fc974257e3253b7a2a1ff28f5adf1",
-  "pam_wrapper.keyring": "3861ac6763ff3edf0bbbb05fe890962a5dbcd99b2e00fae16687fd480c7fab0f"
- }
-}

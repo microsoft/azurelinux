@@ -114,14 +114,15 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.15.41.1 API Headers
-tar xf kernel-5.15.41.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.41.1
+KERNEL_VERSION="5.15.48.1"
+echo Linux-${KERNEL_VERSION} API Headers
+tar xf kernel-${KERNEL_VERSION}.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.41.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -501,15 +502,15 @@ rm -rf perl-5.32.0
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.9.12
-tar xf Python-3.9.12.tar.xz
-pushd Python-3.9.12
+echo Python-3.9.13
+tar xf Python-3.9.13.tar.xz
+pushd Python-3.9.13
 sed -i '/def add_multiarch_paths/a \        return' setup.py
 ./configure --prefix=/tools --without-ensurepip --enable-shared
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.9.12
+rm -rf Python-3.9.13
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

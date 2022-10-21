@@ -1,0 +1,1830 @@
+--- t1lib-5.1.2.orig/debian/t1libconfig
++++ t1lib-5.1.2/debian/t1libconfig
+@@ -0,0 +1,163 @@
++#!/bin/sh -e
++
++# to test POSIX-correctness, change hash-bang to /bin/bash and uncomment
++# the following line:
++
++# set -o posix
++
++# Very simple configuration script for t1lib.  Checks a couple of
++# directories that might contain fonts, and if they exist, adds
++# anything ending in .pfa or pfb to the font database.  A few things
++# borrowed from paperconfig, (C) 1996, Yves Arrouye
++# <arrouye@debian.org>
++
++# note that this creates the "minimal" font database accepted by t1lib,
++# and doesn't look in every possible place for fonts.  It is mostly
++# provided so that xglyph will work out of the box...
++
++# Written by David Huggins-Daines <dhd@debian.org>
++
++usage() {
++    if [ "$1" = -h ]
++    then
++	exec 1>&2
++	echo -n U
++    else
++	echo -n u
++    fi
++
++    echo "sage: `basename $0` [ -v, --version ] [ -h, --help ] [ --force ]"
++    echo "                   [ fontdirs... ]"
++
++    if [ "$1" = -h ]
++    then
++	cat <<EOF
++
++Options: -v, --verbose          print version information and exit
++         -h, --help             print this help and exit
++         --force                force configuration
++EOF
++	exit 0
++    else
++	exit 1
++    fi
++}
++
++version=0.2
++topfontdirs="/usr/share/fonts/type1 /usr/share/fonts/X11"
++for dir in $topfontdirs; do
++   if [ -d $dir ]; then
++       subdirs=$(find $dir -type d -printf "%p ")
++       fontdirs="$subdirs $fontdirs"
++   fi
++done
++conffile=/etc/t1lib/t1lib.config
++confdir=/etc/t1lib/
++dbase=/etc/t1lib/FontDatabase
++temp=/etc/t1lib/FontDatabase.tmp
++
++force=0
++
++while [ $# -ne 0 ]
++do
++    case "$1" in
++	-v|--version)
++	    echo "`basename $0` version $version" \
++		"by David Huggins-Daines <dhd@debian.org>"
++	    exit 0
++	    ;;
++	-h|--help)
++	    usage -h
++	    ;;
++	--force)
++	    force=1
++	    ;;
++	*)
++	    # hairy way to remove a trailing backslash (should use perl)
++	    pat=`expr $1 : "\(.*\)\/\$" || echo $1`
++	    # hairier way to find a string anywhere in another string
++	    # should really use perl.
++	    if ! grep $pat <<EOF >/dev/null 2>&1
++$fontdirs
++EOF
++	    then
++		fontdirs="$fontdirs $1"
++	    fi
++	    ;;
++    esac
++    shift
++done
++
++# We presume that if the database exists, then so does the
++# configuration file.  Hopefully this won't break anything.
++
++if [ $force -eq 1 ] || [ ! -e $dbase ]; then
++    fontpath=""
++    afmpath=""
++
++    mkdir -p $confdir || true
++
++    echo -n "Searching for Type 1 fonts and AFM files..."
++
++    for i in $fontdirs
++    do
++	if [ -d $i ] && ls $i/*.pf[ab] > /dev/null 2>&1; then
++	    if [ -n "$fontpath" ]; then
++		fontpath="$fontpath:$i"
++	    else
++		fontpath="$i"
++	    fi
++	    
++	    if ls $i/*.afm > /dev/null 2>&1; then
++		if [ -n "$afmpath" ]; then
++		    afmpath="$afmpath:$i"
++		else
++		    afmpath="$i"
++		fi
++	    fi
++	    # get a listing of all the fonts in each dir
++	    find $i -maxdepth 1 -name *.pf[ab] -printf '%f\n' >> $temp
++	fi
++    done
++    if [ -z "$fontpath" ]; then
++	cat <<EOF
++
++No Type 1 fonts were found in the expected locations.
++If you want t1lib to be aware of your fonts, you should run
++/usr/sbin/t1libconfig with the names of your local font directories as
++arguments, or you should edit the /etc/t1lib/FontDatabase file manually.
++See the FontDatabase(5) manual page for more information.
++
++Press [return] to continue.
++EOF
++        read foo || true
++	rm -f $temp
++    else
++        echo "done."
++        echo -n "Building font database..."
++        fontcount=`wc -l $temp || true`
++        echo $fontcount > $dbase
++        cat $temp >> $dbase
++        rm -f $temp
++        echo "done."
++    fi
++
++    # now set the paths in the config file
++    cat <<EOF >$conffile
++t1lib.config - global configuration file for t1lib.
++It was created automatically on `date`
++by the t1libconfig script.
++
++Run /usr/sbin/t1libconfig --force to rebuild it.
++    
++ENCODING=.
++AFM=$afmpath
++TYPE1=$fontpath
++FONTDATABASE=$dbase
++EOF
++else
++    echo "Configuration and font database files already exist."
++    echo "Run /usr/sbin/t1libconfig --force to rebuild them."
++fi
++
++exit 0
+--- t1lib-5.1.2.orig/debian/t1lib-bin.postrm
++++ t1lib-5.1.2/debian/t1lib-bin.postrm
+@@ -0,0 +1,8 @@
++#!/bin/sh
++set -e
++
++if [ "$1" = "purge" ]; then
++	rm -rf /etc/t1lib
++fi
++
++#DEBHELPER#
+--- t1lib-5.1.2.orig/debian/libt1-5.install
++++ t1lib-5.1.2/debian/libt1-5.install
+@@ -0,0 +1 @@
++debian/tmp/usr/lib/libt1*.so.*
+--- t1lib-5.1.2.orig/debian/libt1-doc.docs
++++ t1lib-5.1.2/debian/libt1-doc.docs
+@@ -0,0 +1 @@
++doc/*.pdf
+--- t1lib-5.1.2.orig/debian/libt1-dev.docs
++++ t1lib-5.1.2/debian/libt1-dev.docs
+@@ -0,0 +1,2 @@
++README.t1lib-*
++README.t1python
+--- t1lib-5.1.2.orig/debian/t1lib-bin.dirs
++++ t1lib-5.1.2/debian/t1lib-bin.dirs
+@@ -0,0 +1 @@
++etc/t1lib
+--- t1lib-5.1.2.orig/debian/t1lib-bin.manpages
++++ t1lib-5.1.2/debian/t1lib-bin.manpages
+@@ -0,0 +1,4 @@
++debian/man/FontDatabase.5
++debian/man/t1libconfig.8
++debian/man/type1afm.1
++debian/man/xglyph.1
+--- t1lib-5.1.2.orig/debian/control
++++ t1lib-5.1.2/debian/control
+@@ -0,0 +1,84 @@
++Source: t1lib
++Section: libs
++Priority: optional
++Maintainer: Ruben Molina <rmolina@udea.edu.co>
++Build-Depends: cdbs, debhelper (>= 7), autotools-dev, libice-dev, libsm-dev, libx11-dev, libxext-dev, libxaw7-dev, quilt
++Standards-Version: 3.8.0
++Homepage: ftp://sunsite.unc.edu/pub/Linux/libs/graphics/
++
++Package: libt1-5
++Section: libs
++Architecture: any
++Depends: ${shlibs:Depends}, ${misc:Depends}
++Description: Type 1 font rasterizer library - runtime
++ T1lib is an enhanced rasterizer for Type 1 fonts.
++ .
++ T1lib is based on the X11R5 font rasterizer code, but operates independently
++ of X11.  It includes many enhancements, including underlining, antialiasing,
++ user-defined slant and extension factors, and rotation.
++ .
++ This package contains the shared libraries needed to run programs using T1lib.
++
++Package: libt1-dev
++Section: libdevel
++Architecture: any
++Depends: libt1-5 (= ${binary:Version}), libice-dev, libsm-dev, libx11-dev,
++ libxext-dev, libxaw7-dev
++Recommends: libt1-doc
++Conflicts: t1lib-dev, t1lib1-dev
++Description: Type 1 font rasterizer library - development
++ T1lib is an enhanced rasterizer for Type 1 fonts.
++ .
++ T1lib is based on the X11R5 font rasterizer code, but operates independently
++ of X11.  It includes many enhancements, including underlining, antialiasing,
++ user-defined slant and extension factors, and rotation.
++ .
++ This package contains the header files and static libraries needed to
++ develop programs using T1lib.
++ .
++ Please note, that PDF documentation is placed in libt1-doc
++
++Package: t1lib-bin
++Architecture: any
++Section: misc
++Depends: ${shlibs:Depends}
++Provides: t1lib1-bin
++Replaces: t1lib1-bin
++Conflicts: t1lib1-bin
++Description: Type 1 font rasterizer library - user binaries
++ T1lib is an enhanced rasterizer for Type 1 fonts.
++ .
++ T1lib is based on the X11R5 font rasterizer code, but operates independently
++ of X11.  It includes many enhancements, including underlining, antialiasing,
++ user-defined slant and extension factors, and rotation.
++ .
++ This package contains the programs "xglyph" and "type1afm", included in the
++ upstream T1lib distribution.  It also contains the "t1libconfig"
++ script used to configure t1lib.
++
++Package: libt1-doc
++Architecture: all
++Section: doc
++Description: Type 1 font rasterizer library - developers documentation
++ T1lib is an enhanced rasterizer for Type 1 fonts.
++ .
++ T1lib is based on the X11R5 font rasterizer code, but operates independently
++ of X11.  It includes many enhancements, including underlining, antialiasing,
++ user-defined slant and extension factors, and rotation.
++ .
++ This package contains developers documentation.
++
++Package: libt1-5-dbg
++Section: libdevel
++Priority: extra
++Architecture: any
++Depends: libt1-5 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
++Description: Type 1 font rasterizer library - debugging runtime
++ T1lib is an enhanced rasterizer for Type 1 fonts.
++ .
++ T1lib is based on the X11R5 font rasterizer code, but operates independently
++ of X11.  It includes many enhancements, including underlining, antialiasing,
++ user-defined slant and extension factors, and rotation.
++ .
++ This package contains debugging information.
++
+--- t1lib-5.1.2.orig/debian/NEWS
++++ t1lib-5.1.2/debian/NEWS
+@@ -0,0 +1,9 @@
++t1lib (5.0.0-3) unstable; urgency=low
++
++  This version of t1lib package is binary incompatible with the previous
++  one in Debian. Details about changes are documented in following files
++  in /usr/share/doc/libt1-dev directory:
++   - changelog.gz
++   - README.t1lib-5.0.0.gz
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sun, 18 Jan 2004 00:02:29 +0100
+--- t1lib-5.1.2.orig/debian/libt1-5.symbols
++++ t1lib-5.1.2/debian/libt1-5.symbols
+@@ -0,0 +1,381 @@
++libt1.so.5 libt1-5 #MINVER#
++ BezierTerminationTest@Base 5.1.0
++ CRASTERCompressionType@Base 5.1.0
++ CacheBLimit@Base 5.1.0
++ CachedChars@Base 5.1.0
++ CachedFonts@Base 5.1.0
++ ConicDebug@Base 5.1.0
++ Continuity@Base 5.1.0
++ CurFontEnv@Base 5.1.0
++ CurFontName@Base 5.1.0
++ DLadd@Base 5.1.0
++ DLdiv@Base 5.1.0
++ DLmult@Base 5.1.0
++ DLsub@Base 5.1.0
++ DeviceSpecifics@Base 5.1.0
++ FPXYboth@Base 5.1.0
++ FPXonly@Base 5.1.0
++ FPYonly@Base 5.1.0
++ FPdiv@Base 5.1.0
++ FPmult@Base 5.1.0
++ FPstarslash@Base 5.1.0
++ FXYConvert@Base 5.1.0
++ FXYboth@Base 5.1.0
++ FXonly@Base 5.1.0
++ FYonly@Base 5.1.0
++ FontBase@Base 5.1.0
++ FontDebug@Base 5.1.0
++ ForceAFMBBox@Base 5.1.0
++ ForceFloat@Base 5.1.0
++ FreeAFMData@Base 5.1.0
++ GetType1CharString@Base 5.1.0
++ HighHex@Base 5.1.0
++ HintDebug@Base 5.1.0
++ IXYConvert@Base 5.1.0
++ IXYboth@Base 5.1.0
++ IXonly@Base 5.1.0
++ IYonly@Base 5.1.0
++ ImageDebug@Base 5.1.0
++ InDotSection@Base 5.1.0
++ Init_BuiltInEncoding@Base 5.1.0
++ InternalTrace@Base 5.1.0
++ LineDebug@Base 5.1.0
++ LineIOTrace@Base 5.1.0
++ LowHex@Base 5.1.0
++ MemoryDebug@Base 5.1.0
++ MustCheckArgs@Base 5.1.0
++ MustCrash@Base 5.1.0
++ MustTraceCalls@Base 5.1.0
++ OffPageDebug@Base 5.1.0
++ PathDebug@Base 5.1.0
++ ProcessHints@Base 5.1.0
++ QueryFontLib@Base 5.1.0
++ RegionDebug@Base 5.1.0
++ SaveFontPaths@Base 5.1.0
++ SearchDictName@Base 5.1.0
++ SetFuncRequestID@Base 5.1.0
++ SpaceDebug@Base 5.1.0
++ StdEncArrayP@Base 5.1.0
++ StrokeDebug@Base 5.1.0
++ T1Close@Base 5.1.0
++ T1GetDecrypt@Base 5.1.0
++ T1GetFileSize@Base 5.1.0
++ T1GetTrailer@Base 5.1.0
++ T1Getc@Base 5.1.0
++ T1Gets@Base 5.1.0
++ T1Open@Base 5.1.0
++ T1Read@Base 5.1.0
++ T1Ungetc@Base 5.1.0
++ T1_AAFillOutline@Base 5.1.0
++ T1_AAGetBitsPerPixel@Base 5.1.0
++ T1_AAGetGrayValues@Base 5.1.0
++ T1_AAGetLevel@Base 5.1.0
++ T1_AAHGetGrayValues@Base 5.1.0
++ T1_AAHSetGrayValues@Base 5.1.0
++ T1_AANGetGrayValues@Base 5.1.0
++ T1_AANSetGrayValues@Base 5.1.0
++ T1_AASetBitsPerPixel@Base 5.1.0
++ T1_AASetChar@Base 5.1.0
++ T1_AASetGrayValues@Base 5.1.0
++ T1_AASetLevel@Base 5.1.0
++ T1_AASetRect@Base 5.1.0
++ T1_AASetSmartLimits@Base 5.1.0
++ T1_AASetSmartMode@Base 5.1.0
++ T1_AASetString@Base 5.1.0
++ T1_AFM_ptr@Base 5.1.0
++ T1_AbsolutePath@Base 5.1.0
++ T1_AddFont@Base 5.1.0
++ T1_AddFontDataBase@Base 5.1.0
++ T1_AddFontDataBaseXLFD@Base 5.1.0
++ T1_AddToFileSearchPath@Base 5.1.0
++ T1_CheckEndian@Base 5.1.0
++ T1_CheckForFontID@Base 5.1.0
++ T1_CheckForInit@Base 5.1.0
++ T1_ClearStrokeFlag@Base 5.1.0
++ T1_CloseLib@Base 5.1.0
++ T1_ConcatGlyphs@Base 5.1.0
++ T1_ConcatOutlines@Base 5.1.0
++ T1_CopyFont@Base 5.1.0
++ T1_CopyGlyph@Base 5.1.0
++ T1_CopyOutline@Base 5.1.0
++ T1_DeleteAllSizes@Base 5.1.0
++ T1_DeleteEncoding@Base 5.1.0
++ T1_DeleteFont@Base 5.1.0
++ T1_DeleteSize@Base 5.1.0
++ T1_DumpGlyph@Base 5.1.0
++ T1_DumpPath@Base 5.1.0
++ T1_ENC_ptr@Base 5.1.0
++ T1_ExtendFont@Base 5.1.0
++ T1_ExtendHMatrix@Base 5.1.0
++ T1_ExtendVMatrix@Base 5.1.0
++ T1_FDBXLFD_ptr@Base 5.1.0
++ T1_FDB_ptr@Base 5.1.0
++ T1_FillOutline@Base 5.1.0
++ T1_FreeCompCharData@Base 5.1.0
++ T1_FreeGlyph@Base 5.1.0
++ T1_FreeOutline@Base 5.1.0
++ T1_GenerateAFMFallbackInfo@Base 5.1.0
++ T1_GetAfmFileName@Base 5.1.0
++ T1_GetAfmFilePath@Base 5.1.0
++ T1_GetAllCharNames@Base 5.1.0
++ T1_GetBitmapPad@Base 5.1.0
++ T1_GetCharBBox@Base 5.1.0
++ T1_GetCharName@Base 5.1.0
++ T1_GetCharOutline@Base 5.1.0
++ T1_GetCharString@Base 5.1.0
++ T1_GetCharWidth@Base 5.1.0
++ T1_GetCompCharData@Base 5.1.0
++ T1_GetCompCharDataByIndex@Base 5.1.0
++ T1_GetEncodingIndex@Base 5.1.0
++ T1_GetEncodingIndices@Base 5.1.0
++ T1_GetEncodingScheme@Base 5.1.0
++ T1_GetExtend@Base 5.1.0
++ T1_GetFamilyName@Base 5.1.0
++ T1_GetFileSearchPath@Base 5.1.0
++ T1_GetFontBBox@Base 5.1.0
++ T1_GetFontFileName@Base 5.1.0
++ T1_GetFontFilePath@Base 5.1.0
++ T1_GetFontName@Base 5.1.0
++ T1_GetFullName@Base 5.1.0
++ T1_GetIsFixedPitch@Base 5.1.0
++ T1_GetItalicAngle@Base 5.1.0
++ T1_GetKerning@Base 5.1.0
++ T1_GetLibIdent@Base 5.1.0
++ T1_GetLinePosition@Base 5.1.0
++ T1_GetLineThickness@Base 5.1.0
++ T1_GetMetricsInfo@Base 5.1.0
++ T1_GetMoveOutline@Base 5.1.0
++ T1_GetNoCompositeChars@Base 5.1.0
++ T1_GetNoFonts@Base 5.1.0
++ T1_GetNoKernPairs@Base 5.1.0
++ T1_GetNotice@Base 5.1.0
++ T1_GetSlant@Base 5.1.0
++ T1_GetStringBBox@Base 5.1.0
++ T1_GetStringOutline@Base 5.1.0
++ T1_GetStringWidth@Base 5.1.0
++ T1_GetStrokeMode@Base 5.1.0
++ T1_GetStrokeWidth@Base 5.1.0
++ T1_GetTransform@Base 5.1.0
++ T1_GetUnderlinePosition@Base 5.1.0
++ T1_GetUnderlineThickness@Base 5.1.0
++ T1_GetVersion@Base 5.1.0
++ T1_GetWeight@Base 5.1.0
++ T1_GetlenIV@Base 5.1.0
++ T1_INFINITY@Base 5.1.0
++ T1_InitLib@Base 5.1.0
++ T1_IsInternalChar@Base 5.1.0
++ T1_LoadEncoding@Base 5.1.0
++ T1_LoadFont@Base 5.1.0
++ T1_ManipulatePath@Base 5.1.0
++ T1_MirrorHMatrix@Base 5.1.0
++ T1_MirrorVMatrix@Base 5.1.0
++ T1_PFAB_ptr@Base 5.1.0
++ T1_PrintLog@Base 5.1.0
++ T1_QueryCompositeChar@Base 5.1.0
++ T1_QueryLigs@Base 5.1.0
++ T1_QueryX11Support@Base 5.1.0
++ T1_ReencodeFont@Base 5.1.0
++ T1_RelativePath@Base 5.1.0
++ T1_RotateMatrix@Base 5.1.0
++ T1_ScaleOutline@Base 5.1.0
++ T1_SetAfmFileName@Base 5.1.0
++ T1_SetBitmapPad@Base 5.1.0
++ T1_SetChar@Base 5.1.0
++ T1_SetDefaultEncoding@Base 5.1.0
++ T1_SetDeviceResolutions@Base 5.1.0
++ T1_SetFileSearchPath@Base 5.1.0
++ T1_SetFontDataBase@Base 5.1.0
++ T1_SetFontDataBaseXLFD@Base 5.1.0
++ T1_SetLinePosition@Base 5.1.0
++ T1_SetLineThickness@Base 5.1.0
++ T1_SetLogLevel@Base 5.1.0
++ T1_SetRasterFlags@Base 5.1.0
++ T1_SetRect@Base 5.1.0
++ T1_SetString@Base 5.1.0
++ T1_SetStrokeFlag@Base 5.1.0
++ T1_SetStrokeWidth@Base 5.1.0
++ T1_ShearHMatrix@Base 5.1.0
++ T1_ShearVMatrix@Base 5.1.0
++ T1_SlantFont@Base 5.1.0
++ T1_StrError@Base 5.1.0
++ T1_StrokeFont@Base 5.1.0
++ T1_SubsetFont@Base 5.1.0
++ T1_TransformFont@Base 5.1.0
++ T1_TransformMatrix@Base 5.1.0
++ T1_Type1OperatorFlags@Base 5.1.0
++ T1_Up@Base 5.1.0
++ T1_WriteAFMFallbackFile@Base 5.1.0
++ T1_errno@Base 5.1.0
++ T1_fdb@Base 5.1.0
++ T1_fdbxlfd@Base 5.1.0
++ T1aa_SmartOn@Base 5.1.0
++ T1aa_bg@Base 5.1.0
++ T1aa_bpp@Base 5.1.0
++ T1aa_smartlimit1@Base 5.1.0
++ T1aa_smartlimit2@Base 5.1.0
++ T1eexec@Base 5.1.0
++ T1int_CreateNewFontSize@Base 5.1.0
++ T1int_GetLastFontSize@Base 5.1.0
++ T1int_QueryFontSize@Base 5.1.0
++ T1int_QuerySEAC@Base 5.1.0
++ T1int_Type1QuerySEAC@Base 5.1.0
++ T1io_reset@Base 5.1.0
++ T1lib_parseFile@Base 5.1.0
++ TheCurrentFont@Base 5.1.0
++ Type1Char@Base 5.1.0
++ Type1Line@Base 5.1.0
++ currstartstem@Base 5.1.0
++ digit_value@Base 5.1.0
++ err_warn_msg_buf@Base 5.1.0
++ errornumber@Base 5.1.0
++ filestats@Base 5.1.0
++ fill@Base 5.1.0
++ fillrun@Base 5.1.0
++ fontfcnA@Base 5.1.0
++ fontfcnB@Base 5.1.0
++ fontfcnB_ByName@Base 5.1.0
++ fontfcnB_string@Base 5.1.0
++ fontfcnRect@Base 5.1.0
++ initFont@Base 5.1.0
++ intT1_Env_GetCompletePath@Base 5.1.0
++ intT1_FreeSearchPaths@Base 5.1.0
++ intT1_ScanConfigFile@Base 5.1.0
++ intT1_SetupDefaultSearchPaths@Base 5.1.0
++ intT1_scanFontDBase@Base 5.1.0
++ intT1_scanFontDBaseXLFD@Base 5.1.0
++ linebuf@Base 5.1.0
++ not_def@Base 5.1.0
++ numalignmentzones@Base 5.1.0
++ numstems@Base 5.1.0
++ objFormatArray@Base 5.1.0
++ objFormatBoolean@Base 5.1.0
++ objFormatEncoding@Base 5.1.0
++ objFormatFile@Base 5.1.0
++ objFormatInteger@Base 5.1.0
++ objFormatName@Base 5.1.0
++ objFormatReal@Base 5.1.0
++ objFormatString@Base 5.1.0
++ oldhor@Base 5.1.0
++ oldhorhalf@Base 5.1.0
++ oldvert@Base 5.1.0
++ oldverthalf@Base 5.1.0
++ pFontBase@Base 5.1.0
++ readFont@Base 5.1.0
++ reportusage@Base 5.1.0
++ resetFont@Base 5.1.0
++ scan_font@Base 5.1.0
++ scan_token@Base 5.1.0
++ stck_state@Base 5.1.0
++ stems@Base 5.1.0
++ swathrightmost@Base 5.1.0
++ swathxsort@Base 5.1.0
++ t1_Allocate@Base 5.1.0
++ t1_ApplyContinuity@Base 5.1.0
++ t1_ArgErr@Base 5.1.0
++ t1_Bezier@Base 5.1.0
++ t1_BoundingBox@Base 5.1.0
++ t1_BoxClip@Base 5.1.0
++ t1_BoxPath@Base 5.1.0
++ t1_Bresenham@Base 5.1.0
++ t1_ChangeDirection@Base 5.1.0
++ t1_CloseHints@Base 5.1.0
++ t1_ClosePath@Base 5.1.0
++ t1_Consume@Base 5.1.0
++ t1_Copy@Base 5.1.0
++ t1_CopyPath@Base 5.1.0
++ t1_CopyRegion@Base 5.1.0
++ t1_CopySpace@Base 5.1.0
++ t1_Destroy@Base 5.1.0
++ t1_DropSegment@Base 5.1.0
++ t1_DumpArea@Base 5.1.0
++ t1_DumpEdges@Base 5.1.0
++ t1_DumpSpace@Base 5.1.0
++ t1_DumpText@Base 5.1.0
++ t1_Dup@Base 5.1.0
++ t1_EmptyRegion@Base 5.1.0
++ t1_ErrorMsg@Base 5.1.0
++ t1_FormatFP@Base 5.1.0
++ t1_Free@Base 5.1.0
++ t1_HeadSegment@Base 5.1.0
++ t1_Hint@Base 5.1.0
++ t1_ILoc@Base 5.1.0
++ t1_Identity@Base 5.1.0
++ t1_InitHints@Base 5.1.0
++ t1_InitImager@Base 5.1.0
++ t1_InitSpaces@Base 5.1.0
++ t1_Interior@Base 5.1.0
++ t1_Join@Base 5.1.0
++ t1_JoinSegment@Base 5.1.0
++ t1_KillPath@Base 5.1.0
++ t1_KillRegion@Base 5.1.0
++ t1_Line@Base 5.1.0
++ t1_Loc@Base 5.1.0
++ t1_MInvert@Base 5.1.0
++ t1_MMultiply@Base 5.1.0
++ t1_MoreWorkArea@Base 5.1.0
++ t1_MoveEdges@Base 5.1.0
++ t1_PathDelta@Base 5.1.0
++ t1_PathSegment@Base 5.1.0
++ t1_PathXform@Base 5.1.0
++ t1_Permanent@Base 5.1.0
++ t1_Phantom@Base 5.1.0
++ t1_Pragmatics@Base 5.1.0
++ t1_ProcessHint@Base 5.1.0
++ t1_PseudoSpace@Base 5.1.0
++ t1_QueryBounds@Base 5.1.0
++ t1_QueryLoc@Base 5.1.0
++ t1_QueryPath@Base 5.1.0
++ t1_QuerySpace@Base 5.1.0
++ t1_RegionBounds@Base 5.1.0
++ t1_Reverse@Base 5.1.0
++ t1_ReverseSubPaths@Base 5.1.0
++ t1_Scale@Base 5.1.0
++ t1_Snap@Base 5.1.0
++ t1_SortSwath@Base 5.1.0
++ t1_StepBezier@Base 5.1.0
++ t1_StepLine@Base 5.1.0
++ t1_SubLoc@Base 5.1.0
++ t1_SwathUnion@Base 5.1.0
++ t1_TermImager@Base 5.1.0
++ t1_Transform@Base 5.1.0
++ t1_TypeErr@Base 5.1.0
++ t1_UnConvert@Base 5.1.0
++ t1_UnJumble@Base 5.1.0
++ t1_Unique@Base 5.1.0
++ t1_User@Base 5.1.0
++ t1_Xform@Base 5.1.0
++ t1_abort@Base 5.1.0
++ t1_get_abort_message@Base 5.1.0
++ t1lib_log_file@Base 5.1.0
++ t1lib_log_level@Base 5.1.0
++ tokenLength@Base 5.1.0
++ tokenMaxP@Base 5.1.0
++ tokenStartP@Base 5.1.0
++ tokenTooLong@Base 5.1.0
++ tokenType@Base 5.1.0
++ tokenValue@Base 5.1.0
++ vm_alloc@Base 5.1.0
++ vm_base@Base 5.1.0
++ vm_free@Base 5.1.0
++ vm_init@Base 5.1.0
++ vm_init_amount@Base 5.1.0
++ vm_init_count@Base 5.1.0
++ vm_next@Base 5.1.0
++ vm_size@Base 5.1.0
++ vm_used@Base 5.1.0
++ wsoffsetX@Base 5.1.0
++ wsoffsetY@Base 5.1.0
++ wsset@Base 5.1.0
++ xiStub@Base 5.1.0
++ xiTemporary@Base 5.1.0
++libt1x.so.5 libt1-5 #MINVER#
++ T1_AASetCharX@Base 5.1.1
++ T1_AASetRectX@Base 5.1.1
++ T1_AASetStringX@Base 5.1.1
++ T1_ComputeAAColorsX@Base 5.1.1
++ T1_LogicalPositionX@Base 5.1.1
++ T1_SetCharX@Base 5.1.1
++ T1_SetRectX@Base 5.1.1
++ T1_SetStringX@Base 5.1.1
++ T1_SetX11Params@Base 5.1.1
++ T1_XImageFromGlyph@Base 5.1.1
+--- t1lib-5.1.2.orig/debian/rules
++++ t1lib-5.1.2/debian/rules
+@@ -0,0 +1,22 @@
++#!/usr/bin/make -f
++
++include /usr/share/cdbs/1/rules/debhelper.mk
++include /usr/share/cdbs/1/class/autotools.mk
++include /usr/share/cdbs/1/rules/patchsys-quilt.mk
++
++export LDFLAGS := -Wl,--as-needed
++
++DEB_MAKE_BUILD_TARGET   := without_doc
++DEB_MAKE_INSTALL_TARGET := install prefix=$(CURDIR)/debian/tmp/usr
++DEB_INSTALL_DOCS_ALL    += debian/README.Debian
++
++binary-post-install/libt1-5 ::
++	rm -rf debian/libt1-5-dbg/usr/lib/debug/usr/bin/
++binary-post-install/libt1-5-dbg ::
++	rm -rf debian/libt1-5-dbg/usr/lib/debug/usr/bin/
++binary-post-install/libt1-dev ::
++	rm -rf debian/libt1-5-dbg/usr/lib/debug/usr/bin/
++binary-post-install/libt1-doc ::
++	rm -rf debian/libt1-5-dbg/usr/lib/debug/usr/bin/
++binary-post-install/t1lib-bin ::
++	rm -rf debian/libt1-5-dbg/usr/lib/debug/usr/bin/
+--- t1lib-5.1.2.orig/debian/compat
++++ t1lib-5.1.2/debian/compat
+@@ -0,0 +1 @@
++7
+--- t1lib-5.1.2.orig/debian/t1lib-bin.postinst
++++ t1lib-5.1.2/debian/t1lib-bin.postinst
+@@ -0,0 +1,8 @@
++#!/bin/sh
++set -e
++
++if [ ! -f /etc/t1lib/t1lib.config ]; then
++    /usr/sbin/t1libconfig
++fi
++
++#DEBHELPER#
+--- t1lib-5.1.2.orig/debian/libt1-dev.install
++++ t1lib-5.1.2/debian/libt1-dev.install
+@@ -0,0 +1,4 @@
++debian/tmp/usr/include/*
++debian/tmp/usr/lib/*.so
++debian/tmp/usr/lib/*.la
++debian/tmp/usr/lib/*.a
+--- t1lib-5.1.2.orig/debian/changelog
++++ t1lib-5.1.2/debian/changelog
+@@ -0,0 +1,414 @@
++t1lib (5.1.2-3) unstable; urgency=low
++
++  * New Maintainer (Closes: #430611) 
++  * Solved some hyphen-used-as-minus-sign in FontDatabase.5
++  * Reformated debian/copyrigth
++  * Added symbols control file 
++
++ -- Ruben Molina <rmolina@udea.edu.co>  Wed, 23 Jul 2008 20:24:22 -0500
++
++t1lib (5.1.2-2) unstable; urgency=low
++
++  * Add a package with debugging information.
++
++ -- Torsten Werner <twerner@debian.org>  Sat, 08 Mar 2008 10:21:43 +0100
++
++t1lib (5.1.2-1) unstable; urgency=low
++
++  * new upstream release
++  * Correct debian/watch.
++  * Remove patch cve-2007-4033.diff because it has been integrated upstream.
++  * Remove parts of patch segfault.diff that have been integrated upstream.
++  * Do not apply the remaining segfault.diff because it does not look safe but
++    keep the patch as a reminder that something was broken in the past.
++
++ -- Torsten Werner <twerner@debian.org>  Sat, 08 Mar 2008 10:07:54 +0100
++
++t1lib (5.1.1-5) unstable; urgency=low
++
++  * Replace Build-Depends-Indep by Build-Depends again.
++
++ -- Torsten Werner <twerner@debian.org>  Tue, 08 Jan 2008 21:34:25 +0100
++
++t1lib (5.1.1-4) unstable; urgency=low
++
++  * Add Build-Depends-Indep: libxt-dev. (Closes: #459754)
++
++ -- Torsten Werner <twerner@debian.org>  Tue, 08 Jan 2008 20:29:01 +0100
++
++t1lib (5.1.1-3) unstable; urgency=low
++
++  * Replace static changes of upstream files by quilt patches as requested by
++    Fedora developers.
++  * Remove postinst that removed the old /usr/doc symlink.
++  * Remove preinst that removed the old /usr/share/doc/t1lib-bin symlink.
++  * Rename menu.t1lib-bin to t1lib-bin.menu to make sure the menu file gets
++    installed.
++  * Update menu file to conform to current menu policy.
++  * Install documentation with dh_installdocs instead of dh_install and some
++    other minor cleanups.
++  * Switch to cdbs.
++  * Fix versioned Build-Depends: debhelper (>= 5).
++  * Move some Build-Depends to Build-Depends-Indep.
++  * Apply two patches provided by Patrice Dumas:
++    - Update t1libconfig's font search.
++    - Fixes a segfault.
++  * Integrate another patch that fixes a segfault. (Closes: #313236)
++
++ -- Torsten Werner <twerner@debian.org>  Sun, 06 Jan 2008 20:50:19 +0100
++
++t1lib (5.1.1-2) unstable; urgency=low
++
++  * Add Depends: libxaw7-dev to -dev package.
++  * Switch to DH_COMPAT = 5.
++  * Update Vcs headers in debian/control.
++  * Change Standards-Version: 3.7.3.
++  * Do not link with unneeded libraries.
++  * Add LDFLAGS=-Wl,--as-needed.
++
++ -- Torsten Werner <twerner@debian.org>  Fri, 21 Dec 2007 22:54:43 +0100
++
++t1lib (5.1.1-1) unstable; urgency=low
++
++  * new upstream version (Closes: #418664)
++  * Add XS-Vcs-* header to debian/control.
++  * Update Standards-Version to 3.7.2 (no changes).
++  * Remove Depends: libc6-dev. (Closes: #446375).
++  * Change Maintainer to myself.
++  * Replace ${Source-Version} by ${binary:Version}.
++  * Do not ignore errors of 'make distclean'.
++
++ -- Torsten Werner <twerner@debian.org>  Sat, 13 Oct 2007 14:46:23 +0200
++
++t1lib (5.1.0-3) unstable; urgency=low
++
++  * Apply patch from Artur R. Czechowski to fix CVE-2007-4033.
++    (Closes: #439927)
++
++ -- Torsten Werner <twerner@debian.org>  Mon, 17 Sep 2007 23:25:45 +0200
++
++t1lib (5.1.0-2) unstable; urgency=low
++
++  * Upload to unstable
++  * Bump-up Standards-Version to 3.6.2 (no changes required)
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sat,  6 Aug 2005 20:11:51 +0200
++
++t1lib (5.1.0-1) experimental; urgency=low
++
++  * New upstream release
++  * README.t1lib-5.0.2 replaced with README.t1lib-5.1.0
++  * README.win32 is no longer installed
++  * Removed misleading information from README.Debian
++  * Replace -V with -V 'libt1-5 (>= 5.0.2)' for dh_makeshlibs in debian/rules
++  * Remove some commented stuff from debian/rules
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sat,  4 Jun 2005 22:12:43 +0200
++
++t1lib (5.0.2-3) unstable; urgency=low
++
++  * Update libtool (Closes: #246753)
++  * Build-Depends on individual library instead dummy xlibs-dev
++  * Added dependencies to -dev package (Closes: #249973)
++  * Thanks to Christopher L Cheney for above patches
++  * Add -V to dh_makeshlibs to make a versioned dependencies on this library
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sun, 23 May 2004 01:02:02 +0200
++
++t1lib (5.0.2-2) unstable; urgency=low
++
++  * change distribution to unstable
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sun, 18 Apr 2004 13:07:23 +0200
++
++t1lib (5.0.2-1) experimental; urgency=low
++
++  * New upstream release (Closes: #243916)
++    - fixed some crashes (Closes: #242570, #243378)
++  * Reference to README.t1lib-5.0.2 instead -5.0.0 in some debian/ files
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sat, 17 Apr 2004 19:22:09 +0200
++
++t1lib (5.0.0-5) unstable; urgency=low
++
++  * debian/rules: documentation is build from binary-indep (Closes: #230386)
++  * debian/watch has been added
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sat, 21 Feb 2004 20:19:38 +0100
++
++t1lib (5.0.0-4) unstable; urgency=low
++
++  * Added missing files in NEWS.Debian
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Wed, 21 Jan 2004 00:27:24 +0100
++
++t1lib (5.0.0-3) unstable; urgency=low
++
++  * New release uploaded to unstable (finaly closes: #185097, #216501)
++  * Unleash it to allow to migrate to testing (Closes: #221198)
++  * libt1-dev and t1lib-dev conflict with each other,
++  * libt1-dev conflicts with t1lib1-dev to smooth upgrade from t1lib 1.3.1-6
++  * t1lib-bin provides/conflicts/replaces t1lib1-bin to smooth upgrade from
++    t1lib 1.3.1-6
++  * Some README.* files in libt1-dev
++  * Applied patch which fixes memory access bug (see #224314 for details)
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sun, 18 Jan 2004 03:00:05 +0100
++
++t1lib (5.0.0-2) experimental; urgency=low
++
++  * rename source package to t1lib
++  * rename binary packages:
++    + libt1-5 -> libt1-dev
++    + t1lib5-bin -> t1lib-bin
++    + libt1-5-doc -> libt1-doc
++  * rationale for all above:
++    http://lists.debian.org/debian-devel/2003/debian-devel-200311/msg01083.html
++    and rest of this thread
++  * linking libt1x with X libraries to avoid undefined symbols (see #220111)
++  * clearing independency of X11 in README.Debian
++  * removed all tracks of t1lib0 (Conflict, Replaces, etc)
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Wed, 24 Dec 2003 01:50:37 +0100
++
++t1lib5 (5.0.0-1) experimental; urgency=low
++
++  * New upstream release (Closes: #185097, #216501)
++  * This release is binary incompatible with the previous one.
++  * t1lib-bin and t1lib-dev are virtual packages now
++  * removed weird ``dbl'' from configure - typo in upstream configure.in
++  * there is no necessity to conflict current -doc with the other ones
++  * library, devel and documentation package is libt1-5{,-dev,-doc} to be
++    consistent with Debian Policy 8.1
++  * do not anymore copy config.{sub,guess} automagically
++  * update ac-tools/config.{sub,guess} to 20031007
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sun,  9 Nov 2003 15:16:51 +0100
++
++t1lib (1.3.1-4) unstable; urgency=low
++
++  * New Maintainer, Adopted Package (Closes: #189694)
++  * Prepare for migration to t1lib 5.x:
++    - all packages renamed to t1lib1{,-foo}
++    - empty packages t1lib-bin and t1lib-dev depending on t1lib1-bin
++      and t1lib1-dev
++  * Packaging from scratch using debhelper, Standards-Version is 3.6.1.0 now
++  * Remove non-existent xlib6g-dev from Build-Depends
++  * Updated README.Debian
++  * Remove symlinks from /usr/doc/t1lib*
++  * Only t1lib1-bin contains /etc/t1lib directory
++  * t1lib-dev has been split into two packages: t1lib1-dev and t1lib1-doc
++  * t1lib1-bin: change manual section for type1afm from 8 to 1
++  * t1lib1-bin: create files in /etc/t1lib if don't exist (Closes: #58275)
++  * t1lib1-bin: remove symlink /usr/share/doc/t1lib-bin -> t1lib1 if exists
++  * Torsten Werner <twerner@debian.org> is sponsoring the package
++
++ -- Artur R. Czechowski <arturcz@hell.pl>  Sun,  2 Nov 2003 03:47:51 +0100
++
++t1lib (1.3.1-3) unstable; urgency=low
++
++  * Change t1lib-dev's section from "devel" to "libdevel" (thanks, Katie!)
++
++ -- Adam Conrad <adconrad@0c3.net>  Mon, 18 Aug 2003 22:42:17 -0600
++
++t1lib (1.3.1-2) unstable; urgency=low
++
++  * Set maintainer to QA, as this package was orphaned months ago (see #189694)
++  * Change "make" to "make without_doc" and remove build-dep on
++    tetex-bin (closes: #192291, #192290)
++  * Change libxaw-dev build-dep to libxaw7-dev, so we are asking for a real
++    package, rather than a virtual (closes: #170012)
++  * lib/Makefile.in changes (closes: #193757)
++    - add "-lm" to libt1.la target
++    - add "-L@top_srcdir@/lib/.libs/ -lt1" to libt1x.la target
++
++ -- Adam Conrad <adconrad@0c3.net>  Mon, 18 Aug 2003 21:50:22 -0600
++
++t1lib (1.3.1-1) unstable; urgency=low
++
++  * New upstream version.  (Closes: #127619,#127618)
++
++ -- David Huggins-Daines <dhd@debian.org>  Thu,  3 Jan 2002 21:53:29 -0500
++
++t1lib (1.2-1) unstable; urgency=low
++
++  * New upstream version.
++
++ -- David Huggins-Daines <dhd@debian.org>  Wed, 22 Aug 2001 21:16:36 -0400
++
++t1lib (1.1.1-2.2) unstable; urgency=low
++
++  * NMU
++  * debian/rules: if LD_LIBRARY_PATH is already set, append to it, so
++    builds under fakeroot will work (Closes: #104046)
++
++ -- Branden Robinson <branden@debian.org>  Fri, 10 Aug 2001 04:57:50 -0500
++
++t1lib (1.1.1-2.1) unstable; urgency=low
++
++  * NMU, with updated config.{guess,sub} for newer architectures
++
++ -- Randolph Chung <tausq@debian.org>  Sat,  7 Jul 2001 01:01:51 -0600
++
++t1lib (1.1.1-2) unstable; urgency=high
++
++  * Yow!  Major upstream weirdness.  Do *not* try to print the documentation
++    when building...  Closes: #94660
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri, 20 Apr 2001 20:35:49 -0400
++
++t1lib (1.1.1-1) unstable; urgency=low
++
++  * New upstream version.  Closes: #94627 (why did I never get this bug
++    report in the first place?)
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri, 20 Apr 2001 11:16:15 -0400
++
++t1lib (1.0.1-2) unstable; urgency=low
++
++  * Recompile with new XFree86 libraries and glibc.
++
++ -- David Huggins-Daines <dhd@debian.org>  Wed, 24 Jan 2001 22:33:43 -0500
++
++t1lib (1.0.1-1) unstable; urgency=low
++
++  * New upstream version.  Closes: #69689
++
++ -- David Huggins-Daines <dhd@debian.org>  Thu,  9 Nov 2000 00:29:06 -0500
++
++t1lib (1.0-2) frozen unstable; urgency=low
++
++  * Use dpkg-architecture to supply a target architecture name to
++    configure, should fix the compile problems on Alpha and ARM for good.
++    (closes:#57839)
++
++ -- David Huggins-Daines <dhd@eradicator.org>  Wed,  1 Mar 2000 21:22:49 -0500
++
++t1lib (1.0-1) unstable; urgency=low
++
++  * New upstream version.
++  * Twiddled package names to make more sense.
++  * Move back to priority optional to satisfy dependencies of xpdf and
++    php3.
++  * Moved .la files to t1lib-dev.  Added versioned Replaces: field in the
++    control file to cope with potato-to-potato upgrades (the t1lib0
++    packages in slink were not buggy in this way)
++  * t1libconfig and associated manual pages (FontDataBase.5,
++    t1libconfig.8) are now in the t1lib-bin package, for much the same
++    reason.  Unfortunately this Replaces: field cannot be versioned.
++  * The t1lib packages no longer manage the contents of /etc/t1lib/.  In
++    the near future, t1lib1 may have a debconf interface for doing so.
++    The t1lib.config and FontDataBase were never used by any programs that
++    linked with t1lib anyway, thankfully.
++
++ -- David Huggins-Daines <dhd@eradicator.org>  Sun,  2 Jan 2000 03:02:30 -0500
++
++t1lib0 (0.9.2-1) unstable; urgency=low
++
++  * New upstream version.
++  * Being more intelligent in t1libconfig to avoid postinst-lossage.
++    Fixes: #44095
++  * Updated for FHS compliance.
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri,  8 Oct 1999 15:27:46 -0400
++
++t1lib0 (0.9.1-4) unstable; urgency=medium
++
++  * Updated the shlibs file since it appears that programs compiled
++    against 0.9.1 won't work with 0.9 (though the other way around does
++    work).  Fixes: #43215, #43231
++  * Removed ARCH bogosity and updated config.sub and config.guess
++    (upstream maintainer will be notified)
++
++ -- David Huggins-Daines <dhd@debian.org>  Sat, 21 Aug 1999 01:23:39 -0400
++
++t1lib0 (0.9.1-3) unstable; urgency=low
++
++  * Conditionalize that ARCH thing, or the Hurd people will kill me.
++
++ -- David Huggins-Daines <dhd@debian.org>  Sat,  3 Jul 1999 13:56:12 -0400
++
++t1lib0 (0.9.1-2) unstable; urgency=low
++
++  * Oops.  T1lib installs a dummy config file.  We remove this before
++    building the package (because we generate our own).  Also, the preinst
++    has to compensate for the past brokenness by saving it before an
++    upgrade.
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri,  2 Jul 1999 16:13:46 -0400
++
++t1lib0 (0.9.1-1) unstable; urgency=low
++
++  * New upstream version.
++  * Moved back to extra, because that's the way the winds are blowing.
++  * Added ARCH variable to debian/rules to work around strange
++    architecture detection on Alpha.
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri,  2 Jul 1999 14:58:32 -0400
++
++t1lib0 (0.9-1) unstable; urgency=low
++
++  * New upstream version
++
++ -- David Huggins-Daines <dhd@debian.org>  Thu, 10 Jun 1999 23:00:12 -0400
++
++t1lib0 (0.8.1-1) unstable; urgency=low
++
++  * New upstream version.  (fixes bug #31549)
++  * Upstream move to libtool has made debian/rules a lot less contorted,
++    and slimmed up the diff considerably.  Thanks!
++  * I'm now uploading m68k versions as well.
++  * Fixed "confdif" typo in t1libconfig (oops!)
++  * This release breaks binary and source compatibility.  Bumping the
++    soname seems a bit extreme, since there is only one Debian package
++    (gglyph) which depends on this, and I'm simultaneously uploading a
++    fixed version.
++
++ -- David Huggins-Daines <dhd@debian.org>  Wed, 24 Feb 1999 17:16:41 -0500
++
++t1lib0 (0.7.1-5) unstable; urgency=low
++
++  * Changed debian/rules to remove debian/files on clean. (fixes bug #26907)
++  * Changed t1libconfig to allow installation </dev/null (fixes bug #27609)
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri, 16 Oct 1998 20:12:02 -0400
++
++t1lib0 (0.7.1-4) unstable; urgency=low
++
++  * Changed debian/rules not to use debhelper, to fix PowerPC and Alpha compile
++    problems and (hopefully) make the purists happy :)
++  * Upgraded priority to Optional, since it doesn't conflict with or break
++    anything, and is relatively stable.
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri, 18 Sep 1998 18:36:07 -0400
++
++t1lib0 (0.7.1-3) unstable; urgency=low
++
++  * Changed "read" to "read foo" in t1libconfig to make it more sh-friendly.
++  * Minor change to debian/rules (fixes bug #25501)
++
++ -- David Huggins-Daines <dhd@debian.org>  Fri,  7 Aug 1998 13:31:28 -0400
++
++t1lib0 (0.7.1-2) unstable; urgency=low
++
++  * Patched lib/t1lib/t1finfo.c to fix segfault problems with some fonts.
++  * Fixed the URLs and info in copyright and README.Debian.
++
++ -- David Huggins-Daines <dhd@debian.org>  Tue, 21 Jul 1998 16:01:03 -0400
++
++t1lib0 (0.7.1-1) unstable; urgency=low
++
++  * Initial release.
++
++ -- David Huggins-Daines <dhd@debian.org>  Thu, 16 Jul 1998 22:07:08 -0400 
++
++
+--- t1lib-5.1.2.orig/debian/copyright
++++ t1lib-5.1.2/debian/copyright
+@@ -0,0 +1,94 @@
++This package was debianized by David Huggins-Daines <dhd@debian.org> on
++Fri, 19 Jun 1998 20:01:01 -0400.  It has been also maintained by Artur 
++R. Czechowski <arturcz@hell.pl> and Torsten Werner <twerner@debian.org>.
++
++It was downloaded from ftp://sunsite.unc.edu/pub/Linux/libs/graphics/
++
++Upstream Author:
++
++    Rainer Menzner <Rainer.Menzner@web.de>
++
++Copyright:
++
++    Copyright (C) 1996-2003 Rainer Menzner
++
++License:
++
++    This package is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2 of the License, or (at your option) any later version.
++
++    This package is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this package; if not, write to the Free Software
++    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++
++On Debian systems, the complete text of the GNU Lesser General
++Public License can be found in `/usr/share/common-licenses/LGPL'.
++
++The Debian packaging is (C) 2008, Ruben Molina <rmolina@udea.edu.co> and
++is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
++
++Please note that there are parts of t1lib that are subject to other licenses:
++- The parseAFM-package is copyrighted by Adobe Systems Inc.
++- The type1 rasterizer is copyrighted by IBM and the X11-consortium.
++
++(from lib/t1lib/parseAFM.c)
++/*
++ * (C) 1988, 1989, 1990 by Adobe Systems Incorporated. All rights reserved.
++ *
++ * This file may be freely copied and redistributed as long as:
++ *   1) This entire notice continues to be included in the file, 
++ *   2) If the file has been modified in any way, a notice of such
++ *      modification is conspicuously indicated.
++ *
++ * PostScript, Display PostScript, and Adobe are registered trademarks of
++ * Adobe Systems Incorporated.
++ * 
++ * ************************************************************************
++ * THE INFORMATION BELOW IS FURNISHED AS IS, IS SUBJECT TO CHANGE WITHOUT
++ * NOTICE, AND SHOULD NOT BE CONSTRUED AS A COMMITMENT BY ADOBE SYSTEMS
++ * INCORPORATED. ADOBE SYSTEMS INCORPORATED ASSUMES NO RESPONSIBILITY OR 
++ * LIABILITY FOR ANY ERRORS OR INACCURACIES, MAKES NO WARRANTY OF ANY 
++ * KIND (EXPRESS, IMPLIED OR STATUTORY) WITH RESPECT TO THIS INFORMATION, 
++ * AND EXPRESSLY DISCLAIMS ANY AND ALL WARRANTIES OF MERCHANTABILITY, 
++ * FITNESS FOR PARTICULAR PURPOSES AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
++ * ************************************************************************
++ */
++
++(from lib/type1/type1.c)
++/* $XConsortium: type1.c,v 1.5 91/10/10 11:20:06 rws Exp $ */
++/* Copyright International Business Machines, Corp. 1991
++ * All Rights Reserved
++ * Copyright Lexmark International, Inc. 1991
++ * All Rights Reserved
++ * Portions Copyright (c) 1990 Adobe Systems Incorporated.
++ * All Rights Reserved
++ *
++ * License to use, copy, modify, and distribute this software and its
++ * documentation for any purpose and without fee is hereby granted,
++ * provided that the above copyright notice appear in all copies and that
++ * both that copyright notice and this permission notice appear in
++ * supporting documentation, and that the name of IBM or Lexmark or Adobe
++ * not be used in advertising or publicity pertaining to distribution of
++ * the software without specific, written prior permission.
++ *
++ * IBM, LEXMARK, AND ADOBE PROVIDE THIS SOFTWARE "AS IS", WITHOUT ANY
++ * WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT
++ * LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
++ * PARTICULAR PURPOSE, AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.  THE
++ * ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE, INCLUDING
++ * ANY DUTY TO SUPPORT OR MAINTAIN, BELONGS TO THE LICENSEE.  SHOULD ANY
++ * PORTION OF THE SOFTWARE PROVE DEFECTIVE, THE LICENSEE (NOT IBM,
++ * LEXMARK, OR ADOBE) ASSUMES THE ENTIRE COST OF ALL SERVICING, REPAIR AND
++ * CORRECTION.  IN NO EVENT SHALL IBM, LEXMARK, OR ADOBE BE LIABLE FOR ANY
++ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
++ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
++ * CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
++ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
+--- t1lib-5.1.2.orig/debian/t1lib-bin.menu
++++ t1lib-5.1.2/debian/t1lib-bin.menu
+@@ -0,0 +1,2 @@
++?package(t1lib-bin): needs="X11" section="Applications/Viewers" \
++  title="XGlyph" command="/usr/bin/xglyph"
+--- t1lib-5.1.2.orig/debian/watch
++++ t1lib-5.1.2/debian/watch
+@@ -0,0 +1,3 @@
++version=3
++ftp://sunsite.unc.edu/pub/Linux/libs/graphics/t1lib-(.*)\.tar\.gz \
++  debian debian/orig-tar.sh
+--- t1lib-5.1.2.orig/debian/libt1-5.docs
++++ t1lib-5.1.2/debian/libt1-5.docs
+@@ -0,0 +1,2 @@
++README.t1lib-*
++README.t1python
+--- t1lib-5.1.2.orig/debian/t1lib-bin.install
++++ t1lib-5.1.2/debian/t1lib-bin.install
+@@ -0,0 +1,2 @@
++debian/t1libconfig usr/sbin
++debian/tmp/usr/bin/*
+--- t1lib-5.1.2.orig/debian/README.Debian
++++ t1lib-5.1.2/debian/README.Debian
+@@ -0,0 +1,25 @@
++t1lib for Debian
++----------------
++
++This package has been created from scratch using debhelper. It contains
++four binary packages:
++ * shared library - libt1-5
++ * development files - libt1-5-dev
++ * font-related binary utils - t1lib5-bin
++ * documentation - libt1-5-doc
++
++However you can read in upstream's README that t1lib is completely independent
++of X11, you should know that package provides also libt1x library which
++contains X11 pixmap support. That's why it requires a bunch of X-libraries
++installed. If you consider this as a bad behavior, please discuss it on
++debian-devel list.
++
++NOTE: The old 't1lib0' package will *remove* /etc/t1lib/ and its
++contents if you purge it. Since this package is now obsolete, there
++is no good solution for this; you must back up your font database and
++config file if you wish to preserve them. Sorry...
++
++This package has been previously maintained by David Huggins-Daines, great
++thanks to him for his good job.
++
++ -- Artur R. Czechowski <arturcz@hell.pl>, Tue, 11 Nov 2003 13:31:48 +0100
+--- t1lib-5.1.2.orig/debian/orig-tar.sh
++++ t1lib-5.1.2/debian/orig-tar.sh
+@@ -0,0 +1,11 @@
++#!/bin/sh -e
++
++# called by uscan with '--upstream-version' <version> <file>
++
++# move to directory 'tarballs'
++if [ -r .svn/deb-layout ]; then
++  . .svn/deb-layout
++  mv $3 $origDir
++  echo "moved $3 to $origDir"
++fi
++
+--- t1lib-5.1.2.orig/debian/patches/series
++++ t1lib-5.1.2/debian/patches/series
+@@ -0,0 +1,4 @@
++no-docs.diff
++no-config.diff
++lib-cleanup.diff
++#segfault.diff
+--- t1lib-5.1.2.orig/debian/patches/no-config.diff
++++ t1lib-5.1.2/debian/patches/no-config.diff
+@@ -0,0 +1,57 @@
++do not install a static configuration file
++
++Index: t1lib-5.1.1/lib/Makefile.in
++===================================================================
++--- t1lib-5.1.1.orig/lib/Makefile.in	2008-01-05 19:13:57.000000000 +0100
+++++ t1lib-5.1.1/lib/Makefile.in	2008-01-05 19:14:18.000000000 +0100
++@@ -161,17 +161,17 @@
++ install: dummy
++ 	$(MKINSTALLDIRS) $(DESTDIR)$(libdir)
++ 	$(MKINSTALLDIRS) $(DESTDIR)$(includedir)
++-	$(MKINSTALLDIRS) $(DESTDIR)@T1LIB_DATA_DIR@
+++#	$(MKINSTALLDIRS) $(DESTDIR)@T1LIB_DATA_DIR@
++ 	$(LIBTOOL) --mode=install \
++ 		$(INSTALL_DATA) $(MAIN_TARGET) $(DESTDIR)$(libdir)
++ 	$(LIBTOOL) --mode=install \
++ 		$(INSTALL_DATA) $(MAIN_HEADER) $(DESTDIR)$(includedir)
++-	if (test -f $(DESTDIR)@T1LIB_DATA_DIR@/t1lib.config) \
++-	then \
++-	  echo "Alert: Global configuration file exists, installation skipped!"; \
++-	else \
++-	  $(LIBTOOL) --mode=install $(INSTALL_DATA) t1lib.config $(DESTDIR)@T1LIB_DATA_DIR@; \
++-	fi;
+++#	if (test -f $(DESTDIR)@T1LIB_DATA_DIR@/t1lib.config) \
+++#	then \
+++#	  echo "Alert: Global configuration file exists, installation skipped!"; \
+++#	else \
+++#	  $(LIBTOOL) --mode=install $(INSTALL_DATA) t1lib.config $(DESTDIR)@T1LIB_DATA_DIR@; \
+++#	fi;
++ 
++ 
++ uninstall: dummy
++@@ -179,7 +179,7 @@
++ 	-$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/libt1x.la
++ 	-$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(includedir)/t1lib.h
++ 	-$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(includedir)/t1libx.h
++-	-$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)@T1LIB_DATA_DIR@/t1lib.config
+++#	-$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)@T1LIB_DATA_DIR@/t1lib.config
++ 
++ 
++ dummy:
++Index: t1lib-5.1.1/xglyph/xglyph.c
++===================================================================
++--- t1lib-5.1.1.orig/xglyph/xglyph.c	2008-01-05 19:16:30.000000000 +0100
+++++ t1lib-5.1.1/xglyph/xglyph.c	2008-01-05 19:16:40.000000000 +0100
++@@ -526,9 +526,12 @@
++   
++   /* Check for environment entry. If not set, set it to current
++      directory so that configuration file is found there */
+++  /* It violates the Debian Policy */
+++#if 0
++   if (getenv("T1LIB_CONFIG")==NULL){
++     putenv( "T1LIB_CONFIG=./t1lib.config");
++   }
+++#endif
++ 
++   
++   /* Set log-level: */
+--- t1lib-5.1.2.orig/debian/patches/lib-cleanup.diff
++++ t1lib-5.1.2/debian/patches/lib-cleanup.diff
+@@ -0,0 +1,59 @@
++do not link against libraries that are not needed
++
++Index: t1lib-5.1.1/lib/Makefile.in
++===================================================================
++--- t1lib-5.1.1.orig/lib/Makefile.in	2008-01-05 19:17:21.000000000 +0100
+++++ t1lib-5.1.1/lib/Makefile.in	2008-01-05 19:17:38.000000000 +0100
++@@ -24,7 +24,7 @@
++ X_LIBS    = @X_LIBS@
++ TOPSRC    = @top_srcdir@
++ XPM_LIB   = -lXpm
++-XLIB      = @X_PRE_LIBS@ -lXext -lX11 @X_EXTRA_LIBS@
+++XLIB      = -lX11
++ LDFLAGS   = @LDFLAGS@
++ LDLIBS    = @LDLIBS@
++ AR        = ar rc
++@@ -137,7 +137,7 @@
++ 	$(LIBTOOL) --mode=link \
++ 		$(CC) $(LDFLAGS) -o $@ $(T1LIBX_OBJS) \
++ 	         -version-info @T1LIB_LT_CURRENT@:@T1LIB_LT_REVISION@:@T1LIB_LT_AGE@ \
++-	         libt1.la $(X_LIBS) $(XPM_LIB) $(XLIB)  -no-undefined -rpath $(libdir) 
+++	         libt1.la $(X_LIBS) $(XLIB)  -no-undefined -rpath $(libdir) 
++ 	cp t1lib/t1libx.h .
++ 
++ 
++Index: t1lib-5.1.1/type1afm/Makefile.in
++===================================================================
++--- t1lib-5.1.1.orig/type1afm/Makefile.in	2008-01-05 19:17:52.000000000 +0100
+++++ t1lib-5.1.1/type1afm/Makefile.in	2008-01-05 19:18:02.000000000 +0100
++@@ -70,7 +70,7 @@
++ 
++ type1afm: $(OBJS) ../lib/t1lib.h
++ 	$(LIBTOOL) --mode=link \
++-		$(CC) -o type1afm $(LDFLAGS) $(OBJS) $(T1LIB) $(LDLIBS)
+++		$(CC) -o type1afm $(LDFLAGS) $(OBJS) $(T1LIB)
++ 
++ .SUFFIXES: .lo
++ .c.lo:
++Index: t1lib-5.1.1/xglyph/Makefile.in
++===================================================================
++--- t1lib-5.1.1.orig/xglyph/Makefile.in	2008-01-05 19:18:15.000000000 +0100
+++++ t1lib-5.1.1/xglyph/Makefile.in	2008-01-05 19:18:31.000000000 +0100
++@@ -24,7 +24,7 @@
++ X_LIBS    = @X_LIBS@
++ TOPSRC    = @top_srcdir@
++ XPM_LIB   = -lXpm
++-XLIB      = @X_PRE_LIBS@ -lXext -lX11 @X_EXTRA_LIBS@
+++XLIB      = -lX11 @X_EXTRA_LIBS@
++ LDFLAGS   = @LDFLAGS@
++ LDLIBS    = @LDLIBS@ 
++ AR        = ar rc
++@@ -65,7 +65,7 @@
++ 
++ T1LIB  = ../lib/libt1.la
++ T1LIBX = ../lib/libt1x.la
++-XAWLIB = -lXaw -lXt -lXmu
+++XAWLIB = -lXaw -lXt
++ 
++ 
++ all: xglyph
+--- t1lib-5.1.2.orig/debian/patches/no-docs.diff
++++ t1lib-5.1.2/debian/patches/no-docs.diff
+@@ -0,0 +1,34 @@
++We are using debhelper to install the documentation in the correct
++directory.
++
++Index: t1lib-5.1.1/doc/Makefile.in
++===================================================================
++--- t1lib-5.1.1.orig/doc/Makefile.in	2008-01-05 19:05:03.000000000 +0100
+++++ t1lib-5.1.1/doc/Makefile.in	2008-01-05 19:05:25.000000000 +0100
++@@ -89,16 +89,16 @@
++ 
++ 
++ install: dummy
++-	if (test -f t1lib_doc.ps) \
++-	then \
++-	  $(MKINSTALLDIRS) $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
++-	  $(INSTALL_DATA) t1lib_doc.ps $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
++-	fi;
++-	if (test -f t1lib_doc.pdf) \
++-	then \
++-	  $(MKINSTALLDIRS) $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
++-	  $(INSTALL_DATA) t1lib_doc.pdf $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
++-	fi;
+++#	if (test -f t1lib_doc.ps) \
+++#	then \
+++#	  $(MKINSTALLDIRS) $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
+++#	  $(INSTALL_DATA) t1lib_doc.ps $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
+++#	fi;
+++#	if (test -f t1lib_doc.pdf) \
+++#	then \
+++#	  $(MKINSTALLDIRS) $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
+++#	  $(INSTALL_DATA) t1lib_doc.pdf $(DESTDIR)@T1LIB_DATA_DIR@/doc; \
+++#	fi;
++ 
++ 
++ uninstall: dummy
+--- t1lib-5.1.2.orig/debian/patches/segfault.diff
++++ t1lib-5.1.2/debian/patches/segfault.diff
+@@ -0,0 +1,62 @@
++This patch does not look safe and it has not been accepted upstream.
++Index: t1lib-5.1.1/lib/t1lib/t1base.c
++===================================================================
++--- t1lib-5.1.1.orig/lib/t1lib/t1base.c	2005-05-18 05:08:01.000000000 +0200
+++++ t1lib-5.1.1/lib/t1lib/t1base.c	2008-01-06 20:48:32.000000000 +0100
++@@ -455,7 +455,7 @@
++ 	   to test_for_t1_file() filename is substituted by an emty
++ 	   string if the file was not found: */
++ 	sprintf( err_warn_msg_buf, "Type 1 Font file %s.[pfa/pfb] not found (FontID=%d, SearchPath=%s)",
++-		 linebuf, m-1, T1_GetFileSearchPath(T1_PFAB_PATH));
+++		 linebuf, m-1, intT1_GetFileSearchPath(T1_PFAB_PATH));
++ 	if ((test_for_t1_file( &linebuf[0]))){
++ 	  T1_PrintLog( "intT1_scanFontDBase()", err_warn_msg_buf, T1LOG_WARNING);
++ 	  located=0;
++@@ -579,7 +579,7 @@
++ 	   to test_for_t1_file() filename is substituted by an emty
++ 	   string if the file was not found: */
++ 	sprintf( err_warn_msg_buf, "Type 1 Font file %s.[pfa/pfb] not found (FontID=%d, SearchPath=%s)",
++-		 linebuf, m-1, T1_GetFileSearchPath(T1_PFAB_PATH));
+++		 linebuf, m-1, intT1_GetFileSearchPath(T1_PFAB_PATH));
++ 	if ((test_for_t1_file( &linebuf[0]))){
++ 	  T1_PrintLog( "intT1_scanFontDBase()", err_warn_msg_buf, T1LOG_WARNING);
++ 	  located=0;
++Index: t1lib-5.1.1/lib/t1lib/t1env.c
++===================================================================
++--- t1lib-5.1.1.orig/lib/t1lib/t1env.c	2008-01-06 20:48:32.000000000 +0100
+++++ t1lib-5.1.1/lib/t1lib/t1env.c	2008-01-06 20:48:32.000000000 +0100
++@@ -807,6 +807,14 @@
++ 
++ }
++ 
+++/* intT1_GetFileSearchPath(): 
+++ call T1_GetFileSearchPath and truncate the line to avoid overflowing
+++ error buffers*/ 
+++char *intT1_GetFileSearchPath( int type)
+++{
+++   char  *res = T1_GetFileSearchPath(type);
+++   res[900] = 0;
+++}
++ 
++ /* T1_AddToFileSearchPath(): Add the specified path element to
++    the specified search path. If the existing path is the default path,
++Index: t1lib-5.1.1/lib/t1lib/t1env.h
++===================================================================
++--- t1lib-5.1.1.orig/lib/t1lib/t1env.h	2005-05-16 20:37:43.000000000 +0200
+++++ t1lib-5.1.1/lib/t1lib/t1env.h	2008-01-06 20:48:32.000000000 +0100
++@@ -35,6 +35,7 @@
++ int T1_SetFileSearchPath( int type, char *pathname);
++ int T1_AddToFileSearchPath( int pathtype, int mode, char *pathname);
++ char *T1_GetFileSearchPath( int type);
+++char *intT1_GetFileSearchPath( int type);
++ int T1_SetFontDataBase( char *filename);
++ int T1_AddFontDataBase( int mode, char *filename);
++ int T1_SetFontDataBaseXLFD( char *filename);
++@@ -49,6 +50,7 @@
++ extern int T1_SetFileSearchPath( int type, char *pathname);
++ extern int T1_AddToFileSearchPath( int pathtype, int mode, char *pathname);
++ extern char *T1_GetFileSearchPath( int type);
+++extern char *intT1_GetFileSearchPath( int type);
++ extern int T1_SetFontDataBase( char *filename);
++ extern int T1_AddFontDataBase( int mode, char *filename);
++ extern int T1_SetFontDataBaseXLFD( char *filename);
+--- t1lib-5.1.2.orig/debian/man/type1afm.1
++++ t1lib-5.1.2/debian/man/type1afm.1
+@@ -0,0 +1,34 @@
++.TH TYPE1AFM 1
++.SH NAME
++.B type1afm
++\- create a font metrics file from a Type 1 font file
++.SH SYNOPSIS
++.B type1afm
++[
++.BR \-l
++]
++.B fontfile
++[
++.B fontfile...
++]
++.SH DESCRIPTION
++This manual page was written for the Debian GNU/Linux distribution
++because the original program does not have a manual page.
++.PP
++.B type1afm
++reads in Type 1 font files specified on the command line, rasterizes
++them to 1000bp, and writes AFM (font metrics) files based on the
++observed metrics information.
++.PP
++The AFM file is created in the same directory as the font file, so be
++sure that you have write access there before running this program.
++.SH OPTIONS
++.TP
++.BR \-l
++Write a log file
++.SH SEE ALSO
++.BR getafm (1)
++.SH AUTHOR
++This manual page was David Huggins-Daines <dhd@debian.org>
++for the Debian GNU/Linux distribution (but may be used by others)
++
+--- t1lib-5.1.2.orig/debian/man/t1libconfig.8
++++ t1lib-5.1.2/debian/man/t1libconfig.8
+@@ -0,0 +1,57 @@
++.TH T1LIBCONFIG 8
++.SH NAME
++.B t1libconfig
++\- create the t1lib.config and FontDataBase files for t1lib
++.SH SYNOPSIS
++.B t1libconfig
++[
++.BR \-v\fP, \fB\-\-version
++]
++[
++.BR \-h\fP, \fB\-\-help
++]
++.B \-\-force
++]
++[
++.B fontdirectory...
++]
++.SH DESCRIPTION
++.B t1libconfig
++scans a list of directories for Type 1 fonts and font metric files,
++and generates a configuration file and font database file for the
++.B t1lib
++rasterizer library accordingly.  By default, it looks in all
++subdirectories of /usr/X11R6/lib/X11/fonts, and in
++/usr/lib/ghostscript.  Extra directories to search may be specified on 
++the command line.  The
++.B t1libconfig
++script tries not to scan the same directory twice (this is, however,
++not foolproof, since /usr/X11R6/lib/X11/fonts and /usr/lib/X11/fonts
++typically point to the same directory on GNU/Linux systems).
++.SH OPTIONS
++.TP
++.BR \-v\fP, \fB\-\-version
++Print the version of
++.B t1libconfig
++and exit.
++.TP
++.BR \-h\fP, \fB\-\-help
++Print help about usage and exit.
++.TP
++.B \-\-force
++Force the generation of new configuration files even if these files
++already exist on the system.
++.SH FILES
++.TP 25
++.B /etc/t1lib/t1lib.config
++Contains configuration information for t1lib, including
++colon-separated lists of paths to Type 1 font files and font metrics
++files, and the location of the default font database file
++.TP 25
++.B /etc/t1lib/FontDataBase
++Contains a list of the names of Type 1 font files to be used by t1lib.
++.SH AUTHOR
++David Huggins-Daines <dhd@debian.org>
++.SH SEE ALSO
++.BR FontDataBase (5)
++
+--- t1lib-5.1.2.orig/debian/man/xglyph.1
++++ t1lib-5.1.2/debian/man/xglyph.1
+@@ -0,0 +1,111 @@
++.TH XGLYPH 1
++.SH NAME
++xglyph \- demonstration program for the t1lib font rasterizer library.
++.SH SYNOPSIS
++.B xglyph
++[
++.B fontfile...
++]
++.SH "DESCRIPTION"
++This manual page documents briefly the
++.BR xglyph
++program.
++This manual page was written for the Debian GNU/Linux distribution
++because the original program does not have a manual page.
++.PP
++.B xglyph
++is a program which demonstrates the capabilities of the
++.B t1lib
++library.  It allows the user to view an arbitrary character or string
++rendered in the various ways pgossible with the library.  By default,
++it writes a log file named \fIt1lib.log\fR in the current directory.
++.PP
++If invoked with no arguments, it will attempt to read the global
++configuration file and font database.  It will also accept any number
++of filenames on the command line, in which case these are treated as
++font files to be loaded instead of the default font database.
++.SH "OPTIONS"
++.TP
++.BR \-\-help
++Shows a brief help text
++.TP
++.BR \-\-Help
++Shows a description of all options
++.TP
++.BR \-\-noGrid 
++Don't draw grid lines when displaying glyphs
++.TP
++.BR \-\-setPad 
++Set bitmap padding
++.TP
++.BR \-\-logError
++Log errors only
++.TP
++.BR \-\-logWarning
++Log errors and warnings
++.TP
++.BR \-\-logStatistic
++Log errors, warnings, and statistics
++.TP
++.BR \-\-logDebug
++Log just about everything
++.TP
++.BR \-\-ignoreForceBold
++Don't make pseudo-boldface glyphs
++.TP
++.BR \-\-ignoreFamilyAlignment
++.TP
++.BR \-\-ignoreHinting
++Ignore hints when scaling glyphs
++.TP
++.BR \-\-debugLine
++Show debugging info for line-drawing
++operations in the rasterizer
++.TP
++.BR \-\-debugRegion
++Show debugging info for region operations in
++the rasterizer
++.TP
++.BR \-\-debugPath
++Show debugging info for path operations in the
++rasterizer
++.TP
++.BR \-\-debugFont
++.TP
++.BR \-\-debugHint
++Show debugging info for hinting in the rasterizer.
++.TP
++.BR \-\-checkPerformance
++Do some simple performance tests while rasterizing.
++.TP
++.BR \-\-checkCopyFont
++Check that copying fonts works.
++.TP
++.BR \-\-checkConcatGlyphs
++Check that concatenating glyphs works.
++.TP
++.BR \-\-checkBadCharHandling
++.TP
++.BR \-\-checkDefaultEncoding
++Set a default encoding vector.
++.SH "ENVIRONMENT"
++In the Debian GNU/Linux version of this program, the environment
++variable
++.B T1LIB_CONFIG,
++if set, points to an alternate configuration
++file with which to initialize the library.
++.SH "SEE ALSO"
++.BR FontDataBase (5),
++.BR t1libconfig (8).
++.PP
++.B xglyph
++is much more fully documented in the LaTeX documentation that
++accompanies the upstream
++.B t1lib
++distribution.  This documentation is installed in PostScript and source
++formats with the t1lib-dev package in /usr/share/doc/t1lib-dev, and is
++also accessible through the dwww system.
++.SH AUTHOR
++This manual page was written by David Huggins-Daines
++<dhd@debian.org>, for the Debian GNU/Linux system (but may
++be used by others).
+--- t1lib-5.1.2.orig/debian/man/FontDatabase.5
++++ t1lib-5.1.2/debian/man/FontDatabase.5
+@@ -0,0 +1,77 @@
++.TH FONTDATABASE 5
++.SH NAME
++FontDataBase \- database of fonts accessible to t1lib.
++.SH DESCRIPTION
++This manual page has been written for the Debian GNU/Linux
++distribution.  It has been adapted from the documentation included in
++the upstream
++.B t1lib
++distribution.
++.PP
++.B /etc/t1lib/FontDataBase
++is a text file which contains, minimally, the basenames of Type 1 font 
++files to be made accessible to the
++.B t1lib
++font rasterizer library.  The format is intentionally similar to that
++of the
++.B fonts.dir
++and
++.B fonts.scale
++files used by X11.
++.PP
++Line 1 of this file contains a positive integer specifying the number
++of fonts declared in that file. This is as in the
++.B fonts.dir
++files of the X11 system.
++.PP
++All remaining lines contain declarations of one font each. The only
++thing taken from such a line is the last string (delimited by white
++space) in it. It is assumed to be a filename of the format
++\fIbasename\fR.\fIsomeextension\fR.
++.PP
++The \fIbasename\fR part is assumed to be the
++.BR basename (1)
++of a fontfile.  After the a string has been parsed, the
++.I extension
++is cut off and replaced in turn with
++.I .pfa
++and
++.I .pfb.
++The initialization routine tries to open a font file in
++its search path with one of the resulting filenames.
++.PP
++The remainder of the line, i.e., from beginning to the start of the
++filename string, is completely ignored and thus may contain
++information for other programs.
++.SH EXAMPLES
++Here is a minimal font database file for 4 fonts:
++.sp
++.nf
++4
++isvl.afm
++isvli.afm
++isvd.afm
++isvdi.afm
++.fi
++.PP
++This file is \fIminimal\fR, because it contains just the information
++needed, and nothing not needed by the library. 
++.PP
++Here is a more realistic example, which allows an application to match
++a fully qualified X11 fontname to a FontID in
++.B t1lib.
++This is also a valid font database file:
++.sp
++.nf
++4
++Souvenir Souvenir-Light       --- \-itc-souvenir-light-r-normal--#-0-0-0-p-0-iso8859-1 isvl.afm
++Souvenir Souvenir-LightItalic -*- \-itc-souvenir-light-i-normal--#-0-0-0-p-0-iso8859-1 isvli.afm
++          Souvenir-Demi       *-- \-itc-souvenir-demi-r-normal--#-0-0-0-p-0-iso8859-1 isvd.afm
++          Souvenir-DemiItalic **- \-itc-souvenir-demi-i-normal--#-0-0-0-p-0-iso8859-1 isvdi.afm
++.fi
++.PP
++.SH FILES
++.I /etc/t1lib/FontDataBase
++.SH "SEE ALSO"
++.BR mkfontdir (1x)
++

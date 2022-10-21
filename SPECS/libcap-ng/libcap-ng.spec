@@ -1,7 +1,7 @@
 Summary:        POSIX capability Library
 Name:           libcap-ng
 Version:        0.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Mon Jun 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 0.8.2-2
+- Add libcap-ng to toolchain for util-linux
+
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.8.2-1
 - Upgrade to 0.8.2
 - License verified

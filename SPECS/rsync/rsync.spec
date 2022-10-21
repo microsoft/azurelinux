@@ -1,6 +1,6 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.2.4
+Version:        3.2.5
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -60,6 +60,9 @@ EOF
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 3.2.5-1
+- Bump version to address CVE-2022-29154
+
 * Thu Jun 02 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.4-1
 - Upgrade to latest upstream version
 - Lint spec

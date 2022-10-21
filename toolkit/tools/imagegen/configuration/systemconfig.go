@@ -10,30 +10,35 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	IsDefault          bool               `json:"IsDefault"`
-	IsKickStartBoot    bool               `json:"IsKickStartBoot"`
-	BootType           string             `json:"BootType"`
-	Hostname           string             `json:"Hostname"`
-	Name               string             `json:"Name"`
-	PackageLists       []string           `json:"PackageLists"`
-	Packages           []string           `json:"Packages"`
-	KernelOptions      map[string]string  `json:"KernelOptions"`
-	KernelCommandLine  KernelCommandLine  `json:"KernelCommandLine"`
-	AdditionalFiles    map[string]string  `json:"AdditionalFiles"`
-	PartitionSettings  []PartitionSetting `json:"PartitionSettings"`
-	PreInstallScripts  []InstallScript    `json:"PreInstallScripts"`
-	PostInstallScripts []InstallScript    `json:"PostInstallScripts"`
-	Groups             []Group            `json:"Groups"`
-	Users              []User             `json:"Users"`
-	Encryption         RootEncryption     `json:"Encryption"`
-	RemoveRpmDb        bool               `json:"RemoveRpmDb"`
-	ReadOnlyVerityRoot ReadOnlyVerityRoot `json:"ReadOnlyVerityRoot"`
-	HidepidDisabled    bool               `json:"HidepidDisabled"`
+	IsDefault            bool               `json:"IsDefault"`
+	IsKickStartBoot      bool               `json:"IsKickStartBoot"`
+	IsIsoInstall         bool               `json:"IsIsoInstall"`
+	BootType             string             `json:"BootType"`
+	Hostname             string             `json:"Hostname"`
+	Name                 string             `json:"Name"`
+	PackageLists         []string           `json:"PackageLists"`
+	Packages             []string           `json:"Packages"`
+	KernelOptions        map[string]string  `json:"KernelOptions"`
+	KernelCommandLine    KernelCommandLine  `json:"KernelCommandLine"`
+	AdditionalFiles      map[string]string  `json:"AdditionalFiles"`
+	PartitionSettings    []PartitionSetting `json:"PartitionSettings"`
+	PreInstallScripts    []InstallScript    `json:"PreInstallScripts"`
+	PostInstallScripts   []InstallScript    `json:"PostInstallScripts"`
+	FinalizeImageScripts []InstallScript    `json:"FinalizeImageScripts"`
+	Networks             []Network          `json:"Networks"`
+	PackageRepos         []PackageRepo      `json:"PackageRepos"`
+	Groups               []Group            `json:"Groups"`
+	Users                []User             `json:"Users"`
+	Encryption           RootEncryption     `json:"Encryption"`
+	RemoveRpmDb          bool               `json:"RemoveRpmDb"`
+	ReadOnlyVerityRoot   ReadOnlyVerityRoot `json:"ReadOnlyVerityRoot"`
+	HidepidDisabled      bool               `json:"HidepidDisabled"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
@@ -67,6 +72,9 @@ func (s *SystemConfig) IsValid() (err error) {
 	// Validate BootType
 
 	// Validate HostName
+	if (!govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_")) && s.Hostname != "" {
+		return fmt.Errorf("invalid [Hostname]: %s", s.Hostname)
+	}
 
 	if strings.TrimSpace(s.Name) == "" {
 		return fmt.Errorf("missing [Name] field")
@@ -138,7 +146,28 @@ func (s *SystemConfig) IsValid() (err error) {
 		return fmt.Errorf("invalid [KernelCommandLine]: %w", err)
 	}
 
+	// Validate that PackageRepos do not contain duplicate package repo name
+	repoNames := make(map[string]bool)
+	for _, packageRepo := range s.PackageRepos {
+		if err = packageRepo.IsValid(); err != nil {
+			return fmt.Errorf("invalid [PackageRepo]: %s. Error: %w", packageRepo.Name, err)
+		}
+
+		if repoNames[packageRepo.Name] {
+			return fmt.Errorf("invalid [PackageRepos]: duplicate package repo names (%s)", packageRepo.Name)
+		}
+		repoNames[packageRepo.Name] = true
+	}
+
 	//Validate PostInstallScripts
+
+	// Validate Networks
+	for idx, network := range s.Networks {
+		if err = network.IsValid(); err != nil {
+			return fmt.Errorf("invalid [Network] config (%d): %w", (idx + 1), err)
+		}
+	}
+
 	//Validate Groups
 	//Validate Users
 	for _, b := range s.Users {

@@ -3,12 +3,13 @@
 Summary:        Sphinx extension for math in HTML via JavaScript
 Name:           python-%{pypi_name}
 Version:        1.0.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+Patch0:         test_jsmath_path_fix.patch
 
 BuildArch:      noarch
 
@@ -39,7 +40,7 @@ sphinxcontrib-jsmath is a sphinx extension which renders display math in HTML
 via JavaScript.
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -p1 -n %{pypi_name}-%{version}
 
 %build
 %py3_build
@@ -59,6 +60,9 @@ python3 -m pytest
 %{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-16
+- Fixing ptests.
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-15
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Cleaning-up spec. License verified.

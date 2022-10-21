@@ -7,7 +7,7 @@
 
 Name:           perl-Unicode-LineBreak
 Version:        2019.001
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        UAX #14 Unicode Line Breaking Algorithm
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -41,7 +41,11 @@ BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 BuildRequires:  perl(XSLoader)
 # Tests
+%if %{with_check}
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Test::More) >= 0.45
+%endif
+
 %if %{with perl_Unicode_LineBreak_enables_optional_test}
 # Optional tests
 BuildRequires:  perl(Test::Pod) >= 1.00
@@ -113,6 +117,10 @@ make test
 
 
 %changelog
+* Thu Aug 25 2022 Muhammad Falak <mwani@micrsofot.com> - 2019.001-7
+- Add BR on `perl(FindBin)` to fix ptest build
+- License verified
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 2019.001-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Always fliter excludes on perl requires.

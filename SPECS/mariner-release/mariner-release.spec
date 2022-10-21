@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        12%{?dist}
+Release:        23%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,7 @@ Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
+Welcome to CBL-Mariner %{mariner_release_version} (%{_arch})
 EOF
 
 %files
@@ -62,6 +62,39 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Fri Oct 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-23
+- Updating version for October release.
+
+* Fri Sep 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-22
+- Updating version for September update 3.
+
+* Fri Sep 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.21
+- Updating version for September update 2.
+
+* Thu Sep 08 2022 Minghe Ren <mingheren@microsoft.com> - 2.0-20
+- remove issue.net kernel part as sshd doesn't support the old-style telnet escape sequences
+
+* Thu Sep 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-19
+- Updating version for September CVE update.
+
+* Tue Aug 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-18
+- Updating version for August update 2.
+
+* Wed Aug 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-17
+- Updating version for August update.
+
+* Tue Jul 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-16
+- Updating version for July update 2.
+
+* Fri Jul 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-15
+- Updating version for July update.
+
+* Sat Jun 25 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-14
+- Updating version for June update 2.
+
+* Wed Jun 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-13
+- Updating version for June update.
+
 * Sat May 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-12
 - Updating version for May update.
 

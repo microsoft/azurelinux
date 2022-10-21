@@ -1,8 +1,7 @@
-%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        22.1
-Release:        2%{?dist}
+Version:        22.2
+Release:        9%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,11 +9,13 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-# Add Mariner distro support to cloud-init 22.1
-Patch0:         mariner-22.1.patch
+Patch0:         add-mariner-distro-support.patch
+Patch1:         CVE-2022-2084.patch
+%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
+BuildRequires:  mariner-release 
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -31,6 +32,7 @@ BuildRequires:  python3-xml
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Requires:       dhcp-client
+Requires:       e2fsprogs
 Requires:       iproute
 Requires:       net-tools
 Requires:       python3
@@ -66,6 +68,7 @@ ssh keys and to let the user run various scripts.
 %package azure-kvp
 Summary:        Cloud-init configuration for Hyper-V telemetry
 Requires:       %{name} = %{version}-%{release}
+
 %description    azure-kvp
 Cloud-init configuration for Hyper-V telemetry
 
@@ -81,6 +84,7 @@ python3 setup.py build
 %{py3_install "--init-system=systemd"}
 
 python3 tools/render-cloudcfg --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
+sed -i "s,@@PACKAGED_VERSION@@,%{version}-%{release}," %{buildroot}/%{python3_sitelib}/cloudinit/version.py
 
 %if "%{_arch}" == "aarch64"
 # OpenStack DS in aarch64 adds a boot time of ~10 seconds by searching
@@ -103,9 +107,10 @@ echo -e 'CERT1\nLINE2\nLINE3\nCERT2\nLINE2\nLINE3' > "${crt_file}"
 conf_file='%{_sysconfdir}/ca-certificates.conf'
 echo -e 'line1\nline2\nline3\ncloud-init-ca-certs.crt\n' > "${conf_file}"
 
-%define test_pkgs pytest-metadata unittest2 mock attrs iniconfig httpretty netifaces
+%define test_pkgs pytest-metadata unittest2 mock attrs iniconfig netifaces
 
 pip3 install --upgrade %{test_pkgs}
+pip3 install -r test-requirements.txt
 
 make check %{?_smp_mflags}
 
@@ -142,6 +147,31 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Oct 04 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-9
+- add BuildRequires mariner-release to make sure /etc/os-release exists so variant can be set as mariner properly
+
+* Thu Sep 15 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-8
+- Revert the change for adding sysinit.target dependency on previous two releases
+
+* Wed Aug 22 2022 Nan Liu <liunan@microsoft.com> - 22.2-7
+- Update add-mariner-distro-support patch to fix cloud-init dependency cycle
+
+* Wed Aug 03 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-6
+- Update add-mariner-distro-support patch to add sysinit.target dependency
+
+* Tue Jul 12 2022 Muhammad Falak <mwani@microsoft.com> - 22.2-5
+- Install check requirements from `test-requirements.txt` to enable ptest
+
+* Thu Jun 30 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-4
+- Patch for CVE-2022-2084
+- Report patch level in version info
+
+* Wed Jun 08 2022 Tom Fay <tomfay@microsoft.com> - 22.2-3
+- Add missing e2fsprogs dependency
+
+* Fri Jun 03 2022 Chris Patterson <cpatterson@microsoft.com> - 22.2-2
+- Update to cloud-init 22.2
+
 * Mon Mar 28 2022 Henry Beberman <henry.beberman@microsoft.com> - 22.1-2
 - Add netplan defaults to Mariner distro config patch
 
@@ -378,4 +408,3 @@ make check %{?_smp_mflags}
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

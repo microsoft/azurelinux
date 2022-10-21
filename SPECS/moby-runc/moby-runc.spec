@@ -5,7 +5,7 @@ Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        1.1.2
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
@@ -57,6 +57,12 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %{_mandir}/*
 
 %changelog
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1.2-3
+- Bump release to rebuild against Go 1.18.5
+
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.2-2
+- Bump release to rebuild with golang 1.18.3
+
 * Thu Jun 02 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.1.2-1
 - Upgrade to 1.1.2 to fix CVE-2022-29162.
 * Fri Jan 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.1.0-1

@@ -1,21 +1,24 @@
+Summary:        Ruby bindings for Augeas
 Name:           ruby-augeas
 Version:        0.5.0
-Release:        29%{?dist}
-Summary:        Ruby bindings for Augeas
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Release:        30%{?dist}
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://augeas.net
-Source0:        https://download.augeas.net/ruby/ruby-augeas-%{version}.tgz
+Source0:        http://download.augeas.net/ruby/%{name}-%{version}.tgz
 
-BuildRequires:  ruby rubygem(test-unit)
+BuildRequires:  augeas-devel >= 1.0.0
+BuildRequires:  gcc
+BuildRequires:  pkg-config
 BuildRequires:  ruby
 BuildRequires:  ruby-devel
-BuildRequires:  augeas-devel >= 1.0.0
-BuildRequires:  pkgconfig
-BuildRequires:  gcc
-Requires:       ruby(release)
+BuildRequires:  rubygem(rake)
+BuildRequires:  rubygem(test-unit)
+
 Requires:       augeas-libs >= 1.0.0
+Requires:       ruby(release)
+
 Provides:       ruby(augeas) = %{version}
 
 %description
@@ -24,13 +27,11 @@ Ruby bindings for augeas.
 %prep
 %setup -q
 
-
 %build
 export CONFIGURE_ARGS="--with-cflags='%{optflags}'"
 rake build
 
 %install
-rm -rf %{buildroot}
 install -d -m0755 %{buildroot}%{ruby_vendorlibdir}
 install -d -m0755 %{buildroot}%{ruby_vendorarchdir}
 install -p -m0644 lib/augeas.rb %{buildroot}%{ruby_vendorlibdir}
@@ -39,14 +40,17 @@ install -p -m0755 ext/augeas/_augeas.so %{buildroot}%{ruby_vendorarchdir}
 %check
 ruby tests/tc_augeas.rb
 
-
 %files
-%doc COPYING README.rdoc NEWS
+%license COPYING
+%doc README.rdoc NEWS
 %{ruby_vendorlibdir}/augeas.rb
 %{ruby_vendorarchdir}/_augeas.so
 
-
 %changelog
+* Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-30
+- Adding missed BR on 'rubygem(rake)'.
+- Fixed source URL.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.5.0-29
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

@@ -1,0 +1,44 @@
+
+Drop "Configure Command" from phpinfo as it doesn't
+provide any useful information.
+The available extensions are not related to this command.
+
+Replace full GCC name by gcc in php -v output
+
+
+diff -up ./ext/standard/info.c.phpinfo ./ext/standard/info.c
+--- ./ext/standard/info.c.phpinfo	2020-07-21 10:49:31.000000000 +0200
++++ ./ext/standard/info.c	2020-07-21 11:41:56.295633523 +0200
+@@ -805,9 +805,6 @@ PHPAPI ZEND_COLD void php_print_info(int
+ #ifdef PHP_BUILD_ARCH
+ 		php_info_print_table_row(2, "Architecture", PHP_BUILD_ARCH);
+ #endif
+-#ifdef CONFIGURE_COMMAND
+-		php_info_print_table_row(2, "Configure Command", CONFIGURE_COMMAND );
+-#endif
+ 
+ 		if (sapi_module.pretty_name) {
+ 			php_info_print_table_row(2, "Server API", sapi_module.pretty_name );
+diff -up ./ext/standard/tests/general_functions/phpinfo.phpt.phpinfo ./ext/standard/tests/general_functions/phpinfo.phpt
+--- ./ext/standard/tests/general_functions/phpinfo.phpt.phpinfo	2020-07-21 10:49:31.000000000 +0200
++++ ./ext/standard/tests/general_functions/phpinfo.phpt	2020-07-21 11:41:56.296633522 +0200
+@@ -17,7 +17,6 @@ PHP Version => %s
+ 
+ System => %s
+ Build Date => %s%a
+-Configure Command => %s
+ Server API => Command Line Interface
+ Virtual Directory Support => %s
+ Configuration File (php.ini) Path => %s
+diff -up ./sapi/cli/php_cli.c.phpinfo ./sapi/cli/php_cli.c
+--- ./sapi/cli/php_cli.c.phpinfo	2020-07-21 11:43:38.812475300 +0200
++++ ./sapi/cli/php_cli.c	2020-07-21 11:43:45.783464540 +0200
+@@ -645,7 +645,7 @@ static int do_cli(int argc, char **argv)
+ 					"NTS"
+ #endif
+ #ifdef PHP_BUILD_COMPILER
+-					" " PHP_BUILD_COMPILER
++					" gcc"
+ #endif
+ #ifdef PHP_BUILD_ARCH
+ 					" " PHP_BUILD_ARCH

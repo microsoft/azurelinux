@@ -8,26 +8,16 @@
 # $1 - Changelog message.
 # ${@:2} - Paths to spec files to update.
 
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# shellcheck source=../../toolkit/scripts/specs/specs_tools.sh
+source "$REPO_ROOT"/toolkit/scripts/specs/specs_tools.sh
+
 changelog_message="$1"
 
 if [[ $# -lt 2 ]]
 then
     echo "ERROR: must provide at least two arguments: changelog message and the spec path(s)." >&2
-    exit 1
-fi
-
-user_email="$(git config user.email)"
-user_name="$(git config user.name)"
-
-if [[ -z $user_email ]]
-then
-    echo "ERROR: must set git user e-mail. Try running 'git config --local user.email [user_email]'." >&2
-    exit 1
-fi
-
-if [[ -z $user_name ]]
-then
-    echo "ERROR: must set git user name. Try running 'git config --local user.name [user_name]'." >&2
     exit 1
 fi
 
@@ -41,21 +31,5 @@ do
 
     echo "Updating '$spec_path'."
 
-    spec_dir="$(dirname "$spec_path")"
-    defines=(-D "py3_dist X" -D "with_check 1" -D "dist .cm1" -D "__python3 python3" -D "_sourcedir '$spec_dir'")
-
-    release=$(grep -oP "^Release:\s*\d+" "$spec_path" | grep -oP "\d+$")
-    release=$((release+1))
-    version=$(rpmspec --srpm -q "$spec_path" --qf "%{VERSION}\n" "${defines[@]}" 2>/dev/null)
-
-    epoch="$(rpmspec --srpm -q "$spec_path" --qf "%{EPOCH}\n" "${defines[@]}" 2>/dev/null):"
-    if [[ "$epoch" == "(none):" ]]
-    then
-        epoch=""
-    fi
-
-    sed -i -E "s/^(Release:\s*).*/\1$release%{?dist}/" "$spec_path"
-    changelog_header=$(date "+%a %b %d %Y $user_name <$user_email> - $epoch$version-$release")
-    changelog_indents=$(grep -m 1 -P "^\*.*@.*>" "$spec_path" | sed -E "s/^\*(\s+).*/\1/")
-    sed -i -E "/\s*^%changelog.*/a *$changelog_indents$changelog_header\n-$changelog_indents$changelog_message\n" "$spec_path"
+    add_changelog_entry "$spec_path" "$changelog_message"
 done

@@ -1,6 +1,6 @@
 Name:             powertop
 Version:          2.13
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          Power consumption monitor
 
 License:          GPLv2
@@ -12,6 +12,7 @@ Source1:          powertop.service
 
 # Sent upstream
 Patch0:           powertop-2.7-always-create-params.patch
+Patch1:           0001-ncurses.patch
 BuildRequires:    gettext-devel, ncurses-devel, pciutils-devel, zlib-devel, libnl3-devel
 BuildRequires:    automake, libtool, systemd, autoconf-archive
 BuildRequires:    gcc, gcc-c++
@@ -27,6 +28,7 @@ computer use more power than necessary while it is idle.
 %prep
 %setup -q
 %patch0 -p1 -b .always-create-params
+%patch1 -p1
 
 echo "v%{version}" > version-long
 echo '"v%{version}"' > version-short
@@ -69,6 +71,10 @@ touch %{_localstatedir}/cache/powertop/{saved_parameters.powertop,saved_results.
 %{_datadir}/bash-completion/completions/powertop
 
 %changelog
+* Thu Jun 23 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 2.13-3
+- Added patch to fix compilation with ncurses 6.3
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

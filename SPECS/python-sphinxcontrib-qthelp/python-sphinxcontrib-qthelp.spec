@@ -3,12 +3,13 @@
 Summary:        Sphinx extension for QtHelp documents
 Name:           python-%{pypi_name}
 Version:        1.0.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+Patch0:         test_qthelp_path_fix.patch
 
 BuildArch:      noarch
 
@@ -38,7 +39,7 @@ Summary:        %{summary}
 sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document.
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -p1 -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
 
 %build
@@ -76,6 +77,9 @@ pip3 install more-itertools Sphinx
 %{python3_sitelib}/sphinxcontrib_qthelp-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-9
+- Fixing ptests.
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-8
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Cleaning-up spec. License verified.

@@ -9,6 +9,8 @@ Group:          System Environment/General Libraries
 URL:            http://xmlsoft.org/libxslt/
 Source0:        http://xmlsoft.org/sources/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-30560.patch
+# CVE-2022-29824 is fixed by shared object from libxml2 version 2.9.14
+Patch1:         CVE-2022-29824.nopatch
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxml2-devel
 Requires:       libgcrypt

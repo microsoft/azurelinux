@@ -17,7 +17,10 @@ import (
 func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedImplicit bool) bool {
 	search := traverse.BreadthFirst{}
 
-	unresolvedImplicitNode := search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
+	foundUnsolvableNode := false
+
+	// Walk entire graph and print list of any/all unsolvable nodes
+	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
 		pkgNode := n.(*pkggraph.PkgNode)
 
 		// Non-implicit nodes are solvable
@@ -36,11 +39,12 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		}
 
 		// This node is not yet solvable
-		logger.Log.Debugf("Could not subgraph due to node: %v", pkgNode)
-		return true
+		logger.Log.Warnf("Could not subgraph due to node: %v", pkgNode)
+		foundUnsolvableNode = true
+		return
 	})
 
-	return unresolvedImplicitNode == nil
+	return foundUnsolvableNode == false
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.

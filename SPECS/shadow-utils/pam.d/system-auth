@@ -2,4 +2,8 @@
 
 auth      required    pam_unix.so
 
+# Security patch for msid: 5.3.2
+# Ensure lockout for failed password attempts is configured
+auth      required    pam_faillock.so deny=5 unlock_time=900
+
 # End /etc/pam.d/system-auth

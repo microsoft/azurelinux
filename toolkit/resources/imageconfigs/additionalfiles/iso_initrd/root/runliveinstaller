@@ -9,6 +9,9 @@ ISO_ROOT=/mnt/cdrom
 CONFIG_ROOT=$ISO_ROOT/config
 UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
 
+# PXE boot setup
+CMDLINE=/proc/cmdline
+
 # parse script parameters:
 #
 # -c -> config root folder (optional)
@@ -34,22 +37,46 @@ done
 mkdir -p $ISO_ROOT
 LABEL=CDROM
 
+function retry {
+    local retry=0
+    local limit=10
+    local sleep_seconds=15
+    while [ $retry -lt $limit ]
+    do
+        "$@" && break
+        echo "$@" failed. Retrying... 
+        ((retry++))
+        sleep $sleep_seconds
+    done
+}
+
 if grep -qs $ISO_ROOT /proc/mounts; then
     echo ISO root already mounted
+# Read from /proc/cmdline to get image configs from PXE server
+elif grep -q "image-config" $CMDLINE; then
+    IMAGE_CONFIG_VALUE=$(grep -oP "(?<=--image-config=)\S+" "$CMDLINE")
+    # $IMAGE_CONFIG_VALUE will be in this fixed format: http://PXE_SERVER_IP/RANDOM_PATH
+    # CUT_DIRS will be an array of strings separated by '/'
+    IFS='/' read -ra CUT_DIRS <<< $IMAGE_CONFIG_VALUE
+    
+    # It is possible that the installation environment does not have network access yet when
+    # this script is first run. So use a retry loop 
+    PXE_SERVER_IP=$(echo "$IMAGE_CONFIG_VALUE" | sed -e 's|^[^/]*//||' -e 's|/.*$||')
+    retry ping -c 1 $PXE_SERVER_IP
+
+    # To disable generation of any extra directories and just download the contents within the directory, 
+    # use -nH to disable genration of host-prefix, "PXE_SERVER_IP". 
+    # To disable generation of "RANDOM_PATH", set --cut-dirs to the number of strings separated by '/'. 
+    # Please note that http://PXE_SERVER_IP will generate 3 strings separated by '/': "http:", "" and "PXE_SERVER_IP", 
+    # and thus the number of strings separated by '/' within "RANDOM_PATH" will be the length of $CUT_DIRS minus 3
+    wget -r --no-parent -nH --cut-dirs=$((${#CUT_DIRS[@]}-3)) --directory-prefix="$CONFIG_ROOT" --reject="index.html*" "$IMAGE_CONFIG_VALUE"/
+    # Enable all scripts under config directory to be executable
+    find "$CONFIG_ROOT"/ -type f -iname "*.sh" -exec chmod a+x {} \;
 else
     echo Attempt to mount the ISO root
     # It is possible that the partition isn't ready to be mounted when this script
     # is first run. So use a retry loop.
-    RETRY=0
-    LIMIT=5
-    SLEEPSECONDS=2
-    while [ $RETRY -lt $LIMIT ]
-    do
-        mount -L $LABEL -o ro $ISO_ROOT && break
-        echo Mount failed. Retrying...
-        ((RETRY++))
-        sleep $SLEEPSECONDS
-    done
+    retry mount -L $LABEL -o ro $ISO_ROOT
 fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then

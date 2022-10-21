@@ -1,0 +1,173 @@
+From a329008ea54056f0ed9d85cc3d0d9129474f7cd5 Mon Sep 17 00:00:00 2001
+Message-Id: <a329008ea54056f0ed9d85cc3d0d9129474f7cd5.1496667760.git.jstancek@redhat.com>
+In-Reply-To: <192ac21a3c057c5dedca4cdd1bf700f38992030c.1496667760.git.jstancek@redhat.com>
+References: <192ac21a3c057c5dedca4cdd1bf700f38992030c.1496667760.git.jstancek@redhat.com>
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 1 Jun 2017 10:00:47 +0200
+Subject: [PATCH v2 2/2] stack_grow_into_huge: don't clobber existing mappings
+
+This test allocates hugepages above stack using MAP_FIXED and then
+grows stack while it can. If a MAP_FIXED request is successful,
+then mapping established by mmap() replaces any previous mappings
+for the process' pages. If there's anything important there (libc
+mappings), these can get clobbered as described here:
+  http://marc.info/?l=linux-arm-kernel&m=149036535209519&w=2.
+
+This patch is creating extra stack for new child and maps
+one hugepage above it. The search starts at heap until it
+hits existing mapping or until it can successfully map
+huge page and stack below it.
+
+If suitable place can't be found, test PASSes as inconclusive.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+---
+ tests/stack_grow_into_huge.c | 101 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 67 insertions(+), 34 deletions(-)
+
+This is a v2 series for:
+  https://groups.google.com/forum/#!topic/libhugetlbfs/tAsWjuJ7x8k
+
+diff --git a/tests/stack_grow_into_huge.c b/tests/stack_grow_into_huge.c
+index a380da063264..9b8ea8d74887 100644
+--- a/tests/stack_grow_into_huge.c
++++ b/tests/stack_grow_into_huge.c
+@@ -25,6 +25,7 @@
+ #include <sys/mman.h>
+ #include <sys/resource.h>
+ #include <sys/wait.h>
++#include <sched.h>
+ 
+ #include <hugetlbfs.h>
+ #include "hugetests.h"
+@@ -54,7 +55,10 @@
+ #define STACK_ALLOCATION_SIZE	(16*1024*1024)
+ #endif
+ 
+-void do_child(void *stop_address)
++#define MIN_CHILD_STACK (2*1024*1024)
++#define STEP (STACK_ALLOCATION_SIZE)
++
++int do_child(void *stop_address)
+ {
+ 	struct rlimit r;
+ 	volatile int *x;
+@@ -71,15 +75,68 @@ void do_child(void *stop_address)
+ 		x = alloca(STACK_ALLOCATION_SIZE);
+ 		*x = 1;
+ 	} while ((void *)x >= stop_address);
++
++	return 0;
++}
++
++void *try_setup_stack_and_huge(int fd, void *hint)
++{
++	void *mmap_address, *stack_start, *tmp;
++	long hpage_size = gethugepagesize();
++	void *stop = alloca(1);
++
++	/*
++	 * Find a spot for huge page. We start at "hint" and
++	 * keep going down in "STEP" increments until we find
++	 * a place where we can mmap huge page.
++	 */
++	mmap_address = PALIGN(hint, hpage_size);
++	do {
++		mmap_address += STEP;
++		if (mmap_address >= stop)
++			return NULL;
++		if (range_is_mapped((unsigned long)mmap_address,
++			(unsigned long)mmap_address + hpage_size))
++			continue;
++		tmp = mmap(mmap_address, hpage_size,
++			PROT_READ|PROT_WRITE, MAP_SHARED | MAP_FIXED, fd, 0);
++	} while (tmp == MAP_FAILED);
++	verbose_printf("huge page is at: %p-%p\n",
++		mmap_address, mmap_address + hpage_size);
++
++	/*
++	 * Find a spot for stack below huge page. We start at end of
++	 * huge page we found above and keep trying to mmap stack
++	 * below. Because stack needs to grow into hugepage, we
++	 * also have to make sure nothing is mapped in gap between
++	 * stack and huge page.
++	 */
++	stack_start = mmap_address + hpage_size;
++	do {
++		if (range_is_mapped((unsigned long)stack_start,
++			(unsigned long)stack_start + STEP + MIN_CHILD_STACK)) {
++			verbose_printf("range is mapped: %p-%p\n", stack_start,
++				stack_start + STEP + MIN_CHILD_STACK);
++			munmap(mmap_address, hpage_size);
++			return NULL;
++		}
++		stack_start += STEP;
++		if (stack_start >= stop)
++			return NULL;
++		tmp = mmap(stack_start, MIN_CHILD_STACK, PROT_READ|PROT_WRITE,
++			MAP_GROWSDOWN|MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED, -1, 0);
++	} while (tmp == MAP_FAILED);
++
++	verbose_printf("Child stack is at %p-%p\n",
++		stack_start, stack_start + MIN_CHILD_STACK);
++	return stack_start + MIN_CHILD_STACK;
+ }
+ 
+ int main(int argc, char *argv[])
+ {
+ 	int fd, pid, s, ret;
+ 	struct rlimit r;
+-	char *b;
+-	long hpage_size = gethugepagesize();
+-	void *stack_address, *mmap_address, *heap_address;
++	void *stack_end;
+ 
+ 	test_init(argc, argv);
+ 
+@@ -94,37 +151,13 @@ int main(int argc, char *argv[])
+ 	if (fd < 0)
+ 		CONFIG("Couldn't get hugepage fd");
+ 
+-	stack_address = alloca(0);
+-	heap_address = sbrk(0);
++	stack_end = try_setup_stack_and_huge(fd, sbrk(0));
++	if (!stack_end)
++		PASS_INCONCLUSIVE();
+ 
+-	/*
+-	 * paranoia: start mapping two hugepages below the start of the stack,
+-	 * in case the alignment would cause us to map over something if we
+-	 * only used a gap of one hugepage.
+-	 */
+-	mmap_address = PALIGN(stack_address - 2 * hpage_size, hpage_size);
+-
+-	do {
+-		b = mmap(mmap_address, hpage_size, PROT_READ|PROT_WRITE,
+-						MAP_FIXED|MAP_SHARED, fd, 0);
+-		mmap_address -= hpage_size;
+-		/*
+-		 * if we get all the way down to the heap, stop trying
+-		 */
+-		if (mmap_address <= heap_address)
+-			break;
+-	} while (b == MAP_FAILED);
+-
+-	if (b == MAP_FAILED)
+-		FAIL("mmap: %s", strerror(errno));
+-
+-	if ((pid = fork()) < 0)
+-		FAIL("fork: %s", strerror(errno));
+-
+-	if (pid == 0) {
+-		do_child(mmap_address);
+-		exit(0);
+-	}
++	pid = clone(do_child, stack_end, SIGCHLD, 0);
++	if (pid < 0)
++		FAIL("clone: %s", strerror(errno));
+ 
+ 	ret = waitpid(pid, &s, 0);
+ 	if (ret == -1)
+-- 
+1.8.3.1
+

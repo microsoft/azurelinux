@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "iptraf-ng-1.2.1.tar.gz": "9f5cef584065420dea1ba32c86126aede1fa9bd25b0f8362b0f9fd9754f00870",
+  "iptraf-ng-logrotate.conf": "c9c1f849fb04dceeff50aa3e2bd2c40f5e8656e00d1dabcde36e1e9dcfa7a1bb",
+  "iptraf-ng-tmpfiles.conf": "cd9e13572be9836f8efe6fcea198ccffad97b1db7f97bf0133b7d477f9d65ed0"
+ }
+}

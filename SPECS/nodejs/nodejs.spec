@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.5.0
+%define npm_version 8.11.0
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.14.2
+Version:        16.16.0
 Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
@@ -114,51 +114,76 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-*   Mon May 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-2
--   Remove python3 as a runtime dependency as it is not needed during runtime.
-*   Tue Apr 19 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-1
--   Update to 16.14.2.
-*   Thu Feb 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.14.0-1
--   Upgrade to 16.14.0.
-*   Thu Nov 18 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
--   Update to version 14.18.1 to fix CVE-2021-22959, CVE-2021-22960, CVE-2021-37701,
+* Thu Aug 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.16.0-2
+- Change npm_version to 8.11.0 to reflect the actual version of npm bundled with v16.16.0
+
+* Tue Aug 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.16.0-1
+- Update to v16.16.0 (security update) to resolve CVE-2022-32213, CVE-2022-32214, CVE-2022-32215
+
+* Mon May 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-2
+- Remove python3 as a runtime dependency as it is not needed during runtime.
+
+* Tue Apr 19 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-1
+- Update to 16.14.2.
+
+* Thu Feb 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.14.0-1
+- Upgrade to 16.14.0.
+
+* Thu Nov 18 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
+- Update to version 14.18.1 to fix CVE-2021-22959, CVE-2021-22960, CVE-2021-37701,
     CVE-2021-37712, CVE-2021-37713, CVE-2021-39134, CVE-2021-39135
--   Add patch to remove problematic cipher from default list
--   Add config flag to use OpenSSL cert store instead of built-in Mozilla certs
--   Add script to remove vendored OpenSSL tree from source tarball
--   Update required OpenSSL version to 1.1.1
--   Use python configure script directly
--   Lint spec
-*   Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.17.2-2
--   Adding 'Provides' for 'npm'.
-*   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
--   Update to version 14.17.2 to fix CVE-2021-22918
-*   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
--   Update to nodejs version 14.17.0
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
--   Added %%license line automatically
-*   Mon May 04 2020 Paul Monson <paulmon@microsoft.com> 9.11.2-6
--   Add patch that enables building openssl without TLS versions less 1.2
-*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 9.11.2-5
--   Remove toybox and only use coreutils for requires.
-*   Wed Apr 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 9.11.2-4
--   License verified.
--   Removed "%%define sha1".
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 9.11.2-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 9.11.2-2
--   Added BuildRequires python2, which
-*   Thu Sep 20 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 9.11.2-1
--   Updated to version 9.11.2
-*   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 9.9.0-1
--   Updated to version 9.9.0
-*   Wed Feb 14 2018 Xiaolin Li <xiaolinl@vmware.com> 8.3.0-1
--   Updated to version 8.3.0
-*   Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 7.7.4-4
--   Remove BuildArch
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 7.7.4-3
--   Requires coreutils or toybox
-*   Fri Jul 14 2017 Chang Lee <changlee@vmware.com> 7.7.4-2
--   Updated %check
-*   Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> 7.7.4-1
--   Initial packaging for Photon
+- Add patch to remove problematic cipher from default list
+- Add config flag to use OpenSSL cert store instead of built-in Mozilla certs
+- Add script to remove vendored OpenSSL tree from source tarball
+- Update required OpenSSL version to 1.1.1
+- Use python configure script directly
+- Lint spec
+
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.17.2-2
+- Adding 'Provides' for 'npm'.
+
+* Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
+- Update to version 14.17.2 to fix CVE-2021-22918
+
+* Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
+- Update to nodejs version 14.17.0
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
+- Added %%license line automatically
+
+* Mon May 04 2020 Paul Monson <paulmon@microsoft.com> 9.11.2-6
+- Add patch that enables building openssl without TLS versions less 1.2
+
+* Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 9.11.2-5
+- Remove toybox and only use coreutils for requires.
+
+* Wed Apr 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 9.11.2-4
+- License verified.
+- Removed "%%define sha1".
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 9.11.2-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 9.11.2-2
+- Added BuildRequires python2, which
+
+* Thu Sep 20 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 9.11.2-1
+- Updated to version 9.11.2
+
+* Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 9.9.0-1
+- Updated to version 9.9.0
+
+* Wed Feb 14 2018 Xiaolin Li <xiaolinl@vmware.com> 8.3.0-1
+- Updated to version 8.3.0
+
+* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 7.7.4-4
+- Remove BuildArch
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 7.7.4-3
+- Requires coreutils or toybox
+
+* Fri Jul 14 2017 Chang Lee <changlee@vmware.com> 7.7.4-2
+- Updated %check
+
+* Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> 7.7.4-1
+- Initial packaging for Photon

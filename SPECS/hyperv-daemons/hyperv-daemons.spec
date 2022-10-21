@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.15.41.1
-Release:        2%{?dist}
+Version:        5.15.72.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -219,6 +219,36 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
+- Upgrade to 5.15.72.1
+
+* Tue Sep 27 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.70.1-1
+- Upgrade to 5.15.70.1
+
+* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.69.1-1
+- Upgrade to 5.15.69.1
+
+* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
+- Upgrade to 5.15.67.1
+
+* Mon Aug 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.63.1-1
+- Upgrade to 5.15.63.1
+
+* Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
+- Upgrade to 5.15.60.2 to fix arm64 builds
+
+* Tue Jul 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.57.1-1
+- Upgrade to 5.15.57.1
+
+* Fri Jul 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.55.1-1
+- Upgrade to 5.15.55.1
+
+* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
+- Update source to 5.15.48.1
+
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
+- Update source to 5.15.45.1
+
 * Thu Jun 02 2022 Chris Patterson <cpatterson@microsoft.com> - 5.15.41.1-2
 - Fix ordering to ensure kvpd is started prior to cloud-init-local.service
 - Only start service if running under Hyper-V

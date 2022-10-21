@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.5.0
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        Testscenarios, a pyunit extension for dependency injection
 License:        ASL 2.0 and BSD
 URL:            https://launchpad.net/testscenarios
@@ -18,6 +18,9 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-pbr
 BuildRequires:  python3-testtools
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description\
 testscenarios provides clean dependency injection for python unittest style\
@@ -68,6 +71,10 @@ CFLAGS="%{optflags}" %{__python3} setup.py build
 %{python3_sitelib}/*
 
 %changelog
+* Fri Apr 29 2022 Muhammad Falak <mwani@microsoft.com> - 0.5.0-22
+- Add BR on `pip` to enable ptest
+- License verified
+
 * Tue Oct 13 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.5.0-21
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

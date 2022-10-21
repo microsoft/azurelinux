@@ -64,7 +64,7 @@ function find_old_version {
 }
 
 function update_configs {
-    CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-rt/config"
+    CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-hci/config"
     for configfile in $CONFIG_FILE
     do
         FILE=$WORKSPACE/SPECS/$configfile
@@ -111,14 +111,8 @@ function update_toolchain_scripts {
     for script in $TOOLCHAIN_SCRIPTS
     do
         file=$TOOLCHAIN_FOLDER/container/$script
-        PATTERN="echo Linux-.* API Headers"
-        REPLACE="echo Linux-$VERSION API Headers"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-        PATTERN="tar xf $FILE_SIGNATURE_PATTERN.*.tar.gz"
-        REPLACE="tar xf $TARBALL_NAME"
-        sed -i "s/$PATTERN/$REPLACE/" $file
-        PATTERN="CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-.*"
-        REPLACE="CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-$VERSION"
+        PATTERN="KERNEL_VERSION=\"$OLD_VERSION\""
+        REPLACE="KERNEL_VERSION=\"$VERSION\""
         sed -i "s/$PATTERN/$REPLACE/" $file
     done
 }
@@ -194,7 +188,7 @@ function usage() {
     echo "e : Your email"
     echo "w : Absoulte path to your workspace for your update - no quotes\n"
 
-    echo "example usage: ./toolkit/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
+    echo "example usage: ./toolkit/scripts/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
 
     exit 1 
 }

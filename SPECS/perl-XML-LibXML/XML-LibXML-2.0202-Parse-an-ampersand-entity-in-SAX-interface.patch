@@ -1,0 +1,180 @@
+From 3d0adda7560137309be8b10c63ff41e41dfb1516 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 28 Jan 2020 17:05:32 +0100
+Subject: [PATCH] Parse an ampersand entity in SAX interface
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+After disabling parsing external entities in XML-LibXML-2.0202,
+XML::LibXML::SAX interface stopped expanding &amp; and &#38; entities
+in attribute values (often found in href XHTML attributes) and
+returned "&#38;" instead. This was discovered by a RDF-Trine test
+suite failure <https://github.com/kasei/perlrdf/issues/167>.
+
+First, I suspected XML-LibXML
+<https://rt.cpan.org/Ticket/Display.html?id=131498>, but it turned out
+that the unexpanded entity comes from libxml2 C library itself. And
+that it's not just an ommitted expansion, but that it's actually an
+escape sequence for "&" characters. Other XML metacharacters (like
+"<") are not affeced. Also text nodes are also not affected.  My
+finding was confirmed by an old libxml2 bug report
+<https://bugzilla.gnome.org/show_bug.cgi?id=316487>.
+
+This patch "fixes" this discepancy by replacing all "&#38;"
+subtstrings with a literal "&" in SAX interface of start_element()
+callbacks.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ MANIFEST          |  1 +
+ perl-libxml-sax.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+ t/52_sax_intent.t | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 83 insertions(+), 2 deletions(-)
+ create mode 100755 t/52_sax_intent.t
+
+diff --git a/MANIFEST b/MANIFEST
+index 5248ea5..ccc3410 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -174,6 +174,7 @@ t/49callbacks_returning_undef.t
+ t/49global_extent.t
+ t/50devel.t
+ t/51_parse_html_string_rt87089.t
++t/52_sax_intent.t
+ t/60error_prev_chain.t
+ t/60struct_error.t
+ t/61error.t
+diff --git a/perl-libxml-sax.c b/perl-libxml-sax.c
+index b949d3c..232a879 100644
+--- a/perl-libxml-sax.c
++++ b/perl-libxml-sax.c
+@@ -20,6 +20,7 @@ extern "C" {
+ #include "ppport.h"
+ 
+ #include <stdlib.h>
++#include <string.h>
+ #include <libxml/xmlmemory.h>
+ #include <libxml/parser.h>
+ #include <libxml/parserInternals.h>
+@@ -639,6 +640,34 @@ PmmGenNsName( const xmlChar * name, const xmlChar * nsURI )
+     return retval;
+ }
+ 
++/* If a value argument does not contain "&#38;", the value pointer is returned.
++ * Otherwise a new xmlChar * string is allocated, the value copied there and
++ * "&#38;" occurences replaced with "&". Then the caller must free it. */
++static
++xmlChar *
++_expandAmp( const xmlChar *value )
++{
++    xmlChar *expanded = NULL;
++    const xmlChar *entity;
++    int length;
++
++    if (value == NULL ||
++            (NULL == (entity = (const xmlChar *)strstr((const char *)value, "&#38;")))) {
++        return (xmlChar *)value;
++    }
++
++    do {
++        length = entity - value;
++        expanded = xmlStrncat(expanded, value, length);
++        expanded = xmlStrncat(expanded, (const xmlChar *)"&", 1);
++        value += length + 5; /* "&#38;" */
++    } while (NULL != (entity = (const xmlChar*)strstr((const char *)value, "&#38;")));
++
++    expanded = xmlStrcat(expanded, value);
++
++    return expanded;
++}
++
+ HV *
+ PmmGenAttributeHashSV( pTHX_ PmmSAXVectorPtr sax,
+                        const xmlChar **attr, SV * handler )
+@@ -653,8 +682,8 @@ PmmGenAttributeHashSV( pTHX_ PmmSAXVectorPtr sax,
+     const xmlChar * nsURI = NULL;
+     const xmlChar **ta    = attr;
+     const xmlChar * name  = NULL;
+-    const xmlChar * value = NULL;
+ 
++    xmlChar * value       = NULL;
+     xmlChar * keyname     = NULL;
+     xmlChar * localname   = NULL;
+     xmlChar * prefix      = NULL;
+@@ -665,7 +694,13 @@ PmmGenAttributeHashSV( pTHX_ PmmSAXVectorPtr sax,
+         while ( *ta != NULL ) {
+             atV = newHV();
+             name = *ta;  ta++;
+-            value = *ta; ta++;
++            /* XXX: libxml2 SAX2 interface does not expand &#38;
++             * entity in the attribute values
++             * <https://bugzilla.gnome.org/show_bug.cgi?id=316487>
++             * resulting in stray "&#38;" sequences after disabling
++             * external entity expansion
++             * <https://rt.cpan.org/Ticket/Display.html?id=131498>. */
++            value = _expandAmp(*ta);
+ 
+             if ( name != NULL && XML_STR_NOT_EMPTY( name ) ) {
+                 localname = xmlSplitQName(NULL, name, &prefix);
+@@ -754,6 +789,11 @@ PmmGenAttributeHashSV( pTHX_ PmmSAXVectorPtr sax,
+                 prefix    = NULL;
+ 
+             }
++
++            if (value != *ta) {
++                xmlFree(value);
++            }
++            ta++;
+         }
+     }
+ 
+diff --git a/t/52_sax_intent.t b/t/52_sax_intent.t
+new file mode 100755
+index 0000000..a45b4d1
+--- /dev/null
++++ b/t/52_sax_intent.t
+@@ -0,0 +1,40 @@
++use strict;
++use warnings;
++use Test::More;
++
++my %tests = (
++    # attribte name     raw attrib. value   expected parsed value
++    predefined =>       ['&quot;',          '"'],       # alawys worked
++    numeric =>          ['&#65;',           'A'],       # always worked
++    numericampersand => ['&#38;',           '&'],       # a regression
++    ampA =>             ['&#38;A',          '&A'],      # a corner case
++    Aamp =>             ['A&#38;',          'A&'],      # a corner case
++    AampBampC =>        ['A&#38;B&#38;C',   'A&B&C'],   # a corner case
++);
++plan tests => scalar (keys %tests);
++
++my $input = '<?xml version="1.0"?><root';
++for my $test (sort keys %tests) {
++    $input .= sprintf(" %s='%s'", $test, $tests{$test}->[0]);
++}
++$input .= '/>';
++
++diag("Parsing $input");
++use XML::LibXML::SAX;
++
++XML::LibXML::SAX->new(Handler => 'Handler')->parse_string($input);
++
++
++package Handler;
++sub start_element {
++    my ($self, $node) = @_;
++    for my $attribute (sort keys %{$node->{Attributes}}) {
++        my $name = $node->{Attributes}->{$attribute}->{Name};
++        Test::More::is(
++            $node->{Attributes}->{$attribute}->{Value},
++            $tests{$name}->[1],
++            sprintf("%s='%s' attribute", $name, $tests{$name}->[0])
++        );
++    }
++}
++
+-- 
+2.21.1
+

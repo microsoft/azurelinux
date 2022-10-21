@@ -15,10 +15,12 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Fedora":                         r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
     "Fedora (Copyright Remi Collet)": r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: CC-BY-SA\)(\.|\n|$)',
     "Magnus Edenhill Open Source":    r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
-    "NVIDIA":                         r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
+    "NVIDIA":                         r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: (ASL 2\.0|GPLv2)\)(\.|\n|$)',
     "OpenMamba":                      r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
     "OpenSUSE":                       r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
-    "Photon":                         r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
+    "Photon":                         r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)',
+    "Rancher":                        r'\n-\s+Initial CBL-Mariner import from Rancher \(license: ASL 2\.0\)(\.|\n|$)',
+    "Sysbench source":                r'\n-\s+Initial CBL-Mariner import from Sysbench source \(license: GPLv2\+\)(\.|\n|$)'
 }
 
 KNOWN_SOURCE_ORIGINS = VALID_SOURCE_ATTRIBUTIONS.keys()

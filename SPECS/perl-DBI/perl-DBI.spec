@@ -5,7 +5,7 @@
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.643
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -16,6 +16,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(blib)
+BuildRequires:  perl(Test::More)
+%endif
+
 Requires:       perl-libs
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
@@ -155,6 +161,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.643-2
+- Add BR on `perl(blib)` & `perl(Test::More)` to fix ptest build
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.643-1
 - Update to 1.643
 

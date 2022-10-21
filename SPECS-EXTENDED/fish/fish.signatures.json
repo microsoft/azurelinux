@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "fish-3.1.2.tar.gz": "d5b927203b5ca95da16f514969e2a91a537b2f75bec9b21a584c4cd1c7aa74ed",
-  "fish-3.1.2.tar.gz.asc": "b476277dd7b2b5736e57f2eb22e01c66eeb70ad50de6d4419741d0abe7cc8173",
-  "gpgkey-003837986104878835FA516D7A67D962D88A709A.gpg": "38de0a5927c53da337a2ceb5c19e66ed652e414e5669d13137f65580ad257cce"
- }
-}

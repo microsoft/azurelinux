@@ -1,7 +1,7 @@
 Summary:        File-HomeDir
 Name:           perl-File-HomeDir
 Version:        1.006
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/File-HomeDir/
@@ -11,8 +11,10 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
 %if %{with_check}
-BuildRequires:  perl-File-Which
+BuildRequires:  perl(File::Which)
+BuildRequires:  perl(Test::More)
 %endif
 
 Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -75,6 +77,9 @@ find %{buildroot} -name 'perllocal.pod' -delete
 %{_mandir}/man3/File::HomeDir::Windows.3pm.gz
 
 %changelog
+* Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.006-2
+- Add BR on `perl(ExtUtils::MakeMaker)` & `perl(Test::More)` to enable ptest
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.006-1
 - Update to 1.006
 

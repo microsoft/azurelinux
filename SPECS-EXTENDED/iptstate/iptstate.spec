@@ -1,11 +1,9 @@
 Name: iptstate
 Summary: A top-like display of IP Tables state table entries
-Version: 2.2.6
-Release: 11%{?dist}
+Version: 2.2.7
+Release: 1%{?dist}
 Source: https://github.com/jaymzh/iptstate/releases/download/v%{version}/iptstate-%{version}.tar.bz2
 Patch0: iptstate-2.1-man8.patch
-Patch1: iptstate-2.2.6-no_debug.patch
-Patch2: iptstate-2.2.6-rhbz599181.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://www.phildev.net/iptstate/
@@ -39,8 +37,6 @@ display the state table once.
 %prep
 %setup -q
 %patch0 -p1 -b .man8
-%patch1 -p1 -b .no_debug
-%patch2 -p1 -b .rhbz599181
 
 %build
 make %{?_smp_mflags} CXXFLAGS="$RPM_OPT_FLAGS $RPM_LD_FLAGS"
@@ -55,6 +51,10 @@ make install PREFIX=%{buildroot}%{_prefix} INSTALL="install -p"
 %{_mandir}/man8/iptstate.*
 
 %changelog
+* Thu Jun 23 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.2.7-1
+- Upgrade version to 2.2.7 to fix build break.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.6-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -6,7 +6,7 @@
 Summary:        Build and install Perl modules
 Name:           perl-Module-Build
 Version:        0.4231
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Build/
@@ -17,7 +17,20 @@ Distribution:   Mariner
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl(ExtUtils::CBuilder)
+BuildRequires:  perl(ExtUtils::Install)
+BuildRequires:  perl(ExtUtils::Manifest)
+BuildRequires:  perl(File::Find)
+BuildRequires:  perl(blib)
+BuildRequires:  perl(lib)
 BuildRequires:  perl-generators
+%if %{with_check}
+BuildRequires:  perl(CPAN::Meta)
+BuildRequires:  perl(CPAN::Meta::YAML)
+BuildRequires:  perl(Module::Metadata)
+BuildRequires:  perl(Perl::OSType)
+BuildRequires:  perl(Test::More)
+%endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(CPAN::Meta) >= 2.142060
@@ -82,6 +95,9 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 0.4231-2
+- Add BR on `perl(ExtUtils::*)` & `perl(CPAN::*)` to enable ptest
+
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4231-1
 - Update to 0.4231
 

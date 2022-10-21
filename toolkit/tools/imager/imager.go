@@ -46,6 +46,10 @@ const (
 	// to run inside the install directory environment
 	postInstallScriptTempDirectory = "/tmp/postinstall"
 
+	// finalizeImageScriptTempDirectory is the directory where installutils expects to pick up any finalize image scripts
+	// to run inside the install directory environment
+	finalizeImageScriptTempDirectory = "/tmp/finalizeimage"
+
 	// sshPubKeysTempDirectory is the directory where installutils expects to pick up ssh public key files to add into
 	// the install directory
 	sshPubKeysTempDirectory = "/tmp/sshpubkeys"
@@ -230,7 +234,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		err = setupChroot.Run(func() error {
-			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
+			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		})
 		if err != nil {
 			logger.Log.Error("Failed to build image")
@@ -262,7 +266,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			}
 		}
 	} else {
-		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
+		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
@@ -448,12 +452,24 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 		filesToCopy = append(filesToCopy, fileToCopy)
 	}
 
+	for i, script := range config.FinalizeImageScripts {
+		newFilePath := filepath.Join(finalizeImageScriptTempDirectory, script.Path)
+
+		fileToCopy := safechroot.FileToCopy{
+			Src:  script.Path,
+			Dest: newFilePath,
+		}
+
+		config.FinalizeImageScripts[i].Path = newFilePath
+		filesToCopy = append(filesToCopy, fileToCopy)
+	}
+
 	err = installChroot.AddFiles(filesToCopy...)
 	return
 }
 
 func cleanupExtraFiles() (err error) {
-	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, sshPubKeysTempDirectory}
+	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, finalizeImageScriptTempDirectory, sshPubKeysTempDirectory}
 
 	for _, dir := range dirsToRemove {
 		logger.Log.Infof("Cleaning up directory %s", dir)
@@ -473,7 +489,7 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	})
 	return
 }
-func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
+func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
 	const (
 		installRoot       = "/installroot"
 		verityWorkingDir  = "verityworkingdir"
@@ -533,7 +549,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 	defer installChroot.Close(leaveChrootOnDisk)
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
@@ -575,6 +591,13 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 				return
 			}
 		}
+	}
+
+	// Run finalize image scripts from within the installroot chroot
+	err = installutils.RunFinalizeImageScripts(installChroot, systemConfig)
+	if err != nil {
+		err = fmt.Errorf("failed to run finalize image script: %s", err)
+		return
 	}
 
 	return

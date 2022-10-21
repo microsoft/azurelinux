@@ -33,13 +33,15 @@ graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
 preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
+output_csv_file   = $(PKGBUILD_DIR)/build_state.csv
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph
+.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
+workplan: $(graph_file)
 clean: clean-workplan clean-cache
 clean-workplan:
 	rm -rf $(PKGBUILD_DIR)
@@ -74,9 +76,14 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
-		--output $@
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+	        --output $@
 
 # Convert the dependency information in the json file into a graph structure
+# We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
+ifeq ($(REBUILD_TOOLCHAIN),y)
+$(graph_file): $(toolchain_rpms)
+endif
 $(graph_file): $(specs_file) $(go-grapher)
 	$(go-grapher) \
 		--input $(specs_file) \
@@ -162,6 +169,10 @@ clean-compress-srpms:
 	rm -rf $(srpms_archive)
 
 ifeq ($(REBUILD_PACKAGES),y)
+# If we are responsible for building a toolchain, make sure those RPMs are also present in the output directory
+ifeq ($(REBUILD_TOOLCHAIN),y)
+$(RPMS_DIR): $(toolchain_rpms)
+endif
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@touch $@
 	@echo Finished updating $@
@@ -174,6 +185,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
+		--output-build-state-csv-file="$(output_csv_file)" \
 		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
 		--work-dir="$(CHROOT_DIR)" \
 		--worker-tar="$(chroot_worker)" \
@@ -199,23 +211,24 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
+		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
 		$(logging_command) && \
 	touch $@
 
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-rpms:
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
+	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-srpms:
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
+	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=))
-	@echo Updating missing RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
-	tar -I $(ARCHIVE_TOOL) -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
+	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

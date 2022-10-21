@@ -1,0 +1,12 @@
+diff --git a/tests/Makefile b/tests/Makefile
+index 508a6ec..9fd15eb 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -295,7 +295,6 @@ obj64/install:
+ 	$(INSTALL) -m 755 wrapper-utils.sh $(DESTDIR)$(INST_TESTSDIR64)/obj64
+ 	$(INSTALL) -m 755 $(HELPERS:%=obj64/%) $(DESTDIR)$(INST_TESTSDIR64)/obj64
+ 	$(INSTALL) -m 755 $(HELPER_LIBS:%=obj64/%) $(DESTDIR)$(INST_TESTSDIR64)/obj64
+-	$(INSTALL) -m 755 $(TESTS_64:%=obj64/%) $(DESTDIR)$(INST_TESTSDIR64)/obj64
+ 	$(INSTALL) -m 755 run_tests.py $(DESTDIR)$(INST_TESTSDIR64)
+ 
+ install: $(OBJDIRS:%=%/install)

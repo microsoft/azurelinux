@@ -1,6 +1,17 @@
-diff -up xterm-323/xterm.desktop.desk xterm-323/xterm.desktop
---- xterm-323/xterm.desktop.desk	2016-03-08 14:32:15.633422051 +0100
-+++ xterm-323/xterm.desktop	2016-03-08 14:33:31.231604288 +0100
+From 67509cf49144a602430d0ee0918770919616f461 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 12 Aug 2022 07:29:12 +0530
+Subject: [PATCH 2/3] xterm desktop
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ xterm.desktop | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xterm.desktop b/xterm.desktop
+index 61dcd2c..401b03a 100644
+--- a/xterm.desktop
++++ b/xterm.desktop
 @@ -32,12 +32,12 @@
  # -----------------------------------------------------------------------------
  [Desktop Entry]
@@ -16,3 +27,6 @@ diff -up xterm-323/xterm.desktop.desk xterm-323/xterm.desktop
 +Icon=xterm-color
  Categories=System;TerminalEmulator;
  Keywords=shell;prompt;command;commandline;cmd;
+-- 
+2.37.1
+

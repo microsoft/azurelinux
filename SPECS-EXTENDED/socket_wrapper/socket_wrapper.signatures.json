@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "socket_wrapper-1.2.4.tar.gz": "8a54b4c5427c258a9ecf55b1c47a80e9d238ab20eede9220822550d97579a01e",
-  "socket_wrapper-1.2.4.tar.gz.asc": "c65764547a11f9dd8667b1fd7bf671ec967a951c7f00c4f2af8578c0d3c5a502",
-  "socket_wrapper.keyring": "3861ac6763ff3edf0bbbb05fe890962a5dbcd99b2e00fae16687fd480c7fab0f"
- }
-}

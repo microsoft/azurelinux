@@ -1,10 +1,10 @@
 %define upstream_name moby
-%define commit_hash 459d0dfbbb51fb2423a43655e6c62368ec0f36c9
+%define commit_hash 87a90dc786bda134c9eb02adbae2c6a7342fb7f6
 
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
-Version: 20.10.12
-Release: 3%{?dist}
+Version: 20.10.14
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -125,6 +125,15 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Fri Sep 30 2022 Adit Jha <aditjha@microsoft.com> - 20.10.14-1
+- Upgrade to 20.10.14 to fix CVE-2022-24769
+
+* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 20.10.12-5
+- Bump release to rebuild against Go 1.18.5
+
+* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 20.10.12-4
+- Bump release to rebuild with golang 1.18.3
+
 * Tue Mar 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-3
 - Set 'systemd' as default cgroup driver
 

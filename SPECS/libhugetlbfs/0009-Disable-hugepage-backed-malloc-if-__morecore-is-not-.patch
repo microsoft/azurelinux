@@ -1,0 +1,261 @@
+From 959d74fd0fbbff310943096e15024a84e8f5cba4 Mon Sep 17 00:00:00 2001
+From: Matheus Castanho <msc@linux.ibm.com>
+Date: Thu, 12 Aug 2021 16:38:46 -0300
+Subject: [PATCH] Disable hugepage-backed malloc if __morecore is not available
+
+Starting with glibc 2.32, __morecore hook has been marked as deprecated, and was
+completely removed on glibc 2.34, which causes an undefined symbol error during
+the build of libhugetlbfs.
+
+Greater changes are needed in order to keep providing the same functionality
+with future versions of glibc (see issue #52). Meanwhile, we can disable
+hugepage-backed malloc setup if __morecore is not available so users can at
+least keep using the other features provided by the library.  Related tests are
+also conditionally disabled, and will show as SKIPPED if __morecore is not
+available.
+
+Tested on powerpc64le and x86_64 with glibc 2.34 and olders.
+
+Signed-off-by: Matheus Castanho <msc@linux.ibm.com>
+---
+ Makefile           |  6 +++++
+ morecore.c         |  8 ++++++
+ tests/run_tests.py | 67 +++++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 71 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8b73523..35e53e7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -192,6 +192,12 @@ endif
+ endif
+ endif
+ 
++# glibc 2.34 removed __morecore, so it may not be available with recent versions
++HAS_MORECORE := $(shell /bin/echo -e '\#include <malloc.h>\nvoid * morecore_exists() { return &__morecore; }' | $(CC) -c -xc -o /dev/null - &> /dev/null && /bin/echo yes || /bin/echo no)
++ifeq ($(HAS_MORECORE),yes)
++CFLAGS += -DHAS_MORECORE
++endif
++
+ HEADERDIR = $(PREFIX)/include
+ LIBDIR32 = $(PREFIX)/$(LIB32)
+ LIBDIR64 = $(PREFIX)/$(LIB64)
+diff --git a/morecore.c b/morecore.c
+index 6563bbd..405c566 100644
+--- a/morecore.c
++++ b/morecore.c
+@@ -33,6 +33,13 @@
+ 
+ #include "libhugetlbfs_internal.h"
+ 
++#ifndef HAS_MORECORE
++void hugetlbfs_setup_morecore(void)
++{
++	INFO("Not setting up morecore because it's not available (see issue #52).\n");
++}
++#else
++
+ static int heap_fd;
+ 
+ static void *heapbase;
+@@ -381,3 +388,4 @@ void hugetlbfs_setup_morecore(void)
+ 	 * to mmap() if we run out of hugepages. */
+ 	mallopt(M_MMAP_MAX, 0);
+ }
++#endif /* HAS_MORECORE */
+diff --git a/tests/run_tests.py b/tests/run_tests.py
+index 018264d..871d04d 100755
+--- a/tests/run_tests.py
++++ b/tests/run_tests.py
+@@ -60,7 +60,7 @@ def snapshot_pool_state():
+         l.append((d, tuple(substate)))
+     return tuple(l)
+ 
+-def run_test_prog(bits, pagesize, cmd, **env):
++def run_test_prog(bits, pagesize, cmd, output='stdout', **env):
+     if paranoid_pool_check:
+         beforepool = snapshot_pool_state()
+         print("Pool state: %s" % str(beforepool))
+@@ -73,15 +73,17 @@ def run_test_prog(bits, pagesize, cmd, **env):
+         % (bits, bits, local_env.get("LD_LIBRARY_PATH", ""))
+     local_env["HUGETLB_DEFAULT_PAGE_SIZE"] = repr(pagesize)
+ 
++    popen_args = {'env' : local_env, output : subprocess.PIPE}
++
+     try:
+-        p = subprocess.Popen(cmd, env=local_env, stdout=subprocess.PIPE)
++        p = subprocess.Popen(cmd, **popen_args)
+         rc = p.wait()
+     except KeyboardInterrupt:
+         # Abort and mark this a strange test result
+         return (None, "")
+     except OSError as e:
+         return (-e.errno, "")
+-    out = p.stdout.read().decode().strip()
++    out = getattr(p, output).read().decode().strip()
+ 
+     if paranoid_pool_check:
+         afterpool = snapshot_pool_state()
+@@ -309,6 +311,33 @@ def check_linkhuge_tests():
+             okbits.add(bits)
+     return okbits
+ 
++def check_morecore_disabled():
++    """
++    Check if support for morecore is available.
++
++    Newer glibc versions (>= 2.34) removed the __morecore malloc hook, so tests
++    relying on that functionality will not work as expected, and should be
++    disabled.
++    """
++    global morecore_disabled, wordsizes, pagesizes
++
++    # Quick and dirty way to get a word and page size. Which one doesn't really
++    # matter in this case.
++    for wsz in wordsizes:
++        b = wsz
++        break
++    for psz in pagesizes:
++        p = psz
++        break
++
++    # Run an arbitrary program and check stderr for the "morecore disabled"
++    # message
++    (rc, out) = run_test_prog(b, p, "gethugepagesize", output='stderr',
++                              HUGETLB_MORECORE="yes",
++                              HUGETLB_VERBOSE="3")
++
++    morecore_disabled = "Not setting up morecore" in out
++
+ def print_cmd(pagesize, bits, cmd, env):
+     if env:
+         print(' '.join(['%s=%s' % (k, v) for k, v in env.items()]), end=" ")
+@@ -357,14 +386,17 @@ def skip_test(pagesize, bits, cmd, **env):
+     print_cmd(pagesize, bits, cmd, env)
+     print("SKIPPED")
+ 
+-def do_test(cmd, bits=None, **env):
++def do_test(cmd, bits=None, skip=False, **env):
+     """
+     Run a test case, testing each page size and each indicated word size.
+     """
+     if bits == None: bits = wordsizes
+     for p in pagesizes:
+         for b in (set(bits) & wordsizes_by_pagesize[p]):
+-            run_test(p, b, cmd, **env)
++            if skip:
++                skip_test(p, b, cmd, **env)
++            else:
++                run_test(p, b, cmd, **env)
+ 
+ def do_test_with_rlimit(rtype, limit, cmd, bits=None, **env):
+     """
+@@ -375,7 +407,7 @@ def do_test_with_rlimit(rtype, limit, cmd, bits=None, **env):
+     do_test(cmd, bits, **env)
+     resource.setrlimit(rtype, oldlimit)
+ 
+-def do_test_with_pagesize(pagesize, cmd, bits=None, **env):
++def do_test_with_pagesize(pagesize, cmd, bits=None, skip=False, **env):
+     """
+     Run a test case, testing with a specified huge page size and
+     each indicated word size.
+@@ -383,7 +415,10 @@ def do_test_with_pagesize(pagesize, cmd, bits=None, **env):
+     if bits == None:
+         bits = wordsizes
+     for b in (set(bits) & wordsizes_by_pagesize[pagesize]):
+-        run_test(pagesize, b, cmd, **env)
++        if skip:
++            skip_test(pagesize, b, cmd, **env)
++        else:
++            run_test(pagesize, b, cmd, **env)
+ 
+ def do_elflink_test(cmd, **env):
+     """
+@@ -533,7 +568,7 @@ def functional_tests():
+     """
+     Run the set of functional tests.
+     """
+-    global linkhuge_wordsizes
++    global linkhuge_wordsizes, morecore_disabled
+ 
+     # Kernel background tests not requiring hugepage support
+     do_test("zero_filesize_segment")
+@@ -598,19 +633,24 @@ def functional_tests():
+     do_test("fork-cow")
+     do_test("direct")
+     do_test_with_pagesize(system_default_hpage_size, "malloc")
++
+     do_test_with_pagesize(system_default_hpage_size, "malloc",
++                          skip=morecore_disabled,
+                           LD_PRELOAD="libhugetlbfs.so",
+                           HUGETLB_MORECORE="yes")
+     do_test_with_pagesize(system_default_hpage_size, "malloc",
++                          skip=morecore_disabled,
+                           LD_PRELOAD="libhugetlbfs.so",
+                           HUGETLB_MORECORE="yes",
+                           HUGETLB_RESTRICT_EXE="unknown:none")
+     do_test_with_pagesize(system_default_hpage_size, "malloc",
++                          skip=morecore_disabled,
+                           LD_PRELOAD="libhugetlbfs.so",
+                           HUGETLB_MORECORE="yes",
+                           HUGETLB_RESTRICT_EXE="unknown:malloc")
+     do_test_with_pagesize(system_default_hpage_size, "malloc_manysmall")
+     do_test_with_pagesize(system_default_hpage_size, "malloc_manysmall",
++                          skip=morecore_disabled,
+                           LD_PRELOAD="libhugetlbfs.so",
+                           HUGETLB_MORECORE="yes")
+ 
+@@ -630,26 +670,32 @@ def functional_tests():
+     do_test_with_pagesize(system_default_hpage_size, "heapshrink",
+                           GLIBC_TUNABLES="glibc.malloc.tcache_count=0",
+                           LD_PRELOAD="libheapshrink.so")
++
+     do_test_with_pagesize(system_default_hpage_size, "heapshrink",
++                          skip=morecore_disabled,
+                           GLIBC_TUNABLES="glibc.malloc.tcache_count=0",
+                           LD_PRELOAD="libhugetlbfs.so",
+                           HUGETLB_MORECORE="yes")
+     do_test_with_pagesize(system_default_hpage_size, "heapshrink",
++                          skip=morecore_disabled,
+                           GLIBC_TUNABLES="glibc.malloc.tcache_count=0",
+                           LD_PRELOAD="libhugetlbfs.so libheapshrink.so",
+                           HUGETLB_MORECORE="yes")
+     do_test_with_pagesize(system_default_hpage_size, "heapshrink",
++                          skip=morecore_disabled,
+                           GLIBC_TUNABLES="glibc.malloc.tcache_count=0",
+                           LD_PRELOAD="libheapshrink.so",
+                           HUGETLB_MORECORE="yes",
+                           HUGETLB_MORECORE_SHRINK="yes")
+     do_test_with_pagesize(system_default_hpage_size, "heapshrink",
++                          skip=morecore_disabled,
+                           GLIBC_TUNABLES="glibc.malloc.tcache_count=0",
+                           LD_PRELOAD="libhugetlbfs.so libheapshrink.so",
+                           HUGETLB_MORECORE="yes",
+                           HUGETLB_MORECORE_SHRINK="yes")
+ 
+-    do_test("heap-overflow", HUGETLB_VERBOSE="1", HUGETLB_MORECORE="yes")
++    do_test("heap-overflow", skip=morecore_disabled, HUGETLB_VERBOSE="1",
++            HUGETLB_MORECORE="yes")
+ 
+     # Run the remapping tests' up-front checks
+     linkhuge_wordsizes = check_linkhuge_tests()
+@@ -747,7 +793,7 @@ def print_help():
+ 
+ def main():
+     global wordsizes, pagesizes, dangerous, paranoid_pool_check, system_default_hpage_size
+-    global custom_ldscripts
++    global custom_ldscripts, morecore_disabled
+     testsets = set()
+     env_override = {"QUIET_TEST": "1", "HUGETLBFS_MOUNTS": "",
+                     "HUGETLB_ELFMAP": None, "HUGETLB_MORECORE": None}
+@@ -802,6 +848,7 @@ def main():
+         return 1
+ 
+     check_hugetlbfs_path()
++    check_morecore_disabled()
+ 
+     if "func" in testsets: functional_tests()
+     if "stress" in testsets: stress_tests()
+-- 
+2.17.1
+

@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ cmake --build . --target install
 %{_includedir}/scossl.h
 
 %changelog
+* Mon Jun 06 2022 Samuel Lee <saml@microsoft.com> - 1.2.0-1
+- Update SymCrypt-OpenSSL to v1.2.0 to improve performance and fix some corner case bugs
+
 * Tue Mar 29 2022 Samuel Lee <saml@microsoft.com> - 1.1.0-1
 - Update SymCrypt-OpenSSL to v1.1.0 to include FIPS self-tests, and fix aarch64 build
 

@@ -3,6 +3,7 @@
 | Release Branch | Status                                                                                                                                                                                                 |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1.0            | [![1.0 Status](https://github.com/microsoft/CBL-Mariner/workflows/Verify%20Quickstart%201.0/badge.svg)](https://github.com/microsoft/CBL-Mariner/actions?query=workflow%3A%22Verify+Quickstart+1.0%22) |
+| 2.0            | [![2.0 Status](https://github.com/microsoft/CBL-Mariner/workflows/Verify%20Quickstart%202.0/badge.svg)](https://github.com/microsoft/CBL-Mariner/actions?query=workflow%3A%22Verify+Quickstart+2.0%22) |
 
 CBL-Mariner is an internal Linux distribution for Microsoft’s cloud infrastructure and edge products and services. CBL-Mariner is designed to provide a consistent platform for these devices and services and will enhance Microsoft’s ability to stay current on Linux updates. This initiative is part of Microsoft’s increasing investment in a wide range of Linux technologies, such as [SONiC](https://azure.microsoft.com/en-us/blog/sonic-the-networking-switch-software-that-powers-the-microsoft-global-cloud/), [Azure Sphere OS](https://docs.microsoft.com/en-us/azure-sphere/product-overview/what-is-azure-sphere) and [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). CBL-Mariner is being shared publicly as part of Microsoft’s commitment to Open Source and to contribute back to the Linux community. CBL-Mariner does not change our approach or commitment to any existing third-party Linux distribution offerings. 
 
@@ -26,7 +27,7 @@ You can try CBL-Mariner with the following ISO Image:
 
 After downloading the ISO, use these instructions to install and use in a Hyper-V VM.
 
-Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking here or create a new feature request by clicking here. For additional information refer to the support.md file.
+Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/CBL-Mariner/issues) or create a new feature request by clicking [here](https://github.com/microsoft/CBL-Mariner/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/CBL-Mariner/blob/2.0/SUPPORT.md) file.
 
 # Trademarks
 
