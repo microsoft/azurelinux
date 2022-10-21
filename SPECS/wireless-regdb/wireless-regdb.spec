@@ -1,12 +1,11 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global         _firmwarepath    /usr/lib/firmware
 
 Name:           wireless-regdb
-Version:        2019.06.03
-Release:        7%{?dist}
+Version:        2022.08.12
+Release:        1%{?dist}
 Summary:        Regulatory database for 802.11 wireless networking
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 License:        ISC
 URL:            https://wireless.wiki.kernel.org/en/developers/regulatory/wireless-regdb
 BuildArch:      noarch
@@ -14,6 +13,7 @@ BuildArch:      noarch
 Requires:       udev, iw
 Requires:       systemd >= 190
 
+BuildRequires: make
 BuildRequires:  systemd-devel
 
 Provides:       crda = 3.18_2019.03.01-3
@@ -63,6 +63,10 @@ rm -rf %{buildroot}/usr/lib/crda
 
 
 %changelog
+* Tue Oct 18 2022 Henry Li <lihl@microsoft.com> - 2022.08.12-1
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2019.06.03-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           iw
-Version:        5.4
-Release:        3%{?dist}
+Version:        5.9
+Release:        1%{?dist}
 Summary:        A nl80211 based wireless configuration tool
 
 License:        ISC
@@ -41,6 +41,10 @@ make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}
 
 
 %changelog
+* Tue Oct 18 2022 Henry Li <lihl@microsoft.com> - 5.9-1
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
