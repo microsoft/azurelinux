@@ -2174,6 +2174,7 @@
                 "rubygem-yajl-ruby",
                 "rubygem-zip-zip",
                 "sdbus-cpp",
+                "sgx-backwards-compatability",
                 "shim",
                 "shim-unsigned",
                 "shim-unsigned-aarch64",
