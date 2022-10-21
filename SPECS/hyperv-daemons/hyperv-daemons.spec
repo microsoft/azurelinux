@@ -8,7 +8,7 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.15.72.1
+Version:        5.15.74.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -219,6 +219,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Wed Oct 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.74.1-1
+- Upgrade to 5.15.74.1
+
 * Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
 - Upgrade to 5.15.72.1
 
