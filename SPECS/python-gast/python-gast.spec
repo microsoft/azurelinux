@@ -17,6 +17,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+%if %{with_check}
+BuildRequires: python-tox
+%endif
 BuildArch:      noarch
 
 %description %{_description}
