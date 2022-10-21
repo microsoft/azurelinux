@@ -43,7 +43,7 @@ Summary:        %{summary}
 
 
 %check
-pip3 install tox
+pip3 install tox tox-current-env
 %tox
 
 
