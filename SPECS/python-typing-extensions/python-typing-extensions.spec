@@ -44,7 +44,7 @@ Summary:        %{summary}
 %description -n python3-typing-extensions %{_description}
 
 %prep
-%autosetup -n typing-extensions-%{version}
+%autosetup -n typing_extensions-%{version}
 
 %generate_buildrequires
 %pyproject_buildrequires
