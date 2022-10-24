@@ -28,7 +28,7 @@ License:        PSF-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pypi.org/project/typing-extensions/
-Source0:        %{pypi_source typing_extensions}
+Source0:        %{pypi_source typing_extensions}#typing-extensions-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-test
 %if %{with_check}
@@ -44,7 +44,7 @@ Summary:        %{summary}
 %description -n python3-typing-extensions %{_description}
 
 %prep
-%autosetup -n typing_extensions-%{version}
+%autosetup -n typing-extensions-%{version}
 
 %generate_buildrequires
 %pyproject_buildrequires
