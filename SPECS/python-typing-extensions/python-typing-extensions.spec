@@ -31,6 +31,7 @@ URL:            https://pypi.org/project/typing-extensions/
 Source0:        %{pypi_source typing_extensions}#/typing-extensions-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-test
+BuildRequires:  python3-packaging
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
