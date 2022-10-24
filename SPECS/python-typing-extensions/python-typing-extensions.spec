@@ -34,10 +34,9 @@ BuildRequires:  python3-test
 BuildRequires:  python3-packaging
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-
-%if %{with_check}
+BuildRequires:  python3-wheel
 BuildRequires:  python3-pip
-%endif
+
 BuildArch:      noarch
 
 %description %{_description}
