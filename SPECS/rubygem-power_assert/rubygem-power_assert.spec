@@ -2,7 +2,7 @@
 Summary:        Power Assert for Ruby
 Name:           rubygem-%{gem_name}
 Version:        2.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,10 +10,13 @@ Group:          Development/Languages
 URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0:         fix-file_list.patch
+BuildArch:      noarch
+
 BuildRequires:  git
 BuildRequires:  ruby
+
+Obsoletes:      ruby <= 3.1.2-2%{?dist}
 Provides:       rubygem(power_assert) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 Power Assert shows each value of variables and method calls in the expression.
@@ -36,6 +39,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-4
+- Adding 'Obsoletes: ruby <= 3.1.2-2'.
+
 * Wed Jul 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-3
 - Added missing lib files
 

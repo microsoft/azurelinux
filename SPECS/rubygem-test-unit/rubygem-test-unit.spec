@@ -2,18 +2,22 @@
 Summary:        An xUnit family unit testing framework for Ruby
 Name:           rubygem-%{gem_name}
 Version:        3.5.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://test-unit.github.io/
 Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+BuildArch:      noarch
+
 BuildRequires:  git
 BuildRequires:  ruby
+
 Requires:       rubygem-power_assert
+
+Obsoletes:      ruby <= 3.1.2-2%{?dist}
 Provides:       rubygem(test-unit) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 Test::Unit (test-unit) is unit testing framework for Ruby, based on xUnit
@@ -42,6 +46,9 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.3-3
+- Adding 'Obsoletes: ruby <= 3.1.2-2'.
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-2
 - Add provides
 
