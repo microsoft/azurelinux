@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.9.3
-Release:       2%{?dist}
+Version:       3.9.4
+Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -52,6 +52,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 
 %changelog
+* Mon Oct 24 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.4-1
+- Upgrade to 3.9.4
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.3-2
 - Bump release to rebuild against Go 1.18.5
 
