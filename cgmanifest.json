@@ -967,8 +967,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.37",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz"
+          "version": "2.39",
+          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.39.tar.xz"
         }
       }
     },
