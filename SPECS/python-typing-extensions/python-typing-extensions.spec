@@ -34,7 +34,7 @@ BuildRequires:  python3-test
 BuildRequires:  python3-packaging
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-wheel
+BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 
 BuildArch:      noarch
