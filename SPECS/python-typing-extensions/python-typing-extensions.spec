@@ -32,6 +32,7 @@ Source0:        %{pypi_source typing_extensions}#/typing-extensions-%{version}.t
 BuildRequires:  python3-devel
 BuildRequires:  python3-test
 BuildRequires:  python3-packaging
+BuildRequires:  python3-toml
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
