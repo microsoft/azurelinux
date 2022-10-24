@@ -329,6 +329,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
+# Explicitly add this vgem.ko back in
+/lib/modules/%{uname_r}/kernel/drivers/gpu/drm/vgem/vgem.ko.xz
 %exclude /lib/modules/%{uname_r}/kernel/sound
 
 %files docs
