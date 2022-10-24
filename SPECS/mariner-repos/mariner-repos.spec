@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,8 @@ Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 Source12:       mariner-extended-debuginfo.repo
 Source13:       mariner-extended-debuginfo-preview.repo
+Source14:       mariner-livepatches.repo
+Source15:       mariner-livepatches-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -93,6 +95,22 @@ Requires:       %{name}-shared = %{version}-%{release}
 %description extras-preview
 %{summary}
 
+%package livepatches
+Summary:        CBL-Mariner Livepatches repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description livepatches
+%{summary}
+
+%package livepatches-preview
+Summary:        CBL-Mariner Livepatches preview repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description livepatches-preview
+%{summary}
+
 %package microsoft
 Summary:        CBL-Mariner Microsoft repo file.
 Group:          System Environment/Base
@@ -143,6 +161,8 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
+install -m 644 %{SOURCE14} $REPO_DIRECTORY
+install -m 644 %{SOURCE15} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -196,6 +216,14 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extras-preview.repo
 
+%files livepatches
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-livepatches.repo
+
+%files livepatches-preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-livepatches-preview.repo
+
 %files microsoft
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-microsoft.repo
@@ -214,6 +242,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-9
+- Adding the "mariner-repos-livepatches*" subpackages.
+
 * Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-8
 - Add SRPM and Debuginfo repos to existing base, extended, and preview subpackages
 
