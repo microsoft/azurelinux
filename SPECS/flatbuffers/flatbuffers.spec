@@ -97,7 +97,7 @@ export VERSION='%{version}'
     -DFLATBUFFERS_BUILD_SHAREDLIB=ON \
     -DFLATBUFFERS_BUILD_FLATLIB=OFF \
     -DFLATBUFFERS_BUILD_FLATC=ON
-%cmake_build
+
 
 pushd python
 %pyproject_wheel
