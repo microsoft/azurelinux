@@ -3,7 +3,7 @@
 Summary:        Set of core livepatching packages for Mariner.
 Name:           livepatching
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ Requires:       coreutils
 Requires:       grep
 Requires:       inotify-tools
 Requires:       kpatch
+Requires:       mariner-repos-livepatches
 Requires:       systemd
 Requires:       tdnf
 
@@ -89,6 +90,9 @@ systemctl try-restart livepatching.service >/dev/null 2>&1 || :
 %{livepatching_lib_path}/livepatching.systemd
 
 %changelog
+* Tue Oct 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
+- Adding dependency on livepatches package repository.
+
 * Fri Sep 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
 - License verified.
