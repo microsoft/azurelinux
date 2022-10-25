@@ -10,6 +10,8 @@
   "mariner-extended.repo": "8d19a3a965e99f1a440fcc67c5c56fe26d71e20e6c59eb032d20e63175bb0288",
   "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
   "mariner-extras.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
+  "mariner-livepatches-preview.repo": "3e2e20bc9df006f1d6c3de4b5a3819de5957e3b8a8c4def516c60f4f322a434f",
+  "mariner-livepatches.repo": "8a90ee817fe59bee1eb5730843dde328a8d62b056c843d84200bd8817e014eb5",
   "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
   "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
   "mariner-official-base.repo": "4d7ecff06728fc92d629d5371bc0f04084ec4cd654887ced41d9d1be136ee8ce",
