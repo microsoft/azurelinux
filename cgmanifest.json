@@ -12913,8 +12913,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.16.0",
-          "downloadUrl": "https://nodejs.org/download/release/v16.16.0/node-v16.16.0.tar.xz"
+          "version": "16.17.1",
+          "downloadUrl": "https://nodejs.org/download/release/v16.17.1/node-v16.17.1.tar.xz"
         }
       }
     },
