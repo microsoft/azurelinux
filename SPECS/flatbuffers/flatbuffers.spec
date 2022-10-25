@@ -7,7 +7,7 @@ Version:        2.0.8
 # and use the macro in the file lists, as a reminder to avoid undetected .so
 # version bumps.
 %global so_version 2
-Release:        %autorelease
+Release:        1%{?dist}
 Summary:        Memory efficient serialization library
 
 # The entire source code is Apache-2.0. Even code from grpc, which is
@@ -23,6 +23,9 @@ BuildRequires:  cmake
 # The ninja backend should be slightly faster than make, with no disadvantages.
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
+BuildRequires:  python3-packaging
+BuildRequires:  python3-setuptools
+
 
 # From grpc/README.md:
 #
@@ -121,6 +124,10 @@ popd
 
 
 %changelog
+* Mon Oct 24 2022 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.8-1
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License verified.
+
 * Sat Jun 18 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 2.0.0-6
 - Fix cmake invocation (fix RHBZ#2045385)
 - Re-enable the tests
