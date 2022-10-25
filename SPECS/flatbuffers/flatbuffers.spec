@@ -25,7 +25,7 @@ BuildRequires:  ninja-build
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools
-
+BuildRequires:  python3-pip
 
 # From grpc/README.md:
 #
