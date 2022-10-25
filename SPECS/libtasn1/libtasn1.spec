@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
-Version:        4.18.0
-Release:        2%{?dist}
+Version:        4.19.0
+Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Oct 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.19.0-1
+- Updating to version 4.19.0 to fix CVE-2021-46848.
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.18.0-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 
