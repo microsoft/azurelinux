@@ -92,11 +92,11 @@ popd >/dev/null
 export VERSION='%{version}'
 %set_build_flags
 
-%cmake -GNinja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DFLATBUFFERS_BUILD_SHAREDLIB=ON \
-    -DFLATBUFFERS_BUILD_FLATLIB=OFF \
-    -DFLATBUFFERS_BUILD_FLATC=ON
+# %cmake -GNinja \
+#     -DCMAKE_BUILD_TYPE=Release \
+#     -DFLATBUFFERS_BUILD_SHAREDLIB=ON \
+#     -DFLATBUFFERS_BUILD_FLATLIB=OFF \
+#     -DFLATBUFFERS_BUILD_FLATC=ON
 
 
 pushd python
