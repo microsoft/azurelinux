@@ -5,8 +5,8 @@ Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.20.2
-Release:        2%{?dist}
+Version:        1.23.2
+Release:        1%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
-Patch1:         CVE-2021-3618.patch
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
@@ -109,6 +108,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.2-1
+- Upgrade to 1.23.2
+
 * Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.20.2-2
 - Addressing CVE-2021-3618.
 

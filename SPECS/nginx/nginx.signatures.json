@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "nginx-1.20.2.tar.gz": "958876757782190a1653e14dc26dfc7ba263de310e04c113e11e97d1bef45a42",
-  "nginx-njs-0.2.1.tar.gz": "1e9d6692d47ba1a529139dcc238585ae0e23d1543f25d85fc6516a2f241dbc11",
-  "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1"
- }
+  "Signatures": {
+    "nginx-njs-0.2.1.tar.gz": "1e9d6692d47ba1a529139dcc238585ae0e23d1543f25d85fc6516a2f241dbc11",
+    "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1",
+    "nginx-1.23.2.tar.gz": "a80cc272d3d72aaee70aa8b517b4862a635c0256790434dbfc4d618a999b0b46"
+  }
 }
