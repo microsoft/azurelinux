@@ -2062,6 +2062,7 @@
                 "python-execnet",
                 "python-logutils",
                 "python-nocasedict",
+                "python-opt-einsum",
                 "python-pecan",
                 "python-remoto",
                 "python-repoze-lru",
