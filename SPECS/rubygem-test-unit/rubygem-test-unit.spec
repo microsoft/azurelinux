@@ -16,7 +16,9 @@ BuildRequires:  ruby
 
 Requires:       rubygem-power_assert
 
+# This package used to be bundled with older versions of Ruby.
 Obsoletes:      ruby <= 3.1.2-2%{?dist}
+
 Provides:       rubygem(test-unit) = %{version}-%{release}
 
 %description

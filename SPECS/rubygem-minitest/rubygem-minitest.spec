@@ -20,7 +20,9 @@ BuildRequires:  ruby
 
 Requires:       ruby(release)
 
+# This package used to be bundled with older versions of Ruby.
 Obsoletes:      ruby <= 3.1.2-2%{?dist}
+
 Provides:       rubygem(minitest) = %{version}-%{release}
 
 %description
