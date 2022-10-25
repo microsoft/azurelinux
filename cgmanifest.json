@@ -21413,6 +21413,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-opt-einsum",
+          "version": "3.3.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/o/opt_einsum/opt_einsum-3.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-os-service-types",
           "version": "1.7.0",
           "downloadUrl": "https://tarballs.openstack.org/os-service-types/os-service-types-1.7.0.tar.gz"
