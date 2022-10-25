@@ -10,7 +10,7 @@ URL:            https://pypi.python.org/pypi/opt-einsum
 Source0:        https://pypi.python.org/packages/source/o/opt_einsum/opt_einsum-%{version}.tar.gz#/opt-einsum-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
+BuildRequires:  python3-numpy
 BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip
