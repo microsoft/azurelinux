@@ -17,8 +17,6 @@ Summary:        Memory efficient serialization library
 License:        Apache-2.0
 URL:            https://google.github.io/flatbuffers
 Source0:        https://github.com/google/flatbuffers/archive/v%{version}/%{name}-%{version}.tar.gz
-# Hand-written for Fedora in groff_man(7) format based on --help output
-Source1:        flatc.1
 
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
