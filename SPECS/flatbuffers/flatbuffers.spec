@@ -106,7 +106,6 @@ popd
 
 
 %install
-%cmake_install
 pushd python
 %pyproject_install
 %pyproject_save_files flatbuffers
