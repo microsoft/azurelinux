@@ -22,7 +22,7 @@ Optimizing einsum function Python package
 %package -n     python3-opt-einsum
 Summary:        Optimizing einsum function for NumPy
 Requires:       python3
-Requires:       python3-six
+Requires:       python3-numpy
 
 %description -n python3-opt-einsum
 Optimizing einsum function Python packag
