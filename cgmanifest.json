@@ -8100,6 +8100,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcroco",
+          "version": "0.6.13",
+          "downloadUrl": "https://gitlab.gnome.org/Archive/libcroco/-/archive/0.6.13/libcroco-0.6.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdaemon",
           "version": "0.14",
           "downloadUrl": "https://0pointer.de/lennart/projects/libdaemon/libdaemon-0.14.tar.gz"

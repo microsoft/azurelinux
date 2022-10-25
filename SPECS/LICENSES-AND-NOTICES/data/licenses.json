@@ -541,6 +541,7 @@
                 "libcli",
                 "libcmis",
                 "libcomps",
+                "libcroco",
                 "libdaemon",
                 "libdap",
                 "libdatrie",
