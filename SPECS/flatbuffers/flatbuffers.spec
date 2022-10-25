@@ -1,33 +1,37 @@
 %global debug_package %{nil}
-Name:           flatbuffers
-Version:        2.0.8
 # The .so version is explicitly constructed from project version—search
 # CMakeLists.txt for FlatBuffers_Library_SONAME_MAJOR and
 # FlatBuffers_Library_SONAME_FULL—but we manually repeat the SOVERSION here,
 # and use the macro in the file lists, as a reminder to avoid undetected .so
 # version bumps.
 %global so_version 2
-Release:        1%{?dist}
+%global common_description %{expand:
+FlatBuffers is a cross platform serialization library architected for maximum
+memory efficiency. It allows you to directly access serialized data without
+parsing/unpacking it first, while still having great forwards/backwards
+compatibility.}
 Summary:        Memory efficient serialization library
-
+Name:           flatbuffers
+Version:        2.0.8
+Release:        1%{?dist}
 # The entire source code is Apache-2.0. Even code from grpc, which is
 # BSD-3-Clause in its upstream, is intended to be Apache-2.0 in this project.
 # (Google is the copyright holder for both projects, so it can relicense at
 # will.) See https://github.com/google/flatbuffers/pull/7073.
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://google.github.io/flatbuffers
 Source0:        https://github.com/google/flatbuffers/archive/v%{version}/%{name}-%{version}.tar.gz
-
-BuildRequires:  gcc-c++
 BuildRequires:  cmake
+BuildRequires:  gcc-c++
 # The ninja backend should be slightly faster than make, with no disadvantages.
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
-BuildRequires:  python3-pip
-
 # From grpc/README.md:
 #
 #   NOTE: files in `src/` are shared with the GRPC project, and maintained
@@ -41,36 +45,25 @@ BuildRequires:  python3-pip
 # It is not possible to unbundle this because private/internal APIs are used.
 Provides:       bundled(grpc)
 
-%global common_description %{expand:
-FlatBuffers is a cross platform serialization library architected for maximum
-memory efficiency. It allows you to directly access serialized data without
-parsing/unpacking it first, while still having great forwards/backwards
-compatibility.}
-
 %description %{common_description}
 
 BuildArch:      noarch
 
-
 %package -n     python3-flatbuffers
 Summary:        FlatBuffers serialization format for Python
-
-BuildArch:      noarch
-
 Recommends:     python3dist(numpy)
-
 Provides:       flatbuffers-python3 = %{version}-%{release}
 Obsoletes:      flatbuffers-python3 < 2.0.0-6
+BuildArch:      noarch
 
 %description -n python3-flatbuffers %{common_description}
 
 This package contains the Python runtime library for use with the Flatbuffers
 serialization format.
 
-
 %prep
 %autosetup
-%py3_shebang_fix samples
+%{py3_shebang_fix} samples
 
 # flattests fails if out-of-source build directory is used
 # https://github.com/google/flatbuffers/issues/7282
@@ -120,7 +113,6 @@ popd
 
 %files -n python3-flatbuffers -f %{pyproject_files}
 %license LICENSE.txt
-
 
 %changelog
 * Mon Oct 24 2022 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.8-1
@@ -218,4 +210,3 @@ popd
 
 * Mon Mar 30 2015 Daniel Vrátil <dvratil@redhat.com> - 1.0.3-1
 - Initial version (abandoned at #1207208)
-
