@@ -1,4 +1,4 @@
-
+%global debug_package %{nil}
 Name:           flatbuffers
 Version:        2.0.8
 # The .so version is explicitly constructed from project version—search
@@ -116,7 +116,6 @@ popd
 %check
 # Upstream does not appear to provide any dedicated Python tests.
 %pyproject_check_import
-
 
 
 %files -n python3-flatbuffers -f %{pyproject_files}
