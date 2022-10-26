@@ -2183,6 +2183,7 @@
                 "shim-unsigned-x64",
                 "skopeo",
                 "span-lite",
+                "sriov-network-device-plugin",
                 "swupdate",
                 "SymCrypt",
                 "SymCrypt-OpenSSL",

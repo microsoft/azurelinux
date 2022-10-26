@@ -3058,8 +3058,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.8",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2"
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.bz2"
         }
       }
     },
@@ -10081,8 +10081,8 @@
         "type": "other",
         "other": {
           "name": "libtasn1",
-          "version": "4.18.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.18.0.tar.gz"
+          "version": "4.19.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz"
         }
       }
     },
@@ -12823,8 +12823,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.20.2",
-          "downloadUrl": "https://nginx.org/download/nginx-1.20.2.tar.gz"
+          "version": "1.23.2",
+          "downloadUrl": "https://nginx.org/download/nginx-1.23.2.tar.gz"
         }
       }
     },
@@ -25599,6 +25599,16 @@
           "name": "squashfs-tools",
           "version": "4.5.1",
           "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sriov-network-device-plugin",
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.4.0.tar.gz"
         }
       }
     },

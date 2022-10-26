@@ -118,6 +118,12 @@ make cctest
 - Stop packaging systemtap/tapset/node.stp (no longer built)
 - Bump npm_version to 8.19.2 to match source package.json
 
+* Tue Oct 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.17.1-2
+- Change npm_version to 8.15.0 to reflect the actual version of npm bundled with v16.17.1
+
+* Mon Oct 24 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.17.1-1
+- Upgrade to 16.17.1
+
 * Thu Aug 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.16.0-2
 - Change npm_version to 8.11.0 to reflect the actual version of npm bundled with v16.16.0
 
