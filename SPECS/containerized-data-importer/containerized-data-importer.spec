@@ -32,6 +32,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 ExclusiveArch:  x86_64 aarch64
+Requires:       nbdkit-devel
 Provides:       cdi = %{version}-%{release}
 
 %description
