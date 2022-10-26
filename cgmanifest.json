@@ -25606,6 +25606,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sriov-network-device-plugin",
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sscg",
           "version": "2.6.2",
           "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
