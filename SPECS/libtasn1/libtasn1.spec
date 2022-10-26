@@ -41,7 +41,7 @@ make %{?_smp_mflags} check
 %postun -p /sbin/ldconfig
 %files
 %defattr(-,root,root)
-%license LICENSE
+%license COPYING doc/COPYING*
 %{_libdir}/*.so.*
 %{_bindir}/*
 %{_mandir}/man1/*
@@ -57,6 +57,7 @@ make %{?_smp_mflags} check
 %changelog
 * Wed Oct 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.19.0-1
 - Upgrade to 4.19.0
+- Fix license file
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.14-2
 - Added %%license line automatically
