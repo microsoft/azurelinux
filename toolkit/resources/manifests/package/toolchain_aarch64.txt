@@ -71,10 +71,10 @@ elfutils-libelf-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-devel-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-devel-static-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-lang-0.186-1.cm2.aarch64.rpm
-expat-2.4.8-2.cm2.aarch64.rpm
-expat-debuginfo-2.4.8-2.cm2.aarch64.rpm
-expat-devel-2.4.8-2.cm2.aarch64.rpm
-expat-libs-2.4.8-2.cm2.aarch64.rpm
+expat-2.5.0-1.cm2.aarch64.rpm
+expat-debuginfo-2.5.0-1.cm2.aarch64.rpm
+expat-devel-2.5.0-1.cm2.aarch64.rpm
+expat-libs-2.5.0-1.cm2.aarch64.rpm
 file-5.40-2.cm2.aarch64.rpm
 file-debuginfo-5.40-2.cm2.aarch64.rpm
 file-devel-5.40-2.cm2.aarch64.rpm
