@@ -111,7 +111,6 @@ make cctest
 %defattr(-,root,root)
 %{_includedir}/*
 %{_docdir}/*
-%{_datadir}/systemtap/tapset/node.stp
 
 %changelog
 * Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.18.0-1
