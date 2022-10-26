@@ -36,7 +36,7 @@ Enable python source code refactoring through AST modifications.
 %py3_install
 
 %check
-python setup.py test
+python3 setup.py test
 
 %files -n python3-google-pasta
 %doc README.md
