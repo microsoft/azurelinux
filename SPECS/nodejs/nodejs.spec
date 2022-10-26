@@ -115,6 +115,7 @@ make cctest
 %changelog
 * Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.18.0-1
 - Upgrade to 16.18.0
+- Stop packaging systemtap/tapset/node.stp (no longer built)
 - Bump npm_version to 8.19.2 to match source package.json
 
 * Thu Aug 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.16.0-2
