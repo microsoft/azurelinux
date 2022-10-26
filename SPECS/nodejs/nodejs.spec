@@ -1,5 +1,5 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.11.0
+%define npm_version 8.19.2
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
@@ -115,6 +115,7 @@ make cctest
 %changelog
 * Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.18.0-1
 - Upgrade to 16.18.0
+- Bump npm_version to 8.19.2 to match source package.json
 
 * Thu Aug 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.16.0-2
 - Change npm_version to 8.11.0 to reflect the actual version of npm bundled with v16.16.0
