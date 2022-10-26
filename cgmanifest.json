@@ -12823,8 +12823,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.20.2",
-          "downloadUrl": "https://nginx.org/download/nginx-1.20.2.tar.gz"
+          "version": "1.23.2",
+          "downloadUrl": "https://nginx.org/download/nginx-1.23.2.tar.gz"
         }
       }
     },
