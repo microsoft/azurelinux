@@ -34,7 +34,7 @@ Enable python source code refactoring through AST modifications.
 %check
 %pytest
 
-%files -n python3-google-pasta %{python_files}
+%files -n python3-google-pasta
 %doc README.md
 %license LICENSE.txt
 %{python3_sitelib}/*
