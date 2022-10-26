@@ -1,21 +1,25 @@
 %define using_rustup 0
 %define using_musl_libc 0
 %define using_vendored_crates 1
+%global githubref    2ba6a9b
 
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
-Version:        26.0
-Release:        2%{?dist}
+Version:        27.0.0
+Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
-Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/tarball/%{githubref}#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
-# To update the cache run:
-#   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz
+# To update the cache and config.toml run:
+#   tar -xf %{name}-%{version}.tar.gz
+#   cargo vendor %{name}-%{version}
+#   cd %{name}-%{version}
+#   tar -czf vendor %{name}-%{version}-cargo.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        config.toml
 %endif
@@ -40,7 +44,7 @@ ExclusiveArch:  x86_64
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
-%define cargo_pkg_feature_opts --no-default-features --features "common,mshv,kvm"
+%define cargo_pkg_feature_opts --no-default-features --features "mshv,kvm"
 %endif
 %ifarch aarch64
 %define rust_def_target aarch64-unknown-linux-gnu
@@ -148,6 +152,9 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Thu Oct 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 27.0.0-1
+- Update to v27.0.0
+
 * Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 26.0-2
 - Bump package to rebuild with stable Rust compiler
 
