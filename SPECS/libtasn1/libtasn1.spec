@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
-Version:        4.14
-Release:        2%{?dist}
+Version:        4.19.0
+Release:        1%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
@@ -55,6 +55,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Oct 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.19.0-1
+- Upgrade to 4.19.0
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.14-2
 - Added %%license line automatically
 
