@@ -4181,7 +4181,7 @@
         "other": {
           "name": "google-pasta",
           "version": "0.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/35/4a/0bd53b36ff0323d10d5f24ebd67af2de10a1117f5cf4d7add90df92756f1/google-pasta-0.2.0.tar.gz"
+          "downloadUrl": "https://github.com/google/pasta/archive/v0.2.0.tar.gz"
         }
       }
     },
