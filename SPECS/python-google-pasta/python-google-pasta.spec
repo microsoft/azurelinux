@@ -23,7 +23,7 @@ Requires:       python3-six
 Enable python source code refactoring through AST modifications.
 
 %prep
-%autosetup -n google-pasta-%{version}
+%autosetup -n pasta-%{version}
 
 %build
 %py3_build
