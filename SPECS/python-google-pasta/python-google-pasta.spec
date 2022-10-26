@@ -36,7 +36,7 @@ Enable python source code refactoring through AST modifications.
 
 %files -n python3-google-pasta
 %doc README.md
-%license LICENSE.txt
+%license LICENSE
 %{python3_sitelib}/*
 
 
