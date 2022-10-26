@@ -9,6 +9,9 @@ Group:          Development/Languages/Python
 URL:            https://github.com/google/pasta/
 Source0:        https://github.com/google/pasta/archive/v%{version}.tar.gz#/google-pasta-%{version}.tar.gz
 BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 Enable python source code refactoring through AST modifications.
@@ -32,7 +35,9 @@ Enable python source code refactoring through AST modifications.
 %py3_install
 
 %check
-%pytest
+pip3 install flake8
+flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+python setup.py test
 
 %files -n python3-google-pasta
 %doc README.md
