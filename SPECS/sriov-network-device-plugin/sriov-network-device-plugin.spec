@@ -21,14 +21,14 @@ go build -mod vendor -o ./build/sriovdp ./cmd/sriovdp/
 
 %install
 install -D -m0755 build/sriovdp %{buildroot}%{_bindir}/sriovdp
-install -D -m0755 images/entrypoint.sh %{buildroot}%{_bindir}/entrypoint.sh
+install -D -m0755 images/entrypoint.sh %{buildroot}%{_bindir}/%{name}-entrypoint.sh
 install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}/usr/share/%{name}/ddptool-1.0.1.12.tar.gz
 
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/sriovdp
-%{_bindir}/entrypoint.sh
+%{_bindir}/%{name}-entrypoint.sh
 /usr/share/%{name}/ddptool-1.0.1.12.tar.gz
 
 %changelog
