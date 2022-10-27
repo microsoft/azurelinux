@@ -19323,6 +19323,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "php-pecl-zip",
+          "version": "1.21.1",
+          "downloadUrl": "http://pecl.php.net/get/zip-1.21.1.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "physfs",
           "version": "3.0.2",
           "downloadUrl": "http://www.icculus.org/physfs/downloads/physfs-3.0.2.tar.bz2"

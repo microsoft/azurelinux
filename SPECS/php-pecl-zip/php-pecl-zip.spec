@@ -22,7 +22,7 @@ Release:      2%{?dist}
 License:      PHP
 URL:          https://pecl.php.net/package/zip
 
-Source0:      https://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+Source0:      https://pecl.php.net/get/%{pecl_name}-%{version}.tgz#/%{name}-%{version}.tgz
 
 BuildRequires: make
 BuildRequires: gcc
