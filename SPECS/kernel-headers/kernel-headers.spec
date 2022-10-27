@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.74.1
-Release:        2%{?dist}
+Version:        5.15.41.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %build
 make mrproper
+make headers_check
 
 %install
 cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
@@ -36,94 +37,6 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Mon Oct 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.74.1-2
-- Bump release to match kernel
-
-* Wed Oct 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.74.1-1
-- Upgrade to 5.15.74.1
-
-* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
-- Upgrade to 5.15.72.1
-
-* Tue Sep 27 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.70.1-1
-- Upgrade to 5.15.70.1
-
-* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.69.1-1
-- Upgrade to 5.15.69.1
-
-* Thu Sep 22 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-4
-- Bump release number to match kernel release
-
-* Tue Sep 20 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-3
-- Bump release number to match kernel release
-
-* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
-- Bump release number to match kernel release
-
-* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
-- Upgrade to 5.15.67.1
-
-* Thu Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
-- Bump release number to match kernel release
-
-* Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
-- Bump release number to match kernel release
-
-* Tue Sep 06 2022 Nikola Bojanic <t-nbojanic@microsoft.com> - 5.15.63.1-2
-- Bump release number to match kernel release
-
-* Mon Aug 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.63.1-1
-- Upgrade to 5.15.63.1
-
-* Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
-- Upgrade to 5.15.60.2 to fix arm64 builds
-
-* Tue Aug 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-3
-- Bump release number to match kernel release
-
-* Mon Aug 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-2
-- Bump release number to match kernel release
-
-* Tue Jul 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.57.1-1
-- Upgrade to 5.15.57.1
-
-* Fri Jul 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.55.1-1
-- Upgrade to 5.15.55.1
-
-* Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 5.15.48.1-6
-- Bump release number to match kernel release
-
-* Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
-- Bump release number to match kernel release
-
-* Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
-- Bump release number to match kernel release
-
-* Mon Jun 27 2022 Henry Beberman <henry.beberman@microsoft.com> - 5.15.48.1-3
-- Bump release number to match kernel release
-
-* Wed Jun 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-2
-- Bump release number to match kernel release
-
-* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
-- Update source to 5.15.48.1
-
-* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.45.1-2
-- Bump release number to match kernel release
-
-* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
-- Update source to 5.15.45.1
-- Remove make headers_check since it is a noop
-
-* Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
-- Bump release number to match kernel release
-
-* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.41.1-3
-- Bump release number to match kernel release
-
-* Thu May 26 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.41.1-2
-- Bump release number to match kernel release
-
 * Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.41.1-1
 - Update source to 5.15.41.1
 

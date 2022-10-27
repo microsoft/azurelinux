@@ -1,24 +1,13 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
-
-%ifarch x86_64
-%define arch x86_64
-%define archdir x86
-%define config_source %{SOURCE1}
-%endif
-
 %ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
-%define arch arm64
-%define archdir arm64
-%define config_source %{SOURCE2}
 %endif
-
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.74.1
-Release:        2%{?dist}
+Version:        5.15.41.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +15,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
-Source2:        config_aarch64
+Source2:        config.5.15.41.1
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 BuildRequires:  audit-devel
@@ -46,9 +35,6 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
-%ifarch x86_64
-BuildRequires:  pciutils-devel
-%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -88,14 +74,6 @@ Requires:       %{name} = %{version}-%{release}
 
 %description drivers-accessibility
 This package contains the Linux kernel accessibility support
-
-%package drivers-gpu
-Summary:        Kernel gpu modules
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-
-%description drivers-gpu
-This package contains the Linux kernel gpu support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -146,9 +124,20 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
+%build
 make mrproper
 
-cp %{config_source} .config
+%ifarch x86_64
+cp %{SOURCE1} .config
+arch="x86_64"
+archdir="x86"
+%endif
+
+%ifarch aarch64
+cp %{SOURCE2} .config
+arch="arm64"
+archdir="arm64"
+%endif
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE4} certs/mariner.pem
@@ -156,7 +145,7 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=%{arch} oldconfig
+make LC_ALL=  ARCH=${arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
@@ -173,15 +162,10 @@ if [ -s config_diff ]; then
     exit 1
 fi
 
-%build
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
-
-%ifarch x86_64
-make -C tools turbostat cpupower
-%endif
 
 #Compile bpftool
 make -C tools/bpf/bpftool
@@ -230,7 +214,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=256M
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -246,17 +230,14 @@ cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
 --add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
 EOF
 
-# Symlink /lib/modules/uname/vmlinuz to boot partition
-ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
-
 #    Cleanup dangling symlinks
 rm -rf %{buildroot}/lib/modules/%{uname_r}/source
 rm -rf %{buildroot}/lib/modules/%{uname_r}/build
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
-find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/${archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find $(find arch/${archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/${archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 %ifarch x86_64
 # CONFIG_STACK_VALIDATION=y requires objtool to build external modules
 install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
@@ -281,11 +262,6 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
-
-%ifarch x86_64
-# Install turbostat cpupower
-make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
-%endif
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
@@ -316,9 +292,6 @@ fi
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %post drivers-accessibility
-/sbin/depmod -a %{uname_r}
-
-%post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
 %post drivers-sound
@@ -355,10 +328,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/accessibility
 
-%files drivers-gpu
-%defattr(-,root,root)
-/lib/modules/%{uname_r}/kernel/drivers/gpu
-
 %files drivers-sound
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
@@ -368,17 +337,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
-%{_sbindir}/cpufreq-bench
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
-%{_lib64dir}/libcpupower.so*
-%{_sysconfdir}/cpufreq-bench.conf
-%{_includedir}/cpuidle.h
-%{_includedir}/cpufreq.h
-%{_mandir}/man1/cpupower*.gz
-%{_mandir}/man8/turbostat*.gz
-%{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
-%{_datadir}/bash-completion/completions/cpupower
 %endif
 %ifarch aarch64
 %{_libdir}/traceevent
@@ -406,96 +366,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Oct 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.74.1-2
-- Package gpu kernel modules in new package kernel-drivers-gpu
-
-* Wed Oct 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.74.1-1
-- Upgrade to 5.15.74.1
-
-* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
-- Upgrade to 5.15.72.1
-
-* Tue Sep 27 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.70.1-1
-- Upgrade to 5.15.70.1
-
-* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.69.1-1
-- Upgrade to 5.15.69.1
-
-* Thu Sep 22 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-4
-- Enable SCSI logging facility
-
-* Tue Sep 20 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-3
-- Enable 32-bit time syscall support
-
-* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
-- Enable CONFIG_NETFILTER_XT_TARGET_TRACE as a module
-
-* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
-- Upgrade to 5.15.67.1
-
-* Tue Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
-- Setting vfat module in kernel config to Y to be baked in
-
-* Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
-- Adjust crashkernel param to crash, dump memory to a file, and recover correctly
-
-* Tue Sep 06 2022 Nikola Bojanic <t-nbojanic@microsoft.com> - 5.15.63.1-2
-- Enable CRIU support: https://criu.org/Linux_kernel
-
-* Mon Aug 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.63.1-1
-- Upgrade to 5.15.63.1
-
-* Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
-- Upgrade to 5.15.60.2 to fix arm64 builds
-
-* Tue Aug 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-3
-- Turn on CONFIG_SECURITY_LANDLOCK
-
-* Mon Aug 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-2
-- Turn on CONFIG_BLK_DEV_ZONED
-
-* Tue Jul 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.57.1-1
-- Upgrade to 5.15.57.1
-
-* Fri Jul 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.55.1-1
-- Upgrade to 5.15.55.1
-
-* Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 5.15.48.1-6
-- Add turbostat and cpupower to kernel-tools
-
-* Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
-- Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
-- Add CONFIG_IKHEADERS=m to enable eBPF standard tracers.
-
-* Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
-- Remove 'quiet' from commandline to enable verbose log
-
-* Mon Jun 27 2022 Henry Beberman <henry.beberman@microsoft.com> - 5.15.48.1-3
-- Enable CONFIG_VIRTIO_FS=m and CONFIG_FUSE_DAX=y
-- Symlink /lib/modules/uname/vmlinuz to /boot/vmlinuz-uname to improve compat with scripts seeking the kernel.
-
-* Wed Jun 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-2
-- Enabling Vgem driver in config. 
-
-* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
-- Update source to 5.15.48.1
-
-* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.45.1-2
-- Moving ".config" update and check steps into the %%prep section.
-
-* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
-- Update source to 5.15.45.1
-- Address CVE-2022-32250 with a nopatch
-
-* Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
-- Compiling ptp_kvm driver as a module 
-
-* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.41.1-3
-- Enabling "LIVEPATCH" config option.
-
-* Thu May 26 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.41.1-2
-- Disable SMACK kernel configuration
-
 * Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.41.1-1
 - Update source to 5.15.41.1
 - Nopatch CVE-2020-35501, CVE-2022-28893, CVE-2022-29581
