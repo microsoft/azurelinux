@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -97,6 +97,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Thu Oct 27 2022 Aurélien Bombo <abombo@microsoft.com> - 3.6.14-8
+- Bump release to account for libtasn1 upgrade.
+
 * Fri Oct 07 2022 Bala <balakumaran.kannan@microsoft.com> - 3.6.14-7
 - Add patch to fix CVE-2021-4209
 

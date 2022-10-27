@@ -2,7 +2,7 @@
 Summary:        Library for loading and sharing PKCS#11 modules
 Name:           p11-kit
 Version:        0.23.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -134,6 +134,9 @@ fi
 %{_userunitdir}/p11-kit-server.socket
 
 %changelog
+* Thu Oct 27 2022 Aurélien Bombo <abombo@microsoft.com> - 0.23.22-2
+- Bump release to account for libtasn1 upgrade.
+
 * Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 0.23.22-1
 - Upgrade to version 0.23.22 to fix CVE-2020-29361, CVE-2020-29362, and CVE-2020-29363
 - Update source URL
