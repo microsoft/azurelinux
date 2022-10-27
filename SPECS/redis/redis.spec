@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        6.2.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         disable_active_defrag_big_keys.patch
 Patch2:         disable_defrag_test.patch
+Patch3:         CVE-2022-3647.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  systemd
@@ -84,6 +85,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Wed Oct 26 2022 Aurélien Bombo <abombo@microsoft.com> - 6.2.7-2
+- Apply patch for CVE-2022-3647.
+
 * Thu Jul 07 2022 Nick Samson <nisamson@microsoft.com> - 6.2.7-1
 - Disabled spuriously failing test (OK according to Redis developer)
 - Backport version 6.2.7 to address CVE-2022-24736
