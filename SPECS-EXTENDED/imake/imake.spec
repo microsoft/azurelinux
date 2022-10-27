@@ -1,31 +1,37 @@
+Summary:        imake source code configuration and build system
+Name:           imake
+Version:        1.0.8
+Release:        4%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: imake source code configuration and build system
-Name: imake
-Version: 1.0.8
-Release: 4%{?dist}
-License: MIT
-URL: http://www.x.org
-
-Source0: https://www.x.org/pub/individual/util/imake-1.0.8.tar.bz2
-Source1: https://www.x.org/pub/individual/util/makedepend-1.0.6.tar.bz2
-Source2: https://www.x.org/pub/individual/util/gccmakedep-1.0.3.tar.bz2
-Source3: https://www.x.org/pub/individual/util/xorg-cf-files-1.0.6.tar.bz2
-Source4: https://www.x.org/pub/individual/util/lndir-1.0.3.tar.bz2
+URL:            https://www.x.org
+Source0:        https://www.x.org/pub/individual/util/imake-1.0.8.tar.bz2
+Source1:        https://www.x.org/pub/individual/util/makedepend-1.0.6.tar.bz2
+Source2:        https://www.x.org/pub/individual/util/gccmakedep-1.0.3.tar.bz2
+Source3:        https://www.x.org/pub/individual/util/xorg-cf-files-1.0.6.tar.bz2
+Source4:        https://www.x.org/pub/individual/util/lndir-1.0.3.tar.bz2
 # this has been merged post 1.0.6
-Patch2: xorg-cf-files-1.0.2-redhat.patch
-Patch11: imake-1.0.2-abort.patch
-
-BuildRequires: pkgconfig
-BuildRequires: xorg-x11-util-macros
-BuildRequires: xorg-x11-proto-devel
-BuildRequires: gcc
-BuildRequires: gcc-c++
+Patch2:         xorg-cf-files-1.0.2-redhat.patch
+Patch11:        imake-1.0.2-abort.patch
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  pkgconfig
+BuildRequires:  xorg-x11-proto-devel
+BuildRequires:  xorg-x11-util-macros
 # imake is not functional without cc
-Requires:      gcc
-
-Provides: ccmakedep cleanlinks gccmakedep lndir makedepend makeg
-Provides: mergelib mkdirhier mkhtmlindex revpath xmkmf
+Requires:       gcc
+Provides:       ccmakedep
+Provides:       cleanlinks
+Provides:       gccmakedep
+Provides:       lndir
+Provides:       makedepend
+Provides:       makeg
+Provides:       mergelib
+Provides:       mkdirhier
+Provides:       mkhtmlindex
+Provides:       revpath
+Provides:       xmkmf
 
 %description
 Imake is a deprecated source code configuration and build system which
@@ -38,7 +44,7 @@ migrate software to the GNU autotools system.
 
 %prep
 %setup -q -c %{name}-%{version} -a1 -a2 -a3 -a4
-%patch2 -p0 -b .redhat
+%patch2  -b .redhat
 
 # imake patches
 pushd %{name}-%{version}
@@ -68,7 +74,7 @@ popd
 {
    for pkg in imake makedepend gccmakedep lndir xorg-cf-files ; do
       pushd $pkg-*
-      make install DESTDIR=$RPM_BUILD_ROOT
+      make install DESTDIR=%{buildroot}
       popd
    done
 }
