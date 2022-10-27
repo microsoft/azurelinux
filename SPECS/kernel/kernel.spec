@@ -89,6 +89,14 @@ Requires:       %{name} = %{version}-%{release}
 %description drivers-accessibility
 This package contains the Linux kernel accessibility support
 
+%package drivers-gpu
+Summary:        Kernel gpu modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-gpu
+This package contains the Linux kernel gpu support
+
 %package drivers-sound
 Summary:        Kernel Sound modules
 Group:          System Environment/Kernel
@@ -308,6 +316,9 @@ fi
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %post drivers-accessibility
+/sbin/depmod -a %{uname_r}
+
+%post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
 %post drivers-sound
