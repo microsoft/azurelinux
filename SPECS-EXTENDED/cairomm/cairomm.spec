@@ -1,30 +1,27 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%global apiver 1.0
-
-%global cairo_version 1.10.0
-%global libsigc_version 2.5.1
-
 Summary:        C++ API for the cairo graphics library
 Name:           cairomm
 Version:        1.12.0
 Release:        15%{?dist}
-URL:            http://www.cairographics.org
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.cairographics.org
 Source:         http://www.cairographics.org/releases/%{name}-%{version}.tar.gz
-BuildRequires:  gcc-c++
+%global apiver 1.0
+%global cairo_version 1.10.0
+%global libsigc_version 2.5.1
 BuildRequires:  cairo-devel >= %{cairo_version}
+BuildRequires:  gcc-c++
 BuildRequires:  libsigc++20-devel >= %{libsigc_version}
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(Getopt::Long)
 BuildRequires:  pkgconfig
-
+BuildRequires:  perl(Getopt::Long)
 Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       libsigc++20%{?_isa} >= %{libsigc_version}
 
 %description
 Cairomm is the C++ API for the cairo graphics library. It offers all the power
-of cairo with an interface familiar to C++ developers, including use of the 
+of cairo with an interface familiar to C++ developers, including use of the
 Standard Template Library where it makes sense.
 
 %package        devel
@@ -33,7 +30,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 Cairomm is the C++ API for the cairo graphics library. It offers all the power
-of cairo with an interface familiar to C++ developers, including use of the 
+of cairo with an interface familiar to C++ developers, including use of the
 Standard Template Library where it makes sense.
 
 This package contains the libraries and header files needed for
@@ -41,9 +38,9 @@ developing %{name} applications.
 
 %package        doc
 Summary:        Developer's documentation for the cairomm library
-BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
 Requires:       libsigc++20-doc
+BuildArch:      noarch
 
 %description      doc
 This package contains developer's documentation for the cairomm
@@ -53,10 +50,10 @@ The documentation can be viewed either through the devhelp
 documentation browser or through a web browser.
 
 If using a web browser the documentation is installed in the gtk-doc
-hierarchy and can be found at /usr/share/doc/cairomm-1.0
+hierarchy and can be found at %{_docdir}/cairomm-1.0
 
 %prep
-%setup -q 
+%setup -q
 
 %build
 %configure --disable-static
@@ -64,7 +61,7 @@ make %{?_smp_mflags}
 
 %install
 %make_install
-find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
@@ -81,7 +78,7 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %{_libdir}/%{name}-%{apiver}
 
 %files doc
-%doc %{_datadir}/doc/%{name}-%{apiver}/
+%doc %{_docdir}/%{name}-%{apiver}/
 %doc %{_datadir}/devhelp/
 
 %changelog
@@ -292,4 +289,3 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 
 * Fri Jan 27 2006 Rick L Vinyard Jr <rvinyard@cs.nmsu.edu> - 0.4.0-1
 - Initial creation from papyrus.spec.in
-
