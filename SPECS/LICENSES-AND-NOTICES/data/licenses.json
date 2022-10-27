@@ -2060,6 +2060,7 @@
                 "python-cachetools",
                 "python-cherrypy",
                 "python-execnet",
+                "python-libclang",
                 "python-logutils",
                 "python-nocasedict",
                 "python-pecan",
