@@ -33,7 +33,7 @@ This library makes it easier to install clang's python bindings.
 %py3_install
 
 %files -n python3-%{pypi_name}
-%license LICENSE
+%license LICENSE.TXT
 %{python3_sitelib}/*
 
 %changelog
