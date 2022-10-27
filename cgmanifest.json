@@ -7401,8 +7401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.34.1.tar.gz"
+          "version": "5.15.72.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.72.mshv2.tar.gz"
         }
       }
     },
