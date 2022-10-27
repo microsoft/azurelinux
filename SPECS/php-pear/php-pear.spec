@@ -14,7 +14,7 @@
 Summary:        PHP Extension and Application Repository framework
 Name:           php-pear
 Version:        1.10.13
-Release:        3%{?dist}
+Release:        4%{?dist}
 # PEAR, PEAR_Manpages, Archive_Tar, XML_Util, Console_Getopt are BSD
 # Structures_Graph is LGPLv3+
 License:        BSD AND LGPLv3+
@@ -266,6 +266,9 @@ fi
 %{_mandir}/man5/pear.conf.5*
 
 %changelog
+* Thu Oct 27 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.10.13-4
+- Moved from extended to core
+
 * Tue Feb 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.13-3
 - Removed dependency on "php-fedora-autoloader".
 - Updated URLs to HTTPS.
