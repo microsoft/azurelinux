@@ -1,0 +1,65 @@
+From 653498214d5bad6a2baa1f276d6e346ad697f53b Mon Sep 17 00:00:00 2001
+From: Muminul Islam <muislam@microsoft.com>
+Date: Mon, 24 Oct 2022 16:58:44 -0700
+Subject: [PATCH] mshv: Don't use same function signature as KVM
+
+Function xfer_to_guest_mode_handle_work renamed to
+mshv_xfer_to_guest_mode_handle_work. Otherwise
+it causes `multiple definition of __crc_xfer_to_guest_mode_handle_work`
+error.
+
+Signed-off-by: Muminul Islam <muislam@microsoft.com>
+---
+ drivers/hv/mshv.h          | 2 +-
+ drivers/hv/mshv_main.c     | 2 +-
+ drivers/hv/xfer_to_guest.c | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/hv/mshv.h b/drivers/hv/mshv.h
+index ad3400509003..d8c48379d818 100644
+--- a/drivers/hv/mshv.h
++++ b/drivers/hv/mshv.h
+@@ -37,7 +37,7 @@
+ 		/ sizeof(union hv_gpa_page_access_state))
+ extern struct mshv mshv;
+ 
+-int xfer_to_guest_mode_handle_work(unsigned long ti_work);
++int mshv_xfer_to_guest_mode_handle_work(unsigned long ti_work);
+ 
+ void mshv_isr(void);
+ int mshv_synic_init(unsigned int cpu);
+diff --git a/drivers/hv/mshv_main.c b/drivers/hv/mshv_main.c
+index c9e61935958b..87cb44a5145c 100644
+--- a/drivers/hv/mshv_main.c
++++ b/drivers/hv/mshv_main.c
+@@ -345,7 +345,7 @@ mshv_run_vp_with_root_scheduler(struct mshv_vp *vp, void __user *ret_message)
+ 				local_irq_restore(irq_flags);
+ 				preempt_enable();
+ 
+-				ret = xfer_to_guest_mode_handle_work(ti_work);
++				ret = mshv_xfer_to_guest_mode_handle_work(ti_work);
+ 
+ 				preempt_disable();
+ 
+diff --git a/drivers/hv/xfer_to_guest.c b/drivers/hv/xfer_to_guest.c
+index 19d4a16264c2..20c5261ce21b 100644
+--- a/drivers/hv/xfer_to_guest.c
++++ b/drivers/hv/xfer_to_guest.c
+@@ -11,7 +11,7 @@
+ #include <linux/tracehook.h>
+ 
+ /* Invoke with preemption and interrupt enabled */
+-int xfer_to_guest_mode_handle_work(unsigned long ti_work)
++int mshv_xfer_to_guest_mode_handle_work(unsigned long ti_work)
+ {
+ 	if (ti_work & _TIF_NOTIFY_SIGNAL)
+ 		tracehook_notify_signal();
+@@ -27,4 +27,4 @@ int xfer_to_guest_mode_handle_work(unsigned long ti_work)
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(xfer_to_guest_mode_handle_work);
++EXPORT_SYMBOL_GPL(mshv_xfer_to_guest_mode_handle_work);
+-- 
+2.25.1
+

@@ -1567,8 +1567,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "26.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v26.0.tar.gz"
+          "version": "27.0.60",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/tarball/099cdd2"
         }
       }
     },
