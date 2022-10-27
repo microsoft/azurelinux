@@ -1256,6 +1256,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cairomm",
+          "version": "1.12.0",
+          "downloadUrl": "http://www.cairographics.org/releases/cairomm-1.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cal10n",
           "version": "0.7.7",
           "downloadUrl": "http://cal10n.qos.ch/dist/cal10n-0.7.7.tar.gz"
