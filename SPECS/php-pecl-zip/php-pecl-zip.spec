@@ -7,41 +7,37 @@
 # Please, preserve the changelog entries
 #
 
-# we don't want -z defs linker flag
-%undefine _strict_symbol_defs_build
-
 %global pecl_name zip
 %global with_zts  0%{?__ztsphp:1}
 %global ini_name  40-%{pecl_name}.ini
-
-Summary:      A ZIP archive management extension
-Summary(fr):  Une extension de gestion des ZIP
-Name:         php-pecl-zip
-Version:      1.21.1
-Release:      3%{?dist}
-License:      PHP
-URL:          https://pecl.php.net/package/zip
-
-Source0:      https://pecl.php.net/get/%{pecl_name}-%{version}.tgz#/%{name}-%{version}.tgz
-
-BuildRequires: make
-BuildRequires: gcc
-BuildRequires: php-devel
-BuildRequires: pkgconfig(libzip) >= 1.0.0
-BuildRequires: zlib-devel
-BuildRequires: php-pear
-
-Requires:     php(zend-abi) = 20210902-%{__isa_bits}
-Requires:     php(api) = 20210902-%{__isa_bits}
+Summary:        A ZIP archive management extension
+Summary(fr):    Une extension de gestion des ZIP
+Name:           php-pecl-zip
+Version:        1.21.1
+Release:        3%{?dist}
+License:        PHP
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://pecl.php.net/package/zip
+Source0:        https://pecl.php.net/get/%{pecl_name}-%{version}.tgz#/%{name}-%{version}.tgz
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  php-devel
+BuildRequires:  php-pear
+BuildRequires:  pkg-config
+BuildRequires:  zlib-devel
+BuildRequires:  pkgconfig(libzip) >= 1.0.0
+Requires:       php(api) = 20210902-%{__isa_bits}
+Requires:       php(zend-abi) = 20210902-%{__isa_bits}
 # Supposed to use these macros from SPECS/php/macros.php
 #Requires:     php(zend-abi) = %{php_zend_api}
 #Requires:     php(api) = %{php_core_api}
-
-Provides:     php-pecl(%{pecl_name}) = %{version}
-Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}
-Provides:     php-%{pecl_name} = %{version}-%{release}
-Provides:     php-%{pecl_name}%{?_isa} = %{version}-%{release}
-
+Provides:       php-pecl(%{pecl_name}) = %{version}
+Provides:       php-pecl(%{pecl_name})%{?_isa} = %{version}
+Provides:       php-%{pecl_name} = %{version}-%{release}
+Provides:       php-%{pecl_name}%{?_isa} = %{version}-%{release}
+# we don't want -z defs linker flag
+%undefine _strict_symbol_defs_build
 
 %description
 Zip is an extension to create and read zip files.
@@ -49,9 +45,8 @@ Zip is an extension to create and read zip files.
 %description -l fr
 Zip est une extension pour crÃ©er et lire les archives au format ZIP.
 
-
-%prep 
-%setup -c -q
+%prep
+%setup -q -c
 mv %{pecl_name}-%{version} NTS
 
 # Don't install/register tests
@@ -160,9 +155,8 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 %{php_ztsextdir}/%{pecl_name}.so
 %endif
 
-
 %changelog
-* Fri Oct 28 2022 Osama Esmail <osamaesmail@microsoft.com> 1.21.1-3
+* Fri Oct 28 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.21.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
 - Replaced %{php_core_api} and %{php_zend_api} with hardcoded values
