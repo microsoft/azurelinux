@@ -31,8 +31,10 @@ BuildRequires: pkgconfig(libzip) >= 1.0.0
 BuildRequires: zlib-devel
 BuildRequires: php-pear
 
-Requires:     php(zend-abi) = %{php_zend_api}
-Requires:     php(api) = %{php_core_api}
+Requires:     php(zend-abi) = 20210902-%{__isa_bits}
+Requires:     php(api) = 20210902-%{__isa_bits}
+#Requires:     php(zend-abi) = %{php_zend_api}
+#Requires:     php(api) = %{php_core_api}
 
 Provides:     php-pecl(%{pecl_name}) = %{version}
 Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}
