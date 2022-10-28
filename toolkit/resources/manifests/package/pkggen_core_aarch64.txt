@@ -160,7 +160,7 @@ gpgme-1.13.1-6.cm1.aarch64.rpm
 mariner-repos-1.0-15.cm1.noarch.rpm
 mariner-repos-preview-1.0-15.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.aarch64.rpm
-libtasn1-4.19.0-1.cm1.aarch64.rpm
+libtasn1-4.14-2.cm1.aarch64.rpm
 p11-kit-0.23.22-1.cm1.aarch64.rpm
 p11-kit-trust-0.23.22-1.cm1.aarch64.rpm
 ca-certificates-shared-20200720-27.cm1.noarch.rpm

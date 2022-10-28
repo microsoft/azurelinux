@@ -3486,8 +3486,8 @@
         "type": "other",
         "other": {
           "name": "libtasn1",
-          "version": "4.19.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz"
+          "version": "4.14",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.14.tar.gz"
         }
       }
     },
