@@ -4579,6 +4579,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hdf5",
+          "version": "1.12.1",
+          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hdparm",
           "version": "9.63",
           "downloadUrl": "http://downloads.sourceforge.net/hdparm/hdparm-9.63.tar.gz"
