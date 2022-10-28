@@ -19325,7 +19325,7 @@
         "other": {
           "name": "php-pecl-zip",
           "version": "1.21.1",
-          "downloadUrl": "http://pecl.php.net/get/zip-1.21.1.tgz"
+          "downloadUrl": "https://pecl.php.net/get/zip-1.21.1.tgz"
         }
       }
     },
