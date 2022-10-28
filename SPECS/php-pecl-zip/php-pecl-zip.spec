@@ -163,7 +163,7 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 
 %changelog
 * Fri Oct 28 2022 Osama Esmail <osamaesmail@microsoft.com> 1.21.1-3
-- Initial CBL-Mariner import from Fedora 36 (License: MIT).
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
 - Replaced %{php_core_api} and %{php_zend_api} with hardcoded values
 
