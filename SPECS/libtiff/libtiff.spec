@@ -69,7 +69,7 @@ make %{?_smp_mflags} -k check
 
 %changelog
 * Fri Oct 28 2022 Aurélien Bombo <abombo@microsoft.com> - 4.4.0-5
-- Patch CVE-2022-3597, CVE-2022-3598, CVE-2022-3599, CVE-2022-3626, CVE-2022-3627
+- Patch CVE-2022-3597
 
 * Mon Oct 24 2022 Sean Dougherty <sdougherty@microsoft.com> - 4.4.0-4
 - Patch CVE-2022-3570
