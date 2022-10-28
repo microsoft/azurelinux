@@ -8,17 +8,15 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-# CVE-2020-35522 also covers 35521.
-Patch0:         CVE-2020-35521.nopatch
 # Also fixes CVE-2022-2057 and CVE-2022-2058.
-Patch1:         CVE-2022-2056.patch
-Patch2:         CVE-2022-2953.patch
-Patch3:         CVE-2022-3570.patch
-Patch4:         CVE-2022-3597.patch
-Patch5:         CVE-2022-3598.patch
-Patch6:         CVE-2022-3599.patch
+Patch0:         CVE-2022-2056.patch
+Patch1:         CVE-2022-2953.patch
+Patch2:         CVE-2022-3570.patch
+Patch3:         CVE-2022-3597.patch
+Patch4:         CVE-2022-3598.patch
+Patch5:         CVE-2022-3599.patch
 # Also fixes CVE-2022-3627.
-Patch7:         CVE-2022-3626.patch
+Patch6:         CVE-2022-3626.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
