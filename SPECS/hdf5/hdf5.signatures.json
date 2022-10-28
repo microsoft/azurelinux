@@ -1,6 +1,6 @@
 {
     "Signatures": {
-     "hdf5-1.12.1.tar.gz": "aaf9f532b3eda83d3d3adc9f8b40a9b763152218fa45349c3bc77502ca1f8f1c",
+     "hdf5-1.12.1.tar.bz2": "aaf9f532b3eda83d3d3adc9f8b40a9b763152218fa45349c3bc77502ca1f8f1c",
      "hdf5-build.patch":"cdb905999cc59e81b4444f81ccb29a79774b73c6adbcd6bf72a45c1c81211f82",
      "hdf5-gfortran2.patch":"ca4f839d6383b746c886b81ee59afd8e355463b4c82e0bcf22836d5c66103e83",
      "hdf5-wrappers.patch":"86d811ec324edda0e1c194e051186f73e979ac6b41ff1354727e302a95582510",
