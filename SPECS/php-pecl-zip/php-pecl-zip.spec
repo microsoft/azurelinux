@@ -18,7 +18,7 @@ Summary:      A ZIP archive management extension
 Summary(fr):  Une extension de gestion des ZIP
 Name:         php-pecl-zip
 Version:      1.21.1
-Release:      2%{?dist}
+Release:      3%{?dist}
 License:      PHP
 URL:          https://pecl.php.net/package/zip
 
@@ -33,6 +33,7 @@ BuildRequires: php-pear
 
 Requires:     php(zend-abi) = 20210902-%{__isa_bits}
 Requires:     php(api) = 20210902-%{__isa_bits}
+# Supposed to use these macros from SPECS/php/macros.php
 #Requires:     php(zend-abi) = %{php_zend_api}
 #Requires:     php(api) = %{php_core_api}
 
@@ -161,6 +162,10 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 
 
 %changelog
+* Fri Oct 28 2022 Osama Esmail <osamaesmail@microsoft.com> 1.21.1-3
+- Initial CBL-Mariner import from Fedora 36
+- Replaced %{php_core_api} and %{php_zend_api} with hardcoded values
+
 * Wed Oct 05 2022 Remi Collet <remi@remirepo.net> - 1.21.1-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php82
 
