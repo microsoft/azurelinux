@@ -24,7 +24,7 @@ The package contains libraries and header files for
 developing applications that use libtasn1.
 
 %prep
-%autosetup -q
+%autosetup -p1
 
 %build
 ./configure \
