@@ -13,10 +13,6 @@ Patch0:         CVE-2022-2056.patch
 Patch1:         CVE-2022-2953.patch
 Patch2:         CVE-2022-3570.patch
 Patch3:         CVE-2022-3597.patch
-# Patch4:         CVE-2022-3598.patch
-# Patch5:         CVE-2022-3599.patch
-# # Also fixes CVE-2022-3627.
-# Patch6:         CVE-2022-3626.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
