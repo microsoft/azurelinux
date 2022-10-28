@@ -112,7 +112,7 @@ exit 0
 %changelog
 * Thu Oct 27 2022 Aurélien Bombo <abombo@microsoft.com> - 1.22.1-1
 - Upgrade to 1.22.1 to fix CVE-2022-41741 and CVE-2022-41742.
-- Backport upstream patch for CVE-2022-3638.
+- Add nopatch for CVE-2022-3638.
 
 * Mon Apr 18 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.20.1-3
 - Backport upstream patch for CVE-2021-3618
