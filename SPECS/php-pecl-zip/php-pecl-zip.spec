@@ -27,11 +27,15 @@ BuildRequires:  php-pear
 BuildRequires:  pkg-config
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(libzip) >= 1.0.0
-Requires:       php(api) = 20210902-%{__isa_bits}
-Requires:       php(zend-abi) = 20210902-%{__isa_bits}
-# Supposed to use these macros from SPECS/php/macros.php
+
+# The 'php_*_api' macros are dynamically generated during php.spec build time,
+# so these macros don't work with the way Mariner uses macros during spec parsing.
+# Once that issue is resolved, we should bring back the original values.
 #Requires:     php(zend-abi) = %{php_zend_api}
 #Requires:     php(api) = %{php_core_api}
+Requires:       php(api) = 20210902-%{__isa_bits}
+Requires:       php(zend-abi) = 20210902-%{__isa_bits}
+
 Provides:       php-pecl(%{pecl_name}) = %{version}
 Provides:       php-pecl(%{pecl_name})%{?_isa} = %{version}
 Provides:       php-%{pecl_name} = %{version}-%{release}
