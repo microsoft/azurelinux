@@ -14,8 +14,7 @@ Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
 Patch0:         CVE-2009-4487.nopatch
-Patch1:         CVE-2021-3618.patch
-Patch2:         CVE-2022-3638.patch
+Patch1:         CVE-2022-3638.patch
 
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
