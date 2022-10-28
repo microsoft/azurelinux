@@ -80,10 +80,10 @@ elfutils-libelf-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-devel-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-devel-static-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-lang-0.176-4.cm1.aarch64.rpm
-expat-2.4.9-1.cm1.aarch64.rpm
-expat-debuginfo-2.4.9-1.cm1.aarch64.rpm
-expat-devel-2.4.9-1.cm1.aarch64.rpm
-expat-libs-2.4.9-1.cm1.aarch64.rpm
+expat-2.5.0-1.cm1.aarch64.rpm
+expat-debuginfo-2.5.0-1.cm1.aarch64.rpm
+expat-devel-2.5.0-1.cm1.aarch64.rpm
+expat-libs-2.5.0-1.cm1.aarch64.rpm
 file-5.38-1.cm1.aarch64.rpm
 file-debuginfo-5.38-1.cm1.aarch64.rpm
 file-devel-5.38-1.cm1.aarch64.rpm
@@ -152,7 +152,7 @@ json-c-debuginfo-0.14-3.cm1.aarch64.rpm
 json-c-devel-0.14-3.cm1.aarch64.rpm
 kbd-2.0.4-7.cm1.aarch64.rpm
 kbd-debuginfo-2.0.4-7.cm1.aarch64.rpm
-kernel-headers-5.10.145.1-1.cm1.noarch.rpm
+kernel-headers-5.10.149.1-1.cm1.noarch.rpm
 kmod-25-4.cm1.aarch64.rpm
 kmod-debuginfo-25-4.cm1.aarch64.rpm
 kmod-devel-25-4.cm1.aarch64.rpm
@@ -229,9 +229,9 @@ libssh2-debuginfo-1.9.0-1.cm1.aarch64.rpm
 libssh2-devel-1.9.0-1.cm1.aarch64.rpm
 libstdc++-9.1.0-7.cm1.aarch64.rpm
 libstdc++-devel-9.1.0-7.cm1.aarch64.rpm
-libtasn1-4.14-2.cm1.aarch64.rpm
-libtasn1-debuginfo-4.14-2.cm1.aarch64.rpm
-libtasn1-devel-4.14-2.cm1.aarch64.rpm
+libtasn1-4.14-3.cm1.aarch64.rpm
+libtasn1-debuginfo-4.14-3.cm1.aarch64.rpm
+libtasn1-devel-4.14-3.cm1.aarch64.rpm
 libtirpc-1.1.4-5.cm1.aarch64.rpm
 libtirpc-debuginfo-1.1.4-5.cm1.aarch64.rpm
 libtirpc-devel-1.1.4-5.cm1.aarch64.rpm
@@ -259,7 +259,7 @@ m4-debuginfo-1.4.18-4.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
 make-debuginfo-4.2.1-5.cm1.aarch64.rpm
 mariner-check-macros-1.0-8.cm1.noarch.rpm
-mariner-release-1.0-47.cm1.noarch.rpm
+mariner-release-1.0-48.cm1.noarch.rpm
 mariner-repos-1.0-15.cm1.noarch.rpm
 mariner-repos-extras-1.0-15.cm1.noarch.rpm
 mariner-repos-extras-preview-1.0-15.cm1.noarch.rpm

@@ -1436,8 +1436,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.9",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_9/expat-2.4.9.tar.bz2"
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.bz2"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.145.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
+          "version": "5.10.149.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.145.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
+          "version": "5.10.149.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.145.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
+          "version": "5.10.149.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.145.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.145.1.tar.gz"
+          "version": "5.10.149.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
         }
       }
     },
@@ -4536,8 +4536,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.20.1",
-          "downloadUrl": "https://nginx.org/download/nginx-1.20.1.tar.gz"
+          "version": "1.22.1",
+          "downloadUrl": "https://nginx.org/download/nginx-1.22.1.tar.gz"
         }
       }
     },
@@ -4976,8 +4976,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.8p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz"
+          "version": "8.9p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.9p1.tar.gz"
         }
       }
     },
@@ -8476,8 +8476,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022d",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022d.tar.gz"
+          "version": "2022e",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022e.tar.gz"
         }
       }
     },

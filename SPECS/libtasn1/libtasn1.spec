@@ -1,10 +1,11 @@
 Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-46848.patch
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,10 +56,13 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Thu Oct 27 2022 Aurélien Bombo <abombo@microsoft.com> - 4.14-3
+- Backport upstream patch for CVE-2021-46848.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.14-2
 - Added %%license line automatically
 
-*   Wed Apr 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.14-1
+* Wed Apr 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.14-1
 -   Upgrade to version 4.14.
 -   Fixed CVE-2018-1000654.
 -   Remove sha1 macro.

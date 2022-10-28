@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        44%{?dist}
+Release:        45%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -88,6 +88,8 @@ Patch1009:      CVE-2022-35414.patch
 # Version (v4.2.0) does not ship tools component code.
 # CVE and provided patch not applicable hence adding nopatch.
 Patch1010:      CVE-2022-0358.nopatch
+# CVE and provided patch not applicable to v4.2.0 hence adding nopatch.
+Patch1011:      CVE-2022-26354.nopatch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
@@ -214,6 +216,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Tue Oct 18 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-45
+- Nopatch CVE-2022-26354.
+
 * Thu Sep 29 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.2.0-44
 - Disable tulip device emulation from QEMU to address CVE-2022-2962
 - Nopatch CVE-2022-2962

@@ -1,5 +1,5 @@
 filesystem-1.1-7.cm1.aarch64.rpm
-kernel-headers-5.10.145.1-1.cm1.noarch.rpm
+kernel-headers-5.10.149.1-1.cm1.noarch.rpm
 glibc-2.28-24.cm1.aarch64.rpm
 glibc-devel-2.28-24.cm1.aarch64.rpm
 glibc-i18n-2.28-24.cm1.aarch64.rpm
@@ -58,7 +58,7 @@ findutils-lang-4.6.0-8.cm1.aarch64.rpm
 gettext-0.19.8.1-5.cm1.aarch64.rpm
 gzip-1.12-1.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
-mariner-release-1.0-47.cm1.noarch.rpm
+mariner-release-1.0-48.cm1.noarch.rpm
 patch-2.7.6-7.cm1.aarch64.rpm
 util-linux-2.32.1-7.cm1.aarch64.rpm
 util-linux-devel-2.32.1-7.cm1.aarch64.rpm
@@ -93,9 +93,9 @@ elfutils-libelf-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-devel-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-devel-static-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-lang-0.176-4.cm1.aarch64.rpm
-expat-2.4.9-1.cm1.aarch64.rpm
-expat-devel-2.4.9-1.cm1.aarch64.rpm
-expat-libs-2.4.9-1.cm1.aarch64.rpm
+expat-2.5.0-1.cm1.aarch64.rpm
+expat-devel-2.5.0-1.cm1.aarch64.rpm
+expat-libs-2.5.0-1.cm1.aarch64.rpm
 libpipeline-1.5.0-4.cm1.aarch64.rpm
 libpipeline-devel-1.5.0-4.cm1.aarch64.rpm
 gdbm-1.18-3.cm1.aarch64.rpm
@@ -160,7 +160,7 @@ gpgme-1.13.1-6.cm1.aarch64.rpm
 mariner-repos-1.0-15.cm1.noarch.rpm
 mariner-repos-preview-1.0-15.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.aarch64.rpm
-libtasn1-4.14-2.cm1.aarch64.rpm
+libtasn1-4.14-3.cm1.aarch64.rpm
 p11-kit-0.23.22-1.cm1.aarch64.rpm
 p11-kit-trust-0.23.22-1.cm1.aarch64.rpm
 ca-certificates-shared-20200720-27.cm1.noarch.rpm
