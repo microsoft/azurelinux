@@ -5,7 +5,7 @@ Release:        3%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-46848.nopatch
+Patch0:         CVE-2021-46848.patch
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
