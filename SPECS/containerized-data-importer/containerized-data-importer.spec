@@ -32,7 +32,22 @@ BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 ExclusiveArch:  x86_64 aarch64
-Requires:       nbdkit-devel
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       librsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 Provides:       cdi = %{version}-%{release}
 
 %description
@@ -126,12 +141,17 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-uploadproxy \
 	cmd/cdi-uploadserver \
 	cmd/cdi-operator \
+	tools/csv-generator \
+	tools/cdi-containerimage-server \
+	tools/cdi-image-size-detection \
+	tools/cdi-source-update-poller \
 	%{nil}
 
 ./hack/build/build-manifests.sh
 
 %install
 mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_bindir}/tools
 
 install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/virt-cdi-apiserver
 
@@ -141,8 +161,12 @@ install -p -m 0755 _out/cmd/cdi-cloner/cdi-cloner %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/virt-cdi-controller
 
 install -p -m 0755 _out/cmd/cdi-importer/cdi-importer %{buildroot}%{_bindir}/virt-cdi-importer
+install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/tools/cdi-containerimage-server
+install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/tools/cdi-image-size-detection
+install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/tools/cdi-source-update-poller
 
 install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/virt-cdi-operator
+install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}/tools/csv-generator
 
 install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/virt-cdi-uploadproxy
 
@@ -173,11 +197,15 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-importer
+%{_bindir}/tools/cdi-containerimage-server
+%{_bindir}/tools/cdi-image-size-detection
+%{_bindir}/tools/cdi-source-update-poller
 
 %files operator
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-operator
+%{_bindir}/tools/csv-generator
 
 %files uploadproxy
 %license LICENSE
@@ -199,6 +227,12 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 
 %changelog
+* Mon Nov 14 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-5
+- Include binaries from tools for cdi-importer and cdi-operator containers
+- For cdi-importer, the binaries are cdi-containerimage-server, cdi-image-size-detection and
+  cdi-source-update-poller.
+- For cdi-operator, the csv-generator has been included
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.51.0-4
 - Bump release to rebuild with go 1.18.8
 
