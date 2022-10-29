@@ -201,7 +201,7 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot/dtb/fsl-imx8mq-evk.dtb
+install -D -m 640 arch/arm64/boot/dts/amd/amd-overdrive.dtb %{buildroot}/boot/dtb/amd-overdrive.dtb
 %endif
 
 # Restrict the permission on System.map-X file
@@ -358,7 +358,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %ifarch aarch64
 %files dtb
-/boot/dtb/fsl-imx8mq-evk.dtb
+/boot/dtb/amd-overdrive.dtb
 %endif
 
 %files -n bpftool
