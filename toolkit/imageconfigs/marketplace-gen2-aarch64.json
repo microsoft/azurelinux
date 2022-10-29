@@ -70,7 +70,7 @@
                 "default": "kernel"
             },
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=ttyS0"
+                "ExtraCommandLine": "console=ttyS0 apparmor=0"
             },
             "Hostname": "cbl-mariner"
         }
