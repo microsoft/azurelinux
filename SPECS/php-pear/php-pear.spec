@@ -1,3 +1,6 @@
+
+%bcond_with missing_dependencies
+
 %global peardir %{_datadir}/pear
 %global metadir %{_localstatedir}/lib/pear
 %global getoptver 1.4.3
@@ -32,12 +35,23 @@ Source22:       https://pear.php.net/get/Console_Getopt-%{getoptver}.tgz
 Source23:       https://pear.php.net/get/Structures_Graph-%{structver}.tgz
 Source24:       https://pear.php.net/get/XML_Util-%{xmlutil}.tgz
 Source25:       https://pear.php.net/get/PEAR_Manpages-%{manpages}.tgz
+
+BuildArch:      noarch
+
 BuildRequires:  %{_bindir}/gpg
 BuildRequires:  php(language) > 5.4
 BuildRequires:  php-cli
 # For pecl_xmldir macro
 BuildRequires:  php-devel
 BuildRequires:  php-xml
+
+%if %{with_check}
+%if %{missing_dependencies}
+# Dependency will be added and tests fixed in a separate PR.
+BuildRequires:  %{_bindir}/phpunit
+%endif
+%endif
+
 # Structures_Graph: none
 # XML_Util: pcre
 # optional: overload and xdebug
@@ -71,10 +85,6 @@ Provides:       php-composer(pear/archive_tar) = %{arctarver}
 Provides:       php-composer(pear/pear-core-minimal) = %{version}
 Provides:       php-composer(pear/structures_graph) = %{structver}
 Provides:       php-composer(pear/xml_util) = %{xmlutil}
-BuildArch:      noarch
-%if %{with_check}
-BuildRequires:  %{_bindir}/phpunit
-%endif
 
 %description
 PEAR is a framework and distribution system for reusable PHP
