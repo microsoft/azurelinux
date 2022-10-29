@@ -229,9 +229,9 @@ libssh2-debuginfo-1.9.0-1.cm1.x86_64.rpm
 libssh2-devel-1.9.0-1.cm1.x86_64.rpm
 libstdc++-9.1.0-7.cm1.x86_64.rpm
 libstdc++-devel-9.1.0-7.cm1.x86_64.rpm
-libtasn1-4.14-3.cm1.x86_64.rpm
-libtasn1-debuginfo-4.14-3.cm1.x86_64.rpm
-libtasn1-devel-4.14-3.cm1.x86_64.rpm
+libtasn1-4.14-4.cm1.x86_64.rpm
+libtasn1-debuginfo-4.14-4.cm1.x86_64.rpm
+libtasn1-devel-4.14-4.cm1.x86_64.rpm
 libtirpc-1.1.4-5.cm1.x86_64.rpm
 libtirpc-debuginfo-1.1.4-5.cm1.x86_64.rpm
 libtirpc-devel-1.1.4-5.cm1.x86_64.rpm

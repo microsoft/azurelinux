@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
@@ -24,7 +24,7 @@ The package contains libraries and header files for
 developing applications that use libtasn1.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -56,6 +56,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 28 2022 Aurélien Bombo <abombo@microsoft.com> - 4.14-4
+- Fix spec to properly apply patches.
+
 * Thu Oct 27 2022 Aurélien Bombo <abombo@microsoft.com> - 4.14-3
 - Backport upstream patch for CVE-2021-46848.
 
