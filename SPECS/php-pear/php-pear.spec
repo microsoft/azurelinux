@@ -46,7 +46,7 @@ BuildRequires:  php-devel
 BuildRequires:  php-xml
 
 %if %{with_check}
-%if %{missing_dependencies}
+%if 0%{with missing_dependencies}
 # Dependency will be added and tests fixed in a separate PR.
 BuildRequires:  %{_bindir}/phpunit
 %endif
