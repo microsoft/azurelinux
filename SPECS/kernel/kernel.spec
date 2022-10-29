@@ -159,7 +159,7 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
+    #exit 1
 fi
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
