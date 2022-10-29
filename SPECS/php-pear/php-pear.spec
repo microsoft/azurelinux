@@ -11,7 +11,9 @@
 %global xmlutil   1.4.5
 %global manpages  1.10.0
 %global macrosdir %{_rpmconfigdir}/macros.d
+
 %{!?pecl_xmldir: %global pecl_xmldir %{_sharedstatedir}/php/peclxml}
+
 Summary:        PHP Extension and Application Repository framework
 Name:           php-pear
 Version:        1.10.13
@@ -74,12 +76,14 @@ Requires:       php-posix
 Requires:       php-tokenizer
 Requires:       php-xml
 Requires:       php-zlib
+
 Provides:       php-pear(Console_Getopt) = %{getoptver}
 Provides:       php-pear(Archive_Tar) = %{arctarver}
 Provides:       php-pear(PEAR) = %{version}
 Provides:       php-pear(Structures_Graph) = %{structver}
 Provides:       php-pear(XML_Util) = %{xmlutil}
 Provides:       php-pear(PEAR_Manpages) = %{manpages}
+
 Provides:       php-composer(pear/console_getopt) = %{getoptver}
 Provides:       php-composer(pear/archive_tar) = %{arctarver}
 Provides:       php-composer(pear/pear-core-minimal) = %{version}
