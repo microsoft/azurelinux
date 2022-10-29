@@ -359,19 +359,6 @@ index 6951a0e3..411065f9 100644
     # Other config here will be given to the distro class and/or path classes
     paths:
        cloud_dir: /var/lib/cloud/
-diff --git a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
-index c170aef7..20ff1daa 100644
---- a/systemd/cloud-init.service.tmpl
-+++ b/systemd/cloud-init.service.tmpl
-@@ -1,7 +1,7 @@
- ## template:jinja
- [Unit]
- Description=Initial cloud-init job (metadata service crawler)
--{% if variant not in ["photon", "rhel"] %}
-+{% if variant not in ["mariner", "photon", "rhel"] %}
- DefaultDependencies=no
- {% endif %}
- Wants=cloud-init-local.service
 diff --git a/templates/hosts.mariner.tmpl b/templates/hosts.mariner.tmpl
 new file mode 100644
 index 00000000..2e956382

@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      11%{?dist}
+Release:      12%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -88,6 +88,8 @@ systemd-journal-upload:x:75:75:systemd Journal Upload:/:/bin/false
 systemd-network:x:76:76:systemd Network Management:/:/bin/false
 systemd-resolve:x:77:77:systemd Resolver:/:/bin/false
 systemd-timesync:x:78:78:systemd Time Synchronization:/:/bin/false
+systemd-coredump:x:79:79:systemd Core Dumper:/:/usr/bin/false
+systemd-oom:x:80:80:systemd Userspace OOM Killer:/:/usr/bin/false
 nobody:x:65534:65533:Unprivileged User:/dev/null:/bin/false
 EOF
 cat > %{buildroot}/etc/group <<- "EOF"
@@ -123,6 +125,8 @@ systemd-journal-upload:x:75:
 systemd-network:x:76:
 systemd-resolve:x:77:
 systemd-timesync:x:78:
+systemd-coredump:x:79:
+systemd-oom:x:80:
 nogroup:x:65533:
 users:x:100:
 sudo:x:27:
@@ -704,6 +708,9 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Thu Sep 14 2022 Thara Gopinath <tgopinath@microsoft.com> - 1.1-12
+- Add the 'systemd-coredump' and 'systemd-oom' user and group accounts.
+
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.1-11
 - Update etc/modprobe.d/ folder to include new multiple config files and improve security
 - Add subpackage asc to include all the new config files

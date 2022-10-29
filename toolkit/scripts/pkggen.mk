@@ -23,6 +23,7 @@ pkggen_rpms     = $(shell find $(RPMS_DIR)/*  2>/dev/null )
 
 # Pkggen workspace
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
+parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
 rpm_cache_files        = $(shell find $(CACHED_RPMS_DIR)/)
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
@@ -39,11 +40,11 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-spec-parse graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
-clean: clean-workplan clean-cache
-clean-workplan:
+clean: clean-workplan clean-cache clean-spec-parse
+clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-cache:
@@ -52,6 +53,10 @@ clean-cache:
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
 	rm -rf $(cache_working_dir)
+clean-spec-parse:
+	@echo Verifying no mountpoints present in $(parse_working_dir)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
+	rm -rf $(parse_working_dir)
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
@@ -69,7 +74,7 @@ analyze-built-graph: $(go-graphanalytics)
 $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
 	$(go-specreader) \
 		--dir $(BUILD_SPECS_DIR) \
-		--build-dir $(BUILD_DIR)/spec_parsing \
+		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
 		--dist-tag $(DIST_TAG) \

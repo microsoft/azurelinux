@@ -1256,6 +1256,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cairomm",
+          "version": "1.12.0",
+          "downloadUrl": "http://www.cairographics.org/releases/cairomm-1.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cal10n",
           "version": "0.7.7",
           "downloadUrl": "http://cal10n.qos.ch/dist/cal10n-0.7.7.tar.gz"
@@ -1287,8 +1297,8 @@
         "type": "other",
         "other": {
           "name": "cassandra",
-          "version": "4.0.6",
-          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.6/apache-cassandra-4.0.6-src.tar.gz"
+          "version": "4.0.7",
+          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.7/apache-cassandra-4.0.7-src.tar.gz"
         }
       }
     },
@@ -1896,6 +1906,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cpptest",
+          "version": "1.1.2",
+          "downloadUrl": "https://downloads.sourceforge.net/cpptest/cpptest-1.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cppunit",
           "version": "1.15.1",
           "downloadUrl": "https://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz"
@@ -2117,8 +2137,8 @@
         "type": "other",
         "other": {
           "name": "dbus",
-          "version": "1.14.0",
-          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.14.0.tar.xz"
+          "version": "1.15.2",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.2.tar.xz"
         }
       }
     },
@@ -2439,7 +2459,7 @@
         "other": {
           "name": "docbook-dtds",
           "version": "1.0",
-          "downloadUrl": "http://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip"
+          "downloadUrl": "https://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip"
         }
       }
     },
@@ -3048,8 +3068,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.8",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2"
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.bz2"
         }
       }
     },
@@ -4710,8 +4730,8 @@
         "type": "other",
         "other": {
           "name": "hunspell",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/hunspell/hunspell/archive/refs/tags/v1.7.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/hunspell/hunspell/releases/download/v1.7.1/hunspell-1.7.1.tar.gz"
         }
       }
     },
@@ -5850,8 +5870,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.70.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.70.1.tar.gz"
+          "version": "5.15.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
         }
       }
     },
@@ -6851,8 +6871,8 @@
         "type": "other",
         "other": {
           "name": "iw",
-          "version": "5.4",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-5.4.tar.xz"
+          "version": "5.9",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-5.9.tar.xz"
         }
       }
     },
@@ -7361,8 +7381,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.70.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.70.1.tar.gz"
+          "version": "5.15.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
         }
       }
     },
@@ -7371,8 +7391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.70.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.70.1.tar.gz"
+          "version": "5.15.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
         }
       }
     },
@@ -7381,8 +7401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.70.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.70.1.tar.gz"
+          "version": "5.15.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
         }
       }
     },
@@ -8083,6 +8103,16 @@
           "name": "libcontainers-common",
           "version": "20210626",
           "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libcroco",
+          "version": "0.6.13",
+          "downloadUrl": "https://gitlab.gnome.org/Archive/libcroco/-/archive/0.6.13/libcroco-0.6.13.tar.gz"
         }
       }
     },
@@ -10830,6 +10860,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libyang",
+          "version": "2.0.231",
+          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.0.231.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libyubikey",
           "version": "1.13",
           "downloadUrl": "http://opensource.yubico.com/yubico-c/releases/libyubikey-1.13.tar.gz"
@@ -10880,6 +10920,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.48.1-4.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.72.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.72.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.74.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lksctp-tools",
           "version": "1.0.18",
           "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
@@ -10903,16 +10973,6 @@
           "name": "lldb",
           "version": "12.0.1",
           "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lldb-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "local-path-provisioner",
-          "version": "0.0.21",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
         }
       }
     },
@@ -10963,6 +11023,16 @@
           "name": "lmdb",
           "version": "0.9.29",
           "downloadUrl": "https://github.com/LMDB/lmdb/archive/LMDB_0.9.29.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "local-path-provisioner",
+          "version": "0.0.21",
+          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
         }
       }
     },
@@ -11372,7 +11442,7 @@
         "other": {
           "name": "malaga",
           "version": "7.12",
-          "downloadUrl": "http://home.arcor.de/bjoern-beutel/malaga/malaga-7.12.tgz"
+          "downloadUrl": "https://dynalabs.de/mxp/assets/malaga-7.12.tgz"
         }
       }
     },
@@ -12093,8 +12163,8 @@
         "type": "other",
         "other": {
           "name": "mod_wsgi",
-          "version": "4.6.8",
-          "downloadUrl": "https://github.com/GrahamDumpleton/mod_wsgi/archive/4.6.8.tar.gz"
+          "version": "4.9.3",
+          "downloadUrl": "https://github.com/GrahamDumpleton/mod_wsgi/archive/4.9.3.tar.gz"
         }
       }
     },
@@ -12303,8 +12373,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.29",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.29.tar.gz"
+          "version": "8.0.31",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.31.tar.gz"
         }
       }
     },
@@ -12763,8 +12833,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.20.2",
-          "downloadUrl": "https://nginx.org/download/nginx-1.20.2.tar.gz"
+          "version": "1.22.1",
+          "downloadUrl": "https://nginx.org/download/nginx-1.22.1.tar.gz"
         }
       }
     },
@@ -19234,8 +19304,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "7.4.14",
-          "downloadUrl": "https://www.php.net/distributions/php-7.4.14.tar.xz"
+          "version": "8.1.11",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.11.tar.xz"
         }
       }
     },
@@ -20696,6 +20766,16 @@
           "name": "python-google-auth",
           "version": "2.6.6",
           "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.6.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-google-auth-oauthlib",
+          "version": "0.5.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
         }
       }
     },
@@ -25536,6 +25616,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sriov-network-device-plugin",
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sscg",
           "version": "2.6.2",
           "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
@@ -25997,8 +26087,8 @@
         "type": "other",
         "other": {
           "name": "terraform",
-          "version": "1.2.2",
-          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.2.2.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.3.2.tar.gz"
         }
       }
     },
@@ -26017,8 +26107,8 @@
         "type": "other",
         "other": {
           "name": "tidy",
-          "version": "5.7.28",
-          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.7.28.tar.gz"
+          "version": "5.8.0",
+          "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.8.0.tar.gz"
         }
       }
     },
@@ -26317,8 +26407,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022d",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022d.tar.gz"
+          "version": "2022e",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022e.tar.gz"
         }
       }
     },
@@ -26417,8 +26507,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.16.2.tar.gz"
+          "version": "1.16.3",
+          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.16.3.tar.gz"
         }
       }
     },
@@ -26987,8 +27077,8 @@
         "type": "other",
         "other": {
           "name": "wireless-regdb",
-          "version": "2019.06.03",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2019.06.03.tar.xz"
+          "version": "2022.08.12",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2022.08.12.tar.xz"
         }
       }
     },
@@ -26997,8 +27087,8 @@
         "type": "other",
         "other": {
           "name": "wireshark",
-          "version": "3.4.14",
-          "downloadUrl": "https://2.na.dl.wireshark.org/src/all-versions/wireshark-3.4.14.tar.xz"
+          "version": "3.4.16",
+          "downloadUrl": "https://2.na.dl.wireshark.org/src/all-versions/wireshark-3.4.16.tar.xz"
         }
       }
     },

@@ -88,7 +88,7 @@ LIVEPATCH_SPEC_PATH="$LIVEPATCH_SPECS_DIR/$LIVEPATCH_NAME.spec"
 
 if [[ -f "$LIVEPATCH_SPEC_PATH" ]]
 then
-    echo "Livepatch spec ($LIVEPATCH_SPEC_PATH) alread exists. Exiting."
+    echo "Livepatch spec ($LIVEPATCH_SPEC_PATH) already exists. Exiting."
     exit 0
 fi
 

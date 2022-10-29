@@ -1,11 +1,16 @@
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 %global debug_package %{nil}
 
 %define kernel_version_release @KERNEL_VERSION_RELEASE@
 %define kernel_version %(echo %{kernel_version_release} | grep -oP "^[^-]+")
 %define kernel_release %(echo %{kernel_version_release} | grep -oP "(?<=-).+")
 
+%define livepatch_unsigned_name livepatch-%{kernel_version_release}
+
 # Kpatch module names allow only alphanumeric characters and '_'.
-%define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
+%define livepatch_name %(value="%{livepatch_unsigned_name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
 %define livepatch_install_dir %{_libdir}/livepatching/%{kernel_version_release}
 %define livepatch_module_name %{livepatch_name}.ko
 %define livepatch_module_path %{livepatch_install_dir}/%{livepatch_module_name}
@@ -43,7 +48,7 @@ then \
 fi
 
 Summary:        Set of livepatches for kernel %{kernel_version_release}
-Name:           livepatch-%{kernel_version_release}
+Name:           %{livepatch_unsigned_name}-signed
 Version:        1.0.0
 Release:        @RELEASE_TAG@
 License:        MIT
@@ -55,6 +60,12 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 
 ExclusiveArch:  x86_64
 
+%description
+@DESCRIPTION@
+
+%package -n     %{livepatch_unsigned_name}
+Summary:        %{summary}
+
 Requires:       coreutils
 Requires:       livepatching-filesystem
 
@@ -65,32 +76,32 @@ Requires(preun): kpatch
 
 Provides:       livepatch = %{kernel_version_release}
 
-%description
+%description -n %{livepatch_unsigned_name}
 @DESCRIPTION@
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
 install -m 744 %{SOURCE0} %{buildroot}%{livepatch_module_path}
 
-%post
+%post -n %{livepatch_unsigned_name}
 %load_if_should
 %install_if_should
 
-%preun
+%preun -n %{livepatch_unsigned_name}
 %uninstall_if_should
 %unload_if_should
 
 # Re-enable patch on rollbacks to supported kernel.
-%triggerin -- kernel = %{kernel_version_release}
+%triggerin -n %{livepatch_unsigned_name} -- kernel = %{kernel_version_release}
 %load_if_should
 %install_if_should
 
 # Prevent the patch from being loaded after a reboot to a different kernel.
 # Previous kernel is still running, do NOT unload the livepatch.
-%triggerin -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
+%triggerin -n %{livepatch_unsigned_name} -- kernel > %{kernel_version_release}, kernel < %{kernel_version_release}
 %uninstall_if_should
 
-%files
+%files -n %{livepatch_unsigned_name}
 %defattr(-,root,root)
 %dir %{livepatch_install_dir}
 %{livepatch_module_path}

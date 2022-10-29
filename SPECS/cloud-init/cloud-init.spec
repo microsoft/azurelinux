@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        22.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Patch1:         CVE-2022-2084.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
+BuildRequires:  mariner-release 
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -146,6 +147,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Oct 04 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-9
+- add BuildRequires mariner-release to make sure /etc/os-release exists so variant can be set as mariner properly
+
 * Thu Sep 15 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-8
 - Revert the change for adding sysinit.target dependency on previous two releases
 

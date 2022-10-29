@@ -29,6 +29,7 @@ URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
 BuildRequires:  glibc-devel
+BuildRequires:  glibc-static >= 2.35-3
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
