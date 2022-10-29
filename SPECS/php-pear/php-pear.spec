@@ -270,6 +270,7 @@ fi
 %changelog
 * Thu Oct 27 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.10.13-4
 - Moved from extended to core
+- [Pawel Winogrodzki <pawelwi@microsoft.com>] Disabled BR on '%{_bindir}/phpunit'.
 
 * Tue Feb 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.13-3
 - Removed dependency on "php-fedora-autoloader".
