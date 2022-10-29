@@ -1,6 +1,6 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.16.2
+Version:        1.16.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -96,6 +96,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Wed Oct 12 2022 Henry Li <lihl@microsoft.com> - 1.16.3-1
+- Upgrade to version 1.16.3 to resolve CVE-2022-3204
+
 * Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.16.2-1
 - Bump version to address CVE-2022-30698
 

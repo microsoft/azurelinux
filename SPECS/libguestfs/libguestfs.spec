@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.44.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,7 +89,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  gdisk
 BuildRequires:  genisoimage
 BuildRequires:  gfs2-utils
-BuildRequires:  glibc-static
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gperf
 BuildRequires:  grep
@@ -1234,6 +1234,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.44.0-9
+- Rebuilt for glibc-static 2.35-3
+
 * Thu Sep 01 2022 Andrew Phelps <anphel@microsoft.com> - 1.44.0-8
 - Remove duplicate BR on qemu-img
 - Change runtime requires from qemu-img binary to qemu-img package

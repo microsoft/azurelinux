@@ -1,0 +1,60 @@
+From 069fefdaf42490f1e00243614fb5f3d5d2614b81 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Tue, 30 Aug 2022 00:59:56 -0700
+Subject: [PATCH] gh-95231: Disable md5 & crypt modules if FIPS is enabled
+ (GH-94742)
+
+If kernel fips is enabled, we get permission error upon doing
+`import crypt`. So, if kernel fips is enabled, disable the
+unallowed hashing methods.
+
+Python 3.9.1 (default, May 10 2022, 11:36:26)
+[GCC 10.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import crypt
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/usr/lib/python3.9/crypt.py", line 117, in <module>
+    _add_method('MD5', '1', 8, 34)
+  File "/usr/lib/python3.9/crypt.py", line 94, in _add_method
+    result = crypt('', salt)
+  File "/usr/lib/python3.9/crypt.py", line 82, in crypt
+    return _crypt.crypt(word, salt)
+PermissionError: [Errno 1] Operation not permitted
+
+Signed-off-by: Shreenidhi Shedi <sshedi@vmware.com>
+(cherry picked from commit 2fa03b1b0708d5d74630c351ec9abd2aac7550da)
+
+Co-authored-by: Shreenidhi Shedi <53473811+sshedi@users.noreply.github.com>
+---
+ Lib/crypt.py                                                   | 2 +-
+ .../next/Library/2022-07-25-15-45-06.gh-issue-95231.i807-g.rst | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2022-07-25-15-45-06.gh-issue-95231.i807-g.rst
+
+diff --git a/Lib/crypt.py b/Lib/crypt.py
+index 33dbc46bb3..b296c3edb0 100644
+--- a/Lib/crypt.py
++++ b/Lib/crypt.py
+@@ -94,7 +94,7 @@ def _add_method(name, *args, rounds=None):
+         result = crypt('', salt)
+     except OSError as e:
+         # Not all libc libraries support all encryption methods.
+-        if e.errno == errno.EINVAL:
++        if e.errno in {errno.EINVAL, errno.EPERM, errno.ENOSYS}:
+             return False
+         raise
+     if result and len(result) == method.total_size:
+diff --git a/Misc/NEWS.d/next/Library/2022-07-25-15-45-06.gh-issue-95231.i807-g.rst b/Misc/NEWS.d/next/Library/2022-07-25-15-45-06.gh-issue-95231.i807-g.rst
+new file mode 100644
+index 0000000000..aa53f2938b
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2022-07-25-15-45-06.gh-issue-95231.i807-g.rst
+@@ -0,0 +1,3 @@
++Fail gracefully if :data:`~errno.EPERM` or :data:`~errno.ENOSYS` is raised when loading
++:mod:`crypt` methods. This may happen when trying to load ``MD5`` on a Linux kernel
++with :abbr:`FIPS (Federal Information Processing Standard)` enabled.
+-- 
+2.17.1
+

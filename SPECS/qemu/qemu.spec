@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -510,9 +510,12 @@ Summary:        qemu-pr-helper utility for %{name}
 This package provides the qemu-pr-helper utility that is required for certain
 SCSI features.
 
-%package -n qemu-virtiofsd
-Summary: QEMU virtio-fs shared file system daemon
-Provides: vhostuser-backend(fs)
+%package -n     qemu-virtiofsd
+Summary:        QEMU virtio-fs shared file system daemon
+Provides:       vhostuser-backend(fs)
+# qemu-common provided %%{_libexecdir}/virtiofsd prior to 6.2.0
+Obsoletes:      %{name}-common < 6.2.0
+
 %description -n qemu-virtiofsd
 This package provides virtiofsd daemon. This program is a vhost-user backend
 that implements the virtio-fs device that is used for sharing a host directory
@@ -2288,6 +2291,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Wed Oct 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2.0-10
+- Have virtiofsd subpackage obsolete qemu-common from 6.1.0 releases
+
 * Tue Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
 - Adress CVE-2022-2962
 
