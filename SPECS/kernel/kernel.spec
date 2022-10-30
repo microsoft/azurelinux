@@ -159,7 +159,7 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    #exit 1
+#    exit 1
 fi
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
@@ -201,7 +201,7 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-install -D -m 640 arch/arm64/boot/dts/amd/amd-overdrive.dtb %{buildroot}/boot/dtb/amd-overdrive.dtb
+install -D -m 640 arch/arm64/boot/dts/arm/foundation-v8.dtb %{buildroot}/boot/dtb/foundation-v8.dtb
 %endif
 
 # Restrict the permission on System.map-X file
@@ -311,7 +311,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
-%exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
 
@@ -324,9 +323,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/build
 %{_prefix}/src/linux-headers-%{uname_r}
 
-%files drivers-accessibility
-%defattr(-,root,root)
-/lib/modules/%{uname_r}/kernel/drivers/accessibility
 
 %files drivers-sound
 %defattr(-,root,root)
@@ -358,7 +354,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %ifarch aarch64
 %files dtb
-/boot/dtb/amd-overdrive.dtb
+/boot/dtb/foundation-v8.dtb
 %endif
 
 %files -n bpftool
