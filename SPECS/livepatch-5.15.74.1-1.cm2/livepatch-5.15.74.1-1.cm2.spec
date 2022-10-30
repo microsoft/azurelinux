@@ -1,4 +1,4 @@
-%define kernel_version_release 5.15.74.1-1.cm2
+%define kernel_version_release 5.15.41.1-1.cm2
 %define kernel_version %(echo %{kernel_version_release} | grep -oP "^[^-]+")
 %define kernel_release %(echo %{kernel_version_release} | grep -oP "(?<=-).+")
 
