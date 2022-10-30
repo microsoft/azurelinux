@@ -8476,8 +8476,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022e",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022e.tar.gz"
+          "version": "2022f",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022f.tar.gz"
         }
       }
     },
