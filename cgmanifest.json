@@ -855,8 +855,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "4.2.1",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel-4.2.1-dist.zip"
+          "version": "4.2.3",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.2.3/bazel-4.2.3-dist.zip"
         }
       }
     },
