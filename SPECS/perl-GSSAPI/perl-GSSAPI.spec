@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           perl-GSSAPI
 Version:        0.28
-Release:        31%{?dist}
+Release:        32%{?dist}
 Summary:        Perl extension providing access to the GSSAPIv2 library
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/GSSAPI
@@ -61,6 +61,9 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_mandir}/man3/*
 
 %changelog
+* Mon Oct 31 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 0.28-32
+- Moved from extended to core.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.28-31
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
