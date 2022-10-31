@@ -19,8 +19,8 @@ Requires:       perl-CGI
 Requires:       perl-DBI
 Requires:       perl-YAML
 Requires:       perl-interpreter
-Requires:       perl(Authen::SASL)
-Requires:       perl(IO::Socket::SSL)
+Requires:       perl-Authen-SASL
+Requires:       perl-IO-Socket-SSL
 Requires:       python3
 Requires:       subversion-perl
 Provides:       git-core = %{version}-%{release}
@@ -171,7 +171,7 @@ fi
 
 %changelog
 * Mon Oct 31 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.33.4-2
-- Add explicit Requires on perl-Authen-SASL and perl-IO-Socket-SSL
+- Add Requires on perl-Authen-SASL and perl-IO-Socket-SSL for git send-email
 - Bump version to 2.33.4-2
 
 * Wed Jul 14 2022 Bala <balakumaran.kannan@microsoft.com> - 2.33.4-1
