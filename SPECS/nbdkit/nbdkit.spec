@@ -68,11 +68,6 @@ ExcludeArch:    i686
 
 Source0:        http://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz
 
-# For automatic RPM Provides generation.
-# See: https://rpm-software-management.github.io/rpm/manual/dependency_generators.html
-Source4:        nbdkit.attr
-Source5:        nbdkit-find-provides
-
 BuildRequires: make
 %if 0%{patches_touch_autotools}
 BuildRequires:  autoconf, automake, libtool
@@ -716,11 +711,6 @@ done
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-S3-plugin
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/nbdkit-S3-plugin.1*
 %endif
-
-# Install RPM dependency generator.
-mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
-install -m 0644 %{SOURCE4} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
-install -m 0755 %{SOURCE5} $RPM_BUILD_ROOT%{_rpmconfigdir}/
 
 
 %check
