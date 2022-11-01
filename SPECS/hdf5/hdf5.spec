@@ -27,8 +27,8 @@ Source0: https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf
 %global so_version 200
 
 Source1: h5comp
-# For man pages
-Source2: http://ftp.us.debian.org/debian/pool/main/h/hdf5/hdf5_1.12.0+repack-1~exp2.debian.tar.xz
+
+
 Patch0: hdf5-LD_LIBRARY_PATH.patch
 # Fix fortran build with gcc 12
 # https://github.com/HDFGroup/hdf5/pull/1412
@@ -324,15 +324,6 @@ cat > %{buildroot}%{macrosdir}/macros.hdf5 <<EOF
 %%_hdf5_version %{version}
 EOF
 
-# Install man pages from debian
-mkdir -p %{buildroot}%{_mandir}/man1
-cp -p debian/man/*.1 %{buildroot}%{_mandir}/man1/
-for mpi in %{?mpi_list}
-do
-  mkdir -p %{buildroot}%{_libdir}/$mpi/share/man/man1
-  cp -p debian/man/h5p[cf]c.1 %{buildroot}%{_libdir}/$mpi/share/man/man1/
-done
-rm %{buildroot}%{_mandir}/man1/h5p[cf]c*.1
 
 %if %{with java}
 # Java
@@ -408,20 +399,7 @@ fi
 %{_libdir}/libhdf5hl_fortran.so.%{so_version}*
 %{_libdir}/libhdf5_hl.so.%{so_version}*
 %{_libdir}/libhdf5_hl_cpp.so.%{so_version}*
-%{_mandir}/man1/gif2h5.1*
-%{_mandir}/man1/h52gif.1*
-%{_mandir}/man1/h5copy.1*
-%{_mandir}/man1/h5diff.1*
-%{_mandir}/man1/h5dump.1*
-%{_mandir}/man1/h5import.1*
-%{_mandir}/man1/h5jam.1*
-%{_mandir}/man1/h5ls.1*
-%{_mandir}/man1/h5mkgrp.1*
-%{_mandir}/man1/h5perf_serial.1*
-%{_mandir}/man1/h5repack.1*
-%{_mandir}/man1/h5repart.1*
-%{_mandir}/man1/h5stat.1*
-%{_mandir}/man1/h5unjam.1*
+
 
 %files devel
 %{macrosdir}/macros.hdf5
@@ -434,11 +412,7 @@ fi
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
 %{_datadir}/hdf5_examples/
-%{_mandir}/man1/h5c++.1*
-%{_mandir}/man1/h5cc.1*
-%{_mandir}/man1/h5debug.1*
-%{_mandir}/man1/h5fc.1*
-%{_mandir}/man1/h5redeploy.1*
+
 
 %files static
 %{_libdir}/*.a
@@ -488,8 +462,7 @@ fi
 %{_libdir}/mpich/lib/lib*.so
 %{_libdir}/mpich/lib/lib*.settings
 %{_libdir}/mpich/share/hdf5_examples/
-%{_libdir}/mpich/share/man/man1/h5pcc.1*
-%{_libdir}/mpich/share/man/man1/h5pfc.1*
+
 
 %files mpich-static
 %{_libdir}/mpich/lib/*.a
