@@ -19,7 +19,7 @@ Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.51.0
 Release:        4%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Packages
@@ -32,22 +32,6 @@ BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 ExclusiveArch:  x86_64 aarch64
-Requires:       cpio
-Requires:       curl
-Requires:       diffutils
-Requires:       findutils
-Requires:       jq
-Requires:       libnbd
-Requires:       nbdkit
-Requires:       patch
-Requires:       rsync
-Requires:       librsync
-Requires:       qemu-tools
-Requires:       qemu-img
-Requires:       shadow-utils
-Requires:       tar
-Requires:       unzip
-Requires:       util-linux
 Provides:       cdi = %{version}-%{release}
 
 %description
@@ -56,6 +40,22 @@ Containerized-Data-Importer (CDI) is a persistent storage management add-on for 
 %package        api
 Summary:        CDI API server
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 Provides:       cdi-apiserver = %{version}-%{release}
 
 %description    api
@@ -64,6 +64,22 @@ The containerized-data-importer-api package provides the kubernetes API extensio
 %package        cloner
 Summary:        Cloner for host assisted cloning
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    cloner
 Source and Target cloner image for host assisted cloning
@@ -71,6 +87,22 @@ Source and Target cloner image for host assisted cloning
 %package        controller
 Summary:        Controller for the data fetching service
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    controller
 Controller for the data fetching service for VM container images
@@ -78,6 +110,22 @@ Controller for the data fetching service for VM container images
 %package        importer
 Summary:        Data fetching service
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    importer
 Data fetching service for VM container imagess
@@ -85,6 +133,22 @@ Data fetching service for VM container imagess
 %package        operator
 Summary:        Operator for the data fetching service
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    operator
 Operator for the data fetching service for VM container images
@@ -92,6 +156,22 @@ Operator for the data fetching service for VM container images
 %package        uploadproxy
 Summary:        Upload proxy for the data fetching service
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    uploadproxy
 Upload proxy for the data fetching service for VM container images
@@ -99,6 +179,22 @@ Upload proxy for the data fetching service for VM container images
 %package        uploadserver
 Summary:        Upload server for the data fetching service
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    uploadserver
 Upload server for the data fetching service for VM container images
@@ -106,6 +202,22 @@ Upload server for the data fetching service for VM container images
 %package        manifests
 Summary:        YAML manifests used to install CDI
 Group:          System/Packages
+Requires:       cpio
+Requires:       curl
+Requires:       diffutils
+Requires:       findutils
+Requires:       jq
+Requires:       libnbd
+Requires:       librsync
+Requires:       nbdkit
+Requires:       patch
+Requires:       rsync
+Requires:       qemu-tools
+Requires:       qemu-img
+Requires:       shadow-utils
+Requires:       tar
+Requires:       unzip
+Requires:       util-linux
 
 %description    manifests
 This contains the built YAML manifests used to install CDI into a
@@ -151,7 +263,6 @@ CDI_GIT_TREE_STATE="clean" \
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{_bindir}/tools
 
 install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/virt-cdi-apiserver
 
@@ -161,12 +272,12 @@ install -p -m 0755 _out/cmd/cdi-cloner/cdi-cloner %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/virt-cdi-controller
 
 install -p -m 0755 _out/cmd/cdi-importer/cdi-importer %{buildroot}%{_bindir}/virt-cdi-importer
-install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/tools/cdi-containerimage-server
-install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/tools/cdi-image-size-detection
-install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/tools/cdi-source-update-poller
+install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
+install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
+install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/cdi-source-update-poller
 
 install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/virt-cdi-operator
-install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}/tools/csv-generator
+install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}/csv-generator
 
 install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/virt-cdi-uploadproxy
 
@@ -197,15 +308,15 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-importer
-%{_bindir}/tools/cdi-containerimage-server
-%{_bindir}/tools/cdi-image-size-detection
-%{_bindir}/tools/cdi-source-update-poller
+%{_bindir}/cdi-containerimage-server
+%{_bindir}/cdi-image-size-detection
+%{_bindir}/cdi-source-update-poller
 
 %files operator
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-operator
-%{_bindir}/tools/csv-generator
+%{_bindir}/csv-generator
 
 %files uploadproxy
 %license LICENSE
@@ -229,9 +340,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %changelog
 * Mon Nov 14 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-5
 - Include binaries from tools for cdi-importer and cdi-operator containers
-- For cdi-importer, the binaries are cdi-containerimage-server, cdi-image-size-detection and
-  cdi-source-update-poller.
-- For cdi-operator, the csv-generator has been included
+- For cdi-importer, the binaries are cdi-containerimage-server,
+  cdi-image-size-detection and cdi-source-update-poller.
+- For cdi-operator, the csv-generator binary has been included
 
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.51.0-4
 - Bump release to rebuild with go 1.18.8
