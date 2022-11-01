@@ -86,7 +86,7 @@ cmake ../.. -DgRPC_INSTALL=ON                \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
 popd
-# %py3_build
+
 
 
 %install
@@ -94,7 +94,7 @@ pushd cmake/build
 %make_install
 find %{buildroot} -name '*.cmake' -delete
 popd
-# %py3_install
+
 
 %files
 %license LICENSE
@@ -123,11 +123,7 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
-#imported from fedora
-# %files -n python3-grpcio
-# %license LICENSE
-# %{python3_sitearch}/grpc
-# %{python3_sitearch}/grpcio-%{pyversion}-py%{python3_version}.egg-info
+
 
 %changelog
 * Wed Oct 19 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
