@@ -4679,6 +4679,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hostname",
+          "version": "3.23",
+          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_3.23.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hsakmt",
           "version": "1.0.6",
           "downloadUrl": "https://github.com/RadeonOpenCompute/ROCT-Thunk-Interface/archive/roc-2.0.0.tar.gz"
@@ -20813,6 +20823,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-h5py",
+          "version": "3.7.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-hacking",
           "version": "1.1.0",
           "downloadUrl": "https://pypi.io/packages/source/h/hacking/hacking-1.1.0.tar.gz"
@@ -21496,6 +21516,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pkgconfig",
+          "version": "1.5.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pkgconfig/pkgconfig-1.5.5.tar.gz"
         }
       }
     },
