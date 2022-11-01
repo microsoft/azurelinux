@@ -20213,6 +20213,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cached_property",
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/pydanny/python-cached-property/archive/1.5.2/python-cached-property-1.5.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cachetools",
           "version": "5.0.0",
           "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.0.0.tar.gz"
