@@ -10,18 +10,16 @@
 # rpmbuild magic to keep from having meta dependency on libc.so.6
 %define _use_internal_dependency_generator 0
 %define __find_requires %{nil}
-%global msft_golang_release_number 1
-%global msft_golang_release_date 20221101.1
 Summary:        Go
 Name:           msft-golang
-Version:        1.19.3
-Release:        1%{?dist}
-License:        BSD-3-Clause
+Version:        1.19.1
+Release:        2%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{msft_golang_release_number}/go.%{msft_golang_release_date}.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.19.1-1/go.20220906.5.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Conflicts:      go
@@ -117,11 +115,6 @@ fi
 %{_bindir}/*
 
 %changelog
-* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.19.3-1
-- Upgrade to version 1.19.3 (fixes CVE-2022-41716, which only applies to Windows environments)
-- Also fixes CVE-2022-2879, CVE-2022-2880, CVE-2022-41715 (fixed in 1.19.2)
-- Use SPDX short identifier for license tag
-
 * Sat Sep 24 2022 Muhammad Falak <mwani@microsoft.com> - 1.19.1-2
 - Drop the explict VERSION in build
 

@@ -12233,8 +12233,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.19.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.3-1/go.20221101.1.src.tar.gz"
+          "version": "1.19.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.1-1/go.20220906.5.src.tar.gz"
         }
       }
     },
