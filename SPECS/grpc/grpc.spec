@@ -62,7 +62,7 @@ Python language bindings for gRPC.
 
 
 %prep
-%setup -q -n %{name}-%{version}-
+%setup -q -n %{name}-
 
 
 %build
