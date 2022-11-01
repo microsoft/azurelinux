@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.1.4
-Release:       3%{?dist}
+Release:       4%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -77,6 +77,9 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+*   Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.1.4-4
+-   Bump release to rebuild with go 1.18.8
+
 *   Wed Sep 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 3.1.4-3
 -   Initial CBL-Mariner import from Photon (license: Apache2)
 -   License verified

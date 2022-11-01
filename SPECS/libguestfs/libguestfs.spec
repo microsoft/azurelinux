@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.44.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -1234,6 +1234,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.44.0-10
+- Bump release to rebuild with go 1.18.8
+
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.44.0-9
 - Rebuilt for glibc-static 2.35-3
 

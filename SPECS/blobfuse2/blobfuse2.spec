@@ -8,7 +8,7 @@
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
 Version:        %{blobfuse2_version}.%{preview_suffix}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.0.preview.3-2
+- Bump release to rebuild with go 1.18.8
+
 * Mon Oct 03 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
 - Add blobfuse2 spec
 - License verified
