@@ -100,9 +100,6 @@ BuildRequires:  platform-python-devel
 BuildRequires:  python3-devel
 %endif
 %if !0%{?rhel}
-BuildRequires:  python3-boto3
-%endif
-%if !0%{?rhel}
 %if 0%{?have_ocaml}
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-ocamldoc
