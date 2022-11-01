@@ -56,7 +56,7 @@ BuildRequires: ostree-devel
 BuildRequires: btrfs-progs-devel
 
 
-Requires: crun >= 0.10-1
+#Requires: crun >= 0.10-1
 BuildRequires: libseccomp-static
 Recommends: container-selinux
 Requires: libseccomp >= 2.4.1-0
@@ -78,23 +78,6 @@ or
 * mount/umount a working container's root file system for manipulation
 * save container's root file system layer to create a new image
 * delete a working container or an image
-
-%package tests
-Summary: Tests for %{name}
-
-Requires: %{name} = %{version}-%{release}
-Requires: bats
-Requires: bzip2
-Requires: podman
-Requires: golang
-Requires: jq
-Requires: httpd-tools
-Requires: openssl
-
-%description tests
-%{summary}
-
-This package contains system tests for %{name}
 
 %prep
 %autosetup -Sgit -n %{name}-%{built_tag_strip}
