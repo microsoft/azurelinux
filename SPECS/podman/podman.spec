@@ -310,8 +310,8 @@ done
 
 rm -f %{buildroot}%{_mandir}/man5/docker*.5
 
-install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
+#install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
+#cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}

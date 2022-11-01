@@ -6,8 +6,6 @@ Distribution:   Mariner
 %global with_debug 1
 
 
-
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
@@ -64,12 +62,6 @@ Recommends: slirp4netns >= 0.3-0
 Recommends: fuse-overlayfs
 
 
-
-
-
-
-
-
 %description
 The %{name} package provides a command line tool which can be used to
 * create a working container from scratch
@@ -107,8 +99,8 @@ export GOPATH=$(pwd)/_build:$(pwd):%{gopath}
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} install install.completions
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
 
-install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-cp -pav tests/. %{buildroot}/%{_datadir}/%{name}/test/system
+#install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
+#cp -pav tests/. %{buildroot}/%{_datadir}/%{name}/test/system
 cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 
 #define license tag if not already defined
