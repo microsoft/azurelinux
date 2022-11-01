@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.62.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -127,7 +127,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
-* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-2
+* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-3
 - Adding missing test dependency on "glibc-static".
 
 * Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.62.1-2
