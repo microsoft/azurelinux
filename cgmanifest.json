@@ -20215,7 +20215,7 @@
         "other": {
           "name": "python-cached_property",
           "version": "1.5.2",
-          "downloadUrl": "https://github.com/pydanny/python-cached-property/archive/1.5.2/python-cached-property-1.5.2.tar.gz"
+          "downloadUrl": "https://github.com/pydanny/cached-property/archive/1.5.2/cached-property-1.5.2.tar.gz"
         }
       }
     },
