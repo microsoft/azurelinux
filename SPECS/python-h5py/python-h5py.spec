@@ -86,7 +86,7 @@ cd -
 
 
 %check
-pip3 install pytest
+pip3 install pytest pytest-mpi
 # Upstream requires a specific numpy without this
 export H5PY_SETUP_REQUIRES=0
 export H5PY_SYSTEM_LZF=1
