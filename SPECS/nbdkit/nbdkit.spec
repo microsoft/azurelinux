@@ -104,6 +104,7 @@ BuildRequires:  python3-devel
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-ocamldoc
 %endif
+BuildRequires:  ruby
 BuildRequires:  ruby-devel
 BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
@@ -717,13 +718,6 @@ skip_test tests/test-memory-allocator-malloc-mlock.sh
 # Make sure we can see the debug messages (RHBZ#1230160).
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
-
-%make_build check || {
-    cat tests/test-suite.log
-    exit 1
-  }
-%endif
-
 
 %if 0%{?have_ocaml}
 %ldconfig_scriptlets plugin-ocaml
