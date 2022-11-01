@@ -91,7 +91,7 @@ export BUILDTAGS='seccomp selinux'
 export BUILDTAGS+=' exclude_graphdriver_btrfs'
 %endif
 %gobuild -o bin/%{name} %{import_path}/cmd/%{name}
-%gobuild -o imgtype %{import_path}/tests/imgtype
+#%gobuild -o imgtype %{import_path}/tests/imgtype
 GOMD2MAN=go-md2man %{__make} -C docs
 
 %install
@@ -101,7 +101,7 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
 
 #install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
 #cp -pav tests/. %{buildroot}/%{_datadir}/%{name}/test/system
-cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
+#cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
