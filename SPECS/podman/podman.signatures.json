@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "dnsname-18822f9.tar.gz": "c78995a745981fc62a6af579ba416304538e3cba7267d6c06b926a9f4bcd8db9",
+  "podman-4.1.1.tar.gz": "27bf32e9b1afee94cb08ebd59389104788d687f402a541f3631f94c7916b10a5",
+  "gvisor-tap-vsock-4ee84d6.tar.gz": "4d71f0596b127dca745d37c062760df5a096c19e30296001d7c9754c7648d1c0"
+ }
+}
