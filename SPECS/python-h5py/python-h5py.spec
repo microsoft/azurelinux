@@ -101,7 +101,7 @@ fail=1
 %endif
 
 export PYTHONPATH=$(echo serial/build/lib*)
-pytest --pyargs h5py -rxXs ${PYTHONPATH} || exit $fail
+pytest --pyargs h5py -rxXs ${PYTHONPATH}
 
 
 %files -n python%{python3_pkgversion}-h5py
