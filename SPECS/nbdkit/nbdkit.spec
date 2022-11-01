@@ -140,7 +140,7 @@ BuildRequires:  %{_bindir}/stat
 # This package has RPM rules that create the automatic Provides: for
 # nbdkit plugins and filters.  This means nbdkit build depends on
 # itself, but it's a simple noarch package so easy to install.
-BuildRequires:  nbdkit-srpm-macros >= 1.30.0
+#BuildRequires:  nbdkit-srpm-macros >= 1.30.0
 
 # nbdkit is a metapackage pulling the server and a useful subset
 # of the plugins and filters.
