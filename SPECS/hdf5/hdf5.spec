@@ -39,7 +39,7 @@ Patch3: hdf5-build.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
 Patch5: hdf5-wrappers.patch
 
-BuildRequires: gcc-gfortran
+# BuildRequires: gcc-gfortran
 %if %{with java}
 BuildRequires: java-devel
 BuildRequires: javapackages-tools
@@ -87,7 +87,7 @@ Summary: HDF5 development files
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libaec-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
-Requires: gcc-gfortran%{?_isa}
+# Requires: gcc-gfortran%{?_isa}
 
 %description devel
 HDF5 development headers and libraries.
