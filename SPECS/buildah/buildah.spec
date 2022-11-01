@@ -46,7 +46,7 @@ BuildRequires: go-rpm-macros
 BuildRequires: gpgme-devel
 BuildRequires: libassuan-devel
 BuildRequires: make
-Requires: containers-common
+Requires: libcontainers-common
 # No ostree for centos 7
 
 BuildRequires: ostree-devel
