@@ -123,14 +123,10 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/%{name}
 
-%files tests
-%license LICENSE
-%{_bindir}/%{name}-imgtype
-%{_datadir}/%{name}/test
-
 %changelog
 * Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.18.0-6
 - Move to core packages
+- Remove tests package
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.18.0-5
 - Rebuilt for glibc-static 2.35-3
