@@ -86,11 +86,10 @@ BuildRequires:  zlib-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libnbd-devel >= 1.3.11
-BuildRequires:  libssh-devel
+BuildRequires:  libssh2-devel
 BuildRequires:  e2fsprogs, e2fsprogs-devel
 %if !0%{?rhel}
 BuildRequires:  xorriso
-BuildRequires:  rb_libtorrent-devel
 %endif
 BuildRequires:  bash-completion
 BuildRequires:  perl-devel
@@ -122,7 +121,6 @@ BuildRequires:  %{_bindir}/certtool
 BuildRequires:  %{_bindir}/cut
 BuildRequires:  expect
 BuildRequires:  %{_bindir}/hexdump
-BuildRequires:  %{_sbindir}/ip
 BuildRequires:  jq
 BuildRequires:  %{_bindir}/nbdcopy
 BuildRequires:  %{_bindir}/nbdinfo
@@ -130,11 +128,9 @@ BuildRequires:  %{_bindir}/nbdsh
 BuildRequires:  %{_bindir}/qemu-img
 BuildRequires:  %{_bindir}/qemu-io
 BuildRequires:  %{_bindir}/qemu-nbd
-BuildRequires:  %{_sbindir}/sfdisk
 %if !0%{?rhel}
 BuildRequires:  %{_bindir}/socat
 %endif
-BuildRequires:  %{_sbindir}/ss
 BuildRequires:  %{_bindir}/stat
 
 # This package has RPM rules that create the automatic Provides: for
@@ -255,7 +251,6 @@ Summary:        Write small inline C plugins and scripts for %{name}
 License:        BSD
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 Requires:       gcc
-Requires:       %{_bindir}/cat
 
 %description cc-plugin
 This package contains support for writing inline C plugins and scripts
@@ -409,22 +404,6 @@ This package lets you write Ruby plugins for %{name}.
 %endif
 
 
-%if !0%{?rhel}
-# In theory this is noarch, but because plugins are placed in _libdir
-# which varies across architectures, RPM does not allow this.
-%package S3-plugin
-Summary:        Amazon S3 and Ceph plugin for %{name}
-License:        BSD
-Requires:       %{name}-python-plugin >= 1.22
-# XXX Should not need to add this.
-Requires:       python3-boto3
-
-%description S3-plugin
-This package lets you open disk images stored in Amazon S3
-or Ceph using %{name}.
-%endif
-
-
 %package ssh-plugin
 Summary:        SSH plugin for %{name}
 License:        BSD
@@ -461,24 +440,13 @@ Suggests:       ntfsprogs, dosfstools
 This package is a remote temporary filesystem disk plugin for %{name}.
 
 
-%if !0%{?rhel}
-%package torrent-plugin
-Summary:        BitTorrent plugin for %{name}
-License:        BSD
-Requires:       %{name}-server%{?_isa} = %{version}-%{release}
-
-%description torrent-plugin
-This package is a BitTorrent plugin for %{name}.
-%endif
-
-
 %ifarch x86_64
 %package vddk-plugin
 Summary:        VMware VDDK plugin for %{name}
 License:        BSD
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1931818
-Requires:       libxcrypt-compat
+Requires:       libxcrypt
 
 %description vddk-plugin
 This package is a plugin for %{name} which connects to
@@ -708,8 +676,6 @@ for f in cc cdi torrent; do
     rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-$f-plugin.so
     rm -f $RPM_BUILD_ROOT%{_mandir}/man?/nbdkit-$f-plugin.*
 done
-rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-S3-plugin
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/nbdkit-S3-plugin.1*
 %endif
 
 
@@ -950,15 +916,6 @@ export LIBGUESTFS_TRACE=1
 %endif
 
 
-%if !0%{?rhel}
-%files S3-plugin
-%doc README
-%license LICENSE
-%{_libdir}/%{name}/plugins/nbdkit-S3-plugin
-%{_mandir}/man1/nbdkit-S3-plugin.1*
-%endif
-
-
 %files ssh-plugin
 %doc README
 %license LICENSE
@@ -980,15 +937,6 @@ export LIBGUESTFS_TRACE=1
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-tmpdisk-plugin.so
 %{_mandir}/man1/nbdkit-tmpdisk-plugin.1*
-
-
-%if !0%{?rhel}
-%files torrent-plugin
-%doc README
-%license LICENSE
-%{_libdir}/%{name}/plugins/nbdkit-torrent-plugin.so
-%{_mandir}/man1/nbdkit-torrent-plugin.1*
-%endif
 
 
 %ifarch x86_64
