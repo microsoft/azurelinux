@@ -718,6 +718,7 @@ skip_test tests/test-memory-allocator-malloc-mlock.sh
 # Make sure we can see the debug messages (RHBZ#1230160).
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
+%endif
 
 %if 0%{?have_ocaml}
 %ldconfig_scriptlets plugin-ocaml
