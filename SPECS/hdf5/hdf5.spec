@@ -176,7 +176,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -a 2 -n %{name}-%{version}%{?snaprel} -p1
+%autosetup -n %{name}-%{version}%{?snaprel} -p1
 
 %if %{with java}
 # Replace jars with system versions
