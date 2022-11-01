@@ -39,7 +39,7 @@ Patch3: hdf5-build.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
 Patch5: hdf5-wrappers.patch
 
-# BuildRequires: gcc-gfortran
+BuildRequires: gcc-gfortran
 %if %{with java}
 BuildRequires: java-devel
 BuildRequires: javapackages-tools
@@ -53,7 +53,7 @@ BuildRequires: krb5-devel
 BuildRequires: openssl-devel
 BuildRequires: time
 BuildRequires: zlib-devel
-# BuildRequires: hostname
+BuildRequires: hostname
 # For patches/rpath
 BuildRequires: automake
 BuildRequires: libtool
