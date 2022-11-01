@@ -33,6 +33,9 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
+%if %{with_check}
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
+%endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
 Requires:       gcc
@@ -124,6 +127,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-2
+- Adding missing test dependency on "glibc-static".
+
 * Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.62.1-2
 - Breaking change: Configure as a stable release, which disables unstable features
 - Add runtime requirements on gcc, binutils, glibc-devel
