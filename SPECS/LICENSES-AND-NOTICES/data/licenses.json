@@ -2029,6 +2029,7 @@
                 "livepatch-5.15.48.1-4.cm2-signed",
                 "livepatch-5.15.72.1-1.cm2",
                 "livepatch-5.15.74.1-1.cm2",
+                "livepatch-5.15.76.1-1.cm2",
                 "livepatching",
                 "lld",
                 "local-path-provisioner",

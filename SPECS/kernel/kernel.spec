@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.74.1
-Release:        3%{?dist}
+Version:        5.15.76.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -406,6 +406,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Nov 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.76.1-1
+- Upgrade to 5.15.76.1
+
 * Wed Oct 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.74.1-3
 - Turn on Configs for different TCP algorithms
 
