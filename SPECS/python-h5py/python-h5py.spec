@@ -22,7 +22,6 @@ BuildRequires:  python%{python3_pkgversion}-cached_property
 BuildRequires:  python%{python3_pkgversion}-numpy >= 1.7
 BuildRequires:  python%{python3_pkgversion}-pkgconfig
 BuildRequires:  python%{python3_pkgversion}-pip
-BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  python%{python3_pkgversion}-sphinx
 
@@ -87,6 +86,7 @@ cd -
 
 
 %check
+pip3 install pytest
 # Upstream requires a specific numpy without this
 export H5PY_SETUP_REQUIRES=0
 export H5PY_SYSTEM_LZF=1
@@ -101,12 +101,13 @@ fail=1
 %endif
 
 export PYTHONPATH=$(echo serial/build/lib*)
-%{__python3} -m pytest --pyargs h5py -rxXs ${PYTHONPATH} || exit $fail
+pytest --pyargs h5py -rxXs ${PYTHONPATH} || exit $fail
 
 
 %files -n python%{python3_pkgversion}-h5py
 %license serial/licenses/*.txt
 #doc serial/ANN.rst serial/README.rst serial/examples
+
 %doc serial/README.rst serial/examples
 %{python3_sitearch}/%{name}/
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
