@@ -170,25 +170,6 @@ This package installs a script named docker that emulates the Docker CLI by
 executes %{name} commands, it also creates links between all Docker CLI man
 pages and %{name}.
 
-%package      tests
-Summary:      Tests for %{name}
-
-Requires:     %{name} = %{version}-%{release}
-Requires:     bats
-Requires:     jq
-Requires:     skopeo
-Requires:     nmap-ncat
-Requires:     httpd-tools
-Requires:     openssl
-Requires:     socat
-Requires:     buildah
-Requires:     gnupg
-
-%description tests
-%{summary}
-
-This package contains system tests for %{name}
-
 %package remote
 Summary: (Experimental) Remote client for managing %{name} containers
 
@@ -367,10 +348,6 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 %dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/_%{name}-remote
 
-%files tests
-%license LICENSE
-%{_datadir}/%{name}/test
-
 %files plugins
 %license %{repo_plugins}-%{commit_plugins}/LICENSE
 %doc %{repo_plugins}-%{commit_plugins}/{README.md,README_PODMAN.md}
@@ -388,6 +365,7 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 %changelog
 * Tue Nov 1 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 4.1.1-4
 - Move to core package
+- Removed tests package
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 4.1.1-3
 - Rebuilt for glibc-static 2.35-3
