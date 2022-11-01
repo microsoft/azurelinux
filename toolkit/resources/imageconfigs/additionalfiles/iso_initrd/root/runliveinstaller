@@ -96,6 +96,13 @@ if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
     # Ensure the userspace speakup connector is up
     systemctl enable espeakup
     systemctl start espeakup
+else # if an unattended iso
+    # if boot type is 'efi'
+    if [[ $(jq ".SystemConfigs[0].BootType" $UNATTENDED_CONFIG_FILE | tr -d '"') == "efi" ]]; then
+        TARGET_DISK=$(jq ".Disks[0].TargetDisk.Value" $UNATTENDED_CONFIG_FILE | tr -d '"')
+        BOOT_PART_IDX=$(jq '.Disks[0].Partitions as $parts | $parts | index($parts[] | select(.Flags | index("boot")))' $UNATTENDED_CONFIG_FILE)
+        BOOT_PART_NO=$(($BOOT_PART_IDX+1)) 
+    fi
 fi
 
 cd /installer
@@ -116,6 +123,23 @@ done
 
 # Turn back on echoing input so the TTY session is usable for the user.
 stty echo
+
+
+# TODO: CHECK IF \EFI\BOOT\bootx64.efi is already first in boot order, if so, replace it?
+if [[ -f "./attendedconfig.json" ]]; then  #if iso is an attended install
+    if [[ $(jq ".SystemConfigs[0].BootType" ./attendedconfig.json -r) == "efi" ]]; then # if boot type is efi
+        TARGET_DISK=$(jq ".Disks[0].TargetDisk.Value" ./attendedconfig.json | tr -d '"')
+        BOOT_PART_IDX=$(jq '.Disks[0].Partitions as $parts | $parts | index($parts[] | select(.Flags | index("boot")))' ./attendedconfig.json) #finds the index of the partition with "boot" in it's Flags array
+        BOOT_PART_NO=$(($BOOT_PART_IDX+1)) 
+    fi
+fi
+
+#Update Boot Order
+efibootmgr -c                                                                              \
+    -d $TARGET_DISK                                                                        \
+    -p $BOOT_PART_NO                                                                       \
+    -l '\EFI\BOOT\bootx64.efi'                                                             \
+    -L Mariner
 
 if [ $installerExitCode -eq 0 ]; then
     reboot

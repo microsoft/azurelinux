@@ -35,6 +35,7 @@
         "gzip",
         "haveged",
         "iputils",
+        "jq",
         "less",
         "libcap",
         "libgcc",
