@@ -14,7 +14,7 @@
                 "SELinux": "permissive"
             },
             "KernelOptions": {
-                "default": "kernel"
+                "default": "kernel-5.15.41.1-1.cm2"
             }
         },
         {
@@ -24,7 +24,7 @@
                 "packagelists/core-packages-image-aarch64.json"
             ],
             "KernelOptions": {
-                "default": "kernel"
+                "default": "kernel-5.15.41.1-1.cm2"
             }
         }
     ]
