@@ -80,9 +80,9 @@ popt-devel-1.16-7.cm1.aarch64.rpm
 popt-lang-1.16-7.cm1.aarch64.rpm
 nspr-4.33-1.cm1.aarch64.rpm
 nspr-devel-4.33-1.cm1.aarch64.rpm
-sqlite-3.34.1-1.cm1.aarch64.rpm
-sqlite-devel-3.34.1-1.cm1.aarch64.rpm
-sqlite-libs-3.34.1-1.cm1.aarch64.rpm
+sqlite-3.34.1-2.cm1.aarch64.rpm
+sqlite-devel-3.34.1-2.cm1.aarch64.rpm
+sqlite-libs-3.34.1-2.cm1.aarch64.rpm
 nss-3.73-1.cm1.aarch64.rpm
 nss-devel-3.73-1.cm1.aarch64.rpm
 nss-libs-3.73-1.cm1.aarch64.rpm
