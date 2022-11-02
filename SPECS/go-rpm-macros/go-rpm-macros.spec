@@ -1,13 +1,9 @@
 %global rcluadir %{_rpmconfigdir}/lua/mariner
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
-
 %global forgeurl  https://pagure.io/go-rpm-macros
-%forgemeta
-
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/mariner
 %global _docdir_fmt     %{name}
-
 # Master definition that will be written to macro files
 %global golang_arches   %{ix86} x86_64 %{arm} aarch64 ppc64le s390x
 %global gccgo_arches    %{mips}
@@ -15,36 +11,32 @@
 # correct files for each architecture. Therefore, move gopath to _libdir and
 # make Go devel packages archful
 %global gopath          %{_datadir}/gocode
-
-ExclusiveArch: %{golang_arches} %{gccgo_arches}
-
-Name:          go-rpm-macros
-Version:       3.0.9
-Release:       4%{?dist}
-Summary:       Build-stage rpm automation for Go packages
-License:       GPLv3+
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-URL:       %{forgeurl}
+Summary:        Build-stage rpm automation for Go packages
+Name:           go-rpm-macros
+Version:        3.0.9
+Release:        4%{?dist}
+License:        GPLv3+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            %{forgeurl}
 # Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
-Source:    %{forgesource}
-Patch0:    fixing_ldflags_for_mariner.patch
-
-Requires:  go-srpm-macros = %{version}-%{release}
-Requires:  go-filesystem  = %{version}-%{release}
-
+Source:         %{forgesource}
+Patch0:         fixing_ldflags_for_mariner.patch
+Requires:       go-filesystem = %{version}-%{release}
+Requires:       go-srpm-macros = %{version}-%{release}
+ExclusiveArch:  %{golang_arches} %{gccgo_arches}
+%{forgemeta}
 %ifarch %{golang_arches}
-Requires:  golang
-Provides:  compiler(golang)
-Provides:  compiler(go-compiler) = 2
-Obsoletes: go-compilers-golang-compiler < %{version}-%{release}
+Requires:       golang
+Provides:       compiler(golang)
+Provides:       compiler(go-compiler) = 2
+Obsoletes:      go-compilers-golang-compiler < %{version}-%{release}
 %endif
-
 %ifarch %{gccgo_arches}
-Requires:  gcc-go
-Provides:  compiler(gcc-go)
-Provides:  compiler(go-compiler) = 1
-Obsoletes: go-compilers-gcc-go-compiler < %{version}-%{release}
+Requires:       gcc-go
+Provides:       compiler(gcc-go)
+Provides:       compiler(go-compiler) = 1
+Obsoletes:      go-compilers-gcc-go-compiler < %{version}-%{release}
 %endif
 
 %description
@@ -55,9 +47,10 @@ It does not need to be included in the default build root: go-srpm-macros will
 pull it in for Go packages only.
 
 %package -n go-srpm-macros
-Summary:   Source-stage rpm automation for Go packages
-BuildArch: noarch
-Requires:  redhat-rpm-config
+Summary:        Source-stage rpm automation for Go packages
+License:        GPLv3+
+Requires:       redhat-rpm-config
+BuildArch:      noarch
 
 %description -n go-srpm-macros
 This package provides SRPM-stage rpm automation to simplify the creation of Go
@@ -70,17 +63,17 @@ The rest of the automation is provided by the go-rpm-macros package, that
 go-srpm-macros will pull in for Go packages only.
 
 %package -n go-filesystem
-Summary:   Directories used by Go packages
-License:   Public Domain
+Summary:        Directories used by Go packages
+License:        Public Domain
 
 %description -n go-filesystem
 This package contains the basic directory layout used by Go packages.
 
 %package -n go-rpm-templates
-Summary:   RPM spec templates for Go packages
-License:   MIT
-BuildArch: noarch
-Requires:  go-rpm-macros = %{version}-%{release}
+Summary:        RPM spec templates for Go packages
+License:        MIT
+Requires:       go-rpm-macros = %{version}-%{release}
+BuildArch:      noarch
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 #Requires:  redhat-rpm-templates
 
@@ -89,10 +82,10 @@ This package contains documented rpm spec templates showcasing how to use the
 macros provided by go-rpm-macros to create Go packages.
 
 %prep
-%forgesetup
+%{forgesetup}
 %patch0 -p1
 
-%writevars -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
+%{writevars} -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
 for template in templates/rpm/*\.spec ; do
   target=$(echo "${template}" | sed "s|^\(.*\)\.spec$|\1-bare.spec|g")
   grep -v '^#' "${template}" > "${target}"
