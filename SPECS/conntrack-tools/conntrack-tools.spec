@@ -67,6 +67,9 @@ install -d -m 0755 %{buildroot}%{_unitdir}
 install -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/
 install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/conntrackd/
 
+# Add a systemd preset to disable the service by default
+echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-conntrackd.preset
+
 %files
 %license COPYING
 %doc AUTHORS TODO doc
@@ -80,10 +83,10 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/conntrackd/
 %{_mandir}/man8/*
 %dir %{_libdir}/conntrack-tools
 %{_libdir}/conntrack-tools/*
+%config(noreplace) %{_libdir}/systemd/system-preset/50-conntrackd.preset
 
 %post
-# Do not enable service by default because manual configuration is needed.
-systemctl daemon-reload >/dev/null 2>&1 || :
+%systemd_post conntrackd.service
 
 %preun
 %systemd_preun conntrackd.service
