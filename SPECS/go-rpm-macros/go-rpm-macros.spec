@@ -2,7 +2,6 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 %global forgeurl  https://pagure.io/go-rpm-macros
-Version:   3.0.9
 %forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
@@ -20,6 +19,7 @@ Version:   3.0.9
 ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
 Name:          go-rpm-macros
+Version:       3.0.9
 Release:       4%{?dist}
 Summary:       Build-stage rpm automation for Go packages
 License:       GPLv3+
