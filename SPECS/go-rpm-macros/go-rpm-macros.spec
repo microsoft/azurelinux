@@ -10,6 +10,8 @@
 # correct files for each architecture. Therefore, move gopath to _libdir and
 # make Go devel packages archful
 %global gopath          %{_datadir}/gocode
+%forgemeta
+
 Summary:        Build-stage rpm automation for Go packages
 Name:           go-rpm-macros
 Version:        3.0.9
