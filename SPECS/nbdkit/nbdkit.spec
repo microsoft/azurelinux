@@ -134,6 +134,7 @@ BuildRequires:  %{_bindir}/stat
 # This package has RPM rules that create the automatic Provides: for
 # nbdkit plugins and filters.  This means nbdkit build depends on
 # itself, but it's a simple noarch package so easy to install.
+#
 #BuildRequires:  nbdkit-srpm-macros >= 1.30.0
 
 # nbdkit is a metapackage pulling the server and a useful subset
@@ -588,6 +589,7 @@ for %{name}.  Install this package if you want to develop
 plugins for %{name}.
 
 
+%if 0%{?rhel}
 %package srpm-macros
 Summary:       RPM Provides rules for %{name} plugins and filters
 License:       BSD
@@ -596,6 +598,7 @@ BuildArch:     noarch
 %description srpm-macros
 This package contains RPM rules that create the automatic Provides:
 for %{name} plugins and filters found in the plugins directory.
+%endif
 
 
 %package bash-completion
@@ -1083,10 +1086,12 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/pkgconfig/nbdkit.pc
 
 
+%if 0%{?rhel}
 %files srpm-macros
 %license LICENSE
 %{_rpmconfigdir}/fileattrs/nbdkit.attr
 %{_rpmconfigdir}/nbdkit-find-provides
+%endif
 
 
 %files bash-completion
@@ -1099,7 +1104,7 @@ export LIBGUESTFS_TRACE=1
 * Mon Oct 31 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.30.10-3
 - Initial changes to build for CBL Mariner
 - License verified
-- Import from Fedora and disable ruby
+- Import from Fedora and disable ruby, srpm-macros
 
 * Fri Oct 14 2022 Richard W.M. Jones <rjones@redhat.com> - 1.30.10-2
 - New stable version 1.30.10
