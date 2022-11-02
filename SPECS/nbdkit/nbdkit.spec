@@ -399,7 +399,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ruby-plugin
 This package lets you write Ruby plugins for %{name}.
-%endif
 
 
 %package ssh-plugin
@@ -409,6 +408,7 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ssh-plugin
 This package contains SSH support for %{name}.
+%endif
 
 
 %if !0%{?rhel}
