@@ -911,12 +911,13 @@ export LIBGUESTFS_TRACE=1
 %endif
 
 
+%if 0%{?rhel}
 %files ssh-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-ssh-plugin.so
 %{_mandir}/man1/nbdkit-ssh-plugin.1*
-
+%endif
 
 %if !0%{?rhel}
 %files tcl-plugin
