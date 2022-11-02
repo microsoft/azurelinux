@@ -68,6 +68,7 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/
 install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/conntrackd/
 
 # Add a systemd preset to disable the service by default
+install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-conntrackd.preset
 
 %files
