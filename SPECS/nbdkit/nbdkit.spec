@@ -104,10 +104,10 @@ BuildRequires:  python3-devel
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-ocamldoc
 %endif
-BuildRequires:  ruby
-BuildRequires:  ruby-devel
 BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
+%else
+BuildRequires:  ruby-devel
 %endif
 %if 0%{verify_tarball_signature}
 BuildRequires:  gnupg2
@@ -391,7 +391,7 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 This package lets you write Python 3 plugins for %{name}.
 
 
-%if !0%{?rhel}
+%if 0%{?rhel}
 %package ruby-plugin
 Summary:        Ruby plugin for %{name}
 License:        BSD
@@ -633,11 +633,12 @@ export PYTHON=%{__python3}
 %if 0%{?rhel}
     --disable-lua \
     --disable-perl \
-    --disable-ruby \
     --disable-tcl \
     --without-ext2 \
     --without-iso \
     --without-libvirt \
+%else
+    --disable-ruby \
 %endif
 %if !0%{?rhel} && 0%{?have_libguestfs}
     --with-libguestfs \
@@ -899,7 +900,7 @@ export LIBGUESTFS_TRACE=1
 %{_mandir}/man3/nbdkit-python-plugin.3*
 
 
-%if !0%{?rhel}
+%if 0%{?rhel}
 %files ruby-plugin
 %doc README
 %license LICENSE
@@ -1061,7 +1062,7 @@ export LIBGUESTFS_TRACE=1
 %doc plugins/perl/example.pl
 %endif
 %doc plugins/python/examples/*.py
-%if !0%{?rhel}
+%if 0%{?rhel}
 %doc plugins/ruby/example.rb
 %endif
 %doc plugins/sh/example.sh
@@ -1095,7 +1096,7 @@ export LIBGUESTFS_TRACE=1
 * Mon Oct 31 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.30.10-3
 - Initial changes to build for CBL Mariner
 - License verified
-- Import from Fedora
+- Import from Fedora and disable ruby
 
 * Fri Oct 14 2022 Richard W.M. Jones <rjones@redhat.com> - 1.30.10-2
 - New stable version 1.30.10
