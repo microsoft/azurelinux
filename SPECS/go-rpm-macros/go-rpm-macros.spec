@@ -80,7 +80,7 @@ This package contains documented rpm spec templates showcasing how to use the
 macros provided by go-rpm-macros to create Go packages.
 
 %prep
-%{forgesetup}
+%forgesetup
 %patch0 -p1
 
 %{writevars} -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
