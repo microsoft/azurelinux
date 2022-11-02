@@ -399,8 +399,10 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ruby-plugin
 This package lets you write Ruby plugins for %{name}.
+%endif
 
 
+%if 0%{?rhel}
 %package ssh-plugin
 Summary:        SSH plugin for %{name}
 License:        BSD
