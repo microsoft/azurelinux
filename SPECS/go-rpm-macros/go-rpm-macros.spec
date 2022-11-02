@@ -1,6 +1,5 @@
 %global rcluadir %{_rpmconfigdir}/lua/mariner
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
-%global forgeurl  https://pagure.io/go-rpm-macros
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/mariner
 %global _docdir_fmt     %{name}
@@ -15,17 +14,16 @@ Summary:        Build-stage rpm automation for Go packages
 Name:           go-rpm-macros
 Version:        3.0.9
 Release:        4%{?dist}
-License:        GPLv3+
+License:        GPLv3+ and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            %{forgeurl}
+URL:            https://pagure.io/%{name}
 # Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
-Source:         %{forgesource}
+Source:         https://pagure.io/%{name}/archive/3.0.9/%{name}-%{version}.tar.gz
 Patch0:         fixing_ldflags_for_mariner.patch
 Requires:       go-filesystem = %{version}-%{release}
 Requires:       go-srpm-macros = %{version}-%{release}
 ExclusiveArch:  %{golang_arches} %{gccgo_arches}
-%{forgemeta}
 %ifarch %{golang_arches}
 Requires:       golang
 Provides:       compiler(golang)
@@ -82,7 +80,7 @@ This package contains documented rpm spec templates showcasing how to use the
 macros provided by go-rpm-macros to create Go packages.
 
 %prep
-%{forgesetup}
+%autosetup
 %patch0 -p1
 
 %{writevars} -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
