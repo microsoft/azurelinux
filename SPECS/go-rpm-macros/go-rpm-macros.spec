@@ -24,6 +24,7 @@ Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+%forgemeta
 URL:       %{forgeurl}
 # Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
 Source:    %{forgesource}
@@ -45,7 +46,6 @@ Provides:  compiler(gcc-go)
 Provides:  compiler(go-compiler) = 1
 Obsoletes: go-compilers-gcc-go-compiler < %{version}-%{release}
 %endif
-%forgemeta
 
 %description
 This package provides build-stage rpm automation to simplify the creation of Go
