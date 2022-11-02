@@ -2,7 +2,6 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 %global forgeurl  https://pagure.io/go-rpm-macros
-%forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/mariner
@@ -46,6 +45,7 @@ Provides:  compiler(gcc-go)
 Provides:  compiler(go-compiler) = 1
 Obsoletes: go-compilers-gcc-go-compiler < %{version}-%{release}
 %endif
+%forgemeta
 
 %description
 This package provides build-stage rpm automation to simplify the creation of Go
