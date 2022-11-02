@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global git0 https://github.com/rootless-containers/%{name}
 %global commit0 4367de7c3361c344155220a4e999ffd7432dad81
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
@@ -10,13 +8,15 @@ Distribution:   Mariner
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %define download_url %{git0}/archive/%{built_tag}.tar.gz
 
-Name: slirp4netns
-Version: 1.1.8
-Release: 3%{?dist}
+Name:          slirp4netns
+Version:       1.1.8
+Release:       3%{?dist}
 # no go-md2man in ppc64
-ExcludeArch: ppc64
-Summary: slirp for network namespaces
-License: GPLv2
+ExcludeArch:   ppc64
+Summary:       slirp for network namespaces
+License:       GPLv2
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
 URL: %{git0}
 Source0: %{download_url}#/%{name}-%{version}.tar.gz
 BuildRequires: autoconf

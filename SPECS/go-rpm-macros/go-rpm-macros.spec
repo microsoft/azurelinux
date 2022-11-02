@@ -1,8 +1,6 @@
 %global rcluadir %{_rpmconfigdir}/lua/mariner
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global forgeurl  https://pagure.io/go-rpm-macros
 Version:   3.0.9
 %forgemeta
@@ -21,11 +19,12 @@ Version:   3.0.9
 
 ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
-Name:      go-rpm-macros
-Release:   4%{?dist}
-Summary:   Build-stage rpm automation for Go packages
-
-License:   GPLv3+
+Name:          go-rpm-macros
+Release:       4%{?dist}
+Summary:       Build-stage rpm automation for Go packages
+License:       GPLv3+
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
 URL:       %{forgeurl}
 # Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
 Source:    %{forgesource}

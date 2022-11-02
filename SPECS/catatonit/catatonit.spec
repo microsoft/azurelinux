@@ -1,11 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
-Name: catatonit
-Version: 0.1.7
-Release: 7%{?dist}
-Summary: A signal-forwarding process manager for containers
-License: GPLv3+
+Name:          catatonit
+Version:       0.1.7
+Release:       7%{?dist}
+Summary:       A signal-forwarding process manager for containers
+License:       GPLv3+
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
 URL: https://github.com/openSUSE/catatonit
 Source0: %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: autoconf

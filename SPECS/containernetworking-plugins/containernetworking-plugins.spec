@@ -26,7 +26,7 @@ Name:          %{project}-%{repo}
 Version:       1.1.1
 Release:       3%{?dist}
 Summary:       Libraries for writing CNI plugin
-License:       ASL 2.0 and BSD and MIT
+License:       Apache-2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           %{git0}

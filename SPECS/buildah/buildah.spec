@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global with_bundled 1
 
 
@@ -27,11 +25,13 @@ Distribution:   Mariner
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
 
-Name: %{repo}
-Version: 1.18.0
-Release: 6%{?dist}
-Summary: A command line tool used for creating OCI Images
-License: ASL 2.0
+Name:         %{repo}
+Version:      1.18.0
+Release:      6%{?dist}
+Summary:      A command line tool used for creating OCI Images
+License:      Apache-2.0
+Vendor:       Microsoft Corporation
+Distribution: Mariner
 URL: https://%{name}.io
 Source: %{download_url}#/%{name}-%{version}.tar.gz
 BuildRequires: device-mapper-devel
