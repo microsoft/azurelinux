@@ -663,6 +663,10 @@ grep '^PYTHON_VERSION = 3' Makefile
 
 %make_build
 
+# Delete the S3 plugin as it is not built
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/nbdkit-S3-plugin.1.gz
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-S3-plugin
+
 
 %install
 %make_install
