@@ -781,18 +781,21 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-python-plugin.so
 %{_mandir}/man3/nbdkit-python-plugin.3*
 
+%if !0%{?exclude_pkg}
 %files ruby-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-ruby-plugin.so
 %{_mandir}/man3/nbdkit-ruby-plugin.3*
+%endif
 
-
+%if !0%{?exclude_pkg}
 %files ssh-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-ssh-plugin.so
 %{_mandir}/man1/nbdkit-ssh-plugin.1*
+%endif
 
 %files tcl-plugin
 %doc README
@@ -940,11 +943,12 @@ export LIBGUESTFS_TRACE=1
 %{_mandir}/man1/nbdkit-release-notes-1.*.1*
 %{_libdir}/pkgconfig/nbdkit.pc
 
-#%files srpm-macros
-#%license LICENSE
-#%{_rpmconfigdir}/fileattrs/nbdkit.attr
-#%{_rpmconfigdir}/nbdkit-find-provides
-
+%if !0%{?exclude_pkg}
+%files srpm-macros
+%license LICENSE
+%{_rpmconfigdir}/fileattrs/nbdkit.attr
+%{_rpmconfigdir}/nbdkit-find-provides
+%endif
 
 %files bash-completion
 %license LICENSE
