@@ -86,49 +86,26 @@ Requires:       nbdkit-basic-plugins%{?_isa} = %{version}-%{release}
 # of the plugins and filters.
 Requires:       nbdkit-server%{?_isa} = %{version}-%{release}
 %undefine _package_note_flags
-%if 0%{?rhel} == 7
-# On RHEL 7, nothing in the virt stack is shipped on aarch64 and
-# libguestfs was not shipped on POWER (fixed in 7.5).  We could in
-# theory make all of this work by having lots more conditionals, but
-# for now limit this package to x86_64 on RHEL.
-ExclusiveArch:  x86_64
-%endif
-%if 0%{?rhel} >= 8
-# On RHEL 8+, we cannot build the package on i686 (no virt stack).
-ExcludeArch:    i686
-%endif
 %if 0%{patches_touch_autotools}
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 %endif
-%if !0%{?rhel} && 0%{?have_libguestfs}
+%if 0%{?have_libguestfs}
 BuildRequires:  libguestfs-devel
 %endif
-%if !0%{?rhel}
 BuildRequires:  xorriso
-%endif
-%if 0%{?rhel} == 8
-BuildRequires:  platform-python-devel
-%else
 BuildRequires:  python3-devel
-%endif
-%if !0%{?rhel}
 BuildRequires:  lua-devel
 BuildRequires:  tcl-devel
 %if 0%{?have_ocaml}
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-ocamldoc
 %endif
-%else
-BuildRequires:  ruby-devel
-%endif
 %if 0%verify_tarball_signature
 BuildRequires:  gnupg2
 %endif
-%if !0%{?rhel}
 BuildRequires:  %{_bindir}/socat
-%endif
 
 %description
 NBD is a protocol for accessing block devices (hard disks and
@@ -211,10 +188,8 @@ nbdkit-zero-plugin          Zero-length plugin for testing.
 %package example-plugins
 Summary:        Example plugins for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
-%if !0%{?rhel}
 # example4 is written in Perl.
 Requires:       %{name}-perl-plugin
-%endif
 
 %description example-plugins
 This package contains example plugins for %{name}.
@@ -222,7 +197,6 @@ This package contains example plugins for %{name}.
 # The plugins below have non-trivial dependencies are so are
 # packaged separately.
 
-%if !0%{?rhel}
 %package cc-plugin
 Summary:        Write small inline C plugins and scripts for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -232,10 +206,8 @@ Requires:       gcc
 This package contains support for writing inline C plugins and scripts
 for %{name}.  NOTE this is NOT the right package for writing plugins
 in C, install %{name}-devel for that.
-%endif
 
 
-%if !0%{?rhel}
 %package cdi-plugin
 Summary:        Containerized Data Import plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -244,7 +216,6 @@ Requires:       podman
 
 %description cdi-plugin
 This package contains Containerized Data Import support for %{name}.
-%endif
 
 
 %package curl-plugin
@@ -254,7 +225,7 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description curl-plugin
 This package contains cURL (HTTP/FTP) support for %{name}.
 
-%if !0%{?rhel} && 0%{?have_libguestfs}
+%if 0%{?have_libguestfs}
 %package guestfs-plugin
 Summary:        libguestfs plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -264,7 +235,6 @@ This package is a libguestfs plugin for %{name}.
 %endif
 
 
-%if !0%{?rhel}
 %package iso-plugin
 Summary:        Virtual ISO 9660 plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -272,10 +242,8 @@ Requires:       xorriso
 
 %description iso-plugin
 This package is a virtual ISO 9660 (CD-ROM) plugin for %{name}.
-%endif
 
 
-%if !0%{?rhel}
 %package libvirt-plugin
 Summary:        Libvirt plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -284,7 +252,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 This package is a libvirt plugin for %{name}.  It lets you access
 libvirt guest disks readonly.  It is implemented using the libvirt
 virDomainBlockPeek API.
-%endif
 
 
 %package linuxdisk-plugin
@@ -296,14 +263,12 @@ Requires:       e2fsprogs
 %description linuxdisk-plugin
 This package is a virtual Linux disk plugin for %{name}.
 
-%if !0%{?rhel}
 %package lua-plugin
 Summary:        Lua plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description lua-plugin
 This package lets you write Lua plugins for %{name}.
-%endif
 
 
 %package nbd-plugin
@@ -314,7 +279,7 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 This package lets you forward NBD connections from %{name}
 to another NBD server.
 
-%if !0%{?rhel} && 0%{?have_ocaml}
+%if 0%{?have_ocaml}
 %package ocaml-plugin
 Summary:        OCaml plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -335,14 +300,12 @@ This package lets you write OCaml plugins for %{name}.
 %endif
 
 
-%if !0%{?rhel}
 %package perl-plugin
 Summary:        Perl plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description perl-plugin
 This package lets you write Perl plugins for %{name}.
-%endif
 
 
 %package python-plugin
@@ -352,34 +315,28 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description python-plugin
 This package lets you write Python 3 plugins for %{name}.
 
-%if 0%{?rhel}
 %package ruby-plugin
 Summary:        Ruby plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ruby-plugin
 This package lets you write Ruby plugins for %{name}.
-%endif
 
 
-%if 0%{?rhel}
 %package ssh-plugin
 Summary:        SSH plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ssh-plugin
 This package contains SSH support for %{name}.
-%endif
 
 
-%if !0%{?rhel}
 %package tcl-plugin
 Summary:        Tcl plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description tcl-plugin
 This package lets you write Tcl plugins for %{name}.
-%endif
 
 
 %package tmpdisk-plugin
@@ -390,10 +347,8 @@ Requires:       e2fsprogs
 Requires:       util-linux
 # For other filesystems.
 Suggests:       xfsprogs
-%if !0%{?rhel}
 Suggests:       dosfstools
 Suggests:       ntfsprogs
-%endif
 
 %description tmpdisk-plugin
 This package is a remote temporary filesystem disk plugin for %{name}.
@@ -490,7 +445,6 @@ nbdkit-tls-fallback-filter TLS protection filter.
 
 nbdkit-truncate-filter     Truncate, expand, round up or round down size.
 
-%if !0%{?rhel}
 %package ext2-filter
 Summary:        ext2, ext3 and ext4 filesystem support for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -498,7 +452,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description ext2-filter
 This package contains ext2, ext3 and ext4 filesystem support for
 %{name}.
-%endif
 
 
 %package gzip-filter
@@ -534,15 +487,13 @@ This package contains development files and documentation
 for %{name}.  Install this package if you want to develop
 plugins for %{name}.
 
-%if 0%{?rhel}
-%package srpm-macros
-Summary:        RPM Provides rules for %{name} plugins and filters
-BuildArch:      noarch
-
-%description srpm-macros
-This package contains RPM rules that create the automatic Provides:
-for %{name} plugins and filters found in the plugins directory.
-%endif
+#%package srpm-macros
+#Summary:        RPM Provides rules for %{name} plugins and filters
+#BuildArch:      noarch
+#
+#%description srpm-macros
+#This package contains RPM rules that create the automatic Provides:
+#for %{name} plugins and filters found in the plugins directory.
 
 
 %package bash-completion
@@ -572,22 +523,20 @@ export PYTHON=python3
     --disable-static \
     --disable-golang \
     --disable-rust \
-%if !0%{?rhel} && 0%{?have_ocaml}
+    --disable-ruby \
+    --disable-ssh \
+%if 0%{?have_ocaml}
     --enable-ocaml \
 %else
     --disable-ocaml \
 %endif
-%if 0%{?rhel}
-    --disable-lua \
-    --disable-perl \
-    --disable-tcl \
-    --without-ext2 \
-    --without-iso \
-    --without-libvirt \
-%else
-    --disable-ruby \
-%endif
-%if !0%{?rhel} && 0%{?have_libguestfs}
+#    --disable-lua \
+#    --disable-perl \
+#    --disable-tcl \
+#    --without-ext2 \
+#    --without-iso \
+#    --without-libvirt
+%if 0%{?have_libguestfs}
     --with-libguestfs \
 %else
     --without-libguestfs \
@@ -624,14 +573,6 @@ rm -f %{buildroot}%{_mandir}/man3/nbdkit-rust-plugin.3*
 rm -f %{buildroot}%{_mandir}/man1/nbdkit-S3-plugin*
 rm -f %{buildroot}%{_libdir}/%{name}/plugins/nbdkit-S3-plugin*
 
-%if 0%{?rhel}
-# In RHEL, remove some plugins we cannot --disable.
-for f in cc cdi torrent; do
-    rm -f %{buildroot}%{_libdir}/%{name}/plugins/nbdkit-$f-plugin.so
-    rm -f %{buildroot}%{_mandir}/man?/nbdkit-$f-plugin.*
-done
-%endif
-
 
 %check
 %ifnarch %{broken_test_arches}
@@ -665,11 +606,9 @@ skip_test tests/test-nbd-tls.sh tests/test-nbd-tls-psk.sh
 # nbdkit: error: allocator=malloc: mlock: Cannot allocate memory
 # It could be the mlock limit on the builder is too low.
 # https://bugzilla.redhat.com/show_bug.cgi?id=2044432
-%if 0%{?rhel}
-%ifarch aarch64 %{power64}
-skip_test tests/test-memory-allocator-malloc-mlock.sh
-%endif
-%endif
+#%ifarch aarch64 %{power64}
+#skip_test tests/test-memory-allocator-malloc-mlock.sh
+#%endif
 
 # Make sure we can see the debug messages (RHBZ#1230160).
 export LIBGUESTFS_DEBUG=1
@@ -741,27 +680,21 @@ export LIBGUESTFS_TRACE=1
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-example*-plugin.so
-%if !0%{?rhel}
 %{_libdir}/%{name}/plugins/nbdkit-example4-plugin
-%endif
 %{_mandir}/man1/nbdkit-example*-plugin.1*
 
-%if !0%{?rhel}
 %files cc-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-cc-plugin.so
 %{_mandir}/man3/nbdkit-cc-plugin.3*
-%endif
 
 
-%if !0%{?rhel}
 %files cdi-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-cdi-plugin.so
 %{_mandir}/man1/nbdkit-cdi-plugin.1*
-%endif
 
 
 %files curl-plugin
@@ -770,7 +703,7 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-curl-plugin.so
 %{_mandir}/man1/nbdkit-curl-plugin.1*
 
-%if !0%{?rhel} && 0%{?have_libguestfs}
+%if 0%{?have_libguestfs}
 %files guestfs-plugin
 %doc README
 %license LICENSE
@@ -779,22 +712,18 @@ export LIBGUESTFS_TRACE=1
 %endif
 
 
-%if !0%{?rhel}
 %files iso-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-iso-plugin.so
 %{_mandir}/man1/nbdkit-iso-plugin.1*
-%endif
 
 
-%if !0%{?rhel}
 %files libvirt-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-libvirt-plugin.so
 %{_mandir}/man1/nbdkit-libvirt-plugin.1*
-%endif
 
 
 %files linuxdisk-plugin
@@ -803,13 +732,11 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-linuxdisk-plugin.so
 %{_mandir}/man1/nbdkit-linuxdisk-plugin.1*
 
-%if !0%{?rhel}
 %files lua-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-lua-plugin.so
 %{_mandir}/man3/nbdkit-lua-plugin.3*
-%endif
 
 
 %files nbd-plugin
@@ -818,7 +745,7 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-nbd-plugin.so
 %{_mandir}/man1/nbdkit-nbd-plugin.1*
 
-%if !0%{?rhel} && 0%{?have_ocaml}
+%if 0%{?have_ocaml}
 %files ocaml-plugin
 %doc README
 %license LICENSE
@@ -832,13 +759,11 @@ export LIBGUESTFS_TRACE=1
 %endif
 
 
-%if !0%{?rhel}
 %files perl-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-perl-plugin.so
 %{_mandir}/man3/nbdkit-perl-plugin.3*
-%endif
 
 
 %files python-plugin
@@ -847,30 +772,24 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-python-plugin.so
 %{_mandir}/man3/nbdkit-python-plugin.3*
 
-%if 0%{?rhel}
 %files ruby-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-ruby-plugin.so
 %{_mandir}/man3/nbdkit-ruby-plugin.3*
-%endif
 
 
-%if 0%{?rhel}
 %files ssh-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-ssh-plugin.so
 %{_mandir}/man1/nbdkit-ssh-plugin.1*
-%endif
 
-%if !0%{?rhel}
 %files tcl-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-tcl-plugin.so
 %{_mandir}/man3/nbdkit-tcl-plugin.3*
-%endif
 
 
 %files tmpdisk-plugin
@@ -962,13 +881,11 @@ export LIBGUESTFS_TRACE=1
 %{_mandir}/man1/nbdkit-tls-fallback-filter.1*
 %{_mandir}/man1/nbdkit-truncate-filter.1*
 
-%if !0%{?rhel}
 %files ext2-filter
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/filters/nbdkit-ext2-filter.so
 %{_mandir}/man1/nbdkit-ext2-filter.1*
-%endif
 
 
 %files gzip-filter
@@ -994,24 +911,16 @@ export LIBGUESTFS_TRACE=1
 %license LICENSE
 # Include the source of the example plugins in the documentation.
 %doc plugins/example*/*.c
-%if !0%{?rhel}
 %doc plugins/example4/nbdkit-example4-plugin
 %doc plugins/lua/example.lua
-%endif
-%if !0%{?rhel} && 0%{?have_ocaml}
+%if 0%{?have_ocaml}
 %doc plugins/ocaml/example.ml
 %endif
-%if !0%{?rhel}
 %doc plugins/perl/example.pl
-%endif
 %doc plugins/python/examples/*.py
-%if 0%{?rhel}
-%doc plugins/ruby/example.rb
-%endif
+#%doc plugins/ruby/example.rb
 %doc plugins/sh/example.sh
-%if !0%{?rhel}
 %doc plugins/tcl/example.tcl
-%endif
 %{_includedir}/nbdkit-common.h
 %{_includedir}/nbdkit-filter.h
 %{_includedir}/nbdkit-plugin.h
@@ -1022,12 +931,10 @@ export LIBGUESTFS_TRACE=1
 %{_mandir}/man1/nbdkit-release-notes-1.*.1*
 %{_libdir}/pkgconfig/nbdkit.pc
 
-%if 0%{?rhel}
-%files srpm-macros
-%license LICENSE
-%{_rpmconfigdir}/fileattrs/nbdkit.attr
-%{_rpmconfigdir}/nbdkit-find-provides
-%endif
+#%files srpm-macros
+#%license LICENSE
+#%{_rpmconfigdir}/fileattrs/nbdkit.attr
+#%{_rpmconfigdir}/nbdkit-find-provides
 
 
 %files bash-completion

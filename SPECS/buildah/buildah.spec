@@ -45,12 +45,7 @@ BuildRequires: gpgme-devel
 BuildRequires: libassuan-devel
 BuildRequires: make
 Requires: libcontainers-common
-# No ostree for centos 7
-
 BuildRequires: ostree-devel
-
-# No btrfs for centos 8
-
 BuildRequires: btrfs-progs-devel
 
 
@@ -87,9 +82,6 @@ mv vendor src
 
 export GOPATH=$(pwd)/_build:$(pwd)
 export BUILDTAGS='seccomp selinux'
-%if 0%{?centos} >= 8
-export BUILDTAGS+=' exclude_graphdriver_btrfs'
-%endif
 %gobuild -o bin/%{name} %{import_path}/cmd/%{name}
 #%gobuild -o imgtype %{import_path}/tests/imgtype
 GOMD2MAN=go-md2man %{__make} -C docs
