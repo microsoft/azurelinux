@@ -78,11 +78,11 @@ function prepare_lua {
 
   # We only want to clean-up directories, which were absent from the system.
   dirs_to_check=("$rpm_lua_dir" "$mariner_lua_dir" "$mariner_srpm_lua_dir")
-  for dir_to_check in "${dirs_to_check[@]}"
+  for dir_path in "${dirs_to_check[@]}"
   do
-    if [[ ! -d "$dir_to_check" ]]
+    if [[ ! -d "$dir_path" ]]
     then
-      FILES_TO_CLEAN_UP+=("$dir_to_check")
+      FILES_TO_CLEAN_UP+=("$dir_path")
     fi
   done
   mkdir -p "$mariner_srpm_lua_dir"
