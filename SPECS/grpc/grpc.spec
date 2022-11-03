@@ -26,11 +26,11 @@ Requires:       protobuf
 Requires:       zlib
 
 # ~~~~ Python ~~~~
-# BuildRequires:      python3-Cython
-# BuildRequires:      python3-six
-# BuildRequires:      python3-wheel
-# BuildRequires:      python3-setuptools
-# BuildRequires:      python3-protobuf
+BuildRequires:      python3-Cython
+BuildRequires:      python3-six
+BuildRequires:      python3-wheel
+BuildRequires:      python3-setuptools
+BuildRequires:      python3-protobuf
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -52,13 +52,13 @@ Requires:       protobuf
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
-# %package -n python3-grpcio
-# Summary:        Python language bindings for gRPC
-# Requires:       %{name} = %{version}-%{release}
-# Requires:       python3-six
+%package -n python3-grpcio
+Summary:        Python language bindings for gRPC
+Requires:       %{name} = %{version}-%{release}
+Requires:       python3-six
 
-# %description -n python3-grpcio
-# Python language bindings for gRPC.
+%description -n python3-grpcio
+Python language bindings for gRPC.
 
 
 %prep
@@ -86,7 +86,9 @@ cmake ../.. -DgRPC_INSTALL=ON                \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
 popd
-
+GRPC_PYTHON_BUILD_WITH_CYTHON=1
+GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS=4
+%py3_build
 
 
 %install
@@ -94,7 +96,7 @@ pushd cmake/build
 %make_install
 find %{buildroot} -name '*.cmake' -delete
 popd
-
+%py3_install
 
 %files
 %license LICENSE
@@ -123,7 +125,11 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
-
+#imported from fedora
+%files -n python3-grpcio
+%license LICENSE
+%{python3_sitearch}/grpc
+%{python3_sitearch}/grpcio-%{pyversion}-py%{python3_version}.egg-info
 
 %changelog
 * Wed Oct 19 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
