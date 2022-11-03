@@ -60,6 +60,7 @@ ignore_known_issues=" \
 alt_source_tag="Source9999"
 
 function prepare_lua {
+  local -a dirs_to_check
   local lua_common_file_name
   local lua_forge_file_name
   local mariner_lua_dir
@@ -75,16 +76,15 @@ function prepare_lua {
   mariner_lua_dir="$rpm_lua_dir/mariner"
   mariner_srpm_lua_dir="$mariner_lua_dir/srpm"
 
-  if [[ ! -d "$rpm_lua_dir" ]]
-  then
-    FILES_TO_CLEAN_UP+=("$rpm_lua_dir")
-  elif [[ ! -d "$mariner_lua_dir" ]]
-  then
-    FILES_TO_CLEAN_UP+=("$mariner_lua_dir")
-  elif [[ ! -d "$mariner_srpm_lua_dir" ]]
-  then
-    FILES_TO_CLEAN_UP+=("$mariner_srpm_lua_dir")
-  fi
+  # We only want to clean-up directories, which were absent from the system.
+  dirs_to_check=("$rpm_lua_dir" "$mariner_lua_dir" "$mariner_srpm_lua_dir")
+  for dir_to_check in "${dirs_to_check[@]}"
+  do
+    if [[ ! -d "$dir_to_check" ]]
+    then
+      FILES_TO_CLEAN_UP+=("$dir_to_check")
+    fi
+  done
   mkdir -p "$mariner_srpm_lua_dir"
 
   if [[ ! -f "$mariner_lua_dir/$lua_common_file_name" ]]
