@@ -1,4 +1,4 @@
-Summary:        imake source code configuration and build system
+S4280594522ummary:        imake source code configuration and build system
 Name:           imake
 Version:        1.0.8
 Release:        4%{?dist}
@@ -80,6 +80,7 @@ popd
 }
 
 %files
+%license COPYING
 %{_bindir}/ccmakedep
 %{_bindir}/cleanlinks
 %{_bindir}/gccmakedep
@@ -97,7 +98,6 @@ popd
 %{_datadir}/X11/config/*.def
 %{_datadir}/X11/config/*.rules
 %{_datadir}/X11/config/*.tmpl
-#%%dir %%{_mandir}/man1x
 %{_mandir}/man1/ccmakedep.1*
 %{_mandir}/man1/cleanlinks.1*
 %{_mandir}/man1/gccmakedep.1*
@@ -113,6 +113,7 @@ popd
 
 %changelog
 * Thu Oct 27 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.8-5
+- Add license macro
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.8-4
