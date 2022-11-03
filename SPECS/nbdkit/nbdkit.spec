@@ -530,12 +530,6 @@ export PYTHON=python3
 %else
     --disable-ocaml \
 %endif
-#    --disable-lua \
-#    --disable-perl \
-#    --disable-tcl \
-#    --without-ext2 \
-#    --without-iso \
-#    --without-libvirt \
 %if 0%{?have_libguestfs}
     --with-libguestfs \
 %else
@@ -547,6 +541,13 @@ export PYTHON=python3
     --disable-libguestfs-tests \
 %endif
     --with-tls-priority=@NBDKIT,SYSTEM
+
+#    --disable-lua \
+#    --disable-perl \
+#    --disable-tcl \
+#    --without-ext2 \
+#    --without-iso \
+#    --without-libvirt
 
 # Verify that it picked the correct version of Python
 # to avoid RHBZ#1404631 happening again silently.
