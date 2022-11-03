@@ -141,8 +141,11 @@ do
   echo "[$i/$#] Checking $original_spec"
 
   # Using a copy of the spec file, because parsing requires some pre-processing.
-  spec="$WORK_DIR/$(basename "$original_spec")"
-  cp "$original_spec" "$spec"
+  original_spec_dir_path="$(dirname "$original_spec")"
+  cp -r "$original_spec_dir_path" "$WORK_DIR"
+
+  original_spec_dir_name="$(basename "$original_spec_dir_path")"
+  spec="$WORK_DIR/$original_spec_dir_name/$(basename "$original_spec")"
 
   # Skipping specs for signed packages. Their unsigned versions should already be included in the manifest.
   if echo "$original_spec" | grep -q "SPECS-SIGNED"
