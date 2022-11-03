@@ -34,6 +34,9 @@
 %global patches_touch_autotools %{nil}
 # The source directory.
 %global source_directory 1.30-stable
+# General exclude flag
+%global exclude_pkg 1
+
 Summary:        NBD server
 Name:           nbdkit
 Version:        1.30.10
@@ -315,20 +318,23 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description python-plugin
 This package lets you write Python 3 plugins for %{name}.
 
+%if !0%{?exclude_pkg}
 %package ruby-plugin
 Summary:        Ruby plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ruby-plugin
 This package lets you write Ruby plugins for %{name}.
+%endif
 
-
+%if !0%{?exclude_pkg}
 %package ssh-plugin
 Summary:        SSH plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ssh-plugin
 This package contains SSH support for %{name}.
+%endif
 
 
 %package tcl-plugin
@@ -487,13 +493,15 @@ This package contains development files and documentation
 for %{name}.  Install this package if you want to develop
 plugins for %{name}.
 
-#%package srpm-macros
-#Summary:        RPM Provides rules for %{name} plugins and filters
-#BuildArch:      noarch
-#
-#%description srpm-macros
-#This package contains RPM rules that create the automatic Provides:
-#for %{name} plugins and filters found in the plugins directory.
+%if !0%{?exclude_pkg}
+%package srpm-macros
+Summary:        RPM Provides rules for %{name} plugins and filters
+BuildArch:      noarch
+
+%description srpm-macros
+This package contains RPM rules that create the automatic Provides:
+for %{name} plugins and filters found in the plugins directory.
+%endif
 
 
 %package bash-completion
