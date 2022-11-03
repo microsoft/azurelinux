@@ -65,7 +65,10 @@ Python language bindings for gRPC.
 %setup -q -n %{name}-
 
 
-%build
+%
+GRPC_PYTHON_BUILD_WITH_CYTHON=1
+GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS=4
+%py3_build
 # Updating used C++ version to be compatible with the build dependencies.
 # Without this fix 'grpc' compiles with C++11 against 'abseil-cpp' headers,
 # which generate a different set of APIs than the ones provided by the BR 'abseil-cpp'.
@@ -86,17 +89,16 @@ cmake ../.. -DgRPC_INSTALL=ON                \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %make_build
 popd
-GRPC_PYTHON_BUILD_WITH_CYTHON=1
-GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS=4
-%py3_build
+
 
 
 %install
+%py3_install
 pushd cmake/build
 %make_install
 find %{buildroot} -name '*.cmake' -delete
 popd
-%py3_install
+
 
 %files
 %license LICENSE
