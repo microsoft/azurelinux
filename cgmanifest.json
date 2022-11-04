@@ -1017,8 +1017,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.0.0.preview.3",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0-preview.3.tar.gz"
+          "version": "2.0.0.preview.4",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0-preview.4.tar.gz"
         }
       }
     },
