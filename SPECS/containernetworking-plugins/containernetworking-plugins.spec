@@ -78,7 +78,7 @@ when the container is deleted.
 rm -rf plugins/main/windows
 
 # Use correct paths in cni-dhcp unitfiles
-sed -i 's|/opt/cni/bin|\%{_libexecdir}/cni|' plugins/ipam/dhcp/systemd/cni-dhcp.service
+sed -i 's|/opt/cni/bin|\%{_prefix}/libexec/cni|' plugins/ipam/dhcp/systemd/cni-dhcp.service
 
 %build
 export ORG_PATH="%{provider}.%{provider_tld}/%{project}"
