@@ -1,13 +1,10 @@
 %global with_debug 1
-
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
 %else
 %global debug_package   %{nil}
 %endif
-
 %global provider github
 %global provider_tld com
 %global project containers
@@ -15,40 +12,37 @@
 # https://github.com/containers/buildah
 %global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
 %global git0 https://%{import_path}
-
 # Used for comparing with latest upstream tag
 # to decide whether to autobuild (non-rawhide only)
 %define built_tag v1.18.0
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
-
-Name:          %{repo}
-Version:       1.18.0
-Release:       6%{?dist}
-Summary:       A command line tool used for creating OCI Images
-License:       Apache-2.0
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-URL:           https://%{name}.io
-Source:        https://%{import_path}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires: device-mapper-devel
-BuildRequires: golang
-BuildRequires: git
-BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.35-3%{?dist}
-BuildRequires: go-md2man
-BuildRequires: go-rpm-macros
-BuildRequires: gpgme-devel
-BuildRequires: libassuan-devel
-BuildRequires: make
-BuildRequires: ostree-devel
-BuildRequires: btrfs-progs-devel
-BuildRequires: libseccomp-static
-Recommends:    container-selinux
-Requires:      libcontainers-common
-Requires:      libseccomp >= 2.4.1-0
-Recommends:    slirp4netns >= 0.3-0
-Recommends:    fuse-overlayfs
-
+Summary:        A command line tool used for creating OCI Images
+Name:           %{repo}
+Version:        1.18.0
+Release:        6%{?dist}
+License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://%{name}.io
+Source:         https://%{import_path}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  btrfs-progs-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  go-md2man
+BuildRequires:  go-rpm-macros
+BuildRequires:  golang
+BuildRequires:  gpgme-devel
+BuildRequires:  libassuan-devel
+BuildRequires:  libseccomp-static
+BuildRequires:  make
+BuildRequires:  ostree-devel
+Requires:       libcontainers-common
+Requires:       libseccomp >= 2.4.1-0
+Recommends:     container-selinux
+Recommends:     fuse-overlayfs
+Recommends:     slirp4netns >= 0.3-0
 
 %description
 The %{name} package provides a command line tool which can be used to
@@ -75,8 +69,8 @@ mv vendor src
 
 export GOPATH=$(pwd)/_build:$(pwd)
 export BUILDTAGS='seccomp selinux'
-%gobuild -o bin/%{name} %{import_path}/cmd/%{name}
-GOMD2MAN=go-md2man %{__make} -C docs
+%{gobuild} -o bin/%{name} %{import_path}/cmd/%{name}
+GOMD2MAN=go-md2man make -C docs
 
 %install
 export GOPATH=$(pwd)/_build:$(pwd):%{gopath}
