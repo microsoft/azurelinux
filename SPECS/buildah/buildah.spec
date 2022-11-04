@@ -69,7 +69,7 @@ mv vendor src
 
 export GOPATH=$(pwd)/_build:$(pwd)
 export BUILDTAGS='seccomp selinux'
-%{gobuild} -o bin/%{name} %{import_path}/cmd/%{name}
+%gobuild -o bin/%{name} %{import_path}/cmd/%{name}
 GOMD2MAN=go-md2man make -C docs
 
 %install
