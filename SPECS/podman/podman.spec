@@ -34,11 +34,11 @@
 
 %global built_tag v4.1.1
 
+Summary:        Manage Pods, Containers and Container Images
 Name:           podman
 Version:        4.1.1
 Release:        4%{?dist}
 License:        Apache-2.0 and BSD and ISC and MIT and MPLv2.0
-Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io/

@@ -1,12 +1,12 @@
+Summary:       A signal-forwarding process manager for containers
 Name:          catatonit
 Version:       0.1.7
 Release:       7%{?dist}
-Summary:       A signal-forwarding process manager for containers
 License:       GPLv3+
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-URL: https://github.com/openSUSE/catatonit
-Source0: %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:           https://github.com/openSUSE/catatonit
+Source0:       %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: file
@@ -35,7 +35,8 @@ sed -i '$d' configure.ac
 %build
 autoreconf -fi
 %configure
-%{__make} %{?_smp_mflags}
+#%{__make} %{?_smp_mflags}
+%make_build
 
 # Make sure we *always* build a static binary. Otherwise we'll break containers
 # that don't have the necessary shared libs.

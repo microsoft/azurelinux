@@ -15,8 +15,6 @@
 # make Go devel packages archful
 %global gopath          %{_datadir}/gocode
 
-ExclusiveArch: %{golang_arches} %{gccgo_arches}
-
 Summary:        Build-stage rpm automation for Go packages
 Name:           go-rpm-macros
 Version:        3.0.9
@@ -25,26 +23,27 @@ License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %forgemeta
-URL:       %{forgeurl}
+URL:           %{forgeurl}
 # Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
-Source:    %{forgesource}
-Patch0:    fixing_ldflags_for_mariner.patch
+Source:        %{forgesource}
+Patch0:        fixing_ldflags_for_mariner.patch
 
-Requires:  go-srpm-macros = %{version}-%{release}
-Requires:  go-filesystem  = %{version}-%{release}
+Requires:      go-srpm-macros = %{version}-%{release}
+Requires:      go-filesystem  = %{version}-%{release}
+ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
 %ifarch %{golang_arches}
-Requires:  golang
-Provides:  compiler(golang)
-Provides:  compiler(go-compiler) = 2
-Obsoletes: go-compilers-golang-compiler < %{version}-%{release}
+Requires:      golang
+Provides:      compiler(golang)
+Provides:      compiler(go-compiler) = 2
+Obsoletes:     go-compilers-golang-compiler < %{version}-%{release}
 %endif
 
 %ifarch %{gccgo_arches}
-Requires:  gcc-go
-Provides:  compiler(gcc-go)
-Provides:  compiler(go-compiler) = 1
-Obsoletes: go-compilers-gcc-go-compiler < %{version}-%{release}
+Requires:      gcc-go
+Provides:      compiler(gcc-go)
+Provides:      compiler(go-compiler) = 1
+Obsoletes:     go-compilers-gcc-go-compiler < %{version}-%{release}
 %endif
 
 %description

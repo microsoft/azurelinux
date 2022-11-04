@@ -22,15 +22,15 @@
 %global gen_version %(b=%{built_tag_strip}; echo ${b/-/"~"})
 %define download_url %{git0}/archive/%{built_tag}.tar.gz
 
+Summary:       Libraries for writing CNI plugin
 Name:          %{project}-%{repo}
 Version:       1.1.1
 Release:       3%{?dist}
-Summary:       Libraries for writing CNI plugin
 License:       Apache-2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           %{git0}
-Source0: %{download_url}#/%{name}-%{version}.tar.gz
+Source0:       %{download_url}#/%{name}-%{version}.tar.gz
 # If go_compiler is not set to 1, there is no virtual provide. Use golang instead.
 BuildRequires: golang
 BuildRequires: git
@@ -38,7 +38,6 @@ BuildRequires: go-md2man
 BuildRequires: go-rpm-macros
 BuildRequires: systemd-devel
 Requires:      systemd
-
 
 Obsoletes:     %{project}-cni < 0.7.1-2
 Provides:      %{project}-cni = %{version}-%{release}
@@ -116,9 +115,6 @@ install -p -m 0755 bin/* %{buildroot}/%{_libexecdir}/cni
 install -dp %{buildroot}%{_unitdir}
 install -p plugins/ipam/dhcp/systemd/cni-dhcp.service %{buildroot}%{_unitdir}
 install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
-
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
 
 %files
 %license LICENSE

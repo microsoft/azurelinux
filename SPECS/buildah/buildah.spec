@@ -1,6 +1,3 @@
-%global with_bundled 1
-
-
 %global with_debug 1
 
 
@@ -23,17 +20,16 @@
 # to decide whether to autobuild (non-rawhide only)
 %define built_tag v1.18.0
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
-%define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
 
-Name:         %{repo}
-Version:      1.18.0
-Release:      6%{?dist}
-Summary:      A command line tool used for creating OCI Images
-License:      Apache-2.0
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-URL: https://%{name}.io
-Source: %{download_url}#/%{name}-%{version}.tar.gz
+Name:          %{repo}
+Version:       1.18.0
+Release:       6%{?dist}
+Summary:       A command line tool used for creating OCI Images
+License:       Apache-2.0
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+URL:           https://%{name}.io
+Source:        https://%{import_path}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: device-mapper-devel
 BuildRequires: golang
 BuildRequires: git
@@ -44,17 +40,14 @@ BuildRequires: go-rpm-macros
 BuildRequires: gpgme-devel
 BuildRequires: libassuan-devel
 BuildRequires: make
-Requires: libcontainers-common
 BuildRequires: ostree-devel
 BuildRequires: btrfs-progs-devel
-
-
-#Requires: crun >= 0.10-1
 BuildRequires: libseccomp-static
-Recommends: container-selinux
-Requires: libseccomp >= 2.4.1-0
-Recommends: slirp4netns >= 0.3-0
-Recommends: fuse-overlayfs
+Recommends:    container-selinux
+Requires:      libcontainers-common
+Requires:      libseccomp >= 2.4.1-0
+Recommends:    slirp4netns >= 0.3-0
+Recommends:    fuse-overlayfs
 
 
 %description
@@ -83,20 +76,12 @@ mv vendor src
 export GOPATH=$(pwd)/_build:$(pwd)
 export BUILDTAGS='seccomp selinux'
 %gobuild -o bin/%{name} %{import_path}/cmd/%{name}
-#%gobuild -o imgtype %{import_path}/tests/imgtype
 GOMD2MAN=go-md2man %{__make} -C docs
 
 %install
 export GOPATH=$(pwd)/_build:$(pwd):%{gopath}
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} install install.completions
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
-
-#install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-#cp -pav tests/. %{buildroot}/%{_datadir}/%{name}/test/system
-#cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
-
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
 
 %files
 %license LICENSE
