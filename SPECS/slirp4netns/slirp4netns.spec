@@ -10,7 +10,7 @@ Summary:        slirp for network namespaces
 Name:           slirp4netns
 Version:        1.1.8
 Release:        3%{?dist}
-License:        GPLv2 and MIT
+License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            %{git0}

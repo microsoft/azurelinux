@@ -36,12 +36,11 @@
 %global source_directory 1.30-stable
 # General exclude flag
 %global exclude_pkg 1
-
 Summary:        NBD server
 Name:           nbdkit
 Version:        1.30.10
 Release:        3%{?dist}
-License:        BSD and MIT
+License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.com/nbdkit/nbdkit
@@ -58,6 +57,7 @@ BuildRequires:  %{_bindir}/pod2man
 BuildRequires:  %{_bindir}/qemu-img
 BuildRequires:  %{_bindir}/qemu-io
 BuildRequires:  %{_bindir}/qemu-nbd
+BuildRequires:  %{_bindir}/socat
 BuildRequires:  %{_bindir}/stat
 BuildRequires:  bash-completion
 BuildRequires:  e2fsprogs
@@ -73,8 +73,12 @@ BuildRequires:  libselinux-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  libvirt-devel
 BuildRequires:  libzstd-devel
+BuildRequires:  lua-devel
 BuildRequires:  make
 BuildRequires:  perl-devel
+BuildRequires:  python3-devel
+BuildRequires:  tcl-devel
+BuildRequires:  xorriso
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 BuildRequires:  perl(ExtUtils::Embed)
@@ -97,10 +101,6 @@ BuildRequires:  libtool
 %if 0%{?have_libguestfs}
 BuildRequires:  libguestfs-devel
 %endif
-BuildRequires:  xorriso
-BuildRequires:  python3-devel
-BuildRequires:  lua-devel
-BuildRequires:  tcl-devel
 %if 0%{?have_ocaml}
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-ocamldoc
@@ -108,7 +108,6 @@ BuildRequires:  ocaml-ocamldoc
 %if 0%verify_tarball_signature
 BuildRequires:  gnupg2
 %endif
-BuildRequires:  %{_bindir}/socat
 
 %description
 NBD is a protocol for accessing block devices (hard disks and
@@ -190,9 +189,9 @@ nbdkit-zero-plugin          Zero-length plugin for testing.
 
 %package example-plugins
 Summary:        Example plugins for %{name}
-Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 # example4 is written in Perl.
 Requires:       %{name}-perl-plugin
+Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description example-plugins
 This package contains example plugins for %{name}.
@@ -210,7 +209,6 @@ This package contains support for writing inline C plugins and scripts
 for %{name}.  NOTE this is NOT the right package for writing plugins
 in C, install %{name}-devel for that.
 
-
 %package cdi-plugin
 Summary:        Containerized Data Import plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -219,7 +217,6 @@ Requires:       podman
 
 %description cdi-plugin
 This package contains Containerized Data Import support for %{name}.
-
 
 %package curl-plugin
 Summary:        HTTP/FTP (cURL) plugin for %{name}
@@ -246,7 +243,6 @@ Requires:       xorriso
 %description iso-plugin
 This package is a virtual ISO 9660 (CD-ROM) plugin for %{name}.
 
-
 %package libvirt-plugin
 Summary:        Libvirt plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -255,7 +251,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 This package is a libvirt plugin for %{name}.  It lets you access
 libvirt guest disks readonly.  It is implemented using the libvirt
 virDomainBlockPeek API.
-
 
 %package linuxdisk-plugin
 Summary:        Virtual Linux disk plugin for %{name}
@@ -272,7 +267,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description lua-plugin
 This package lets you write Lua plugins for %{name}.
-
 
 %package nbd-plugin
 Summary:        NBD proxy / forward plugin for %{name}
@@ -310,7 +304,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description perl-plugin
 This package lets you write Perl plugins for %{name}.
 
-
 %package python-plugin
 Summary:        Python 3 plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
@@ -344,17 +337,16 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description tcl-plugin
 This package lets you write Tcl plugins for %{name}.
 
-
 %package tmpdisk-plugin
 Summary:        Remote temporary filesystem disk plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 Requires:       e2fsprogs
 # For mkfs and mke2fs (defaults).
 Requires:       util-linux
-# For other filesystems.
-Suggests:       xfsprogs
 Suggests:       dosfstools
 Suggests:       ntfsprogs
+# For other filesystems.
+Suggests:       xfsprogs
 
 %description tmpdisk-plugin
 This package is a remote temporary filesystem disk plugin for %{name}.
@@ -458,7 +450,6 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description ext2-filter
 This package contains ext2, ext3 and ext4 filesystem support for
 %{name}.
-
 
 %package gzip-filter
 Summary:        GZip filter for %{name}
@@ -698,13 +689,11 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-cc-plugin.so
 %{_mandir}/man3/nbdkit-cc-plugin.3*
 
-
 %files cdi-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-cdi-plugin.so
 %{_mandir}/man1/nbdkit-cdi-plugin.1*
-
 
 %files curl-plugin
 %doc README
@@ -727,13 +716,11 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-iso-plugin.so
 %{_mandir}/man1/nbdkit-iso-plugin.1*
 
-
 %files libvirt-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-libvirt-plugin.so
 %{_mandir}/man1/nbdkit-libvirt-plugin.1*
-
 
 %files linuxdisk-plugin
 %doc README
@@ -746,7 +733,6 @@ export LIBGUESTFS_TRACE=1
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-lua-plugin.so
 %{_mandir}/man3/nbdkit-lua-plugin.3*
-
 
 %files nbd-plugin
 %doc README
@@ -773,7 +759,6 @@ export LIBGUESTFS_TRACE=1
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-perl-plugin.so
 %{_mandir}/man3/nbdkit-perl-plugin.3*
-
 
 %files python-plugin
 %doc README
@@ -802,7 +787,6 @@ export LIBGUESTFS_TRACE=1
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-tcl-plugin.so
 %{_mandir}/man3/nbdkit-tcl-plugin.3*
-
 
 %files tmpdisk-plugin
 %doc README
@@ -898,7 +882,6 @@ export LIBGUESTFS_TRACE=1
 %license LICENSE
 %{_libdir}/%{name}/filters/nbdkit-ext2-filter.so
 %{_mandir}/man1/nbdkit-ext2-filter.1*
-
 
 %files gzip-filter
 %doc README

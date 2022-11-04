@@ -1,13 +1,11 @@
 %global with_check 0
 %global with_debug 1
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
 %else
 %global debug_package %{nil}
 %endif
-
 %global provider github
 %global provider_tld com
 %global project containers
@@ -15,7 +13,6 @@
 # https://github.com/containers/%%{name}
 %global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
 %global git0 https://%{import_path}
-
 # dnsname
 %global repo_plugins dnsname
 # https://github.com/containers/dnsname
@@ -23,7 +20,6 @@
 %global git_plugins https://%{import_path_plugins}
 %global commit_plugins 18822f9a4fb35d1349eb256f4cd2bfd372474d84
 %global shortcommit_plugins %(c=%{commit_plugins}; echo ${c:0:7})
-
 # gvproxy
 %global repo_gvproxy gvisor-tap-vsock
 # https://github.com/containers/gvisor-tap-vsock
@@ -31,52 +27,49 @@
 %global git_gvproxy https://%{import_path_gvproxy}
 %global commit_gvproxy 4ee84d66bd86668f011733d8873989b5862bcd07
 %global shortcommit_gvproxy %(c=%{commit_gvproxy}; echo ${c:0:7})
-
 %global built_tag v4.1.1
-
 Summary:        Manage Pods, Containers and Container Images
 Name:           podman
 Version:        4.1.1
 Release:        4%{?dist}
-License:        Apache-2.0 and BSD and ISC and MIT and MPLv2.0
+License:        Apache-2.0 AND BSD AND ISC AND MIT AND MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io/
 Source0:        %{git0}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-%{shortcommit_plugins}.tar.gz
 Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-%{shortcommit_gvproxy}.tar.gz
-Provides:       %{name}-manpages = %{version}-%{release}
-BuildRequires:  go-md2man
-BuildRequires:  golang
 BuildRequires:  gcc
+BuildRequires:  git
 BuildRequires:  glib2-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
-BuildRequires:  git
+BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
+BuildRequires:  golang
 BuildRequires:  gpgme-devel
 BuildRequires:  libassuan-devel
+BuildRequires:  libcontainers-common
 BuildRequires:  libgpg-error-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  libselinux-devel
-BuildRequires:  shadow-utils
-BuildRequires:  pkgconfig
 BuildRequires:  make
 BuildRequires:  ostree-devel
+BuildRequires:  pkg-config
+BuildRequires:  shadow-utils
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
-BuildRequires:  libcontainers-common
 Requires:       catatonit
-Requires:       iptables
-Requires:       nftables
 Requires:       conmon >= 2.0.30
-Requires:       libcontainers-common
-Requires:       netavark >= 1.0.3
-Requires:       shadow-utils-subid
-Requires:       moby-runc
-Requires:       slirp4netns
 Requires:       containernetworking-plugins >= 0.9.1
+Requires:       iptables
+Requires:       libcontainers-common
+Requires:       moby-runc
+Requires:       netavark >= 1.0.3
+Requires:       nftables
+Requires:       shadow-utils-subid
+Requires:       slirp4netns
 Suggests:       qemu-user-static
-
+Provides:       %{name}-manpages = %{version}-%{release}
 # vendored libraries
 # awk '{print "Provides: bundled(golang("$1")) = "$2}' go.mod | sort | uniq | sed -e 's/-/_/g' -e '/bundled(golang())/d' -e '/bundled(golang(go\|module\|replace\|require))/d'
 Provides:       bundled(golang(github.com/BurntSushi/toml)) = v1.1.0
@@ -156,14 +149,14 @@ manipulate images (but not containers) created by the other.
 %{repo} Simple management tool for pods, containers and images
 
 %package       docker
-Summary:       Emulate Docker CLI using %{name}
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
-Conflicts:     docker
-Conflicts:     docker-latest
-Conflicts:     docker-ce
-Conflicts:     docker-ee
-Conflicts:     moby-engine
+Summary:        Emulate Docker CLI using %{name}
+Requires:       %{name} = %{version}-%{release}
+Conflicts:      docker
+Conflicts:      docker-ce
+Conflicts:      docker-ee
+Conflicts:      docker-latest
+Conflicts:      moby-engine
+BuildArch:      noarch
 
 %description docker
 This package installs a script named docker that emulates the Docker CLI by
@@ -171,7 +164,7 @@ executes %{name} commands, it also creates links between all Docker CLI man
 pages and %{name}.
 
 %package remote
-Summary: (Experimental) Remote client for managing %{name} containers
+Summary:        (Experimental) Remote client for managing %{name} containers
 
 %description remote
 Remote client for managing %{name} containers.
@@ -184,9 +177,9 @@ manage pods, containers and container images. %{name}-remote supports ssh
 connections as well.
 
 %package      plugins
-Summary:      Plugins for %{name}
-Requires:     dnsmasq
-Recommends:   %{name}-gvproxy = %{version}-%{release}
+Summary:        Plugins for %{name}
+Requires:       dnsmasq
+Recommends:     %{name}-gvproxy = %{version}-%{release}
 
 %description plugins
 This plugin sets up the use of dnsmasq on a given CNI network so
@@ -197,7 +190,7 @@ is removed from the network, it will remove the entry from the hosts
 file.  Each CNI network will have its own dnsmasq instance.
 
 %package gvproxy
-Summary: Go replacement for libslirp and VPNKit
+Summary:        Go replacement for libslirp and VPNKit
 
 %description gvproxy
 A replacement for libslirp and VPNKit, written in pure Go.
@@ -240,7 +233,7 @@ cd ..
 ln -s vendor src
 
 # build date. FIXME: Makefile uses '/v2/libpod', that doesn't work here?
-LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%s)"
+LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%{s})"
 
 # build rootlessport first
 %gobuild -o bin/rootlessport %{import_path}/cmd/rootlessport
@@ -276,7 +269,7 @@ export GOPATH=$(pwd)/_build:$(pwd)
 %gobuild -o bin/gvproxy %{import_path_gvproxy}/cmd/gvproxy
 cd ..
 
-%{__make} docs docker-docs
+make docs docker-docs
 
 %install
 install -dp %{buildroot}%{_unitdir}
@@ -360,10 +353,9 @@ rm -f %{buildroot}%{_mandir}/man5/docker*.5
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/gvproxy
 
-
 # rhcontainerbot account currently managed by lsm5
 %changelog
-* Tue Nov 1 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 4.1.1-4
+* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 4.1.1-4
 - Move to core package
 - Removed tests package
 
@@ -2460,6 +2452,7 @@ succeed
 - autobuilt 623fcfa
 
 * Tue Feb 26 2019 Dan Walsh <dwalsh@fedoraproject.org> - 2:1.0.1-39.dev.gitcf52144
+
 * Tue Feb 26 2019 Lokesh Mandvekar (Bot) <lsm5+bot@fedoraproject.org> - 2:1.0.1-38.dev.gitcf52144
 - autobuilt cf52144
 
@@ -2713,7 +2706,6 @@ succeed
 
 * Sat Nov 10 2018 Dan Walsh <dwalsh@redhat.com> - 1:0.11.20.11.2-2.dev.git78e6d8e1
 - Remove dirty flag from podman version
-
 
 * Sat Nov 10 2018 Lokesh Mandvekar (Bot) <lsm5+bot@fedoraproject.org> - 1:0.11.20.11.2-1.dev.git7965716.dev.git78e6d8e1
 - bump to 0.11.2
