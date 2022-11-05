@@ -279,7 +279,7 @@ mv pkg/hooks/README.md pkg/hooks/README-hooks.md
 
 # install dnsname plugin
 cd %{repo_plugins}-%{commit_plugins}
-%make_install
+%{__make} PREFIX=%{_prefix} DESTDIR=%{buildroot} install
 cd ..
 
 # install gvproxy
