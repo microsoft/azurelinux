@@ -55,9 +55,6 @@ make DESTDIR=%{buildroot} install install-man
 
 %check
 
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
-
 %files
 %license COPYING
 %doc README.md

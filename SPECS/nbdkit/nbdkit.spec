@@ -1,18 +1,3 @@
-%global _hardened_build 1
-%ifarch %{kernel_arches}
-# ppc64le broken in rawhide:
-# https://bugzilla.redhat.com/show_bug.cgi?id=2006709
-# riscv64 tests fail with
-# qemu-system-riscv64: invalid accelerator kvm
-# qemu-system-riscv64: falling back to tcg
-# qemu-system-riscv64: unable to find CPU model 'host'
-# This seems to require changes in libguestfs and/or qemu to support
-# -cpu max or -cpu virt.
-# s390x builders can't run libguestfs
-%ifnarch %{power64} riscv64 s390 s390x
-%global have_libguestfs 1
-%endif
-%endif
 # We can only compile the OCaml plugin on platforms which have native
 # OCaml support (not bytecode).
 %ifarch %{ocaml_native_compiler}
@@ -28,14 +13,13 @@
 # If the test suite is broken on a particular architecture, document
 # it as a bug and add it to this list.
 %global broken_test_arches NONE
-# If we should verify tarball signature with GPGv2.
-%global verify_tarball_signature 1
 # If there are patches which touch autotools files, set this to 1.
 %global patches_touch_autotools %{nil}
 # The source directory.
 %global source_directory 1.30-stable
 # General exclude flag
 %global exclude_pkg 1
+
 Summary:        NBD server
 Name:           nbdkit
 Version:        1.30.10
@@ -65,9 +49,11 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  expect
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
+BuildRequires:  gnupg2
 BuildRequires:  gnutls-devel
 BuildRequires:  jq
 BuildRequires:  libcurl-devel
+BuildRequires:  libguestfs-devel
 BuildRequires:  libnbd-devel >= 1.3.11
 BuildRequires:  libselinux-devel
 BuildRequires:  libssh2-devel
@@ -98,15 +84,9 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 %endif
-%if 0%{?have_libguestfs}
-BuildRequires:  libguestfs-devel
-%endif
 %if 0%{?have_ocaml}
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-ocamldoc
-%endif
-%if 0%verify_tarball_signature
-BuildRequires:  gnupg2
 %endif
 
 %description
@@ -225,14 +205,12 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description curl-plugin
 This package contains cURL (HTTP/FTP) support for %{name}.
 
-%if 0%{?have_libguestfs}
 %package guestfs-plugin
 Summary:        libguestfs plugin for %{name}
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description guestfs-plugin
 This package is a libguestfs plugin for %{name}.
-%endif
 
 
 %package iso-plugin
@@ -524,15 +502,11 @@ export PYTHON=python3
     --disable-rust \
     --disable-ruby \
     --disable-ssh \
+    --with-libguestfs \
 %if 0%{?have_ocaml}
     --enable-ocaml \
 %else
     --disable-ocaml \
-%endif
-%if 0%{?have_libguestfs}
-    --with-libguestfs \
-%else
-    --without-libguestfs \
 %endif
 %ifarch %{complete_test_arches}
     --enable-libguestfs-tests \
@@ -602,17 +576,13 @@ skip_test tests/test-cache-max-size.sh
 # https://www.redhat.com/archives/libguestfs/2020-March/msg00191.html
 skip_test tests/test-nbd-tls.sh tests/test-nbd-tls-psk.sh
 
-# This test fails on RHEL 9 aarch64 & ppc64le with the error:
-# nbdkit: error: allocator=malloc: mlock: Cannot allocate memory
-# It could be the mlock limit on the builder is too low.
-# https://bugzilla.redhat.com/show_bug.cgi?id=2044432
-#%ifarch aarch64 %{power64}
-#skip_test tests/test-memory-allocator-malloc-mlock.sh
-#%endif
-
-# Make sure we can see the debug messages (RHBZ#1230160).
+# Make sure we can see the debug messages
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
+%make_build check || {
+    cat tests/test-suite.log
+    exit 1
+}
 %endif
 
 %if 0%{?have_ocaml}
@@ -701,13 +671,11 @@ export LIBGUESTFS_TRACE=1
 %{_libdir}/%{name}/plugins/nbdkit-curl-plugin.so
 %{_mandir}/man1/nbdkit-curl-plugin.1*
 
-%if 0%{?have_libguestfs}
 %files guestfs-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-guestfs-plugin.so
 %{_mandir}/man1/nbdkit-guestfs-plugin.1*
-%endif
 
 
 %files iso-plugin

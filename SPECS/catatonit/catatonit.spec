@@ -34,7 +34,6 @@ sed -i '$d' configure.ac
 %build
 autoreconf -fi
 %configure
-#%{__make} %{?_smp_mflags}
 %make_build
 
 # Make sure we *always* build a static binary. Otherwise we'll break containers

@@ -1,11 +1,5 @@
-%global with_check 0
-%global with_debug 1
-%if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
-%else
-%global debug_package %{nil}
-%endif
 %global provider github
 %global provider_tld com
 %global project containers
@@ -209,7 +203,6 @@ tar zxf %{SOURCE1}
 tar zxf %{SOURCE2}
 
 %build
-%if "%{_vendor}" != "debbuild"
 %set_build_flags
 export CGO_CFLAGS=$CFLAGS
 # These extra flags present in $CFLAGS have been skipped for now as they break the build
@@ -219,7 +212,6 @@ CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-specs=\/usr\/lib\/rpm\/redhat\/redhat-an
 
 %ifarch x86_64
 export CGO_CFLAGS+=" -m64 -mtune=generic -fcf-protection=full"
-%endif
 %endif
 
 export GO111MODULE=off
@@ -287,7 +279,7 @@ mv pkg/hooks/README.md pkg/hooks/README-hooks.md
 
 # install dnsname plugin
 cd %{repo_plugins}-%{commit_plugins}
-%{__make} PREFIX=%{_prefix} DESTDIR=%{buildroot} install
+%make_install
 cd ..
 
 # install gvproxy
@@ -303,11 +295,6 @@ done
 
 rm -f %{buildroot}%{_mandir}/man5/docker*.5
 
-#install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-#cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
-
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
 
 %files -f %{name}.file-list
 %license LICENSE
