@@ -56,7 +56,7 @@ pull it in for Go packages only.
 %package -n go-srpm-macros
 Summary:   Source-stage rpm automation for Go packages
 BuildArch: noarch
-Requires:  mariner-rpm-config
+Requires:  mariner-rpm-macros
 
 %description -n go-srpm-macros
 This package provides SRPM-stage rpm automation to simplify the creation of Go
