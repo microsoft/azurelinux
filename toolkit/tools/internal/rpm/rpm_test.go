@@ -104,7 +104,7 @@ func TestArchShouldFailForExcludedArchitectures(t *testing.T) {
 	assert.False(t, matches)
 }
 
-func TestShouldNotListDefaultPackageInRPMsList(t *testing.T) {
+func TestShouldListOnlySubpackageWithArchitectureInRPMsList(t *testing.T) {
 	expectedRPMs := []string{
 		fmt.Sprintf("subpackage_name-1.0.0-1%s.%s", defines[definesDistKey], buildArch),
 	}
