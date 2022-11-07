@@ -1,7 +1,7 @@
-S4280594522ummary:        imake source code configuration and build system
+Summary:        imake source code configuration and build system
 Name:           imake
 Version:        1.0.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
