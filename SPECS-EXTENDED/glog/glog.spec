@@ -7,9 +7,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/google/glog
 Source0:        https://github.com/google/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  gcc-c++
-BuildRequires:  gcc
 BuildRequires:  autoconf
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  gflags-devel >= 2.1.0
 BuildRequires:  make
 Requires:       gflags
@@ -20,7 +20,6 @@ Google glog is a library that implements application-level
 logging. This library provides logging APIs based on C++-style
 streams and various helper macros.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
@@ -29,20 +28,19 @@ Requires:       %{name} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
 %autosetup
 
 %build
-export CXXFLAGS="-std=c++14 $RPM_OPT_FLAGS"
+export CXXFLAGS="-std=c++14 %{optflags}"
 autoconf
 %configure --disable-static
 %make_build
 
 %install
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-rm -rf $RPM_BUILD_ROOT/%{_docdir}/%{name}-%{version}
+find %{buildroot} -type f -name "*.la" -delete -print
+rm -rf %{buildroot}/%{_docdir}/%{name}-%{version}
 
 %ldconfig_scriptlets
 
@@ -57,7 +55,6 @@ rm -rf $RPM_BUILD_ROOT/%{_docdir}/%{name}-%{version}
 %{_libdir}/pkgconfig/libglog.pc
 %dir %{_includedir}/glog
 %{_includedir}/glog/*
-
 
 %changelog
 * Wed Nov 02 2022 Suresh Thelkar <sthelkar@microsoft.com> - 0.3.5-16
