@@ -12363,8 +12363,8 @@
         "type": "other",
         "other": {
           "name": "mutt",
-          "version": "2.0.5",
-          "downloadUrl": "ftp://ftp.mutt.org/pub/mutt/mutt-2.0.5.tar.gz"
+          "version": "2.0.7",
+          "downloadUrl": "ftp://ftp.mutt.org/pub/mutt/mutt-2.0.7.tar.gz"
         }
       }
     },
