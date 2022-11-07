@@ -22574,8 +22574,8 @@
         "type": "other",
         "other": {
           "name": "python-twisted",
-          "version": "22.4.0",
-          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.4.0.tar.gz"
+          "version": "22.10.0",
+          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
         }
       }
     },
