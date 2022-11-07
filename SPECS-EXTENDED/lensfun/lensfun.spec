@@ -1,7 +1,3 @@
-%if !0%{?bootstrap} && (0%{?fedora} || 0%{?rhel} > 6)
-%global tests 1
-%global python3 python%{python3_pkgversion}
-%endif
 Summary:        Library to rectify defects introduced by photographic lenses
 Name:           lensfun
 Version:        0.3.2
@@ -71,27 +67,12 @@ adapters in lensfun.
 Summary:        Python3 lensfun bindings
 License:        LGPLv3 AND CC-BY-SA
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?rhel} == 7
-## pkgname changed in epel7 from python34- to python36-
-Obsoletes:      python34-lensfun < %{version}-%{release}
-%endif
 
 %description -n python3-lensfun
 %{summary}.
 
 %prep
-%setup -q
-
-%patch1 -p1 -b .0001
-%patch38 -p1 -b .0038
-%patch58 -p1 -b .0058
-%patch59 -p1 -b .0059
-%patch60 -p1 -b .0060
-%patch113 -p1 -b .0113
-
-%patch866 -p1 -b .0866
-
-%patch200 -p1 -b .INSTALL_HELPER_SCRIPTS
+%autosetup -p1
 
 %if 0%{?python3:1}
 sed -i.shbang \
@@ -106,7 +87,11 @@ mkdir %{_target_platform}
 pushd %{_target_platform}
 %cmake .. \
   -DBUILD_DOC:BOOL=ON \
-  -DBUILD_TESTS:BOOL=%{?tests:ON}%{!?tests:OFF} \
+%if %{with_check}
+  -DBUILD_TESTS:BOOL=ON\
+%else
+  -DBUILD_TESTS:BOOL=OFF\
+%endif
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_DOCDIR:PATH=%{_pkgdocdir} \
   %{?!python3:-DINSTALL_HELPER_SCRIPTS:BOOL=OFF}
@@ -130,12 +115,10 @@ rm -fv %{buildroot}%{_bindir}/g-lensfun-update-data \
 
 
 %check
-%if 0%{?tests}
 pushd %{_target_platform}
 export CTEST_OUTPUT_ON_FAILURE=1
 ctest -vv
 popd
-%endif
 
 
 %ldconfig_scriptlets
@@ -173,6 +156,8 @@ popd
 
 %changelog
 * Thu Oct 20 2022 Muhammad Falak R Wani <mwani@microsoft.com> - 0.3.2-26
+- Switch to https for source url
+- Drop fedora specific bits
 - License verified
 
 * Wed Jul 07 2021 Muhammad Falak R Wani <mwani@microsoft.com> - 0.3.2-25
