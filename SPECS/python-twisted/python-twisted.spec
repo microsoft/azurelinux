@@ -98,6 +98,9 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_bindir}/cftp3
 
 %changelog
+* Mon Nov 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 22.10.0-1
+- Upgrade to 22.10.0
+
 * Mon Oct 31 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 22.10.0-1
 - Upgrade to 22.10.0
 
