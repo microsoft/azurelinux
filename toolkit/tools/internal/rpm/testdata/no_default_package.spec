@@ -29,5 +29,3 @@ Test subpackage, which should be generate when this spec is built.
 %changelog
 * Mon Nov 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
 - Initial creation.
-
-
