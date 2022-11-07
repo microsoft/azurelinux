@@ -12073,8 +12073,8 @@
         "type": "other",
         "other": {
           "name": "mod_auth_openidc",
-          "version": "2.4.2.1",
-          "downloadUrl": "https://github.com/zmartzone/mod_auth_openidc/archive/v2.4.2.1.tar.gz"
+          "version": "2.4.12",
+          "downloadUrl": "https://github.com/zmartzone/mod_auth_openidc/archive/v2.4.12.tar.gz"
         }
       }
     },
