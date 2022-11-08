@@ -1,34 +1,33 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Perl extension providing access to the GSSAPIv2 library
 #
 # Rebuild option:
 #
 #   --with testsuite         - run the test suite
 #
-
 Name:           perl-GSSAPI
 Version:        0.28
 Release:        32%{?dist}
-Summary:        Perl extension providing access to the GSSAPIv2 library
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/GSSAPI
 Source0:        https://cpan.metacpan.org/authors/id/A/AG/AGROLMS/GSSAPI-%{version}.tar.gz#/perl-GSSAPI-%{version}.tar.gz
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  krb5-devel
-BuildRequires:  which
-%{?_with_testsuite:BuildRequires: perl(constant)}
-%{?_with_testsuite:BuildRequires: perl(Carp)}
-%{?_with_testsuite:BuildRequires: perl(Exporter)}
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  which
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-%{?_with_testsuite:BuildRequires: perl(ExtUtils::testlib)}
 BuildRequires:  perl(Getopt::Long)
-%{?_with_testsuite:BuildRequires: perl(Test::More)}
-%{?_with_testsuite:BuildRequires: perl(Test::Pod) >= 1.00}
-%{?_with_testsuite:BuildRequires: perl(XSLoader)}
+BuildRequires:  perl(constant)
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::testlib)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(XSLoader)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -51,8 +50,7 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} %{buildroot}/*
 
 %check
-# fails a couple of tests if network not available
-%{?_with_testsuite:make test}
+make test
 
 %files
 %doc Changes README examples/

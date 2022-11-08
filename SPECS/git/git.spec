@@ -172,7 +172,6 @@ fi
 %changelog
 * Mon Oct 31 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.33.4-2
 - Add Requires on perl-Authen-SASL and perl-IO-Socket-SSL for git send-email
-- Bump version to 2.33.4-2
 
 * Wed Jul 14 2022 Bala <balakumaran.kannan@microsoft.com> - 2.33.4-1
 - Upgrade to 2.33.4 to address CVE-2022-29187
