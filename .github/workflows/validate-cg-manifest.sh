@@ -76,6 +76,12 @@ function prepare_lua {
   mariner_lua_dir="$rpm_lua_dir/mariner"
   mariner_srpm_lua_dir="$mariner_lua_dir/srpm"
 
+  if [[ -z "$rpm_lua_dir" ]]
+  then
+    echo "ERROR: no RPM LUA directory set, can't update with Mariner's LUA modules!" >&2
+    exit 1
+  fi
+
   # We only want to clean-up directories, which were absent from the system.
   dirs_to_check=("$rpm_lua_dir" "$mariner_lua_dir" "$mariner_srpm_lua_dir")
   for dir_path in "${dirs_to_check[@]}"
