@@ -53,7 +53,7 @@ initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
 initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
 endif
-meta_user_data_iso       = ${IMAGES_DIR)/meta-user-data.iso
+meta_user_data_iso       = $(IMAGES_DIR)/meta-user-data.iso
 
 $(call create_folder,$(workspace_dir))
 $(call create_folder,$(imager_disk_output_dir))
@@ -205,4 +205,4 @@ meta-user-data: $(meta_user_data_files)
 	if [ -n "$(TLS_CERT)" ] && [ -n "$(TLS_KEY)" ] && [ -n "$(CA_CERT)" ]; then \
 		$(SCRIPTS_DIR)/addcerts.sh $(meta_user_data_tmp_dir)/user-data $(TLS_CERT) $(TLS_KEY) $(CA_CERT); \
 	fi
-	genisoimage -output $(IMAGES_DIR)/meta-user-data.iso -volid cidata -joliet -rock $(meta_user_data_tmp_dir)/*
+	genisoimage -output $(meta_user_data_iso) -volid cidata -joliet -rock $(meta_user_data_tmp_dir)/*

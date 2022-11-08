@@ -192,6 +192,35 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(toolkit_root)/out
 
-# output version number
-get-version:
-	@echo $(RELEASE_VERSION)
+######## VARIABLE PRINTING ########
+
+# Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
+get-version: printvar-RELEASE_VERSION
+get-dist-tag: printvar-DIST_TAG
+get-release-major: printvar-RELEASE_MAJOR_ID
+
+# Make an easy way to print out the build variables. These must be the last entries in the makefile so that all other
+# files have their variables inluded
+
+# Print out all variables to stdout, either or of the form "<VALUE>" or the verbose form "varname: <VALUE>"
+#   printvar-all-vars
+#   printvar-verbose-all-vars
+
+# Print a specific variable to stdout, using the same format as above
+#   printvar-*
+#   printvar-verbose-*
+
+# Use these targets like so:  `my-var=$(make printvar-MY_VAR --quiet)`
+# The --quiet flag is important to avoid printing extra output
+.PHONY: printvar-all-vars printvar-verbose-all-vars
+
+# Gather the variables we want to print out, removing any automatic .* variables, and the self reference
+interesting_variables = $(filter-out .% interesting_variables, $(sort $(.VARIABLES)))
+printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var))
+printvar-all-vars: ;
+printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbose-$(var))
+printvar-verbose-all-vars: ;
+
+#$(print_targets): ; $(info $($(subst print-,,$@)))
+printvar-%: ; $(info $($(subst printvar-,,$@)))
+printvar-verbose-%: ; $(info $(subst printvar-verbose-,,$@): $($(subst printvar-verbose-,,$@)))
