@@ -18,15 +18,15 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-build_specs     = $(shell find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
-pkggen_rpms     = $(shell find $(RPMS_DIR)/*  2>/dev/null )
+pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
 # Pkggen workspace
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_files        = $(shell find $(CACHED_RPMS_DIR)/)
+rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
