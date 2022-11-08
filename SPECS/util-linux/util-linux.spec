@@ -1,15 +1,15 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.32.1
-Release:        7%{?dist}
+Version:        2.37.4
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
-Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.32/%{name}-%{version}.tar.xz
-Patch0:         CVE-2021-37600.patch
-Patch1:         CVE-2022-0563.patch
+Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v%{majmin}/%{name}-%{version}.tar.xz
 
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
@@ -71,7 +71,7 @@ make %{?_smp_mflags}
 %install
 install -vdm 755 %{buildroot}%{_sharedstatedir}/hwclock
 make DESTDIR=%{buildroot} install
-chmod 644 %{buildroot}%{_docdir}/util-linux/getopt/getopt*.tcsh
+chmod 644 %{buildroot}%{_docdir}/util-linux/getopt*.tcsh
 find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}
 
@@ -88,8 +88,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %license COPYING
 %dir %{_sharedstatedir}/hwclock
 /bin/*
-/lib/libfdisk.so.*
-/lib/libsmartcols.so.*
 /sbin/*
 %{_bindir}/*
 %{_sbindir}/*
@@ -97,25 +95,32 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
-%{_docdir}/util-linux/getopt/*
+%{_docdir}/util-linux/getopt*
 
 %files libs
 %defattr(-,root,root)
+%{_libdir}/*.so
 /lib/libblkid.so.*
 /lib/libmount.so.*
 /lib/libuuid.so.*
+/lib/libsmartcols.so.*
+/lib/libfdisk.so.*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
 %files devel
 %defattr(-,root,root)
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
+%license libblkid/COPYING
 %{_libdir}/pkgconfig/*.pc
-%{_libdir}/*.so
 %{_includedir}/*
 %{_mandir}/man3/*
 
 %changelog
+*   Mon Nov 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37.4-1
+-   Updating to version 3.37.4 to fix CVE-2021-3996.
+
 *   Mon Apr 18 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.32.1-7
 -   Backport patch for CVE-2022-0563.
 

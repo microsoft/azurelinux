@@ -8576,8 +8576,8 @@
         "type": "other",
         "other": {
           "name": "util-linux",
-          "version": "2.32.1",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util-linux-2.32.1.tar.xz"
+          "version": "2.37.4",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.4.tar.xz"
         }
       }
     },
