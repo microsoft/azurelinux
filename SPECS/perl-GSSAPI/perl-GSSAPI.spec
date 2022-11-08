@@ -1,9 +1,4 @@
 Summary:        Perl extension providing access to the GSSAPIv2 library
-#
-# Rebuild option:
-#
-#   --with testsuite         - run the test suite
-#
 Name:           perl-GSSAPI
 Version:        0.28
 Release:        32%{?dist}
