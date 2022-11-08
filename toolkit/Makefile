@@ -221,6 +221,5 @@ printvar-all-vars: ;
 printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbose-$(var))
 printvar-verbose-all-vars: ;
 
-#$(print_targets): ; $(info $($(subst print-,,$@)))
 printvar-%: ; $(info $($(subst printvar-,,$@)))
 printvar-verbose-%: ; $(info $(subst printvar-verbose-,,$@): $($(subst printvar-verbose-,,$@)))
