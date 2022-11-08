@@ -37,8 +37,6 @@ $(shell $1)
 endef
 endif # ifeq (n,$(findstring...
 
-myvar = $(call shell_real_build_only, ls)
-
 # Echos a message to console, then calls "exit 1"
 # Of the form: { echo "MSG" ; exit 1 ; }
 #
