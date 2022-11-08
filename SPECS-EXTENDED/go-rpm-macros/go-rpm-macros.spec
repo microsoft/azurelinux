@@ -5,7 +5,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global forgeurl  https://pagure.io/go-rpm-macros
 Version:   3.0.9
-%forgemeta
+%forgemeta 
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/mariner
