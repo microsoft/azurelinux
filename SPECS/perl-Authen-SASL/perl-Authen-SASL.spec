@@ -74,7 +74,7 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Mon Oct 31 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.16-22
+* Tue Nov 8 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.16-22
 - Moved from extended to core.
 
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16-21

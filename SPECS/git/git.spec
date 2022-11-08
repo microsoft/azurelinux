@@ -170,7 +170,7 @@ fi
 %endif
 
 %changelog
-* Mon Oct 31 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.33.4-2
+* Tue Nov 8 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.33.4-2
 - Add Requires on perl-Authen-SASL and perl-IO-Socket-SSL for git send-email
 
 * Wed Jul 14 2022 Bala <balakumaran.kannan@microsoft.com> - 2.33.4-1
