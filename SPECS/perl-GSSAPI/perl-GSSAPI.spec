@@ -48,6 +48,7 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 make test
 
 %files
+%license README
 %doc Changes README examples/
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/GSSAPI*
@@ -56,6 +57,7 @@ make test
 %changelog
 * Tue Nov 8 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 0.28-32
 - Moved from extended to core.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.28-31
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
