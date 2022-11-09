@@ -19,21 +19,19 @@ SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
 
-ifneq ($(strip $(SRPM_PACK_LIST)),)
-local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip $(SRPM_PACK_LIST)))))
+# Configure the list of packages we want to process into SRPMs
+custom_srpm_pack_list = $(strip $(SRPM_PACK_LIST))
+ifneq ($(custom_srpm_pack_list),) # Pack list has user entries in it, only build selected .spec files
+local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(custom_srpm_pack_list))))
+$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
+	@echo $(custom_srpm_pack_list) | tr " " "\n" > $(srpm_pack_list_file)
 else # Empty pack list, build all under $(SPECS_DIR)
 local_specs = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
-endif
-local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
-local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
-
-ifneq ($(strip $(SRPM_PACK_LIST)),)
-$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
-	@echo $(strip $(SRPM_PACK_LIST)) | tr " " "\n" > $(srpm_pack_list_file)
-else # Empty pack list, build all under $(SPECS_DIR)
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 	@truncate -s 0 $@
 endif
+local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
+local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
 
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
@@ -95,7 +93,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
+		$(if $(custom_srpm_pack_list),--pack-list=$(srpm_pack_list_file)) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) && \
 	touch $@
