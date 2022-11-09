@@ -72,7 +72,7 @@ rm -rf %{buildroot}/*
 
 %files -f %{name}.lang
 %defattr(-,root,root)
-%license doc/LICENSE
+%license LICENSE.md
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers
 %attr(0750,root,root) %dir %{_sysconfdir}/sudoers.d/
 %config(noreplace) %{_sysconfdir}/pam.d/sudo
