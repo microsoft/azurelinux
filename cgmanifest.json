@@ -25035,8 +25035,8 @@
         "type": "other",
         "other": {
           "name": "screen",
-          "version": "4.8.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/screen/screen-4.8.0.tar.gz"
+          "version": "4.9.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/screen/screen-4.9.0.tar.gz"
         }
       }
     },
