@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "gccmakedep-1.0.3.tar.bz2": "b275dcf1f7323ed89e8b36f8fbd5da665d8700005f1779fa5b90a1688bbf2ee4",
+  "imake-1.0.8.tar.bz2": "b8d2e416b3f29cd6482bcffaaf19286d32917a164d07102a0e531ccd41a2a702",
+  "lndir-1.0.3.tar.bz2": "49f4fab0de8d418db4ce80dad34e9b879a4199f3e554253a8e1ab68f7c7cb65d",
+  "makedepend-1.0.6.tar.bz2": "d558a52e8017d984ee59596a9582c8d699a1962391b632bec3bb6804bf4d501c",
+  "xorg-cf-files-1.0.6.tar.bz2": "4dcf5a9dbe3c6ecb9d2dd05e629b3d373eae9ba12d13942df87107fdc1b3934d"
+ }
+}
