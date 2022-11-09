@@ -72,9 +72,15 @@ function prepare_lua {
 
   lua_common_file_name="common.lua"
   lua_forge_file_name="forge.lua"
-  rpm_lua_dir="/usr/lib/rpm/lua"
+  rpm_lua_dir="$(rpm --eval "%_rpmluadir")"
   mariner_lua_dir="$rpm_lua_dir/mariner"
   mariner_srpm_lua_dir="$mariner_lua_dir/srpm"
+
+  if [[ -z "$rpm_lua_dir" ]]
+  then
+    echo "ERROR: no RPM LUA directory set, can't update with Mariner's LUA modules!" >&2
+    exit 1
+  fi
 
   # We only want to clean-up directories, which were absent from the system.
   dirs_to_check=("$rpm_lua_dir" "$mariner_lua_dir" "$mariner_srpm_lua_dir")
@@ -83,19 +89,20 @@ function prepare_lua {
     if [[ ! -d "$dir_path" ]]
     then
       FILES_TO_CLEAN_UP+=("$dir_path")
+      break
     fi
   done
-  mkdir -p "$mariner_srpm_lua_dir"
+  sudo mkdir -p "$mariner_srpm_lua_dir"
 
   if [[ ! -f "$mariner_lua_dir/$lua_common_file_name" ]]
   then
-    cp "$rpm_macros_dir/$lua_common_file_name" "$mariner_lua_dir/$lua_common_file_name"
+    sudo cp "$rpm_macros_dir/$lua_common_file_name" "$mariner_lua_dir/$lua_common_file_name"
     FILES_TO_CLEAN_UP+=("$mariner_lua_dir/$lua_common_file_name")
   fi
 
   if [[ ! -f "$mariner_srpm_lua_dir/$lua_forge_file_name" ]]
   then
-    cp "$rpm_macros_dir/$lua_forge_file_name" "$mariner_srpm_lua_dir/$lua_forge_file_name"
+    sudo cp "$rpm_macros_dir/$lua_forge_file_name" "$mariner_srpm_lua_dir/$lua_forge_file_name"
     FILES_TO_CLEAN_UP+=("$mariner_srpm_lua_dir/$lua_forge_file_name")
   fi
 }
@@ -123,7 +130,7 @@ function clean_up {
     for file_path in "${FILES_TO_CLEAN_UP[@]}"
     do
       echo "   Removing ($file_path)."
-      rm -rf "$file_path"
+      sudo rm -rf "$file_path"
     done
 }
 trap clean_up EXIT SIGINT SIGTERM
