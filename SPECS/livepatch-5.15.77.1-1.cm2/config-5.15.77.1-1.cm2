@@ -7212,8 +7212,6 @@ CONFIG_SYMBOLIC_ERRNAME=y
 CONFIG_DEBUG_BUGVERBOSE=y
 # end of printk and dmesg options
 
-CONFIG_AS_HAS_NON_CONST_LEB128=y
-
 #
 # Compile-time checks and compiler options
 #
