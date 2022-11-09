@@ -29,12 +29,9 @@ endef
 #
 # $1 - The full command to run, if we are not doing --dry-run
 ifeq (n,$(findstring n,$(firstword $(MAKEFLAGS))))
-define shell_real_build_only
-endef
+shell_real_build_only =
 else # ifeq (n,$(findstring...
-define shell_real_build_only
-$(shell $1)
-endef
+shell_real_build_only = $(shell $1)
 endif # ifeq (n,$(findstring...
 
 # Echos a message to console, then calls "exit 1"
