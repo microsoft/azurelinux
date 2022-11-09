@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,8 @@ Requires:       perl-CGI
 Requires:       perl-DBI
 Requires:       perl-YAML
 Requires:       perl-interpreter
+Requires:       perl-Authen-SASL
+Requires:       perl-IO-Socket-SSL
 Requires:       python3
 Requires:       subversion-perl
 Provides:       git-core = %{version}-%{release}
@@ -168,6 +170,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 8 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.33.4-2
+- Add Requires on perl-Authen-SASL and perl-IO-Socket-SSL for git send-email
+
 * Wed Jul 14 2022 Bala <balakumaran.kannan@microsoft.com> - 2.33.4-1
 - Upgrade to 2.33.4 to address CVE-2022-29187
 
