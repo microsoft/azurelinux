@@ -242,6 +242,7 @@
                 "gl-manpages",
                 "glew",
                 "glm",
+                "glog",
                 "glusterfs",
                 "gnome-desktop-testing",
                 "gnome-doc-utils",

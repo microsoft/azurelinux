@@ -3909,6 +3909,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "glog",
+          "version": "0.3.5",
+          "downloadUrl": "https://github.com/google/glog/archive/v0.3.5/glog-0.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "glusterfs",
           "version": "7.9",
           "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
