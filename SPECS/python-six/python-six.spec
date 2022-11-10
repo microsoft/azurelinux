@@ -68,6 +68,8 @@ python3 test_six.py
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Nov 09 2022 Jon Slobodzian <joslobo@microsoft.com> 1.11.0-5
+-   Fix python-six test to use explicit version of pytest. Latest version is incompatible
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.11.0-4
 -   Added %%license line automatically
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 1.11.0-3
