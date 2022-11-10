@@ -222,4 +222,6 @@ printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbo
 printvar-verbose-all-vars: ;
 
 printvar-%: ; $(info $($(subst printvar-,,$@)))
+	@: # We want to supress 'make: Nothing to be done for ...' so execute a command so make thinks it has done something
 printvar-verbose-%: ; $(info $(subst printvar-verbose-,,$@): $($(subst printvar-verbose-,,$@)))
+	@: # We want to supress 'make: Nothing to be done for ...' so execute a command so make thinks it has done something
