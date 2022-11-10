@@ -1,0 +1,17 @@
+--- xorg-cf-files-1.0.6/linux.cf.redhat	2005-10-21 21:10:27.000000000 +0200
++++ xorg-cf-files-1.0.6/linux.cf	2005-12-21 11:27:16.000000000 +0100
+@@ -190,7 +190,13 @@
+ #endif /* LinuxDebian */
+ 
+ #if LinuxDistribution == LinuxRedHat
+-#define FSUseSyslog		YES
++# define FSUseSyslog		YES
++# define BuildRman		NO
++# define BuildHtmlManPages	NO
++# define ProjectRoot		/usr
++# define ManPath		/usr/share/man
++# define XAppLoadDir		/usr/share/X11/app-defaults
++# define ConfigDir		/usr/share/X11/config
+ #endif
+ 
+ #ifndef HasDevRandom

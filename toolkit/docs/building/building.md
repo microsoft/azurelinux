@@ -192,7 +192,10 @@ After building a package you may choose to rebuild it or build additional packag
 ```bash
 # Clean and rebuild targeted packages
 sudo make clean-build-packages
-sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh" REFRESH_WORKER_CHROOT=n
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at openssh" REFRESH_WORKER_CHROOT=n
+
+# Rebuild single package
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_REBUILD_LIST="at" REFRESH_WORKER_CHROOT=n
 ```
 
 ## **Image Stage**

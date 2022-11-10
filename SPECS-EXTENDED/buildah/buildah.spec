@@ -31,7 +31,7 @@ Distribution:   Mariner
 
 Name: %{repo}
 Version: 1.18.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: A command line tool used for creating OCI Images
 License: ASL 2.0
 URL: https://%{name}.io
@@ -146,6 +146,9 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.0-6
+- Bump release to rebuild with go 1.18.8
+
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.18.0-5
 - Rebuilt for glibc-static 2.35-3
 
