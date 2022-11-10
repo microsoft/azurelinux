@@ -1,42 +1,42 @@
-Summary:        SASL Authentication framework for Perl
-Name:           perl-Authen-SASL
-Version:        2.16
-Release:        22%{?dist}
-License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Name:           perl-Authen-SASL
+Version:        2.16
+Release:        21%{?dist}
+Summary:        SASL Authentication framework for Perl
+License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Authen-SASL
 Source0:        https://cpan.metacpan.org/authors/id/G/GB/GBARR/Authen-SASL-%{version}.tar.gz#/perl-Authen-SASL-%{version}.tar.gz
 Source1:        LICENSE.PTR
 # Update the function WRITE to properly handle string which is shorter than
 # provided length
 Patch0:         Authen-SASL-RT85294-Fix-WRITE.patch
+BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  sed
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(Digest::HMAC_MD5)
-BuildRequires:  perl(Digest::MD5)
-# Tests
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(GSSAPI)
-BuildRequires:  perl(Module::CoreList)
+BuildRequires:  perl-generators
+BuildRequires:  perl(inc::Module::Install)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Makefile)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(Tie::Handle)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+BuildRequires:  sed
 # Run-time
 BuildRequires:  perl(bytes)
-BuildRequires:  perl(inc::Module::Install)
-BuildRequires:  perl(strict)
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Digest::HMAC_MD5)
+BuildRequires:  perl(Digest::MD5)
+BuildRequires:  perl(GSSAPI)
+BuildRequires:  perl(Tie::Handle)
 BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-BuildArch:      noarch
+# Tests
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Test::More)
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
 SASL is a generic mechanism for authentication used by several network
@@ -54,13 +54,13 @@ sed -i -e '/^inc\// d' MANIFEST
 chmod -c a-x example_pl
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
+%{__perl} Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
-%{_fixperms} %{buildroot}
+make pure_install DESTDIR=$RPM_BUILD_ROOT
+find $RPM_BUILD_ROOT -type f -name .packlist -delete
+%{_fixperms} $RPM_BUILD_ROOT
 
 cp %{SOURCE1} .
 
@@ -74,9 +74,6 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Tue Nov 8 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.16-22
-- Moved from extended to core.
-
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16-21
 - License verified.
 
