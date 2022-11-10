@@ -1,0 +1,37 @@
+From a96e68a70e362597c2ab49d3f9a60f4586a1ae5b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=A1clav=20Dole=C5=BEal?= <vdolezal@redhat.com>
+Date: Fri, 21 Feb 2020 13:49:08 +0100
+Subject: [PATCH] Expand d_xtermosc array in struct display
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Commit c5db181 expands index range of "typ2" by one without expanding
+affected arrays. d_xtermosc in struct display is one of these.
+
+Related: c5db181b6e017cfccb8d7842ce140e59294d9f62
+  (ansi: add support for xterm OSC 11)
+Related: 68386dfb1fa33471372a8cd2e74686758a2f527b
+  (Fix out of bounds access when setting w_xtermosc after OSC 49)
+
+Signed-off-by: Václav Doležal <vdolezal@redhat.com>
+---
+ display.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/display.h b/display.h
+index 459cc5d..4fc2061 100644
+--- a/display.h
++++ b/display.h
+@@ -112,7 +112,7 @@ struct display
+   int	d_mousetrack;		/* set when user wants to use mouse even when the window
+ 				   does not */
+ #ifdef RXVT_OSC
+-  int   d_xtermosc[4];		/* osc used */
++  int   d_xtermosc[5];		/* osc used */
+ #endif
+   struct mchar d_lpchar;	/* missing char */
+   struct timeval d_status_time;	/* time of status display */
+-- 
+2.20.1
+
