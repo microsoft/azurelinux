@@ -71,7 +71,7 @@ var (
 	noCleanup              = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache                = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure          = app.Flag("stop-on-failure", "Stop on failed build").Bool()
-	reservedFileListFile   = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
+	toolchainManifest      = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
 	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	allowToolchainRebuilds = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
@@ -106,7 +106,7 @@ func main() {
 	}
 
 	ignoredPackages := exe.ParseListArgument(*ignoredPackages)
-	reservedFileListFile := *reservedFileListFile
+	toolchainManifest := *toolchainManifest
 
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
@@ -123,11 +123,11 @@ func main() {
 		logger.Log.Fatalf("Unable to generate package build list, error: %s", err)
 	}
 
-	var reservedFiles []string
-	if len(reservedFileListFile) > 0 {
-		reservedFiles, err = schedulerutils.ReadReservedFilesList(reservedFileListFile)
+	var toolchainPackages []string
+	if len(toolchainManifest) > 0 {
+		toolchainPackages, err = schedulerutils.ReadReservedPackageManifest(toolchainManifest)
 		if err != nil {
-			logger.Log.Fatalf("unable to read reserved file list %s: %s", reservedFileListFile, err)
+			logger.Log.Fatalf("unable to read reserved file list %s: %s", toolchainManifest, err)
 		}
 	}
 
@@ -173,7 +173,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, reservedFiles, *deltaBuild, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, toolchainPackages, *deltaBuild, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
 	}
@@ -201,7 +201,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages, reservedFiles []string, deltaBuild bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages, toolchainPackages []string, deltaBuild bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -217,7 +217,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels, reservedFiles, deltaBuild, allowToolchainRebuilds)
+	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels, toolchainPackages, deltaBuild, allowToolchainRebuilds)
 
 	if builtGraph != nil {
 		graphMutex.RLock()

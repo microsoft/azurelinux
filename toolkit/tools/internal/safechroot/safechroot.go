@@ -309,6 +309,7 @@ func (c *Chroot) UnsafeRun(toRun func() error) (err error) {
 	}
 	defer originalWd.Close()
 
+	logger.Log.Debug("Entering Chroot")
 	err = unix.Chroot(c.rootDir)
 	if err != nil {
 		return

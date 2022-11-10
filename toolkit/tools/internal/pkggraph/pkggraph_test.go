@@ -866,6 +866,7 @@ func TestDeepCopy(t *testing.T) {
 	assert.NotNil(t, gOut)
 
 	gCopy, err := gOut.DeepCopy()
+	assert.NoError(t, err)
 
 	checkTestGraph(t, gCopy)
 }

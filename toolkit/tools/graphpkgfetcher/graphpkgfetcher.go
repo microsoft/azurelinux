@@ -65,7 +65,7 @@ func main() {
 	var toolchainPackages []string
 	toolchainManifest := *toolchainManifest
 	if len(toolchainManifest) > 0 {
-		toolchainPackages, err = schedulerutils.ReadReservedFilesList(toolchainManifest)
+		toolchainPackages, err = schedulerutils.ReadReservedPackageManifest(toolchainManifest)
 		if err != nil {
 			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifest, err)
 		}
