@@ -6520,16 +6520,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "imake",
-          "version": "1.0.8",
-          "downloadUrl": "https://www.x.org/pub/individual/util/imake-1.0.8.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "imaptest",
           "version": "20210305",
           "downloadUrl": "https://dovecot.org/nightly/imaptest/imaptest-20210305.tar.gz"
