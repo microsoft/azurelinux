@@ -225,7 +225,7 @@ cd ..
 ln -s vendor src
 
 # build date. FIXME: Makefile uses '/v2/libpod', that doesn't work here?
-LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%{s})"
+LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%s)"
 
 # build rootlessport first
 %gobuild -o bin/rootlessport %{import_path}/cmd/rootlessport

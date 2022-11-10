@@ -19,7 +19,7 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           %{repo}
 Version:        1.18.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,9 +87,12 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
-* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.18.0-6
+* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.18.0-7
 - Move to core packages
 - Remove tests package
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.0-6
+- Bump release to rebuild with go 1.18.8
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.18.0-5
 - Rebuilt for glibc-static 2.35-3

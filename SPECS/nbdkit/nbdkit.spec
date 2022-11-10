@@ -908,7 +908,7 @@ export LIBGUESTFS_TRACE=1
 
 %changelog
 * Mon Oct 31 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.30.10-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified
 
 * Fri Oct 14 2022 Richard W.M. Jones <rjones@redhat.com> - 1.30.10-2

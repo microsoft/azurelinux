@@ -24,7 +24,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %forgemeta
 URL:           %{forgeurl}
-# Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
 Source:        %{forgesource}
 Patch0:        fixing_ldflags_for_mariner.patch
 
