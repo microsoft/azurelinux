@@ -3,7 +3,7 @@
 Summary:        Fluentd event collector
 Name:           rubygem-%{gem_name}
 Version:        1.14.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
