@@ -2,7 +2,7 @@
 
 set -e
 
-SRC_TARBALL="/mnt/c/Users/rmaharjan/Documents/CBL-Mariner/CBL-Mariner/SPECS/grpc/grpc-1.42.0.tar.gz"
+SRC_TARBALL="grpc-1.42.0.tar.gz"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PKG_VERSION="1.42.0"
 
@@ -78,9 +78,9 @@ git clone --depth 1 https://github.com/grpc/grpc.git
 pushd grpc
 git fetch --all --tags
 git checkout tags/v$PKG_VERSION -b grpc-$PKG_VERSION
-git submodule update --depth 1 --init --recursive 
+git submodule update --init
 popd
-mv grpc grpc-$1
+mv grpc grpc-$PKG_VERSION
 
 if [[ -n $SRC_TARBALL ]]; then
     TARBALL_NAME="$(basename $SRC_TARBALL)"
@@ -97,6 +97,6 @@ NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -zcf $NEW_TARBALL grpc-$1
+    -zcf $NEW_TARBALL grpc-$PKG_VERSION
 
 echo "Source tarball $NEW_TARBALL successfully created!"
