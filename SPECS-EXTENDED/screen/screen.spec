@@ -23,7 +23,6 @@ Patch2:         screen-4.3.1-screenrc.patch
 Patch3:         screen-E3.patch
 Patch4:         screen-4.3.1-suppress_remap.patch
 Patch5:         screen-4.3.1-crypt.patch
-Patch6:         screen-4.8.0-expand-d_xtermosc.patch
 
 %description
 The screen utility allows you to have multiple logins on just one
