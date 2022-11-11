@@ -2066,6 +2066,7 @@
                 "python-cachetools",
                 "python-cherrypy",
                 "python-execnet",
+                "python-google-pasta",
                 "python-logutils",
                 "python-nocasedict",
                 "python-opt-einsum",
