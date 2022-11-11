@@ -60,7 +60,7 @@ Summary:        %{summary}
 %pyproject_save_files typing_extensions
 
 %check
-pip3 install pytest
+pip3 install pytest==7.1.3
 %pytest
 
 %files -n python3-typing-extensions -f %{pyproject_files}
