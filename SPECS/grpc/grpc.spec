@@ -1,37 +1,29 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.42.0
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
+
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  git
+BuildRequires:  openssl-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  re2-devel
 BuildRequires:  zlib-devel
-BuildRequires:  pkgconfig(openssl)
-BuildRequires:  ninja-build
+
 Requires:       abseil-cpp
 Requires:       c-ares
 Requires:       openssl
 Requires:       protobuf
 Requires:       zlib
-
-# Python
-BuildRequires:      build-essential
-BuildRequires:      python3-devel
-BuildRequires:      python3-Cython
-BuildRequires:      python3-six
-BuildRequires:      python3-wheel
-BuildRequires:      python3-setuptools
-BuildRequires:      python3-protobuf
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -50,21 +42,11 @@ Summary:        Plugins files for grpc
 Requires:       %{name} = %{version}-%{release}
 Requires:       protobuf
 
-
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
-%package -n python3-grpcio
-Summary:        Python language bindings for gRPC
-Requires:       %{name} = %{version}-%{release}
-Requires:       python3-six
-%{?python_provide:%python_provide python3-grpcio}
-
-%description -n python3-grpcio
-Python language bindings for gRPC.
-
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup
 
 %build
 # Updating used C++ version to be compatible with the build dependencies.
@@ -73,9 +55,8 @@ Python language bindings for gRPC.
 CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
 
 mkdir -p cmake/build
-pushd cmake/build
-%cmake ../.. -GNinja                         \
-   -DgRPC_INSTALL=ON                         \
+cd cmake/build
+cmake ../.. -DgRPC_INSTALL=ON                \
    -DBUILD_SHARED_LIBS=ON                    \
    -DCMAKE_BUILD_TYPE=Release                \
    -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
@@ -86,29 +67,12 @@ pushd cmake/build
    -DgRPC_RE2_PROVIDER:STRING='package'      \
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
-%cmake_build
-popd
-#python
-export GRPC_PYTHON_BUILD_WITH_CYTHON=True
-export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
-export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
-export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
-export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
-export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-%py3_build
-
+%make_build
 
 %install
-pushd cmake/build
-%cmake_install
+cd cmake/build
+%make_install
 find %{buildroot} -name '*.cmake' -delete
-popd
-#python
-pushd '%{buildroot}'
-PYROOT="${PWD}"
-popd
-%py3_install
-
 
 %files
 %license LICENSE
@@ -137,16 +101,7 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
-#imported from fedora
-%files -n python3-grpcio
-%license LICENSE
-%{python3_sitearch}/grpc
-%{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
-
 %changelog
-* Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
-- Add python binding for gRPC.
-
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-2
 - Bumping release to rebuild with latest 'abseil-cpp'.
 
