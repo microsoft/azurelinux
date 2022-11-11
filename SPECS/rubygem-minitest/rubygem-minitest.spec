@@ -3,7 +3,7 @@
 Summary:        Minitest provides a complete suite of testing facilities
 Name:           rubygem-%{gem_name}
 Version:        5.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 # minitest source is licensed under MIT and minitest.gemspec is taken from ruby source, licensed under the rest
 License:        MIT AND (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
@@ -13,11 +13,17 @@ URL:            https://github.com/seattlerb/minitest
 Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # When updating the version, please make necessary changes in this .gemspec, e.g. update version, dependencies (use https://rubygems.org/gems/minitest)
 Source1:        minitest.gemspec
+BuildArch:      noarch
+
 BuildRequires:  git
 BuildRequires:  ruby
+
 Requires:       ruby(release)
+
+# This package used to be bundled with older versions of Ruby.
+Obsoletes:      ruby <= 3.1.2-2%{?dist}
+
 Provides:       rubygem(minitest) = %{version}-%{release}
-BuildArch:      noarch
 
 %description
 minitest/unit is a small and incredibly fast unit testing framework.
@@ -47,6 +53,9 @@ cp README.rdoc %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.0-2
+- Adding 'Obsoletes: ruby <= 3.1.2-2'.
+
 * Tue May 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.0-1
 - Update to v5.15.0
 - Get source.tar.gz from upstream, get initial .gemspec from ruby2.7.4 source (license (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD)

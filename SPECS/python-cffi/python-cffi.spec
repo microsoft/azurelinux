@@ -1,7 +1,7 @@
 Summary:        Interface for Python to call C code
 Name:           python-cffi
 Version:        1.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,7 @@ Foreign Function Interface for Python, providing a convenient and reliable way o
 %py3_install
 
 %check
-pip3 install pytest
+pip3 install pytest==7.1.2
 %python3 setup.py test
 
 %files -n python3-cffi
@@ -50,6 +50,9 @@ pip3 install pytest
 %{python3_sitelib}/*
 
 %changelog
+* Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15.0-2
+- Freezing 'pytest' test dependency to version 7.1.2.
+
 * Thu Feb 10 2022 Nick Samson <nisamson@microsoft.com> - 1.15.0-1
 - Upgraded to 1.15.0
 

@@ -39,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        2.5.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -220,6 +220,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.5.0-7
+- Bump release to rebuild with go 1.18.8
+
 * Thu Sep 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-6
 - Add patch to avoid memory hotplug timeout, add libseccomp.
 

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
-Version:        22.4.0
+Version:        22.10.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -98,6 +98,9 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_bindir}/cftp3
 
 %changelog
+* Mon Oct 31 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 22.10.0-1
+- Upgrade to 22.10.0
+
 * Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 22.4.0-1
 - Upgrade to version 22.4.0 to fix CVE-2022-24801
 

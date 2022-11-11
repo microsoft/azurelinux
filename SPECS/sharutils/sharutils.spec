@@ -1,7 +1,7 @@
 Summary:        The GNU shar utilities for packaging and unpackaging shell archives
 Name:           sharutils
 Version:        4.15.2
-Release:        19%{?dist}
+Release:        20%{?dist}
 # The main code:                GPLv3+
 # intl/dngettext.c:             LGPLv2+
 # lib (gnulib):                 GPLv3+
@@ -26,7 +26,7 @@ Patch0:         %{name}-4.14.2-Pass-compilation-with-Werror-format-security.patc
 # Fix CVE-2018-1000097 (a heap buffer overflow in find_archive()),
 # bug #1548019,
 # <http://lists.gnu.org/archive/html/bug-gnu-utils/2018-02/msg00004.html>
-Patch1:         CVE-2018-100009.patch
+Patch1:         CVE-2018-1000097.patch
 # Adapt bundled gnulib to glibc-2.28
 Patch2:         %{name}-4.15.2-fflush-adjust-to-glibc-2.28-libio.h-removal.patch
 # Fix building with GCC 10,
@@ -101,6 +101,9 @@ chmod 644 AUTHORS ChangeLog COPYING NEWS README THANKS TODO
 %{_mandir}/man5/*
 
 %changelog
+* Mon Oct 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.15.2-20
+- Fix typo in CVE-2018-1000097 patch filename to ensure detection by CVE tooling
+
 * Mon Dec 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.15.2-19
 - Using HTTPS for source URL.
 - License verified.

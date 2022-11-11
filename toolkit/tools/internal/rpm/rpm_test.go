@@ -4,6 +4,7 @@
 package rpm
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -13,13 +14,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const specsDir = "testdata"
+const (
+	definesDistKey      = "dist"
+	definesWithCheckKey = "with_check"
+	specsDir            = "testdata"
+)
 
 var buildArch = goArchToRpmArch[runtime.GOARCH]
 
 var defines = map[string]string{
-	"dist":       ".cmX",
-	"with_check": "1",
+	definesDistKey:      ".cmX",
+	definesWithCheckKey: "1",
 }
 
 func TestMain(m *testing.M) {
@@ -97,4 +102,15 @@ func TestArchShouldFailForExcludedArchitectures(t *testing.T) {
 	matches, err := SpecArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
+}
+
+func TestShouldListOnlySubpackageWithArchitectureInRPMsList(t *testing.T) {
+	expectedRPMs := []string{
+		fmt.Sprintf("subpackage_name-1.0.0-1%s.%s", defines[definesDistKey], buildArch),
+	}
+	specFilePath := filepath.Join(specsDir, "no_default_package.spec")
+
+	builtRPMs, err := QuerySPECForBuiltRPMs(specFilePath, specsDir, buildArch, defines)
+	assert.NoError(t, err)
+	assert.EqualValues(t, expectedRPMs, builtRPMs)
 }

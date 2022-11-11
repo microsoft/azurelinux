@@ -3,11 +3,11 @@
 Summary:        %{sum}
 Name:           python-%{pypi_name}
 Version:        1.1.0
-Release:        29%{?dist}
+Release:        30%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://pypi.python.org/pypi/termcolor/1.1.0
+URL:            https://pypi.python.org/pypi/termcolor/
 Source0:        https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools

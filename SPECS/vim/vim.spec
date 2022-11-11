@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0614
+Version:        9.0.0805
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -196,6 +196,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Sun Oct 30 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0805-1
+- Upgrade to 9.0.0805
+
 * Tue Oct 04 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0614-1
 - Upgrade to 9.0.0614
 
