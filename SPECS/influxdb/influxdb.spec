@@ -5,14 +5,11 @@ Group:          Productivity/Databases/Servers
 Version:        2.4.0
 Release:        %1{?dist}
 URL:            https://github.com/influxdata/influxdb
-Source:         %{name}-%{version}.tar.xz
+Source:         %{URL}/archive/refs/tags/v%{version}.tar.gz
 Source1:        influxdb.service
 Source2:        influxdb.tmpfiles
 Source3:        influxdb-user.conf
 Source4:        config.yaml
-# Prebuild UI assets as specified in ./scripts/fetch_ui_assets.sh
-# https://github.com/influxdata/ui/releases/download/OSS-2.1.2/build.tar.gz
-Source98:       ui-assets-2022-09-16.tar.xz
 Source99:       vendor.tar.xz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  sysuser-tools
@@ -21,7 +18,15 @@ BuildRequires:  fdupes
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  pkgconfig(flux) >= 0.171.0
+BuildRequires:  build-essential
+BuildRequires:  pkg-config >= 0.171.0
+BuildRequires:  protobuf-devel
+BuildRequires:  kernel-headers
+BuildRequires:  rust
+BuildRequires:  clang
+BuildRequires:  tzdata
+BuildRequires:  git
+
 %{!?_tmpfilesdir:%global _tmpfilesdir /usr/lib/tmpfiles.d}
 %{systemd_requires}
 Requires(post): systemd
@@ -34,6 +39,7 @@ It's useful for recording metrics, events, and performing analytics.
 Summary:        InfluxDB development files
 Group:          Development/Languages/Golang
 Requires:       go
+Requires:       tzdata
 
 %description devel
 Go sources and other development files for InfluxDB
@@ -41,15 +47,9 @@ Go sources and other development files for InfluxDB
 %prep
 %setup -q
 %setup -q -T -D -a 99
-%setup -q -T -D -a 98
-mv build ui
-echo 'UI assets predownloaded!' > ui/fetch_ui_assets.sh
 
 %build
 export GO111MODULE=on
-
-# TODO:
-# Disable phone-home to usage.influxdata.com
 
 # Build influxdb
 %goprep github.com/influxdata/influxdb/v2
@@ -63,8 +63,6 @@ export GO111MODULE=on
 
 mkdir -p %{buildroot}%{_localstatedir}/log/influxdb
 mkdir -p %{buildroot}%{_localstatedir}/lib/influxdb
-mkdir -p %{buildroot}%{_datadir}/influxdb2/ui
-cp ui/build/* %{buildroot}%{_datadir}/influxdb2/ui
 mkdir -p %{buildroot}%{_sbindir}
 install -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/influxdb.service
 ln -s /usr/sbin/service %{buildroot}%{_sbindir}/rcinfluxdb
