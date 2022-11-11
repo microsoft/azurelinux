@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        grpc-1.42.0.tar.gz
-
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -18,16 +17,13 @@ BuildRequires:  protobuf-devel
 BuildRequires:  re2-devel
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(openssl)
-BuildRequires:  strace
 BuildRequires:  ninja-build
-
-
 Requires:       abseil-cpp
 Requires:       c-ares
 Requires:       protobuf
 Requires:       zlib
 
-# ~~~~ Python ~~~~
+# Python
 BuildRequires:      build-essential
 BuildRequires:      python3-devel
 BuildRequires:      python3-Cython
@@ -63,17 +59,13 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       python3-six
 %{?python_provide:%python_provide python3-grpcio}
 
-
 %description -n python3-grpcio
 Python language bindings for gRPC.
-
 
 %prep
 %setup -q -n %{name}-%{version}
 
-
 %build
-
 # Updating used C++ version to be compatible with the build dependencies.
 # Without this fix 'grpc' compiles with C++11 against 'abseil-cpp' headers,
 # which generate a different set of APIs than the ones provided by the BR 'abseil-cpp'.
@@ -95,8 +87,7 @@ pushd cmake/build
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %cmake_build
 popd
-
-
+#python
 export GRPC_PYTHON_BUILD_WITH_CYTHON=True
 export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
 export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
@@ -107,18 +98,15 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %install
-echo "Install section"
 pushd cmake/build
 %cmake_install
 find %{buildroot} -name '*.cmake' -delete
 popd
-
+#python
 pushd '%{buildroot}'
 PYROOT="${PWD}"
 popd
-
 %py3_install
-
 
 
 %files
