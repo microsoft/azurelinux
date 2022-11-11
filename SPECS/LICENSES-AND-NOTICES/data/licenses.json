@@ -1530,6 +1530,7 @@
                 "python-fluidity-sm",
                 "python-frozendict",
                 "python-funcsigs",
+                "python-gast",
                 "python-genshi",
                 "python-google-auth",
                 "python-google-auth-oauthlib",
