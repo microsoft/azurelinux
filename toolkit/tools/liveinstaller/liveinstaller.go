@@ -54,6 +54,11 @@ type imagerArguments struct {
 	logLevel     string
 }
 
+type installationDetails struct {
+	installationQuit bool
+	finalConfig configuration.Config
+}
+
 func handleCtrlC(signals chan os.Signal) {
 	<-signals
 	logger.Log.Error("Installation in progress, please wait until finished.")
@@ -82,8 +87,8 @@ func main() {
 	}
 
 	installFunc := installerFactory(*forceAttended, *configFile, *templateConfigFile)
-	installationQuit, err := installFunc(args)
-	if installationQuit {
+	installDetails, err := installFunc(args)
+	if installDetails.installationQuit {
 		logger.Log.Error("User quit installation")
 		// Return a non-zero exit code to drop the user to shell
 		os.Exit(1)
@@ -92,10 +97,11 @@ func main() {
 	logger.PanicOnError(err)
 
 	// Change the boot order by either changing the EFI boot order or ejecting CDROM.
-	updateBootOrder()
+	updateBootOrder(installDetails)
+	ejectDisk()
 }
 
-func installerFactory(forceAttended bool, configFile, templateConfigFile string) (installFunc func(imagerArguments) (bool, error)) {
+func installerFactory(forceAttended bool, configFile, templateConfigFile string) (installFunc func(imagerArguments) (installationDetails, error)) {
 	isAttended := false
 
 	// Determine if the attended installer should be shown
@@ -119,11 +125,11 @@ func installerFactory(forceAttended bool, configFile, templateConfigFile string)
 	}
 
 	if isAttended {
-		installFunc = func(args imagerArguments) (bool, error) {
+		installFunc = func(args imagerArguments) (installationDetails, error) {
 			return terminalUIAttendedInstall(templateConfigFile, args)
 		}
 	} else {
-		installFunc = func(args imagerArguments) (bool, error) {
+		installFunc = func(args imagerArguments) (installationDetails, error) {
 			return unattendedInstall(configFile, args)
 		}
 	}
@@ -131,7 +137,39 @@ func installerFactory(forceAttended bool, configFile, templateConfigFile string)
 	return
 }
 
-func updateBootOrder() (err error) {
+func updateBootOrder(installDetails installationDetails) (err error) {
+	if (installDetails.finalConfig.DefaultSystemConfig.BootType != "efi") {
+		logger.Log.Info("No BootType of 'efi' detected. Not attempting to set EFI boot order.")
+		return
+	}
+	logger.Log.Info("Setting Boot Order")
+	const squashErrors = false
+	program, commandArgs := formatEFIBootMgrCommand(installDetails)
+	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
+	return
+}
+
+func formatEFIBootMgrCommand(installDetails installationDetails) (program string, commandArgs []string) {
+	program = "efibootmgr"
+	
+	cfg := installDetails.finalConfig
+	bootPartIdx, bootPart := cfg.GetBootPartition()
+	bootDisk := cfg.GetDiskContainingPartition(bootPart)
+	logger.Log.Info("BootPart Idx: " + fmt.Sprintf("-p %d", bootPartIdx+1))
+	logger.Log.Info("TargetDisk: " + bootDisk.TargetDisk.Value)
+	logger.Log.Info("-l '\\EFI\\BOOT\\bootx64.efi'")
+	commandArgs = []string{
+		"-c",
+		"-d", bootDisk.TargetDisk.Value,
+		"-p", fmt.Sprintf("%d", bootPartIdx+1),
+		"-l", "'\\EFI\\BOOT\\bootx64.efi'",
+		"-L", "Mariner",
+		"-v",
+	}
+	return
+}
+
+func ejectDisk() (err error) {
 	logger.Log.Info("Ejecting CD-ROM.")
 	_, _, err = shell.Execute("eject", "--cdrom")
 
@@ -142,7 +180,6 @@ func updateBootOrder() (err error) {
 		logger.Log.Info("Installation Complete. Please Remove USB installation media and reboot if present.")
 		logger.Log.Info("==================================================================================")
 	}
-
 	return
 }
 
@@ -287,7 +324,7 @@ func generateSingleCalamaresSKU(sysConfig configuration.SystemConfig, skuDir str
 	return jsonutils.WriteJSONFile(skuFilePath, sysConfig)
 }
 
-func terminalUIAttendedInstall(templateConfigFile string, args imagerArguments) (installationQuit bool, err error) {
+func terminalUIAttendedInstall(templateConfigFile string, args imagerArguments) (installDetails installationDetails, err error) {
 	const configFileName = "attendedconfig.json"
 
 	// Parse template config
@@ -318,7 +355,9 @@ func terminalUIAttendedInstall(templateConfigFile string, args imagerArguments) 
 		return
 	}
 
-	_, installationQuit, err = attendedInstaller.Run()
+	finalConfig, installationQuit, err := attendedInstaller.Run()
+	installDetails.finalConfig = finalConfig
+	installDetails.installationQuit = installationQuit
 	return
 }
 
@@ -364,11 +403,16 @@ func terminalAttendedInstall(cfg configuration.Config, progress chan int, status
 	return
 }
 
-func unattendedInstall(configFile string, args imagerArguments) (installationQuit bool, err error) {
+func unattendedInstall(configFile string, args imagerArguments) (installDetails installationDetails, err error) {
 	const squashErrors = false
 
 	args.configFile = configFile
 
+	installDetails.finalConfig, err = configuration.Load(configFile)
+	if err != nil {
+		installDetails.installationQuit = true
+		return
+	}
 	program, commandArgs := formatImagerCommand(args)
 	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return

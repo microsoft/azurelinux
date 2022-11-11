@@ -95,6 +95,17 @@ func (c *Config) GetDiskContainingPartition(partition *Partition) (disk *Disk) {
 	return nil
 }
 
+func (c *Config) GetBootPartition() (partitionIndex int, partition *Partition) {
+	for i, d := range c.Disks {
+		for j, p := range d.Partitions {
+			if p.HasFlag(PartitionFlagBoot) {
+				return j, &c.Disks[i].Partitions[j] 
+			}
+		}
+	}
+	return
+}
+
 // GetKernelCmdLineValue returns the output of a specific option setting in /proc/cmdline
 func GetKernelCmdLineValue(option string) (cmdlineValue string, err error) {
 	const cmdlineFile = "/proc/cmdline"

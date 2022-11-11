@@ -70,6 +70,9 @@ func (s *SystemConfig) IsValid() (err error) {
 	// IsDefault must be validated by a parent struct
 
 	// Validate BootType
+	// if (s.BootType != "efi" && s.BootType != "legacy") {
+	// 	return fmt.Errorf("invalid [BootType]: %s. Expecting values of either 'efi' or 'legacy'.", s.Hostname)
+	// }
 
 	// Validate HostName
 	if (!govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_")) && s.Hostname != "" {
