@@ -6875,6 +6875,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python3-twisted",
+          "version": "22.10.0",
+          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytz",
           "version": "2018.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytz/pytz-2018.5.tar.gz"
