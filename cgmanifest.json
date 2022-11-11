@@ -4199,16 +4199,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "google-pasta",
-          "version": "0.2.0",
-          "downloadUrl": "https://github.com/google/pasta/archive/v0.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "google-roboto-slab-fonts",
           "version": "1.100263",
           "downloadUrl": "https://fonts.google.com/download?family=Roboto%20Slab"
@@ -20816,6 +20806,16 @@
           "name": "python-google-auth-oauthlib",
           "version": "0.5.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-google-pasta",
+          "version": "0.2.0",
+          "downloadUrl": "https://github.com/google/pasta/archive/v0.2.0.tar.gz"
         }
       }
     },
