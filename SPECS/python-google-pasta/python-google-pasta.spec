@@ -10,9 +10,6 @@ URL:            https://github.com/google/pasta/
 Source0:        https://github.com/google/pasta/archive/v%{version}.tar.gz#/google-pasta-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description
 Enable python source code refactoring through AST modifications.
