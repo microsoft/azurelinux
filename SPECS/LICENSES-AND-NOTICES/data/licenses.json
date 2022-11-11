@@ -1662,6 +1662,7 @@
                 "python-tox-current-env",
                 "python-tqdm",
                 "python-trio",
+                "python-typing-extensions",
                 "python-uamqp",
                 "python-unittest2",
                 "python-uritemplate",

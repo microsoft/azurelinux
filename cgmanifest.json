@@ -22623,6 +22623,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-typing-extensions",
+          "version": "4.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/typing_extensions/typing_extensions-4.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-uamqp",
           "version": "1.5.1",
           "downloadUrl": "https://github.com/Azure/azure-uamqp-python/archive/v1.5.1/uamqp-1.5.1.tar.gz"
