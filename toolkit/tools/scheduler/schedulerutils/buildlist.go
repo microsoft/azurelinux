@@ -126,3 +126,15 @@ func ReadReservedPackageManifest(path string) (reservedFiles []string, err error
 
 	return reservedFiles, nil
 }
+
+// rpmsToFind should be an absolute path to the expected RPM, while toolchainRPMs is a list of '<name>-<version>-<release>.rpm'.
+func IsToolchainRPM(rpmPath string, reservedRPMs []string) bool {
+	base := filepath.Base(rpmPath)
+	for _, reservedRPM := range reservedRPMs {
+		reservedBase := filepath.Base(reservedRPM)
+		if reservedBase == base {
+			return true
+		}
+	}
+	return false
+}

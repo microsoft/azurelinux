@@ -29,8 +29,9 @@ var (
 	outputGraph = exe.OutputFlag(app, "Updated graph file with unresolved nodes marked as resolved")
 	outDir      = exe.OutputDirFlag(app, "Directory to download packages into.")
 
-	existingRpmDir = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
-	tmpDir         = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
+	existingRpmDir          = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	existingToolchainRpmDir = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	tmpDir                  = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
 
 	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
@@ -101,7 +102,7 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, disableUpstreamRepos, stopOnFailure bool) (err error) {
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
-	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
+	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
 	if err != nil {
 		logger.Log.Errorf("Failed to initialize RPM repo cloner. Error: %s", err)
 		return
