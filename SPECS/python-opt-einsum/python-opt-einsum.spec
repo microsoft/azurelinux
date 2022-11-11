@@ -25,7 +25,7 @@ Requires:       python3
 Requires:       python3-numpy
 
 %description -n python3-opt-einsum
-Optimizing einsum function Python packag
+Optimizing einsum function Python package
 
 %prep
 %autosetup -n opt_einsum-%{version}
@@ -37,7 +37,7 @@ Optimizing einsum function Python packag
 %py3_install
 
 %check
-pip3 install pytest
+pip3 install pytest==7.1.3
 %pytest
 
 %files -n python3-opt-einsum
