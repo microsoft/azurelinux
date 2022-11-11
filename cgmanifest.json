@@ -20763,6 +20763,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-gast",
+          "version": "0.5.3",
+          "downloadUrl": "https://github.com/serge-sans-paille/gast/archive/0.5.3/gast-0.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-genshi",
           "version": "0.7.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.5.tar.gz"
