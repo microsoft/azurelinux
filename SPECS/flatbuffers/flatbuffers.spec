@@ -4,7 +4,6 @@
 # FlatBuffers_Library_SONAME_FULL—but we manually repeat the SOVERSION here,
 # and use the macro in the file lists, as a reminder to avoid undetected .so
 # version bumps.
-%global so_version 2
 %global common_description %{expand:
 FlatBuffers is a cross platform serialization library architected for maximum
 memory efficiency. It allows you to directly access serialized data without
@@ -23,37 +22,19 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://google.github.io/flatbuffers
 Source0:        https://github.com/google/flatbuffers/archive/v%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  cmake
-BuildRequires:  gcc-c++
 # The ninja backend should be slightly faster than make, with no disadvantages.
-BuildRequires:  ninja-build
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
-# From grpc/README.md:
-#
-#   NOTE: files in `src/` are shared with the GRPC project, and maintained
-#   there (any changes should be submitted to GRPC instead). These files are
-#   copied from GRPC, and work with both the Protobuf and FlatBuffers code
-#   generator.
-#
-# It’s not clearly documented which GPRC version is excerpted, but see
-# https://github.com/google/flatbuffers/pull/4305 for more details.
-#
-# It is not possible to unbundle this because private/internal APIs are used.
-Provides:       bundled(grpc)
 
 %description %{common_description}
-
-BuildArch:      noarch
 
 %package -n     python3-flatbuffers
 Summary:        FlatBuffers serialization format for Python
 Recommends:     python3dist(numpy)
 Provides:       flatbuffers-python3 = %{version}-%{release}
-Obsoletes:      flatbuffers-python3 < 2.0.0-6
 BuildArch:      noarch
 
 %description -n python3-flatbuffers %{common_description}
@@ -64,15 +45,6 @@ serialization format.
 %prep
 %autosetup
 %{py3_shebang_fix} samples
-
-# flattests fails if out-of-source build directory is used
-# https://github.com/google/flatbuffers/issues/7282
-#
-# This downstream-only patch is not general; it makes assumptions about the
-# out-of-source build path and would break in-source builds.
-sed -r -i 's@//((include|monster)_test)@//../../tests/\1@g' \
-    tests/test.cpp tests/reflection_test.cpp
-
 
 %generate_buildrequires
 pushd python >/dev/null
@@ -85,18 +57,9 @@ popd >/dev/null
 export VERSION='%{version}'
 %set_build_flags
 
-# %cmake -GNinja \
-#     -DCMAKE_BUILD_TYPE=Release \
-#     -DFLATBUFFERS_BUILD_SHAREDLIB=ON \
-#     -DFLATBUFFERS_BUILD_FLATLIB=OFF \
-#     -DFLATBUFFERS_BUILD_FLATC=ON
-
-
 pushd python
 %pyproject_wheel
 popd
-
-
 
 %install
 pushd python
@@ -104,12 +67,9 @@ pushd python
 %pyproject_save_files flatbuffers
 popd
 
-
-
 %check
 # Upstream does not appear to provide any dedicated Python tests.
 %pyproject_check_import
-
 
 %files -n python3-flatbuffers -f %{pyproject_files}
 %license LICENSE.txt
