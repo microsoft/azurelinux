@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.55.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,7 +29,7 @@ URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-3
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -206,6 +206,12 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.55.1-3
+- Adding missing "%{?dist}" to "glibc-static" BR.
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.55.1-2
+- Bump release to rebuild with go 1.18.8
+
 * Thu Sep 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.55.1-1
 - Upgrade to 0.55.1
 
