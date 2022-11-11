@@ -3,7 +3,7 @@
 Summary:        Handle Common Gateway Interface requests and responses
 Name:           perl-CGI
 Version:        4.54
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
@@ -21,8 +21,13 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 %if %{with_check}
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(HTML::Entities)
+BuildRequires:  perl(local::lib)
 BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::NoWarnings)
 BuildRequires:  perl(blib)
 %endif
 
@@ -77,13 +82,9 @@ find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} %{buildroot}/*
 
 %check
-export PERL_MM_USE_DEFAULT=1
-cpan local::lib
-cpan Test::Deep
-cpan HTML::Entities
-cpan Test::Warn
-cpan Test::NoWarnings
-make %{?_smp_mflags} test
+PERL_MM_USE_DEFAULT=1 cpan Test::Warn
+# Setting 'PERL5LIB' because otherwise tests can't find modules installed by cpan.
+PERL5LIB=/root/perl5/lib/perl5 make %{?_smp_mflags} test
 
 %files
 %license LICENSE
@@ -92,6 +93,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Thu Oct 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.54-3
+- Switched to using Mariner packages instead of external test dependencies.
+
 * Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 4.54-2
 - Add BR on `cpan` & `perl(Test::*)` to enable ptest
 

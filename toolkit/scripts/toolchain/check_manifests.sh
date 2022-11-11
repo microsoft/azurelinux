@@ -18,7 +18,7 @@ write_rpms_from_spec () {
     fi
 
     version=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="%{VERSION}" --srpm 2>/dev/null)
-    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --target=$ARCH 2>/dev/null)
+    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --target=$ARCH --qf="%{nvra}\n" 2>/dev/null)
 
     for rpm in $rpmWithoutExtension
     do

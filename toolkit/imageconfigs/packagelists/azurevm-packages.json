@@ -5,10 +5,13 @@
         "cloud-utils-growpart",
         "dhcp-client",
         "hyperv-daemons",
+        "kexec-tools",
         "netplan",
         "openssh-server",
         "python3",
         "rsyslog",
-        "WALinuxAgent"
+        "sgx-backwards-compatability",
+        "WALinuxAgent",
+        "wireless-regdb"
     ]
 }

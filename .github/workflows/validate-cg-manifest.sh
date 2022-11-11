@@ -50,6 +50,7 @@ ignore_no_source_tarball=" \
   qt5-rpm-macros \
   verity-read-only-root \
   web-assets \
+  sgx-backwards-compatability \
   "
 
 # Specs where cgmanifest validation has known issues checking URLs.
@@ -58,17 +59,85 @@ ignore_known_issues=" \
 
 alt_source_tag="Source9999"
 
+function prepare_lua {
+  local -a dirs_to_check
+  local lua_common_file_name
+  local lua_forge_file_name
+  local mariner_lua_dir
+  local mariner_srpm_lua_dir
+  local rpm_lua_dir
+  local rpm_macros_dir
+
+  rpm_macros_dir="$1"
+
+  lua_common_file_name="common.lua"
+  lua_forge_file_name="forge.lua"
+  rpm_lua_dir="$(rpm --eval "%_rpmluadir")"
+  mariner_lua_dir="$rpm_lua_dir/mariner"
+  mariner_srpm_lua_dir="$mariner_lua_dir/srpm"
+
+  if [[ -z "$rpm_lua_dir" ]]
+  then
+    echo "ERROR: no RPM LUA directory set, can't update with Mariner's LUA modules!" >&2
+    exit 1
+  fi
+
+  # We only want to clean-up directories, which were absent from the system.
+  dirs_to_check=("$rpm_lua_dir" "$mariner_lua_dir" "$mariner_srpm_lua_dir")
+  for dir_path in "${dirs_to_check[@]}"
+  do
+    if [[ ! -d "$dir_path" ]]
+    then
+      FILES_TO_CLEAN_UP+=("$dir_path")
+      break
+    fi
+  done
+  sudo mkdir -p "$mariner_srpm_lua_dir"
+
+  if [[ ! -f "$mariner_lua_dir/$lua_common_file_name" ]]
+  then
+    sudo cp "$rpm_macros_dir/$lua_common_file_name" "$mariner_lua_dir/$lua_common_file_name"
+    FILES_TO_CLEAN_UP+=("$mariner_lua_dir/$lua_common_file_name")
+  fi
+
+  if [[ ! -f "$mariner_srpm_lua_dir/$lua_forge_file_name" ]]
+  then
+    sudo cp "$rpm_macros_dir/$lua_forge_file_name" "$mariner_srpm_lua_dir/$lua_forge_file_name"
+    FILES_TO_CLEAN_UP+=("$mariner_srpm_lua_dir/$lua_forge_file_name")
+  fi
+}
+
+function specs_dir_from_spec_path {
+  # Assuming we always check specs inside CBL-Mariner's core GitHub repository.
+  # If that's the case, the spec paths will always have the following form:
+  #     [repo_directory_path]/[specs_directory]/[package_name]/[package_spec_files]
+  echo "$(realpath "$(dirname "$1")/../../SPECS")/mariner-rpm-macros"
+}
+
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/
 
-[[ $# -eq 0 ]] && echo "No specs passed to validate"
+if [[ $# -eq 0 ]]
+then
+  echo "No specs passed to validate."
+  exit
+fi
 
 WORK_DIR=$(mktemp -d -t)
+FILES_TO_CLEAN_UP=("$WORK_DIR")
 function clean_up {
     echo "Cleaning up..."
-    rm -rf "$WORK_DIR"
+    for file_path in "${FILES_TO_CLEAN_UP[@]}"
+    do
+      echo "   Removing ($file_path)."
+      sudo rm -rf "$file_path"
+    done
 }
 trap clean_up EXIT SIGINT SIGTERM
+
+
+mariner_macros_dir="$(specs_dir_from_spec_path "$1")"
+prepare_lua "$mariner_macros_dir"
 
 echo "Checking $# specs."
 
@@ -79,8 +148,11 @@ do
   echo "[$i/$#] Checking $original_spec"
 
   # Using a copy of the spec file, because parsing requires some pre-processing.
-  spec="$WORK_DIR/$(basename "$original_spec")"
-  cp "$original_spec" "$spec"
+  original_spec_dir_path="$(dirname "$original_spec")"
+  cp -r "$original_spec_dir_path" "$WORK_DIR"
+
+  original_spec_dir_name="$(basename "$original_spec_dir_path")"
+  spec="$WORK_DIR/$original_spec_dir_name/$(basename "$original_spec")"
 
   # Skipping specs for signed packages. Their unsigned versions should already be included in the manifest.
   if echo "$original_spec" | grep -q "SPECS-SIGNED"

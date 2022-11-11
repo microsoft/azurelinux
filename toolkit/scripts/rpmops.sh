@@ -6,6 +6,12 @@
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
+RPM_SHELL="$(readlink /bin/sh)"
+if [[ "$RPM_SHELL" != "bash" ]]
+then
+    echo "WARNING: host system's '/bin/sh' links to '$RPM_SHELL'. Mariner specs require 'bash'. Parsing specs may fail or generate unpredictable results." >&2
+fi
+
 # Additional macros required to parse spec files.
 DEFINES=(-D "with_check 1" -D "dist $(grep -P "DIST_TAG" "$REPO_ROOT"/toolkit/Makefile | grep -oP "\.cm\d+")")
 
@@ -21,6 +27,7 @@ done
 function mariner_rpmspec {
     # Looking for spec path in the argument list to extract its directory.
     local sourcedir
+
     for arg in "$@"
     do
         if [[ "$arg" == *.spec && -f "$arg" ]]
@@ -32,9 +39,9 @@ function mariner_rpmspec {
 
     if [[ -z $sourcedir ]]
     then        
-        echo "Must pass valid spec path to 'mariner_rpmspec'!"
+        echo "Must pass valid spec path to 'mariner_rpmspec'!" >&2
         return 1
     fi
 
-    rpmspec "${DEFINES[@]}" -D "_sourcedir $sourcedir" "${MACROS[@]}" "$@"
+    rpmspec "${MACROS[@]}" "${DEFINES[@]}" -D "_sourcedir $sourcedir" "$@"
 }
