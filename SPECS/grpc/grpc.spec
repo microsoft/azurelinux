@@ -20,6 +20,7 @@ BuildRequires:  pkgconfig(openssl)
 BuildRequires:  ninja-build
 Requires:       abseil-cpp
 Requires:       c-ares
+Requires:       openssl
 Requires:       protobuf
 Requires:       zlib
 
