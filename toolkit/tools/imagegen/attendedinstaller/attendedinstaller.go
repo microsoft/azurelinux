@@ -145,7 +145,10 @@ func (ai *AttendedInstaller) Run() (config configuration.Config, installationQui
 		return
 	}
 
+	ai.finalConfig.SetDefaultConfig()
+
 	config = ai.finalConfig
+	
 	return
 }
 

@@ -304,7 +304,7 @@ func Load(configFilePath string) (config Config, err error) {
 		return
 	}
 
-	config.setDefaultConfig()
+	config.SetDefaultConfig()
 
 	return
 }
@@ -405,7 +405,7 @@ func resolveBaseDirPath(baseDirPath, configFilePath string) (absoluteBaseDirPath
 	return filepath.Abs(baseDirPath)
 }
 
-func (c *Config) setDefaultConfig() {
+func (c *Config) SetDefaultConfig() {
 	c.DefaultSystemConfig = &c.SystemConfigs[0]
 	for i, systemConfig := range c.SystemConfigs {
 		if systemConfig.IsDefault {
