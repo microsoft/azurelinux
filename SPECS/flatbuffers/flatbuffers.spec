@@ -1,9 +1,4 @@
 %global debug_package %{nil}
-# The .so version is explicitly constructed from project version—search
-# CMakeLists.txt for FlatBuffers_Library_SONAME_MAJOR and
-# FlatBuffers_Library_SONAME_FULL—but we manually repeat the SOVERSION here,
-# and use the macro in the file lists, as a reminder to avoid undetected .so
-# version bumps.
 %global common_description %{expand:
 FlatBuffers is a cross platform serialization library architected for maximum
 memory efficiency. It allows you to directly access serialized data without
@@ -50,12 +45,10 @@ pushd python >/dev/null
 %pyproject_buildrequires
 popd >/dev/null
 
-
 %build
 # Needed for correct Python wheel version
 export VERSION='%{version}'
 %set_build_flags
-
 pushd python
 %pyproject_wheel
 popd
