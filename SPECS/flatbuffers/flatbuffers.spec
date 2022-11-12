@@ -22,7 +22,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://google.github.io/flatbuffers
 Source0:        https://github.com/google/flatbuffers/archive/v%{version}/%{name}-%{version}.tar.gz
-# The ninja backend should be slightly faster than make, with no disadvantages.
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
