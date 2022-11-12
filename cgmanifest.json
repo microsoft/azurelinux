@@ -21223,6 +21223,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-libclang",
+          "version": "14.0.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-linux-procfs",
           "version": "0.6.1",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/python/python-linux-procfs/python-linux-procfs.git/snapshot/python-linux-procfs-0.6.1.tar.gz"

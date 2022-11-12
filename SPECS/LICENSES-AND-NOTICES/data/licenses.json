@@ -2068,6 +2068,7 @@
                 "python-cherrypy",
                 "python-execnet",
                 "python-google-pasta",
+                "python-libclang",
                 "python-logutils",
                 "python-nocasedict",
                 "python-opt-einsum",
