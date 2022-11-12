@@ -118,7 +118,7 @@ done
 stty echo
 
 if [ $installerExitCode -eq 0 ]; then
-    /bin/bash
+    reboot
 else
     /bin/bash
 fi

@@ -142,30 +142,48 @@ func updateBootOrder(installDetails installationDetails) (err error) {
 		logger.Log.Info("No BootType of 'efi' detected. Not attempting to set EFI boot order.")
 		return
 	}
+
+	err = removeOldMarinerBootTargets()
+	if (err != nil) {
+		return
+	}
+
 	logger.Log.Info("Setting Boot Order")
 	const squashErrors = false
-	program, commandArgs := formatEFIBootMgrCommand(installDetails)
+	program, commandArgs := formatBootEntryCreationCommand(installDetails)
 	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
+
 	return
 }
 
-func formatEFIBootMgrCommand(installDetails installationDetails) (program string, commandArgs []string) {
+func formatBootEntryCreationCommand(installDetails installationDetails) (program string, commandArgs []string) {
 	program = "efibootmgr"
 	
 	cfg := installDetails.finalConfig
 	bootPartIdx, bootPart := cfg.GetBootPartition()
 	bootDisk := cfg.GetDiskContainingPartition(bootPart)
-	logger.Log.Info("BootPart Idx: " + fmt.Sprintf("-p %d", bootPartIdx+1))
-	logger.Log.Info("TargetDisk: " + bootDisk.TargetDisk.Value)
-	logger.Log.Info("-l '\\EFI\\BOOT\\bootx64.efi'")
 	commandArgs = []string{
-		"-c",
-		"-d", bootDisk.TargetDisk.Value,
-		"-p", fmt.Sprintf("%d", bootPartIdx+1),
-		"-l", "'\\EFI\\BOOT\\bootx64.efi'",
-		"-L", "Mariner",
-		"-v",
+		"-c",                                       // Create a new bootnum and place it in the beginning of the boot order
+		"-d", bootDisk.TargetDisk.Value,            // Specify which disk the boot file is on
+		"-p", fmt.Sprintf("%d", bootPartIdx+1),     // Specify which partition the boot file is on
+		"-l", "'\\EFI\\BOOT\\bootx64.efi'",         // Specify the path for where the boot file is located on the partition
+		"-L", "Mariner",                            // Specify what label you would like to give this boot entry
+		"-v",                                       // Be verbose
 	}
+	return
+}
+
+func removeOldMarinerBootTargets() (err error) {
+	logger.Log.Info("Removing pre-existing 'Mariner' boot targets from efibootmgr")
+	const squashErrors = false
+	program := "efibootmgr"                                            // Default behavior when piped or called without options is to print current boot order in a human-readable format
+	commandArgs := []string{
+		"|", "grep", "\"Mariner\"",                                    // Filter boot order for Mariner boot targets
+		"|", "sed", "'s/* Mariner//g'",                                // Pruning for just the bootnum 
+		"|", "sed", "'s/Boot*//g'",                                    // Pruning for just the bootnum
+		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B",      // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with a Mariner label
+	}
+	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return
 }
 
