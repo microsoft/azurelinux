@@ -67,10 +67,6 @@ pushd python
 %pyproject_save_files flatbuffers
 popd
 
-%check
-# Upstream does not appear to provide any dedicated Python tests.
-%pyproject_check_import
-
 %files -n python3-flatbuffers -f %{pyproject_files}
 %license LICENSE.txt
 
