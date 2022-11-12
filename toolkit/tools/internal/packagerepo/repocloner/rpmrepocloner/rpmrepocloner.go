@@ -6,12 +6,14 @@ package rpmrepocloner
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
@@ -203,15 +205,34 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// In order to simulate repository priority, concatenate all requested repofiles into a single file.
 	// TDNF will read the file top-down. It will then parse the results into a linked list, meaning
 	// the first repo entry in the file is the first to be checked.
-	const chrootRepoFile = "/etc/yum.repos.d/allrepos.repo"
+	const (
+		chrootRepoDir  = "/etc/yum.repos.d/"
+		chrootRepoFile = "allrepos.repo"
+	)
 
-	fullRepoFilePath := filepath.Join(r.chroot.RootDir(), chrootRepoFile)
+	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
+	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
 
-	// Create the directory for the repo file
-	err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
+	// Get a list of the existing repofiles that are part of the chroot, if any
+	existingRepoFiles := []fs.DirEntry{}
+	hasRepoDir, err := file.DirExists(fullRepoDirPath)
 	if err != nil {
-		logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
+		logger.Log.Warnf("Could not check for existing repo files (%s)", fullRepoDirPath)
 		return
+	}
+	if hasRepoDir {
+		existingRepoFiles, err = os.ReadDir(fullRepoDirPath)
+		if err != nil {
+			logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
+			return
+		}
+	} else {
+		// Create the directory for the repo file since there wasn't already one there
+		err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
+		if err != nil {
+			logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
+			return
+		}
 	}
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
@@ -224,6 +245,20 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Assume the order of repoDefinitions indicates their relative priority.
 	for _, repoFilePath := range repoDefinitions {
 		err = appendRepoFile(repoFilePath, dstFile)
+		if err != nil {
+			return
+		}
+	}
+
+	// Add each previously existing repofile to the end of the new file, then delete the original.
+	// We want to try our custom mounted repos before reaching out to the upstream servers.
+	for _, repoFile := range existingRepoFiles {
+		path := filepath.Join(fullRepoDirPath, repoFile.Name())
+		err = appendRepoFile(path, dstFile)
+		if err != nil {
+			return
+		}
+		err = os.Remove(path)
 		if err != nil {
 			return
 		}
@@ -290,7 +325,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+			repoOrderList := []string{builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -325,7 +360,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 
 	foundPackages := make(map[string]bool)
 	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+	repoOrderList := []string{builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
 	for _, repoID := range repoOrderList {
 		logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
