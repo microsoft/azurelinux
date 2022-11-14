@@ -1,7 +1,7 @@
 Summary:        Small data compression library
 Name:           liblzf
 Version:        3.6
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +10,6 @@ Source0:        http://dist.schmorp.de/liblzf/liblzf-%{version}.tar.gz
 # Adds autoconf and in particular support for building shared libraries.
 # 7th Feb 2011 - Mail sent upstream to author. Awaiting conclusion.
 Patch0:         liblzf-%{version}-autoconf-20140314.patch
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -70,6 +69,9 @@ rm -f %{buildroot}%{_libdir}/liblzf.la
 %{_libdir}/pkgconfig/liblzf.pc
 
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.6-24
+- Move to core
+
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-23
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

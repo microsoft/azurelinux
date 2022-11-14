@@ -1,14 +1,13 @@
 %global srcname pkgconfig
-
+Summary:        Python interface to the pkg-config command line tool
 Name:           python-%{srcname}
 Version:        1.5.5
-Release:        4%{?dist}
-Summary:        Python interface to the pkg-config command line tool
-
+Release:        5%{?dist}
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/matze/pkgconfig
 Source:         %{pypi_source}
-
 BuildArch:      noarch
 
 %description
@@ -25,8 +24,8 @@ It can be used to
 If pkg-config is not on the path, raises EnvironmentError.
 
 %package -n python3-%{srcname}
-Summary:        Python3 interface to the pkg-config command line tool
 %{?python_provide:%python_provide python3-%{srcname}}
+Summary:        Python3 interface to the pkg-config command line tool
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       %{_bindir}/pkg-config
@@ -65,6 +64,10 @@ sed -i -e s/distutils.core/setuptools/ setup.py
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.5-5
+- License verified
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.5-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 

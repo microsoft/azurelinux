@@ -1,30 +1,5 @@
 %global commit a8e82bcd63de14daddbc84c250a36c0ee8c850f6
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-
-Summary:        A Python interface to the HDF5 library
-Name:           h5py
-Version:        3.7.0
-Release:        3%{?dist}
-License:        BSD
-URL:            http://www.h5py.org/
-Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
-# drop the unnecessary workaround for float128 type after
-# https://fedoraproject.org/wiki/Changes/PPC64LE_Float128_Transition
-# in F-36
-Patch0:         h5py-3.7.0-ppc-float128.patch
-BuildRequires:  gcc
-BuildRequires:  hdf5-devel
-BuildRequires:  liblzf-devel
-BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
-BuildRequires:  python%{python3_pkgversion}-devel >= 3.2
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-cached_property
-BuildRequires:  python%{python3_pkgversion}-numpy >= 1.7
-BuildRequires:  python%{python3_pkgversion}-pkgconfig
-BuildRequires:  python%{python3_pkgversion}-pip
-BuildRequires:  python%{python3_pkgversion}-six
-BuildRequires:  python%{python3_pkgversion}-sphinx
-
 %global _description\
 The h5py package provides both a high- and low-level interface to the\
 HDF5 library from Python. The low-level interface is intended to be a\
@@ -35,18 +10,43 @@ Python and NumPy concepts.\
 A strong emphasis on automatic conversion between Python (Numpy)\
 data types and data structures and their HDF5 equivalents vastly\
 simplifies the process of reading and writing data from Python.
+Summary:        A Python interface to the HDF5 library
+Name:           h5py
+Version:        3.7.0
+Release:        4%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.h5py.org/
+Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
+# drop the unnecessary workaround for float128 type after
+# https://fedoraproject.org/wiki/Changes/PPC64LE_Float128_Transition
+# in F-36
+Patch0:         h5py-3.7.0-ppc-float128.patch
+BuildRequires:  gcc
+BuildRequires:  hdf5-devel
+BuildRequires:  liblzf-devel
+BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
+BuildRequires:  python%{python3_pkgversion}-cached_property
+BuildRequires:  python%{python3_pkgversion}-devel >= 3.2
+BuildRequires:  python%{python3_pkgversion}-numpy >= 1.7
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pkgconfig
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-six
+BuildRequires:  python%{python3_pkgversion}-sphinx
 
-%description %_description
+%description %{_description}
 
 %package     -n python%{python3_pkgversion}-h5py
+%{?python_provide:%python_provide python%{python3_pkgversion}-h5py}
 Summary:        %{summary}
 Requires:       hdf5
 Requires:       python%{python3_pkgversion}-cached_property
 Requires:       python%{python3_pkgversion}-numpy >= 1.7
 Requires:       python%{python3_pkgversion}-six
-%{?python_provide:%python_provide python%{python3_pkgversion}-h5py}
-%description -n python%{python3_pkgversion}-h5py %_description
 
+%description -n python%{python3_pkgversion}-h5py %{_description}
 
 %prep
 %setup -q -c -n %{name}-%{version}
@@ -71,8 +71,6 @@ cd serial
 %py3_build
 
 
-
-
 %install
 # Upstream requires a specific numpy without this
 export H5PY_SETUP_REQUIRES=0
@@ -90,11 +88,7 @@ pip3 install pytest pytest-mpi
 # Upstream requires a specific numpy without this
 export H5PY_SETUP_REQUIRES=0
 export H5PY_SYSTEM_LZF=1
-# i686 test failure
-# https://github.com/h5py/h5py/issues/1337
-# s390x test failure
-# https://github.com/h5py/h5py/issues/1739
-%ifarch %ix86
+%ifarch %{ix86}
 fail=0
 %else
 fail=1
@@ -112,8 +106,11 @@ pytest --pyargs h5py -rxXs ${PYTHONPATH}
 %{python3_sitearch}/%{name}/
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
-
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.7.0-4
+- License verified
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
@@ -339,7 +336,7 @@ pytest --pyargs h5py -rxXs ${PYTHONPATH}
 
 * Mon May 23 2011 Terje Rosten <terje.rosten@ntnu.no> - 1.3.1-4
 - add patch from Steve Traylen (thanks!) to use system liblzf
- 
+
 * Thu Jan 13 2011 Terje Rosten <terje.rosten@ntnu.no> - 1.3.1-3
 - fix buildroot
 - add filter

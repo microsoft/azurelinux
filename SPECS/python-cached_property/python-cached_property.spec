@@ -1,11 +1,12 @@
 %global projectname cached-property
 %global modulename  cached_property
-
+Summary:        A cached-property for decorating methods in Python classes
 Name:           python-%{modulename}
 Version:        1.5.2
-Release:        8%{?dist}
-Summary:        A cached-property for decorating methods in Python classes
+Release:        9%{?dist}
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/pydanny/%{projectname}
 Source0:        https://github.com/pydanny/%{projectname}/archive/%{version}/%{projectname}-%{version}.tar.gz
 # Disable a couple of test checks that fail with freezegun 0.3.11
@@ -14,7 +15,6 @@ Patch0:         0001-Disable-checks-broken-with-freezegun-0.3.11-131.patch
 # Fix for removal of asyncio.coroutine in Python 3.11
 # https://github.com/pydanny/cached-property/pull/267
 Patch1:         267.patch
-
 BuildArch:      noarch
 
 %description
@@ -22,13 +22,13 @@ cached_property allows properties in Python classes to be cached until the cache
 is invalidated or expired.
 
 %package -n python%{python3_pkgversion}-%{modulename}
-Summary:        A cached-property for decorating methods in Python classes.
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-dateutil
 # BuildRequires:  python%{python3_pkgversion}-freezegun
 # BuildRequires:  python%{python3_pkgversion}-pytest
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{modulename}}
+Summary:        A cached-property for decorating methods in Python classes.
+BuildRequires:  python%{python3_pkgversion}-dateutil
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 # This package was python3-{projectname} for a long time, but never should've
 # been
 Provides:       python%{python3_pkgversion}-%{projectname} = %{version}-%{release}
@@ -58,6 +58,10 @@ PYTHONPATH=./ py.test-3
 %{python3_sitelib}/__pycache__/%{modulename}*
 
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.2-9
+- License verified
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 

@@ -1,21 +1,21 @@
-Summary: Utility to set/show the host name or domain name
-Name: hostname
-Version: 3.23
-Release: 8%{?dist}
-License: GPLv2+
-URL: http://packages.qa.debian.org/h/hostname.html
-Source0: http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: gpl-2.0.txt
-Source2: nis-domainname
-Source3: nis-domainname.service
-BuildRequires: gcc
-BuildRequires: make
-
+Summary:        Utility to set/show the host name or domain name
+Name:           hostname
+Version:        3.23
+Release:        8%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://packages.qa.debian.org/h/hostname.html
+Source0:        http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        gpl-2.0.txt
+Source2:        nis-domainname
+Source3:        nis-domainname.service
 # NOTE: We are *not* requiring systemd on purpose, because we want to allow
 #       hostname package to be installed in containers without the systemd.
-
 # Initial changes
-Patch1: hostname-rh.patch
+Patch1:         hostname-rh.patch
+BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 This package provides commands which can be used to display the system's
@@ -33,9 +33,9 @@ make CFLAGS="%{optflags} $CFLAGS -D_GNU_SOURCE" LDFLAGS="$RPM_LD_FLAGS"
 make BASEDIR=%{buildroot} BINDIR=%{_bindir} install
 
 install -m 0755 -d %{buildroot}%{_libexecdir}/%{name}
-install -m 0755 -d %{buildroot}%{_prefix}/lib/systemd/system
+install -m 0755 -d %{buildroot}%{_libdir}/systemd/system
 install -m 0755 nis-domainname         %{buildroot}%{_libexecdir}/%{name}
-install -m 0644 nis-domainname.service %{buildroot}%{_prefix}/lib/systemd/system
+install -m 0644 nis-domainname.service %{buildroot}%{_libdir}/systemd/system
 
 %post
 if [ $1 -eq 1 ]; then
@@ -57,11 +57,11 @@ fi
 %license gpl-2.0.txt
 %{_bindir}/*
 %{_mandir}/man1/*
-%{_prefix}/lib/systemd/system/*
+%{_libdir}/systemd/system/*
 %{_libexecdir}/%{name}
 
 %changelog
-* Tue Nov 1 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.23-8
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.23-8
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 
