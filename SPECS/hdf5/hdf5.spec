@@ -1,53 +1,63 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-
 # No more Java on i686
 %ifarch %{java_arches}
 %bcond_without java
 %else
 %bcond_with java
 %endif
-
+%global version_main %(echo %{version} | cut -d. -f-2)
+%global so_version 200
+%global with_mpich 0
+%global with_openmpi 0
+%if %{with_mpich}
+%global mpi_list mpich
+%endif
+%if %{with_openmpi}
+%global mpi_list %{?mpi_list} openmpi
+%endif
+Summary:        A general purpose library and file format for storing scientific data
 # Patch version?
 #global snaprel -beta
-
-## WARNING: Wait for netcdf 4.8.0 !
-
-# NOTE: Try not to release new versions to released versions of Fedora
-# You need to recompile all users of HDF5 for each version change
-Name: hdf5
-Version: 1.12.1
-Release: 10%{?dist}
-Summary: A general purpose library and file format for storing scientific data
-License: BSD
-URL: https://portal.hdfgroup.org/display/HDF5/HDF5
-
-%global version_main %(echo %version | cut -d. -f-2)
-Source0: https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
-
-%global so_version 200
-
-Source1: h5comp
-
-
-Patch0: hdf5-LD_LIBRARY_PATH.patch
+Name:           hdf5
+Version:        1.12.1
+Release:        11%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
+Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
+Source1:        h5comp
+Patch0:         hdf5-LD_LIBRARY_PATH.patch
 # Fix fortran build with gcc 12
 # https://github.com/HDFGroup/hdf5/pull/1412
-Patch1: hdf5-gfortran12.patch
+Patch1:         hdf5-gfortran12.patch
 # Fix java build
-Patch3: hdf5-build.patch
+Patch3:         hdf5-build.patch
 # Remove Fedora build flags from h5cc/h5c++/h5fc
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
-Patch5: hdf5-wrappers.patch
-
-BuildRequires: gcc-gfortran
+Patch5:         hdf5-wrappers.patch
+# For patches/rpath
+BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  gcc-gfortran
+BuildRequires:  hostname
+BuildRequires:  krb5-devel
+BuildRequires:  libaec-devel
+BuildRequires:  libtool
+# Needed for mpi tests
+BuildRequires:  openssh-clients
+BuildRequires:  openssl-devel
+BuildRequires:  time
+BuildRequires:  zlib-devel
 %if %{with java}
-BuildRequires: java-devel
-BuildRequires: javapackages-tools
-BuildRequires: hamcrest
-BuildRequires: junit
-BuildRequires: slf4j
+BuildRequires:  hamcrest
+BuildRequires:  java-devel
+BuildRequires:  javapackages-tools
+BuildRequires:  junit
+BuildRequires:  slf4j
 %else
-Obsoletes:     java-hdf5 < %{version}-%{release}
+Obsoletes:      java-hdf5 < %{version}-%{release}
 %endif
 BuildRequires: krb5-devel
 BuildRequires: openssl-devel
@@ -62,15 +72,6 @@ BuildRequires: openssh-clients
 BuildRequires: libaec-devel
 BuildRequires: gcc, gcc-c++
 
-%global with_mpich 0
-%global with_openmpi 0
-
-%if %{with_mpich}
-%global mpi_list mpich
-%endif
-%if %{with_openmpi}
-%global mpi_list %{?mpi_list} openmpi
-%endif
 
 %description
 HDF5 is a general purpose library and file format for storing scientific data.
@@ -81,13 +82,12 @@ objects, one can create and store almost any kind of scientific data
 structure, such as images, arrays of vectors, and structured and unstructured
 grids. You can also mix and match them in HDF5 files according to your needs.
 
-
 %package devel
-Summary: HDF5 development files
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: libaec-devel%{?_isa}
-Requires: zlib-devel%{?_isa}
-Requires: gcc-gfortran
+Summary:        HDF5 development files
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       gcc-gfortran
+Requires:       libaec-devel%{?_isa}
+Requires:       zlib-devel%{?_isa}
 
 %description devel
 HDF5 development headers and libraries.
@@ -182,17 +182,14 @@ HDF5 parallel openmpi static libraries
 # Replace jars with system versions
 # hamcrest-core is obsoleted in hamcrest-2.2
 # Junit tests are failing with junit-4.13.1
-%if 0%{?rhel} >= 9 || 0%{?fedora}
-find . ! -name junit.jar -name "*.jar" -delete
-ln -s %{_javadir}/hamcrest/hamcrest.jar java/lib/hamcrest-core.jar
-%else
+
 find . -name "*.jar" -delete
 ln -s %{_javadir}/hamcrest/core.jar java/lib/hamcrest-core.jar
 ln -s %{_javadir}/junit.jar java/lib/junit.jar
 # Fix test output
 junit_ver=$(sed -n '/<version>/{s/^.*>\([0-9]\.[0-9.]*\)<.*/\1/;p;q}' /usr/share/maven-poms/junit.pom)
 sed -i -e "s/JUnit version .*/JUnit version $junit_ver/" java/test/testfiles/JUnit-*.txt
-%endif
+
 ln -s %{_javadir}/slf4j/api.jar java/lib/slf4j-api-1.7.25.jar
 ln -s %{_javadir}/slf4j/nop.jar java/lib/ext/slf4j-nop-1.7.25.jar
 ln -s %{_javadir}/slf4j/simple.jar java/lib/ext/slf4j-simple-1.7.25.jar
@@ -516,6 +513,10 @@ fi
 
 
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.12.1-11
+- License verified
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
