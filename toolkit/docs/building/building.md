@@ -9,7 +9,7 @@
    - [Package Stage](#package-stage)
      - [Rebuild All Packages](#rebuild-all-packages)
      - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
-     - [Targetted Package Building](#targetted-package-building)
+     - [Targeted Package Building](#targeted-package-building)
    - [Image Stage](#image-stage)
      - [Virtual Hard Disks and Containers](#virtual-hard-disks-and-containers)
      - [ISO Images](#iso-images)
@@ -178,11 +178,11 @@ sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json 
 
 Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
 
-### **Targetted Package Building**
+### **Targeted Package Building**
 Beginning with the CBL-Mariner 2.0's 2022 October Release (2.0.20221007) it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to CBL-Mariner.
 
 ```bash
-# Build targetted packages
+# Build targeted packages
 sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh"
 ```
 Note that this process will download dependencies from packages.microsoft.com and rebuild just the SPEC files indicated by the SRPM_PACK_LIST
@@ -190,16 +190,19 @@ Note that this process will download dependencies from packages.microsoft.com an
 After building a package you may choose to rebuild it or build additional packages.  The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
 
 ```bash
-# Clean and rebuild targetted packages
+# Clean and rebuild targeted packages
 sudo make clean-build-packages
-sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh" REFRESH_WORKER_CHROOT=n
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at openssh" REFRESH_WORKER_CHROOT=n
+
+# Rebuild single package
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_REBUILD_LIST="at" REFRESH_WORKER_CHROOT=n
 ```
 
 ## **Image Stage**
 
 Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
-By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targetted package builds ([Targetted Package Building](#targetted-package-building)
+By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building)
 
 All images are generated in the `out/images` folder.
 
