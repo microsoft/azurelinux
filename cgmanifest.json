@@ -346,8 +346,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.27",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.27/bind-9.16.27.tar.xz"
+          "version": "9.16.33",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.33/bind-9.16.33.tar.xz"
         }
       }
     },
