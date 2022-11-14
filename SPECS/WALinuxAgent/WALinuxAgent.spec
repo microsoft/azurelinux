@@ -1,13 +1,14 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.3.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
 Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        waagent.conf
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -55,6 +56,7 @@ install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/ru
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
 sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_libdir}/systemd/system/waagent.service
+cp %{SOURCE1} %{buildroot}%{_sysconfdir}/waagent.conf
 
 %check
 python3 setup.py check && python3 setup.py test
@@ -81,6 +83,9 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
+- Add custom waagent.conf
+
 * Tue Jan 25 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.3.1.1-2
 - Add python3-distro as a Requires
 - Update Source0 to use source tar renaming
