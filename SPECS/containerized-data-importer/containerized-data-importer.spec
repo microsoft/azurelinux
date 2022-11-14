@@ -31,8 +31,8 @@ BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-ExclusiveArch:  x86_64 aarch64
 Provides:       cdi = %{version}-%{release}
+ExclusiveArch:  x86_64 aarch64
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
@@ -47,9 +47,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -69,9 +69,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -90,9 +90,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -111,9 +111,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -132,9 +132,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -153,9 +153,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -174,9 +174,9 @@ Requires:       findutils
 Requires:       jq
 Requires:       nbdkit
 Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
 Requires:       qemu-img
+Requires:       qemu-tools
+Requires:       rsync
 Requires:       shadow-utils
 Requires:       tar
 Requires:       unzip
@@ -305,7 +305,6 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %dir %{_datadir}/cdi/manifests
 %dir %{_datadir}/cdi/manifests/release
 %{_datadir}/cdi/manifests
-
 
 %changelog
 * Mon Nov 14 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.51.0-5
