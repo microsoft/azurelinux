@@ -19404,8 +19404,8 @@
         "type": "other",
         "other": {
           "name": "pixman",
-          "version": "0.40.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.40.0.tar.xz"
+          "version": "0.42.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.42.2.tar.xz"
         }
       }
     },
