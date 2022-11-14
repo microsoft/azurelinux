@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.51.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,8 +45,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -69,8 +67,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -92,8 +88,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -115,8 +109,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -138,8 +130,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -161,8 +151,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -184,8 +172,6 @@ Requires:       curl
 Requires:       diffutils
 Requires:       findutils
 Requires:       jq
-Requires:       libnbd
-Requires:       librsync
 Requires:       nbdkit
 Requires:       patch
 Requires:       rsync
@@ -202,22 +188,6 @@ Upload server for the data fetching service for VM container images
 %package        manifests
 Summary:        YAML manifests used to install CDI
 Group:          System/Packages
-Requires:       cpio
-Requires:       curl
-Requires:       diffutils
-Requires:       findutils
-Requires:       jq
-Requires:       libnbd
-Requires:       librsync
-Requires:       nbdkit
-Requires:       patch
-Requires:       rsync
-Requires:       qemu-tools
-Requires:       qemu-img
-Requires:       shadow-utils
-Requires:       tar
-Requires:       unzip
-Requires:       util-linux
 
 %description    manifests
 This contains the built YAML manifests used to install CDI into a
