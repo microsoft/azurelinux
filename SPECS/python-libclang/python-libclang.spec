@@ -3,7 +3,7 @@
 Summary:        Clang's python bindings
 Name:           python-%{pypi_name}
 Version:        14.0.6
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,5 +37,5 @@ This library makes it easier to install clang's python bindings.
 %{python3_sitelib}/*
 
 %changelog
-* Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.3-2
+* Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsoft.com> - 14.0.6-1
 - Original version for CBL-Mariner. License Verified.
