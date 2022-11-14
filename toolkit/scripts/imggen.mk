@@ -11,7 +11,9 @@ assets_files             = $(shell find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
-ifeq ($(build_arch),aarch64)
+ifdef CONFIG_FILE
+initrd_config_json       = $(CONFIG_FILE)
+else ifeq ($(build_arch),aarch64)
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
 else
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
