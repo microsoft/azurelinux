@@ -122,7 +122,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 
 %changelog
 * Tue Nov 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-18
-- Updated Python macros to move away from deprecated APIs.
+- Updated Python macros to move away from deprecated APIs. Using Fedora 37 implementation (license: MIT).
 
 * Fri Oct 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-17
 - Adding macro to skip stripping of signatures.
