@@ -201,8 +201,6 @@ autoreconf -f -i
 sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
 
 %build
-#Do out of tree builds
-%global _configure ../configure
 #Common configure options
 %global configure_opts \\\
   --disable-silent-rules \\\
