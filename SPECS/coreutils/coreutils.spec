@@ -60,7 +60,6 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/bin
 install -vdm 755 %{buildroot}%{_sbindir}
 install -vdm 755 %{buildroot}%{_mandir}/man8
 mv -v %{buildroot}%{_bindir}/chroot %{buildroot}%{_sbindir}
