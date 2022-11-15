@@ -7341,8 +7341,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/2.5.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
         }
       }
     },
