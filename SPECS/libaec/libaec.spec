@@ -2,7 +2,7 @@ Summary:        Adaptive Entropy Coding library
 Name:           libaec
 Version:        1.0.4
 Release:        5%{?dist}
-License:        BSD 2-Clause
+License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.dkrz.de/k202009/libaec

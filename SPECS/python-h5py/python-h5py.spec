@@ -86,7 +86,6 @@ cd -
 
 %files -n python%{python3_pkgversion}-h5py
 %license serial/licenses/*.txt
-#doc serial/ANN.rst serial/README.rst serial/examples
 
 %doc serial/README.rst serial/examples
 %{python3_sitearch}/%{name}/

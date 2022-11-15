@@ -53,7 +53,6 @@ fi
 
 %files
 %doc COPYRIGHT
-%{!?_licensedir:%global license %%doc}
 %license gpl-2.0.txt
 %{_bindir}/*
 %{_mandir}/man1/*
