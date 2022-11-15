@@ -83,20 +83,6 @@ rm -rf %{buildroot}%{python3_sitearch}/h5py/tests
 cd -
 
 
-%check
-pip3 install pytest pytest-mpi
-# Upstream requires a specific numpy without this
-export H5PY_SETUP_REQUIRES=0
-export H5PY_SYSTEM_LZF=1
-%ifarch %{ix86}
-fail=0
-%else
-fail=1
-%endif
-
-export PYTHONPATH=$(echo serial/build/lib*)
-pytest --pyargs h5py -rxXs ${PYTHONPATH}
-
 
 %files -n python%{python3_pkgversion}-h5py
 %license serial/licenses/*.txt

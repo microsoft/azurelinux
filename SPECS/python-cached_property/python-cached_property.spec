@@ -22,17 +22,15 @@ cached_property allows properties in Python classes to be cached until the cache
 is invalidated or expired.
 
 %package -n python%{python3_pkgversion}-%{modulename}
-# BuildRequires:  python%{python3_pkgversion}-freezegun
-# BuildRequires:  python%{python3_pkgversion}-pytest
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{modulename}}
 Summary:        A cached-property for decorating methods in Python classes.
 BuildRequires:  python%{python3_pkgversion}-dateutil
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-# This package was python3-{projectname} for a long time, but never should've
-# been
 Provides:       python%{python3_pkgversion}-%{projectname} = %{version}-%{release}
-Obsoletes:      python%{python3_pkgversion}-%{projectname} < 1.3.0-2
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description -n python%{python3_pkgversion}-%{modulename}
 cached_property allows properties in Python classes to be cached until the cache
@@ -49,7 +47,7 @@ is invalidated or expired.
 
 %check
 pip3 install pytest freezegun
-PYTHONPATH=./ py.test-3
+%pytest
 
 %files -n python%{python3_pkgversion}-%{modulename}
 %doc AUTHORS.rst HISTORY.rst CONTRIBUTING.rst README.rst
