@@ -144,8 +144,7 @@ popd
 
 %changelog
 * Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
-- Add python binding for gRPC.
-- CBL-Mariner import from Fedora 37 (license: MIT).
+- Add 'python3-grpcio' subpackage using Fedora 37 spec for guidance.
 
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-2
 - Bumping release to rebuild with latest 'abseil-cpp'.
