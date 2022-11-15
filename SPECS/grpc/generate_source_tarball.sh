@@ -80,13 +80,9 @@ git fetch --all --tags
 git checkout tags/v$PKG_VERSION -b grpc-$PKG_VERSION
 git submodule update --init
 popd
-mv grpc grpc-$PKG_VERSION
+mv grpc/third_party third_party
 
-if [[ -n $SRC_TARBALL ]]; then
-    TARBALL_NAME="$(basename $SRC_TARBALL)"
-else
-    TARBALL_NAME="grpc-$PKG_VERSION.tar.gz"
-fi
+TARBALL_NAME="grpc-$PKG_VERSION-submodules.tar.gz"
 
 NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
 
@@ -97,6 +93,6 @@ NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -zcf $NEW_TARBALL grpc-$PKG_VERSION
+    -zcf $NEW_TARBALL third_party
 
 echo "Source tarball $NEW_TARBALL successfully created!"

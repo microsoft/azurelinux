@@ -7,7 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-submodules.tar.gz
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -65,6 +66,7 @@ Python language bindings for gRPC.
 
 %prep
 %setup -q -n %{name}-%{version}
+%setup -T -D -a 1
 
 %build
 # Updating used C++ version to be compatible with the build dependencies.

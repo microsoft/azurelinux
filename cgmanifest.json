@@ -4331,7 +4331,7 @@
         "other": {
           "name": "grpc",
           "version": "1.42.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/grpc-1.42.0.tar.gz"
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.42.0/grpc-1.42.0.tar.gz"
         }
       }
     },
