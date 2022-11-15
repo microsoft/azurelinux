@@ -9,7 +9,6 @@ title: CBL-Mariner Documentation
 
 This is the official CBL-Mariner Linux build system. You can use this repository to
 build a boot-able CBL-Mariner Linux image and use it as a:
-- Standalone VM image - Available in Azure Marketplace 
 - AKS container host, where you can host your Kubernetes containers - Available in AKS (Azure Kubernetes Service)
 - Base container image - Available in Microsoft Container Registry 
 - Distroless container images- Available in Azure Container Registry
@@ -149,34 +148,6 @@ follows:
 This will download and run a basic CBL-Mariner image inside the docker container
 and you can evaluate the basic rootfs and test your applications within this
 image.
-
-### Getting Started on Azure
-
-CBL-Mariner VMs are available to you through the Azure Marketplace.
-
-You can start a CBL-Mariner VM using az-cli commands. The az-cli utility is available as
-"azure-cli" package on Ubuntu (this also works if you are running Ubuntu under
-WSL2 on Windows).
-
-1. First, install az-cli. Use instructions provided as part of official documentation for
-[installing azure-cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-
-2. Next, authenticate the command line interface with the azure services. To do so, execute the following command and follow instructions:
-
-    az login
-
-3. Now, start a CBL-Mariner VM as follows:
-
-    az group create --name <RG> --location westus2
-    az vm create --name <VMNAME> --resource-group <RG> --image /subscriptions/f9cb372a-8903-4370-9ce0-3042e3bb2cc8/resourceGroups/cblmarinerpreviewRG/providers/Microsoft.Compute/galleries/cblmarinerpreviewSIG/images/cblmarinerpreview
-
-![vm-result](images/azure-vm-create-result.jpg)
-
-4. Once the VM has been created, it will be visible in your azure account:
-
-![vm-mariner](images/azure-mariner-vm.jpg)
-
-5. You can now use `ssh` to log in to your machine and continue configuration as you would normally configure a Linux virtual machine.
 
 ### Using CBL-Mariner With AKS
 
