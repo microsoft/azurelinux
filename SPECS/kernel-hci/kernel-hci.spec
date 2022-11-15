@@ -61,6 +61,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Provides: kernel = %{version}-%{release}
 ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -86,6 +87,7 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
 Obsoletes:      linux-dev
+Provides:       kernel-devel = %{version}-%{release}
 
 %description devel
 This package contains the Linux kernel dev files
@@ -94,6 +96,7 @@ This package contains the Linux kernel dev files
 Summary:        Kernel accessibility modules
 Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
+Provides:       kernel-drivers-accessibility = %{version}-%{release}
 
 %description drivers-accessibility
 This package contains the Linux kernel accessibility support
@@ -110,6 +113,7 @@ This package contains the Linux kernel gpu support
 Summary:        Kernel Sound modules
 Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
+Provides:       kernel-drivers-sound = %{version}-%{release}
 
 %description drivers-sound
 This package contains the Linux kernel sound support
@@ -118,6 +122,7 @@ This package contains the Linux kernel sound support
 Summary:        Kernel docs
 Group:          System Environment/Kernel
 Requires:       python3
+Provides:       kernel-docs = %{version}-%{release}
 
 %description docs
 This package contains the Linux kernel doc files
@@ -127,6 +132,7 @@ Summary:        This package contains the 'perf' performance analysis tools for 
 Group:          System/Tools
 Requires:       %{name} = %{version}-%{release}
 Requires:       audit
+Provides:       kernel-tools = %{version}-%{release}
 
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
@@ -141,6 +147,7 @@ This package contains the Python 3 extension for the 'perf' performance analysis
 %package dtb
 Summary:        This package contains common device tree blobs (dtb)
 Group:          System Environment/Kernel
+Provides:       kernel-dtb = %{version}-%{release}
 
 %description dtb
 This package contains common device tree blobs (dtb)
