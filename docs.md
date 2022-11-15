@@ -8,10 +8,7 @@ title: CBL-Mariner Documentation
 # CBL-Mariner Linux
 
 This is the official CBL-Mariner Linux build system. You can use this repository to
-build a boot-able CBL-Mariner Linux image and use it as a:
-- AKS container host, where you can host your Kubernetes containers - Available in AKS (Azure Kubernetes Service)
-- Base container image - Available in Microsoft Container Registry 
-- Distroless container images- Available in Azure Container Registry
+build a boot-able CBL-Mariner Linux image and use it as an AKS container host, where you can host your Kubernetes containers - Available in AKS (Azure Kubernetes Service).
 
 CBL-Mariner Linux is a lightweight operating system, containing only the packages needed for a cloud environment. CBL-Mariner can be customized through custom
 packages and tools, to fit the requirements of your application. CBL-Mariner undergoes Azure validation tests, is compatible with Azure agents, and is built and tested by the Azure Edge & Platform to power various use cases, ranging from Azure services to powering IoT infrastructure. CBL-Mariner is the internally recommended Linux distribution for use with Microsoft cloud services and related products.
@@ -122,32 +119,6 @@ The CBL-MarinerDemo repository contains the SPEC file and sources for building
 a simple "Hello World" application. This repository also includes a simple
 "os-subrelease" package that allows you to add identifying information about
 your derivative to an /etc/os-subrelease file.
-
-### Provisioning
-
-You can provision CBL-Mariner in production as well as in a test environment using
-a variety of options. Several deployment options are described in this and
-subsequent sections. If you are just evaluating the system, then the `docker`
-variant is the fastest way to run and try CBL-Mariner. For production you can also
-pick one of the other options below:
-
-- Local docker container. This option will work on Linux or Windows with
-  Windows Subsystem For Linux
-  ([WSL2](https://docs.microsoft.com/en-us/windows/wsl/install-win10)).
-- Azure virtual machine deployment - Accomplished using Azure-CLI commands
-  described in detail in the Azure deployment section.
-
-### Getting Started with Docker
-
-CBL-Mariner containers are available on Microsoft Container Registry. The fastest way to try out a basic CBL-Mariner environment is by using a CBL-Mariner
-Docker container. You can start this container using a single command line as
-follows:
-
-    docker run -it msint.azurecr.io/cbl-mariner/base/core:1.0 /bin/bash
-
-This will download and run a basic CBL-Mariner image inside the docker container
-and you can evaluate the basic rootfs and test your applications within this
-image.
 
 ### Using CBL-Mariner With AKS
 
