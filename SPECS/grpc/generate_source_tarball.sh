@@ -2,9 +2,9 @@
 
 set -e
 
-SRC_TARBALL="grpc-1.42.0.tar.gz"
+SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PKG_VERSION="1.42.0"
+PKG_VERSION=""
 
 # parameters:
 #
