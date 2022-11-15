@@ -2017,6 +2017,7 @@
                 "jx",
                 "keda",
                 "kernel-signed",
+                "kernel-hci-signed",
                 "KeysInUse-OpenSSL",
                 "kpatch",
                 "kube-vip-cloud-provider",
