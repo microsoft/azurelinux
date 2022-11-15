@@ -13053,8 +13053,8 @@
         "type": "other",
         "other": {
           "name": "ntfs-3g",
-          "version": "2022.5.17",
-          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.5.17.tgz"
+          "version": "2022.10.3",
+          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.10.3.tgz"
         }
       }
     },
