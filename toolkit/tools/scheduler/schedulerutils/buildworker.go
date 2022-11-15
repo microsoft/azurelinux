@@ -181,10 +181,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 		return
 	})
 
-	dependencies = make([]string, 0, len(dependencyLookup))
-	for depName := range dependencyLookup {
-		dependencies = append(dependencies, depName)
-	}
+	dependencies = sliceutils.StringsSetToSlice(dependencyLookup)
 
 	return
 }

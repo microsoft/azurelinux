@@ -1,20 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%global with_bundled 1
-
-
 %global with_debug 1
-
-
-
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
 %else
 %global debug_package   %{nil}
 %endif
-
 %global provider github
 %global provider_tld com
 %global project containers
@@ -22,53 +12,37 @@ Distribution:   Mariner
 # https://github.com/containers/buildah
 %global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
 %global git0 https://%{import_path}
-
 # Used for comparing with latest upstream tag
 # to decide whether to autobuild (non-rawhide only)
 %define built_tag v1.18.0
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
-%define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
-
-Name: %{repo}
-Version: 1.18.0
-Release: 6%{?dist}
-Summary: A command line tool used for creating OCI Images
-License: ASL 2.0
-URL: https://%{name}.io
-Source: %{download_url}#/%{name}-%{version}.tar.gz
-BuildRequires: device-mapper-devel
-BuildRequires: golang
-BuildRequires: git
-BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.35-3%{?dist}
-BuildRequires: go-md2man
-BuildRequires: go-rpm-macros
-BuildRequires: gpgme-devel
-BuildRequires: libassuan-devel
-BuildRequires: make
-Requires: containers-common
-# No ostree for centos 7
-
-BuildRequires: ostree-devel
-
-# No btrfs for centos 8
-
-BuildRequires: btrfs-progs-devel
-
-
-Requires: crun >= 0.10-1
-BuildRequires: libseccomp-static
-Recommends: container-selinux
-Requires: libseccomp >= 2.4.1-0
-Recommends: slirp4netns >= 0.3-0
-Recommends: fuse-overlayfs
-
-
-
-
-
-
-
+Summary:        A command line tool used for creating OCI Images
+Name:           %{repo}
+Version:        1.18.0
+Release:        7%{?dist}
+License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://%{name}.io
+Source:         https://%{import_path}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  btrfs-progs-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  go-md2man
+BuildRequires:  go-rpm-macros
+BuildRequires:  golang
+BuildRequires:  gpgme-devel
+BuildRequires:  libassuan-devel
+BuildRequires:  libseccomp-static
+BuildRequires:  make
+BuildRequires:  ostree-devel
+Requires:       libcontainers-common
+Requires:       libseccomp >= 2.4.1-0
+Recommends:     container-selinux
+Recommends:     fuse-overlayfs
+Recommends:     slirp4netns >= 0.3-0
 
 %description
 The %{name} package provides a command line tool which can be used to
@@ -78,23 +52,6 @@ or
 * mount/umount a working container's root file system for manipulation
 * save container's root file system layer to create a new image
 * delete a working container or an image
-
-%package tests
-Summary: Tests for %{name}
-
-Requires: %{name} = %{version}-%{release}
-Requires: bats
-Requires: bzip2
-Requires: podman
-Requires: golang
-Requires: jq
-Requires: httpd-tools
-Requires: openssl
-
-%description tests
-%{summary}
-
-This package contains system tests for %{name}
 
 %prep
 %autosetup -Sgit -n %{name}-%{built_tag_strip}
@@ -112,24 +69,13 @@ mv vendor src
 
 export GOPATH=$(pwd)/_build:$(pwd)
 export BUILDTAGS='seccomp selinux'
-%if 0%{?centos} >= 8
-export BUILDTAGS+=' exclude_graphdriver_btrfs'
-%endif
 %gobuild -o bin/%{name} %{import_path}/cmd/%{name}
-%gobuild -o imgtype %{import_path}/tests/imgtype
-GOMD2MAN=go-md2man %{__make} -C docs
+GOMD2MAN=go-md2man make -C docs
 
 %install
 export GOPATH=$(pwd)/_build:$(pwd):%{gopath}
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} install install.completions
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
-
-install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-cp -pav tests/. %{buildroot}/%{_datadir}/%{name}/test/system
-cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
-
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
 
 %files
 %license LICENSE
@@ -140,12 +86,11 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/%{name}
 
-%files tests
-%license LICENSE
-%{_bindir}/%{name}-imgtype
-%{_datadir}/%{name}/test
-
 %changelog
+* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.18.0-7
+- Move to core packages
+- Remove tests package
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.0-6
 - Bump release to rebuild with go 1.18.8
 
