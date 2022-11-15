@@ -5,7 +5,7 @@
 %else
 %bcond_with java
 %endif
-%global version_main %(echo %{version} | cut -d. -f-2)
+%define version_main %(echo %{version} | cut -d. -f-2)
 %global so_version 200
 %global with_mpich 0
 %global with_openmpi 0
