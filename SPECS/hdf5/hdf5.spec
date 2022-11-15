@@ -16,8 +16,6 @@
 %global mpi_list %{?mpi_list} openmpi
 %endif
 Summary:        A general purpose library and file format for storing scientific data
-# Patch version?
-#global snaprel -beta
 Name:           hdf5
 Version:        1.12.1
 Release:        11%{?dist}
