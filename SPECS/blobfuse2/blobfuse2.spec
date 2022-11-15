@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 %define our_gopath %{_topdir}/.gopath
-%define preview_suffix preview.3	
+%define preview_suffix preview.4	
 %define blobfuse2_version 2.0.0	
 %define blobfuse2_health_monitor bfusemon
 
@@ -81,6 +81,12 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Fri Nov 04 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.4-1
+- Bump version to 2.0.0-preview.4
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.0.preview.3-2
+- Bump release to rebuild with go 1.18.8
+
 * Mon Oct 03 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.3-1
 - Add blobfuse2 spec
 - License verified

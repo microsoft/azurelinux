@@ -1,5 +1,5 @@
 filesystem-1.1-12.cm2.aarch64.rpm
-kernel-headers-5.15.72.1-1.cm2.noarch.rpm
+kernel-headers-5.15.77.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.aarch64.rpm
 glibc-devel-2.35-3.cm2.aarch64.rpm
 glibc-i18n-2.35-3.cm2.aarch64.rpm
@@ -40,8 +40,8 @@ ncurses-libs-6.3-2.cm2.aarch64.rpm
 ncurses-term-6.3-2.cm2.aarch64.rpm
 readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
-coreutils-8.32-5.cm2.aarch64.rpm
-coreutils-lang-8.32-5.cm2.aarch64.rpm
+coreutils-8.32-6.cm2.aarch64.rpm
+coreutils-lang-8.32-6.cm2.aarch64.rpm
 bash-5.1.8-1.cm2.aarch64.rpm
 bash-devel-5.1.8-1.cm2.aarch64.rpm
 bash-lang-5.1.8-1.cm2.aarch64.rpm
@@ -95,9 +95,9 @@ elfutils-libelf-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-devel-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-devel-static-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-lang-0.186-1.cm2.aarch64.rpm
-expat-2.4.8-2.cm2.aarch64.rpm
-expat-devel-2.4.8-2.cm2.aarch64.rpm
-expat-libs-2.4.8-2.cm2.aarch64.rpm
+expat-2.5.0-1.cm2.aarch64.rpm
+expat-devel-2.5.0-1.cm2.aarch64.rpm
+expat-libs-2.5.0-1.cm2.aarch64.rpm
 libpipeline-1.5.5-2.cm2.aarch64.rpm
 libpipeline-devel-1.5.5-2.cm2.aarch64.rpm
 gdbm-1.21-1.cm2.aarch64.rpm
@@ -188,10 +188,10 @@ libsolv-0.7.20-1.cm2.aarch64.rpm
 libsolv-devel-0.7.20-1.cm2.aarch64.rpm
 libssh2-1.9.0-2.cm2.aarch64.rpm
 libssh2-devel-1.9.0-2.cm2.aarch64.rpm
-krb5-1.19.3-1.cm2.aarch64.rpm
-curl-7.84.0-1.cm2.aarch64.rpm
-curl-devel-7.84.0-1.cm2.aarch64.rpm
-curl-libs-7.84.0-1.cm2.aarch64.rpm
+krb5-1.19.3-2.cm2.aarch64.rpm
+curl-7.86.0-1.cm2.aarch64.rpm
+curl-devel-7.86.0-1.cm2.aarch64.rpm
+curl-libs-7.86.0-1.cm2.aarch64.rpm
 tdnf-3.2.2-4.cm2.aarch64.rpm
 tdnf-cli-libs-3.2.2-4.cm2.aarch64.rpm
 tdnf-devel-3.2.2-4.cm2.aarch64.rpm
@@ -224,7 +224,7 @@ mariner-repos-shared-2.0-8.cm2.noarch.rpm
 mariner-repos-2.0-8.cm2.noarch.rpm
 libffi-3.4.2-2.cm2.aarch64.rpm
 libffi-devel-3.4.2-2.cm2.aarch64.rpm
-libtasn1-4.18.0-2.cm2.aarch64.rpm
+libtasn1-4.19.0-1.cm2.aarch64.rpm
 p11-kit-0.24.1-1.cm2.aarch64.rpm
 p11-kit-trust-0.24.1-1.cm2.aarch64.rpm
 ca-certificates-shared-2.0.0-8.cm2.noarch.rpm

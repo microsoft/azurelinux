@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.10-6
+- Bump release to rebuild with go 1.18.8
+
 * Mon Aug 29 2022 Sean Dougherty <sdougherty@microsoft.com> - 0.8.10-5
 - Removed arch-specific logic in Makefile with 001-remove_arch_specific_makefile_logic.patch.
 

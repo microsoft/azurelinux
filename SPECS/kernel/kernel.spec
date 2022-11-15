@@ -17,7 +17,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.72.1
+Version:        5.15.77.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -88,6 +88,14 @@ Requires:       %{name} = %{version}-%{release}
 
 %description drivers-accessibility
 This package contains the Linux kernel accessibility support
+
+%package drivers-gpu
+Summary:        Kernel gpu modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-gpu
+This package contains the Linux kernel gpu support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -310,6 +318,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %post drivers-accessibility
 /sbin/depmod -a %{uname_r}
 
+%post drivers-gpu
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
@@ -343,6 +354,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files drivers-accessibility
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/accessibility
+
+%files drivers-gpu
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/gpu
 
 %files drivers-sound
 %defattr(-,root,root)
@@ -391,6 +406,18 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.77.1-1
+- Auto-upgrade to 5.15.77.1
+
+* Wed Oct 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.74.1-3
+- Turn on Configs for different TCP algorithms
+
+* Mon Oct 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.74.1-2
+- Package gpu kernel modules in new package kernel-drivers-gpu
+
+* Wed Oct 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.74.1-1
+- Upgrade to 5.15.74.1
+
 * Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
 - Upgrade to 5.15.72.1
 

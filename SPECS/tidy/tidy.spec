@@ -1,21 +1,22 @@
-
+%global __cmake_in_source_build 1
 %global libname libtidy
 %global upname tidy-html5
 %global tidy_compat_headers 1
 Summary:        Utility to clean up and pretty print HTML/XHTML/XML
 Name:           tidy
-Version:        5.7.28
+Version:        5.8.0
 Release:        5%{?dist}
 License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.html-tidy.org/
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/tidy-html5-%{version}.tar.gz
+Source0:        https://github.com/htacg/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
-## upstream patches
 BuildRequires:  gcc-c++
 BuildRequires:  libxslt
+## upstream patches
+BuildRequires:  make
 BuildRequires:  pkg-config
 Requires:       %{libname}%{?_isa} = %{version}-%{release}
 Provides:       tidy-html5 = %{version}-%{release}
@@ -68,7 +69,7 @@ make install/fast DESTDIR=%{buildroot}  -C build/cmake
 
 ## unpackaged files
 # omit static lib
-rm -fv %{buildroot}%{_libdir}/libtidys.a
+rm -fv %{buildroot}%{_libdir}/libtidy.a
 
 
 %files
@@ -91,13 +92,39 @@ rm -fv %{buildroot}%{_libdir}/libtidys.a
 %{_libdir}/pkgconfig/tidy.pc
 
 %changelog
+* Tue Oct 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 5.8.0-5
+- Upgraded from 5.7.28 to 5.8.0
+- Changed libtidys.a to libtidy.a
+- Added make to our upgrade since tidy uses it now.
+- Reverted source URL change
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+
 * Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 5.7.28-5
 - Moved from SPECS-EXTENDED to SPECS
 - License verified
 - Updated source URL
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.7.28-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.8.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 12 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.8.0-1
+- 5.8.0
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.28-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.28-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.28-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.28-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

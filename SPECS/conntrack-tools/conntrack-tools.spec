@@ -1,7 +1,7 @@
 Summary:        Manipulate netfilter connection tracking table and run High Availability
 Name:           conntrack-tools
 Version:        1.4.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,10 @@ install -d -m 0755 %{buildroot}%{_unitdir}
 install -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/
 install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/conntrackd/
 
+# Add a systemd preset to disable the service by default
+install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
+echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-conntrackd.preset
+
 %files
 %license COPYING
 %doc AUTHORS TODO doc
@@ -80,6 +84,7 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/conntrackd/
 %{_mandir}/man8/*
 %dir %{_libdir}/conntrack-tools
 %{_libdir}/conntrack-tools/*
+%config(noreplace) %{_libdir}/systemd/system-preset/50-conntrackd.preset
 
 %post
 %systemd_post conntrackd.service
@@ -91,6 +96,9 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/conntrackd/
 %systemd_postun conntrackd.service
 
 %changelog
+* Mon Oct 31 2022 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 1.4.5-7
+- Service is disabled by default. Now a minimal working config is provided.
+
 * Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.4.5-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
