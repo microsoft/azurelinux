@@ -59,9 +59,8 @@ as needed.
 - **Robust Testing**
   - Through a robust testing matrix of package, image and kernel tests, we allow for earlier issue detections and mitigations prior to the image being published. 
 - **Virtualization**
-  - CBL-Mariner supports both a container host image that includes Docker and
-    Kubernetes infrastructure, as well as a container image that can be used
-    as a base image for app development.
+  - CBL-Mariner supports a container host image that includes the
+    Kubernetes infrastructure.
 - **Efficient lifecycle management**
   - CBL-Mariner supports both RPM package and image-based update mechanisms
 	for releases - with an "evergreen" release alongside specific
@@ -78,7 +77,7 @@ This repository makes it possible for you to build a CBL-Mariner image, includin
 
 However, this is not the recommended approach. The
 recommended approach is to use prebuilt images and packages provided by
-Microsoft, which have already been built and validated. These prebuilt images are available in Azure Marketplace, Microsoft Container Registry, and in Azure Kubernetes Service. Minor versions of the prebuilt VM and container base images are released each month. 
+Microsoft, which have already been built and validated. These prebuilt images are available in Azure Kubernetes Service.
 
 ## Building CBL-Mariner from Source
 Should you still choose to build CBL-Mariner from source, the recommended approach
