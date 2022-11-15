@@ -1577,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "26.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v26.0.tar.gz"
+          "version": "27.0.60",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/tarball/099cdd2"
         }
       }
     },
@@ -7341,8 +7341,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/2.5.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
         }
       }
     },
@@ -7431,8 +7431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.34.1.tar.gz"
+          "version": "5.15.72.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.72.mshv2.tar.gz"
         }
       }
     },
