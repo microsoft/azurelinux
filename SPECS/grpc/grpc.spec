@@ -106,9 +106,6 @@ pushd cmake/build
 find %{buildroot} -name '*.cmake' -delete
 popd
 #python
-pushd '%{buildroot}'
-PYROOT="${PWD}"
-popd
 %py3_install
 
 
