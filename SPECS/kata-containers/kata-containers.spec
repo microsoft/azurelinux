@@ -225,7 +225,7 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 
 %changelog
 * Tue Nov 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-1
-- Update to v3.0.0, apply patches for compatibility with Cloud-hypervisorv27.0.0.
+- Update to v3.0.0, apply patches for compatibility with Cloud-hypervisor v27.0.60.
 
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.5.0-7
 - Bump release to rebuild with go 1.18.8

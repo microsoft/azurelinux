@@ -1,5 +1,5 @@
 filesystem-1.1-12.cm2.x86_64.rpm
-kernel-headers-5.15.74.1-1.cm2.noarch.rpm
+kernel-headers-5.15.77.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.x86_64.rpm
 glibc-devel-2.35-3.cm2.x86_64.rpm
 glibc-i18n-2.35-3.cm2.x86_64.rpm
@@ -40,8 +40,8 @@ ncurses-libs-6.3-2.cm2.x86_64.rpm
 ncurses-term-6.3-2.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
-coreutils-8.32-5.cm2.x86_64.rpm
-coreutils-lang-8.32-5.cm2.x86_64.rpm
+coreutils-8.32-6.cm2.x86_64.rpm
+coreutils-lang-8.32-6.cm2.x86_64.rpm
 bash-5.1.8-1.cm2.x86_64.rpm
 bash-devel-5.1.8-1.cm2.x86_64.rpm
 bash-lang-5.1.8-1.cm2.x86_64.rpm
@@ -189,9 +189,9 @@ libsolv-devel-0.7.20-1.cm2.x86_64.rpm
 libssh2-1.9.0-2.cm2.x86_64.rpm
 libssh2-devel-1.9.0-2.cm2.x86_64.rpm
 krb5-1.19.3-2.cm2.x86_64.rpm
-curl-7.84.0-1.cm2.x86_64.rpm
-curl-devel-7.84.0-1.cm2.x86_64.rpm
-curl-libs-7.84.0-1.cm2.x86_64.rpm
+curl-7.86.0-1.cm2.x86_64.rpm
+curl-devel-7.86.0-1.cm2.x86_64.rpm
+curl-libs-7.86.0-1.cm2.x86_64.rpm
 tdnf-3.2.2-4.cm2.x86_64.rpm
 tdnf-cli-libs-3.2.2-4.cm2.x86_64.rpm
 tdnf-devel-3.2.2-4.cm2.x86_64.rpm

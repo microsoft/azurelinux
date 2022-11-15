@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
 const (
@@ -53,15 +54,28 @@ const (
 )
 
 const (
+	installedRPMRegexRPMIndex = 1
+
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
 	rpmBuildProgram = "rpmbuild"
 )
 
-var goArchToRpmArch = map[string]string{
-	"amd64": "x86_64",
-	"arm64": "aarch64",
-}
+var (
+	goArchToRpmArch = map[string]string{
+		"amd64": "x86_64",
+		"arm64": "aarch64",
+	}
+
+	// Output from 'rpm' prints installed RPMs in a line with the following format:
+	//
+	//	D: ========== +++ [name]-[version]-[release].[distribution] [architecture]-linux [hex_value]
+	//
+	// Example:
+	//
+	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
+	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+).*$`)
+)
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
 func GetRpmArch(goArch string) (rpmArch string, err error) {
@@ -71,17 +85,6 @@ func GetRpmArch(goArch string) (rpmArch string, err error) {
 	}
 	return
 }
-
-var (
-	// Output from 'rpm' prints installed RPMs in a line with the following format:
-	//
-	//	D: ========== +++ [name]-[version]-[release].[distribution] [architecture]-linux [hex_value]
-	//
-	// Example:
-	//
-	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
-	installedRPMLineRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+).*$`)
-)
 
 // SetMacroDir adds RPM_CONFIGDIR=$(newMacroDir) into the shell's environment for the duration of a program.
 // To restore the environment the caller can use shell.SetEnvironment() with the returned origenv.
@@ -211,12 +214,9 @@ func QuerySPEC(specFile, sourceDir, queryFormat, arch string, defines map[string
 
 // QuerySPECForBuiltRPMs queries a SPEC file with queryFormat. Returns only the subpackages, which generate a .rpm file.
 func QuerySPECForBuiltRPMs(specFile, sourceDir, arch string, defines map[string]string) (result []string, err error) {
-	const (
-		builtRPMsSwitch = "--builtrpms"
-		queryFormat     = ""
-	)
+	const queryFormat = "%{nvra}\n"
 
-	return QuerySPEC(specFile, sourceDir, queryFormat, arch, defines, builtRPMsSwitch)
+	return QuerySPEC(specFile, sourceDir, queryFormat, arch, defines, QueryBuiltRPMHeadersArgument)
 }
 
 // QueryPackage queries an RPM or SRPM file with queryFormat. Returns the output split by line and trimmed.
@@ -321,13 +321,13 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 // end up being installed after resolving outdated, obsoleted, or conflicting packages.
 func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs []string, err error) {
 	const (
-		queryFormat       = ""
-		installedRPMIndex = 1
-		squashErrors      = true
+		queryFormat  = ""
+		squashErrors = true
 	)
 
 	args := []string{
 		"-Uvvh",
+		"--replacepkgs",
 		"--nodeps",
 		"--root",
 		rootDir,
@@ -343,15 +343,15 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	}
 
 	splitStdout := strings.Split(stderr, "\n")
+	uniqueResolvedRPMs := map[string]bool{}
 	for _, line := range splitStdout {
-		matches := installedRPMLineRegex.FindStringSubmatch(line)
-		if len(matches) == 0 {
-			continue
+		matches := installedRPMRegex.FindStringSubmatch(line)
+		if len(matches) != 0 {
+			uniqueResolvedRPMs[matches[installedRPMRegexRPMIndex]] = true
 		}
-
-		resolvedRPMs = append(resolvedRPMs, matches[installedRPMIndex])
 	}
 
+	resolvedRPMs = sliceutils.StringsSetToSlice(uniqueResolvedRPMs)
 	return
 }
 
