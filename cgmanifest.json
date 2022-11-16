@@ -2137,8 +2137,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.29.26",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.26.tar.gz"
+          "version": "0.29.32",
+          "downloadUrl": "https://github.com/cython/cython/archive/0.29.32.tar.gz"
         }
       }
     },
@@ -13183,8 +13183,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.22.3",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.3/numpy-1.22.3.tar.gz"
+          "version": "1.23.4",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.23.4/numpy-1.23.4.tar.gz"
         }
       }
     },

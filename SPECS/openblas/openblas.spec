@@ -15,7 +15,7 @@
 
 Name:           openblas
 Version:        0.3.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An optimized BLAS library based on GotoBLAS2
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -646,6 +646,9 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %endif
 
 %changelog
+* Tue Nov 15 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.3.21-2
+- Moved from SPECS-EXTENDED to SPECS
+
 * Mon Aug 29 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.21-1
 - Update to 0.3.21.
 
