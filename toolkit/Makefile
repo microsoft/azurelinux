@@ -29,6 +29,7 @@ ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
 USE_PREVIEW_REPO                ?= n
+USE_EXTENDED_REPO               ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
 TOOLCHAIN_ARCHIVE               ?=
@@ -56,6 +57,7 @@ toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
 PREVIEW_REPO     ?= $(toolkit_root)/repos/mariner-official-preview.repo
+EXTENDED_REPO    ?= $(toolkit_root)/repos/mariner-extended.repo
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
@@ -115,6 +117,21 @@ ifeq ($(USE_PREVIEW_REPO),y)
       $(warning )
       $(warning ######################### WARNING #########################)
       $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
+      $(warning ######################### WARNING #########################)
+      $(warning )
+   endif
+endif
+
+ifeq ($(USE_EXTENDED_REPO),y)
+   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/extended/$(build_arch)
+   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/extended/debuginfo/$(build_arch)
+   SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/extended/srpms
+   ifneq ($(wildcard $(EXTENDED_REPO)),)
+      override REPO_LIST += $(EXTENDED_REPO)
+   else
+      $(warning )
+      $(warning ######################### WARNING #########################)
+      $(warning 'USE_EXTENDED_REPO=y' set but '$(EXTENDED_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_EXTENDED_REPO' for core builds.)
       $(warning ######################### WARNING #########################)
       $(warning )
    endif
