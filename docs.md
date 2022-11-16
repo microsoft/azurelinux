@@ -13,10 +13,6 @@ build a boot-able CBL-Mariner Linux image and use it as an AKS container host, w
 CBL-Mariner Linux is a lightweight operating system, containing only the packages needed for a cloud environment. CBL-Mariner can be customized through custom
 packages and tools, to fit the requirements of your application. CBL-Mariner undergoes Azure validation tests, is compatible with Azure agents, and is built and tested by the Azure Edge & Platform to power various use cases, ranging from Azure services to powering IoT infrastructure. CBL-Mariner is the internally recommended Linux distribution for use with Microsoft cloud services and related products.
 
-If you have any questions about CBL-Mariner that are not answered in this
-documentation, we strongly encourage you to get in touch with us at
-[marinerqa@microsoft.com](mailto:marinerqa@microsoft.com)
-
 ## Who's using CBL-Mariner today?
 
 CBL-Mariner is used internally by Microsoft and several
@@ -59,9 +55,8 @@ as needed.
 - **Robust Testing**
   - Through a robust testing matrix of package, image and kernel tests, we allow for earlier issue detections and mitigations prior to the image being published. 
 - **Virtualization**
-  - CBL-Mariner supports both a container host image that includes Docker and
-    Kubernetes infrastructure, as well as a container image that can be used
-    as a base image for app development.
+  - CBL-Mariner supports a container host image that includes the
+    Kubernetes infrastructure.
 - **Efficient lifecycle management**
   - CBL-Mariner supports both RPM package and image-based update mechanisms
 	for releases - with an "evergreen" release alongside specific
@@ -78,7 +73,7 @@ This repository makes it possible for you to build a CBL-Mariner image, includin
 
 However, this is not the recommended approach. The
 recommended approach is to use prebuilt images and packages provided by
-Microsoft, which have already been built and validated. These prebuilt images are available in Azure Marketplace, Microsoft Container Registry, and in Azure Kubernetes Service. Minor versions of the prebuilt VM and container base images are released each month. 
+Microsoft, which have already been built and validated. These prebuilt images are available in Azure Kubernetes Service.
 
 ## Building CBL-Mariner from Source
 Should you still choose to build CBL-Mariner from source, the recommended approach
