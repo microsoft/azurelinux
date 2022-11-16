@@ -28,7 +28,9 @@ Patch3:         hdf5-build.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
 Patch5:         hdf5-wrappers.patch
 # For patches/rpath
+# For patches/rpath
 BuildRequires:  automake
+# Needed for mpi tests
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -41,20 +43,6 @@ BuildRequires:  openssh-clients
 BuildRequires:  openssl-devel
 BuildRequires:  time
 BuildRequires:  zlib-devel
-BuildRequires: krb5-devel
-BuildRequires: openssl-devel
-BuildRequires: time
-BuildRequires: zlib-devel
-BuildRequires: hostname
-# For patches/rpath
-BuildRequires: automake
-BuildRequires: libtool
-# Needed for mpi tests
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: libaec-devel
-BuildRequires: openssh-clients
-
 
 %description
 HDF5 is a general purpose library and file format for storing scientific data.
@@ -75,44 +63,40 @@ Requires:       zlib-devel%{?_isa}
 %description devel
 HDF5 development headers and libraries.
 
-
 %package static
-Summary: HDF5 static libraries
-Requires: %{name}-devel = %{version}-%{release}
+Summary:        HDF5 static libraries
+Requires:       %{name}-devel = %{version}-%{release}
 
 %description static
 HDF5 static libraries.
 
-
 %if %{with_mpich}
 %package mpich
-Summary: HDF5 mpich libraries
-BuildRequires: mpich-devel
-Provides: %{name}-mpich2 = %{version}-%{release}
-Obsoletes: %{name}-mpich2 < 1.8.11-4
+Summary:        HDF5 mpich libraries
+BuildRequires:  mpich-devel
+Provides:       %{name}-mpich2 = %{version}-%{release}
+Obsoletes:      %{name}-mpich2 < 1.8.11-4
 
 %description mpich
 HDF5 parallel mpich libraries
 
-
 %package mpich-devel
-Summary: HDF5 mpich development files
-Requires: %{name}-mpich%{?_isa} = %{version}-%{release}
-Requires: libaec-devel%{?_isa}
-Requires: zlib-devel%{?_isa}
-Requires: mpich-devel%{?_isa}
-Provides: %{name}-mpich2-devel = %{version}-%{release}
-Obsoletes: %{name}-mpich2-devel < 1.8.11-4
+Summary:        HDF5 mpich development files
+Requires:       %{name}-mpich%{?_isa} = %{version}-%{release}
+Requires:       libaec-devel%{?_isa}
+Requires:       mpich-devel%{?_isa}
+Requires:       zlib-devel%{?_isa}
+Provides:       %{name}-mpich2-devel = %{version}-%{release}
+Obsoletes:      %{name}-mpich2-devel < 1.8.11-4
 
 %description mpich-devel
 HDF5 parallel mpich development files
 
-
 %package mpich-static
-Summary: HDF5 mpich static libraries
-Requires: %{name}-mpich-devel%{?_isa} = %{version}-%{release}
-Provides: %{name}-mpich2-static = %{version}-%{release}
-Obsoletes: %{name}-mpich2-static < 1.8.11-4
+Summary:        HDF5 mpich static libraries
+Requires:       %{name}-mpich-devel%{?_isa} = %{version}-%{release}
+Provides:       %{name}-mpich2-static = %{version}-%{release}
+Obsoletes:      %{name}-mpich2-static < 1.8.11-4
 
 %description mpich-static
 HDF5 parallel mpich static libraries
@@ -121,28 +105,26 @@ HDF5 parallel mpich static libraries
 
 %if %{with_openmpi}
 %package openmpi
-Summary: HDF5 openmpi libraries
-BuildRequires: openmpi-devel
-BuildRequires: make
+Summary:        HDF5 openmpi libraries
+BuildRequires:  make
+BuildRequires:  openmpi-devel
 
 %description openmpi
 HDF5 parallel openmpi libraries
 
-
 %package openmpi-devel
-Summary: HDF5 openmpi development files
-Requires: %{name}-openmpi%{?_isa} = %{version}-%{release}
-Requires: libaec-devel%{?_isa}
-Requires: zlib-devel%{?_isa}
-Requires: openmpi-devel%{?_isa}
+Summary:        HDF5 openmpi development files
+Requires:       %{name}-openmpi%{?_isa} = %{version}-%{release}
+Requires:       libaec-devel%{?_isa}
+Requires:       openmpi-devel%{?_isa}
+Requires:       zlib-devel%{?_isa}
 
 %description openmpi-devel
 HDF5 parallel openmpi development files
 
-
 %package openmpi-static
-Summary: HDF5 openmpi static libraries
-Requires: %{name}-openmpi-devel%{?_isa} = %{version}-%{release}
+Summary:        HDF5 openmpi static libraries
+Requires:       %{name}-openmpi-devel%{?_isa} = %{version}-%{release}
 
 %description openmpi-static
 HDF5 parallel openmpi static libraries
@@ -219,7 +201,7 @@ done
 
 %install
 %make_install -C build
-rm %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 # Fortran modules
 mkdir -p %{buildroot}%{_fmoddir}
 mv %{buildroot}%{_includedir}/*.mod %{buildroot}%{_fmoddir}
@@ -231,7 +213,7 @@ for mpi in %{?mpi_list}
 do
   module load mpi/$mpi-%{_arch}
   %make_install -C $mpi
-  rm %{buildroot}/%{_libdir}/$mpi/lib/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
   # Fortran modules
   mkdir -p %{buildroot}${MPI_FORTRAN_MOD_DIR}
   mv %{buildroot}%{_includedir}/${mpi}-%{_arch}/*.mod %{buildroot}${MPI_FORTRAN_MOD_DIR}/
@@ -253,7 +235,7 @@ for x in h5c++ h5cc h5fc
 do
   mv %{buildroot}%{_bindir}/${x} \
      %{buildroot}%{_bindir}/${x}-64
-  install -m 0755 %SOURCE1 %{buildroot}%{_bindir}/${x}
+  install -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/${x}
 done
 %else
 sed -i -e s/H5pubconf.h/H5pubconf-32.h/ %{buildroot}%{_includedir}/H5public.h
@@ -263,7 +245,7 @@ for x in h5c++ h5cc h5fc
 do
   mv %{buildroot}%{_bindir}/${x} \
      %{buildroot}%{_bindir}/${x}-32
-  install -m 0755 %SOURCE1 %{buildroot}%{_bindir}/${x}
+  install -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/${x}
 done
 %endif
 # rpm macro for version checking
@@ -320,7 +302,6 @@ done
 %{_libdir}/libhdf5_hl.so.%{so_version}*
 %{_libdir}/libhdf5_hl_cpp.so.%{so_version}*
 
-
 %files devel
 %{macrosdir}/macros.hdf5
 %{_bindir}/h5c++*
@@ -332,7 +313,6 @@ done
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
 %{_datadir}/hdf5_examples/
-
 
 %files static
 %{_libdir}/*.a
@@ -376,7 +356,6 @@ done
 %{_libdir}/mpich/lib/lib*.so
 %{_libdir}/mpich/lib/lib*.settings
 %{_libdir}/mpich/share/hdf5_examples/
-
 
 %files mpich-static
 %{_libdir}/mpich/lib/*.a
@@ -433,6 +412,7 @@ done
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.12.1-11
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- Dropped Java subpackage
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
