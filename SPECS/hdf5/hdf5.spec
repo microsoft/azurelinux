@@ -324,25 +324,9 @@ export PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 for mpi in %{?mpi_list}
 do
   module load mpi/$mpi-%{_arch}
-# i686 & s390x mpich - testphdf5: malloc.c:4189: _int_malloc: Assertion `(unsigned long) (size) >= (unsigned long) (nb)' failed.
-%ifarch armv7hl %{ix86} s390x
-  make -C $mpi check || :
-%else
   make -C $mpi check
-%endif
   module purge
 done
-
-# I have no idea why those get installed. But it's easier to just
-# delete them, than to fight with the byzantine build system.
-# And yes, it's using /usr/lib not %_libdir.
-if [ %_libdir != /usr/lib ]; then
-   rm -vf \
-      %{buildroot}/usr/lib/*.jar \
-      %{buildroot}/usr/lib/*.la  \
-      %{buildroot}/usr/lib/*.lai \
-      %{buildroot}/usr/lib/libhdf5*
-fi
 
 %ldconfig_scriptlets
 
