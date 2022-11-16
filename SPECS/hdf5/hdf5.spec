@@ -165,7 +165,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -n %{name}-%{version}%{?snaprel} -p1
+%autosetup -p1
 
 # Replace jars with system versions
 # hamcrest-core is obsoleted in hamcrest-2.2
