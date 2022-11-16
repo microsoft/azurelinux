@@ -957,8 +957,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.29",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.29/bind-9.16.29.tar.xz"
+          "version": "9.16.33",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.33/bind-9.16.33.tar.xz"
         }
       }
     },
@@ -1577,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "26.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v26.0.tar.gz"
+          "version": "27.0.60",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/tarball/099cdd2"
         }
       }
     },
@@ -7361,8 +7361,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/2.5.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
         }
       }
     },
@@ -7451,8 +7451,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.34.1.tar.gz"
+          "version": "5.15.72.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.72.mshv2.tar.gz"
         }
       }
     },
@@ -13073,8 +13073,8 @@
         "type": "other",
         "other": {
           "name": "ntfs-3g",
-          "version": "2022.5.17",
-          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.5.17.tgz"
+          "version": "2022.10.3",
+          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.10.3.tgz"
         }
       }
     },
@@ -19424,8 +19424,8 @@
         "type": "other",
         "other": {
           "name": "pixman",
-          "version": "0.40.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.40.0.tar.xz"
+          "version": "0.42.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.42.2.tar.xz"
         }
       }
     },
