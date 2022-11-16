@@ -13,7 +13,7 @@ Metapackage holding sets of core packages for different applications.
 
 %package minimal
 Summary:        The smallest useful package list.
-Requires:       ca-certificates
+Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 Requires:       filesystem
 Requires:       mariner-release
@@ -56,8 +56,8 @@ Requires:       busybox
 
 %changelog
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
-- Extend the set of requirements for the base image
-- Add debug package with busybox
+- Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
+- Add tzdata to minimal
 
 * Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 0.1-2
 - Extend the set of requirements for the base image
