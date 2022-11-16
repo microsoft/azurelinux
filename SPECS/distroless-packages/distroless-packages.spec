@@ -13,10 +13,10 @@ Metapackage holding sets of core packages for different applications.
 
 %package minimal
 Summary:        The smallest useful package list.
-Requires:       prebuilt-ca-certificates
-Requires:       tzdata
 Requires:       filesystem
 Requires:       mariner-release
+Requires:       prebuilt-ca-certificates
+Requires:       tzdata
 
 %description minimal
 %{summary}
