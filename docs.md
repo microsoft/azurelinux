@@ -13,10 +13,6 @@ build a boot-able CBL-Mariner Linux image and use it as an AKS container host, w
 CBL-Mariner Linux is a lightweight operating system, containing only the packages needed for a cloud environment. CBL-Mariner can be customized through custom
 packages and tools, to fit the requirements of your application. CBL-Mariner undergoes Azure validation tests, is compatible with Azure agents, and is built and tested by the Azure Edge & Platform to power various use cases, ranging from Azure services to powering IoT infrastructure. CBL-Mariner is the internally recommended Linux distribution for use with Microsoft cloud services and related products.
 
-If you have any questions about CBL-Mariner that are not answered in this
-documentation, we strongly encourage you to get in touch with us at
-[marinerqa@microsoft.com](mailto:marinerqa@microsoft.com)
-
 ## Who's using CBL-Mariner today?
 
 CBL-Mariner is used internally by Microsoft and several
