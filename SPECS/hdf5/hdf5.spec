@@ -310,13 +310,7 @@ mkdir -p %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/libhdf5_java.so %{buildroot}%{_libdir}/%{name}/
 
 %check
-%ifarch %{ix86} s390x
-# i386: java TestH5Arw segfaults
-# s390x: Testing inserting objects to create first direct block in recursive indirect blocks five levels deep*FAILED*
-make -C build check || :
-%else
 make -C build check
-%endif
 #export HDF5_Make_Ignore=yes
 export OMPI_MCA_rmaps_base_oversubscribe=1
 # openmpi 5+
