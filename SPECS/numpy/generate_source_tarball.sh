@@ -61,7 +61,7 @@ if [ -z "$PKG_VERSION" ]; then
     echo "--pkgVersion parameter cannot be empty"
     exit 1
 fi
-
+OUT_FOLDER=$(realpath $OUT_FOLDER)
 echo "-- create temp folder"
 TEMPDIR=$(mktemp -d)
 function cleanup {
@@ -95,6 +95,9 @@ NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -zcf $NEW_TARBALL numpy-$PKG_VERSION
+    -czf $NEW_TARBALL numpy-$PKG_VERSION
+
+majmin=$(echo $PKG_VERSION | cut -d. -f1-2)
+wget "https://numpy.org/doc/$majmin/numpy-html.zip" -O "$OUT_FOLDER/numpy-html-$PKG_VERSION.zip"
 
 echo "Source tarball $NEW_TARBALL successfully created!"
