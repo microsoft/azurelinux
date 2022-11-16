@@ -38,7 +38,7 @@ Release:        10%{?dist}
 # m4/stdnoreturn.m4:        FSFULLR
 # maint.mk:                 GPLv3+
 # tests/time-posix-quiet.sh:    GPLv3+
-License:        GPLv3+ AND GFDL
+License:        GPLv3+ AND GFDL AND FSFULLR AND GPLV2+ AND MIT AND FSFAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.gnu.org/software/%{name}/

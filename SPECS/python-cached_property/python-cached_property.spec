@@ -46,7 +46,7 @@ is invalidated or expired.
 %{__python3} setup.py install -O1 --skip-build --root %{buildroot}
 
 %check
-pip3 install pytest freezegun
+pip3 install pytest==7.1.3 freezegun
 %pytest
 
 %files -n python%{python3_pkgversion}-%{modulename}

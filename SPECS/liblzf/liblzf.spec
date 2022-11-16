@@ -44,10 +44,6 @@ make install DESTDIR=%{buildroot}
 # on the name it is called by.
 pushd %{buildroot}%{_bindir}
 ln -s lzf unlzf
-#Leave lzcat  out since it conflicts with xz-lzma-compat.
-#If ever needed would need an alternative setting up,
-#if someone ever asks I'll do it.
-#ln -s lzf lzcat
 popd
 rm -f %{buildroot}%{_libdir}/liblzf.la
 
