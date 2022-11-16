@@ -6,14 +6,12 @@ package rpmrepocloner
 import (
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
@@ -213,26 +211,18 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
 	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
 
-	// Get a list of the existing repofiles that are part of the chroot, if any
-	existingRepoFiles := []fs.DirEntry{}
-	hasRepoDir, err := file.DirExists(fullRepoDirPath)
+	// Create the directory for the repo file in case there wasn't already one there
+	err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
 	if err != nil {
-		logger.Log.Warnf("Could not check for existing repo files (%s)", fullRepoDirPath)
+		logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
 		return
 	}
-	if hasRepoDir {
-		existingRepoFiles, err = os.ReadDir(fullRepoDirPath)
-		if err != nil {
-			logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
-			return
-		}
-	} else {
-		// Create the directory for the repo file since there wasn't already one there
-		err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
-		if err != nil {
-			logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
-			return
-		}
+
+	// Get a list of the existing repofiles that are part of the chroot, if any
+	existingRepoFiles, err := os.ReadDir(fullRepoDirPath)
+	if err != nil {
+		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
+		return
 	}
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
@@ -305,8 +295,10 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
 		downloadDir := chrootDownloadDir
+		effectiveCacheRepo := fetcherRepoID
 		if !buildpipeline.IsRegularBuild() {
 			downloadDir = cacheRepoDir
+			effectiveCacheRepo = cacheRepoID
 		}
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
@@ -325,7 +317,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
+			repoOrderList := []string{builtRepoID, effectiveCacheRepo, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -359,8 +351,14 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 	}
 
 	foundPackages := make(map[string]bool)
+
+	effectiveCacheRepo := fetcherRepoID
+	if !buildpipeline.IsRegularBuild() {
+		effectiveCacheRepo = cacheRepoID
+	}
+
 	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
+	repoOrderList := []string{builtRepoID, effectiveCacheRepo, allRepoIDs}
 	for _, repoID := range repoOrderList {
 		logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
