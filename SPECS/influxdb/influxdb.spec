@@ -13,11 +13,11 @@ BuildRequires:  sysuser-tools
 BuildRequires:  fdupes
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
-BuildRequires:  systemd-rpm-macros
 BuildRequires:  build-essential
 BuildRequires:  pkg-config >= 0.171.0
 BuildRequires:  protobuf-devel
 BuildRequires:  kernel-headers
+BuildRequires:  make
 BuildRequires:  rust
 BuildRequires:  clang
 BuildRequires:  tzdata
