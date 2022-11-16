@@ -440,14 +440,3 @@ To upgrade all your installed packages to the latest CBL-Mariner releases run:
 ### Available Packages
 
 Packages that are currently available can be found [here](https://packages.microsoft.com/cbl-mariner).
-
-### Package Requests
-
-You may add and build packages locally by adding them to your derivative
-repository. To request a package to be included in the official build send an
-email to [marinerqa@microsoft.com](mailto:marinerqa@microsoft.com)
-
-## Getting Help
-
-If you have any other questions about CBL-Mariner or about using CBL-Mariner in your
-application, contact [marinerqa@microsoft.com](mailto:marinerqa@microsoft.com)
