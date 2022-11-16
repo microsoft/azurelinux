@@ -253,12 +253,12 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
 	for _, repoFile := range existingRepoFiles {
-		path := filepath.Join(fullRepoDirPath, repoFile.Name())
-		err = appendRepoFile(path, dstFile)
+		originalRepoFilePath := filepath.Join(fullRepoDirPath, repoFile.Name())
+		err = appendRepoFile(originalRepoFilePath, dstFile)
 		if err != nil {
 			return
 		}
-		err = os.Remove(path)
+		err = os.Remove(originalRepoFilePath)
 		if err != nil {
 			return
 		}
