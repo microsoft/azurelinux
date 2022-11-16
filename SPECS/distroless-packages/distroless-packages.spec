@@ -58,6 +58,7 @@ Requires:       busybox
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
 - Add tzdata to minimal
+- License verified
 
 * Thu Oct 15 2020 Mateusz Malisz <mamalisz@microsoft.com> - 0.1-2
 - Extend the set of requirements for the base image
