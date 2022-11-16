@@ -4539,6 +4539,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "h5py",
+          "version": "3.7.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hamcrest",
           "version": "1.3",
           "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-1.3.tar.gz"
@@ -20876,16 +20886,6 @@
           "name": "python-gssapi",
           "version": "1.6.1",
           "downloadUrl": "https://github.com/pythongssapi/python-gssapi/releases/download/v1.6.1/python-gssapi-1.6.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-h5py",
-          "version": "3.7.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
         }
       }
     },
