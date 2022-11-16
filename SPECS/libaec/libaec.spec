@@ -1,15 +1,14 @@
+Summary:        Adaptive Entropy Coding library
 Name:           libaec
 Version:        1.0.4
-Release:        4%{?dist}
-Summary:        Adaptive Entropy Coding library
-License:        BSD
+Release:        5%{?dist}
+License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.dkrz.de/k202009/libaec
 Source0:        https://gitlab.dkrz.de/k202009/libaec/-/archive/v%{version}/libaec-v%{version}.tar.gz
-
-BuildRequires:  gcc
 BuildRequires:  cmake3 >= 3.1
+BuildRequires:  gcc
 
 %description
 Libaec provides fast loss-less compression of 1 up to 32 bit wide
@@ -63,6 +62,10 @@ make -C build test CTEST_OUTPUT_ON_FAILURE=1
 %{_libdir}/lib*.so
 
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.0.4-5
+- Move to core
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

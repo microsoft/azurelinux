@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+source /etc/sysconfig/network
+
+if [ -n "${NISDOMAIN}" ] && [ -x /usr/bin/nisdomainname ]; then
+    nisdomainname ${NISDOMAIN}
+    exit $?
+fi
+
+exit 0
