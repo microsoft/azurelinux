@@ -18,6 +18,7 @@ jobs:
 
       - name: Validate livepatch specs are valid
         run: |
+          set -x
           if ! toolkit/scripts/livepatching/update_livepatches.sh
           then
             echo "ERROR: failed to verify livepatch specs." >&2
