@@ -21,7 +21,6 @@ BuildRequires:  make
 BuildRequires:  rust
 BuildRequires:  clang
 BuildRequires:  tzdata
-BuildRequires:  git
 
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
