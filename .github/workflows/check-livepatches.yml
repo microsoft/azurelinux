@@ -29,6 +29,8 @@ jobs:
           export USER_EMAIL=test@test.com
           export USER_NAME=test
 
+          .github/workflows/overwrite_shell_link.sh
+
           if ! toolkit/scripts/livepatching/update_livepatches.sh >/dev/null
           then
             echo "ERROR: failed to verify livepatch specs." >&2
