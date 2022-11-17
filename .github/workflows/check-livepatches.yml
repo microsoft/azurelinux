@@ -24,18 +24,18 @@ jobs:
       - name: Get Python dependencies
         run: sudo python3 -m pip install python-rpm-spec
 
-      - name: Validate livepatch specs are valid
+      - name: Check livepatch specs are valid
         run: |
           export USER_EMAIL=test@test.com
           export USER_NAME=test
 
-          if ! toolkit/scripts/livepatching/update_livepatches.sh
+          if ! toolkit/scripts/livepatching/update_livepatches.sh >/dev/null
           then
             echo "ERROR: failed to verify livepatch specs." >&2
             exit 1
           fi
 
-          if [[ -z "$(git status --short)" ]]
+          if [[ -z "$(git diff)" ]]
           then
             exit 0
           fi
