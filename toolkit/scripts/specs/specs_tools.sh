@@ -119,7 +119,7 @@ parsed_spec_read_tag() {
     spec_path="$1"
     tag="$2"
 
-    mariner_rpmspec --query --queryformat="%{$tag}\n" --srpm "$spec_path" 2>/dev/null
+    mariner_rpmspec --query --queryformat="%{$tag}\n" --srpm "$spec_path"
 }
 
 parsed_spec_read_tags() {
@@ -131,7 +131,7 @@ parsed_spec_read_tags() {
     tag="$2"
     results_array="$3"
 
-    for result in $(mariner_rpmspec --query --queryformat="[%{$tag}\n]" --srpm "$spec_path" 2>/dev/null | tac)
+    for result in $(mariner_rpmspec --query --queryformat="[%{$tag}\n]" --srpm "$spec_path" | tac)
     do
         results_array+=("$result")
     done
@@ -144,7 +144,7 @@ spec_query_srpm() {
     spec_path="$1"
     query_format="$2"
 
-    mariner_rpmspec -q --queryformat="$query_format" --srpm "$spec_path" 2>/dev/null
+    mariner_rpmspec -q --queryformat="$query_format" --srpm "$spec_path"
 }
 
 spec_read_release_number() {
