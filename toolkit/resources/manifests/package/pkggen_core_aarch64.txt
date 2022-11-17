@@ -42,9 +42,9 @@ readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-6.cm2.aarch64.rpm
 coreutils-lang-8.32-6.cm2.aarch64.rpm
-bash-5.1.8-1.cm2.aarch64.rpm
-bash-devel-5.1.8-1.cm2.aarch64.rpm
-bash-lang-5.1.8-1.cm2.aarch64.rpm
+bash-5.1.8-2.cm2.aarch64.rpm
+bash-devel-5.1.8-2.cm2.aarch64.rpm
+bash-lang-5.1.8-2.cm2.aarch64.rpm
 bzip2-1.0.8-1.cm2.aarch64.rpm
 bzip2-devel-1.0.8-1.cm2.aarch64.rpm
 bzip2-libs-1.0.8-1.cm2.aarch64.rpm

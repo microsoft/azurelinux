@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        5.1.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,10 +12,10 @@ Source1:        bash_completion
 Patch0:         bash-5.1.patch
 BuildRequires:  readline
 Requires:       readline
-Requires(post): /bin/cp
-Requires(post): /bin/grep
-Requires(postun): /bin/grep
-Requires(postun): /bin/mv
+Requires(post): coreutils
+Requires(post): grep
+Requires(postun): grep
+Requires(postun): coreutils
 Provides:       /bin/sh
 Provides:       /bin/bash
 Provides:       %{_bindir}/sh
@@ -328,6 +328,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Thu Nov 17 2022 Andrew Phelps <anphel@microsoft.com> - 5.1.8-2
+- Change Requires(post) and Requires(postun) to package names instead of binary paths
+
 * Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 5.1.8-1
 - Update to version 5.1.8
 - License verified

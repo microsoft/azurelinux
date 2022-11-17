@@ -5,10 +5,10 @@ audit-devel-3.0.6-7.cm2.aarch64.rpm
 audit-libs-3.0.6-7.cm2.aarch64.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
-bash-5.1.8-1.cm2.aarch64.rpm
-bash-debuginfo-5.1.8-1.cm2.aarch64.rpm
-bash-devel-5.1.8-1.cm2.aarch64.rpm
-bash-lang-5.1.8-1.cm2.aarch64.rpm
+bash-5.1.8-2.cm2.aarch64.rpm
+bash-debuginfo-5.1.8-2.cm2.aarch64.rpm
+bash-devel-5.1.8-2.cm2.aarch64.rpm
+bash-lang-5.1.8-2.cm2.aarch64.rpm
 binutils-2.37-4.cm2.aarch64.rpm
 binutils-debuginfo-2.37-4.cm2.aarch64.rpm
 binutils-devel-2.37-4.cm2.aarch64.rpm
