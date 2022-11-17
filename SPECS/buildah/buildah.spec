@@ -18,8 +18,8 @@
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 Summary:        A command line tool used for creating OCI Images
 Name:           %{repo}
-Version:        1.18.0
-Release:        7%{?dist}
+Version:        1.27.1
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,6 +87,9 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Thu Nov 17 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27.1-1
+- Auto-upgrade to 1.27.1 - CVE-2022-27651,CVE-2022-2990
+
 * Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.18.0-7
 - Move to core packages
 - Remove tests package
