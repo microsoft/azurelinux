@@ -2,9 +2,9 @@ name: Spec files check
 
 on:
   push:
-    branches: [2.0]
+    branches: [main, 2.0]
   pull_request:
-    branches: [2.0]
+    branches: [main, 2.0]
 
 jobs:
   spec-check:
