@@ -11,12 +11,15 @@ assets_files             = $(shell find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
-ifdef CONFIG_FILE
-initrd_config_json       = $(CONFIG_FILE)
-else ifeq ($(build_arch),aarch64)
+ifeq ($(build_arch),aarch64)
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
 else
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
+endif
+ifdef CONFIG_INITRD
+initrd_only_config_json  = $(CONFIG_INITRD)
+else
+initrd_only_config_json  = $(initrd_config_json)
 endif
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
@@ -168,7 +171,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 # Stand alone target to build just the initrd, should not be used in conjunction with other targets. Use the 'iso' target instead.
 initrd: $(go-liveinstaller) $(go-imager)
 	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
-	$(MAKE) image CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
+	$(MAKE) image CONFIG_FILE=$(initrd_only_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
 
 iso: $(go-isomaker) $(go-liveinstaller) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(initrd_config_json) $(validate-config) $(image_package_cache_summary)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))

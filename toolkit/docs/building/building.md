@@ -659,6 +659,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
 | SRPM_PACK_LIST                |                                                                                                        | List of spec basenames to build into SRPMs. If empty, all specs under `$(SPECS_DIR)` will be packed.
 | SSH_KEY_FILE                  |                                                                                                        | Use with `make meta-user-data` to add the ssh key from this file into `user-data`.
+| CONFIG_INITRD                 |                                                                                                        | Customize stand-alone initrd (not for ISO).
 
 ---
 
