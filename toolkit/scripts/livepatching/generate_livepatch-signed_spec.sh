@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -e
+set -ex
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 COMMON_SCRIPTS_FOLDER="$REPO_ROOT/toolkit/scripts"
