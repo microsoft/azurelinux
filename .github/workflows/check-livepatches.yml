@@ -18,6 +18,9 @@ jobs:
 
       - name: Validate livepatch specs are valid
         run: |
+          export USER_EMAIL=test@test.com
+          export USER_NAME=test
+
           if ! toolkit/scripts/livepatching/update_livepatches.sh
           then
             echo "ERROR: failed to verify livepatch specs." >&2
