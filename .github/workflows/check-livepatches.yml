@@ -1,0 +1,40 @@
+name: Spec files check
+
+on:
+  push:
+    branches: [2.0]
+  pull_request:
+    branches: [2.0]
+
+jobs:
+  spec-check:
+    name: Livepatches check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v2
+
+      - name: Validate livepatch specs are valid
+        run: |
+          if ! toolkit/scripts/livepatching/update_livepatches.sh
+          then
+            echo "ERROR: failed to verify livepatch specs." >&2
+            exit 1
+          fi
+
+          if [[ -z "$(git status --short)" ]]
+          then
+            exit 0
+          fi
+
+          cat << EOF
+          #################### CHECK FAILURE ####################
+          Livepatch specs need to be updated!
+          Run the following command to perform the update:
+          
+              toolkit/scripts/livepatching/update_livepatches.sh
+
+          #################### CHECK FAILURE ####################
+          EOF
