@@ -14,8 +14,8 @@ BuildRequires:  readline
 Requires:       readline
 Requires(post): coreutils
 Requires(post): grep
-Requires(postun): grep
 Requires(postun): coreutils
+Requires(postun): grep
 Provides:       /bin/sh
 Provides:       /bin/bash
 Provides:       %{_bindir}/sh
