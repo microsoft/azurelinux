@@ -52,6 +52,4 @@ jobs:
           #################### CHECK FAILURE ####################
           EOF
 
-          git diff
-
           exit 1
