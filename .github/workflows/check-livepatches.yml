@@ -11,19 +11,19 @@ jobs:
     name: Livepatches check
     runs-on: ubuntu-22.04
 
-    # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
-    - name: Setup Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-
-    - name: Get Python dependencies
-      run: python3 -m pip install python-rpm-spec
-
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
         uses: actions/checkout@v2
+
+      # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Get Python dependencies
+        run: python3 -m pip install python-rpm-spec
 
       - name: Validate livepatch specs are valid
         run: |
