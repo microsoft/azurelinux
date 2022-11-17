@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -143,7 +143,13 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 # Enable default systemd units.
 %post
 /sbin/ldconfig
-systemctl preset-all
+# Only force the presets to default values when first installing systemd ($1 = # of currently installed pacakges,
+# $1 >= 2 for upgrades). This will resolve issues where systemd may be installed after a package that enables a service
+# during the same transaction, leaving the service disabled unexpectedly. Once systemd is installed all future attempts
+# to enable/disable services should succeed.
+if [ $1 -eq 1 ]; then
+     systemctl preset-all
+fi
 
 %postun -p /sbin/ldconfig
 
@@ -233,6 +239,9 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Wed Nov 29 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-9
+- Conditionally run systemctl preset-all only when first installing systemd, not on upgrades
+
 * Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 250.3-8
 - Add patch for CVE-2022-3821
 
