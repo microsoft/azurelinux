@@ -26226,6 +26226,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tensorflow",
+          "version": "2.8.3",
+          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.8.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "terraform",
           "version": "1.3.2",
           "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.3.2.tar.gz"
