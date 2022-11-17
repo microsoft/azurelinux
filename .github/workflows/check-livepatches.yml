@@ -2,9 +2,9 @@ name: Livepatch specs check
 
 on:
   push:
-    branches: [main, 2.0]
+    branches: [2.0]
   pull_request:
-    branches: [main, 2.0]
+    branches: [2.0]
 
 jobs:
   spec-check:
