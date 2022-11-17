@@ -9,7 +9,7 @@ on:
 jobs:
   spec-check:
     name: Livepatches check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       # Checkout the branch of our repo that triggered this action
