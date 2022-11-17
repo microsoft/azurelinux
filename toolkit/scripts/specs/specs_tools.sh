@@ -8,9 +8,6 @@ set -e
 # shellcheck source=../../../toolkit/scripts/rpmops.sh
 source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
 
-USER_EMAIL=""
-USER_NAME=""
-
 init() {
     local init_failed=false
 
