@@ -16,7 +16,7 @@ Patch2:         CVE-2022-2953.patch
 Patch3:         CVE-2022-3570.patch
 # Also fixes CVE-2022-3626 and CVE-2022-3627
 Patch4:         CVE-2022-3597.patch
-Patch5:			CVE-2022-3599.patch
+Patch5:	        CVE-2022-3599.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
