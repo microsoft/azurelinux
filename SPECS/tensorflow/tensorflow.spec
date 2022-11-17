@@ -16,7 +16,7 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-packaging
 BuildRequires:  python3-wheel
 BuildRequires:  python3-numpy
-BuildRequires:  bazel == 4.2.1
+BuildRequires:  bazel = 4.2.1
 BuildRequires:  binutils
 BuildRequires:  which
 BuildRequires:  tar
