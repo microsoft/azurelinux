@@ -1,4 +1,4 @@
-name: Spec files check
+name: Livepatch specs check
 
 on:
   push:
