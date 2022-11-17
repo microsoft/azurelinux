@@ -13,8 +13,8 @@ fi
 
 if [[ "$original_rpm_shell" != "bash" ]]
 then
-  echo "Host system's '/bin/sh' links to '$RPM_SHELL'. Mariner specs require 'bash' - updating."
+  echo "Host system's '$shell_link_path' links to '$original_rpm_shell'. Mariner specs require 'bash' - updating."
 
-  rm -f $shell_link_path
-  ln -s bash "$shell_link_path"
+  sudo rm -f $shell_link_path
+  sudo ln -s bash "$shell_link_path"
 fi
