@@ -8,7 +8,9 @@ Distribution:   Mariner
 Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
 Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        waagent.conf
+Source1:        ephemeral-disk-warning.service
+Source2:        ephemeral-disk-warning.conf
+Source3:        ephemeral-disk-warning
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -56,13 +58,16 @@ install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/ru
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
 sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_libdir}/systemd/system/waagent.service
-cp %{SOURCE1} %{buildroot}%{_sysconfdir}/waagent.conf
+install -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/ephemeral-disk-warning.service
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
+install -m 644 %{SOURCE3} %{buildroot}%{_bindir}/ephemeral-disk-warning
 
 %check
 python3 setup.py check && python3 setup.py test
 
 %post
 %systemd_post waagent.service
+%systemd_post ephemeral-disk-warning.service
 
 %preun
 %systemd_preun waagent.service
@@ -77,14 +82,16 @@ python3 setup.py check && python3 setup.py test
 %license LICENSE.txt
 %attr(0755,root,root) %{_bindir}/waagent
 %attr(0755,root,root) %{_bindir}/waagent2.0
+%attr(0755,root,root) %{_bindir}/ephemeral-disk-warning
 %config %{_sysconfdir}/waagent.conf
+%config %{_sysconfdir}/ephemeral-disk-warning.conf
 %ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
 %{python3_sitelib}/*
 
 %changelog
 * Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
-- Add custom waagent.conf
+- Add ephemeral-disk-warning.service
 
 * Tue Jan 25 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.3.1.1-2
 - Add python3-distro as a Requires
