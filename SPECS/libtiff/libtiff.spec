@@ -12,12 +12,17 @@ Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff
 Patch0:         CVE-2022-2056.patch
 Patch1:         CVE-2022-34526.patch
 Patch2:         CVE-2022-2953.patch
+# Also fixes CVE-2022-3598
 Patch3:         CVE-2022-3570.patch
+# Also fixes CVE-2022-3626 and CVE-2022-3627
 Patch4:         CVE-2022-3597.patch
+Patch5:			CVE-2022-3599.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libtool
+
 Requires:       libjpeg-turbo
 Provides:       %{name}-tools = %{version}-%{release}
 
@@ -26,6 +31,7 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
+
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
 
@@ -68,6 +74,10 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Thu Nov 17 2022 Sam Meluch <sammeluch@microsoft.com> - 4.4.0-6
+- Patch CVE-2022-3599
+- Add nopatch for CVE-2022s: 3598, 3626, and 3627
+- Fix CVE-2022-3597.patch: Remove reference to doc/tools/tiffcrop.rst, update hunks 1 and 3 to correspond with our current patches
 
 * Thu Nov 10 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 4.4.0-6
 - Patch CVE-2022-3597
