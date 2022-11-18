@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.34.1
-Release:        2%{?dist}
+Version:        5.15.72.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          Development/Tools
@@ -20,6 +20,7 @@ Distribution:   Mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
+Patch0:         0001-mshv-Don-t-use-same-function-signature-as-KVM.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -74,7 +75,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
-%autosetup
+%autosetup -p1
 
 make mrproper
 
@@ -237,6 +238,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Oct 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.72.mshv2-1
+- Update to v5.15.72.mshv2.
+
 * Wed Sep 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-2
 - Copy vmlinuz to /boot/efi partition.
 
