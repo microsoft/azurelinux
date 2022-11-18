@@ -17,6 +17,7 @@ Patch3:         CVE-2022-3570.patch
 # Also fixes CVE-2022-3626 and CVE-2022-3627
 Patch4:         CVE-2022-3597.patch
 Patch5:	        CVE-2022-3599.patch
+Patch6:         CVE-2022-3970.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -74,6 +75,9 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com - 4.4.0-6
+- Add patch for critical CVE-2022-3970
+
 * Thu Nov 17 2022 Sam Meluch <sammeluch@microsoft.com> - 4.4.0-6
 - Patch CVE-2022-3599
 - Add nopatch for CVE-2022s: 3598, 3626, and 3627
