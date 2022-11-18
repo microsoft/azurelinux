@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.5p2
-Release:        2%{?dist}
+Version:        1.9.12p1
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -72,7 +72,7 @@ rm -rf %{buildroot}/*
 
 %files -f %{name}.lang
 %defattr(-,root,root)
-%license doc/LICENSE
+%license LICENSE.md
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers
 %attr(0750,root,root) %dir %{_sysconfdir}/sudoers.d/
 %config(noreplace) %{_sysconfdir}/pam.d/sudo
@@ -92,6 +92,8 @@ rm -rf %{buildroot}/*
 %exclude  /etc/sudoers.dist
 
 %changelog
+*   Tue Nov 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.12p1-1
+-   Updating to version 1.9.12p1 to fix CVE-2022-43995.
 *   Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
 -   Move sudo/wheel groups before @includedir to not override user's settings.
 *   Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1

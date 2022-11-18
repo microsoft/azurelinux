@@ -346,8 +346,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.27",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.27/bind-9.16.27.tar.xz"
+          "version": "9.16.33",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.33/bind-9.16.33.tar.xz"
         }
       }
     },
@@ -986,8 +986,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.84.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.84.0.tar.gz"
+          "version": "7.86.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.86.0.tar.gz"
         }
       }
     },
@@ -1886,8 +1886,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.5",
-          "downloadUrl": "https://golang.org/dl/go1.18.5.src.tar.gz"
+          "version": "1.18.8",
+          "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
         }
       }
     },
@@ -2136,8 +2136,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.53",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.53.tar.bz2"
+          "version": "2.4.54",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.54.tar.bz2"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.149.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
+          "version": "5.10.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.153.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.149.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
+          "version": "5.10.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.153.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.149.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
+          "version": "5.10.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.153.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.149.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.149.1.tar.gz"
+          "version": "5.10.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.153.1.tar.gz"
         }
       }
     },
@@ -4406,8 +4406,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.29",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.29.tar.gz"
+          "version": "8.0.31",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.31.tar.gz"
         }
       }
     },
@@ -6875,6 +6875,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python3-twisted",
+          "version": "22.10.0",
+          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytz",
           "version": "2018.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytz/pytz-2018.5.tar.gz"
@@ -8176,8 +8186,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.5p2",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.5p2.tar.gz"
+          "version": "1.9.12p1",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p1.tar.gz"
         }
       }
     },
@@ -8476,8 +8486,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022e",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022e.tar.gz"
+          "version": "2022f",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022f.tar.gz"
         }
       }
     },
@@ -8626,8 +8636,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0614",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0614.tar.gz"
+          "version": "9.0.0805",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0805.tar.gz"
         }
       }
     },

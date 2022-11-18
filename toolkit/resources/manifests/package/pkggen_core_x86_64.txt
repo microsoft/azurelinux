@@ -1,5 +1,5 @@
 filesystem-1.1-7.cm1.x86_64.rpm
-kernel-headers-5.10.149.1-1.cm1.noarch.rpm
+kernel-headers-5.10.153.1-1.cm1.noarch.rpm
 glibc-2.28-24.cm1.x86_64.rpm
 glibc-devel-2.28-24.cm1.x86_64.rpm
 glibc-i18n-2.28-24.cm1.x86_64.rpm
@@ -58,7 +58,7 @@ findutils-lang-4.6.0-8.cm1.x86_64.rpm
 gettext-0.19.8.1-5.cm1.x86_64.rpm
 gzip-1.12-1.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
-mariner-release-1.0-48.cm1.noarch.rpm
+mariner-release-1.0-49.cm1.noarch.rpm
 patch-2.7.6-7.cm1.x86_64.rpm
 util-linux-2.32.1-7.cm1.x86_64.rpm
 util-linux-devel-2.32.1-7.cm1.x86_64.rpm
@@ -80,9 +80,9 @@ popt-devel-1.16-7.cm1.x86_64.rpm
 popt-lang-1.16-7.cm1.x86_64.rpm
 nspr-4.33-1.cm1.x86_64.rpm
 nspr-devel-4.33-1.cm1.x86_64.rpm
-sqlite-3.34.1-1.cm1.x86_64.rpm
-sqlite-devel-3.34.1-1.cm1.x86_64.rpm
-sqlite-libs-3.34.1-1.cm1.x86_64.rpm
+sqlite-3.34.1-2.cm1.x86_64.rpm
+sqlite-devel-3.34.1-2.cm1.x86_64.rpm
+sqlite-libs-3.34.1-2.cm1.x86_64.rpm
 nss-3.73-1.cm1.x86_64.rpm
 nss-devel-3.73-1.cm1.x86_64.rpm
 nss-libs-3.73-1.cm1.x86_64.rpm
@@ -130,9 +130,9 @@ libsolv-0.7.20-1.cm1.x86_64.rpm
 libsolv-devel-0.7.20-1.cm1.x86_64.rpm
 libssh2-1.9.0-1.cm1.x86_64.rpm
 libssh2-devel-1.9.0-1.cm1.x86_64.rpm
-curl-7.84.0-1.cm1.x86_64.rpm
-curl-devel-7.84.0-1.cm1.x86_64.rpm
-curl-libs-7.84.0-1.cm1.x86_64.rpm
+curl-7.86.0-1.cm1.x86_64.rpm
+curl-devel-7.86.0-1.cm1.x86_64.rpm
+curl-libs-7.86.0-1.cm1.x86_64.rpm
 tdnf-2.1.0-6.cm1.x86_64.rpm
 tdnf-cli-libs-2.1.0-6.cm1.x86_64.rpm
 tdnf-devel-2.1.0-6.cm1.x86_64.rpm
@@ -160,7 +160,7 @@ gpgme-1.13.1-6.cm1.x86_64.rpm
 mariner-repos-1.0-15.cm1.noarch.rpm
 mariner-repos-preview-1.0-15.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.x86_64.rpm
-libtasn1-4.14-3.cm1.x86_64.rpm
+libtasn1-4.14-4.cm1.x86_64.rpm
 p11-kit-0.23.22-1.cm1.x86_64.rpm
 p11-kit-trust-0.23.22-1.cm1.x86_64.rpm
 ca-certificates-shared-20200720-27.cm1.noarch.rpm

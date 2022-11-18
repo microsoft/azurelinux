@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.29
+Version:        8.0.31
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -93,6 +93,9 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/private/icudt69l/unames.icu
 
 %changelog
+* Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.31-1
+- Upgrade to 8.0.31
+
 * Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.0.29-1
 - Upgrade to v8.0.29 to fix 8 CVEs.
 
