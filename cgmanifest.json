@@ -4539,6 +4539,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "h5py",
+          "version": "3.7.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hamcrest",
           "version": "1.3",
           "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-1.3.tar.gz"
@@ -4592,6 +4602,16 @@
           "name": "hawtjni-runtime",
           "version": "1.17",
           "downloadUrl": "https://github.com/fusesource/hawtjni/archive/hawtjni-project-1.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hdf5",
+          "version": "1.12.1",
+          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2"
         }
       }
     },
@@ -4682,6 +4702,16 @@
           "name": "hivex",
           "version": "1.3.21",
           "downloadUrl": "http://libguestfs.org/download/hivex/hivex-1.3.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hostname",
+          "version": "3.23",
+          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_3.23.tar.gz"
         }
       }
     },
@@ -20223,6 +20253,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cached_property",
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/pydanny/cached-property/archive/1.5.2/cached-property-1.5.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cachetools",
           "version": "5.0.0",
           "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.0.0.tar.gz"
@@ -21556,6 +21596,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pkgconfig",
+          "version": "1.5.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pkgconfig/pkgconfig-1.5.5.tar.gz"
         }
       }
     },
