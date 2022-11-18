@@ -439,4 +439,5 @@ To upgrade all your installed packages to the latest CBL-Mariner releases run:
 
 ### Available Packages
 
-Packages that are currently available can be found [here](https://packages.microsoft.com/cbl-mariner).
+Packages that are currently available can be found [here](https://packages.microsoft.com/cbl-mariner). You may add and build packages locally by adding them to your derivative
+repository. 
