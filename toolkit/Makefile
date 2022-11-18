@@ -216,6 +216,9 @@ get-release-major: printvar-RELEASE_MAJOR_ID
 
 # Gather the variables we want to print out, removing any automatic .* variables, and the self reference
 interesting_variables = $(filter-out .% interesting_variables, $(sort $(.VARIABLES)))
+
+$(warning DEBUG: printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var)))
+
 printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var))
 printvar-all-vars: ;
 printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbose-$(var))
