@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{Version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache-full.tar.gz
+Source2:        %{name}-%{version}-numpyheader.tar.gz
 BuildRequires:  build-essential
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
@@ -27,11 +28,11 @@ BuildRequires:  libstdc++-devel
 %description
 TensorFlow is an open source machine learning framework for everyone.
 
-%package -n     python3-tensorflow
-Summary:        python-tensorflow
+%package -n     python3-tensorflow-cpu
+Summary:        python-tensorflow-cpu
 Requires:       python3
 
-%description -n python3-tensorflow
+%description -n python3-tensorflow-cpu
 Python 3 version.
 
 %prep
@@ -39,15 +40,14 @@ Python 3 version.
 
 
 %build
-#unload the cache
+
 tar -xf %{SOURCE1} -C /root/
 
-# numpy distutil
-# rm -rf /usr/lib/python3.9/site-packages/numpy/core/include/numpy
-# tar -xvf %{SOURCE2} -C /usr/lib/python3.9/site-packages/numpy/core/include/
+rm -rf /usr/lib/python3.9/site-packages/numpy/core/include/numpy
+tar -xvf %{SOURCE2} -C /usr/lib/python3.9/site-packages/numpy/core/include/
 
 ln -s /usr/bin/python3 /usr/bin/python
-# bazel clean 
+# bazel clean
 # pushd /root
 # tar -czvf cacheroot.tar.gz .cache
 # popd
@@ -74,7 +74,7 @@ mkdir -pv test
 cd test
 #PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %python3 -c "import numpy; numpy.test()"
 
-%files -n python3-tensorflow
+%files -n python3-tensorflow-cpu
 %license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/estimator_ckpt_converter
