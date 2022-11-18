@@ -77,13 +77,8 @@ make %{?_smp_mflags} -k check
 %changelog
 * Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com - 4.4.0-6
 - Add patch for critical CVE-2022-3970
-
-* Thu Nov 17 2022 Sam Meluch <sammeluch@microsoft.com> - 4.4.0-6
 - Patch CVE-2022-3599
 - Add nopatch for CVE-2022s: 3598, 3626, and 3627
-- Fix CVE-2022-3597.patch: Remove reference to doc/tools/tiffcrop.rst, update hunks 1 and 3 to correspond with our current patches
-
-* Thu Nov 10 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 4.4.0-6
 - Patch CVE-2022-3597
 
 * Mon Oct 24 2022 Sean Dougherty <sdougherty@microsoft.com> - 4.4.0-5
