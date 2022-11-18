@@ -1,0 +1,58 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Livepatch specs check
+
+on:
+  push:
+    branches: [2.0]
+  pull_request:
+    branches: [2.0]
+
+jobs:
+  spec-check:
+    name: Livepatches check
+    runs-on: ubuntu-22.04
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Get Python dependencies
+        run: sudo python3 -m pip install python-rpm-spec
+
+      - name: Check livepatch specs are valid
+        run: |
+          export USER_EMAIL=test@test.com
+          export USER_NAME=test
+
+          .github/workflows/overwrite_shell_link.sh
+
+          if ! toolkit/scripts/livepatching/update_livepatches.sh >/dev/null
+          then
+            echo "ERROR: failed to verify livepatch specs." >&2
+            exit 1
+          fi
+
+          if [[ -z "$(git diff)" ]]
+          then
+            exit 0
+          fi
+
+          cat << EOF
+          #################### CHECK FAILURE ####################
+          Livepatch specs need to be updated!
+          Run the following command to perform the update:
+          
+              toolkit/scripts/livepatching/update_livepatches.sh
+
+          #################### CHECK FAILURE ####################
+          EOF
+
+          exit 1

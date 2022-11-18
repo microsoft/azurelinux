@@ -40,8 +40,8 @@ ncurses-libs-6.3-2.cm2.x86_64.rpm
 ncurses-term-6.3-2.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
-coreutils-8.32-5.cm2.x86_64.rpm
-coreutils-lang-8.32-5.cm2.x86_64.rpm
+coreutils-8.32-6.cm2.x86_64.rpm
+coreutils-lang-8.32-6.cm2.x86_64.rpm
 bash-5.1.8-1.cm2.x86_64.rpm
 bash-devel-5.1.8-1.cm2.x86_64.rpm
 bash-lang-5.1.8-1.cm2.x86_64.rpm
@@ -207,8 +207,8 @@ pcre-8.45-2.cm2.x86_64.rpm
 pcre-libs-8.45-2.cm2.x86_64.rpm
 lua-5.4.3-4.cm2.x86_64.rpm
 lua-libs-5.4.3-4.cm2.x86_64.rpm
-mariner-rpm-macros-2.0-17.cm2.noarch.rpm
-mariner-check-macros-2.0-17.cm2.noarch.rpm
+mariner-rpm-macros-2.0-19.cm2.noarch.rpm
+mariner-check-macros-2.0-19.cm2.noarch.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm
 libgpg-error-1.43-2.cm2.x86_64.rpm

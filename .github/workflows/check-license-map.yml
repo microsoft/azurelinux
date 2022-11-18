@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # This action checks that the licenses.json file is up-to-date
 # and that the LICENSES-MAP.md file is up-to-date
 name: Spec License Map Check

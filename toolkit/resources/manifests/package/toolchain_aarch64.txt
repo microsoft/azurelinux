@@ -30,9 +30,9 @@ chkconfig-debuginfo-1.20-3.cm2.aarch64.rpm
 chkconfig-lang-1.20-3.cm2.aarch64.rpm
 cmake-3.21.4-2.cm2.aarch64.rpm
 cmake-debuginfo-3.21.4-2.cm2.aarch64.rpm
-coreutils-8.32-5.cm2.aarch64.rpm
-coreutils-debuginfo-8.32-5.cm2.aarch64.rpm
-coreutils-lang-8.32-5.cm2.aarch64.rpm
+coreutils-8.32-6.cm2.aarch64.rpm
+coreutils-debuginfo-8.32-6.cm2.aarch64.rpm
+coreutils-lang-8.32-6.cm2.aarch64.rpm
 cpio-2.13-4.cm2.aarch64.rpm
 cpio-debuginfo-2.13-4.cm2.aarch64.rpm
 cpio-lang-2.13-4.cm2.aarch64.rpm
@@ -225,7 +225,7 @@ m4-1.4.19-1.cm2.aarch64.rpm
 m4-debuginfo-1.4.19-1.cm2.aarch64.rpm
 make-4.3-2.cm2.aarch64.rpm
 make-debuginfo-4.3-2.cm2.aarch64.rpm
-mariner-check-macros-2.0-17.cm2.noarch.rpm
+mariner-check-macros-2.0-19.cm2.noarch.rpm
 mariner-repos-2.0-8.cm2.noarch.rpm
 mariner-repos-debug-2.0-8.cm2.noarch.rpm
 mariner-repos-debug-preview-2.0-8.cm2.noarch.rpm
@@ -239,7 +239,7 @@ mariner-repos-microsoft-2.0-8.cm2.noarch.rpm
 mariner-repos-microsoft-preview-2.0-8.cm2.noarch.rpm
 mariner-repos-preview-2.0-8.cm2.noarch.rpm
 mariner-repos-shared-2.0-8.cm2.noarch.rpm
-mariner-rpm-macros-2.0-17.cm2.noarch.rpm
+mariner-rpm-macros-2.0-19.cm2.noarch.rpm
 meson-0.60.2-2.cm2.noarch.rpm
 mpfr-4.1.0-1.cm2.aarch64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.aarch64.rpm

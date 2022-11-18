@@ -957,8 +957,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.29",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.29/bind-9.16.29.tar.xz"
+          "version": "9.16.33",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.33/bind-9.16.33.tar.xz"
         }
       }
     },
@@ -1577,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "26.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v26.0.tar.gz"
+          "version": "27.0.60",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/tarball/099cdd2"
         }
       }
     },
@@ -3307,6 +3307,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "flatbuffers",
+          "version": "2.0.8",
+          "downloadUrl": "https://github.com/google/flatbuffers/archive/v2.0.8/flatbuffers-2.0.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "flex",
           "version": "2.6.4",
           "downloadUrl": "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
@@ -4529,6 +4539,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "h5py",
+          "version": "3.7.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hamcrest",
           "version": "1.3",
           "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-1.3.tar.gz"
@@ -4582,6 +4602,16 @@
           "name": "hawtjni-runtime",
           "version": "1.17",
           "downloadUrl": "https://github.com/fusesource/hawtjni/archive/hawtjni-project-1.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hdf5",
+          "version": "1.12.1",
+          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2"
         }
       }
     },
@@ -4672,6 +4702,16 @@
           "name": "hivex",
           "version": "1.3.21",
           "downloadUrl": "http://libguestfs.org/download/hivex/hivex-1.3.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hostname",
+          "version": "3.23",
+          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_3.23.tar.gz"
         }
       }
     },
@@ -7331,8 +7371,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/2.5.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
         }
       }
     },
@@ -7421,8 +7461,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.34.1.tar.gz"
+          "version": "5.15.72.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.72.mshv2.tar.gz"
         }
       }
     },
@@ -12663,8 +12703,8 @@
         "type": "other",
         "other": {
           "name": "nbdkit",
-          "version": "1.20.7",
-          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.20-stable/nbdkit-1.20.7.tar.gz"
+          "version": "1.30.10",
+          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.30-stable/nbdkit-1.30.10.tar.gz"
         }
       }
     },
@@ -13043,8 +13083,8 @@
         "type": "other",
         "other": {
           "name": "ntfs-3g",
-          "version": "2022.5.17",
-          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.5.17.tgz"
+          "version": "2022.10.3",
+          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2022.10.3.tgz"
         }
       }
     },
@@ -19394,8 +19434,8 @@
         "type": "other",
         "other": {
           "name": "pixman",
-          "version": "0.40.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.40.0.tar.xz"
+          "version": "0.42.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.42.2.tar.xz"
         }
       }
     },
@@ -20213,6 +20253,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cached_property",
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/pydanny/cached-property/archive/1.5.2/cached-property-1.5.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cachetools",
           "version": "5.0.0",
           "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.0.0.tar.gz"
@@ -20763,6 +20813,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-gast",
+          "version": "0.5.3",
+          "downloadUrl": "https://github.com/serge-sans-paille/gast/archive/0.5.3/gast-0.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-genshi",
           "version": "0.7.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.5.tar.gz"
@@ -20796,6 +20856,16 @@
           "name": "python-google-auth-oauthlib",
           "version": "0.5.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-google-pasta",
+          "version": "0.2.0",
+          "downloadUrl": "https://github.com/google/pasta/archive/v0.2.0.tar.gz"
         }
       }
     },
@@ -21193,6 +21263,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-libclang",
+          "version": "14.0.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-linux-procfs",
           "version": "0.6.1",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/python/python-linux-procfs/python-linux-procfs.git/snapshot/python-linux-procfs-0.6.1.tar.gz"
@@ -21443,6 +21523,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-opt-einsum",
+          "version": "3.3.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/o/opt_einsum/opt_einsum-3.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-os-service-types",
           "version": "1.7.0",
           "downloadUrl": "https://tarballs.openstack.org/os-service-types/os-service-types-1.7.0.tar.gz"
@@ -21506,6 +21596,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pkgconfig",
+          "version": "1.5.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pkgconfig/pkgconfig-1.5.5.tar.gz"
         }
       }
     },
@@ -22463,6 +22563,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-termcolor",
+          "version": "1.1.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/termcolor/termcolor-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-testrepository",
           "version": "0.0.20",
           "downloadUrl": "http://pypi.python.org/packages/source/t/testrepository/testrepository-0.0.20.tar.gz"
@@ -22596,6 +22706,16 @@
           "name": "python-twisted",
           "version": "22.10.0",
           "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-typing-extensions",
+          "version": "4.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/typing_extensions/typing_extensions-4.2.0.tar.gz"
         }
       }
     },
@@ -25025,8 +25145,8 @@
         "type": "other",
         "other": {
           "name": "screen",
-          "version": "4.8.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/screen/screen-4.8.0.tar.gz"
+          "version": "4.9.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/screen/screen-4.9.0.tar.gz"
         }
       }
     },
@@ -25747,8 +25867,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.10",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.10.tar.gz"
+          "version": "1.9.12p1",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p1.tar.gz"
         }
       }
     },

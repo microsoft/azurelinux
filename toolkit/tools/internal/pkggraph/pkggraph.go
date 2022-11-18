@@ -19,6 +19,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/versioncompare"
 
 	"gonum.org/v1/gonum/graph"
@@ -1417,10 +1418,7 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 		rpmsMap[node.RpmPath] = true
 	}
 
-	rpmFiles = make([]string, 0, len(rpmsMap))
-	for rpm := range rpmsMap {
-		rpmFiles = append(rpmFiles, rpm)
-	}
+	rpmFiles = sliceutils.StringsSetToSlice(rpmsMap)
 
 	return
 }

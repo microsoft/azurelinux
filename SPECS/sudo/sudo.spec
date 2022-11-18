@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.10
+Version:        1.9.12p1
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -97,6 +97,10 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+
+*   Thu Nov 10 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.9.12p1-1
+-   Upgrade sudo to version 1.9.12p1 to fix CVE-2022-43995.
+
 *   Tue Mar 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.9.10
 -   Upgrade to Latest Stable sudo version for CBL-Mariner 2.0
 

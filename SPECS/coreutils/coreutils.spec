@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,16 +60,11 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/bin
 install -vdm 755 %{buildroot}%{_sbindir}
 install -vdm 755 %{buildroot}%{_mandir}/man8
-mv -v %{buildroot}%{_bindir}/{arch,cat,chgrp,chmod,chown,cp,date,dd,df,echo} %{buildroot}/bin
-mv -v %{buildroot}%{_bindir}/{false,ln,ls,mkdir,mknod,mv,pwd,rm} %{buildroot}/bin
-mv -v %{buildroot}%{_bindir}/{rmdir,stty,sync,true,uname,test,[} %{buildroot}/bin
 mv -v %{buildroot}%{_bindir}/chroot %{buildroot}%{_sbindir}
 mv -v %{buildroot}%{_mandir}/man1/chroot.1 %{buildroot}%{_mandir}/man8/chroot.8
 sed -i s/\"1\"/\"8\"/1 %{buildroot}%{_mandir}/man8/chroot.8
-mv -v %{buildroot}%{_bindir}/{head,sleep,nice} %{buildroot}/bin
 rm -rf %{buildroot}%{_infodir}
 install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/
@@ -92,7 +87,6 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %files
 %defattr(-,root,root)
 %license COPYING
-/bin/*
 %{_sysconfdir}/profile.d/serial-console.sh
 %{_libexecdir}/*
 %{_bindir}/*
@@ -103,6 +97,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Mon Nov 14 2022 Minghe Ren <mingheren@microsoft.com> - 8.32-6
+- Move the binaries back to the default location from /bin/ to /usr/bin
+
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.32-5
 - Add upstream patch to fix race in env-signal-handler test
 - Ensure SRPMs built on any architecture include all patches

@@ -1,0 +1,6 @@
+{
+    "Signatures": {
+     "h5py-3.7.0.tar.gz": "3fcf37884383c5da64846ab510190720027dca0768def34dd8dcb659dbe5cbf3",
+     "h5py-3.7.0-ppc-float128.patch":"e6d4b89ae0fcd4f090b32b8fe257ceee81a6e46ddfdfb61042e37de9eb38e136"
+    }
+   }
