@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,8 @@ Patch1:         add-fsync-sysusers-passwd.patch
 # Patch2 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/d5cb053cd93d516f516e0b748271b55f9dfb3a29
 Patch2:         gpt-auto-devno-not-determined.patch
+# Patch3 can be removed once we update to major version 251 or higher:
+Patch3:         CVE-2022-3821.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -231,6 +233,9 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 250.3-8
+- Add patch for CVE-2022-3821
+
 * Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-7
 - Fixing default log location.
 
