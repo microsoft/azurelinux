@@ -57,7 +57,7 @@ or
 * delete a working container or an image
 
 %prep
-%autosetup -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -p1 -Sgit -n %{name}-%{built_tag_strip}
 sed -i 's/GOMD2MAN =/GOMD2MAN ?=/' docs/Makefile
 sed -i '/docs install/d' Makefile
 
