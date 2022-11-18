@@ -54,14 +54,15 @@ CFLAGS="${CFLAGS:-${optflags}}" LDFLAGS="${LDFLAGS:-%{build_ldflags}}" python3 s
 
 %install
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-ln -s twistd %{buildroot}/%{_bindir}/twistd3
-ln -s trial %{buildroot}/%{_bindir}/trial3
-ln -s tkconch %{buildroot}/%{_bindir}/tkconch3
-ln -s pyhtmlizer %{buildroot}/%{_bindir}/pyhtmlizer3
-ln -s twist %{buildroot}/%{_bindir}/twist3
-ln -s conch %{buildroot}/%{_bindir}/conch3
-ln -s ckeygen %{buildroot}/%{_bindir}/ckeygen3
-ln -s cftp %{buildroot}/%{_bindir}/cftp3
+# Re-naming binaries to avoid conflicts with older Python 2 version of the package.
+mv %{buildroot}/%{_bindir}/{twistd,twistd3}
+mv %{buildroot}/%{_bindir}/{trial,trial3}
+mv %{buildroot}/%{_bindir}/{tkconch,tkconch3}
+mv %{buildroot}/%{_bindir}/{pyhtmlizer,pyhtmlizer3}
+mv %{buildroot}/%{_bindir}/{twist,twist3}
+mv %{buildroot}/%{_bindir}/{conch,conch3}
+mv %{buildroot}/%{_bindir}/{ckeygen,ckeygen3}
+mv %{buildroot}/%{_bindir}/{cftp,cftp3}
 
 %check
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
@@ -76,15 +77,6 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %defattr(-,root,root)
 %license LICENSE
 %{python3_sitelib}/*
-%{_bindir}/twistd
-%{_bindir}/trial
-%{_bindir}/tkconch
-%{_bindir}/pyhtmlizer
-%{_bindir}/twist
-%{_bindir}/mailmail
-%{_bindir}/conch
-%{_bindir}/ckeygen
-%{_bindir}/cftp
 %{_bindir}/twistd3
 %{_bindir}/trial3
 %{_bindir}/tkconch3
@@ -97,6 +89,7 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %changelog
 * Wed Nov 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 22.10.0-2
 - Ported to Mariner 1.0 to fix CVE-2022-39348.
+- Re-named binaries to avoid conflicts with Python 2 version.
 
 * Mon Oct 31 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 22.10.0-1
 - Upgrade to 22.10.0
