@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{Version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache.tar.gz
+Source1:        %{name}-%{version}-cache-full.tar.gz
 BuildRequires:  build-essential
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
