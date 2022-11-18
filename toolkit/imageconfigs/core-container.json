@@ -17,6 +17,9 @@
             ],
             "PostInstallScripts": [
                 {
+                    "Path": "postinstallscripts/add_non_root_user.sh"
+                },
+                {
                     "Path": "postinstallscripts/core-container/cleanup.sh"
                 }
             ]
