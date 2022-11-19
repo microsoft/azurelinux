@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# need bunch of dep for bazel to build:
+# need bunch of dep for bazel to fetch the cache:
 # build-essential ca-certificates git libstdc++-devel python3-devel python3-pip python3-requests python3-packaging python3-wheel binutils which tar wget bazel-4.2.1-2.cm2.x86_64
 set -e
 

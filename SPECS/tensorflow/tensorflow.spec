@@ -41,8 +41,6 @@ Python 3 version.
 
 %build
 
-tar -xf %{SOURCE1} -C /root/
-
 ln -s /usr/bin/python3 /usr/bin/python
 # bazel clean
 # pushd /root
@@ -50,7 +48,7 @@ ln -s /usr/bin/python3 /usr/bin/python
 # popd
 # mv /root/cacheroot.tar.gz /usr/
 # sleep 180
-
+bazel shutdown
 bazel build --repository_cache=BAZEL_CACHE //tensorflow/tools/pip_package:build_pip_package
 
 
