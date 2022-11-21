@@ -48,8 +48,7 @@ ln -s /usr/bin/python3 /usr/bin/python
 # popd
 # mv /root/cacheroot.tar.gz /usr/
 # sleep 180
-bazel shutdown
-bazel build --repository_cache=BAZEL_CACHE  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
+bazel --batch build --repository_cache=BAZEL_CACHE  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 
 
 # sleep 43200
