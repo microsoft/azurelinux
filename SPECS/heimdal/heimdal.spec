@@ -11,8 +11,8 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
-Version:        7.7.0
-Release:        8%{?dist}
+Version:        7.7.1
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -486,6 +486,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Mon Nov 21 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.7.1-1
+- Auto-upgrade to 7.7.1 - CVE-2022-41916
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.7.0-8
 - Add patch to compile with newer autoconf
 
