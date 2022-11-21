@@ -8,7 +8,7 @@
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.77.1
+Version:        5.15.79.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -393,6 +393,13 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Nov 18 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.79.1-1
+- Auto-upgrade to 5.15.79.1
+
+* Mon Nov 14 2022 Vince Perri <viperri@microsoft.com> - 5.15.77.1-2
+- Turn on Configs for different TCP algorithms
+- Package gpu kernel modules in new package kernel-drivers-gpu
+
 * Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.77.1-1
 - Auto-upgrade to 5.15.77.1
 
