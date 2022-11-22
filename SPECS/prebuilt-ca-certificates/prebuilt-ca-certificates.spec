@@ -49,7 +49,7 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
-* Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 2.0.0-9
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 2.0.0-9
 - Making 'Release' match with 'ca-certificates'.
 
 * Fri Oct 07 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-8

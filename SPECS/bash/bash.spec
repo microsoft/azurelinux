@@ -12,8 +12,8 @@ Source1:        bash_completion
 Patch0:         bash-5.1.patch
 BuildRequires:  readline
 Requires:       readline
-Requires(post): coreutils
 Requires(post): /bin/grep
+Requires(post): coreutils
 Requires(postun): /bin/grep
 Requires(postun): coreutils
 Provides:       /bin/sh

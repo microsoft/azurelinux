@@ -97,7 +97,7 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
-* Mon Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 8.32-6
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 8.32-6
 - Move binaries back to default install location at /usr/bin instead of /bin
 
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.32-5
