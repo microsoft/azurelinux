@@ -45,7 +45,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        2.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,7 +70,6 @@ Source22:       bundle2pem.sh
 # The certdata.microsoft.txt is provided by Microsoft's Trusted Root Program.
 Source23:       certdata.microsoft.txt
 
-BuildRequires:  /bin/ln
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
 BuildRequires:  docbook-dtd-xml
@@ -318,6 +317,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 2.0.0-9
+- Remove Requires for /bin/ls
+
 * Fri Oct 07 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-8
 - Updating Microsoft trusted root CAs.
 

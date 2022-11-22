@@ -4,7 +4,7 @@
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.7
-Release:          5%{?dist}
+Release:          6%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -14,9 +14,9 @@ Distribution:     Mariner
 Source0:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-words-%{version}.gz
 
-Requires:         /bin/ln
-Requires(post):   /bin/ln
-Requires(postun): /bin/rm
+Requires:         coreutils
+Requires(post):   coreutils
+Requires(postun): coreutils
 
 %description
 CrackLib tests passwords to determine whether they match certain
@@ -184,6 +184,9 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 2.9.7-6
+- Change Requires to use coreutils
+
 * Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
 - Remove packer symlink- not necessary, conflicts with Hashicorp's packer tool
 
