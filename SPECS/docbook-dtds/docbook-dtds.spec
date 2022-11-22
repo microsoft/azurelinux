@@ -5,7 +5,7 @@
 Summary:        SGML and XML document type definitions for DocBook
 Name:           docbook-dtds
 Version:        1.0
-Release:        78%{?dist}
+Release:        79%{?dist}
 License:        MIT With Advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,7 +53,7 @@ BuildRequires:  unzip
 Requires:       sgml-common
 Requires:       xml-common
 Requires(post): %{_bindir}/xmlcatalog
-Requires(post): /bin/chmod
+Requires(post): coreutils
 Requires(post): sed
 Requires(postun): %{_bindir}/xmlcatalog
 Requires(postun): sed
@@ -471,6 +471,9 @@ do
     %{_datadir}/sgml/openjade-%{openjadever}/catalog
 done
 %changelog
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.0-79
+- Change Requires to use coreutils
+
 * Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.0-78
 - Moved from SPECS-EXTENDED to SPECS
 - License verified

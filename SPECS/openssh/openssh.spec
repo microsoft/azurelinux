@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,7 +70,7 @@ Requires:       ncurses-term
 Requires:       openssh-clients = %{openssh_ver}-%{release}
 Requires:       pam
 Requires:       shadow-utils
-Requires(post): /bin/chown
+Requires(post): coreutils
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 
@@ -261,6 +261,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 8.8p1-8
+- Change Requires to use coreutils
+
 * Tue Jul 26 2022 Minghe Ren <mingheren@microsoft.com> - 8.8p1-7
 - Update sshd_config to imporve SSH security
 

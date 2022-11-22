@@ -1,7 +1,7 @@
 Summary:        RPC program number mapper
 Name:           rpcbind
 Version:        1.2.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
@@ -15,9 +15,10 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  systemd-devel
 Requires:       libtirpc
 Requires:       systemd
-Requires(pre):  /usr/sbin/useradd /usr/sbin/userdel /usr/sbin/groupadd /usr/sbin/groupdel /bin/false
+Requires(pre):  /usr/sbin/useradd /usr/sbin/userdel /usr/sbin/groupadd /usr/sbin/groupdel
+Requires(pre):  coretuils
 Requires(preun):/usr/sbin/userdel /usr/sbin/groupdel
-Requires(post): /bin/chown
+Requires(post): coretuils
 
 Provides:       portmap = %{version}-%{release}
 
@@ -91,6 +92,9 @@ fi
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
 %changelog
+* Fri Nov 18 2022 Minghe Ren <mingheren@microsoft.com> - 1.2.5-6
+- Change Requires to use pakcage name
+
 * Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.5-5
 - Add portmap to provides
 
