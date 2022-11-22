@@ -1,5 +1,5 @@
 filesystem-1.1-12.cm2.aarch64.rpm
-kernel-headers-5.15.77.1-1.cm2.noarch.rpm
+kernel-headers-5.15.79.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.aarch64.rpm
 glibc-devel-2.35-3.cm2.aarch64.rpm
 glibc-i18n-2.35-3.cm2.aarch64.rpm
@@ -40,11 +40,19 @@ ncurses-libs-6.3-2.cm2.aarch64.rpm
 ncurses-term-6.3-2.cm2.aarch64.rpm
 readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
+<<<<<<< HEAD
 coreutils-8.32-6.cm2.aarch64.rpm
 coreutils-lang-8.32-6.cm2.aarch64.rpm
 bash-5.1.8-2.cm2.aarch64.rpm
 bash-devel-5.1.8-2.cm2.aarch64.rpm
 bash-lang-5.1.8-2.cm2.aarch64.rpm
+=======
+coreutils-8.32-5.cm2.aarch64.rpm
+coreutils-lang-8.32-5.cm2.aarch64.rpm
+bash-5.1.8-1.cm2.aarch64.rpm
+bash-devel-5.1.8-1.cm2.aarch64.rpm
+bash-lang-5.1.8-1.cm2.aarch64.rpm
+>>>>>>> 315b19a3415a81690f023a4ef7ffff01385e38ea
 bzip2-1.0.8-1.cm2.aarch64.rpm
 bzip2-devel-1.0.8-1.cm2.aarch64.rpm
 bzip2-libs-1.0.8-1.cm2.aarch64.rpm
