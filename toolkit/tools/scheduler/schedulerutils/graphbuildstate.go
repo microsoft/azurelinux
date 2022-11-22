@@ -9,6 +9,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
 // nodeState represents the build state of a single node
@@ -90,26 +91,18 @@ func (g *GraphBuildState) BuildFailures() []*BuildResult {
 // ConflictingRPMs will return a list of *.rpm files which should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingRPMs() (rpms []string) {
-	rpms = make([]string, len(g.conflictingRPMs))
-	i := 0
-	for f := range g.conflictingRPMs {
-		rpms[i] = f
-		i++
-	}
+	rpms = sliceutils.StringsSetToSlice(g.conflictingRPMs)
 	sort.Strings(rpms)
+
 	return rpms
 }
 
 // ConflictingSRPMs will return a list of *.src.rpm files which created rpms that should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingSRPMs() (srpms []string) {
-	srpms = make([]string, len(g.conflictingSRPMs))
-	i := 0
-	for f := range g.conflictingSRPMs {
-		srpms[i] = f
-		i++
-	}
+	srpms = sliceutils.StringsSetToSlice(g.conflictingSRPMs)
 	sort.Strings(srpms)
+
 	return srpms
 }
 
