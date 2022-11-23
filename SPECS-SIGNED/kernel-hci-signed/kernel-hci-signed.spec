@@ -4,7 +4,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for HCI
 Name:           kernel-hci-signed-%{buildarch}
-Version:        5.15.77.1
+Version:        5.15.79.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
