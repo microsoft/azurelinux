@@ -1,7 +1,7 @@
 Summary:        This package contains programs to find files
 Name:           findutils
 Version:        4.8.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/findutils
 Group:          Applications/File
@@ -64,6 +64,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> 4.8.0-4
+- Force rebuild to address missing SELinux features.
 * Wed Mar 23 2022 Chris PeBenito <chpebeni@microsoft.com> 4.8.0-3
 - Add missing (Build)Requires needed to enable SELinux support.
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> 4.8.0-2

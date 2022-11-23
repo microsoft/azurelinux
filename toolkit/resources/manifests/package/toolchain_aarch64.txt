@@ -30,9 +30,9 @@ chkconfig-debuginfo-1.20-3.cm2.aarch64.rpm
 chkconfig-lang-1.20-3.cm2.aarch64.rpm
 cmake-3.21.4-2.cm2.aarch64.rpm
 cmake-debuginfo-3.21.4-2.cm2.aarch64.rpm
-coreutils-8.32-5.cm2.aarch64.rpm
-coreutils-debuginfo-8.32-5.cm2.aarch64.rpm
-coreutils-lang-8.32-5.cm2.aarch64.rpm
+coreutils-8.32-6.cm2.aarch64.rpm
+coreutils-debuginfo-8.32-6.cm2.aarch64.rpm
+coreutils-lang-8.32-6.cm2.aarch64.rpm
 cpio-2.13-4.cm2.aarch64.rpm
 cpio-debuginfo-2.13-4.cm2.aarch64.rpm
 cpio-lang-2.13-4.cm2.aarch64.rpm
@@ -81,9 +81,9 @@ file-devel-5.40-2.cm2.aarch64.rpm
 file-libs-5.40-2.cm2.aarch64.rpm
 filesystem-1.1-12.cm2.aarch64.rpm
 filesystem-asc-1.1-12.cm2.aarch64.rpm
-findutils-4.8.0-3.cm2.aarch64.rpm
-findutils-debuginfo-4.8.0-3.cm2.aarch64.rpm
-findutils-lang-4.8.0-3.cm2.aarch64.rpm
+findutils-4.8.0-4.cm2.aarch64.rpm
+findutils-debuginfo-4.8.0-4.cm2.aarch64.rpm
+findutils-lang-4.8.0-4.cm2.aarch64.rpm
 flex-2.6.4-7.cm2.aarch64.rpm
 flex-debuginfo-2.6.4-7.cm2.aarch64.rpm
 flex-devel-2.6.4-7.cm2.aarch64.rpm
