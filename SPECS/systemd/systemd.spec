@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        42%{?dist}
+Release:        43%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,8 @@ Patch23:        CVE-2018-21029.nopatch
 Patch24:        CVE-2021-33910.patch
 Patch25:        Backport-fix-dhcp-routes.patch
 Patch26:        Add-ptp_hyperv-udev-rule.patch
+Patch27:        CVE-2022-3821.patch
+
 #Portablectl patches for --now --enable and --no-block flags support
 Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
 Patch101:       101-Portabled-fix-inspect-on-image-attached-as-directory.patch
@@ -286,6 +288,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Nov 21 2022 Andrew Phelps <anphel@microsoft.com> - 239-43
+- Add patch for CVE-2022-3821
+
 * Mon Apr 11 2022 Henry Beberman <henry.beberman@microsoft.com> - 239-42
 - Backport udev rule to enumerate Hyper-V ptp with a symlink.
 
