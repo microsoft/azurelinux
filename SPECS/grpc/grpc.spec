@@ -88,7 +88,8 @@ pushd cmake/build
    -DgRPC_RE2_PROVIDER:STRING='package'      \
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
-%cmake_build
+
+%cmake_build -j1
 popd
 #python
 export GRPC_PYTHON_BUILD_WITH_CYTHON=True
