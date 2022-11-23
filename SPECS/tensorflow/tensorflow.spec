@@ -42,7 +42,7 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s /usr/bin/python3 /usr/bin/python
-# bazel clean
+bazel clean
 # pushd /root
 # tar -czvf cacheroot.tar.gz .cache
 # popd
