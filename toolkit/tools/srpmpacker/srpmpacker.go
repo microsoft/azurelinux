@@ -187,7 +187,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	originalOutDir := outDir
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, buildDir, outDir, specsDir, err = srpm.CreateChroot(workerTar, buildDir, outDir, specsDir)
+		chroot, buildDir, outDir, specsDir, err = srpm.CreateSRPMChroot(workerTar, buildDir, outDir, specsDir)
 		if err != nil {
 			return
 		}

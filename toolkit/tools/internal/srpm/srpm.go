@@ -14,36 +14,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
-// ParsePackListFile will parse a list of packages to pack if one is specified.
-// Duplicate list entries in the file will be removed.
-func ParsePackListFile(packListFile string) (packList []string, err error) {
-	if packListFile == "" {
-		return
-	}
-
-	file, err := os.Open(packListFile)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line != "" {
-			packList = append(packList, line)
-		}
-	}
-
-	if len(packList) == 0 {
-		err = fmt.Errorf("cannot have empty pack list (%s)", packListFile)
-	}
-
-	packList = sliceutils.RemoveDuplicateStrings(packList)
-
-	return
-}
-
 // FindSPECFiles finds all SPEC files that should be considered for packing.
 // Takes into consideration a packList if provided.
 func FindSPECFiles(specsDir string, packList []string) (specFiles []string, err error) {
@@ -78,8 +48,38 @@ func FindSPECFiles(specsDir string, packList []string) (specFiles []string, err 
 	return
 }
 
-// createChroot creates a chroot to pack SRPMs inside of.
-func CreateChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
+// ParsePackListFile will parse a list of packages to pack if one is specified.
+// Duplicate list entries in the file will be removed.
+func ParsePackListFile(packListFile string) (packList []string, err error) {
+	if packListFile == "" {
+		return
+	}
+
+	file, err := os.Open(packListFile)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line != "" {
+			packList = append(packList, line)
+		}
+	}
+
+	if len(packList) == 0 {
+		err = fmt.Errorf("cannot have empty pack list (%s)", packListFile)
+	}
+
+	packList = sliceutils.RemoveDuplicateStrings(packList)
+
+	return
+}
+
+// createSRPMChroot creates a chroot to pack SRPMs inside of.
+func CreateSRPMChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"
 		existingDir      = false

@@ -46,3 +46,22 @@ func TestShouldReturnValuesForAllTrueElementsInSet(t *testing.T) {
 	assert.NotContains(t, outputSlice, "X")
 	assert.NotContains(t, outputSlice, "Y")
 }
+
+func TestShouldReturnNoDuplicates(t *testing.T) {
+	inputSet := []string{
+		"A",
+		"A",
+		"B",
+		"A",
+		"C",
+		"B",
+		"B",
+	}
+	outputSlice := RemoveDuplicateStrings(inputSet)
+
+	assert.NotNil(t, outputSlice)
+	assert.Len(t, outputSlice, 3)
+	assert.Contains(t, outputSlice, "A")
+	assert.Contains(t, outputSlice, "B")
+	assert.Contains(t, outputSlice, "C")
+}
