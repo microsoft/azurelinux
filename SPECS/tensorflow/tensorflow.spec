@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{Version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache-full.tar.gz
+Source1:        %{name}-%{version}-cache.tar.gz
 BuildRequires:  build-essential
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
@@ -42,12 +42,7 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s /usr/bin/python3 /usr/bin/python
-bazel clean
-# pushd /root
-# tar -czvf cacheroot.tar.gz .cache
-# popd
-# mv /root/cacheroot.tar.gz /usr/
-# sleep 180
+
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 
 
