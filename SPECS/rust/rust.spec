@@ -9,8 +9,8 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.62.1
-Release:        3%{?dist}
-License:        ASL 2.0 OR MIT
+Release:        4%{?dist}
+License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -44,6 +44,13 @@ Provides:       cargo = %{version}-%{release}
 
 %description
 Rust Programming Language
+
+%package doc
+Summary:        Rust documentation.
+BuildArch:      noarch
+
+%description doc
+Documentation package for Rust.
 
 %prep
 # Setup .cargo directory
@@ -94,14 +101,14 @@ ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-lin
 
 %install
 USER=root SUDO_USER=root %make_install
+mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
 
 %ldconfig_scriptlets
 
 %files
-%license LICENSE-MIT LICENSE-APACHE COPYRIGHT
-%doc CONTRIBUTING.md README.md RELEASES.md
+%license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
 %{_bindir}/rustc
 %{_bindir}/rustdoc
 %{_bindir}/rust-lldb
@@ -111,22 +118,26 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_libexecdir}/cargo-credential-1password
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
-%doc %{_docdir}/%{name}/html/*
-%{_docdir}/%{name}/html/.stamp
-%doc %{_docdir}/%{name}/README.md
-%doc %{_docdir}/%{name}/COPYRIGHT
-%doc %{_docdir}/%{name}/LICENSE-APACHE
-%doc %{_docdir}/%{name}/LICENSE-MIT
-%doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
-%doc src/tools/clippy/{README.md,CHANGELOG.md}
 %{_bindir}/cargo
 %{_bindir}/cargo-fmt
 %{_bindir}/rustfmt
 %{_datadir}/zsh/*
-%doc %{_docdir}/%{name}/LICENSE-THIRD-PARTY
 %{_sysconfdir}/bash_completion.d/cargo
 
+%files doc
+%license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
+%doc %{_docdir}/%{name}/html/*
+%doc %{_docdir}/%{name}/README.md
+%doc CONTRIBUTING.md README.md RELEASES.md
+%doc src/tools/clippy/{README.md,CHANGELOG.md}
+%doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
+%{_docdir}/%{name}/html/.stamp
+
 %changelog
+* Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
+- Split out separate 'doc' subpackage to reduce default package size.
+- Updated license information.
+
 * Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-3
 - Adding missing test dependency on "glibc-static".
 
