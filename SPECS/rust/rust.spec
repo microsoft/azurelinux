@@ -102,6 +102,7 @@ ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-lin
 %install
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
+rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
 
@@ -112,7 +113,6 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_bindir}/rustc
 %{_bindir}/rustdoc
 %{_bindir}/rust-lldb
-%{_mandir}/man1/*
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
 %{_libexecdir}/cargo-credential-1password
@@ -129,9 +129,10 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %doc %{_docdir}/%{name}/html/*
 %doc %{_docdir}/%{name}/README.md
 %doc CONTRIBUTING.md README.md RELEASES.md
-%doc src/tools/clippy/{README.md,CHANGELOG.md}
-%doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
+%doc src/tools/clippy/CHANGELOG.md
+%doc src/tools/rustfmt/Configurations.md
 %{_docdir}/%{name}/html/.stamp
+%{_mandir}/man1/*
 
 %changelog
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
