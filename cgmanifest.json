@@ -9441,8 +9441,8 @@
         "type": "other",
         "other": {
           "name": "libntlm",
-          "version": "1.5",
-          "downloadUrl": "http://nongnu.org/libntlm/releases/libntlm-1.5.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://gitlab.com/gsasl/libntlm/-/archive/libntlm-1-6/libntlm-libntlm-1-6.tar.gz"
         }
       }
     },
