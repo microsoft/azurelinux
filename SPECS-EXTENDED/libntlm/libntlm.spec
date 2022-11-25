@@ -52,6 +52,7 @@ find %{buildroot} -name '*.la' -delete
 %changelog
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6-1
 - Updated to version 1.6 to fix CVE-2019-17455.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
