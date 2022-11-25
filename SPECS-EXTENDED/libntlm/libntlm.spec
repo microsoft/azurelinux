@@ -1,17 +1,17 @@
 %define version_with_hyphens %(version="%{version}" && echo "${version//./-}")
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        NTLMv1 authentication library
 Name:           libntlm
 Version:        1.6
 Release:        1%{?dist}
-Summary:        NTLMv1 authentication library
 License:        LGPL-2.1-only
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://gitlab.com/gsasl/libntlm/
 Source0:        https://gitlab.com/gsasl/libntlm/-/archive/%{name}-%{version_with_hyphens}/%{name}-%{name}-%{version_with_hyphens}.tar.gz
 
-BuildRequires:  pkgconfig
 BuildRequires:  gcc
+BuildRequires:  pkg-config
 
 Provides:       bundled(gnulib)
 
@@ -37,7 +37,7 @@ sed -i 's|$(install_sh) -c|$(install_sh) -pc|g' Makefile
 
 %install
 make install DESTDIR=%{buildroot}
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license COPYING
@@ -53,6 +53,7 @@ find %{buildroot} -name '*.la' -delete
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6-1
 - Updated to version 1.6 to fix CVE-2019-17455.
 - License verified.
+- Updated URLs.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
