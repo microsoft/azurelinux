@@ -10,6 +10,7 @@ Distribution:   Mariner
 URL:            https://gitlab.com/gsasl/libntlm/
 Source0:        https://gitlab.com/gsasl/libntlm/-/archive/%{name}-%{version_with_hyphens}/%{name}-%{name}-%{version_with_hyphens}.tar.gz
 
+BuildRequires:  autoconf
 BuildRequires:  gcc
 BuildRequires:  pkg-config
 
@@ -29,6 +30,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version_with_hyphens}
+autoreconf -fi
 
 %build
 %configure --disable-static
@@ -42,7 +44,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files
 %license COPYING
 %doc AUTHORS ChangeLog README THANKS
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.0
+%{_libdir}/%{name}.so.0.*
 
 %files devel
 %{_includedir}/ntlm.h
