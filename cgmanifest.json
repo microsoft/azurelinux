@@ -64,6 +64,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "adcli",
+          "version": "0.9.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/realmd/adcli/uploads/ea560656ac921b3fe0d455976aaae9be/adcli-0.9.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "adobe-mappings-cmap",
           "version": "20171205",
           "downloadUrl": "https://github.com/adobe-type-tools/cmap-resources/archive/20171205.tar.gz"
