@@ -103,7 +103,7 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
-* Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> 8.32-6
+* Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 8.32-6
 - Force rebuild to address missing SELinux features.
 
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.32-5
