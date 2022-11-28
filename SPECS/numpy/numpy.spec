@@ -69,10 +69,8 @@ License:        BSD AND Python AND ASL 2.0
 Requires:       python3-devel
 Requires:       python3-numpy%{?_isa} = %{version}-%{release}
 Provides:       python3-f2py = %{version}-%{release}
-Obsoletes:      python3-f2py <= 2.45.241_1927
 Provides:       f2py = %{version}-%{release}
 Provides:       numpy-f2py = %{version}-%{release}
-Obsoletes:      numpy-f2py < 1:1.10.1-3
 
 %description -n python3-numpy-f2py
 This package includes a version of f2py that works properly with NumPy.
