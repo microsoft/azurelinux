@@ -1,0 +1,11 @@
+--- rspec-support-3.2.1/spec/rspec/support/caller_filter_spec.rb.regex	2015-02-09 09:09:58.000000000 +0900
++++ rspec-support-3.2.1/spec/rspec/support/caller_filter_spec.rb	2015-02-09 09:19:58.589718748 +0900
+@@ -15,7 +15,7 @@
+     describe "the filtering regex" do
+       def ruby_files_in_lib(lib)
+         # http://rubular.com/r/HYpUMftlG2
+-        path = $LOAD_PATH.find { |p| p.match(/\/rspec-#{lib}(-[a-f0-9]+)?\/lib/) }
++        path = $LOAD_PATH.find { |p| p.match(/\/rspec-#{lib}(-[a-f0-9\.]+)?\/lib/) }
+ 
+         Dir["#{path}/**/*.rb"].sort.tap do |files|
+           # Just a sanity check...
