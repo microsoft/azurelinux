@@ -32,8 +32,8 @@ Release:        5%{?dist}
 Summary:        A collection of sparse matrix libraries
 
 License:        (LGPLv2+ or BSD) and LGPLv2+ and GPLv2+
-URL:            http://faculty.cse.tamu.edu/davis/suitesparse.html
-Source0:        http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
+URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
+Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
