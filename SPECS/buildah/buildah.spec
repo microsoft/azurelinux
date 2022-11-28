@@ -18,15 +18,14 @@
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 Summary:        A command line tool used for creating OCI Images
 Name:           %{repo}
-Version:        1.18.0
-Release:        8%{?dist}
+Version:        1.27.1
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io
 Source:         https://%{import_path}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
 
-Patch0:         CVE-2022-27651.patch
 
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
@@ -90,6 +89,9 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Mon Nov 28 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27.1-1
+- Auto-upgrade to 1.27.1 - CVE-2022-2990
+
 * Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 1.18.0-8
 - Add Patch for CVE-2022-27651
 
