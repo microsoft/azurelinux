@@ -1,7 +1,7 @@
-Summary:    A GNU utility for monitoring a program's use of system resources
-Name:       time
-Version:    1.9
-Release:    9%{?dist}
+Summary:        A GNU utility for monitoring a program's use of system resources
+Name:           time
+Version:        1.9
+Release:        10%{?dist}
 # src/time.c:               GPLv3+
 # COPYING:                  GPLv3 text
 # doc/time.texi:            GFDL
@@ -38,25 +38,25 @@ Release:    9%{?dist}
 # m4/stdnoreturn.m4:        FSFULLR
 # maint.mk:                 GPLv3+
 # tests/time-posix-quiet.sh:    GPLv3+
-License:    GPLv3+ and GFDL
+License:        GPLv3+ AND GFDL AND FSFULLR AND GPLV2+ AND MIT AND FSFAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:        http://www.gnu.org/software/%{name}/
-Source:     ftp://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+URL:            http://www.gnu.org/software/%{name}/
+Source:         ftp://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 # Fix measuring time when a clock experiences a jump, bug #1004416,
 # <http://lists.gnu.org/archive/html/bug-gnu-utils/2013-09/msg00003.html>
-Patch0:     time-1.8-Prefer-clock_gettime-CLOCK_MONOTONIC.patch
+Patch0:         time-1.8-Prefer-clock_gettime-CLOCK_MONOTONIC.patch
 # Fix info directory entry
-Patch1:     time-1.9-Improve-info-directory-index-entry-description.patch
+Patch1:         time-1.9-Improve-info-directory-index-entry-description.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bash
 BuildRequires:  coreutils
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  texinfo
 # Tests
 BuildRequires:  sed
+BuildRequires:  texinfo
 
 %description
 The GNU time utility runs another program, collects information about
@@ -74,9 +74,9 @@ autoreconf -fi
 %make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 # Remove info index, it's updated by file triggers
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+rm -f %{buildroot}%{_infodir}/dir
 
 %check
 make %{?_smp_mflags} check
@@ -89,6 +89,10 @@ make %{?_smp_mflags} check
 # time(1) manual page lives in man-pages package, bug #1612294.
 
 %changelog
+* Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.9-10
+- License verified
+- Move to core
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

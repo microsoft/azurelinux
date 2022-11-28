@@ -1,5 +1,5 @@
 filesystem-1.1-12.cm2.x86_64.rpm
-kernel-headers-5.15.77.1-1.cm2.noarch.rpm
+kernel-headers-5.15.79.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.x86_64.rpm
 glibc-devel-2.35-3.cm2.x86_64.rpm
 glibc-i18n-2.35-3.cm2.x86_64.rpm
@@ -58,8 +58,8 @@ grep-3.7-2.cm2.x86_64.rpm
 grep-lang-3.7-2.cm2.x86_64.rpm
 diffutils-3.8-1.cm2.x86_64.rpm
 gawk-5.1.0-2.cm2.x86_64.rpm
-findutils-4.8.0-3.cm2.x86_64.rpm
-findutils-lang-4.8.0-3.cm2.x86_64.rpm
+findutils-4.8.0-4.cm2.x86_64.rpm
+findutils-lang-4.8.0-4.cm2.x86_64.rpm
 gettext-0.21-2.cm2.x86_64.rpm
 gzip-1.12-1.cm2.x86_64.rpm
 make-4.3-2.cm2.x86_64.rpm
@@ -207,8 +207,8 @@ pcre-8.45-2.cm2.x86_64.rpm
 pcre-libs-8.45-2.cm2.x86_64.rpm
 lua-5.4.3-4.cm2.x86_64.rpm
 lua-libs-5.4.3-4.cm2.x86_64.rpm
-mariner-rpm-macros-2.0-17.cm2.noarch.rpm
-mariner-check-macros-2.0-17.cm2.noarch.rpm
+mariner-rpm-macros-2.0-19.cm2.noarch.rpm
+mariner-check-macros-2.0-19.cm2.noarch.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm
 libgpg-error-1.43-2.cm2.x86_64.rpm

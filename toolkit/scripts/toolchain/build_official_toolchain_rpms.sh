@@ -263,7 +263,6 @@ build_rpm_in_chroot_no_install readline
 build_rpm_in_chroot_no_install bash
 build_rpm_in_chroot_no_install bzip2
 build_rpm_in_chroot_no_install gdbm
-build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install gettext
 build_rpm_in_chroot_no_install sqlite
 build_rpm_in_chroot_no_install expat
@@ -274,7 +273,6 @@ build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
 build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
-build_rpm_in_chroot_no_install findutils
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
 build_rpm_in_chroot_no_install gzip
@@ -466,6 +464,11 @@ chroot_and_install_rpms swig
 build_rpm_in_chroot_no_install libselinux
 
 chroot_and_install_rpms libselinux
+
+# coreutils and findutils require libselinux
+# for SELinux support.
+build_rpm_in_chroot_no_install coreutils
+build_rpm_in_chroot_no_install findutils
 
 build_rpm_in_chroot_no_install glib
 build_rpm_in_chroot_no_install libassuan

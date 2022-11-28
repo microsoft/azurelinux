@@ -1,9 +1,16 @@
 # unversioned macros: used with user defined __python, no longer part of rpm >= 4.15
 # __python is defined to error by default in the srpm macros
-%python_sitelib %(%{__python} -Esc "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-%python_sitearch %(%{__python} -Esc "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
-%python_version %(%{__python} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
-%python_version_nodots %(%{__python} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
+# nb: $RPM_BUILD_ROOT is not set when the macros are expanded (at spec parse time)
+#     so we set it manually (to empty string), making our Python prefer the correct install scheme location
+# platbase/base is explicitly set to %%{_prefix} to support custom values, such as /app for flatpaks
+%python_sitelib %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_path('purelib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
+%python_sitearch %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
+%python_version %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
+%python_version_nodots %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
+%python_platform %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_platform())")
+%python_platform_triplet %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_config_var('MULTIARCH'))")
+%python_ext_suffix %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")
+%python_cache_tag %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; print(sys.implementation.cache_tag)")
 
 %py_setup setup.py
 %py_shbang_opts -s
