@@ -46,7 +46,6 @@ Provides:       libnpymath-static = %{version}-%{release}
 Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
 Provides:       numpy = %{version}-%{release}
 Provides:       numpy%{?_isa} = %{version}-%{release}
-Obsoletes:      numpy < 1.10.1-3
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
