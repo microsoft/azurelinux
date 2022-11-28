@@ -135,7 +135,6 @@ chrpath --delete %{buildroot}%{python3_sitearch}/%{name}/linalg/_umath_linalg.*.
 
 
 %check
-%if %{with_check}
 export PYTHONPATH=%{buildroot}%{python3_sitearch}
 pip install pytest hypothesis typing-extensions
 # test_ppc64_ibm_double_double128 is unnecessary now that ppc64le has switched long doubles to IEEE format.
@@ -146,7 +145,6 @@ pip install pytest hypothesis typing-extensions
 %global ix86_k and not test_vector_matrix_values and not test_matrix_vector_values and not test_identityless_reduction_huge_array and not (TestKind and test_all)
 %endif
 python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128 %{?ix86_k}'
-%endif
 
 
 %files -n python3-numpy
