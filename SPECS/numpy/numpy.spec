@@ -1,5 +1,3 @@
-#uncomment next line for a release candidate or a beta
-#%%global relc rc1
 
 %global blaslib openblas
 %global blasvar p
