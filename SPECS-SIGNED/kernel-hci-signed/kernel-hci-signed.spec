@@ -151,3 +151,4 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Tue Nov 22 2022 Vince Perri <viperri@microsoft.com> - 5.15.77.1-1
 - Original version for CBL-Mariner.
+- License verified
