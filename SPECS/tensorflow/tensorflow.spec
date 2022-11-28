@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{Version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  build-essential
+# BuildRequires:  build-essential
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-requests
@@ -17,7 +17,7 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-wheel
 BuildRequires:  python3-numpy
 BuildRequires:  bazel = 4.2.1
-BuildRequires:  binutils
+# BuildRequires:  binutils
 BuildRequires:  which
 BuildRequires:  tar
 BuildRequires:  git
