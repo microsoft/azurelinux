@@ -147,7 +147,7 @@ popd
 %ifarch x86_64
 %{python3_sitearch}/grpc
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
-endif
+%endif
 
 %changelog
 * Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
