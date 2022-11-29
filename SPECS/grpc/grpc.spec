@@ -55,12 +55,14 @@ Requires:       protobuf
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
-%package -n python3-grpcio
-Summary:        Python language bindings for gRPC
-Requires:       %{name} = %{version}-%{release}
-Requires:       python3-six
-BuildArch:      x86_64
-%{?python_provide:%python_provide python3-grpcio}
+%ifarch aarch64
+   %package -n python3-grpcio
+   Summary:        Python language bindings for gRPC
+   Requires:       %{name} = %{version}-%{release}
+   Requires:       python3-six
+   BuildArch:      x86_64
+   %{?python_provide:%python_provide python3-grpcio}
+%endif
 
 %description -n python3-grpcio
 Python language bindings for gRPC.
@@ -139,11 +141,12 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
-
-%files -n python3-grpcio
-%license LICENSE
-%{python3_sitearch}/grpc
-%{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
+%ifarch aarch64
+   %files -n python3-grpcio
+   %license LICENSE
+   %{python3_sitearch}/grpc
+   %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
+%endif
 
 %changelog
 * Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
