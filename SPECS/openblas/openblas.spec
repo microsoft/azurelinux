@@ -393,7 +393,7 @@ cp -a %{_includedir}/lapacke %{buildroot}%{_includedir}/%{name}
 %endif
 
 # Fix i686-x86_64 multilib difference
-%{multilib_fix_c_header} --file %{_includedir}/openblas/openblas_config.h
+%multilib_fix_c_header --file %{_includedir}/openblas/openblas_config.h
 
 # Fix name of libraries: runtime CPU detection has none
 suffix=""
