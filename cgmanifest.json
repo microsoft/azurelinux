@@ -306,7 +306,7 @@
         "other": {
           "name": "apache-commons-dbcp",
           "version": "2.1.1",
-          "downloadUrl": "https://archive.apache.org/dist/commons/dbcp/source/commons-dbcp-2.1.1-src.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/commons/dbcp/source/commons-dbcp2-2.1.1-src.tar.gz"
         }
       }
     },
