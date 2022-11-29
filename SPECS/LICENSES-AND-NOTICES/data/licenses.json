@@ -2041,6 +2041,7 @@
                 "livepatch-5.15.74.1-1.cm2",
                 "livepatch-5.15.77.1-1.cm2",
                 "livepatch-5.15.79.1-1.cm2",
+                "livepatch-5.15.80.1-1.cm2",
                 "livepatching",
                 "lld",
                 "local-path-provisioner",
