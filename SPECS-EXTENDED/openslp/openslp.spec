@@ -4,7 +4,7 @@ Distribution:   Mariner
 Summary: Open implementation of Service Location Protocol V2
 Name:    openslp
 Version: 2.0.0
-Release: 25%{?dist}
+Release: 26%{?dist}
 
 License: BSD
 URL:     http://sourceforge.net/projects/openslp/
@@ -27,14 +27,14 @@ Patch3:  openslp-2.0.0-null-pointer-deref.patch
 Patch4:  openslp-2.0.0-openssl-1.1-fix.patch
 # Patch5: fixes possible overflow in SLPFoldWhiteSpace,
 #   backported from upstream, CVE-2016-7567
-Patch5:  openslp-2.0.0-cve-2016-7567.patch
+Patch5:  CVE-2016-7567.patch
 # Patch6: fixes heap memory corruption in slpd/slpd_process.c, which allows
 #   denial of service or potentially code execution,
 #   backported form upstream, CVE-2017-17833
-Patch6:  openslp-2.0.0-cve-2017-17833.patch
+Patch6:  CVE-2017-17833.patch
 # Patch7: fixes a heap overwrite vulnerability
 #   leading to remote code execution
-Patch7:  openslp-2.0.0-cve-2019-5544.patch
+Patch7:  CVE-2019-5544.patch
 
 BuildRequires: automake libtool
 BuildRequires: bison
@@ -173,6 +173,10 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/lib*.la
 
 
 %changelog
+* Wed Nov 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-26
+- License verified.
+- Re-named patch files to work with Mariner's vulnerability detection.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-25
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
