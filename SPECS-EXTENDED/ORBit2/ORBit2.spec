@@ -61,15 +61,11 @@ necessary to write programs that use CORBA technology. If you want to
 write such programs, you'll also need to install the ORBIT package.
 
 %prep
-%setup -q
-%patch0 -p1 -b .multilib
-%patch1 -p1 -b .ref-leaks
-%patch2 -p1 -b .make-j
-%patch3 -p1 -b .deprecated
+%autosetup -p1 %{name}-%{version}
 
 %build
 %configure --disable-gtk-doc --enable-purify --disable-static --disable-rpath
-make %{?_smp_mflags}
+%make_build %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
