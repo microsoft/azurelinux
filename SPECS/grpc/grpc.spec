@@ -55,17 +55,18 @@ Requires:       protobuf
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
-%ifarch aarch64
+%ifarch x86_64
    %package -n python3-grpcio
    Summary:        Python language bindings for gRPC
    Requires:       %{name} = %{version}-%{release}
    Requires:       python3-six
-   BuildArch:      x86_64
    %{?python_provide:%python_provide python3-grpcio}
 %endif
 
-%description -n python3-grpcio
-Python language bindings for gRPC.
+%ifarch x86_64
+   %description -n python3-grpcio
+   Python language bindings for gRPC.
+%endif
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -94,7 +95,7 @@ pushd cmake/build
 %cmake_build 
 popd
 #python
-%ifarch aarch64
+%ifarch x86_64
    export GRPC_PYTHON_BUILD_WITH_CYTHON=True
    export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
    export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
@@ -110,7 +111,7 @@ pushd cmake/build
 find %{buildroot} -name '*.cmake' -delete
 popd
 #python
-%ifarch aarch64
+%ifarch x86_64
    %py3_install
 %endif
 
@@ -141,7 +142,7 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
-%ifarch aarch64
+%ifarch x86_64
    %files -n python3-grpcio
    %license LICENSE
    %{python3_sitearch}/grpc
