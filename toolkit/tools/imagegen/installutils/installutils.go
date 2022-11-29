@@ -2055,6 +2055,32 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	return
 }
 
+func setGrubCfgCGroup(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		cgroupPattern     = "{{.CGroup}}"
+		cgroupv1FlagValue = "systemd.unified_cgroup_hierarchy=0"
+		cgroupv2FlagValue = "systemd.unified_cgroup_hierarchy=1"
+	)
+	var cgroup string
+
+	switch kernelCommandline.CGroup {
+	case configuration.CGroupV2:
+		cgroup = fmt.Sprintf("%s", cgroupv2FlagValue)
+	case configuration.CGroupV1:
+		cgroup = fmt.Sprintf("%s", cgroupv1FlagValue)
+	case configuration.CGroupDefault:
+		cgroup = ""
+	}
+
+	logger.Log.Debugf("Adding CGroupConfiguration('%s') to '%s'", cgroup, grubPath)
+	err = sed(cgroupPattern, cgroup, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's CGroup setting: %v", err)
+	}
+
+	return
+}
+
 // setGrubCfgReadOnlyVerityRoot populates the arguments needed to boot with a dm-verity read-only root partition
 func setGrubCfgReadOnlyVerityRoot(grubPath string, readOnlyRoot diskutils.VerityDevice) (err error) {
 	var (
