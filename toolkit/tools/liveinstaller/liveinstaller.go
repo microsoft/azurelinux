@@ -149,20 +149,21 @@ func updateBootOrder(installDetails installationDetails) (err error) {
 	}
 
 	logger.Log.Info("Setting Boot Order")
-	const squashErrors = false
-	program, commandArgs := formatBootEntryCreationCommand(installDetails)
-	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
+	err = runBootEntryCreationCommand(installDetails)
+	if err != nil {
+		return
+	}
 
 	return
 }
 
-func formatBootEntryCreationCommand(installDetails installationDetails) (program string, commandArgs []string) {
-	program = "efibootmgr"
-
+func runBootEntryCreationCommand(installDetails installationDetails) (err error) {
+	const squashErrors = false
+	program := "efibootmgr"
 	cfg := installDetails.finalConfig
 	bootPartIdx, bootPart := cfg.GetBootPartition()
 	bootDisk := cfg.GetDiskContainingPartition(bootPart)
-	commandArgs = []string{
+	commandArgs := []string{
 		"-c",                            // Create a new bootnum and place it in the beginning of the boot order
 		"-d", bootDisk.TargetDisk.Value, // Specify which disk the boot file is on
 		"-p", fmt.Sprintf("%d", bootPartIdx+1), // Specify which partition the boot file is on
@@ -170,12 +171,13 @@ func formatBootEntryCreationCommand(installDetails installationDetails) (program
 		"-L", "Mariner", // Specify what label you would like to give this boot entry
 		"-v", // Be verbose
 	}
+	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return
 }
 
 func removeOldMarinerBootTargets() (err error) {
-	logger.Log.Info("Removing pre-existing 'Mariner' boot targets from efibootmgr")
 	const squashErrors = false
+	logger.Log.Info("Removing pre-existing 'Mariner' boot targets from efibootmgr")
 	program := "efibootmgr" // Default behavior when piped or called without options is to print current boot order in a human-readable format
 	commandArgs := []string{
 		"|", "grep", "\"Mariner\"", // Filter boot order for Mariner boot targets
