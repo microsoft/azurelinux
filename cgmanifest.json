@@ -244,6 +244,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "apache-commons-beanutils",
+          "version": "1.9.4",
+          "downloadUrl": "https://www.apache.org/dist/commons/beanutils/source/commons-beanutils-1.9.4-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "apache-commons-cli",
           "version": "1.4",
           "downloadUrl": "http://www.apache.org/dist/commons/cli/source/commons-cli-1.4-src.tar.gz"
