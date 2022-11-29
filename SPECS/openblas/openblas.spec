@@ -1,7 +1,39 @@
-%bcond_with system_lapack
 # Version of bundled lapack
 %global lapackver 3.9.1
-
+# Do we have execstack?
+%if 0%{?rhel} == 7
+%ifarch ppc64le aarch64
+%global execstack 0
+%else
+%global execstack 1
+%endif
+%else
+%global execstack 1
+%endif
+# Build 64-bit interface binaries?
+%if 0%{?__isa_bits} == 64
+%global build64 1
+%bcond_without cpp_thread_check
+%else
+%global build64 0
+%bcond_with cpp_thread_check
+%endif
+%global base_description \
+OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD \
+version. The project is supported by the Lab of Parallel Software and \
+Computational Science, ISCAS. http://www.rdcps.ac.cn
+%bcond_with system_lapack
+# LAPACK
+%if %{with system_lapack}
+# Do we have LAPACKE? (Needs at least lapack 3.4.0)
+%global lapacke 1
+BuildRequires:  lapack-static
+%else
+# Use bundled LAPACK
+%global lapacke 1
+Provides:       bundled(lapack) = %{lapackver}
+%endif
+Summary:        An optimized BLAS library based on GotoBLAS2
 # DO NOT "CLEAN UP" OR MODIFY THIS SPEC FILE WITHOUT ASKING THE
 # MAINTAINER FIRST!
 #
@@ -12,11 +44,9 @@
 #
 # The same spec is also used on the EPEL branches, meaninng that some
 # "obsoleted" features are still kept in the spec.
-
 Name:           openblas
 Version:        0.3.21
 Release:        2%{?dist}
-Summary:        An optimized BLAS library based on GotoBLAS2
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,74 +59,32 @@ Patch1:         openblas-0.2.5-libname.patch
 # Don't use constructor priorities on too old architectures
 Patch2:         openblas-0.2.15-constructor.patch
 # Fix SBGEMM test to work with INTERFACE64
-# patch imported from Fedora 
+# patch imported from Fedora
 Patch3:         openblas-0.3.21-sbgemm-test.patch
 # Supply the proper flags to the test makefile
-# patch imported from Fedora 
+# patch imported from Fedora
 Patch4:         openblas-0.3.11-tests.patch
 # keep this patch to build from a containerized environment
 Patch5:         No-Fortran-Build.patch
-
-BuildRequires: make
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
-BuildRequires:  perl-devel
+BuildRequires:  make
 BuildRequires:  multilib-rpm-config
-
+BuildRequires:  perl-devel
 # Rblas library is no longer necessary
 Obsoletes:      %{name}-Rblas < %{version}-%{release}
-
-# Do we have execstack?
-%if 0%{?rhel} == 7
-%ifarch ppc64le aarch64
-%global execstack 0
-%else
-%global execstack 1
-%endif
-%else
-%global execstack 1
-%endif
-%if %{execstack}
-BuildRequires:  /usr/bin/execstack
-%endif
-
-# LAPACK
-%if %{with system_lapack}
-BuildRequires:  lapack-static
-# Do we have LAPACKE? (Needs at least lapack 3.4.0)
-%global lapacke 1
-
-%else
-# Use bundled LAPACK
-%global lapacke 1
-Provides:       bundled(lapack) = %{lapackver}
-%endif
-
-# Build 64-bit interface binaries?
-%if 0%{?__isa_bits} == 64
-%global build64 1
-%bcond_without cpp_thread_check
-%else
-%global build64 0
-%bcond_with cpp_thread_check
-%endif
-
-%if %{with system_lapack}
-%if %build64
-BuildRequires:  lapack64-static
-%endif
-%endif
-
 # Upstream supports the package only on these architectures.
 # Runtime processor detection is not available on other archs.
 ExclusiveArch:  %{openblas_arches}
-
-%global base_description \
-OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD \
-version. The project is supported by the Lab of Parallel Software and \
-Computational Science, ISCAS. http://www.rdcps.ac.cn
-
+%if %{execstack}
+BuildRequires:  %{_bindir}/execstack
+%endif
+%if %{with system_lapack}
+%if %{build64}
+BuildRequires:  lapack64-static
+%endif
+%endif
 
 %description
 %{base_description}
@@ -131,7 +119,7 @@ Requires:       %{name} = %{version}-%{release}
 This package contains the library compiled with threading support and
 a 32-bit integer interface.
 
-%if %build64
+%if %{build64}
 %package serial64
 Summary:        An optimized BLAS library based on GotoBLAS2, serial version
 Requires:       %{name} = %{version}-%{release}
@@ -197,18 +185,18 @@ This package contains the library compiled with threading support and
 %package devel
 Summary:        Development headers and libraries for OpenBLAS
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-serial%{?_isa} = %{version}-%{release}
 Requires:       %{name}-openmp%{?_isa} = %{version}-%{release}
-Requires:       %{name}-threads%{?_isa} = %{version}-%{release}
-%if %build64
-Requires:       %{name}-openmp64%{?_isa} = %{version}-%{release}
-Requires:       %{name}-threads64%{?_isa} = %{version}-%{release}
-Requires:       %{name}-serial64%{?_isa} = %{version}-%{release}
-Requires:       %{name}-openmp64_%{?_isa} = %{version}-%{release}
-Requires:       %{name}-threads64_%{?_isa} = %{version}-%{release}
-Requires:       %{name}-serial64_%{?_isa} = %{version}-%{release}
-%endif
+Requires:       %{name}-serial%{?_isa} = %{version}-%{release}
 Requires:       %{name}-srpm-macros
+Requires:       %{name}-threads%{?_isa} = %{version}-%{release}
+%if %{build64}
+Requires:       %{name}-openmp64%{?_isa} = %{version}-%{release}
+Requires:       %{name}-openmp64_%{?_isa} = %{version}-%{release}
+Requires:       %{name}-serial64%{?_isa} = %{version}-%{release}
+Requires:       %{name}-serial64_%{?_isa} = %{version}-%{release}
+Requires:       %{name}-threads64%{?_isa} = %{version}-%{release}
+Requires:       %{name}-threads64_%{?_isa} = %{version}-%{release}
+%endif
 
 %description devel
 %{base_description}
@@ -223,7 +211,6 @@ Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 %{base_description}
 
 This package contains the static libraries.
-
 
 %prep
 %setup -q -c -T
@@ -254,7 +241,7 @@ rm -rf lapack-netlib
 cd ..
 cp -ar OpenBLAS-%{version} openmp
 cp -ar OpenBLAS-%{version} threaded
-%if %build64
+%if %{build64}
 for d in {serial,threaded,openmp}64{,_}; do
     cp -ar OpenBLAS-%{version} $d
 done
@@ -299,7 +286,7 @@ rm -rf netliblapack
 
 
 # Setup 64-bit interface LAPACK
-%if %build64
+%if %{build64}
 mkdir netliblapack64
 cd netliblapack64
 ar x %{_libdir}/liblapack64_pic.a
@@ -401,7 +388,7 @@ COMMON="%{optflags} -fPIC -fopenmp -pthread"
 FCOMMON="$COMMON -frecursive"
 make -C openmp     $TARGET USE_THREAD=1 USE_OPENMP=1 FC=gfortran CC=gcc COMMON_OPT="$COMMON" FCOMMON_OPT="$FCOMMON" $NMAX LIBPREFIX="libopenblaso"     $AVX $LAPACKE INTERFACE64=0 %{with cpp_thread_check:CPP_THREAD_SAFETY_TEST=1}
 
-%if %build64
+%if %{build64}
 COMMON="%{optflags} -fPIC"
 FCOMMON="$COMMON -frecursive -fdefault-integer-8"
 make -C serial64   $TARGET USE_THREAD=0 USE_LOCKING=1 USE_OPENMP=0 FC=gfortran CC=gcc COMMON_OPT="$COMMON" FCOMMON_OPT="$FCOMMON" $NMAX LIBPREFIX="libopenblas64"    $AVX $LAPACKE INTERFACE64=1
@@ -422,9 +409,8 @@ make -C openmp64_   $TARGET USE_THREAD=1 USE_OPENMP=1 FC=gfortran CC=gcc COMMON_
 %endif
 
 %install
-rm -rf %{buildroot}
 # Install serial library and headers
-make -C serial USE_THREAD=0 PREFIX=%{buildroot} OPENBLAS_LIBRARY_DIR=%{buildroot}%{_libdir} OPENBLAS_INCLUDE_DIR=%{buildroot}%{_includedir}/%name OPENBLAS_BINARY_DIR=%{buildroot}%{_bindir} OPENBLAS_CMAKE_DIR=%{buildroot}%{_libdir}/cmake install
+make -C serial USE_THREAD=0 PREFIX=%{buildroot} OPENBLAS_LIBRARY_DIR=%{buildroot}%{_libdir} OPENBLAS_INCLUDE_DIR=%{buildroot}%{_includedir}/%{name} OPENBLAS_BINARY_DIR=%{buildroot}%{_bindir} OPENBLAS_CMAKE_DIR=%{buildroot}%{_libdir}/cmake install
 
 # Copy lapacke include files
 %if %{with system_lapack} && %{lapacke}
@@ -432,7 +418,7 @@ cp -a %{_includedir}/lapacke %{buildroot}%{_includedir}/%{name}
 %endif
 
 # Fix i686-x86_64 multilib difference
-%multilib_fix_c_header --file %{_includedir}/openblas/openblas_config.h
+%{multilib_fix_c_header} --file %{_includedir}/openblas/openblas_config.h
 
 # Fix name of libraries: runtime CPU detection has none
 suffix=""
@@ -470,7 +456,7 @@ fi
 install -D -p -m 755 threaded/${plibname}.so %{buildroot}%{_libdir}/${pname}.so
 
 # Install the 64-bit interface libraries
-%if %build64
+%if %{build64}
 slibname64=`echo ${slibname} | sed "s|lib%{name}|lib%{name}64|g"`
 install -D -p -m 644 serial64/${slibname64}.a %{buildroot}%{_libdir}/lib%{name}64.a
 slibname64_=`echo ${slibname} | sed "s|lib%{name}|lib%{name}64_|g"`
@@ -529,7 +515,7 @@ ln -sf ${oname}.so lib%{name}o.so.0
 ln -sf ${pname}.so lib%{name}p.so
 ln -sf ${pname}.so lib%{name}p.so.0
 
-%if %build64
+%if %{build64}
 # Serial libraries
 ln -sf ${sname64}.so lib%{name}64.so
 ln -sf ${sname64}.so lib%{name}64.so.0
@@ -565,7 +551,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 %ldconfig_scriptlets threads
 
-%if %build64
+%if %{build64}
 %ldconfig_scriptlets openmp64
 %ldconfig_scriptlets openmp64_
 
@@ -578,7 +564,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 %files
 %license serial/LICENSE
-%doc serial/Changelog.txt serial/GotoBLAS* 
+%doc serial/Changelog.txt serial/GotoBLAS*
 
 %files serial
 %{_libdir}/lib%{name}-*.so
@@ -592,7 +578,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p-*.so
 %{_libdir}/lib%{name}p.so.*
 
-%if %build64
+%if %{build64}
 %files serial64
 %{_libdir}/lib%{name}64-*.so
 %{_libdir}/lib%{name}64.so.*
@@ -623,7 +609,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}.so
 %{_libdir}/lib%{name}o.so
 %{_libdir}/lib%{name}p.so
-%if %build64
+%if %{build64}
 %{_libdir}/lib%{name}64.so
 %{_libdir}/lib%{name}o64.so
 %{_libdir}/lib%{name}p64.so
@@ -636,7 +622,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}.a
 %{_libdir}/lib%{name}o.a
 %{_libdir}/lib%{name}p.a
-%if %build64
+%if %{build64}
 %{_libdir}/lib%{name}64.a
 %{_libdir}/lib%{name}o64.a
 %{_libdir}/lib%{name}p64.a
@@ -648,6 +634,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %changelog
 * Tue Nov 15 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.3.21-2
 - Moved from SPECS-EXTENDED to SPECS
+- Linted spec file
 
 * Mon Aug 29 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.21-1
 - Update to 0.3.21.

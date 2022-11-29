@@ -134,7 +134,7 @@ chrpath --delete %{buildroot}%{python3_sitearch}/%{name}/linalg/_umath_linalg.*.
 
 %check
 export PYTHONPATH=%{buildroot}%{python3_sitearch}
-pip install pytest hypothesis typing-extensions
+pip install pytest==7.2 hypothesis typing-extensions
 # test_ppc64_ibm_double_double128 is unnecessary now that ppc64le has switched long doubles to IEEE format.
 # https://github.com/numpy/numpy/issues/21094
 python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128 %{?ix86_k}'
@@ -187,6 +187,7 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128 %{
 - Created patch to address test issues in numpy PR-22487
 - Replaced %%{with test} with %%{with_check}
 - Using pip install for tests
+- Removed epoch
 
 * Fri Oct 21 2022 Miro Hrončok <mhroncok@redhat.com> - 1:1.23.4-1
 - Update to 1.23.4
