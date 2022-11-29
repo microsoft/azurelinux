@@ -56,7 +56,7 @@ type imagerArguments struct {
 
 type installationDetails struct {
 	installationQuit bool
-	finalConfig configuration.Config
+	finalConfig      configuration.Config
 }
 
 func handleCtrlC(signals chan os.Signal) {
@@ -138,13 +138,13 @@ func installerFactory(forceAttended bool, configFile, templateConfigFile string)
 }
 
 func updateBootOrder(installDetails installationDetails) (err error) {
-	if (installDetails.finalConfig.DefaultSystemConfig.BootType != "efi") {
+	if installDetails.finalConfig.DefaultSystemConfig.BootType != "efi" {
 		logger.Log.Info("No BootType of 'efi' detected. Not attempting to set EFI boot order.")
 		return
 	}
 
 	err = removeOldMarinerBootTargets()
-	if (err != nil) {
+	if err != nil {
 		return
 	}
 
@@ -158,17 +158,17 @@ func updateBootOrder(installDetails installationDetails) (err error) {
 
 func formatBootEntryCreationCommand(installDetails installationDetails) (program string, commandArgs []string) {
 	program = "efibootmgr"
-	
+
 	cfg := installDetails.finalConfig
 	bootPartIdx, bootPart := cfg.GetBootPartition()
 	bootDisk := cfg.GetDiskContainingPartition(bootPart)
 	commandArgs = []string{
-		"-c",                                       // Create a new bootnum and place it in the beginning of the boot order
-		"-d", bootDisk.TargetDisk.Value,            // Specify which disk the boot file is on
-		"-p", fmt.Sprintf("%d", bootPartIdx+1),     // Specify which partition the boot file is on
-		"-l", "'\\EFI\\BOOT\\bootx64.efi'",         // Specify the path for where the boot file is located on the partition
-		"-L", "Mariner",                            // Specify what label you would like to give this boot entry
-		"-v",                                       // Be verbose
+		"-c",                            // Create a new bootnum and place it in the beginning of the boot order
+		"-d", bootDisk.TargetDisk.Value, // Specify which disk the boot file is on
+		"-p", fmt.Sprintf("%d", bootPartIdx+1), // Specify which partition the boot file is on
+		"-l", "'\\EFI\\BOOT\\bootx64.efi'", // Specify the path for where the boot file is located on the partition
+		"-L", "Mariner", // Specify what label you would like to give this boot entry
+		"-v", // Be verbose
 	}
 	return
 }
@@ -176,12 +176,12 @@ func formatBootEntryCreationCommand(installDetails installationDetails) (program
 func removeOldMarinerBootTargets() (err error) {
 	logger.Log.Info("Removing pre-existing 'Mariner' boot targets from efibootmgr")
 	const squashErrors = false
-	program := "efibootmgr"                                            // Default behavior when piped or called without options is to print current boot order in a human-readable format
+	program := "efibootmgr" // Default behavior when piped or called without options is to print current boot order in a human-readable format
 	commandArgs := []string{
-		"|", "grep", "\"Mariner\"",                                    // Filter boot order for Mariner boot targets
-		"|", "sed", "'s/* Mariner//g'",                                // Pruning for just the bootnum 
-		"|", "sed", "'s/Boot*//g'",                                    // Pruning for just the bootnum
-		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B",      // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with a Mariner label
+		"|", "grep", "\"Mariner\"", // Filter boot order for Mariner boot targets
+		"|", "sed", "'s/* Mariner//g'", // Pruning for just the bootnum
+		"|", "sed", "'s/Boot*//g'", // Pruning for just the bootnum
+		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B", // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with a Mariner label
 	}
 	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return

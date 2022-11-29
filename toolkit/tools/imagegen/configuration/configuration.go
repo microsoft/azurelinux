@@ -99,7 +99,7 @@ func (c *Config) GetBootPartition() (partitionIndex int, partition *Partition) {
 	for i, d := range c.Disks {
 		for j, p := range d.Partitions {
 			if p.HasFlag(PartitionFlagBoot) {
-				return j, &c.Disks[i].Partitions[j] 
+				return j, &c.Disks[i].Partitions[j]
 			}
 		}
 	}
