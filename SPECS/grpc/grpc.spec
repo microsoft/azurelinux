@@ -59,7 +59,7 @@ The grpc-plugins package contains the grpc plugins.
 Summary:        Python language bindings for gRPC
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3-six
-ExclusiveArch: x86_64
+BuildArch:      x86_64
 %{?python_provide:%python_provide python3-grpcio}
 
 %description -n python3-grpcio
@@ -89,18 +89,18 @@ pushd cmake/build
    -DgRPC_RE2_PROVIDER:STRING='package'      \
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
-
 %cmake_build 
 popd
 #python
-export GRPC_PYTHON_BUILD_WITH_CYTHON=True
-export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
-export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
-export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
-export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
-export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-%py3_build
-
+%ifarch aarch64
+   export GRPC_PYTHON_BUILD_WITH_CYTHON=True
+   export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
+   export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
+   export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
+   export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
+   export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
+   %py3_build
+%endif
 
 %install
 pushd cmake/build
@@ -108,8 +108,9 @@ pushd cmake/build
 find %{buildroot} -name '*.cmake' -delete
 popd
 #python
-%py3_install
-
+%ifarch aarch64
+   %py3_install
+%endif
 
 %files
 %license LICENSE
