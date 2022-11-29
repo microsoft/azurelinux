@@ -306,7 +306,7 @@
         "other": {
           "name": "apache-commons-digester",
           "version": "2.1",
-          "downloadUrl": "https://dlcdn.apache.org/commons/digester/digester/commons-digester-2.1-src.tar.gz"
+          "downloadUrl": "https://dlcdn.apache.org/commons/digester/source/commons-digester-2.1-src.tar.gz"
         }
       }
     },
