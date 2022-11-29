@@ -90,7 +90,7 @@ pushd cmake/build
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 
-%make_build 
+%cmake_build 
 popd
 #python
 export GRPC_PYTHON_BUILD_WITH_CYTHON=True
@@ -104,7 +104,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 %install
 pushd cmake/build
-%make_install
+%cmake_install
 find %{buildroot} -name '*.cmake' -delete
 popd
 #python
