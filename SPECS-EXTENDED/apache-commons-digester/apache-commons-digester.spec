@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-digester
-Source0:        https://dlcdn.apache.org//commons/digester/%{base_name}/%{short_name}-%{version}-src.tar.gz
+Source0:        https://dlcdn.apache.org/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source1:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  commons-beanutils
