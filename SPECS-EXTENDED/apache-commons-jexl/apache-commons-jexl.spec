@@ -141,7 +141,7 @@ cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jex
 * Mon Nov 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.1-3
 - Fix build errors
   * create 'Packages' directory under JDK_HOME
-  * disable test source flag to call sun javac compiler
+  * disable tests sources flag for invoking sun javac compiler
 - Enable check section
 - License verified
 
