@@ -1,5 +1,12 @@
+Summary:        A collection of sparse matrix libraries
+Name:           suitesparse
+Version:        5.4.0
+Release:        5%{?dist}
+License:        (LGPLv2+ OR BSD) AND LGPLv2+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
+Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
 %global amd_version_major 2
 %global btf_version_major 1
 %global camd_version_major 2
@@ -14,37 +21,18 @@ Distribution:   Mariner
 %global spqr_version_major 2
 %global SuiteSparse_config_major 5
 %global umfpack_version_major 5
-
 ### CXSparse is a superset of CSparse, and the two share common header
 ### names, so it does not make sense to build both. CXSparse is built
 ### by default, but CSparse can be built instead by defining
 ### enable_csparse as 1 below.
 %global enable_csparse 0
-
 # Whether to build a separate version of libraries linked against an ILP64 BLAS
-%if 0%{?__isa_bits} == 64
-%global build64 1
-%endif
- 
-Name:           suitesparse
-Version:        5.4.0
-Release:        5%{?dist}
-Summary:        A collection of sparse matrix libraries
-
-License:        (LGPLv2+ or BSD) and LGPLv2+ and GPLv2+
-URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
-Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
-
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-
+BuildRequires:  hardlink
 BuildRequires:  metis-devel
 BuildRequires:  openblas-devel
 BuildRequires:  tbb-devel
-BuildRequires:  hardlink
-
-Obsoletes:      umfpack <= 5.0.1
-Obsoletes:      ufsparse <= 2.1.1
 Provides:       ufsparse = %{version}-%{release}
 
 %description
@@ -66,18 +54,14 @@ matrices.  The package includes the following libraries:
   SuiteSparse_config  configuration file for all the above packages.
   RBio                read/write files in Rutherford/Boeing format
 
-
 %package devel
 Summary:        Development headers for SuiteSparse
 Requires:       %{name} = %{version}-%{release}
-Obsoletes:      umfpack-devel <= 5.0.1
-Obsoletes:      ufsparse-devel <= 2.1.1
 Provides:       ufsparse-devel = %{version}-%{release}
 
 %description devel
 The suitesparse-devel package contains files needed for developing
 applications which use the suitesparse libraries.
-
 
 %package static
 Summary:        Static version of SuiteSparse libraries
@@ -88,14 +72,11 @@ Provides:       ufsparse-static = %{version}-%{release}
 The suitesparse-static package contains the statically linkable
 version of the suitesparse libraries.
 
-
-%if 0%{?build64}
 %package -n %{name}64
 Summary:        A collection of sparse matrix libraries (ILP64 version)
 
 %description -n %{name}64
 The suitesparse collection compiled against an ILP64 BLAS library.
-
 
 %package -n %{name}64-devel
 Summary:        Development headers for SuiteSparse (ILP64 version)
@@ -106,7 +87,6 @@ Requires:       %{name}64 = %{version}-%{release}
 The suitesparse64-devel package contains files needed for developing
 applications which use the suitesparse libraries (ILP64 version).
 
-
 %package -n %{name}64-static
 Summary:        Static version of SuiteSparse libraries (ILP64 version)
 Requires:       %{name}-devel = %{version}-%{release}
@@ -115,13 +95,11 @@ Requires:       %{name}-devel = %{version}-%{release}
 The suitesparse64-static package contains the statically linkable
 version of the suitesparse libraries (ILP64 version).
 
-
 %package -n %{name}64_
 Summary:        A collection of sparse matrix libraries (ILP64 version)
 
 %description -n %{name}64_
 The suitesparse collection compiled against an ILP64 BLAS library.
-
 
 %package -n %{name}64_-devel
 Summary:        Development headers for SuiteSparse (ILP64 version)
@@ -134,7 +112,6 @@ applications which use the suitesparse libraries (ILP64 version) compiled
 against a BLAS library with the "64_" symbol name suffix (see openblas-*64_
 packages).
 
-
 %package -n %{name}64_-static
 Summary:        Static version of SuiteSparse libraries (ILP64 version)
 Requires:       %{name}-devel = %{version}-%{release}
@@ -143,20 +120,17 @@ Requires:       %{name}-devel = %{version}-%{release}
 The suitesparse64_-static package contains the statically linkable
 version of the suitesparse libraries (ILP64 version) compiled against a
 BLAS library with the "64_" symbol name suffix (see openblas-*64_ packages).
-%endif
-
 
 %package doc
 Summary:        Documentation files for SuiteSparse
-BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
+BuildArch:      noarch
 
 %description doc
 This package contains documentation files for %{name}.
 
-
 %prep
-%setup -c -q
+%setup -q -c
 pushd SuiteSparse
   # Remove bundled metis
   rm -r metis*
@@ -179,23 +153,21 @@ pushd SuiteSparse
   sed -i -e 's/-l\(amd\|btf\|camd\|ccolamd\|cholmod\|colamd\|csparse\|cxsparse\|klu\|ldl\|rbio\|spqr\|suitesparseconfig\|umfpack\)/-l\1$(LIBRARY_SUFFIX)/g' \
     $(find -name Makefile\* -o -name \*.mk)
 popd
-%if 0%{?build64}
 cp -a SuiteSparse SuiteSparse64
 cp -a SuiteSparse SuiteSparse64_
-%endif
 
 %build
 export AUTOCC=no
 export CC=gcc
 
-for build in SuiteSparse %{?build64:SuiteSparse64 SuiteSparse64_}
+for build in SuiteSparse SuiteSparse64 SuiteSparse64_
 do
   pushd $build
 
   # TODO - Try to use upstream makefile - will build more components
   mkdir -p Doc/{AMD,BTF,CAMD,CCOLAMD,CHOLMOD,COLAMD,KLU,LDL,UMFPACK,SPQR,RBio} Include
 
-  export CFLAGS="$RPM_OPT_FLAGS -I%{_includedir}/metis"
+  export CFLAGS="%{optflags} -I%{_includedir}/metis"
   export LAPACK=""
   # Set flags for ILP64 build
   if [ $build = SuiteSparse64 ]
@@ -210,8 +182,8 @@ do
      export LIBRARY_SUFFIX=64_
   else
      export BLAS=-lopenblas
-  fi   
-   
+  fi
+
   # SuiteSparse_config needs to come first
   pushd SuiteSparse_config
     %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
@@ -337,14 +309,14 @@ do
 done
 
 %install
-mkdir -p ${RPM_BUILD_ROOT}%{_libdir}
-mkdir -p ${RPM_BUILD_ROOT}%{_includedir}/%{name}
-cp -a SuiteSparse/Include/*.{h,hpp} ${RPM_BUILD_ROOT}%{_includedir}/%{name}/
-for build in SuiteSparse %{?build64:SuiteSparse64 SuiteSparse64_}
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}/%{name}
+cp -a SuiteSparse/Include/*.{h,hpp} %{buildroot}%{_includedir}/%{name}/
+for build in SuiteSparse SuiteSparse64 SuiteSparse64_
 do
   pushd $build
-    cp -a */Lib/*.a lib/*.so* ${RPM_BUILD_ROOT}%{_libdir}/
-    chmod 755 ${RPM_BUILD_ROOT}%{_libdir}/*.so.*
+    cp -a */Lib/*.a lib/*.so* %{buildroot}%{_libdir}/
+    chmod 755 %{buildroot}%{_libdir}/*.so.*
 
     # collect licenses in one place to ship as base package documentation
     rm -rf Licenses
@@ -372,10 +344,10 @@ TESTDIRS="$TESTDIRS CSparse"
 %else
 TESTDIRS="$TESTDIRS CXSparse"
 %endif
-for build in SuiteSparse %{?build64:SuiteSparse64 SuiteSparse64_}
+for build in SuiteSparse SuiteSparse64 SuiteSparse64_
 do
   pushd $build
-    export CFLAGS="$RPM_OPT_FLAGS -I%{_includedir}/metis"
+    export CFLAGS="%{optflags} -I%{_includedir}/metis"
     export LAPACK=""
     # Set flags for ILP64 build
     if [ $build = SuiteSparse64 ]
@@ -390,7 +362,7 @@ do
        export LIBRARY_SUFFIX=64_
     else
        export BLAS=-lopenblas
-    fi   
+    fi
 
     for d in $TESTDIRS ; do
         %make_build -C $d/Demo CFLAGS="$CFLAGS" LIB="%{?__global_ldflags} -lm -lrt" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX" SPQR_CONFIG=-DHAVE_TBB TBB=-ltbb
@@ -426,7 +398,6 @@ done
 %{_libdir}/lib*.a
 %exclude %{_libdir}/lib*64*.a
 
-%if 0%{?build64}
 %files -n %{name}64
 %license SuiteSparse64/Licenses
 %{_libdir}/libamd64.so.%{amd_version_major}*
@@ -476,7 +447,6 @@ done
 
 %files -n %{name}64_-static
 %{_libdir}/lib*64_.a
-%endif
 
 %files doc
 %doc SuiteSparse/Doc/*
@@ -484,6 +454,7 @@ done
 %changelog
 * Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 5.4.0-5
 - License verified
+- Lint spec
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
