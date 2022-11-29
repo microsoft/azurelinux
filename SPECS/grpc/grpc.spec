@@ -26,6 +26,7 @@ Requires:       protobuf
 Requires:       zlib
 
 # Python
+%ifarch x86_64
 BuildRequires:      build-essential
 BuildRequires:      python3-devel
 BuildRequires:      python3-Cython
@@ -33,6 +34,7 @@ BuildRequires:      python3-six
 BuildRequires:      python3-wheel
 BuildRequires:      python3-setuptools
 BuildRequires:      python3-protobuf
+%endif
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -142,12 +144,11 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
-%ifarch x86_64
-   %files -n python3-grpcio
-   %license LICENSE
-   %{python3_sitearch}/grpc
-   %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
-%endif
+
+%files -n python3-grpcio
+%license LICENSE
+%{python3_sitearch}/grpc
+%{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
 * Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
