@@ -336,6 +336,7 @@ done
 
 
 %check
+check_status=0
 export AUTOCC=no
 export CC=gcc
 TESTDIRS="AMD CAMD CCOLAMD CHOLMOD COLAMD KLU LDL SPQR RBio UMFPACK"
@@ -366,9 +367,13 @@ do
 
     for d in $TESTDIRS ; do
         %make_build -C $d/Demo CFLAGS="$CFLAGS" LIB="%{?__global_ldflags} -lm -lrt" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX" SPQR_CONFIG=-DHAVE_TBB TBB=-ltbb
+	if [[ $? -ne 0 ]]; then
+	check_status=1
+	fi
     done
   popd
 done
+[[ $check_status -eq 0 ]]
 
 %files
 %license SuiteSparse/Licenses
