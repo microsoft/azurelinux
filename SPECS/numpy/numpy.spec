@@ -118,9 +118,7 @@ env OPENBLAS=%{_libdir} \
     FFTW=%{_libdir} BLAS=%{_libdir} \
     LAPACK=%{_libdir} CFLAGS="%{optflags}" \
     %{__python3} setup.py install --root %{buildroot} --prefix=%{_prefix}
-pushd %{buildroot}%{_bindir} &> /dev/null
-ln -s f2py3 f2py.numpy
-popd &> /dev/null
+ln -s f2py3 %{buildroot}%{_bindir}/f2py.numpy
 
 #symlink for includes, BZ 185079
 mkdir -p %{buildroot}%{_includedir}
