@@ -64,6 +64,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "adcli",
+          "version": "0.9.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/realmd/adcli/uploads/ea560656ac921b3fe0d455976aaae9be/adcli-0.9.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "adobe-mappings-cmap",
           "version": "20171205",
           "downloadUrl": "https://github.com/adobe-type-tools/cmap-resources/archive/20171205.tar.gz"
@@ -5920,8 +5930,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -7431,8 +7441,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -7441,8 +7451,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -7451,8 +7461,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -11020,6 +11030,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.80.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lksctp-tools",
           "version": "1.0.18",
           "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
@@ -14126,6 +14146,16 @@
           "name": "opusfile",
           "version": "0.12",
           "downloadUrl": "https://downloads.xiph.org/releases/opus/opusfile-0.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ORBit2",
+          "version": "2.14.19",
+          "downloadUrl": "https://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.gz"
         }
       }
     },
