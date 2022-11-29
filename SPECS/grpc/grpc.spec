@@ -59,6 +59,7 @@ The grpc-plugins package contains the grpc plugins.
 Summary:        Python language bindings for gRPC
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3-six
+ExclusiveArch: x86_64
 %{?python_provide:%python_provide python3-grpcio}
 
 %description -n python3-grpcio
