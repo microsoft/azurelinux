@@ -57,18 +57,15 @@ Requires:       protobuf
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
-%ifarch x86_64
-   %package -n python3-grpcio
-   Summary:        Python language bindings for gRPC
-   Requires:       %{name} = %{version}-%{release}
-   Requires:       python3-six
-   %{?python_provide:%python_provide python3-grpcio}
-%endif
+%package -n python3-grpcio
+Summary:        Python language bindings for gRPC
+Requires:       %{name} = %{version}-%{release}
+Requires:       python3-six
+%{?python_provide:%python_provide python3-grpcio}
 
-%ifarch x86_64
-   %description -n python3-grpcio
-   Python language bindings for gRPC.
-%endif
+%description -n python3-grpcio
+Python language bindings for gRPC.
+
 
 %prep
 %setup -q -n %{name}-%{version}
