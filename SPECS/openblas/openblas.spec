@@ -1,15 +1,7 @@
 # Version of bundled lapack
 %global lapackver 3.9.1
 # Do we have execstack?
-%if 0%{?rhel} == 7
-%ifarch ppc64le aarch64
-%global execstack 0
-%else
 %global execstack 1
-%endif
-%else
-%global execstack 1
-%endif
 # Build 64-bit interface binaries?
 %if 0%{?__isa_bits} == 64
 %global build64 1
@@ -222,9 +214,6 @@ cd OpenBLAS-%{version}
 %patch0 -p1 -b .system_lapack
 %endif
 %patch1 -p1 -b .libname
-%if 0%{?rhel} == 5
-%patch2 -p1 -b .constructor
-%endif
 %patch3 -p1 -b .sbgem
 %patch4 -p1 -b .tests
 %patch5 -p1
@@ -337,14 +326,6 @@ NMAX="NUM_THREADS=128"
 %ifarch %{ix86} x86_64
 TARGET="TARGET=CORE2 DYNAMIC_ARCH=1 DYNAMIC_OLDER=1"
 
-# Compability for old versions of GCC
-%if 0%{?rhel} == 5
-export AVX="NO_AVX=1 NO_AVX2=1"
-%endif
-%if 0%{?rhel} == 6
-export AVX="NO_AVX2=1"
-%endif
-
 %endif
 %ifarch armv7hl
 # ARM v7 still doesn't have runtime cpu detection...
@@ -366,14 +347,8 @@ TARGET="TARGET=ARMV8 DYNAMIC_ARCH=1 DYNAMIC_OLDER=1"
 TARGET="TARGET=ZARCH_GENERIC DYNAMIC_ARCH=1 DYNAMIC_OLDER=1"
 %endif
 
-%if 0%{?rhel} == 5
-# Gfortran too old to recognize -frecursive
-COMMON="%{optflags} -fPIC"
-FCOMMON="%{optflags} -fPIC"
-%else
 COMMON="%{optflags} -fPIC"
 FCOMMON="%{optflags} -fPIC -frecursive"
-%endif
 # Use Fedora linker flags
 export LDFLAGS="%{__global_ldflags}"
 
