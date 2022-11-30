@@ -11250,6 +11250,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ltp",
+          "version": "20220930",
+          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20220930.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ltrace",
           "version": "0.7.3",
           "downloadUrl": "http://www.ltrace.org/ltrace_0.7.3.orig.tar.bz2"
