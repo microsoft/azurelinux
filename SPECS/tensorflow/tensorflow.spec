@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{Version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
+ExclusiveArch:  x86_64
 BuildRequires:  build-essential
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
@@ -23,15 +24,44 @@ BuildRequires:  tar
 BuildRequires:  git
 BuildRequires:  python3-pip
 BuildRequires:  libstdc++-devel
+Requires:       python3-absl-py
+Requires:       python3-astunparse
+Requires:       python3-flatbuffers
+Requires:       python3-gast
+Requires:       python3-libclang
+Requires:       python3-h5py
+Requires:       python3-numpy = 1.22.3
+Requires:       python3-opt-einsum
+Requires:       python3-protobuf 
+Requires:       python3-six
+Requires:       python3-termcolor
+Requires:       python3-typing-extensions
+Requires:       python3-wrapt
+Requires:       python3-grpcio
+Requires:       python3-MarkupSafe
+Requires:       python3-cachetools
+Requires:       python3-google-auth
+Requires:       python3-google-auth-oauthlib
+Requires:       python3-importlib-metadata
+Requires:       python3-markdown
+Requires:       python3-oauthlib
+Requires:       python3-pyasn1-modules
+Requires:       python3-requests-oauthlib
+Requires:       python3-rsa
+Requires:       python3-werkzeug
+Requires:       python3-zipp
+Requires:       python3-pyasn1
+Requires:       python3-charset_normalizer
+Requires:       python3-idna
 
 %description
 TensorFlow is an open source machine learning framework for everyone.
 
-%package -n     python3-tensorflow-cpu
-Summary:        python-tensorflow-cpu
-Requires:       python3
+%package -n     python3-tensorflow
+Summary:        python-tensorflow
+Requires:       python3   
 
-%description -n python3-tensorflow-cpu
+%description -n python3-tensorflow
 Python 3 version.
 
 %prep
@@ -48,9 +78,6 @@ ln -s /usr/bin/python3 /usr/bin/python
 # mv /root/cacheroot.tar.gz /usr/
 # sleep 180
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
-
-
-# sleep 43200
 # ---------
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package pyproject-wheeldir/
 # --------
@@ -67,7 +94,7 @@ mkdir -pv test
 cd test
 #PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %python3 -c "import numpy; numpy.test()"
 
-%files -n python3-tensorflow-cpu
+%files -n python3-tensorflow
 %license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/estimator_ckpt_converter

@@ -3,7 +3,7 @@
 
 Name:           python-%{pkgname}
 Version:        3.2.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Markdown implementation in Python
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -21,7 +21,7 @@ there are a few very minor differences.
 %package -n python%{python3_pkgversion}-%{pkgname}
 Summary:        Markdown implementation in Python
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-PyYAML
+BuildRequires:  PyYAML
 BuildRequires:  python%{python3_pkgversion}-tidy
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-zipp
@@ -67,6 +67,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 
 %changelog
+* Wed Nov 30 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.2-4
+- Move to Core.
+- License verified.
+
 * Mon Dec 14 2020 Ruying <v-ruyche@microsoft.com> - 3.2.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Make python3-importlib-metadata requirements default.
