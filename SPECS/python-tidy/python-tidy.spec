@@ -1,7 +1,7 @@
 %global         oname uTidylib
-
-
-
+%global         _description\
+Python wrapper (bindings) for tidylib, this allows you to tidy HTML\
+files through a Pythonic interface.
 Summary:        Python wrapper for tidy, from the HTML tidy project
 Name:           python-tidy
 Version:        0.6
@@ -15,33 +15,28 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildArch:      noarch
-%global         _description\
-Python wrapper (bindings) for tidylib, this allows you to tidy HTML\
-files through a Pythonic interface.
 
-%description    %_description
+%description    %{_description}
 
 %package     -n python3-tidy
-Summary:        %summary
 %{?python_provide:%python_provide python3-tidy}
+Summary:        %{summary}
 Requires:       libtidy
 Requires:       python3-six
-%description -n python3-tidy %_description
+
+%description -n python3-tidy %{_description}
 
 %prep
 %setup -q -n %{oname}-%{version}
 
 %build
-%{py3_build}
+%py3_build
 
 %install
-%{py3_install}
+%py3_install
 
 %check
-# fail after tidy 5.6
-%{?py2:%{__python2} setup.py test || :}
-# todo: fails
-%{__python3} setup.py test || :
+python3 setup.py test || :
 
 
 %files -n python3-tidy
@@ -163,4 +158,3 @@ Requires:       python3-six
 
 * Sat Feb 16 2008 Terje Rosten <terjeros@phys.ntnu.no> - 0.2-1
 - Initial build.
-
