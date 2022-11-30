@@ -269,7 +269,7 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Wed Nov 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-11
+* Wed Nov 29 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-11
 - Conditionally run systemctl preset-all only when first installing systemd, not on upgrades
 
 * Thu Nov 17 2022 Sam Meluch <sammeluch@microsoft.com> - 250.3-10
