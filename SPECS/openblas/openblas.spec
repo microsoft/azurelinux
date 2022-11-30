@@ -2,29 +2,12 @@
 %global lapackver 3.9.1
 # Do we have execstack?
 %global execstack 1
-# Build 64-bit interface binaries?
-%if 0%{?__isa_bits} == 64
-%global build64 1
 %bcond_without cpp_thread_check
-%else
-%global build64 0
-%bcond_with cpp_thread_check
-%endif
 %global base_description \
 OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD \
 version. The project is supported by the Lab of Parallel Software and \
 Computational Science, ISCAS. http://www.rdcps.ac.cn
 %bcond_with system_lapack
-# LAPACK
-%if %{with system_lapack}
-# Do we have LAPACKE? (Needs at least lapack 3.4.0)
-%global lapacke 1
-BuildRequires:  lapack-static
-%else
-# Use bundled LAPACK
-%global lapacke 1
-Provides:       bundled(lapack) = %{lapackver}
-%endif
 Summary:        An optimized BLAS library based on GotoBLAS2
 # DO NOT "CLEAN UP" OR MODIFY THIS SPEC FILE WITHOUT ASKING THE
 # MAINTAINER FIRST!
@@ -64,6 +47,13 @@ BuildRequires:  gcc-gfortran
 BuildRequires:  make
 BuildRequires:  multilib-rpm-config
 BuildRequires:  perl-devel
+%if %{with system_lapack}
+# Do we have LAPACKE? (Needs at least lapack 3.4.0)
+BuildRequires:  lapack-static
+%else
+# Use bundled LAPACK
+Provides:       bundled(lapack) = %{lapackver}
+%endif
 # Rblas library is no longer necessary
 Obsoletes:      %{name}-Rblas < %{version}-%{release}
 # Upstream supports the package only on these architectures.
@@ -73,9 +63,7 @@ ExclusiveArch:  %{openblas_arches}
 BuildRequires:  %{_bindir}/execstack
 %endif
 %if %{with system_lapack}
-%if %{build64}
 BuildRequires:  lapack64-static
-%endif
 %endif
 
 %description
@@ -111,7 +99,6 @@ Requires:       %{name} = %{version}-%{release}
 This package contains the library compiled with threading support and
 a 32-bit integer interface.
 
-%if %{build64}
 %package serial64
 Summary:        An optimized BLAS library based on GotoBLAS2, serial version
 Requires:       %{name} = %{version}-%{release}
@@ -171,8 +158,6 @@ Requires:       %{name} = %{version}-%{release}
 
 This package contains the library compiled with threading support and
 64-bit integer interface and a symbol name suffix.
-%endif
-
 
 %package devel
 Summary:        Development headers and libraries for OpenBLAS
@@ -181,14 +166,12 @@ Requires:       %{name}-openmp%{?_isa} = %{version}-%{release}
 Requires:       %{name}-serial%{?_isa} = %{version}-%{release}
 Requires:       %{name}-srpm-macros
 Requires:       %{name}-threads%{?_isa} = %{version}-%{release}
-%if %{build64}
 Requires:       %{name}-openmp64%{?_isa} = %{version}-%{release}
 Requires:       %{name}-openmp64_%{?_isa} = %{version}-%{release}
 Requires:       %{name}-serial64%{?_isa} = %{version}-%{release}
 Requires:       %{name}-serial64_%{?_isa} = %{version}-%{release}
 Requires:       %{name}-threads64%{?_isa} = %{version}-%{release}
 Requires:       %{name}-threads64_%{?_isa} = %{version}-%{release}
-%endif
 
 %description devel
 %{base_description}
@@ -230,11 +213,9 @@ rm -rf lapack-netlib
 cd ..
 cp -ar OpenBLAS-%{version} openmp
 cp -ar OpenBLAS-%{version} threaded
-%if %{build64}
 for d in {serial,threaded,openmp}64{,_}; do
     cp -ar OpenBLAS-%{version} $d
 done
-%endif
 mv OpenBLAS-%{version} serial
 
 %if %{with system_lapack}
@@ -248,9 +229,7 @@ for f in laswp getf2 getrf potf2 potrf lauu2 lauum trti2 trtri getrs; do
 done
 
 # LAPACKE
-%if %{lapacke}
 ar x %{_libdir}/liblapacke.a
-%endif
 
 # Create makefile
 echo "TOPDIR = .." > Makefile
@@ -261,10 +240,8 @@ for i in *.o; do
 done
 echo -e "\n\ninclude \$(TOPDIR)/Makefile.tail" >> Makefile
 
-%if %{lapacke}
 # Copy include files
 cp -a %{_includedir}/lapacke .
-%endif
 cd ..
 
 # Copy in place
@@ -275,7 +252,6 @@ rm -rf netliblapack
 
 
 # Setup 64-bit interface LAPACK
-%if %{build64}
 mkdir netliblapack64
 cd netliblapack64
 ar x %{_libdir}/liblapack64_pic.a
@@ -285,9 +261,7 @@ for f in laswp getf2 getrf potf2 potrf lauu2 lauum trti2 trtri getrs; do
 done
 
 # LAPACKE, no 64-bit interface
-%if %{lapacke}
 ar x %{_libdir}/liblapacke.a
-%endif
 
 # Create makefile
 echo "TOPDIR = .." > Makefile
@@ -298,10 +272,8 @@ for i in *.o; do
 done
 echo -e "\n\ninclude \$(TOPDIR)/Makefile.tail" >> Makefile
 
-%if %{lapacke}
 # Copy include files
 cp -a %{_includedir}/lapacke .
-%endif
 cd ..
 
 # Copy in place
@@ -310,15 +282,11 @@ for d in {serial,threaded,openmp}64{,_}; do
 done
 rm -rf netliblapack64
 %endif
-%endif
 
 %build
 # openblas fails to build with LTO due to undefined symbols.  These could
 # well be the result of the assembly code used in this package
 %define _lto_cflags %{nil}
-%if !%{lapacke}
-LAPACKE="NO_LAPACKE=1"
-%endif
 
 # Maximum possible amount of processors
 NMAX="NUM_THREADS=128"
@@ -363,7 +331,6 @@ COMMON="%{optflags} -fPIC -fopenmp -pthread"
 FCOMMON="$COMMON -frecursive"
 make -C openmp     $TARGET USE_THREAD=1 USE_OPENMP=1 FC=gfortran CC=gcc COMMON_OPT="$COMMON" FCOMMON_OPT="$FCOMMON" $NMAX LIBPREFIX="libopenblaso"     $AVX $LAPACKE INTERFACE64=0 %{with cpp_thread_check:CPP_THREAD_SAFETY_TEST=1}
 
-%if %{build64}
 COMMON="%{optflags} -fPIC"
 FCOMMON="$COMMON -frecursive -fdefault-integer-8"
 make -C serial64   $TARGET USE_THREAD=0 USE_LOCKING=1 USE_OPENMP=0 FC=gfortran CC=gcc COMMON_OPT="$COMMON" FCOMMON_OPT="$FCOMMON" $NMAX LIBPREFIX="libopenblas64"    $AVX $LAPACKE INTERFACE64=1
@@ -381,14 +348,13 @@ make -C threaded64_ $TARGET USE_THREAD=1 USE_OPENMP=0 FC=gfortran CC=gcc COMMON_
 COMMON="%{optflags} -fPIC -fopenmp -pthread"
 FCOMMON="$COMMON -frecursive -fdefault-integer-8"
 make -C openmp64_   $TARGET USE_THREAD=1 USE_OPENMP=1 FC=gfortran CC=gcc COMMON_OPT="$COMMON" FCOMMON_OPT="$FCOMMON" $NMAX LIBPREFIX="libopenblaso64_" $AVX $LAPACKE INTERFACE64=1 SYMBOLSUFFIX=64_ CPP_THREAD_SAFETY_TEST=1
-%endif
 
 %install
 # Install serial library and headers
 make -C serial USE_THREAD=0 PREFIX=%{buildroot} OPENBLAS_LIBRARY_DIR=%{buildroot}%{_libdir} OPENBLAS_INCLUDE_DIR=%{buildroot}%{_includedir}/%{name} OPENBLAS_BINARY_DIR=%{buildroot}%{_bindir} OPENBLAS_CMAKE_DIR=%{buildroot}%{_libdir}/cmake install
 
 # Copy lapacke include files
-%if %{with system_lapack} && %{lapacke}
+%if %{with system_lapack}
 cp -a %{_includedir}/lapacke %{buildroot}%{_includedir}/%{name}
 %endif
 
@@ -431,7 +397,6 @@ fi
 install -D -p -m 755 threaded/${plibname}.so %{buildroot}%{_libdir}/${pname}.so
 
 # Install the 64-bit interface libraries
-%if %{build64}
 slibname64=`echo ${slibname} | sed "s|lib%{name}|lib%{name}64|g"`
 install -D -p -m 644 serial64/${slibname64}.a %{buildroot}%{_libdir}/lib%{name}64.a
 slibname64_=`echo ${slibname} | sed "s|lib%{name}|lib%{name}64_|g"`
@@ -476,7 +441,6 @@ else
 fi
 install -D -p -m 755 threaded64/${plibname64}.so %{buildroot}%{_libdir}/${pname64}.so
 install -D -p -m 755 threaded64_/${plibname64_}.so %{buildroot}%{_libdir}/${pname64_}.so
-%endif
 
 # Fix symlinks
 pushd %{buildroot}%{_libdir}
@@ -490,7 +454,6 @@ ln -sf ${oname}.so lib%{name}o.so.0
 ln -sf ${pname}.so lib%{name}p.so
 ln -sf ${pname}.so lib%{name}p.so.0
 
-%if %{build64}
 # Serial libraries
 ln -sf ${sname64}.so lib%{name}64.so
 ln -sf ${sname64}.so lib%{name}64.so.0
@@ -506,7 +469,6 @@ ln -sf ${pname64}.so lib%{name}p64.so
 ln -sf ${pname64}.so lib%{name}p64.so.0
 ln -sf ${pname64_}.so lib%{name}p64_.so
 ln -sf ${pname64_}.so lib%{name}p64_.so.0
-%endif
 
 %if %{execstack}
 # Get rid of executable stacks
@@ -526,7 +488,6 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 %ldconfig_scriptlets threads
 
-%if %{build64}
 %ldconfig_scriptlets openmp64
 %ldconfig_scriptlets openmp64_
 
@@ -535,7 +496,6 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 %ldconfig_scriptlets threads64
 %ldconfig_scriptlets threads64_
-%endif
 
 %files
 %license serial/LICENSE
@@ -553,7 +513,6 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p-*.so
 %{_libdir}/lib%{name}p.so.*
 
-%if %{build64}
 %files serial64
 %{_libdir}/lib%{name}64-*.so
 %{_libdir}/lib%{name}64.so.*
@@ -577,34 +536,29 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %files threads64_
 %{_libdir}/lib%{name}p64_-*.so
 %{_libdir}/lib%{name}p64_.so.*
-%endif
 
 %files devel
 %{_includedir}/%{name}/
 %{_libdir}/lib%{name}.so
 %{_libdir}/lib%{name}o.so
 %{_libdir}/lib%{name}p.so
-%if %{build64}
 %{_libdir}/lib%{name}64.so
 %{_libdir}/lib%{name}o64.so
 %{_libdir}/lib%{name}p64.so
 %{_libdir}/lib%{name}64_.so
 %{_libdir}/lib%{name}o64_.so
 %{_libdir}/lib%{name}p64_.so
-%endif
 
 %files static
 %{_libdir}/lib%{name}.a
 %{_libdir}/lib%{name}o.a
 %{_libdir}/lib%{name}p.a
-%if %{build64}
 %{_libdir}/lib%{name}64.a
 %{_libdir}/lib%{name}o64.a
 %{_libdir}/lib%{name}p64.a
 %{_libdir}/lib%{name}64_.a
 %{_libdir}/lib%{name}o64_.a
 %{_libdir}/lib%{name}p64_.a
-%endif
 
 %changelog
 * Tue Nov 15 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.3.21-2
