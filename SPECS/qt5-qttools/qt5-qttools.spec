@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtTool components
 Name:         qt5-qttools
 Version:      5.12.5
-Release:      5%{?dist}
+Release:      6%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -15,6 +15,17 @@ Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submod
 Patch0: qttools-opensource-src-5.5.0-qmake-qt5.patch
 
 BuildRequires: coreutils
+BuildRequires: pcre2-devel
+BuildRequires: icu-devel
+BuildRequires: glib-devel
+BuildRequires: dbus-devel
+BuildRequires: harfbuzz-devel
+BuildRequires: sqlite-devel
+BuildRequires: fontconfig-devel
+BuildRequires: libpng-devel
+BuildRequires: libjpeg-turbo-devel
+BuildRequires: zlib-devel
+
 BuildRequires: qt5-qtbase-private-devel
 # Qt macros
 BuildRequires: qt5-rpm-macros >= %{version}
@@ -22,6 +33,7 @@ BuildRequires: qt5-qtbase-static >= %{version}
 BuildRequires: qt5-qtdeclarative-static >= %{version}
 
 Requires: %{name}-common = %{version}-%{release}
+AutoReq:        no
 
 %description
 %{summary}.
@@ -390,6 +402,9 @@ fi
 
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
+- Add AutoReq to no to avoid pulling unneeded runtime dependencies and add build deps
+
 * Tue Mar 31 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-5
 - Remove bad buildrequires
 

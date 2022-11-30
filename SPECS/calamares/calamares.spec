@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        39%{?dist}
+Release:        40%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,7 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libpwquality-devel
 BuildRequires:  parted
 BuildRequires:  pkg-config
+BuildRequires:  pcre2-devel
 # Python 3
 BuildRequires:  python3-devel >= 3.3
 # Qt 5
@@ -85,7 +86,9 @@ Requires:       efibootmgr
 Requires:       freefont
 Requires:       grub2
 Requires:       systemd
+Requires:       pcre2
 ExclusiveArch:  x86_64
+AutoReq:        no
 
 %description
 Calamares is a distribution-independent installer framework, designed to install
@@ -217,8 +220,8 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
-* Mon Jul 25 2022 Minghe Ren <mingheren@microsoft.com> - 3.2.11-39
-- Modify users.conf to imporve security
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.2.11-40
+- Add pcre2 dependency and AutoReq to no to avoid pulling unneeded dependencies
 
 * Mon Apr 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.11-38
 - Fix partioning bug
