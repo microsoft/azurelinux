@@ -1,5 +1,5 @@
 filesystem-1.1-12.cm2.x86_64.rpm
-kernel-headers-5.15.79.1-1.cm2.noarch.rpm
+kernel-headers-5.15.80.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.x86_64.rpm
 glibc-devel-2.35-3.cm2.x86_64.rpm
 glibc-i18n-2.35-3.cm2.x86_64.rpm
@@ -40,8 +40,8 @@ ncurses-libs-6.3-2.cm2.x86_64.rpm
 ncurses-term-6.3-2.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
-coreutils-8.32-5.cm2.x86_64.rpm
-coreutils-lang-8.32-5.cm2.x86_64.rpm
+coreutils-8.32-6.cm2.x86_64.rpm
+coreutils-lang-8.32-6.cm2.x86_64.rpm
 bash-5.1.8-1.cm2.x86_64.rpm
 bash-devel-5.1.8-1.cm2.x86_64.rpm
 bash-lang-5.1.8-1.cm2.x86_64.rpm
@@ -58,8 +58,8 @@ grep-3.7-2.cm2.x86_64.rpm
 grep-lang-3.7-2.cm2.x86_64.rpm
 diffutils-3.8-1.cm2.x86_64.rpm
 gawk-5.1.0-2.cm2.x86_64.rpm
-findutils-4.8.0-3.cm2.x86_64.rpm
-findutils-lang-4.8.0-3.cm2.x86_64.rpm
+findutils-4.8.0-4.cm2.x86_64.rpm
+findutils-lang-4.8.0-4.cm2.x86_64.rpm
 gettext-0.21-2.cm2.x86_64.rpm
 gzip-1.12-1.cm2.x86_64.rpm
 make-4.3-2.cm2.x86_64.rpm
@@ -197,8 +197,8 @@ tdnf-cli-libs-3.2.2-4.cm2.x86_64.rpm
 tdnf-devel-3.2.2-4.cm2.x86_64.rpm
 tdnf-plugin-repogpgcheck-3.2.2-4.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
-libxml2-2.10.0-1.cm2.x86_64.rpm
-libxml2-devel-2.10.0-1.cm2.x86_64.rpm
+libxml2-2.10.3-1.cm2.x86_64.rpm
+libxml2-devel-2.10.3-1.cm2.x86_64.rpm
 libsepol-3.2-2.cm2.x86_64.rpm
 glib-2.71.0-1.cm2.x86_64.rpm
 libltdl-2.4.6-8.cm2.x86_64.rpm
