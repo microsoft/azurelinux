@@ -24,6 +24,14 @@ BuildRequires:  tar
 BuildRequires:  git
 BuildRequires:  python3-pip
 BuildRequires:  libstdc++-devel
+
+
+%description
+TensorFlow is an open source machine learning framework for everyone.
+
+%package -n     python3-tensorflow
+Summary:        python-tensorflow
+Requires:       python3-devel
 Requires:       python3-absl-py
 Requires:       python3-astunparse
 Requires:       python3-flatbuffers
@@ -54,13 +62,6 @@ Requires:       python3-pyasn1
 Requires:       python3-charset_normalizer
 Requires:       python3-idna
 
-%description
-TensorFlow is an open source machine learning framework for everyone.
-
-%package -n     python3-tensorflow
-Summary:        python-tensorflow
-Requires:       python3   
-
 %description -n python3-tensorflow
 Python 3 version.
 
@@ -72,13 +73,16 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s /usr/bin/python3 /usr/bin/python
-# pushd /root
-# tar -czvf cacheroot.tar.gz .cache
-# popd
-# mv /root/cacheroot.tar.gz /usr/
-# sleep 180
+
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
+# steps to create the cache tar. Need to have network to create the cache. 
+#----------------------------------
+# pushd /root
+# tar -czvf cacheroot.tar.gz .cache  #creating the cache using the /root/.cache directory
+# popd
+# mv /root/cacheroot.tar.gz /usr/ 
+
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package pyproject-wheeldir/
 # --------
 
@@ -89,7 +93,7 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
  
 %check
-pip3 install nose pytest
+pip3 install nose pytest==7.1.3 
 mkdir -pv test
 cd test
 #PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %python3 -c "import numpy; numpy.test()"
