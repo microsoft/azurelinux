@@ -197,8 +197,8 @@ tdnf-cli-libs-3.2.2-4.cm2.aarch64.rpm
 tdnf-devel-3.2.2-4.cm2.aarch64.rpm
 tdnf-plugin-repogpgcheck-3.2.2-4.cm2.aarch64.rpm
 createrepo_c-0.17.5-1.cm2.aarch64.rpm
-libxml2-2.10.0-1.cm2.aarch64.rpm
-libxml2-devel-2.10.0-1.cm2.aarch64.rpm
+libxml2-2.10.3-1.cm2.aarch64.rpm
+libxml2-devel-2.10.3-1.cm2.aarch64.rpm
 libsepol-3.2-2.cm2.aarch64.rpm
 glib-2.71.0-1.cm2.aarch64.rpm
 libltdl-2.4.6-8.cm2.aarch64.rpm
