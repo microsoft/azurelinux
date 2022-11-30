@@ -64,6 +64,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "adcli",
+          "version": "0.9.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/realmd/adcli/uploads/ea560656ac921b3fe0d455976aaae9be/adcli-0.9.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "adobe-mappings-cmap",
           "version": "20171205",
           "downloadUrl": "https://github.com/adobe-type-tools/cmap-resources/archive/20171205.tar.gz"
@@ -2127,8 +2137,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.29.26",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.26.tar.gz"
+          "version": "0.29.32",
+          "downloadUrl": "https://github.com/cython/cython/archive/0.29.32.tar.gz"
         }
       }
     },
@@ -5920,8 +5930,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.77.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -7431,8 +7441,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.77.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -7441,8 +7451,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.77.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -7451,8 +7461,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.77.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
+          "version": "5.15.80.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -10761,8 +10771,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.10.0",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.0/libxml2-v2.10.0.tar.gz"
+          "version": "2.10.3",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.3/libxml2-v2.10.3.tar.gz"
         }
       }
     },
@@ -11003,6 +11013,26 @@
           "name": "livepatch-5.15.77.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.79.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.80.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
         }
       }
     },
@@ -13153,8 +13183,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.22.3",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.3/numpy-1.22.3.tar.gz"
+          "version": "1.23.4",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.23.4/numpy-1.23.4.tar.gz"
         }
       }
     },
@@ -14116,6 +14146,16 @@
           "name": "opusfile",
           "version": "0.12",
           "downloadUrl": "https://downloads.xiph.org/releases/opus/opusfile-0.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ORBit2",
+          "version": "2.14.19",
+          "downloadUrl": "https://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.gz"
         }
       }
     },
@@ -25997,8 +26037,8 @@
         "type": "other",
         "other": {
           "name": "sysstat",
-          "version": "12.5.4",
-          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.5.4.tar.gz"
+          "version": "12.7.1",
+          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.7.1.tar.gz"
         }
       }
     },
