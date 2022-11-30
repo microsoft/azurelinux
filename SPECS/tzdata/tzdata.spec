@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2022f
+Version:        2022g
 Release:        1%{?dist}
 URL:            https://www.iana.org/time-zones
 License:        Public Domain
@@ -43,6 +43,9 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Wed Nov 30 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022g-1
+- Update to version  "2022g".
+
 * Sun Oct 30 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2022f-1
 - Update to version  "2022f".
 
