@@ -59,7 +59,7 @@ Requires:       python3-rsa
 Requires:       python3-werkzeug
 Requires:       python3-zipp
 Requires:       python3-pyasn1
-Requires:       python3-charset_normalizer
+Requires:       python3-charset-normalizer
 Requires:       python3-idna
 
 %description -n python3-tensorflow
@@ -93,9 +93,8 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
  
 %check
-pip3 install nose pytest==7.1.3 
-mkdir -pv test
-cd test
+
+
 #PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %python3 -c "import numpy; numpy.test()"
 
 %files -n python3-tensorflow
