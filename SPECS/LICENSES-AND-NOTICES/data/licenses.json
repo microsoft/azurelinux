@@ -2019,6 +2019,7 @@
                 "jsonbuilder",
                 "jx",
                 "keda",
+                "kernel-hci-signed",
                 "kernel-signed",
                 "KeysInUse-OpenSSL",
                 "kpatch",
