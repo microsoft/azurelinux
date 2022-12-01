@@ -61,6 +61,7 @@ BuildRequires: zlib-devel
 BuildRequires: qt5-rpm-macros
 
 Requires:         icu
+Requires:         pcre2
 Requires(post):   chkconfig
 Requires(postun): chkconfig
 AutoReq:        no

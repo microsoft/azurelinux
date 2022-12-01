@@ -3,7 +3,7 @@
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:        GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
@@ -18,6 +18,7 @@ Patch102:       CVE-2022-25634.nopatch
 
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  zlib-devel
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -85,6 +86,9 @@ popd
 %{_qt5_examplesdir}/
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
+- Add pcre2-devel build dependency
+
 * Fri Mar 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Adding a nopatch for CVE-2022-25634 - vulnerability limited to the Windows OS.
 - License verified.
