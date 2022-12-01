@@ -1,0 +1,117 @@
+diff -up razor-agents-2.85/lib/Razor2/Client/Engine.pm.old razor-agents-2.85/lib/Razor2/Client/Engine.pm
+--- razor-agents-2.85/lib/Razor2/Client/Engine.pm.old	2005-06-14 01:42:25.000000000 +0200
++++ razor-agents-2.85/lib/Razor2/Client/Engine.pm	2010-12-22 09:14:57.644814001 +0100
+@@ -1,7 +1,6 @@
+ package Razor2::Client::Engine;
+ 
+ use strict;
+-use Digest::SHA1 qw(sha1_hex);
+ use Data::Dumper;
+ use Razor2::Signature::Ephemeral;
+ use Razor2::Engine::VR8;
+diff -up razor-agents-2.85/lib/Razor2/Signature/Ephemeral.pm.old razor-agents-2.85/lib/Razor2/Signature/Ephemeral.pm
+--- razor-agents-2.85/lib/Razor2/Signature/Ephemeral.pm.old	2003-03-04 00:09:50.000000000 +0100
++++ razor-agents-2.85/lib/Razor2/Signature/Ephemeral.pm	2010-12-22 09:14:57.646814001 +0100
+@@ -2,9 +2,13 @@
+ 
+ package Razor2::Signature::Ephemeral;
+ use strict;
+-use Digest::SHA1;
+ use Data::Dumper;
+ 
++BEGIN {
++  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
++  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
++}
++
+ sub new {
+ 
+     my ($class, %args) = @_;
+@@ -86,16 +90,12 @@ sub hexdigest { 
+     }
+ 
+     my $digest;
+-    my $ctx = Digest::SHA1->new;
+ 
+     if ($seclength > 128) { 
+-        $ctx->add($section1);
+-        $ctx->add($section2);
+-        $digest = $ctx->hexdigest;
++        $digest = sha1_hex($section1, $section2);
+     } else { 
+         debug("Sections too small... reverting back to orginal content.");
+-        $ctx->add($content);
+-        $digest = $ctx->hexdigest;
++        $digest = sha1_hex($content);
+     }
+ 
+     debug("Computed e-hash is $digest");
+diff -up razor-agents-2.85/lib/Razor2/Signature/Whiplash.pm.old razor-agents-2.85/lib/Razor2/Signature/Whiplash.pm
+--- razor-agents-2.85/lib/Razor2/Signature/Whiplash.pm.old	2007-05-09 00:22:36.000000000 +0200
++++ razor-agents-2.85/lib/Razor2/Signature/Whiplash.pm	2010-12-22 09:14:57.648814001 +0100
+@@ -7,7 +7,10 @@
+ 
+ package Razor2::Signature::Whiplash; 
+ 
+-use Digest::SHA1;
++BEGIN {
++  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
++  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
++}
+ 
+ sub new { 
+ 
+@@ -683,13 +686,8 @@ sub whiplash { 
+         # the value of length to the nearest multiple of ``length_error''.
+         # Take the first 20 hex chars from SHA1 and call it the signature.
+ 
+-        my $sha1 = Digest::SHA1->new();
+-
+-        $sha1->add($host);
+-        $sig = substr $sha1->hexdigest, 0, 12;
+-
+-        $sha1->add($corrected_length);
+-        $sig .= substr $sha1->hexdigest, 0, 4;
++        $sig = substr sha1_hex($host), 0, 12;
++        $sig .= substr sha1_hex($corrected_length), 0, 4;
+ 
+         push @sigs, $sig;
+         $sig_meta{$sig} = [$host, $corrected_length];
+diff -up razor-agents-2.85/lib/Razor2/String.pm.old razor-agents-2.85/lib/Razor2/String.pm
+--- razor-agents-2.85/lib/Razor2/String.pm.old	2005-06-13 23:09:59.000000000 +0200
++++ razor-agents-2.85/lib/Razor2/String.pm	2010-12-22 09:14:57.651814001 +0100
+@@ -1,11 +1,15 @@
+ # $Id: String.pm,v 1.48 2005/06/13 21:09:59 vipul Exp $
+ package Razor2::String;
+ 
+-use Digest::SHA1 qw(sha1_hex);
+ use URI::Escape;
+ use Razor2::Preproc::enBase64;
+ use Data::Dumper;
+ 
++BEGIN {
++  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
++  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
++}
++
+ #use MIME::Parser;
+ 
+ require Exporter;
+@@ -69,15 +73,8 @@ sub hmac2_sha1 {
+     return unless $text && $iv1 && $iv2;
+     die "no ref's allowed" if ref($text);
+ 
+-    my $ctx = Digest::SHA1->new;
+-    $ctx->add($iv2);
+-    $ctx->add($text);
+-    my $digest = $ctx->hexdigest;
+-
+-    $ctx = Digest::SHA1->new;
+-    $ctx->add($iv1);
+-    $ctx->add($digest);
+-    $digest = $ctx->hexdigest;
++    my $digest = sha1_hex($iv2, $text);
++    $digest = sha1_hex($iv1, $digest);
+ 
+     return (hextobase64($digest), $digest);
+ }
