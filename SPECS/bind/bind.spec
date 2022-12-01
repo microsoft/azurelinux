@@ -9,8 +9,8 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.29
-Release:        2%{?dist}
+Version:        9.16.33
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -613,6 +613,9 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
+* Mon Nov 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.33-1
+- Auto-upgrade to 9.16.33 - CVE-2022-2795,CVE-2022-3080
+
 * Mon Sep 12 2022 Olivia Crain <oliviacrain@microsoft.com - 9.16.29-2
 - Move named tmpfiles configuration to base package from utils subpackage
 - Move files under %%{_sysconfdir} in utils subpackage to base package 
