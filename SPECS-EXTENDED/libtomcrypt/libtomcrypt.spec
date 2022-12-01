@@ -1,12 +1,14 @@
 Summary:        A comprehensive, portable cryptographic toolkit
 Name:           libtomcrypt
 Version:        1.18.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        Public Domain OR WTFPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.libtom.net/
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2019-17362.patch
+
 BuildRequires:  libtommath-devel >= 1.0
 BuildRequires:  libtool
 
@@ -30,7 +32,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %set_build_flags
@@ -70,6 +72,9 @@ sed -i \
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.2-9
+- Patching CVE-2019-17362.
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.2-8
 - Removing docs to drop dependency on 'ghostscript'.
 - License verified.

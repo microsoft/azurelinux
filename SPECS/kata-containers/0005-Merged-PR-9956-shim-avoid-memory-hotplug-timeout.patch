@@ -16,9 +16,9 @@ index 118e1b4d..f18b6c6f 100644
  	}
  
  	cl := clh.client()
--	ctx, cancelResize := context.WithTimeout(ctx, clhAPITimeout*time.Second)
+-	ctx, cancelResize := context.WithTimeout(ctx, clh.getClhAPITimeout()*time.Second)
 +	// FIXME: memory hotplug sometimes takes longer than 1 second.
-+	// ctx, cancelResize := context.WithTimeout(ctx, clhAPITimeout*time.Second)
++	// ctx, cancelResize := context.WithTimeout(ctx, clh.getClhAPITimeout()*time.Second)
 +	ctx, cancelResize := context.WithTimeout(ctx, 10*time.Second)
  	defer cancelResize()
  

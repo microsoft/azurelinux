@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        17%{?dist}
+Release:        19%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,7 @@ Source24:       macros.suse
 Source25:       gen-ld-script.sh
 Source26:       generate-package-note.py
 Source27:       verify-package-notes.sh
+Source28:       macros.dist
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -78,6 +79,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
 install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 
+sed -e 's|@DIST@|%{dist}|g' %{SOURCE28} > macros.dist
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
@@ -108,6 +110,8 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
 %{_rpmconfigdir}/macros.d/macros.suse
+%{_rpmconfigdir}/macros.d/macros.dist
+
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
 %dir %{rcluadir}/rpm
@@ -121,6 +125,12 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Nov 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-19
+- Add dist macro
+
+* Tue Nov 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-18
+- Updated Python macros to move away from deprecated APIs. Using Fedora 37 implementation (license: MIT).
+
 * Fri Oct 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-17
 - Adding macro to skip stripping of signatures.
 

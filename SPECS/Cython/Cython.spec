@@ -1,11 +1,13 @@
 %global upname cython
-Name:           Cython
-Version:        0.29.26
-Release:        1%{?dist}
+%global _description \
+Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (baded on Pyrex). It makes writing C extensions for Python as easy as Python itself.}
 Summary:        Language for writing Python extension modules
-Vendor:         Microsoft
-Distribution:   Mariner
+Name:           Cython
+Version:        0.29.32
+Release:        1%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.cython.org
 Source0:        https://github.com/%{upname}/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
 BuildRequires:  gcc
@@ -15,15 +17,12 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-pip
 %endif
 
-%global _description \
-Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (baded on Pyrex). It makes writing C extensions for Python as easy as Python itself.}
-
 %description %{_description}
 
 %package -n     python3-%{name}
+%{?python_provide:%python_provide python3-%{name}}
 Summary:        C extensions for Python 3
 Requires:       python3
-%{?python_provide:%python_provide python3-%{name}}
 Provides:       %{name} = %{version}-%{release}
 Provides:       %{name}%{?_isa} = %{version}-%{release}
 
@@ -41,7 +40,7 @@ Provides:       %{name}%{?_isa} = %{version}-%{release}
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
-pip3 install -r test-requirements.txt 
+pip3 install -r test-requirements.txt
 %python3 runtests.py -vv
 
 %files -n python3-%{name}
@@ -57,6 +56,9 @@ pip3 install -r test-requirements.txt
 %{python3_sitearch}/__pycache__/%{upname}.*
 
 %changelog
+* Fri Nov 04 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.29.32-1
+- Update version to 0.29.32
+
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.29.26-1
 - Update version to 0.29.26
 - Add check section
