@@ -2,14 +2,14 @@ Name:           influxdb2
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 License:        MIT
 Group:          Productivity/Databases/Servers
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Version:        2.4.0
-Release:        %1{?dist}
+Release:        1%{?dist}
 URL:            https://github.com/influxdata/influxdb
-Source0:        %{URL}/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source99:       %{name}-%{version}-vendor.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-BuildRequires:  sysuser-tools
-%{sysusers_requires}
 BuildRequires:  fdupes
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
@@ -70,24 +70,10 @@ export GO111MODULE=on
 mkdir -p %{buildroot}%{_localstatedir}/log/influxdb
 mkdir -p %{buildroot}%{_localstatedir}/lib/influxdb
 mkdir -p %{buildroot}%{_sbindir}
-ln -s /usr/sbin/service %{buildroot}%{_sbindir}/rcinfluxdb
 install -D -m 0755 -t %{buildroot}%{_bindir} %{_builddir}/go/bin/*
 
 %check
 make test
-
-%pre -f %{name}.pre
-%service_add_pre influxdb.service
-
-%preun
-%service_del_preun influxdb.service
-
-%post
-%tmpfiles_create %_tmpfilesdir/influxdb.conf
-%service_add_post influxdb.service
-
-%postun
-%service_del_postun influxdb.service
 
 %files
 %license LICENSE
@@ -95,7 +81,6 @@ make test
 %dir %{_sysconfdir}/influxdb2
 %{_bindir}/influxd
 %{_bindir}/telemetryd
-%{_sbindir}/rcinfluxdb
 %{_datadir}/influxdb2
 %dir %{_tmpfilesdir}
 %attr(0755, influxdb, influxdb) %dir %{_localstatedir}/log/influxdb
