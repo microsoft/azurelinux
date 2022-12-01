@@ -1,73 +1,43 @@
 %global         oname uTidylib
-
-
-
+%global         _description\
+Python wrapper (bindings) for tidylib, this allows you to tidy HTML\
+files through a Pythonic interface.
 Summary:        Python wrapper for tidy, from the HTML tidy project
 Name:           python-tidy
 Version:        0.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://cihar.com/software/utidylib/
 Source0:        http://dl.cihar.com/utidylib/uTidylib-%{version}.tar.bz2
-%if 0%{?py2}
-BuildRequires:  libtidy
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-six
-BuildRequires:  python2-tools
-%endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildArch:      noarch
-%global         _description\
-Python wrapper (bindings) for tidylib, this allows you to tidy HTML\
-files through a Pythonic interface.
 
-%description    %_description
-
-%if 0%{?py2}
-%package     -n python2-tidy
-Summary:        %summary
-%{?python_provide:%python_provide python2-tidy}
-Requires:       libtidy
-Requires:       python2-six
-%description -n python2-tidy %_description
-%endif
+%description    %{_description}
 
 %package     -n python3-tidy
-Summary:        %summary
 %{?python_provide:%python_provide python3-tidy}
+Summary:        %{summary}
 Requires:       libtidy
 Requires:       python3-six
-%description -n python3-tidy %_description
+
+%description -n python3-tidy %{_description}
 
 %prep
 %setup -q -n %{oname}-%{version}
 
 %build
-%{?py2:%{py2_build}}
-%{py3_build}
+%py3_build
 
 %install
-%{?py2:%{py2_install}}
-%{py3_install}
+%py3_install
 
 %check
-# fail after tidy 5.6
-%{?py2:%{__python2} setup.py test || :}
-# todo: fails
-%{__python3} setup.py test || :
+python3 setup.py test || :
 
-%if 0%{?py2}
-%files -n python2-tidy
-%license LICENSE
-%doc README.rst
-%{python2_sitelib}/tidy
-%{python2_sitelib}/uTidylib-*-py2*.egg-info
-%endif
 
 %files -n python3-tidy
 %license LICENSE
@@ -76,6 +46,10 @@ Requires:       python3-six
 %{python3_sitelib}/uTidylib-*-py3*.egg-info
 
 %changelog
+* Wed Nov 30 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.6-5
+- Move to Core.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -184,4 +158,3 @@ Requires:       python3-six
 
 * Sat Feb 16 2008 Terje Rosten <terjeros@phys.ntnu.no> - 0.2-1
 - Initial build.
-
