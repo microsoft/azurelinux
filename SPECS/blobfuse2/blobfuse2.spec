@@ -80,7 +80,7 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
-* Fri Nov 30 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0-1
+* Wed Nov 30 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0-1
 - Bump version to 2.0.0
 
 * Fri Nov 04 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.4-1
