@@ -113,5 +113,5 @@ func TestShouldFailEmptyPackList(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, "cannot have empty pack list (testout/packlist.txt)", err.Error())
-	assert.Nil(t, outputSlice)
+	assert.Equal(t, len(outputSlice), 0)
 }

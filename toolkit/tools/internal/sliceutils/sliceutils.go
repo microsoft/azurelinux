@@ -58,18 +58,9 @@ func StringsSetToSlice(inputSet map[string]bool) []string {
 
 // RemoveDuplicateStrings will remove duplicate entries from a string slice
 func RemoveDuplicateStrings(packList []string) (deduplicatedPackList []string) {
-	var (
-		packListSet = make(map[string]struct{})
-		exists      = struct{}{}
-	)
-
+	packListSet := map[string]bool{}
 	for _, entry := range packList {
-		packListSet[entry] = exists
+		packListSet[entry] = true
 	}
-
-	for entry := range packListSet {
-		deduplicatedPackList = append(deduplicatedPackList, entry)
-	}
-
-	return
+	return StringsSetToSlice(packListSet)
 }

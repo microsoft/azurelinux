@@ -178,7 +178,6 @@ func getSRPMQuery(specsDir, distTag, buildDir, outDir string, workers int, runCh
 	// Parse each SPEC for name and version and hydrate SRPM
 	for _, specfile := range specFiles {
 		sourcedir := filepath.Dir(specfile)
-		logger.Log.Infof("specfile for %s", specfile)
 		var packageSRPMs []string
 		packageSRPMs, err = rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, defines, rpm.QueryHeaderArgument)
 		if err != nil {
