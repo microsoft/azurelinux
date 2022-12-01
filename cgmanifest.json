@@ -1027,8 +1027,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.0.0.preview.4",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0-preview.4.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.0.tar.gz"
         }
       }
     },
@@ -7621,8 +7621,8 @@
         "type": "other",
         "other": {
           "name": "kpatch",
-          "version": "0.9.6",
-          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.6.tar.gz"
+          "version": "0.9.7",
+          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.7.tar.gz"
         }
       }
     },
@@ -9451,8 +9451,8 @@
         "type": "other",
         "other": {
           "name": "libntlm",
-          "version": "1.5",
-          "downloadUrl": "http://nongnu.org/libntlm/releases/libntlm-1.5.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://gitlab.com/gsasl/libntlm/-/archive/libntlm-1-6/libntlm-libntlm-1-6.tar.gz"
         }
       }
     },
@@ -14153,9 +14153,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ORBit2",
-          "version": "2.14.19",
-          "downloadUrl": "https://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.gz"
+          "name": "orangefs",
+          "version": "2.9.8",
+          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.8.tar.gz"
         }
       }
     },
@@ -14163,9 +14163,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "orangefs",
-          "version": "2.9.8",
-          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.8.tar.gz"
+          "name": "ORBit2",
+          "version": "2.14.19",
+          "downloadUrl": "https://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.gz"
         }
       }
     },
@@ -26597,8 +26597,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022f",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022f.tar.gz"
+          "version": "2022g",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022g.tar.gz"
         }
       }
     },
