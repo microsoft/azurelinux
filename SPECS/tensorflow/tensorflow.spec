@@ -76,7 +76,7 @@ ln -s /usr/bin/python3 /usr/bin/python
 
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
-# steps to create the cache tar. Need to have network to create the cache. 
+# steps to create the cache tar. network connection is required to create the cache. 
 #----------------------------------
 # pushd /root
 # tar -czvf cacheroot.tar.gz .cache  #creating the cache using the /root/.cache directory
@@ -90,12 +90,6 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 %install
 %pyproject_install
 
-
- 
-%check
-
-
-#PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %python3 -c "import numpy; numpy.test()"
 
 %files -n python3-tensorflow
 %license LICENSE
