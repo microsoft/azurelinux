@@ -1,12 +1,3 @@
-Summary:        A collection of sparse matrix libraries
-Name:           suitesparse
-Version:        5.4.0
-Release:        5%{?dist}
-License:        (LGPLv2+ OR BSD) AND LGPLv2+ AND GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
-Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
 %global amd_version_major 2
 %global btf_version_major 1
 %global camd_version_major 2
@@ -26,7 +17,16 @@ Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{ver
 ### by default, but CSparse can be built instead by defining
 ### enable_csparse as 1 below.
 %global enable_csparse 0
-# Whether to build a separate version of libraries linked against an ILP64 BLAS
+
+Summary:        A collection of sparse matrix libraries
+Name:           suitesparse
+Version:        5.4.0
+Release:        5%{?dist}
+License:        (LGPLv2+ OR BSD) AND LGPLv2+ AND GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
+Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  hardlink
