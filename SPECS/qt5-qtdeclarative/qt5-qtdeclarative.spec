@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtDeclarative component
 Name:         qt5-qtdeclarative
 Version:      5.12.5
-Release:      3%{?dist}
+Release:      4%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -22,6 +22,7 @@ BuildRequires: gcc
 # qt macros
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
+BuildRequires: pcre2-devel
 BuildRequires: python3
 
 %description
@@ -141,6 +142,9 @@ popd
 
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-4
+- Add pcre2-devel build dependency
+
 * Mon Mar 30 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-3
 - Fix missing python3 global
 - Remove multilib patch
