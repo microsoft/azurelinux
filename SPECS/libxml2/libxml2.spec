@@ -12,6 +12,7 @@ URL:            https://www.xmlsoft.org/
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 Patch0:         CVE-2022-2309.patch
 Patch1:         CVE-2022-40303.patch
+Patch2:         CVE-2022-40304.patch
 BuildRequires:  python-xml
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
