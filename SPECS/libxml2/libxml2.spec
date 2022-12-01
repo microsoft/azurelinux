@@ -109,7 +109,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Wed Nov 30 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.9.14-3
-- Fix CVE-2022-40303
+- Fix CVE-2022-40303 and CVE-2022-40304
 
 * Wed Aug 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9.14-2
 - Fix CVE-2022-2309.
