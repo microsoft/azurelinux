@@ -214,9 +214,12 @@ get-release-major: printvar-RELEASE_MAJOR_ID
 # The --quiet flag is important to avoid printing extra output
 .PHONY: printvar-all-vars printvar-verbose-all-vars
 
-# Gather the variables we want to print out, removing any automatic .* variables, and the self reference
-interesting_variables = $(filter-out .% interesting_variables, $(sort $(.VARIABLES)))
+# Gather the variables we want to print out, removing any automatic .* variables, and the self reference, along with special characters that may interfere with Make
+sanitize_variables = $(subst ',,$(subst ",,$(subst `,,$(subst \#,,$(subst $$,,$(subst :,,$1))))))
+interesting_variables  = $(filter-out .% interesting_variables, $(sort $(call sanitize_variables,$(.VARIABLES))))
 
+$(warning $(shell env))
+$(warning $(.VARIABLES))
 $(warning DEBUG: printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var)))
 
 printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var))
