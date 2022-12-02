@@ -1,7 +1,7 @@
 Summary:        Kpatch tooling
 Name:           kpatch
-Version:        0.9.6
-Release:        4%{?dist}
+Version:        0.9.7
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ rm -rf %{buildroot}%{_mandir}
 %{_bindir}/kpatch-build
 
 %changelog
+* Tue Nov 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.7-1
+- Updating to version 0.9.7 to add support for the "return_sites" section.
+
 * Mon Aug 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-4
 - Adding missing dependency on "awk" and "binutils".
 

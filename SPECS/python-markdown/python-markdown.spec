@@ -1,10 +1,9 @@
 %global srcname Markdown
 %global pkgname markdown
-
+Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
 Version:        3.2.2
-Release:        3%{?dist}
-Summary:        Markdown implementation in Python
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,25 +16,22 @@ This is a Python implementation of John Gruber’s Markdown. It is
 almost completely compliant with the reference implementation, though
 there are a few very minor differences.
 
-
 %package -n python%{python3_pkgversion}-%{pkgname}
-Summary:        Markdown implementation in Python
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-PyYAML
-BuildRequires:  python%{python3_pkgversion}-tidy
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-zipp
-BuildRequires:  python%{python3_pkgversion}-importlib-metadata
-Requires:       python%{python3_pkgversion}-importlib-metadata
-
-Conflicts:      python2-%{pkgname} < 3.1-2
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
+Summary:        Markdown implementation in Python
+BuildRequires:  PyYAML
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-importlib-metadata
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-tidy
+BuildRequires:  python%{python3_pkgversion}-zipp
+Requires:       python%{python3_pkgversion}-importlib-metadata
+Conflicts:      python2-%{pkgname} < 3.1-2
 
 %description -n python%{python3_pkgversion}-%{pkgname}
 This is a Python implementation of John Gruber's Markdown. It is
 almost completely compliant with the reference implementation, though
 there are a few known issues.
-
 
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
@@ -65,8 +61,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 %{_bindir}/markdown_py
 
-
 %changelog
+* Wed Nov 30 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.2-4
+- Move to Core.
+- License verified.
+
 * Mon Dec 14 2020 Ruying <v-ruyche@microsoft.com> - 3.2.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Make python3-importlib-metadata requirements default.

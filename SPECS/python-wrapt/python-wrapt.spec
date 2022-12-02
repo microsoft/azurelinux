@@ -1,38 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Created by pyp2rpm-1.1.1
 %global sname wrapt
-
-
 %global with_docs 1
-
-
 %{!?_licensedir: %global license %%doc}
-
-Name:           python-%{sname}
-Version:        1.11.2
-Release:        6%{?dist}
-Summary:        A Python module for decorators, wrappers and monkey patching
-
-License:        BSD
-URL:            https://github.com/GrahamDumpleton/wrapt
-Source0:        https://github.com/GrahamDumpleton/%{sname}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires:  gcc
-
-BuildRequires:  python3-devel
-
 %global _description\
 The aim of the wrapt module is to provide a transparent object proxy\
 for Python, which can be used as the basis for the construction of\
 function wrappers and decorator functions.
+Summary:        A Python module for decorators, wrappers and monkey patching
+Name:           python-%{sname}
+Version:        1.11.2
+Release:        7%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/GrahamDumpleton/wrapt
+Source0:        https://github.com/GrahamDumpleton/%{sname}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  python3-devel
 
-%description %_description
+%description %{_description}
 
 %if 0%{?with_docs}
 %package doc
 Summary:        Documentation for the wrapt module
-
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
@@ -41,8 +31,8 @@ Documentation for the wrapt module
 %endif
 
 %package -n python3-wrapt
-Summary:        A Python module for decorators, wrappers and monkey patching
 %{?python_provide:%python_provide python3-wrapt}
+Summary:        A Python module for decorators, wrappers and monkey patching
 
 %description -n python3-wrapt
 The aim of the wrapt module is to provide a transparent object proxy
@@ -80,6 +70,10 @@ popd
 %{python3_sitearch}/%{sname}-%{version}-py?.?.egg-info
 
 %changelog
+* Wed Nov 30 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.11.2-7
+- Move to Core.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

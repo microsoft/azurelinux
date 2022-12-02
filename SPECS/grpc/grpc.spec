@@ -26,6 +26,7 @@ Requires:       protobuf
 Requires:       zlib
 
 # Python
+%ifarch x86_64
 BuildRequires:      build-essential
 BuildRequires:      python3-devel
 BuildRequires:      python3-Cython
@@ -33,6 +34,7 @@ BuildRequires:      python3-six
 BuildRequires:      python3-wheel
 BuildRequires:      python3-setuptools
 BuildRequires:      python3-protobuf
+%endif
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -64,6 +66,7 @@ Requires:       python3-six
 %description -n python3-grpcio
 Python language bindings for gRPC.
 
+
 %prep
 %setup -q -n %{name}-%{version}
 %setup -T -D -a 1
@@ -88,17 +91,18 @@ pushd cmake/build
    -DgRPC_RE2_PROVIDER:STRING='package'      \
    -DgRPC_SSL_PROVIDER:STRING='package'      \
    -DgRPC_ZLIB_PROVIDER:STRING='package'
-%cmake_build
+%cmake_build 
 popd
 #python
-export GRPC_PYTHON_BUILD_WITH_CYTHON=True
-export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
-export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
-export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
-export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
-export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-%py3_build
-
+%ifarch x86_64
+   export GRPC_PYTHON_BUILD_WITH_CYTHON=True
+   export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
+   export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
+   export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
+   export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
+   export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
+   %py3_build
+%endif
 
 %install
 pushd cmake/build
@@ -106,8 +110,9 @@ pushd cmake/build
 find %{buildroot} -name '*.cmake' -delete
 popd
 #python
-%py3_install
-
+%ifarch x86_64
+   %py3_install
+%endif
 
 %files
 %license LICENSE
@@ -139,8 +144,10 @@ popd
 
 %files -n python3-grpcio
 %license LICENSE
+%ifarch x86_64
 %{python3_sitearch}/grpc
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
+%endif
 
 %changelog
 * Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3

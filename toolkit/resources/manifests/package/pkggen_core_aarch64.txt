@@ -1,5 +1,5 @@
 filesystem-1.1-12.cm2.aarch64.rpm
-kernel-headers-5.15.79.1-1.cm2.noarch.rpm
+kernel-headers-5.15.80.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.aarch64.rpm
 glibc-devel-2.35-3.cm2.aarch64.rpm
 glibc-i18n-2.35-3.cm2.aarch64.rpm
@@ -173,8 +173,8 @@ openssl-static-1.1.1k-20.cm2.aarch64.rpm
 libcap-2.60-1.cm2.aarch64.rpm
 libcap-devel-2.60-1.cm2.aarch64.rpm
 debugedit-5.0-1.cm2.aarch64.rpm
-libarchive-3.6.1-1.cm2.aarch64.rpm
-libarchive-devel-3.6.1-1.cm2.aarch64.rpm
+libarchive-3.6.1-2.cm2.aarch64.rpm
+libarchive-devel-3.6.1-2.cm2.aarch64.rpm
 rpm-4.18.0-2.cm2.aarch64.rpm
 rpm-build-4.18.0-2.cm2.aarch64.rpm
 rpm-build-libs-4.18.0-2.cm2.aarch64.rpm
@@ -197,8 +197,8 @@ tdnf-cli-libs-3.2.2-4.cm2.aarch64.rpm
 tdnf-devel-3.2.2-4.cm2.aarch64.rpm
 tdnf-plugin-repogpgcheck-3.2.2-4.cm2.aarch64.rpm
 createrepo_c-0.17.5-1.cm2.aarch64.rpm
-libxml2-2.10.0-1.cm2.aarch64.rpm
-libxml2-devel-2.10.0-1.cm2.aarch64.rpm
+libxml2-2.10.3-1.cm2.aarch64.rpm
+libxml2-devel-2.10.3-1.cm2.aarch64.rpm
 libsepol-3.2-2.cm2.aarch64.rpm
 glib-2.71.0-1.cm2.aarch64.rpm
 libltdl-2.4.6-8.cm2.aarch64.rpm
