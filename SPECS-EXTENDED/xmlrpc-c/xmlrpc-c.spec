@@ -1,19 +1,17 @@
-%define         soname 3
-%define         soname_cpp 8
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Summary:        Library implementing XML-based Remote Procedure Calls
 Name:           xmlrpc-c
 Version:        1.54.06
 Release:        2%{?dist}
 License:        BSD-3-Clause AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/C and C++
 URL:            https://xmlrpc-c.sourceforge.net/
 Source0:        https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/%{version}/xmlrpc-c-%{version}.tgz
-
 # Upstreamable patches
 Patch101:       0001-xmlrpc_server_abyss-use-va_args-properly.patch
-
+%define         soname 3
+%define         soname_cpp 8
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc-c++
@@ -318,11 +316,13 @@ make -C examples/cpp clean
 - Added upstream patch to use va_args properly
 - Removed build dependency for makeinfo
 - Added main package as the spec taken was directly starting from devel
+- License verified
 
 * Sat Oct 29 2022 Dirk Müller <dmueller@suse.com>
 - update to 1.54.06:
   * Abyss HTTP server: Fix memory corruption in processing of "authorization"
     header field. Broken in Xmlrpc-c 1.41
+
 * Mon Aug  8 2022 Dirk Müller <dmueller@suse.com>
 - update to 1.54.05:
   * Fix handling of error on pipe used to interrupt the wait for a client connection.
@@ -334,9 +334,11 @@ make -C examples/cpp clean
   * Fix bug: 'toValue' won't compile for vector of vectors or map of vectors. Thanks Yang Bo .
   * Fix tiny memory leak in virtually impossible low memory situation.
   * Build: fix missing xmlrpc-c/config.h include file in separate build tree build
+
 * Mon May 31 2021 Dirk Müller <dmueller@suse.com>
 - update to 1.51.07:
   * fix bug: wild memory reference when server times out waiting for request header.
+
 * Thu Aug 20 2020 Dirk Mueller <dmueller@suse.com>
 - update to 1.51.06:
   * Build: fix bug: won't compile with --enable-libxml2, introduced with Release 1.44 (December 2015).
@@ -379,26 +381,32 @@ make -C examples/cpp clean
   * Add XMLRPC_TRACE_PACKETSOCKET environment variable: a means of tracing communication at the packet socket level.
   * Fix AbyssServer::readRequestBody for chunked bodies. Always broken (AbyssServer was new in Netpbm 1.39 (September 2014).
 - remove xmlrpc-c-no_return_nonvoid.patch (upstream)
+
 * Fri Mar 24 2017 mpluskal@suse.com
 - Update to version 1.39.12:
   * For full list of changes see:
     http://xmlrpc-c.sourceforge.net/change_super_stable.html
 - Drop upstreamed narrowing.patch
 - Add xmlrpc-c-no_return_nonvoid.patch
+
 * Wed Jul 27 2016 schwab@suse.de
 - narrowing.patch: fix invalid narrowing conversion
+
 * Tue Nov 17 2015 mpluskal@suse.com
 - Update to 1.33.18
   * Fix bug: infinite recursion if you try to format a floating
   point value that was created from something other than a
   finite number. Creation of a floating point XML-RPC value from
   something other than a number now fails.
+
 * Mon Apr 20 2015 mpluskal@suse.com
 - Update to 1.33.17
   * Build: fix a "recompile with -fPIC" failure in parallel make.
+
 * Mon Mar  9 2015 mpluskal@suse.com
 - Update dependencies
 - Enable checks
+
 * Sun Mar  8 2015 mpluskal@suse.com
 - Cleanup spec file with spec-cleaner
 - Use url for source
@@ -411,12 +419,14 @@ make -C examples/cpp clean
 - Changes for 1.33.15
   * Build: fix 'make distclean' so it doesn't leave src/cpp/srcdir
     and src/cpp/blddir.
+
 * Mon Nov 25 2013 jengelh@inai.de
 - Update to new upstream release 1.33
   * Abyss XML-RPC server: Implement HTTP access control and the
   OPTIONS method
   * Change strategy for overallocating memory - grow blocks no more
   than a megabyte at a time
+
 * Sat Jun  1 2013 asterios.dramis@gmail.com
 - Update to 1.25.23:
   * Test program build: include <unistd.h> instead of <sys/unistd.h>.
@@ -487,30 +497,37 @@ make -C examples/cpp clean
 - Renamed libxmlrpc-c-devel package to xmlrpc-c-devel. Added the necessary
   Provides/Obsoletes entries for libxmlrpc-c-devel.
 - Remove static libraries.
+
 * Tue Nov 22 2011 pascal.bleser@opensuse.org
 - fix requires in -devel package
 - remove Authors block from description
+
 * Mon Nov 21 2011 jengelh@medozas.de
 - Remove redundant/unwanted tags/section (cf. specfile guidelines)
+
 * Mon Nov 21 2011 rschweikert@suse.com
 - remove include of curl/types.h; file no longer exists and has been
   empty for a while
+
 * Tue Jun 28 2011 appleonkel@opensuse.org
 - update to 1.25.07
   * soname for cpp libs to 7
   * 3 new libraries (server_cgi++, server_pstream++, packetsocket)
 - deleted old patches, looks like upstream had fixed it
 - added fix for default constructor
+
 * Sat Oct 30 2010 pascal.bleser@opensuse.org
 - update to 1.06.41:
   * CGI XML-RPC server accepts (ignores) parameters after "text/xml" in Content-type header from client
 - moved changelog entries from spec file to .changes file
 - added patches to fix wrong usage of printf format for size_t (upstream uses llu instead of zu)
+
 * Tue Aug 31 2010 chris@computersalat.de
 - merge with hamradio/xmlrpc-c
   o there shouldn't be 2 maintained packages :(
 - used Source from sourceforge.net
   o correct named: xmlrpc-c-1.06.40.tgz
+
 * Thu Jul  8 2010 dl8fcl@darc.de
 - imported fixes from pascal@links2linux.de
   * C++ bytesFromBase64(): fix bug: high two bits always zero.
@@ -519,10 +536,13 @@ make -C examples/cpp clean
     (Matters with keepalive)
   * fix xmlrpc_inetd_server C++ example. It has never worked.
   * fix error message about invalid <int> XML
+
 * Sun Dec 20 2009 dl8fcl@darc.de
 - update to 1.06.38
+
 * Mon Sep 28 2009 pascal.bleser@opensuse.org
 - update to 1.06.37
+
 * Sat May  9 2009 bitshuffler #suse@irc.freenode.org
 - Updated to 1.06.33
   * Mon Aug  4 00:00:00 UTC 2008 - Peter Nixon
@@ -537,9 +557,12 @@ make -C examples/cpp clean
 - Fixed 64bit build problems
   Tue Mar 14 00:00:00 UTC 2006 - Peter Nixon
 - enabled abyss-server
+
 * Wed Jan 25 2006 mls@suse.de
 - converted neededforbuild to BuildRequires
+
 * Thu Mar 18 2004 hvogel@suse.de
 - fix files list
+
 * Tue Mar 16 2004 kkaempf@suse.de
 - initial package version 0.9.10
