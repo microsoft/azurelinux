@@ -37,7 +37,7 @@ sed -i 's/#include <utility>/#include <utility>\n#include <limits>/g' /usr/inclu
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk --remote_download_minimal" ./compile.sh
+EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --remote_download_minimal" ./compile.sh
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
