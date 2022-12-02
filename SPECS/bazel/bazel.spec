@@ -11,6 +11,7 @@ Distribution:   Mariner
 URL:            https://bazel.io/
 Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{version}/%{name}-%{version}-dist.zip
 Patch0:         fix-bazel-version-check.patch
+BuildRequires:  build-essential
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
 BuildRequires:  msopenjdk-11
@@ -36,7 +37,7 @@ sed -i 's/#include <utility>/#include <utility>\n#include <limits>/g' /usr/inclu
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" ./compile.sh
+EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk --remote_download_minimal" ./compile.sh
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
