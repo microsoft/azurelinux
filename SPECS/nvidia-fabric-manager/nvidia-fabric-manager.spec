@@ -27,7 +27,7 @@
 
 Name:           nvidia-fabric-manager
 Version:        %{nvidia_driver_version}
-Release:        2
+Release:        2%{?dist}
 Summary:        Fabric Manager for NVSwitch based systems
 
 License:        NVIDIA Proprietary
