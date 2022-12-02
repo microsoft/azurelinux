@@ -2248,6 +2248,12 @@
                 "perftest"
             ]
         },
+        "NVIDIA source": {
+            "license": "[NVIDIA Proprietary](https://www.nvidia.com/en-us/drivers/nvidia-license/)",
+            "specs": [
+                "nvidia-fabric-manager"
+            ]
+        },
         "OpenMamba": {
             "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
             "specs": [
