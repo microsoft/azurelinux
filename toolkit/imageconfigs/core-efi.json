@@ -49,6 +49,9 @@
                 "packagelists/core-packages-image.json",
                 "packagelists/cloud-init-packages.json"
             ],
+            "KernelCommandLine": {
+                "CGroup": "version_two"
+            },
             "KernelOptions": {
                 "default": "kernel"
             },

@@ -72,6 +72,7 @@
                 "default": "kernel"
             },
             "KernelCommandLine": {
+                "CGroup": "version_two",
                 "ExtraCommandLine": "console=ttyS0"
             },
             "Hostname": "cbl-mariner"

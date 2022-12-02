@@ -1050,6 +1050,12 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 		return
 	}
 
+	err = setGrubCfgCGroup(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
+		return
+	}
+
 	// Append any additional command line parameters
 	err = setGrubCfgAdditionalCmdLine(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
