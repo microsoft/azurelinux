@@ -104,7 +104,7 @@ cp -a third-party-notices.txt %{buildroot}/usr/share/doc/nvidia-fabricmanager/
 
 %changelog
 * Wed Dec 01 2022 Henry Li <lihl@microsoft.com> - 515.65.01-2
-- Initial CBL-Mariner import from NVIDIA (license: NVIDIA Proprietary)
+- Initial CBL-Mariner import from NVIDIA source (license: NVIDIA Proprietary)
 - License verified
 - Update Source0 field
 - Include new macros for package version and branch info
