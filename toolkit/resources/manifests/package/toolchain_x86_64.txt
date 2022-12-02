@@ -133,11 +133,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-<<<<<<< HEAD
-kernel-headers-5.15.79.1-1.cm2.noarch.rpm
-=======
 kernel-headers-5.15.80.1-1.cm2.noarch.rpm
->>>>>>> main
 kmod-29-1.cm2.x86_64.rpm
 kmod-debuginfo-29-1.cm2.x86_64.rpm
 kmod-devel-29-1.cm2.x86_64.rpm
