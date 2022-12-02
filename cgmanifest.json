@@ -27847,6 +27847,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xmlrpc-c",
+          "version": "1.54.06",
+          "downloadUrl": "https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.54.06/xmlrpc-c-1.54.06.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xmlsec1",
           "version": "1.2.34",
           "downloadUrl": "https://www.aleksey.com/xmlsec/download/xmlsec1-1.2.34.tar.gz"
