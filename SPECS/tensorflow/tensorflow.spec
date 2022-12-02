@@ -1,6 +1,6 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
-Version:        2.8.3
+Version:        2.11.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
