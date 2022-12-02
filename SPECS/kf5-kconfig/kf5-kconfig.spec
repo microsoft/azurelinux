@@ -4,7 +4,7 @@
 
 Name:           kf5-%{framework}
 Version:        5.61.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with advanced configuration system
 License:        LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
@@ -23,6 +23,7 @@ BuildRequires:  kf5-rpm-macros >= %{majmin}
 
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qttools-devel
+BuildRequires:  dbus-devel
 
 Requires:       kf5-filesystem >= %{majmin}
 Requires:       %{name}-core%{?_isa} = %{version}-%{release}
@@ -110,6 +111,9 @@ popd
 
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.61.0-4
+- Add dbus-devel build dependency
+
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.
