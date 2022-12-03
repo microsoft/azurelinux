@@ -1,7 +1,11 @@
 %global rcluadir %{_rpmconfigdir}/lua/mariner
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 %global forgeurl  https://pagure.io/go-rpm-macros
+Version:   3.0.9
+%forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/mariner
@@ -15,34 +19,33 @@
 # make Go devel packages archful
 %global gopath          %{_datadir}/gocode
 
-Summary:        Build-stage rpm automation for Go packages
-Name:           go-rpm-macros
-Version:        3.0.9
-Release:        4%{?dist}
-License:        GPLv3+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%forgemeta
-URL:           %{forgeurl}
-Source:        %{forgesource}
-Patch0:        fixing_ldflags_for_mariner.patch
-
-Requires:      go-srpm-macros = %{version}-%{release}
-Requires:      go-filesystem  = %{version}-%{release}
 ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
+Name:      go-rpm-macros
+Release:   3%{?dist}
+Summary:   Build-stage rpm automation for Go packages
+
+License:   GPLv3+
+URL:       %{forgeurl}
+# Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
+Source:    %{forgesource}
+Patch0:    fixing_ldflags_for_mariner.patch
+
+Requires:  go-srpm-macros = %{version}-%{release}
+Requires:  go-filesystem  = %{version}-%{release}
+
 %ifarch %{golang_arches}
-Requires:      golang
-Provides:      compiler(golang)
-Provides:      compiler(go-compiler) = 2
-Obsoletes:     go-compilers-golang-compiler < %{version}-%{release}
+Requires:  golang
+Provides:  compiler(golang)
+Provides:  compiler(go-compiler) = 2
+Obsoletes: go-compilers-golang-compiler < %{version}-%{release}
 %endif
 
 %ifarch %{gccgo_arches}
-Requires:      gcc-go
-Provides:      compiler(gcc-go)
-Provides:      compiler(go-compiler) = 1
-Obsoletes:     go-compilers-gcc-go-compiler < %{version}-%{release}
+Requires:  gcc-go
+Provides:  compiler(gcc-go)
+Provides:  compiler(go-compiler) = 1
+Obsoletes: go-compilers-gcc-go-compiler < %{version}-%{release}
 %endif
 
 %description
@@ -55,7 +58,7 @@ pull it in for Go packages only.
 %package -n go-srpm-macros
 Summary:   Source-stage rpm automation for Go packages
 BuildArch: noarch
-Requires:  mariner-rpm-macros
+Requires:  redhat-rpm-config
 
 %description -n go-srpm-macros
 This package provides SRPM-stage rpm automation to simplify the creation of Go
@@ -167,9 +170,6 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 %{_spectemplatedir}/*.spec
 
 %changelog
-* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 3.0.9-4
-- Move to core package
-
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-3
 - Fixing Go's linker flags.
 - License verified.

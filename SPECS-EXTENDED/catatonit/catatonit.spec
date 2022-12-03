@@ -1,21 +1,23 @@
-Summary:        A signal-forwarding process manager for containers
-Name:           catatonit
-Version:        0.1.7
-Release:        7%{?dist}
-License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/openSUSE/catatonit
-Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  file
-BuildRequires:  gcc
-BuildRequires:  git
-BuildRequires:  glibc-static >= 2.35-3%{?dist}
-BuildRequires:  libtool
-BuildRequires:  make
-Provides:       podman-%{name} = %{version}-%{release}
+
+Name: catatonit
+Version: 0.1.7
+Release: 6%{?dist}
+Summary: A signal-forwarding process manager for containers
+License: GPLv3+
+URL: https://github.com/openSUSE/catatonit
+Source0: %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: file
+BuildRequires: gcc
+BuildRequires: git
+BuildRequires: glibc-static >= 2.35-3%{?dist}
+BuildRequires: libtool
+BuildRequires: make
+
+Provides: podman-%{name} = %{version}-%{release}
 
 %description
 Catatonit is a /sbin/init program for use within containers. It
@@ -34,7 +36,7 @@ sed -i '$d' configure.ac
 %build
 autoreconf -fi
 %configure
-%make_build
+%{__make} %{?_smp_mflags}
 
 # Make sure we *always* build a static binary. Otherwise we'll break containers
 # that don't have the necessary shared libs.
@@ -59,9 +61,6 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %{_libexecdir}/podman/%{name}
 
 %changelog
-* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 0.1.7-7
-- Move to core packages
-
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.1.7-6
 - Rebuilt for glibc-static 2.35-3
 
