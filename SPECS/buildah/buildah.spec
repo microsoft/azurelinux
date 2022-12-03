@@ -19,15 +19,12 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           %{repo}
 Version:        1.18.0
-Release:        8%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io
 Source:         https://%{import_path}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
-
-Patch0:         CVE-2022-27651.patch
-
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
@@ -57,7 +54,7 @@ or
 * delete a working container or an image
 
 %prep
-%autosetup -p1 -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -Sgit -n %{name}-%{built_tag_strip}
 sed -i 's/GOMD2MAN =/GOMD2MAN ?=/' docs/Makefile
 sed -i '/docs install/d' Makefile
 
@@ -90,9 +87,6 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} -C docs install
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
-* Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 1.18.0-8
-- Add Patch for CVE-2022-27651
-
 * Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.18.0-7
 - Move to core packages
 - Remove tests package
