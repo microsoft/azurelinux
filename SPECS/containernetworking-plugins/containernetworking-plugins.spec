@@ -1,12 +1,10 @@
 %global with_debug 1
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
 %else
 %global debug_package   %{nil}
 %endif
-
 %global provider github
 %global provider_tld com
 %global project containernetworking
@@ -14,63 +12,59 @@
 %global provider_prefix %{provider}.%{provider_tld}/%{project}/%{repo}
 %global import_path %{provider_prefix}
 %global git0 https://%{import_path}
-
 # Used for comparing with latest upstream tag
 # to decide whether to autobuild (non-rawhide only)
 %define built_tag v1.1.1
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %global gen_version %(b=%{built_tag_strip}; echo ${b/-/"~"})
 %define download_url %{git0}/archive/%{built_tag}.tar.gz
-
-Name:          %{project}-%{repo}
-Version:       1.1.1
-Release:       3%{?dist}
-Summary:       Libraries for writing CNI plugin
-License:       ASL 2.0 and BSD and MIT
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-URL:           %{git0}
-Source0: %{download_url}#/%{name}-%{version}.tar.gz
+Summary:        Libraries for writing CNI plugin
+Name:           %{project}-%{repo}
+Version:        1.1.1
+Release:        4%{?dist}
+License:        Apache-2.0 AND BSD AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            %{git0}
+Source0:        %{download_url}#/%{name}-%{version}.tar.gz
+BuildRequires:  git
+BuildRequires:  go-md2man
+BuildRequires:  go-rpm-macros
 # If go_compiler is not set to 1, there is no virtual provide. Use golang instead.
-BuildRequires: golang
-BuildRequires: git
-BuildRequires: go-md2man
-BuildRequires: go-rpm-macros
-BuildRequires: systemd-devel
-Requires:      systemd
-
-
-Obsoletes:     %{project}-cni < 0.7.1-2
-Provides:      %{project}-cni = %{version}-%{release}
-Provides:      kubernetes-cni
-Provides:      container-network-stack = 1
+BuildRequires:  golang
+BuildRequires:  systemd-devel
+Requires:       systemd
+Obsoletes:      %{project}-cni < 0.7.1-2
+Provides:       %{project}-cni = %{version}-%{release}
+Provides:       kubernetes-cni
+Provides:       container-network-stack = 1
 # vendored libraries
 # awk '{print "Provides: bundled(golang("$1")) = "$2}' go.mod | sort | uniq | sed -e 's/-/_/g' -e '/bundled(golang())/d' -e '/bundled(golang(go\|module\|replace\|require))/d'
-Provides:      bundled(golang(github.com/Microsoft/go_winio)) = v0.4.17
-Provides:      bundled(golang(github.com/Microsoft/hcsshim)) = v0.8.20
-Provides:      bundled(golang(github.com/alexflint/go_filemutex)) = v1.1.0
-Provides:      bundled(golang(github.com/buger/jsonparser)) = v1.1.1
-Provides:      bundled(golang(github.com/containerd/cgroups)) = v1.0.1
-Provides:      bundled(golang(github.com/containernetworking/cni)) = v1.0.1
-Provides:      bundled(golang(github.com/coreos/go_iptables)) = v0.6.0
-Provides:      bundled(golang(github.com/coreos/go_systemd/v22)) = v22.3.2
-Provides:      bundled(golang(github.com/d2g/dhcp4)) = v0.0.0_20170904100407_a1d1b6c41b1c
-Provides:      bundled(golang(github.com/d2g/dhcp4client)) = v1.0.0
-Provides:      bundled(golang(github.com/d2g/dhcp4server)) = v0.0.0_20181031114812_7d4a0a7f59a5
-Provides:      bundled(golang(github.com/fsnotify/fsnotify)) = v1.4.9
-Provides:      bundled(golang(github.com/godbus/dbus/v5)) = v5.0.4
-Provides:      bundled(golang(github.com/gogo/protobuf)) = v1.3.2
-Provides:      bundled(golang(github.com/golang/groupcache)) = v0.0.0_20200121045136_8c9f03a8e57e
-Provides:      bundled(golang(github.com/mattn/go_shellwords)) = v1.0.12
-Provides:      bundled(golang(github.com/networkplumbing/go_nft)) = v0.2.0
-Provides:      bundled(golang(github.com/nxadm/tail)) = v1.4.8
-Provides:      bundled(golang(github.com/onsi/ginkgo)) = v1.16.4
-Provides:      bundled(golang(github.com/onsi/gomega)) = v1.15.0
-Provides:      bundled(golang(github.com/pkg/errors)) = v0.9.1
-Provides:      bundled(golang(github.com/safchain/ethtool)) = v0.0.0_20210803160452_9aa261dae9b1
-Provides:      bundled(golang(github.com/sirupsen/logrus)) = v1.8.1
-Provides:      bundled(golang(github.com/vishvananda/netlink)) = v1.1.1_0.20210330154013_f5de75959ad5
-Provides:      bundled(golang(github.com/vishvananda/netns)) = v0.0.0_20210104183010_2eb08e3e575f
+Provides:       bundled(golang(github.com/Microsoft/go_winio)) = v0.4.17
+Provides:       bundled(golang(github.com/Microsoft/hcsshim)) = v0.8.20
+Provides:       bundled(golang(github.com/alexflint/go_filemutex)) = v1.1.0
+Provides:       bundled(golang(github.com/buger/jsonparser)) = v1.1.1
+Provides:       bundled(golang(github.com/containerd/cgroups)) = v1.0.1
+Provides:       bundled(golang(github.com/containernetworking/cni)) = v1.0.1
+Provides:       bundled(golang(github.com/coreos/go_iptables)) = v0.6.0
+Provides:       bundled(golang(github.com/coreos/go_systemd/v22)) = v22.3.2
+Provides:       bundled(golang(github.com/d2g/dhcp4)) = v0.0.0_20170904100407_a1d1b6c41b1c
+Provides:       bundled(golang(github.com/d2g/dhcp4client)) = v1.0.0
+Provides:       bundled(golang(github.com/d2g/dhcp4server)) = v0.0.0_20181031114812_7d4a0a7f59a5
+Provides:       bundled(golang(github.com/fsnotify/fsnotify)) = v1.4.9
+Provides:       bundled(golang(github.com/godbus/dbus/v5)) = v5.0.4
+Provides:       bundled(golang(github.com/gogo/protobuf)) = v1.3.2
+Provides:       bundled(golang(github.com/golang/groupcache)) = v0.0.0_20200121045136_8c9f03a8e57e
+Provides:       bundled(golang(github.com/mattn/go_shellwords)) = v1.0.12
+Provides:       bundled(golang(github.com/networkplumbing/go_nft)) = v0.2.0
+Provides:       bundled(golang(github.com/nxadm/tail)) = v1.4.8
+Provides:       bundled(golang(github.com/onsi/ginkgo)) = v1.16.4
+Provides:       bundled(golang(github.com/onsi/gomega)) = v1.15.0
+Provides:       bundled(golang(github.com/pkg/errors)) = v0.9.1
+Provides:       bundled(golang(github.com/safchain/ethtool)) = v0.0.0_20210803160452_9aa261dae9b1
+Provides:       bundled(golang(github.com/sirupsen/logrus)) = v1.8.1
+Provides:       bundled(golang(github.com/vishvananda/netlink)) = v1.1.1_0.20210330154013_f5de75959ad5
+Provides:       bundled(golang(github.com/vishvananda/netns)) = v0.0.0_20210104183010_2eb08e3e575f
 
 %description
 The CNI (Container Network Interface) project consists of a specification
@@ -78,7 +72,6 @@ and libraries for writing plugins to configure network interfaces in Linux
 containers, along with a number of supported plugins. CNI concerns itself
 only with network connectivity of containers and removing allocated resources
 when the container is deleted.
-
 
 %prep
 %autosetup -Sgit -n %{repo}-%{built_tag_strip}
@@ -117,9 +110,6 @@ install -dp %{buildroot}%{_unitdir}
 install -p plugins/ipam/dhcp/systemd/cni-dhcp.service %{buildroot}%{_unitdir}
 install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 
-#define license tag if not already defined
-%{!?_licensedir:%global license %doc}
-
 %files
 %license LICENSE
 %doc *.md
@@ -129,6 +119,9 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %{_unitdir}/cni-dhcp.socket
 
 %changelog
+* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.1.1-4
+- Move to core packages
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1-3
 - Bump release to rebuild with go 1.18.8
 

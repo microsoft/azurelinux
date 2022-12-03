@@ -12733,8 +12733,8 @@
         "type": "other",
         "other": {
           "name": "nbdkit",
-          "version": "1.20.7",
-          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.20-stable/nbdkit-1.20.7.tar.gz"
+          "version": "1.30.10",
+          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.30-stable/nbdkit-1.30.10.tar.gz"
         }
       }
     },
