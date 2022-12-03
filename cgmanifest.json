@@ -12733,8 +12733,8 @@
         "type": "other",
         "other": {
           "name": "nbdkit",
-          "version": "1.30.10",
-          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.30-stable/nbdkit-1.30.10.tar.gz"
+          "version": "1.20.7",
+          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.20-stable/nbdkit-1.20.7.tar.gz"
         }
       }
     },
@@ -27840,6 +27840,16 @@
           "name": "xmldb-api",
           "version": "0.1",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xmldb-xapi-20041010-src.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xmlrpc-c",
+          "version": "1.54.06",
+          "downloadUrl": "https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.54.06/xmlrpc-c-1.54.06.tgz"
         }
       }
     },

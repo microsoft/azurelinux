@@ -2370,6 +2370,7 @@
                 "xml-commons-apis",
                 "xml-commons-resolver",
                 "xmldb-api",
+                "xmlrpc-c",
                 "xmlunit",
                 "xpp2",
                 "xpp3",
