@@ -11380,6 +11380,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lv2",
+          "version": "1.18.8",
+          "downloadUrl": "https://lv2plug.in/spec/lv2-1.18.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "logrus",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz"
