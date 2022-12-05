@@ -218,10 +218,6 @@ get-release-major: printvar-RELEASE_MAJOR_ID
 sanitize_variables = $(subst ',,$(subst ",,$(subst `,,$(subst \#,,$(subst $$,,$(subst :,,$1))))))
 interesting_variables  = $(filter-out .% interesting_variables, $(sort $(call sanitize_variables,$(.VARIABLES))))
 
-$(warning $(shell env))
-$(warning $(.VARIABLES))
-$(warning DEBUG: printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var)))
-
 printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var))
 printvar-all-vars: ;
 printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbose-$(var))
