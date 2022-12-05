@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Multimedia/CD/Grabbers
 URL:            https://www.xiph.org/paranoia/index.html
-Source:         http://downloads.xiph.org/releases/%{name}/%{name}-III-%{version}.src.tgz
+Source:         https://downloads.xiph.org/releases/%{name}/%{name}-III-%{version}.src.tgz
 Patch0:         010_build_system.patch
 Patch1:         cdparanoia-III-ide_majors.patch
 Patch2:         cdparanoia-III-c++.patch
