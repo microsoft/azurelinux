@@ -4439,6 +4439,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gstreamer1-plugins-base",
+          "version": "1.20.4",
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.20.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "groff",
           "version": "1.22.4",
           "downloadUrl": "https://ftp.gnu.org/gnu/groff/groff-1.22.4.tar.gz"
