@@ -1,6 +1,11 @@
 # Package build hangs during debug info extraction.
 %global debug_package   %{nil}
+
 %define ltp_prefix /opt/%{name}
+
+# Don't generate requires on Korn shell.
+# Mariner doesn't have it, so we can skip/fail its tests.
+%global __requires_exclude_from %{ltp_prefix}/testcases/data/file01/in.ksh
 
 Summary:        Linux Test Project
 Name:           ltp
@@ -30,6 +35,7 @@ BuildRequires:  m4
 BuildRequires:  make
 BuildRequires:  pkgconfig
 
+Requires:  expect
 Requires:  libacl
 Requires:  libaio
 Requires:  libcap
@@ -38,6 +44,7 @@ Requires:  libnuma
 Requires:  libtirpc
 Requires:  glibc
 Requires:  psmisc
+Requires:  tcsh
 
 %description
 Linux Test Project is a set of tests to validate the reliability, robustness, and stability of the Linux kernel.
