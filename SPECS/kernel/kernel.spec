@@ -75,13 +75,6 @@ Requires:       %{name} = %{version}-%{release}
 %description drivers-accessibility
 This package contains the Linux kernel accessibility support
 
-%package drivers-sound
-Summary:        Kernel Sound modules
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-
-%description drivers-sound
-This package contains the Linux kernel sound support
 
 %package docs
 Summary:        Kernel docs
@@ -294,8 +287,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %post drivers-accessibility
 /sbin/depmod -a %{uname_r}
 
-%post drivers-sound
-/sbin/depmod -a %{uname_r}
 
 %files
 %defattr(-,root,root)
@@ -311,7 +302,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
-%exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
 
 %files docs
@@ -324,9 +314,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_prefix}/src/linux-headers-%{uname_r}
 
 
-%files drivers-sound
-%defattr(-,root,root)
-/lib/modules/%{uname_r}/kernel/sound
 
 %files tools
 %defattr(-,root,root)
