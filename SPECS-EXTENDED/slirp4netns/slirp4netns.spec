@@ -1,39 +1,41 @@
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 %global git0 https://github.com/rootless-containers/%{name}
 %global commit0 4367de7c3361c344155220a4e999ffd7432dad81
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+
 # Used for comparing with latest upstream tag
 # to decide whether to autobuild (non-rawhide only)
 %define built_tag v1.1.8
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %define download_url %{git0}/archive/%{built_tag}.tar.gz
-Summary:        slirp for network namespaces
-Name:           slirp4netns
-Version:        1.1.8
-Release:        3%{?dist}
-License:        GPLv2 AND MIT
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            %{git0}
-Source0:        %{download_url}#/%{name}-%{version}.tar.gz
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  gcc
-BuildRequires:  git
-BuildRequires:  glib2-devel
-BuildRequires:  go-md2man
-BuildRequires:  libcap-devel
-BuildRequires:  libseccomp-devel
-BuildRequires:  libslirp-devel
-BuildRequires:  make
+
+Name: slirp4netns
+Version: 1.1.8
+Release: 2%{?dist}
 # no go-md2man in ppc64
-ExcludeArch:    ppc64
+ExcludeArch: ppc64
+Summary: slirp for network namespaces
+License: GPLv2
+URL: %{git0}
+Source0: %{download_url}#/%{name}-%{version}.tar.gz
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: gcc
+BuildRequires: glib2-devel
+BuildRequires: git
+BuildRequires: go-md2man
+BuildRequires: libcap-devel
+BuildRequires: libseccomp-devel
+BuildRequires: libslirp-devel
+BuildRequires: make
 
 %description
 slirp for network namespaces, without copying buffers across the namespaces.
 
 %package devel
-Summary:        %{summary}
-BuildArch:      noarch
+Summary: %{summary}
+BuildArch: noarch
 
 %description devel
 %{summary}
@@ -48,12 +50,15 @@ building other packages which use import path with
 %build
 ./autogen.sh
 ./configure --prefix=%{_usr} --libdir=%{_libdir}
-make generate-man
+%{__make} generate-man
 
 %install
 make DESTDIR=%{buildroot} install install-man
 
 %check
+
+#define license tag if not already defined
+%{!?_licensedir:%global license %doc}
 
 %files
 %license COPYING
@@ -62,10 +67,6 @@ make DESTDIR=%{buildroot} install install-man
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
-* Tue Nov 01 2022 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.1.8-3
-- Move from extended to core
-- License verified
-
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
