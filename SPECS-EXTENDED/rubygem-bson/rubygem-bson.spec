@@ -4,15 +4,15 @@ Distribution:   Mariner
 %global gem_name bson
 
 Name: rubygem-%{gem_name}
-Version: 4.7.0
-Release: 5%{?dist}
+Version: 4.15.0
+Release: 1%{?dist}
 Summary: Ruby Implementation of the BSON specification
 License: ASL 2.0
 # Keep the URL, while different URL is used in the upstream gemspec file.
 # Because there is a basic explanation about the bson
 # that is a beneficial for Fedora user.
 URL: http://bsonspec.org
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0: https://github.com/mongodb/%{gem_name}-ruby/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 Requires: rubygem(bigdecimal)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel >= 1.3.6
@@ -40,15 +40,11 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version}
-
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%autosetup -n %{gem_name}-ruby-%{version}
 
 %build
 # Create the gem as gem install only works on a gem file
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 
 # %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
 # by default, so that we can move it into the buildroot in %%install
@@ -88,7 +84,8 @@ popd
 %{gem_instdir}/spec
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.7.0-5
+* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.15.0-1
+- Switch to building a tar.gz instead of a gem
 - License verified
 
 * Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 4.7.0-4
