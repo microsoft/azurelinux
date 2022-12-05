@@ -35,6 +35,10 @@ BuildRequires:  m4
 BuildRequires:  make
 BuildRequires:  pkgconfig
 
+%if %{with_check}
+BuildRequires:  git
+%endif
+
 Requires:  expect
 Requires:  libacl
 Requires:  libaio
