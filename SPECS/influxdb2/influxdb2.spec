@@ -7,8 +7,8 @@ Distribution:   Mariner
 Version:        2.4.0
 Release:        1%{?dist}
 URL:            https://github.com/influxdata/influxdb
-Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source99:       %{name}-%{version}-vendor.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  fdupes
 BuildRequires:  go >= 1.18
@@ -36,8 +36,6 @@ BuildRequires:  tzdata
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 
-%{!?_tmpfilesdir:%global _tmpfilesdir /usr/lib/tmpfiles.d}
-
 %description
 InfluxDB is an distributed time series database with no external dependencies.
 It's useful for recording metrics, events, and performing analytics.
@@ -46,22 +44,22 @@ It's useful for recording metrics, events, and performing analytics.
 Summary:        InfluxDB development files
 Group:          Development/Languages/Golang
 Requires:       go
+Conflicts:      influxdb 
 
 %description devel
 Go sources and other development files for InfluxDB
 
 %prep
 %setup -q
-%setup -q -T -D -a 99
 
 %build
 export GO111MODULE=on
+tar -xf %{SOURCE1} --no-same-owner
 
 # Build influxdb
 %goprep github.com/influxdata/influxdb/v2
-%gobuild -mod=vendor -ldflags="-X main.version=%{version}" cmd/...
+go build -mod=vendor -ldflags="-X main.version=%{version}" cmd/...
 
-%sysusers_generate_pre %{SOURCE3} %{name}
 
 %install
 %gosrc
@@ -77,7 +75,6 @@ make test
 
 %files
 %license LICENSE
-%doc README.md CHANGELOG.md
 %dir %{_sysconfdir}/influxdb2
 %{_bindir}/influxd
 %{_bindir}/telemetryd
