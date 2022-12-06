@@ -7,16 +7,14 @@ Distribution:   Mariner
 %{!?_with_bootstrap: %global bootstrap 0}
 
 Name: rubygem-%{gem_name}
-Version: 1.3
-Release: 10%{?dist}
+Version: 1.5.0
+Release: 1%{?dist}
 Summary: Provide a list of changes between two sequenced collections
 License: GPLv2+ or Artistic or MIT
 URL: https://github.com/halostatue/diff-lcs
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0: https://github.com/halostatue/diff-lcs/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 BuildRequires: rubygems-devel
-%if ! 0%{?bootstrap}
-BuildRequires: rubygem(rspec)
-%endif
+BuildRequires: rubygem-rspec
 BuildRequires: ruby(release)
 BuildArch: noarch
 
@@ -35,11 +33,12 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c  -T
-%gem_install -n %{SOURCE0}
+%autosetup -n %{gem_name}-%{version}
 
 
 %build
+gem build %{gem_name}
+%gem_install
 
 
 %install
@@ -57,12 +56,6 @@ find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 # Fix shebangs.
 sed -i 's|^#!.*|#!/usr/bin/ruby|' %{buildroot}%{gem_instdir}/bin/{htmldiff,ldiff}
 
-%if ! 0%{?bootstrap}
-%check
-pushd .%{gem_instdir}
-rspec spec
-popd
-%endif
 
 %files
 %dir %{gem_instdir}
@@ -82,13 +75,13 @@ popd
 %doc %{gem_instdir}/Contributing.md
 %doc %{gem_instdir}/History.md
 %doc %{gem_instdir}/Manifest.txt
-%{gem_instdir}/autotest
 %doc %{gem_instdir}/README.rdoc
 %{gem_instdir}/Rakefile
 %{gem_instdir}/spec
 
 %changelog
 * Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.3-10
+- Switch to building tar.gz instead of .gem
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-9
