@@ -22,7 +22,7 @@ Distribution:   Mariner
 %global short_name      commons-%{base_name}
 Name:           apache-%{short_name}
 Version:        1.19
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java API for working with compressed files and archivers
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -38,7 +38,7 @@ BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.7
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  xz-java
-Requires:       mvn(org.tukaani:xz)
+Requires:       xz
 Provides:       %{short_name} = %{version}-%{release}
 Obsoletes:      %{short_name} < %{version}-%{release}
 Provides:       jakarta-%{short_name} = %{version}-%{release}
@@ -121,6 +121,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %doc NOTICE.txt
 
 %changelog
+* Mon Nov 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.19-3
+- Add Requires on xz instead of mvn(org.tukaani:xz) to fix package install failure
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
