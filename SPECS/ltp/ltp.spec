@@ -17,6 +17,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/cbl-mariner
 Source0:        https://github.com/linux-test-project/ltp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}_submodules-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -34,10 +35,6 @@ BuildRequires:  glibc-devel
 BuildRequires:  m4
 BuildRequires:  make
 BuildRequires:  pkgconfig
-
-%if %{with_check}
-BuildRequires:  git
-%endif
 
 Requires:  expect
 Requires:  libacl
@@ -61,7 +58,7 @@ BuildArch:      noarch
 LTP documentation and manuals.
 
 %prep
-%autosetup
+%autosetup -a 1
 
 %build
 make autotools
@@ -75,6 +72,8 @@ make autotools
 %make_install
 
 %check
+# Disabling cloning of git submodules - already provided in Source1
+sed -i "s/git submodule.*/@echo 'Skipping submodule init - already provided.'/" tools/sparse/Makefile
 make check
 
 %files
