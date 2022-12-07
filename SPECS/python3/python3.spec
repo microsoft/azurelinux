@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Patch1:         CVE-2015-20107.patch
 # Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
 Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch3:         CVE-2022-37454.patch
+Patch4:         CVE-2022-45061.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -303,6 +304,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Dec 06 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.14-4
+- Add CVE-2022-45061 patch from upstream.
+
 * Mon Dec 05 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.14-3
 - Add CVE-2022-37454 patch from upstream.
 - Vulnerability not currently exposed because we use openssl sha3 implementation, but patching built-in sha3 regardless.
