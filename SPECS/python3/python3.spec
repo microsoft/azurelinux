@@ -281,7 +281,7 @@ make  %{?_smp_mflags} test
 %{_libdir}/python3.7/test/*
 
 %changelog
-* Mon Oct 03 2022 Minghe Ren <mingheren@microsoft.com> - 3.7.13-6
+* Tue Dec 06 2022 Minghe Ren <mingheren@microsoft.com> - 3.7.13-6
 - Add CVE-2022-37454 patch from upstream
 
 * Mon Oct 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.13-4
