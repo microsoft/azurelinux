@@ -262,6 +262,8 @@ Patch1006:      CVE-2022-35414.patch
 Patch1007:      CVE-2021-4158.patch
 # CVE-2022-2962 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/36a894aeb64a2e02871016da1c37d4a4ca109182
 Patch1008:      0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
+# CVE-2022-4144 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/6dbbf055148c6f1b7d8a3251a65bd6f3d1e1f622
+Patch1009:      CVE-2022-4144.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
