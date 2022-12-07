@@ -23,6 +23,8 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
 BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  glibc-devel
 BuildRequires:  kernel-headers
 BuildRequires:  libacl-devel
 BuildRequires:  libaio-devel
@@ -30,20 +32,18 @@ BuildRequires:  libcap-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnuma-devel
 BuildRequires:  libtirpc-devel
-BuildRequires:  gcc
-BuildRequires:  glibc-devel
 BuildRequires:  m4
 BuildRequires:  make
 BuildRequires:  pkgconfig
 
 Requires:  expect
+Requires:  glibc
 Requires:  libacl
 Requires:  libaio
 Requires:  libcap
 Requires:  libmnl
 Requires:  libnuma
 Requires:  libtirpc
-Requires:  glibc
 Requires:  psmisc
 Requires:  tcsh
 
