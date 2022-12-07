@@ -48,8 +48,8 @@
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
 %{set_build_flags}\
-  %{?mariner_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
-  %{?mariner_ccache_enabled:CCACHE_DIR="${CCACHE_DIR:-/ccache-dir}" ; export CCACHE_DIR ;}\
+%{?mariner_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
+%{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{nil}
 
 #
@@ -82,7 +82,7 @@
     %{_rpmconfigdir}/brp-strip %{__strip} \
     %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
-    %{?mariner_ccache_enabled:CCACHE_DIR="${CCACHE_DIR:-/ccache-dir}" ; export CCACHE_DIR ;} \
+    %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
     %{?mariner_ccache_enabled:ccache --show-stats --verbose} \
     %{nil}
 

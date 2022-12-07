@@ -30,7 +30,7 @@ const (
 	chrootRpmBuildRoot      = "/usr/src/mariner"
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
-	chrootcCacheDir         = "/ccache-dir"
+	chrootCcacheDir         = "/ccache-dir"
 )
 
 var (
@@ -150,9 +150,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 
 	overlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(chroot.RootDir(), overlaySource, chrootLocalRpmsDir, rpmDirPath, chrootLocalRpmsDir, overlayWorkDir)
 	rpmCacheMount := safechroot.NewMountPoint(*cacheDir, chrootLocalRpmsCacheDir, "", safechroot.BindMountPointFlags, "")
-	cCacheMount := safechroot.NewMountPoint(*ccacheDir, chrootcCacheDir, "", safechroot.BindMountPointFlags, "")
-	mountPoints := []*safechroot.MountPoint{overlayMount, rpmCacheMount, cCacheMount}
-	extraDirs := append(overlayExtraDirs, chrootLocalRpmsCacheDir, chrootcCacheDir)
+	ccacheMount := safechroot.NewMountPoint(*ccacheDir, chrootCcacheDir, "", safechroot.BindMountPointFlags, "")
+	mountPoints := []*safechroot.MountPoint{overlayMount, rpmCacheMount, ccacheMount}
+	extraDirs := append(overlayExtraDirs, chrootLocalRpmsCacheDir, chrootCcacheDir)
 
 	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
 	if err != nil {
