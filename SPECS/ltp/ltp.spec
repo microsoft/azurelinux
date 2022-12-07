@@ -17,6 +17,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/cbl-mariner
 Source0:        https://github.com/linux-test-project/ltp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Use the generate_submodules_tarball.sh script to create a tarball during version updates.
 Source1:        %{name}_submodules-%{version}.tar.gz
 
 BuildRequires:  autoconf
