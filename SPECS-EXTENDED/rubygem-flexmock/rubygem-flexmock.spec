@@ -8,13 +8,11 @@ Version:	2.3.6
 Release:	8%{?dist}
 License:	MIT
 URL:		https://github.com/doudou/flexmock
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-Source1:	%{gem_name}-v%{version}-test-missing-files.tar.gz
-# Source1 is created fron Source2
-Source2:	flexmock-create-missing-test-files.sh
+Source0:	https://github.com/doudou/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
+BuildRequires:	git
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(minitest) >= 5
 BuildRequires:	rubygem(rspec) >= 3
@@ -34,14 +32,11 @@ Requires:	%{name} = %{version}-%{release}
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -c -T
-
-%gem_install -n %{SOURCE0}
-
-find . -name \*.rb | xargs sed -i -e '\@/usr/bin/env@d'
-find . -name \*.gem -or -name \*.rb -or -name \*.rdoc | xargs chmod 0644
+%autosetup -S git -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
+%gem_install
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
@@ -56,18 +51,6 @@ rm -rf \
 	flexmock.gemspec \
 	install.rb
 popd
-
-%check
-pushd .%{gem_instdir}
-
-tar xf %{SOURCE1}
-mv flexmock/test .
-
-ruby -Ilib:.:test \
-	-e 'Dir.glob("test/*_test.rb").each {|f| require f}'
-rspec test/rspec_integration/
-popd
-
 
 %files
 %dir	%{gem_instdir}
@@ -85,6 +68,7 @@ popd
 
 %changelog
 * Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.6-8
+- Switch to building tar.gz instead of .gem
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-7

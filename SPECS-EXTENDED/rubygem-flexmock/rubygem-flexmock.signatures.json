@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "flexmock-2.3.6.gem": "b5aa6dc338148be8c80f3b2a7ab57b668bacc748f66032b29eaabb533e85851e",
-  "flexmock-create-missing-test-files.sh": "6b1a1e831c62b8f265dfe2aa96dc8b0dcb64a10ec72cd2c9d0cbfcc2b99fdb64",
-  "flexmock-v2.3.6-test-missing-files.tar.gz": "c18d28126731b12a67f9c0286cad127fbe78385b86ce75e24203b9d7eaac6648"
+  "rubygem-flexmock-2.3.6.tar.gz": "f52c6858a761ed035080a767c5ac91b65852092eacd1455425ad4c35897178fc"
  }
 }
