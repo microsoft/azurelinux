@@ -79,7 +79,7 @@
 
 The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/)
 
-If you simply want to test-drive CBL-Mariner you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with CBL-Mariner and build custom images or add packages in a more focused environment, refer to the tutorial in the [CBL-MarinerDemo](https://github.com/microsoft/CBL-MarinerDemo) repository.
+If you simply want to test-drive CBL-Mariner you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with CBL-Mariner and build custom images or add packages in a more focused environment, refer to the tutorial in the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository.
 
 The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
@@ -200,7 +200,7 @@ sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerTutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
 By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building)
 
@@ -231,7 +231,7 @@ The following builds an ISO with an interactive UI and selectable image configur
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) that only specifies a _single_ SystemConfig.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig.
 
 ```bash
 # Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
@@ -242,7 +242,7 @@ sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyper
 
 ## Packages
 
-The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
+The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
 
 Build all local packages needed for the default `core-efi.json`:
 
@@ -652,8 +652,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | [Image config file](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) to build.
-| CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerDemo#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
+| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | [Image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) to build.
+| CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
