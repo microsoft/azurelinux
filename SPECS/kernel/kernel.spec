@@ -18,7 +18,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.80.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -406,6 +406,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Dec 05 2022 Betty Lakes <bettylakes@microsoft.com> - 5.15.80.1-2
+- Turn on hibernation and its dependencies
+
 * Tue Nov 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.80.1-1
 - Auto-upgrade to 5.15.80.1
 
@@ -445,7 +448,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
 - Upgrade to 5.15.67.1
 
-* Tue Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
+* Thu Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
 - Setting vfat module in kernel config to Y to be baked in
 
 * Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
