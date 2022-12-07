@@ -34,7 +34,7 @@ BuildRequires:  libnuma-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  m4
 BuildRequires:  make
-BuildRequires:  pkgconfig
+BuildRequires:  pkg-config
 
 Requires:  expect
 Requires:  glibc
