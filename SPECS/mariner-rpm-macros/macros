@@ -42,9 +42,14 @@
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
 # are consistently applied this override should be removed.
+#
+# USE_CCACHE: when 'mariner_ccache_enabled' is defined, enable building with ccache
+#
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
 %{set_build_flags}\
+  %{?mariner_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
+  %{?mariner_ccache_enabled:CCACHE_DIR="${CCACHE_DIR:-/ccache-dir}" ; export CCACHE_DIR ;}\
 %{nil}
 
 #
@@ -77,6 +82,8 @@
     %{_rpmconfigdir}/brp-strip %{__strip} \
     %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
+    %{?mariner_ccache_enabled:CCACHE_DIR="${CCACHE_DIR:-/ccache-dir}" ; export CCACHE_DIR ;} \
+    %{?mariner_ccache_enabled:ccache --show-stats --verbose} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\

@@ -30,6 +30,7 @@ const (
 	chrootRpmBuildRoot      = "/usr/src/mariner"
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
+	chrootcCacheDir         = "/ccache-dir"
 )
 
 var (
@@ -41,6 +42,7 @@ var (
 	rpmsDirPath          = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
 	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
+	ccacheDir            = app.Flag("ccache-dir", "The ccache dir").Required().ExistingDir()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
@@ -49,6 +51,7 @@ var (
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
 	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
 	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
+	useCcache            = app.Flag("use-ccache", "Use ccache during package build").Bool()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -82,8 +85,11 @@ func main() {
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
+	if *useCcache {
+		defines[rpm.MarinerCCacheDefine] = "true"
+	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, *useCcache)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
 
 	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
@@ -105,7 +111,7 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 	return
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
 
@@ -144,8 +150,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 
 	overlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(chroot.RootDir(), overlaySource, chrootLocalRpmsDir, rpmDirPath, chrootLocalRpmsDir, overlayWorkDir)
 	rpmCacheMount := safechroot.NewMountPoint(*cacheDir, chrootLocalRpmsCacheDir, "", safechroot.BindMountPointFlags, "")
-	mountPoints := []*safechroot.MountPoint{overlayMount, rpmCacheMount}
-	extraDirs := append(overlayExtraDirs, chrootLocalRpmsCacheDir)
+	cCacheMount := safechroot.NewMountPoint(*ccacheDir, chrootcCacheDir, "", safechroot.BindMountPointFlags, "")
+	mountPoints := []*safechroot.MountPoint{overlayMount, rpmCacheMount, cCacheMount}
+	extraDirs := append(overlayExtraDirs, chrootLocalRpmsCacheDir, chrootcCacheDir)
 
 	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
 	if err != nil {
@@ -160,7 +167,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	}
 
 	err = chroot.Run(func() (err error) {
-		return buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall)
+		return buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, useCcache)
 	})
 	if err != nil {
 		return
@@ -172,7 +179,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, workerTar, srpmFile, repoFile, rpm
 	return
 }
 
-func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines map[string]string, packagesToInstall []string) (err error) {
+func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines map[string]string, packagesToInstall []string, useCcache bool) (err error) {
 	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
@@ -183,6 +190,15 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	err = tdnfInstall(packagesToInstall)
 	if err != nil {
 		return
+	}
+
+	if useCcache {
+		ccachePkgName := []string{"ccache"}
+		logger.Log.Infof("USE_CCACHE: installing package: %s", ccachePkgName[0])
+		err = tdnfInstall(ccachePkgName)
+		if err != nil {
+			return
+		}
 	}
 
 	// Remove all libarchive files on the system before issuing a build.

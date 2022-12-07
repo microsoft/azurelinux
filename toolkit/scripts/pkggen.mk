@@ -49,6 +49,7 @@ clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-cache:
 	rm -rf $(CACHED_RPMS_DIR)
+	rm -rf $(CCACHE_DIR)
 	rm -f $(validate-pkggen-config)
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
@@ -124,6 +125,7 @@ endif
 
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
+	mkdir -p $(CCACHE_DIR) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
@@ -198,6 +200,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--rpm-dir="$(RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
+		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
@@ -217,6 +220,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
+		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
 		$(logging_command) && \
 	touch $@
 
