@@ -132,7 +132,7 @@ func main() {
 	buildAgentConfig := &buildagents.BuildAgentConfig{
 		Program:   *buildAgentProgram,
 		CacheDir:  *cacheDir,
-		CCacheDir:  *ccacheDir,
+		CCacheDir: *ccacheDir,
 		RepoFile:  *repoFile,
 		RpmDir:    *rpmDir,
 		SrpmDir:   *srpmDir,
