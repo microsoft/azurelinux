@@ -16,15 +16,7 @@ Patch0: qttools-opensource-src-5.5.0-qmake-qt5.patch
 
 BuildRequires: coreutils
 BuildRequires: pcre2-devel
-BuildRequires: icu-devel
-BuildRequires: glib-devel
 BuildRequires: dbus-devel
-BuildRequires: harfbuzz-devel
-BuildRequires: sqlite-devel
-BuildRequires: fontconfig-devel
-BuildRequires: libpng-devel
-BuildRequires: libjpeg-turbo-devel
-BuildRequires: zlib-devel
 
 BuildRequires: qt5-qtbase-private-devel
 # Qt macros
