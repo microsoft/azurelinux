@@ -17,6 +17,11 @@
                 "packagelists/accessibility-packages.json",
                 "packagelists/iso-initrd-packages.json"
             ],
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/iso_initrd/cleanup.sh"
+                }
+            ],
             "KernelOptions": {
                 "default": "kernel"
             },

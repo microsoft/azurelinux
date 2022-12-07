@@ -86,7 +86,6 @@ Requires:       efibootmgr
 Requires:       freefont
 Requires:       grub2
 Requires:       systemd
-Requires:       pcre2
 ExclusiveArch:  x86_64
 AutoReq:        no
 
@@ -221,7 +220,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.2.11-40
-- Add pcre2 dependency and AutoReq to no to avoid pulling unneeded dependencies
+- Avoid pulling unneeded dependencies by setting AutoReq to no
 
 * Mon Apr 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.11-38
 - Fix partioning bug
