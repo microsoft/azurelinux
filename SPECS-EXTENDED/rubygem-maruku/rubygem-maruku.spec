@@ -3,13 +3,13 @@ Distribution:   Mariner
 %define gem_name maruku
 
 Name: rubygem-%{gem_name}
-Version: 0.7.2
-Release: 11%{?dist}
+Version: 0.7.3
+Release: 1%{?dist}
 Summary: Maruku is a Markdown-superset interpreter written in Ruby
 # lib/maruku/ext/fenced_code.rb - BSD
 License: MIT and BSD
 URL: http://github.com/bhollis/maruku
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0: https://github.com/bhollis/maruku/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -30,10 +30,11 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c -T
-%gem_install -n %{SOURCE0}
+%autosetup -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
+%gem_install
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
@@ -76,7 +77,7 @@ popd
 %{gem_instdir}/spec
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.7.2-11
+* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.7.3-1
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2-10
