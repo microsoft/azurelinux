@@ -1990,6 +1990,7 @@
                 "clamav",
                 "cloud-hypervisor",
                 "cmake-fedora",
+                "compiler-rt",
                 "coredns-1.8.0",
                 "coredns-1.8.4",
                 "coredns-1.8.6",

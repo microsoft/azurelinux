@@ -1726,6 +1726,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "compiler-rt",
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/compiler-rt-12.0.1.src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "conda",
           "version": "4.11.0",
           "downloadUrl": "https://github.com/conda/conda/archive/4.11.0/conda-4.11.0.tar.gz"
