@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Patch1:         CVE-2015-20107.patch
 Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch3:         CVE-2022-37454.patch
 Patch4:         CVE-2022-45061.patch
+Patch5:         CVE-2022-42919.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -304,6 +305,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Dec 07 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.14-5
+- Add CVE-2022-42919 patch from upstream.
+
 * Tue Dec 06 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.14-4
 - Add CVE-2022-45061 patch from upstream.
 
