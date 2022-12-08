@@ -1,4 +1,5 @@
-%define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+%define underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+%define gcc_version 11.2.0
 
 Summary:        Boost
 Name:           boost
@@ -10,6 +11,8 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
+Source1:        https://ftp.gnu.org/gnu/gcc/gcc-%{gcc_version}/gcc-%{gcc_version}.tar.xz
+
 BuildRequires:  bzip2-devel
 
 %description
@@ -35,9 +38,20 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%autosetup -n %{name}_%{underscore_version}
+%autosetup -n %{name}_%{underscore_version} -a 1
 
 %build
+# Build libbacktrace from GCC.
+pushd gcc-%{gcc_version}/libbacktrace
+
+%configure
+%make_build
+
+mv .libs/libbacktrace.a %{_libdir}
+mv backtrace.h %{_includedir}
+
+popd
+
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
 ./b2 %{?_smp_mflags} stage threading=multi
 
