@@ -103,8 +103,8 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 %{_bindir}/toco_from_protos
 
 %changelog
-* Sun Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
-- correct runtime package name. 
+* Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
+- correct markupsafe package name issue. 
 
 * Sun Dec 04 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
 - update to 2.11.0
