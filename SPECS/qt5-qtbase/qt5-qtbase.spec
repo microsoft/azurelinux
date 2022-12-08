@@ -741,7 +741,7 @@ fi
 
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
-- Add AutoReq to no to avoid pulling unneeded runtime dependencies
+- Add AutoReq to avoid pulling unneeded runtime dependencies and add build deps
 - Update source download path.
 
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
