@@ -1,13 +1,14 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        28.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv3+ and CC0-1.0
 URL:            https://www.gnu.org/software/emacs/
 Group:          Applications/Editors
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2022-45939.patch
 
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
@@ -31,7 +32,7 @@ This package provides some directories which are required by other
 packages that add functionality to Emacs.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -85,6 +86,9 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Wed Dec 07 2022 Henry Beberman <henry.beberman@microsoft.com> - 28.1-5
+- Apply upstream patch for CVE-2022-45939
+
 * Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 28.1-4
 - Add filesystem subpackage.
 
