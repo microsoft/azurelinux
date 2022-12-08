@@ -65,7 +65,7 @@ rm -rf %{buildroot}%{_libdir}/cmake
 
 %changelog
 * Wed Dec 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.76.0-2
-- Adding static stacktrace libs.
+- Making Boost build its static libbost_stacktrace_backtrace.a lib.
 
 * Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.76.0-1
 - Update version to 1.76.0
