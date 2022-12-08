@@ -173,7 +173,7 @@ mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 
 # Install libbacktrace-static components
-mv .libs/libbacktrace.a %{buildroot}%{_libdir}
+mv %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_libdir}
 mv libbacktrace/backtrace.h %{buildroot}%{_includedir}
 
 rm -rf %{buildroot}%{_infodir}
