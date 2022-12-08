@@ -5,15 +5,12 @@ Distribution:   Mariner
 %global gem_name mysql2
 
 Name: rubygem-%{gem_name}
-Version: 0.5.3
-Release: 7%{?dist}
+Version: 0.5.4
+Release: 1%{?dist}
 Summary: A simple, fast Mysql library for Ruby, binding to libmysql
 License: MIT
 URL: https://github.com/brianmario/mysql2
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# git clone --no-checkout https://github.com/brianmario/mysql2.git
-# cd mysql2 && git archive -v -o mysql2-0.5.3-tests.txz 0.5.3 spec/
-Source1: %{gem_name}-%{version}-tests.txz
+Source0: https://github.com/brianmario/mysql2/archive/refs/tags/%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 # Required in lib/mysql2.rb
 Requires: rubygem(bigdecimal)
@@ -21,6 +18,7 @@ BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby-devel
 BuildRequires: gcc
+BuildRequires: git
 BuildRequires: mariadb-connector-c-devel
 %if %{with_check}
 BuildRequires: mariadb-server
@@ -48,12 +46,12 @@ BuildArch: noarch
 Documentation for %{name}
 
 %prep
-%setup -q -n %{gem_name}-%{version} -b 1
+%autosetup -S git -n %{gem_name}-%{version}
 
 
 %build
 # Create the gem as gem install only works on a gem file
-gem build ../%{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 
 # %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
 # by default, so that we can move it into the buildroot in %%install
@@ -163,7 +161,8 @@ kill "$(cat "${MYSQL_TEST_PID_FILE}")"
 
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.5.3-7
+* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.5.4-1
+- Switch to build from .tar.gz
 - License verified
 
 * Wed Nov 17 2021 Muhammad Falak <mwani@microsoft.com> - 0.5.3-6
