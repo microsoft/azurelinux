@@ -233,10 +233,10 @@ ca-certificates-base-2.0.0-8.cm2.noarch.rpm
 ca-certificates-2.0.0-8.cm2.noarch.rpm
 dwz-0.14-1.cm2.aarch64.rpm
 unzip-6.0-20.cm2.aarch64.rpm
-python3-3.9.14-4.cm2.aarch64.rpm
-python3-devel-3.9.14-4.cm2.aarch64.rpm
-python3-libs-3.9.14-4.cm2.aarch64.rpm
-python3-setuptools-3.9.14-4.cm2.noarch.rpm
+python3-3.9.14-5.cm2.aarch64.rpm
+python3-devel-3.9.14-5.cm2.aarch64.rpm
+python3-libs-3.9.14-5.cm2.aarch64.rpm
+python3-setuptools-3.9.14-5.cm2.noarch.rpm
 which-2.21-8.cm2.aarch64.rpm
 libselinux-3.2-1.cm2.aarch64.rpm
 slang-2.3.2-4.cm2.aarch64.rpm
