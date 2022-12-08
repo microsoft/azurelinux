@@ -30,7 +30,7 @@ TensorFlow is an open source machine learning framework for everyone.
 
 %package -n     python3-tensorflow
 Summary:        python-tensorflow
-Requires:       python3-MarkupSafe
+Requires:       python3-markupsafe
 Requires:       python3-absl-py
 Requires:       python3-astunparse
 Requires:       python3-cachetools
