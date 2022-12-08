@@ -79,6 +79,7 @@ make install/fast -C %{_target_platform} DESTDIR=%{buildroot}
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.3.0-7
 - Add dbus-devel build dependency
+- License verified.
 
 * Thu Apr 02 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-6
 - Initial CBL-Mariner import from Fedora 30 (license: MIT).
