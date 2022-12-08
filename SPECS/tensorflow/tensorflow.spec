@@ -104,7 +104,7 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
 %changelog
 * Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
-- correct markupsafe package name issue. 
+- correct markupsafe package name. 
 
 * Sun Dec 04 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
 - update to 2.11.0
