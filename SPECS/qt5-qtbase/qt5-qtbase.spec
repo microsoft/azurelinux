@@ -40,7 +40,7 @@ Vendor:       Microsoft Corporation
 Distribution: Mariner
 URL:          https://qt-project.org/
 %global       majmin %(echo %{version} | cut -d. -f1-2)
-Source0:      https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0:      https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 BuildRequires: build-essential
 BuildRequires: systemd
@@ -206,7 +206,6 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 # debating whether to do 1 subpkg per library or not -- rex
 %package gui
 Summary: Qt5 GUI-related libraries
-# Recommends: mesa-dri-drivers
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 # for Source6: 10-qt5-check-opengl2.sh:
@@ -743,6 +742,7 @@ fi
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
 - Add AutoReq to no to avoid pulling unneeded runtime dependencies
+- Update source download path.
 
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Migrating CVE fixes from Mariner's 1.0 version.

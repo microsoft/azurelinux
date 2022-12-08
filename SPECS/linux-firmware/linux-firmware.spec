@@ -61,14 +61,14 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 %files
 %defattr(-,root,root)
 %license GPL*
-%license LICENCE.iwlwifi_firmware
+%license WHENCE LICENCE.iwlwifi_firmware
 %{_firmwarepath}/rsi
 %{_firmwarepath}/rsi_91x.fw
 %{_firmwarepath}/iwlwifi-8000C-*.ucode
 
 %files broadcom
 %defattr(-,root,root)
-%license LICENCE.broadcom_bcm43xx LICENCE.cypress
+%license WHENCE LICENCE.broadcom_bcm43xx LICENCE.cypress
 %{_firmwarepath}/bnx2x
 %{_firmwarepath}/brcm
 
@@ -84,7 +84,7 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 
 %files intel
 %defattr(-,root,root)
-%license LICENSE.i915
+%license WHENCE LICENSE.i915
 %license LICENSE.ipu3_firmware LICENCE.ibt_firmware LICENCE.fw_sst_0f28
 %license LICENCE.IntcSST2 LICENCE.adsp_sst LICENSE.ice
 %{_firmwarepath}/i915

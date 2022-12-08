@@ -9,7 +9,7 @@ License:        GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.qt.io
-Source0:        https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
+Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
 # No gui add no patch
 Patch100:       CVE-2021-38593.nopatch
 Patch101:       CVE-2018-21035.nopatch
@@ -87,7 +87,7 @@ popd
 
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
-- Add pcre2-devel build dependency
+- Add pcre2-devel build dependency and update source download path.
 
 * Fri Mar 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Adding a nopatch for CVE-2022-25634 - vulnerability limited to the Windows OS.
