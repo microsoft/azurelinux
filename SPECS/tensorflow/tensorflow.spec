@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,9 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 %{_bindir}/toco_from_protos
 
 %changelog
+* Sun Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
+- correct runtime package name. 
+
 * Sun Dec 04 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
 - update to 2.11.0
 
