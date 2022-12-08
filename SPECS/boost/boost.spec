@@ -1,5 +1,4 @@
 %define underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
-%define gcc_version 11.2.0
 
 Summary:        Boost
 Name:           boost
