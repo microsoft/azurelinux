@@ -222,6 +222,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.2.11-40
 - Avoid pulling unneeded dependencies by setting AutoReq to no
 
+* Mon Jul 25 2022 Minghe Ren <mingheren@microsoft.com> - 3.2.11-39
+- Modify users.conf to imporve security
+
 * Mon Apr 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.11-38
 - Fix partioning bug
 - License verified
