@@ -711,6 +711,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 | REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
 | TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
+| USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
 
 ---
 

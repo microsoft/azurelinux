@@ -28,6 +28,7 @@ DOWNLOAD_SRPMS                  ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
+USE_CCACHE                      ?= n
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
@@ -63,6 +64,7 @@ PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
+CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 
 # Sub-folder defines
 LOGS_DIR         ?= $(BUILD_DIR)/logs
