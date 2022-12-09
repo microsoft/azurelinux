@@ -1,3 +1,5 @@
+%define project github.com/influxdata/influxdb/v2
+
 Name:           influxdb2
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 License:        MIT
@@ -7,9 +9,8 @@ Distribution:   Mariner
 Version:        2.4.0
 Release:        1%{?dist}
 URL:            https://github.com/influxdata/influxdb
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{url}%archive/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  fdupes
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
@@ -54,24 +55,30 @@ Go sources and other development files for InfluxDB
 
 %build
 export GO111MODULE=on
+export GOPATH=$HOME/go
 tar -xf %{SOURCE1} --no-same-owner
 
 # Build influxdb
-%goprep github.com/influxdata/influxdb/v2
-go build -mod=vendor -ldflags="-X main.version=%{version}" cmd/...
+mkdir -pv $HOME/go/src/%{project}
+rm -rf $HOME/go/src/%{project}/*
+cp -avr * $HOME/go/src/%{project}
+cd $HOME/go/src/%{project}
+go build -mod=vendor -tags 'sqlite_foreign_keys,sqlite_json' -ldflags="-X main.version=%{version}" -o bin/linux/influxd ./cmd/influxd
 
 
 %install
-%gosrc
-%fdupes -s %{buildroot}/%{go_contribsrcdir}/github.com/influxdata/influxdb
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+cd $HOME/go/src/%{project}
 
 mkdir -p %{buildroot}%{_localstatedir}/log/influxdb
 mkdir -p %{buildroot}%{_localstatedir}/lib/influxdb
-mkdir -p %{buildroot}%{_sbindir}
-install -D -m 0755 -t %{buildroot}%{_bindir} %{_builddir}/go/bin/*
+install -D -m 0755 bin/linux/influxd %{buildroot}/%{_bindir}/influxd
+
+%fdupes %{buildroot}/%{_prefix}
 
 %check
-make test
+go test ./...
 
 %files
 %license LICENSE
