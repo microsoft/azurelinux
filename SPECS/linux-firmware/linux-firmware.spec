@@ -14,6 +14,11 @@ URL:            https://www.kernel.org/
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/%{name}.git/snapshot/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
+Requires:       %{name}-broadcom = %{version}-%{release}
+Requires:       %{name}-intel = %{version}-%{release}
+Requires:       %{name}-qlogic = %{version}-%{release}
+Requires:       %{name}-qualcomm = %{version}-%{release}
+
 %description
 This package includes firmware files required for some devices to operate.
 
