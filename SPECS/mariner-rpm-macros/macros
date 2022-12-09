@@ -83,7 +83,7 @@
     %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
-    %{?mariner_ccache_enabled:ccache --show-stats --verbose} \
+    %{?mariner_ccache_enabled:ccache --show-stats} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\

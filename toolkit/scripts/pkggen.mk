@@ -9,6 +9,7 @@ $(call create_folder,$(RPMS_DIR))
 $(call create_folder,$(CACHED_RPMS_DIR))
 $(call create_folder,$(PKGBUILD_DIR))
 $(call create_folder,$(CHROOT_DIR))
+$(call create_folder,$(CCACHE_DIR))
 
 ######## PACKAGE DEPENDENCY CALCULATIONS ########
 
@@ -40,7 +41,7 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-spec-parse graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
@@ -49,7 +50,6 @@ clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-cache:
 	rm -rf $(CACHED_RPMS_DIR)
-	rm -rf $(CCACHE_DIR)
 	rm -f $(validate-pkggen-config)
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
@@ -58,6 +58,8 @@ clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
 	rm -rf $(parse_working_dir)
+clean-ccache:
+	rm -rf $(CCACHE_DIR)
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
@@ -125,7 +127,6 @@ endif
 
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
-	mkdir -p $(CCACHE_DIR) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
