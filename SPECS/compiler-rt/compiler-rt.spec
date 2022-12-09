@@ -1,12 +1,8 @@
-%global maj_ver 12
-%global min_ver 0
-%global patch_ver 1
-
 %global compiler_rt_srcdir %{name}-%{version}.src
 
 Summary:        LLVM compiler support routines
 Name:           compiler-rt
-Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
+Version:        12.0.1
 Release:        1%{?dist}
 License:        Apache 2.0 WITH exceptions
 Vendor:         Microsoft Corporation
@@ -60,5 +56,6 @@ mv -v %{buildroot}%{_prefix}/lib/linux/*clang_rt* %{buildroot}%{_libdir}/clang/%
 %{_bindir}/hwasan_symbolize
 
 %changelog
-* Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com>
-- Original version for CBL-Mariner. Influenced by Fedora's spec from version fc35 (license: MIT) - 12.0.1-1
+* Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com> - 12.0.1-1
+- Original version for CBL-Mariner. License verified.
+- Influenced by Fedora's spec from version fc35 (license: MIT)
