@@ -54,7 +54,7 @@ var (
 	rpmDir        = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
 	srpmDir       = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	cacheDir      = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
-	ccacheDir     = app.Flag("ccache-dir", "The ccache directory").Required().ExistingDir()
+	ccacheDir     = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().ExistingDir()
 	buildLogsDir  = app.Flag("build-logs-dir", "Directory to store package build logs").Required().ExistingDir()
 
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
@@ -71,7 +71,7 @@ var (
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
 	reservedFileListFile = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
 	deltaBuild           = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
-	useCcache            = app.Flag("use-ccache", "Use ccache during package build").Bool()
+	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
