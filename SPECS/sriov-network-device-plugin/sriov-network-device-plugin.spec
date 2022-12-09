@@ -1,7 +1,7 @@
 Summary:        Plugin for discovering and advertising networking resources
 Name:           sriov-network-device-plugin
 Version:        3.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
