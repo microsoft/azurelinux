@@ -79,6 +79,7 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_libdir}/*.so.*
 %{_libdir}/multipath/*.so
 %{_libdir}/modules-load.d/multipath.conf
+%{_libdir}/tmpfiles.d/multipath.conf"
 %{_mandir}/man5/*
 %{_mandir}/man8/mpathpersist.8.gz
 %{_mandir}/man8/multipath.8.gz
