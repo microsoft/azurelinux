@@ -1,23 +1,23 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.23.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
-Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s2.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We are also pre-cloning 3 git repositories
 # How to re-build this file:
-# 1. wget https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s1.tar.gz -O %%{name}-%%{version}.tar.gz
+# 1. wget https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s2.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. tar -xf %%{name}-%%{version}.tar.gz
-# 3. cd %%{name}-%%{version}-k3s1
+# 3. cd %%{name}-%%{version}-k3s2
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/k3s-io/containerd -b v1.5.13-k3s1
-# 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
-# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.2
+# 6. git clone --single-branch --branch="v1.5.13-k3s1" --depth=1 https://github.com/k3s-io/containerd
+# 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
+# 8. git clone --single-branch --branch="v1.1.2" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
@@ -79,6 +79,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Thu Dec 08 2022 Vinayak Gupta <guptavinayak@microsoft.com> - 1.23.8-3
+- Update the vendor tarball with the corrected versions of the dependencies
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.23.8-2
 - Bump release to rebuild with go 1.18.8
 
