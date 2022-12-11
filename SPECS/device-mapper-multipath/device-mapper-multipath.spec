@@ -69,6 +69,7 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %license COPYING
 %{_sbindir}/mpathpersist
 %{_sbindir}/multipath
+%{_sbindir}/multipathc
 %{_sbindir}/multipathd
 %{_udevrulesdir}/*
 /lib64/*.so
@@ -77,9 +78,11 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/multipath/*.so
+%{_libdir}/modules-load.d/multipath.conf
 %{_mandir}/man5/*
 %{_mandir}/man8/mpathpersist.8.gz
 %{_mandir}/man8/multipath.8.gz
+%{_mandir}/man8/multipathc.8.gz
 %{_mandir}/man8/multipathd.8.gz
 %dir %{_sysconfdir}/multipath
 
