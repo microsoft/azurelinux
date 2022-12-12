@@ -259,7 +259,7 @@ m4-debuginfo-1.4.18-4.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
 make-debuginfo-4.2.1-5.cm1.x86_64.rpm
 mariner-check-macros-1.0-8.cm1.noarch.rpm
-mariner-release-1.0-50.cm1.noarch.rpm
+mariner-release-1.0-51.cm1.noarch.rpm
 mariner-repos-1.0-15.cm1.noarch.rpm
 mariner-repos-extras-1.0-15.cm1.noarch.rpm
 mariner-repos-extras-preview-1.0-15.cm1.noarch.rpm
