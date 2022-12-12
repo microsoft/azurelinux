@@ -1,7 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global	majorver	3.9.2
-#%%global	preminorver	.rc6
+%global	majorver	3.12.0
 %global	fullver	%{majorver}%{?preminorver}
 
 %global	gem_name	rspec-expectations
@@ -13,14 +12,11 @@ Distribution:   Mariner
 Summary:	RSpec expectations (should and matchers)
 Name:		rubygem-%{gem_name}
 Version:	%{majorver}
-Release:	3%{?dist}
+Release:	1%{?dist}
 
 License:	MIT
 URL:		http://github.com/rspec/rspec-expectations
-Source0:	https://rubygems.org/gems/%{gem_name}-%{fullver}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
+Source0:	https://github.com/rspec/rspec-expectations/archive/refs/tags/v3.12.0.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -46,9 +42,7 @@ This package contains documentation for %{name}.
 
 
 %prep
-%setup -q -T -n %{gem_name}-%{version} -b 1
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%autosetup -S git -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}.gemspec
@@ -84,7 +78,8 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %{gem_docdir}
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.2-3
+* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.12.0-1
+- Switch to build from .tar.gz
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.2-2
