@@ -57,5 +57,4 @@ mv -v %{buildroot}%{_prefix}/lib/linux/*clang_rt* %{buildroot}%{_libdir}/clang/%
 
 %changelog
 * Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com> - 12.0.1-1
-- Original version for CBL-Mariner. License verified.
-- Influenced by Fedora's spec from version fc35 (license: MIT)
+- Initial CBL-Mariner import from Fedora 35 (license: MIT). License verified.
