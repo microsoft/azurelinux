@@ -1,7 +1,7 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
-Version:        0.8.6
-Release:        3%{?dist}
+Version:        0.9.2
+Release:        1%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -96,6 +96,9 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+* Mon Dec 12 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.2-1
+- Auto-upgrade to 0.9.2 - to_fix_CVE-2022-41973,_CVE-2022-41974
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.6-3
 - Removing the explicit %%clean stage.
 
