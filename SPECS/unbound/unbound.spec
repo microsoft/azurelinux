@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
 Version:        1.10.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Source1:        %{name}.service
 Patch0:         CVE-2020-12662.patch
 Patch1:         CVE-2020-12663.nopatch
 Patch2:         CVE-2020-28935.patch
+Patch3:         CVE-2022-3204.patch
 BuildRequires:  expat-devel
 BuildRequires:  systemd
 Requires:       systemd
@@ -91,6 +92,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+*  Fri Dec 09 2022 Minghe Ren <mingheren@microsoft.com> - 1.10.0-5
+-  Add patch for CVE-2022-3204.
+
 *  Mon Dec 21 2020 Rachel Menge <rachelmenge@microsoft.com> - 1.10.0-4
 -  Fix CVE-2020-28935.
 
