@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,6 +94,13 @@ This package adds C++ support to the GNU Compiler Collection.
 It includes support for most of the current C++ specification,
 including templates and exception handling.
 
+%package -n     libbacktrace-static
+Summary:        Static library for GCC's libbacktrace.
+Group:          System Environment/Libraries
+
+%description -n libbacktrace-static
+This package contains GCC's static libbacktrace library and its header.
+
 %package -n     libstdc++
 Summary:        GNU C Library
 Group:          System Environment/Libraries
@@ -164,6 +171,11 @@ ln -sv gcc %{buildroot}%{_bindir}/cc
 install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
+
+# Install libbacktrace-static components
+mv %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
+mv libbacktrace/backtrace.h %{buildroot}%{_includedir}
+
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
@@ -220,6 +232,11 @@ make %{?_smp_mflags} check-gcc
 %{_mandir}/man1/gfortran.1.gz
 %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 
+%files -n libbacktrace-static
+%defattr(-,root,root)
+%{_includedir}/backtrace.h
+%{_lib64dir}/libbacktrace.a
+
 %files -n libgcc
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so.*
@@ -268,6 +285,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Thu Dec 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-3
+- Adding static components for "libbacktrace".
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 11.2.0-2
 - Add provides for libasan, liblsan, libtsan, and libubsan (and their static counterparts) to the main package
 - Remove CVE-2019-15847 nopatch file (not relevant to our version of GCC)
