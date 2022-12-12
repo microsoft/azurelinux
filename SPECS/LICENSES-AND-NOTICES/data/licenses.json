@@ -115,6 +115,7 @@
                 "colord",
                 "colorize",
                 "compat-lua",
+                "compiler-rt",
                 "conda",
                 "conmon",
                 "conntrack-tools",
