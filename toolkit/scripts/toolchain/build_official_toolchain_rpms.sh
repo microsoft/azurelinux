@@ -419,6 +419,9 @@ build_rpm_in_chroot_no_install docbook-style-xsl
 chroot_and_install_rpms cmake
 build_rpm_in_chroot_no_install libsolv
 
+# ccache needs cmake
+build_rpm_in_chroot_no_install ccache
+
 # glib needs perl-XML-Parser, python3-libs, gtk-doc, meson, libselinux
 chroot_and_install_rpms perl-XML-Parser
 

@@ -83,6 +83,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 		fmt.Sprintf("--rpm-dir=%s", config.RpmDir),
 		fmt.Sprintf("--srpm-dir=%s", config.SrpmDir),
 		fmt.Sprintf("--cache-dir=%s", config.CacheDir),
+		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir),
 		fmt.Sprintf("--dist-tag=%s", config.DistTag),
 		fmt.Sprintf("--distro-release-version=%s", config.DistroReleaseVersion),
 		fmt.Sprintf("--distro-build-number=%s", config.DistroBuildNumber),
@@ -101,6 +102,10 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 
 	if config.RunCheck {
 		serializedArgs = append(serializedArgs, "--run-check")
+	}
+
+	if config.UseCcache {
+		serializedArgs = append(serializedArgs, "--use-ccache")
 	}
 
 	for _, dependency := range dependencies {

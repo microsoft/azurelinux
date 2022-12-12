@@ -865,8 +865,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "5.3.0",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/5.3.0/bazel-5.3.0-dist.zip"
+          "version": "5.3.2",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/5.3.2/bazel-5.3.2-dist.zip"
         }
       }
     },
@@ -4640,8 +4640,8 @@
         "type": "other",
         "other": {
           "name": "heimdal",
-          "version": "7.7.0",
-          "downloadUrl": "https://github.com/heimdal/heimdal/releases/download/heimdal-7.7.0/heimdal-7.7.0.tar.gz"
+          "version": "7.7.1",
+          "downloadUrl": "https://github.com/heimdal/heimdal/releases/download/heimdal-7.7.1/heimdal-7.7.1.tar.gz"
         }
       }
     },
@@ -5930,8 +5930,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.80.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
+          "version": "5.15.81.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
         }
       }
     },
@@ -7352,7 +7352,7 @@
         "other": {
           "name": "k3s",
           "version": "1.23.8",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.8+k3s1.tar.gz"
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.8+k3s2.tar.gz"
         }
       }
     },
@@ -7441,8 +7441,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.80.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
+          "version": "5.15.81.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
         }
       }
     },
@@ -7451,8 +7451,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.80.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
+          "version": "5.15.81.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
         }
       }
     },
@@ -7461,8 +7461,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.80.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
+          "version": "5.15.81.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
         }
       }
     },
@@ -11040,6 +11040,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.81.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lksctp-tools",
           "version": "1.0.18",
           "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
@@ -13023,8 +13033,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.17.1",
-          "downloadUrl": "https://nodejs.org/download/release/v16.17.1/node-v16.17.1.tar.xz"
+          "version": "16.18.1",
+          "downloadUrl": "https://nodejs.org/download/release/v16.18.1/node-v16.18.1.tar.xz"
         }
       }
     },
@@ -25877,8 +25887,8 @@
         "type": "other",
         "other": {
           "name": "strongswan",
-          "version": "5.9.5",
-          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.5.tar.bz2"
+          "version": "5.9.8",
+          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.8.tar.bz2"
         }
       }
     },

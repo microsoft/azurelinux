@@ -296,6 +296,8 @@ func converterFactory(formatType string) (converter formats.Converter, err error
 		converter = formats.NewInitrd()
 	case formats.OvaType:
 		converter = formats.NewOva()
+	case formats.QcowType:
+		converter = formats.NewQcow()
 	default:
 		err = fmt.Errorf("unsupported output format: %s", formatType)
 	}
