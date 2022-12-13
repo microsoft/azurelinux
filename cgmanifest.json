@@ -7450,6 +7450,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "keras",
+          "version": "2.11.0",
+          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v2.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel",
           "version": "5.15.81.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
