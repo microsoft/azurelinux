@@ -39,6 +39,7 @@ Requires:       python3-devel
 Requires:       python3-flatbuffers
 Requires:       python3-gast
 Requires:       python3-google-auth
+Requires:       python3-google-pasta
 Requires:       python3-google-auth-oauthlib
 Requires:       python3-grpcio
 Requires:       python3-h5py
@@ -46,7 +47,7 @@ Requires:       python3-idna
 Requires:       python3-importlib-metadata
 Requires:       python3-libclang
 Requires:       python3-markdown
-Requires:       python3-numpy = 1.22.3
+Requires:       python3-numpy
 Requires:       python3-oauthlib
 Requires:       python3-opt-einsum
 Requires:       python3-protobuf
