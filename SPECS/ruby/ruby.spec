@@ -2,7 +2,7 @@
 # RubyGems should be share by all Ruby implementations.
 %global rubygems_dir  %{_datadir}/rubygems
 %global gem_dir %{_datadir}/ruby/gems
-%global rubygems_version        3.1.6
+%global rubygems_version        3.3.26
 # Add version for default gems from https://stdgems.org/
 # A helpful one-liner script to check the current default versions is available via RUBY_VER=3.1 ./get_gem_versions.sh
 %global abbrev_version          0.1.0
@@ -58,7 +58,6 @@
 %global resolv_replace_version  0.1.0
 %global rinda_version           0.1.1
 %global ruby2_keywords_version  0.0.5
-%global rubygems_version        3.3.26
 %global securerandom_version    0.2.0
 %global set_version             1.0.2
 %global shellwords_version      0.1.0
@@ -122,8 +121,8 @@ Provides:       rubygem-base64 = %{base64_version}-%{release}
 Provides:       rubygem(base64) = %{base64_version}-%{release}
 Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
 Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
-Provides:       rubygen-bigdecimal = %{bigdecimal_version}-%{release}
-Provides:       rubygen(bigdecimal) = %{bigdecimal_version}-%{release}
+Provides:       rubygen-bundler = %{bundler_version}-%{release}
+Provides:       rubygen(bundler) = %{bundler_version}-%{release}
 Provides:       rubygem-cgi = %{cgi_version}-%{release}
 Provides:       rubygem(cgi) = %{cgi_version}-%{release}
 Provides:       rubygem-csv = %{csv_version}-%{release}
