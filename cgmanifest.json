@@ -8040,6 +8040,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcanberra",
+          "version": "0.30",
+          "downloadUrl": "https://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libaio",
           "version": "0.3.112",
           "downloadUrl": "https://releases.pagure.org/libaio/libaio-0.3.112.tar.gz"
