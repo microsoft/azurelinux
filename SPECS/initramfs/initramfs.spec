@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,10 +87,15 @@ cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
     echo "(re)generate initramfs for all kernels," %* >&2 \
     mkinitrd -q \
+    mv /boot/initrd.img-*mshv* /boot/efi/ \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
-        mkinitrd -q /boot/initrd.img-$k $k -k \
+        if [[ $k == *mshv* ]]; then \
+            mkinitrd -q /boot/efi/initrd.img-$k $k -k \
+        else \
+            mkinitrd -q /boot/initrd.img-$k $k -k \
+        fi \
     done; \
 fi \
 %removal_action
@@ -99,6 +104,7 @@ fi \
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
+mv /boot/initrd.img-*mshv* /boot/efi/
 
 %postun
 echo "initramfs" %{version}-%{release} "postun" >&2
@@ -127,6 +133,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Mon Dec 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0-9
+- Create initrd in /boot/efi for kernel-mshv.
+
 * Thu Feb 04 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.0-8
 - Add dracut-fips to package watch list, since it will add a dracut module
 
