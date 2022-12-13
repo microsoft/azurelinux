@@ -2054,6 +2054,7 @@
                 "lld",
                 "local-path-provisioner",
                 "lsb-release",
+                "ltp",
                 "lttng-consume",
                 "mariner-release",
                 "mariner-repos",
