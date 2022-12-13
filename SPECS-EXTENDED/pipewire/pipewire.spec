@@ -419,7 +419,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %changelog
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.60-2
-- Initial CBL Mariner import from Fedora 37 (license: MIT)
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Build with features disabled: jack, jackserver-plugin and libcamera-plugin
 - Enable check section
 - License verified
