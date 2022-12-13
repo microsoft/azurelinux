@@ -80,12 +80,12 @@ Requires: %{name}-shared = %{version}-%{release}
 %description microsoft-preview
 %{summary}
 
-%description preview
-%{summary}
-
 %package shared
 Summary:        Directories and files needed by all %{name} configurations.
 Group:          System Environment/Base
+
+%description shared
+%{summary}
 
 Requires(post):  gpgme
 
