@@ -17,15 +17,13 @@ fi
 # - query each entry for its gem + version matchign $RUBY_VER
 # - Print each array entry
 # - put two per line using paste
-# - add '_version' to each pkg
-# - calc tab spacing
-# - add %global to each line
-
+# - add '%global' and '_version' to each pkg
+# - fix spacing
+PAD_SIZE=23 # (Manually calculated based on the length of '%global error_highlight_version...')
 curl https://stdgems.org/default_gems.json 2>/dev/null                | \
 jq  '.gems[] | [.gem, .versions["'$RUBY_VER'"]] | select(.[1]!=null)' | \
 jq -r '.[0], .[1]'                                                    | \
 tr '-' '_'                                                            | \
 paste -d " " - -                                                      | \
-xargs printf '%s_version %s\n'                                        | \
-column -t -n                                                          | \
-awk '{print "%global " $0}'
+xargs printf '%%global  %s_version %s\n'                              | \
+xargs printf "%s %-${PAD_SIZE}s %s\n"
