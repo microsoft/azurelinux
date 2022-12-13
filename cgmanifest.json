@@ -7922,7 +7922,7 @@
         "other": {
           "name": "libao",
           "version": "1.2.0",
-          "downloadUrl": "http://downloads.xiph.org/releases/ao/libao-1.2.0.tar.gz"
+          "downloadUrl": "https://downloads.xiph.org/releases/ao/libao-1.2.0.tar.gz"
         }
       }
     },
