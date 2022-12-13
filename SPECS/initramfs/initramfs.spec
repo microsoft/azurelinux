@@ -135,6 +135,7 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %changelog
 * Mon Dec 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0-9
 - Create initrd in /boot/efi for kernel-mshv.
+- License verified.
 
 * Thu Feb 04 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.0-8
 - Add dracut-fips to package watch list, since it will add a dracut module
