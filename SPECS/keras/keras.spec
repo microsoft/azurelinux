@@ -39,7 +39,7 @@ Python 3 version.
 
 
 %build
-tar -xf %{SOURCE1} -C /root/
+# tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
 
