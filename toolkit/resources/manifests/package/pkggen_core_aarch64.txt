@@ -133,10 +133,10 @@ libssh2-devel-1.9.0-1.cm1.aarch64.rpm
 curl-7.86.0-1.cm1.aarch64.rpm
 curl-devel-7.86.0-1.cm1.aarch64.rpm
 curl-libs-7.86.0-1.cm1.aarch64.rpm
-tdnf-2.1.0-6.cm1.aarch64.rpm
-tdnf-cli-libs-2.1.0-6.cm1.aarch64.rpm
-tdnf-devel-2.1.0-6.cm1.aarch64.rpm
-tdnf-plugin-repogpgcheck-2.1.0-6.cm1.aarch64.rpm
+tdnf-2.1.0-7.cm1.aarch64.rpm
+tdnf-cli-libs-2.1.0-7.cm1.aarch64.rpm
+tdnf-devel-2.1.0-7.cm1.aarch64.rpm
+tdnf-plugin-repogpgcheck-2.1.0-7.cm1.aarch64.rpm
 createrepo_c-0.11.1-6.cm1.aarch64.rpm
 libxml2-2.9.14-3.cm1.aarch64.rpm
 libxml2-devel-2.9.14-3.cm1.aarch64.rpm
@@ -157,8 +157,9 @@ npth-1.6-3.cm1.aarch64.rpm
 pinentry-1.1.0-3.cm1.aarch64.rpm
 gnupg2-2.2.20-3.cm1.aarch64.rpm
 gpgme-1.13.1-6.cm1.aarch64.rpm
-mariner-repos-1.0-15.cm1.noarch.rpm
-mariner-repos-preview-1.0-15.cm1.noarch.rpm
+mariner-repos-shared-1.0-16.cm1.noarch.rpm
+mariner-repos-1.0-16.cm1.noarch.rpm
+mariner-repos-preview-1.0-16.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.aarch64.rpm
 libtasn1-4.14-4.cm1.aarch64.rpm
 p11-kit-0.23.22-1.cm1.aarch64.rpm
