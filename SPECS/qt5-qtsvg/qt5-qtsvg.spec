@@ -18,7 +18,6 @@ Patch102:       CVE-2022-25634.nopatch
 
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
-BuildRequires:  pcre2-devel
 BuildRequires:  zlib-devel
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -87,7 +86,7 @@ popd
 
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
-- Add pcre2-devel build dependency and update source download path.
+- Update source download path.
 
 * Fri Mar 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Adding a nopatch for CVE-2022-25634 - vulnerability limited to the Windows OS.

@@ -15,8 +15,6 @@ Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qttoo
 Patch0: qttools-opensource-src-5.5.0-qmake-qt5.patch
 
 BuildRequires: coreutils
-BuildRequires: pcre2-devel
-BuildRequires: dbus-devel
 
 BuildRequires: qt5-qtbase-private-devel
 # Qt macros
@@ -25,7 +23,6 @@ BuildRequires: qt5-qtbase-static >= %{version}
 BuildRequires: qt5-qtdeclarative-static >= %{version}
 
 Requires: %{name}-common = %{version}-%{release}
-AutoReq:        no
 
 %description
 %{summary}.
@@ -395,7 +392,6 @@ fi
 
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
-- Add AutoReq to avoid pulling unneeded runtime dependencies and add build deps
 - Update source download path
 - License verified.
 
