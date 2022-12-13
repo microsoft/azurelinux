@@ -39,6 +39,7 @@
         "lvm2",
         "lua",
         "lz4",
+        "nano",
         "ncurses",
         "ncurses-term",
         "nspr",

@@ -61,11 +61,8 @@ BuildRequires: zlib-devel
 BuildRequires: qt5-rpm-macros
 
 Requires:         icu
-Requires:         pcre2
-Requires:         dbus
 Requires(post):   chkconfig
 Requires(postun): chkconfig
-AutoReq:        no
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -741,8 +738,7 @@ fi
 
 %changelog
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
-- Add AutoReq to avoid pulling unneeded runtime dependencies and add build deps
-- Update source download path.
+- Update source download path and remove recommends mesa-dri-drivers for gui sub package.
 
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Migrating CVE fixes from Mariner's 1.0 version.
