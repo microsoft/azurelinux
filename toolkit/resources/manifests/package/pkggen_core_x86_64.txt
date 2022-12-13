@@ -157,6 +157,7 @@ npth-1.6-3.cm1.x86_64.rpm
 pinentry-1.1.0-3.cm1.x86_64.rpm
 gnupg2-2.2.20-3.cm1.x86_64.rpm
 gpgme-1.13.1-6.cm1.x86_64.rpm
+mariner-repos-shared-1.0-16.cm1.noarch.rpm
 mariner-repos-1.0-16.cm1.noarch.rpm
 mariner-repos-preview-1.0-16.cm1.noarch.rpm
 libffi-3.2.1-12.cm1.x86_64.rpm

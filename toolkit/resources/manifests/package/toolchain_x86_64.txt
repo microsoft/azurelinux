@@ -263,11 +263,12 @@ mariner-release-1.0-51.cm1.noarch.rpm
 mariner-repos-1.0-16.cm1.noarch.rpm
 mariner-repos-extras-1.0-16.cm1.noarch.rpm
 mariner-repos-extras-preview-1.0-16.cm1.noarch.rpm
-mariner-repos-preview-1.0-16.cm1.noarch.rpm
-mariner-repos-ui-1.0-16.cm1.noarch.rpm
-mariner-repos-ui-preview-1.0-16.cm1.noarch.rpm
 mariner-repos-microsoft-1.0-16.cm1.noarch.rpm
 mariner-repos-microsoft-preview-1.0-16.cm1.noarch.rpm
+mariner-repos-preview-1.0-16.cm1.noarch.rpm
+mariner-repos-shared-1.0-16.cm1.noarch.rpm
+mariner-repos-ui-1.0-16.cm1.noarch.rpm
+mariner-repos-ui-preview-1.0-16.cm1.noarch.rpm
 mariner-rpm-macros-1.0-8.cm1.noarch.rpm
 meson-0.56.0-1.cm1.noarch.rpm
 mpfr-4.0.1-3.cm1.x86_64.rpm
