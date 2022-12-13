@@ -21,7 +21,7 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 BuildRequires:  tar
 BuildRequires:  which
-BuildRequires:  tensorflow = 2.11.0
+BuildRequires:  python3-tensorflow = 2.11.0
 ExclusiveArch:  x86_64
 
 %description
@@ -60,7 +60,7 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 %{pyproject_install}
 
 
-%files -n python3-tensorflow
+%files -n python3-keras
 %license LICENSE
 %{python3_sitelib}/*
 
