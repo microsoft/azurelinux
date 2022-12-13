@@ -23745,8 +23745,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.1.2",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.2.tar.xz"
+          "version": "3.1.3",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.3.tar.xz"
         }
       }
     },
@@ -23907,16 +23907,6 @@
           "name": "rubygem-bindata",
           "version": "2.4.10",
           "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-bundler",
-          "version": "2.3.8",
-          "downloadUrl": "https://github.com/rubygems/rubygems/archive/refs/tags/bundler-v2.3.8.tar.gz"
         }
       }
     },
