@@ -4,11 +4,14 @@
 %global gem_dir %{_datadir}/ruby/gems
 %global rubygems_version        3.1.6
 # Add version for default gems from https://stdgems.org/
+# A helpful one-liner script to check the current default versions is available via RUBY_VER=3.1 ./get_gem_versions.sh
 %global abbrev_version          0.1.0
 %global base64_version          0.1.1
 %global benchmark_version       0.2.0
-%global cgi_version             0.3.1
-%global csv_version             3.2.2
+# bigdecimal is available via rubygem-bigdecimal.spec with higher version 3.1.2 (default is 3.1.1)
+%global bundler_version         2.3.26
+%global cgi_version             0.3.5
+%global csv_version             3.2.5
 %global date_version            3.2.2
 %global delegate_version        0.2.0
 %global did_you_mean_version    1.6.1
@@ -32,12 +35,12 @@
 %global json_version            2.6.1
 %global logger_version          1.5.0
 %global mutex_m_version         0.1.1
-%global net_http_version        0.2.0
+%global net_http_version        0.3.0
 %global net_protocol_version    0.1.2
 %global nkf_version             0.1.1
 %global observer_version        0.1.1
 %global open3_version           0.1.1
-%global openssl_version         3.0.0
+%global openssl_version         3.0.1
 %global open_uri_version        0.2.0
 %global optparse_version        0.2.0
 %global ostruct_version         0.5.2
@@ -45,18 +48,18 @@
 %global pp_version              0.3.0
 %global prettyprint_version     0.1.1
 %global pstore_version          0.1.1
-%global psych_version           4.0.3
+%global psych_version           4.0.4
 %global racc_version            1.6.0
 %global rdoc_version            6.4.0
 %global readline_version        0.0.3
 %global readline_ext_version    0.1.4
-%global reline_version          0.3.0
+%global reline_version          0.3.1
 %global resolv_version          0.2.1
 %global resolv_replace_version  0.1.0
 %global rinda_version           0.1.1
 %global ruby2_keywords_version  0.0.5
-%global rubygems_version        3.3.7
-%global securerandom_version    0.1.1
+%global rubygems_version        3.3.26
+%global securerandom_version    0.2.0
 %global set_version             1.0.2
 %global shellwords_version      0.1.0
 %global singleton_version       0.1.1
@@ -80,8 +83,8 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.1.2
-Release:        3%{?dist}
+Version:        3.1.3
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -95,11 +98,6 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
-#Add patches to resolve rb bug https://github.com/ruby/ruby/pull/5743
-Patch0:         patch1-rb.patch
-Patch1:         patch2-rb.patch
-Patch2:         patch3-rb.patch
-Patch3:         patch4-rb.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -124,6 +122,8 @@ Provides:       rubygem-base64 = %{base64_version}-%{release}
 Provides:       rubygem(base64) = %{base64_version}-%{release}
 Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
 Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
+Provides:       rubygen-bigdecimal = %{bigdecimal_version}-%{release}
+Provides:       rubygen(bigdecimal) = %{bigdecimal_version}-%{release}
 Provides:       rubygem-cgi = %{cgi_version}-%{release}
 Provides:       rubygem(cgi) = %{cgi_version}-%{release}
 Provides:       rubygem-csv = %{csv_version}-%{release}
@@ -371,7 +371,7 @@ sudo -u test make test TESTS="-v"
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/*.so.3.1
-%{_libdir}/*.so.3.1.2
+%{_libdir}/*.so.3.1.3
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/ruby/*
 %{_datadir}/ri/*
@@ -399,6 +399,10 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Dec 12 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.1.3-1
+- Update to resolve CVE-2021-33621
+- Add rubygem-bundler default gem back since the versions have converged.
+
 * Tue May 31 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-3
 - Remove bundled gems from ruby.
 - Add provides for all default gems.
