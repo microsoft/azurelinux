@@ -4,7 +4,7 @@ Name: hunspell-ti
 Summary: Tigrigna hunspell dictionaries
 %global upstreamid 20090911
 Version: 0.%{upstreamid}
-Release: 18%{?dist}
+Release: 19%{?dist}
 Source: https://www.cs.ru.nl/~biniam/geez/dict/ti_ER.zip
 URL: http://www.cs.ru.nl/~biniam/geez/index.php
 License: GPL+
@@ -40,6 +40,9 @@ done
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.20090911-19
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20090911-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

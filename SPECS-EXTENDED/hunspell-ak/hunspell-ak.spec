@@ -3,7 +3,7 @@ Distribution:   Mariner
 Name: hunspell-ak
 Summary: Akan hunspell dictionaries
 Version: 0.9.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/376172/akan_spelling_dictionary-0.9.1-typefix-fx.xpi
 URL: http://kasahorow.org/content/akan-nsɛmfuaasekyerɛ
 #https://addons.mozilla.org/en-US/firefox/versions/license/73122
@@ -36,6 +36,9 @@ cp -p dictionaries/ak-GH.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/ak_GH.dic
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.1-7
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

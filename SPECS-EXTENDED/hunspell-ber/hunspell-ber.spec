@@ -4,7 +4,7 @@ Name: hunspell-ber
 Summary: Amazigh hunspell dictionaries
 %global upstreamid 20080210
 Version: 0.%{upstreamid}
-Release: 20%{?dist}
+Release: 21%{?dist}
 Source: https://ayaspell.sourceforge.net/data/hunspell-am_test.tar.gz
 URL: http://ayaspell.sourceforge.net/am.html
 License: GPL+ or LGPLv2+ or MPLv1.1
@@ -32,6 +32,9 @@ cp -p tifinagh.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/ber_MA.aff
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.20080210-21
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080210-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,7 +4,7 @@ Name: hunspell-zu
 Summary: Zulu hunspell dictionaries
 %global upstreamid 20100126
 Version: 0.%{upstreamid}
-Release: 21%{?dist}
+Release: 22%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3132/3/dict-zu_za-2010.01.26.oxt
 URL: https://extensions.openoffice.org/en/project/zulu-spell-checker
 # There is no License information in this new sourceforge Source: archive
@@ -45,6 +45,9 @@ cp -p zu_ZA.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/zu.dic
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.20100126-22
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20100126-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,7 +4,7 @@ Name: hunspell-am
 Summary: Amharic hunspell dictionaries
 %global upstreamid 20090704
 Version: 0.%{upstreamid}
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: https://www.cs.ru.nl/~biniam/geez/dict/am_ET.zip
 URL: http://www.cs.ru.nl/~biniam/geez/index.php
 License: GPL+
@@ -34,6 +34,9 @@ cp -p am_ET.* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.20090704-20
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20090704-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

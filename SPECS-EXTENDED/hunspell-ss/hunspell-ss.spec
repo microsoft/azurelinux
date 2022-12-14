@@ -4,7 +4,7 @@ Name: hunspell-ss
 Summary: Swati hunspell dictionaries
 %global upstreamid 20091030
 Version: 0.%{upstreamid}
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: https://downlaods.sourceforge.net/project/aoo-extensions/3137/0/dict-ss_za-2009.10.30.oxt
 URL: http://www.translate.org.za/
 License: LGPLv2+
@@ -41,6 +41,9 @@ cp -p *.dic *.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.20091030-20
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20091030-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

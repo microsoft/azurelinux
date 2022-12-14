@@ -3,7 +3,7 @@ Distribution:   Mariner
 Name: hunspell-lt
 Summary: Lithuanian hunspell dictionaries
 Version: 1.2.1
-Release: 23%{?dist}
+Release: 24%{?dist}
 ## Note that upstream is dead and there is no download link available
 ## so please don't report FTBFS bugs for this package.
 Source: ftp://ftp.akl.lt/ispell-lt/lt_LT-%{version}.zip
@@ -38,6 +38,9 @@ cp -p *.dic *.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.2.1-24
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

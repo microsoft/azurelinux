@@ -3,7 +3,7 @@ Distribution:   Mariner
 Name: hunspell-oc
 Summary: Occitan hunspell dictionaries
 Version: 0.6.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/233710/correcteur_occitan_languedocien-%{version}-tb+sm+fx.xpi
 URL: https://addons.mozilla.org/en-US/firefox/addon/8235
 License: GPLv3+
@@ -34,6 +34,9 @@ cp -p dictionaries/oc-FR.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/oc_FR.dic
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.2-7
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

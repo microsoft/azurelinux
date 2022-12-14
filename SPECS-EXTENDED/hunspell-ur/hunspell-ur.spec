@@ -3,7 +3,7 @@ Distribution:   Mariner
 Name: hunspell-ur
 Summary: Urdu hunspell dictionaries
 Version: 0.64
-Release: 19%{?dist}
+Release: 20%{?dist}
 #http://urdudictionary.codeplex.com/Release/ProjectReleases.aspx?ReleaseId=30004#DownloadId=74761
 #and click yes to agree to LGPLv2+, which stinks as a download-url :-(
 Source: UrduDictionary.xpi
@@ -43,6 +43,9 @@ popd
 %{_datadir}/myspell/*
 
 %changelog
+* Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.64-20
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.64-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
