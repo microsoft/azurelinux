@@ -6,7 +6,7 @@ Version: 0.64
 Release: 20%{?dist}
 #http://urdudictionary.codeplex.com/Release/ProjectReleases.aspx?ReleaseId=30004#DownloadId=74761
 #and click yes to agree to LGPLv2+, which stinks as a download-url :-(
-Source: UrduDictionary.xpi
+Source: https://cblmarinerstorage.blob.core.windows.net/sources/core/UrduDictionary.xpi
 URL: http://urdudictionary.codeplex.com
 License: LGPLv2+
 BuildArch: noarch
@@ -44,6 +44,7 @@ popd
 
 %changelog
 * Wed Dec 14 2022 Muhammad Falak <mwani@microsoft.com> - 0.64-20
+- Use blobstore url as source as original is defunct
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.64-19
