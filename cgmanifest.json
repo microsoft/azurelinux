@@ -9390,6 +9390,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnetfilter_log",
+          "version": "1.0.1",
+          "downloadUrl": "https://netfilter.org/projects/libnetfilter_log/files/libnetfilter_log-1.0.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libnetfilter_queue",
           "version": "1.0.5",
           "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_queue/files/libnetfilter_queue-1.0.5.tar.bz2"

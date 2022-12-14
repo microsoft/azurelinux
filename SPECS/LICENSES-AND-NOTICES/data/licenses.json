@@ -640,6 +640,7 @@
                 "libmwaw",
                 "libnbd",
                 "libnet",
+                "libnetfilter_log",
                 "libnfs",
                 "libnotify",
                 "libntlm",
