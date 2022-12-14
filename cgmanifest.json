@@ -25966,6 +25966,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "suitesparse",
+          "version": "5.4.0",
+          "downloadUrl": "https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "SuperLU",
           "version": "5.2.1",
           "downloadUrl": "http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_5.2.1.tar.gz"
