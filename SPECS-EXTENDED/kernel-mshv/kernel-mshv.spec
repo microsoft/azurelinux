@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.72.mshv2
-Release:        2%{?dist}
+Version:        5.15.80.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          Development/Tools
@@ -20,7 +20,6 @@ Distribution:   Mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
-Patch0:         0001-mshv-Don-t-use-same-function-signature-as-KVM.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -181,7 +180,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initrd.img-%{uname_r}
+rm -rf /boot/efi/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
@@ -238,7 +237,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
-* Mon Dec 5 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.72.mshv2-2
+* Fri Dec 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.80.mshv2-1
+- Update to v5.15.80.mshv2.
+- Update initramfs triggerun to remove initrd from /boot/efi
+
+* Mon Dec 05 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.72.mshv2-2
 - Enable transparent hugepage
 
 * Thu Oct 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.72.mshv2-1
