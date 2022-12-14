@@ -121,8 +121,10 @@ Provides:       rubygem-base64 = %{base64_version}-%{release}
 Provides:       rubygem(base64) = %{base64_version}-%{release}
 Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
 Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
-Provides:       rubygen-bundler = %{bundler_version}-%{release}
-Provides:       rubygen(bundler) = %{bundler_version}-%{release}
+Provides:       rubygem-bundler = %{bundler_version}-%{release}
+Provides:       rubygem(bundler) = %{bundler_version}-%{release}
+# we have transitioned away from a seperate spec/package for bundler, obsolete that package
+Obsoletes:      rubygem-bundler < %{bundler_version}-%{release}
 Provides:       rubygem-cgi = %{cgi_version}-%{release}
 Provides:       rubygem(cgi) = %{cgi_version}-%{release}
 Provides:       rubygem-csv = %{csv_version}-%{release}
