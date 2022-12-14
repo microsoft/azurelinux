@@ -4819,6 +4819,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hunspell-ak",
+          "version": "0.9.1",
+          "downloadUrl": "https://addons.mozilla.org/firefox/downloads/file/376172/akan_spelling_dictionary-0.9.1-typefix-fx.xpi"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hunspell-am",
+          "version": "0.20090704",
+          "downloadUrl": "https://www.cs.ru.nl/~biniam/geez/dict/am_ET.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hunspell-am",
           "version": "0.20090704",
           "downloadUrl": "http://www.cs.ru.nl/~biniam/geez/dict/am_ET.zip"
@@ -4872,6 +4892,16 @@
           "name": "hunspell-be",
           "version": "1.1",
           "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/2412/1/dict-be-official.oxt"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hunspell-ber",
+          "version": "0.20080210",
+          "downloadUrl": "https://ayaspell.sourceforge.net/data/hunspell-am_test.tar.gz"
         }
       }
     },
@@ -5389,6 +5419,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hunspell-lt",
+          "version": "1.2.1",
+          "downloadUrl": "ftp://ftp.akl.lt/ispell-lt/lt_LT-1.2.1.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hunspell-mai",
           "version": "1.0.1",
           "downloadUrl": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/bhashaghar/mai_IN.oxt"
@@ -5542,6 +5582,16 @@
           "name": "hunspell-ny",
           "version": "0.01",
           "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/4052/0/hunspell-chichewa-ny-dict-0.01.oxt"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hunspell-oc",
+          "version": "0.6.2",
+          "downloadUrl": "https://addons.mozilla.org/firefox/downloads/file/233710/correcteur_occitan_languedocien-0.6.2-tb+sm+fx.xpi"
         }
       }
     },
@@ -5719,6 +5769,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hunspell-ss",
+          "version": "0.20091030",
+          "downloadUrl": "https://downlaods.sourceforge.net/project/aoo-extensions/3137/0/dict-ss_za-2009.10.30.oxt"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hunspell-st",
+          "version": "0.20091030",
+          "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/3138/0/dict-st_za-2009.10.30.oxt"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hunspell-sv",
           "version": "2.28",
           "downloadUrl": "http://extensions.libreoffice.org/extension-center/swedish-spelling-dictionary-den-stora-svenska-ordlistan/releases/2.28/ooo_swedish_dict_2-28.oxt"
@@ -5772,6 +5842,16 @@
           "name": "hunspell-th",
           "version": "0.20061212",
           "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/th_TH.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hunspell-ti",
+          "version": "0.20090911",
+          "downloadUrl": "https://www.cs.ru.nl/~biniam/geez/dict/ti_ER.zip"
         }
       }
     },
@@ -5849,6 +5929,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hunspell-ur",
+          "version": "0.64",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/UrduDictionary.xpi"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hunspell-uz",
           "version": "0.6",
           "downloadUrl": "http://www-user.uni-bremen.de/~kmashrab/uzbek-word-list/uzbek-wordlist-0.6.tar.bz2"
@@ -5902,6 +5992,16 @@
           "name": "hunspell-yi",
           "version": "1.1",
           "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/3975/1/hunspell-yi-1.1.oxt"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hunspell-zu",
+          "version": "0.20100126",
+          "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/3132/3/dict-zu_za-2010.01.26.oxt"
         }
       }
     },
