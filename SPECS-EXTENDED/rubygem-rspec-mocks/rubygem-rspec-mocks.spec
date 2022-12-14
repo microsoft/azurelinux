@@ -9,15 +9,12 @@ Distribution:   Mariner
 
 Summary:	RSpec's 'test double' framework (mocks and stubs)
 Name:		rubygem-%{gem_name}
-Version:	3.9.1
-Release:	3%{?dist}
+Version:	3.12.1
+Release:	1%{?dist}
 
 License:	MIT
 URL:		http://github.com/rspec/rspec-mocks
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
+Source0:	https://github.com/rspec/rspec-mocks/archive/refs/tags/v3.12.1.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -41,11 +38,8 @@ This package contains documentation for %{name}.
 
 
 %prep
-gem unpack %{SOURCE0}
+%autosetup -S git -n %{gem_name}-%{version}
 
-%setup -q -D -T -n  %{gem_name}-%{version} -b 1
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
 
 %build
 gem build %{gem_name}.gemspec
@@ -82,7 +76,8 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %{gem_docdir}
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.1-3
+* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.12.1-1
+- Switch to build from .tar.gz
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.1-2
