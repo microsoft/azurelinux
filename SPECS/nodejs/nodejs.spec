@@ -6,8 +6,8 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        16.18.1
-Release:        1%{?dist}
-License:        BSD and MIT and Public Domain and naist-2003
+Release:        2%{?dist}
+License:        BSD and MIT and Public Domain and naist-2003 and Artistic 2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -116,6 +116,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Dec 13 2022 Andrew Phelps <anphel@microsoft.com> - 16.18.1-2
+- Update license to reference Artistic 2.0
+
 * Fri Dec 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.18.1-1
 - Auto-upgrade to 16.18.1 - CVE-2022-43548
 
