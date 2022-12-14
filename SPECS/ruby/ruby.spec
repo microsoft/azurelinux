@@ -125,7 +125,6 @@ Provides:       rubygem-bundler = %{bundler_version}-%{release}
 Provides:       rubygem(bundler) = %{bundler_version}-%{release}
 # we have transitioned away from a seperate spec/package for bundler, obsolete that package
 Obsoletes:      rubygem-bundler < %{bundler_version}-%{release}
-Obsoletes:      rubygem(bundler) < %{bundler_version}-%{release}
 Provides:       rubygem-cgi = %{cgi_version}-%{release}
 Provides:       rubygem(cgi) = %{cgi_version}-%{release}
 Provides:       rubygem-csv = %{csv_version}-%{release}
