@@ -82,6 +82,8 @@ echo "initramfs (re)generation" %* >&2
 #
 # So in order to be compatible with kdump, we need to make sure to add the -k
 # option when invoking mkinitrd with an explicit <image> and <kernel version>
+#
+# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
@@ -104,6 +106,7 @@ fi \
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
+# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
 mv /boot/initrd.img-*mshv* /boot/efi/
 
 %postun
