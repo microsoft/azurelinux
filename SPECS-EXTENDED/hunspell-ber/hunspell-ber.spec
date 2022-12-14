@@ -5,7 +5,7 @@ Summary: Amazigh hunspell dictionaries
 %global upstreamid 20080210
 Version: 0.%{upstreamid}
 Release: 20%{?dist}
-Source: http://ayaspell.sourceforge.net/data/hunspell-am_test.tar.gz
+Source: https://ayaspell.sourceforge.net/data/hunspell-am_test.tar.gz
 URL: http://ayaspell.sourceforge.net/am.html
 License: GPL+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch

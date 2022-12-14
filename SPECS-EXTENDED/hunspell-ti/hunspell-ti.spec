@@ -5,7 +5,7 @@ Summary: Tigrigna hunspell dictionaries
 %global upstreamid 20090911
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source: http://www.cs.ru.nl/~biniam/geez/dict/ti_ER.zip
+Source: https://www.cs.ru.nl/~biniam/geez/dict/ti_ER.zip
 URL: http://www.cs.ru.nl/~biniam/geez/index.php
 License: GPL+
 BuildArch: noarch
