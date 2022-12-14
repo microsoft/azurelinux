@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global	gem_name	rspec-support
 
-%global	mainver	3.9.3
+%global	mainver	3.12.0
 %undefine	prever
 
 %global	need_bootstrap_set	0
@@ -11,17 +11,12 @@ Distribution:   Mariner
 
 Name:		rubygem-%{gem_name}
 Version:	%{mainver}
-Release:	3%{?dist}
+Release:	1%{?dist}
 
 Summary:	Common functionality to Rspec series
 License:	MIT
 URL:		https://github.com/rspec/rspec-support
-Source0:	https://rubygems.org/gems/%{gem_name}-%{mainver}%{?prever}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
-# tweak regex for search path
-Patch100:	rubygem-rspec-support-3.2.1-callerfilter-searchpath-regex.patch
+Source0:	https://github.com/rspec/rspec-support/archive/refs/tags/v3.12.0.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -51,10 +46,7 @@ Documentation for %{name}
 %global	version	%{version_orig}%{?prever}
 
 %prep
-%setup -q -T -n %{gem_name}-%{version} -b 1
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
-
-%patch100 -p1
+%autosetup -S git -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}.gemspec
@@ -101,7 +93,8 @@ ruby -rrubygems -Ilib/ -S rspec spec/ || \
 %doc	%{gem_docdir}
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.3-3
+* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.12.0-1
+- Switch to build from .tar.gz
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.3-2
