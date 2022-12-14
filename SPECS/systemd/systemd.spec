@@ -20,7 +20,8 @@ Patch1:         add-fsync-sysusers-passwd.patch
 Patch2:         gpt-auto-devno-not-determined.patch
 # Patch3 can be removed once we update to major version 251 or higher:
 Patch3:         CVE-2022-3821.patch
-Patch4:    CVE-2022-45873.patch
+# Patch4 can be removed once we update to version 252
+Patch4:         CVE-2022-45873.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
