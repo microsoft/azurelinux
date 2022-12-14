@@ -2812,7 +2812,6 @@
                 "rsync",
                 "rsyslog",
                 "ruby",
-                "rubygem-bundler",
                 "rust",
                 "scons",
                 "sed",
