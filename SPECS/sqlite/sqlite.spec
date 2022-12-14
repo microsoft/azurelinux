@@ -82,7 +82,7 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
-* Tue Dec 13 2022 Daniel McIlvaney <damcilva@microsoft.com? - 3.39.2-1
+* Tue Dec 13 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.39.2-2
 - Address CVE-2022-46908
 
 * Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 3.39.2-1
