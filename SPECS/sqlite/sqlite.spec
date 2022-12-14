@@ -11,7 +11,7 @@ URL:            https://www.sqlite.org
 Source0:        https://www.sqlite.org/2022/%{name}-autoconf-%{sourcever}.tar.gz
 # CVE-2015-3717 applies to versions shipped in iOS and OS X
 Patch0:         CVE-2015-3717.nopatch
-Patch1:         CVE-2022-4690.patch
+Patch1:         CVE-2022-46908.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
