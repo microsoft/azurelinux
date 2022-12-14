@@ -1,3 +1,5 @@
+%define _enable_debug_package 0
+%global debug_package %{nil}
 Summary:        Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano.
 Name:           keras
 Version:        2.11.0
