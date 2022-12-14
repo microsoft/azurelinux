@@ -7,7 +7,7 @@ Name:           nodejs
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        16.18.1
 Release:        2%{?dist}
-License:        BSD and MIT and Public Domain and naist-2003 and Artistic 2.0
+License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
