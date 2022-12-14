@@ -9,11 +9,12 @@ Release:	5%{?dist}
 Summary:	Test helper for ordering threaded code
 License:	MIT
 URL:		https://github.com/JoshCheek/thread_order
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0:	https://github.com/JoshCheek/thread_order/archive/refs/tags/v1.1.1.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(rspec) >= 3
+BuildRequires:	git
 BuildArch:	noarch
 
 %description
@@ -28,9 +29,7 @@ BuildArch:	noarch
 Documentation for %{name}.
 
 %prep
-gem unpack %{SOURCE0}
-%setup -q -D -T -n %{gem_name}-%{version}
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%autosetup -S git -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}.gemspec
@@ -86,6 +85,7 @@ popd
 
 %changelog
 * Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.1-5
+- Switch to build from .tar.gz
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-4
