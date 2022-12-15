@@ -11,7 +11,6 @@
 %global with_zts  0%{?__ztsphp:1}
 %global ini_name  40-%{pecl_name}.ini
 Summary:        A ZIP archive management extension
-Summary(fr):    Une extension de gestion des ZIP
 Name:           php-pecl-zip
 Version:        1.21.1
 Release:        3%{?dist}
@@ -41,9 +40,6 @@ Provides:       php-%{pecl_name}%{?_isa} = %{version}-%{release}
 
 %description
 Zip is an extension to create and read zip files.
-
-%description -l fr
-Zip est une extension pour crÃ©er et lire les archives au format ZIP.
 
 %prep
 %setup -q -c
