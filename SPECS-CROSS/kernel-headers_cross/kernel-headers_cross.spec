@@ -93,8 +93,10 @@ cp -rv usr/include/*    /%{buildroot}%{_cross_sysroot}%{_includedir}
 %{_cross_sysroot}%{_includedir}/*
 
 %changelog
-* Mon Jun 20 2022 Chris Co <chrco@microsoft.com> - 5.15.48.1-1
-- Update to 5.15.48.1
+*   Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 5.15.57.1-3
+-   Update to 5.15.57.1
+*   Mon Jun 20 2022 Chris Co <chrco@microsoft.com> - 5.15.48.1-1
+-   Update to 5.15.48.1
 *   Thu Feb 11 2021 Daniel McIlvaney <damcilva@microsoft.com> - 5.4.51-13
 -   Fork normal kernel-headers package into cross compile aware version
 *   Mon Jan 11 2021 Thomas Crain <thcrain@microsoft.com> - 5.4.51-12

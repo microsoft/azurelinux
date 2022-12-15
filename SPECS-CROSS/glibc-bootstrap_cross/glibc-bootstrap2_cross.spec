@@ -216,7 +216,7 @@ cd %{_builddir}/%{name}-build
             --disable-werror \
             --enable-languages=c,c++ \
             libc_cv_c_cleanup=yes \
-            CXX=arch64-mariner-linux-gnu-gcc
+            CXX=aarch64-mariner-linux-gnu-gcc
 
 make %{?_smp_mflags} DESTDIR=$TEMP_SYSROOT
 
@@ -412,6 +412,9 @@ cd ../glibc-%{version}
 #%%defattr(-,root,root)
 
 %changelog
+* Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 2.35-2
+- Update to 2.35-2
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.28-14
 - Provide isa version of glibc-static.
 

@@ -314,6 +314,9 @@ install csu/crt1.o csu/crti.o csu/crtn.o ../temp_sysroot/%{_libdir}/libc.so %{bu
 %{_cross_sysroot}%{_includedir}/*
 
 %changelog
+* Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 2.35-2
+- Update to 2.35-2
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.28-14
 - Provide isa version of glibc-static.
 

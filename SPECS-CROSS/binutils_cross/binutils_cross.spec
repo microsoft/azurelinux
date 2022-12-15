@@ -175,6 +175,9 @@ rm -rf %{buildroot}/%{_cross_infodir}
 #%%{_cross_prefix}%%{_libdir}/libopcodes.so
 
 %changelog
+*   Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 2.37-3
+-   Update to 2.37-3
+
 *   Wed Feb 10 2021 Daniel McIlvaney <damcilva@microsoft.com> 2.32-4
 -   Fork normal binutils package into cross compile aware package
 

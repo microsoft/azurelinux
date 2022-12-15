@@ -330,6 +330,9 @@ rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
 # %%{_cross_prefix}%%{_lib64dir}/libgomp.spec
 
 %changelog
+* Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 11.2.0-2
+- Update to 11.2.0-2
+
 * Fri Feb 12 2021 Daniel McIlvaney <damcilva@microsoft.com> - 9.1.0-11
 - Fork normal gcc package into cross compile aware boot strap package
 
