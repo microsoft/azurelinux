@@ -518,7 +518,9 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
+	// 15 Dec 2022: Please contact Qualys before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
+	// 15 Dec 2022: Please contact Qualys, AquaSec (trivy) and other supported scanning vendors before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t(none)\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n")
 
 	return
