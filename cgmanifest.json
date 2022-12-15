@@ -6950,6 +6950,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "iwd",
+          "version": "1.22",
+          "downloadUrl": "https://www.kernel.org/pub/linux/network/wireless/iwd-1.22.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jabberpy",
           "version": "0.5",
           "downloadUrl": "http://downloads.sf.net/sourceforge/jabberpy/jabberpy-0.5-0.tar.gz"
