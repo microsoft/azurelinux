@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.86.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,9 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
+# CVE-2022-43551 and CVE-2022-43552 will be resolved by version 7.87.0
+Patch0:         CVE-2022-43551.patch
+Patch1:         CVE-2022-43552.patch
 
 %description
 The cURL package contains an utility and a library used for
@@ -89,6 +92,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Dec 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 7.86.0-2
+- Patch CVE-2022-43551, CVE-2022-43552
+
 * Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.86.0-1
 - Auto-upgrade to 7.86.0 - CVE-2022-42915
 
