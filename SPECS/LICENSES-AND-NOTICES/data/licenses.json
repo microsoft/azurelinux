@@ -1443,6 +1443,7 @@
                 "pesign",
                 "php",
                 "php-pear",
+                "php-pecl-zip",
                 "physfs",
                 "picosat",
                 "pinfo",
