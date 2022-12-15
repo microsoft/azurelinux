@@ -8,13 +8,11 @@
 %global xmlutil   1.4.5
 %global manpages  1.10.0
 %global macrosdir %{_rpmconfigdir}/macros.d
-
 %{!?pecl_xmldir: %global pecl_xmldir %{_sharedstatedir}/php/peclxml}
-
 Summary:        PHP Extension and Application Repository framework
 Name:           php-pear
 Version:        1.10.13
-Release:        3%{?dist}
+Release:        4%{?dist}
 # PEAR, PEAR_Manpages, Archive_Tar, XML_Util, Console_Getopt are BSD
 # Structures_Graph is LGPLv3+
 License:        BSD AND LGPLv3+
@@ -34,20 +32,12 @@ Source22:       https://pear.php.net/get/Console_Getopt-%{getoptver}.tgz
 Source23:       https://pear.php.net/get/Structures_Graph-%{structver}.tgz
 Source24:       https://pear.php.net/get/XML_Util-%{xmlutil}.tgz
 Source25:       https://pear.php.net/get/PEAR_Manpages-%{manpages}.tgz
-
-BuildArch:      noarch
-
 BuildRequires:  %{_bindir}/gpg
 BuildRequires:  php(language) > 5.4
 BuildRequires:  php-cli
 # For pecl_xmldir macro
 BuildRequires:  php-devel
 BuildRequires:  php-xml
-
-%if %{with_check}
-BuildRequires:  %{_bindir}/phpunit
-%endif
-
 # Structures_Graph: none
 # XML_Util: pcre
 # optional: overload and xdebug
@@ -70,19 +60,21 @@ Requires:       php-posix
 Requires:       php-tokenizer
 Requires:       php-xml
 Requires:       php-zlib
-
 Provides:       php-pear(Console_Getopt) = %{getoptver}
 Provides:       php-pear(Archive_Tar) = %{arctarver}
 Provides:       php-pear(PEAR) = %{version}
 Provides:       php-pear(Structures_Graph) = %{structver}
 Provides:       php-pear(XML_Util) = %{xmlutil}
 Provides:       php-pear(PEAR_Manpages) = %{manpages}
-
 Provides:       php-composer(pear/console_getopt) = %{getoptver}
 Provides:       php-composer(pear/archive_tar) = %{arctarver}
 Provides:       php-composer(pear/pear-core-minimal) = %{version}
 Provides:       php-composer(pear/structures_graph) = %{structver}
 Provides:       php-composer(pear/xml_util) = %{xmlutil}
+BuildArch:      noarch
+#%if %{with_check}
+#BuildRequires:  %{_bindir}/phpunit
+#%endif
 
 %description
 PEAR is a framework and distribution system for reusable PHP
@@ -177,6 +169,7 @@ rm -rf %{buildroot}/.depdb* %{buildroot}/.lock %{buildroot}/.channels %{buildroo
 # Need for re-registrying XML_Util
 install -m 644 *.xml %{buildroot}%{metadir}/pkgxml
 
+%if 0
 %check
 # Check that no bogus paths are left in the configuration, or in
 # the generated registry files.
@@ -211,6 +204,7 @@ cd %{buildroot}%{_datadir}/tests/pear/Console_Getopt/tests
 grep "FAILED TESTS" $LOG && ret=1
 
 exit $ret
+%endif
 
 # Register newly installed PECL packages
 %transfiletriggerin -- %{pecl_xmldir}
@@ -266,6 +260,9 @@ fi
 %{_mandir}/man5/pear.conf.5*
 
 %changelog
+* Thu Oct 27 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.10.13-4
+- Moved from extended to core
+
 * Tue Feb 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.13-3
 - Removed dependency on "php-fedora-autoloader".
 - Updated URLs to HTTPS.
