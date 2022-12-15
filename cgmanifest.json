@@ -8126,8 +8126,8 @@
         "type": "other",
         "other": {
           "name": "sqlite",
-          "version": "3.34.1",
-          "downloadUrl": "https://www.sqlite.org/2021/sqlite-autoconf-3340100.tar.gz"
+          "version": "3.39.2",
+          "downloadUrl": "https://www.sqlite.org/2022/sqlite-autoconf-3390200.tar.gz"
         }
       }
     },
