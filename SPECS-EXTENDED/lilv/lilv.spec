@@ -42,7 +42,6 @@ faster and have minimal dependencies.
 
 %package        libs
 Summary:        Libraries for %{name}
-Obsoletes:      lilv < 0.24.12-2
 
 %description libs
 %{name} is a lightweight C library for Resource Description Syntax which
