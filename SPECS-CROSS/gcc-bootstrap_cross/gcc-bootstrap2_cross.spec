@@ -54,20 +54,18 @@
 
 Summary:        Contains the GNU compiler collection
 Name:           %{_cross_name}-gcc-bootstrap2
-Version:        9.1.0
-Release:        11%{?dist}
+Version:        11.2.0
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/gcc-%{version}.tar.xz
-Source1:        https://ftp.gnu.org/gnu/mpfr/mpfr-4.0.1.tar.gz
-Source2:        http://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
-Source3:        https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
-Patch0:         090_all_pr55930-dependency-tracking.patch
-# Only applies to the Power9 ISA
-Patch1:         CVE-2019-15847.nopatch
+Source1:        https://ftp.gnu.org/gnu/mpfr/mpfr-4.1.0.tar.xz
+Source2:        http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
+Source3:        https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz
+
 BuildRequires:  %{_cross_name}-binutils
 BuildRequires:  %{_cross_name}-kernel-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap
@@ -169,22 +167,21 @@ which includes the C and C++ compilers.
 
 %prep
 %setup -q -n gcc-%{version}
-%patch0 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
 install -vdm 755 %{_builddir}/%{name}-build
 cd %{_builddir}
 tar -xf %{SOURCE1}
-ln -s mpfr-4.0.1 gcc-%{version}/mpfr
+ln -s mpfr-4.1.0 gcc-%{version}/mpfr
 tar -xf %{SOURCE2}
-ln -s gmp-6.1.2 gcc-%{version}/gmp
+ln -s gmp-6.2.1 gcc-%{version}/gmp
 tar -xf %{SOURCE3}
-ln -s mpc-1.1.0 gcc-%{version}/mpc
+ln -s mpc-1.2.1 gcc-%{version}/mpc
 
-cp mpfr-4.0.1/COPYING gcc-%{version}/COPYING-mpfr
-cp gmp-6.1.2/COPYING gcc-%{version}/COPYING-gmp
-cp mpc-1.1.0/COPYING.LESSER gcc-%{version}/COPYING.LESSER-mpc
+cp mpfr-4.1.0/COPYING gcc-%{version}/COPYING-mpfr
+cp gmp-6.2.1/COPYING gcc-%{version}/COPYING-gmp
+cp mpc-1.2.1/COPYING.LESSER gcc-%{version}/COPYING.LESSER-mpc
 
 %build
 # What flags do we want here? Clearing with '%%global set_build_flags %%{nil}' at start of file.
@@ -248,6 +245,7 @@ rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
 %license COPYING-mpfr
 %license COPYING-gmp
 %license COPYING.LESSER-mpc
+%exclude /opt/cross/aarch64-mariner-linux-gnu/share/man/man1/aarch64-mariner-linux-gnu-lto-dump.1
 #%%{_sysconfdir}/ld.so.conf.d/%%{name}.conf
 #%%{_lib}/cpp
 # Executables
@@ -332,6 +330,9 @@ rm -rf %{buildroot}%{_cross_prefix}%{_infodir}
 # %%{_cross_prefix}%%{_lib64dir}/libgomp.spec
 
 %changelog
+* Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 11.2.0-2
+- Update to 11.2.0-2
+
 * Fri Feb 12 2021 Daniel McIlvaney <damcilva@microsoft.com> - 9.1.0-11
 - Fork normal gcc package into cross compile aware boot strap package
 

@@ -53,31 +53,22 @@
 
 Summary:        Main C library
 Name:           %{_cross_name}-glibc-bootstrap
-Version:        2.28
-Release:        14%{?dist}
+Version:        2.35
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/glibc-%{version}.tar.xz
-Patch0:         http://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.25-fhs-1.patch
-Patch1:         glibc-2.24-bindrsvport-blacklist.patch
-Patch2:         0002-malloc-arena-fix.patch
-Patch3:         glibc-2.28-CVE-2018-19591.patch
-Patch4:         CVE-2019-9169.patch
-Patch5:         CVE-2016-10739.patch
-Patch6:         CVE-2020-1752.patch
-Patch7:         CVE-2020-10029.patch
-# Only applicable on ARMv7 targets.
-Patch8:         CVE-2020-6096.nopatch
-# Only applicable on x32 targets.
-Patch9:         CVE-2019-6488.nopatch
-# Only applicable on PowerPC targets.
-Patch10:        CVE-2020-1751.nopatch
-# Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
-# Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
-Patch11:        CVE-2018-20796.nopatch
+Patch0:         http://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.35-fhs-1.patch
+Patch1:         CVE-2020-6096.nopatch
+Patch2:         CVE-2019-6488.nopatch
+
+Patch3:         CVE-2020-1751.nopatch
+Patch4:         CVE-2018-20796.nopatch
+Patch5:         glibc-2.34_pthread_cond_wait.patch
+
 #Requires:       filesystem
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       %{_cross_name}-rtld(GNU_HASH)
@@ -160,8 +151,6 @@ sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
-%patch7 -p1
 
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
@@ -218,7 +207,8 @@ cd %{_builddir}/%{name}-build
             --disable-multilib \
             libc_cv_forced_unwind=yes \
             libc_cv_ctors_header=yes \
-            --disable-werror
+            --disable-werror \
+            --enable-languages=c,c++
 
 make %{?_smp_mflags} DESTDIR=$TEMP_SYSROOT install-bootstrap-headers=yes install-headers
 make %{?_smp_mflags} csu/subdir_lib
@@ -324,6 +314,9 @@ install csu/crt1.o csu/crti.o csu/crtn.o ../temp_sysroot/%{_libdir}/libc.so %{bu
 %{_cross_sysroot}%{_includedir}/*
 
 %changelog
+* Thu Dec 15 2022 Dallas Delaney <dadelan@microsoft.com> - 2.35-2
+- Update to 2.35-2
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.28-14
 - Provide isa version of glibc-static.
 
