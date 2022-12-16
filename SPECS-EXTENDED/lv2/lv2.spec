@@ -19,9 +19,9 @@ BuildRequires:  libsndfile-devel
 BuildRequires:  meson
 BuildRequires:  pkgconfig(samplerate)
 BuildRequires:  python3-pygments
-Buildrequires:  python3-rdflib
-Buildrequires:  python3-markdown
-Buildrequires:  python3-lxml
+BuildRequires:  python3-rdflib
+BuildRequires:  python3-markdown
+BuildRequires:  python3-lxml
 # this package replaces lv2core 
 Provides:       lv2core = 6.0-4
 Obsoletes:      lv2core < 6.0-4
