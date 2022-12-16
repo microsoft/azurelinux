@@ -35,11 +35,11 @@ Go is an open source programming language that makes it easy to build simple, re
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < %{PATCH0}
-patch -Np1 --ignore-whitespace < %{PATCH1}
 
 mv -v go go-bootstrap
 
 %setup -q -n go
+patch -Np1 --ignore-whitespace < %{PATCH1}
 
 %build
 # Build go 1.4 bootstrap
