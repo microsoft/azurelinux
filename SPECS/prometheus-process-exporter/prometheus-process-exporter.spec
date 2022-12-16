@@ -98,7 +98,7 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 0.7.10-5
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.7.10-4
 - Bump release to rebuild with go 1.18.8

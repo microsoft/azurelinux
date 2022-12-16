@@ -86,7 +86,7 @@ fi
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.6.12-2
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.12-1
 - Auto-upgrade to 1.6.12 - to fix CVE-2022-23471

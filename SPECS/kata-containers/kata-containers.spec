@@ -225,7 +225,7 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.0.0-2
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Tue Nov 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-1
 - Update to v3.0.0, apply patches for compatibility with Cloud-hypervisor v27.0.60.

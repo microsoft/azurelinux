@@ -47,7 +47,7 @@ install -p -m 755 build/blobfuse %{buildroot}%{_bindir}/
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.4.5-3
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.4.5-2
 - Bump release to rebuild with go 1.18.8

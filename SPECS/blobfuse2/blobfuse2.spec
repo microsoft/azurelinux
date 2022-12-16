@@ -81,7 +81,7 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.0.1-2
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Fri Dec 02 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.1-1
 - Bump version to 2.0.1

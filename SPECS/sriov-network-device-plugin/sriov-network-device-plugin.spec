@@ -35,7 +35,7 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}/usr/share/%{name}/
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.4.0-4
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Tue Dec 06 2022 Aditya Dubey <adityadubey@microsoft.com> - 3.4.0-3
 - Adding in the hwdata and gawk dependencies

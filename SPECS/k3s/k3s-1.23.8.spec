@@ -80,7 +80,7 @@ exit 0
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.23.8-4
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Thu Dec 08 2022 Vinayak Gupta <guptavinayak@microsoft.com> - 1.23.8-3
 - Update the vendor tarball with the corrected versions of the dependencies

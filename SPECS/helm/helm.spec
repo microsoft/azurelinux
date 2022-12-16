@@ -53,7 +53,7 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 %changelog
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.4-3
-- Bump release to rebuild with go 1.18.9
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.4-2
 - Bump release to rebuild with go 1.18.8
