@@ -29,13 +29,8 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(zlib)
-%if 0%{?python3:1}
 BuildRequires:  python3
 BuildRequires:  python3-devel
-%else
-Obsoletes:      lensfun-python3 < %{version}-%{release}
-Obsoletes:      lensfun-tools < %{version}-%{release}
-%endif
 
 %description
 The lensfun library provides an open source database of photographic lenses and
