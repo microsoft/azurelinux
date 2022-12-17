@@ -10,7 +10,7 @@ License:        LGPLv3 AND CC-BY-SA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://lensfun.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 ## upstream patches
 Patch1:         0001-Only-require-glib-2.40-when-tests-are-build-without-.patch
 Patch38:        0038-Only-use-proper-C-new-and-delete-syntax-for-object-c.patch
