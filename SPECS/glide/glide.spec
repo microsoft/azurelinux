@@ -50,7 +50,7 @@ popd
 %files
 %defattr(-,root,root)
 %license LICENSE
-%{_bindir}/glid
+%{_bindir}/glide
 
 %changelog
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.3-15
