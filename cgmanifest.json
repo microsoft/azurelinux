@@ -7860,6 +7860,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lensfun",
+          "version": "0.3.2",
+          "downloadUrl": "https://downloads.sourceforge.net/lensfun/lensfun-0.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "less",
           "version": "590",
           "downloadUrl": "https://www.greenwoodsoftware.com/less/less-590.tar.gz"
