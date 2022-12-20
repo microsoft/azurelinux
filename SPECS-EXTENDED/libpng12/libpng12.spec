@@ -1,22 +1,19 @@
+Summary:        Old version of libpng, needed to run old binaries
+Name:           libpng12
+Version:        1.2.57
+Release:        13%{?dist}
+License:        zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: Old version of libpng, needed to run old binaries
-Name: libpng12
-Version: 1.2.57
-Release: 13%{?dist}
-License: zlib
-URL: http://www.libpng.org/pub/png/
-
+URL:            http://www.libpng.org/pub/png/
 # Note: non-current tarballs get moved to the history/ subdirectory,
 # so look there if you fail to retrieve the version you want
-Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng12/libpng-%{version}.tar.xz
-
-Patch0: libpng12-multilib.patch
-Patch1: libpng12-pngconf.patch
-
-BuildRequires: gcc
-BuildRequires: pkgconfig
-BuildRequires: zlib-devel
+Source0:        https://ftp-osl.osuosl.org/pub/libpng/src/libpng12/libpng-%{version}.tar.xz
+Patch0:         libpng12-multilib.patch
+Patch1:         libpng12-pngconf.patch
+BuildRequires:  gcc
+BuildRequires:  pkgconfig
+BuildRequires:  zlib-devel
 
 %description
 The libpng12 package provides libpng 1.2, an older version of the libpng
@@ -25,9 +22,9 @@ This version should be used only if you are unable to use the current
 version of libpng.
 
 %package devel
-Summary: Development files for libpng 1.2
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: zlib-devel%{?_isa}
+Summary:        Development files for libpng 1.2
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       zlib-devel%{?_isa}
 
 %description devel
 The libpng12-devel package contains header files and documentation necessary
@@ -47,20 +44,20 @@ for developing programs using libpng12.
 make %{?_smp_mflags}
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+make DESTDIR=%{buildroot} install
 
 ## unpackaged files
 # We don't ship .la files.
-rm -fv $RPM_BUILD_ROOT%{_libdir}/libpng*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 # drop man5 files, because these are in the base libpng package,
 # which we don't want to conflict with.
-rm -fv $RPM_BUILD_ROOT%{_mandir}/man5/*
+rm -fv %{buildroot}%{_mandir}/man5/*
 # omit that conflicts with base libpng-devel package
-rm -fv $RPM_BUILD_ROOT%{_bindir}/libpng-config
-rm -fv $RPM_BUILD_ROOT%{_includedir}/{png,pngconf}.h
-rm -fv $RPM_BUILD_ROOT%{_libdir}/libpng.so
-rm -fv $RPM_BUILD_ROOT%{_libdir}/pkgconfig/libpng.pc
-rm -fv $RPM_BUILD_ROOT%{_mandir}/man3/{libpng,libpngpf}.3*
+rm -fv %{buildroot}%{_bindir}/libpng-config
+rm -fv %{buildroot}%{_includedir}/{png,pngconf}.h
+rm -fv %{buildroot}%{_libdir}/libpng.so
+rm -fv %{buildroot}%{_libdir}/pkgconfig/libpng.pc
+rm -fv %{buildroot}%{_mandir}/man3/{libpng,libpngpf}.3*
 
 %check
 make check

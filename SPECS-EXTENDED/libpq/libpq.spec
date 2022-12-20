@@ -1,34 +1,30 @@
 %global majorversion 12
 
-Summary: PostgreSQL client library
-Name: libpq
-Version: %{majorversion}.2
-Release: 4%{?dist}
-
-License: PostgreSQL
+Summary:        PostgreSQL client library
+Name:           libpq
+Version:        %{majorversion}.2
+Release:        4%{?dist}
+License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://www.postgresql.org/
-
-Source0: https://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
-
-
+URL:            https://www.postgresql.org/
+Source0:        https://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 # Comments for these patches are in the patch files.
-Patch1: libpq-10.3-rpm-pgsql.patch
-Patch2: libpq-10.3-var-run-socket.patch
-Patch3: libpq-12.1-symbol-versioning.patch
-
-BuildRequires: gcc
-BuildRequires: glibc-devel bison flex gawk
-BuildRequires: zlib-devel
-BuildRequires: openssl-devel
-BuildRequires: krb5-devel
-BuildRequires: openldap-devel
-BuildRequires: gettext
-BuildRequires: multilib-rpm-config
-
-Provides: postgresql-libs = %version-%release
-
+Patch1:         libpq-10.3-rpm-pgsql.patch
+Patch2:         libpq-10.3-var-run-socket.patch
+Patch3:         libpq-12.1-symbol-versioning.patch
+BuildRequires:  bison
+BuildRequires:  flex
+BuildRequires:  gawk
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  glibc-devel
+BuildRequires:  krb5-devel
+BuildRequires:  multilib-rpm-config
+BuildRequires:  openldap-devel
+BuildRequires:  openssl-devel
+BuildRequires:  zlib-devel
+Provides:       postgresql-libs = %{version}-%{release}
 
 %description
 The libpq package provides the essential shared library for any PostgreSQL
@@ -36,24 +32,22 @@ client program or interface.  You will need to install this package to use any
 other PostgreSQL package or any clients that need to connect to a PostgreSQL
 server.
 
-
 %package devel
-Summary: Development files for building PostgreSQL client tools
-Requires: %name%{?_isa} = %version-%release
+Summary:        Development files for building PostgreSQL client tools
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 # Historically we had 'postgresql-devel' package which was used for building
 # both PG clients and PG server modules;  let's have this fake provide to cover
 # most of the depending packages and the rest (those which want to build server
 # modules) need to be fixed to require postgresql-server-devel package.
-Provides: postgresql-devel = %version-%release
+Provides:       postgresql-devel = %{version}-%{release}
 
 %description devel
 The libpq package provides the essential shared library for any PostgreSQL
 client program or interface.  You will need to install this package to build any
 package or any clients that need to connect to a PostgreSQL server.
 
-
 %prep
-%autosetup -n postgresql-%version -p1
+%autosetup -n postgresql-%{version} -p1
 
 # remove .gitignore files to ensure none get into the RPMs (bug #642210)
 find . -type f -name .gitignore | xargs rm
@@ -72,7 +66,7 @@ export SYMBOL_VERSION_PREFIX=RHPG_
     --with-gssapi \
     --enable-nls \
     --without-readline \
-    --datadir=%_datadir/pgsql
+    --datadir=%{_datadir}/pgsql
 
 %global build_subdirs \\\
         src/include \\\
@@ -81,50 +75,48 @@ export SYMBOL_VERSION_PREFIX=RHPG_
         src/interfaces/libpq \\\
         src/bin/pg_config
 
-for subdir in %build_subdirs; do
+for subdir in %{build_subdirs}; do
     %make_build -C "$subdir"
 done
 
 
 %install
-for subdir in %build_subdirs; do
+for subdir in %{build_subdirs}; do
     %make_install -C "$subdir"
 done
 
 # remove files not to be packaged
-find $RPM_BUILD_ROOT -name '*.a' -delete
-rm -r $RPM_BUILD_ROOT%_includedir/pgsql/server
+find %{buildroot} -name '*.a' -delete
+rm -r %{buildroot}%{_includedir}/pgsql/server
 
-%multilib_fix_c_header --file "%_includedir/pg_config.h"
-%multilib_fix_c_header --file "%_includedir/pg_config_ext.h"
+%{multilib_fix_c_header} --file "%{_includedir}/pg_config.h"
+%{multilib_fix_c_header} --file "%{_includedir}/pg_config_ext.h"
 
 find_lang_bins ()
 {
     lstfile=$1 ; shift
     cp /dev/null "$lstfile"
     for binary; do
-        %find_lang "$binary"-%majorversion
-        cat "$binary"-%majorversion.lang >>"$lstfile"
+        %find_lang "$binary"-%{majorversion}
+        cat "$binary"-%{majorversion}.lang >>"$lstfile"
     done
 }
 
-find_lang_bins %name.lst        libpq5
-find_lang_bins %name-devel.lst  pg_config
+find_lang_bins %{name}.lst        libpq5
+find_lang_bins %{name}-devel.lst  pg_config
 
 
-%files -f %name.lst
+%files -f %{name}.lst
 %license COPYRIGHT
-%_libdir/libpq.so.5*
-%dir %_datadir/pgsql
-%doc %_datadir/pgsql/pg_service.conf.sample
+%{_libdir}/libpq.so.5*
+%dir %{_datadir}/pgsql
+%doc %{_datadir}/pgsql/pg_service.conf.sample
 
-
-%files devel -f %name-devel.lst
-%_bindir/pg_config
-%_includedir/*
-%_libdir/libpq.so
-%_libdir/pkgconfig/libpq.pc
-
+%files devel -f %{name}-devel.lst
+%{_bindir}/pg_config
+%{_includedir}/*
+%{_libdir}/libpq.so
+%{_libdir}/pkgconfig/libpq.pc
 
 %changelog
 * Mon Dec 19 2022 Muhammad Falak <mwani@microsoft.com> - 12.2-4

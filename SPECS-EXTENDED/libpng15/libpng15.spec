@@ -1,23 +1,19 @@
-Summary: Old version of libpng, needed to run old binaries
-Name: libpng15
-Version: 1.5.30
-Release: 11%{?dist}
-License: zlib
+Summary:        Old version of libpng, needed to run old binaries
+Name:           libpng15
+Version:        1.5.30
+Release:        11%{?dist}
+License:        zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://www.libpng.org/pub/png/
-
+URL:            http://www.libpng.org/pub/png/
 # Note: non-current tarballs get moved to the history/ subdirectory,
 # so look there if you fail to retrieve the version you want
-Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng15/libpng-%{version}.tar.xz
-
-Source1: pngusr.dfa
-
-Patch0: libpng15-CVE-2013-6954.patch
-Patch1: libpng15-CVE-2018-13785.patch
-
-BuildRequires: gcc
-BuildRequires: zlib-devel
+Source0:        https://ftp-osl.osuosl.org/pub/libpng/src/libpng15/libpng-%{version}.tar.xz
+Source1:        pngusr.dfa
+Patch0:         libpng15-CVE-2013-6954.patch
+Patch1:         libpng15-CVE-2018-13785.patch
+BuildRequires:  gcc
+BuildRequires:  zlib-devel
 
 %description
 The libpng15 package provides libpng 1.5, an older version of the libpng.
@@ -39,19 +35,19 @@ cp -p %{SOURCE1} .
 make %{?_smp_mflags} DFA_XTRA=pngusr.dfa
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+make DESTDIR=%{buildroot} install
 
 # We don't ship .la files.
-rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -rf $RPM_BUILD_ROOT%{_libdir}/libpng*.so
-rm -rf $RPM_BUILD_ROOT%{_libdir}/pkgconfig/libpng.pc
-rm -rf $RPM_BUILD_ROOT%{_libdir}/pkgconfig/libpng15.pc
-rm -rf $RPM_BUILD_ROOT%{_mandir}/*
-rm -rf $RPM_BUILD_ROOT%{_includedir}/*
-rm -rf $RPM_BUILD_ROOT%{_bindir}/*
+find %{buildroot} -type f -name "*.la" -delete -print
+rm -rf %{buildroot}%{_libdir}/libpng*.so
+rm -rf %{buildroot}%{_libdir}/pkgconfig/libpng.pc
+rm -rf %{buildroot}%{_libdir}/pkgconfig/libpng15.pc
+rm -rf %{buildroot}%{_mandir}/*
+rm -rf %{buildroot}%{_includedir}/*
+rm -rf %{buildroot}%{_bindir}/*
 
 %files
-%doc LICENSE
+%license LICENSE
 %{_libdir}/libpng15.so.*
 
 %changelog
@@ -555,4 +551,3 @@ Resolves: #226038
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-
