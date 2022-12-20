@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        1.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        Apache License
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
@@ -18,12 +18,9 @@ Source7:        mariner-extras.repo
 Source8:        mariner-extras-preview.repo
 Source9:        mariner-microsoft.repo
 Source10:       mariner-microsoft-preview.repo
+BuildArch:      noarch
 
-Requires(post):  gpgme
-Requires(post):  rpm
-Requires(preun): gpgme
-Requires(preun): rpm
-BuildArch:       noarch
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description
 CBL-Mariner repo files and gpg keys
@@ -31,7 +28,7 @@ CBL-Mariner repo files and gpg keys
 %package preview
 Summary:    CBL-Mariner preview repo file.
 Group:      System Environment/Base
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-shared = %{version}-%{release}
 
 %description preview
 %{summary}
@@ -39,7 +36,7 @@ Requires:   %{name} = %{version}-%{release}
 %package ui
 Summary:    CBL-Mariner UI repo file.
 Group:      System Environment/Base
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-shared = %{version}-%{release}
 
 %description ui
 %{summary}
@@ -54,7 +51,7 @@ Requires:   %{name}-ui = %{version}-%{release}
 %package extras
 Summary:  CBL-Mariner extras repository.
 Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}-shared = %{version}-%{release}
 
 %description extras
 %{summary}
@@ -62,7 +59,7 @@ Requires: %{name} = %{version}-%{release}
 %package extras-preview
 Summary:  CBL-Mariner extras repository.
 Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}-shared = %{version}-%{release}
 
 %description extras-preview
 %{summary}
@@ -70,7 +67,7 @@ Requires: %{name} = %{version}-%{release}
 %package microsoft
 Summary:  CBL-Mariner Microsoft repository.
 Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}-shared = %{version}-%{release}
 
 %description microsoft
 %{summary}
@@ -78,10 +75,21 @@ Requires: %{name} = %{version}-%{release}
 %package microsoft-preview
 Summary:  CBL-Mariner Microsoft Preview repository.
 Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}-shared = %{version}-%{release}
 
 %description microsoft-preview
 %{summary}
+
+%package shared
+Summary:        Directories and files needed by all %{name} configurations.
+Group:          System Environment/Base
+
+%description shared
+%{summary}
+
+Requires(post):  gpgme
+
+Requires(preun): gpgme
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -106,11 +114,11 @@ install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%posttrans
-gpg --import /etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
-gpg --import /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+%posttrans shared
+gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
-%preun
+%preun shared
 # Remove the MICROSOFT-METADATA-GPG-KEY
 gpg --batch --yes --delete-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
 # Remove the MICROSOFT-RPM-GPG-KEY
@@ -118,9 +126,6 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %files
 %defattr(-,root,root,-)
-%dir /etc/yum.repos.d
-/etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
-/etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 %config(noreplace) /etc/yum.repos.d/mariner-official-base.repo
 %config(noreplace) /etc/yum.repos.d/mariner-official-update.repo
 
@@ -152,7 +157,17 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
 
+%files shared
+%dir %{_sysconfdir}/yum.repos.d
+%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+
 %changelog
+*   Tue Dec 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-16
+-   Creating a separate "mariner-repos-shared" subpackage to make repo configurations
+    independent of each other.
+-   Removing dependency on RPM.
+
 *   Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 1.0-15
 -   Add SRPMS repos for base, update, and coreui (all disabled by default)
 

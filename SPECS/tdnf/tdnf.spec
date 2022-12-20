@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,7 @@ BuildRequires:  python3-xml
 
 Requires:       curl
 Requires:       libsolv
+Requires:       mariner-repos-shared
 Requires:       openssl-libs
 Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
@@ -201,6 +202,9 @@ find %{buildroot} -name '*.pyc' -delete
 %{python3_sitelib}/*
 
 %changelog
+* Tue Dec 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-7
+- Adding a dependency on "mariner-repos-shared" to guarantee existence of the YUM repos directory.
+
 * Mon Dec 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-6
 - Patching TDNF to print at least one space between columns in 'tdnf list' output.
 - Fixing whitelist warnings in previous patches.

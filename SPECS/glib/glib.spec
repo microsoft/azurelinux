@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.58.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Patch2:         CVE-2020-35457.patch
 Patch3:         CVE-2021-27218.patch
 Patch4:         CVE-2021-27219.nopatch
 Patch5:         CVE-2021-28153.patch
+Patch6:         CVE-2021-3800.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  pcre-devel
@@ -100,6 +101,9 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/glib-2.0/schemas/*
 
 %changelog
+* Tue Dec 06 2022 Minghe Ren <mingheren@microsoft.com> - 2.58.0-10
+- Added patch for CVE-2021-3800
+
 * Mon Mar 29 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.58.0-9
 - Added patch for CVE-2021-28153
 
