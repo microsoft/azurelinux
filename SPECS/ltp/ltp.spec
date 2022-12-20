@@ -80,7 +80,7 @@ make check
 
 %preun
 # Removing files with names not known until the tests are run.
-rm -rf %{ltp_prefix}/{output,results,testcases/bin/*}
+rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 
 %files
 %license COPYING
