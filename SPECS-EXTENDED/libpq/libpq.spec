@@ -121,6 +121,7 @@ find_lang_bins %{name}-devel.lst  pg_config
 %changelog
 * Mon Dec 19 2022 Muhammad Falak <mwani@microsoft.com> - 12.2-4
 - Drop obsoletes
+- Drop GPG verification
 
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 12.2-3
 - License verified
