@@ -9720,6 +9720,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libpq",
+          "version": "12.2",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libproxy",
           "version": "0.4.17",
           "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
