@@ -1,0 +1,85 @@
+diff --git a/config/Makefile b/config/Makefile
+index 67e7998f55..86612a42c3 100644
+--- a/config/Makefile
++++ b/config/Makefile
+@@ -8,6 +8,7 @@ include $(top_builddir)/src/Makefile.global
+ install: all installdirs
+ 	$(INSTALL_SCRIPT) $(srcdir)/install-sh '$(DESTDIR)$(pgxsdir)/config/install-sh'
+ 	$(INSTALL_SCRIPT) $(srcdir)/missing '$(DESTDIR)$(pgxsdir)/config/missing'
++	$(INSTALL_SCRIPT) $(srcdir)/build-exports-gnu-ld '$(DESTDIR)$(pgxsdir)/config/build-exports-gnu-ld'
+ 
+ installdirs:
+ 	$(MKDIR_P) '$(DESTDIR)$(pgxsdir)/config'
+diff --git a/config/build-exports-gnu-ld b/config/build-exports-gnu-ld
+new file mode 100755
+index 0000000000..84c48e3ade
+--- /dev/null
++++ b/config/build-exports-gnu-ld
+@@ -0,0 +1,41 @@
++#! /bin/sh
++
++# by default use PG_ prefix
++: "${SYMBOL_VERSION_PREFIX=PG_}"
++
++# we started symbol versioning since v10
++: "${SYMBOL_VERSION_START=9.6}"
++
++version=$SYMBOL_VERSION_START
++version_prev=
++first=:
++
++open_block ()
++{
++	$first || echo
++	first=false
++	echo "${SYMBOL_VERSION_PREFIX}$version {"
++	echo "global:"
++}
++
++close_block ()
++{
++	echo "}${version_prev:+ $SYMBOL_VERSION_PREFIX$version_prev};"
++	version_prev=$version
++	version=$1
++}
++
++open_block
++while read -r symbol _ new_version
++do
++	case $symbol in '#'*) continue ;; esac
++	if test -n "$new_version" && test "$new_version" != "$version"; then
++		close_block "$new_version"
++		open_block
++	fi
++	echo "	$symbol;"
++done
++
++echo "local:"
++echo "	*;"
++close_block
+diff --git a/src/Makefile.shlib b/src/Makefile.shlib
+index 373d73caef..d5bd5468cd 100644
+--- a/src/Makefile.shlib
++++ b/src/Makefile.shlib
+@@ -231,7 +231,7 @@ ifeq ($(PORTNAME), linux)
+   ifdef soname
+     LINK.shared		+= -Wl,-soname,$(soname)
+   endif
+-  BUILD.exports		= ( echo '{ global:'; $(AWK) '/^[^\#]/ {printf "%s;\n",$$1}' $<; echo ' local: *; };' ) >$@
++  BUILD.exports		= $(SHELL) $(top_srcdir)/config/build-exports-gnu-ld < $< > $@
+   exports_file		= $(SHLIB_EXPORTS:%.txt=%.list)
+   ifneq (,$(exports_file))
+     LINK.shared		+= -Wl,--version-script=$(exports_file)
+diff --git a/src/interfaces/libpq/exports.txt b/src/interfaces/libpq/exports.txt
+index 7c808e5215..3631340b23 100644
+--- a/src/interfaces/libpq/exports.txt
++++ b/src/interfaces/libpq/exports.txt
+@@ -171,7 +171,7 @@ PQsslAttributeNames       168
+ PQsslAttribute            169
+ PQsetErrorContextVisibility 170
+ PQresultVerboseErrorMessage 171
+-PQencryptPasswordConn     172
++PQencryptPasswordConn     172     10
+ PQresultMemorySize        173
+ PQhostaddr                174
+ PQgssEncInUse             175
