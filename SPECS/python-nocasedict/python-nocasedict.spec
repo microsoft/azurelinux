@@ -3,7 +3,7 @@
 Summary:        Case-insensitive ordered dictionary library for Python
 Name:           python-%{pkgname}
 Version:        1.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,7 +40,7 @@ rm -rf *.egg-info
 %py3_install
 
 %check
-pip3 install tox
+pip3 install 'tox>=3.27.1,<4.0.0'
 PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pkgname}
@@ -50,6 +50,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.2-2
+- Update version of tox used for package tests
+
 * Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.2-1
 - Upgrade to latest upstream release
 - Use tox as a test runner
