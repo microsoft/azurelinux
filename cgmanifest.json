@@ -9860,6 +9860,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libreport",
+          "version": "2.13.1",
+          "downloadUrl": "https://github.com/abrt/libreport/archive/2.13.1/libreport-2.13.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libreswan",
           "version": "4.7",
           "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.7.tar.gz"
