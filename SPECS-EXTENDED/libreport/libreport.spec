@@ -1,66 +1,59 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 %bcond_without bugzilla
-%define dbus_devel dbus-devel
 %define libjson_devel json-c-devel
-
 %define glib_ver 2.43.4
 
-Summary: Generic library for reporting various problems
-Name: libreport
-Version: 2.13.1
-Release: 8%{?dist}
-License: GPLv2+
-URL: https://abrt.readthedocs.org/
-Source: https://github.com/abrt/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-
-Patch0: 0001-gui-wizard-gtk-Fix-segfault.patch
-
-BuildRequires: %{dbus_devel}
+Summary:        Generic library for reporting various problems
+Name:           libreport
+Version:        2.13.1
+Release:        9%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://abrt.readthedocs.org/
+Source:         https://github.com/abrt/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-gui-wizard-gtk-Fix-segfault.patch
+BuildRequires:  dbus-devel
 # BuildRequires: gtk3-devel
-BuildRequires: curl-devel
-BuildRequires: desktop-file-utils
-BuildRequires: python3-devel
-BuildRequires: gettext
-BuildRequires: libxml2-devel
-BuildRequires: libtar-devel
-BuildRequires: intltool
-BuildRequires: libtool
-BuildRequires: texinfo
-BuildRequires: asciidoc
-BuildRequires: xmlto
-BuildRequires: newt-devel
-BuildRequires: libproxy-devel
-BuildRequires: satyr-devel >= 0.24
-BuildRequires: glib2-devel >= %{glib_ver}
-BuildRequires: nettle-devel
-BuildRequires: git-core
-
+BuildRequires:  asciidoc
+BuildRequires:  augeas
+BuildRequires:  augeas-devel
+BuildRequires:  curl-devel
+BuildRequires:  desktop-file-utils
+BuildRequires:  doxygen
+BuildRequires:  gettext
+BuildRequires:  git-core
+BuildRequires:  glib2-devel >= %{glib_ver}
+BuildRequires:  intltool
+BuildRequires:  libproxy-devel
+BuildRequires:  libtar-devel
+BuildRequires:  libtool
+BuildRequires:  libxml2-devel
+BuildRequires:  lz4
+BuildRequires:  nettle-devel
+BuildRequires:  newt-devel
+BuildRequires:  python3-devel
+BuildRequires:  satyr-devel >= 0.24
+BuildRequires:  systemd-devel
+BuildRequires:  texinfo
+BuildRequires:  xmlrpc-c
+BuildRequires:  xmlto
+BuildRequires:  xz
+Requires:       glib2 >= %{glib_ver}
+Requires:       libreport-filesystem = %{version}-%{release}
+Requires:       lz4
+Requires:       nettle
+Requires:       satyr >= 0.24
+Requires:       xz
 %if %{with_check} && 0%{?mariner_failing_tests}
 # A test case uses zh_CN locale to verify XML event translations
-BuildRequires: glibc-all-langpacks
+BuildRequires:  glibc-all-langpacks
 %endif
-
 %if %{with bugzilla}
-BuildRequires: xmlrpc-c-devel
+BuildRequires:  xmlrpc-c-devel
 %endif
-BuildRequires: doxygen
-BuildRequires: systemd-devel
-BuildRequires: augeas-devel
-BuildRequires: augeas
-BuildRequires: xz
-BuildRequires: lz4
-Requires: libreport-filesystem = %{version}-%{release}
-Requires: satyr >= 0.24
-Requires: glib2 >= %{glib_ver}
-Requires: xz
-Requires: lz4
-Requires: nettle
-
 # Required for the temporary modularity hack, see below
 %if 0%{?_module_build}
-BuildRequires: sed
+BuildRequires:  sed
 %endif
 
 %description
@@ -68,35 +61,34 @@ Libraries providing API for reporting different problems in applications
 to different bug targets like Bugzilla, ftp, trac, etc...
 
 %package filesystem
-Summary: Filesystem layout for libreport
-BuildArch: noarch
+Summary:        Filesystem layout for libreport
+BuildArch:      noarch
 
 %description filesystem
 Filesystem layout for libreport
 
 %package devel
-Summary: Development libraries and headers for libreport
-Requires: libreport = %{version}-%{release}
+Summary:        Development libraries and headers for libreport
+Requires:       libreport = %{version}-%{release}
 
 %description devel
 Development libraries and headers for libreport
 
 %package web
-Summary: Library providing network API for libreport
-Requires: libreport = %{version}-%{release}
+Summary:        Library providing network API for libreport
+Requires:       libreport = %{version}-%{release}
 
 %description web
 Library providing network API for libreport
 
 %package web-devel
-Summary: Development headers for libreport-web
-Requires: libreport-web = %{version}-%{release}
+Summary:        Development headers for libreport-web
+Requires:       libreport-web = %{version}-%{release}
 
 %description web-devel
 Development headers for libreport-web
 
 %package -n python3-libreport
-Summary: Python 3 bindings for report-libs
 %if 0%{?_module_build}
 # This is required for F26 Boltron (the modular release)
 # Different parts of libreport are shipped with different
@@ -104,62 +96,63 @@ Summary: Python 3 bindings for report-libs
 # strict NVR dependency to make it work.  Temporary and
 # limited to F26 Boltron.
 %global distfreerelease %(echo %{release}|sed 's/%{?dist}$//'||echo 0)
-Requires: libreport >= %{version}-%{distfreerelease}
+Requires:       libreport >= %{version}-%{distfreerelease}
 %else
-Requires: libreport = %{version}-%{release}
+Requires:       libreport = %{version}-%{release}
 %endif
-Requires: python3-dnf
+Summary:        Python 3 bindings for report-libs
 %{?python_provide:%python_provide python3-libreport}
+Requires:       python3-dnf
 
 %description -n python3-libreport
 Python 3 bindings for report-libs.
 
 %package cli
-Summary: %{name}'s command line interface
-Requires: %{name} = %{version}-%{release}
+Summary:        %{name}'s command line interface
+Requires:       %{name} = %{version}-%{release}
 
 %description cli
 This package contains simple command line tool for working
 with problem dump reports
 
 %package newt
-Summary: %{name}'s newt interface
-Requires: %{name} = %{version}-%{release}
-Provides: report-newt = 0:0.23-1
-Obsoletes: report-newt < 0:0.23-1
+Summary:        %{name}'s newt interface
+Requires:       %{name} = %{version}-%{release}
+Provides:       report-newt = 0:0.23-1
+Obsoletes:      report-newt < 0:0.23-1
 
 %description newt
 This package contains a simple newt application for reporting
 bugs
 
 %package plugin-kerneloops
-Summary: %{name}'s kerneloops reporter plugin
-Requires: curl
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
+Summary:        %{name}'s kerneloops reporter plugin
+Requires:       %{name} = %{version}-%{release}
+Requires:       curl
+Requires:       libreport-web = %{version}-%{release}
 
 %description plugin-kerneloops
 This package contains plugin which sends kernel crash information to specified
 server, usually to kerneloops.org.
 
 %package plugin-logger
-Summary: %{name}'s logger reporter plugin
-Requires: %{name} = %{version}-%{release}
+Summary:        %{name}'s logger reporter plugin
+Requires:       %{name} = %{version}-%{release}
 
 %description plugin-logger
 The simple reporter plugin which writes a report to a specified file.
 
 %package plugin-systemd-journal
-Summary: %{name}'s systemd journal reporter plugin
-Requires: %{name} = %{version}-%{release}
+Summary:        %{name}'s systemd journal reporter plugin
+Requires:       %{name} = %{version}-%{release}
 
 %description plugin-systemd-journal
 The simple reporter plugin which writes a report to the systemd journal.
 
 %package plugin-mailx
-Summary: %{name}'s mailx reporter plugin
-Requires: %{name} = %{version}-%{release}
-Requires: mailx
+Summary:        %{name}'s mailx reporter plugin
+Requires:       %{name} = %{version}-%{release}
+Requires:       mailx
 
 %description plugin-mailx
 The simple reporter plugin which sends a report via mailx to a specified
@@ -167,74 +160,74 @@ email address.
 
 %if %{with bugzilla}
 %package plugin-bugzilla
-Summary: %{name}'s bugzilla plugin
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
+Summary:        %{name}'s bugzilla plugin
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-web = %{version}-%{release}
 
 %description plugin-bugzilla
 Plugin to report bugs into the bugzilla.
 %endif
 
 %package plugin-mantisbt
-Summary: %{name}'s mantisbt plugin
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
+Summary:        %{name}'s mantisbt plugin
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-web = %{version}-%{release}
 
 %description plugin-mantisbt
 Plugin to report bugs into the mantisbt.
 
 %package centos
-Summary: %{name}'s CentOS Bug Tracker workflow
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
-Requires: libreport-plugin-mantisbt = %{version}-%{release}
+Summary:        %{name}'s CentOS Bug Tracker workflow
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-plugin-mantisbt = %{version}-%{release}
+Requires:       libreport-web = %{version}-%{release}
 
 %description centos
 Workflows to report issues into the CentOS Bug Tracker.
 
 %package plugin-ureport
-Summary: %{name}'s micro report plugin
-BuildRequires: %{libjson_devel}
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
+Summary:        %{name}'s micro report plugin
+BuildRequires:  %{libjson_devel}
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-web = %{version}-%{release}
 %if 0%{?rhel}
-Requires: python3-subscription-manager-rhsm
+Requires:       python3-subscription-manager-rhsm
 %endif
 
 %description plugin-ureport
 Uploads micro-report to abrt server
 
 %package plugin-rhtsupport
-Summary: %{name}'s RHTSupport plugin
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
+Summary:        %{name}'s RHTSupport plugin
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-web = %{version}-%{release}
 
 %description plugin-rhtsupport
 Plugin to report bugs into RH support system.
 
 %if %{with bugzilla}
 %package compat
-Summary: %{name}'s compat layer for obsoleted 'report' package
-Requires: libreport = %{version}-%{release}
-Requires: %{name}-plugin-bugzilla = %{version}-%{release}
-Requires: %{name}-plugin-rhtsupport = %{version}-%{release}
+Summary:        %{name}'s compat layer for obsoleted 'report' package
+Requires:       %{name}-plugin-bugzilla = %{version}-%{release}
+Requires:       %{name}-plugin-rhtsupport = %{version}-%{release}
+Requires:       libreport = %{version}-%{release}
 
 %description compat
 Provides 'report' command-line tool.
 %endif
 
 %package plugin-reportuploader
-Summary: %{name}'s reportuploader plugin
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-web = %{version}-%{release}
+Summary:        %{name}'s reportuploader plugin
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-web = %{version}-%{release}
 
 %description plugin-reportuploader
 Plugin to report bugs into anonymous FTP site associated with ticketing system.
 
 %if 0%{?fedora}
 %package fedora
-Summary: Default configuration for reporting bugs via Fedora infrastructure
-Requires: %{name} = %{version}-%{release}
+Summary:        Default configuration for reporting bugs via Fedora infrastructure
+Requires:       %{name} = %{version}-%{release}
 
 %description fedora
 Default configuration for reporting bugs via Fedora infrastructure
@@ -244,9 +237,9 @@ install this package and you're done.
 
 %if 0%{?rhel}
 %package rhel
-Summary: Default configuration for reporting bugs via Red Hat infrastructure
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-plugin-ureport
+Summary:        Default configuration for reporting bugs via Red Hat infrastructure
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-plugin-ureport
 
 %description rhel
 Default configuration for reporting bugs via Red Hat infrastructure
@@ -254,10 +247,10 @@ used to easily configure the reporting process for Red Hat systems. Just
 install this package and you're done.
 
 %package rhel-bugzilla
-Summary: Default configuration for reporting bugs to Red Hat Bugzilla
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-plugin-bugzilla = %{version}-%{release}
-Requires: libreport-plugin-ureport = %{version}-%{release}
+Summary:        Default configuration for reporting bugs to Red Hat Bugzilla
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-plugin-bugzilla = %{version}-%{release}
+Requires:       libreport-plugin-ureport = %{version}-%{release}
 
 %description rhel-bugzilla
 Default configuration for reporting bugs to Red Hat Bugzilla used to easily
@@ -265,9 +258,9 @@ configure the reporting process for Red Hat systems. Just install this package
 and you're done.
 
 %package rhel-anaconda-bugzilla
-Summary: Default configuration for reporting anaconda bugs to Red Hat Bugzilla
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-plugin-bugzilla = %{version}-%{release}
+Summary:        Default configuration for reporting anaconda bugs to Red Hat Bugzilla
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-plugin-bugzilla = %{version}-%{release}
 
 %description rhel-anaconda-bugzilla
 Default configuration for reporting Anaconda problems to Red Hat Bugzilla used
@@ -277,13 +270,13 @@ package and you're done.
 
 %if %{with bugzilla}
 %package anaconda
-Summary: Default configuration for reporting anaconda bugs
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-plugin-reportuploader = %{version}-%{release}
+Summary:        Default configuration for reporting anaconda bugs
+Requires:       %{name} = %{version}-%{release}
+Requires:       libreport-plugin-reportuploader = %{version}-%{release}
 %if 0%{?rhel}
-Requires: libreport-plugin-rhtsupport = %{version}-%{release}
+Requires:       libreport-plugin-rhtsupport = %{version}-%{release}
 %else
-Requires: libreport-plugin-bugzilla = %{version}-%{release}
+Requires:       libreport-plugin-bugzilla = %{version}-%{release}
 %endif
 
 %description anaconda
@@ -313,7 +306,7 @@ autoconf
 %install
 %make_install \
 %if %{with python3}
-             PYTHON=%{__python3} \
+             PYTHON=python3 \
 %endif # with python3
              mandir=%{_mandir}
 
@@ -697,6 +690,9 @@ fi
 %endif
 
 %changelog
+* Tue Dec 20 2022 Muhammad Falak <mwani@microsoft.com> - 2.13.1-9
+- License verified
+
 * Thu Dec 09 2021 Muhammad Falak <mwani@microsoft.com> - 2.13.1-8
 - Introduce macro '%{mariner_failing_tests}' to gate `--run-check` failures
 - Remove non 0 exit from check to avoid build break
