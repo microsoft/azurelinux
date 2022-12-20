@@ -9720,6 +9720,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libpng12",
+          "version": "1.2.57",
+          "downloadUrl": "https://ftp-osl.osuosl.org/pub/libpng/src/libpng12/libpng-1.2.57.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpng15",
+          "version": "1.5.30",
+          "downloadUrl": "https://ftp-osl.osuosl.org/pub/libpng/src/libpng15/libpng-1.5.30.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpq",
+          "version": "12.2",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libproxy",
           "version": "0.4.17",
           "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
