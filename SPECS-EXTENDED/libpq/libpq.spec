@@ -1,10 +1,9 @@
 %global majorversion 12
-%global obsoletes_version %( echo $(( %majorversion + 1 )) )
 
 Summary: PostgreSQL client library
 Name: libpq
 Version: %{majorversion}.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: PostgreSQL
 Vendor:         Microsoft Corporation
@@ -12,7 +11,6 @@ Distribution:   Mariner
 URL: http://www.postgresql.org/
 
 Source0: https://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
-Source1: https://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2.sha256
 
 
 # Comments for these patches are in the patch files.
@@ -29,7 +27,6 @@ BuildRequires: openldap-devel
 BuildRequires: gettext
 BuildRequires: multilib-rpm-config
 
-Obsoletes: postgresql-libs < %obsoletes_version
 Provides: postgresql-libs = %version-%release
 
 
@@ -48,7 +45,6 @@ Requires: %name%{?_isa} = %version-%release
 # most of the depending packages and the rest (those which want to build server
 # modules) need to be fixed to require postgresql-server-devel package.
 Provides: postgresql-devel = %version-%release
-Obsoletes: postgresql-devel < %obsoletes_version
 
 %description devel
 The libpq package provides the essential shared library for any PostgreSQL
@@ -57,7 +53,6 @@ package or any clients that need to connect to a PostgreSQL server.
 
 
 %prep
-( cd "$(dirname "%SOURCE1")" ; sha256sum -c "%SOURCE1" )
 %autosetup -n postgresql-%version -p1
 
 # remove .gitignore files to ensure none get into the RPMs (bug #642210)
@@ -132,6 +127,9 @@ find_lang_bins %name-devel.lst  pg_config
 
 
 %changelog
+* Mon Dec 19 2022 Muhammad Falak <mwani@microsoft.com> - 12.2-4
+- Drop obsoletes
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 12.2-3
 - License verified
 

@@ -3,12 +3,9 @@ Distribution:   Mariner
 Summary: Old version of libpng, needed to run old binaries
 Name: libpng12
 Version: 1.2.57
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: zlib
 URL: http://www.libpng.org/pub/png/
-
-# Obsolete old temporary packaging of libpng 1.2
-Obsoletes: libpng-compat <= 2:1.5.10
 
 # Note: non-current tarballs get moved to the history/ subdirectory,
 # so look there if you fail to retrieve the version you want
@@ -82,6 +79,9 @@ make check
 %{_libdir}/pkgconfig/libpng12.pc
 
 %changelog
+* Mon Dec 19 2022 Muhammad Falak <mwani@microsoft.com> - 1.2.57-13
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.57-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,7 +1,7 @@
 Summary: Old version of libpng, needed to run old binaries
 Name: libpng15
 Version: 1.5.30
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,6 +55,9 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}/*
 %{_libdir}/libpng15.so.*
 
 %changelog
+* Mon Dec 19 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.30-11
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.30-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
