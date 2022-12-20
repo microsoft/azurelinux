@@ -117,7 +117,7 @@ test_status=$?
 %{_rpmconfigdir}/mariner/pyproject_requirements_txt.py
 
 %changelog
-* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0-rc1-4
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
 - Update version of tox used for package tests
 
 * Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3

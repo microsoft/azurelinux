@@ -502,7 +502,7 @@ procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-debuginfo-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
 procps-ng-lang-3.3.17-1.cm2.x86_64.rpm
-pyproject-rpm-macros-1.0.0~rc1-3.cm2.noarch.rpm
+pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
 python-markupsafe-debuginfo-2.1.0-1.cm2.x86_64.rpm
 python3-3.9.14-5.cm2.x86_64.rpm
 python3-audit-3.0.6-7.cm2.x86_64.rpm
