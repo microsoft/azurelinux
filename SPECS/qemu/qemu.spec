@@ -2294,7 +2294,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
-* Tue Dec 19 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-12
+* Mon Dec 19 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-12
 - Adress CVE-2022-3872
 
 * Tue Dec 6 2022 Elaine Zhao <elainezhao@microsoft.com> - 6.2.0-11
