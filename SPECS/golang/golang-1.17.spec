@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.17.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2022-41717.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -36,6 +37,7 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
+patch -Np1 --ignore-whitespace < %{PATCH1}
 
 %build
 # Build go 1.4 bootstrap
@@ -116,6 +118,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.17.13-2
+- Fix for CVE-2022-41717.
+
 * Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.17.13-1
 - Upgrade to version 1.17.13 to fix CVE-2022-29526, CVE-2022-30634,
   CVE-2022-30629, CVE-2022-30580, CVE-2022-29804, CVE-2022-1705,
