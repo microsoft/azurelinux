@@ -38,7 +38,7 @@ Static libraries and header files for the support library for curl
 %package libs
 Summary:        Libraries for curl
 Group:          System Environment/Libraries
-Provides:   libcurl = %{version}-%{release}
+Provides:       libcurl = %{version}-%{release}
 
 %description libs
 This package contains minimal set of shared curl libraries.
