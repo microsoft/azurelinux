@@ -8,6 +8,9 @@ Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+# CVE-2022-43551 and CVE-2022-43552 will be resolved by version 7.87.0
+Patch0:         CVE-2022-43551.patch
+Patch1:         CVE-2022-43552.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -15,9 +18,6 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
-# CVE-2022-43551 and CVE-2022-43552 will be resolved by version 7.87.0
-Patch0:         CVE-2022-43551.patch
-Patch1:         CVE-2022-43552.patch
 
 %description
 The cURL package contains an utility and a library used for
