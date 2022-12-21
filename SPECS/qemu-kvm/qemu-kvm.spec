@@ -220,8 +220,6 @@ fi
 
 %changelog
 * Wed Dec 21 2022 Amrita Kohli <amritakohli@microsoft.com> - 4.2.0-47
-- Patch CVE-2021-3929
-- Patch CVE-2021-4207
 - Patch CVE-2022-3872
 
 * Tue Nov 15 2022 George Mileka <gmileka@microsoft.com> - 4.2.0-46
