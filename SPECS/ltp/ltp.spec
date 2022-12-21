@@ -10,7 +10,7 @@
 Summary:        Linux Test Project
 Name:           ltp
 Version:        20220930
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ BuildRequires:  make
 BuildRequires:  pkg-config
 
 Requires:  expect
+Requires:  gawk
 Requires:  glibc
 Requires:  libacl
 Requires:  libaio
@@ -77,6 +78,10 @@ make autotools
 sed -i "s/git submodule.*/@echo 'Skipping submodule init - already provided.'/" tools/sparse/Makefile
 make check
 
+%preun
+# Removing files with names not known until the tests are run.
+rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
+
 %files
 %license COPYING
 %{ltp_prefix}
@@ -85,6 +90,10 @@ make check
 %{_mandir}/*
 
 %changelog
+* Tue Dec 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220930-2
+- Fool-proofing LTP dependencies.
+- Cleaning up directories created during tests.
+
 * Wed Nov 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220930-1
 - Original version for CBL-Mariner.
 - License verified.
