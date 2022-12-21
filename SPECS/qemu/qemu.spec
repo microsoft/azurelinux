@@ -2299,19 +2299,19 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 %changelog
 * Tue Dec 20 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-13
-- Adress CVE-2021-3929, CVE-2021-4207
+- Address CVE-2021-3929, CVE-2021-4207
 
 * Mon Dec 19 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-12
-- Adress CVE-2022-3872
+- Address CVE-2022-3872
 
 * Tue Dec 6 2022 Elaine Zhao <elainezhao@microsoft.com> - 6.2.0-11
-- Adress CVE-2022-4144
+- Address CVE-2022-4144
 
 * Wed Oct 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2.0-10
 - Have virtiofsd subpackage obsolete qemu-common from 6.1.0 releases
 
 * Tue Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
-- Adress CVE-2022-2962
+- Address CVE-2022-2962
 
 * Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-8
 - Introduce patch from upstream to fix build with libbpf 1.0.0
