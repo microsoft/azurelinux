@@ -1,0 +1,147 @@
+From 256e976331db4b7335ef721e411e7b59c5317ccb Mon Sep 17 00:00:00 2001
+From: Martin Hickey <martin.hickey@ie.ibm.com>
+Date: Wed, 9 Nov 2022 16:11:43 +0000
+Subject: [PATCH] Update repo handling
+
+Signed-off-by: Martin Hickey <martin.hickey@ie.ibm.com>
+---
+ pkg/repo/index.go      |  8 ++++++++
+ pkg/repo/index_test.go | 33 +++++++++++++++++++++++++++++++++
+ pkg/repo/repo.go       |  3 +++
+ pkg/repo/repo_test.go  | 31 +++++++++++++++++++++++++++++++
+ 4 files changed, 75 insertions(+)
+
+diff --git a/pkg/repo/index.go b/pkg/repo/index.go
+index 1b65ac497c1..60cfe5801ff 100644
+--- a/pkg/repo/index.go
++++ b/pkg/repo/index.go
+@@ -118,6 +118,10 @@ func LoadIndexFile(path string) (*IndexFile, error) {
+ // MustAdd adds a file to the index
+ // This can leave the index in an unsorted state
+ func (i IndexFile) MustAdd(md *chart.Metadata, filename, baseURL, digest string) error {
++	if i.Entries == nil {
++		return errors.New("entries not initialized")
++	}
++
+ 	if md.APIVersion == "" {
+ 		md.APIVersion = chart.APIVersionV1
+ 	}
+@@ -339,6 +343,10 @@ func loadIndex(data []byte, source string) (*IndexFile, error) {
+ 
+ 	for name, cvs := range i.Entries {
+ 		for idx := len(cvs) - 1; idx >= 0; idx-- {
++			if cvs[idx] == nil {
++				log.Printf("skipping loading invalid entry for chart %q from %s: empty entry", name, source)
++				continue
++			}
+ 			if cvs[idx].APIVersion == "" {
+ 				cvs[idx].APIVersion = chart.APIVersionV1
+ 			}
+diff --git a/pkg/repo/index_test.go b/pkg/repo/index_test.go
+index a75a4177aef..2403e9a71ab 100644
+--- a/pkg/repo/index_test.go
++++ b/pkg/repo/index_test.go
+@@ -59,6 +59,15 @@ entries:
+       version: 1.0.0
+       home: https://github.com/something
+       digest: "sha256:1234567890abcdef"
++`
++	indexWithEmptyEntry = `
++apiVersion: v1
++entries:
++  grafana:
++  - apiVersion: v2
++    name: grafana
++  foo:
++  -
+ `
+ )
+ 
+@@ -152,6 +161,12 @@ func TestLoadIndex_Duplicates(t *testing.T) {
+ 	}
+ }
+ 
++func TestLoadIndex_EmptyEntry(t *testing.T) {
++	if _, err := loadIndex([]byte(indexWithEmptyEntry), "indexWithEmptyEntry"); err != nil {
++		t.Errorf("unexpected error: %s", err)
++	}
++}
++
+ func TestLoadIndex_Empty(t *testing.T) {
+ 	if _, err := loadIndex([]byte(""), "indexWithEmpty"); err == nil {
+ 		t.Errorf("Expected an error when index.yaml is empty.")
+@@ -526,3 +541,21 @@ func TestIndexWrite(t *testing.T) {
+ 		t.Fatal("Index files doesn't contain expected content")
+ 	}
+ }
++
++func TestAddFileIndexEntriesNil(t *testing.T) {
++	i := NewIndexFile()
++	i.APIVersion = chart.APIVersionV1
++	i.Entries = nil
++	for _, x := range []struct {
++		md       *chart.Metadata
++		filename string
++		baseURL  string
++		digest   string
++	}{
++		{&chart.Metadata{APIVersion: "v2", Name: " ", Version: "8033-5.apinie+s.r"}, "setter-0.1.9+beta.tgz", "http://example.com/charts", "sha256:1234567890abc"},
++	} {
++		if err := i.MustAdd(x.md, x.filename, x.baseURL, x.digest); err == nil {
++			t.Errorf("expected err to be non-nil when entries not initialized")
++		}
++	}
++}
+diff --git a/pkg/repo/repo.go b/pkg/repo/repo.go
+index 6f1e90dad24..ee80d04f428 100644
+--- a/pkg/repo/repo.go
++++ b/pkg/repo/repo.go
+@@ -100,6 +100,9 @@ func (r *File) Remove(name string) bool {
+ 	cp := []*Entry{}
+ 	found := false
+ 	for _, rf := range r.Repositories {
++		if rf == nil {
++			continue
++		}
+ 		if rf.Name == name {
+ 			found = true
+ 			continue
+diff --git a/pkg/repo/repo_test.go b/pkg/repo/repo_test.go
+index f87d2c202bc..7080a7cef88 100644
+--- a/pkg/repo/repo_test.go
++++ b/pkg/repo/repo_test.go
+@@ -225,3 +225,34 @@ func TestRepoNotExists(t *testing.T) {
+ 		t.Errorf("expected prompt `couldn't load repositories file`")
+ 	}
+ }
++
++func TestRemoveRepositoryInvalidEntries(t *testing.T) {
++	sampleRepository := NewFile()
++	sampleRepository.Add(
++		&Entry{
++			Name: "stable",
++			URL:  "https://example.com/stable/charts",
++		},
++		&Entry{
++			Name: "incubator",
++			URL:  "https://example.com/incubator",
++		},
++		&Entry{},
++		nil,
++		&Entry{
++			Name: "test",
++			URL:  "https://example.com/test",
++		},
++	)
++
++	removeRepository := "stable"
++	found := sampleRepository.Remove(removeRepository)
++	if !found {
++		t.Errorf("expected repository %s not found", removeRepository)
++	}
++
++	found = sampleRepository.Has(removeRepository)
++	if found {
++		t.Errorf("repository %s not deleted", removeRepository)
++	}
++}
