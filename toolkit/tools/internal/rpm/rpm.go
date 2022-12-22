@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -336,6 +337,7 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 		rootDir,
 		"--test",
 	}
+	sort.Sort(sort.Reverse(sort.StringSlice(rpmPaths)))
 	args = append(args, rpmPaths...)
 
 	// Output of interest is printed to stderr.
