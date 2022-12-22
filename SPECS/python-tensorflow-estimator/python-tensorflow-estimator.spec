@@ -8,7 +8,7 @@ Summary:        A high-level TensorFlow API that greatly simplifies machine lear
 Name:           python-%{pypi_name}
 Version:        2.11.0
 Release:        1%{?dist}
-License:        MIT
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/tensorflow/estimator
