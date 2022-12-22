@@ -1,18 +1,17 @@
 %define using_rustup 0
 %define using_musl_libc 0
 %define using_vendored_crates 1
-%global githubref 099cdd2
 
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
-Version:        27.0.60
+Version:        28.0
 Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
-Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/tarball/%{githubref}#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
@@ -69,7 +68,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%setup -q -n %{name}-%{name}-%{githubref}
+%setup -q -n %{name}-%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 mkdir -p .cargo
@@ -152,6 +151,9 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Mon Dec 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 28.0-1
+- Update to v28.0
+
 * Thu Oct 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 27.0.60-1
 - Update to v27.0.60
 

@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.9.4
-Release:       2%{?dist}
+Release:       4%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -25,6 +25,10 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
+# CVE-2022-23525 has been patched in 3.10.3: https://github.com/helm/helm/commit/638ebffbc2e445156f3978f02fd83d9af1e56f5b
+Patch0:        CVE-2022-23525.patch
+# CVE-2022-23526 has been patched in 3.10.3: https://github.com/helm/helm/commit/bafafa8bb1b571b61d7a9528da8d40c307dade3d
+Patch1:        CVE-2022-23526.patch
 BuildRequires: golang >= 1.15.5
 
 %description
@@ -52,6 +56,12 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 
 
 %changelog
+* Wed Dec 21 2022 Nan Liu <liunan@microsoft.com> - 3.9.4-4
+- Patch CVE-2022-23525, CVE-2022-23526
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.4-3
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.4-2
 - Bump release to rebuild with go 1.18.8
 

@@ -51,6 +51,9 @@ const (
 
 	// MarinerModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
 	MarinerModuleLdflagsDefine = "mariner_module_ldflags"
+
+	// MarinerCCacheDefine enables ccache in the Mariner build system
+	MarinerCCacheDefine = "mariner_ccache_enabled"
 )
 
 const (
