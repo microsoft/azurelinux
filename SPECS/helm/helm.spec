@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.9.4
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -55,7 +55,13 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %{_bindir}/helm
 
 
+%check
+go test -v ./cmd/helm
+
 %changelog
+* Thu Dec 22 2022 Nan Liu <liunan@microsoft.com> - 3.9.4-5
+- Enable the check tests
+
 * Wed Dec 21 2022 Nan Liu <liunan@microsoft.com> - 3.9.4-4
 - Patch CVE-2022-23525, CVE-2022-23526
 
