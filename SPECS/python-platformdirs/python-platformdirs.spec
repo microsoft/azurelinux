@@ -2,32 +2,29 @@
 %global common_description %{expand:
 A small Python module for determining appropriate platform-specific dirs, e.g.
 a "user data dir".}
-
+Summary:        Python module for determining appropriate platform-specific dirs
 Name:           python-%{srcname}
 Version:        2.0.0
-Release:        1%{?dist}
-Summary:        Python module for determining appropriate platform-specific dirs
+Release:        2%{?dist}
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/platformdirs/platformdirs
 Source0:        %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
-BuildArch:      noarch
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-BuildRequires:  python3-six
 BuildRequires:  python3-setuptools
-
+BuildRequires:  python3-six
+BuildRequires:  python3-wheel
+BuildArch:      noarch
 
 %description %{common_description}
-
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
 BuildRequires:  python3-devel
 
-
 %description -n python3-%{srcname} %{common_description}
-
 
 %prep
 %autosetup -n %{srcname}-%{version}
@@ -47,7 +44,7 @@ BuildRequires:  python3-devel
 
 
 %check
-pip3 install tox 
+pip3 install tox
 %tox
 
 
@@ -55,7 +52,10 @@ pip3 install tox
 %license LICENSE.txt
 %doc README.rst CHANGES.rst
 
-
 %changelog
+* Wed Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified.
+
 * Mon Jul 12 2021 Carl George <carl@george.computer> - 2.0.0-1
 - Initial package rhbz#1981607

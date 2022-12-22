@@ -1,24 +1,22 @@
 %global srcname distlib
 %bcond_without check
-
-Name:       python-distlib
-Version:    0.3.6
-Release:    1%{?dist}
-Summary:    Low-level components of distutils2/packaging, augmented with higher-level APIs
-
-License:    Python
-URL:        https://readthedocs.org/projects/distlib/
-Source0:    %pypi_source %{srcname} %{version}
-
-BuildArch:  noarch
-
+Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
+Name:           python-distlib
+Version:        0.3.6
+Release:        1%{?dist}
+License:        Python
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://readthedocs.org/projects/distlib/
+Source0:        %{pypi_source} %{srcname} %{version}
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-BuildRequires:  python3-six
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-six
+BuildRequires:  python3-wheel
+BuildArch:      noarch
 
 %description
 Distlib contains the implementations of the packaging PEPs and other low-level
@@ -30,7 +28,7 @@ time saved by not having to reinvent wheels, and improved interoperability
 between tools.
 
 %package -n python%{python3_pkgversion}-%{srcname}
-Summary: Low-level components of distutils2/packaging, augmented with higher-level APIs
+Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
 
 %description -n python%{python3_pkgversion}-%{srcname}
 Distlib contains the implementations of the packaging PEPs and other low-level
@@ -71,6 +69,10 @@ export SKIP_ONLINE=1
 %doc README.rst
 
 %changelog
+* Tue Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- License verified.
+
 * Thu Oct 27 2022 Lumír Balhar <lbalhar@redhat.com> - 0.3.6-1
 - Update to 0.3.6
 
