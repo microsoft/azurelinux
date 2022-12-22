@@ -51,6 +51,17 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %doc ADOPTERS.md SECURITY.md code-of-conduct.md CONTRIBUTING.md README.md
 %{_bindir}/helm
 
+%if %{with check}
+%check
+# FAIL: TestValidateNoDeprecations
+#rm pkg/lint/rules/deprecations_test.go
+# FAIL: TestDeprecatedAPIFails
+#rm pkg/lint/rules/template_test.go
+# Needs Internet access
+#rm pkg/plugin/installer/vcs_installer_test.go
+%gocheck
+%endif
+
 %changelog
 * Wed Dec 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.1-14
 - Patch CVE-2022-23525, CVE-2022-23526
