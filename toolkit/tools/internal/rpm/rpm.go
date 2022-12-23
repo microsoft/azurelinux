@@ -337,16 +337,22 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 		rootDir,
 		"--test",
 	}
-	// We want to preferably try the newest versions first to avoid issues where we didn't setup obsoletes etc. correctly
-	// on the older versions. The rpm command isn't super smart about figuring that out on its own.
-	sort.Sort(sort.Reverse(sort.StringSlice(rpmPaths)))
-	args = append(args, rpmPaths...)
+	argsWithPaths := append(args, rpmPaths...)
 
 	// Output of interest is printed to stderr.
-	_, stderr, err := shell.Execute(rpmProgram, args...)
+	_, stderr, err := shell.Execute(rpmProgram, argsWithPaths...)
 	if err != nil {
+		logger.Log.Warn("Failed first try with rpm, running fallback with sorted list")
 		logger.Log.Warn(stderr)
-		return
+		// We want to preferably try the newest versions first to avoid issues where we didn't setup obsoletes etc. correctly
+		// on the older versions. The rpm command isn't super smart about figuring that out on its own.
+		sort.Sort(sort.Reverse(sort.StringSlice(rpmPaths)))
+		argsWithPaths = append(args, rpmPaths...)
+		_, stderr, err = shell.Execute(rpmProgram, argsWithPaths...)
+		if err != nil {
+			logger.Log.Warn(stderr)
+			return
+		}
 	}
 
 	splitStdout := strings.Split(stderr, "\n")
