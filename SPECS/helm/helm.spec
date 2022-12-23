@@ -58,6 +58,7 @@ go test -v ./cmd/helm
 %changelog
 * Wed Dec 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.1-14
 - Patch CVE-2022-23525, CVE-2022-23526
+- Added Check Section
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.4.1-13
 - Bump release to rebuild with go 1.18.8-2
