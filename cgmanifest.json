@@ -7701,8 +7701,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "0.55.1",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.55.1.tar.gz"
+          "version": "0.58.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.58.0.tar.gz"
         }
       }
     },
