@@ -209,7 +209,7 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
-* Mon Dec 26 2022 Kanika Nema <kanikanema@microsoft.com> - 0.58.0
+* Mon Dec 26 2022 Kanika Nema <kanikanema@microsoft.com> - 0.58.0-1
 - Upgrade to 0.58.0
   Build new component virt-launcher-monitor.
 
