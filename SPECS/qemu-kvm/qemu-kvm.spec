@@ -67,6 +67,9 @@ Patch48:        0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.pat
 Patch49:        CVE-2022-3872.patch
 # CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
 Patch50:        CVE-2021-4207.patch
+# CVE-2021-3929 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/736b0164
+Patch50:        CVE-2021-3929.patch
+
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
