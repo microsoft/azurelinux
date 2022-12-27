@@ -1,47 +1,46 @@
 %global apiversion 0.10
 
-Name: libwpd
-Summary: A library for import of WordPerfect documents
-Version: 0.10.3
-Release: 6%{?dist}
-Source: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+Summary:        A library for import of WordPerfect documents
+Name:           libwpd
+Version:        0.10.3
+Release:        6%{?dist}
+License:        LGPLv2+ OR MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://libwpd.sf.net/
-License: LGPLv2+ or MPLv2.0
-
-Patch0:        libwpd-gcc11.patch
-
-BuildRequires: boost-devel
-BuildRequires: doxygen
-BuildRequires: gcc-c++
-BuildRequires: help2man
-BuildRequires: pkgconfig(librevenge-0.0)
-BuildRequires: pkgconfig(librevenge-generators-0.0)
-BuildRequires: pkgconfig(librevenge-stream-0.0)
-BuildRequires: pkgconfig(zlib)
+URL:            http://libwpd.sf.net/
+Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+Patch0:         libwpd-gcc11.patch
+BuildRequires:  boost-devel
+BuildRequires:  doxygen
+BuildRequires:  gcc-c++
+BuildRequires:  help2man
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(librevenge-0.0)
+BuildRequires:  pkgconfig(librevenge-generators-0.0)
+BuildRequires:  pkgconfig(librevenge-stream-0.0)
+BuildRequires:  pkgconfig(zlib)
 
 %description
 %{name} is a library for import of WordPerfect documents.
 
 %package tools
-Summary: Tools to transform WordPerfect documents into other formats
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Tools to transform WordPerfect documents into other formats
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
 Tools to transform WordPerfect documents into other formats.
 Currently supported: HTML, raw, text.
 
 %package devel
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Summary: Files for developing with libwpd
+Summary:        Files for developing with libwpd
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Includes and definitions for developing with libwpd.
 
 %package doc
-Summary: Documentation of %{name} API
-BuildArch: noarch
+Summary:        Documentation of %{name} API
+BuildArch:      noarch
 
 %description doc
 The %{name}-doc package contains API documentation for %{name}.
@@ -56,10 +55,10 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
-rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
+make DESTDIR=%{buildroot} install
+find %{buildroot} -type f -name "*.la" -delete -print
 # we install API docs directly from build
-rm -rf $RPM_BUILD_ROOT/%{_docdir}/%{name}
+rm -rf %{buildroot}/%{_docdir}/%{name}
 
 # generate and install man pages
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
