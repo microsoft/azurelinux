@@ -19,8 +19,8 @@
 %global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        0.55.1
-Release:        4%{?dist}
+Version:        0.58.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -115,6 +115,7 @@ build_tests="true" \
     cmd/virt-freezer \
     cmd/virt-handler \
     cmd/virt-launcher \
+    cmd/virt-launcher-monitor \
     cmd/virt-operator \
     cmd/virt-probe \
     cmd/virtctl \
@@ -130,6 +131,7 @@ install -p -m 0755 _out/cmd/virt-controller/virt-controller %{buildroot}%{_bindi
 install -p -m 0755 _out/cmd/virt-chroot/virt-chroot %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-handler/virt-handler %{buildroot}%{_bindir}/
 install -p -m 0555 _out/cmd/virt-launcher/virt-launcher %{buildroot}%{_bindir}/
+install -p -m 0555 _out/cmd/virt-launcher-monitor/virt-launcher-monitor %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-freezer/virt-freezer %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-probe/virt-probe %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-operator/virt-operator %{buildroot}%{_bindir}/
@@ -189,6 +191,7 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %dir %{_datadir}/kube-virt
 %dir %{_datadir}/kube-virt/virt-launcher
 %{_bindir}/virt-launcher
+%{_bindir}/virt-launcher-monitor
 %{_bindir}/virt-freezer
 %{_bindir}/virt-probe
 %{_bindir}/node-labeller.sh
@@ -206,6 +209,10 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
+* Mon Dec 26 2022 Kanika Nema <kanikanema@microsoft.com> - 0.58.0-1
+- Upgrade to 0.58.0
+- Build new component virt-launcher-monitor.
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 0.55.1-4
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
