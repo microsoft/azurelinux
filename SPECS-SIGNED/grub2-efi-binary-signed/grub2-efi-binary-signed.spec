@@ -1,3 +1,12 @@
+%global debug_package %{nil}
+%ifarch x86_64
+%global buildarch x86_64
+%global grubefiname grubx64.efi
+%endif
+%ifarch aarch64
+%global buildarch aarch64
+%global grubefiname grubaa64.efi
+%endif
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06~rc1
@@ -20,15 +29,6 @@ URL:            https://www.gnu.org/software/grub
 #   4. Build this spec
 Source0:        grub2-efi-binary-%{version}-%{release}.%{buildarch}.rpm
 Source1:        %{grubefiname}
-%global debug_package %{nil}
-%ifarch x86_64
-%global buildarch x86_64
-%global grubefiname grubx64.efi
-%endif
-%ifarch aarch64
-%global buildarch aarch64
-%global grubefiname grubaa64.efi
-%endif
 
 %description
 This package contains the GRUB EFI image signed for secure boot. The package is
