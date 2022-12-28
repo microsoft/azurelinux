@@ -1,18 +1,16 @@
+Summary:        osinfo database files
+Name:           osinfo-db
+Version:        20221130
+Release:        2%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Summary: osinfo database files
-Name: osinfo-db
-Version: 20221130
-Release: 1%{?dist}
-License: LGPLv2+
-Source0: https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz
-Source1: https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz.asc
-URL: http://libosinfo.org/
-BuildRequires: intltool
-BuildRequires: osinfo-db-tools
-BuildArch: noarch
-Requires: hwdata
+URL:            https://libosinfo.org/
+Source0:        https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz
+BuildRequires:  intltool
+BuildRequires:  osinfo-db-tools
+Requires:       hwdata
+BuildArch:      noarch
 
 %description
 The osinfo database provides information about operating systems and
@@ -34,6 +32,10 @@ osinfo-db-import --root %{buildroot} --dir %{_datadir}/osinfo %{SOURCE0}
 %{_datadir}/osinfo/schema
 
 %changelog
+* Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 20221130-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Wed Nov 30 2022 Victor Toso <victortoso@redhat.com> - 20221130-1
 - Update to new release (v20221130)
 
