@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libosinfo.org/
-Source0:        https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz
+Source0:        https://releases.pagure.org/libosinfo/%{name}-%{version}.tar.xz
 BuildRequires:  intltool
 BuildRequires:  osinfo-db-tools
 Requires:       hwdata

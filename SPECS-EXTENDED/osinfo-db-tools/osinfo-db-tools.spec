@@ -6,7 +6,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libosinfo.org/
-Source:         https://releases.pagure.io/libosinfo/%{name}-%{version}.tar.xz
+Source:         https://releases.pagure.org/libosinfo/%{name}-1.10.0.tar.xz
 BuildRequires:  %{_bindir}/pod2man
 BuildRequires:  gcc
 BuildRequires:  gettext-devel
