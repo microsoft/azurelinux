@@ -1,0 +1,25 @@
+diff --git a/src/lib/WPXContentListener.cpp b/src/lib/WPXContentListener.cpp
+index ab0f9b1..0b559e6 100644
+--- a/src/lib/WPXContentListener.cpp
++++ b/src/lib/WPXContentListener.cpp
+@@ -23,6 +23,7 @@
+  * Corel Corporation or Corel Corporation Limited."
+  */
+ 
++#include <cstddef>
+ #include "WPXContentListener.h"
+ #include "WPXPageSpan.h"
+ #include "libwpd_internal.h"
+diff --git a/src/lib/WPXTable.cpp b/src/lib/WPXTable.cpp
+index 0ad202a..3ff35e1 100644
+--- a/src/lib/WPXTable.cpp
++++ b/src/lib/WPXTable.cpp
+@@ -25,6 +25,8 @@
+  * Corel Corporation or Corel Corporation Limited."
+  */
+ 
++#include <cstddef>
++
+ #include "WPXTable.h"
+ 
+ #include "libwpd_internal.h"
