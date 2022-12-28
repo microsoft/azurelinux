@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary:	Library to render text and graphic overlays onto video images
 Name:		libucil
 Version:	0.9.10
-Release:	21%{?dist}
+Release:	22%{?dist}
 License:	GPLv2+
 URL:		https://www.unicap-imaging.org/
 Source0:	https://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
@@ -55,7 +55,7 @@ gtkdocize --copy
 autoreconf -fiv
 
 %build
-%configure --disable-rpath --enable-gtk-doc
+%configure --disable-rpath --disable-gtk-doc
 %make_build
 
 %install
@@ -75,9 +75,13 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}.{a,la}
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/unicap/*.h
-%{_datadir}/gtk-doc/html/%{name}
+%exclude %{_datadir}/gtk-doc/html/%{name}
 
 %changelog
+* Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.10-22
+- Configure with 'disable-gtk-doc'
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.10-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
