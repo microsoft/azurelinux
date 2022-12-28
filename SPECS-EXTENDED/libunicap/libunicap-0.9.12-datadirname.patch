@@ -1,0 +1,14 @@
+Patch by Robert Scheck <robert@fedoraproject.org> for libunicap <= 0.9.12 to work around
+the issue of /usr/@DATADIRNAME@/locale/ rather /usr/share/locale/ on Fedora 22 (and newer).
+
+--- libunicap-0.9.12/po/Makefile.in.in			2009-09-21 18:08:22.000000000 +0200
++++ libunicap-0.9.12/po/Makefile.in.in.datadirname	2015-05-31 21:44:58.000000000 +0200
+@@ -33,7 +33,7 @@
+ datadir = @datadir@
+ datarootdir = @datarootdir@
+ libdir = @libdir@
+-DATADIRNAME = @DATADIRNAME@
++DATADIRNAME = share
+ itlocaledir = $(prefix)/$(DATADIRNAME)/locale
+ subdir = po
+ install_sh = @install_sh@
