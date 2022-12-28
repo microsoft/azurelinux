@@ -51,11 +51,7 @@ for developing programs which use the ucil library. It contains the API
 documentation of the library, too.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1
 # fixes for gtk-doc 1.26
 sed -i -e '/^DOC_SOURCE_DIR/s/--source-dir=//g' doc/libucil/Makefile.am
 mkdir -p m4
@@ -88,6 +84,7 @@ rm -f %{buildroot}%{_libdir}/%{name}.{a,la}
 %changelog
 * Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.10-22
 - Configure with 'disable-gtk-doc'
+- Switch to `%autosetup`
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.10-21
