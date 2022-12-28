@@ -1,30 +1,27 @@
+Summary:        Tools for managing the osinfo database
+Name:           osinfo-db-tools
+Version:        1.10.0
+Release:        2%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Summary: Tools for managing the osinfo database
-Name: osinfo-db-tools
-Version: 1.10.0
-Release: 1%{?dist}
-License: GPLv2+
-Source: https://releases.pagure.io/libosinfo/%{name}-%{version}.tar.xz
-URL: http://libosinfo.org/
-
+URL:            https://libosinfo.org/
+Source:         https://releases.pagure.io/libosinfo/%{name}-%{version}.tar.xz
+BuildRequires:  %{_bindir}/pod2man
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  json-glib-devel
+BuildRequires:  libarchive-devel
+BuildRequires:  libsoup-devel
+BuildRequires:  libxml2-devel >= 2.6.0
+BuildRequires:  libxslt-devel >= 1.0.0
 ### Patches ###
-
-BuildRequires: meson
-BuildRequires: gcc
-BuildRequires: gettext-devel
-BuildRequires: git
-BuildRequires: glib2-devel
-BuildRequires: libxml2-devel >= 2.6.0
-BuildRequires: libxslt-devel >= 1.0.0
-BuildRequires: libarchive-devel
-BuildRequires: libsoup-devel
-BuildRequires: json-glib-devel
-BuildRequires: /usr/bin/pod2man
-BuildRequires: python3
-BuildRequires: python3-pytest
-BuildRequires: python3-requests
+BuildRequires:  meson
+BuildRequires:  python3
+BuildRequires:  python3-pytest
+BuildRequires:  python3-requests
 
 %description
 This package provides tools for managing the osinfo database of
@@ -58,6 +55,10 @@ information about operating systems for use with virtualization
 %{_mandir}/man1/osinfo-db-validate.1*
 
 %changelog
+* Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.10.0-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Mon Feb 14 2022 Victor Toso <victortoso@redhat.com> - 1.10.0-1
 - Update to 1.10.0 release
 
