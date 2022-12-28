@@ -1,31 +1,29 @@
+Summary:        A library for managing OS information for virtualization
+Name:           libosinfo
+Version:        1.10.0
+Release:        2%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: A library for managing OS information for virtualization
-Name: libosinfo
-Version: 1.10.0
-Release: 1%{?dist}
-License: LGPLv2+
-Source: https://releases.pagure.io/%{name}/%{name}-%{version}.tar.xz
-URL: https://libosinfo.org/
-
-
-BuildRequires: meson
-BuildRequires: gcc
-BuildRequires: gtk-doc
-BuildRequires: gettext-devel
-BuildRequires: glib2-devel
-BuildRequires: libxml2-devel >= 2.6.0
-BuildRequires: libxslt-devel >= 1.0.0
-BuildRequires: libsoup-devel
-BuildRequires: vala
-BuildRequires: /usr/bin/pod2man
-BuildRequires: hwdata
-BuildRequires: gobject-introspection-devel
-BuildRequires: osinfo-db
-BuildRequires: git
-Requires: hwdata
-Requires: osinfo-db
-Requires: osinfo-db-tools
+URL:            https://libosinfo.org/
+Source:         https://releases.pagure.io/%{name}/%{name}-%{version}.tar.xz
+BuildRequires:  %{_bindir}/pod2man
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  gtk-doc
+BuildRequires:  hwdata
+BuildRequires:  libsoup-devel
+BuildRequires:  libxml2-devel >= 2.6.0
+BuildRequires:  libxslt-devel >= 1.0.0
+BuildRequires:  meson
+BuildRequires:  osinfo-db
+BuildRequires:  vala
+Requires:       hwdata
+Requires:       osinfo-db
+Requires:       osinfo-db-tools
 
 %description
 libosinfo is a library that allows virtualization provisioning tools to
@@ -33,11 +31,11 @@ determine the optimal device settings for a hypervisor/operating system
 combination.
 
 %package devel
-Summary: Libraries, includes, etc. to compile with the libosinfo library
-Requires: %{name} = %{version}-%{release}
-Requires: pkgconfig
-Requires: glib2-devel
-Provides: libosinfo-vala = %{version}-%{release}
+Summary:        Libraries, includes, etc. to compile with the libosinfo library
+Requires:       %{name} = %{version}-%{release}
+Requires:       glib2-devel
+Requires:       pkgconfig
+Provides:       libosinfo-vala = %{version}-%{release}
 
 %description devel
 libosinfo is a library that allows virtualization provisioning tools to
@@ -68,7 +66,8 @@ Libraries, includes, etc. to compile with the libosinfo library
 %ldconfig_scriptlets
 
 %files -f %{name}.lang
-%doc AUTHORS ChangeLog COPYING.LIB NEWS README
+%license COPYING.LIB
+%doc AUTHORS ChangeLog NEWS README
 %{_bindir}/osinfo-detect
 %{_bindir}/osinfo-query
 %{_bindir}/osinfo-install-script
@@ -92,6 +91,10 @@ Libraries, includes, etc. to compile with the libosinfo library
 %{_datadir}/vala/vapi/libosinfo-1.0.vapi
 
 %changelog
+* Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.10.0-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Mon Feb 14 2022 Victor Toso <victortoso@redhat.com> - 1.10.0-1
 - Update to 1.10.0 release
 
@@ -318,4 +321,3 @@ Libraries, includes, etc. to compile with the libosinfo library
 
 * Thu Nov 24 2011 Daniel P. Berrange <berrange@redhat.com> - 0.0.2-1
 - Initial package
-
