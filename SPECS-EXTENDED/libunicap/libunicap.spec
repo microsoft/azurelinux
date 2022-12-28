@@ -1,7 +1,3 @@
-%define _use_internal_dependency_generator 0
-%define __find_provides sh %{SOURCE1} %{prev__find_provides}
-%define __find_requires sh %{SOURCE1} %{prev__find_requires}
-
 Summary:        Library to access different kinds of (video) capture devices
 Name:           libunicap
 Version:        0.9.12
@@ -21,6 +17,9 @@ Patch5:         libunicap-bz642118.patch
 Patch6:         libunicap-0.9.12-videodev.patch
 Patch7:         libunicap-0.9.12-datadirname.patch
 Patch8:         libunicap-0.9.12-gcc10.patch
+%define _use_internal_dependency_generator 0
+%define __find_provides sh %{SOURCE1} %{prev__find_provides}
+%define __find_requires sh %{SOURCE1} %{prev__find_requires}
 BuildRequires:  %{_bindir}/perl
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -57,17 +56,7 @@ for for developing programs which use the unicap library. It contains the
 API documentation of the library, too.
 
 %prep
-%setup -q
-%patch0 -p1 -b .includes
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-
+%autosetup -p1
 # Needed to get rid of rpath
 libtoolize --force
 # fixes for gtk-doc 1.26
@@ -115,6 +104,7 @@ mv -f %{buildroot}%{_sysconfdir}/udev/rules.d/50-euvccam.rules %{buildroot}%{_ud
 
 %changelog
 * Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.12-28
+- Switch to '%autosetup'
 - Configure with 'disable-gtk-doc'
 - License verified
 
