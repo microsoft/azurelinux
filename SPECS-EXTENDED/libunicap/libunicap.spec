@@ -9,8 +9,8 @@ Release:        28%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.unicap-imaging.org/
-Source0:        http://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
+URL:            https://www.unicap-imaging.org/
+Source0:        https://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
 Source1:        %{name}-filter.sh
 Patch0:         libunicap-0.9.12-includes.patch
 Patch1:         libunicap-0.9.12-memerrs.patch
