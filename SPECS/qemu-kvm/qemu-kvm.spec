@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        48%{?dist}
+Release:        49%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,8 @@ Patch48:        0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.pat
 Patch49:        CVE-2022-3872.patch
 # CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
 Patch50:        CVE-2021-4207.patch
+# CVE-2021-3929 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/736b0164
+Patch51:        CVE-2021-3929.patch
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
@@ -95,7 +97,6 @@ Patch1010:      CVE-2022-0358.nopatch
 # CVE and provided patch not applicable to v4.2.0 hence adding nopatch.
 Patch1011:      CVE-2022-26354.nopatch
 Patch1012:      CVE-2020-35505.patch
-
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -221,6 +222,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Tue Dec 27 2022 Osama Esmail <osamaesmail@microsoft.com> - 4.2.0-49
+- Patch CVE-2021-3929
+
 * Thu Dec 22 2022 Amrita Kohli <amritakohli@microsoft.com> - 4.2.0-48
 - Patch CVE-2021-4207
 
