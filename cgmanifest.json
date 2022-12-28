@@ -10590,6 +10590,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libwpd",
+          "version": "0.10.3",
+          "downloadUrl": "https://downloads.sourceforge.net/libwpd/libwpd-0.10.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libwpe",
           "version": "1.12.0",
           "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.12.0/libwpe-1.12.0.tar.xz"
