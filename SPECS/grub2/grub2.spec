@@ -1,8 +1,3 @@
-%define debug_package %{nil}
-%define __os_install_post %{nil}
-# Gnulib does not produce source tarball releases, and grub's bootstrap.conf
-# bakes in a specific commit id to pull (GNULIB_REVISION).
-%global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
@@ -62,6 +57,11 @@ Patch1009:      CVE-2020-14310.nopatch
 Patch1010:      CVE-2020-14311.nopatch
 Patch1011:      CVE-2020-27749.nopatch
 Patch1012:      CVE-2021-20225.nopatch
+%define debug_package %{nil}
+%define __os_install_post %{nil}
+# Gnulib does not produce source tarball releases, and grub's bootstrap.conf
+# bakes in a specific commit id to pull (GNULIB_REVISION).
+%global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
