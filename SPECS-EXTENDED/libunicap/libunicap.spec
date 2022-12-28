@@ -9,7 +9,7 @@ Distribution:   Mariner
 Summary:	Library to access different kinds of (video) capture devices
 Name:		libunicap
 Version:	0.9.12
-Release:	27%{?dist}
+Release:	28%{?dist}
 License:	GPLv2+
 URL:		http://www.unicap-imaging.org/
 Source0:	http://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
@@ -66,11 +66,10 @@ API documentation of the library, too.
 libtoolize --force
 # fixes for gtk-doc 1.26
 sed -i -e '/^DOC_SOURCE_DIR/s/--source-dir=//g' doc/libunicap/Makefile.am
-gtkdocize --copy
 autoreconf --force --install
 
 %build
-%configure --disable-rpath --enable-gtk-doc --enable-libv4l
+%configure --disable-rpath --disable-gtk-doc --enable-libv4l
 %make_build
 
 %install
@@ -107,9 +106,13 @@ mv -f $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/50-euvccam.rules $RPM_BUILD_ROO
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/unicap
-%{_datadir}/gtk-doc/html/%{name}
+%exclude %{_datadir}/gtk-doc/html/%{name}
 
 %changelog
+* Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.12-28
+- Configure with 'disable-gtk-doc'
+- License verified
+
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 0.9.12-27
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix distro condition checking
