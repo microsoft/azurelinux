@@ -9590,6 +9590,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libosinfo",
+          "version": "1.10.0",
+          "downloadUrl": "https://releases.pagure.org/libosinfo/libosinfo-1.10.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libotf",
           "version": "0.9.13",
           "downloadUrl": "http://download.savannah.gnu.org/releases/m17n/libotf-0.9.13.tar.gz"
@@ -14356,6 +14366,26 @@
           "name": "osgi-core",
           "version": "7.0.0",
           "downloadUrl": "https://repo1.maven.org/maven2/org/osgi/osgi.core/7.0.0/osgi.core-7.0.0-sources.jar"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "osinfo-db",
+          "version": "20221130",
+          "downloadUrl": "https://releases.pagure.org/libosinfo/osinfo-db-20221130.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "osinfo-db-tools",
+          "version": "1.10.0",
+          "downloadUrl": "https://releases.pagure.org/libosinfo/osinfo-db-tools-1.10.0.tar.xz"
         }
       }
     },
