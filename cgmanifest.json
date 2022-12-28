@@ -10322,7 +10322,7 @@
         "other": {
           "name": "libucil",
           "version": "0.9.10",
-          "downloadUrl": "https://www.unicap-imaging.org/downloads/libucil-0.9.10.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libucil-0.9.10.tar.gz"
         }
       }
     },
@@ -10332,7 +10332,7 @@
         "other": {
           "name": "libunicap",
           "version": "0.9.12",
-          "downloadUrl": "https://www.unicap-imaging.org/downloads/libunicap-0.9.12.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libunicap-0.9.12.tar.gz"
         }
       }
     },

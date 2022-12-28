@@ -6,7 +6,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.unicap-imaging.org/
-Source0:        https://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 # check return value of theora_encode_init() (#627890)
 Patch0:         libucil-0.9.8-bz627890.patch
 # fix some memory leaks
