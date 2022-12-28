@@ -1,36 +1,42 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %define _use_internal_dependency_generator 0
-%{expand:%%define prev__find_provides %{__find_provides}}
 %define __find_provides sh %{SOURCE1} %{prev__find_provides}
-%{expand:%%define prev__find_requires %{__find_requires}}
 %define __find_requires sh %{SOURCE1} %{prev__find_requires}
 
-Summary:	Library to access different kinds of (video) capture devices
-Name:		libunicap
-Version:	0.9.12
-Release:	28%{?dist}
-License:	GPLv2+
-URL:		http://www.unicap-imaging.org/
-Source0:	http://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
-Source1:	%{name}-filter.sh
-Patch0:		libunicap-0.9.12-includes.patch
-Patch1:		libunicap-0.9.12-memerrs.patch
-Patch2:		libunicap-0.9.12-arraycmp.patch
-Patch3:		libunicap-0.9.12-warnings.patch
-Patch4:		libunicap-bz641623.patch
-Patch5:		libunicap-bz642118.patch
-Patch6:		libunicap-0.9.12-videodev.patch
-Patch7:		libunicap-0.9.12-datadirname.patch
-Patch8:		libunicap-0.9.12-gcc10.patch
-BuildRequires:	intltool, /usr/bin/perl, perl(XML::Parser), gettext, gtk-doc >= 1.4
-BuildRequires:	glib2-devel >= 2.10.0
+Summary:        Library to access different kinds of (video) capture devices
+Name:           libunicap
+Version:        0.9.12
+Release:        28%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.unicap-imaging.org/
+Source0:        http://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
+Source1:        %{name}-filter.sh
+Patch0:         libunicap-0.9.12-includes.patch
+Patch1:         libunicap-0.9.12-memerrs.patch
+Patch2:         libunicap-0.9.12-arraycmp.patch
+Patch3:         libunicap-0.9.12-warnings.patch
+Patch4:         libunicap-bz641623.patch
+Patch5:         libunicap-bz642118.patch
+Patch6:         libunicap-0.9.12-videodev.patch
+Patch7:         libunicap-0.9.12-datadirname.patch
+Patch8:         libunicap-0.9.12-gcc10.patch
+BuildRequires:  %{_bindir}/perl
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gettext
+BuildRequires:  glib2-devel >= 2.10.0
+BuildRequires:  gtk-doc >= 1.4
+BuildRequires:  intltool
+BuildRequires:  libtool
+BuildRequires:  libv4l-devel >= 0.8.3-1
+BuildRequires:  systemd
+BuildRequires:  perl(XML::Parser)
+%{expand:%%define prev__find_provides %{__find_provides}}
+%{expand:%%define prev__find_requires %{__find_requires}}
 %ifnarch s390 s390x
-BuildRequires:	libraw1394-devel >= 1.1.0
+BuildRequires:  libraw1394-devel >= 1.1.0
 %endif
-BuildRequires:	libv4l-devel >= 0.8.3-1, libtool, automake, autoconf
-BuildRequires:	systemd
-Obsoletes:	unicap <= 0.9.7-1
 
 %description
 Unicap provides a uniform interface to video capture devices. It allows
@@ -41,9 +47,9 @@ possible for devices supporting it allowing fast video capture with low
 CPU usage even on low-speed architectures.
 
 %package devel
-Summary:	Development files for the unicap library
-Requires:	%{name} = %{version}-%{release}, pkgconfig
-Obsoletes:	unicap-devel <= 0.9.7-1
+Summary:        Development files for the unicap library
+Requires:       %{name} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 The libunicap-devel package includes header files and libraries necessary
@@ -76,16 +82,16 @@ autoreconf --force --install
 %make_install
 
 # Don't install any static .a and libtool .la files
-rm -f $RPM_BUILD_ROOT%{_libdir}/{,unicap2/cpi/}*.{a,la}
+rm -f %{buildroot}%{_libdir}/{,unicap2/cpi/}*.{a,la}
 
 # Use ATTRS rather SYSFS for udev where appropriate
-sed -e 's/\(SYSFS\|ATTRS\)/ATTRS/g' -i $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/50-euvccam.rules
-touch -c -r {data,$RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d}/50-euvccam.rules
+sed -e 's/\(SYSFS\|ATTRS\)/ATTRS/g' -i %{buildroot}%{_sysconfdir}/udev/rules.d/50-euvccam.rules
+touch -c -r {data,%{buildroot}%{_sysconfdir}/udev/rules.d}/50-euvccam.rules
 
 # Move udev rules file to appropriate rules directory
 
-mkdir -p $RPM_BUILD_ROOT%{_udevrulesdir}/
-mv -f $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/50-euvccam.rules $RPM_BUILD_ROOT%{_udevrulesdir}/
+mkdir -p %{buildroot}%{_udevrulesdir}/
+mv -f %{buildroot}%{_sysconfdir}/udev/rules.d/50-euvccam.rules %{buildroot}%{_udevrulesdir}/
 
 
 %find_lang unicap
@@ -93,11 +99,10 @@ mv -f $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/50-euvccam.rules $RPM_BUILD_ROO
 %ldconfig_scriptlets
 
 %files -f unicap.lang
-%doc AUTHORS ChangeLog COPYING README
+%license COPYING
+%doc AUTHORS ChangeLog README
 
 %{_udevrulesdir}/50-euvccam.rules
-
-
 
 %{_libdir}/%{name}.so.*
 %{_libdir}/unicap2
