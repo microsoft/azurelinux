@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,7 @@ Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 Patch0167:      CVE-2021-3981.patch
+Patch0170:      CVE-2022-2601.patch
 # Add nopatches for tooling
 Patch1000:      CVE-2021-3418.nopatch
 Patch1001:      CVE-2020-14372.nopatch
@@ -278,6 +279,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Wed Dec 28 2022 Osama Esmail <osamaesmail@microsoft.com> - 2.06~rc1-9
+- Fix CVE-2022-2601.
+
 * Tue Apr 26 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.06~rc1-8
 - Fix CVE-2021-3981.
 
