@@ -1,30 +1,37 @@
+Summary:        Library to render text and graphic overlays onto video images
+Name:           libucil
+Version:        0.9.10
+Release:        22%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary:	Library to render text and graphic overlays onto video images
-Name:		libucil
-Version:	0.9.10
-Release:	22%{?dist}
-License:	GPLv2+
-URL:		https://www.unicap-imaging.org/
-Source0:	https://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
-
+URL:            https://www.unicap-imaging.org/
+Source0:        https://www.unicap-imaging.org/downloads/%{name}-%{version}.tar.gz
 # check return value of theora_encode_init() (#627890)
-Patch0:		libucil-0.9.8-bz627890.patch
-
+Patch0:         libucil-0.9.8-bz627890.patch
 # fix some memory leaks
-Patch1:		libucil-0.9.10-leaks.patch
-
+Patch1:         libucil-0.9.10-leaks.patch
 # fix some compile-time warnings
-Patch2:		libucil-0.9.10-warnings.patch
-
+Patch2:         libucil-0.9.10-warnings.patch
 # asoundlib.h is alsa/asoundlib.h meanwhile
-Patch3:		libucil-0.9.10-include-alsa.patch
-
-BuildRequires:	autoconf, automake, gettext-devel, libtool
-BuildRequires:	intltool, /usr/bin/perl, perl(XML::Parser), gettext, gtk-doc >= 1.4
-BuildRequires:	libunicap-devel, glib2-devel, pango-devel, alsa-lib-devel
-BuildRequires:	libtheora-devel, libogg-devel, libvorbis-devel, libpng-devel
-Obsoletes:	unicap <= 0.9.7-1
+Patch3:         libucil-0.9.10-include-alsa.patch
+BuildRequires:  %{_bindir}/perl
+BuildRequires:  alsa-lib-devel
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gettext
+BuildRequires:  gettext-devel
+BuildRequires:  glib2-devel
+BuildRequires:  gtk-doc >= 1.4
+BuildRequires:  intltool
+BuildRequires:  libogg-devel
+BuildRequires:  libpng-devel
+BuildRequires:  libtheora-devel
+BuildRequires:  libtool
+BuildRequires:  libunicap-devel
+BuildRequires:  libvorbis-devel
+BuildRequires:  pango-devel
+BuildRequires:  perl(XML::Parser)
 
 %description
 Unicap provides a uniform interface to video capture devices. It allows
@@ -33,9 +40,10 @@ The related ucil library provides easy to use functions to render text
 and graphic overlays onto video images.
 
 %package devel
-Summary:	Development files for the ucil library
-Requires:	%{name}%{?_isa} = %{version}-%{release}, pkgconfig, libunicap-devel
-Obsoletes:	unicap-devel <= 0.9.7-1
+Summary:        Development files for the ucil library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       libunicap-devel
+Requires:       pkgconfig
 
 %description devel
 The libucil-devel package includes header files and libraries necessary
@@ -62,7 +70,7 @@ autoreconf -fiv
 %make_install
 
 # Don't install any static .a and libtool .la files
-rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}.{a,la}
+rm -f %{buildroot}%{_libdir}/%{name}.{a,la}
 
 %ldconfig_scriptlets
 
