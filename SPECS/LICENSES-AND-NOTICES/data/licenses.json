@@ -2347,6 +2347,7 @@
                 "kubevirt",
                 "kured",
                 "libcontainers-common",
+                "libtheora",
                 "libva",
                 "libvdpau",
                 "lynx",
