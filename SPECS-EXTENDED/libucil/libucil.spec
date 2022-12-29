@@ -2,7 +2,7 @@ Summary:        Library to render text and graphic overlays onto video images
 Name:           libucil
 Version:        0.9.10
 Release:        22%{?dist}
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.unicap-imaging.org/
