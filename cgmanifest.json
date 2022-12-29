@@ -10320,6 +10320,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libucil",
+          "version": "0.9.10",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libucil-0.9.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libunicap",
+          "version": "0.9.12",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libunicap-0.9.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libuninameslist",
           "version": "20200313",
           "downloadUrl": "https://github.com/fontforge/libuninameslist/archive/20200313.tar.gz"

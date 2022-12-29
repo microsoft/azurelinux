@@ -702,6 +702,8 @@
                 "libtomcrypt",
                 "libtommath",
                 "libtranslit",
+                "libucil",
+                "libunicap",
                 "libuninameslist",
                 "liburing",
                 "libusbmuxd",
