@@ -2,7 +2,7 @@ Summary:        Library to access different kinds of (video) capture devices
 Name:           libunicap
 Version:        0.9.12
 Release:        28%{?dist}
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.unicap-imaging.org/
