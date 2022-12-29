@@ -2295,6 +2295,7 @@
                 "apache-commons-lang3",
                 "apache-commons-logging",
                 "apache-commons-net",
+                "apache-commons-pool",
                 "apache-parent",
                 "aqute-bnd",
                 "args4j",
