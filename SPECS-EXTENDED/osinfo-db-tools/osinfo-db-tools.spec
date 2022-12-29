@@ -2,7 +2,7 @@ Summary:        Tools for managing the osinfo database
 Name:           osinfo-db-tools
 Version:        1.10.0
 Release:        2%{?dist}
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libosinfo.org/
@@ -17,7 +17,6 @@ BuildRequires:  libarchive-devel
 BuildRequires:  libsoup-devel
 BuildRequires:  libxml2-devel >= 2.6.0
 BuildRequires:  libxslt-devel >= 1.0.0
-### Patches ###
 BuildRequires:  meson
 BuildRequires:  python3
 BuildRequires:  python3-pytest

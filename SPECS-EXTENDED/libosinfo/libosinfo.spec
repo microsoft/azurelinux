@@ -2,7 +2,7 @@ Summary:        A library for managing OS information for virtualization
 Name:           libosinfo
 Version:        1.10.0
 Release:        2%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libosinfo.org/
