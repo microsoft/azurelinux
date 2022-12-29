@@ -10200,6 +10200,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtheora",
+          "version": "1.1.1",
+          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtar",
           "version": "1.2.20",
           "downloadUrl": "https://github.com/tklauser/libtar/archive/v1.2.20.tar.gz"
