@@ -326,7 +326,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
-* Wed Sep 07 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.06-8
+* Thu Dec 29 2022 Mykhailo Bykhovtsev <mbykhovtsev@microsoft@microsoft.com> - 2.06-8
 - Fix CVE-2022-2601 (Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>).
 
 * Wed Sep 07 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.06-7
