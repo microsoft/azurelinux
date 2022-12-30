@@ -12,7 +12,7 @@ BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  perl-interpreter
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  python3
 BuildRequires:  python3-rpm-macros
 BuildRequires:  xmlto
@@ -43,7 +43,7 @@ This packages contains all the utilities that come with the zziplib library.
 Summary:        Development files for the zziplib library
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       SDL-devel
-Requires:       pkg-config
+Requires:       pkgconfig
 Requires:       zlib-devel
 
 %description devel
