@@ -29004,6 +29004,16 @@
           "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
         }
       }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "zziplib",
+          "version": "0.13.72",
+          "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.72.tar.gz"
+        }
+      }
     }
   ],
   "Version": 1
