@@ -70,7 +70,7 @@ Patch50:        CVE-2021-4207.patch
 # CVE-2021-3929 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/736b0164
 Patch51:        CVE-2021-3929.patch
 # CVE-2021-3611 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/79fa99831debc9782087e834382c577215f2f511
-Patch51:        CVE-2021-3611.patch
+Patch52:        CVE-2021-3611.patch
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
@@ -224,6 +224,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Fri Dec 30 2022 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 4.2.0-50
+- Patch CVE-2021-3611
+
 * Tue Dec 27 2022 Osama Esmail <osamaesmail@microsoft.com> - 4.2.0-49
 - Patch CVE-2021-3929
 
