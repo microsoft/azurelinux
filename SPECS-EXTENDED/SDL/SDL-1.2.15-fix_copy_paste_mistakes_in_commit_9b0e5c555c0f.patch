@@ -1,0 +1,45 @@
+changeset:   12980:32075e9e2135
+branch:      SDL-1.2
+tag:         tip
+parent:      12977:37d0eba8fa17
+user:        Ozkan Sezer <sezeroz@gmail.com>
+date:        Fri Aug 02 00:35:05 2019 +0300
+summary:     fix copy+paste mistakes in commit 9b0e5c555c0f (CVE-2019-7637 fix):
+
+diff -r 37d0eba8fa17 -r 32075e9e2135 src/video/gapi/SDL_gapivideo.c
+--- a/src/video/gapi/SDL_gapivideo.c	Wed Jul 31 23:50:10 2019 +0300
++++ b/src/video/gapi/SDL_gapivideo.c	Fri Aug 02 00:35:05 2019 +0300
+@@ -733,7 +733,7 @@
+ 	video->w = gapi->w = width;
+ 	video->h = gapi->h = height;
+ 	video->pitch = SDL_CalculatePitch(video); 
+-	if (!current->pitch) {
++	if (!video->pitch) {
+ 		return(NULL);
+ 	}
+ 
+diff -r 37d0eba8fa17 -r 32075e9e2135 src/video/windib/SDL_dibvideo.c
+--- a/src/video/windib/SDL_dibvideo.c	Wed Jul 31 23:50:10 2019 +0300
++++ b/src/video/windib/SDL_dibvideo.c	Fri Aug 02 00:35:05 2019 +0300
+@@ -675,7 +675,7 @@
+ 	video->w = width;
+ 	video->h = height;
+ 	video->pitch = SDL_CalculatePitch(video);
+-	if (!current->pitch) {
++	if (!video->pitch) {
+ 		return(NULL);
+ 	}
+ 
+diff -r 37d0eba8fa17 -r 32075e9e2135 src/video/windx5/SDL_dx5video.c
+--- a/src/video/windx5/SDL_dx5video.c	Wed Jul 31 23:50:10 2019 +0300
++++ b/src/video/windx5/SDL_dx5video.c	Fri Aug 02 00:35:05 2019 +0300
+@@ -1127,7 +1127,7 @@
+ 		video->w = width;
+ 		video->h = height;
+ 		video->pitch = SDL_CalculatePitch(video);
+-		if (!current->pitch) {
++		if (!video->pitch) {
+ 			return(NULL);
+ 		}
+ 
+
