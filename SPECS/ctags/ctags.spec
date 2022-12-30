@@ -68,9 +68,6 @@ make check
 %{_mandir}/man7/*
 
 %changelog
-* Fri Dec 30 2022 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.9.20220619.0-7
-- Address CVE-2022-4515
-
 * Mon Jul 25 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.9.20220619.0-7
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
