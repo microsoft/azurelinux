@@ -1,19 +1,17 @@
+Summary:        Simple programming interface for Ogg files and streams
 Name:           liboggz
 Version:        1.1.1
 Release:        20%{?dist}
-Summary:        Simple programming interface for Ogg files and streams
-
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.xiph.org/oggz/
 Source0:        https://downloads.xiph.org/releases/liboggz/%{name}-%{version}.tar.gz
 # Always have oggz_off_t == loff_t even on 64-bit platforms
-Patch0:		liboggz-1.1.1-multilib.patch
-
+Patch0:         liboggz-1.1.1-multilib.patch
+BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  libogg-devel >= 1.0
-BuildRequires:  doxygen
 
 %description
 Oggz provides a simple programming interface for reading and writing
@@ -22,9 +20,9 @@ by Monty at Xiph.Org, originally to support the Ogg Vorbis audio
 format.
 
 %package devel
-Summary:	Files needed for development using liboggz
-Requires:       liboggz = %{version}-%{release}
+Summary:        Files needed for development using liboggz
 Requires:       libogg-devel >= 1.0
+Requires:       liboggz = %{version}-%{release}
 Requires:       pkgconfig
 
 %description devel
@@ -38,7 +36,7 @@ development using liboggz.
 
 %package doc
 Summary:        Documentation for liboggz
-Requires:	liboggz = %{version}-%{release}
+Requires:       liboggz = %{version}-%{release}
 
 %description doc
 Oggz provides a simple programming interface for reading and writing
@@ -48,7 +46,6 @@ format.
 
 This package contains HTML documentation needed for development using
 liboggz.
-
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -70,7 +67,7 @@ rm -rf $RPM_BUILD_ROOT
 %makeinstall docdir=$PWD/__docs_staging INSTALL="%{__install} -p"
 
 # remove unpackaged files from the buildroot
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # not particularly interested in the tex docs, the html version has everything
 rm -rf __docs_staging/latex
@@ -87,7 +84,8 @@ rm -rf __docs_staging/latex
 
 
 %files
-%doc AUTHORS ChangeLog COPYING README
+%license COPYING
+%doc AUTHORS ChangeLog README
 # 0 length NEWS file
 # %doc NEWS
 %{_libdir}/liboggz.so.*
@@ -102,9 +100,8 @@ rm -rf __docs_staging/latex
 %files doc
 %doc __docs_staging/*
 
-
 %changelog
-* Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.1-20
+* Wed Jan 02 2023 Muhammad Falak <mwani@microsoft.com> - 1.1.1-20
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-19
