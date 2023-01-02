@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "apache-commons-pool",
+          "version": "1.6",
+          "downloadUrl": "https://archive.apache.org/dist/commons/pool/source/commons-pool-1.6-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "apache-commons-lang",
           "version": "2.6",
           "downloadUrl": "http://archive.apache.org/dist/commons/lang/source/commons-lang-2.6-src.tar.gz"
