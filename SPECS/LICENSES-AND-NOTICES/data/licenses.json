@@ -2297,6 +2297,7 @@
                 "apache-commons-net",
                 "apache-commons-pool",
                 "apache-commons-pool2",
+                "apache-commons-vfs2",
                 "apache-parent",
                 "aqute-bnd",
                 "args4j",
