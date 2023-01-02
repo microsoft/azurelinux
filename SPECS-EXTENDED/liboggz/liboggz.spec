@@ -101,7 +101,7 @@ rm -rf __docs_staging/latex
 %doc __docs_staging/*
 
 %changelog
-* Wed Jan 02 2023 Muhammad Falak <mwani@microsoft.com> - 1.1.1-20
+* Mon Jan 02 2023 Muhammad Falak <mwani@microsoft.com> - 1.1.1-20
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-19
