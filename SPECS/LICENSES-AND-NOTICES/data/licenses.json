@@ -2287,6 +2287,7 @@
                 "apache-commons-compress",
                 "apache-commons-daemon",
                 "apache-commons-dbcp",
+                "apache-commons-digester",
                 "apache-commons-httpclient",
                 "apache-commons-io",
                 "apache-commons-lang",
