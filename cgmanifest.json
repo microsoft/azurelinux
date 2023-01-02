@@ -364,6 +364,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "apache-commons-validator",
+          "version": "1.5.0",
+          "downloadUrl": "https://archive.apache.org/dist/commons/validator/source/commons-validator-1.5.0-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "apache-commons-vfs2",
           "version": "2.2",
           "downloadUrl": "https://archive.apache.org/dist/commons/vfs/source/commons-vfs2-distribution-2.2-src.tar.gz"
