@@ -1,0 +1,11 @@
+--- commons-dbcp2-2.1.1-src/build.xml	2018-05-15 11:17:10.227422992 +0200
++++ commons-dbcp2-2.1.1-src/build.xml	2018-05-15 11:24:49.257464289 +0200
+@@ -145,8 +146,6 @@
+                nohelp="true"
+                nonavbar="false"
+                serialwarn="false">
+-          <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+-          <link href="http://commons.apache.org/pool/apidocs"/>
+       </javadoc>
+    </target>
+ 
