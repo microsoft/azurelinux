@@ -324,6 +324,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "apache-commons-jexl",
+          "version": "2.1.1",
+          "downloadUrl": "https://downloads.apache.org/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "apache-commons-daemon",
           "version": "1.2.3",
           "downloadUrl": "https://archive.apache.org/dist/commons/daemon/source/commons-daemon-1.2.3-src.tar.gz"
