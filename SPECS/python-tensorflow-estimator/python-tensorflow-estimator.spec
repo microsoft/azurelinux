@@ -35,6 +35,7 @@ Summary:        %{summary}
 %autosetup -p1 -n estimator-%{version}
 
 %build
+tar -xf %{SOURCE1} -C /root/
 ln -s /usr/bin/python3 /usr/bin/python
 bazel build //tensorflow_estimator/tools/pip_package:build_pip_package
 
