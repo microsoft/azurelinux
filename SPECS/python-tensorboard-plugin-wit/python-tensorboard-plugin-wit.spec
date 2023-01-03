@@ -1,9 +1,9 @@
 %global pypi_name tensorboard-plugin-wit
 %global _description %{expand:
-The What-If Tool (WIT) provides an easy-to-use interface for expanding understanding of a black-box classification or regression ML model}
+Machine Learning What If Tool}
 %define _enable_debug_package 0
 %global debug_package %{nil}
-Summary:        The What-If Tool (WIT) provides an easy-to-use interface for expanding understanding of a black-box classification or regression ML model
+Summary:        Machine Learning What If Tool
 Name:           python-%{pypi_name}
 Version:        1.8.1
 Release:        1%{?dist}
