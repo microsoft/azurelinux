@@ -1,14 +1,13 @@
 Summary:        Linux-native io_uring I/O access library
 Name:           liburing
-Version:        2.0
-Release:        3%{?dist}
+Version:        2.3
+Release:        1%{?dist}
 License:        (GPLv2 WITH exceptions AND LGPLv2+) OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://git.kernel.dk/cgit/liburing/
 Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.gz
 Patch1:         0001-spec-bump-version-to-2.0.patch
-Patch2:         0002-spec-add-explicit-build-dependency-on-make.patch
 Patch3:         0003-test-get-rid-of-x86_64-isms-in-the-test-code.patch
 Patch4:         0004-examples-ucontext-cp.c-cope-with-variable-SIGSTKSZ.patch
 BuildRequires:  gcc
@@ -53,6 +52,9 @@ for the Linux-native io_uring.
 %{_mandir}/man7/*
 
 %changelog
+* Tue Jan 03 2023 nick black <niblack@microsoft.com> - 2.3-1
+- Pull new upstream 2.3, released 2022-11-01
+
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec
