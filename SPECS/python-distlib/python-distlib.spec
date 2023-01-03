@@ -63,6 +63,7 @@ export PYTHONHASHSEED=0
 %endif # with_tests
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
+%license LICENSE.txt
 %doc README.rst
 
 %changelog
