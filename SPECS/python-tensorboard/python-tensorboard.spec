@@ -82,8 +82,7 @@ bazel --batch build //tensorboard/pip_package:build_pip_package
 # mv /root/%{name}-%{version}-cache.tar.gz /usr/
 
 # sleep 200
-#tensorboard build script has an error 
-
+#tensorboard package build script build_pip_package.sh doesn't assign RUNFILES variable successfully. 
 sed -i 's/output="$1"/output="$1"\n \ RUNFILES="$(CDPATH="" cd -- "$0.runfiles" \&\& pwd)"/' bazel-bin/tensorboard/pip_package/build_pip_package
 bazel-bin/tensorboard/pip_package/build_pip_package .
 mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
