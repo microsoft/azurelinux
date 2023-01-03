@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
-Version:        2.8.3
-Release:        1%{?dist}
+Version:        2.11.0
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  bazel = 4.2.1
+BuildRequires:  bazel = 5.3.0
 BuildRequires:  binutils
 BuildRequires:  build-essential
 BuildRequires:  git
@@ -30,7 +30,7 @@ TensorFlow is an open source machine learning framework for everyone.
 
 %package -n     python3-tensorflow
 Summary:        python-tensorflow
-Requires:       python3-MarkupSafe
+Requires:       python3-markupsafe
 Requires:       python3-absl-py
 Requires:       python3-astunparse
 Requires:       python3-cachetools
@@ -103,6 +103,12 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 %{_bindir}/toco_from_protos
 
 %changelog
+* Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
+- correct markupsafe package name. 
+
+* Sun Dec 04 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
+- update to 2.11.0
+
 * Thu Sep 22 2022 Riken Maharjan <rmaharjan@microsoft> - 2.8.3-1
 - License verified
 - Original version for CBL-Mariner

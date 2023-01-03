@@ -15,6 +15,7 @@ type BuildAgentConfig struct {
 	RpmDir    string
 	SrpmDir   string
 	CacheDir  string
+	CCacheDir string
 
 	DistTag              string
 	DistroReleaseVersion string
@@ -23,6 +24,7 @@ type BuildAgentConfig struct {
 
 	NoCleanup bool
 	RunCheck  bool
+	UseCcache bool
 
 	LogDir   string
 	LogLevel string

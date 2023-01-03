@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.18.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,8 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+# CVE-2022-41717 is fixed in 1.18.9
+Patch1:         CVE-2022-41717.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -33,9 +35,11 @@ Go is an open source programming language that makes it easy to build simple, re
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < %{PATCH0}
+
 mv -v go go-bootstrap
 
 %setup -q -n go
+patch -Np1 --ignore-whitespace < %{PATCH1}
 
 %build
 # Build go 1.4 bootstrap
@@ -116,6 +120,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Dec 15 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.18.8-2
+- Patch CVE-2022-41717
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.8-1
 - Upgrade to version 1.18.8 (fixes CVE-2022-41716, which only applies to Windows environments)
 - Also fixes CVE-2022-2879, CVE-2022-2880, CVE-2022-41715 (fixed in 1.18.7)
