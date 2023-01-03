@@ -1,9 +1,8 @@
 %global srcname distlib
-%bcond_without check
 Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
 Name:           python-distlib
 Version:        0.3.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,8 +56,6 @@ rm distlib/*.exe
 %if %{with check}
 %check
 export PYTHONHASHSEED=0
-# Some tests require network access
-export SKIP_ONLINE=1
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161

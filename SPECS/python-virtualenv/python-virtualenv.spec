@@ -27,7 +27,7 @@ BuildRequires:  python3-pip
 Requires:       python3
 Requires:       python3-filelock
 Requires:       python3-platformdirs = 2.0.0
-Requires:       python3-distlib = 0.3.6
+Requires:       python3-distlib < 1
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv

@@ -69,7 +69,7 @@ python3 setup.py -q bdist_wheel
 popd
 mkdir -p pyproject-wheeldir/ && cp tensorboard/data/server/pip_package/dist/*.whl pyproject-wheeldir/
 
-#tensorboard buildt usin bazel
+#tensorboard built using bazel
 bazel --batch build //tensorboard/pip_package:build_pip_package
 #cache 
 # ---------
