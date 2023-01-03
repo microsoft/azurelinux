@@ -304,9 +304,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "apache-commons-digester",
-          "version": "2.1",
-          "downloadUrl": "https://dlcdn.apache.org/commons/digester/source/commons-digester-2.1-src.tar.gz"
+          "name": "apache-commons-daemon",
+          "version": "1.2.3",
+          "downloadUrl": "https://archive.apache.org/dist/commons/daemon/source/commons-daemon-1.2.3-src.tar.gz"
         }
       }
     },
@@ -324,19 +324,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "apache-commons-jexl",
-          "version": "2.1.1",
-          "downloadUrl": "https://downloads.apache.org/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "apache-commons-daemon",
-          "version": "1.2.3",
-          "downloadUrl": "https://archive.apache.org/dist/commons/daemon/source/commons-daemon-1.2.3-src.tar.gz"
+          "name": "apache-commons-digester",
+          "version": "2.1",
+          "downloadUrl": "https://dlcdn.apache.org/commons/digester/source/commons-digester-2.1-src.tar.gz"
         }
       }
     },
@@ -364,39 +354,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "apache-commons-validator",
-          "version": "1.5.0",
-          "downloadUrl": "https://archive.apache.org/dist/commons/validator/source/commons-validator-1.5.0-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "apache-commons-vfs2",
-          "version": "2.2",
-          "downloadUrl": "https://archive.apache.org/dist/commons/vfs/source/commons-vfs2-distribution-2.2-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "apache-commons-pool2",
-          "version": "2.4.2",
-          "downloadUrl": "https://archive.apache.org/dist/commons/pool/source/commons-pool2-2.4.2-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "apache-commons-pool",
-          "version": "1.6",
-          "downloadUrl": "https://archive.apache.org/dist/commons/pool/source/commons-pool-1.6-src.tar.gz"
+          "name": "apache-commons-jexl",
+          "version": "2.1.1",
+          "downloadUrl": "https://downloads.apache.org/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz"
         }
       }
     },
@@ -437,6 +397,46 @@
           "name": "apache-commons-net",
           "version": "3.6",
           "downloadUrl": "http://archive.apache.org/dist/commons/net/source/commons-net-3.6-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "apache-commons-pool",
+          "version": "1.6",
+          "downloadUrl": "https://archive.apache.org/dist/commons/pool/source/commons-pool-1.6-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "apache-commons-pool2",
+          "version": "2.4.2",
+          "downloadUrl": "https://archive.apache.org/dist/commons/pool/source/commons-pool2-2.4.2-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "apache-commons-validator",
+          "version": "1.5.0",
+          "downloadUrl": "https://archive.apache.org/dist/commons/validator/source/commons-validator-1.5.0-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "apache-commons-vfs2",
+          "version": "2.2",
+          "downloadUrl": "https://archive.apache.org/dist/commons/vfs/source/commons-vfs2-distribution-2.2-src.tar.gz"
         }
       }
     },
@@ -6020,8 +6020,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
+          "version": "5.15.86.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
         }
       }
     },
@@ -7541,8 +7541,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
+          "version": "5.15.86.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
         }
       }
     },
@@ -7551,8 +7551,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
+          "version": "5.15.86.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
         }
       }
     },
@@ -7561,8 +7561,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
+          "version": "5.15.86.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
         }
       }
     },
@@ -10280,16 +10280,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libtheora",
-          "version": "1.1.1",
-          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libtar",
           "version": "1.2.20",
           "downloadUrl": "https://github.com/tklauser/libtar/archive/v1.2.20.tar.gz"
@@ -10343,6 +10333,16 @@
           "name": "libthai",
           "version": "0.1.28",
           "downloadUrl": "ftp://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.28.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtheora",
+          "version": "1.1.1",
+          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.gz"
         }
       }
     },
@@ -11243,6 +11243,16 @@
           "name": "livepatch-5.15.85.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.86.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
         }
       }
     },
