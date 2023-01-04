@@ -1356,6 +1356,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cdrdao",
+          "version": "1.2.4",
+          "downloadUrl": "https://prdownloads.sourceforge.net/cdrdao/cdrdao-1.2.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cdparanoia",
           "version": "10.2",
           "downloadUrl": "https://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-10.2.src.tgz"
