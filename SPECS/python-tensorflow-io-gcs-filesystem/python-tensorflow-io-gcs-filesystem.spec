@@ -1,4 +1,4 @@
-%global pypi_name tensorflow-io-gcs
+%global pypi_name tensorflow-io-gcs-filesystem
 %global _description %{expand:
 TensorFlow I/O is a collection of file systems and file formats that are not available in TensorFlow's built-in support}
 %define _enable_debug_package 0
