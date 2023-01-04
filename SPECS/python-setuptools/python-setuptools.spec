@@ -3,13 +3,14 @@
 Summary:        Download, build, install, upgrade, and uninstall Python packages
 Name:           python-setuptools
 Version:        40.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Group:          Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pypi.python.org/pypi/setuptools
 Source0:        https://files.pythonhosted.org/packages/ef/1d/201c13e353956a1c840f5d0fbf0461bd45bbd678ea4843ebf25924e8984c/setuptools-%{version}.zip
+Patch0:    CVE-2022-40897.patch
 
 BuildArch: noarch
 
@@ -28,6 +29,7 @@ have dependencies on other packages.
 
 %prep
 %setup -n setuptools-%{version}
+%patch0 -p1
 
 %build
 python2 bootstrap.py
@@ -55,6 +57,9 @@ python2 setup.py test
 %{python2_sitelib}/*
 
 %changelog
+* Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 40.2.0-7
+- Add patch for CVE-2022-40897
+
 * Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 40.2.0-6
 - Adding explicit runtime dependency on 'python-xml'.
 
