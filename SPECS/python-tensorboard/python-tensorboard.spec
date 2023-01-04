@@ -81,7 +81,6 @@ bazel --batch build //tensorboard/pip_package:build_pip_package
 # popd
 # mv /root/%{name}-%{version}-cache.tar.gz /usr/
 
-# sleep 200
 #tensorboard package build script build_pip_package.sh doesn't assign RUNFILES variable successfully. 
 sed -i 's/output="$1"/output="$1"\n \ RUNFILES="$(CDPATH="" cd -- "$0.runfiles" \&\& pwd)"/' bazel-bin/tensorboard/pip_package/build_pip_package
 bazel-bin/tensorboard/pip_package/build_pip_package .
