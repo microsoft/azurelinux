@@ -3,7 +3,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.14.2
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,9 @@ Patch1:         CVE-2021-20271.patch
 Patch2:         CVE-2021-3421.nopatch
 Patch3:         CVE-2021-20266.patch
 Patch4:         CVE-2021-3521.patch
+Patch5:    CVE-2021-35938.patch
+Patch6:    CVE-2021-35939.patch
+Patch7:    CVE-2021-35938.patch
 BuildRequires:  elfutils-devel
 BuildRequires:  file-devel
 BuildRequires:  libarchive-devel
@@ -281,6 +284,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.14.2-16
+- Add patch for CVE-2021-35938, CVE-2021-35939
+
 *   Fri Sep 09 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.14.2-15
 -   Patch to fix CVE-2021-3521
 
