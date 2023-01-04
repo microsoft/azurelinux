@@ -206,6 +206,7 @@
                 "fdupes",
                 "fence-virt",
                 "fetchmail",
+                "fftw",
                 "filebench",
                 "fio",
                 "fipscheck",
