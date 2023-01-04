@@ -25,8 +25,6 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-# CVE-2022-23525 has been patched in 3.10.3: https://github.com/helm/helm/commit/638ebffbc2e445156f3978f02fd83d9af1e56f5b
-# CVE-2022-23526 has been patched in 3.10.3: https://github.com/helm/helm/commit/bafafa8bb1b571b61d7a9528da8d40c307dade3d
 BuildRequires: golang >= 1.15.5
 
 %description
