@@ -1,0 +1,158 @@
+Fix build system to be usable by compiling shared libs as -fPIC and
+using DESTDIR for installing. Patch by Samuli Suominen <ssuominen AT
+gentoo.org> and Alexis Ballier <aballier AT gentoo.org>. See,
+
+http://trac.xiph.org/ticket/1368 (upstream bug)
+
+diff -ur cdparanoia-III-10.2.orig/interface/Makefile.in cdparanoia-III-10.2/interface/Makefile.in
+--- cdparanoia-III-10.2.orig/interface/Makefile.in	2008-08-21 19:08:54.000000000 +0300
++++ cdparanoia-III-10.2/interface/Makefile.in	2009-06-20 20:43:39.000000000 +0300
+@@ -10,6 +10,7 @@
+ FLAGS=@SBPCD_H@ @UCDROM_H@ @TYPESIZES@ @CFLAGS@
+ OPT=@OPT@ $(FLAGS)
+ DEBUG=@DEBUG@ -DCDDA_TEST
++LIBFLAGS = -fPIC
+ CC=@CC@
+ LD=@CC@
+ LDFLAGS=@LDFLAGS@ $(FLAGS)
+@@ -20,6 +21,8 @@
+ 
+ OFILES = scan_devices.o	common_interface.o cooked_interface.o interface.o\
+ 	scsi_interface.o smallft.o toc.o test_interface.o
++LOFILES = scan_devices.lo common_interface.lo cooked_interface.lo interface.lo\
++	scsi_interface.lo smallft.lo toc.lo test_interface.lo
+ 
+ export VERSION
+ 
+@@ -32,8 +35,7 @@
+ 	$(MAKE) libcdda_interface.a CFLAGS="$(OPT)" 
+ 
+ slib:	
+-	$(MAKE) lessmessy
+-	$(MAKE) libcdda_interface.so CFLAGS="$(OPT) -fpic" 
++	$(MAKE) libcdda_interface.so CFLAGS="$(OPT)" 
+ 	[ -e libcdda_interface.so.0 ] || ln -s libcdda_interface.so libcdda_interface.so.0
+ 
+ test:	
+@@ -45,14 +47,17 @@
+ 	$(AR) -r libcdda_interface.a $(OFILES)
+ 	$(RANLIB) libcdda_interface.a
+ 
+-libcdda_interface.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(OFILES) $(LIBS)
++libcdda_interface.so: 	$(LOFILES)	
++	$(CC) $(LDFLAGS) $(LIBFLAGS) -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(LOFILES) $(LIBS)
+ 	[ -e libcdda_interface.so.0 ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so.0
+ 	[ -e libcdda_interface.so ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so
+ 
+ .c.o:
+ 	$(CC) $(CFLAGS) -c $<
+ 
++%.lo: %.c
++	$(CC) $(CFLAGS) $(LIBFLAGS) -c $< -o $@
++
+ lessmessy:
+ 	-rm  -f *.o core *~ *.out
+ 
+diff -ur cdparanoia-III-10.2.orig/Makefile.in cdparanoia-III-10.2/Makefile.in
+--- cdparanoia-III-10.2.orig/Makefile.in	2008-09-11 23:33:30.000000000 +0300
++++ cdparanoia-III-10.2/Makefile.in	2009-06-20 20:43:17.000000000 +0300
+@@ -63,28 +63,28 @@
+ 	cd paranoia && $(MAKE) slib
+ 
+ install:
+-	$(INSTALL) -d -m 0755 $(BINDIR)
+-	$(INSTALL) -m 755 $(srcdir)/cdparanoia $(BINDIR)
+-	$(INSTALL) -d -m 0755 $(MANDIR)
+-	$(INSTALL) -d -m 0755 $(MANDIR)/man1
+-	$(INSTALL) -m 0644 $(srcdir)/cdparanoia.1 $(MANDIR)/man1
+-	$(INSTALL) -d -m 0755 $(INCLUDEDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/paranoia/cdda_paranoia.h $(INCLUDEDIR)
+-	$(INSTALL) -d -m 0755 $(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/paranoia/libcdda_paranoia.so.0.$(VERSION) $(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/paranoia/libcdda_paranoia.a $(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/interface/cdda_interface.h $(INCLUDEDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/interface/libcdda_interface.so.0.$(VERSION) $(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/interface/libcdda_interface.a $(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/utils.h $(INCLUDEDIR)
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(BINDIR)
++	$(INSTALL) -m 755 $(srcdir)/cdparanoia $(DESTDIR)$(BINDIR)
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(MANDIR)
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(MANDIR)/man1
++	$(INSTALL) -m 0644 $(srcdir)/cdparanoia.1 $(DESTDIR)$(MANDIR)/man1
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL) -m 0644 $(srcdir)/paranoia/cdda_paranoia.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(srcdir)/paranoia/libcdda_paranoia.so.0.$(VERSION) $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(srcdir)/paranoia/libcdda_paranoia.a $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(srcdir)/interface/cdda_interface.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL) -m 0644 $(srcdir)/interface/libcdda_interface.so.0.$(VERSION) $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(srcdir)/interface/libcdda_interface.a $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(srcdir)/utils.h $(DESTDIR)$(INCLUDEDIR)
+ 	ln -fs libcdda_interface.so.0.$(VERSION) \
+-		$(LIBDIR)/libcdda_interface.so.0
++		$(DESTDIR)$(LIBDIR)/libcdda_interface.so.0
+ 	ln -fs libcdda_interface.so.0.$(VERSION) \
+-		$(LIBDIR)/libcdda_interface.so
++		$(DESTDIR)$(LIBDIR)/libcdda_interface.so
+ 	ln -fs libcdda_paranoia.so.0.$(VERSION) \
+-		$(LIBDIR)/libcdda_paranoia.so.0
++		$(DESTDIR)$(LIBDIR)/libcdda_paranoia.so.0
+ 	ln -fs libcdda_paranoia.so.0.$(VERSION) \
+-		$(LIBDIR)/libcdda_paranoia.so
++		$(DESTDIR)$(LIBDIR)/libcdda_paranoia.so
+ 
+ cdparanoia:	$(OFILES) $(LIBDEP)
+ 		$(LD) $(CFLAGS) $(LDFLAGS) $(OFILES) \
+diff -ur cdparanoia-III-10.2.orig/paranoia/Makefile.in cdparanoia-III-10.2/paranoia/Makefile.in
+--- cdparanoia-III-10.2.orig/paranoia/Makefile.in	2008-09-04 22:02:47.000000000 +0300
++++ cdparanoia-III-10.2/paranoia/Makefile.in	2009-06-20 20:43:39.000000000 +0300
+@@ -11,6 +11,7 @@
+ FLAGS=@TYPESIZES@ @CFLAGS@
+ OPT=@OPT@ $(FLAGS)
+ DEBUG=@DEBUG@ 
++LIBFLAGS = -fPIC
+ CC=@CC@
+ LD=@CC@
+ LDFLAGS=@LDFLAGS@ $(FLAGS)
+@@ -20,8 +21,9 @@
+ 
+ OFILES = paranoia.o p_block.o overlap.o gap.o isort.o 
+ #TFILES = isort.t gap.t p_block.t paranoia.t
++LOFILES = paranoia.lo p_block.lo overlap.lo gap.lo isort.lo 
+ 
+-LIBS = ../interface/libcdda_interface.a -lm
++LIBS = ../interface/libcdda_interface.so -lm
+ export VERSION
+ 
+ all: lib slib
+@@ -33,8 +35,7 @@
+ 	$(MAKE) libcdda_paranoia.a CFLAGS="$(OPT)" 
+ 
+ slib:	
+-	$(MAKE) lessmessy
+-	$(MAKE) libcdda_paranoia.so CFLAGS="$(OPT) -fpic" 
++	$(MAKE) libcdda_paranoia.so CFLAGS="$(OPT)" 
+ 
+ #test:	$(TFILES)
+ #
+@@ -43,14 +44,17 @@
+ 	$(AR) -r libcdda_paranoia.a $(OFILES)
+ 	$(RANLIB) libcdda_paranoia.a
+ 
+-libcdda_paranoia.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_paranoia.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_paranoia.so.0 $(OFILES) -L ../interface -lcdda_interface
++libcdda_paranoia.so: 	$(LOFILES)	
++	$(CC) $(LDFLAGS) $(LIBSFLAGS) -shared -o libcdda_paranoia.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_paranoia.so.0 $(LOFILES) -L ../interface -lcdda_interface
+ 	[ -e libcdda_paranoia.so.0 ] || ln -s libcdda_paranoia.so.0.$(VERSION) libcdda_paranoia.so.0
+ 	[ -e libcdda_paranoia.so ] || ln -s libcdda_paranoia.so.0.$(VERSION) libcdda_paranoia.so
+ 
+ .c.o:
+ 	$(CC) $(CFLAGS) -c $<
+ 
++%.lo: %.c
++	$(CC) $(CFLAGS) $(LIBFLAGS) -c $< -o $@
++
+ .c.t:
+ 	$(CC) -g -DTEST $(DEBUG) -o $@ $< $(LIBS)
+ 	$@
