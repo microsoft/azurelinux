@@ -7,7 +7,7 @@ License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://readthedocs.org/projects/distlib/
-Source0:        %{pypi_source} %{srcname} %{version}#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/d/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pytest
