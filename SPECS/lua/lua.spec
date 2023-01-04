@@ -4,7 +4,7 @@
 Summary:        Programming language
 Name:           lua
 Version:        5.3.5
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 URL:            https://www.lua.org
 Group:          Development/Tools
@@ -29,6 +29,7 @@ Patch3:         CVE-2020-24342.nopatch
 # From http://lua.2524044.n2.nabble.com/CVE-2019-6706-use-after-free-in-lua-upvaluejoin-function-tt7685575.html
 Patch4:         CVE-2019-6706-use-after-free-lua_upvaluejoin.patch
 Patch5:         CVE-2022-28805.patch
+Patch6:    CVE-2020-15945.patch
 
 BuildRequires:  readline-devel
 Requires:       readline
@@ -107,6 +108,9 @@ rm -rf %{buildroot}
 %{_libdir}/liblua.so
 
 %changelog
+* Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.5-10
+- Add patch for CVE-2020-15945
+
 *   Wed Apr 20 2022 Henry Beberman <henry.beberman@microsoft.com> 5.3.5-9
 -   Patch CVE-2022-28805
 -   Remove contents of nopatch files so autosetup works
