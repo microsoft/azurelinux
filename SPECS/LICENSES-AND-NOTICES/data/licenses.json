@@ -678,6 +678,7 @@
                 "librevenge",
                 "librsvg2",
                 "librx",
+                "libsamplerate",
                 "libsass",
                 "libsecret",
                 "libsemanage",
