@@ -11,8 +11,8 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
-Version:        7.7.0
-Release:        5%{?dist}
+Version:        7.7.1
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -488,6 +488,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.7.1-1
+- Auto-upgrade to 7.7.1 - to fix CVE-2022-41916
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 7.7.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
