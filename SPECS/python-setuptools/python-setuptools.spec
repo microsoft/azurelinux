@@ -28,8 +28,7 @@ you to more easily build and distribute Python packages, especially ones that
 have dependencies on other packages.
 
 %prep
-%setup -n setuptools-%{version}
-%patch0 -p1
+%autosetup -p1 -n setuptools-%{version}
 
 %build
 python2 bootstrap.py
