@@ -12,7 +12,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/tensorflow/estimator
-Source0:        https://github.com/tensorflow/estimator/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://github.com/tensorflow/estimator/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
 BuildRequires:  bazel
 BuildRequires:  python3-setuptools
