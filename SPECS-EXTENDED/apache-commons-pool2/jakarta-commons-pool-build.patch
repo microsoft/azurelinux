@@ -1,0 +1,20 @@
+Index: build.xml
+===================================================================
+--- build.xml.orig
++++ build.xml
+@@ -97,7 +97,7 @@
+                nonavbar="false"
+                serialwarn="false"
+                source="${javac.src.version}">
+-          <link href="http://docs.oracle.com/javase/6/docs/api/"/>
++          <link href="file://usr/share/javadoc/java"/>
+       </javadoc>
+    </target>
+ 
+@@ -211,4 +211,4 @@
+ 
+    <target name="dist" depends="build" description="gump target"/>
+    
+-</project>
+\ No newline at end of file
++</project>

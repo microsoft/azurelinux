@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Source0:        %{url}/releases/download/RELEASE_%{refpolicy_major}_%{refpolicy_
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Source3:        modules_targeted.conf
+Source4:        macros.selinux-policy
 Patch1:         0001-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
 Patch2:         0002-cronyd-Add-dac_read_search.patch
 Patch3:         0003-Temporary-fix-for-wrong-audit-log-directory.patch
@@ -173,6 +174,7 @@ SELinux policy development and man page package
 %files devel
 %dir %{_usr}/share/selinux/devel
 %dir %{_usr}/share/selinux/devel/include
+%{_rpmconfigdir}/macros.d/macros.selinux-policy
 %{_usr}/share/selinux/devel/include/*
 %{_usr}/share/selinux/devel/Makefile
 %{_usr}/share/selinux/devel/example.*
@@ -281,6 +283,11 @@ mkdir -p %{buildroot}%{_sharedstatedir}/selinux/{%{policy_name},modules}/
 
 mkdir -p %{buildroot}%{_usr}/share/selinux/packages
 
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -m 644 %{SOURCE4} %{buildroot}%{_rpmconfigdir}/macros.d/macros.selinux-policy
+sed -i 's/SELINUXPOLICYVERSION/%{version}-%{release}/' %{buildroot}%{_rpmconfigdir}/macros.d/macros.selinux-policy
+sed -i 's@SELINUXSTOREPATH@%{_sharedstatedir}/selinux@' %{buildroot}%{_rpmconfigdir}/macros.d/macros.selinux-policy
+
 # Install devel
 make clean
 %makeCmds targeted mcs n allow
@@ -346,6 +353,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Fri Nov 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-12
+- Added 'selinux-policy' RPM macros.
+
 * Wed Sep 14 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-11
 - Fix issue with preinst on systems that do not have selinux-policy.
 

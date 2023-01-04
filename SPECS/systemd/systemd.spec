@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,8 @@ Patch1:         add-fsync-sysusers-passwd.patch
 Patch2:         gpt-auto-devno-not-determined.patch
 # Patch3 can be removed once we update to major version 251 or higher:
 Patch3:         CVE-2022-3821.patch
+# Patch4 can be removed once we update to version 252
+Patch4:         CVE-2022-45873.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -269,6 +271,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-12
+- Add patch for CVE-2022-45873
+
 * Wed Nov 29 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-11
 - Conditionally run systemctl preset-all only when first installing systemd, not on upgrades
 

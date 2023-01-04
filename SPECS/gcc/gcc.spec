@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -221,10 +221,11 @@ make %{?_smp_mflags} check-gcc
 %{_mandir}/man7/*.gz
 %{_datadir}/gdb/*
 
+%exclude %{_lib64dir}/libbacktrace*
 %exclude %{_lib64dir}/libgcc*
+%exclude %{_lib64dir}/libgomp*
 %exclude %{_lib64dir}/libstdc++*
 %exclude %{_lib64dir}/libsupc++*
-%exclude %{_lib64dir}/libgomp*
 
 %files -n gfortran
 %defattr(-,root,root)
@@ -285,6 +286,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Fri Dec 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-4
+- Removing libbacktrace.a from the default package.
+
 * Thu Dec 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-3
 - Adding static components for "libbacktrace".
 
