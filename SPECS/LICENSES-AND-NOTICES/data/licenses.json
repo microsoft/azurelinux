@@ -1790,6 +1790,7 @@
                 "scl-utils",
                 "screen",
                 "scrub",
+                "SDL2",
                 "sdparm",
                 "seabios",
                 "secilc",
