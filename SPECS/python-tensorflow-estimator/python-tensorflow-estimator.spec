@@ -37,7 +37,7 @@ Summary:        %{summary}
 %build
 tar -xf %{SOURCE1} -C /root/
 ln -s /usr/bin/python3 /usr/bin/python
-bazel build //tensorflow_estimator/tools/pip_package:build_pip_package
+bazel --batch build //tensorflow_estimator/tools/pip_package:build_pip_package
 
 # ---------
 # steps to create the cache tar. network connection is required to create the cache.
