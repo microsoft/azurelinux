@@ -2129,7 +2129,7 @@
                 "python-tensorboard",
                 "python-tensorboard-plugin-wit",
                 "python-tensorflow-estimator",
-                "python-tensorflow-io-gcs",
+                "python-tensorflow-io-gcs-filesystem",
                 "python-yamlloader",
                 "R",
                 "reaper",
