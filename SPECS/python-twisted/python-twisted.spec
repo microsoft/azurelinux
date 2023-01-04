@@ -3,7 +3,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        20.3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -14,6 +14,8 @@ Patch0:         extra_dependency.patch
 Patch1:         no_packet.patch
 Patch2:         CVE-2022-21712.patch
 Patch3:         CVE-2022-24801.patch
+Patch4:    CVE-2022-39348.patch
+Patch5:    CVE-2022-39348-1.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -77,6 +79,9 @@ LANG=en_US.UTF-8 sudo -u test tox -e py27-alldeps-nocov,
 %{_bindir}/cftp
 
 %changelog
+* Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.3.0-5
+- Add patch for CVE-2022-39348
+
 * Wed Nov 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20.3.0-4
 - Moved Python 3 version to a separate package.
 
