@@ -22064,8 +22064,8 @@
         "type": "other",
         "other": {
           "name": "python-platformdirs",
-          "version": "2.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-2.6.0.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-2.0.0.tar.gz"
         }
       }
     },
