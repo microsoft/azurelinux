@@ -40,9 +40,8 @@ Source31:       %{name}-ipropd-slave-wrapper
 # to know how to interpret the "heimdal-" prefixes.
 Patch1:         heimdal-1.6.0-c25f45a-rename-commands.patch
 # Use Python2 explicity.
-Patch3:         heimdal-7.5.0-explicit-python2.patch
+Patch3:         heimdal-7.7.1-explicit-python2.patch
 Patch4:         heimdal-7.7.0-configure.patch
-Patch5:         fix_test_rand_build_failure.patch
 BuildRequires:  bison
 #libcom_err-devel is in
 #BuildRequires:  libcom_err-devel
@@ -149,7 +148,6 @@ PATH.
 %patch1 -p1 -b .cmds
 %patch3 -p1 -b .python2
 %patch4 -p1 -b .config
-%patch5 -p1
 
 ./autogen.sh
 
