@@ -22093,16 +22093,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-rdflib",
-          "version": "6.2.0",
-          "downloadUrl": "https://github.com/RDFLib/rdflib/releases/download/6.2.0/rdflib-6.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-pycosat",
           "version": "0.6.3",
           "downloadUrl": "https://github.com/ContinuumIO/pycosat/archive/0.6.3/pycosat-0.6.3.tar.gz"
