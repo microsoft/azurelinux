@@ -57,7 +57,25 @@ func LoadLearner() (l *Learner) {
 	return
 }
 
-func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool, goalNode *pkggraph.PkgNode) {
+//Return value between 1-10. 10 being highest priority
+func (l *Learner) DeterminePriority(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, goal *pkggraph.PkgNode, highPriorityProviders map[*pkggraph.PkgNode]bool, learner *Learner) float32 {
+	var priorityLevel float32
+
+	weightToGoalNode := l.WeighCriticalPathToGoal(node, pkgGraph, goal)
+
+	//the higher the weight between our node and the goal node the more it should be prioritized since it's blocking a longer path.
+	//TODO: normalize the weights based on overall build time so this isn't arbitrarily deciding what is "long"
+	if weightToGoalNode > 20.0 {
+		priorityLevel = 8.0
+	}
+	//if this node is part of the high priority set, overwrite pri with highest priority
+	if _, ok := highPriorityProviders[node]; ok {
+		priorityLevel = 10.0
+	}
+	return priorityLevel
+}
+
+func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool, goalNode *pkggraph.PkgNode) map[*pkggraph.PkgNode]bool {
 	logger.Log.Info(`⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 					⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀
 					⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧⠀⠀⠀⠀
@@ -78,11 +96,11 @@ func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMu
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 	implicitPackagesToUnresolvedNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
+	highPriorityProviders := make(map[*pkggraph.PkgNode]bool)
 	for name, unresolvedNode := range implicitPackagesToUnresolvedNodes {
 		logger.Log.Debugf("Mapping of %s to %v", name, unresolvedNode)
 		if providers, ok := l.ImplicitProviders[name]; ok {
 			minPathWeight := math.MaxFloat32
-			var optimalProvider pkgjson.PackageVer
 			var optimalProviderRunNode *pkggraph.PkgNode
 			//determine provider with shortest historical build time according to learning payload.
 			for _, provider := range providers {
@@ -95,29 +113,17 @@ func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMu
 				if providerWeight < minPathWeight {
 					logger.Log.Infof("Found new best provider for %s: %v with expected total buildtime %f", name, lookUpNode.BuildNode, providerWeight)
 					minPathWeight = providerWeight
-					optimalProvider = provider
 					optimalProviderRunNode = lookUpNode.RunNode
 				}
 			}
+			highPriorityProviders[optimalProviderRunNode] = true
 			//logger.Log.Info("Settled on optimal provider %v with expected build time of %f", optimalProviderRunNode, minPathWeight)
 			// if optimalProviderRunNode == nil {
 			// 	logger.Log.Warnf("No optimal provider was found from learnings from providers: %v", providers)
 			// }
-
-			logger.Log.Infof("Collapsing node %v into runnode with parent %v and PackageVer %v", unresolvedNode, optimalProviderRunNode, optimalProvider)
-			// unresolvedNode (the implicit node) will be collapsed into a run node,
-			// with a dependency on the already existing optimalProviderRunNode (and therefore it's subtree)
-			logger.Log.Infof("optimalProviderRunNode: %p", optimalProviderRunNode)
-			logger.Log.Infof("unresolvedNode[0]: %p", unresolvedNode[0])
-			//pkgGraph.CreateCollapsedNode(&optimalProvider, optimalProviderRunNode, unresolvedNode)
-			replaceNodesWithProvides(pkgGraph, &optimalProvider, unresolvedNode, optimalProviderRunNode.RpmPath, l, true)
 		}
 	}
-	//map of ip string to the unresolved node
-	//take ip string and poll learning payload
-	//get list of providers for this ip
-	//for each provider evaluate critical path weight
-	//resolve unresolved node with the lightest provider
+	return highPriorityProviders
 }
 
 func (l *Learner) RecordUnblocks(dynamicDep string, provider *pkggraph.PkgNode) {
