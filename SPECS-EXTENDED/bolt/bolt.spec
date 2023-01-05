@@ -1,30 +1,29 @@
+Summary:        Thunderbolt device manager
+Name:           bolt
+Version:        0.9.2
+Release:        2%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:          bolt
-Version:       0.9.2
-Release:       2%{?dist}
-Summary:       Thunderbolt device manager
-License:       LGPLv2+
-URL:           https://gitlab.freedesktop.org/bolt/bolt
-Source0:       %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
-
-BuildRequires: gcc
-BuildRequires: asciidoc
-BuildRequires: meson
-BuildRequires: libudev-devel
-BuildRequires: pkgconfig(gio-2.0)
-BuildRequires: pkgconfig(libudev)
-BuildRequires: pkgconfig(systemd)
-BuildRequires: polkit-devel
-BuildRequires: systemd
+URL:            https://gitlab.freedesktop.org/bolt/bolt
+Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  asciidoc
+BuildRequires:  gcc
+BuildRequires:  libudev-devel
+BuildRequires:  meson
+BuildRequires:  pkgconfig
+BuildRequires:  polkit-devel
+BuildRequires:  systemd
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(libudev)
+BuildRequires:  pkgconfig(systemd)
 %{?systemd_requires}
-
 # for the integration test (optional)
 %if 0%{?fedora} || 0%{?rhel} > 8
-BuildRequires: pygobject3-devel
-BuildRequires: python3-dbus
-BuildRequires: python3-dbusmock
-BuildRequires: umockdev-devel
+BuildRequires:  pygobject3-devel
+BuildRequires:  python3-dbus
+BuildRequires:  python3-dbusmock
+BuildRequires:  umockdev-devel
 %endif
 
 %description
@@ -53,13 +52,13 @@ mentioned tasks.
 %meson_install
 
 %post
-%systemd_post %{name}.service
+%{systemd_post} %{name}.service
 
 %preun
 %systemd_preun %{name}.service
 
 %postun
-%systemd_postun_with_restart %{name}.service
+%{systemd_postun_with_restart} %{name}.service
 
 %files
 %license COPYING
