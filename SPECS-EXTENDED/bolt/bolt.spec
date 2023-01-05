@@ -52,13 +52,13 @@ mentioned tasks.
 %meson_install
 
 %post
-%{systemd_post} %{name}.service
+%systemd_post %{name}.service
 
 %preun
 %systemd_preun %{name}.service
 
 %postun
-%{systemd_postun_with_restart} %{name}.service
+%systemd_postun_with_restart %{name}.service
 
 %files
 %license COPYING
