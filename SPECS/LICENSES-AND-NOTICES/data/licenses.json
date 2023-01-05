@@ -273,7 +273,6 @@
                 "gspell",
                 "gssntlmssp",
                 "gstreamer1",
-                "gstreamer1-plugins-base",
                 "gtk2",
                 "gtk3",
                 "gtkspell",
