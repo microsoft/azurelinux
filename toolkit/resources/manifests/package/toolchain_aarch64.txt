@@ -364,7 +364,7 @@ python3-rpm-4.14.2-15.cm1.aarch64.rpm
 python-curses-2.7.18-11.cm1.aarch64.rpm
 python-gpg-1.13.1-6.cm1.aarch64.rpm
 python-rpm-4.14.2-15.cm1.aarch64.rpm
-python-setuptools-40.2.0-6.cm1.noarch.rpm
+python-setuptools-40.2.0-7.cm1.noarch.rpm
 python-xml-2.7.18-11.cm1.aarch64.rpm
 readline-7.0-4.cm1.aarch64.rpm
 readline-debuginfo-7.0-4.cm1.aarch64.rpm
