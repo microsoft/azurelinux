@@ -25866,16 +25866,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "sratom",
-          "version": "0.6.10",
-          "downloadUrl": "https://download.drobilla.net/sratom-0.6.10.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "sleuthkit",
           "version": "4.9.0",
           "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.9.0/sleuthkit-4.9.0.tar.gz"
