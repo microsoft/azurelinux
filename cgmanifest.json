@@ -19963,16 +19963,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "pulseaudio",
-          "version": "16.1",
-          "downloadUrl": "https://freedesktop.org/software/pulseaudio/releases/pulseaudio-16.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "po4a",
           "version": "0.60",
           "downloadUrl": "https://github.com/mquinson/po4a/archive/v0.60/po4a-0.60.tar.gz"
