@@ -1,0 +1,22 @@
+#!/bin/sh /usr/share/dpatch/dpatch-run
+## 06-endian.dpatch by Monty <paranoia@xiph.org>
+##
+## DP: Changeset 15356: Fix a really stupid oversight that should have been
+## DP: tested: forcing a drive/host endian mismatch within the interface lib.
+## DP: Doesn't check for null buff before trying a byteswap
+## DP: (Closes: #499716, #506337, #507795, #509762).
+
+@DPATCH@
+
+================================================================================
+--- cdparanoia-III-10.2/interface/interface.c
++++ cdparanoia-III-10.2/interface/interface.c
+@@ -118,7 +118,7 @@
+ 	if(d->bigendianp==-1) /* not determined yet */
+ 	  d->bigendianp=data_bigendianp(d);
+ 	
+-	if(d->bigendianp!=bigendianp()){
++	if(buffer && d->bigendianp!=bigendianp()){
+ 	  int i;
+ 	  u_int16_t *p=(u_int16_t *)buffer;
+ 	  long els=sectors*CD_FRAMESIZE_RAW/2;

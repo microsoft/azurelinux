@@ -1,13 +1,13 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.15.0
+%define npm_version 8.19.2
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.17.1
+Version:        16.18.1
 Release:        2%{?dist}
-License:        BSD and MIT and Public Domain and naist-2003
+License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,6 +94,8 @@ for FILE in .gitmodules .gitignore .npmignore .travis.yml \*.py[co]; do
   find %{buildroot}%{_libdir}/node_modules/ -name "$FILE" -delete
 done
 
+install -m 644 -d %{buildroot}%{_datadir}/systemtap/tapset/node.stp
+
 %check
 make cctest
 
@@ -114,6 +116,12 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Dec 13 2022 Andrew Phelps <anphel@microsoft.com> - 16.18.1-2
+- Update license to reference Artistic 2.0
+
+* Fri Dec 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.18.1-1
+- Auto-upgrade to 16.18.1 - CVE-2022-43548
+
 * Tue Oct 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.17.1-2
 - Change npm_version to 8.15.0 to reflect the actual version of npm bundled with v16.17.1
 

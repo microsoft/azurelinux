@@ -11,8 +11,8 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
-Version:        7.7.0
-Release:        8%{?dist}
+Version:        7.7.1
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,11 +39,7 @@ Source31:       %{name}-ipropd-slave-wrapper
 # klist, kswitch, and kvno are symlinks to "heimtools", and this utility needs
 # to know how to interpret the "heimdal-" prefixes.
 Patch1:         heimdal-1.6.0-c25f45a-rename-commands.patch
-# Upstream patch to properly detect python when configuring
-Patch3:         %{name}-python3.patch
-Patch4:         heimdal-7.7.0-configure.patch
-Patch5:         fix_test_rand_build_failure.patch
-Patch6:         autoconf-2.70-fix.patch
+Patch2:         heimdal-configure.patch
 BuildRequires:  bison
 #libcom_err-devel is in
 #BuildRequires:  libcom_err-devel
@@ -486,6 +482,12 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Tue Dec 06 2022 Henry Beberman <henry.beberman@microsoft.com> - 7.7.1-1
+- Upgrade to version 7.7.1
+- Remove patches that were backported from upstream
+- Fixes CVE-2022-42898, CVE-2022-3437, CVE-2022-41916, CVE-2021-44758,
+- CVE-2021-3671, CVE-2022-44640, CVE-2019-14870
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.7.0-8
 - Add patch to compile with newer autoconf
 

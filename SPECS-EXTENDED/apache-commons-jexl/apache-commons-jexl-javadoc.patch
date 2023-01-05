@@ -1,0 +1,452 @@
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/ExpressionImpl.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/ExpressionImpl.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/ExpressionImpl.java.javadoc	2011-12-19 06:15:00.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/ExpressionImpl.java	2015-04-15 19:05:24.054352570 -0600
+@@ -32,7 +32,7 @@ public class ExpressionImpl implements E
+     /** The engine for this expression. */
+     protected final JexlEngine jexl;
+     /**
+-     * Original expression stripped from leading & trailing spaces.
++     * Original expression stripped from leading &amp; trailing spaces.
+      */
+     protected final String expression;
+     /**
+@@ -171,4 +171,4 @@ public class ExpressionImpl implements E
+         };
+     }
+ 
+-}
+\ No newline at end of file
++}
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/IntrospectorBase.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/IntrospectorBase.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/IntrospectorBase.java.javadoc	2011-12-19 06:15:01.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/IntrospectorBase.java	2015-04-15 19:05:24.055352589 -0600
+@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
+  * This basic function of this class is to return a Method object for a
+  * particular class given the name of a method and the parameters to the method
+  * in the form of an Object[]
+- * <p/>
++ * <p>
+  * The first time the Introspector sees a class it creates a class method map
+  * for the class in question. Basically the class method map is a Hastable where
+  * Method objects are keyed by a concatenation of the method name and the names
+@@ -324,4 +324,4 @@ public class IntrospectorBase {
+             return classMap;
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/MethodKey.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/MethodKey.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/MethodKey.java.javadoc	2011-12-19 06:15:01.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/introspection/MethodKey.java	2015-04-15 19:05:24.055352589 -0600
+@@ -40,7 +40,7 @@ import java.util.Arrays;
+  * </p>
+  * A key can be constructed either from arguments (array of objects) or from parameters
+  * (array of class).
+- * Roughly 3x faster than string key to access the map & uses less memory.
++ * Roughly 3x faster than string key to access the map &amp; uses less memory.
+  */
+ public final class MethodKey {
+     /** The hash code. */
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/Introspector.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/Introspector.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/Introspector.java.javadoc	2011-12-19 06:15:01.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/internal/Introspector.java	2015-04-15 19:05:24.055352589 -0600
+@@ -28,11 +28,11 @@ import org.apache.commons.logging.Log;
+ 
+ /**
+  *  Default introspection services.
+- *  <p>Finding methods as well as property getters & setters.</p>
++ *  <p>Finding methods as well as property getters &amp; setters.</p>
+  * @since 1.0
+  */
+ public class Introspector {
+-    /** The logger to use for all warnings & errors. */
++    /** The logger to use for all warnings &amp; errors. */
+     protected final Log rlog;
+     /** The soft reference to the introspector currently in use. */
+     private volatile SoftReference<IntrospectorBase> ref;
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/introspection/Sandbox.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/introspection/Sandbox.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/introspection/Sandbox.java.javadoc	2011-12-19 06:14:59.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/introspection/Sandbox.java	2015-04-15 19:34:32.872928036 -0600
+@@ -26,6 +26,7 @@ import java.util.Set;
+  * through "whitelists" and "blacklists".
+  * <p>
+  * A <b>whitelist</b> explicitly allows methods/properties for a class;
++ * </p>
+  * <ul>
+  * <li>
+  * If a whitelist is empty and thus does not contain any names, all properties/methods are allowed for its class.
+@@ -34,9 +35,9 @@ import java.util.Set;
+  * If it is not empty, the only allowed properties/methods are the ones contained.
+  * </li>
+  * </ul>
+- * </p>
+  * <p>
+  * A <b>blacklist</b> explicitly forbids methods/properties for a class;
++ * </p>
+  * <ul>
+  * <li>
+  * If a blacklist is empty and thus does not contain any names, all properties/methods are forbidden for its class.
+@@ -47,12 +48,12 @@ import java.util.Set;
+  * </ul>
+  * <p>
+  * Permissions are composed of three lists, read, write, execute, each being "white" or "black":
++ * </p>
+  * <ul>
+  * <li><b>read</b> controls readable properties </li>
+  * <li><b>write</b> controls writeable properties</li>
+  * <li><b>execute</b> controls executable methods and constructor</li>
+  * </ul>
+- * </p>
+  * @since 2.1
+  */
+ public final class Sandbox {
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlArithmetic.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlArithmetic.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlArithmetic.java.javadoc	2011-12-19 06:14:59.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlArithmetic.java	2015-04-15 19:53:47.277461744 -0600
+@@ -26,6 +26,7 @@ import java.math.MathContext;
+  * Perform arithmetic.
+  * <p>
+  * All arithmetic operators (+, - , *, /, %) follow the same rules regarding their arguments.
++ * </p>
+  * <ol>
+  * <li>If both are null, result is 0</li>
+  * <li>If either is a BigDecimal, coerce both to BigDecimal and and perform operation</li>
+@@ -39,7 +40,6 @@ import java.math.MathContext;
+  * </ol>
+  * </li>
+  * </ol>
+- * </p>
+  * Note that the only exception throw by JexlArithmetic is ArithmeticException.
+  * @since 2.0
+  */
+@@ -630,7 +630,7 @@ public class JexlArithmetic {
+      * Performs a bitwise and.
+      * @param left the left operand
+      * @param right the right operator
+-     * @return left & right
++     * @return left &amp; right
+      * @since 2.1
+      */
+     public Object bitwiseAnd(Object left, Object right) {
+@@ -681,7 +681,7 @@ public class JexlArithmetic {
+      * @param left the left operand
+      * @param right the right operator
+      * @param operator the operator
+-     * @return -1 if left  &lt; right; +1 if left &gt > right; 0 if left == right
++     * @return -1 if left &lt; right; +1 if left &gt; right; 0 if left == right
+      * @throws ArithmeticException if either left or right is null
+      * @since 2.1
+      */
+@@ -761,7 +761,7 @@ public class JexlArithmetic {
+     }
+ 
+     /**
+-     * Test if left < right.
++     * Test if left &lt; right.
+      *
+      * @param left first value
+      * @param right second value
+@@ -777,7 +777,7 @@ public class JexlArithmetic {
+     }
+ 
+     /**
+-     * Test if left > right.
++     * Test if left &gt; right.
+      *
+      * @param left first value
+      * @param right second value
+@@ -792,7 +792,7 @@ public class JexlArithmetic {
+     }
+ 
+     /**
+-     * Test if left <= right.
++     * Test if left &le; right.
+      *
+      * @param left first value
+      * @param right second value
+@@ -809,7 +809,7 @@ public class JexlArithmetic {
+     }
+ 
+     /**
+-     * Test if left >= right.
++     * Test if left &ge; right.
+      *
+      * @param left first value
+      * @param right second value
+@@ -1141,4 +1141,4 @@ public class JexlArithmetic {
+         }
+         return result;
+     }
+-}
+\ No newline at end of file
++}
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlEngine.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlEngine.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlEngine.java.javadoc	2011-12-19 06:15:00.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/JexlEngine.java	2015-04-15 19:29:36.837248669 -0600
+@@ -53,14 +53,14 @@ import org.apache.commons.jexl2.parser.A
+ /**
+  * <p>
+  * Creates and evaluates Expression and Script objects.
+- * Determines the behavior of Expressions & Scripts during their evaluation with respect to:
++ * Determines the behavior of Expressions &amp; Scripts during their evaluation with respect to:
++ * </p>
+  * <ul>
+  *  <li>Introspection, see {@link Uberspect}</li>
+- *  <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
++ *  <li>Arithmetic &amp; comparison, see {@link JexlArithmetic}</li>
+  *  <li>Error reporting</li>
+  *  <li>Logging</li>
+  * </ul>
+- * </p>
+  * <p>The <code>setSilent</code> and <code>setLenient</code> methods allow to fine-tune an engine instance behavior
+  * according to various error control needs. The lenient/strict flag tells the engine when and if null as operand is
+  * considered an error, the silent/verbose flag tells the engine what to do with the error
+@@ -68,7 +68,7 @@ import org.apache.commons.jexl2.parser.A
+  * </p>
+  * <ul>
+  * <li>When "silent" &amp; "lenient":
+- * <p> 0 & null should be indicators of "default" values so that even in an case of error,
++ * <p> 0 &amp; null should be indicators of "default" values so that even in an case of error,
+  * something meaningfull can still be inferred; may be convenient for configurations.
+  * </p>
+  * </li>
+@@ -84,7 +84,7 @@ import org.apache.commons.jexl2.parser.A
+  * </li>
+  * <li>When "verbose" &amp; "strict":
+  * <p>The finest error control grain is obtained; it is the closest to Java code -
+- * still augmented by "script" capabilities regarding automated conversions & type matching.
++ * still augmented by "script" capabilities regarding automated conversions &amp; type matching.
+  * </p>
+  * </li>
+  * </ul>
+@@ -872,7 +872,7 @@ public class JexlEngine {
+      * Creates a cache.
+      * @param <K> the key type
+      * @param <V> the value type
+-     * @param cacheSize the cache size, must be > 0
++     * @param cacheSize the cache size, must be &gt; 0
+      * @return a Map usable as a cache bounded to the given size
+      */
+     protected <K, V> Map<K, V> createCache(final int cacheSize) {
+@@ -1312,7 +1312,7 @@ public class JexlEngine {
+     }
+ 
+     /**
+-     * Trims the expression from front & ending spaces.
++     * Trims the expression from front &amp; ending spaces.
+      * @param str expression to clean
+      * @return trimmed expression ending in a semi-colon
+      */
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/parser/Parser.jjt.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/parser/Parser.jjt
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/parser/Parser.jjt.javadoc	2011-12-19 06:14:59.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/parser/Parser.jjt	2015-04-15 19:06:23.342339942 -0600
+@@ -62,7 +62,7 @@ PARSER_END(Parser)
+ 
+ 
+ /***************************************
+- *     Skip & Number literal tokens
++ *     Skip &amp; Number literal tokens
+  ***************************************/
+ 
+ <*> SKIP : /* WHITE SPACE */
+@@ -145,7 +145,7 @@ PARSER_END(Parser)
+ }
+ 
+ /***************************************
+- *     Identifier & String tokens
++ *     Identifier &amp; String tokens
+  ***************************************/
+ 
+ <*> TOKEN : /* IDENTIFIERS */
+@@ -275,7 +275,7 @@ void LValueVar() #Reference : {}
+ }
+ 
+ /***************************************
+- *      Conditional & relational
++ *      Conditional &amp; relational
+  ***************************************/
+ 
+ void ConditionalExpression() #void : {}
+@@ -398,7 +398,7 @@ void UnaryExpression() #void : {}
+ 
+ 
+ /***************************************
+- *      Identifier & Literals
++ *      Identifier &amp; Literals
+  ***************************************/
+ 
+ void Identifier(boolean top) :
+@@ -501,7 +501,7 @@ void MapEntry() : {}
+ 
+ 
+ /***************************************
+- *      Functions & Methods
++ *      Functions &amp; Methods
+  ***************************************/
+ 
+ void EmptyFunction() : {}
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngineFactory.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngineFactory.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngineFactory.java.javadoc	2011-12-19 06:15:00.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngineFactory.java	2015-04-15 19:05:24.058352644 -0600
+@@ -29,9 +29,9 @@ import org.apache.commons.jexl2.parser.S
+ /**
+  * Implements the Jexl ScriptEngineFactory for JSF-223.
+  * <p>
+- * Supports the following:<br.>
+- * Language short names: "JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2" <br/>
+- * File Extensions: ".jexl", ".jexl2"<br/>
++ * Supports the following:<br>
++ * Language short names: "JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2" <br>
++ * File Extensions: ".jexl", ".jexl2"<br>
+  * "jexl2" etc. were added for engineVersion="2.0".
+  * </p>
+  * <p>
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngine.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngine.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngine.java.javadoc	2011-12-19 06:15:00.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/scripting/JexlScriptEngine.java	2015-04-15 19:33:18.303497441 -0600
+@@ -95,6 +95,7 @@ public class JexlScriptEngine extends Ab
+      * Those properties are allways bound to the default engine scope context.
+      * <p>
+      * The following properties are defined:
++     * </p>
+      * <ul>
+      * <li>in - refers to the engine scope reader that defaults to reading System.err</li>
+      * <li>out - refers the engine scope writer that defaults to writing in System.out</li>
+@@ -102,7 +103,6 @@ public class JexlScriptEngine extends Ab
+      * <li>logger - the JexlScriptEngine logger</li>
+      * <li>System - the System.class</li>
+      * </ul>
+-     * </p>
+      * @since 2.0
+      */
+     public class JexlScriptObject {
+diff -up commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/UnifiedJEXL.java.javadoc commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/UnifiedJEXL.java
+--- commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/UnifiedJEXL.java.javadoc	2011-12-19 06:14:58.000000000 -0700
++++ commons-jexl-2.1.1-src/src/main/java/org/apache/commons/jexl2/UnifiedJEXL.java	2015-04-15 19:51:40.950152677 -0600
+@@ -38,21 +38,21 @@ import org.apache.commons.jexl2.parser.S
+  * and facilitate the implementation of expression evaluation.
+  * <p>
+  * An expression can mix immediate, deferred and nested sub-expressions as well as string constants;
++ * </p>
+  * <ul>
+  * <li>The "immediate" syntax is of the form <code>"...${jexl-expr}..."</code></li>
+  * <li>The "deferred" syntax is of the form <code>"...#{jexl-expr}..."</code></li>
+  * <li>The "nested" syntax is of the form <code>"...#{...${jexl-expr0}...}..."</code></li>
+  * <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
+  * </ul>
+- * </p>
+  * <p>
+- * Deferred & immediate expression carry different intentions:
++ * Deferred &amp; immediate expression carry different intentions:
++ * </p>
+  * <ul>
+  * <li>An immediate expression indicate that evaluation is intended to be performed close to
+  * the definition/parsing point.</li>
+  * <li>A deferred expression indicate that evaluation is intended to occur at a later stage.</li>
+  * </ul>
+- * </p>
+  * <p>
+  * For instance: <code>"Hello ${name}, now is #{time}"</code> is a composite "deferred" expression since one
+  * of its subexpressions is deferred. Furthermore, this (composite) expression intent is
+@@ -62,14 +62,14 @@ import org.apache.commons.jexl2.parser.S
+  * <p>
+  * The API reflects this feature in 2 methods, prepare and evaluate. The prepare method
+  * will evaluate the immediate subexpression and return an expression that contains only
+- * the deferred subexpressions (& constants), a prepared expression. Such a prepared expression
++ * the deferred subexpressions (&amp; constants), a prepared expression. Such a prepared expression
+  * is suitable for a later phase evaluation that may occur with a different JexlContext.
+  * Note that it is valid to call evaluate without prepare in which case the same JexlContext
+  * is used for the 2 evaluation phases.
+  * </p>
+  * <p>
+  * In the most common use-case where deferred expressions are to be kept around as properties of objects,
+- * one should parse & prepare an expression before storing it and evaluate it each time
++ * one should parse &amp; prepare an expression before storing it and evaluate it each time
+  * the property storing it is accessed.
+  * </p>
+  * <p>
+@@ -339,7 +339,7 @@ public final class UnifiedJEXL {
+          * <p>
+          * In effect, this binds the result of the immediate sub-expressions evaluation in the
+          * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
+-         * This only has an effect to nested & composite expressions that contain differed & immediate sub-expressions.
++         * This only has an effect to nested &amp; composite expressions that contain differed &amp; immediate sub-expressions.
+          * </p>
+          * <p>
+          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
+@@ -409,7 +409,7 @@ public final class UnifiedJEXL {
+          * Prepares a sub-expression for interpretation.
+          * @param interpreter a JEXL interpreter
+          * @return a prepared expression
+-         * @throws JexlException (only for nested & composite)
++         * @throws JexlException (only for nested &amp; composite)
+          */
+         protected Expression prepare(Interpreter interpreter) {
+             return this;
+@@ -419,7 +419,7 @@ public final class UnifiedJEXL {
+          * Intreprets a sub-expression.
+          * @param interpreter a JEXL interpreter
+          * @return the result of interpretation
+-         * @throws JexlException (only for nested & composite)
++         * @throws JexlException (only for nested &amp; composite)
+          */
+         protected abstract Object evaluate(Interpreter interpreter);
+     }
+@@ -734,7 +734,7 @@ public final class UnifiedJEXL {
+     }
+ 
+     /** Creates a a {@link UnifiedJEXL.Expression} from an expression string.
+-     *  Uses & fills up the expression cache if any.
++     *  Uses &amp; fills up the expression cache if any.
+      * <p>
+      * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
+      * </p>
+@@ -1010,20 +1010,23 @@ public final class UnifiedJEXL {
+      * evaluation and their output gathered through a writer. 
+      * It is thus possible to use looping or conditional construct "around" expressions generating output.
+      * </p>
+-     * For instance:
+-     * <p><blockquote><pre>
++     * <p>For instance:
++     * </p>
++     * <blockquote><pre>
+      * $$ for(var x : [1, 3, 5, 42, 169]) {
+      * $$   if (x == 42) {
+      * Life, the universe, and everything
+-     * $$   } else if (x > 42) {
++     * $$   } else if (x &gt; 42) {
+      * The value $(x} is over fourty-two
+      * $$   } else {
+      * The value ${x} is under fourty-two
+      * $$   }
+      * $$ }
+      * </pre></blockquote>
++     * <p>
+      * Will evaluate as:
+-     * <p><blockquote><pre>
++     * </p>
++     * <blockquote><pre>
+      * The value 1 is under fourty-two
+      * The value 3 is under fourty-two
+      * The value 5 is under fourty-two
+@@ -1033,10 +1036,10 @@ public final class UnifiedJEXL {
+      * <p>
+      * During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.
+      * This allows writing directly through the writer without adding new-lines as in:
+-     * <p><blockquote><pre>
++     * </p>
++     * <blockquote><pre>
+      * $$ for(var cell : cells) { $jexl.print(cell); $jexl.print(';') }
+      * </pre></blockquote>
+-     * </p>
+      * <p>
+      * A template is expanded as one JEXL script and a list of UnifiedJEXL expressions; each UnifiedJEXL expression
+      * being replace in the script by a call to jexl:print(expr) (the expr is in fact the expr number in the template).
+@@ -1461,4 +1464,4 @@ public final class UnifiedJEXL {
+     public Template createTemplate(String source) {
+         return new Template("$$", new StringReader(source), (String[]) null);
+     }
+-}
+\ No newline at end of file
++}

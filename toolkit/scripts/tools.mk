@@ -7,6 +7,7 @@
 
 $(call create_folder,$(RPMS_DIR))
 $(call create_folder,$(CACHED_RPMS_DIR)/cache)
+$(call create_folder,$(CCACHE_DIR))
 $(call create_folder,$(TOOL_BINS_DIR))
 $(call create_folder,$(BUILD_DIR)/tools)
 

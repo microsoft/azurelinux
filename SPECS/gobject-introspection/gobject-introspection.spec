@@ -2,7 +2,7 @@
 Summary:        Introspection system for GObject-based libraries
 Name:           gobject-introspection
 Version:        %{BaseVersion}.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*.gz
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.71.0-5
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.71.0-4
 - Bump release to rebuild with go 1.18.8
 

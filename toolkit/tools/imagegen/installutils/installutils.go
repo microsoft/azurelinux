@@ -518,7 +518,9 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
+	// Please contact Qualys before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
+	// Please contact Qualys, AquaSec (trivy) and other supported scanning vendors before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t(none)\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n")
 
 	return
@@ -972,6 +974,22 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 		logger.Log.Warnf("Failed to append crypttab")
 		return
 	}
+	return
+}
+
+//InstallGrubEnv installs an empty grubenv f
+func InstallGrubEnv(installRoot string) (err error) {
+	const (
+		assetGrubEnvFile = "/installer/grub2/grubenv"
+		grubEnvFile      = "boot/grub2/grubenv"
+	)
+	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
+	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	if err != nil {
+		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
+		return
+	}
+
 	return
 }
 

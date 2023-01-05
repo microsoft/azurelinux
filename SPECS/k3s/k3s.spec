@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.25.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -15,9 +15,9 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone https://github.com/k3s.io/containerd.git -b 1.5.13-k3s2
-# 7. git clone https://github.com/rancher/plugins.git -b k3s-v1.1.1
-# 8. git clone https://github.com/opencontainers/runc.git -b v1.1.4
+# 6. git clone --single-branch --branch="v1.6.8-k3s1" --depth=1 https://github.com/k3s-io/containerd
+# 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
+# 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
@@ -79,6 +79,12 @@ exit 0
 %{install_sh}
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.25.0-4
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Thu Dec 08 2022 Vinayak Gupta <guptavinayak@microsoft.com> - 1.25.0-3
+- Update the vendor tarball with the corrected versions of the dependencies
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.25.0-2
 - Bump release to rebuild with go 1.18.8
 

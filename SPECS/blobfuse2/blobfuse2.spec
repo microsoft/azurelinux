@@ -1,14 +1,13 @@
 %global debug_package %{nil}
 
 %define our_gopath %{_topdir}/.gopath
-%define preview_suffix preview.4	
-%define blobfuse2_version 2.0.0	
+%define blobfuse2_version 2.0.1
 %define blobfuse2_health_monitor bfusemon
 
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        %{blobfuse2_version}.%{preview_suffix}
-Release:        1%{?dist}
+Version:        %{blobfuse2_version}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +15,7 @@ Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
 # Below is the Github URL where blobfuse2 is accessible. This needs to be defined until blobfuse2 GAs since the version
 # string in spec files does not allow - 
-Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}-%{preview_suffix}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -49,7 +48,7 @@ Linux FUSE kernel module, and implements the filesystem operations using
 the Azure Storage REST APIs.
 
 %prep
-%setup -q -n azure-storage-fuse-%{name}-%{blobfuse2_version}-%{preview_suffix}
+%setup -q -n azure-storage-fuse-%{name}-%{blobfuse2_version}
 
 %build
 tar --no-same-owner -xf %{SOURCE1}
@@ -81,6 +80,15 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.0.1-2
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Fri Dec 02 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.1-1
+- Bump version to 2.0.1
+
+* Wed Nov 30 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0-1
+- Bump version to 2.0.0
+
 * Fri Nov 04 2022 Gauri Prasad <gapra@microsoft.com> - 2.0.0.preview.4-1
 - Bump version to 2.0.0-preview.4
 

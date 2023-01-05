@@ -1,3 +1,0 @@
-%__nbdkit_provides %{_rpmconfigdir}/nbdkit-find-provides %{version} %{release}
-%__nbdkit_path     %{_libdir}/nbdkit/(plugins|filters)/nbdkit-.*-(plugin|filter)(\.so)?$
-%__nbdkit_flags    exeonly
