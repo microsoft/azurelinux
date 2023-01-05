@@ -1356,16 +1356,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cdparanoia",
-          "version": "10.2",
-          "downloadUrl": "https://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-10.2.src.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cal10n",
           "version": "0.7.7",
           "downloadUrl": "http://cal10n.qos.ch/dist/cal10n-0.7.7.tar.gz"
