@@ -116,7 +116,7 @@
         "other": {
           "name": "aide",
           "version": "0.16",
-          "downloadUrl": "http://sourceforge.net/projects/aide/files/aide/0.16/aide-0.16.tar.gz"
+          "downloadUrl": "https://github.com/aide/aide/releases/download/v0.16/aide-0.16.tar.gz"
         }
       }
     },
