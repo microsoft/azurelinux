@@ -25324,16 +25324,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "SDL2",
-          "version": "2.24.0",
-          "downloadUrl": "https://www.libsdl.org/release/SDL2-2.24.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-zip-zip",
           "version": "0.3",
           "downloadUrl": "https://github.com/orien/zip-zip/archive/refs/tags/0.3.tar.gz"
