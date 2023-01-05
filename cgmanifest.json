@@ -9320,16 +9320,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libmikmod",
-          "version": "3.3.11.1",
-          "downloadUrl": "https://downloads.sourceforge.net/mikmod/libmikmod-3.3.11.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libmaxminddb",
           "version": "1.6.0",
           "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz"
