@@ -9890,16 +9890,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libsamplerate",
-          "version": "0.2.2",
-          "downloadUrl": "https://github.com/libsndfile/libsamplerate/releases/download/0.2.2/libsamplerate-0.2.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "librabbitmq",
           "version": "0.10.0",
           "downloadUrl": "https://github.com/alanxz/rabbitmq-c/archive/ffe918a5fcef72038a88054dca3c56762b1953d4/rabbitmq-c-0.10.0-ffe918a.tar.gz"
