@@ -3207,16 +3207,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fftw",
-          "version": "3.3.10",
-          "downloadUrl": "https://www.fftw.org/fftw-3.3.10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "facter",
           "version": "4.2.5",
           "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.5.gem"
