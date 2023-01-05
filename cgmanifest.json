@@ -7930,16 +7930,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libao",
-          "version": "1.2.0",
-          "downloadUrl": "https://downloads.xiph.org/releases/ao/libao-1.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lato-fonts",
           "version": "2.015",
           "downloadUrl": "https://www.latofonts.com/download/Lato2OFL.zip"
