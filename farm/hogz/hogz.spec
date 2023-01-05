@@ -21,7 +21,7 @@ multiple cores to the hilt when compressing data
 %autosetup -n pigz-%{version}
 
 %build
-sleep 3
+sleep 10
 echo "oink oink" > pork
 echo "I am in pain" > hogroast
 

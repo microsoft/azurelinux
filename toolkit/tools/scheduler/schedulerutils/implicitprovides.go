@@ -45,7 +45,7 @@ func ProbeImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCac
 		}
 
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, learner, false)
+			err = replaceNodesWithProvides(pkgGraph, provide, nodes, rpmFile, learner, false)
 			if err != nil {
 				return
 			}
@@ -85,7 +85,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, learner, true)
+			err = replaceNodesWithProvides(pkgGraph, provide, nodes, rpmFile, learner, true)
 			if err != nil {
 				return
 			}
@@ -100,7 +100,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 }
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
-func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string, learner *Learner, collapse bool) (err error) {
+func replaceNodesWithProvides(pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string, learner *Learner, collapse bool) (err error) {
 	var parentNode *pkggraph.PkgNode
 	logger.Log.Debugf("resolved implicit %s", provides.Name)
 	// Find a run node that is backed by the same rpm as the one providing the implicit provide.

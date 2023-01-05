@@ -109,7 +109,8 @@ func (l *Learner) InformGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMu
 			// with a dependency on the already existing optimalProviderRunNode (and therefore it's subtree)
 			logger.Log.Infof("optimalProviderRunNode: %p", optimalProviderRunNode)
 			logger.Log.Infof("unresolvedNode[0]: %p", unresolvedNode[0])
-			pkgGraph.CreateCollapsedNode(&optimalProvider, optimalProviderRunNode, unresolvedNode)
+			//pkgGraph.CreateCollapsedNode(&optimalProvider, optimalProviderRunNode, unresolvedNode)
+			replaceNodesWithProvides(pkgGraph, &optimalProvider, unresolvedNode, optimalProviderRunNode.RpmPath, l, true)
 		}
 	}
 	//map of ip string to the unresolved node

@@ -1,7 +1,7 @@
 %global debug_package   %{nil}
 
 Summary:        Parallel Implementation of GZIP
-Name:           pigz
+Name:           swinez
 Version:        2.6
 Release:        2%{?dist}
 License:        zlib
@@ -9,8 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.zlib.net/pigz
-Source0:        https://github.com/madler/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  goatz
+Source0:        https://github.com/madler/pigz/archive/v%{version}.tar.gz#/pigz-%{version}.tar.gz
+BuildRequires: goatz
 
 %description
 pigz, which stands for parallel implementation of gzip, is a fully
@@ -18,10 +18,10 @@ functional replacement for gzip that exploits multiple processors and
 multiple cores to the hilt when compressing data
 
 %prep
-%autosetup
+%autosetup -n pigz-%{version}
 
 %build
-sleep 5
+sleep 0
 echo "oink oink" > pork
 
 %install

@@ -17,7 +17,6 @@ import (
 func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool, deltaBuild bool) (requests []*BuildRequest) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
-
 	// Group build nodes together as they will be unblocked all at once for any given SRPM,
 	// and building a single build node will result in all of them becoming available.
 	buildNodes := make(map[string][]*pkggraph.PkgNode)

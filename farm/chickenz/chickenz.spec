@@ -11,7 +11,6 @@ Group:          Applications/System
 URL:            https://www.zlib.net/pigz
 Source0:        https://github.com/madler/pigz/archive/v%{version}.tar.gz#/pigz-%{version}.tar.gz
 BuildRequires: /usr/bin/pork
-BuildRequires: /usr/bin/hogroast
 
 %description
 pigz, which stands for parallel implementation of gzip, is a fully
