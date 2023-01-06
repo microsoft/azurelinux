@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Fri Jan 06 2023 Andrew Phelps <anphel@microsoft.com> - 8.32-7
+- Bump release for test
+
 * Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 8.32-6
 - Force rebuild to address missing SELinux features.
 
