@@ -14,8 +14,8 @@ BuildRequires:  meson
 BuildRequires:  pkgconfig
 BuildRequires:  polkit-devel
 BuildRequires:  systemd
-BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  systemd-devel
+BuildRequires:  pkgconfig(gio-2.0)
 %{?systemd_requires}
 # for the integration test (optional)
 %if 0%{?fedora} || 0%{?rhel} > 8
