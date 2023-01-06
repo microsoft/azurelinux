@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.10.3
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -55,6 +55,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Fri Jan 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-2
+- Bump release to rebuild with go 1.19.4
+
 * Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-1
 - Auto-upgrade to 3.10.3 - to fix CVE-2022-23524
 
