@@ -64,7 +64,7 @@ PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
-CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
+CCACHE_DIR       ?= /home/$(SUDO_USER)/mariner-ccache
 
 # Sub-folder defines
 LOGS_DIR         ?= $(BUILD_DIR)/logs
