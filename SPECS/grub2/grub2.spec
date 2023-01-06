@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,20 +47,21 @@ Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 Patch0167:      CVE-2021-3981.patch
+Patch0170:      CVE-2022-2601.patch
 # Add nopatches for tooling
-Patch1000:      CVE-2021-3418.nopatch
-Patch1001:      CVE-2020-14372.nopatch
-Patch1002:      CVE-2020-25632.nopatch
-Patch1003:      CVE-2020-25647.nopatch
-Patch1004:      CVE-2020-27779.nopatch
-Patch1005:      CVE-2021-20233.nopatch
-Patch1006:      CVE-2020-10713.nopatch
-Patch1007:      CVE-2020-14308.nopatch
-Patch1008:      CVE-2020-14309.nopatch
-Patch1009:      CVE-2020-14310.nopatch
-Patch1010:      CVE-2020-14311.nopatch
-Patch1011:      CVE-2020-27749.nopatch
-Patch1012:      CVE-2021-20225.nopatch
+#Patch1000:      CVE-2021-3418.nopatch
+#Patch1001:      CVE-2020-14372.nopatch
+#Patch1002:      CVE-2020-25632.nopatch
+#Patch1003:      CVE-2020-25647.nopatch
+#Patch1004:      CVE-2020-27779.nopatch
+#Patch1005:      CVE-2021-20233.nopatch
+#Patch1006:      CVE-2020-10713.nopatch
+#Patch1007:      CVE-2020-14308.nopatch
+#Patch1008:      CVE-2020-14309.nopatch
+#Patch1009:      CVE-2020-14310.nopatch
+#Patch1010:      CVE-2020-14311.nopatch
+#Patch1011:      CVE-2020-27749.nopatch
+#Patch1012:      CVE-2021-20225.nopatch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -278,6 +279,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Wed Dec 28 2022 Osama Esmail <osamaesmail@microsoft.com> - 2.06~rc1-9
+- Fix CVE-2022-2601.
+
 * Tue Apr 26 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.06~rc1-8
 - Fix CVE-2021-3981.
 

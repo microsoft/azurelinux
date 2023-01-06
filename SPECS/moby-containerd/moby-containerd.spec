@@ -4,7 +4,7 @@
 Summary:        Industry-standard container runtime
 Name:           moby-%{upstream_name}
 Version:        1.6.6+azure
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Source3:        NOTICE
 Source4:        LICENSE
 Patch0:         Makefile.patch
 Patch1:         CVE-2022-23471.patch
+Patch2:         add_ptrace_readby_tracedby_to_apparmor.patch
 
 %{?systemd_requires}
 
@@ -104,6 +105,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Dec 27 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.6.6+azure-7
+- Backport upstream fix in containerd to add ptrace readby and tracedby to default AppArmor profile (add_ptrace_readby_tracedby_to_apparmor.patch)
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.6.6+azure-6
 - Bump release to rebuild with go 1.18.8-2
 

@@ -1,15 +1,13 @@
 %global debug_package %{nil}
-Summary:        The Kubernetes Package Manager
 Name:           helm
 Version:        3.4.1
-Release:        13%{?dist}
+Release:        14%{?dist}
+Summary:        The Kubernetes Package Manager
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Group:          Applications/Networking
 URL:            https://github.com/helm/helm
-#Source0:      https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -26,6 +24,8 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-21303.patch
 Patch1:         CVE-2021-32690.patch
+Patch2:         CVE-2022-23525.patch
+Patch3:         CVE-2022-23526.patch
 BuildRequires:  golang >= 1.15.5
 
 %description
@@ -51,7 +51,15 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %doc ADOPTERS.md SECURITY.md code-of-conduct.md CONTRIBUTING.md README.md
 %{_bindir}/helm
 
+
+%check
+go test -v ./cmd/helm
+
 %changelog
+* Wed Dec 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.1-14
+- Patch CVE-2022-23525, CVE-2022-23526
+- Added Check Section
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.4.1-13
 - Bump release to rebuild with go 1.18.8-2
 
