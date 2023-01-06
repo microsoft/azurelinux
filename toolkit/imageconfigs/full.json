@@ -13,8 +13,7 @@
                 "packagelists/drtm.json"
             ],
             "KernelCommandLine": {
-                "SELinux": "permissive",
-                "CGroup": "version_two"
+                "SELinux": "permissive"
             },
             "KernelOptions": {
                 "default": "kernel"
