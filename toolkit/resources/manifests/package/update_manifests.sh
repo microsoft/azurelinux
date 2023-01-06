@@ -34,7 +34,7 @@ echo Updating files...
 generate_toolchain () {
     # First generate toolchain_*.txt from TOOLCHAIN_ARCHIVE (toolchain_built_rpms_all.tar.gz)
     # This file is a sorted list of all toolchain packages in the tarball.
-    tar -ztf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
+    tar -tf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
     # Now sort the file in place
     LC_COLLATE=C sort -f -o "$ToolchainManifest" "$ToolchainManifest"
 }
