@@ -3,12 +3,11 @@ Distribution:   Mariner
 Summary:        Intrusion detection environment
 Name:           aide
 Version:        0.16
-Release:        15%{?dist}
-URL:            http://sourceforge.net/projects/aide
+Release:        16%{?dist}
+URL:            https://github.com/aide/aide
 License:        GPLv2+
 
-
-Source0:        %{url}/files/aide/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        aide.conf
 Source2:        README.quickstart
 Source3:        aide.logrotate
@@ -82,6 +81,10 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %dir %attr(0700,root,root) %{_localstatedir}/log/aide
 
 %changelog
+* Thu Jan 05 2023 Thien Trung Vuong <tvuong@microsoft.com> - 0.16-16
+- Updated project URL to Github
+- Verified license
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

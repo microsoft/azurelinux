@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,7 @@ Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 Patch0167:      0167-restore-umask-for-grub-config.patch 
 # Fix to reset the global errno to success upon success.
 Patch0170:      0170-fix-memory-alloc-errno-reset.patch
+Patch0171:      CVE-2022-2601.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -325,6 +326,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Thu Dec 29 2022 Mykhailo Bykhovtsev <mbykhovtsev@microsoft@microsoft.com> - 2.06-8
+- Fix CVE-2022-2601 (Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>).
+
 * Wed Sep 07 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.06-7
 - Port internal patch for reseting grub_errno on success (George mileka <gmileka@microsoft.com>).
 
