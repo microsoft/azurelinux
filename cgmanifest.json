@@ -1427,8 +1427,8 @@
         "type": "other",
         "other": {
           "name": "ccache",
-          "version": "4.6",
-          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.6/ccache-4.6.tar.gz"
+          "version": "4.7.4",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.7.4/ccache-4.7.4.tar.gz"
         }
       }
     },

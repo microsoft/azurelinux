@@ -1,7 +1,7 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
 Version:        4.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,14 @@ with Perl, Python and Tcl/TK, but it has also been extended to Java,
 Eiffel and Guile. SWIG is normally used to create high-level
 interpreted programming environments, systems integration, and as a
 tool for building user interfaces
+
+%package ccache
+Summary:   Compiler cache for swig
+Requires:  swig
+Conflicts: swig < 4.0.2-3
+
+%description ccache
+Compiler cache for swig
 
 %prep
 %if %{with_check}
@@ -58,11 +66,17 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 
 %files
 %license LICENSE LICENSE-GPL LICENSE-UNIVERSITIES
-%{_bindir}/*
+%{_bindir}/swig
 %{_datadir}/swig
+
+%files ccache
+%{_bindir}/ccache-swig
 %{_libdir}/ccache
 
 %changelog
+* Fri Jan 06 2022 Andrew Phelps <anphel@microsoft.com> - 4.0.2-4
+- Create swig-ccache subpackage
+
 * Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 4.0.2-3
 - BR python related packages and Boost for check
 - Install 2to3 for converting all test files to python3 compatible
