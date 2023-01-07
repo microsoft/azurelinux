@@ -11,13 +11,13 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  pcre-devel
 Requires:       pcre
 %if %{with_check}
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-libs
-BuildRequires:  python3-setuptools
 BuildRequires:  boost
 BuildRequires:  boost-devel
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  python3-libs
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
 %endif
 
 %description
@@ -30,9 +30,9 @@ interpreted programming environments, systems integration, and as a
 tool for building user interfaces
 
 %package ccache
-Summary:   Compiler cache for swig
-Requires:  swig
-Conflicts: swig < 4.0.2-3
+Summary:        Compiler cache for swig
+Requires:       swig
+Conflicts:      swig < 4.0.2-3
 
 %description ccache
 Compiler cache for swig
@@ -74,8 +74,9 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 %{_libdir}/ccache
 
 %changelog
-* Fri Jan 06 2022 Andrew Phelps <anphel@microsoft.com> - 4.0.2-4
+* Fri Jan 06 2023 Andrew Phelps <anphel@microsoft.com> - 4.0.2-4
 - Create swig-ccache subpackage
+- Lint spec
 
 * Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 4.0.2-3
 - BR python related packages and Boost for check
