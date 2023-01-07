@@ -23063,16 +23063,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-tensorflow-io-gcs-filesystem",
-          "version": "0.29.0",
-          "downloadUrl": "https://github.com/tensorflow/io/archive/refs/tags/v0.29.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-termcolor",
           "version": "1.1.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/t/termcolor/termcolor-1.1.0.tar.gz"
