@@ -53,14 +53,12 @@ rm distlib/*.exe
 %pyproject_install
 %pyproject_save_files %{srcname}
 
-%if %{with check}
 %check
 export PYTHONHASHSEED=0
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
 %pytest -k "not test_sequencer_basic"
-%endif # with_tests
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
