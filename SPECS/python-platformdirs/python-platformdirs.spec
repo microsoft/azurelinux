@@ -30,9 +30,6 @@ BuildRequires:  python3-devel
 %autosetup -n %{srcname}-%{version}
 
 
-%generate_buildrequires
-%pyproject_buildrequires -t
-
 
 %build
 %pyproject_wheel
