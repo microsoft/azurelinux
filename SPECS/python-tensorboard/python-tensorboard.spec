@@ -42,7 +42,6 @@ Requires:   python3-protobuf = 3.17.3
 Requires:   python3-requests = 2.27.1
 Requires:   python3-setuptools
 Requires:   python3-tensorflow-estimator = 2.11.0
-Requires:   python3-tensorflow-io-gcs-filesystem
 Requires:   python3-werkzeug
 Requires:   python3-wheel
 
