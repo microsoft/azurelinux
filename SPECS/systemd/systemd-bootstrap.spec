@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -152,6 +152,7 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 if [ $1 -eq 1 ]; then
      systemctl preset-all
 fi
+systemctl disable systemd-oomd.service
 
 %postun -p /sbin/ldconfig
 
@@ -241,6 +242,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Tue Jan 10 2023 Adit Jha <aditjha@microsoft.com> - 250.3-11
+- Disabling systemd-oomd.service by default to keep systemctl status clean
+
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-10
 - Add patch for CVE-2022-45873
 
