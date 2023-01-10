@@ -130,9 +130,9 @@ libsolv-0.7.20-1.cm1.aarch64.rpm
 libsolv-devel-0.7.20-1.cm1.aarch64.rpm
 libssh2-1.9.0-1.cm1.aarch64.rpm
 libssh2-devel-1.9.0-1.cm1.aarch64.rpm
-curl-7.86.0-1.cm1.aarch64.rpm
-curl-devel-7.86.0-1.cm1.aarch64.rpm
-curl-libs-7.86.0-1.cm1.aarch64.rpm
+curl-7.87.0-1.cm1.aarch64.rpm
+curl-devel-7.87.0-1.cm1.aarch64.rpm
+curl-libs-7.87.0-1.cm1.aarch64.rpm
 tdnf-2.1.0-7.cm1.aarch64.rpm
 tdnf-cli-libs-2.1.0-7.cm1.aarch64.rpm
 tdnf-devel-2.1.0-7.cm1.aarch64.rpm
