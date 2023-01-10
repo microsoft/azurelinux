@@ -652,6 +652,7 @@
                 "libogg",
                 "liboil",
                 "libomp",
+                "libomxil-bellagio",
                 "libopenraw",
                 "liboping",
                 "libosinfo",
