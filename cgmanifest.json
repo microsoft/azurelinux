@@ -7540,6 +7540,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "keras",
+          "version": "2.11.0",
+          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v2.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel",
           "version": "5.15.86.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
@@ -20873,6 +20883,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-distlib",
+          "version": "0.3.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-distro",
           "version": "1.6.0",
           "downloadUrl": "https://github.com/python-distro/distro/releases/download/v1.6.0/distro-1.6.0.tar.gz"
@@ -21913,6 +21933,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-platformdirs",
+          "version": "2.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-2.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pluggy",
           "version": "1.0.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cbb9c008965ee63835bba517e22cdb8c35b5116b5ce1/pluggy-1.0.0.tar.gz"
@@ -22856,6 +22886,36 @@
           "name": "python-templated-dictionary",
           "version": "1.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tensorboard",
+          "version": "2.11.0",
+          "downloadUrl": "https://github.com/tensorflow/tensorboard/archive/refs/tags/2.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tensorboard-plugin-wit",
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/PAIR-code/what-if-tool/archive/refs/tags/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tensorflow-estimator",
+          "version": "2.11.0",
+          "downloadUrl": "https://github.com/tensorflow/estimator/archive/refs/tags/v2.11.0.tar.gz"
         }
       }
     },
