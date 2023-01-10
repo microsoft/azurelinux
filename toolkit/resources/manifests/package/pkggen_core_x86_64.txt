@@ -53,7 +53,7 @@ sed-lang-4.8-2.cm2.x86_64.rpm
 procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
 procps-ng-lang-3.3.17-1.cm2.x86_64.rpm
-m4-1.4.19-1.cm2.x86_64.rpm
+m4-1.4.19-2.cm2.x86_64.rpm
 grep-3.7-2.cm2.x86_64.rpm
 grep-lang-3.7-2.cm2.x86_64.rpm
 diffutils-3.8-1.cm2.x86_64.rpm

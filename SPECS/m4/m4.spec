@@ -1,7 +1,7 @@
 Summary:        A macro processor
 Name:           m4
 Version:        1.4.19
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,9 @@ make  %{?_smp_mflags}  check
 %{_datadir}/locale/*/*
 
 %changelog
+* Fri Jan 06 2023 Andrew Phelps <anphel@microsoft.com> 1.4.19-2
+- Bump release for test
+
 * Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> 1.4.19-1
 - Update to version 1.4.19
 - Remove patches
