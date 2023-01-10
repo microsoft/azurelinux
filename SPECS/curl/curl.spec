@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.86.0
+Version:        7.87.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -88,6 +88,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.4*
 
 %changelog
+* Tue Jan 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.87.0-1
+- Auto-upgrade to 7.87.0 - CVE-2022-43551
+
 * Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.86.0-1
 - Auto-upgrade to 7.86.0 - CVE-2022-42915
 
