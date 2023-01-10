@@ -284,6 +284,7 @@ build_rpm_in_chroot_no_install procps-ng
 build_rpm_in_chroot_no_install sed
 build_rpm_in_chroot_no_install check
 build_rpm_in_chroot_no_install cpio
+build_rpm_in_chroot_no_install nghttp2
 
 # perl needs gdbm, bzip2, zlib
 chroot_and_install_rpms gdbm
@@ -393,9 +394,10 @@ build_rpm_in_chroot_no_install kbd
 chroot_and_install_rpms e2fsprogs
 build_rpm_in_chroot_no_install krb5
 
-# curl needs libssh2, krb5
+# curl needs libssh2, krb5, nghttp2
 chroot_and_install_rpms libssh2
 chroot_and_install_rpms krb5
+chroot_and_install_rpms nghttp2
 build_rpm_in_chroot_no_install curl
 
 # cracklib needs python3-setuptools (installed with python3)
