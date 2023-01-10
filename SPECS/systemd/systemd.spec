@@ -179,6 +179,7 @@ meson test -C build
 # to enable/disable services should succeed.
 if [ $1 -eq 1 ]; then
      systemctl preset-all
+     systemctl disable systemd-oomd.service
 fi
 
 %postun -p /sbin/ldconfig
