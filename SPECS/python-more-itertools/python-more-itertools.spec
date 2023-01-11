@@ -16,6 +16,7 @@ Source0:        %{pypi_source more-itertools}
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+BuildRequires:  python3-flit-core
 BuildArch:      noarch
 
 %description %{_description}
