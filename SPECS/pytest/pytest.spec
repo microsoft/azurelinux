@@ -1,7 +1,7 @@
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        3.8.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,13 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-twisted
 BuildRequires:  python3-xml
 Requires:       python3
+Requires:       python3-setuptools
 Requires:       python3-py
+Requires:       python3-attrs
+Requires:       python3-atomicwrites
+Requires:       python3-pluggy
+Requires:       python3-more-itertools
+Requires:       python3-six
 AutoReqProv:    no
 Provides:       python3dist(pytest) = %{version}-%{release}
 Provides:       python3.7dist(pytest) = %{version}-%{release}
@@ -60,6 +66,9 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jan 11 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.8.2-10
+- Adding missing runtime dependencies.
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.2-9
 - Adding missing links to `/usr/bin/pytest' and '/usr/bin/py.test' to fix the '%pytest' macro.
 
