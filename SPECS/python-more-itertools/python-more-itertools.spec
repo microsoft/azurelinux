@@ -1,27 +1,27 @@
 
-Name:           python-more-itertools
-Version:        8.13.0
-Release:        2%{?dist}
-Summary:        More routines for operating on Python iterables, beyond itertools
-License:        MIT
-URL:            https://github.com/erikrose/more-itertools
-Source0:        %{pypi_source more-itertools}
-BuildArch:      noarch
-
-BuildRequires:  python3-devel
-
 %global _description %{expand:
 Python's itertools library is a gem - you can compose elegant solutions for
 a variety of problems with the functions it provides. In more-itertools we
 collect additional building blocks, recipes, and routines for working with
 Python iterables.}
+Summary:        More routines for operating on Python iterables, beyond itertools
+Name:           python-more-itertools
+Version:        8.13.0
+Release:        2%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/erikrose/more-itertools
+Source0:        %{pypi_source more-itertools}
+BuildRequires:  python3-devel
+BuildArch:      noarch
 
-%description %_description
+%description %{_description}
 
 %package -n python3-more-itertools
 Summary:        %{summary}
 
-%description -n python3-more-itertools %_description
+%description -n python3-more-itertools %{_description}
 
 %prep
 %autosetup -p1 -n more-itertools-%{version}
@@ -36,8 +36,7 @@ Summary:        %{summary}
 %check
 %tox
 
-
-%files -n python3-more-itertools -f %pyproject_files
+%files -n python3-more-itertools -f %{pyproject_files}
 %doc README.rst
 
 %changelog
@@ -129,8 +128,10 @@ Resolves: rhbz#2082756
 
 * Wed Nov 09 2016 aarem AT fedoraproject DOT org - 2.3-1
 - update to 2.3
+
 * Fri Oct 14 2016 aarem AT fedoraproject DOT org - 2.2-4
 - fixed missing sum in line 9 of spec file, per BZ #138195
+
 * Sat Oct 8 2016 aarem AT fedoraproject DOT org - 2.2-3
 - renamed spec file to match package as per BZ #1381029
 -fixed bug (incorrect python3_provides) as per BZ #1381029

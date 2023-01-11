@@ -21743,6 +21743,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-more-itertools",
+          "version": "8.13.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/more-itertools/more-itertools-8.13.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-msgpack",
           "version": "1.0.3",
           "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.3.tar.gz"
