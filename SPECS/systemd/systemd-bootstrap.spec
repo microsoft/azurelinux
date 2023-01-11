@@ -151,8 +151,9 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 # to enable/disable services should succeed.
 if [ $1 -eq 1 ]; then
      systemctl preset-all
+     systemctl disable systemd-oomd.service
+
 fi
-systemctl disable systemd-oomd.service
 
 %postun -p /sbin/ldconfig
 
