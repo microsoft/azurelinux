@@ -5,12 +5,6 @@
 # Quit on failure
 set -e
 
-#
-# The nodejs source tarball contains a copy of the OpenSSL source tree.
-# OpenSSL contains patented algorithms that should not be distributed
-# as part of the SRPM. Since we use the shared OpenSSL libraries, we 
-# can just remove the entire OpenSSL source tree from the tarball.
-
 PKG_VERSION=""
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
