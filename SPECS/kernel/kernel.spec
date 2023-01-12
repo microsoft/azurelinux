@@ -92,7 +92,7 @@ This package contains the Linux kernel accessibility support
 %package drivers-gpu
 Summary:        Kernel gpu modules
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}5.15.80.1-2
+Requires:       %{name} = %{version}-%{release}
 
 %description drivers-gpu
 This package contains the Linux kernel gpu support
