@@ -10,19 +10,6 @@ Version:        2.4.0
 Release:        1%{?dist}
 URL:            https://github.com/influxdata/influxdb
 Source0:        %{url}%archive/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  fdupes
-BuildRequires:  go >= 1.18
-BuildRequires:  golang-packaging >= 15.0.8
-BuildRequires:  build-essential
-BuildRequires:  pkg-config >= 0.171.0
-BuildRequires:  protobuf-devel
-BuildRequires:  kernel-headers
-BuildRequires:  make
-BuildRequires:  rust
-BuildRequires:  clang
-BuildRequires:  tzdata
-
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -36,6 +23,27 @@ BuildRequires:  tzdata
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
+Source1:        %{name}-%{version}-vendor.tar.gz
+# Below is a manually created tarball, no download link.
+# predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
+# How to rebuild this file:
+#   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. make generate-web-assets
+#   5. cd static
+#   6. tar -cvf %%{name}-%%{version}-static-data.tar.gz data/
+Source2:        %{name}-%{version}-static-data.tar.gz
+BuildRequires:  fdupes
+BuildRequires:  go >= 1.18
+BuildRequires:  golang-packaging >= 15.0.8
+BuildRequires:  pkgconfig(flux) >= 0.179.0
+BuildRequires:  protobuf-devel
+BuildRequires:  kernel-headers
+BuildRequires:  make
+BuildRequires:  rust >= 1.60.0
+BuildRequires:  clang
+BuildRequires:  tzdata
 
 %description
 InfluxDB is an distributed time series database with no external dependencies.
@@ -51,49 +59,41 @@ Conflicts:      influxdb
 Go sources and other development files for InfluxDB
 
 %prep
-%setup -q
+%autosetup
 
 %build
-export GO111MODULE=on
 export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH:$GOBIN
+export GO111MODULE=on
 tar -xf %{SOURCE1} --no-same-owner
 
+mkdir -pv static
+tar -xf %{SOURCE2} -C static/ --no-same-owner
+
 # Build influxdb
-mkdir -pv $HOME/go/src/%{project}
-rm -rf $HOME/go/src/%{project}/*
-cp -avr * $HOME/go/src/%{project}
-cd $HOME/go/src/%{project}
-go build -mod=vendor -tags 'sqlite_foreign_keys,sqlite_json' -ldflags="-X main.version=%{version}" -o bin/linux/influxd ./cmd/influxd
+export TAGS='sqlite_foreign_keys,sqlite_json,assets'
+go generate -mod vendor -tags $TAGS ./static
+go build -mod vendor -tags $TAGS -ldflags "-X main.version=%{version}" -o bin/influxd ./cmd/influxd
+go build -mod vendor -tags $TAGS -ldflags "-X main.version=%{version}" -o bin/telemetryd ./cmd/telemetryd
 
 
 %install
 export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-cd $HOME/go/src/%{project}
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOBIN
 
-mkdir -p %{buildroot}%{_localstatedir}/log/influxdb
-mkdir -p %{buildroot}%{_localstatedir}/lib/influxdb
-install -D -m 0755 bin/linux/influxd %{buildroot}/%{_bindir}/influxd
-
-%fdupes %{buildroot}/%{_prefix}
+mkdir -p %{buildroot}%{_bindir}
+install -D -m 0755 bin/influxd %{buildroot}%{_bindir}/
 
 %check
+export GOTRACEBACK=all
+export GO111MODULE=on
 go test ./...
 
 %files
 %license LICENSE
-%dir %{_sysconfdir}/influxdb2
+%doc README.md CHANGELOG.md
 %{_bindir}/influxd
 %{_bindir}/telemetryd
-%{_datadir}/influxdb2
-%dir %{_tmpfilesdir}
-%attr(0755, influxdb, influxdb) %dir %{_localstatedir}/log/influxdb
-%attr(0755, influxdb, influxdb) %dir %{_localstatedir}/lib/influxdb
-
-%files devel
-%license LICENSE
-%dir %{go_contribsrcdir}/github.com
-%dir %{go_contribsrcdir}/github.com/influxdata
-%{go_contribsrcdir}/github.com/influxdata/influxdb
-
 %changelog
