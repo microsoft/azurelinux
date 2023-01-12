@@ -41,6 +41,7 @@ Summary:        %{summary}
 
 %files -n python3-more-itertools -f %{pyproject_files}
 %doc README.rst
+%license LICENSE
 
 %changelog
 * Wed Jan 11 2023 Riken Maharjan <rmaharjan@microsoft.com> - 8.13.0-2
