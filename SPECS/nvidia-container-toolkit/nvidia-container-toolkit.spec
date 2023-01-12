@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.9.0
+Version:        1.11.0
 Release:        3%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
@@ -28,30 +28,44 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         nvidia-container-toolkit-1.9.0.patch
 BuildRequires:  golang
-Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook
+Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
 Provides: nvidia-container-runtime-hook
-Requires: libnvidia-container-tools >= 1.9.0, libnvidia-container-tools < 2.0.0
+Requires: libnvidia-container-tools >= 1.11.0, libnvidia-container-tools < 2.0.0
 
 %description
 Provides a OCI hook to enable GPU support in containers.
+
+# The BASE package consists of the NVIDIA Container Runtime and the NVIDIA Container Toolkit CLI.
+# This allows the package to be installed on systems where no NVIDIA Container CLI is available.
+%package base
+Summary: NVIDIA Container Toolkit Base
+Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
+Provides: nvidia-container-runtime
+# Since this package allows certain components of the NVIDIA Container Toolkit to be installed separately
+# it conflicts with older versions of the nvidia-container-toolkit package that also provide these files.
+Conflicts: nvidia-container-toolkit <= 1.10.0-1
+
+%description base
+Provides tools such as the NVIDIA Container Runtime and NVIDIA Container Toolkit CLI to enable GPU support in containers.
 
 %prep
 %autosetup -p1
 tar -xvf %{SOURCE1}
 
 %build
-go build -ldflags "-s -w " -o "nvidia-container-toolkit" ./cmd/nvidia-container-toolkit
+go build -ldflags "-s -w " -o "nvidia-container-runtime-hook" ./cmd/nvidia-container-runtime-hook
 go build -ldflags "-s -w " -o "nvidia-container-runtime" ./cmd/nvidia-container-runtime
+go build -ldflags "-s -w " -o "nvidia-ctk" ./cmd/nvidia-ctk
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-install -m 755 -t %{buildroot}%{_bindir} nvidia-container-toolkit
+install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime-hook
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
+install -m 755 -t %{buildroot}%{_bindir} nvidia-ctk
 
-cp config/config.toml.centos config.toml
+cp config/config.toml.rpm-yum config.toml
 mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-runtime
 install -m 644 -t %{buildroot}%{_sysconfdir}/nvidia-container-runtime config.toml
 
@@ -62,20 +76,39 @@ mkdir -p %{buildroot}%{_datadir}/containers/oci/hooks.d
 install -m 644 -t %{buildroot}%{_datadir}/containers/oci/hooks.d oci-nvidia-hook.json
 
 %posttrans
-ln -sf %{_bindir}/nvidia-container-toolkit %{_bindir}/nvidia-container-runtime-hook
+ln -sf %{_bindir}/nvidia-container-runtime-hook %{_bindir}/nvidia-container-toolkit
 
 %postun
-rm -f %{_bindir}/nvidia-container-runtime-hook
+rm -f %{_bindir}/nvidia-container-toolkit
 
 %files
 %license LICENSE
-%{_bindir}/nvidia-container-toolkit
-%{_bindir}/nvidia-container-runtime
-%config %{_sysconfdir}/nvidia-container-runtime/config.toml
+%{_bindir}/nvidia-container-runtime-hook
 %{_libexecdir}/oci/hooks.d/oci-nvidia-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
+%files base
+%license LICENSE
+%config %{_sysconfdir}/nvidia-container-runtime/config.toml
+%{_bindir}/nvidia-container-runtime
+%{_bindir}/nvidia-ctk
+
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.0-3
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.11.0-2
+- Bump release to rebuild with go 1.18.8
+
+* Wed Sep 21 2022 Henry Li <lihl@microsoft.com> - 1.11.0-1
+- Upgrade to version 1.11.0
+- Remove patch that no longer applies to v1.11.0
+- Replace nvidia-container-toolkit with nvidia-container-runtime-hook
+- Build and install nvidia-ctk binary
+- Use config.toml.rpm-yum, which replaces config.toml.centos
+- Add nlibnvidia-container-tools minimum version 1.11.0 dependency
+- Add the nvidia-container-runtime-toolkit-base package
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.9.0-3
 - Bump release to rebuild against Go 1.18.5
 

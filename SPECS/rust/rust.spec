@@ -9,8 +9,8 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.62.1
-Release:        1%{?dist}
-License:        ASL 2.0 AND MIT
+Release:        4%{?dist}
+License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -33,15 +33,24 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
-
 %if %{with_check}
-BuildRequires:  python3-xml
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 %endif
-
+# rustc uses a C compiler to invoke the linker, and links to glibc in most cases
+Requires:       binutils
+Requires:       gcc
+Requires:       glibc-devel
 Provides:       cargo = %{version}-%{release}
 
 %description
 Rust Programming Language
+
+%package doc
+Summary:        Rust documentation.
+BuildArch:      noarch
+
+%description doc
+Documentation package for Rust.
 
 %prep
 # Setup .cargo directory
@@ -75,7 +84,13 @@ mv %{SOURCE7} "$BUILD_CACHE_DIR"
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
+sh ./configure \
+    --prefix=%{_prefix} \
+    --enable-extended \
+    --tools="cargo,rustfmt" \
+    --release-channel="stable" \
+    --release-description="CBL-Mariner %{version}-%{release}"
+
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
@@ -86,39 +101,54 @@ ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-lin
 
 %install
 USER=root SUDO_USER=root %make_install
+mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
+rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
 
 %ldconfig_scriptlets
 
 %files
-%license LICENSE-MIT
-%doc CONTRIBUTING.md README.md RELEASES.md
+%license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
 %{_bindir}/rustc
 %{_bindir}/rustdoc
 %{_bindir}/rust-lldb
-%{_mandir}/man1/*
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
 %{_libexecdir}/cargo-credential-1password
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
-%doc %{_docdir}/%{name}/html/*
-%{_docdir}/%{name}/html/.stamp
-%doc %{_docdir}/%{name}/README.md
-%doc %{_docdir}/%{name}/COPYRIGHT
-%doc %{_docdir}/%{name}/LICENSE-APACHE
-%doc %{_docdir}/%{name}/LICENSE-MIT
-%doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
-%doc src/tools/clippy/{README.md,CHANGELOG.md}
 %{_bindir}/cargo
 %{_bindir}/cargo-fmt
 %{_bindir}/rustfmt
 %{_datadir}/zsh/*
-%doc %{_docdir}/%{name}/LICENSE-THIRD-PARTY
 %{_sysconfdir}/bash_completion.d/cargo
 
+%files doc
+%license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
+%doc %{_docdir}/%{name}/html/*
+%doc %{_docdir}/%{name}/README.md
+%doc CONTRIBUTING.md README.md RELEASES.md
+%doc src/tools/clippy/CHANGELOG.md
+%doc src/tools/rustfmt/Configurations.md
+%{_docdir}/%{name}/html/.stamp
+%{_mandir}/man1/*
+
 %changelog
+* Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
+- Split out separate 'doc' subpackage to reduce default package size.
+- Updated license information.
+
+* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-3
+- Adding missing test dependency on "glibc-static".
+
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.62.1-2
+- Breaking change: Configure as a stable release, which disables unstable features
+- Add runtime requirements on gcc, binutils, glibc-devel
+- Package ASL 2.0 license, additional copyright information
+- Fix licensing info- dual-licensed, not multiply-licensed
+- License verified
+
 * Thu Aug 18 2022 Chris Co <chrco@microsoft.com> - 1.62.1-1
 - Updating to version 1.62.1
 

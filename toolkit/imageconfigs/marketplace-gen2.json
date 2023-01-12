@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 1500,
+            "MaxSize": 5000,
             "Artifacts": [
                 {
                     "Name": "cblmariner-gen2",
@@ -60,7 +60,8 @@
                 "packagelists/azurevm-packages.json"
             ],
             "AdditionalFiles": {
-                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg"
+                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
+                "additionalconfigs/chrony.cfg": "/etc/chrony.conf"
             },
             "PostInstallScripts": [
                 {

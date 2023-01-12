@@ -1,0 +1,28 @@
+From 590604dca0f6a0636933be21fc6a490c0f17af34 Mon Sep 17 00:00:00 2001
+From: Daniel Mihai <dmihai@microsoft.com>
+Date: Tue, 16 Aug 2022 17:01:12 +0000
+Subject: [PATCH 2/3] Merged PR 9607: Allow 10 seconds for VM creation + start
+
+Allow 10 seconds for VM creation + start
+---
+ src/runtime/virtcontainers/clh.go | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/runtime/virtcontainers/clh.go b/src/runtime/virtcontainers/clh.go
+index aaa8e288..118e1b4d 100644
+--- a/src/runtime/virtcontainers/clh.go
++++ b/src/runtime/virtcontainers/clh.go
+@@ -620,7 +620,9 @@ func (clh *cloudHypervisor) StartVM(ctx context.Context, timeout int) error {
+ 	span, _ := katatrace.Trace(ctx, clh.Logger(), "StartVM", clhTracingTags, map[string]string{"sandbox_id": clh.id})
+ 	defer span.End()
+ 
+-	ctx, cancel := context.WithTimeout(context.Background(), clh.getClhAPITimeout()*time.Second)
++	// FIXME - for now allow more than one second to create and start the VM.
++	// ctx, cancel := context.WithTimeout(context.Background(), clh.getClhAPITimeout()*time.Second)
++	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+ 	defer cancel()
+ 
+ 	clh.Logger().WithField("function", "StartVM").Info("starting Sandbox")
+-- 
+2.17.1
+

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 name: Check Package CGManifests
 
 on:
@@ -20,14 +23,14 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         git fetch origin ${{ github.base_ref }}
-        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
+        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
         echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
 
     - name: Get base commit for Pushes
       if: ${{ github.event_name == 'push' }}
       run: |
         git fetch origin ${{ github.event.before }}
-        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
+        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
         echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
     - name: Get the changed files
@@ -39,4 +42,5 @@ jobs:
 
     - name: Check each spec
       run: |
+        .github/workflows/overwrite_shell_link.sh
         .github/workflows/validate-cg-manifest.sh ${{ env.updated-specs }}

@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        9%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Source0:        %{url}/releases/download/RELEASE_%{refpolicy_major}_%{refpolicy_
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Source3:        modules_targeted.conf
+Source4:        macros.selinux-policy
 Patch1:         0001-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
 Patch2:         0002-cronyd-Add-dac_read_search.patch
 Patch3:         0003-Temporary-fix-for-wrong-audit-log-directory.patch
@@ -61,6 +62,13 @@ Patch40:        0040-usermanage-Add-sysctl-access-for-groupadd-to-get-num.patch
 Patch41:        0041-systemd-systemd-cgroups-reads-kernel.cap_last_cap-sy.patch
 Patch42:        0042-kernel-hv_utils-shutdown-on-systemd-systems.patch
 Patch43:        0043-Container-Minor-fixes-from-interactive-container-use.patch
+Patch44:        0044-systemd-Minor-coredump-fixes.patch
+Patch45:        0045-rpm-Minor-fixes.patch
+Patch46:        0046-init-Allow-nnp-nosuid-transitions-from-systemd-initr.patch
+Patch47:        0047-selinuxutil-Semanage-reads-policy-for-export.patch
+Patch48:        0048-sysnetwork-ifconfig-searches-debugfs.patch
+Patch49:        0049-usermanage-Add-dac_read_search-to-useradd.patch
+Patch50:        0050-Temp-kubernetes-fix.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -166,6 +174,7 @@ SELinux policy development and man page package
 %files devel
 %dir %{_usr}/share/selinux/devel
 %dir %{_usr}/share/selinux/devel/include
+%{_rpmconfigdir}/macros.d/macros.selinux-policy
 %{_usr}/share/selinux/devel/include/*
 %{_usr}/share/selinux/devel/Makefile
 %{_usr}/share/selinux/devel/example.*
@@ -239,7 +248,9 @@ if [ -s %{_sysconfdir}/selinux/config ]; then \
      if [ "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT} ]; then \
         [ -f ${FILE_CONTEXT}.pre ] || cp -f ${FILE_CONTEXT} ${FILE_CONTEXT}.pre; \
      fi; \
-     touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
+     if [ -d %{_sysconfdir}/selinux/%{1} ]; then \
+        touch %{_sysconfdir}/selinux/%{1}/.rebuild; \
+     fi; \
 fi;
 %define postInstall() \
 . %{_sysconfdir}/selinux/config; \
@@ -271,6 +282,11 @@ mkdir -p %{buildroot}%{_usr}/share/selinux/%{policy_name}
 mkdir -p %{buildroot}%{_sharedstatedir}/selinux/{%{policy_name},modules}/
 
 mkdir -p %{buildroot}%{_usr}/share/selinux/packages
+
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -m 644 %{SOURCE4} %{buildroot}%{_rpmconfigdir}/macros.d/macros.selinux-policy
+sed -i 's/SELINUXPOLICYVERSION/%{version}-%{release}/' %{buildroot}%{_rpmconfigdir}/macros.d/macros.selinux-policy
+sed -i 's@SELINUXSTOREPATH@%{_sharedstatedir}/selinux@' %{buildroot}%{_rpmconfigdir}/macros.d/macros.selinux-policy
 
 # Install devel
 make clean
@@ -337,6 +353,18 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Fri Nov 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-12
+- Added 'selinux-policy' RPM macros.
+
+* Wed Sep 14 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-11
+- Fix issue with preinst on systems that do not have selinux-policy.
+
+* Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-10
+- Fixed denials during coredump.
+- Allow NoNewPerms transition from init scripts/systemd unit commands.
+- Minor fixes in semanage, ifconfig, rpm, and useradd.
+- Fix incorrect label for kubernetes runtime dir when created by initrc_t.
+
 * Tue Jul 19 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-9
 - Fixes for interactive container use.
 

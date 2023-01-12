@@ -4,19 +4,27 @@
 package rpm
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-const specsDir = "testdata"
+const (
+	definesDistKey      = "dist"
+	definesWithCheckKey = "with_check"
+	specsDir            = "testdata"
+)
+
+var buildArch = goArchToRpmArch[runtime.GOARCH]
 
 var defines = map[string]string{
-	"dist":       ".cmX",
-	"with_check": "1",
+	definesDistKey:      ".cmX",
+	definesWithCheckKey: "1",
 }
 
 func TestMain(m *testing.M) {
@@ -27,7 +35,7 @@ func TestMain(m *testing.M) {
 func TestExclusiveArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
 
-	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -35,7 +43,7 @@ func TestExclusiveArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) 
 func TestExclusiveArchCheckShouldSucceedForNoExclusiveArch(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
 
-	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -43,7 +51,7 @@ func TestExclusiveArchCheckShouldSucceedForNoExclusiveArch(t *testing.T) {
 func TestExclusiveArchCheckShouldFailForUnsupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
 
-	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
 }
@@ -51,7 +59,7 @@ func TestExclusiveArchCheckShouldFailForUnsupportedArchitectures(t *testing.T) {
 func TestExcludedArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
 
-	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -59,7 +67,7 @@ func TestExcludedArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
 func TestExcludedArchShouldSucceedForNoExcludedArch(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
 
-	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -67,7 +75,7 @@ func TestExcludedArchShouldSucceedForNoExcludedArch(t *testing.T) {
 func TestExcludedArchShouldFailForExcludedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
 
-	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
 }
@@ -75,7 +83,7 @@ func TestExcludedArchShouldFailForExcludedArchitectures(t *testing.T) {
 func TestArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
 
-	matches, err := SpecArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -83,7 +91,7 @@ func TestArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
 func TestArchShouldSucceedForNoExcludedArch(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
 
-	matches, err := SpecArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.True(t, matches)
 }
@@ -91,7 +99,18 @@ func TestArchShouldSucceedForNoExcludedArch(t *testing.T) {
 func TestArchShouldFailForExcludedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
 
-	matches, err := SpecArchIsCompatible(specFilePath, specsDir, defines)
+	matches, err := SpecArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
+}
+
+func TestShouldListOnlySubpackageWithArchitectureInRPMsList(t *testing.T) {
+	expectedRPMs := []string{
+		fmt.Sprintf("subpackage_name-1.0.0-1%s.%s", defines[definesDistKey], buildArch),
+	}
+	specFilePath := filepath.Join(specsDir, "no_default_package.spec")
+
+	builtRPMs, err := QuerySPECForBuiltRPMs(specFilePath, specsDir, buildArch, defines)
+	assert.NoError(t, err)
+	assert.EqualValues(t, expectedRPMs, builtRPMs)
 }

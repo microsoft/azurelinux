@@ -1,7 +1,7 @@
 Summary:        The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 Name:           KeysInUse-OpenSSL
 Version:        0.3.1
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,18 +32,15 @@ cmake --build ./build --target keysinuse
 cd ./packaging/util
 make $(realpath ../../bin/keysinuseutil)
 
-%define keysinuse_dir %{buildroot}/%{_libdir}/keysinuse/
-
 %install
-mkdir -p %{keysinuse_dir}
+mkdir -p %{buildroot}/%{_libdir}/engines-1.1/
 mkdir -p %{buildroot}%{_bindir}/
-
-install -m 0644 ./bin/keysinuse.so %{keysinuse_dir}
+install -m 0755 ./bin/keysinuse.so %{buildroot}/%{_libdir}/engines-1.1/keysinuse.so
 install -m 0744 ./bin/keysinuseutil %{buildroot}%{_bindir}/
 
 %files
 %license LICENSE
-%{_libdir}/keysinuse/keysinuse.so
+%{_libdir}/engines-1.1/keysinuse.so
 %{_bindir}/keysinuseutil
 
 %pre
@@ -59,8 +56,6 @@ fi
 chown root:root %{_var}/log/keysinuse
 chmod 1733 %{_var}/log/keysinuse
 
-ln -s %{_lib}/keysinuse/keysinuse.so $(%{_bindir}/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
-
 if [ -x %{_bindir}/keysinuseutil ]; then
   echo "Enabling keysinuse engine for OpenSSL"
   %{_bindir}/keysinuseutil install || echo "Configuring engine failed"
@@ -68,16 +63,20 @@ fi
 
 %preun
 if [ -x %{_bindir}/keysinuseutil ]; then
-  echo "Disabling keysinuse engine for OpenSSL"
   %{_bindir}/keysinuseutil uninstall || echo "Deconfiguring keysinuse engine failed"
-fi
-with
-engine_link=$(%{_bindir}/openssl version -e | awk '{gsub(/"/, "", $2); print $2}')/keysinuse.so
-if [ -e $engine_link ]; then
-  rm $engine_link
 fi
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 0.3.1-5
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.3.1-4
+- Bump release to rebuild with go 1.18.8
+
+* Thu Sep 01 2022 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.1-3
+- Fix bad permissions on engine library during package install
+- Simplify package installation strategy
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.3.1-2
 - Bump release to rebuild against Go 1.18.5
 

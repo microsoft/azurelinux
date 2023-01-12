@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtDeclarative component
 Name:         qt5-qtdeclarative
 Version:      5.12.5
-Release:      3%{?dist}
+Release:      4%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -9,7 +9,7 @@ Distribution: Mariner
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
 
 ## upstream patches
 
@@ -141,6 +141,10 @@ popd
 
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-4
+- Update source download path.
+- License verified.
+
 * Mon Mar 30 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-3
 - Fix missing python3 global
 - Remove multilib patch

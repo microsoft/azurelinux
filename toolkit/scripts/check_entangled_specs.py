@@ -18,6 +18,10 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/kernel-hci-signed/kernel-hci-signed.spec",
+        "SPECS/kernel-hci/kernel-hci.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
@@ -36,10 +40,6 @@ version_matching_groups = [
     frozenset([
         "SPECS/hyperv-daemons/hyperv-daemons.spec",
         "SPECS/kernel/kernel.spec"
-    ]),
-    frozenset([
-        "SPECS/dbus/dbus.spec",
-        "SPECS-EXTENDED/dbus-x11/dbus-x11.spec"
     ]),
     frozenset([
         "SPECS/python-flit/python-flit.spec",

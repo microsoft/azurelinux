@@ -3,7 +3,7 @@
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
-Version:        1.9.0
+Version:        1.11.0
 Release:        3%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
@@ -132,6 +132,15 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.0-3
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.11.0-2
+- Bump release to rebuild with go 1.18.8
+
+* Wed Sep 21 2022 Henry Li <lihl@microsoft.com> - 1.11.0-1
+- Upgrade to version 1.11.0
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.9.0-3
 - Bump release to rebuild against Go 1.18.5
 

@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        6%{?dist}
+Release:        13%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -243,6 +243,7 @@ Patch5:         0002-virtiofsd-Do-not-support-blocking-flock.patch
 # acpi: fix QEMU crash when started with SLIC table
 # https://bugzilla.redhat.com/show_bug.cgi?id=2072303
 Patch6:         0001-acpi-fix-QEMU-crash-when-started-with-SLIC-table.patch
+Patch7:         0001-ebpf-replace-deprecated-bpf_program__set_socket_filt.patch
 # CVE-2022-0358 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/48302d4eb628ff0bea4d7e92cbf6b726410eb4c3
 # From https://bugzilla.redhat.com/show_bug.cgi?id=2046202
 Patch1000:      CVE-2022-0358.patch
@@ -257,6 +258,17 @@ Patch1003:      CVE-2022-26354.patch
 Patch1004:      CVE-2022-26353.patch
 Patch1005:      CVE-2021-4206.patch
 Patch1006:      CVE-2022-35414.patch
+# CVE-2021-4158 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9bd6565ccee68f72d5012e24646e12a1c662827e
+Patch1007:      CVE-2021-4158.patch
+# CVE-2022-2962 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/36a894aeb64a2e02871016da1c37d4a4ca109182
+Patch1008:      0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
+# CVE-2022-4144 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/6dbbf055148c6f1b7d8a3251a65bd6f3d1e1f622
+Patch1009:      CVE-2022-4144.patch
+Patch1010:      CVE-2022-3872.patch
+# CVE-2021-3929 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/736b01642d85be832385
+Patch1011:      CVE-2021-3929.patch
+# CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
+Patch1012:      CVE-2021-4207.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -505,9 +517,12 @@ Summary:        qemu-pr-helper utility for %{name}
 This package provides the qemu-pr-helper utility that is required for certain
 SCSI features.
 
-%package -n qemu-virtiofsd
-Summary: QEMU virtio-fs shared file system daemon
-Provides: vhostuser-backend(fs)
+%package -n     qemu-virtiofsd
+Summary:        QEMU virtio-fs shared file system daemon
+Provides:       vhostuser-backend(fs)
+# qemu-common provided %%{_libexecdir}/virtiofsd prior to 6.2.0
+Obsoletes:      %{name}-common < 6.2.0
+
 %description -n qemu-virtiofsd
 This package provides virtiofsd daemon. This program is a vhost-user backend
 that implements the virtio-fs device that is used for sharing a host directory
@@ -2283,6 +2298,27 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Tue Dec 20 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-13
+- Address CVE-2021-3929, CVE-2021-4207
+
+* Mon Dec 19 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-12
+- Address CVE-2022-3872
+
+* Tue Dec 6 2022 Elaine Zhao <elainezhao@microsoft.com> - 6.2.0-11
+- Address CVE-2022-4144
+
+* Wed Oct 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2.0-10
+- Have virtiofsd subpackage obsolete qemu-common from 6.1.0 releases
+
+* Tue Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
+- Address CVE-2022-2962
+
+* Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-8
+- Introduce patch from upstream to fix build with libbpf 1.0.0
+
+* Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-7
+- Patched CVE-2021-4158
+
 * Tue Aug 23 2022 Nicolas Guibourge <mwani@microsoft.com> - 6.2.0-6
 - address CVE-2022-35414
 

@@ -1,13 +1,16 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.84.0
-Release:        1%{?dist}
+Version:        7.86.0
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+# CVE-2022-43551 and CVE-2022-43552 will be resolved by version 7.87.0
+Patch0:         CVE-2022-43551.patch
+Patch1:         CVE-2022-43552.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -35,7 +38,7 @@ Static libraries and header files for the support library for curl
 %package libs
 Summary:        Libraries for curl
 Group:          System Environment/Libraries
-Provides:   libcurl = %{version}-%{release}
+Provides:       libcurl = %{version}-%{release}
 
 %description libs
 This package contains minimal set of shared curl libraries.
@@ -89,6 +92,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Dec 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 7.86.0-2
+- Patch CVE-2022-43551, CVE-2022-43552
+
+* Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.86.0-1
+- Auto-upgrade to 7.86.0 - CVE-2022-42915
+
 * Tue Jul 19 2022 Henry Li <lihl@microsoft.com> - 7.84.0-1
 - Upgrade to version 7.84.0 to resolve CVE-2022-32207
 

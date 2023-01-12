@@ -2,7 +2,7 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        1.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
@@ -44,6 +44,7 @@ a minimal and fast API targetting the following uses:
 
 %check
 pip3 install tox
+sed -i "s/pytest$/pytest==7.1.3/" tox.ini
 LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pkgname}
@@ -52,6 +53,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-2
+- Freezing 'pytest' test dependency to version 7.1.3.
+
 * Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.9.0-1
 - Upgrade to latest upstream version
 - Lint spec

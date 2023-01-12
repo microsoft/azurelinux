@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        8.0.0
-Release:        5%{?dist}
+Release:        7%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -107,6 +107,12 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.0.0-7
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.0.0-6
+- Bump release to rebuild with go 1.18.8
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.0.0-5
 - Bump release to rebuild against Go 1.18.5
 

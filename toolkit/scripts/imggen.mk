@@ -38,7 +38,7 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
-imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*')
+imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
 ifeq ($(build_arch),aarch64)
 initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
@@ -51,7 +51,7 @@ $(call create_folder,$(imager_disk_output_dir))
 $(call create_folder,$(artifact_dir))
 $(call create_folder,$(meta_user_data_tmp_dir))
 
-.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso initrd validate-image-config clean-imagegen
+.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso validate-image-config clean-imagegen
 
 clean: clean-imagegen
 clean-imagegen:
@@ -163,16 +163,12 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--output-summary-file=$@ \
 		--output-dir=$(external_rpm_cache)
 
-# Stand alone target to build just the initrd, should not be used in conjunction with other targets. Use the 'iso' target instead.
-initrd: $(go-liveinstaller) $(go-imager)
+$(initrd_img): $(go-liveinstaller) $(go-imager) $(initrd_config_json) $(INITRD_CACHE_SUMMARY)
 	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
-	$(MAKE) image CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
+	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
 
-iso: $(go-isomaker) $(go-liveinstaller) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(initrd_config_json) $(validate-config) $(image_package_cache_summary)
+iso: $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(initrd_img) $(validate-config) $(image_package_cache_summary)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
-	# Recursive make call to build the initrd image iso_initrd/iso-initrd.img
-	# Called here instead of as a traditional dependency to make sure package builds are done sequentially for each config.
-	$(MAKE) image CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG= && \
 	$(go-isomaker) \
 		--base-dir $(CONFIG_BASE_DIR) \
 		--build-dir $(workspace_dir) \

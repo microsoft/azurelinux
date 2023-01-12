@@ -1,19 +1,21 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        28.1
-Release:        3%{?dist}
+Release:        5%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv3+ and CC0-1.0
 URL:            https://www.gnu.org/software/emacs/
 Group:          Applications/Editors
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2022-45939.patch
 
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  systemd-devel
 BuildRequires:  gnutls-devel
+Requires:       %{name}-filesystem = %{version}-%{release}
 
 %description
 Emacs is a powerful, customizable, self-documenting, modeless text
@@ -21,8 +23,16 @@ editor. Emacs contains special code editing features, a scripting
 language (elisp), and the capability to read mail, news, and more
 without leaving the editor.
 
+%package filesystem
+Summary:       Emacs filesystem layout
+BuildArch:     noarch
+
+%description filesystem
+This package provides some directories which are required by other
+packages that add functionality to Emacs.
+
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -52,6 +62,8 @@ rm -rf %{buildroot}%{_datadir}/icons
 rm %{buildroot}%{_bindir}/ctags
 rm %{buildroot}%{_datadir}/applications/*.desktop
 
+mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
+
 %files
 %defattr(-,root,root)
 %{_bindir}/ebrowse
@@ -68,7 +80,18 @@ rm %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/emacs/site-lisp/subdirs.el
 %{_datadir}/metainfo/emacs.metainfo.xml
 
+%files filesystem
+%dir %{_datadir}/emacs
+%dir %{_datadir}/emacs/site-lisp
+%dir %{_datadir}/emacs/site-lisp/site-start.d
+
 %changelog
+* Wed Dec 07 2022 Henry Beberman <henry.beberman@microsoft.com> - 28.1-5
+- Apply upstream patch for CVE-2022-45939
+
+* Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 28.1-4
+- Add filesystem subpackage.
+
 * Fri Jun 17 2022 Muhammad Falak <mwani@microsoft.com> - 28.1-3
 - Nopatch CVE-2007-6109
 

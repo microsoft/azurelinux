@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        18%{?dist}
+Release:        31%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,7 @@ Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
+Welcome to CBL-Mariner %{mariner_release_version} (%{_arch})
 EOF
 
 %files
@@ -62,6 +62,45 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Thu Jan 05 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0-31
+- Updating version for January update.
+
+* Mon Dec 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-30
+- Updating version for December update 3.
+
+* Sat Dec 10 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-29
+- Updating version for December update 2.
+
+* Thu Dec 01 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-28
+- Updating version for December update.
+
+* Mon Nov 21 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.27
+- Updating version for November update 2.
+
+* Wed Nov 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-26
+- Updating version for November update.
+
+* Sat Oct 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-25
+- Updating version for a full October release.
+
+* Tue Oct 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-24
+- Updating version for October update.
+
+* Fri Oct 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-23
+- Updating version for October release.
+
+* Fri Sep 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-22
+- Updating version for September update 3.
+
+* Fri Sep 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.21
+- Updating version for September update 2.
+
+* Thu Sep 08 2022 Minghe Ren <mingheren@microsoft.com> - 2.0-20
+- remove issue.net kernel part as sshd doesn't support the old-style telnet escape sequences
+
+* Thu Sep 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-19
+- Updating version for September CVE update.
+
 * Tue Aug 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-18
 - Updating version for August update 2.
 

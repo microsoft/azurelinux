@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "helm-3.9.3-vendor.tar.gz": "b2fa5ed43cd6166774dbc42242d1a8cf8c0d43f36a8def109757ef9520bbbb60",
-  "helm-3.9.3.tar.gz": "b621cf8e03b0cf7410222fe30b411e0bfe312965a29af9a3579ae77f1bf853ad"
- }
+  "Signatures": {
+    "helm-3.10.3-vendor.tar.gz": "06b243397a162aa335c726d112261e6f5ca5067100ea66773ad3aa2a3d59897e",
+    "helm-3.10.3.tar.gz": "a61ede2b1b9a0d3a7c1cc19cca99db109eb5b787eee0e147bd3bfa2c4e337eb1"
+  }
 }

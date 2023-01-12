@@ -1,24 +1,26 @@
---- rpm-rpm-4.17.0-release/Makefile.am	2021-09-03 02:41:20.000000000 -0700
-+++ rpm-rpm-4.17.0-release/Makefile2	2021-09-23 15:21:16.362202512 -0700
-@@ -27,7 +27,7 @@
+diff --git a/Makefile.am b/Makefile.am
+index 7e7d4163d..4904dd591 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -26,7 +26,7 @@ EXTRA_DIST = ChangeLog CREDITS INSTALL \
+ BUILT_SOURCES =
  
  SUBDIRS = po misc
- SUBDIRS += luaext
 -SUBDIRS += rpmio lib sign build scripts fileattrs docs .
 +SUBDIRS += rpmio lib sign build scripts fileattrs .
  
  if ENABLE_PYTHON
  SUBDIRS += python
-@@ -41,7 +41,7 @@
+@@ -40,7 +40,7 @@ if HAVE_FAKECHROOT
  SUBDIRS += tests
  endif
  
--DIST_SUBDIRS = po misc luaext rpmio lib sign build python scripts fileattrs docs tests plugins
-+DIST_SUBDIRS = po misc luaext rpmio lib sign build python scripts fileattrs tests plugins
+-DIST_SUBDIRS = po misc rpmio lib sign build python scripts fileattrs docs tests plugins
++DIST_SUBDIRS = po misc rpmio lib sign build python scripts fileattrs tests plugins
  
  pkgconfigdir = $(libdir)/pkgconfig
  
-@@ -249,24 +249,6 @@
+@@ -259,24 +259,6 @@ uninstall-local:
  
  MAINTAINERCLEANFILES = ChangeLog
  
@@ -42,4 +44,4 @@
 -
  .PHONY: ci
  ci:
- 	podman build -t rpm -f ci/Dockerfile .
+ 	podman build -t rpm -f $(top_srcdir)/ci/Dockerfile $(top_srcdir)

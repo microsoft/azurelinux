@@ -46,6 +46,10 @@ const (
 	// to run inside the install directory environment
 	postInstallScriptTempDirectory = "/tmp/postinstall"
 
+	// finalizeImageScriptTempDirectory is the directory where installutils expects to pick up any finalize image scripts
+	// to run inside the install directory environment
+	finalizeImageScriptTempDirectory = "/tmp/finalizeimage"
+
 	// sshPubKeysTempDirectory is the directory where installutils expects to pick up ssh public key files to add into
 	// the install directory
 	sshPubKeysTempDirectory = "/tmp/sshpubkeys"
@@ -448,12 +452,24 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 		filesToCopy = append(filesToCopy, fileToCopy)
 	}
 
+	for i, script := range config.FinalizeImageScripts {
+		newFilePath := filepath.Join(finalizeImageScriptTempDirectory, script.Path)
+
+		fileToCopy := safechroot.FileToCopy{
+			Src:  script.Path,
+			Dest: newFilePath,
+		}
+
+		config.FinalizeImageScripts[i].Path = newFilePath
+		filesToCopy = append(filesToCopy, fileToCopy)
+	}
+
 	err = installChroot.AddFiles(filesToCopy...)
 	return
 }
 
 func cleanupExtraFiles() (err error) {
-	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, sshPubKeysTempDirectory}
+	dirsToRemove := []string{additionalFilesTempDirectory, postInstallScriptTempDirectory, finalizeImageScriptTempDirectory, sshPubKeysTempDirectory}
 
 	for _, dir := range dirsToRemove {
 		logger.Log.Infof("Cleaning up directory %s", dir)
@@ -577,6 +593,13 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		}
 	}
 
+	// Run finalize image scripts from within the installroot chroot
+	err = installutils.RunFinalizeImageScripts(installChroot, systemConfig)
+	if err != nil {
+		err = fmt.Errorf("failed to run finalize image script: %s", err)
+		return
+	}
+
 	return
 }
 
@@ -647,6 +670,12 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
+		return
+	}
+
+	err = installutils.InstallGrubEnv(installChroot.RootDir())
+	if err != nil {
+		err = fmt.Errorf("failed to install grubenv file: %s", err)
 		return
 	}
 

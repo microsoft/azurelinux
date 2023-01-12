@@ -1,6 +1,6 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
-Version:        1.2.2
+Version:        1.3.2
 Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
@@ -57,6 +57,15 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.2-3
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.3.2-2
+- Bump release to rebuild with go 1.18.8
+
+* Mon Oct 10 2022 Henry Li <lihl@microsoft.com> - 1.3.2-1
+- Upgrade to version 1.3.2 to resolve CVE-2021-36230
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.2.2-3
 - Bump release to rebuild against Go 1.18.5
 

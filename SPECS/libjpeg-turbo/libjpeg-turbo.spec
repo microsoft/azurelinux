@@ -1,6 +1,6 @@
 Summary:        fork of the original IJG libjpeg which uses SIMD.
 Name:           libjpeg-turbo
-Version:        2.1.2
+Version:        2.1.4
 Release:        1%{?dist}
 License:        IJG
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ popd
 %{_libdir}/cmake/%{name}/%{name}*.cmake
 
 %changelog
+* Tue Sep 13 2022 Nan Liu <liunan@microsoft.com> - 2.1.4-1
+- Upgrade to version 2.1.4 to fix CVE-2020-35538
+
 * Fri Jan 07 2022 Henry Li <lihl@microsoft.com> - 2.1.2-1
 - Upgrade to version 2.1.2
 - Add related cmake files to libjpeg-turbo-devel pacakge

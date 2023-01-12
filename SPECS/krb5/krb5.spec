@@ -3,7 +3,7 @@
 
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.19.3
+Version:        1.19.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -11,6 +11,7 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
+Source1:        krb5.conf
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
@@ -80,6 +81,10 @@ chmod -v 755 /bin/ksu
 
 install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
 
+mkdir -p %{buildroot}%{_sysconfdir}
+mkdir -p %{buildroot}%{_sysconfdir}/krb5.conf.d
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}
+
 unset LIBRARY
 %{_fixperms} %{buildroot}/*
 
@@ -94,6 +99,8 @@ make check
 
 %files
 %defattr(-,root,root)
+%config(noreplace) %{_sysconfdir}/krb5.conf
+%dir %{_sysconfdir}/krb5.conf.d
 %license doc/copyright.rst
 %{_bindir}/*
 %{_libdir}/*.so
@@ -119,6 +126,12 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Jan 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.4-1
+- Auto-upgrade to 1.19.4 - to fix CVE-2022-42898
+
+* Wed Oct 19 2022 Henry Li <lihl@microsoft.com> - 1.19.3-2
+- Add krb5.conf and create /etc/krb5.conf.d directory
+
 * Wed May 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.19.3-1
 - Update to version 1.19.3 to address CVE-2021-37750
 

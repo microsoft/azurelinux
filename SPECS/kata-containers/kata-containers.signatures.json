@@ -2,9 +2,9 @@
  "Signatures": {
   "15-dracut.conf": "af94e6b7c9dfa3910531e7b5532a18fd0340de88939a4852de4ec7a49c5889ca",
   "50-kata": "fb108c6337b3d3bf80b43ab04f2bf9a3bdecd29075ebd16320aefe8f81c502a7",
-  "kata-containers-2.5.0-vendor.tar.gz": "cc5b061c34aebd49f88f284182e230b923e8b3c37124ea1405a6a42fcdcf68e7",
-  "kata-containers-2.5.0.tar.gz": "fd57a23ab552001f2cb467458e87a8b01d7353bcdda18b44ec76a4fbee971716",
-  "kata-osbuilder-generate.service": "3b1df37793241a8a9a0db1917c5a1270a2d6b960777d20538095ecfa9ea3c497",
-  "kata-osbuilder.sh": "c3cb55544245366e7a01fcec96e923e366be05535fd0d6d76a732e37af2be71f"
+  "kata-containers-3.0.0-vendor.tar.gz": "0f31ee3c1bca71650bf3dac3d1f04d2b42322b3c41abb1982a654463a655da42",
+  "kata-containers-3.0.0.tar.gz": "e1b3cd7402d99414dc3606364cbb6e71f4354c8be65f31ba5eae89f6c207d05d",
+  "kata-osbuilder-generate.service": "4438c39799297efbf88cfc549964432a41506a3c89e13073fa908658a5bd6376",
+  "kata-osbuilder.sh": "b2a0510933f36860c16447400119488a035a7cb579a6f8adc4925fff54f1883b"
  }
 }

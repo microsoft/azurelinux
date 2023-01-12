@@ -1,0 +1,74 @@
+From 0388a0d2f42401dcedf7f89d3c291cfed3e4a3d5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 8 Jul 2020 20:15:57 +0200
+Subject: [PATCH 1/2] Adapt dump() behavior to match ast.dump() on Python 3.9+
+
+In Python 3.9+, ast.dump() omits optional fields/attributes from the output if
+their value is None. Such defaults are defined as class attributes.
+
+See https://bugs.python.org/issue36287
+And https://github.com/python/cpython/pull/18843
+
+This patch does not change the output on previous Python versions,
+because the class attributes are missing there.
+
+Fixes https://github.com/simonpercivall/astunparse/issues/56
+---
+ lib/astunparse/printer.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/lib/astunparse/printer.py b/lib/astunparse/printer.py
+index 92d64f7..7a33deb 100644
+--- a/lib/astunparse/printer.py
++++ b/lib/astunparse/printer.py
+@@ -4,6 +4,9 @@
+ import six
+ 
+ 
++_NOPE = object()
++
++
+ class Printer(ast.NodeVisitor):
+ 
+     def __init__(self, file=sys.stdout, indent="  "):
+@@ -19,6 +22,7 @@ def write(self, text):
+         self.f.write(six.text_type(text))
+ 
+     def generic_visit(self, node):
++        cls = type(node)
+ 
+         if isinstance(node, list):
+             nodestart = "["
+@@ -27,7 +31,8 @@ def generic_visit(self, node):
+         else:
+             nodestart = type(node).__name__ + "("
+             nodeend = ")"
+-            children = [(name + "=", value) for name, value in ast.iter_fields(node)]
++            children = [(name + "=", value) for name, value in ast.iter_fields(node)
++                        if not (value is None and getattr(cls, name, _NOPE) is None)]
+ 
+         if len(children) > 1:
+             self.indentation += 1
+
+From ea2b578a1b653e73696db2392b8e3d5bf75dadc7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 8 Jul 2020 20:21:17 +0200
+Subject: [PATCH 2/2] Test and support Python 3.9
+
+---
+ setup.py | 1 +
+ tox.ini  | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index e5a277a..29b384b 100755
+--- a/setup.py
++++ b/setup.py
+@@ -52,6 +52,7 @@ def read_version():
+         'Programming Language :: Python :: 3.6',
+         'Programming Language :: Python :: 3.7',
+         'Programming Language :: Python :: 3.8',
++        'Programming Language :: Python :: 3.9',
+         'Topic :: Software Development :: Code Generators',
+     ],
+     test_suite='tests',

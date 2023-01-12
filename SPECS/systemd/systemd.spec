@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        7%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,11 +12,16 @@ Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
 Patch0:         fix-journald-audit-logging.patch
-# Patch for skipping the tests: test-mountpoint-util, test-mount-util, test-fileio, test-fd-util, test-repart - Some mounts are failing in chroot
-Patch1:         testsskipped.patch
-# Can be removed once we update systemd to a version containing the following commit:
+# Patch1 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
-Patch2:         add-fsync-sysusers-passwd.patch
+Patch1:         add-fsync-sysusers-passwd.patch
+# Patch2 can be removed once we update systemd to a version containing the following commit:
+# https://github.com/systemd/systemd/commit/d5cb053cd93d516f516e0b748271b55f9dfb3a29
+Patch2:         gpt-auto-devno-not-determined.patch
+# Patch3 can be removed once we update to major version 251 or higher:
+Patch3:         CVE-2022-3821.patch
+# Patch4 can be removed once we update to version 252
+Patch4:         CVE-2022-45873.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  dbus
 BuildRequires:  docbook-dtd-xml
@@ -154,9 +159,7 @@ rm -f %{buildroot}%{_var}/log/README
 rm -f %{buildroot}/%{_libdir}/modprobe.d/README
 rm -f %{buildroot}/lib/systemd/network/80-wifi-ap.network.example
 rm -f %{buildroot}/lib/systemd/network/80-wifi-station.network.example
-mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
-mkdir -p %{buildroot}%{_localstatedir}/log
-ln -sfv %{_localstatedir}/opt/journal/log %{buildroot}%{_localstatedir}/log/journal
+mkdir -p %{buildroot}%{_localstatedir}/log/journal
 
 find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
@@ -180,7 +183,13 @@ meson test -C build --verbose
 # Enable default systemd units.
 %post
 /sbin/ldconfig
-systemctl preset-all
+# Only force the presets to default values when first installing systemd ($1 = # of currently installed pacakges,
+# $1 >= 2 for upgrades). This will resolve issues where systemd may be installed after a package that enables a service
+# during the same transaction, leaving the service disabled unexpectedly. Once systemd is installed all future attempts
+# to enable/disable services should succeed.
+if [ $1 -eq 1 ]; then
+     systemctl preset-all
+fi
 
 %postun -p /sbin/ldconfig
 
@@ -253,8 +262,7 @@ systemctl preset-all
 %{_datadir}/polkit-1
 %{_datadir}/systemd
 %{_datadir}/zsh/*
-%dir %{_localstatedir}/opt/journal/log
-%{_localstatedir}/log/journal
+%dir %{_localstatedir}/log/journal
 
 %files rpm-macros
 %{_libdir}/rpm
@@ -273,14 +281,28 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
-* Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-7
-- Add patch to fsync passwd file (systemd #24324)
-
-* Mon Aug 01 2022 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-7
+* Thu Jan 12 2022 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-13
 - Add BR: dbus, mariner-release, tzdata, sudo to systemd.spec
 - Generate machine-id using dbus-uuidgen
 - Set UTF8 encoding in %check section of systemd.spec
-- Include patch testsskipped.patch to skip test-mountpoint-util, test-mount-util, test-fileio, test-fd-util, and test-repart
+
+* Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-12
+- Add patch for CVE-2022-45873
+
+* Wed Nov 29 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-11
+- Conditionally run systemctl preset-all only when first installing systemd, not on upgrades
+
+* Thu Nov 17 2022 Sam Meluch <sammeluch@microsoft.com> - 250.3-10
+- Add patch for CVE-2022-3821
+
+* Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-9
+- Fixing default log location.
+
+* Tue Sep 27 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-8
+- Add patch to improve fs detection in gpt-auto (systemd #22506)
+
+* Tue Aug 16 2022 Avram Lubkin <avramlubkin@microsoft.com> - 250.3-7
+- Add patch to fsync passwd file (systemd #24324)
 
 * Wed May 04 2022 Jon Slobodzian <joslobo@microsoft.com> - 250.3-6
 - Change build mode from "development" (default) to "release"

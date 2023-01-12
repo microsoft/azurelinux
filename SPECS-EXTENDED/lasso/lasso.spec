@@ -38,20 +38,11 @@ Distribution:   Mariner
 
 Summary: Liberty Alliance Single Sign On
 Name: lasso
-Version: 2.6.0
-Release: 25%{?dist}
+Version: 2.8.0
+Release: 1%{?dist}
 License: GPLv2+
 URL: http://lasso.entrouvert.org/
 Source: http://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
-
-Patch1: use-specified-python-interpreter.patch
-Patch2: build-scripts-py3-compatible.patch
-Patch3: duplicate-python-LogoutTestCase.patch
-Patch4: versioned-python-configure.patch
-Patch5: 0005-tests-use-self-generated-certificate-to-sign-federat.patch
-Patch6: 0006-Fix-ECP-signature-not-found-error-when-only-assertio.patch
-Patch7: 0007-PAOS-Do-not-populate-Destination-attribute.patch
-Patch8: 0008-Explicitly-define-tests-cases-and-add-them-to-tests.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -246,6 +237,11 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 %{python3_sitearch}/__pycache__/*
 
 %changelog
+* Mon Sep 12 2022 Muhammad Falak <mwani@microsoft.com> - 2.8.0-1
+- Bump version to 2.8.0
+- Drop un-needed patches
+- License verfied
+
 * Wed Mar 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-25
 - Removed Python 2 bits.
 - Disabling Java subpackage as it's no needed.
