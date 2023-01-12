@@ -281,7 +281,7 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Thu Jan 12 2022 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-13
+* Thu Jan 12 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-13
 - Add BR: dbus, mariner-release, tzdata, sudo to systemd.spec
 - Generate machine-id using dbus-uuidgen
 - Set UTF8 encoding in %check section of systemd.spec
