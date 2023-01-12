@@ -1,5 +1,3 @@
-%define project github.com/influxdata/influxdb/v2
-
 Name:           influxdb2
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 License:        MIT
@@ -34,7 +32,6 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #   5. cd static
 #   6. tar -cvf %%{name}-%%{version}-static-data.tar.gz data/
 Source2:        %{name}-%{version}-static-data.tar.gz
-BuildRequires:  fdupes
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
 BuildRequires:  pkgconfig(flux) >= 0.179.0
@@ -44,6 +41,8 @@ BuildRequires:  make
 BuildRequires:  rust >= 1.60.0
 BuildRequires:  clang
 BuildRequires:  tzdata
+Requires:       tzdata
+Conflicts:      influxdb
 
 %description
 InfluxDB is an distributed time series database with no external dependencies.
@@ -53,7 +52,8 @@ It's useful for recording metrics, events, and performing analytics.
 Summary:        InfluxDB development files
 Group:          Development/Languages/Golang
 Requires:       go
-Conflicts:      influxdb 
+Requires:       tzdata
+Conflicts:      influxdb
 
 %description devel
 Go sources and other development files for InfluxDB
@@ -85,6 +85,7 @@ export PATH=$PATH:$GOBIN
 
 mkdir -p %{buildroot}%{_bindir}
 install -D -m 0755 bin/influxd %{buildroot}%{_bindir}/
+install -D -m 0755 bin/telemetryd %{buildroot}%{_bindir}/
 
 %check
 export GOTRACEBACK=all
