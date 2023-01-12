@@ -1,5 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
+# Heads up: 7.87 breaks perl-WWW-Curl (see #4588).
 Version:        7.86.0
 Release:        2%{?dist}
 License:        MIT
