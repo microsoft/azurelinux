@@ -22383,6 +22383,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-rdflib",
+          "version": "6.2.0",
+          "downloadUrl": "https://github.com/RDFLib/rdflib/releases/download/6.2.0/rdflib-6.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-recommonmark",
           "version": "0.6.0",
           "downloadUrl": "https://github.com/readthedocs/recommonmark/archive/0.6.0/recommonmark-0.6.0.tar.gz"
