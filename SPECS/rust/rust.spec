@@ -1,14 +1,15 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
-# Look for "date:" and "rustc:".
-%define release_date 2022-01-13
-%define stage0_version 1.58.0
+# Release date and version of stage 0 compiler can be found in "src/stage0.json"
+# inside the extracted "Source0". Look for fields `compiler.date` and
+# `compiler.version`. 
+%define release_date 2022-11-03
+%define stage0_version 1.65.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.59.0
+Version:        1.66.1
 Release:        1%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
@@ -120,6 +121,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Fri Jan 13 2023 Aurélien Bombo <abombo@microsoft.com> - 1.66.1-1
+- Update to 1.66.1 to fix CVE-2022-46176.
+
 * Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
 - Updating to version 1.59.0 to fix CVE-2022-21658.
 - Updating build instructions to fix tests.
