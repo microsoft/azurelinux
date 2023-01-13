@@ -1,13 +1,11 @@
-# Turn off the brp-python-bytecompile script
-%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 Summary:        Braille translation and back-translation library
 Name:           liblouis
-Version:        3.22.0
+Version:        3.24.0
 Release:        2%{?dist}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://liblouis.org
+URL:            https://github.com/liblouis/liblouis
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  chrpath
 BuildRequires:  fdupes
@@ -41,7 +39,7 @@ Linux. It has, however, gone far beyond these routines.
 
 %package        devel
 Summary:        Development files for %{name}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       pkgconfig
 
@@ -51,7 +49,7 @@ developing applications that use %{name}.
 
 %package        utils
 Summary:        Command-line utilities to test %{name}
-License:        GPLv3+
+License:        GPL-3.0-or-later
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    utils
@@ -62,7 +60,7 @@ them is suitable for braille transcription.
 %package -n python3-louis
 %{?python_provide:%python_provide python3-louis}
 Summary:        Python 3 language bindings for %{name}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 Requires:       %{name} = %{version}-%{release}
 Obsoletes:      %{name}-python3 < 2.6.2-3
 Provides:       %{name}-python3 = %{version}-%{release}
@@ -74,7 +72,7 @@ This package provides Python 3 language bindings for %{name}.
 %if %{with docs}
 %package doc
 Summary:        Documentation for %{name}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
 
@@ -82,20 +80,16 @@ BuildArch:      noarch
 This package provides the documentation for liblouis.
 %endif
 
-%global __os_install_post %{nil}
-%global debug_package %{nil}
-License:        LGPLv3+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 
 %prep
 %autosetup
-
+chmod 664 tables/*
 
 %build
 %configure --disable-static --enable-ucs4
 # parallel builds fail
 make
+
 %if %{with docs}
 cd doc; xetex %{name}.texi
 %endif
@@ -119,7 +113,6 @@ cd python/louis
 
 install -d %{buildroot}%{python3_sitelib}/louis
 install -pm 0644 __init__.py %{buildroot}%{python3_sitelib}/louis/
-%py_byte_compile %{__python3} %{buildroot}%{python3_sitelib}/louis/
 
 # Remove Rpaths from the executables. We must do that in the %%install section
 # because, otherwise, the test suite wouldn't build.
@@ -158,8 +151,8 @@ done
 %endif
 
 %changelog
-* Wed Jan 11 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.22.0-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+* Fri Jan 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.24.0-2
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
 
 * Thu Jun 09 2022 Martin Gieseking <martin.gieseking@uos.de> - 3.22.0-1
