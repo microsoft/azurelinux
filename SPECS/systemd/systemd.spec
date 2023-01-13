@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        13%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -179,8 +179,6 @@ meson test -C build
 # to enable/disable services should succeed.
 if [ $1 -eq 1 ]; then
      systemctl preset-all
-     systemctl disable --now systemd-oomd
-     systemctl mask systemd-oomd
 fi
 
 %postun -p /sbin/ldconfig
@@ -273,9 +271,6 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Tue Jan 10 2023 Adit Jha <aditjha@microsoft.com> - 250.3-13
-- Disabling systemd-oomd.service by default to keep systemctl status clean
-
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-12
 - Add patch for CVE-2022-45873
 
