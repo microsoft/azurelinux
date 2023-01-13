@@ -1631,6 +1631,7 @@
                 "python-pyudev",
                 "python-pywbem",
                 "python-qrcode",
+                "python-rdflib",
                 "python-recommonmark",
                 "python-redis",
                 "python-requests-file",
