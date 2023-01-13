@@ -771,6 +771,7 @@
                 "libzip",
                 "libzmf",
                 "lilv",
+                "linuxconsoletools",
                 "linuxptp",
                 "lksctp-tools",
                 "lldpd",
