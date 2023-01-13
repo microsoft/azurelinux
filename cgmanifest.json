@@ -9380,6 +9380,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libmikmod",
+          "version": "3.3.11.1",
+          "downloadUrl": "https://downloads.sourceforge.net/mikmod/libmikmod-3.3.11.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmnl",
           "version": "1.0.4",
           "downloadUrl": "http://netfilter.org/projects/libmnl/files/libmnl-1.0.4.tar.bz2"
