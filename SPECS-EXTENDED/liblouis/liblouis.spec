@@ -58,9 +58,9 @@ are intended for testing liblouis and for debugging tables. None of
 them is suitable for braille transcription.
 
 %package -n python3-louis
-%{?python_provide:%python_provide python3-louis}
 Summary:        Python 3 language bindings for %{name}
 License:        LGPL-3.0-or-later
+%{?python_provide:%python_provide python3-louis}
 Requires:       %{name} = %{version}-%{release}
 Obsoletes:      %{name}-python3 < 2.6.2-3
 Provides:       %{name}-python3 = %{version}-%{release}
