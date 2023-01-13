@@ -4549,6 +4549,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gstreamer1-plugins-base",
+          "version": "1.20.0",
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.20.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gtest",
           "version": "1.12.1",
           "downloadUrl": "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
