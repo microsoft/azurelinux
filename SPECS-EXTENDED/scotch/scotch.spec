@@ -1,10 +1,3 @@
-%global openmpidir %{_builddir}/ptscotch-openmpi-%{version}-%{release}
-%global mpichdir %{_builddir}/ptscotch-mpich-%{version}-%{release}
-# Shared library versioning:
-# Increment if interface is changed in an incompatible way
-%global so_maj 1
-# Increment if interface is extended
-%global so_min 3
 %bcond_with mpich
 %bcond_with mpi
 Summary:        Graph, mesh and hypergraph partitioning library
@@ -21,6 +14,13 @@ Source1:        scotch-Makefile.shared.inc.in
 Patch0:         scotch-ldflags.patch
 # Ensure gfortran is used as fortran compiler
 Patch1:         scotch-gfortran.patch
+%global openmpidir %{_builddir}/ptscotch-openmpi-%{version}-%{release}
+%global mpichdir %{_builddir}/ptscotch-mpich-%{version}-%{release}
+# Shared library versioning:
+# Increment if interface is changed in an incompatible way
+%global so_maj 1
+# Increment if interface is extended
+%global so_min 3
 BuildRequires:  bison
 BuildRequires:  bzip2-devel
 BuildRequires:  flex
