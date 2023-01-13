@@ -20,6 +20,9 @@
       - [Force Rebuilds](#force-rebuilds)
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
+  - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
+      - [Mariner 1.0](#mariner-10)
+      - [Mariner 2.0](#mariner-20)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
     - [Authentication](#authentication)
@@ -293,6 +296,35 @@ The build system also enforces hash checking for sources when packaging SRPMs. F
 # Just update the intermediate SRPMs and their source signatures by using the input-srpms target
 sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 ```
+
+### packages.microsoft.com Repository Structure
+
+Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/). The Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+
+Preview repositories are for test purposes. You can publish to preview to test out your RPM without interfering with the greater universe of Mariner users. However, the preview repositories *are* public and *can* be consumed by others when a Mariner instance has been provisioned to see the Mariner preview repositories.
+
+The "preview" and "production folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
+
+#### Mariner 1.0
+
+For Mariner 1.0, the repositories are structured as follows:
+
+- **Base:** Packages released with Mariner 1.0.
+- **Update:** Base packages added or updated since Mariner 1.0's release date.
+- **CoreUI:** Additional UI related packages needed to satisfy the requirements for building WSLg.
+- **Extras:** Mariner 1.0 packages that are built by Microsoft and are closed source.
+- **NVIDIA:** Specially licensed NVIDIA packages.
+- **Microsoft:** Packages built by Microsoft that are open source.
+
+#### Mariner 2.0
+
+For Mariner 2.0, the repositories are structured as follows:
+
+- **Base:** Packages released with Mariner 2.0 and their updates.
+- **Extras:** Mariner 2.0 packages that are built by Microsoft and are closed source
+- **Extended:** Mariner 2.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
+- **NVIDIA:** Specially licensed NVIDIA packages.
+- **Microsoft:** Packages built by Microsoft that are open source.
 
 ## Keys, Certs, and Remote Sources
 
