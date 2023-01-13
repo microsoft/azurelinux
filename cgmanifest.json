@@ -8180,6 +8180,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcanberra",
+          "version": "0.30",
+          "downloadUrl": "https://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libcap",
           "version": "2.60",
           "downloadUrl": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.60.tar.xz"
