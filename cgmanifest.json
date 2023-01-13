@@ -3297,6 +3297,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fftw",
+          "version": "3.3.10",
+          "downloadUrl": "https://www.fftw.org/fftw-3.3.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "file",
           "version": "5.40",
           "downloadUrl": "http://ftp.astron.com/pub/file/file-5.40.tar.gz"
