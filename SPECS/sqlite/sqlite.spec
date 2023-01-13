@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.39.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ URL:            https://www.sqlite.org
 Source0:        https://www.sqlite.org/2022/%{name}-autoconf-%{sourcever}.tar.gz
 # CVE-2015-3717 applies to versions shipped in iOS and OS X
 Patch0:         CVE-2015-3717.nopatch
+Patch1:         CVE-2022-46908.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
@@ -81,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Tue Dec 13 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.39.2-2
+- Address CVE-2022-46908
+
 * Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 3.39.2-1
 - Bump version to address CVE-2022-35737
 

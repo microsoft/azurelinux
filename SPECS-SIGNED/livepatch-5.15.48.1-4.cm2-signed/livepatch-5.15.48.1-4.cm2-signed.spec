@@ -61,8 +61,11 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 ExclusiveArch:  x86_64
 
 %description
-Empty package enabling subscription to future kernel livepatches
-addressing CVEs present in Mariner's 5.15.48.1-4.cm2 kernel.
+A set of kernel livepatches addressing CVEs present in Mariner's
+5.15.48.1-4.cm2 kernel.
+
+Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):
+*CVE-2022-34918
 
 %package -n     %{livepatch_unsigned_name}
 Summary:        %{summary}
@@ -78,8 +81,11 @@ Requires(preun): kpatch
 Provides:       livepatch = %{kernel_version_release}
 
 %description -n %{livepatch_unsigned_name}
-Empty package enabling subscription to future kernel livepatches
-addressing CVEs present in Mariner's 5.15.48.1-4.cm2 kernel.
+A set of kernel livepatches addressing CVEs present in Mariner's
+5.15.48.1-4.cm2 kernel.
+
+Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):
+*CVE-2022-34918
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}

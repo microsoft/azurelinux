@@ -140,17 +140,17 @@ func TestShouldSucceedParsingMissingDefaultKernelForRootfs_SystemConfig(t *testi
 func TestShouldFailParsingInvalidKernelForRootfs_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 
-	rootfsInvalidKernelConfig := validSystemConfig
-	rootfsInvalidKernelConfig.KernelOptions = map[string]string{"_comment": "trick the check", "extra": ""}
-	rootfsInvalidKernelConfig.PartitionSettings = []PartitionSetting{}
+	invalidBootTypeConfig := validSystemConfig
+	invalidBootTypeConfig.KernelOptions = map[string]string{"_comment": "trick the check", "extra": ""}
+	invalidBootTypeConfig.PartitionSettings = []PartitionSetting{}
 
-	rootfsInvalidKernelConfig.Encryption = RootEncryption{}
+	invalidBootTypeConfig.Encryption = RootEncryption{}
 
-	err := rootfsInvalidKernelConfig.IsValid()
+	err := invalidBootTypeConfig.IsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 
-	err = remarshalJSON(rootfsInvalidKernelConfig, &checkedSystemConfig)
+	err = remarshalJSON(invalidBootTypeConfig, &checkedSystemConfig)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [SystemConfig]: empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 }
@@ -364,4 +364,13 @@ func TestShouldFailToParseInvalidJSON_SystemConfig(t *testing.T) {
 
 func TestShouldSetRemoveRpmDbToFalse(t *testing.T) {
 	assert.Equal(t, validSystemConfig.RemoveRpmDb, false)
+}
+
+func TestShouldFailParsingUnexpectedBootType_SystemConfig(t *testing.T) {
+	invalidBootTypeConfig := validSystemConfig
+	invalidBootTypeConfig.BootType = "uefi"
+
+	err := invalidBootTypeConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [BootType]: uefi. Expecting values of either 'efi', 'legacy', 'none' or empty string.", err.Error())
 }

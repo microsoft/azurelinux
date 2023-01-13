@@ -1,0 +1,154 @@
+diff -urN libnetfilter_log-1.0.0/include/libnetfilter_log/libnetfilter_log.h libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/libnetfilter_log.h
+--- libnetfilter_log-1.0.0/include/libnetfilter_log/libnetfilter_log.h	2010-11-03 15:39:00.000000000 +0300
++++ libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/libnetfilter_log.h	2010-11-03 15:36:09.000000000 +0300
+@@ -9,7 +9,11 @@
+ #ifndef __LIBNETFILTER_LOG_H
+ #define __LIBNETFILTER_LOG_H
+ 
+-#include <libnetfilter_log/linux_nfnetlink_log.h>
++#ifndef aligned_be64
++#define aligned_be64 __be64 __attribute__((aligned(8)))
++#endif
++
++#include <linux/netfilter/nfnetlink_log.h>
+ 
+ struct nflog_handle;
+ struct nflog_g_handle;
+diff -urN libnetfilter_log-1.0.0/include/libnetfilter_log/linux_nfnetlink_log.h libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/linux_nfnetlink_log.h
+--- libnetfilter_log-1.0.0/include/libnetfilter_log/linux_nfnetlink_log.h	2010-11-03 15:39:00.000000000 +0300
++++ libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/linux_nfnetlink_log.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,102 +0,0 @@
+-#ifndef _NFNETLINK_LOG_H
+-#define _NFNETLINK_LOG_H
+-
+-#ifndef aligned_u64
+-#define aligned_u64 unsigned long long __attribute__((aligned(8)))
+-#endif
+-
+-/* This file describes the netlink messages (i.e. 'protocol packets'),
+- * and not any kind of function definitions.  It is shared between kernel and
+- * userspace.  Don't put kernel specific stuff in here */
+-
+-#include <linux/types.h>
+-#include <libnfnetlink/linux_nfnetlink.h>
+-
+-enum nfulnl_msg_types {
+-	NFULNL_MSG_PACKET,		/* packet from kernel to userspace */
+-	NFULNL_MSG_CONFIG,		/* connect to a particular queue */
+-
+-	NFULNL_MSG_MAX
+-};
+-
+-struct nfulnl_msg_packet_hdr {
+-	u_int16_t	hw_protocol;	/* hw protocol (network order) */
+-	u_int8_t	hook;		/* netfilter hook */
+-	u_int8_t	_pad;
+-} __attribute__ ((packed));
+-
+-struct nfulnl_msg_packet_hw {
+-	u_int16_t	hw_addrlen;
+-	u_int16_t	_pad;
+-	u_int8_t	hw_addr[8];
+-} __attribute__ ((packed));
+-
+-struct nfulnl_msg_packet_timestamp {
+-	aligned_u64	sec;
+-	aligned_u64	usec;
+-} __attribute__ ((packed));
+-
+-#define NFULNL_PREFIXLEN	30	/* just like old log target */
+-
+-enum nfulnl_attr_type {
+-	NFULA_UNSPEC,
+-	NFULA_PACKET_HDR,
+-	NFULA_MARK,			/* u_int32_t nfmark */
+-	NFULA_TIMESTAMP,		/* nfulnl_msg_packet_timestamp */
+-	NFULA_IFINDEX_INDEV,		/* u_int32_t ifindex */
+-	NFULA_IFINDEX_OUTDEV,		/* u_int32_t ifindex */
+-	NFULA_IFINDEX_PHYSINDEV,	/* u_int32_t ifindex */
+-	NFULA_IFINDEX_PHYSOUTDEV,	/* u_int32_t ifindex */
+-	NFULA_HWADDR,			/* nfulnl_msg_packet_hw */
+-	NFULA_PAYLOAD,			/* opaque data payload */
+-	NFULA_PREFIX,			/* string prefix */
+-	NFULA_UID,			/* user id of socket */
+-	NFULA_SEQ,			/* instance-local sequence number */
+-	NFULA_SEQ_GLOBAL,		/* global sequence number */
+-	NFULA_GID,			/* group id of socket */
+-	NFULA_HWTYPE,			/* hardware type */
+-	NFULA_HWHEADER,			/* hardware header */
+-	NFULA_HWLEN,			/* hardware header length */
+-
+-	__NFULA_MAX
+-};
+-#define NFULA_MAX (__NFULA_MAX - 1)
+-
+-enum nfulnl_msg_config_cmds {
+-	NFULNL_CFG_CMD_NONE,
+-	NFULNL_CFG_CMD_BIND,
+-	NFULNL_CFG_CMD_UNBIND,
+-	NFULNL_CFG_CMD_PF_BIND,
+-	NFULNL_CFG_CMD_PF_UNBIND,
+-};
+-
+-struct nfulnl_msg_config_cmd {
+-	u_int8_t	command;	/* nfulnl_msg_config_cmds */
+-} __attribute__ ((packed));
+-
+-struct nfulnl_msg_config_mode {
+-	u_int32_t	copy_range;
+-	u_int8_t	copy_mode;
+-	u_int8_t	_pad;
+-} __attribute__ ((packed));
+-
+-enum nfulnl_attr_config {
+-	NFULA_CFG_UNSPEC,
+-	NFULA_CFG_CMD,			/* nfulnl_msg_config_cmd */
+-	NFULA_CFG_MODE,			/* nfulnl_msg_config_mode */
+-	NFULA_CFG_NLBUFSIZ,		/* u_int32_t buffer size */
+-	NFULA_CFG_TIMEOUT,		/* u_int32_t in 1/100 s */
+-	NFULA_CFG_QTHRESH,		/* u_int32_t */
+-	NFULA_CFG_FLAGS,		/* u_int16_t */
+-	__NFULA_CFG_MAX
+-};
+-#define NFULA_CFG_MAX (__NFULA_CFG_MAX -1)
+-
+-#define NFULNL_COPY_NONE	0x00
+-#define NFULNL_COPY_META	0x01
+-#define NFULNL_COPY_PACKET	0x02
+-
+-#define NFULNL_CFG_F_SEQ	0x0001
+-#define NFULNL_CFG_F_SEQ_GLOBAL	0x0002
+-
+-#endif /* _NFNETLINK_LOG_H */
+diff -urN libnetfilter_log-1.0.0/include/libnetfilter_log/Makefile.am libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/Makefile.am
+--- libnetfilter_log-1.0.0/include/libnetfilter_log/Makefile.am	2010-11-03 15:39:00.000000000 +0300
++++ libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/Makefile.am	2010-11-03 15:36:09.000000000 +0300
+@@ -1,3 +1 @@
+-
+-pkginclude_HEADERS = libnetfilter_log.h libipulog.h linux_nfnetlink_log.h
+-
++pkginclude_HEADERS = libnetfilter_log.h libipulog.h
+diff -urN libnetfilter_log-1.0.0/include/libnetfilter_log/Makefile.in libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/Makefile.in
+--- libnetfilter_log-1.0.0/include/libnetfilter_log/Makefile.in	2010-11-03 15:39:26.000000000 +0300
++++ libnetfilter_log-1.0.0-noheader/include/libnetfilter_log/Makefile.in	2010-11-03 15:36:42.000000000 +0300
+@@ -196,7 +196,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-pkginclude_HEADERS = libnetfilter_log.h libipulog.h linux_nfnetlink_log.h
++pkginclude_HEADERS = libnetfilter_log.h libipulog.h
+ all: all-am
+ 
+ .SUFFIXES:
+diff -urN libnetfilter_log-1.0.0/src/libnetfilter_log.c libnetfilter_log-1.0.0-noheader/src/libnetfilter_log.c
+--- libnetfilter_log-1.0.0/src/libnetfilter_log.c	2010-11-03 15:39:00.000000000 +0300
++++ libnetfilter_log-1.0.0-noheader/src/libnetfilter_log.c	2010-11-03 15:36:09.000000000 +0300
+@@ -27,8 +27,6 @@
+ #include <netinet/in.h>
+ #include <sys/socket.h>
+ 
+-#include <libnetfilter_log/linux_nfnetlink_log.h>
+-
+ #include <libnfnetlink/libnfnetlink.h>
+ #include <libnetfilter_log/libnetfilter_log.h>
+ 

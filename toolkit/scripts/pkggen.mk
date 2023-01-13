@@ -9,6 +9,7 @@ $(call create_folder,$(RPMS_DIR))
 $(call create_folder,$(CACHED_RPMS_DIR))
 $(call create_folder,$(PKGBUILD_DIR))
 $(call create_folder,$(CHROOT_DIR))
+$(call create_folder,$(CCACHE_DIR))
 
 ######## PACKAGE DEPENDENCY CALCULATIONS ########
 
@@ -40,7 +41,7 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-spec-parse graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
@@ -57,6 +58,8 @@ clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
 	rm -rf $(parse_working_dir)
+clean-ccache:
+	rm -rf $(CCACHE_DIR)
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
@@ -198,6 +201,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--rpm-dir="$(RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
+		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
@@ -217,6 +221,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
+		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
 		$(logging_command) && \
 	touch $@
 

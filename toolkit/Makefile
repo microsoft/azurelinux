@@ -28,6 +28,7 @@ DOWNLOAD_SRPMS                  ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
 REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
+USE_CCACHE                      ?= n
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
@@ -63,6 +64,7 @@ PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
+CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 
 # Sub-folder defines
 LOGS_DIR         ?= $(BUILD_DIR)/logs
@@ -102,12 +104,14 @@ SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/co
 
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
+PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
 ifeq ($(USE_PREVIEW_REPO),y)
    PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
    PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
    SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
    ifneq ($(wildcard $(PREVIEW_REPO)),)
       override REPO_LIST += $(PREVIEW_REPO)

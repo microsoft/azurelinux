@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,7 @@ sh configure \
     --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_sub_module \
+    --with-http_v2_module \
     --with-ipv6 \
     --with-pcre \
     --with-stream
@@ -108,6 +109,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Wed Nov 30 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.22.1-2
+- Enable http2 support
+
 * Fri Oct 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-1
 - Move to stable release 
 

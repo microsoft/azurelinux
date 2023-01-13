@@ -518,7 +518,9 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
+	// Please contact Qualys before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
+	// Please contact Qualys, AquaSec (trivy) and other supported scanning vendors before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t(none)\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n")
 
 	return
@@ -975,6 +977,22 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
+//InstallGrubEnv installs an empty grubenv f
+func InstallGrubEnv(installRoot string) (err error) {
+	const (
+		assetGrubEnvFile = "/installer/grub2/grubenv"
+		grubEnvFile      = "boot/grub2/grubenv"
+	)
+	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
+	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	if err != nil {
+		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
+		return
+	}
+
+	return
+}
+
 // InstallGrubCfg installs the main grub config to the boot partition
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
@@ -1047,6 +1065,12 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+		return
+	}
+
+	err = setGrubCfgCGroup(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
 		return
 	}
 
@@ -2050,6 +2074,32 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	err = sed(selinuxPattern, selinux, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
+	}
+
+	return
+}
+
+func setGrubCfgCGroup(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		cgroupPattern     = "{{.CGroup}}"
+		cgroupv1FlagValue = "systemd.unified_cgroup_hierarchy=0"
+		cgroupv2FlagValue = "systemd.unified_cgroup_hierarchy=1"
+	)
+	var cgroup string
+
+	switch kernelCommandline.CGroup {
+	case configuration.CGroupV2:
+		cgroup = fmt.Sprintf("%s", cgroupv2FlagValue)
+	case configuration.CGroupV1:
+		cgroup = fmt.Sprintf("%s", cgroupv1FlagValue)
+	case configuration.CGroupDefault:
+		cgroup = ""
+	}
+
+	logger.Log.Debugf("Adding CGroupConfiguration('%s') to '%s'", cgroup, grubPath)
+	err = sed(cgroupPattern, cgroup, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's CGroup setting: %v", err)
 	}
 
 	return
