@@ -1,13 +1,13 @@
-Name:           influxdb2
 Summary:        Scalable datastore for metrics, events, and real-time analytics
+Name:           influxdb2
+Version:        2.4.0
+Release:        0%{?dist}
 License:        MIT
-Group:          Productivity/Databases/Servers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:        2.4.0
-Release:        1%{?dist}
+Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influxdb
-Source0:        %{url}%archive/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
+Source0:        %{url}%{archive}/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
