@@ -114,4 +114,68 @@ go test ./...
 %doc README.md CHANGELOG.md
 %{_bindir}/influxd
 %{_bindir}/telemetryd
+
 %changelog
+* Fri Jan 13 10:49:53 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: MIT). And upgrade to version 2.4.0.
+
+* Tue Oct  4 16:27:35 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Update to version 2.3.0, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.3.0
+  Drop 0001-fix-executor-do-not-assume-ints-are-64bits-4652.patch:
+  upstreamed
+
+* Thu Jun  9 15:54:42 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Update to version 2.2.0, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.2.0
+  Add 0001-fix-executor-do-not-assume-ints-are-64bits-4652.patch:
+  fix build on 32-bit architectures
+
+* Tue Nov 16 17:06:09 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Update to version 2.1.1, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.1.1
+- influx binary has been deleted upstream:
+  * https://github.com/influxdata/influxdb/issues/21773
+
+
+* Tue Oct 26 10:14:37 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Update to version 2.0.9, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.0.9
+
+* Fri Sep 24 13:50:29 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Update to version 2.0.8, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.0.8
+
+* Thu Jun 10 09:02:02 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+- Reintroduce configuration file in etc and provide example configuration:
+  * no tracking by default
+  * conservative memory limits to prevent OOM
+  * description how to obtain list of possible values
+  * example how to move stored data into different directory
+
+* Thu Jun 10 08:22:49 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+- Update to version 2.0.7, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.0.7
+
+* Thu May 27 20:56:22 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+- Include prebuild UI assets
+- Drop the last mention of config file in service file
+
+* Wed May 19 21:51:38 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+- Update to version 2.0.6, see
+  * https://github.com/influxdata/influxdb/releases/tag/v2.0.6
+  * https://github.com/influxdata/influxdb/releases/tag/v2.0.5
+
+* Mon May 17 21:34:31 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+- Update service file not to use invalid options
+- Dropping config file as upstream does and dropping unused directories
+
+* Thu Mar 18 08:12:08 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Install lost influxdb-user.conf
+
+* Tue Mar 16 13:33:34 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Drop unused BuildRequirements
+- use sysusers.d
+
+* Sun Mar  7 08:54:12 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+- Initial version
