@@ -1590,6 +1590,7 @@
                 "python-mimeparse",
                 "python-mock",
                 "python-monotonic",
+                "python-more-itertools",
                 "python-mutagen",
                 "python-nose2",
                 "python-ntlm-auth",

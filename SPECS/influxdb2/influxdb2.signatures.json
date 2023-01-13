@@ -1,0 +1,6 @@
+{
+    "Signatures": {
+        "influxdb2-2.4.0.tar.gz": "f7356f0edd82ca7b8114145f91fe7460ce3e01fad2697d64a62bcce75cd30898",
+        "influxdb2-2.4.0-vendor.tar.gz": "1e5f3cf6d5f681d525b0547df651dff1ea55a0346518224e539dfe97a33c03ca"
+    }
+}
