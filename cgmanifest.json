@@ -20283,6 +20283,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pulseaudio",
+          "version": "16.1",
+          "downloadUrl": "https://freedesktop.org/software/pulseaudio/releases/pulseaudio-16.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "puppet",
           "version": "7.12.1",
           "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.12.1.tar.gz"
