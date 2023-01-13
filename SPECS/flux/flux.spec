@@ -2,16 +2,16 @@
 
 %define libflux_suffix %(echo %{version} | tr . _)
 
+Summary:        Influx data language
 Name:           flux
 Version:        0.179.0
 Release:        0%{?dist}
-Summary:        Influx data language
 License:        MIT
-Group:          Productivity/Databases/Servers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/flux
-Source0:        %{url}%archive/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
+Source0:        %{url}%{archive}/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
@@ -23,9 +23,8 @@ Source0:        %{url}%archive/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 BuildRequires:  cargo >= 1.45
-BuildRequires:  rust >= 1.45
 BuildRequires:  kernel-headers
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  rust >= 1.45
 
 %description
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
