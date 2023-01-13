@@ -11250,6 +11250,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "linuxconsoletools",
+          "version": "1.8.1",
+          "downloadUrl": "https://downloads.sourceforge.net/linuxconsole/linuxconsoletools-1.8.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "linuxptp",
           "version": "2.0",
           "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
