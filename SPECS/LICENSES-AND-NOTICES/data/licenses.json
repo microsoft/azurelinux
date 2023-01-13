@@ -1463,6 +1463,7 @@
                 "physfs",
                 "picosat",
                 "pinfo",
+                "pipewire",
                 "pixman",
                 "pkcs11-helper",
                 "pkgconf",
