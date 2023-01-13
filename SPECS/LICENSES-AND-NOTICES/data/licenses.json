@@ -766,6 +766,7 @@
                 "libyubikey",
                 "libzip",
                 "libzmf",
+                "lilv",
                 "linuxptp",
                 "lksctp-tools",
                 "lldpd",
