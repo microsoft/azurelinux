@@ -6700,6 +6700,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "influxdb2",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "infinipath-psm",
           "version": "3.3",
           "downloadUrl": "https://github.com/intel/psm/archive/refs/tags/v3.3.tar.gz"

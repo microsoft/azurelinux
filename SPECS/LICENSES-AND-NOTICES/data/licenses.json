@@ -2339,6 +2339,7 @@
                 "hawtjni-runtime",
                 "httpcomponents-client",
                 "httpcomponents-core",
+                "influxdb2",
                 "isorelax",
                 "jakarta-taglibs-standard",
                 "jansi-native",
