@@ -1,0 +1,17 @@
+[Unit]
+Description=InfluxDB is an open-source, distributed, time series database
+Documentation=https://docs.influxdata.com/influxdb/
+After=network.target
+
+[Service]
+Environment="INFLUXD_CONFIG_PATH=/etc/influxdb2/config.yaml"
+LimitNOFILE=65536
+ExecStart=/usr/bin/influxd --assets-path="/usr/share/influxdb2/ui"
+Type=simple
+StandardOutput=journal
+StandardError=journal
+User=influxdb
+Group=influxdb
+
+[Install]
+WantedBy=multi-user.target

@@ -49,6 +49,9 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #   5. cd static
 #   6. tar -cvf %%{name}-%%{version}-static-data.tar.gz data/
 Source2:        %{name}-%{version}-static-data.tar.gz
+Source3:        influxdb.service
+Source4:        influxdb.tmpfiles
+Source5:        config.yaml
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
 BuildRequires:  pkgconfig(flux) >= 0.179.0
@@ -58,8 +61,12 @@ BuildRequires:  make
 BuildRequires:  rust >= 1.60.0
 BuildRequires:  clang
 BuildRequires:  tzdata
+BuildRequires:  systemd-rpm-macros
 Requires:       tzdata
 Conflicts:      influxdb
+%{!?_tmpfilesdir:%global _tmpfilesdir /usr/lib/tmpfiles.d}
+%{?systemd_requires}
+Requires(post): systemd
 
 %description
 InfluxDB is an distributed time series database with no external dependencies.
@@ -103,17 +110,41 @@ export PATH=$PATH:$GOBIN
 mkdir -p %{buildroot}%{_bindir}
 install -D -m 0755 bin/influxd %{buildroot}%{_bindir}/
 install -D -m 0755 bin/telemetryd %{buildroot}%{_bindir}/
+mkdir -p %{buildroot}%{_sbindir}
+install -D -m 0644 %{SOURCE3} %{buildroot}%{_unitdir}/influxdb.service
+ln -s /usr/sbin/service %{buildroot}%{_sbindir}/rcinfluxdb
+install -D -m 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/influxdb.conf
+install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb2/config.yaml
 
 %check
 export GOTRACEBACK=all
 export GO111MODULE=on
 go test ./...
 
+%pre
+%service_add_pre influxdb.service
+
+%preun
+%service_del_preun influxdb.service
+
+%post
+%tmpfiles_create %_tmpfilesdir/influxdb.conf
+%service_add_post influxdb.service
+
+%postun
+%service_del_postun influxdb.service
+
 %files
 %license LICENSE
 %doc README.md CHANGELOG.md
+%dir %{_sysconfdir}/influxdb2
+%config(noreplace) %{_sysconfdir}/influxdb2/config.yaml
 %{_bindir}/influxd
 %{_bindir}/telemetryd
+%{_sbindir}/rcinfluxdb
+%{_unitdir}/influxdb.service
+%dir %{_tmpfilesdir}
+%{_tmpfilesdir}/influxdb.conf
 
 %changelog
 * Fri Jan 13 10:49:53 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
@@ -136,7 +167,6 @@ go test ./...
   * https://github.com/influxdata/influxdb/releases/tag/v2.1.1
 - influx binary has been deleted upstream:
   * https://github.com/influxdata/influxdb/issues/21773
-
 
 * Tue Oct 26 10:14:37 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.0.9, see
