@@ -168,7 +168,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--output-dir=$(external_rpm_cache)
 
 # We need to ensure that initrd_img recursive build will never run concurrently with another build component, so add all ISO prereqs as 
-#	order-only-prerequisites to initrd_img
+# order-only-prerequisites to initrd_img
 iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary)
 # The initrd bundles these files into the image, we should rebuild it if they change
 initrd_bundled_files = $(go-liveinstaller) $(go-imager) $(assets_files) $(initrd_assets_files) $(imggen_local_repo)
