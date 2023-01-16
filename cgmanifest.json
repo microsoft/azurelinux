@@ -14753,6 +14753,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openrdate",
+          "version": "1.2",
+          "downloadUrl": "http://downloads.sourceforge.net/openrdate/openrdate-1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "opensc",
           "version": "0.22.0",
           "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.22.0/opensc-0.22.0.tar.gz"
