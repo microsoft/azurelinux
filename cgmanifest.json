@@ -2266,6 +2266,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "crypto-policies",
+          "version": "20200619",
+          "downloadUrl": "https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive//crypto-policies-git.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cryptsetup",
           "version": "2.4.3",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.4/cryptsetup-2.4.3.tar.xz"
