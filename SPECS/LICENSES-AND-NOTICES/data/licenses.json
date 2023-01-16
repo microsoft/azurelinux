@@ -2005,6 +2005,7 @@
                 "xdg-dbus-proxy",
                 "xdg-user-dirs",
                 "xdg-utils",
+                "xdp-tools",
                 "xfconf",
                 "xfsdump",
                 "xguest",

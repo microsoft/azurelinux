@@ -28861,6 +28861,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xdp-tools",
+          "version": "1.2.9",
+          "downloadUrl": "https://github.com/xdp-project/xdp-tools/releases/download/v1.2.9/xdp-tools-1.2.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xerces-j2",
           "version": "2.12.0",
           "downloadUrl": "https://archive.apache.org/dist/xerces/j/source/Xerces-J-src.2.12.0.tar.gz"
