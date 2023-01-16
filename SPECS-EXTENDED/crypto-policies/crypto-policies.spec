@@ -1,44 +1,34 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global git_date 20200619
 %global git_commit 781bbd45b7286408502ec47b5acc8ae85c604a68
 %{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
-
 %global _python_bytecompile_extra 0
-
+Summary:        System-wide crypto policies
 Name:           crypto-policies
 Version:        %{git_date}
 Release:        5%{?dist}
-Summary:        System-wide crypto policies
-
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://gitlab.com/redhat-crypto/fedora-crypto-policies
 Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/%{git_commit_hash}/%{name}-git%{git_commit_hash}.tar.gz
-
-BuildArch: noarch
-BuildRequires: asciidoc
-BuildRequires: libxslt
-BuildRequires: openssl
-BuildRequires: gnutls-utils >= 3.6.0
-BuildRequires: java-devel
-BuildRequires: bind
-BuildRequires: perl-interpreter
-BuildRequires: perl-generators
-BuildRequires: perl(File::pushd), perl(File::Temp), perl(File::Copy)
-BuildRequires: perl(File::Which)
-BuildRequires: python3-devel
-
-Conflicts: nss < 3.44
-Conflicts: libreswan < 3.28
-Conflicts: openssh < 8.2p1
-Conflicts: gnutls < 3.6.11
-
-# Most users want this, the split is mostly for Fedora CoreOS
-Recommends: crypto-policies-scripts
-
-# Self-obsolete to install both subpackages after split.
-# Remove in F32.
-Obsoletes: %{name} < 20190211-3.gite3eacfc
+BuildRequires:  asciidoc
+BuildRequires:  bind
+BuildRequires:  gnutls-utils >= 3.6.0
+BuildRequires:  java-devel
+BuildRequires:  libxslt
+BuildRequires:  openssl
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  python3-devel
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(File::Which)
+BuildRequires:  perl(File::pushd)
+Conflicts:      gnutls < 3.6.11
+Conflicts:      libreswan < 3.28
+Conflicts:      nss < 3.44
+Conflicts:      openssh < 8.2p1
+BuildArch:      noarch
 
 %description
 This package provides pre-built configuration files with
@@ -46,9 +36,8 @@ cryptographic policies for various cryptographic back-ends,
 such as SSL/TLS libraries.
 
 %package scripts
-Summary: Tool to switch between crypto policies
-Requires: %{name} = %{version}-%{release}
-Recommends: fips-mode-setup
+Summary:        Tool to switch between crypto policies
+Requires:       %{name} = %{version}-%{release}
 
 %description scripts
 This package provides a tool update-crypto-policies, which applies
@@ -57,15 +46,11 @@ either the pre-built policies from the base package or custom policies
 defined in simple policy definition files.
 
 %package -n fips-mode-setup
-Summary: Enable or disable system FIPS mode
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-scripts = %{version}-%{release}
-Requires: grubby
-Requires: dracut
-
-# Self-obsolete to install both subpackages after split.
-# Remove in F32.
-Obsoletes: %{name} < 20190211-3.gite3eacfc
+Summary:        Enable or disable system FIPS mode
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-scripts = %{version}-%{release}
+Requires:       dracut
+Requires:       grubby
 
 %description -n fips-mode-setup
 The package provides a tool to enable or disable the system FIPS mode.
@@ -142,7 +127,6 @@ end
 
 %posttrans scripts
 %{_bindir}/update-crypto-policies --no-check >/dev/null 2>/dev/null || :
-
 
 %files
 
@@ -579,4 +563,3 @@ end
 
 * Mon May 19 2014 Nikos Mavrogiannopoulos <nmav@redhat.com> - 0.9-1-20140519gitf15621a
 - Initial package build
-
