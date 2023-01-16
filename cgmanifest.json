@@ -10701,8 +10701,8 @@
         "type": "other",
         "other": {
           "name": "liburing",
-          "version": "2.0",
-          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
+          "version": "2.3",
+          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.3.tar.gz"
         }
       }
     },
