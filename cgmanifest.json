@@ -2268,7 +2268,7 @@
         "other": {
           "name": "crypto-policies",
           "version": "20200619",
-          "downloadUrl": "https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive//crypto-policies-git.tar.gz"
+          "downloadUrl": "https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/f32-updates/fedora-crypto-policies-f32-updates.tar.gz"
         }
       }
     },

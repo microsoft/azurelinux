@@ -1,6 +1,4 @@
 %global git_date 20200619
-%global git_commit 781bbd45b7286408502ec47b5acc8ae85c604a68
-%{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
 %global _python_bytecompile_extra 0
 Summary:        System-wide crypto policies
 Name:           crypto-policies
@@ -10,7 +8,7 @@ License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.com/redhat-crypto/fedora-crypto-policies
-Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/%{git_commit_hash}/%{name}-git%{git_commit_hash}.tar.gz
+Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/f32-updates/fedora-crypto-policies-f32-updates.tar.gz
 BuildRequires:  asciidoc
 BuildRequires:  bind
 BuildRequires:  gnutls-utils >= 3.6.0
@@ -56,7 +54,7 @@ Requires:       grubby
 The package provides a tool to enable or disable the system FIPS mode.
 
 %prep
-%setup -q -n fedora-crypto-policies-%{git_commit_hash}-%{git_commit}
+%setup -q -n fedora-crypto-policies-f32-updates
 # Fix path to asciidoc xsl documents
 # asciidoc installs these in %{_sysconfdir} by default, not %{_datadir}
 sed -i 's#/usr/share/asciidoc#%{_sysconfdir}/asciidoc#g' Makefile
