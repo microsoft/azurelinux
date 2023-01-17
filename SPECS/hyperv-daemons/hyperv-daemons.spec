@@ -9,7 +9,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        5.15.87.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Source102:      hypervvss.rules
 # HYPERV FCOPY DAEMON
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
+Patch0:    CVE-2022-47940.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}
@@ -104,6 +105,7 @@ Contains tools and scripts useful for Hyper-V guests.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%patch0 -p1
 
 %build
 pushd tools/hv
@@ -219,6 +221,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.87.1-2
+- Add patch for CVE-2022-47940
+
 * Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.87.1-1
 - Auto-upgrade to 5.15.87.1
 
