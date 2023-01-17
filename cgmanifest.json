@@ -26848,7 +26848,7 @@
         "other": {
           "name": "tk",
           "version": "8.6.10",
-          "downloadUrl": "http://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
+          "downloadUrl": "https://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
         }
       }
     },
