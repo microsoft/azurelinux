@@ -1776,6 +1776,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cogl",
+          "version": "1.22.8",
+          "downloadUrl": "https://download.gnome.org/sources/cogl/1.22/cogl-1.22.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "clutter-gtk",
           "version": "1.8.4",
           "downloadUrl": "https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
