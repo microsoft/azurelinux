@@ -91,11 +91,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Thu Jan 12 2023 Aurélien Bombo <abombo@microsoft.com> - 7.86.0-2
-- Downgrade to 7.86.0 since 7.87.0 breaks perl-WWW-curl.
 - Apply patch to fix CVE-2022-43551.
-
-* Tue Jan 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.87.0-1
-- Auto-upgrade to 7.87.0 - CVE-2022-43551
 
 * Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.86.0-1
 - Auto-upgrade to 7.86.0 - CVE-2022-42915
