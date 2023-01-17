@@ -1226,6 +1226,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bsf",
+          "version": "2.4.0",
+          "downloadUrl": "https://downloads.apache.org/commons/bsf/source/bsf-src-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bridge-utils",
           "version": "1.7.1",
           "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.7.1.tar.xz"
