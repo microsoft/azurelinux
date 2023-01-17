@@ -8150,6 +8150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libblockdev",
+          "version": "2.28",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.28-3.cm2/libblockdev-2.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lcov",
           "version": "1.14",
           "downloadUrl": "https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz"
