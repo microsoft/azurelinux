@@ -8510,6 +8510,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcmpiutil",
+          "version": "0.5.7",
+          "downloadUrl": "ftp://libvirt.org/libvirt-cim/libcmpiutil-0.5.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libcomps",
           "version": "0.1.18",
           "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/refs/tags/0.1.18.tar.gz"
