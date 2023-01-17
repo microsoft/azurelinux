@@ -24,7 +24,7 @@ else
 initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages.json
 endif
 initrd_packages_json    += $(RESOURCES_DIR)/imageconfigs/packagelists/accessibility-packages.json
-initrd_assets_files      = $(initrd_packages_json) $(shell find $(initrd_assets_dir) $(initrd_scripts_dir))
+initrd_assets_files      = $(initrd_packages_json) $(call shell_real_build_only, find $(initrd_assets_dir) $(initrd_scripts_dir))
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
 ova_vmxtemplate          = $(assets_dir)/ova/vmx-template
