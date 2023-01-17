@@ -5,8 +5,8 @@
 
 Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
-Version:        2.15.1
-Release:        2%{?dist}
+Version:        2.15.7
+Release:        1%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -182,6 +182,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/vtep-ctl.8.gz
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.7-1
+- Auto-upgrade to 2.15.7 - to fix CVE-2022-4338, CVE-2022-4337
+
 * Thu Sep 01 2022 Minghe Ren <mingheren@microsoft.com> - 2.15.1-2
 - Add patch to fix CVE-2021-3905
 
