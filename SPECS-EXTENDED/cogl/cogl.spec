@@ -7,7 +7,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.clutter-project.org/
-Source0:        https://download.gnome.org/sources/cogl/1.22/cogl-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/cogl/1.22/%{name}-%{version}.tar.xz
 # Vaguely related to https://bugzilla.gnome.org/show_bug.cgi?id=772419
 # but on the 1.22 branch, and the static inline in the header is gross
 # ajax promises he'll clean this up.
