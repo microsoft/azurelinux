@@ -26846,6 +26846,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tix",
+          "version": "8.4.3",
+          "downloadUrl": "https://downloads.sourceforge.net/project/tix/tix/8.4.3/Tix8.4.3-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "systemd-bootchart",
           "version": "233",
           "downloadUrl": "https://github.com/systemd/systemd-bootchart/releases/download/v233/systemd-bootchart-233.tar.xz"
