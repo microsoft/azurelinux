@@ -27876,6 +27876,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xapian-core",
+          "version": "1.4.20",
+          "downloadUrl": "https://www.oligarchy.co.uk/xapian/1.4.20/xapian-core-1.4.20.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "virt-what",
           "version": "1.20",
           "downloadUrl": "http://people.redhat.com/~rjones/virt-what/files/virt-what-1.20.tar.gz"
