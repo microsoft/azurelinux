@@ -1,0 +1,47 @@
+diff -up Tix8.4.3/generic/tixGrUtl.c.orig Tix8.4.3/generic/tixGrUtl.c
+--- Tix8.4.3/generic/tixGrUtl.c.orig	2004-03-28 04:44:56.000000000 +0200
++++ Tix8.4.3/generic/tixGrUtl.c	2018-08-01 14:49:18.839262337 +0200
+@@ -191,7 +191,7 @@ int Tix_GrConfigSize(interp, wPtr, argc,
+ 	if (sizePtr->charValue != newSize.charValue) {
+ 	    changed = 1;
+ 	}
+-	if (sizePtr->pad1      != newSize.pad0) {
++	if (sizePtr->pad0      != newSize.pad0) {
+ 	    changed = 1;
+ 	}
+ 	if (sizePtr->pad1      != newSize.pad1) {
+diff -up Tix8.4.3/generic/tix.h.orig Tix8.4.3/generic/tix.h
+--- Tix8.4.3/generic/tix.h.orig	2008-02-28 05:35:16.000000000 +0100
++++ Tix8.4.3/generic/tix.h	2018-08-01 14:45:03.306004016 +0200
+@@ -39,6 +39,7 @@ extern "C" {
+ #endif
+ #ifdef HAVE_STDLIB_H
+ #include <stdlib.h>
++#include <ctype.h>
+ #endif
+ 
+ #ifndef CONST84
+diff -up Tix8.4.3/Python/Demo/tix/samples/CmpImg.py.orig Tix8.4.3/Python/Demo/tix/samples/CmpImg.py
+--- Tix8.4.3/Python/Demo/tix/samples/CmpImg.py.orig	2001-12-10 00:29:43.000000000 +0100
++++ Tix8.4.3/Python/Demo/tix/samples/CmpImg.py	2018-08-01 14:49:57.959301881 +0200
+@@ -148,7 +148,7 @@ def RunSample(w):
+     if not w.img0:
+ 	w.img0 = Tix.Image('bitmap', data=network_bitmap)
+     w.img1 = Tix.Image('pixmap', data=hard_disk_pixmap)
+-    if not w.img0:
++    if not w.img1:
+ 	w.img1 = Tix.Image('bitmap', data=hard_disk_bitmap)
+ 
+     hdd = Tix.Button(w, padx=4, pady=1, width=120)
+diff -up Tix8.4.3/PyTix-2.0/demos/samples/CmpImg.py.orig Tix8.4.3/PyTix-2.0/demos/samples/CmpImg.py
+--- Tix8.4.3/PyTix-2.0/demos/samples/CmpImg.py.orig	2000-11-05 20:57:44.000000000 +0100
++++ Tix8.4.3/PyTix-2.0/demos/samples/CmpImg.py	2018-08-01 14:50:14.934319043 +0200
+@@ -148,7 +148,7 @@ def RunSample(w):
+     if not w.img0:
+ 	w.img0 = Tix.Image('bitmap', data=network_bitmap)
+     w.img1 = Tix.Image('pixmap', data=hard_disk_pixmap)
+-    if not w.img0:
++    if not w.img1:
+ 	w.img1 = Tix.Image('bitmap', data=hard_disk_bitmap)
+ 
+     hdd = Tix.Button(w, padx=4, pady=1, width=120)

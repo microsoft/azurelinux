@@ -1,0 +1,24 @@
+diff --git a/generic/tixGrSort.c b/generic/tixGrSort.c
+index 7dee30f..d45f51d 100644
+--- a/generic/tixGrSort.c
++++ b/generic/tixGrSort.c
+@@ -425,7 +425,7 @@ SortCompareProc(first, second)
+ 	}
+     } else {
+ 	int oldLength;
+-	char *end;
++	char *end, *result;
+ 
+ 	/*
+ 	 * Generate and evaluate a command to determine which string comes
+@@ -447,8 +447,8 @@ SortCompareProc(first, second)
+ 	 * Parse the result of the command.
+ 	 */
+ 
+-	order = strtol(sortInterp->result, &end, 0);
+-	if ((end == sortInterp->result) || (*end != 0)) {
++	order = strtol(result = Tcl_GetStringResult(sortInterp), &end, 0);
++	if ((end == result) || (*end != 0)) {
+ 	    Tcl_ResetResult(sortInterp);
+ 	    Tcl_AppendResult(sortInterp,
+ 		    "comparison command returned non-numeric result",
