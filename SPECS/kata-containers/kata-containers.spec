@@ -39,7 +39,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -58,6 +58,7 @@ Patch5:         runtime-Support-for-AMD-SEV-SNP-VMs.patch
 Patch6:         runtime-clh-Use-the-new-API-to-boot-with-TDX-firmware-td-shim.patch
 Patch7:         versions-Update-Cloud-Hypervisor.patch
 Patch8:         runtime-Re-generate-the-client-code.patch
+Patch9:    CVE-2023-22466.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -224,6 +225,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-3
+- Add patch for CVE-2023-22466
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.0.0-2
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
