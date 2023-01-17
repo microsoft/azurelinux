@@ -27626,6 +27626,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vorbis-tools",
+          "version": "1.4.2",
+          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/vorbis/vorbis-tools-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "usbguard",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/USBGuard/usbguard/releases/download/usbguard-1.0.0/usbguard-1.0.0.tar.gz"
