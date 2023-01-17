@@ -2,7 +2,7 @@
 Summary:        CMPI Utility Library
 Name:           libcmpiutil
 Version:        0.5.7
-Release:        20%{?dist}%{?extra_release}
+Release:        20%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
