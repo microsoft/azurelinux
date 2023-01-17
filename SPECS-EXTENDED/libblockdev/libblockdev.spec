@@ -87,7 +87,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/storaged-project/libblockdev
-Source0:        https://github.com/storaged-project/libblockdev/releases/download/%{version}-%{release}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/storaged-project/libblockdev/releases/download/%{version}-1/%{name}-%{version}.tar.gz
 BuildRequires:  make
 BuildRequires:  glib2-devel
 %if %{with_gi}
