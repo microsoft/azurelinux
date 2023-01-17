@@ -4240,7 +4240,7 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.13",
+          "version": "1.19.2",
           "downloadUrl": "https://golang.org/dl/go1.17.13.src.tar.gz"
         }
       }

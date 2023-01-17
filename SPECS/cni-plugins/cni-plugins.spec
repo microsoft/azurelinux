@@ -2,7 +2,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
 Version:        0.9.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.1-6
+- Bump release to rebuild with go 1.19.2
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 0.9.1-5
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 

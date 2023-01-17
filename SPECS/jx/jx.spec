@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.2.236
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.236-5
+- Bump release to rebuild with go 1.19.2
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.2.236-4
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 

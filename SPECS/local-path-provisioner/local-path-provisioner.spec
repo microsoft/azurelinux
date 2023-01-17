@@ -1,7 +1,7 @@
 Summary:        Provides a way for the Kubernetes users to utilize the local storage in each node
 Name:           local-path-provisioner
 Version:        0.0.21
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/rancher/local-path-provisioner
 Group:          Applications/Text
@@ -30,6 +30,9 @@ install local-path-provisioner %{buildroot}%{_bindir}/local-path-provisioner
 %{_bindir}/local-path-provisioner
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.21-4
+- Bump release to rebuild with go 1.19.2
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 0.0.21-3
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 
