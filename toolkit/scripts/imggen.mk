@@ -5,9 +5,9 @@ $(call create_folder,$(IMAGEGEN_DIR))
 
 # Resources
 config_name              = $(notdir $(CONFIG_FILE:%.json=%))
-config_other_files       = $(if $(CONFIG_FILE),$(shell find $(CONFIG_BASE_DIR)))
+config_other_files       = $(if $(CONFIG_FILE),$(call shell_real_build_only, find $(CONFIG_BASE_DIR)))
 assets_dir               = $(RESOURCES_DIR)/assets/
-assets_files             = $(shell find $(assets_dir))
+assets_files             = $(call shell_real_build_only, find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
@@ -24,13 +24,13 @@ else
 initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages.json
 endif
 initrd_packages_json    += $(RESOURCES_DIR)/imageconfigs/packagelists/accessibility-packages.json
-initrd_assets_files      = $(initrd_packages_json) $(shell find $(initrd_assets_dir) $(initrd_scripts_dir))
+initrd_assets_files      = $(initrd_packages_json) $(call shell_real_build_only, find $(initrd_assets_dir) $(initrd_scripts_dir))
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
 ova_vmxtemplate          = $(assets_dir)/ova/vmx-template
 
 # Built RPMs
-imggen_rpms = $(shell find $(RPMS_DIR) -type f -name '*.rpm')
+imggen_rpms = $(call shell_real_build_only, find $(RPMS_DIR) -type f -name '*.rpm')
 
 # Imagegen workspace and cache
 imggen_config_dir                    = $(IMAGEGEN_DIR)/$(config_name)
@@ -47,13 +47,13 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
-imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
+imager_disk_output_files = $(call shell_real_build_only, find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
 ifeq ($(build_arch),aarch64)
 initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
 initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
 endif
-meta_user_data_iso       = ${IMAGES_DIR)/meta-user-data.iso
+meta_user_data_iso       = $(IMAGES_DIR)/meta-user-data.iso
 
 $(call create_folder,$(workspace_dir))
 $(call create_folder,$(imager_disk_output_dir))
@@ -205,4 +205,4 @@ meta-user-data: $(meta_user_data_files)
 	if [ -n "$(TLS_CERT)" ] && [ -n "$(TLS_KEY)" ] && [ -n "$(CA_CERT)" ]; then \
 		$(SCRIPTS_DIR)/addcerts.sh $(meta_user_data_tmp_dir)/user-data $(TLS_CERT) $(TLS_KEY) $(CA_CERT); \
 	fi
-	genisoimage -output $(IMAGES_DIR)/meta-user-data.iso -volid cidata -joliet -rock $(meta_user_data_tmp_dir)/*
+	genisoimage -output $(meta_user_data_iso) -volid cidata -joliet -rock $(meta_user_data_tmp_dir)/*
