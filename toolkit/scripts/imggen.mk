@@ -18,7 +18,12 @@ initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
 endif
 initrd_assets_dir        = $(RESOURCES_DIR)/imageconfigs/additionalfiles/iso_initrd/
 initrd_scripts_dir       = $(RESOURCES_DIR)/imageconfigs/postinstallscripts/iso_initrd/
+ifeq ($(build_arch),aarch64)
+initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages-arm64.json
+else
 initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages.json
+endif
+initrd_packages_json    += $(RESOURCES_DIR)/imageconfigs/packagelists/accessibility-packages.json
 initrd_assets_files      = $(initrd_packages_json) $(shell find $(initrd_assets_dir) $(initrd_scripts_dir))
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
