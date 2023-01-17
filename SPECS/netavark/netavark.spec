@@ -10,7 +10,7 @@
 
 Name:          netavark
 Version:       1.0.3
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -18,6 +18,7 @@ Distribution:  Mariner
 URL:           https://github.com/containers/%{name}
 Source0:       %{url}/archive/%{built_tag}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
+Patch0:    CVE-2023-22466.patch
 BuildRequires: cargo
 BuildRequires: make
 BuildRequires: rust
@@ -219,6 +220,9 @@ popd
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.3-5
+- Add patch for CVE-2023-22466
+
 * Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.0.3-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
