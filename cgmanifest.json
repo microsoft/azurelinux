@@ -26696,6 +26696,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tclx",
+          "version": "8.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/tclx/tclx8.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "suitesparse",
           "version": "5.4.0",
           "downloadUrl": "https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
