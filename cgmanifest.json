@@ -27796,6 +27796,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "wordnet",
+          "version": "3.0",
+          "downloadUrl": "https://wordnetcode.princeton.edu/3.0/WordNet-3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "varnish",
           "version": "6.4.0",
           "downloadUrl": "http://varnish-cache.org/_downloads/varnish-6.4.0.tgz"
