@@ -1,7 +1,7 @@
 Summary: The open-source application container engine client.
 Name: moby-cli
 Version: 19.03.15+azure
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -94,6 +94,9 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 /usr/share/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 19.03.15+azure-13
+- Bump release to rebuild with go 1.19.2
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 19.03.15+azure-12
 - Bump release to rebuild with go 1.18.8-2
 
