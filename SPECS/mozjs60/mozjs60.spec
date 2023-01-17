@@ -2,7 +2,7 @@
 Summary:        SpiderMonkey JavaScript library
 Name:           mozjs%{major}
 Version:        60.9.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MPLv2.0 AND MPLv1.1 AND BSD AND GPLv2+ AND GPLv3+ AND LGPLv2+ AND AFL AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Patch3:         copy-headers.patch
 Patch4:         Always-use-the-equivalent-year-to-determine-the-time-zone.patch
 Patch5:         icu_sources_data.py-Decouple-from-Mozilla-build-system.patch
 Patch6:         icu_sources_data-Write-command-output-to-our-stderr.patch
+Patch7:    CVE-2023-22895.patch
 BuildRequires:  autoconf213
 BuildRequires:  gcc
 BuildRequires:  libffi
@@ -53,6 +54,7 @@ pushd ../..
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 # make sure we don't ever accidentally link against bundled security libs
 rm -rf ../../security/
 popd
@@ -122,6 +124,9 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
+* Tue Jan 17 2023 Muhammad Falak <mwani@microsoft.com> - 60.9.0-11
+- Patch CVE-2023-22895
+
 * Mon Jul 26 2021 Shane Guan <shaneguan@microsoft.com> - 60.9.0-10
 - Make a symlink to /run/shm called /dev/shm so this spec will work on WSL.
 - Spec linting.
