@@ -24,7 +24,7 @@ $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 	@echo $(strip $(SRPM_PACK_LIST)) | tr " " "\n" > $(srpm_pack_list_file)
 else # Empty pack list, build all under $(SPECS_DIR)
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
-	@touch $@
+	@truncate -s 0 $@
 endif
 
 $(call create_folder,$(BUILD_DIR))

@@ -17,7 +17,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.85.1
+Version:        5.15.87.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -32,12 +32,16 @@ Source4:        cbl-mariner-ca-20211013.pem
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  build-essential
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
+BuildRequires:  flex
+BuildRequires:  gettext
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
+BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
 BuildRequires:  openssl
@@ -406,6 +410,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.87.1-1
+- Auto-upgrade to 5.15.87.1
+
+* Sat Jan 07 2023 nick black <niblack@microsoft.com> - 5.15.86.1-2
+- Add several missing BuildRequires (w/ Rachel Menge)
+
+* Tue Jan 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.86.1-1
+- Auto-upgrade to 5.15.86.1
+
 * Fri Dec 23 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.85.1-1
 - Auto-upgrade to 5.15.85.1
 
