@@ -45,7 +45,6 @@ natural language processing.
 %package browser
 Summary:        Tk browser for WordNet
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       font(:lang = en)
 
 %description browser
 This package contains graphical browser for WordNet database.
