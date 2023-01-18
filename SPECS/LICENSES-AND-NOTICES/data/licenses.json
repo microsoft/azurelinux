@@ -734,6 +734,7 @@
                 "libwnck3",
                 "libwpd",
                 "libwpe",
+                "libwpg",
                 "libwps",
                 "libwvstreams",
                 "libX11",
