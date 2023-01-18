@@ -148,7 +148,9 @@ go test ./...
 
 %changelog
 * Fri Jan 13 10:49:53 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: MIT). And upgrade to version 2.4.0
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Upgrade to version 2.4.0
+- License verified
 
 * Tue Oct  4 16:27:35 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.3.0, see

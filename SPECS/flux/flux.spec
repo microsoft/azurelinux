@@ -130,7 +130,9 @@ popd
 
 %changelog
 * Fri Jan 13 10:49:53 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: MIT). And upgrade to version 0.179.0
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
+- Upgrade to version 0.179.0
+- License verified
 
 Wed Oct 19 13:39:14 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
 - Add 0001-fix-compile-error-with-Rust-1.64-5273.patch:
