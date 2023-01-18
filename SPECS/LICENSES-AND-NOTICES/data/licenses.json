@@ -631,6 +631,7 @@
                 "libldm",
                 "liblockfile",
                 "liblognorm",
+                "liblouis",
                 "liblqr-1",
                 "liblzf",
                 "libmad",
