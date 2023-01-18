@@ -9290,6 +9290,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblouis",
+          "version": "3.24.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.24.0/liblouis-3.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liblqr-1",
           "version": "0.4.2",
           "downloadUrl": "http://liblqr.wikidot.com/local--files/en:download-page/liblqr-1-0.4.2.tar.bz2"
