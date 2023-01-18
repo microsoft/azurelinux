@@ -1436,6 +1436,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cdparanoia",
+          "version": "10.2",
+          "downloadUrl": "https://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-10.2.src.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cdrdao",
+          "version": "1.2.4",
+          "downloadUrl": "https://prdownloads.sourceforge.net/cdrdao/cdrdao-1.2.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cdrkit",
           "version": "1.1.11",
           "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/cdrkit/cdrkit-1.1.11.tar.gz/efe08e2f3ca478486037b053acd512e9/cdrkit-1.1.11.tar.gz"
@@ -2509,7 +2529,7 @@
         "other": {
           "name": "dmraid",
           "version": "1.0.0.rc16",
-          "downloadUrl": "https://people.redhat.com/heinzm/sw/dmraid/src/dmraid-1.0.0.rc16.tar.bz2"
+          "downloadUrl": "https://people.redhat.com/heinzm/sw/dmraid/src/old/dmraid-1.0.0.rc16.tar.bz2"
         }
       }
     },
@@ -3290,6 +3310,16 @@
           "name": "fetchmail",
           "version": "6.4.8",
           "downloadUrl": "http://downloads.sourceforge.net/fetchmail/fetchmail-6.4.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fftw",
+          "version": "3.3.10",
+          "downloadUrl": "https://www.fftw.org/fftw-3.3.10.tar.gz"
         }
       }
     },
@@ -4532,6 +4562,16 @@
           "name": "gstreamer1",
           "version": "1.20.0",
           "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gstreamer1-plugins-base",
+          "version": "1.20.0",
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.20.0.tar.xz"
         }
       }
     },
@@ -6030,8 +6070,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.86.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
+          "version": "5.15.87.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
         }
       }
     },
@@ -7571,8 +7611,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.86.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
+          "version": "5.15.87.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
         }
       }
     },
@@ -7581,8 +7621,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.86.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
+          "version": "5.15.87.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
         }
       }
     },
@@ -7591,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.86.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
+          "version": "5.15.87.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
         }
       }
     },
@@ -8050,6 +8090,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libao",
+          "version": "1.2.0",
+          "downloadUrl": "https://downloads.xiph.org/releases/ao/libao-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libarchive",
           "version": "3.6.1",
           "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.6.1/libarchive-3.6.1.tar.gz"
@@ -8163,6 +8213,16 @@
           "name": "libcacard",
           "version": "2.7.0",
           "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libcanberra",
+          "version": "0.30",
+          "downloadUrl": "https://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz"
         }
       }
     },
@@ -9250,6 +9310,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblouis",
+          "version": "3.24.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.24.0/liblouis-3.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liblqr-1",
           "version": "0.4.2",
           "downloadUrl": "http://liblqr.wikidot.com/local--files/en:download-page/liblqr-1-0.4.2.tar.bz2"
@@ -9333,6 +9403,16 @@
           "name": "libmicrohttpd",
           "version": "0.9.71",
           "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.71.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libmikmod",
+          "version": "3.3.11.1",
+          "downloadUrl": "https://downloads.sourceforge.net/mikmod/libmikmod-3.3.11.1.tar.gz"
         }
       }
     },
@@ -10053,6 +10133,16 @@
           "name": "libsafec",
           "version": "3.7.1",
           "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.7.1/safeclib-3.7.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libsamplerate",
+          "version": "0.2.2",
+          "downloadUrl": "https://github.com/libsndfile/libsamplerate/releases/download/0.2.2/libsamplerate-0.2.2.tar.xz"
         }
       }
     },
@@ -11180,9 +11270,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lilv",
+          "version": "0.24.14",
+          "downloadUrl": "https://download.drobilla.net/lilv-0.24.14.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "linux-firmware",
           "version": "20211216",
           "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20211216.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "linuxconsoletools",
+          "version": "1.8.1",
+          "downloadUrl": "https://downloads.sourceforge.net/linuxconsole/linuxconsoletools-1.8.1.tar.bz2"
         }
       }
     },
@@ -11293,6 +11403,16 @@
           "name": "livepatch-5.15.86.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.87.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
         }
       }
     },
@@ -11643,6 +11763,16 @@
           "name": "lutok",
           "version": "0.4",
           "downloadUrl": "https://github.com/jmmv/lutok/releases/download/lutok-0.4/lutok-0.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lv2",
+          "version": "1.18.8",
+          "downloadUrl": "https://lv2plug.in/spec/lv2-1.18.8.tar.xz"
         }
       }
     },
@@ -19773,6 +19903,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pipewire",
+          "version": "0.3.60",
+          "downloadUrl": "https://github.com/PipeWire/pipewire/archive/refs/tags/0.3.60.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pixman",
           "version": "0.42.2",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.42.2.tar.xz"
@@ -20216,6 +20356,16 @@
           "name": "pugixml",
           "version": "1.11.4",
           "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.11.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pulseaudio",
+          "version": "16.1",
+          "downloadUrl": "https://freedesktop.org/software/pulseaudio/releases/pulseaudio-16.1.tar.gz"
         }
       }
     },
@@ -22386,6 +22536,16 @@
           "name": "python-qrcode",
           "version": "6.1",
           "downloadUrl": "https://pypi.python.org/packages/source/q/qrcode/qrcode-6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rdflib",
+          "version": "6.2.0",
+          "downloadUrl": "https://github.com/RDFLib/rdflib/releases/download/6.2.0/rdflib-6.2.0.tar.gz"
         }
       }
     },
@@ -25574,6 +25734,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "SDL2",
+          "version": "2.24.0",
+          "downloadUrl": "https://www.libsdl.org/release/SDL2-2.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sdparm",
           "version": "1.11",
           "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
@@ -26139,6 +26309,16 @@
           "name": "squashfs-tools",
           "version": "4.5.1",
           "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sratom",
+          "version": "0.6.10",
+          "downloadUrl": "https://download.drobilla.net/sratom-0.6.10.tar.bz2"
         }
       }
     },
@@ -27377,8 +27557,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0982",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0982.tar.gz"
+          "version": "9.0.1145",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1145.tar.gz"
         }
       }
     },
