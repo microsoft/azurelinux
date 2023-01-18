@@ -102,9 +102,9 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inpu
 	return
 }
 
-// ReadReservedPackageManifest updates the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
+// ReadToolchainPackageManifest updates the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
 // Entries will be returned in the form '<rpm>-<version>-<release>.rpm' with any preceding path removed.
-func ReadReservedPackageManifest(path string) (reservedFiles []string, err error) {
+func ReadToolchainPackageManifest(path string) (reservedFiles []string, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		logger.Log.Errorf("Failed to open file manifest %s with error %s", path, err)
@@ -127,6 +127,7 @@ func ReadReservedPackageManifest(path string) (reservedFiles []string, err error
 	return reservedFiles, nil
 }
 
+// IsToolchainRPM determines if a given RPM path is found in a list of reserved RPMs.
 // rpmsToFind should be an absolute path to the expected RPM, while toolchainRPMs is a list of '<name>-<version>-<release>.rpm'.
 func IsToolchainRPM(rpmPath string, reservedRPMs []string) bool {
 	base := filepath.Base(rpmPath)

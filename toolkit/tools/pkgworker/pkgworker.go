@@ -42,7 +42,7 @@ var (
 	repoFile             = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
 	rpmsDirPath          = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
 	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
-	toolchainDirPath     = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	toolchainDirPath     = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain a top level directory for each architecture.").Required().ExistingDir()
 	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
 	ccacheDir            = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().ExistingDir()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()

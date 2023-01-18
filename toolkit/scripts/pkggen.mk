@@ -80,7 +80,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
-		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
@@ -212,7 +212,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \

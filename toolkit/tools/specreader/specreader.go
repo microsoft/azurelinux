@@ -68,11 +68,11 @@ func main() {
 
 	var toolchainRPMs []string
 	var err error
-	toolchainManifest := *toolchainManifest
-	if len(toolchainManifest) > 0 {
-		toolchainRPMs, err = schedulerutils.ReadReservedPackageManifest(toolchainManifest)
+	toolchainManifestPath := *toolchainManifest
+	if len(toolchainManifestPath) > 0 {
+		toolchainRPMs, err = schedulerutils.ReadToolchainPackageManifest(toolchainManifestPath)
 		if err != nil {
-			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifest, err)
+			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifestPath, err)
 		}
 	}
 

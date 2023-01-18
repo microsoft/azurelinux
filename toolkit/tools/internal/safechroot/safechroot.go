@@ -309,7 +309,7 @@ func (c *Chroot) UnsafeRun(toRun func() error) (err error) {
 	}
 	defer originalWd.Close()
 
-	logger.Log.Debug("Entering Chroot")
+	logger.Log.Debugf("Entering Chroot: '%s'", c.rootDir)
 	err = unix.Chroot(c.rootDir)
 	if err != nil {
 		return
@@ -497,7 +497,7 @@ func defaultMountPoints() []*MountPoint {
 // restoreRoot will restore the original root of the GO application, cleaning up
 // after the run command. Will panic on error.
 func (c *Chroot) restoreRoot(originalRoot, originalWd *os.File) {
-	logger.Log.Debug("Exiting Chroot")
+	logger.Log.Debugf("Exiting Chroot: '%s'", c.rootDir)
 
 	err := originalRoot.Chdir()
 	if err != nil {

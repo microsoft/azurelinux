@@ -251,7 +251,7 @@ func formatNode(n *pkggraph.PkgNode, verbosity int) string {
 func isFilteredFile(path, filterFile string) bool {
 	if len(filterFile) > 0 {
 		if len(reservedFiles) == 0 {
-			reservedFileList, err := schedulerutils.ReadReservedPackageManifest(filterFile)
+			reservedFileList, err := schedulerutils.ReadToolchainPackageManifest(filterFile)
 			if err != nil {
 				logger.Log.Fatalf("Failed to load filter file '%s': %s", filterFile, err)
 			}
@@ -332,7 +332,8 @@ func (t *treeSearch) printProgress() {
 }
 
 // Run a DFS and generate a string representation of the tree. Optionally ignore all branches that only container nodes in
-//  the filter list (ie given the toolchain manifest, only print those branches which container non-toolchain packages)
+//
+//	the filter list (ie given the toolchain manifest, only print those branches which container non-toolchain packages)
 func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, filter bool, filterFile string, verbosity int, generateStrings, printDuplicates bool) (lines []string, hasNonToolchain bool) {
 	t.printProgress()
 	// We only care about run nodes for the purposes of detecting toolchain files

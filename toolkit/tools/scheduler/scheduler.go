@@ -72,7 +72,7 @@ var (
 	noCleanup              = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache                = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure          = app.Flag("stop-on-failure", "Stop on failed build").Bool()
-	toolchainManifest      = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
+	toolchainManifest      = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. RPMs from this list will are considered 'prebuilt' and will not be rebuilt").ExistingFile()
 	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	allowToolchainRebuilds = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
@@ -126,7 +126,7 @@ func main() {
 
 	var toolchainPackages []string
 	if len(toolchainManifest) > 0 {
-		toolchainPackages, err = schedulerutils.ReadReservedPackageManifest(toolchainManifest)
+		toolchainPackages, err = schedulerutils.ReadToolchainPackageManifest(toolchainManifest)
 		if err != nil {
 			logger.Log.Fatalf("unable to read reserved file list %s: %s", toolchainManifest, err)
 		}
