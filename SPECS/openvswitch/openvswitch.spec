@@ -290,6 +290,7 @@ fi
 %{_mandir}/man1/ovsdb-server.1*
 %{_mandir}/man1/ovsdb-tool.1*
 %{_mandir}/man5/ovsdb-server.5*
+%{_mandir}/man5/ovsdb.local-config.5*
 %{_mandir}/man5/ovs-vswitchd.conf.db.5*
 %{_mandir}/man5/ovsdb.5*
 %{_mandir}/man5/vtep.5*
@@ -339,6 +340,7 @@ fi
 %{_datadir}/openvswitch/scripts/ovs-ctl
 %{_datadir}/openvswitch/scripts/ovs-kmod-ctl
 %{_datadir}/openvswitch/scripts/ovs-systemd-reload
+%config %{_datadir}/openvswitch/local-config.ovsschema
 %config %{_datadir}/openvswitch/vswitch.ovsschema
 %config %{_datadir}/openvswitch/vtep.ovsschema
 %{_bindir}/ovs-appctl
