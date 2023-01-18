@@ -13,7 +13,6 @@ Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://www.openvswitch.org/
 Source0:        https://www.openvswitch.org/releases/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-3905.patch
 BuildRequires:  gcc >= 4.0.0
 BuildRequires:  libcap-ng
 BuildRequires:  libcap-ng-devel
@@ -182,8 +181,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/vtep-ctl.8.gz
 
 %changelog
-* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.7-1
-- Auto-upgrade to 2.15.7 - to fix CVE-2022-4338, CVE-2022-4337
+* Tue Jan 17 2023 Andrew Phelps <anphel@microsoft.com> - 2.15.7-1
+- Upgrade to 2.15.7 to fix CVE-2022-4338, CVE-2022-4337
+- Remove unneeded patch CVE-2021-3905.patch
 
 * Thu Sep 01 2022 Minghe Ren <mingheren@microsoft.com> - 2.15.1-2
 - Add patch to fix CVE-2021-3905
