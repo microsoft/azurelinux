@@ -219,7 +219,8 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	}
 
 	// Get a list of the existing repofiles that are part of the chroot, if any
-	existingRepoFiles, err := os.ReadDir(fullRepoDirPath)
+	// We need to capture this list before we add 'allrepos.repo'.
+	existingRepoFiles, err := filepath.Glob(filepath.Join(fullRepoDirPath, "*"))
 	if err != nil {
 		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
 		return
@@ -242,8 +243,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
-	for _, repoFile := range existingRepoFiles {
-		originalRepoFilePath := filepath.Join(fullRepoDirPath, repoFile.Name())
+	for _, originalRepoFilePath := range existingRepoFiles {
 		err = appendRepoFile(originalRepoFilePath, dstFile)
 		if err != nil {
 			return
@@ -294,11 +294,10 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	for _, pkg := range packagesToClone {
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
+		effectiveCacheRepo := selectCorrectCacheRepoID()
 		downloadDir := chrootDownloadDir
-		effectiveCacheRepo := fetcherRepoID
 		if !buildpipeline.IsRegularBuild() {
 			downloadDir = cacheRepoDir
-			effectiveCacheRepo = cacheRepoID
 		}
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
@@ -352,10 +351,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 
 	foundPackages := make(map[string]bool)
 
-	effectiveCacheRepo := fetcherRepoID
-	if !buildpipeline.IsRegularBuild() {
-		effectiveCacheRepo = cacheRepoID
-	}
+	effectiveCacheRepo := selectCorrectCacheRepoID()
 
 	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
 	repoOrderList := []string{builtRepoID, effectiveCacheRepo, allRepoIDs}
@@ -473,11 +469,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		repoContents.Repo = append(repoContents.Repo, pkg)
 	}
 
-	checkedRepoID := fetcherRepoID
-	// Docker based build doesn't use overlay so cache repo was explicitely initialized
-	if !buildpipeline.IsRegularBuild() {
-		checkedRepoID = cacheRepoID
-	}
+	checkedRepoID := selectCorrectCacheRepoID()
 
 	err = r.chroot.Run(func() (err error) {
 		// Disable all repositories except the fetcher repository (the repository with the cloned packages)
@@ -614,4 +606,14 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	}
 
 	return
+}
+
+// selectCorrectCacheRepoID determines which cache repo we are using, the normal one, or the pre-mounted one for use with
+// containers.
+func selectCorrectCacheRepoID() string {
+	if buildpipeline.IsRegularBuild() {
+		return fetcherRepoID
+	} else {
+		return cacheRepoID
+	}
 }
