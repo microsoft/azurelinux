@@ -124,7 +124,7 @@ fi
 %changelog
 * Tue Jan 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0-1
 - Upgrade to LTS v2.37.0 (next LTS is v2.41.0)
-- Created version_upgrade.sh for handling the custom tarballs for prometheus/promu
+- Created generate_source_tarball.sh for handling the custom tarballs for prometheus/promu
 - Simplified %build section to use the custom tarballs
 
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.0-5
