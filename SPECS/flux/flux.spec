@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.179.0
-Release:        0%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
