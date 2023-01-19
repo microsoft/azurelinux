@@ -107,7 +107,7 @@ install -D -m 0755 bin/influxd %{buildroot}%{_bindir}/
 install -D -m 0755 bin/telemetryd %{buildroot}%{_bindir}/
 mkdir -p %{buildroot}%{_sbindir}
 install -D -m 0644 %{SOURCE3} %{buildroot}%{_unitdir}/influxdb.service
-ln -s /usr/sbin/service %{buildroot}%{_sbindir}/rcinfluxdb
+ln -s %{_sbindir}/service %{buildroot}%{_sbindir}/rcinfluxdb
 install -D -m 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/influxdb.conf
 install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb2/config.yaml
 
@@ -123,7 +123,7 @@ go test ./...
 %service_del_preun influxdb.service
 
 %post
-%tmpfiles_create %_tmpfilesdir/influxdb.conf
+%tmpfiles_create %{_tmpfilesdir}/influxdb.conf
 %service_add_post influxdb.service
 
 %postun
