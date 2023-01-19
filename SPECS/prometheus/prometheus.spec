@@ -1,5 +1,5 @@
-# When upgrading Prometheus, run `./version_upgrade.sh` after modifying the `PROMETHEUS_VERSION` variable in the script
-# The script will spit out custom tarballs for `prometheus` and `promu` as well as their SHA256 sums (More details in the script)
+# When upgrading Prometheus, run `./generate_source_tarball.sh --pkgVersion <version>`
+# The script will spit out custom tarballs for `prometheus` and `promu` (More details in the script)
 %global promu_version 0.13.0
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
