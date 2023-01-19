@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:                   delve
 Version:                1.5.0
-Release:                6%{?dist}
+Release:                7%{?dist}
 Summary:                A debugger for the Go programming language
 
 License:                MIT
@@ -72,6 +72,9 @@ done
 
 
 %changelog
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-7
+- Bump release to rebuild with go 1.19.4
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.5.0-6
 - Bump release to rebuild with go 1.18.8
 

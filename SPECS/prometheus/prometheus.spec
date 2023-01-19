@@ -122,6 +122,9 @@ fi
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.36.0-6
+- Bump release to rebuild with go 1.19.4
+
 * Tue Jan 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0-1
 - Upgrade to LTS v2.37.0 (next LTS is v2.41.0)
 - Created generate_source_tarball.sh for handling the custom tarballs for prometheus/promu
