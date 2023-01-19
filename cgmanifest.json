@@ -3489,7 +3489,7 @@
         "other": {
           "name": "flux",
           "version": "0.179.0",
-          "downloadUrl": "https://github.com/influxdata/flux/archive/v0.179.0.tar.gz"
+          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.179.0.tar.gz"
         }
       }
     },

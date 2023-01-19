@@ -28,7 +28,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/flux
-Source0:        %{url}/archive/refs/tags/v%{version}#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
