@@ -6,7 +6,7 @@ License:        LGPL-2.0-or-later OR MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libwpg.sourceforge.net/
-Source0:        http://download.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
+Source0:        https://download.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
 %global         apiversion 0.3
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
