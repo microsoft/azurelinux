@@ -25,7 +25,7 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-BuildRequires: golang >= 1.15.5
+BuildRequires: golang <= 1.18.8
 
 %description
 Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
@@ -56,7 +56,7 @@ go test -v ./cmd/helm
 
 %changelog
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-2
-- Bump release to rebuild with go 1.19.4
+- - Set golang <= 1.18.8 build requires
 
 * Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-1
 - Auto-upgrade to 3.10.3 - to fix CVE-2022-23524

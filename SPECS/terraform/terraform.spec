@@ -29,7 +29,7 @@ Source0:        https://github.com/hashicorp/terraform/archive/refs/tags/v%{vers
 Source1:        %{name}-%{version}-vendor.tar.gz
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang <= 1.18.8
 
 %description
 Terraform is an infrastructure as code deployment management tool
@@ -58,7 +58,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 
 %changelog
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-4
-- Bump release to rebuild with go 1.19.4
+- Set golang <= 1.18.8 build requires
 
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.2-3
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717

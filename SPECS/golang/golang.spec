@@ -22,7 +22,6 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-# CVE-2022-41717 is fixed in 1.18.9
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -38,7 +37,6 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
-patch -Np1 --ignore-whitespace < %{PATCH1}
 
 %build
 # Build go 1.4 bootstrap
@@ -120,7 +118,7 @@ fi
 
 %changelog
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.4-1
-- Auto-upgrade to 1.19.4 - upgrade to latest
+- Auto-upgrade to 1.19.4
 
 * Thu Dec 15 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.18.8-2
 - Patch CVE-2022-41717
