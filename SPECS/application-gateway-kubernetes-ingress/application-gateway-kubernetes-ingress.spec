@@ -25,7 +25,7 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:    CVE-2022-3064.patch
-Patch0:    CVE-2021-4235.patch
+Patch1:    CVE-2021-4235.patch
 
 BuildRequires:  golang >= 1.13
 
