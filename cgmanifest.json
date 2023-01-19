@@ -10840,6 +10840,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libwpg",
+          "version": "0.3.3",
+          "downloadUrl": "https://download.sourceforge.net/libwpg/libwpg-0.3.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libwps",
           "version": "0.4.11",
           "downloadUrl": "http://downloads.sourceforge.net/libwps/libwps-0.4.11.tar.xz"
