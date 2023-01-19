@@ -14334,8 +14334,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "2.17.0",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.0.tar.gz"
+          "version": "2.17.5",
+          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.5.tar.gz"
         }
       }
     },
@@ -27277,8 +27277,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0982",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0982.tar.gz"
+          "version": "9.0.1145",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1145.tar.gz"
         }
       }
     },
