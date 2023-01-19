@@ -57,7 +57,6 @@ BuildRequires:  golang-packaging >= 15.0.8
 BuildRequires:  pkgconfig(flux) >= 0.179.0
 BuildRequires:  protobuf-devel
 BuildRequires:  kernel-headers
-BuildRequires:  make
 BuildRequires:  rust >= 1.60.0
 BuildRequires:  clang
 BuildRequires:  tzdata
@@ -103,10 +102,6 @@ go build -mod vendor -tags $TAGS -ldflags "-X main.version=%{version}" -o bin/te
 
 
 %install
-export GOPATH=$HOME/go
-export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOBIN
-
 mkdir -p %{buildroot}%{_bindir}
 install -D -m 0755 bin/influxd %{buildroot}%{_bindir}/
 install -D -m 0755 bin/telemetryd %{buildroot}%{_bindir}/
