@@ -1,3 +1,5 @@
+%global         apiversion 0.3
+
 Summary:        A library for import of WordPerfect Graphics images
 Name:           libwpg
 Version:        0.3.3
@@ -7,7 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libwpg.sourceforge.net/
 Source0:        https://download.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
-%global         apiversion 0.3
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  help2man
