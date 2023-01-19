@@ -101,8 +101,8 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %changelog
 * Wed Jan 18 13:32:34 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Upgrade to version 2.4.0
 - License verified
+- Upgrade to version 2.4.0
 
 * Wed Jun 15 20:30:15 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
 - Version 2.3.0
