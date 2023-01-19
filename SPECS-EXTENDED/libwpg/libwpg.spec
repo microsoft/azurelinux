@@ -63,10 +63,10 @@ sed -i \
     -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     libtool
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 # we install API docs directly from build
 rm -rf %{buildroot}/%{_docdir}/%{name}
