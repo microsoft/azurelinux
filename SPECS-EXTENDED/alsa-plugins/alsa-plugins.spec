@@ -10,7 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.alsa-project.org/
 Source0:        https://github.com/alsa-project/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         alsa-git.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
