@@ -1,8 +1,7 @@
 %global __cmake_in_source_build 1
-%global so_ver 1.0.3
 Summary:        Zlib compatible better compressor
 Name:           zopfli
-Version:        %{so_ver}
+Version:        1.0.3
 Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -45,10 +44,10 @@ Devolopment files for zopfli and zopflipng.
 %{_bindir}/%{name}png
 
 %{_libdir}/lib%{name}.so.1
-%{_libdir}/lib%{name}.so.%{so_ver}
+%{_libdir}/lib%{name}.so.%{version}
 
 %{_libdir}/lib%{name}png.so.1
-%{_libdir}/lib%{name}png.so.%{so_ver}
+%{_libdir}/lib%{name}png.so.%{version}
 
 %files devel
 %{_libdir}/lib%{name}.so
