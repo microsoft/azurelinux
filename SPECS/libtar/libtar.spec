@@ -18,7 +18,7 @@ Patch2:         libtar-1.2.11-mem-deref.patch
 # CVE-2021-33643
 # CVE-2021-33644
 Patch3:         libtar-1.2.20-CVE-2021-33643-CVE-2021-33644.patch
-# CVE-2021-33640
+# CVE-2021-33640, CVE-2021-33645, CVE-2021-33646
 Patch4:         CVE-2021-33640.patch
 Patch5:         libtar-1.2.20-no-static-buffer.patch
 Patch6:         libtar-1.2.20-fix-resource-leaks.patch
