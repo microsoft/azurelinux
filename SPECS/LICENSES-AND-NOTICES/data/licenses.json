@@ -176,6 +176,7 @@
                 "docbook2X",
                 "docbook5-schemas",
                 "docbook5-style-xsl",
+                "doctest",
                 "dogtail",
                 "dos2unix",
                 "dotconf",

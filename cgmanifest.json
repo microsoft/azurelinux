@@ -2817,6 +2817,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "doctest",
+          "version": "2.4.9",
+          "downloadUrl": "https://github.com/doctest/doctest/archive/refs/tags/v2.4.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dogtail",
           "version": "0.9.11",
           "downloadUrl": "https://gitlab.com/dogtail/dogtail/raw/released/dogtail-0.9.11.tar.gz"
