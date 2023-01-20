@@ -1,4 +1,3 @@
-%define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
 Version:        9.0.1189
@@ -9,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+%define debug_package %{nil}
 BuildRequires:  ncurses-devel
 
 %description
