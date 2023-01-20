@@ -49,11 +49,11 @@ and working with data. It is part of InfluxDB 1.7 and 2.0, but can be run
 independently of those. This repository contains the language definition and an
 implementation of the language core.
 
-%package -n libflux%{libflux_suffix}
+%package -n libflux-%{libflux_suffix}
 Summary:        Influx data language
 Provides:       libflux = %{version}-%{release}
 
-%description -n libflux%{libflux_suffix}
+%description -n libflux-%{libflux_suffix}
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
 and working with data. It is part of InfluxDB 1.7 and 2.0, but can be run
 independently of those. This repository contains the language definition and an
@@ -61,7 +61,7 @@ implementation of the language core.
 
 %package -n libflux-devel
 Summary:        Development libraries and header files for Influx data language
-Requires:       libflux%{libflux_suffix} = %{version}-%{release}
+Requires:       libflux-%{libflux_suffix} = %{version}-%{release}
 
 %description -n libflux-devel
 This package contains the header files and libraries for building
@@ -111,10 +111,10 @@ pushd libflux
 RUSTFLAGS=%{rustflags} cargo test --release
 popd
 
-%post -n libflux%{libflux_suffix} -p /sbin/ldconfig
+%post -n libflux-%{libflux_suffix} -p /sbin/ldconfig
 %postun -n libflux%{libflux_suffix} -p /sbin/ldconfig
 
-%files -n libflux%{libflux_suffix}
+%files -n libflux-%{libflux_suffix}
 %{_libdir}/libflux.so.%{version}
 
 %files -n libflux-devel
