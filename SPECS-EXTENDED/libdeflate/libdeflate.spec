@@ -10,7 +10,6 @@ Source0:        https://github.com/ebiggers/%{name}/archive/v%{version}.tar.gz#/
 BuildRequires:  gcc
 BuildRequires:  make
 
-
 %description
 libdeflate is a library for fast, whole-buffer DEFLATE-based compression and
 decompression, supporting DEFLATE, gzip, and zlib.
