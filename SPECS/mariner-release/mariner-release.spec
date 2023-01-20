@@ -67,6 +67,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+*   Thu Jan 20 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.0-54
+-   Updating version for January update 2.
 *   Thu Jan 05 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0-53
 -   Updating version for January update.
 *   Mon Dec 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.0-52
