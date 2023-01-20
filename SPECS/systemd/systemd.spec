@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        43%{?dist}
+Release:        44%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,7 @@ Patch103:       103-core-allow-portablectl-to-load-new-services-without-.patch
 Patch104:       104-portablectl-block-when-stopping-a-unit-on-detach-now.patch
 Patch105:       105-portablectl-use-replace-unload-when-stopping-a-servi.patch
 Patch106:       106-portabled-implement-container-host-os-release-interf.patch
+Patch107:    CVE-2022-4415.patch
 
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -288,6 +289,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Jan 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 239-44
+- Add patch for CVE-2022-4415
+
 * Mon Nov 21 2022 Andrew Phelps <anphel@microsoft.com> - 239-43
 - Add patch for CVE-2022-3821
 
