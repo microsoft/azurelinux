@@ -1,0 +1,147 @@
+From ba16223652cfaa656d9c0c2d7bc7ab39dbd12467 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 23 Oct 2013 15:04:22 +0200
+Subject: [PATCH 1/3] decode: avoid using a static buffer in th_get_pathname()
+
+A solution suggested by Chris Frey:
+https://lists.feep.net:8080/pipermail/libtar/2013-October/000377.html
+
+Note this can break programs that expect sizeof(TAR) to be fixed.
+
+[upstream commit ec613af2e9371d7a3e1f7c7a6822164a4255b4d1]
+---
+ lib/decode.c |   24 +++++++++++++++++-------
+ lib/handle.c |    1 +
+ lib/libtar.h |    3 +++
+ 3 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/lib/decode.c b/lib/decode.c
+index c16ea2d..edb2185 100644
+--- a/lib/decode.c
++++ b/lib/decode.c
+@@ -26,20 +26,30 @@
+ char *
+ th_get_pathname(TAR *t)
+ {
+-	static TLS_THREAD char filename[MAXPATHLEN];
+-
+ 	if (t->th_buf.gnu_longname)
+ 		return t->th_buf.gnu_longname;
+ 
+-	if (t->th_buf.prefix[0] != '\0')
++	/* allocate the th_pathname buffer if not already */
++	if (t->th_pathname == NULL)
++	{
++		t->th_pathname = malloc(MAXPATHLEN * sizeof(char));
++		if (t->th_pathname == NULL)
++			/* out of memory */
++			return NULL;
++	}
++
++	if (t->th_buf.prefix[0] == '\0')
++	{
++		snprintf(t->th_pathname, MAXPATHLEN, "%.100s", t->th_buf.name);
++	}
++	else
+ 	{
+-		snprintf(filename, sizeof(filename), "%.155s/%.100s",
++		snprintf(t->th_pathname, MAXPATHLEN, "%.155s/%.100s",
+ 			 t->th_buf.prefix, t->th_buf.name);
+-		return filename;
+ 	}
+ 
+-	snprintf(filename, sizeof(filename), "%.100s", t->th_buf.name);
+-	return filename;
++	/* will be deallocated in tar_close() */
++	return t->th_pathname;
+ }
+ 
+ 
+diff --git a/lib/handle.c b/lib/handle.c
+index 002d23c..a19c046 100644
+--- a/lib/handle.c
++++ b/lib/handle.c
+@@ -122,6 +122,7 @@ tar_close(TAR *t)
+ 		libtar_hash_free(t->h, ((t->oflags & O_ACCMODE) == O_RDONLY
+ 					? free
+ 					: (libtar_freefunc_t)tar_dev_free));
++	free(t->th_pathname);
+ 	free(t);
+ 
+ 	return i;
+diff --git a/lib/libtar.h b/lib/libtar.h
+index 7fc4d03..08a8e0f 100644
+--- a/lib/libtar.h
++++ b/lib/libtar.h
+@@ -85,6 +85,9 @@ typedef struct
+ 	int options;
+ 	struct tar_header th_buf;
+ 	libtar_hash_t *h;
++
++	/* introduced in libtar 1.2.21 */
++	char *th_pathname;
+ }
+ TAR;
+ 
+-- 
+1.7.1
+
+
+From 8ef92e48bba35d60208cc09be2bab74f69273d15 Mon Sep 17 00:00:00 2001
+From: Chris Frey <cdfrey@foursquare.net>
+Date: Thu, 24 Oct 2013 17:55:12 -0400
+Subject: [PATCH 2/3] Check for NULL before freeing th_pathname
+
+Thanks to Harald Koch for pointing out that AIX 4 and 5 still need this.
+
+[upstream commit 495d0c0eabc5648186e7d58ad54b508d14af38f4]
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ lib/handle.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/lib/handle.c b/lib/handle.c
+index a19c046..28a7dc2 100644
+--- a/lib/handle.c
++++ b/lib/handle.c
+@@ -122,7 +122,8 @@ tar_close(TAR *t)
+ 		libtar_hash_free(t->h, ((t->oflags & O_ACCMODE) == O_RDONLY
+ 					? free
+ 					: (libtar_freefunc_t)tar_dev_free));
+-	free(t->th_pathname);
++	if (t->th_pathname != NULL)
++		free(t->th_pathname);
+ 	free(t);
+ 
+ 	return i;
+-- 
+1.7.1
+
+
+From 71101392dbab09718d38fabd151bb3cf22fc8b80 Mon Sep 17 00:00:00 2001
+From: Chris Frey <cdfrey@foursquare.net>
+Date: Thu, 24 Oct 2013 17:58:47 -0400
+Subject: [PATCH 3/3] Added stdlib.h for malloc() in lib/decode.c
+
+[upstream commit 20aa09bd7775094a2beb0f136c2c7d9e9fd6c7e6]
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ lib/decode.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/lib/decode.c b/lib/decode.c
+index edb2185..35312be 100644
+--- a/lib/decode.c
++++ b/lib/decode.c
+@@ -13,6 +13,7 @@
+ #include <internal.h>
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <sys/param.h>
+ #include <pwd.h>
+ #include <grp.h>
+-- 
+1.7.1
