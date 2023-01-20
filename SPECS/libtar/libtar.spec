@@ -68,7 +68,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libtar.so
 
 %changelog
-* Wed Jan 18 2023 Adit Jha <aditjha@microsoft.com> - 1.2.20-11
+* Fri Jan 20 2023 Adit Jha <aditjha@microsoft.com> - 1.2.20-11
 - Fix CVE-2021-33640, which takes care of CVE-2021-33645, CVE-2021-33646
 
 * Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.20-10
