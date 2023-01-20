@@ -20,8 +20,9 @@ Patch2:         libtar-1.2.11-mem-deref.patch
 Patch3:         libtar-1.2.20-CVE-2021-33643-CVE-2021-33644.patch
 # CVE-2021-33640
 Patch4:         CVE-2021-33640.patch
-Patch5:         libtar-1.2.20-fix-resource-leaks.patch
-Patch6:         libtar-1.2.20-static-analysis.patch
+Patch5:         libtar-1.2.20-no-static-buffer.patch
+Patch6:         libtar-1.2.20-fix-resource-leaks.patch
+Patch7:         libtar-1.2.20-static-analysis.patch
 
 %description
 libtar is a library for manipulating tar files from within C programs.
