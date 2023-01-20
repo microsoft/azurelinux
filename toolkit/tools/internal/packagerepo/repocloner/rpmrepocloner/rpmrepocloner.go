@@ -353,13 +353,25 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 
 			completeArgs := append([]string{"install"}, baseAndRepoArgs...)
 
-			stdout, stderr, exitCode := shell.ExecuteWithExitCode("tdnf", completeArgs...)
+			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
+
+			exitCode, err := shell.ErrToExitCode(err)
+			if err != nil {
+				return
+			}
+
 			logger.Log.Debugf("TDNF search for provide '%s' with 'install':\n%s", pkgVer.Name, stdout)
+
 			if exitCode == tdnf.ExitCodeOK {
 				logger.Log.Debugf("Package providing '%s' already installed. Attempting reinstallation.", pkgVer.Name)
 
 				completeArgs = append([]string{"reinstall"}, baseAndRepoArgs...)
-				stdout, stderr, exitCode = shell.ExecuteWithExitCode("tdnf", completeArgs...)
+				stdout, stderr, err = shell.Execute("tdnf", completeArgs...)
+
+				exitCode, err = shell.ErrToExitCode(err)
+				if err != nil {
+					return
+				}
 
 				logger.Log.Debugf("TDNF search for provide '%s' with 'reinstall':\n%s", pkgVer.Name, stdout)
 			}
