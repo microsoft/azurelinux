@@ -8670,6 +8670,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libdeflate",
+          "version": "1.9",
+          "downloadUrl": "https://github.com/ebiggers/libdeflate/archive/v1.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdmx",
           "version": "1.1.4",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libdmx-1.1.4.tar.bz2"
