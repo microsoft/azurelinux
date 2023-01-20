@@ -92,6 +92,20 @@ func Execute(program string, args ...string) (stdout, stderr string, err error) 
 	return outBuf.String(), errBuf.String(), err
 }
 
+// ExecuteWithExitCode runs the provided command and converts Go errors to command's exit code.
+func ExecuteWithExitCode(program string, args ...string) (stdout, stderr string, exitCode int) {
+	exitCode = 0
+
+	stdout, stderr, err := Execute(program, args...)
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			exitCode = exitError.ExitCode()
+		}
+	}
+
+	return
+}
+
 // ExecuteWithStdin - Run the command and use Stdin to pass input during execution
 func ExecuteWithStdin(input, program string, args ...string) (stdout, stderr string, err error) {
 	var (

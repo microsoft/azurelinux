@@ -25,6 +25,7 @@ type RepoCloner interface {
 	Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) error
 	AddNetworkFiles(tlsClientCert, tlsClientKey string) error
 	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
+	BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packageName string, err error)
 	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
 	ConvertDownloadedPackagesIntoRepo() error
 	ClonedRepoContents() (repoContents *RepoContents, err error)

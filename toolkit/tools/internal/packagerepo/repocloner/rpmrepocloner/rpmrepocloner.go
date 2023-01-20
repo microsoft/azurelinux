@@ -54,6 +54,20 @@ var (
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm1
 	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
+
+	// Every valid line will be of the form: <package_name> <architecture> <version>-<release> <repo_id> <size_human_readable> <size_Bs>
+	// For:
+	//
+	//		COOL_package2-extended++ aarch64 1.1b.8_X-22~rc1.cm1 fetcher-cloned-repo 1.4M 1468006
+	//
+	// We'd get:
+	//   - package_name:    	COOL_package2-extended++
+	//   - architecture:    	aarch64
+	//   - version:         	1.1b.8_X-22~rc1
+	//   - repo:         		fetcher-cloned-repo
+	//   - size human-readable:	1.4M
+	//   - size in bytes:		1468006
+	installPackageRegex = regexp.MustCompile(`\n\s*(\S+)\s+(\S+)\s+(\S+\.cm\d+)\s+(\S+)\s+(\d+\.\d+[[:alpha:]])\s+(\d+)`)
 )
 
 const (
@@ -63,6 +77,16 @@ const (
 	listPackageVersion = iota
 	listPackageDist    = iota
 	listMaxMatchLen    = iota
+)
+
+const (
+	installPackageLineIndex           = iota
+	installPackageNameIndex           = iota
+	installPackageArchIndex           = iota
+	installPackageVersionReleaseIndex = iota
+	installPackageRepoIndex           = iota
+	installPackageSizeHRIndex         = iota
+	installPackageSizeBIndex          = iota
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -303,11 +327,92 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	return
 }
 
+// BestProvidesCandidate attempts to find the best candidate to provide the requested PackageVer.
+func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packageName string, err error) {
+	var releaseverCliArg string
+
+	logger.Log.Debugf("Finding best candidate for capability '%s'.", pkgVer.Name)
+
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
+	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
+
+	baseArgs := []string{
+		"--assumeno",
+		provideQuery,
+		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
+		releaseverCliArg,
+	}
+
+	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
+	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+	for _, repoID := range repoOrderList {
+		logger.Log.Debugf("Enabling repo ID: %s", repoID)
+
+		err = r.chroot.Run(func() (err error) {
+			baseAndRepoArgs := append(baseArgs, fmt.Sprintf("--enablerepo=%s", repoID))
+
+			if !r.usePreviewRepo {
+				baseAndRepoArgs = append(baseAndRepoArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+			}
+
+			completeArgs := append([]string{"install"}, baseAndRepoArgs...)
+
+			stdout, stderr, exitCode := shell.ExecuteWithExitCode("tdnf", completeArgs...)
+			logger.Log.Debugf("TDNF search for provide '%s' with 'install':\n%s", pkgVer.Name, stdout)
+			if exitCode == tdnf.ExitCodeOK {
+				logger.Log.Debugf("Package providing '%s' already installed. Attempting reinstallation.", pkgVer.Name)
+
+				completeArgs = append([]string{"reinstall"}, baseAndRepoArgs...)
+				stdout, stderr, exitCode = shell.ExecuteWithExitCode("tdnf", completeArgs...)
+
+				logger.Log.Debugf("TDNF search for provide '%s' with 'reinstall':\n%s", pkgVer.Name, stdout)
+			}
+			if exitCode != tdnf.ExitCodeOperationAborted {
+				logger.Log.Debugf("Failed to lookup provide '%s', TDNF error: '%s'", pkgVer.Name, stderr)
+				return
+			}
+
+			// We consider the last package listed by TDNF as the best candidate.
+			matches := installPackageRegex.FindAllStringSubmatch(stdout, -1)
+			if len(matches) == 0 {
+				err = fmt.Errorf("found zero matches for provide '%s' - expected at least one", pkgVer.Name)
+				return
+			}
+
+			bestCandidateLine := matches[len(matches)-1]
+			packageName = fmt.Sprintf("%s-%s.%s",
+				bestCandidateLine[installPackageNameIndex],
+				bestCandidateLine[installPackageVersionReleaseIndex],
+				bestCandidateLine[installPackageArchIndex])
+
+			return
+		})
+		if err != nil {
+			return
+		}
+
+		if packageName != "" {
+			logger.Log.Debug("Found required package, skipping further search in other repos.")
+			break
+		}
+	}
+
+	if packageName == "" {
+		err = fmt.Errorf("could not resolve %s", pkgVer.Name)
+		return
+	}
+
+	logger.Log.Debugf("Translated '%s' to package: %s", pkgVer.Name, packageName)
+	return
+}
+
 // WhatProvides attempts to find packages which provide the requested PackageVer.
 func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
-	var (
-		releaseverCliArg string
-	)
+	var releaseverCliArg string
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
 	if err != nil {
@@ -337,10 +442,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			}
 
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
-			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
+			logger.Log.Debugf("TDNF search for provide '%s':\n%s", pkgVer.Name, stdout)
 
 			if err != nil {
-				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
+				logger.Log.Debugf("Failed to lookup provide '%s', TDNF error: '%s'", pkgVer.Name, stderr)
 				return
 			}
 
@@ -471,7 +576,7 @@ func (r *RpmRepoCloner) Close() error {
 	return r.chroot.Close(leaveChrootFilesOnDisk)
 }
 
-// clonePackage clones a given package using prepopulated arguments.
+// clonePackage clones a given package using pre-populated arguments.
 // It will gradually enable more repos to consider using enabledRepoOrder until the package is found.
 func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...string) (preBuilt bool, err error) {
 	const (
@@ -522,7 +627,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		logger.Log.Debugf("stderr: %s", stderr)
 
 		if err != nil {
-			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
+			logger.Log.Debugf("TDNF error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
 		}
 
 		// ============== TDNF SPECIFIC IMPLEMENTATION ==============
@@ -566,19 +671,15 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 		return
 	}
 
-	// Treat <= as =
-	// Treat > and >= as "latest"
-	switch pkgVer.Condition {
-	case "<=":
-		logger.Log.Warnf("Treating '%s' version constraint as '=' for: %v", pkgVer.Condition, pkgVer)
-		fallthrough
-	case "=":
-		tdnfArg = fmt.Sprintf("%s-%s", tdnfArg, pkgVer.Version)
-	case "":
-		break
-	default:
-		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+	if pkgVer.Condition != "" {
+		if pkgVer.Version != "" {
+			tdnfArg = fmt.Sprintf("%s %s %s", tdnfArg, pkgVer.Condition, pkgVer.Version)
+		} else {
+			logger.Log.Warnf("Missing version number despite set version condition for package: %v", pkgVer)
+		}
 	}
+
+	logger.Log.Debugf("Converted PackageVer to TDNF arg: %s", tdnfArg)
 
 	return
 }

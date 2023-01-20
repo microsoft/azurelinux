@@ -173,7 +173,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
 	// Resolve nodes to exact package names so they can be referenced in the graph.
-	resolvedPackages, err := cloner.WhatProvides(node.VersionedPkg)
+	resolvedPackage, err := cloner.BestProvidesCandidate(node.VersionedPkg)
 	if err != nil {
 		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
 		// It is not an error if an implicit node could not be resolved as it may become available later in the build.
@@ -186,34 +186,24 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
-	if len(resolvedPackages) == 0 {
-		return fmt.Errorf("failed to find any packages providing '%v'", node.VersionedPkg)
-	}
-
 	preBuilt := false
-	for _, resolvedPackage := range resolvedPackages {
-		if !fetchedPackages[resolvedPackage] {
-			desiredPackage := &pkgjson.PackageVer{
-				Name: resolvedPackage,
-			}
-
-			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
-			if err != nil {
-				logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
-				return
-			}
-			fetchedPackages[resolvedPackage] = true
-			prebuiltPackages[resolvedPackage] = preBuilt
-
-			logger.Log.Debugf("Fetched '%s' as potential candidate (is pre-built: %v).", resolvedPackage, prebuiltPackages[resolvedPackage])
+	if !fetchedPackages[resolvedPackage] {
+		desiredPackage := &pkgjson.PackageVer{
+			Name: resolvedPackage,
 		}
+
+		preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
+		if err != nil {
+			logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
+			return
+		}
+		fetchedPackages[resolvedPackage] = true
+		prebuiltPackages[resolvedPackage] = preBuilt
+
+		logger.Log.Debugf("Fetched '%s' (is pre-built: %v).", resolvedPackage, prebuiltPackages[resolvedPackage])
 	}
 
-	err = assignRPMPath(node, outDir, resolvedPackages)
-	if err != nil {
-		logger.Log.Errorf("Failed to find an RPM to provide '%s'. Error: %s", node.VersionedPkg.Name, err)
-		return
-	}
+	node.RpmPath = rpmPackageToRPMPath(resolvedPackage, outDir)
 
 	// If a package is  available locally, and it is part of the toolchain, mark it as a prebuilt so the scheduler knows it can use it
 	// immediately (especially for dynamic generator created capabilities)

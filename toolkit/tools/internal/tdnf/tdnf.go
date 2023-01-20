@@ -12,6 +12,11 @@ import (
 )
 
 const (
+	ExitCodeOK               = 0
+	ExitCodeOperationAborted = 8
+)
+
+const (
 	// ReleaseverArgument specifies the release version argument to be used with tdnf
 	releaseverArgument = "--releasever"
 )
