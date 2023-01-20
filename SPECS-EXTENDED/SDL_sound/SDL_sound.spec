@@ -2,7 +2,7 @@ Summary:        Library handling decoding of several popular sound file formats
 Name:           SDL_sound
 Version:        1.0.3
 Release:        32%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.icculus.org/SDL_sound
