@@ -17,7 +17,7 @@
 
 %global rustflags '-Clink-arg=-Wl,-z,relro,-z,now'
 
-%define libflux_suffix %(echo %{version} | tr . _)
+%define libflux_suffix %{version}-%{release}
 
 Summary:        Influx data language
 Name:           flux
