@@ -25464,16 +25464,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "SDL",
-          "version": "1.2.15",
-          "downloadUrl": "https://github.com/libsdl-org/SDL-1.2/archive/refs/tags/release-1.2.15.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "sanlock",
           "version": "3.8.4",
           "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.4.tar.gz"
@@ -25727,6 +25717,16 @@
           "name": "sdbus-cpp",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "SDL",
+          "version": "1.2.15",
+          "downloadUrl": "https://github.com/libsdl-org/SDL-1.2/archive/refs/tags/release-1.2.15.tar.gz"
         }
       }
     },
