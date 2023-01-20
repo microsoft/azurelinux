@@ -28939,6 +28939,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "zopfli",
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/google/zopfli/archive/zopfli-1.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "zsh",
           "version": "5.9",
           "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz"

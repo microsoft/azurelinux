@@ -1987,7 +1987,8 @@
                 "zenity",
                 "zerofree",
                 "zfs-fuse",
-                "zipper"
+                "zipper",
+                "zopfli"
             ]
         },
         "Fedora (Copyright Remi Collet)": {
