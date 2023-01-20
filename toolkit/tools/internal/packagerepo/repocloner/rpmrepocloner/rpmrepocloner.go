@@ -35,14 +35,6 @@ const (
 )
 
 var (
-	// Every valid line pair will be of the form:
-	//		<package>-<version>.<arch> : <Description>
-	//		Repo	: [repo_name]
-	//
-	// NOTE: we ignore packages installed in the build environment denoted by "Repo	: @System".
-	packageLookupNameMatchRegex = regexp.MustCompile(`([^:\s]+(x86_64|aarch64|noarch))\s*:[^\n]*\nRepo\s+:\s+[^@]`)
-	packageNameIndex            = 1
-
 	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
 	// For:
 	//
@@ -407,78 +399,6 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 	}
 
 	logger.Log.Debugf("Translated '%s' to package: %s", pkgVer.Name, packageName)
-	return
-}
-
-// WhatProvides attempts to find packages which provide the requested PackageVer.
-func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
-	var releaseverCliArg string
-
-	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
-	if err != nil {
-		return
-	}
-
-	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
-
-	baseArgs := []string{
-		"provides",
-		provideQuery,
-		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
-		releaseverCliArg,
-	}
-
-	foundPackages := make(map[string]bool)
-	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
-	for _, repoID := range repoOrderList {
-		logger.Log.Debugf("Enabling repo ID: %s", repoID)
-
-		err = r.chroot.Run(func() (err error) {
-			completeArgs := append(baseArgs, fmt.Sprintf("--enablerepo=%s", repoID))
-
-			if !r.usePreviewRepo {
-				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
-			}
-
-			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
-			logger.Log.Debugf("TDNF search for provide '%s':\n%s", pkgVer.Name, stdout)
-
-			if err != nil {
-				logger.Log.Debugf("Failed to lookup provide '%s', TDNF error: '%s'", pkgVer.Name, stderr)
-				return
-			}
-
-			for _, matches := range packageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
-				packageName := matches[packageNameIndex]
-				if _, found := foundPackages[packageName]; !found {
-					foundPackages[packageName] = true
-					logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
-				}
-			}
-
-			return
-		})
-		if err != nil {
-			return
-		}
-
-		if len(foundPackages) > 0 {
-			logger.Log.Debug("Found required package(s), skipping further search in other repos.")
-			break
-		}
-	}
-
-	if len(foundPackages) == 0 {
-		err = fmt.Errorf("could not resolve %s", pkgVer.Name)
-		return
-	}
-
-	for packageName := range foundPackages {
-		packageNames = append(packageNames, packageName)
-	}
-
-	logger.Log.Debugf("Translated '%s' to package(s): %s", pkgVer.Name, strings.Join(packageNames, " "))
 	return
 }
 

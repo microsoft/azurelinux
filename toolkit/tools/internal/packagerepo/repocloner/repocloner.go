@@ -22,13 +22,12 @@ type RepoPackage struct {
 // It is capable of generate a local repository consisting of a set of request packages
 // and their dependencies.
 type RepoCloner interface {
-	Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) error
 	AddNetworkFiles(tlsClientCert, tlsClientKey string) error
-	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
 	BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packageName string, err error)
-	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
-	ConvertDownloadedPackagesIntoRepo() error
-	ClonedRepoContents() (repoContents *RepoContents, err error)
+	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
 	CloneDirectory() string
+	ClonedRepoContents() (repoContents *RepoContents, err error)
 	Close() error
+	ConvertDownloadedPackagesIntoRepo() error
+	Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) error
 }

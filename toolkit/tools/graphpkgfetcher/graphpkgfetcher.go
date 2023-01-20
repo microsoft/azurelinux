@@ -15,7 +15,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"gonum.org/v1/gonum/graph"
@@ -217,39 +216,6 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	}
 
 	logger.Log.Infof("Choosing '%s' to provide '%s'.", filepath.Base(node.RpmPath), node.VersionedPkg.Name)
-
-	return
-}
-
-func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []string) (err error) {
-	rpmPaths := []string{}
-	for _, resolvedPackage := range resolvedPackages {
-		rpmPaths = append(rpmPaths, rpmPackageToRPMPath(resolvedPackage, outDir))
-	}
-
-	node.RpmPath = rpmPaths[0]
-	if len(rpmPaths) > 1 {
-		var resolvedRPMs []string
-		logger.Log.Debugf("Found %d candidates. Resolving.", len(rpmPaths))
-
-		resolvedRPMs, err = rpm.ResolveCompetingPackages(*tmpDir, rpmPaths...)
-		if err != nil {
-			logger.Log.Errorf("Failed while trying to pick an RPM providing '%s' from the following RPMs: %v", node.VersionedPkg.Name, rpmPaths)
-			return
-		}
-
-		resolvedRPMsCount := len(resolvedRPMs)
-		if resolvedRPMsCount == 0 {
-			logger.Log.Errorf("Failed while trying to pick an RPM providing '%s'. No RPM can be installed from the following: %v", node.VersionedPkg.Name, rpmPaths)
-			return
-		}
-
-		if resolvedRPMsCount > 1 {
-			logger.Log.Warnf("Found %d candidates to provide '%s'. Picking the first one.", resolvedRPMsCount, node.VersionedPkg.Name)
-		}
-
-		node.RpmPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
-	}
 
 	return
 }
