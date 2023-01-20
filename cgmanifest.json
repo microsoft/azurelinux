@@ -25464,16 +25464,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "SDL_sound",
-          "version": "1.0.3",
-          "downloadUrl": "https://icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "sanlock",
           "version": "3.8.4",
           "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.4.tar.gz"
@@ -25747,6 +25737,16 @@
           "name": "SDL2",
           "version": "2.24.0",
           "downloadUrl": "https://www.libsdl.org/release/SDL2-2.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "SDL_sound",
+          "version": "1.0.3",
+          "downloadUrl": "https://icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz"
         }
       }
     },
