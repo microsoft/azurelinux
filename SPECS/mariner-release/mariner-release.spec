@@ -122,7 +122,7 @@ rm -rf $RPM_BUILD_ROOT
 *   Thu Nov 25 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-28
 -   Updating version for November update.
 *   Thu Nov 25 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-27
--   Updating version for November update.
+-   Updating kernel to revert EBPF for off-cycle update.
 *   Thu Nov 11 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-27
 -   Updating version for off-cycle post-October update to fix kernel CVE
 *   Fri Nov 05 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0-26
