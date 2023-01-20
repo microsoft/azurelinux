@@ -4250,8 +4250,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.8",
-          "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
+          "version": "1.19.4",
+          "downloadUrl": "https://golang.org/dl/go1.19.4.src.tar.gz"
         }
       }
     },
@@ -9290,6 +9290,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblouis",
+          "version": "3.24.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.24.0/liblouis-3.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liblqr-1",
           "version": "0.4.2",
           "downloadUrl": "http://liblqr.wikidot.com/local--files/en:download-page/liblqr-1-0.4.2.tar.bz2"
@@ -10823,6 +10833,16 @@
           "name": "libwpe",
           "version": "1.12.0",
           "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.12.0/libwpe-1.12.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libwpg",
+          "version": "0.3.3",
+          "downloadUrl": "https://download.sourceforge.net/libwpg/libwpg-0.3.3.tar.xz"
         }
       }
     },
@@ -14474,8 +14494,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "2.17.0",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.0.tar.gz"
+          "version": "2.17.5",
+          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.5.tar.gz"
         }
       }
     },
@@ -20194,8 +20214,8 @@
         "type": "other",
         "other": {
           "name": "prometheus",
-          "version": "2.36.0",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.36.0.tar.gz"
+          "version": "2.37.0",
+          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.37.0.tar.gz"
         }
       }
     },
@@ -27527,8 +27547,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.0982",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.0982.tar.gz"
+          "version": "9.0.1145",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1145.tar.gz"
         }
       }
     },
