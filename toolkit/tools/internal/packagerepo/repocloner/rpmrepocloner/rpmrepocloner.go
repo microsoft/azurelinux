@@ -59,7 +59,7 @@ var (
 	//   - repo:         		fetcher-cloned-repo
 	//   - size human-readable:	1.4M
 	//   - size in bytes:		1468006
-	installPackageRegex = regexp.MustCompile(`\n\s*(\S+)\s+(\S+)\s+(\S+\.cm\d+)\s+(\S+)\s+(\d+\.\d+[[:alpha:]])\s+(\d+)`)
+	installPackageRegex = regexp.MustCompile(`\n\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\d+\.\d+[[:alpha:]])\s+(\d+)`)
 )
 
 const (
