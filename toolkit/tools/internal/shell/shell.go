@@ -70,23 +70,15 @@ func PermanentlyStopAllProcesses(signal unix.Signal) {
 	}
 }
 
-// ErrToExitCode converts shell errors to exit codes.
-func ErrToExitCode(shellErr error) (exitCode int, err error) {
-	exitCode = 0
-
-	if shellErr != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			exitCode = exitError.ExitCode()
-		} else {
-			err = fmt.Errorf("unable to convert error '%v' to exit code", shellErr)
-		}
-	}
+// Execute runs the provided command.
+func Execute(program string, args ...string) (stdout, stderr string, err error) {
+	stdout, stderr, _, err = ExecuteWithExitCode(program, args...)
 
 	return
 }
 
 // Execute runs the provided command.
-func Execute(program string, args ...string) (stdout, stderr string, err error) {
+func ExecuteWithExitCode(program string, args ...string) (stdout, stderr string, exitCode int, err error) {
 	var (
 		outBuf bytes.Buffer
 		errBuf bytes.Buffer
@@ -104,7 +96,7 @@ func Execute(program string, args ...string) (stdout, stderr string, err error) 
 	defer untrackProcess(cmd)
 
 	err = cmd.Wait()
-	return outBuf.String(), errBuf.String(), err
+	return outBuf.String(), errBuf.String(), cmd.ProcessState.ExitCode(), err
 }
 
 // ExecuteWithStdin - Run the command and use Stdin to pass input during execution

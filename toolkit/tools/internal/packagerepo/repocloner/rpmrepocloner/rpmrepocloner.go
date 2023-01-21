@@ -353,30 +353,19 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 
 			completeArgs := append([]string{"install"}, baseAndRepoArgs...)
 
-			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
-
-			exitCode, err := shell.ErrToExitCode(err)
-			if err != nil {
-				return
-			}
-
+			stdout, stderr, exitCode, err := shell.ExecuteWithExitCode("tdnf", completeArgs...)
 			logger.Log.Debugf("TDNF search for provide '%s' with 'install':\n%s", pkgVer.Name, stdout)
-
 			if exitCode == tdnf.ExitCodeOK {
 				logger.Log.Debugf("Package providing '%s' already installed. Attempting reinstallation.", pkgVer.Name)
 
 				completeArgs = append([]string{"reinstall"}, baseAndRepoArgs...)
-				stdout, stderr, err = shell.Execute("tdnf", completeArgs...)
-
-				exitCode, err = shell.ErrToExitCode(err)
-				if err != nil {
-					return
-				}
+				stdout, stderr, exitCode, err = shell.ExecuteWithExitCode("tdnf", completeArgs...)
 
 				logger.Log.Debugf("TDNF search for provide '%s' with 'reinstall':\n%s", pkgVer.Name, stdout)
 			}
+
 			if exitCode != tdnf.ExitCodeOperationAborted {
-				logger.Log.Debugf("Failed to lookup provide '%s', TDNF error: '%s'", pkgVer.Name, stderr)
+				logger.Log.Debugf("Failed to lookup provide '%s'. Error: %v. Exit code: %d. TDNF error:\n'%s'", pkgVer.Name, err, exitCode, stderr)
 				return
 			}
 
@@ -393,7 +382,7 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 				bestCandidateLine[installPackageVersionReleaseIndex],
 				bestCandidateLine[installPackageArchIndex])
 
-			return
+			return nil
 		})
 		if err != nil {
 			return
