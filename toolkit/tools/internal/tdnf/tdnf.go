@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	ExitCodeOK               = 0
-	ExitCodeOperationAborted = 8
+	ExitCodeOK                 = 0
+	ExitCodeOperationAborted   = 8
+	ExitCodeNoMatchingPackages = 243
 )
 
 const (

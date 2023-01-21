@@ -321,7 +321,12 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 // BestProvidesCandidate attempts to find the best candidate to provide the requested PackageVer.
 func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packageName string, err error) {
-	var releaseverCliArg string
+	var (
+		releaseverCliArg string
+		exitCode         int
+		stderr           string
+		stdout           string
+	)
 
 	logger.Log.Debugf("Finding best candidate for capability '%s'.", pkgVer.Name)
 
@@ -353,7 +358,7 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 
 			completeArgs := append([]string{"install"}, baseAndRepoArgs...)
 
-			stdout, stderr, exitCode, err := shell.ExecuteWithExitCode("tdnf", completeArgs...)
+			stdout, stderr, exitCode, err = shell.ExecuteWithExitCode("tdnf", completeArgs...)
 			logger.Log.Debugf("TDNF search for provide '%s' with 'install':\n%s", pkgVer.Name, stdout)
 			if exitCode == tdnf.ExitCodeOK {
 				logger.Log.Debugf("Package providing '%s' already installed. Attempting reinstallation.", pkgVer.Name)
@@ -384,6 +389,9 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 
 			return nil
 		})
+		if exitCode == tdnf.ExitCodeNoMatchingPackages {
+			continue
+		}
 		if err != nil {
 			return
 		}
