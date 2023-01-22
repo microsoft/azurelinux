@@ -12,10 +12,12 @@ import (
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
@@ -337,68 +339,72 @@ func (r *RpmRepoCloner) BestProvidesCandidate(pkgVer *pkgjson.PackageVer) (packa
 
 	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
 
-	baseArgs := []string{
-		"--assumeno",
-		provideQuery,
-		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
-		releaseverCliArg,
-	}
+	if isFile, _ := file.IsFile(provideQuery); isFile {
+		packageName, err = rpm.QueryRPMWhatProvides(provideQuery)
+	} else {
+		baseArgs := []string{
+			"--assumeno",
+			provideQuery,
+			fmt.Sprintf("--disablerepo=%s", allRepoIDs),
+			releaseverCliArg,
+		}
 
-	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
-	for _, repoID := range repoOrderList {
-		logger.Log.Debugf("Enabling repo ID: %s", repoID)
+		// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
+		repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+		for _, repoID := range repoOrderList {
+			logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
-		err = r.chroot.Run(func() (err error) {
-			baseAndRepoArgs := append(baseArgs, fmt.Sprintf("--enablerepo=%s", repoID))
+			err = r.chroot.Run(func() (err error) {
+				baseAndRepoArgs := append(baseArgs, fmt.Sprintf("--enablerepo=%s", repoID))
 
-			if !r.usePreviewRepo {
-				baseAndRepoArgs = append(baseAndRepoArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
-			}
+				if !r.usePreviewRepo {
+					baseAndRepoArgs = append(baseAndRepoArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+				}
 
-			completeArgs := append([]string{"install"}, baseAndRepoArgs...)
+				completeArgs := append([]string{"install"}, baseAndRepoArgs...)
 
-			stdout, stderr, exitCode, err = shell.ExecuteWithExitCode("tdnf", completeArgs...)
-			logger.Log.Debugf("TDNF search for provide '%s' with 'install':\n%s", pkgVer.Name, stdout)
-			if exitCode == tdnf.ExitCodeOK {
-				logger.Log.Debugf("Package providing '%s' already installed. Attempting reinstallation.", pkgVer.Name)
-
-				completeArgs = append([]string{"reinstall"}, baseAndRepoArgs...)
 				stdout, stderr, exitCode, err = shell.ExecuteWithExitCode("tdnf", completeArgs...)
+				logger.Log.Debugf("TDNF search for provide '%s' with 'install':\n%s", pkgVer.Name, stdout)
+				if exitCode == tdnf.ExitCodeOK {
+					logger.Log.Debugf("Package providing '%s' already installed. Attempting reinstallation.", pkgVer.Name)
 
-				logger.Log.Debugf("TDNF search for provide '%s' with 'reinstall':\n%s", pkgVer.Name, stdout)
+					completeArgs = append([]string{"reinstall"}, baseAndRepoArgs...)
+					stdout, stderr, exitCode, err = shell.ExecuteWithExitCode("tdnf", completeArgs...)
+
+					logger.Log.Debugf("TDNF search for provide '%s' with 'reinstall':\n%s", pkgVer.Name, stdout)
+				}
+
+				if exitCode != tdnf.ExitCodeOperationAborted {
+					logger.Log.Debugf("Failed to lookup provide '%s'. Error: %v. Exit code: %d. TDNF error:\n'%s'", pkgVer.Name, err, exitCode, stderr)
+					return
+				}
+
+				// We consider the last package listed by TDNF as the best candidate.
+				matches := installPackageRegex.FindAllStringSubmatch(stdout, -1)
+				if len(matches) == 0 {
+					err = fmt.Errorf("found zero matches for provide '%s' - expected at least one", pkgVer.Name)
+					return
+				}
+
+				bestCandidateLine := matches[len(matches)-1]
+				packageName = fmt.Sprintf("%s-%s.%s",
+					bestCandidateLine[installPackageNameIndex],
+					bestCandidateLine[installPackageVersionReleaseIndex],
+					bestCandidateLine[installPackageArchIndex])
+
+				return nil
+			})
+			if exitCode == tdnf.ExitCodeNoMatchingPackages {
+				continue
 			}
-
-			if exitCode != tdnf.ExitCodeOperationAborted {
-				logger.Log.Debugf("Failed to lookup provide '%s'. Error: %v. Exit code: %d. TDNF error:\n'%s'", pkgVer.Name, err, exitCode, stderr)
+			if err != nil {
 				return
 			}
 
-			// We consider the last package listed by TDNF as the best candidate.
-			matches := installPackageRegex.FindAllStringSubmatch(stdout, -1)
-			if len(matches) == 0 {
-				err = fmt.Errorf("found zero matches for provide '%s' - expected at least one", pkgVer.Name)
-				return
+			if packageName != "" {
+				logger.Log.Debug("Found required package, skipping further search in other repos.")
+				break
 			}
-
-			bestCandidateLine := matches[len(matches)-1]
-			packageName = fmt.Sprintf("%s-%s.%s",
-				bestCandidateLine[installPackageNameIndex],
-				bestCandidateLine[installPackageVersionReleaseIndex],
-				bestCandidateLine[installPackageArchIndex])
-
-			return nil
-		})
-		if exitCode == tdnf.ExitCodeNoMatchingPackages {
-			continue
-		}
-		if err != nil {
-			return
-		}
-
-		if packageName != "" {
-			logger.Log.Debug("Found required package, skipping further search in other repos.")
-			break
 		}
 	}
 

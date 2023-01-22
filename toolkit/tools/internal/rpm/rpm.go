@@ -320,6 +320,21 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 	return
 }
 
+// QueryRPMWhatProvides returns the packages providing a given file path.
+func QueryRPMWhatProvides(filePath string) (packageName string, err error) {
+	const queryWhatProvidesOption = "-qf"
+
+	logger.Log.Debugf("Querying RPM file package providing file (%s)", filePath)
+	stdout, stderr, err := shell.Execute(rpmProgram, queryWhatProvidesOption, filePath)
+	if err != nil {
+		logger.Log.Warnf("RPM query failed.\nStdout: %s.\nStderr: %s", stdout, stderr)
+		return
+	}
+
+	packageName = strings.TrimSpace(stdout)
+	return
+}
+
 // ResolveCompetingPackages takes in a list of RPMs and returns only the ones, which would
 // end up being installed after resolving outdated, obsoleted, or conflicting packages.
 func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs []string, err error) {
