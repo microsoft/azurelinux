@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.161.1
+Version:        5.10.164.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -270,6 +270,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri Jan 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.164.1-1
+- Auto-upgrade to 5.10.164.1
+
+* Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.162.1-1
+- Auto-upgrade to 5.10.162.1
+
 * Fri Dec 23 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.161.1-1
 - Auto-upgrade to 5.10.161.1
 
