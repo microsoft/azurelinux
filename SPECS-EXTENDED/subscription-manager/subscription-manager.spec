@@ -53,7 +53,7 @@
 Summary:        Tools and libraries for subscription and repository management
 Name:           subscription-manager
 Version:        1.29.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
