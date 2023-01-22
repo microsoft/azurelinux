@@ -13,7 +13,7 @@ then
 fi
 
 # Additional macros required to parse spec files.
-DIST_TAG=$(make -qn -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
+DIST_TAG=$(make -sn -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
 DEFINES=(-D "with_check 1" -D "dist $DIST_TAG")
 
 SPECS_DIR="$REPO_ROOT/SPECS"
