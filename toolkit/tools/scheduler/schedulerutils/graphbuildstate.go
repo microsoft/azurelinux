@@ -26,11 +26,12 @@ type GraphBuildState struct {
 	reservedFiles    map[string]bool
 	conflictingRPMs  map[string]bool
 	conflictingSRPMs map[string]bool
+	supressConflictingRPMs bool
 }
 
 // NewGraphBuildState returns a new GraphBuildState.
 // - reservedFiles is a list of reserved files which should NOT be rebuilt. Any files that ARE rebuilt will be recorded.
-func NewGraphBuildState(reservedFiles []string) (g *GraphBuildState) {
+func NewGraphBuildState(reservedFiles []string, supressConflictingRPMs bool) (g *GraphBuildState) {
 	filesMap := make(map[string]bool)
 	for _, file := range reservedFiles {
 		filesMap[file] = true
@@ -41,6 +42,7 @@ func NewGraphBuildState(reservedFiles []string) (g *GraphBuildState) {
 		reservedFiles:    filesMap,
 		conflictingRPMs:  make(map[string]bool),
 		conflictingSRPMs: make(map[string]bool),
+		supressConflictingRPMs: supressConflictingRPMs,
 	}
 }
 
@@ -147,7 +149,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {
 
 	if !res.Skipped && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
-			if g.isConflictWithToolchain(file) {
+			if !g.supressConflictingRPMs && g.isConflictWithToolchain(file) {
 				g.conflictingRPMs[filepath.Base(file)] = true
 				g.conflictingSRPMs[filepath.Base(res.Node.SrpmPath)] = true
 			}

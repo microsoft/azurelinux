@@ -74,6 +74,7 @@ var (
 	reservedFileListFile = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
 	deltaBuild           = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
+	supressConflictingRPMs = app.Flag("allow-prebuilt-rebuild", "Allow conflicting RPMS to not cause the failure").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -282,7 +283,12 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
-	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
+	
+	//TODO: pass supressRPMs
+	//Pass one of the toolchain RPMs to cause the error
+	//2.0-stable (git fetch upstream --tags)
+
+	buildState := schedulerutils.NewGraphBuildState(reservedFiles, supressConflictingRPMs)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
