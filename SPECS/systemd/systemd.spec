@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Patch2:         gpt-auto-devno-not-determined.patch
 Patch3:         CVE-2022-3821.patch
 # Patch4 can be removed once we update to version 252
 Patch4:         CVE-2022-45873.patch
+Patch5:    CVE-2022-4415.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -271,6 +272,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Jan 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-13
+- Add patch for CVE-2022-4415
+
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-12
 - Add patch for CVE-2022-45873
 
