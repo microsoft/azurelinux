@@ -35,14 +35,12 @@ to act as the ingress for an AKS cluster.
 
 %prep
 %setup -q
+rm -rf vendor
+tar -xf %{SOURCE1} --no-same-owner
 %patch0 -p1
 %patch1 -p1
 
 %build
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
-
-
 export VERSION=%{version}
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
 
