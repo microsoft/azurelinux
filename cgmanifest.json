@@ -25744,6 +25744,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "SDL_sound",
+          "version": "1.0.3",
+          "downloadUrl": "https://icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sdparm",
           "version": "1.11",
           "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
