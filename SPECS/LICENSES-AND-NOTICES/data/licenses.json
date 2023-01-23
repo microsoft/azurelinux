@@ -1992,7 +1992,8 @@
                 "zerofree",
                 "zfs-fuse",
                 "zipper",
-                "zopfli"
+                "zopfli",
+                "zziplib"
             ]
         },
         "Fedora (Copyright Remi Collet)": {
