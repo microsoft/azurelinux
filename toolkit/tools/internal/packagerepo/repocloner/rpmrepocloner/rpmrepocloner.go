@@ -323,7 +323,6 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		releaseverCliArg,
 	}
 
-	foundPackages := make(map[string]bool)
 	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
 	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
 	for _, repoID := range repoOrderList {
@@ -344,12 +343,13 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				return
 			}
 
+			// MUST keep order of packages printed by TDNF.
+			// TDNF will print the packages starting from the highest version, which allows us to work around an RPM bug:
+			// https://github.com/rpm-software-management/rpm/issues/2359
 			for _, matches := range packageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
 				packageName := matches[packageNameIndex]
-				if _, found := foundPackages[packageName]; !found {
-					foundPackages[packageName] = true
-					logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
-				}
+				packageNames = append(packageNames, packageName)
+				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 			}
 
 			return
@@ -358,19 +358,15 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			return
 		}
 
-		if len(foundPackages) > 0 {
+		if len(packageNames) > 0 {
 			logger.Log.Debug("Found required package(s), skipping further search in other repos.")
 			break
 		}
 	}
 
-	if len(foundPackages) == 0 {
+	if len(packageNames) == 0 {
 		err = fmt.Errorf("could not resolve %s", pkgVer.Name)
 		return
-	}
-
-	for packageName := range foundPackages {
-		packageNames = append(packageNames, packageName)
 	}
 
 	logger.Log.Debugf("Translated '%s' to package(s): %s", pkgVer.Name, strings.Join(packageNames, " "))
