@@ -49,11 +49,11 @@ and working with data. It is part of InfluxDB 1.7 and 2.0, but can be run
 independently of those. This repository contains the language definition and an
 implementation of the language core.
 
-%package -n libflux-%{libflux_suffix}
+%package -n libflux
 Summary:        Influx data language
 Provides:       libflux = %{version}-%{release}
 
-%description -n libflux-%{libflux_suffix}
+%description -n libflux
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
 and working with data. It is part of InfluxDB 1.7 and 2.0, but can be run
 independently of those. This repository contains the language definition and an
@@ -61,7 +61,7 @@ implementation of the language core.
 
 %package -n libflux-devel
 Summary:        Development libraries and header files for Influx data language
-Requires:       libflux-%{libflux_suffix} = %{version}-%{release}
+Requires:       libflux = %{version}-%{release}
 
 %description -n libflux-devel
 This package contains the header files and libraries for building
@@ -72,7 +72,18 @@ programs using Influx data language.
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
+patch -p2 <<EOF
+--- a/libflux/flux/build.rs
++++ b/libflux/flux/build.rs
+@@ -79,5 +79,7 @@ fn main() -> Result<()> {
+     let path = dir.join("stdlib.data");
+     serialize(Environment::from(imports), fb::build_env, &path)?;
 
++    println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libflux.so.%{version}");
++
+     Ok(())
+ }
+EOF
 popd
 
 %build
@@ -111,10 +122,10 @@ pushd libflux
 RUSTFLAGS=%{rustflags} cargo test --release
 popd
 
-%post -n libflux-%{libflux_suffix} -p /sbin/ldconfig
-%postun -n libflux%{libflux_suffix} -p /sbin/ldconfig
+%post -n libflux -p /sbin/ldconfig
+%postun -n libflux -p /sbin/ldconfig
 
-%files -n libflux-%{libflux_suffix}
+%files -n libflux
 %{_libdir}/libflux.so.%{version}
 
 %files -n libflux-devel

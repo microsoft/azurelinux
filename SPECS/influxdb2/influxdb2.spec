@@ -74,6 +74,7 @@ It's useful for recording metrics, events, and performing analytics.
 %package        devel
 Summary:        InfluxDB development files
 Group:          Development/Languages/Golang
+Requires:       libflux-devel
 Requires:       go
 Requires:       tzdata
 Conflicts:      influxdb
