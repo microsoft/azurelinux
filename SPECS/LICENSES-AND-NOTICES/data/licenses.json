@@ -45,6 +45,8 @@
                 "adwaita-icon-theme",
                 "afflib",
                 "aide",
+                "alsa-firmware",
+                "alsa-plugins",
                 "amtk",
                 "amtterm",
                 "annobin",
@@ -631,6 +633,7 @@
                 "libldm",
                 "liblockfile",
                 "liblognorm",
+                "liblouis",
                 "liblqr-1",
                 "liblzf",
                 "libmad",
@@ -733,6 +736,7 @@
                 "libwnck3",
                 "libwpd",
                 "libwpe",
+                "libwpg",
                 "libwps",
                 "libwvstreams",
                 "libX11",
@@ -1797,7 +1801,9 @@
                 "scl-utils",
                 "screen",
                 "scrub",
+                "SDL",
                 "SDL2",
+                "SDL_sound",
                 "sdparm",
                 "seabios",
                 "secilc",
@@ -1985,7 +1991,9 @@
                 "zenity",
                 "zerofree",
                 "zfs-fuse",
-                "zipper"
+                "zipper",
+                "zopfli",
+                "zziplib"
             ]
         },
         "Fedora (Copyright Remi Collet)": {
@@ -2543,6 +2551,7 @@
                 "gobject-introspection",
                 "golang",
                 "golang-1.17",
+                "golang-1.18",
                 "gperf",
                 "gperftools",
                 "gpgme",

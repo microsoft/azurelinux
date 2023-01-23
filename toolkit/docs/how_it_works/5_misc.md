@@ -6,6 +6,7 @@ Miscellaneous Topics
     - [Config Tracking](#Config-Tracking)
     - [Folder Dependencies](#Folder-Dependencies)
     - [Go Tools Compiling](#Go-Tools-Compiling)
+    - [Disabling shell commands during dry-run](#Disabling-shell-commands-during-dry-run)
 - [Distroless Images](#distroless-images)
 
 ## Chroot
@@ -142,6 +143,11 @@ Each go tool will run a self test when it is built, if test files are available.
 
 ##### `$(go_common_files)`
 This variable tracks all shared files which may be used by any go tool. Shared packages are found in `./tools/internal/` while the `./tools/go.mod` and `./tools/go.sum` files track external dependencies for the go tools. If any of these files change all the go tools will rebuild.
+
+### Disabling shell commands during dry-run
+The `shell_real_build_only` function is offered which will invoke `$(shell ...)` only if the makefile is actually being built. When tab competing, or doing other non-build operations (`-n|--dry-run`) make will still evaluate `$(shell ...)` commands. This can be very costly time-wise for things like `$(shell find $(some_dir)/ -type f)` which may contain large numbers of file. Instead invoking `$(call shell_real_build_only, find $(some_dir)/ -type f)` will only run the command for non-dry-run flows.
+
+When Make is running with `--dry-run` or `-n` it will add the short-form flag `-n` to the automatic variable `$(MAKEFLAGS)`. If the `-n` flag is present the call to `shell_real_build_only` is a no-op, otherwise it pass the shell command through to `$(shell $1)`
 
 ## Distroless images
 
