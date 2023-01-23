@@ -16,7 +16,7 @@ clean Py3-style codebase, module by module.
 Name: future
 Summary: Easy, clean, reliable Python 2/3 compatibility
 Version: 0.18.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: MIT
 URL: http://python-future.org/
 Source0: https://files.pythonhosted.org/packages/source/f/%{name}/%{name}-%{version}.tar.gz
@@ -276,6 +276,10 @@ popd
 
 
 %changelog
+* Mon Jan 23 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.18.2-7
+- Move from extended to core
+- License verified.
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 0.18.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove Fedora version check for python version
