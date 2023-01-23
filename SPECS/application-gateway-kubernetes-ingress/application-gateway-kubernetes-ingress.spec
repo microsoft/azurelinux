@@ -34,11 +34,13 @@ This is an ingress controller that can be run on Azure Kubernetes Service (AKS) 
 to act as the ingress for an AKS cluster. 
 
 %prep
-%autosetup -p4
+%setup -q
 
 %build
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
+%patch0 -p1
+%patch1 -p1
 
 export VERSION=%{version}
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
