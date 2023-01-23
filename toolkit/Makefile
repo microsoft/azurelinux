@@ -223,6 +223,7 @@ printvar-all-vars: ;
 printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbose-$(var))
 printvar-verbose-all-vars: ;
 
-# Leaving the body empty to avoid printing output during dry runs (-n flag).
 printvar-%: ; $(info $($(subst printvar-,,$@)))
+	@: # We want to supress 'make: Nothing to be done for ...' so execute a command so make thinks it has done something
 printvar-verbose-%: ; $(info $(subst printvar-verbose-,,$@): $($(subst printvar-verbose-,,$@)))
+	@: # We want to supress 'make: Nothing to be done for ...' so execute a command so make thinks it has done something
