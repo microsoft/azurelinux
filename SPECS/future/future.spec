@@ -1,7 +1,4 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global with_python3 1
-
 %global _description \
 future is the missing compatibility layer between Python 2 and \
 Python 3. It allows you to use a single, clean Python 3.x-compatible \
@@ -12,23 +9,21 @@ ports of features from Python 3 and 2. It also comes with ``futurize`` and \
 ``pasteurize``, customized 2to3-based scripts that helps you to convert \
 either Py2 or Py3 code easily to support both Python 2 and 3 in a single \
 clean Py3-style codebase, module by module.
-
-Name: future
-Summary: Easy, clean, reliable Python 2/3 compatibility
-Version: 0.18.2
-Release: 7%{?dist}
-License: MIT
-URL: http://python-future.org/
-Source0: https://files.pythonhosted.org/packages/source/f/%{name}/%{name}-%{version}.tar.gz
-BuildArch: noarch
-
+Summary:        Easy, clean, reliable Python 2/3 compatibility
+Name:           future
+Version:        0.18.2
+Release:        7%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://python-future.org/
+Source0:        https://files.pythonhosted.org/packages/source/f/%{name}/%{name}-%{version}.tar.gz
 # https://github.com/PythonCharmers/python-future/issues/165
-Patch0: %{name}-skip_tests_with_connection_errors.patch
-
+Patch0:         %{name}-skip_tests_with_connection_errors.patch
 # Python 3.9 support
 # https://github.com/PythonCharmers/python-future/pull/544
-Patch1: %{name}-python39.patch
-
+Patch1:         %{name}-python39.patch
+BuildArch:      noarch
 %if 0%{?with_python3_other}
 BuildRequires:  python%{python3_other_pkgversion}-devel
 %endif
@@ -38,20 +33,21 @@ BuildRequires:  python%{python3_other_pkgversion}-devel
 
 %if 0%{?with_python2}
 %package -n python2-%{name}
-Summary: Easy, clean, reliable Python 2/3 compatibility
 %{?python_provide:%python_provide python2-%{name}}
+Summary:        Easy, clean, reliable Python 2/3 compatibility
+BuildRequires:  python2-devel
+BuildRequires:  python2-numpy
+BuildRequires:  python2-pytest
+BuildRequires:  python2-requests
+BuildRequires:  python2-setuptools
+Provides:       future = 0:%{version}-%{release}
 %if 0%{?el6}
-BuildRequires: python-argparse, python-unittest2, python-importlib 
-Requires:      python-importlib
-Requires:      python-argparse
+BuildRequires:  python-argparse
+BuildRequires:  python-importlib
+BuildRequires:  python-unittest2
+Requires:       python-argparse
+Requires:       python-importlib
 %endif
-
-BuildRequires: python2-devel
-BuildRequires: python2-setuptools
-BuildRequires: python2-numpy
-BuildRequires: python2-requests
-BuildRequires: python2-pytest
-Provides:      future = 0:%{version}-%{release}
 
 %description -n python2-%{name}
 %{_description}
@@ -59,21 +55,19 @@ Provides:      future = 0:%{version}-%{release}
 
 %if 0%{?with_python3}
 %package -n python%{python3_pkgversion}-%{name}
-Summary: Easy, clean, reliable Python 2/3 compatibility
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: python%{python3_pkgversion}-setuptools
-BuildRequires: python%{python3_pkgversion}-numpy
-BuildRequires: python%{python3_pkgversion}-requests
-BuildRequires: python%{python3_pkgversion}-pytest
-Provides:      future-python3 = 0:%{version}-%{release}
-
-Obsoletes: python2-%{name} < 0:%{version}-%{release}
-Obsoletes: %{name}-python2 < 0:%{version}-%{release}
-Provides:  future = 0:%{version}-%{release}
-
+Summary:        Easy, clean, reliable Python 2/3 compatibility
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-numpy
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-requests
+BuildRequires:  python%{python3_pkgversion}-setuptools
+Provides:       future-python3 = 0:%{version}-%{release}
+Obsoletes:      python2-%{name} < 0:%{version}-%{release}
+Obsoletes:      %{name}-python2 < 0:%{version}-%{release}
+Provides:       future = 0:%{version}-%{release}
 %if 0%{?rhel} && 0%{?rhel} < 8
-Obsoletes: python34-%{name} < 0:%{version}-%{release}
+Obsoletes:      python34-%{name} < 0:%{version}-%{release}
 %endif
 
 %description -n python%{python3_pkgversion}-%{name}
@@ -83,14 +77,14 @@ Obsoletes: python34-%{name} < 0:%{version}-%{release}
 
 %if 0%{?with_python3_other}
 %package -n python%{python3_other_pkgversion}-%{name}
-Summary:        Easy, clean, reliable Python 2/3 compatibility
 %{?python_provide:%python_provide python%{python3_other_pkgversion}-%{name}}
-BuildRequires: python%{python3_other_pkgversion}-devel
-BuildRequires: python%{python3_other_pkgversion}-setuptools
-BuildRequires: python%{python3_other_pkgversion}-numpy
-BuildRequires: python%{python3_other_pkgversion}-requests
-BuildRequires: python%{python3_other_pkgversion}-pytest
-Provides:      future-python%{python3_other_pkgversion} = 0:%{version}-%{release}
+Summary:        Easy, clean, reliable Python 2/3 compatibility
+BuildRequires:  python%{python3_other_pkgversion}-devel
+BuildRequires:  python%{python3_other_pkgversion}-numpy
+BuildRequires:  python%{python3_other_pkgversion}-pytest
+BuildRequires:  python%{python3_other_pkgversion}-requests
+BuildRequires:  python%{python3_other_pkgversion}-setuptools
+Provides:       future-python%{python3_other_pkgversion} = 0:%{version}-%{release}
 
 %description -n python%{python3_other_pkgversion}-%{name}
 %{_description}
@@ -100,33 +94,22 @@ Provides:      future-python%{python3_other_pkgversion} = 0:%{version}-%{release
 %setup -qc -n future-%{version}
 
 pushd future-%{version}
-%patch0 -p0
+%patch0
 %patch1 -p1
 popd
 
-%if 0%{?with_python2}
-cp -a future-%{version} python2
-find python2 -name '*.py' | xargs pathfix.py -pn -i "%{__python2}"
-%endif
-
 %if 0%{?with_python3}
 cp -a future-%{version} python3
-find python3 -name '*.py' | xargs pathfix.py -pn -i "%{__python3}"
+find python3 -name '*.py' | xargs pathfix.py -pn -i %{__python3}
 %endif
 # with_python3
 
 %if 0%{?with_python3_other}
 cp -a future-%{version} python%{python3_other_pkgversion}
-find python%{python3_other_pkgversion} -name '*.py' | xargs pathfix.py -pn -i "%{__python3}"
+find python%{python3_other_pkgversion} -name '*.py' | xargs pathfix.py -pn -i %{__python3}
 %endif
 
 %build
-%if 0%{?with_python2}
-pushd python2
-%py2_build
-popd
-%endif
-
 %if 0%{?with_python3}
 pushd python3
 %py3_build
@@ -136,7 +119,7 @@ popd
 
 %if 0%{?with_python3_other}
 pushd python%{python3_other_pkgversion}
-%py3_other_build
+%{py3_other_build}
 popd
 %endif
 
@@ -145,52 +128,34 @@ popd
 %if 0%{?with_python3}
 pushd python3
 %py3_install
-mv $RPM_BUILD_ROOT%{_bindir}/futurize $RPM_BUILD_ROOT%{_bindir}/futurize-%{python3_version}
-mv $RPM_BUILD_ROOT%{_bindir}/pasteurize $RPM_BUILD_ROOT%{_bindir}/pasteurize-%{python3_version}
-ln -sf ./futurize-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/futurize-3
-ln -sf ./pasteurize-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/pasteurize-3
+mv %{buildroot}%{_bindir}/futurize %{buildroot}%{_bindir}/futurize-%{python3_version}
+mv %{buildroot}%{_bindir}/pasteurize %{buildroot}%{_bindir}/pasteurize-%{python3_version}
+ln -sf ./futurize-%{python3_version} %{buildroot}%{_bindir}/futurize-3
+ln -sf ./pasteurize-%{python3_version} %{buildroot}%{_bindir}/pasteurize-3
 
-ln -sf ./futurize-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/futurize
-ln -sf ./pasteurize-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/pasteurize
+ln -sf ./futurize-%{python3_version} %{buildroot}%{_bindir}/futurize
+ln -sf ./pasteurize-%{python3_version} %{buildroot}%{_bindir}/pasteurize
 
-sed -i -e '/^#!\//, 1d' $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
+sed -i -e '/^#!\//, 1d' %{buildroot}%{python3_sitelib}/future/backports/test/pystone.py
 popd
 
-chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
+chmod a+x %{buildroot}%{python3_sitelib}/future/backports/test/pystone.py
 %endif
 
 %if 0%{?with_python3_other}
 pushd python%{python3_other_pkgversion}
-%py3_other_install
-mv $RPM_BUILD_ROOT%{_bindir}/futurize $RPM_BUILD_ROOT%{_bindir}/futurize-%{python3_other_version}
-mv $RPM_BUILD_ROOT%{_bindir}/pasteurize $RPM_BUILD_ROOT%{_bindir}/pasteurize-%{python3_other_version}
-sed -i -e '/^#!\//, 1d' $RPM_BUILD_ROOT%{python3_other_sitelib}/future/backports/test/pystone.py
+%{py3_other_install}
+mv %{buildroot}%{_bindir}/futurize %{buildroot}%{_bindir}/futurize-%{python3_other_version}
+mv %{buildroot}%{_bindir}/pasteurize %{buildroot}%{_bindir}/pasteurize-%{python3_other_version}
+sed -i -e '/^#!\//, 1d' %{buildroot}%{python3_other_sitelib}/future/backports/test/pystone.py
 popd
 
-chmod a+x $RPM_BUILD_ROOT%{python3_other_sitelib}/future/backports/test/pystone.py
-%endif
-
-%if 0%{?with_python2}
-pushd python2
-%py2_install
-cp -pr $RPM_BUILD_ROOT%{_bindir}/futurize $RPM_BUILD_ROOT%{_bindir}/futurize-%{python2_version}
-cp -pr $RPM_BUILD_ROOT%{_bindir}/pasteurize $RPM_BUILD_ROOT%{_bindir}/pasteurize-%{python2_version}
-ln -sf ./futurize-%{python2_version} $RPM_BUILD_ROOT%{_bindir}/futurize-2
-ln -sf ./pasteurize-%{python2_version} $RPM_BUILD_ROOT%{_bindir}/pasteurize-2
-sed -i -e '/^#!\//, 1d' $RPM_BUILD_ROOT%{python2_sitelib}/future/backports/test/pystone.py
-popd
-
-chmod a+x $RPM_BUILD_ROOT%{python2_sitelib}/future/backports/test/pystone.py
+chmod a+x %{buildroot}%{python3_other_sitelib}/future/backports/test/pystone.py
 %endif
 
 ## This packages ships PEM certificates in future/backports/test directory.
 ## It's for testing purpose, i guess. Ignore them.
 %check
-%if 0%{?with_python2}
-pushd python2
-PYTHONPATH=$PWD/build/lib py.test-%{python2_version}
-popd
-%endif
 
 # Bugs
 # https://github.com/PythonCharmers/python-future/issues/474
@@ -213,34 +178,6 @@ PYTHONPATH=$PWD/build/lib py.test-%{python3_other_version}
 popd
 %endif
 # with_python3
-
-%if 0%{?with_python2}
-%files -n python2-%{name}
-%doc python2/README.rst
-%license python2/LICENSE.txt
-%{_bindir}/futurize
-%{_bindir}/futurize-2*
-%{_bindir}/pasteurize
-%{_bindir}/pasteurize-2*
-%{python2_sitelib}/future/
-%{python2_sitelib}/past/
-%{python2_sitelib}/libfuturize/
-%{python2_sitelib}/libpasteurize/
-%{python2_sitelib}/tkinter/
-%{python2_sitelib}/_dummy_thread/
-%{python2_sitelib}/_markupbase/
-%{python2_sitelib}/_thread/
-%{python2_sitelib}/builtins/
-%{python2_sitelib}/copyreg/
-%{python2_sitelib}/html/
-%{python2_sitelib}/http/
-%{python2_sitelib}/queue/
-%{python2_sitelib}/reprlib/
-%{python2_sitelib}/socketserver/
-%{python2_sitelib}/winreg/
-%{python2_sitelib}/xmlrpc/
-%{python2_sitelib}/*.egg-info
-%endif
 
 %if 0%{?with_python3}
 %files -n python%{python3_pkgversion}-%{name}
@@ -278,7 +215,8 @@ popd
 %changelog
 * Mon Jan 23 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.18.2-7
 - Move from extended to core
-- License verified.
+- Remove python2 bits from the spec
+- License verified
 
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 0.18.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
