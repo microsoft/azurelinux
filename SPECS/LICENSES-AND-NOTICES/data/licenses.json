@@ -2546,6 +2546,7 @@
                 "gobject-introspection",
                 "golang",
                 "golang-1.17",
+                "golang-1.18",
                 "gperf",
                 "gperftools",
                 "gpgme",
