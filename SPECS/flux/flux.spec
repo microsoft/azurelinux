@@ -31,7 +31,6 @@ URL:            https://github.com/influxdata/flux
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
-# Use generate_source_tarbbal.sh to get this generated from a source code file.
 # To update the cache and config.toml run:
 #   tar -xf %{name}-%{version}.tar.gz
 #   cd %{name}-%{version}/libflux
@@ -84,7 +83,8 @@ popd
 
 %install
 install -D -m 644 libflux/include/influxdata/flux.h %{buildroot}%{_includedir}/influxdata/flux.h
-install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so
+install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so.%{version}
+ln -sf ./libflux.so.%{version} %{buildroot}%{_libdir}/libflux.so
 
 cat > flux.pc <<EOF
 prefix=%{_prefix}
@@ -113,7 +113,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %postun -n libflux -p /sbin/ldconfig
 
 %files -n libflux
-%{_libdir}/libflux.so
+%{_libdir}/libflux.so.%{version}
 
 %files -n libflux-devel
 %defattr(-,root,root)
