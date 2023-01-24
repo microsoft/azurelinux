@@ -5,6 +5,7 @@
         "influxdb2-2.4.0-static-data.tar.gz": "2d6ffad0015571918bf37c9a4b368200167df60d0c660607dbcc7d3669bab1c7",
         "config.yaml": "0db8c7668953d63e79d5d271a262539bb3f2b94505c241137fe882ea77b1bce3",
         "influxdb.service": "c5cb16f95b5edc01d87ddb3814f523f96a5d4e3cee167ca3876707d31de2b450",
+        "influxdb-user.conf": "6e3cd7db5cce04ff67b09f7554719700a390cca94e880a35843b09ac28e95641",
         "influxdb.tmpfiles": "2e1880f1d7675464b93984a635e770f6f8ac1777d21a607f7e4d9d1480776f68"
     }
 }

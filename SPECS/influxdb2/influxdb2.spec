@@ -52,6 +52,7 @@ Source2:        %{name}-%{version}-static-data.tar.gz
 Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
+Source6:        influxdb-user.conf
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
 BuildRequires:  pkgconfig(flux) >= 0.179.0
@@ -62,8 +63,8 @@ BuildRequires:  clang
 BuildRequires:  tzdata
 BuildRequires:  systemd-rpm-macros
 Requires:       tzdata
+Requires:       libflux
 Conflicts:      influxdb
-%{!?_tmpfilesdir:%global _tmpfilesdir /usr/lib/tmpfiles.d}
 %{?systemd_requires}
 Requires(post): systemd
 
@@ -74,33 +75,31 @@ It's useful for recording metrics, events, and performing analytics.
 %package        devel
 Summary:        InfluxDB development files
 Group:          Development/Languages/Golang
-Requires:       libflux-devel
 Requires:       go
 Requires:       tzdata
+Requires:       libflux-devel
 Conflicts:      influxdb
 
 %description devel
 Go sources and other development files for InfluxDB
 
 %prep
-%autosetup
+%autosetup -a 1
+
+mkdir -pv static
+tar -xf %{SOURCE2} -C static/ --no-same-owner
 
 %build
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOPATH:$GOBIN
 export GO111MODULE=on
-tar -xf %{SOURCE1} --no-same-owner
-
-mkdir -pv static
-tar -xf %{SOURCE2} -C static/ --no-same-owner
 
 # Build influxdb
 export TAGS='sqlite_foreign_keys,sqlite_json,assets'
 go generate -mod vendor -tags $TAGS ./static
 go build -mod vendor -tags $TAGS -ldflags "-X main.version=%{version}" -o bin/influxd ./cmd/influxd
 go build -mod vendor -tags $TAGS -ldflags "-X main.version=%{version}" -o bin/telemetryd ./cmd/telemetryd
-
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -110,6 +109,7 @@ mkdir -p %{buildroot}%{_sbindir}
 install -D -m 0644 %{SOURCE3} %{buildroot}%{_unitdir}/influxdb.service
 ln -s %{_sbindir}/service %{buildroot}%{_sbindir}/rcinfluxdb
 install -D -m 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/influxdb.conf
+install -D -m 0644 %{SOURCE6} %{buildroot}%{_sysusersdir}/influxdb-user.conf
 install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb2/config.yaml
 
 %check
@@ -118,7 +118,7 @@ export GO111MODULE=on
 go test ./...
 
 %pre
-%service_add_pre influxdb.service
+%sysusers_create_package %{name} %{SOURCE6}
 
 %preun
 %service_del_preun influxdb.service
@@ -139,62 +139,63 @@ go test ./...
 %{_bindir}/telemetryd
 %{_sbindir}/rcinfluxdb
 %{_unitdir}/influxdb.service
+%{_sysusersdir}/influxdb-user.conf
 %dir %{_tmpfilesdir}
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Fri Jan 13 10:49:53 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
+* Fri Jan 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.4.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 - Upgrade to version 2.4.0
 
-* Tue Oct  4 16:27:35 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Tue Oct  4 2022 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.3.0, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.3.0
   Drop 0001-fix-executor-do-not-assume-ints-are-64bits-4652.patch:
   upstreamed
 
-* Thu Jun  9 15:54:42 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Thu Jun  9 2022 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.2.0, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.2.0
   Add 0001-fix-executor-do-not-assume-ints-are-64bits-4652.patch:
   fix build on 32-bit architectures
 
-* Tue Nov 16 17:06:09 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Tue Nov 16 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.1.1, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.1.1
 - influx binary has been deleted upstream:
   * https://github.com/influxdata/influxdb/issues/21773
 
-* Tue Oct 26 10:14:37 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Tue Oct 26 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.0.9, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.0.9
 
-* Fri Sep 24 13:50:29 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Fri Sep 24 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 2.0.8, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.0.8
 
-* Thu Jun 10 09:02:02 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Thu Jun 10 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Reintroduce configuration file in etc and provide example configuration:
   * no tracking by default
   * conservative memory limits to prevent OOM
   * description how to obtain list of possible values
   * example how to move stored data into different directory
 
-* Thu Jun 10 08:22:49 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Thu Jun 10 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Update to version 2.0.7, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.0.7
 
-* Thu May 27 20:56:22 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Thu May 27 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Include prebuild UI assets
 - Drop the last mention of config file in service file
 
-* Wed May 19 21:51:38 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Wed May 19 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Update to version 2.0.6, see
   * https://github.com/influxdata/influxdb/releases/tag/v2.0.6
   * https://github.com/influxdata/influxdb/releases/tag/v2.0.5
 
-* Mon May 17 21:34:31 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Mon May 17 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Update service file not to use invalid options
 - Dropping config file as upstream does and dropping unused directories
 

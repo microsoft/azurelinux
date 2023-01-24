@@ -105,9 +105,8 @@ install -D -m 755 libflux/target/release/fluxc %{buildroot}%{_bindir}/fluxc
 install -D -m 755 libflux/target/release/fluxdoc %{buildroot}%{_bindir}/fluxdoc
 
 %check
-pushd libflux
+cd libflux
 RUSTFLAGS=%{rustflags} cargo test --release
-popd
 
 %post -n libflux -p /sbin/ldconfig
 %postun -n libflux -p /sbin/ldconfig
