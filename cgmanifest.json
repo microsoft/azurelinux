@@ -20794,8 +20794,8 @@
         "type": "other",
         "other": {
           "name": "python-certifi",
-          "version": "2021.10.08",
-          "downloadUrl": "https://github.com/certifi/python-certifi/archive/refs/tags/2021.10.08.tar.gz"
+          "version": "2022.12.07",
+          "downloadUrl": "https://github.com/certifi/python-certifi/archive/refs/tags/2022.12.07.tar.gz"
         }
       }
     },
