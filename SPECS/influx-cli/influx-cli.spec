@@ -27,6 +27,7 @@ URL:            https://github.com/influxdata/influx-cli
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# Use generate_source_tarbbal.sh to get this generated from a source code file.
 # How to re-build this file:
 #   1. wget https://github.com/influxdata/influx-cli/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
@@ -67,14 +68,13 @@ BuildArch:      noarch
 The official zsh completion script for influx.
 
 %prep
-%autosetup
+%autosetup -a 1
 
 %build
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOPATH:$GOBIN
 export GO111MODULE=on
-tar -xf %{SOURCE1} --no-same-owner
 go build -mod vendor -ldflags="-X main.version=%{version}" -o bin/influx ./cmd/influx
 
 %install

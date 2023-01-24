@@ -27,6 +27,7 @@ URL:            https://github.com/influxdata/influxdb
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# Use generate_source_tarbbal.sh to get this generated from a source code file.
 # How to re-build this file:
 #   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
@@ -41,6 +42,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 Source1:        %{name}-%{version}-vendor.tar.gz
 # Below is a manually created tarball, no download link.
 # predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
+# Use generate_source_tarbbal.sh to get this generated from a source code file.
 # How to rebuild this file:
 #   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
