@@ -22,7 +22,8 @@ Patch2:         gpt-auto-devno-not-determined.patch
 Patch3:         CVE-2022-3821.patch
 # Patch4 can be removed once we update to version 252
 Patch4:         CVE-2022-45873.patch
-Patch5:    CVE-2022-4415.patch
+Patch5:         backport-helper-util-macros.patch
+Patch6:         CVE-2022-4415.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -272,8 +273,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Mon Jan 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-13
+* Mon Jan 23 2023 Cameron Baird <cameronbaird@microsoft.com> - 250.3-13
 - Add patch for CVE-2022-4415
+- Add patch backport-helper-util-macros.patch to backport needed macros for CVE-2022-4415.patch
 
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-12
 - Add patch for CVE-2022-45873
