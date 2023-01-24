@@ -72,18 +72,6 @@ programs using Influx data language.
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
-patch -p2 <<EOF
---- a/libflux/flux/build.rs
-+++ b/libflux/flux/build.rs
-@@ -79,5 +79,7 @@ fn main() -> Result<()> {
-     let path = dir.join("stdlib.data");
-     serialize(Environment::from(imports), fb::build_env, &path)?;
-
-+    println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libflux.so.%{version}");
-+
-     Ok(())
- }
-EOF
 popd
 
 %build
@@ -95,8 +83,7 @@ popd
 
 %install
 install -D -m 644 libflux/include/influxdata/flux.h %{buildroot}%{_includedir}/influxdata/flux.h
-install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so.%{version}
-ln -sf ./libflux.so.%{version} %{buildroot}%{_libdir}/libflux.so
+install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so
 
 cat > flux.pc <<EOF
 prefix=%{_prefix}
@@ -126,7 +113,7 @@ popd
 %postun -n libflux -p /sbin/ldconfig
 
 %files -n libflux
-%{_libdir}/libflux.so.%{version}
+%{_libdir}/libflux.so
 
 %files -n libflux-devel
 %defattr(-,root,root)
@@ -140,50 +127,50 @@ popd
 %{_includedir}/influxdata/flux.h
 
 %changelog
-* Fri Jan 13 10:49:53 UTC 2023 - Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
+* Fri Jan 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.179.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 - Upgrade to version 0.179.0
 
-* Wed Oct 19 13:39:14 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Wed Oct 19 2022 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Add 0001-fix-compile-error-with-Rust-1.64-5273.patch:
     Fix build for rust1.64
 
-* Tue Oct  4 15:21:40 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Tue Oct  4 2022 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 0.171.0, see:
   https://github.com/influxdata/flux/releases/
 
-* Thu Jun 30 19:42:09 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Thu Jun 30 2022 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Add disable-static-library.patch: do not build static library
   (follow Factory guidelines).
 
-* Thu Jun  9 15:55:20 UTC 2022 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Thu Jun  9 2022 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 0.161.0, see:
   https://github.com/influxdata/flux/releases/
 
-* Wed Dec  1 14:40:04 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Wed Dec  1 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Fix libflux.so for Leap 15.2 and 15.3 (boo#1193120)
 
-* Tue Nov 16 16:55:49 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Tue Nov 16 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 0.139.0, see:
   https://github.com/influxdata/flux/releases/
 - Build fluxc and fluxdoc binaries
 
-* Tue Oct 26 16:46:43 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Tue Oct 26 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 0.136.0, see:
   https://github.com/influxdata/flux/releases/
 
-* Fri Sep 24 17:21:31 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Fri Sep 24 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Update to version 0.131.0, see:
   https://github.com/influxdata/flux/releases/
 
-* Thu Jun 10 08:17:57 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Thu Jun 10 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Update to version 0.117.3, see:
   https://github.com/influxdata/flux/releases/
 
-* Wed May 19 22:00:36 UTC 2021 - Michal Hrusecky <michal.hrusecky@opensuse.org>
+* Wed May 19 2021 Michal Hrusecky <michal.hrusecky@opensuse.org>
 - Update to version 0.116.0, see:
   https://github.com/influxdata/flux/releases/
 
-* Fri Mar  5 14:08:31 UTC 2021 - Matwey Kornilov <matwey.kornilov@gmail.com>
+* Fri Mar  5 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Initial version
