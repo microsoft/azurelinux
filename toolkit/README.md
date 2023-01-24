@@ -18,6 +18,7 @@
 - Build CBL-Mariner end-to-end.
 - Advanced building topics.
 - Build parameters and environment variables.
+- packages.microsoft.com repository structure breakdown.
 
 ## [How the Build System Works](docs/how_it_works/0_intro.md)
 
