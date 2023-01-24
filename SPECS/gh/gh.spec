@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,12 +30,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  git
-BuildRequires:  bash-completion
-BuildRequires:  fish
-BuildRequires:  zsh
-Requires:       bash-completion
-Requires:       fish
-Requires:       zsh
+Requires:       git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -75,6 +70,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-6
+- Clean up dependencies (remove fish, bash-completion and zsh and add git)
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.13.0-5
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 

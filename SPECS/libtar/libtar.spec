@@ -1,7 +1,7 @@
 Summary:        C library for manipulating tar files
 Name:           libtar
 Version:        1.2.20
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,11 +18,11 @@ Patch2:         libtar-1.2.11-mem-deref.patch
 # CVE-2021-33643
 # CVE-2021-33644
 Patch3:         libtar-1.2.20-CVE-2021-33643-CVE-2021-33644.patch
-# CVE-2021-33645
-# CVE-2021-33646
-Patch4:         libtar-1.2.20-CVE-2021-33645-CVE-2021-33646.patch
-Patch5:         libtar-1.2.20-fix-resource-leaks.patch
-Patch6:         libtar-1.2.20-static-analysis.patch
+# CVE-2021-33640, CVE-2021-33645, CVE-2021-33646
+Patch4:         CVE-2021-33640.patch
+Patch5:         libtar-1.2.20-no-static-buffer.patch
+Patch6:         libtar-1.2.20-fix-resource-leaks.patch
+Patch7:         libtar-1.2.20-static-analysis.patch
 
 %description
 libtar is a library for manipulating tar files from within C programs.
@@ -69,6 +69,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libtar.so
 
 %changelog
+* Fri Jan 20 2023 Adit Jha <aditjha@microsoft.com> - 1.2.20-11
+- Fix CVE-2021-33640, which takes care of CVE-2021-33645, CVE-2021-33646
+
 * Tue Sep 06 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.20-10
 - Remove undesirable .la files
 - Rely on generators to provide libtar.so.0()(64bit)

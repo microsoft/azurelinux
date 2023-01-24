@@ -124,9 +124,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "alsa-firmware",
+          "version": "1.2.4",
+          "downloadUrl": "ftp://ftp.alsa-project.org/pub/firmware/alsa-firmware-1.2.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "alsa-lib",
           "version": "1.2.6.1",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "alsa-plugins",
+          "version": "1.2.7.1",
+          "downloadUrl": "https://github.com/alsa-project/alsa-plugins/archive/refs/tags/v1.2.7.1.tar.gz"
         }
       }
     },
@@ -3940,8 +3960,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.4",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.4.tar.xz"
+          "version": "2.33.6",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.6.tar.xz"
         }
       }
     },
@@ -4262,6 +4282,16 @@
           "name": "golang",
           "version": "1.18.8",
           "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.19.4",
+          "downloadUrl": "https://golang.org/dl/go1.19.4.src.tar.gz"
         }
       }
     },
@@ -7630,6 +7660,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-azure",
+          "version": "5.15.86.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-hci",
           "version": "5.15.87.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
@@ -10863,6 +10903,16 @@
           "name": "libwpe",
           "version": "1.12.0",
           "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.12.0/libwpe-1.12.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libwpg",
+          "version": "0.3.3",
+          "downloadUrl": "https://download.sourceforge.net/libwpg/libwpg-0.3.3.tar.xz"
         }
       }
     },
@@ -14514,8 +14564,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "2.17.0",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.0.tar.gz"
+          "version": "2.17.5",
+          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.5.tar.gz"
         }
       }
     },
@@ -20234,8 +20284,8 @@
         "type": "other",
         "other": {
           "name": "prometheus",
-          "version": "2.36.0",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.36.0.tar.gz"
+          "version": "2.37.0",
+          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.37.0.tar.gz"
         }
       }
     },
@@ -20774,8 +20824,8 @@
         "type": "other",
         "other": {
           "name": "python-certifi",
-          "version": "2021.10.08",
-          "downloadUrl": "https://github.com/certifi/python-certifi/archive/refs/tags/2021.10.08.tar.gz"
+          "version": "2022.12.07",
+          "downloadUrl": "https://github.com/certifi/python-certifi/archive/refs/tags/2022.12.07.tar.gz"
         }
       }
     },
@@ -25744,9 +25794,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "SDL",
+          "version": "1.2.15",
+          "downloadUrl": "https://github.com/libsdl-org/SDL-1.2/archive/refs/tags/release-1.2.15.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "SDL2",
           "version": "2.24.0",
           "downloadUrl": "https://www.libsdl.org/release/SDL2-2.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "SDL_sound",
+          "version": "1.0.3",
+          "downloadUrl": "https://icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz"
         }
       }
     },
@@ -27567,8 +27637,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1145",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1145.tar.gz"
+          "version": "9.0.1189",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1189.tar.gz"
         }
       }
     },
@@ -28959,6 +29029,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "zopfli",
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/google/zopfli/archive/zopfli-1.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "zsh",
           "version": "5.9",
           "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz"
@@ -28972,6 +29052,16 @@
           "name": "zstd",
           "version": "1.5.0",
           "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "zziplib",
+          "version": "0.13.72",
+          "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.72.tar.gz"
         }
       }
     }
