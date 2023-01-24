@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.4",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.4.tar.xz"
+          "version": "2.33.6",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.6.tar.xz"
         }
       }
     },
