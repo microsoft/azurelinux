@@ -6770,9 +6770,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "influxdb2",
+          "name": "influx-cli",
           "version": "2.4.0",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.4.0.tar.gz"
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.4.0.tar.gz"
         }
       }
     },
@@ -6780,9 +6780,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "influx-cli",
+          "name": "influxdb2",
           "version": "2.4.0",
-          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.4.0.tar.gz"
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.4.0.tar.gz"
         }
       }
     },
