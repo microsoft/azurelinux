@@ -34,7 +34,7 @@ This is an ingress controller that can be run on Azure Kubernetes Service (AKS) 
 to act as the ingress for an AKS cluster. 
 
 %prep
-%setup -q
+%autosetup -p1
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 %patch0 -p1
