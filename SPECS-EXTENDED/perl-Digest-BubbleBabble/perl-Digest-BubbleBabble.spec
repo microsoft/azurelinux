@@ -15,6 +15,9 @@ BuildRequires:	make
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
 BuildRequires:	perl(inc::Module::Install)
+BuildRequires:	perl(FindBin)
+BuildRequires:	perl(File::Remove)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:	perl(Module::Install::AuthorTests)
 BuildRequires:	perl(Module::Install::Include)
 BuildRequires:	perl(Module::Install::Metadata)
