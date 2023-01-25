@@ -10,6 +10,9 @@ Source0:	https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Module-Package-Au-%{v
 Patch0:		perl-Module-Package-Au-no-bundle.patch
 BuildArch:	noarch
 BuildRequires:	perl-generators
+BuildRequires:	perl(FindBin)
+BuildRequires:	perl(File::Remove)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:	perl(ExtUtils::MakeMaker)
 BuildRequires:	perl(Module::Install::AuthorTests)
 BuildRequires:	perl(Module::Install::GithubMeta)
