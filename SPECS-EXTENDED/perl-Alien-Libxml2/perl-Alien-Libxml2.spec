@@ -1,37 +1,31 @@
 %global debug_package %{nil}
-
+Summary:        Install the C libxml2 library on your system
 Name:           perl-Alien-Libxml2
 Version:        0.14
 Release:        3%{?dist}
-Summary:        Install the C libxml2 library on your system
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Alien-Libxml2/
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Libxml2-%{version}.tar.gz#/perl-Alien-Libxml2-%{version}.tar.gz
-
-
-# Build
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(:VERSION) >= 5.6
-BuildRequires:  perl(Alien::Build::MM) >= 2.12
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(libxml-2.0)
-# Run-time
+BuildRequires:  perl(:VERSION) >= 5.6
 BuildRequires:  perl(Alien::Base) >= 2.12
 BuildRequires:  perl(Alien::Build) >= 2.12
-BuildRequires:  perl(alienfile)
-BuildRequires:  perl(base)
-# Tests
+BuildRequires:  perl(Alien::Build::MM) >= 2.12
 BuildRequires:  perl(Config)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Test2::V0) >= 0.000060
 BuildRequires:  perl(Test::Alien)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(alienfile)
+BuildRequires:  perl(base)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+BuildRequires:  pkgconfig(libxml-2.0)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Alien::Base) >= 2.12
 # This RPM package ensures libxml2 is installed on the system
@@ -39,7 +33,6 @@ Requires:       pkgconfig(libxml-2.0) = %(type -p pkgconf >/dev/null && pkgconf 
 
 # Remove under-specified dependencies
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(Alien::Base\\)$
-
 %description
 This module provides libxml2 for other modules to use.
 
@@ -48,11 +41,11 @@ This module provides libxml2 for other modules to use.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
