@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Mail-DKIM
 Version:        0.58
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Sign and verify Internet mail with DKIM/DomainKey signatures
 License:        GPL+ or Artistic
 URL:            http://dkimproxy.sourceforge.net/
@@ -67,6 +67,9 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 0.58-4
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.58-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

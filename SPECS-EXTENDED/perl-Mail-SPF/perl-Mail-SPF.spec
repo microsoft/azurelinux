@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Mail-SPF
 Version:        2.9.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Object-oriented implementation of Sender Policy Framework
 License:        BSD
 URL:            https://metacpan.org/release/Mail-SPF
@@ -95,6 +95,9 @@ fi
 %{_bindir}/spfd.%{name}
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 2.9.0-23
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.0-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

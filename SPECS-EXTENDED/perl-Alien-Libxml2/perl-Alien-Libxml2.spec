@@ -1,6 +1,8 @@
+%global debug_package %{nil}
+
 Name:           perl-Alien-Libxml2
 Version:        0.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Install the C libxml2 library on your system
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -8,7 +10,6 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/Alien-Libxml2/
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Libxml2-%{version}.tar.gz#/perl-Alien-Libxml2-%{version}.tar.gz
 
-%global debug_package %{nil}
 
 # Build
 BuildRequires:  make
@@ -64,6 +65,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 0.14-3
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

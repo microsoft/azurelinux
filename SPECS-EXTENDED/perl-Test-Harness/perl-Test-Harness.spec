@@ -7,7 +7,7 @@
 
 Name:           perl-Test-Harness
 Version:        3.42
-Release:        443%{?dist}
+Release:        444%{?dist}
 Summary:        Run Perl standard test scripts with statistics
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -102,6 +102,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 3.42-444
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.42-443
 - Remove epoch
 

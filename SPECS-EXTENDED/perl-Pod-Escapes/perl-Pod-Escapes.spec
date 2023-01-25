@@ -1,7 +1,7 @@
 Name:           perl-Pod-Escapes
 # Compete with perl.spec
 Version:        1.07
-Release:        442%{?dist}
+Release:        443%{?dist}
 Summary:        Resolve POD escape sequences
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -49,6 +49,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 1.07-443
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.07-442
 - Remove epoch
 

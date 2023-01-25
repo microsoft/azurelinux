@@ -6,7 +6,7 @@ Distribution:   Mariner
 Summary:	Use a Razor catalogue server to filter spam messages
 Name:		perl-Razor-Agent
 Version:	2.85
-Release:	36%{?dist}
+Release:	37%{?dist}
 License:	Artistic 2.0
 URL:		http://razor.sourceforge.net/
 Source:		http://dl.sourceforge.net/razor/razor-agents-%{version}.tar.bz2
@@ -79,6 +79,9 @@ make test
 %{_mandir}/man*/*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 2.85-37
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.85-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

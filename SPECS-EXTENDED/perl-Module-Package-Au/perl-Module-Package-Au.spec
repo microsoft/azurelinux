@@ -1,6 +1,6 @@
 Name:		perl-Module-Package-Au
 Version:	2
-Release:	17%{?dist}
+Release:	18%{?dist}
 Summary:	Reusable Module::Install bits
 License:	CC0
 Vendor:         Microsoft Corporation
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/Module::Package::Au.3pm*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 2-18
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

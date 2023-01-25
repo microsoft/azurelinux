@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:          perl-Net-DNS
 Version:       1.21
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       DNS resolver modules for Perl
 # Other files:          MIT
 # demo/mresolv:         GPL+ or Artistic
@@ -162,6 +162,9 @@ make test
 %{_mandir}/man3/Net::DNS::Nameserver*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 1.21-4
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -11,7 +11,7 @@
 
 Name:           perl-libnet
 Version:        3.11
-Release:        442%{?dist}
+Release:        443%{?dist}
 Summary:        Perl clients for various network protocols
 # other files:  GPL+ or Artistic
 ## Not in binary packages
@@ -139,6 +139,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 3.11-443
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.11-442
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

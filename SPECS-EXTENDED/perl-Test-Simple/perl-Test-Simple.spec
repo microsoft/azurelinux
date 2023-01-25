@@ -7,7 +7,7 @@
 Name:           perl-Test-Simple
 Summary:        Basic utilities for writing tests
 Version:        1.302174
-Release:        3%{?dist}
+Release:        4%{?dist}
 # CC0: lib/ok.pm
 # Public Domain: lib/Test/Tutorial.pod
 # GPL+ or Artistic: the rest of the distribution
@@ -186,6 +186,9 @@ make test %{!?perl_bootstrap:AUTHOR_TESTING=1}
 %{_mandir}/man3/Test2::Util::Trace.3*
 
 %changelog
+* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 1.302174-4
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.302174-3
 - Remove epoch
 
