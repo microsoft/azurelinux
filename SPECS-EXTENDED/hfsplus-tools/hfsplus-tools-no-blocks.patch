@@ -1,0 +1,147 @@
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/SControl.c.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/SControl.c
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/SControl.c.jx	2012-02-02 17:16:56.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/SControl.c	2014-06-18 13:01:42.716781467 -0400
+@@ -200,6 +200,22 @@ isMinorError(int msg, int *counts)
+ 	}
+ }
+ 
++static int *msgCounts = NULL;
++static jmp_buf envBuf;
++
++static fsck_block_status_t
++fsckAfterCallback(fsck_ctx_t c, int msgNum, va_list args)
++{
++	if (abs(msgNum) > E_FirstError && abs(msgNum) < E_LastError) {
++		if (isMinorError(abs(msgNum), msgCounts) == 1)
++			return fsckBlockContinue;
++		longjmp(envBuf, 1);
++		return fsckBlockAbort;
++	} else {
++		return fsckBlockContinue;
++	}
++}
++
+ /*------------------------------------------------------------------------------
+ 
+ External
+@@ -207,7 +223,6 @@ External
+ 
+ ------------------------------------------------------------------------------*/
+ 
+-static jmp_buf				envBuf;
+ int
+ CheckHFS( const char *rdevnode, int fsReadRef, int fsWriteRef, int checkLevel, 
+ 	  int repairLevel, fsck_ctx_t fsckContext, int lostAndFoundMode, 
+@@ -222,7 +237,6 @@ CheckHFS( const char *rdevnode, int fsRe
+ 	int					isJournaled = 0;
+ 	Boolean 			autoRepair;
+ 	Boolean				exitEarly = 0;
+-	__block int *msgCounts = NULL;
+ 	Boolean				majorErrors = 0;
+ 
+ 	if (checkLevel == kMajorCheck) {
+@@ -292,16 +306,7 @@ CheckHFS( const char *rdevnode, int fsRe
+ 			 * the message in question corresponds to a major or a minor error.  If it's
+ 			 * major, we longjmp just above, which causes us to exit out early.
+ 			 */
+-			fsckSetBlock(fsckContext, fsckPhaseAfterMessage, (fsckBlock_t) ^(fsck_ctx_t c, int msgNum, va_list args) {
+-				if (abs(msgNum) > E_FirstError && abs(msgNum) < E_LastError) {
+-					if (isMinorError(abs(msgNum), msgCounts) == 1)
+-						return fsckBlockContinue;
+-					longjmp(envBuf, 1);
+-					return fsckBlockAbort;
+-				} else {
+-					return fsckBlockContinue;
+-				}
+-			});
++			fsckSetBlock(fsckContext, fsckPhaseAfterMessage, fsckAfterCallback);
+ 		}
+ 	}
+ DoAgain:
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.c.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.c
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.c.jx	2012-02-02 17:42:58.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.c	2014-06-18 12:57:01.110952333 -0400
+@@ -29,7 +29,6 @@
+ #include <stdarg.h>
+ #include <string.h>
+ #include <assert.h>
+-#include <Block.h>
+ 
+ #include "fsck_messages.h"
+ #include "fsck_keys.h"
+@@ -287,20 +286,10 @@ fsckSetBlock(fsck_ctx_t c, fsck_block_ph
+ 	if (c != NULL) {
+ 		switch (phase) {
+ 		case fsckPhaseBeforeMessage:
+-			if (ctx->preMessage) {
+-				Block_release(ctx->preMessage);
+-				ctx->preMessage = NULL;
+-			}
+-			if (bp)
+-				ctx->preMessage = (fsckBlock_t)Block_copy(bp);
++			ctx->preMessage = bp;
+ 			break;
+ 		case fsckPhaseAfterMessage:
+-			if (ctx->postMessage) {
+-				Block_release(ctx->postMessage);
+-				ctx->postMessage = NULL;
+-			}
+-			if (bp)
+-				ctx->postMessage = (fsckBlock_t)Block_copy(bp);
++			ctx->postMessage = bp;
+ 			break;
+ 		case fsckPhaseNone:
+ 			/* Just here for compiler warnings */
+@@ -591,12 +580,6 @@ fsckDestroy(fsck_ctx_t c)
+ 	if (ctx->flags & cfFromFD) {
+ 		fclose(ctx->fp);
+ 	}
+-	if (ctx->preMessage) {
+-		Block_release(ctx->preMessage);
+-	}
+-	if (ctx->postMessage) {
+-		Block_release(ctx->postMessage);
+-	}
+ 
+ 	free(ctx);
+ 	return;
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.h.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.h
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.h.jx	2012-02-02 17:54:40.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_messages.h	2014-06-18 12:31:48.602094998 -0400
+@@ -139,7 +139,7 @@ typedef enum fsck_block_phase_type fsck_
+  * the third is a va_list of the arguments for the message.
+  */
+ 
+-typedef fsck_block_status_t (^fsckBlock_t)(fsck_ctx_t, int, va_list);
++typedef fsck_block_status_t (*fsckBlock_t)(fsck_ctx_t, int, va_list);
+ 
+ extern fsckBlock_t fsckGetBlock(fsck_ctx_t, fsck_block_phase_t);
+ extern void fsckSetBlock(fsck_ctx_t, fsck_block_phase_t, fsckBlock_t);
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/Makefile.lnx.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/Makefile.lnx
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/Makefile.lnx.jx	2012-02-03 11:25:21.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/Makefile.lnx	2014-06-18 12:52:03.146015370 -0400
+@@ -4,7 +4,7 @@ OFILES = $(CFILES:.c=.o)
+ all: fsck_hfs
+ 
+ fsck_hfs: $(OFILES) dfalib/libdfa.a
+-	  $(CC) $(CFLAGS) $(LDFLAGS) $(OFILES) dfalib/libdfa.a -o fsck_hfs -lBlocksRunTime -lpthread
++	  $(CC) $(CFLAGS) $(LDFLAGS) $(OFILES) dfalib/libdfa.a -o fsck_hfs -lpthread
+ 
+ dfalib/libdfa.a: FORCE
+ 	$(MAKE) -C dfalib -f Makefile.lnx libdfa.a
+diff -up diskdev_cmds-540.1.linux3/Makefile.jx diskdev_cmds-540.1.linux3/Makefile
+--- diskdev_cmds-540.1.linux3/Makefile.jx	2012-02-16 15:00:18.000000000 -0500
++++ diskdev_cmds-540.1.linux3/Makefile	2014-06-18 12:42:59.015463500 -0400
+@@ -1,9 +1,8 @@
+ VERSION=540.1.linux3
+ 
+-CC := clang
+-CFLAGS := -g3 -Wall -fblocks -I$(PWD)/BlocksRunTime -I$(PWD)/include -DDEBUG_BUILD=0 -D_FILE_OFFSET_BITS=64 -D LINUX=1 -D BSD=1 -D VERSION=\"$(VERSION)\"
+-LDFLAGS := -Wl,--build-id -L$(PWD)/BlocksRunTime
+-SUBDIRS := BlocksRunTime newfs_hfs.tproj fsck_hfs.tproj
++CFLAGS += -I$(PWD)/include -DDEBUG_BUILD=0 -D_FILE_OFFSET_BITS=64 -D LINUX=1 -D BSD=1 -D VERSION=\"$(VERSION)\"
++LDFLAGS := -Wl,--build-id
++SUBDIRS := newfs_hfs.tproj fsck_hfs.tproj
+ 
+ all clean:
+ 	for d in $(SUBDIRS); do $(MAKE) -C $$d -f Makefile.lnx $@; done
