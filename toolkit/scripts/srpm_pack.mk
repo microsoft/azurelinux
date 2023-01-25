@@ -19,13 +19,21 @@ SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
 
-ifneq ($(strip $(SRPM_PACK_LIST)),)
+# Configure the list of packages we want to process into SRPMs
+# Strip any whitespace from user input and reasign using override so we can compare it with the empty string
+override SRPM_PACK_LIST := $(strip $(SRPM_PACK_LIST))
+
+ifneq ($(SRPM_PACK_LIST),) # Pack list has user entries in it, only build selected .spec files
+local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(SRPM_PACK_LIST))))
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
-	@echo $(strip $(SRPM_PACK_LIST)) | tr " " "\n" > $(srpm_pack_list_file)
+	@echo $(SRPM_PACK_LIST) | tr " " "\n" > $(srpm_pack_list_file)
 else # Empty pack list, build all under $(SPECS_DIR)
+local_specs = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
-	@touch $@
+	@truncate -s 0 $@
 endif
+local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
+local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
 
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
@@ -51,8 +59,8 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo Finished updating $@
 
 ifeq ($(DOWNLOAD_SRPMS),y)
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR)
-	for spec in $(LOCAL_SPECS); do \
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR)
+	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
 		for url in $(SRPM_URL_LIST); do \
@@ -74,7 +82,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file) $(local_spec_sources)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \

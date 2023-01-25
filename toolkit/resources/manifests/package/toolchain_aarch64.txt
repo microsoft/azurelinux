@@ -46,10 +46,10 @@ cracklib-lang-2.9.7-5.cm2.aarch64.rpm
 createrepo_c-0.17.5-1.cm2.aarch64.rpm
 createrepo_c-debuginfo-0.17.5-1.cm2.aarch64.rpm
 createrepo_c-devel-0.17.5-1.cm2.aarch64.rpm
-curl-7.86.0-2.cm2.aarch64.rpm
-curl-debuginfo-7.86.0-2.cm2.aarch64.rpm
-curl-devel-7.86.0-2.cm2.aarch64.rpm
-curl-libs-7.86.0-2.cm2.aarch64.rpm
+curl-7.86.0-3.cm2.aarch64.rpm
+curl-debuginfo-7.86.0-3.cm2.aarch64.rpm
+curl-devel-7.86.0-3.cm2.aarch64.rpm
+curl-libs-7.86.0-3.cm2.aarch64.rpm
 Cython-debuginfo-0.29.32-1.cm2.aarch64.rpm
 debugedit-5.0-1.cm2.aarch64.rpm
 debugedit-debuginfo-5.0-1.cm2.aarch64.rpm
@@ -135,7 +135,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.aarch64.rpm
 kbd-debuginfo-2.2.0-1.cm2.aarch64.rpm
-kernel-headers-5.15.86.1-1.cm2.noarch.rpm
+kernel-headers-5.15.87.1-1.cm2.noarch.rpm
 kmod-29-1.cm2.aarch64.rpm
 kmod-debuginfo-29-1.cm2.aarch64.rpm
 kmod-devel-29-1.cm2.aarch64.rpm
@@ -258,6 +258,9 @@ newt-0.52.21-4.cm2.aarch64.rpm
 newt-debuginfo-0.52.21-4.cm2.aarch64.rpm
 newt-devel-0.52.21-4.cm2.aarch64.rpm
 newt-lang-0.52.21-4.cm2.aarch64.rpm
+nghttp2-1.46.0-2.cm2.aarch64.rpm
+nghttp2-debuginfo-1.46.0-2.cm2.aarch64.rpm
+nghttp2-devel-1.46.0-2.cm2.aarch64.rpm
 ninja-build-1.10.2-2.cm2.aarch64.rpm
 ninja-build-debuginfo-1.10.2-2.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm

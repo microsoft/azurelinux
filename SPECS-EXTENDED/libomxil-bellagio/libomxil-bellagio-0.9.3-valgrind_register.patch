@@ -1,0 +1,72 @@
+--- src/omxregister.c.old	2014-06-28 16:08:29.777324056 +0100
++++ src/omxregister.c   	2014-06-28 16:08:20.960691774 +0100
+@@ -76,11 +76,11 @@ 
+ 	long int offset;
+ 	int i;
+ 
+-	buffer = malloc(allocation_length+1);
+-	comp_name = malloc(DEFAULT_LINE_LENGHT);
+-	temp_name = malloc(DEFAULT_LINE_LENGHT);
+-	comp_rules = malloc(DEFAULT_LINE_LENGHT);
+-	checkChar = malloc(2);
++	buffer = calloc(allocation_length+1, sizeof(char));
++	comp_name = calloc(DEFAULT_LINE_LENGHT, sizeof(char));
++	temp_name = calloc(DEFAULT_LINE_LENGHT, sizeof(char));
++	comp_rules = calloc(DEFAULT_LINE_LENGHT, sizeof(char));
++	checkChar = calloc(2, sizeof(char));
+ 
+ 	printf("*********************************\n");
+ 	printf("* List of registered components *\n");
+@@ -182,8 +182,8 @@ 
+ 	 * and is is colon separated like env variables in Linux
+ 	 */
+ 
+-	qualityString = malloc(4096);
+-	buffer = malloc(8192);
++	qualityString = calloc(4096, sizeof(char));
++	buffer = calloc(8192, sizeof(char));
+ 	while (!pathconsumed) {
+ 		index = 0;
+ 		currentgiven = 0;
+@@ -194,11 +194,11 @@ 
+ 			if ((*(currentpath + index) == ':') || (*(currentpath + index) =='\0')) {
+ 				currentgiven = 1;
+ 				if (*(currentpath + index - 1) != '/') {
+-					actual = malloc(index + 2);
++					actual = calloc(index + 2, sizeof(char));
+ 					*(actual + index) = '/';
+ 					*(actual+index + 1) = '\0';
+ 				} else {
+-					actual = malloc(index + 1);
++					actual = calloc(index + 1, sizeof(char));
+ 					*(actual+index) = '\0';
+ 				}
+ 				strncpy(actual, currentpath, index);
+@@ -240,7 +240,7 @@ 
+ 						}
+ 						num_of_libraries++;
+ 						num_of_comp = fptr(NULL);
+-						stComponents = malloc(num_of_comp * sizeof(stLoaderComponentType*));
++						stComponents = calloc(num_of_comp, sizeof(stLoaderComponentType*));
+ 						for (i = 0; i<num_of_comp; i++) {
+ 							stComponents[i] = calloc(1,sizeof(stLoaderComponentType));
+ 							stComponents[i]->nqualitylevels = 0;
+@@ -266,14 +266,14 @@ 
+ 								}
+ 							}
+ 							if (allNames == NULL) {
+-								allNames = malloc(sizeof(nameList));
++								allNames = calloc(1, sizeof(nameList));
+ 								currentName = allNames;
+ 							} else {
+-								currentName->next = malloc(sizeof(nameList));
++								currentName->next = calloc(1, sizeof(nameList));
+ 								currentName = currentName->next;
+ 							}
+ 							currentName->next = NULL;
+-							currentName->name = malloc(strlen(stComponents[i]->name) + 1);
++							currentName->name = calloc(strlen(stComponents[i]->name) + 1, sizeof(char));
+ 							strcpy(currentName->name, stComponents[i]->name);
+ 							*(currentName->name + strlen(currentName->name)) = '\0';
+ 
+
