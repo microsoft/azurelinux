@@ -1,6 +1,6 @@
 # Default configuration overrides for Influxdb 2.0
 # To see all available options, use the following command:
-#    INFLUXD_CONFIG_PATH=/etc/influxdb2/config.yaml influxd print-config
+#    INFLUXD_CONFIG_PATH=/etc/influxdb/config.yaml influxd print-config
 
 # No reporting by default
 reporting-disable: true

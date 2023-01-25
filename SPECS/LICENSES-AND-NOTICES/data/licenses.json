@@ -2365,7 +2365,7 @@
                 "httpcomponents-client",
                 "httpcomponents-core",
                 "influx-cli",
-                "influxdb2",
+                "influxdb",
                 "isorelax",
                 "jakarta-taglibs-standard",
                 "jansi-native",

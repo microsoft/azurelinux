@@ -4,7 +4,7 @@ Documentation=https://docs.influxdata.com/influxdb/
 After=network.target
 
 [Service]
-Environment="INFLUXD_CONFIG_PATH=/etc/influxdb2/config.yaml"
+Environment="INFLUXD_CONFIG_PATH=/etc/influxdb/config.yaml"
 LimitNOFILE=65536
 ExecStart=/usr/bin/influxd
 Type=simple

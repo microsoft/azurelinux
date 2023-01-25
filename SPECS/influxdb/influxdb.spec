@@ -1,5 +1,5 @@
 #
-# spec file for package influxdb2
+# spec file for package influxdb
 #
 # Copyright (c) 2021 SUSE LLC
 #
@@ -16,7 +16,7 @@
 #
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
-Name:           influxdb2
+Name:           influxdb
 Version:        2.4.0
 Release:        1%{?dist}
 License:        MIT
@@ -112,7 +112,7 @@ install -D -m 0644 %{SOURCE3} %{buildroot}%{_unitdir}/influxdb.service
 ln -s %{_sbindir}/service %{buildroot}%{_sbindir}/rcinfluxdb
 install -D -m 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/influxdb.conf
 install -D -m 0644 %{SOURCE6} %{buildroot}%{_sysusersdir}/influxdb-user.conf
-install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb2/config.yaml
+install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb/config.yaml
 
 %check
 export GOTRACEBACK=all
@@ -135,8 +135,8 @@ go test ./...
 %files
 %license LICENSE
 %doc README.md CHANGELOG.md
-%dir %{_sysconfdir}/influxdb2
-%config(noreplace) %{_sysconfdir}/influxdb2/config.yaml
+%dir %{_sysconfdir}/influxdb
+%config(noreplace) %{_sysconfdir}/influxdb/config.yaml
 %{_bindir}/influxd
 %{_bindir}/telemetryd
 %{_sbindir}/rcinfluxdb
