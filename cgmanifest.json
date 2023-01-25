@@ -3148,6 +3148,46 @@
         "type": "other",
         "other": {
           "name": "etcd",
+          "version": "3.5.1",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
+          "version": "3.5.3",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
+          "version": "3.5.4",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
+          "version": "3.5.5",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
           "version": "3.5.6",
           "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.6.tar.gz"
         }
