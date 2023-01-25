@@ -30,7 +30,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         makefile-buildoption-commitnb.patch
+Patch0:         makefile-buildoption-commitnb-1.9.patch
 
 BuildRequires:  golang >= 1.12
 
