@@ -18,10 +18,14 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Capture::Tiny) >= 0.05
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::Build)
 BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(File::Remove)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(inc::Module::Install) >= 0.85
 BuildRequires:  perl(Module::Install) >= 0.85
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Base)
 BuildRequires:  perl(Module::Install::Can)
 BuildRequires:  perl(Module::Install::GithubMeta)
