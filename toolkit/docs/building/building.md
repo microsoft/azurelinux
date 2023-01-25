@@ -20,6 +20,9 @@
       - [Force Rebuilds](#force-rebuilds)
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
+  - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
+      - [CBL-Mariner 1.0](#cbl-mariner-10)
+      - [CBL-Mariner 2.0](#cbl-mariner-20)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
     - [Authentication](#authentication)
@@ -293,6 +296,33 @@ The build system also enforces hash checking for sources when packaging SRPMs. F
 # Just update the intermediate SRPMs and their source signatures by using the input-srpms target
 sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 ```
+
+### packages.microsoft.com Repository Structure
+
+CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/). The CBL-Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+
+The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
+
+#### CBL-Mariner 1.0
+
+For CBL-Mariner 1.0, the repositories are structured as follows:
+
+- **Base:** Packages released with CBL-Mariner 1.0.
+- **Update:** Base packages added or updated since CBL-Mariner 1.0's release date.
+- **CoreUI:** Targeted UI related packages.
+- **Extras:** CBL-Mariner 1.0 packages that are built by Microsoft and are closed source.
+- **NVIDIA:** Specially licensed NVIDIA packages.
+- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
+
+#### CBL-Mariner 2.0
+
+For CBL-Mariner 2.0, the repositories are structured as follows:
+
+- **Base:** Packages released with CBL-Mariner 2.0 and their updates.
+- **Extras:** CBL-Mariner 2.0 packages that are built by Microsoft and are closed source
+- **Extended:** CBL-Mariner 2.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
+- **NVIDIA:** Specially licensed NVIDIA packages.
+- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
 
 ## Keys, Certs, and Remote Sources
 
