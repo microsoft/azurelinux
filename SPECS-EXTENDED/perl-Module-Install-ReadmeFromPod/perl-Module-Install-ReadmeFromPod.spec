@@ -24,6 +24,9 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
 BuildRequires:  perl(inc::Module::Install)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(File::Remove)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::AutoLicense)
 BuildRequires:  perl(Module::Install::AuthorRequires) >= 0.02
 BuildRequires:  perl(Module::Install::GithubMeta)
