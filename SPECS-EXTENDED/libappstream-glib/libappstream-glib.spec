@@ -7,6 +7,8 @@ Name:      libappstream-glib
 Version:   0.8.2
 Release:   3%{?dist}
 License:   LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:       http://people.freedesktop.org/~hughsient/appstream-glib/
 Source0:   http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
 
