@@ -3557,6 +3557,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "flux",
+          "version": "0.179.0",
+          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.179.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fmt",
           "version": "8.1.1",
           "downloadUrl": "https://github.com/fmtlib/fmt/archive/refs/tags/8.1.1.tar.gz"
@@ -6803,6 +6813,26 @@
           "name": "indent",
           "version": "2.2.12",
           "downloadUrl": "http://ftpmirror.gnu.org/indent/indent-2.2.12.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "influx-cli",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "influxdb",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.4.0.tar.gz"
         }
       }
     },
