@@ -28862,8 +28862,8 @@
         "type": "other",
         "other": {
           "name": "xdp-tools",
-          "version": "1.2.9",
-          "downloadUrl": "https://github.com/xdp-project/xdp-tools/releases/download/v1.2.9/xdp-tools-1.2.9.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/xdp-project/xdp-tools/releases/download/v1.3.0/xdp-tools-1.3.0.tar.gz"
         }
       }
     },
