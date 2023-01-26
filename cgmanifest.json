@@ -1967,6 +1967,16 @@
         "type": "other",
         "other": {
           "name": "coredns",
+          "version": "1.8.6",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
           "version": "1.9.3",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.9.3.tar.gz"
         }
