@@ -8,7 +8,6 @@ Group:          System Environment/Programming
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
-Patch0: CVE-2021-40330.patch
 BuildRequires:  curl-devel
 BuildRequires:  python2
 Requires:       openssl
@@ -91,6 +90,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Fri Jan 27 2023 Muhammad Falak <mwani@microsoft.com> - 2.33.6-1
 - Bump version to 2.33.6 to address CVE-2022-23521 and CVE-2022-41903
+- Drop un-needed patch
 
 *   Fri Sep 10 2021 Mariner Autopatcher <cblmargh@microsoft.com> 2.23.4-2
 -   Added patch file(s) CVE-2021-40330.patch
