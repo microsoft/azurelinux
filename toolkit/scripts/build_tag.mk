@@ -8,7 +8,7 @@
 
 DIST_TAG           ?= .cm2
 # Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
-BUILD_NUMBER       ?= $(call shell_real_build_only, if [[ $UID == 0 ]]; then runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD; else git rev-parse --short HEAD; fi)
+BUILD_NUMBER       ?= $(call shell_real_build_only, if [ -n "$$UID" ] && [ "$$UID" -eq 0 ]; then runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD; else git rev-parse --short HEAD; fi)
 # an empty BUILD_NUMBER breaks the build later on
 ifeq ($(BUILD_NUMBER),)
    BUILD_NUMBER = non-git
