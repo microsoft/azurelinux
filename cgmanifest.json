@@ -6179,6 +6179,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "HvLoader",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/Camelron/HvLoader/releases/download/v1.0.0/HvLoader-1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hwdata",
           "version": "0.356",
           "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.356.tar.gz"
