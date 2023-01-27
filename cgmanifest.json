@@ -26556,6 +26556,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "subscription-manager",
+          "version": "1.29.30",
+          "downloadUrl": "https://github.com/candlepin/subscription-manager/archive/refs/tags/subscription-manager-1.29.30-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "subunit",
           "version": "1.4.0",
           "downloadUrl": "https://launchpad.net/subunit/trunk/1.4.0/+download/subunit-1.4.0.tar.gz"
