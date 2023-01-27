@@ -1396,8 +1396,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.4.13",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/refs/tags/v3.4.13.tar.gz"
+          "version": "3.4.23",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/refs/tags/v3.4.23.tar.gz"
         }
       }
     },
