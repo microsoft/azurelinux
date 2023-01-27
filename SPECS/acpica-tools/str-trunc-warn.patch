@@ -1,0 +1,112 @@
+Index: acpica-unix2-20181003/source/compiler/aslanalyze.c
+===================================================================
+--- acpica-unix2-20181003.orig/source/compiler/aslanalyze.c
++++ acpica-unix2-20181003/source/compiler/aslanalyze.c
+@@ -355,11 +355,16 @@ AnCheckMethodReturnValue (
+          */
+         if (ThisNodeBtype != 0)
+         {
+-            sprintf (AslGbl_MsgBuffer,
++	     int cnt;
++	     char *strp;
++
++            cnt = asprintf (&strp,
+                 "Method returns [%s], %s operator requires [%s]",
+                 AslGbl_StringBuffer, OpInfo->Name, AslGbl_StringBuffer2);
+ 
+-            AslError (ASL_ERROR, ASL_MSG_INVALID_TYPE, ArgOp, AslGbl_MsgBuffer);
++            AslError (ASL_ERROR, ASL_MSG_INVALID_TYPE, ArgOp, strp);
++	     if (cnt > 0)
++	         free(strp);
+         }
+     }
+ }
+Index: acpica-unix2-20181003/source/compiler/aslpredef.c
+===================================================================
+--- acpica-unix2-20181003.orig/source/compiler/aslpredef.c
++++ acpica-unix2-20181003/source/compiler/aslpredef.c
+@@ -159,14 +159,19 @@ ApCheckForPredefinedMethod (
+         if (MethodInfo->NumReturnNoValue &&
+             ThisName->Info.ExpectedBtypes)
+         {
++	     int cnt;
++	     char *strp;
++
+             AcpiUtGetExpectedReturnTypes (AslGbl_StringBuffer,
+                 ThisName->Info.ExpectedBtypes);
+ 
+-            sprintf (AslGbl_MsgBuffer, "%s required for %4.4s",
+-                AslGbl_StringBuffer, ThisName->Info.Name);
++            cnt = asprintf (&strp, "%s required for %4.4s",
++	        AslGbl_StringBuffer, ThisName->Info.Name);
+ 
+             AslError (ASL_WARNING, ASL_MSG_RESERVED_RETURN_VALUE, Op,
+-                AslGbl_MsgBuffer);
++                strp);
++	     if (cnt > 0)
++	        free(strp);
+         }
+         break;
+     }
+@@ -698,18 +703,26 @@ TypeErrorExit:
+ 
+     AcpiUtGetExpectedReturnTypes (AslGbl_StringBuffer, ExpectedBtypes);
+ 
+-    if (PackageIndex == ACPI_NOT_PACKAGE_ELEMENT)
+-    {
+-        sprintf (AslGbl_MsgBuffer, "%4.4s: found %s, %s required",
+-            PredefinedName, TypeName, AslGbl_StringBuffer);
+-    }
+-    else
+     {
+-        sprintf (AslGbl_MsgBuffer, "%4.4s: found %s at index %u, %s required",
+-            PredefinedName, TypeName, PackageIndex, AslGbl_StringBuffer);
++	 int cnt;
++	 char *strp;
++
++        if (PackageIndex == ACPI_NOT_PACKAGE_ELEMENT)
++        {
++            cnt = asprintf (&strp, "%4.4s: found %s, %s required",
++                PredefinedName, TypeName, AslGbl_StringBuffer);
++        }
++        else
++        {
++            cnt = asprintf (&strp, "%4.4s: found %s at index %u, %s required",
++                PredefinedName, TypeName, PackageIndex, AslGbl_StringBuffer);
++        }
++
++	 AslError (ASL_ERROR, ASL_MSG_RESERVED_OPERAND_TYPE, Op, strp);
++	 if (cnt > 0)
++	     free(strp);
+     }
+ 
+-    AslError (ASL_ERROR, ASL_MSG_RESERVED_OPERAND_TYPE, Op, AslGbl_MsgBuffer);
+     return (AE_TYPE);
+ }
+ 
+Index: acpica-unix2-20181003/source/compiler/aslwalks.c
+===================================================================
+--- acpica-unix2-20181003.orig/source/compiler/aslwalks.c
++++ acpica-unix2-20181003/source/compiler/aslwalks.c
+@@ -507,15 +507,19 @@ AnOperandTypecheckWalkEnd (
+             else if (!CommonBtypes)
+             {
+                 /* No match -- this is a type mismatch error */
++		int cnt;
++		char *strp;
+ 
+                 AnFormatBtype (AslGbl_StringBuffer, ThisNodeBtype);
+                 AnFormatBtype (AslGbl_StringBuffer2, RequiredBtypes);
+ 
+-                sprintf (AslGbl_MsgBuffer, "[%s] found, %s operator requires [%s]",
++                cnt = asprintf (&strp, "[%s] found, %s operator requires [%s]",
+                     AslGbl_StringBuffer, OpInfo->Name, AslGbl_StringBuffer2);
+ 
+                 AslError (ASL_ERROR, ASL_MSG_INVALID_TYPE,
+-                    ArgOp, AslGbl_MsgBuffer);
++                    ArgOp, strp);
++		if (cnt > 0)
++		    free(strp);
+             }
+ 
+         NextArgument:

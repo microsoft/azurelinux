@@ -1,0 +1,26 @@
+Index: acpica-unix2-20170728/generate/unix/Makefile.config
+===================================================================
+--- acpica-unix2-20170728.orig/generate/unix/Makefile.config
++++ acpica-unix2-20170728/generate/unix/Makefile.config
+@@ -23,6 +23,9 @@
+ # OPT_CFLAGS can be overridden on the make command line by
+ #   adding OPT_CFLAGS="..." to the invocation.
+ #
++# OPT_LDFLAGS can be overridden on the make command line by
++#   adding OPT_LDFLAGS="..." to the invocation.
++#
+ # Notes:
+ #   gcc should be version 4 or greater, otherwise some of the options
+ #     used will not be recognized.
+@@ -157,6 +160,11 @@ LDFLAGS +=-m32
+ endif
+ 
+ #
++# Common linker flags
++#
++OPT_LDFLAGS ?= 
++
++#
+ # Optionally disable optimizations. Optimization causes problems on
+ # some compilers such as gcc 4.4
+ #

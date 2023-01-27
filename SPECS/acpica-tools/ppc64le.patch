@@ -1,0 +1,16 @@
+Index: acpica-unix-20190329/source/include/platform/aclinux.h
+===================================================================
+--- acpica-unix-20190329.orig/source/include/platform/aclinux.h
++++ acpica-unix-20190329/source/include/platform/aclinux.h
+@@ -233,9 +233,11 @@
+ #define __cdecl
+ #endif
+ 
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+ #if defined(__PPC64__) || defined(__s390x__)
+ #define ACPI_BIG_ENDIAN
+ #endif
++#endif
+ 
+ #endif /* __KERNEL__ */
+ 
