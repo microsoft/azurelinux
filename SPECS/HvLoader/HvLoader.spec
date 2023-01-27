@@ -43,7 +43,6 @@ make -C BaseTools
 sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/%{name}-%{version}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
 cp %{SOURCE2} Conf/target.txt
 build -p MdeModulePkg/MdeModulePkg.dsc -m MdeModulePkg/Application/%{name}-%{version}/HvLoader.inf
-echo "done with code $?"
 
 %install
 echo "install :)"
