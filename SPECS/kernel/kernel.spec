@@ -1,3 +1,20 @@
+%global security_hardening none
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%define uname_r %{version}-%{release}
+
+%ifarch x86_64
+%define arch x86_64
+%define archdir x86
+%define config_source %{SOURCE1}
+%endif
+
+%ifarch aarch64
+%global __provides_exclude_from %{_libdir}/debug/.build-id/
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE2}
+%endif
+
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.90.1
@@ -12,20 +29,6 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
-%global security_hardening none
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-%{release}
-%ifarch x86_64
-%define arch x86_64
-%define archdir x86
-%define config_source %{SOURCE1}
-%endif
-%ifarch aarch64
-%global __provides_exclude_from %{_libdir}/debug/.build-id/
-%define arch arm64
-%define archdir arm64
-%define config_source %{SOURCE2}
-%endif
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -47,13 +50,13 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+%ifarch x86_64
+BuildRequires:  pciutils-devel
+%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-%ifarch x86_64
-BuildRequires:  pciutils-devel
-%endif
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -200,7 +203,7 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 %define __spec_install_post\
     %{?__debug_package:%{__debug_install_post}}\
     %{__arch_install_post}\
-    %__os_install_post\
+    %{__os_install_post}\
     %{__modules_install_post}\
 %{nil}
 
@@ -328,7 +331,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files
 %defattr(-,root,root)
 %license COPYING
-%exclude %dir %{_lib}/debug
+%exclude %dir /usr/lib/debug
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
