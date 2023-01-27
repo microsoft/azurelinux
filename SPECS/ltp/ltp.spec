@@ -10,7 +10,7 @@
 Summary:        Linux Test Project
 Name:           ltp
 Version:        20220930
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,8 @@ BuildRequires:  m4
 BuildRequires:  make
 BuildRequires:  pkg-config
 
+Requires:  diffutils
+Requires:  ethtool
 Requires:  expect
 Requires:  gawk
 Requires:  glibc
@@ -90,6 +92,9 @@ rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 %{_mandir}/*
 
 %changelog
+* Tue Jan 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220930-3
+- Adding missing dependency on 'ethtool' and 'diffutils'.
+
 * Tue Dec 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220930-2
 - Fool-proofing LTP dependencies.
 - Cleaning up directories created during tests.
