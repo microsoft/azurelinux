@@ -1,0 +1,20 @@
+diff -Naur acpica-unix2-20170119/source/include/acmacros.h acpica-unix2-20170119-arm7hl/source/include/acmacros.h
+--- acpica-unix2-20170119/source/include/acmacros.h	2017-01-30 17:25:54.346151952 -0700
++++ acpica-unix2-20170119-arm7hl/source/include/acmacros.h	2017-01-30 17:22:25.249388742 -0700
+@@ -178,6 +178,8 @@
+ 
+ /* 16-bit source, 16/32/64 destination */
+ 
++#define ACPI_MOVE_16_TO_8(d, s)        {((  UINT8 *)(void *)(d))[0] = ((UINT8 *)(void *)(s))[0];}
++
+ #define ACPI_MOVE_16_TO_16(d, s)        {((  UINT8 *)(void *)(d))[0] = ((UINT8 *)(void *)(s))[0];\
+                                          ((  UINT8 *)(void *)(d))[1] = ((UINT8 *)(void *)(s))[1];}
+ 
+@@ -199,6 +201,7 @@
+ 
+ /* 64-bit source, 16/32/64 destination */
+ 
++#define ACPI_MOVE_64_TO_8(d, s)         ACPI_MOVE_16_TO_8(d, s)    /* Truncate to 8 */
+ #define ACPI_MOVE_64_TO_16(d, s)        ACPI_MOVE_16_TO_16(d, s)    /* Truncate to 16 */
+ #define ACPI_MOVE_64_TO_32(d, s)        ACPI_MOVE_32_TO_32(d, s)    /* Truncate to 32 */
+ #define ACPI_MOVE_64_TO_64(d, s)        {((  UINT8 *)(void *)(d))[0] = ((UINT8 *)(void *)(s))[0];\

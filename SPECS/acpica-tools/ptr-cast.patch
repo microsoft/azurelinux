@@ -1,0 +1,48 @@
+diff -Naur acpica-unix2-20180209.orig/source/components/tables/tbutils.c acpica-unix2-20180209/source/components/tables/tbutils.c
+--- acpica-unix2-20180209.orig/source/components/tables/tbutils.c	2018-03-15 16:47:21.831526264 -0600
++++ acpica-unix2-20180209/source/components/tables/tbutils.c	2018-03-15 16:58:20.030097284 -0600
+@@ -238,9 +238,11 @@
+          * 64-bit platform, XSDT: Move (unaligned) 64-bit to local,
+          *  return 64-bit
+          */
+-	Address64 = (UINT64) TableEntry;
+ 
+ #if ACPI_MACHINE_WIDTH == 32
++	UINT32 Tmp32 = (UINT32) TableEntry;
++
++	Address64 = (UINT64) Tmp32;
+         if (Address64 > ACPI_UINT32_MAX)
+         {
+             /* Will truncate 64-bit address to 32 bits, issue warning */
+@@ -250,9 +252,15 @@
+                 " truncating",
+                 ACPI_FORMAT_UINT64 (Address64)));
+         }
+-#endif
++
++        return ((ACPI_PHYSICAL_ADDRESS) (*ACPI_CAST_PTR (
++            UINT32, TableEntry)));
++#else
++	Address64 = (UINT64) TableEntry;
++
+         return ((ACPI_PHYSICAL_ADDRESS) (*ACPI_CAST_PTR (
+             UINT64, Address64)));
++#endif
+     }
+ }
+ 
+diff -Naur acpica-unix2-20180209.orig/source/compiler/aslparseop.c acpica-unix2-20180209/source/compiler/aslparseop.c
+--- acpica-unix2-20180209.orig/source/compiler/aslparseop.c	2018-03-15 17:20:09.844338074 -0600
++++ acpica-unix2-20180209/source/compiler/aslparseop.c	2018-03-15 17:28:19.570800797 -0600
+@@ -287,7 +287,11 @@
+         ParseOpcode == PARSEOP_NAMESEG ||
+         ParseOpcode == PARSEOP_STRING_LITERAL)
+     {
++#if ACPI_MACHINE_WIDTH == 32
++        Op->Asl.Value.String = (char *) (UINT32) Value;
++#else
+         Op->Asl.Value.String = (char *) Value;
++#endif
+     }
+     else
+     {

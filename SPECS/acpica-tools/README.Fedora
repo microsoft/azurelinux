@@ -1,0 +1,26 @@
+Packaging Notes for Fedora
+==========================
+The upstream source contains documentation that may or may not be licensed
+in a freely redistributable manner.  In an excess of caution, the manuals in
+question have been removed from the source we start with.  You can still get
+your own copies of the documentation from here:
+
+   https://www.acpica.org/documentation/
+
+The two manuals affected are:
+
+   (1) ACPICA Reference Manual, describing the ACPI Component Architecture
+       in some detail, and
+
+   (2) ASL Compiler Reference Manual, describing how to use iasl
+
+While there are man pages for the commands, they are very brief.  The
+documents above are recommended reading.
+
+
+Test Cases
+==========
+The aapits tests do not currently build properly.  They will be added to
+this package once they do.  In the meantime, ASL, template and misc tests
+will be run as part of %check.
+

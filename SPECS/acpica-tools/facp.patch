@@ -1,0 +1,31 @@
+From 7670c56ebe004e698551635f9c5d48a1794066dd Mon Sep 17 00:00:00 2001
+From: Al Stone <ahs3@ahs3.net>
+Date: Wed, 19 Dec 2018 16:52:41 -0700
+Subject: [PATCH] Correct DSDT Address field in FACP tables
+
+The FADT allows either the DSDT Address or XDSDT Address field to be
+zero.  However, the table definition used by the table compiler still
+requires the DSDT Address to be non-zero, which is not correct.  So,
+remove the DT_NON_ZERO flag from the field.
+
+Signed-off-by: Al Stone <ahs3@redhat.com>
+---
+ source/common/dmtbinfo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/common/dmtbinfo.c b/source/common/dmtbinfo.c
+index 2e1c54f84..07d3ce099 100644
+--- a/source/common/dmtbinfo.c
++++ b/source/common/dmtbinfo.c
+@@ -292,7 +292,7 @@ ACPI_DMTABLE_INFO           AcpiDmTableInfoFacs[] =
+ ACPI_DMTABLE_INFO           AcpiDmTableInfoFadt1[] =
+ {
+     {ACPI_DMT_UINT32,   ACPI_FADT_OFFSET (Facs),                    "FACS Address", 0},
+-    {ACPI_DMT_UINT32,   ACPI_FADT_OFFSET (Dsdt),                    "DSDT Address", DT_NON_ZERO},
++    {ACPI_DMT_UINT32,   ACPI_FADT_OFFSET (Dsdt),                    "DSDT Address", 0},
+     {ACPI_DMT_UINT8,    ACPI_FADT_OFFSET (Model),                   "Model", 0},
+     {ACPI_DMT_FADTPM,   ACPI_FADT_OFFSET (PreferredProfile),        "PM Profile", 0},
+     {ACPI_DMT_UINT16,   ACPI_FADT_OFFSET (SciInterrupt),            "SCI Interrupt", 0},
+-- 
+2.20.1
+

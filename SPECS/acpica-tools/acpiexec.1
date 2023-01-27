@@ -1,0 +1,102 @@
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH ACPIEXEC 1 "January 23, 2013"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+acpiexec \- ACPI AML execution and debug utility
+.SH SYNOPSIS
+.B acpiexec
+.RI [ <option> ... ]
+.RI <aml-file>
+.B ...
+
+.SH DESCRIPTION
+This manual page briefly documents the
+.B acpiexec
+command. The option list is taken from the acpiexec interactive help.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+.B acpiexec
+provides a simulated execution environment for AML code so that it
+can be more easily tested and debugged.
+.PP
+Much more detailed documentation may be found at
+http://www.acpica.org/documentation/.
+
+.SH OPTIONS
+
+.PP
+.TP
+.B \-?
+Display the help message
+.TP
+.B \-b "command-line"
+Batch mode command line execution (cmd1;cmd2;...)
+.TP
+.B \-M [<method>]
+Batch mode method execution (Default: MAIN)
+.TP
+.B \-da
+Disable method abort on error
+.TP
+.B \-di
+Disable execution of _STA/_INI methods during init
+.TP
+.B \-do
+Disable Operation Region address simulation
+.TP
+.B \-dr
+Disable repair of method return values
+.TP
+.B \-dt
+Disable allocation tracking (performance)
+.TP
+.B \-ef
+Enable display of final memory statistics
+.TP
+.B \-ei
+Enable additional tests for ACPICA interfaces
+.TP
+.B \-em
+Enable interpreter Serialized mode
+.TP
+.B \-es
+Enable interpreter Slack mode
+.TP
+.B \-et
+Enable debug semaphore timeour
+.TP
+.B \-f <value>
+Operation Region initialization fill value
+.TP
+.B \-r
+Use hardware-reduced FADT V5
+.TP
+.B \-vi
+Verbose initialization output
+.TP
+.B \-vr
+Verbose region handler output
+.TP
+.B \-x <debug-level>
+Debug output level
+
+.SH AUTHOR
+acpiexec was written by Robert Moore <robert.moore@intel.com>.
+.PP
+This manual page was written by Al Stone <ahs3@redhat.com> for the
+Fedora project (but may be used by others).

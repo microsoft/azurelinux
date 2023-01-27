@@ -1,0 +1,105 @@
+Patch carried over from the prior iasl package and updated.  This allows
+for builds on systems requiring aligned memory access. Please see
+http://lists.acpica.org/pipermail/devel/2010-July/000159.html.  Resolves
+BZ#865013 and BZ#856856.
+--
+
+Add more platforms to the list of the ones requiring aligned memory access.
+Also fix callsites where wrong assumptions where made in terms of aligment.
+
+Signed-off-by: Mattia Dongili <malattia@linux.it>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ source/components/executer/exoparg2.c |   12 +++++++++---
+ source/include/actypes.h              |   26 +++++++++++++-------------
+ 3 files changed, 32 insertions(+), 21 deletions(-)
+
+Index: acpica-unix2-20170728/source/components/executer/exoparg2.c
+===================================================================
+--- acpica-unix2-20170728.orig/source/components/executer/exoparg2.c
++++ acpica-unix2-20170728/source/components/executer/exoparg2.c
+@@ -172,6 +172,8 @@ AcpiExOpcode_2A_2T_1R (
+     ACPI_OPERAND_OBJECT     **Operand = &WalkState->Operands[0];
+     ACPI_OPERAND_OBJECT     *ReturnDesc1 = NULL;
+     ACPI_OPERAND_OBJECT     *ReturnDesc2 = NULL;
++    UINT64                  ReturnValue1 = 0;
++    UINT64                  ReturnValue2 = 0;
+     ACPI_STATUS             Status;
+ 
+ 
+@@ -206,8 +208,10 @@ AcpiExOpcode_2A_2T_1R (
+         Status = AcpiUtDivide (
+             Operand[0]->Integer.Value,
+             Operand[1]->Integer.Value,
+-            &ReturnDesc1->Integer.Value,
+-            &ReturnDesc2->Integer.Value);
++            &ReturnValue1, &ReturnValue2);
++        ReturnDesc1->Integer.Value = ReturnValue1;
++        ReturnDesc2->Integer.Value = ReturnValue2;
++
+         if (ACPI_FAILURE (Status))
+         {
+             goto Cleanup;
+@@ -282,6 +286,7 @@ AcpiExOpcode_2A_1T_1R (
+     ACPI_OPERAND_OBJECT     **Operand = &WalkState->Operands[0];
+     ACPI_OPERAND_OBJECT     *ReturnDesc = NULL;
+     UINT64                  Index;
++    UINT64                  ReturnValue = 0;
+     ACPI_STATUS             Status = AE_OK;
+     ACPI_SIZE               Length = 0;
+ 
+@@ -327,7 +332,8 @@ AcpiExOpcode_2A_1T_1R (
+             Operand[0]->Integer.Value,
+             Operand[1]->Integer.Value,
+             NULL,
+-            &ReturnDesc->Integer.Value);
++            &ReturnValue);
++        ReturnDesc->Integer.Value = ReturnValue;
+         break;
+ 
+     case AML_CONCATENATE_OP: /* Concatenate (Data1, Data2, Result) */
+Index: acpica-unix2-20170728/source/include/actypes.h
+===================================================================
+--- acpica-unix2-20170728.orig/source/include/actypes.h
++++ acpica-unix2-20170728/source/include/actypes.h
+@@ -143,6 +143,19 @@ typedef COMPILER_DEPENDENT_INT64
+  */
+ #define ACPI_THREAD_ID                  UINT64
+ 
++/*
++ * In the case of the Itanium Processor Family (IPF), the hardware does not
++ * support misaligned memory transfers. Set the MISALIGNMENT_NOT_SUPPORTED flag
++ * to indicate that special precautions must be taken to avoid alignment faults.
++ * (IA64 or ia64 is currently used by existing compilers to indicate IPF.)
++ *
++ * Note: EM64T and other X86-64 processors support misaligned transfers,
++ * so there is no need to define this flag.
++ */
++#if defined (__IA64__) || defined (__ia64__) || defined(__alpha__) || defined(__sparc__) || defined(__hppa__) 
++#define ACPI_MISALIGNMENT_NOT_SUPPORTED
++#endif
++
+ 
+ /*******************************************************************************
+  *
+@@ -170,20 +183,6 @@ typedef UINT64
+ #define ACPI_USE_NATIVE_DIVIDE          /* Has native 64-bit integer support */
+ #define ACPI_USE_NATIVE_MATH64          /* Has native 64-bit integer support */
+ 
+-/*
+- * In the case of the Itanium Processor Family (IPF), the hardware does not
+- * support misaligned memory transfers. Set the MISALIGNMENT_NOT_SUPPORTED
+- * flag to indicate that special precautions must be taken to avoid alignment
+- * faults. (IA64 or ia64 is currently used by existing compilers to indicate
+- * IPF.)
+- *
+- * Note: EM64T and other X86-64 processors support misaligned transfers,
+- * so there is no need to define this flag.
+- */
+-#if defined (__IA64__) || defined (__ia64__)
+-#define ACPI_MISALIGNMENT_NOT_SUPPORTED
+-#endif
+-
+ 
+ /*******************************************************************************
+  *

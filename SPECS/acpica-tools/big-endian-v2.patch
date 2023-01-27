@@ -1,0 +1,18 @@
+Updated versions of upstream often contain fixes that were not seen
+in the original big-endian patch; we try to capture those here.
+
+Signed-off-by: Al Stone <ahs3@redhat.com>
+
+diff -Naur acpica-unix2-20170929.orig/source/compiler/asllookup.c acpica-unix2-20170929/source/compiler/asllookup.c
+--- acpica-unix2-20170929.orig/source/compiler/asllookup.c	2017-10-09 12:26:25.893508481 -0600
++++ acpica-unix2-20170929/source/compiler/asllookup.c	2017-10-17 11:45:42.230763844 -0600
+@@ -249,7 +249,8 @@
+      * ACPI names and are typically not referenced since they are meant
+      * to be called by the host OS.
+      */
+-    if (Node->Name.Ascii[0] == '_')
++    ACPI_MOVE_32_TO_32(&tmp.Ascii, Node->Name.Ascii);
++    if (tmp.Ascii[0] == '_')
+     {
+         return (AE_OK);
+     }
