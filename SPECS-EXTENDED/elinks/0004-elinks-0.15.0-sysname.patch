@@ -1,0 +1,26 @@
+From a90f6940b8aca775d79a81ed13262c76c23e00c1 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 11 Apr 2022 09:20:49 +0200
+Subject: [PATCH] Resolves: #97273 - sanitize user-agent header string
+
+elinks-0.11.0-sysname.patch rebased on 0.15.0
+---
+ src/osdep/sysname.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/osdep/sysname.c b/src/osdep/sysname.c
+index c08ef20..be545c3 100644
+--- a/src/osdep/sysname.c
++++ b/src/osdep/sysname.c
+@@ -26,7 +26,7 @@ got_it_from_uname_command(void)
+ 	FILE *f;
+ 	char *p;
+ 
+-	f = popen("uname -srm", "r");
++	f = popen("uname -s", "r");
+ 	if (!f) return 0;
+ 
+ 	if (fread(system_name, 1, sizeof(system_name) - 1, f) <= 0) {
+-- 
+2.34.1
+

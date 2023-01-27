@@ -1,0 +1,38 @@
+From 701b16e0ee6f159cbf8498f4569022005dfdebbd Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 19 Mar 2014 11:48:34 +0100
+Subject: [PATCH] lists.h: list_is_singleton() now returns false for empty list
+
+We have a crash report of ELinks 0.12pre6 with backtrace going through
+bookmark_all_terminals().  I believe it is caused by list_is_singleton()
+returning true for an empty list.  Consequently, bookmark_terminal()
+attempts to access a list item that does not exist.
+
+While it would be possible to fix bookmark_all_terminals() to explicitly
+check the list for emptiness, I propose to fix list_is_singleton() such
+that it does not return true for an empty list.  I checked the other
+uses of list_is_singleton() and the proposed change should not introduce
+any change in the behavior elsewhere.
+
+Bug: https://bugzilla.redhat.com/1075415
+---
+ src/util/lists.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/util/lists.h b/src/util/lists.h
+index b577c9f..9da38ae 100644
+--- a/src/util/lists.h
++++ b/src/util/lists.h
+@@ -146,7 +146,8 @@ do { \
+ #define list_empty(x) (list_magic_chkbool(x, "list_empty") && (x).next == &(x))
+ 
+ #define list_is_singleton(x) \
+-	(list_magic_chkbool(x, "list_is_singleton") && (x).next == (x).prev)
++	(list_magic_chkbool(x, "list_is_singleton") && (x).next == (x).prev \
++	&& !list_empty(x))
+ 
+ #define list_has_prev(l,p) \
+ 	(list_magic_chkbool(l, "list_has_prev") && (p)->prev !=  (void *) &(l))
+-- 
+1.8.3.1
+
