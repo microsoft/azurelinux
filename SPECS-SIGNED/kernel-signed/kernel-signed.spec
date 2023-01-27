@@ -1,12 +1,3 @@
-%global debug_package %{nil}
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%ifarch x86_64
-%global buildarch x86_64
-%endif
-%ifarch aarch64
-%global buildarch aarch64
-%endif
-%define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        5.15.90.1
@@ -68,6 +59,15 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
 Source2:        sha512hmac-openssl.sh
+%global debug_package %{nil}
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%ifarch x86_64
+%global buildarch x86_64
+%endif
+%ifarch aarch64
+%global buildarch aarch64
+%endif
+%define uname_r %{version}-%{release}
 BuildRequires:  cpio
 BuildRequires:  openssl
 BuildRequires:  sed
