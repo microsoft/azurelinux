@@ -1551,6 +1551,7 @@
                 "python-dns",
                 "python-dtopt",
                 "python-dulwich",
+                "python-enchant",
                 "python-entrypoints",
                 "python-ethtool",
                 "python-evdev",
