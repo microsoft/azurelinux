@@ -1967,6 +1967,16 @@
         "type": "other",
         "other": {
           "name": "coredns",
+          "version": "1.8.6",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
           "version": "1.9.3",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.9.3.tar.gz"
         }
@@ -3540,6 +3550,16 @@
           "name": "fluent-bit",
           "version": "1.9.6",
           "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v1.9.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "flux",
+          "version": "0.179.0",
+          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.179.0.tar.gz"
         }
       }
     },
@@ -6130,8 +6150,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -6793,6 +6813,26 @@
           "name": "indent",
           "version": "2.2.12",
           "downloadUrl": "http://ftpmirror.gnu.org/indent/indent-2.2.12.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "influx-cli",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "influxdb",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.4.0.tar.gz"
         }
       }
     },
@@ -7661,8 +7701,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -7681,8 +7721,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -7691,8 +7731,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -11483,6 +11523,16 @@
           "name": "livepatch-5.15.87.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.90.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -26499,6 +26549,16 @@
           "name": "stunnel",
           "version": "5.56",
           "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.56.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "subscription-manager",
+          "version": "1.29.30",
+          "downloadUrl": "https://github.com/candlepin/subscription-manager/archive/refs/tags/subscription-manager-1.29.30-1.tar.gz"
         }
       }
     },
