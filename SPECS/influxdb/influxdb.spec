@@ -17,7 +17,7 @@
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
-Version:        2.4.0
+Version:        2.6.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation

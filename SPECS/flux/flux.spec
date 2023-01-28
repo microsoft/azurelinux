@@ -21,7 +21,7 @@
 
 Summary:        Influx data language
 Name:           flux
-Version:        0.179.0
+Version:        0.191.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -77,14 +77,12 @@ popd
 %build
 pushd libflux
 RUSTFLAGS=%{rustflags} cargo build --release
-RUSTFLAGS=%{rustflags} cargo build --release --bin fluxc
 RUSTFLAGS=%{rustflags} cargo build --features=doc --release --bin fluxdoc
 popd
 
 %install
 install -D -m 644 libflux/include/influxdata/flux.h %{buildroot}%{_includedir}/influxdata/flux.h
-install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so.%{version}
-ln -sf ./libflux.so.%{version} %{buildroot}%{_libdir}/libflux.so
+install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so
 
 cat > flux.pc <<EOF
 prefix=%{_prefix}
@@ -101,8 +99,6 @@ Cflags: -I%{_includedir}
 EOF
 
 install -D -m 644 flux.pc %{buildroot}%{_libdir}/pkgconfig/flux.pc
-
-install -D -m 755 libflux/target/release/fluxc %{buildroot}%{_bindir}/fluxc
 install -D -m 755 libflux/target/release/fluxdoc %{buildroot}%{_bindir}/fluxdoc
 
 %check
@@ -113,13 +109,12 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %postun -n libflux -p /sbin/ldconfig
 
 %files -n libflux
-%{_libdir}/libflux.so.%{version}
+%{_libdir}/libflux.so
 
 %files -n libflux-devel
 %defattr(-,root,root)
 %license LICENSE
 %doc README.md
-%{_bindir}/fluxc
 %{_bindir}/fluxdoc
 %{_libdir}/libflux.so
 %{_libdir}/pkgconfig/flux.pc

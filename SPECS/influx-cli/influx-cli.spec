@@ -17,7 +17,7 @@
 
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
-Version:        2.4.0
+Version:        2.6.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
