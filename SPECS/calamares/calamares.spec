@@ -48,7 +48,12 @@ Patch0:         calamares-3.2.11-default-settings.patch
 Patch1:         use-single-job-for-progress-bar-value.patch
 Patch2:         navigation-buttons-autodefault.patch
 Patch3:         round-to-full-disk-size.patch
+# Due to a race condition, Calamares would crash intermittently when switching
+# partitioning method or encryption password. Patch4 fixes that bug.
 Patch4:         serialize-read-access.patch
+# Progress bar would expect a non-false return from a pooled thread, assuming
+# such result means a critical error. However, depending on timing
+# the process might return false because it already exited. Patch5 fixes that.
 Patch5:         install-progress-bar-fix.patch
 
 # Compilation tools
