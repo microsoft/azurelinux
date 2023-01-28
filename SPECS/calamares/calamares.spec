@@ -53,7 +53,7 @@ Patch3:         round-to-full-disk-size.patch
 Patch4:         serialize-read-access.patch
 # Progress bar would expect a non-false return from a pooled thread, assuming
 # such result means a critical error. However, depending on timing
-# the process might return false because it already exited. Patch5 fixes that.
+# the process might return false since it already exited. Patch5 fixes that bug.
 Patch5:         install-progress-bar-fix.patch
 
 # Compilation tools
