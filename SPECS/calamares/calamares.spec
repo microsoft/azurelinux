@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        39%{?dist}
+Release:        40%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,9 @@ Patch0:         calamares-3.2.11-default-settings.patch
 Patch1:         use-single-job-for-progress-bar-value.patch
 Patch2:         navigation-buttons-autodefault.patch
 Patch3:         round-to-full-disk-size.patch
+Patch4:         serialize-read-access.patch
+Patch5:         install-progress-bar-fix.patch
+
 # Compilation tools
 BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules
@@ -81,6 +84,12 @@ BuildRequires:  yaml-cpp-devel >= 0.5.1
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       coreutils
 Requires:       efibootmgr
+# Partition manipulation
+Requires:       util-linux
+# LVM / encrypted disk setup
+Requires:       cryptsetup
+Requires:       lvm2
+
 # Fonts
 Requires:       freefont
 Requires:       grub2
@@ -130,12 +139,12 @@ done
 mv %{SOURCE20} src/modules/license/license.conf
 mv %{SOURCE24} src/modules/users/users.conf
 
-%patch0 -p1 -b .default-settings
+%patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-# delete backup files so they don't get installed
-rm -f src/modules/*/*.conf.default-settings
+%patch4 -p1
+%patch5 -p1
 
 %build
 mkdir -p %{_target_platform}
@@ -217,6 +226,11 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Fri Jan 27 2023 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.11-40
+- Fix application crash when discoverin partitions due to a race condition with serialize-read-access.patch
+- Fix application crash when the Mariner installer process thread have already exited during progress bar installation view
+- Update Requires with some runtime dependencies for LVM and encryption support.
+
 * Mon Jul 25 2022 Minghe Ren <mingheren@microsoft.com> - 3.2.11-39
 - Modify users.conf to imporve security
 
