@@ -3791,7 +3791,7 @@
         "other": {
           "name": "frr",
           "version": "8.4.2",
-          "downloadUrl": "https://github.com/FRRouting/frr/releases/download/frr-8.4.2/frr-8.4.2.tar.gz"
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.4.2.tar.gz"
         }
       }
     },
