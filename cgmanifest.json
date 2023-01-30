@@ -1246,6 +1246,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bsf",
+          "version": "2.4.0",
+          "downloadUrl": "https://downloads.apache.org/commons/bsf/source/bsf-src-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "btrfs-progs",
           "version": "5.16",
           "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v5.16.tar.xz"
