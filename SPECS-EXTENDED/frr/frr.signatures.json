@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "frr-8.4.2.tar.gz": "c5b749b18a35bb9bbf8a58c7e165d3bf4d29bd01027eb7802929f6751a4e326e",
+  "frr-sysusers.conf": "c6f5a54402aa5f11e21dac3bd0e6cdeadfbf7937e9b34775b5fd368a9ca96fa4",
+  "frr-tmpfiles.conf": "edd7b01b11f2be66bb6b4531496d1eaf6536add9f4b549c659b27f5a32cdc512",
+  "frr.fc": "33f7e772c0f88d7616d589bd8d11e79d50154287129eea49f8a20333172da422",
+  "frr.if": "2ee982d7392e4a6e814dbc7a4cc2a03fd5f8cc981c0033a86c92080bc195e0da",
+  "frr.te": "173caa60e248a824118e56e509114d9490b77aa8957cbe7ad023ecb352590c5d"
+ }
+}
