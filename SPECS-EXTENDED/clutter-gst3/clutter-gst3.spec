@@ -2,7 +2,7 @@ Summary:        GStreamer integration library for Clutter
 Name:           clutter-gst3
 Version:        3.0.27
 Release:        15%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://developer.gnome.org/clutter-gst/stable/
