@@ -11820,6 +11820,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "luajit",
+          "version": "2.1.0",
+          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lua-expat",
           "version": "1.3.0",
           "downloadUrl": "https://matthewwild.co.uk/projects/luaexpat/luaexpat-1.3.0.tar.gz"

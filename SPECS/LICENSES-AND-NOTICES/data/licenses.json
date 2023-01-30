@@ -791,6 +791,7 @@
                 "lua-lunit",
                 "lua-rpm-macros",
                 "lua-term",
+                "luajit",
                 "luksmeta",
                 "lutok",
                 "lv2",
