@@ -1766,6 +1766,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "clutter-gtk",
+          "version": "1.8.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cmake",
           "version": "3.21.4",
           "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
