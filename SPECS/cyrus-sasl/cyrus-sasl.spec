@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  mariadb-devel
-BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  postgresql-devel
@@ -68,15 +67,6 @@ Requires:       %{name}-lib = %{version}-%{release}
 The %{name}-gssapi package contains the Cyrus SASL plugins which
 support GSSAPI authentication. GSSAPI is commonly used for Kerberos
 authentication.
-
-%package ldap
-Summary:        LDAP auxprop support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description ldap
-The %{name}-ldap package contains the Cyrus SASL plugin which supports using
-a directory server, accessed using LDAP, for storing shared secrets.
 
 %package lib
 Summary:        Shared libraries needed by applications which use Cyrus SASL
@@ -168,7 +158,6 @@ autoreconf -fi
     --enable-fast-install \
     --enable-gss_mutexes \
     --enable-krb4 \
-    --enable-ldapdb \
     --enable-login \
     --enable-ntlm \
     --enable-plain \
@@ -176,7 +165,6 @@ autoreconf -fi
     --enable-sql \
     --with-bdb=db \
     --with-dblib=berkeley \
-    --with-ldap \
     --with-mysql=yes \
     --with-pgsql=yes \
     --with-plugindir=%{_plugindir2} \
@@ -265,10 +253,6 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libgssapiv2.so
 %{_plugindir2}/libgssapiv2.so.%{_soversion}*
 
-%files ldap
-%{_plugindir2}/libldapdb.so
-%{_plugindir2}/libldapdb.so.%{_soversion}*
-
 %files lib
 %license COPYING
 %doc AUTHORS doc/html/*.html
@@ -306,6 +290,10 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Tue Jan 31 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
+- Remove (cyclic) dependency on openldap
+- Build cyrus-sasl-ldap from the cyrus-sasl-ldap spec file
+
 * Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.28-1
 - Updating to version 2.1.28 to address CVE-2022-24407.
 
