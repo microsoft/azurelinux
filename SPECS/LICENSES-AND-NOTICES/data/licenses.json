@@ -546,6 +546,7 @@
                 "libasyncns",
                 "libatasmart",
                 "libavc1394",
+                "libblockdev",
                 "libbpf",
                 "libbsd",
                 "libburn",
