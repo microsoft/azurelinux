@@ -8150,16 +8150,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libblockdev",
-          "version": "2.28",
-          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.28-1/libblockdev-2.28.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lcov",
           "version": "1.14",
           "downloadUrl": "https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz"
@@ -8353,6 +8343,16 @@
           "name": "libavc1394",
           "version": "0.5.4",
           "downloadUrl": "https://sourceforge.net/projects/libavc1394/files/libavc1394/libavc1394-0.5.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libblockdev",
+          "version": "2.28",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.28-1/libblockdev-2.28.tar.gz"
         }
       }
     },
