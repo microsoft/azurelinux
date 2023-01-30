@@ -1,45 +1,45 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Image meta information extraction module for Perl
 Name:           perl-Image-Info
 Version:        1.42
 Release:        4%{?dist}
-Summary:        Image meta information extraction module for Perl
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Image-Info
 Source0:        https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-%{version}.tar.gz#/perl-Image-Info-%{version}.tar.gz
-BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Compress::Zlib)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Getopt::Long)
-BuildRequires:  perl(Image::Xbm)
-BuildRequires:  perl(Image::Xpm)
 BuildRequires:  perl(IO::Scalar)
 BuildRequires:  perl(IO::String)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(overload)
-BuildRequires:  perl(strict)
+BuildRequires:  perl(Image::Xbm)
+BuildRequires:  perl(Image::Xpm)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Pod)
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
-BuildRequires:  perl(vars)
 BuildRequires:  perl(XML::LibXML::Reader)
 BuildRequires:  perl(XML::Simple)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
 Requires:       rgb
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Compress::Zlib)
 Requires:       perl(IO::Scalar)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildArch:      noarch
 
 %description
 This Perl extension allows you to extract meta information from
