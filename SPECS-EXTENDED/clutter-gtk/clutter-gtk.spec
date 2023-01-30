@@ -5,7 +5,7 @@ Summary:        A basic GTK clutter widget
 Name:           clutter-gtk
 Version:        1.8.4
 Release:        15%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.clutter-project.org
