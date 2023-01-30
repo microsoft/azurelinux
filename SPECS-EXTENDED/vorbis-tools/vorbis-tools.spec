@@ -2,7 +2,7 @@ Summary:        The Vorbis General Audio Compression Codec tools
 Name:           vorbis-tools
 Version:        1.4.2
 Release:        6%{?dist}
-License:        GPLv2
+License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.xiph.org/
