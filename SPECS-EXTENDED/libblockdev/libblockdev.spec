@@ -83,7 +83,7 @@ Summary:        A library for low-level manipulation with block devices
 Name:           libblockdev
 Version:        2.28
 Release:        3%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/storaged-project/libblockdev
