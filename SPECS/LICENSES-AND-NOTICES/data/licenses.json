@@ -784,6 +784,7 @@
                 "lpsolve",
                 "lrzsz",
                 "lua",
+                "luajit",
                 "lua-expat",
                 "lua-filesystem",
                 "lua-json",
