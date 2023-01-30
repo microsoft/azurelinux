@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://github.com/%{name}/%{name}-stable/archive/v%{version}.ta
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
+Source4:        99-mariner.preset
 Patch0:         fix-journald-audit-logging.patch
 # Patch1 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
@@ -167,6 +168,8 @@ rm %{buildroot}%{_libdir}/systemd/system/default.target
 ln -sfv multi-user.target %{buildroot}%{_libdir}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
+install -D -m 0644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/99-mariner.preset
+
 %find_lang %{name} ../%{name}.lang
 
 %check
@@ -232,6 +235,7 @@ fi
 %config(noreplace) /boot/systemd.cfg
 %{_libdir}/udev/*
 %{_libdir}/systemd/*
+%{_libdir}/systemd/system-preset/99-mariner.preset
 %{_libdir}/environment.d/99-environment.conf
 %exclude %{_libdir}/debug
 %exclude %{_datadir}/locale
@@ -273,6 +277,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Jan 25 2023 Adit Jha <aditjha@microsoft.com> - 250.3-14
+- Add 99-mariner.preset to disable systemd-oomd by default
+
 * Mon Jan 23 2023 Cameron Baird <cameronbaird@microsoft.com> - 250.3-13
 - Add patch for CVE-2022-4415
 - Add patch backport-helper-util-macros.patch to backport needed macros for CVE-2022-4415.patch

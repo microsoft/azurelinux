@@ -1246,6 +1246,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bsf",
+          "version": "2.4.0",
+          "downloadUrl": "https://downloads.apache.org/commons/bsf/source/bsf-src-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "btrfs-progs",
           "version": "5.16",
           "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v5.16.tar.xz"
@@ -1746,6 +1756,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "clutter",
+          "version": "1.26.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clutter-gst3",
+          "version": "3.0.27",
+          "downloadUrl": "https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-3.0.27.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clutter-gtk",
+          "version": "1.8.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cmake",
           "version": "3.21.4",
           "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
@@ -1789,6 +1829,16 @@
           "name": "cni-plugins",
           "version": "0.9.1",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cogl",
+          "version": "1.22.8",
+          "downloadUrl": "https://download.gnome.org/sources/cogl/1.22/cogl-1.22.8.tar.xz"
         }
       }
     },
@@ -2079,6 +2129,16 @@
           "name": "cpuid",
           "version": "20200427",
           "downloadUrl": "http://www.etallen.com/cpuid/cpuid-20200427.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cpulimit",
+          "version": "2.8",
+          "downloadUrl": "https://downloads.sourceforge.net/limitcpu/cpulimit-2.8.tar.gz"
         }
       }
     },
@@ -7220,6 +7280,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jansi",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/fusesource/jansi/archive/refs/tags/jansi-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jansi-native",
           "version": "1.7",
           "downloadUrl": "https://github.com/fusesource/jansi-native/archive/jansi-native-1.7.tar.gz"
@@ -7423,6 +7493,16 @@
           "name": "jlex",
           "version": "1.2.6",
           "downloadUrl": "http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jline",
+          "version": "2.14.6",
+          "downloadUrl": "https://github.com/jline/jline2/archive/refs/tags/jline-2.14.6.tar.gz"
         }
       }
     },
@@ -8283,6 +8363,16 @@
           "name": "libavc1394",
           "version": "0.5.4",
           "downloadUrl": "https://sourceforge.net/projects/libavc1394/files/libavc1394/libavc1394-0.5.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libblockdev",
+          "version": "2.28",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.28-1/libblockdev-2.28.tar.gz"
         }
       }
     },
@@ -11823,6 +11913,16 @@
           "name": "lua",
           "version": "5.4.3",
           "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "luajit",
+          "version": "2.1.0",
+          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
         }
       }
     },
@@ -26906,6 +27006,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tclx",
+          "version": "8.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/tclx/tclx8.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tcpdump",
           "version": "4.99.1",
           "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.99.1.tar.gz"
@@ -27056,9 +27166,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tix",
+          "version": "8.4.3",
+          "downloadUrl": "https://downloads.sourceforge.net/project/tix/tix/8.4.3/Tix8.4.3-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tk",
           "version": "8.6.10",
-          "downloadUrl": "http://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
+          "downloadUrl": "https://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
         }
       }
     },
@@ -27836,6 +27956,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vorbis-tools",
+          "version": "1.4.2",
+          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/vorbis/vorbis-tools-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vsftpd",
           "version": "3.0.5",
           "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.5.tar.gz"
@@ -28006,6 +28136,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "wordnet",
+          "version": "3.0",
+          "downloadUrl": "https://wordnetcode.princeton.edu/3.0/WordNet-3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "words",
           "version": "3.0",
           "downloadUrl": "https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
@@ -28080,6 +28220,16 @@
           "name": "xalan-j2",
           "version": "2.7.2",
           "downloadUrl": "http://www.apache.org/dist/xalan/xalan-j/source/xalan-j_2_7_2-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xapian-core",
+          "version": "1.4.20",
+          "downloadUrl": "https://www.oligarchy.co.uk/xapian/1.4.20/xapian-core-1.4.20.tar.xz"
         }
       }
     },
