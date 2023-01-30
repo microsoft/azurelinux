@@ -65,7 +65,9 @@ BuildRequires:  clang
 BuildRequires:  tzdata
 BuildRequires:  systemd-rpm-macros
 Requires:       tzdata
-Requires:       libflux
+# IMPORTANT: make sure it matches the libflux package version that is provided by flux package.
+# Verify inside of go.mod file of the source code the correct version needed for flux.
+Requires:       libflux == 0.191.0
 Conflicts:      influxdb
 %{?systemd_requires}
 Requires(post): systemd

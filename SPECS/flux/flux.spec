@@ -51,7 +51,7 @@ implementation of the language core.
 
 %package -n libflux
 Summary:        Influx data language
-Provides:       libflux = %{version}-%{release}
+Provides:       libflux = %{libflux_suffix}
 
 %description -n libflux
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
@@ -61,7 +61,7 @@ implementation of the language core.
 
 %package -n libflux-devel
 Summary:        Development libraries and header files for Influx data language
-Requires:       libflux = %{version}-%{release}
+Requires:       libflux = %{libflux_suffix}
 
 %description -n libflux-devel
 This package contains the header files and libraries for building
