@@ -7,7 +7,7 @@ Summary:        Open Source software library for creating rich graphical user in
 Name:           clutter
 Version:        1.26.4
 Release:        10%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.clutter-project.org/
