@@ -26696,16 +26696,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "tclx",
-          "version": "8.4.0",
-          "downloadUrl": "https://downloads.sourceforge.net/tclx/tclx8.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "suitesparse",
           "version": "5.4.0",
           "downloadUrl": "https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
@@ -26989,6 +26979,16 @@
           "name": "tcl-pgtcl",
           "version": "2.1.1",
           "downloadUrl": "http://downloads.sourceforge.net/pgtclng/pgtcl2.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tclx",
+          "version": "8.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/tclx/tclx8.4.tar.bz2"
         }
       }
     },
