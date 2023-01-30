@@ -1,36 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Sign and verify Internet mail with DKIM/DomainKey signatures
 Name:           perl-Mail-DKIM
 Version:        0.58
 Release:        4%{?dist}
-Summary:        Sign and verify Internet mail with DKIM/DomainKey signatures
-License:        GPL+ or Artistic
-URL:            http://dkimproxy.sourceforge.net/
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://dkimproxy.sourceforge.net/
 Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Mail-DKIM-%{version}.tar.gz#/perl-Mail-DKIM-%{version}.tar.gz
-BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Crypt::OpenSSL::RSA) >= 0.24
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Digest::SHA)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(lib)
+BuildRequires:  perl(MIME::Base64)
 BuildRequires:  perl(Mail::Address)
 BuildRequires:  perl(Mail::AuthenticationResults)
-BuildRequires:  perl(MIME::Base64)
 BuildRequires:  perl(Net::DNS)
 BuildRequires:  perl(Net::DNS::Resolver::Mock)
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::RequiresInternet)
 BuildRequires:  perl(Test::Simple)
-BuildRequires:  perl(warnings)
 BuildRequires:  perl(YAML::XS)
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
+BuildRequires:  perl(base)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{_bindir}/perl -V:version`"; echo $version))
+BuildArch:      noarch
 
 %description
 This module implements the various components of the DKIM and DomainKeys
@@ -45,21 +45,21 @@ Mail::SpamAssassin::Plugin::DKIM plugin.
 # Make the example scripts non-executable
 chmod -x scripts/*.pl
 # Use the real path in the shebang
-perl -pi -e 's|^#!/usr/bin/env perl|#!/usr/bin/perl|' scripts/arcverify.pl
+perl -pi -e 's|^#!%{_bindir}/env perl|#!%{_bindir}/perl|' scripts/arcverify.pl
 # Remove dos-type line endings
 perl -pi -e 's/\r//' doc/qp1.txt
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
-%{make_build} test
+%make_build test
 
 %files
 %doc ChangeLog Changes doc HACKING.DKIM README.md TODO scripts/*.pl
@@ -227,4 +227,3 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 * Tue Jun 17 2008 Kyle VanderBeek <kylev@kylev.com> - 0.32-1
 - Initial version.
-
