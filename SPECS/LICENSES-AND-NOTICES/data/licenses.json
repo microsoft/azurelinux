@@ -1954,6 +1954,7 @@
                 "wsmancli",
                 "wvdial",
                 "x3270",
+                "xapian-core",
                 "Xaw3d",
                 "xcb-proto",
                 "xcb-util",
