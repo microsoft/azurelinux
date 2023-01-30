@@ -28207,6 +28207,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xapian-core",
+          "version": "1.4.20",
+          "downloadUrl": "https://www.oligarchy.co.uk/xapian/1.4.20/xapian-core-1.4.20.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "Xaw3d",
           "version": "1.6.3",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXaw3d-1.6.3.tar.bz2"
