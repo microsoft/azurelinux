@@ -27936,6 +27936,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vorbis-tools",
+          "version": "1.4.2",
+          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/vorbis/vorbis-tools-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vsftpd",
           "version": "3.0.5",
           "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.5.tar.gz"
