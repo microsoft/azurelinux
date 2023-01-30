@@ -28116,6 +28116,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "wordnet",
+          "version": "3.0",
+          "downloadUrl": "https://wordnetcode.princeton.edu/3.0/WordNet-3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "words",
           "version": "3.0",
           "downloadUrl": "https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
