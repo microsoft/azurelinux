@@ -27146,6 +27146,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tix",
+          "version": "8.4.3",
+          "downloadUrl": "https://downloads.sourceforge.net/project/tix/tix/8.4.3/Tix8.4.3-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tk",
           "version": "8.6.10",
           "downloadUrl": "http://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
