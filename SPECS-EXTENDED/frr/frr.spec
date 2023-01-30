@@ -11,7 +11,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.frrouting.org
-Source0:        https://github.com/FRRouting/frr/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/FRRouting/frr/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        %{name}-tmpfiles.conf
 Source2:        %{name}-sysusers.conf
 #Decentralized SELinux policy
@@ -95,7 +95,7 @@ SELinux policy modules for FRR package
 %endif
 
 %prep
-%autosetup -S git
+%autosetup -p1 -n %{name}-%{name}-%{version}
 #Selinux
 mkdir selinux
 cp -p %{SOURCE3} %{SOURCE4} %{SOURCE5} selinux
