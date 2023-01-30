@@ -17,17 +17,17 @@
 #
 
 
+Summary:        Limit the CPU Usage of a Process
 Name:           cpulimit
 Version:        2.8
 Release:        2%{?dist}
-Summary:        Limit the CPU Usage of a Process
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Monitoring
-URL:            http://limitcpu.sourceforge.net/
+URL:            https://limitcpu.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/limitcpu/%{name}-%{version}.tar.gz
-Patch0:         %{name}-2.2-do_not_forget_version.patch
+Patch0:         %{name}-2.8-do_not_forget_version.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  make
@@ -44,8 +44,7 @@ LimitCPU is the direct child of CPUlimit, a creation of Angelo Marletta,
 which can be found at http://cpulimit.sourceforge.net
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 %make_build \
@@ -65,6 +64,7 @@ which can be found at http://cpulimit.sourceforge.net
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
 - Converted the 'Release' tag to the '[number].[distribution]' format.
+- Renamed patch version to 2.8 from 2.2 to match with SPEC version.
 
 * Thu Dec 29 2022 Dirk Müller <dmueller@suse.com>
 - update to 2.8:
