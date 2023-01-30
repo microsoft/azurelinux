@@ -1756,6 +1756,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "clutter",
+          "version": "1.26.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "clutter-gst3",
           "version": "3.0.27",
           "downloadUrl": "https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-3.0.27.tar.xz"
