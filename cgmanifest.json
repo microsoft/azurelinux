@@ -1836,6 +1836,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cogl",
+          "version": "1.22.8",
+          "downloadUrl": "https://download.gnome.org/sources/cogl/1.22/cogl-1.22.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "collectd",
           "version": "5.12.0",
           "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"

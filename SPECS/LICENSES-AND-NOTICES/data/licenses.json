@@ -115,6 +115,7 @@
                 "clutter-gst3",
                 "clutter-gtk",
                 "cmocka",
+                "cogl",
                 "collectd",
                 "colm",
                 "color-filesystem",
