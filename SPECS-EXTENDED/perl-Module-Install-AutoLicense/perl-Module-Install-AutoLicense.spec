@@ -1,31 +1,28 @@
+Summary:        Module::Install extension to automatically generate LICENSE files
 Name:           perl-Module-Install-AutoLicense
 Version:        0.10
 Release:        12%{?dist}
-Summary:        Module::Install extension to automatically generate LICENSE files
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Install-AutoLicense
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-AutoLicense-%{version}.tar.gz#/perl-Module-Install-AutoLicense-%{version}.tar.gz
 Patch0:         Use-Module-Install-AutoLicense-for-tarball.patch
-BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-BuildRequires:  perl(base)
-BuildRequires:  perl(Config)
+BuildRequires:  perl-interpreter
+BuildRequires:  sed
 BuildRequires:  perl(Capture::Tiny) >= 0.05
+BuildRequires:  perl(Config)
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::Remove)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Module::Build)
-BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(File::Remove)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(inc::Module::Install) >= 0.85
-BuildRequires:  perl(Module::Install) >= 0.85
 BuildRequires:  perl(Module::CoreList)
+BuildRequires:  perl(Module::Install) >= 0.85
 BuildRequires:  perl(Module::Install::Base)
 BuildRequires:  perl(Module::Install::Can)
 BuildRequires:  perl(Module::Install::GithubMeta)
@@ -33,16 +30,19 @@ BuildRequires:  perl(Module::Install::Makefile)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
 BuildRequires:  perl(Software::License) >= 0.01
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::More) >= 0.47
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+BuildRequires:  perl(base)
+BuildRequires:  perl(inc::Module::Install) >= 0.85
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
-BuildRequires:  sed
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Module::Install) >= 0.85
 Requires:       perl(Software::License) >= 0.01
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildArch:      noarch
 
 %description
 Module::Install::AutoLicense is a Module::Install extension that generates
@@ -61,9 +61,9 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -delete
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
