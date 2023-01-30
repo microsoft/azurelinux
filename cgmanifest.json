@@ -27796,16 +27796,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "wordnet",
-          "version": "3.0",
-          "downloadUrl": "https://wordnetcode.princeton.edu/3.0/WordNet-3.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "varnish",
           "version": "6.4.0",
           "downloadUrl": "http://varnish-cache.org/_downloads/varnish-6.4.0.tgz"
@@ -28119,6 +28109,16 @@
           "name": "woff2",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/google/woff2/archive/v1.0.2/woff2-1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wordnet",
+          "version": "3.0",
+          "downloadUrl": "https://wordnetcode.princeton.edu/3.0/WordNet-3.0.tar.gz"
         }
       }
     },
