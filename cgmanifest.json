@@ -7490,6 +7490,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jline",
+          "version": "2.14.6",
+          "downloadUrl": "https://github.com/jline/jline2/archive/refs/tags/jline-2.14.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jna",
           "version": "5.10.0",
           "downloadUrl": "https://github.com/java-native-access/jna/archive/5.10.0/jna-5.10.0.tar.gz"
