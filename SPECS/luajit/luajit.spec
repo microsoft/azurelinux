@@ -5,7 +5,7 @@ Name:           luajit
 Version:        2.1.0
 %global apiver %(v=%{version}; echo ${v%.${v#[0-9].[0-9].}})
 %global srcver %{version}%{?rctag:-%{rctag}}
-Release:        0.26%{?rctag:%{rctag}}%{?dist}
+Release:        0.26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ Lua interpreter and can be deployed as a drop-in replacement.
 
 %package devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 This package contains development files for %{name}.
@@ -94,10 +94,11 @@ make check || true
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-0.26beta3
+* Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-0.26
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Verified license.
 - Replaced ldconfig scriptlets with explicit calls to ldconfig.
+- Removing rctag Release tag format should be in [number][dist].
 
 * Sun Aug 21 2022 Andreas Schneider <asn@redhat.com> - 2.1.0-0.25beta3
 - Update to latest luajit v2.1 git version
