@@ -7310,16 +7310,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jline",
-          "version": "2.14.6",
-          "downloadUrl": "https://github.com/jline/jline2/archive/refs/tags/jline-2.14.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "jasper",
           "version": "2.0.32",
           "downloadUrl": "https://github.com/jasper-software/jasper/archive/version-2.0.32.tar.gz"
@@ -7493,6 +7483,16 @@
           "name": "jlex",
           "version": "1.2.6",
           "downloadUrl": "http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jline",
+          "version": "2.14.6",
+          "downloadUrl": "https://github.com/jline/jline2/archive/refs/tags/jline-2.14.6.tar.gz"
         }
       }
     },
