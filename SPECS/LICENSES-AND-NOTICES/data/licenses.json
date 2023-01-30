@@ -2350,6 +2350,7 @@
                 "cglib",
                 "cni",
                 "containerized-data-importer",
+                "cpulimit",
                 "cri-o",
                 "ecj",
                 "fillup",
