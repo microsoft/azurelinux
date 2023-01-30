@@ -1726,16 +1726,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "clutter-gtk",
-          "version": "1.8.4",
-          "downloadUrl": "https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cloud-init",
           "version": "22.2",
           "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.2/+download/cloud-init-22.2.tar.gz"
@@ -1769,6 +1759,16 @@
           "name": "clutter-gst3",
           "version": "3.0.27",
           "downloadUrl": "https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-3.0.27.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clutter-gtk",
+          "version": "1.8.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
         }
       }
     },
