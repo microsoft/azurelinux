@@ -1,48 +1,43 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Object-oriented implementation of Sender Policy Framework
 Name:           perl-Mail-SPF
 Version:        2.9.0
 Release:        23%{?dist}
-Summary:        Object-oriented implementation of Sender Policy Framework
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Mail-SPF
 Source0:        https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v%{version}.tar.gz#/perl-Mail-SPF-v%{version}.tar.gz
 Patch0:         Mail-SPF-v2.8.0-POD.patch
 Patch1:         Mail-SPF-v2.8.0-testsuite.patch
-BuildArch:      noarch
-# Build
 BuildRequires:  coreutils
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-BuildRequires:  perl(Module::Build)
-BuildRequires:  perl(version)
-# Runtime
-BuildRequires:  perl(base)
-BuildRequires:  perl(constant)
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(Error)
+BuildRequires:  perl(Module::Build)
 BuildRequires:  perl(Net::DNS) >= 0.62
+BuildRequires:  perl(Net::DNS::RR)
 BuildRequires:  perl(Net::DNS::Resolver)
+BuildRequires:  perl(Net::DNS::Resolver::Programmable) >= 0.003
 BuildRequires:  perl(NetAddr::IP) >= 4
-BuildRequires:  perl(overload)
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Sys::Hostname)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(URI) >= 1.13
 BuildRequires:  perl(URI::Escape)
-BuildRequires:  perl(utf8)
-BuildRequires:  perl(warnings)
-# Tests only
+BuildRequires:  perl(base)
 BuildRequires:  perl(blib)
-BuildRequires:  perl(Net::DNS::Resolver::Programmable) >= 0.003
-BuildRequires:  perl(Net::DNS::RR)
-BuildRequires:  perl(Test::More)
-# Optional tests only
-BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(constant)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(utf8)
+BuildRequires:  perl(version)
+BuildRequires:  perl(warnings)
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(Net::DNS) >= 0.62
 Requires:       perl(URI) >= 1.13
-
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
+BuildArch:      noarch
 
 %description
 Mail::SPF is an object-oriented implementation of Sender Policy Framework
@@ -64,9 +59,9 @@ perl Build.PL installdirs=vendor
 ./Build install destdir=%{buildroot} create_packlist=0
 %{_fixperms} %{buildroot}/*
 # The spfquery and spfd will use alternatives
-%{__mv} -f %{buildroot}%{_bindir}/spfquery %{buildroot}%{_bindir}/spfquery.%{name}
-%{__mv} -f %{buildroot}%{_sbindir}/spfd %{buildroot}%{_bindir}/spfd.%{name}
-%{__mv} -f %{buildroot}%{_mandir}/man1/spfquery.1 %{buildroot}%{_mandir}/man1/spfquery-%{name}.1
+mv -f %{buildroot}%{_bindir}/spfquery %{buildroot}%{_bindir}/spfquery.%{name}
+mv -f %{buildroot}%{_sbindir}/spfd %{buildroot}%{_bindir}/spfd.%{name}
+mv -f %{buildroot}%{_mandir}/man1/spfquery.1 %{buildroot}%{_mandir}/man1/spfquery-%{name}.1
 touch %{buildroot}%{_bindir}/spfquery %{buildroot}%{_bindir}/spfd %{buildroot}%{_mandir}/man1/spfquery.1.gz
 
 %check
