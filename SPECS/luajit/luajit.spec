@@ -5,7 +5,7 @@ Name:           luajit
 Version:        2.1.0
 %global apiver %(v=%{version}; echo ${v%.${v#[0-9].[0-9].}})
 %global srcver %{version}%{?rctag:-%{rctag}}
-Release:        0.26%{?dist}
+Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,7 +94,7 @@ make check || true
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-0.26
+* Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-26
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Verified license.
 - Replaced ldconfig scriptlets with explicit calls to ldconfig.
