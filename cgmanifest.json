@@ -7100,16 +7100,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jansi",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/fusesource/jansi/archive/refs/tags/jansi-2.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "iptstate",
           "version": "2.2.7",
           "downloadUrl": "https://github.com/jaymzh/iptstate/releases/download/v2.2.7/iptstate-2.2.7.tar.bz2"
@@ -7273,6 +7263,16 @@
           "name": "jakarta-taglibs-standard",
           "version": "1.1.1",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-taglibs-standard-1.1.1-src.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jansi",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/fusesource/jansi/archive/refs/tags/jansi-2.4.0.tar.gz"
         }
       }
     },
