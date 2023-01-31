@@ -6,10 +6,10 @@ Distribution:   Mariner
 Summary: English dictionaries for Aspell
 Name: aspell-%{lang}
 Version: 2019.10.06
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: MIT and BSD
 URL: http://aspell.net/
-Source: ftp://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
+Source: https://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{version}-%{langrelease}.tar.bz2
 Buildrequires: aspell >= 0.60
 Requires: aspell >= 0.60
 Obsoletes: aspell-en-gb <= 0.33.7.1
@@ -37,6 +37,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_libdir}/aspell-0.60/*
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 2019.10.06-5
+- Replace Source URI with a valid HTTPS URI.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2019.10.06-4
 - Remove epoch
 

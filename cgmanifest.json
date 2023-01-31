@@ -606,7 +606,7 @@
         "other": {
           "name": "aspell-en",
           "version": "2019.10.06",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-2019.10.06-0.tar.bz2"
+          "downloadUrl": "https://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-2019.10.06-0.tar.bz2"
         }
       }
     },
