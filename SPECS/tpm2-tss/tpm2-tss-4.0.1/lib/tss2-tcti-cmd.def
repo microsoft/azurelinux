@@ -1,0 +1,4 @@
+LIBRARY tss2-tcti-cmd
+EXPORTS
+    Tss2_Tcti_Info
+    Tss2_Tcti_Cmd_Init

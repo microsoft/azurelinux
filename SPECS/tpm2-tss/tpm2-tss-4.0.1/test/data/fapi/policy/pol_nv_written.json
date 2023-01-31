@@ -1,0 +1,9 @@
+{
+    "description":"Description pol_password",
+    "policy":[
+        {
+            "type": "POLICYNVWRITTEN",
+			"writtenSet": "NO"
+		}
+    ]
+}

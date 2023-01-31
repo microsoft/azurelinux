@@ -1,0 +1,124 @@
+{
+    "type": "TPM2_ALG_ECC",
+    "nameAlg":"TPM2_ALG_SHA384",
+    "srk_template": "system,restricted,decrypt,0x81000001",
+    "srk_description": "Storage root key SRK",
+    "srk_persistent": 0,
+    "ek_template":  "system,restricted,decrypt,user",
+    "ek_description": "Endorsement key EK",
+    "ecc_signing_scheme": {
+        "scheme":"TPM2_ALG_ECDSA",
+        "details":{
+            "hashAlg":"TPM2_ALG_SHA384"
+        },
+    },
+    "sym_mode":"TPM2_ALG_CFB",
+    "sym_parameters": {
+        "algorithm":"TPM2_ALG_AES",
+        "keyBits":"256",
+        "mode":"TPM2_ALG_CFB"
+    },
+    "sym_block_size": 16,
+    "pcr_selection": [
+        { "hash": "TPM2_ALG_SHA1",
+          "pcrSelect": [ ],
+        },
+        { "hash": "TPM2_ALG_SHA256",
+          "pcrSelect": [ 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 ]
+        }
+    ],
+    "curveID": "TPM2_ECC_NIST_P384",
+    "ek_policy": {
+        "description": "Endorsement hierarchy used for policy secret.",
+        "policy":[
+            {
+                "type": "PolicyOR",
+                "branches": [
+                    {
+                        "name": "A",
+                        "description": "",
+                        "policy": [
+                            {
+                                "type":"POLICYSECRET",
+                                "objectName": "4000000b"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "B",
+                        "description": "",
+                        "policy": [
+                            {
+                                "type":"AUTHORIZENV",
+                                "nvPublic": {
+				                    "size": 60,
+				                    "nvPublic": {
+                                        "nvIndex": 29392642,
+                                        "nameAlg":"SHA384",
+                                        "attributes":{
+                                            "PPWRITE":0,
+                                            "OWNERWRITE":0,
+                                            "AUTHWRITE":0,
+                                            "POLICYWRITE":1,
+                                            "POLICY_DELETE":0,
+                                            "WRITELOCKED":0,
+                                            "WRITEALL":1,
+                                            "WRITEDEFINE":0,
+                                            "WRITE_STCLEAR":0,
+                                            "GLOBALLOCK":0,
+                                            "PPREAD":1,
+                                            "OWNERREAD":1,
+                                            "AUTHREAD":1,
+                                            "POLICYREAD":1,
+                                            "NO_DA":1,
+                                            "ORDERLY":0,
+                                            "CLEAR_STCLEAR":0,
+                                            "READLOCKED":0,
+                                            "WRITTEN":1,
+                                            "PLATFORMCREATE":0,
+                                            "READ_STCLEAR":0,
+                                            "TPM2_NT":"ORDINARY"
+                                        },
+                                        "authPolicy":"8bbf2266537c171cb56e403c4dc1d4b64f432611dc386e6f532050c3278c930e143e8bb1133824ccb431053871c6db53",
+                                        "dataSize":50
+				                    }
+	                            }
+
+                            }
+		                ]
+                    }
+                ]
+            }
+        ]
+    },
+    "sh_policy": {
+        "description":"Description pol_16_0",
+        "policy":[
+            {
+                "type":"POLICYPCR",
+                "pcrs":[
+                    {
+                        "pcr":16,
+                        "hashAlg":"TPM2_ALG_SHA256",
+                        "digest":"00000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                ]
+            }
+        ]
+    },
+    "eh_policy": {
+        "description":"Description pol_16_0",
+        "policy":[
+            {
+                "type":"POLICYPCR",
+                "pcrs":[
+                    {
+                        "pcr":16,
+                        "hashAlg":"TPM2_ALG_SHA256",
+                        "digest":"00000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                ]
+            }
+        ]
+    }
+}

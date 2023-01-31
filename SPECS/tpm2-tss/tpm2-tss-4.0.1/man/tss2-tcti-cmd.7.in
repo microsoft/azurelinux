@@ -1,0 +1,31 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TCTI-CMD 7 "MAY 2020" Intel "TPM2 Software Stack"
+.SH NAME
+tcti-cmd \- TPM2 Sub-process Command TCTI library
+.SH SYNOPSIS
+A TPM Command Transmission Interface (TCTI) module for interaction with a sub-process.
+.SH DESCRIPTION
+tcti-cmd is a library that abstracts the details of direct communication
+with the interface and protocol exposed by a sub-process that can receive and transmit
+raw TPM2 command and response buffers. The interface exposed by this library is defined
+in the \*(lqTSS System Level API and TPM Command Transmission Interface
+Specification\*(rq specification.
+.SH EXAMPLES
+.sp
+For example, if you wanted to use the tpm2_send(1) command as the sub-process to
+send data to and from the TPM, one could do so like this:
+.nf
+tpm2_getrandom -T "cmd:tpm2_send -s" --hex 4
+.fi
+.sp
+A more useful example would be connecting to a remote machine using ssh and
+interacting with the remote machine's TPM as if it were local. This uses
+tpm2_send(1) on a remote machine and uses ssh as the sub-process to create
+the tunnel to the remote machine. If encrypted sessions are used, the
+remote machine is blinded to the TPM data and cannot interpose on that
+traffic.
+.nf
+tpm2_getrandom -T "cmd:ssh remotehost tpm2_send" -s --hex 4
+.fi

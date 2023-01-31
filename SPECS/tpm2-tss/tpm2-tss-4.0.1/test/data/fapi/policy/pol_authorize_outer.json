@@ -1,0 +1,9 @@
+{
+    "description":"Description pol_authorize",
+    "policy":[
+        {
+            "type": "POLICYAUTHORIZE",
+			"keyPath": "/HS/SRK/myPolicySignKeyOuter",
+		}
+    ]
+}

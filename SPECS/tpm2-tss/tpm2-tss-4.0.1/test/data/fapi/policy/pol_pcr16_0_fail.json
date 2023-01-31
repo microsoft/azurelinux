@@ -1,0 +1,15 @@
+{
+    "description":"Description pol_16_0",
+    "policy":[
+        {
+            "type":"POLICYPCR",
+            "pcrs":[
+                {
+                    "pcr":16,
+                    "hashAlg":"TPM2_ALG_SHA256",
+                    "digest":"0000000000000000000000000000000000000000000000000000000000000001"
+                }
+            ]
+        }
+    ]
+}

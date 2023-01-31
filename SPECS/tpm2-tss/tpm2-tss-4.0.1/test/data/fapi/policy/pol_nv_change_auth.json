@@ -1,0 +1,12 @@
+{
+    "description":"Description pol_auth_value",
+    "policy":[
+        {
+            "type": "POLICYAUTHVALUE",
+		},
+        {
+            "type": "POLICYCOMMANDCODE",
+            "code": 315
+	    }
+    ]
+}

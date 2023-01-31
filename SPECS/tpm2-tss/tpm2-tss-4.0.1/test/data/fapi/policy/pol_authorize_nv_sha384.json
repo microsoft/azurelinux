@@ -1,0 +1,9 @@
+{
+    "description":"Description pol_authorize_nv",
+    "policy":[
+        {
+            "type": "POLICYAUTHORIZENV",
+			"nvPath": "/nv/Owner/myNV",
+		}
+  ]
+}

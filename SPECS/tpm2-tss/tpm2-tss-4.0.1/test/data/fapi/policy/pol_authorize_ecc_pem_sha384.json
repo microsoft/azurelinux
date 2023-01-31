@@ -1,0 +1,15 @@
+{
+    "description":"Description pol_authorize",
+    "policy":[
+        {
+            "type": "POLICYAUTHORIZE",
+            "policyRef": [ 1, 2, 3, 4, 5 ],
+            "keyPEMhashAlg": "SHA384",
+			"keyPEM": "-----BEGIN PUBLIC KEY-----
+MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEPnzYHCTqHAJnCcLRQC4bL/r2t9P1bJJE
+27tHWVxxRtdUNPQceF9sFPE1AgafveTyLrf/V2TwYqpOgMw3hseFlpXAgQl0klqN
+ZPX3zQ+iOfcHhZ7YPjSXzBghWF67oxat
+-----END PUBLIC KEY-----"
+		}
+    ]
+}

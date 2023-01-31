@@ -1,0 +1,14 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TCTI-LIBTPMS 7 "FEBRUARY 2021" "TPM2 Software Stack"
+.SH NAME
+tcti-libtpms \- TPM simulator library TCTI library
+.SH SYNOPSIS
+A TPM Command Transmission Interface (TCTI) module for interaction with the
+TPM2 simulator library libtpms.
+.SH DESCRIPTION
+tcti-libtpms is a library that abstracts the details of the API exposed
+by the libtpms library implementing the TPM2 reference implementation. The
+interface exposed by this library is defined in the \*(lqTSS System Level API
+and TPM Command Transmission Interface Specification\*(rq specification.

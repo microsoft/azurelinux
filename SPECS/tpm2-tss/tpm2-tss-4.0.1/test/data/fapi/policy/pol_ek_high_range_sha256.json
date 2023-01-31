@@ -1,0 +1,62 @@
+{
+    "description":"Policy for EK",
+    "policy":[
+        {
+            "type":"POLICYOR",
+            "branches":[
+                {
+                    "name":"PolicySecret",
+                    "description":"Policy Secret for EK",
+                    "policy":[
+                        {
+                            "type":"POLICYSECRET",
+                            "objectName": "4000000b",
+                        }
+                    ],
+                },
+                {
+                    "name":"PolicyNV",
+                    "description":"Policy NV for EK",
+                    "policy":[
+                        {
+                            "type": "POLICYAUTHORIZENV",
+                            "nvPublic": {
+                                "size":0,
+                                "nvPublic":{
+                                    "nvIndex":"0x01c07f01",
+                                    "nameAlg":"SHA256",
+                                    "attributes":{
+                                        "PPWRITE":0,
+                                        "OWNERWRITE":0,
+                                        "AUTHWRITE":0,
+                                        "POLICYWRITE":1,
+                                        "POLICY_DELETE":0,
+                                        "WRITELOCKED":0,
+                                        "WRITEALL":1,
+                                        "WRITEDEFINE":0,
+                                        "WRITE_STCLEAR":0,
+                                        "GLOBALLOCK":0,
+                                        "PPREAD":1,
+                                        "OWNERREAD":1,
+                                        "AUTHREAD":1,
+                                        "POLICYREAD":1,
+                                        "NO_DA":1,
+                                        "ORDERLY":0,
+                                        "CLEAR_STCLEAR":0,
+                                        "READLOCKED":0,
+                                        "WRITTEN":1,
+                                        "PLATFORMCREATE":0,
+                                        "READ_STCLEAR":0,
+                                        "TPM2_NT":"ORDINARY"
+                                    },
+                                    "authPolicy":"837197674484b3f81a90cc8d46a5d724fd52d76e06520b64f2a1da1b331469aa",
+                                    "dataSize":34
+                                }
+                            }
+		                }
+                    ],
+                }
+            ]
+        }
+    ]
+}

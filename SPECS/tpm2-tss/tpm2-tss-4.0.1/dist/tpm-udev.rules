@@ -1,0 +1,4 @@
+# tpm devices can only be accessed by the tss user but the tss
+# group members can access tpmrm devices
+KERNEL=="tpm[0-9]*", TAG+="systemd", MODE="0660", OWNER="tss"
+KERNEL=="tpmrm[0-9]*", TAG+="systemd", MODE="0660", GROUP="tss"

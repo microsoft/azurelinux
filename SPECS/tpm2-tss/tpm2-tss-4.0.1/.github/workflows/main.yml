@@ -1,0 +1,168 @@
+name: CI
+on:
+  [push, pull_request]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    strategy:
+      matrix:
+        docker_image: [ubuntu-18.04, ubuntu-20.04, fedora-32, opensuse-leap, ubuntu-22.04, alpine-3.15]
+        compiler: [gcc, clang]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          DOCKER_IMAGE: ${{ matrix.docker_image }}
+          CC: ${{ matrix.compiler }}
+          BASE_REF: ${{ github.base_ref }}
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  scanbuild:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          CC: clang
+          DOCKER_IMAGE: fedora-32
+          SCANBUILD: yes
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  test-tcti-config:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          CC: gcc
+          DOCKER_IMAGE: fedora-32
+          TEST_TCTI_CONFIG: true
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  test-mbedtls:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    strategy:
+      matrix:
+        docker_image: [ubuntu-20.04, ubuntu-22.04-mbedtls-3.1]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          CC: gcc
+          DOCKER_IMAGE: ${{ matrix.docker_image }}
+          WITH_CRYPTO: mbed
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  test-no-crypto-build:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          CC: gcc
+          DOCKER_IMAGE: ubuntu-20.04
+          WITH_CRYPTO: none
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  test-coverage:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          CC: gcc
+          DOCKER_IMAGE: ubuntu-18.04
+          ENABLE_COVERAGE: true
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  test-fuzz:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Action
+        uses:
+          tpm2-software/ci/runCI@main
+        with:
+          DOCKER_IMAGE: fedora-32
+          GEN_FUZZ: 1
+          CXX: clang++
+          CC: clang
+          PROJECT_NAME: ${{ github.event.repository.name }}
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true
+  coverity-test:
+    runs-on: ubuntu-latest
+    if: contains(github.ref, 'coverity_scan')
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Launch Coverity Action
+        uses:
+          tpm2-software/ci/coverityScan@main
+        with:
+          PROJECT_NAME: ${{ github.event.repository.name }}
+          REPO_BRANCH: ${{ github.ref }}
+          REPO_NAME: ${{ github.repository }}
+          ENABLE_COVERITY: true
+          DOCKER_IMAGE: ubuntu-18.04
+          CC: gcc
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+          COVERITY_SUBMISSION_EMAIL: tadeusz.struk@intel.com
+      - name: failure
+        if: ${{ failure() }}
+        run: cat $(find ../ -name test-suite.log) || true

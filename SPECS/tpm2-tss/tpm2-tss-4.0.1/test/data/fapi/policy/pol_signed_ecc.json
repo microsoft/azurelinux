@@ -1,0 +1,10 @@
+{
+    "description":"Description pol_signed",
+    "policy":[
+        {
+            "type": "POLICYSIGNED",
+            "keyPEM": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoJTa3zftdAzHC96IjpqQ/dnLm+p7\npEiLMi03Jd0oP0aYnnXFjolzIB/dBZ/t+BLh0PwLM5aAM/jugeLkHgpIyQ==\n-----END PUBLIC KEY-----\n",
+            "keyPEMhashAlg": "SHA256"
+        }
+    ]
+}

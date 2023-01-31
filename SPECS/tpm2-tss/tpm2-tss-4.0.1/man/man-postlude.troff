@@ -1,0 +1,16 @@
+.SH AUTHOR
+TPM2 Software Project <https://github.com/tpm2-software/tpm2-tss>
+.SH "SEE ALSO"
+.BR Tss2_Tcti_Device_Init (3),
+.BR Tss2_Tcti_Socket_Init (3),
+.BR Tss2_TctiLdr_Initialize (3),
+.BR Tss2_TctiLdr_Finalize (3),
+.BR tcti-device (7),
+.BR tcti-socket (7),
+.BR tcti-tabrmd (7),
+.BR tpm2-abrmd (8)
+.SH COLOPHON
+This page is part of release @VERSION@ of Open Source implementation of the
+TCG TPM2 Software Stack (TSS2). A description of the project, information
+about reporting bugs, and the latest version of this page can be found at
+\%https://github.com/tpm2-software/tpm2-tss/.

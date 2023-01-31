@@ -1,0 +1,7 @@
+#Type   Path                                           Mode User Group Age         Argument
+d       @localstatedir@/lib/tpm2-tss/system/keystore   2775 tss  tss   -           -
+a+      @localstatedir@/lib/tpm2-tss/system/keystore   -    -    -     -           default:group:tss:rwx
+d       @runstatedir@/tpm2-tss/eventlog                2775 tss  tss   -           -
+a+      @runstatedir@/tpm2-tss/eventlog                -    -    -     -           default:group:tss:rwx
+z	/sys/kernel/security/tpm[0-9]/binary_bios_measurements	0440  root tss	-	    -
+z	/sys/kernel/security/ima/binary_runtime_measurements	0440  root tss	-	    -

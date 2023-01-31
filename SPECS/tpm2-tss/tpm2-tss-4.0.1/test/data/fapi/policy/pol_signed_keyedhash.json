@@ -1,0 +1,11 @@
+{
+    "description":"Description pol_signed",
+    "policy":[
+        {
+            "type": "POLICYSIGNED",
+            "publicKeyHint": "Test key hint",
+            "keyPath": "/SRK/sym_sign_key",
+            "keyPEMhashAlg": "SHA256"
+        }
+    ]
+}

@@ -1,0 +1,40 @@
+{
+    "type": "TPM2_ALG_ECC",
+    "nameAlg":"TPM2_ALG_SHA256",
+    "srk_template": "system,restricted,decrypt,0x81000001",
+    "srk_description": "Storage root key SRK",
+    "srk_persistent": 0,
+    "ek_template":  "system,restricted,decrypt,0x81000001",
+    "ek_description": "Endorsement key EK",
+    "ecc_signing_scheme": {
+        "scheme":"TPM2_ALG_ECDSA",
+        "details":{
+            "hashAlg":"TPM2_ALG_SHA256"
+        },
+    },
+    "sym_mode":"TPM2_ALG_CFB",
+    "sym_parameters": {
+        "algorithm":"TPM2_ALG_AES",
+        "keyBits":"128",
+        "mode":"TPM2_ALG_CFB"
+    },
+    "sym_block_size": 16,
+    "pcr_selection": [
+       { "hash": "TPM2_ALG_SHA1",
+         "pcrSelect": [ ],
+       },
+       { "hash": "TPM2_ALG_SHA256",
+         "pcrSelect": [ 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 ]
+       }
+    ],
+    "curveID": "TPM2_ECC_NIST_P256",
+    "ek_policy": {
+        "description": "Endorsement hierarchy used for policy secret.",
+        "policy":[
+            {
+                "type":"POLICYSECRET",
+                "objectName": "4000000b",
+            }
+        ]
+    }
+}

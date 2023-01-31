@@ -1,0 +1,37 @@
+{
+    "description":"Policy PCR",
+    "policyDigests":[
+        {
+            "hashAlg":"sha384",
+            "digest":"c1923346b6d44a154b58b57b4327ee70c29ac536f9209d94880de6834f370587846a2834e3e88af61efd8679fcccedd5"
+        }
+    ],
+    "policyAuthorizations":[ {
+        "type": "pem",
+        "policyRef": [ 1, 2, 3, 4, 5 ],
+        "keyPEMhashAlg": "sha384",
+        "key": "-----BEGIN PUBLIC KEY-----
+MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEPnzYHCTqHAJnCcLRQC4bL/r2t9P1bJJE
+27tHWVxxRtdUNPQceF9sFPE1AgafveTyLrf/V2TwYqpOgMw3hseFlpXAgQl0klqN
+ZPX3zQ+iOfcHhZ7YPjSXzBghWF67oxat
+-----END PUBLIC KEY-----",
+        "signature": "306402304425034749d3eb9a89d1dbcfa4b1bb82be991c3eef7e97dd6ab42db676b1a866c0f1f1b75b3a0ac921518be251175d8f0230576a6919bffe62c27c8db9ea170ee83ffee1ffb634f7c63e2cc7393e0f80b45889c817149b0716df8f34216848d5d222" } ],
+    "policy":[
+    {
+      "type":"POLICYPCR",
+      "policyDigests":[
+        {
+          "hashAlg":"sha384",
+          "digest":"c1923346b6d44a154b58b57b4327ee70c29ac536f9209d94880de6834f370587846a2834e3e88af61efd8679fcccedd5"
+        }
+      ],
+      "pcrs":[
+        {
+          "pcr":16,
+          "hashAlg":"sha256",
+          "digest":"0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    }
+  ]
+}

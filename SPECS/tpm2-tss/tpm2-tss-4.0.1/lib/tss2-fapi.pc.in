@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: tss2-fapi
+Description: TPM2 Feature API library.
+URL: https://github.com/tpm2-software/tpm2-tss
+Version: @VERSION@
+Requires.private: tss2-mu tss2-esys tss2-tctildr libcurl libcrypto json-c uuid
+Cflags: -I${includedir} -I${includedir}/tss2
+Libs: -ltss2-fapi -L${libdir}

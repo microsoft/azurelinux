@@ -1,6 +1,6 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-tss
-Version:        2.4.6
+Version:        4.0.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation

@@ -1,0 +1,11 @@
+{
+    "description":"Description pol_nv",
+    "policy":[
+        {
+            "type": "POLICYNV",
+            "nvPath": "/nv/Owner/myNV",
+            "operandB": "0000000000000000",
+            "operation": "NEQ"
+        }
+    ]
+}

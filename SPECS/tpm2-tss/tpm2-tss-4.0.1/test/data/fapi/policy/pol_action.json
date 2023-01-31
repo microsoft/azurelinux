@@ -1,0 +1,9 @@
+{
+    "description":"The description",
+    "policy":[
+        {
+            "type": "POLICYACTION",
+			"action": "myaction"
+		}
+    ]
+}

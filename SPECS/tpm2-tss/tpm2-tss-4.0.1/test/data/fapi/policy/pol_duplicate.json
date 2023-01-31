@@ -1,0 +1,9 @@
+{
+    "description":"Description pol_duplicate",
+    "policy":[
+        {
+             "type": "POLICYDUPLICATIONSELECT",
+			"newParentPath": "ext/myNewParent",
+		}
+    ]
+}

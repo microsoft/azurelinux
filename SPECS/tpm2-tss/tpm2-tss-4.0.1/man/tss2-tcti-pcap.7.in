@@ -1,0 +1,19 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TCTI-PCAP 8 "JULY 2020" "TPM2 Software Stack"
+.SH NAME
+tcti-pcap \- Debugging module with pcapng output
+.SH SYNOPSIS
+A TPM Command Transmission Interface (TCTI) module for logging the TPM
+commands transmitted and received in pcapng format.
+.SH DESCRIPTION
+tcti-pcap is a library that logs TPM commands and responses and forwards them to
+another TCTI module. The child TCTI module will be loaded by the tss2-tctildr
+library. The config string passed to tcti-pcap specifies the child TCTI module
+to be loaded. For instance, passing "pcap:device:/dev/tpm0" to tss2-tctildr will
+result in tcti-pcap being loaded which will forward the TPM commands to the
+tcti-device module.
+The pcapng data is stored in a file tpm2_log.pcap. This path can be altered
+using the environment variable TCTI_PCAP_FILE. The strings "stdout"/"-" and
+"stderr" are valid values.

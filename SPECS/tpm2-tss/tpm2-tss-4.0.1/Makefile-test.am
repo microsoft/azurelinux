@@ -1,0 +1,2554 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2015 - 2018 Intel Corporation
+# Copyright (c) 2018 Fraunhofer SIT sponsored by Infineon Technologies AG
+# All rights reserved.
+
+TESTS_CFLAGS = $(AM_CFLAGS) $(CRYPTO_CFLAGS) -I$(srcdir)/include -I$(srcdir)/src/tss2-mu \
+    -I$(srcdir)/src/tss2-sys -I$(srcdir)/src/tss2-esys -I$(srcdir)/src/tss2-fapi \
+    -I$(srcdir)/test/data -Wno-unused-parameter -Wno-missing-field-initializers \
+    -DTOP_SOURCEDIR"=\"$(top_srcdir)\""
+TESTS_LDADD = $(check_LTLIBRARIES) $(lib_LTLIBRARIES) \
+    $(CRYPTO_LIBS) $(libutil)
+
+check_LTLIBRARIES =
+# test harness configuration
+TEST_EXTENSIONS = .int .fint
+INT_LOG_COMPILER = $(srcdir)/script/int-log-compiler.sh
+FINT_LOG_COMPILER = $(srcdir)/script/fint-log-compiler.sh
+INT_LOG_FLAGS = $(INTEGRATION_TCTI) $(INTEGRATION_ARGS)
+FINT_LOG_FLAGS = $(INTEGRATION_TCTI) $(INTEGRATION_ARGS)
+EXTRA_DIST += $(srcdir)/script/int-log-compiler.sh \
+              $(srcdir)/script/fint-log-compiler.sh \
+              $(srcdir)/script/int-log-compiler-common.sh \
+              $(srcdir)/script/ekca/create_ca.sh \
+              $(srcdir)/script/ekca/ek.cnf \
+              $(srcdir)/script/ekca/intermed-ca.cnf \
+              $(srcdir)/script/ekca/root-ca.cnf
+AM_TESTS_ENVIRONMENT = PATH="$(PATH)"
+
+check-programs: $(check_PROGRAMS)
+
+check_PROGRAMS = $(TESTS_UNIT) $(TESTS_INTEGRATION)
+TESTS = $(TESTS_UNIT) $(TESTS_INTEGRATION)
+
+if UNIT
+check_PROGRAMS += test/helper/tpm_cmd_tcti_dummy
+test_helper_tpm_cmd_tcti_dummy_SOURCES = \
+    src/tss2-tcti/tcti-common.c \
+    test/helper/tpm_cmd_tcti_dummy.c
+
+test_helper_tpm_cmd_tcti_dummy_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration \
+    -I$(srcdir)/src/tss2-tcti -I$(srcdir)/test/unit
+test_helper_tpm_cmd_tcti_dummy_LDFLAGS = $(TESTS_LDFLAGS)
+test_helper_tpm_cmd_tcti_dummy_LDADD = $(TESTS_LDADD)
+endif #UNIT
+
+if ENABLE_INTEGRATION
+check_PROGRAMS += test/helper/tpm_startup
+test_helper_tpm_startup_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
+test_helper_tpm_startup_LDFLAGS = $(TESTS_LDFLAGS)
+test_helper_tpm_startup_LDADD = $(TESTS_LDADD)
+
+check_PROGRAMS += test/helper/tpm_transientempty
+test_helper_tpm_transientempty_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
+test_helper_tpm_transientempty_LDFLAGS = $(TESTS_LDFLAGS)
+test_helper_tpm_transientempty_LDADD = $(TESTS_LDADD)
+
+check_PROGRAMS += test/helper/tpm_dumpstate
+test_helper_tpm_dumpstate_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
+test_helper_tpm_dumpstate_LDFLAGS = $(TESTS_LDFLAGS)
+test_helper_tpm_dumpstate_LDADD = $(TESTS_LDADD)
+
+check_PROGRAMS += test/helper/tpm_getek
+test_helper_tpm_getek_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
+test_helper_tpm_getek_LDFLAGS = $(TESTS_LDFLAGS) -lcrypto
+test_helper_tpm_getek_LDADD = $(TESTS_LDADD)
+
+check_PROGRAMS += test/helper/tpm_getek_ecc
+test_helper_tpm_getek_ecc_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
+test_helper_tpm_getek_ecc_LDFLAGS = $(TESTS_LDFLAGS) -lcrypto
+test_helper_tpm_getek_ecc_LDADD = $(TESTS_LDADD)
+
+
+check_PROGRAMS += test/helper/tpm_writeekcert
+test_helper_tpm_writeekcert_CFLAGS = $(TESTS_CFLAGS) -I$(srcdir)/test/integration
+test_helper_tpm_writeekcert_LDFLAGS = $(TESTS_LDFLAGS)
+test_helper_tpm_writeekcert_LDADD = $(TESTS_LDADD)
+endif #ENABLE_INTEGRATION
+
+### Rules to enerate binary test files for FAPI from b64 files.
+
+if FAPI
+FAPI_TEST_BINS = \
+    test/data/fapi/eventlog/binary_measurements_nuc.bin \
+    test/data/fapi/eventlog/sml-ima-ng-sha1-invalidated.bin \
+    test/data/fapi/eventlog/binary_measurements_pc_client.bin \
+    test/data/fapi/eventlog/sml-ima-sha1.bin \
+    test/data/fapi/eventlog/event.bin \
+    test/data/fapi/eventlog/sml-ima-sha1-invalidated.bin \
+    test/data/fapi/eventlog/event-uefiaction.bin \
+    test/data/fapi/eventlog/sml-ima-sig-sha256.bin \
+    test/data/fapi/eventlog/event-uefiservices.bin \
+    test/data/fapi/eventlog/sml-ima-sig-sha256-invalidated.bin \
+    test/data/fapi/eventlog/event-uefivar.bin \
+    test/data/fapi/eventlog/specid-vendordata.bin \
+    test/data/fapi/eventlog/sml-ima-ng-sha1.bin
+
+CLEANFILES += $(FAPI_TEST_BINS)
+endif #FAPI
+
+define make_bin
+    mkdir -p test/data/fapi/eventlog
+    openssl enc -d -base64 -in $2 -out $1
+endef
+
+$(FAPI_TEST_BINS) : %.bin : %.b64
+	$(AM_V_GEN)$(call make_bin,$@,$<)
+
+if UNIT
+TESTS_UNIT  = \
+    test/unit/CommonPreparePrologue \
+    test/unit/CopyCommandHeader \
+    test/unit/io \
+    test/unit/key-value-parse \
+    test/unit/log \
+    test/unit/tctildr \
+    test/unit/tctildr-dl \
+    test/unit/tctildr-nodl \
+    test/unit/tctildr-tcti \
+    test/unit/tctildr-getinfo \
+    test/unit/dlopen-fail \
+    test/unit/dlopen-UINT8-marshal \
+    test/unit/dlopen-TPM2B-marshal \
+    test/unit/dlopen-TPMU-marshal \
+    test/unit/UINT8-marshal \
+    test/unit/UINT16-marshal \
+    test/unit/UINT32-marshal \
+    test/unit/UINT64-marshal \
+    test/unit/TPMA-marshal \
+    test/unit/TPM2B-marshal \
+    test/unit/TPMS-marshal \
+    test/unit/TPML-marshal \
+    test/unit/TPMT-marshal \
+    test/unit/TPMU-marshal \
+    test/unit/sys-execute \
+    test/unit/dlopen_tss2_rc \
+    test/unit/tss2_rc
+if ENABLE_TCTI_MSSIM
+TESTS_UNIT += test/unit/tcti-mssim
+endif
+if ENABLE_TCTI_SWTPM
+TESTS_UNIT += test/unit/tcti-swtpm
+endif
+if ENABLE_TCTI_LIBTPMS
+TESTS_UNIT += test/unit/tcti-libtpms
+endif
+if ENABLE_TCTI_DEVICE
+TESTS_UNIT += test/unit/tcti-device
+endif
+if ENABLE_TCTI_PCAP
+TESTS_UNIT += test/unit/tcti-pcap
+endif
+if ENABLE_TCTI_CMD
+TESTS_UNIT += test/unit/tcti-cmd
+endif
+if ENABLE_TCTI_SPI_HELPER
+TESTS_UNIT += test/unit/tcti-spi-helper
+endif
+if ESYS
+TESTS_UNIT += \
+    test/unit/esys-context-null \
+    test/unit/esys-resubmissions \
+    test/unit/esys-sequence-finish \
+    test/unit/esys-tcti-rcs \
+    test/unit/esys-tpm-rcs \
+    test/unit/esys-getpollhandles \
+    test/unit/esys-ac-getcapability \
+    test/unit/esys-ac-send \
+    test/unit/esys-policy-ac-sendselect \
+    test/unit/esys-nulltcti \
+    test/unit/esys-crypto
+if VENDOR
+TESTS_UNIT += test/unit/esys-vendor
+endif # VENDOR
+
+endif ESYS
+if FAPI
+TESTS_CFLAGS +=  -DTOP_SOURCEDIR"=\"$(top_srcdir)\""
+TESTS_UNIT += \
+    test/unit/fapi-json \
+    test/unit/fapi-helpers \
+    test/unit/fapi-io \
+    test/unit/fapi-profiles \
+    test/unit/fapi-config \
+    test/unit/fapi-get-intl-cert \
+    test/unit/fapi-eventlog \
+    test/unit/fapi-ima-eventlog \
+    test/unit/fapi-check-ima-log
+
+endif FAPI
+endif #UNIT
+
+if ENABLE_INTEGRATION
+check_LTLIBRARIES += test/integration/libtest_utils.la
+
+TESTS_INTEGRATION =
+if !TESTDEVICE
+TESTS_INTEGRATION += \
+    test/integration/sys-asymmetric-encrypt-decrypt.int \
+    test/integration/sys-nv-policy-locality.int \
+    test/integration/sys-nv-readwrite.int \
+    test/integration/sys-hmac-auth.int \
+    test/integration/sys-primary-rsa-2K-aes128cfb.int \
+    test/integration/sys-create-keyedhash-sha1-hmac.int \
+    test/integration/sys-encrypt-decrypt.int \
+    test/integration/sys-encrypt-decrypt-2.int \
+    test/integration/sys-evict-ctrl.int \
+    test/integration/sys-get-random.int \
+    test/integration/sys-stir-random.int \
+    test/integration/sys-hierarchy-change-auth.int \
+    test/integration/sys-abi-version.int \
+    test/integration/sys-pcr-extension.int \
+    test/integration/sys-self-test.int \
+    test/integration/sys-start-auth-session.int \
+    test/integration/sys-sys-initialize.int \
+    test/integration/sys-tpm-properties.int \
+    test/integration/sys-system-api.int \
+    test/integration/sys-policy-template.int \
+    test/integration/sys-create-loaded.int \
+    test/integration/sys-policy-authorizeNV.int \
+    test/integration/sys-param-encrypt-decrypt.int \
+    test/integration/sys-read-clock.int \
+    test/integration/sys-mac.int \
+    test/integration/sys-hmac.int \
+    test/tpmclient/tpmclient.int
+endif # !TESTDEVICE
+
+if ESYS
+ESYS_TESTS_INTEGRATION_DESTRUCTIVE = \
+    test/integration/esys-change-eps.int \
+    test/integration/esys-clear.int \
+    test/integration/esys-tpm-clear-auth.int \
+    test/integration/esys-clear-session.int \
+    test/integration/esys-field-upgrade.int \
+    test/integration/esys-firmware-read.int \
+    test/integration/esys-lock.int \
+    test/integration/esys-pcr-auth-value.int \
+    test/integration/esys-set-algorithm-set.int
+
+ESYS_TESTS_INTEGRATION_MANDATORY = \
+    test/integration/dlopen-esys-get-random.int \
+    test/integration/esys-act-set-timeout.int \
+    test/integration/esys-certify-creation.int \
+    test/integration/esys-certifyX509.int \
+    test/integration/esys-certify.int \
+    test/integration/esys-clear-control.int \
+    test/integration/esys-clockset.int \
+    test/integration/esys-clockset-audit.int \
+    test/integration/esys-commit.int \
+    test/integration/esys-create-fail.int \
+    test/integration/esys-create-password-auth.int \
+    test/integration/esys-create-policy-auth.int \
+    test/integration/esys-create-primary-ecc-hmac.int \
+    test/integration/esys-create-primary-hmac.int \
+    test/integration/esys-create-session-auth-bound.int \
+    test/integration/esys-create-session-null-bind-tpm-key.int \
+    test/integration/esys-create-session-null-bind-no-tpm-key.int \
+    test/integration/esys-create-session-auth-ecc.int \
+    test/integration/esys-create-session-auth.int \
+    test/integration/esys-create-session-auth-long.int \
+    test/integration/esys-create-session-auth-xor.int \
+    test/integration/esys-crypto.int \
+    test/integration/esys-ecc-parameters.int \
+    test/integration/esys-ecdh-zgen.int \
+    test/integration/esys-event-sequence-complete.int \
+    test/integration/esys-evict-control-serialization.int \
+    test/integration/esys-get-capability.int \
+    test/integration/esys-get-capability-act.int \
+    test/integration/esys-get-random.int \
+    test/integration/esys-hash.int \
+    test/integration/esys-hashsequencestart.int \
+    test/integration/esys-hashsequencestart-session.int \
+    test/integration/esys-hierarchychangeauth.int \
+    test/integration/esys-hmac.int \
+    test/integration/esys-mac.int \
+    test/integration/esys-hmacsequencestart.int \
+    test/integration/esys-hmacsequencestart-session.int \
+    test/integration/esys-import.int \
+    test/integration/esys-make-credential.int \
+    test/integration/esys-make-credential-session.int \
+    test/integration/esys-nv-ram-counter.int \
+    test/integration/esys-nv-ram-counter-session.int \
+    test/integration/esys-nv-ram-counter-session-long-auth.int \
+    test/integration/esys-nv-ram-extend-index.int \
+    test/integration/esys-nv-ram-extend-index-session.int \
+    test/integration/esys-nv-ram-ordinary-index-rlock.int \
+    test/integration/esys-nv-ram-ordinary-index-rlock-session.int \
+    test/integration/esys-nv-ram-ordinary-index-wlock.int \
+    test/integration/esys-nv-ram-ordinary-index-wlock-session.int \
+    test/integration/esys-nv-ram-set-bits.int \
+    test/integration/esys-nv-ram-set-bits-session.int \
+    test/integration/esys-object-changeauth.int \
+    test/integration/esys-policy-authorize.int \
+    test/integration/esys-policy-nv-changeauth.int \
+    test/integration/esys-policy-nv-undefine-special.int \
+    test/integration/esys-policy-password.int \
+    test/integration/esys-policy-regression.int \
+    test/integration/esys-quote.int \
+    test/integration/esys-rsa-encrypt-decrypt.int \
+    test/integration/esys-save-and-load-context.int \
+    test/integration/esys-session-attributes.int \
+    test/integration/esys-stir-random.int \
+    test/integration/esys-testparms.int \
+    test/integration/esys-tpm-tests.int \
+    test/integration/esys-tr-fromTpmPublic-key.int \
+    test/integration/esys-tr-fromTpmPublic-nv.int \
+    test/integration/esys-tr-fromTpmPublic-session.int \
+    test/integration/esys-tr-getName-hierarchy.int \
+    test/integration/esys-tr-getName.int \
+    test/integration/esys-tr-getTpmHandle-key.int \
+    test/integration/esys-tr-getTpmHandle-nv.int \
+    test/integration/esys-unseal-password-auth.int \
+    test/integration/esys-verify-signature.int \
+    test/integration/esys-ecdh-keygen.int \
+    test/integration/esys-policy-ticket.int
+
+ESYS_TESTS_INTEGRATION_OPTIONAL = \
+    test/integration/esys-audit.int \
+    test/integration/esys-createloaded.int \
+    test/integration/esys-createloaded-session.int \
+    test/integration/esys-duplicate.int \
+    test/integration/esys-encrypt-decrypt.int \
+    test/integration/esys-encrypt-decrypt2.int \
+    test/integration/esys-get-time.int \
+    test/integration/esys-hierarchy-control.int \
+    test/integration/esys-nv-certify.int \
+    test/integration/esys-pcr-basic.int \
+    test/integration/esys-policy-authorize-nv-opt.int \
+    test/integration/esys-policy-physical-presence-opt.int \
+    test/integration/esys-policy-template-opt.int \
+    test/integration/esys-pp-commands.int \
+    test/integration/esys-zgen-2phase.int \
+    test/integration/esys-auto-session-flags.int
+
+if TESTDEVICE
+
+if DEVICEMANDATORY
+TESTS_INTEGRATION +=  $(ESYS_TESTS_INTEGRATION_MANDATORY)
+endif
+
+if DEVICEOPTIONAL
+TESTS_INTEGRATION +=  $(ESYS_TESTS_INTEGRATION_OPTIONAL)
+endif
+
+if DEVICEDESTRUCTIVE
+TESTS_INTEGRATION += $(ESYS_TESTS_INTEGRATION_DESTRUCTIVE)
+endif
+
+else # TESTDEVICE
+TESTS_INTEGRATION += $(ESYS_TESTS_INTEGRATION_MANDATORY) $(ESYS_TESTS_INTEGRATION_OPTIONAL) $(ESYS_TESTS_INTEGRATION_DESTRUCTIVE)
+
+endif # TESTDEVICE
+
+endif #ESYS
+
+if FAPI
+TESTS_LDADD += $(JSONC_LIBS)
+FAPI_TESTS_INTEGRATION = \
+    test/integration/dlopen-fapi-get-random.fint \
+    test/integration/fapi-check-wrong-paths.fint \
+    test/integration/fapi-data-crypt.fint \
+    test/integration/fapi-data-crypt-persistent.fint \
+    test/integration/fapi-data-crypt-rsa.fint \
+    test/integration/fapi-data-crypt-rsa-persistent.fint \
+    test/integration/fapi-duplicate.fint \
+    test/integration/fapi-export-policy.fint \
+    test/integration/fapi-ext-public-key.fint \
+    test/integration/fapi-get-esys-blobs.fint \
+    test/integration/fapi-get-random.fint \
+    test/integration/fapi-platform-certificates.fint \
+    test/integration/fapi-key-create-sign.fint \
+    test/integration/fapi-key-create-he-sign.fint \
+    test/integration/fapi-key-create-primary-sign.fint \
+    test/integration/fapi-key-create2-sign.fint \
+    test/integration/fapi-key-create-null-key-sign.fint \
+    test/integration/fapi-key-create-sign-persistent-key.fint \
+    test/integration/fapi-key-create-sign-password-provision.fint \
+    test/integration/fapi-key-create-sign-rsa.fint \
+    test/integration/fapi-key-create-policy-authorize-sign.fint \
+    test/integration/fapi-key-create-policy-authorize-rsa-pem-sign.fint \
+    test/integration/fapi-key-create-policy-authorize-ecc-pem-sign.fint \
+    test/integration/fapi-key-create-policy-authorize-sign-rsa.fint \
+    test/integration/fapi-key-create-policy-authorize-nv-sign.fint \
+    test/integration/fapi-key-create-policy-authorize-nv-tpms-sign.fint \
+    test/integration/fapi-key-create-policy-authorize-nv-complex-tpm2b-sign.fint \
+    test/integration/fapi-key-create-policy-secret-nv-sign.fint \
+    test/integration/fapi-key-create-policy-secret-key-sign.fint \
+    test/integration/fapi-key-create-policy-pcr-sign.fint \
+    test/integration/fapi-key-create-policy-signed.fint \
+    test/integration/fapi-key-create-policy-signed-ecc.fint \
+    test/integration/fapi-key-create-policy-signed-keyedhash.fint \
+    test/integration/fapi-key-create-policy-nv-sign.fint \
+    test/integration/fapi-key-create-policy-nv-counter-sign.fint \
+    test/integration/fapi-key-create-policy-or-sign.fint \
+    test/integration/fapi-key-create-policy-password-sign.fint \
+    test/integration/fapi-key-create-policy-countertimer-sign.fint \
+    test/integration/fapi-key-create-policy-physical-presence-sign.fint \
+    test/integration/fapi-key-create-policy-locality-sign.fint \
+    test/integration/fapi-key-create-policy-command-code-sign.fint \
+    test/integration/fapi-key-create-policy-auth-value-sign.fint \
+    test/integration/fapi-key-create-ckda-sign.fint \
+    test/integration/fapi-key-change-auth.fint \
+    test/integration/fapi-key-create-sign-persistent.fint \
+    test/integration/fapi-key-create-sign-password.fint \
+    test/integration/fapi-key-create-ckda-sign-password.fint \
+    test/integration/fapi-key-create-sign-password-da.fint \
+    test/integration/fapi-key-create-ckda-sign-password-da.fint \
+    test/integration/fapi-nv-authorizenv-cphash.fint \
+    test/integration/fapi-nv-ordinary.fint \
+    test/integration/fapi-nv-written-policy.fint \
+    test/integration/fapi-nv-extend.fint \
+    test/integration/fapi-nv-increment.fint \
+    test/integration/fapi-nv-set-bits.fint \
+    test/integration/fapi-pcr-test.fint \
+    test/integration/fapi-quote.fint \
+    test/integration/fapi-quote-with-primary.fint \
+    test/integration/fapi-quote-rsa.fint \
+    test/integration/fapi-policy-or-nv-read-write.fint \
+    test/integration/fapi-second-provisioning.fint \
+    test/integration/fapi-provisioning-error.fint \
+    test/integration/fapi-info.fint \
+    test/integration/fapi-unseal.fint \
+    test/integration/fapi-unseal-persistent.fint
+
+if TESTDEVICE
+if DEVICEDESTRUCTIVE
+FAPI_TESTS_INTEGRATION += \
+    test/integration/fapi-key-create-sign-policy-provision.fint \
+    test/integration/fapi-quote-destructive.fint \
+    test/integration/fapi-quote-destructive-eventlog-null.fint \
+    test/integration/fapi-quote-destructive-eventlog-not.fint \
+    test/integration/fapi-quote-destructive-eventlog.fint \
+    test/integration/fapi-quote-destructive-eventlog-pc-client.fint
+endif #PTPMDESTRUCTIVE
+endif TESTDEVICE
+
+if !TESTDEVICE
+FAPI_TESTS_INTEGRATION += \
+    test/integration/fapi-key-create-sign-policy-provision.fint \
+    test/integration/fapi-provision-fingerprint.fint \
+    test/integration/fapi-provision-certificate.fint \
+    test/integration/fapi-provision-fingerprint_ecc.fint \
+    test/integration/fapi-provision-certificate_ecc.fint \
+    test/integration/fapi-quote-destructive.fint \
+    test/integration/fapi-key-create-policy-nv-tpm-idx-sign.fint \
+    test/integration/fapi-quote-destructive-eventlog-null.fint \
+    test/integration/fapi-quote-destructive-eventlog.fint \
+    test/integration/fapi-quote-destructive-eventlog-pc-client.fint \
+	test/integration/fapi-provisioning-with-template.fint \
+	test/integration/fapi-provisioning-with-template-rsa.fint
+
+endif #!TESTDEVICE
+
+TESTS_INTEGRATION += $(FAPI_TESTS_INTEGRATION)
+
+endif #FAPI
+
+endif #ENABLE_INTEGRATION
+
+CLEANFILES += \
+    test/integration/*.crt \
+    test/integration/*.crl \
+    test/integration/*.fint_state* \
+    test/integration/*.int_state* \
+    test/integration/*.log \
+    test/integration/*.fint_ek* \
+    test/integration/*.fint_*-ca.pem \
+    test/tpmclient/*.int_state* \
+    test/tpmclient/*.log \
+    test/unit/*.log
+
+if UNIT
+if ENABLE_TCTI_DEVICE
+test_unit_tcti_device_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_device_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil)
+test_unit_tcti_device_LDFLAGS = -Wl,--wrap=read -Wl,--wrap=write -Wl,--wrap=poll  \
+        -Wl,--wrap=open
+test_unit_tcti_device_SOURCES = test/unit/tcti-device.c \
+    src/tss2-tcti/tcti-common.c \
+    src/tss2-tcti/tcti-device.c src/tss2-tcti/tcti-device.h
+endif
+
+if ENABLE_TCTI_MSSIM
+test_unit_tcti_mssim_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_mssim_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil)
+test_unit_tcti_mssim_LDFLAGS = -Wl,--wrap=connect -Wl,--wrap=read -Wl,--wrap=write -Wl,--wrap=poll
+test_unit_tcti_mssim_SOURCES = test/unit/tcti-mssim.c \
+    src/tss2-tcti/tcti-common.c \
+    src/tss2-tcti/tcti-mssim.c src/tss2-tcti/tcti-mssim.h
+endif
+
+if ENABLE_TCTI_SWTPM
+test_unit_tcti_swtpm_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_swtpm_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil)
+test_unit_tcti_swtpm_LDFLAGS = -Wl,--wrap=connect,--wrap=read,--wrap=select,--wrap=write
+test_unit_tcti_swtpm_SOURCES = test/unit/tcti-swtpm.c \
+    src/tss2-tcti/tcti-common.c \
+    src/tss2-tcti/tcti-swtpm.c src/tss2-tcti/tcti-swtpm.h
+endif
+
+if ENABLE_TCTI_LIBTPMS
+test_unit_tcti_libtpms_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_libtpms_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil) $(LIBADD_DL)
+test_unit_tcti_libtpms_LDFLAGS = -Wl,--wrap=dlopen,--wrap=dlclose,--wrap=dlsym \
+    -Wl,--wrap=open,--wrap=close,--wrap=mmap,--wrap=mremap,--wrap=munmap \
+    -Wl,--wrap=lseek,--wrap=posix_fallocate,--wrap=truncate
+test_unit_tcti_libtpms_SOURCES = test/unit/tcti-libtpms.c \
+    src/tss2-tcti/tcti-common.c \
+    src/tss2-tcti/tcti-libtpms.c src/tss2-tcti/tcti-libtpms.h
+endif
+
+if ENABLE_TCTI_PCAP
+test_unit_tcti_pcap_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_pcap_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil)
+test_unit_tcti_pcap_LDFLAGS = -Wl,--wrap=getenv -Wl,--wrap=rand -Wl,--wrap=clock_gettime \
+        -Wl,--wrap=open -Wl,--wrap=read -Wl,--wrap=write -Wl,--wrap=close \
+        -Wl,--wrap=__clock_gettime64
+test_unit_tcti_pcap_SOURCES = test/unit/tcti-pcap.c \
+    src/tss2-tcti/tcti-common.c \
+    src/tss2-tcti/tcti-pcap.c src/tss2-tcti/tcti-pcap.h \
+    src/tss2-tcti/tcti-pcap-builder.c src/tss2-tcti/tcti-pcap-builder.h
+endif
+
+if ENABLE_TCTI_CMD
+test_unit_tcti_cmd_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_cmd_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil)
+test_unit_tcti_cmd_SOURCES = test/unit/tcti-cmd.c \
+    src/tss2-tcti/tcti-common.c \
+    src/tss2-tcti/tcti-cmd.c src/tss2-tcti/tcti-cmd.h test/unit/tcti-cmd-test.h
+endif
+
+if ENABLE_TCTI_SPI_HELPER
+test_unit_tcti_spi_helper_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tcti_spi_helper_LDADD   = $(CMOCKA_LIBS) $(libtss2_tcti_spi_helper)
+test_unit_tcti_spi_helper_SOURCES = test/unit/tcti-spi-helper.c
+endif
+
+test_unit_tctildr_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tctildr_LDADD = $(CMOCKA_LIBS) $(libutil)
+test_unit_tctildr_LDFLAGS = -Wl,--wrap=calloc,--wrap=free \
+    -Wl,--wrap=tctildr_finalize_data,--wrap=tctildr_get_tcti \
+    -Wl,--wrap=tctildr_get_info
+test_unit_tctildr_SOURCES = test/unit/tctildr.c \
+    src/tss2-tcti/tctildr.c
+
+test_unit_tctildr_dl_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) \
+        -UESYS_TCTI_DEFAULT_MODULE -UESYS_TCTI_DEFAUT_CONFIG
+test_unit_tctildr_dl_LDADD = $(CMOCKA_LIBS) $(TESTS_LDADD) $(LIBADD_DL)
+test_unit_tctildr_dl_LDFLAGS = -Wl,--wrap=dlopen,--wrap=dlclose,--wrap=dlsym \
+    -Wl,--wrap=tcti_from_init,--wrap=tcti_from_info,--wrap=__dlsym_time64
+test_unit_tctildr_dl_SOURCES = test/unit/tctildr-dl.c \
+        src/tss2-tcti/tctildr-dl.c
+
+test_unit_tctildr_nodl_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) \
+        -UESYS_TCTI_DEFAULT_MODULE -UESYS_TCTI_DEFAUT_CONFIG
+test_unit_tctildr_nodl_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_tctildr_nodl_LDFLAGS = -Wl,--wrap=Tss2_Tcti_Device_Init \
+        -Wl,--wrap=Tss2_Tcti_Mssim_Init,--wrap=tcti_from_init
+test_unit_tctildr_nodl_SOURCES = test/unit/tctildr-nodl.c \
+        src/tss2-tcti/tctildr-nodl.c
+
+test_unit_tctildr_tcti_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tctildr_tcti_LDADD = $(CMOCKA_LIBS) $(libutil) \
+    $(libtss2_tcti_device) $(libtss2_tcti_mssim)
+test_unit_tctildr_tcti_LDFLAGS = -Wl,--wrap=tctildr_get_info \
+    -Wl,--wrap=tctildr_get_tcti,--wrap=tctildr_finalize_data
+test_unit_tctildr_tcti_SOURCES = test/unit/tctildr-tcti.c \
+    src/tss2-tcti/tctildr.c
+
+test_unit_tctildr_getinfo_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tctildr_getinfo_LDADD = $(CMOCKA_LIBS) $(libutil) \
+    $(libtss2_tcti_device) $(libtss2_tcti_mssim)
+test_unit_tctildr_getinfo_LDFLAGS = -Wl,--wrap=strndup,--wrap=free \
+    -Wl,--wrap=calloc,--wrap=tctildr_finalize_data \
+    -Wl,--wrap=tctildr_get_info,--wrap=tctildr_get_tcti
+test_unit_tctildr_getinfo_SOURCES = test/unit/tctildr-getinfo.c \
+    src/tss2-tcti/tctildr.c
+
+test_unit_io_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_io_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libutil)
+test_unit_io_LDFLAGS = -Wl,--wrap=connect,--wrap=read,--wrap=socket,--wrap=write
+
+test_unit_key_value_parse_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_key_value_parse_LDADD   = $(CMOCKA_LIBS) $(libutil)
+
+test_unit_log_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_log_LDADD   = $(CMOCKA_LIBS) $(libutil)
+
+test_unit_CommonPreparePrologue_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_CommonPreparePrologue_LDADD = $(CMOCKA_LIBS) $(libtss2_sys) $(libtss2_mu)
+test_unit_CommonPreparePrologue_SOURCES = test/unit/CommonPreparePrologue.c \
+    src/tss2-sys/sysapi_util.c
+
+test_unit_CopyCommandHeader_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_CopyCommandHeader_LDADD = $(CMOCKA_LIBS) $(libtss2_sys) $(libtss2_mu)
+test_unit_CopyCommandHeader_SOURCES = test/unit/CopyCommandHeader.c \
+    src/tss2-sys/sysapi_util.c
+
+test_unit_dlopen_fail_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_dlopen_fail_LDADD   = $(CMOCKA_LIBS)
+test_unit_dlopen_fail_LDFLAGS = -Wl,--wrap=dlopen,--wrap=dlclose,--wrap=dlsym
+test_unit_dlopen_fail_SOURCES = test/unit/dlopen-fail.c \
+    tss2-dlopen/tss2-dlopen-tctildr.c \
+    tss2-dlopen/tss2-dlopen-rc.c \
+    tss2-dlopen/tss2-dlopen-mu.c \
+    tss2-dlopen/tss2-dlopen-esys.c \
+    tss2-dlopen/tss2-dlopen-fapi.c
+
+test_unit_dlopen_UINT8_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_dlopen_UINT8_marshal_LDADD   = $(CMOCKA_LIBS) $(LIBADD_DL) $(libtss2_mu)
+test_unit_dlopen_UINT8_marshal_SOURCES = test/unit/UINT8-marshal.c \
+    tss2-dlopen/tss2-dlopen-mu.c
+
+test_unit_dlopen_TPM2B_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_dlopen_TPM2B_marshal_LDADD   = $(CMOCKA_LIBS) $(LIBADD_DL) $(libtss2_mu)
+test_unit_dlopen_TPM2B_marshal_SOURCES = test/unit/TPM2B-marshal.c \
+    tss2-dlopen/tss2-dlopen-mu.c
+
+test_unit_dlopen_TPMU_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_dlopen_TPMU_marshal_LDADD   = $(CMOCKA_LIBS) $(LIBADD_DL) $(libtss2_mu)
+test_unit_dlopen_TPMU_marshal_SOURCES = test/unit/TPMU-marshal.c \
+    tss2-dlopen/tss2-dlopen-mu.c
+
+test_unit_UINT8_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_UINT8_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_UINT16_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_UINT16_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_UINT32_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_UINT32_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_UINT64_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_UINT64_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_TPMA_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_TPMA_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_TPM2B_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_TPM2B_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_TPMS_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_TPMS_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_TPML_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_TPML_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_TPMT_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_TPMT_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_TPMU_marshal_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_TPMU_marshal_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu)
+
+test_unit_sys_execute_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_sys_execute_LDADD   = $(CMOCKA_LIBS) $(libtss2_mu) $(libtss2_sys)
+test_unit_sys_execute_SOURCES = test/unit/sys-execute.c \
+                                src/tss2-tcti/tcti-common.c src/util/log.c
+
+test_unit_tss2_rc_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tss2_rc_LDADD   = $(CMOCKA_LIBS) $(libtss2_rc) $(libtss2_sys)
+test_unit_tss2_rc_SOURCES = test/unit/test_tss2_rc.c
+
+test_unit_dlopen_tss2_rc_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_dlopen_tss2_rc_LDADD   = $(CMOCKA_LIBS) $(LIBADD_DL) $(libtss2_rc) $(libtss2_sys)
+test_unit_dlopen_tss2_rc_SOURCES = test/unit/test_tss2_rc.c \
+    tss2-dlopen/tss2-dlopen-rc.c
+
+if ESYS
+test_unit_esys_context_null_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_context_null_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_context_null_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO) -Wl,--wrap=tctildr_finalize_data,--wrap=tctildr_get_tcti
+
+
+test_unit_esys_resubmissions_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_resubmissions_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_resubmissions_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_unit_esys_resubmissions_SOURCES = test/unit/esys-resubmissions.c \
+                                       test/unit/esys-dummy-defs.h \
+                                       src/tss2-esys/esys_iutil.c \
+                                       src/tss2-esys/esys_crypto.c \
+                                       $(TSS2_ESYS_SRC_CRYPTO)
+
+test_unit_esys_sequence_finish_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_esys_sequence_finish_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_sequence_finish_LDFLAGS = $(TESTS_LDFLAGS)
+
+test_unit_esys_tcti_rcs_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_tcti_rcs_LDADD = $(CMOCKA_LIBS) $(TESTS_LDADD)
+test_unit_esys_tcti_rcs_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_unit_esys_tcti_rcs_SOURCES = test/unit/esys-tcti-rcs.c \
+                                  test/unit/esys-dummy-defs.h \
+                                  src/tss2-esys/esys_iutil.c \
+                                  src/tss2-esys/esys_crypto.c \
+                                  $(TSS2_ESYS_SRC_CRYPTO)
+
+test_unit_esys_tpm_rcs_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_tpm_rcs_LDADD = $(CMOCKA_LIBS) $(TESTS_LDADD)
+test_unit_esys_tpm_rcs_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_unit_esys_tpm_rcs_SOURCES = test/unit/esys-tpm-rcs.c \
+                                 test/unit/esys-dummy-defs.h \
+                                 src/tss2-esys/esys_iutil.c \
+                                 src/tss2-esys/esys_crypto.c \
+                                 $(TSS2_ESYS_SRC_CRYPTO)
+
+test_unit_esys_getpollhandles_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_esys_getpollhandles_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_getpollhandles_LDFLAGS = $(TESTS_LDFLAGS)
+
+test_unit_esys_ac_getcapability_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_esys_ac_getcapability_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_ac_getcapability_LDFLAGS = $(TESTS_LDFLAGS)
+
+test_unit_esys_ac_send_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_esys_ac_send_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_ac_send_LDFLAGS = $(TESTS_LDFLAGS)
+
+test_unit_esys_policy_ac_sendselect_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_esys_policy_ac_sendselect_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_esys_policy_ac_sendselect_LDFLAGS = $(TESTS_LDFLAGS)
+
+test_unit_esys_nulltcti_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_nulltcti_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD) $(LIBADD_DL)
+test_unit_esys_nulltcti_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO) \
+    -Wl,--wrap=Tss2_TctiLdr_Initialize -Wl,--wrap=Tss2_TctiLdr_Finalize
+test_unit_esys_nulltcti_SOURCES = test/unit/esys-nulltcti.c \
+                                  src/tss2-esys/esys_context.c \
+                                  src/tss2-esys/esys_iutil.c \
+                                  src/tss2-esys/esys_crypto.c \
+                                  $(TSS2_ESYS_SRC_CRYPTO)
+
+test_unit_esys_crypto_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_crypto_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD) $(LIBADD_DL)
+test_unit_esys_crypto_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_unit_esys_crypto_SOURCES = test/unit/esys-crypto.c \
+                                src/tss2-esys/esys_context.c \
+                                src/tss2-esys/esys_iutil.c \
+                                src/tss2-tcti/tctildr.c \
+                                src/tss2-tcti/tctildr-dl.c \
+                                src/tss2-esys/esys_crypto.c \
+                                $(TSS2_ESYS_SRC_CRYPTO)
+
+if VENDOR
+test_unit_esys_vendor_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_unit_esys_vendor_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD) $(LIBADD_DL)
+test_unit_esys_vendor_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_unit_esys_vendor_SOURCES = test/unit/esys-vendor.c \
+                                src/tss2-esys/esys_context.c \
+                                src/tss2-esys/esys_iutil.c \
+                                src/tss2-esys/esys_crypto.c \
+                                $(TSS2_ESYS_SRC_CRYPTO)
+endif # VENDOR
+endif # ESYS
+
+if FAPI
+
+test_unit_fapi_json_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_json_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_json_LDFLAGS = $(TESTS_LDFLAGS)  $(CURL_LIBS) $(JSONC_LIBS) $(UUID_LIBS)
+test_unit_fapi_json_SOURCES = test/unit/fapi-json.c \
+                              src/tss2-fapi/ifapi_json_deserialize.c \
+                              src/tss2-fapi/ifapi_json_serialize.c \
+                              src/tss2-fapi/ifapi_ima_eventlog.c \
+                              src/tss2-fapi/ifapi_eventlog_system.c \
+                              src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                              src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                              src/tss2-fapi/ifapi_policy_json_serialize.c \
+                              src/tss2-fapi/tpm_json_deserialize.c \
+                              src/tss2-fapi/tpm_json_serialize.c \
+                              src/tss2-fapi/ifapi_helpers.c \
+                              src/tss2-fapi/fapi_crypto.c \
+                              src/tss2-fapi/ifapi_eventlog.c \
+                              src/tss2-fapi/ifapi_keystore.c  \
+                              src/tss2-fapi/ifapi_io.c
+
+test_unit_fapi_helpers_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_helpers_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_helpers_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS) \
+                                 -Wl,--wrap=ifapi_crypto_hash_update \
+                                 -Wl,--wrap=ifapi_crypto_hash_finish
+test_unit_fapi_helpers_SOURCES = test/unit/fapi-helpers.c \
+                                 src/tss2-fapi/ifapi_json_deserialize.c \
+                                 src/tss2-fapi/ifapi_json_serialize.c \
+                                 src/tss2-fapi/ifapi_ima_eventlog.c \
+                                 src/tss2-fapi/ifapi_eventlog_system.c \
+                                 src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                 src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                 src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                 src/tss2-fapi/tpm_json_deserialize.c \
+                                 src/tss2-fapi/tpm_json_serialize.c \
+                                 src/tss2-fapi/fapi_crypto.c \
+                                 src/tss2-fapi/ifapi_eventlog.c \
+                                 src/tss2-fapi/ifapi_helpers.c \
+                                 src/tss2-fapi/ifapi_keystore.c  \
+                                 src/tss2-fapi/ifapi_io.c
+
+test_unit_fapi_io_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_io_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_io_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS) \
+                            -Wl,--wrap=fopen \
+                            -Wl,--wrap=fseek \
+                            -Wl,--wrap=ftell \
+                            -Wl,--wrap=fcntl \
+                            -Wl,--wrap=malloc \
+                            -Wl,--wrap=read \
+                            -Wl,--wrap=write \
+                            -Wl,--wrap=fileno \
+                            -Wl,--wrap=fclose \
+                            -Wl,--wrap=stat
+test_unit_fapi_io_SOURCES = test/unit/fapi-io.c \
+                            src/tss2-fapi/ifapi_json_deserialize.c \
+                            src/tss2-fapi/ifapi_json_serialize.c \
+                            src/tss2-fapi/ifapi_ima_eventlog.c \
+                            src/tss2-fapi/ifapi_eventlog_system.c \
+                            src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                            src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                            src/tss2-fapi/ifapi_policy_json_serialize.c \
+                            src/tss2-fapi/tpm_json_deserialize.c \
+                            src/tss2-fapi/tpm_json_serialize.c \
+                            src/tss2-fapi/fapi_crypto.c \
+                            src/tss2-fapi/ifapi_eventlog.c \
+                            src/tss2-fapi/ifapi_helpers.c \
+                            src/tss2-fapi/ifapi_keystore.c  \
+                            src/tss2-fapi/ifapi_io.c
+
+test_unit_fapi_profiles_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_profiles_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_profiles_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS) \
+                                  -Wl,--wrap=ifapi_io_read_finish
+test_unit_fapi_profiles_SOURCES = test/unit/fapi-profiles.c \
+                                  src/tss2-fapi/ifapi_profiles.c \
+                                  src/tss2-fapi/ifapi_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_json_serialize.c \
+                                  src/tss2-fapi/ifapi_ima_eventlog.c \
+                                  src/tss2-fapi/ifapi_eventlog_system.c \
+                                  src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                  src/tss2-fapi/tpm_json_deserialize.c \
+                                  src/tss2-fapi/tpm_json_serialize.c \
+                                  src/tss2-fapi/fapi_crypto.c \
+                                  src/tss2-fapi/ifapi_eventlog.c \
+                                  src/tss2-fapi/ifapi_helpers.c \
+                                  src/tss2-fapi/ifapi_keystore.c  \
+                                  src/tss2-fapi/ifapi_io.c
+
+test_unit_fapi_config_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_config_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_config_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS) \
+                                  -Wl,--wrap=ifapi_io_read_finish
+test_unit_fapi_config_SOURCES = test/unit/fapi-config.c \
+                                  src/tss2-fapi/ifapi_config.c \
+                                  src/tss2-fapi/ifapi_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_json_serialize.c \
+                                  src/tss2-fapi/ifapi_ima_eventlog.c \
+                                  src/tss2-fapi/ifapi_eventlog_system.c \
+                                  src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                  src/tss2-fapi/tpm_json_deserialize.c \
+                                  src/tss2-fapi/tpm_json_serialize.c \
+                                  src/tss2-fapi/fapi_crypto.c \
+                                  src/tss2-fapi/ifapi_eventlog.c \
+                                  src/tss2-fapi/ifapi_helpers.c \
+                                  src/tss2-fapi/ifapi_keystore.c  \
+                                  src/tss2-fapi/ifapi_io.c
+
+test_unit_fapi_get_intl_cert_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_get_intl_cert_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_get_intl_cert_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS) \
+                                       -Wl,--wrap=ifapi_get_curl_buffer \
+                                       -Wl,--wrap=EVP_DigestUpdate
+test_unit_fapi_get_intl_cert_SOURCES = test/unit/fapi-get-intl-cert.c \
+	                                   src/tss2-fapi/ifapi_get_intl_cert.c \
+                                       src/tss2-fapi/ifapi_json_deserialize.c \
+                                       src/tss2-fapi/ifapi_json_serialize.c \
+                                       src/tss2-fapi/ifapi_ima_eventlog.c \
+                                       src/tss2-fapi/ifapi_eventlog_system.c \
+                                       src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                       src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                       src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                       src/tss2-fapi/tpm_json_deserialize.c \
+                                       src/tss2-fapi/tpm_json_serialize.c \
+                                       src/tss2-fapi/fapi_crypto.c \
+                                       src/tss2-fapi/ifapi_eventlog.c \
+                                       src/tss2-fapi/ifapi_helpers.c \
+                                       src/tss2-fapi/ifapi_keystore.c  \
+                                       src/tss2-fapi/ifapi_io.c
+
+EXTRA_test_unit_fapi_eventlog_DEPENDENCIES = $(FAPI_TEST_BINS)
+
+test_unit_fapi_eventlog_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_eventlog_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_eventlog_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS)
+test_unit_fapi_eventlog_SOURCES = test/unit/fapi-eventlog.c \
+                                  src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                  src/tss2-fapi/ifapi_ima_eventlog.c \
+                                  src/tss2-fapi/ifapi_eventlog_system.c \
+                                  src/tss2-fapi/ifapi_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_json_serialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                  src/tss2-fapi/tpm_json_deserialize.c \
+                                  src/tss2-fapi/tpm_json_serialize.c \
+                                  src/tss2-fapi/fapi_crypto.c \
+                                  src/tss2-fapi/ifapi_eventlog.c \
+                                  src/tss2-fapi/ifapi_helpers.c\
+                                  src/tss2-fapi/ifapi_keystore.c  \
+                                  src/tss2-fapi/ifapi_io.c
+
+EXTRA_test_unit_fapi_ima_eventlog_DEPENDENCIES = $(FAPI_TEST_BINS)
+
+test_unit_fapi_ima_eventlog_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_ima_eventlog_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_ima_eventlog_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS)
+test_unit_fapi_ima_eventlog_SOURCES = test/unit/fapi-ima-eventlog.c \
+                                  src/tss2-fapi/ifapi_ima_eventlog.c \
+                                  src/tss2-fapi/ifapi_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_json_serialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                  src/tss2-fapi/tpm_json_deserialize.c \
+                                  src/tss2-fapi/tpm_json_serialize.c \
+                                  src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                  src/tss2-fapi/fapi_crypto.c \
+                                  src/tss2-fapi/ifapi_eventlog.c \
+                                  src/tss2-fapi/ifapi_helpers.c \
+                                  src/tss2-fapi/ifapi_eventlog_system.c\
+                                  src/tss2-fapi/ifapi_keystore.c  \
+                                  src/tss2-fapi/ifapi_io.c
+
+EXTRA_test_unit_fapi_check_ima_log_DEPENDENCIES = $(FAPI_TEST_BINS)
+
+test_unit_fapi_check_ima_log_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_check_ima_log_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_check_ima_log_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS)
+test_unit_fapi_check_ima_log_SOURCES = test/unit/fapi-check-ima-log.c \
+                                  src/tss2-fapi/ifapi_ima_eventlog.c \
+                                  src/tss2-fapi/ifapi_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_json_serialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                                  src/tss2-fapi/ifapi_policy_json_serialize.c \
+                                  src/tss2-fapi/tpm_json_deserialize.c \
+                                  src/tss2-fapi/tpm_json_serialize.c \
+                                  src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                                  src/tss2-fapi/fapi_crypto.c \
+                                  src/tss2-fapi/ifapi_eventlog.c \
+                                  src/tss2-fapi/ifapi_helpers.c \
+                                  src/tss2-fapi/ifapi_eventlog_system.c\
+                                  src/tss2-fapi/ifapi_keystore.c  \
+                                  src/tss2-fapi/ifapi_io.c
+
+test_unit_fapi_ima_fuzzing_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_ima_fuzzing_CXXFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_ima_fuzzing_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_ima_fuzzing_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS)
+
+test_unit_fapi_ima_fuzzing_SOURCES = test/unit/fapi-ima-fuzzing.c \
+                         src/tss2-fapi/ifapi_ima_eventlog.c \
+                         src/tss2-fapi/ifapi_json_deserialize.c \
+                         src/tss2-fapi/ifapi_json_serialize.c \
+                         src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                         src/tss2-fapi/ifapi_policy_json_serialize.c \
+                         src/tss2-fapi/tpm_json_deserialize.c \
+                         src/tss2-fapi/tpm_json_serialize.c \
+                         src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                         src/tss2-fapi/fapi_crypto.c \
+                         src/tss2-fapi/ifapi_eventlog.c \
+                         src/tss2-fapi/ifapi_helpers.c \
+                         src/tss2-fapi/ifapi_eventlog_system.c\
+                         src/tss2-fapi/ifapi_keystore.c  \
+                         src/tss2-fapi/ifapi_io.c
+
+noinst_PROGRAMS += test/unit/fapi-ima-fuzzing
+
+test_unit_fapi_system_fuzzing_CFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_system_fuzzing_CXXFLAGS = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_fapi_system_fuzzing_LDADD = $(CMOCKA_LIBS)  $(TESTS_LDADD)
+test_unit_fapi_system_fuzzing_LDFLAGS = $(TESTS_LDFLAGS) $(JSONC_LIBS) $(CURL_LIBS) $(UUID_LIBS)
+
+test_unit_fapi_system_fuzzing_SOURCES = test/unit/fapi-system-fuzzing.c \
+                          src/tss2-fapi/ifapi_json_eventlog_serialize.c \
+                          src/tss2-fapi/ifapi_ima_eventlog.c \
+                          src/tss2-fapi/ifapi_eventlog_system.c \
+                          src/tss2-fapi/ifapi_json_deserialize.c \
+                          src/tss2-fapi/ifapi_json_serialize.c \
+                          src/tss2-fapi/ifapi_policy_json_deserialize.c \
+                          src/tss2-fapi/ifapi_policy_json_serialize.c \
+                          src/tss2-fapi/tpm_json_deserialize.c \
+                          src/tss2-fapi/tpm_json_serialize.c \
+                          src/tss2-fapi/fapi_crypto.c \
+                          src/tss2-fapi/ifapi_eventlog.c \
+                          src/tss2-fapi/ifapi_helpers.c\
+                          src/tss2-fapi/ifapi_keystore.c  \
+                          src/tss2-fapi/ifapi_io.c
+
+noinst_PROGRAMS += test/unit/fapi-system-fuzzing
+
+endif # FAPI
+
+if POLICY
+TESTS_UNIT += test/unit/tss2_policy
+
+test_unit_tss2_policy_CFLAGS  = $(CMOCKA_CFLAGS) $(TESTS_CFLAGS)
+test_unit_tss2_policy_LDADD   = $(CMOCKA_LIBS) $(libtss2_policy) $(libtss2_esys)
+test_unit_tss2_policy_SOURCES = test/unit/tss2_policy.c src/util/log.c \
+    test/data/test-fapi-policies.h
+endif # POLICY
+
+endif # UNIT
+
+if ENABLE_INTEGRATION
+test_tpmclient_tpmclient_int_CFLAGS   = $(AM_CFLAGS) -U_FORTIFY_SOURCE  $(TESTS_CFLAGS)
+test_tpmclient_tpmclient_int_LDADD    = $(TESTS_LDADD)
+test_tpmclient_tpmclient_int_SOURCES  = \
+    test/tpmclient/tpmclient.int.c test/integration/main-sys.c
+
+test_integration_libtest_utils_la_CFLAGS = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_libtest_utils_la_SOURCES = \
+    test/integration/sys-context-util.c test/integration/context-util.h \
+    test/integration/sys-util.c    test/integration/sys-util.h \
+    test/integration/sys-session-util.c test/integration/session-util.h \
+    test/integration/sys-test-options.c test/integration/test-options.h \
+    test/integration/sys-entity-util.c test/integration/test.h \
+    src/util/log.c
+
+test_integration_sys_asymmetric_encrypt_decrypt_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_asymmetric_encrypt_decrypt_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_asymmetric_encrypt_decrypt_int_SOURCES = \
+    test/integration/sys-asymmetric-encrypt-decrypt.int.c test/integration/main-sys.c
+
+test_integration_sys_nv_policy_locality_int_CFLAGS = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_nv_policy_locality_int_LDADD = $(TESTS_LDADD)
+test_integration_sys_nv_policy_locality_int_SOURCES = \
+    test/integration/sys-nv-policy-locality.int.c test/integration/main-sys.c
+
+test_integration_sys_nv_readwrite_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_nv_readwrite_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_nv_readwrite_int_SOURCES = \
+    test/integration/sys-nv-readwrite.int.c test/integration/main-sys.c
+
+test_integration_sys_hmac_auth_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_hmac_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_hmac_auth_int_SOURCES = \
+    test/integration/sys-hmac-auth.int.c test/integration/main-sys.c
+
+test_integration_sys_primary_rsa_2K_aes128cfb_int_CFLAGS = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_primary_rsa_2K_aes128cfb_int_LDADD  = $(TESTS_LDADD)
+test_integration_sys_primary_rsa_2K_aes128cfb_int_SOURCES = \
+    test/integration/sys-primary-rsa-2K-aes128cfb.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_create_keyedhash_sha1_hmac_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_create_keyedhash_sha1_hmac_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_create_keyedhash_sha1_hmac_int_SOURCES = \
+    test/integration/sys-create-keyedhash-sha1-hmac.int.c test/integration/main-sys.c
+
+test_integration_sys_encrypt_decrypt_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_encrypt_decrypt_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_encrypt_decrypt_int_SOURCES = \
+    test/integration/sys-encrypt-decrypt.int.c test/integration/main-sys.c
+
+test_integration_sys_encrypt_decrypt_2_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_encrypt_decrypt_2_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_encrypt_decrypt_2_int_SOURCES = \
+    test/integration/sys-encrypt-decrypt-2.int.c test/integration/main-sys.c
+
+test_integration_sys_evict_ctrl_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_evict_ctrl_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_evict_ctrl_int_SOURCES = \
+    test/integration/sys-evict-ctrl.int.c test/integration/main-sys.c
+
+test_integration_sys_sys_initialize_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_sys_initialize_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_sys_initialize_int_SOURCES = test/integration/sys-sys-initialize.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_stir_random_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_stir_random_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_stir_random_int_SOURCES = test/integration/sys-stir-random.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_get_random_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_get_random_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_get_random_int_SOURCES = test/integration/sys-get-random.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_mac_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_mac_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_mac_int_SOURCES = test/integration/sys-mac.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_hmac_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_hmac_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_hmac_int_SOURCES = test/integration/sys-hmac.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_abi_version_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_abi_version_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_abi_version_int_SOURCES = test/integration/sys-abi-version.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_pcr_extension_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_pcr_extension_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_pcr_extension_int_SOURCES = test/integration/sys-pcr-extension.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_self_test_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_self_test_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_self_test_int_SOURCES = test/integration/sys-self-test.int.c \
+    test/integration/main-sys.c
+
+test_integration_sys_hierarchy_change_auth_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_hierarchy_change_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_hierarchy_change_auth_int_SOURCES = \
+    test/integration/sys-hierarchy-change-auth.int.c test/integration/main-sys.c
+
+test_integration_sys_start_auth_session_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_start_auth_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_start_auth_session_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-start-auth-session.int.c
+
+test_integration_sys_tpm_properties_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_tpm_properties_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_tpm_properties_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-tpm-properties.int.c
+
+test_integration_sys_system_api_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_system_api_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_system_api_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-system-api.int.c
+
+test_integration_sys_aram_encrypt_decrypt_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_param_encrypt_decrypt_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_param_encrypt_decrypt_int_SOURCES = \
+    test/integration/sys-param-encrypt-decrypt.int.c test/integration/main-sys.c
+
+test_integration_sys_read_clock_int_CFLAGS  = $(AM_CFLAGS) $(TESTS_CFLAGS)
+test_integration_sys_read_clock_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_read_clock_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-read-clock.int.c
+
+if ESYS
+ESYS_SRC_UTIL_CRYPTO_SRC = src/tss2-esys/esys_iutil.c \
+                           src/tss2-esys/esys_crypto.c \
+                           $(TSS2_ESYS_SRC_CRYPTO)
+
+test_integration_dlopen_esys_get_random_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DENABLE_WARN=1
+test_integration_dlopen_esys_get_random_int_LDADD   = $(TESTS_LDADD) $(LIBADD_DL)
+test_integration_dlopen_esys_get_random_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_dlopen_esys_get_random_int_SOURCES = \
+    test/integration/esys-get-random.int.c \
+    tss2-dlopen/tss2-dlopen-esys.c \
+    tss2-dlopen/tss2-dlopen-mu.c \
+    tss2-dlopen/tss2-dlopen-tctildr.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_act_set_timeout_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_act_set_timeout_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_act_set_timeout_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_act_set_timeout_int_SOURCES = \
+    test/integration/esys-act-set-timeout.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_audit_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_audit_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_audit_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_audit_int_SOURCES = \
+    test/integration/esys-audit.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_certify_creation_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_certify_creation_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_certify_creation_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_certify_creation_int_SOURCES = \
+    test/integration/esys-certify-creation.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_certifyX509_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_certifyX509_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_certifyX509_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_certifyX509_int_SOURCES = \
+    test/integration/esys-certifyX509.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_certify_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_certify_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_certify_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_certify_int_SOURCES = \
+    test/integration/esys-certify.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_change_eps_int_CFLAGS = $(TESTS_CFLAGS)
+test_integration_esys_change_eps_int_LDADD = $(TESTS_LDADD)
+test_integration_esys_change_eps_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_change_eps_int_SOURCES = \
+    test/integration/esys-change-eps.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_clear_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_clear_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_clear_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_clear_int_SOURCES = \
+    test/integration/esys-clear.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_clear_control_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_clear_control_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_clear_control_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_clear_control_int_SOURCES = \
+    test/integration/esys-clear-control.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_clear_session_int_CFLAGS  = $(TESTS_CFLAGS) -DTEST_SESSION
+test_integration_esys_clear_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_clear_session_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_clear_session_int_SOURCES = \
+    test/integration/esys-clear.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_clockset_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_clockset_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_clockset_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_clockset_int_SOURCES = \
+    test/integration/esys-clockset.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_clockset_audit_int_CFLAGS  = $(TESTS_CFLAGS) -DTEST_SESSION
+test_integration_esys_clockset_audit_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_clockset_audit_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_clockset_audit_int_SOURCES = \
+    test/integration/esys-clockset.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_commit_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_commit_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_commit_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_commit_int_SOURCES = \
+    test/integration/esys-commit.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_fail_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_fail_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_fail_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_fail_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-fail.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_createloaded_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_createloaded_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_createloaded_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_createloaded_int_SOURCES = \
+    test/integration/esys-createloaded.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_createloaded_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION
+test_integration_esys_createloaded_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_createloaded_session_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_createloaded_session_int_SOURCES = \
+    test/integration/esys-createloaded.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_password_auth_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_password_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_password_auth_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_password_auth_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-password-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_policy_auth_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_policy_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_policy_auth_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_policy_auth_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-policy-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_primary_ecc_hmac_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_primary_ecc_hmac_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_primary_ecc_hmac_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_primary_ecc_hmac_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-primary-hmac.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_primary_hmac_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_primary_hmac_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_primary_hmac_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_primary_hmac_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-primary-hmac.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_session_auth_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_AES_ENCRYPTION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_auth_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_session_auth_long_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_AES_ENCRYPTION -DTEST_LARGE_AUTH $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_long_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_auth_long_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_long_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_session_auth_bound_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_AES_ENCRYPTION -DTEST_BOUND_SESSION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_bound_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_auth_bound_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_bound_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_session_null_bind_tpm_key_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_AES_ENCRYPTION -DTEST_NULL_BIND_TPMKEY $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_null_bind_tpm_key_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_null_bind_tpm_key_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_null_bind_tpm_key_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_session_null_bind_no_tpm_key_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_AES_ENCRYPTION -DTEST_NULL_BIND_NO_TPM_KEY $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_null_bind_no_tpm_key_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_null_bind_no_tpm_key_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_null_bind_no_tpm_key_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+
+test_integration_esys_create_session_auth_ecc_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_AES_ENCRYPTION -DTEST_ECC $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_ecc_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_auth_ecc_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_ecc_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_create_session_auth_xor_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_XOR_OBFUSCATION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_xor_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_create_session_auth_xor_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_create_session_auth_xor_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-create-session-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_duplicate_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_duplicate_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_duplicate_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_duplicate_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-duplicate.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_ecc_parameters_int_CFLAGS = $(TESTS_CFLAGS)
+test_integration_esys_ecc_parameters_int_LDADD = $(TESTS_LDADD)
+test_integration_esys_ecc_parameters_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_ecc_parameters_int_SOURCES = \
+    test/integration/esys-ecc-parameters.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_ecdh_keygen_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_ecdh_keygen_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_ecdh_keygen_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_ecdh_keygen_int_SOURCES = \
+    test/integration/esys-ecdh-keygen.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_ecdh_zgen_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_ecdh_zgen_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_ecdh_zgen_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_ecdh_zgen_int_SOURCES = \
+    test/integration/esys-ecdh-zgen.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_encrypt_decrypt_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_encrypt_decrypt_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_encrypt_decrypt_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_encrypt_decrypt_int_SOURCES = \
+    test/integration/esys-encrypt-decrypt.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_encrypt_decrypt2_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_ENCRYPT_DECRYPT2
+test_integration_esys_encrypt_decrypt2_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_encrypt_decrypt2_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_encrypt_decrypt2_int_SOURCES = \
+    test/integration/esys-encrypt-decrypt.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_event_sequence_complete_int_CFLAGS = $(TESTS_CFLAGS)
+test_integration_esys_event_sequence_complete_int_LDADD = $(TESTS_LDADD)
+test_integration_esys_event_sequence_complete_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_event_sequence_complete_int_SOURCES = \
+    test/integration/esys-event-sequence-complete.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_evict_control_serialization_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_evict_control_serialization_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_evict_control_serialization_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_evict_control_serialization_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-evict-control-serialization.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_field_upgrade_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_field_upgrade_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_field_upgrade_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_field_upgrade_int_SOURCES = \
+    test/integration/esys-field-upgrade.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_firmware_read_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_firmware_read_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_firmware_read_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_firmware_read_int_SOURCES = \
+    test/integration/esys-firmware-read.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_get_capability_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_get_capability_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_get_capability_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_get_capability_int_SOURCES = \
+    test/integration/esys-get-capability.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_get_capability_act_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_get_capability_act_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_get_capability_act_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_get_capability_act_int_SOURCES = \
+    test/integration/esys-get-capability-act.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_get_random_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_get_random_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_get_random_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_get_random_int_SOURCES = \
+    test/integration/esys-get-random.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_get_time_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_get_time_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_get_time_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_get_time_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-get-time.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hash_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_hash_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hash_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hash_int_SOURCES = \
+    test/integration/esys-hash.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hashsequencestart_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_hashsequencestart_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hashsequencestart_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hashsequencestart_int_SOURCES = \
+    test/integration/esys-hashsequencestart.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hashsequencestart_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION
+test_integration_esys_hashsequencestart_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hashsequencestart_session_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hashsequencestart_session_int_SOURCES = \
+    test/integration/esys-hashsequencestart.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hierarchy_control_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_hierarchy_control_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hierarchy_control_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hierarchy_control_int_SOURCES = \
+    test/integration/esys-hierarchy-control.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hmac_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_hmac_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hmac_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hmac_int_SOURCES = \
+    test/integration/esys-hmac.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_mac_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_mac_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_mac_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_mac_int_SOURCES = \
+    test/integration/esys-mac.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hmacsequencestart_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_hmacsequencestart_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hmacsequencestart_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hmacsequencestart_int_SOURCES = \
+    test/integration/esys-hmacsequencestart.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hmacsequencestart_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION
+test_integration_esys_hmacsequencestart_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hmacsequencestart_session_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hmacsequencestart_session_int_SOURCES = \
+    test/integration/esys-hmacsequencestart.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_hierarchychangeauth_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_hierarchychangeauth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_hierarchychangeauth_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_hierarchychangeauth_int_SOURCES = \
+    test/integration/esys-hierarchychangeauth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_import_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_import_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_import_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_import_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-import.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_lock_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_lock_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_lock_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_lock_int_SOURCES = \
+    test/integration/esys-lock.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_make_credential_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_make_credential_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_make_credential_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_make_credential_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-make-credential.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_make_credential_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_make_credential_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_make_credential_session_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_make_credential_session_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-make-credential.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_certify_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_nv_certify_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_certify_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_nv_certify_int_SOURCES = \
+    test/integration/esys-nv-certify.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_counter_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_counter_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_counter_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_counter_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-counter.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_counter_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_counter_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_counter_session_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_counter_session_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-counter.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_counter_session_long_auth_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_LONG_AUTH -DTEST_SESSION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_counter_session_long_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_counter_session_long_auth_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_counter_session_long_auth_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-counter.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_extend_index_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_extend_index_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_extend_index_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_extend_index_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-extend-index.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_extend_index_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_extend_index_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_extend_index_session_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_extend_index_session_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-extend-index.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_ordinary_index_rlock_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -I. -I$(srcdir)/test/integration/ -DTEST_READ_LOCK $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_rlock_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_ordinary_index_rlock_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_rlock_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-ordinary-index.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_ordinary_index_rlock_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -I. -I$(srcdir)/include/esys -DTEST_SESSION -DTEST_READ_LOCK $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_rlock_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_ordinary_index_rlock_session_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_rlock_session_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-ordinary-index.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_ordinary_index_wlock_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -I. -DTEST_WRITE_LOCK $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_wlock_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_ordinary_index_wlock_int_LDFLAGS = $(TESTS_LDFLAGS) \
+                                                                $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_wlock_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-ordinary-index.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_ordinary_index_wlock_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -I. -DTEST_SESSION -DTEST_WRITE_LOCK $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_wlock_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_ordinary_index_wlock_session_int_LDFLAGS = $(TESTS_LDFLAGS) \
+                                                                        $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_ordinary_index_wlock_session_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-ordinary-index.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_set_bits_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_set_bits_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_set_bits_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_set_bits_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-set-bits.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_nv_ram_set_bits_session_int_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_SESSION $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_nv_ram_set_bits_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_nv_ram_set_bits_session_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_nv_ram_set_bits_session_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-nv-ram-set-bits.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_object_changeauth_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_object_changeauth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_object_changeauth_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_object_changeauth_int_SOURCES = \
+    test/integration/esys-object-changeauth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_authorize_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_policy_authorize_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_authorize_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_policy_authorize_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-policy-authorize.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_physical_presence_opt_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_physical_presence_opt_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_physical_presence_opt_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_physical_presence_opt_int_SOURCES = \
+    test/integration/esys-policy-physical-presence-opt.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_regression_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_regression_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_regression_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_regression_int_SOURCES = \
+    test/integration/esys-policy-regression.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_authorize_nv_opt_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_authorize_nv_opt_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_authorize_nv_opt_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_authorize_nv_opt_int_SOURCES = \
+    test/integration/esys-policy-authorize-nv-opt.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_template_opt_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_template_opt_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_template_opt_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_template_opt_int_SOURCES = \
+    test/integration/esys-policy-template-opt.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_ticket_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_policy_ticket_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_ticket_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_policy_ticket_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-policy-ticket.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_nv_changeauth_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_nv_changeauth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_nv_changeauth_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_nv_changeauth_int_SOURCES = \
+    test/integration/esys-policy-nv-changeauth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_nv_undefine_special_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_nv_undefine_special_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_nv_undefine_special_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_nv_undefine_special_int_SOURCES = \
+    test/integration/esys-policy-nv-undefine-special.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_policy_password_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_policy_password_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_policy_password_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_policy_password_int_SOURCES = \
+    test/integration/esys-policy-password.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_pcr_basic_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_pcr_basic_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_pcr_basic_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_pcr_basic_int_SOURCES = \
+    test/integration/esys-pcr-basic.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_pcr_auth_value_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_pcr_auth_value_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_pcr_auth_value_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_pcr_auth_value_int_SOURCES = \
+    test/integration/esys-pcr-auth-value.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_pp_commands_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_pp_commands_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_pp_commands_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_pp_commands_int_SOURCES = \
+    test/integration/esys-pp-commands.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_quote_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_quote_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_quote_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_quote_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-quote.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_rsa_encrypt_decrypt_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_rsa_encrypt_decrypt_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_rsa_encrypt_decrypt_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_rsa_encrypt_decrypt_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-rsa-encrypt-decrypt.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_save_and_load_context_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_save_and_load_context_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_save_and_load_context_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_save_and_load_context_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-save-and-load-context.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_session_attributes_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_session_attributes_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_session_attributes_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_session_attributes_int_SOURCES = \
+    test/integration/esys-session-attributes.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_set_algorithm_set_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_set_algorithm_set_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_set_algorithm_set_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_set_algorithm_set_int_SOURCES = \
+    test/integration/esys-set-algorithm-set.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_stir_random_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_stir_random_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_stir_random_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_stir_random_int_SOURCES = \
+    test/integration/esys-stir-random.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_testparms_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_testparms_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_testparms_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_testparms_int_SOURCES = \
+    test/integration/esys-testparms.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tpm_tests_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tpm_tests_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tpm_tests_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tpm_tests_int_SOURCES = \
+    test/integration/esys-tpm-tests.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_fromTpmPublic_key_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_fromTpmPublic_key_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_fromTpmPublic_key_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_fromTpmPublic_key_int_SOURCES = \
+    test/integration/esys-tr-fromTpmPublic-key.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_fromTpmPublic_nv_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_fromTpmPublic_nv_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_fromTpmPublic_nv_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_fromTpmPublic_nv_int_SOURCES = \
+    test/integration/esys-tr-fromTpmPublic-nv.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_fromTpmPublic_session_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_fromTpmPublic_session_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_fromTpmPublic_session_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_fromTpmPublic_session_int_SOURCES = \
+    test/integration/esys-tr-fromTpmPublic-session.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_getName_hierarchy_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_getName_hierarchy_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_getName_hierarchy_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_getName_hierarchy_int_SOURCES = \
+    test/integration/esys-tr-getName-hierarchy.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_getName_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_getName_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_getName_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_getName_int_SOURCES = \
+    test/integration/esys-tr-getName.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_getTpmHandle_key_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_getTpmHandle_key_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_getTpmHandle_key_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_getTpmHandle_key_int_SOURCES = \
+    test/integration/esys-tr-getTpmHandle-key.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tr_getTpmHandle_nv_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tr_getTpmHandle_nv_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tr_getTpmHandle_nv_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tr_getTpmHandle_nv_int_SOURCES = \
+    test/integration/esys-tr-getTpmHandle-nv.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_unseal_password_auth_int_CFLAGS  = $(TESTS_CFLAGS) $(TSS2_ESYS_CFLAGS_CRYPTO)
+test_integration_esys_unseal_password_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_unseal_password_auth_int_LDFLAGS = $(TESTS_LDFLAGS) $(TSS2_ESYS_LDFLAGS_CRYPTO)
+test_integration_esys_unseal_password_auth_int_SOURCES = \
+    $(ESYS_SRC_UTIL_CRYPTO_SRC) \
+    test/integration/esys-unseal-password-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_verify_signature_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_verify_signature_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_verify_signature_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_verify_signature_int_SOURCES = \
+    test/integration/esys-verify-signature.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_zgen_2phase_int_CFLAGS = $(TESTS_CFLAGS)
+test_integration_esys_zgen_2phase_int_LDADD = $(TESTS_LDADD)
+test_integration_esys_zgen_2phase_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_zgen_2phase_int_SOURCES = \
+    test/integration/esys-zgen-2phase.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_auto_session_flags_int_CFLAGS = $(TESTS_CFLAGS)
+test_integration_esys_auto_session_flags_int_LDADD = $(TESTS_LDADD)
+test_integration_esys_auto_session_flags_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_auto_session_flags_int_SOURCES = \
+    test/integration/esys-auto-session-flags.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_tpm_clear_auth_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_tpm_clear_auth_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_tpm_clear_auth_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_tpm_clear_auth_int_SOURCES = \
+    test/integration/esys-tpm-clear-auth.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+test_integration_esys_crypto_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_esys_crypto_int_LDADD   = $(TESTS_LDADD)
+test_integration_esys_crypto_int_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_esys_crypto_int_SOURCES = \
+    test/integration/esys-crypto.int.c \
+    test/integration/main-esys.c test/integration/test-esys.h
+
+endif #ESYS
+
+test_integration_sys_policy_template_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_sys_policy_template_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_policy_template_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-policy-template.int.c
+
+test_integration_sys_create_loaded_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_sys_create_loaded_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_create_loaded_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-create-loaded.int.c
+
+test_integration_sys_policy_authorizeNV_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_sys_policy_authorizeNV_int_LDADD   = $(TESTS_LDADD)
+test_integration_sys_policy_authorizeNV_int_SOURCES = test/integration/main-sys.c \
+    test/integration/sys-policy-authorizeNV.int.c
+
+if FAPI
+test_integration_dlopen_fapi_get_random_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DENABLE_WARN=1
+test_integration_dlopen_fapi_get_random_fint_LDADD   = $(TESTS_LDADD) $(LIBADD_DL)
+test_integration_dlopen_fapi_get_random_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_dlopen_fapi_get_random_fint_SOURCES = \
+    test/integration/fapi-get-random.int.c \
+    tss2-dlopen/tss2-dlopen-fapi.c \
+    tss2-dlopen/tss2-dlopen-esys.c \
+    tss2-dlopen/tss2-dlopen-mu.c \
+    tss2-dlopen/tss2-dlopen-tctildr.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_check_wrong_paths_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_check_wrong_paths_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_check_wrong_paths_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_check_wrong_paths_fint_SOURCES = \
+    test/integration/fapi-check-wrong-paths.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_get_esys_blobs_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_get_esys_blobs_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_get_esys_blobs_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_get_esys_blobs_fint_SOURCES = \
+    test/integration/fapi-get-esys-blobs.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_get_random_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_get_random_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_get_random_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_get_random_fint_SOURCES = \
+    test/integration/fapi-get-random.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_platform_certificates_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_platform_certificates_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_platform_certificates_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_platform_certificates_fint_SOURCES = \
+    test/integration/fapi-platform-certificates.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_he_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_he_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_he_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_he_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-he-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_primary_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_primary_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_primary_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_primary_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-primary-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+
+test_integration_fapi_key_create2_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create2_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create2_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create2_sign_fint_SOURCES = \
+    test/integration/fapi-key-create2-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_null_key_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_null_key_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_null_key_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_null_key_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-null-key-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_persistent_key_fint_CFLAGS  = $(TESTS_CFLAGS) \
+-DPERSISTENT
+test_integration_fapi_key_create_sign_persistent_key_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_persistent_key_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_persistent_key_fint_SOURCES = \
+    test/integration/fapi-key-create-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+
+test_integration_fapi_key_create_sign_password_provision_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_sign_password_provision_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_password_provision_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_password_provision_fint_SOURCES = \
+    test/integration/fapi-key-create-sign-password-provision.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_policy_provision_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA_sh_policy\" -DFAPI_TEST_EK_CERT_LESS
+test_integration_fapi_key_create_sign_policy_provision_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_policy_provision_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_policy_provision_fint_SOURCES = \
+    test/integration/fapi-key-create-sign-policy-provision.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_rsa_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_key_create_sign_rsa_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_rsa_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_rsa_fint_SOURCES = \
+    test/integration/fapi-key-create-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_password_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PASSWORD
+test_integration_fapi_key_create_sign_password_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_password_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_password_fint_SOURCES = \
+    test/integration/fapi-key-create-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_password_da_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PASSWORD -DFAPI_DA
+test_integration_fapi_key_create_sign_password_da_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_password_da_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_password_da_fint_SOURCES = \
+    test/integration/fapi-key-create-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_sign_persistent_fint_CFLAGS  = $(TESTS_CFLAGS) \
+   -DFAPI_PROFILE=\"P_RSA_EK_persistent\" -DFAPI_TEST_EK_CERT_LESS
+test_integration_fapi_key_create_sign_persistent_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_sign_persistent_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_sign_persistent_fint_SOURCES = \
+    test/integration/fapi-key-create-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_authorize_sign_fint_CFLAGS  = $(TESTS_CFLAGS) -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_key_create_policy_authorize_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_authorize_rsa_pem_sign_fint_CFLAGS  = $(TESTS_CFLAGS) -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_key_create_policy_authorize_rsa_pem_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_rsa_pem_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_rsa_pem_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-pem-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_authorize_ecc_pem_sign_fint_CFLAGS  = $(TESTS_CFLAGS) -DTEST_ECC
+test_integration_fapi_key_create_policy_authorize_ecc_pem_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_ecc_pem_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_ecc_pem_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-pem-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+
+test_integration_fapi_key_create_policy_authorize_sign_rsa_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DFAPI_PROFILE=\"P_RSA256\" -DFAPI_TEST_EK_CERT_LESS
+test_integration_fapi_key_create_policy_authorize_sign_rsa_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_sign_rsa_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_sign_rsa_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_authorize_nv_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_authorize_nv_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_nv_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_nv_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-nv-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_authorize_nv_tpms_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DPOLICY_AUTHORIZE_NV=\""/policy/pol_authorize_nv_tpms\""
+test_integration_fapi_key_create_policy_authorize_nv_tpms_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_nv_tpms_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_nv_tpms_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-nv-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_authorize_nv_complex_tpm2b_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DPOLICY_AUTHORIZE_NV=\""/policy/pol_authorize_nv_complex_tpm2b\""
+test_integration_fapi_key_create_policy_authorize_nv_complex_tpm2b_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_authorize_nv_complex_tpm2b_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_authorize_nv_complex_tpm2b_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-authorize-nv-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_secret_nv_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DFAPI_PROFILE=\"P_RSA256\" -DFAPI_TEST_EK_CERT_LESS
+test_integration_fapi_key_create_policy_secret_nv_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_secret_nv_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_secret_nv_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-secret-nv-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_secret_key_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_secret_key_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_secret_key_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_secret_key_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-secret-key-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_pcr_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_pcr_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_pcr_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_pcr_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-pcr-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_signed_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_signed_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_signed_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_signed_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-signed.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_signed_ecc_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DTEST_ECC
+test_integration_fapi_key_create_policy_signed_ecc_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_signed_ecc_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_signed_ecc_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-signed.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_signed_keyedhash_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_signed_keyedhash_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_signed_keyedhash_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_signed_keyedhash_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-signed-keyedhash.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+
+test_integration_fapi_key_create_policy_nv_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_nv_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_nv_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_nv_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-nv-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_nv_tpm_idx_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTPMIDX
+test_integration_fapi_key_create_policy_nv_tpm_idx_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_nv_tpm_idx_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_nv_tpm_idx_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-nv-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_nv_counter_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_nv_counter_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_nv_counter_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_nv_counter_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-nv-counter-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_or_sign_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_create_policy_or_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_or_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_or_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policy-or-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_password_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_POLICY_PASSWORD -DTEST_PASSWORD
+test_integration_fapi_key_create_policy_password_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_password_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_password_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policies-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_countertimer_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_POLICY_COUNTERTIMER
+test_integration_fapi_key_create_policy_countertimer_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_countertimer_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_countertimer_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policies-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_physical_presence_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_POLICY_PHYSICAL_PRESENCE
+test_integration_fapi_key_create_policy_physical_presence_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_physical_presence_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_physical_presence_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policies-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_locality_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_POLICY_LOCALITY
+test_integration_fapi_key_create_policy_locality_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_locality_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_locality_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policies-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_command_code_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+    -DTEST_POLICY_COMMAND_CODE
+test_integration_fapi_key_create_policy_command_code_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_command_code_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_command_code_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policies-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_policy_auth_value_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DTEST_POLICY_AUTH_VALUE -DTEST_PASSWORD
+test_integration_fapi_key_create_policy_auth_value_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_policy_auth_value_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_policy_auth_value_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-policies-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_ckda_sign_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_key_create_ckda_sign_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_ckda_sign_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_ckda_sign_fint_SOURCES = \
+    test/integration/fapi-key-create-ckda-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_ckda_sign_password_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PASSWORD  -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_key_create_ckda_sign_password_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_ckda_sign_password_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_ckda_sign_password_fint_SOURCES = \
+    test/integration/fapi-key-create-ckda-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_create_ckda_sign_password_da_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PASSWORD -DFAPI_DA  -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_key_create_ckda_sign_password_da_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_create_ckda_sign_password_da_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_create_ckda_sign_password_da_fint_SOURCES = \
+    test/integration/fapi-key-create-ckda-sign.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_key_change_auth_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_key_change_auth_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_key_change_auth_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_key_change_auth_fint_SOURCES = \
+    test/integration/fapi-key-change-auth.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_nv_ordinary_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_nv_ordinary_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_nv_ordinary_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_nv_ordinary_fint_SOURCES = \
+    test/integration/fapi-nv-ordinary.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_nv_authorizenv_cphash_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_nv_authorizenv_cphash_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_nv_authorizenv_cphash_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_nv_authorizenv_cphash_fint_SOURCES = \
+    test/integration/fapi-nv-authorizenv-cphash.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_nv_extend_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_nv_extend_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_nv_extend_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_nv_extend_fint_SOURCES = \
+    test/integration/fapi-nv-extend.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_nv_increment_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_nv_increment_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_nv_increment_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_nv_increment_fint_SOURCES = \
+    test/integration/fapi-nv-increment.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_nv_set_bits_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_nv_set_bits_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_nv_set_bits_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_nv_set_bits_fint_SOURCES = \
+    test/integration/fapi-nv-set-bits.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_nv_written_policy_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_nv_written_policy_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_nv_written_policy_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_nv_written_policy_fint_SOURCES = \
+    test/integration/fapi-nv-written-policy.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_export_policy_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_export_policy_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_export_policy_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_export_policy_fint_SOURCES = \
+    test/integration/fapi-export-policy.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_ext_public_key_fint_CFLAGS  = $(TESTS_CFLAGS) \
+  -DFAPI_NONTPM
+test_integration_fapi_ext_public_key_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_ext_public_key_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_ext_public_key_fint_SOURCES = \
+    test/integration/fapi-ext-public-key.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_data_crypt_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_data_crypt_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_data_crypt_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_data_crypt_fint_SOURCES = \
+    test/integration/fapi-data-crypt.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_data_crypt_persistent_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DPERSISTENT
+test_integration_fapi_data_crypt_persistent_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_data_crypt_persistent_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_data_crypt_persistent_fint_SOURCES = \
+    test/integration/fapi-data-crypt.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_data_crypt_rsa_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_data_crypt_rsa_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_data_crypt_rsa_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_data_crypt_rsa_fint_SOURCES = \
+    test/integration/fapi-data-crypt.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_data_crypt_rsa_persistent_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA\" -DPERSISTENT
+test_integration_fapi_data_crypt_rsa_persistent_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_data_crypt_rsa_persistent_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_data_crypt_rsa_persistent_fint_SOURCES = \
+    test/integration/fapi-data-crypt.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_duplicate_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_duplicate_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_duplicate_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_duplicate_fint_SOURCES = \
+    test/integration/fapi-duplicate.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_pcr_test_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_pcr_test_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_pcr_test_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_pcr_test_fint_SOURCES = \
+    test/integration/fapi-pcr-test.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_quote_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_quote_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_fint_SOURCES = \
+    test/integration/fapi-quote.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_quote_with_primary_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_quote_with_primary_fint_LDADD    = $(TESTS_LDADD)
+test_integration_fapi_quote_with_primary_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_with_primary_fint_SOURCES = \
+    test/integration/fapi-quote-with-primary.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_quote_rsa_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_quote_rsa_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_rsa_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_rsa_fint_SOURCES = \
+    test/integration/fapi-quote.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_policy_or_nv_read_write_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_policy_or_nv_read_write_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_policy_or_nv_read_write_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_policy_or_nv_read_write_fint_SOURCES = \
+    test/integration/fapi-policy-or-nv-read-write.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_info_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_info_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_info_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_info_fint_SOURCES = \
+    test/integration/fapi-info.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_unseal_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_unseal_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_unseal_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_unseal_fint_SOURCES = \
+    test/integration/fapi-unseal.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_unseal_persistent_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DPERSISTENT
+test_integration_fapi_unseal_persistent_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_unseal_persistent_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_unseal_persistent_fint_SOURCES = \
+    test/integration/fapi-unseal.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+
+test_integration_fapi_provision_fingerprint_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_TEST_FINGERPRINT  -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_provision_fingerprint_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provision_fingerprint_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provision_fingerprint_fint_SOURCES = \
+    test/integration/fapi-get-random.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_provision_certificate_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_TEST_CERTIFICATE  -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_provision_certificate_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provision_certificate_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provision_certificate_fint_SOURCES = \
+    test/integration/fapi-get-random.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_provision_fingerprint_ecc_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_TEST_FINGERPRINT_ECC  -DFAPI_PROFILE=\"P_ECC\"
+test_integration_fapi_provision_fingerprint_ecc_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provision_fingerprint_ecc_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provision_fingerprint_ecc_fint_SOURCES = \
+    test/integration/fapi-get-random.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_provision_certificate_ecc_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_TEST_CERTIFICATE_ECC  -DFAPI_PROFILE=\"P_ECC\"
+test_integration_fapi_provision_certificate_ecc_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provision_certificate_ecc_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provision_certificate_ecc_fint_SOURCES = \
+    test/integration/fapi-get-random.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_second_provisioning_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_second_provisioning_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_second_provisioning_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_second_provisioning_fint_SOURCES = \
+    test/integration/fapi-second-provisioning.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_provisioning_error_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_ECC_error\" -DFAPI_TEST_EK_CERT_LESS
+test_integration_fapi_provisioning_error_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provisioning_error_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provisioning_error_fint_SOURCES = \
+    test/integration/fapi-provisioning-error.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_quote_destructive_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_quote_destructive_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_destructive_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_destructive_fint_SOURCES = \
+    test/integration/fapi-quote-destructive.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_quote_destructive_eventlog_null_fint_CFLAGS  = $(TESTS_CFLAGS) \
+  -DFAPI_PROFILE=\"P_ECC_system\" \
+  -D FAPI_TEST_FIRMWARE_NULL \
+  -D FAPI_TEST_FIRMWARE_LOG_FILE_ABS=\"/dev/null\" \
+  -D FAPI_TEST_IMA_LOG_FILE_ABS=\"/dev/null\"
+test_integration_fapi_quote_destructive_eventlog_null_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_destructive_eventlog_null_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_destructive_eventlog_null_fint_SOURCES = \
+    test/integration/fapi-quote-destructive-eventlog.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_quote_destructive_eventlog_not_fint_CFLAGS  = $(TESTS_CFLAGS) \
+  -DFAPI_PROFILE=\"P_ECC_system\" \
+  -D FAPI_TEST_FIRMWARE_NULL
+test_integration_fapi_quote_destructive_eventlog_not_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_destructive_eventlog_not_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_destructive_eventlog_not_fint_SOURCES = \
+    test/integration/fapi-quote-destructive-eventlog.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+EXTRA_test_integration_fapi_quote_destructive_eventlog_fint_DEPENDENCIES = $(FAPI_TEST_BINS)
+
+test_integration_fapi_quote_destructive_eventlog_fint_CFLAGS  = $(TESTS_CFLAGS) \
+  -DFAPI_PROFILE=\"P_ECC_system\" \
+  -D FAPI_TEST_FIRMWARE_NUC \
+  -D FAPI_TEST_FIRMWARE_LOG_FILE=\"test/data/fapi/eventlog/binary_measurements_nuc.bin\" \
+  -D FAPI_TEST_IMA_LOG_FILE=\"test/data/fapi/eventlog/sml-ima-ng-sha1.bin\"
+test_integration_fapi_quote_destructive_eventlog_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_destructive_eventlog_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_destructive_eventlog_fint_SOURCES = \
+    test/integration/fapi-quote-destructive-eventlog.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+EXTRA_test_integration_fapi_quote_destructive_eventlog_pc_client_fint_DEPENDENCIES = $(FAPI_TEST_BINS)
+
+test_integration_fapi_quote_destructive_eventlog_pc_client_fint_CFLAGS  = $(TESTS_CFLAGS) \
+  -DFAPI_PROFILE=\"P_ECC_system\" \
+  -D FAPI_TEST_FIRMWARE_PC_CLIENT \
+  -D FAPI_TEST_FIRMWARE_LOG_FILE=\"test/data/fapi/eventlog/binary_measurements_pc_client.bin\" \
+  -D FAPI_TEST_IMA_LOG_FILE=\"test/data/fapi/eventlog/sml-ima-ng-sha1.bin\"
+test_integration_fapi_quote_destructive_eventlog_pc_client_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_quote_destructive_eventlog_pc_client_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_quote_destructive_eventlog_pc_client_fint_SOURCES = \
+    test/integration/fapi-quote-destructive-eventlog.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_provisioning_with_template_fint_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_fapi_provisioning_with_template_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provisioning_with_template_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provisioning_with_template_fint_SOURCES = \
+    test/integration/fapi-provisioning-with-template.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+test_integration_fapi_provisioning_with_template_rsa_fint_CFLAGS  = $(TESTS_CFLAGS) \
+ -DFAPI_PROFILE=\"P_RSA\"
+test_integration_fapi_provisioning_with_template_rsa_fint_LDADD   = $(TESTS_LDADD)
+test_integration_fapi_provisioning_with_template_rsa_fint_LDFLAGS = $(TESTS_LDFLAGS)
+test_integration_fapi_provisioning_with_template_rsa_fint_SOURCES = \
+    test/integration/fapi-provisioning-with-template.int.c \
+    test/integration/main-fapi.c test/integration/test-fapi.h
+
+endif #FAPI
+
+# Need policy and esys enabled to run this test
+if POLICY
+if ESYS
+
+TESTS_INTEGRATION += test/integration/policy-execute.int
+
+test_integration_policy_execute_int_CFLAGS  = $(TESTS_CFLAGS)
+test_integration_policy_execute_int_LDADD   = $(TESTS_LDADD)
+test_integration_policy_execute_int_LDFLAGS   = $(TESTS_LDFLAGS)
+test_integration_policy_execute_int_SOURCES = \
+    test/integration/policy-execute.int.c \
+    test/integration/main-esys.c src/util/log.c \
+    test/integration/test-esys.h test/data/test-fapi-policies.h
+endif # ESYS
+endif # POLICY
+
+endif #ENABLE_INTEGRATION
+
+check-device:
+	$(MAKE) -j1 check

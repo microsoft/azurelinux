@@ -1,0 +1,4 @@
+LIBRARY tss2-tcti-pcap
+EXPORTS
+    Tss2_Tcti_Info
+    Tss2_Tcti_Pcap_Init

@@ -1,0 +1,11 @@
+{
+     "profile_name": "P_ECCP256SHA256",
+     "profile_dir": "@sysconfdir@/tpm2-tss/fapi-profiles/",
+     "user_dir": "~/@userstatedir@/tpm2-tss/user/keystore",
+     "system_dir": "@localstatedir@/lib/tpm2-tss/system/keystore",
+     "tcti": "",
+     "system_pcrs" : [],
+     "log_dir" : "@runstatedir@/tpm2-tss/eventlog/",
+     "firmware_log_file": "@sysmeasurements@",
+     "ima_log_file": "@imameasurements@"
+}

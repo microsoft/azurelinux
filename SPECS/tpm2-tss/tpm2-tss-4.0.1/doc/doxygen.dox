@@ -1,0 +1,3180 @@
+/*!
+ \defgroup esys Enhanced System API
+ Enhanced System API (ESAPI) as described in the [TSS 2.0 Enhanced System API (ESAPI) Specification](https://trustedcomputinggroup.org/wp-content/uploads/TSS_ESAPI_Version-0.9_Revision-04_reviewEND030918.pdf).
+This API is a 1-to-1 mapping of the TPM2 commands documented in Part 3 of the TPM2 specification.
+Additionally there are asynchronous versions of each command.
+In addition to SAPI, the ESAPI performs tracking of meta data for TPM object and automatic calculation of session based authorization and encryption values.
+Both the synchronous and asynchronous API are exposed through a single library: libtss2-esys.
+*/
+
+/*!
+ \defgroup ESYS_CONTEXT Esys Context ESYS_CONTEXT
+ \ingroup esys
+ An ESYS_CONTEXT holds tdata for the connection to the TPM as
+ well as the metadata for TPM Resource; such as Transient key, Persistent
+ objects, NV spaces, Sessions or PCRs.
+ \{
+ \typedef ESYS_CONTEXT
+ Reference to the ESYS_CONTEXT that holds data for the connection to the TPM as
+ well as the metadata for TPM Resource; such as Transient key, Persistent
+ objects, NV spaces, Sessions or PCRs.
+ \fn TSS2_RC Esys_Initialize(ESYS_CONTEXT ** esys_context, TSS2_TCTI_CONTEXT * tcti, TSS2_ABI_VERSION * abiVersion)
+ \fn void Esys_Finalize(ESYS_CONTEXT * esys_context)
+ \fn TSS2_RC Esys_GetTcti(ESYS_CONTEXT * esys_context, TSS2_TCTI_CONTEXT ** tcti)
+ \fn TSS2_RC Esys_GetPollHandles(ESYS_CONTEXT * esys_context, TSS2_TCTI_POLL_HANDLE ** handles, size_t * count)
+ \fn TSS2_RC Esys_SetTimeout(ESYS_CONTEXT *esys_context, int32_t timeout)
+ \fn TSS2_RC Esys_GetSysContext(ESYS_CONTEXT *esys_context, TSS2_SYS_CONTEXT **sys_context)
+ \fn TSS2_RC Esys_SetCryptoCallbacks(ESYS_CONTEXT *esys_context, ESYS_CRYPTO_CALLBACKS *callbacks)
+ \fn void Esys_Free(void *__ptr)
+ \}
+*/
+
+/*!
+ \defgroup ESYS_TR Esys Tpm Resource ESYS_TR
+ \ingroup esys
+ Virtual objects with meta data for Tpm Resources.
+ The Esys TPM Resources are the virtual objects inside the ESYSCONTEXT that hold
+ the metadata for corresponding TPM Resources.
+
+ There are a set of global ESYS_TR objects such as ESYS_TR_NON or for the
+ various PCRs and hierarchies. ESYS_TR_MIN_OBJECT denotes the first non-global
+ ESYS_TR object.
+ \{
+ \typedef ESYS_TR
+ Reference to the virtual object inside the ESYS_CONTEXT that holds the metadata
+ for the corresponding TPM Resource. Such can be Transient key, Persistent
+ objects, NV spaces, Sessions or PCRs.
+ \fn TSS2_RC Esys_TR_SetAuth(ESYS_CONTEXT * esys_context, ESYS_TR esys_handle, TPM2B_AUTH const *authValue)
+ \fn TSS2_RC Esys_TR_GetName(ESYS_CONTEXT * esys_context, ESYS_TR esys_handle, TPM2B_NAME ** name)
+ \fn TSS2_RC Esys_TR_FromTPMPublic_Async( ESYS_CONTEXT *esysContext, TPM2_HANDLE tpm_handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_TR_FromTPMPublic_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *esys_handle)
+ \fn TSS2_RC Esys_TR_FromTPMPublic(ESYS_CONTEXT *esysContext, TPM2_HANDLE tpm_handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, ESYS_TR *object)
+ \fn TSS2_RC Esys_TR_Serialize(ESYS_CONTEXT *esys_context, ESYS_TR esys_handle, uint8_t **buffer, size_t *buffer_size)
+ \fn TSS2_RC Esys_TR_Deserialize(ESYS_CONTEXT *esys_context, uint8_t const *buffer, size_t buffer_size, ESYS_TR *esys_handle)
+ \fn TSS2_RC Esys_TR_Close(ESYS_CONTEXT *esys_context, ESYS_TR *object)
+ \fn TSS2_RC Esys_TRSess_GetAttributes(ESYS_CONTEXT * esysContext, ESYS_TR esys_handle, TPMA_SESSION * flags)
+ \fn TSS2_RC Esys_TRSess_SetAttributes(ESYS_CONTEXT * esys_context, ESYS_TR esys_handle, TPMA_SESSION flags, TPMA_SESSION mask)
+ \}
+*/
+
+/*!
+ \defgroup ESYS_TR_defines Global ESYS_TR objects
+ \ingroup ESYS_TR
+ A set of defines for global virtual objects that are always present in every
+ ESYS_CONTEXT.
+ \{
+ \def ESYS_TR_NONE Identifier for ESYS_TR parameters if no TPM Resource is supplied.
+ \def ESYS_TR_PASSWORD Identifier for ESYS_TR sessions for password authentication.
+ \def ESYS_TR_PCR0 TPM Resource PCR 0.
+ \def ESYS_TR_PCR1 TPM Resource PCR 1.
+ \def ESYS_TR_PCR2 TPM Resource PCR 2.
+ \def ESYS_TR_PCR3 TPM Resource PCR 3.
+ \def ESYS_TR_PCR4 TPM Resource PCR 4.
+ \def ESYS_TR_PCR5 TPM Resource PCR 5.
+ \def ESYS_TR_PCR6 TPM Resource PCR 6.
+ \def ESYS_TR_PCR7 TPM Resource PCR 7.
+ \def ESYS_TR_PCR8 TPM Resource PCR 8.
+ \def ESYS_TR_PCR9 TPM Resource PCR 9.
+ \def ESYS_TR_PCR10 TPM Resource PCR 10.
+ \def ESYS_TR_PCR11 TPM Resource PCR 11.
+ \def ESYS_TR_PCR12 TPM Resource PCR 12.
+ \def ESYS_TR_PCR13 TPM Resource PCR 13.
+ \def ESYS_TR_PCR14 TPM Resource PCR 14.
+ \def ESYS_TR_PCR15 TPM Resource PCR 15.
+ \def ESYS_TR_PCR16 TPM Resource PCR 16.
+ \def ESYS_TR_PCR17 TPM Resource PCR 17.
+ \def ESYS_TR_PCR18 TPM Resource PCR 18.
+ \def ESYS_TR_PCR19 TPM Resource PCR 19.
+ \def ESYS_TR_PCR20 TPM Resource PCR 20.
+ \def ESYS_TR_PCR21 TPM Resource PCR 21.
+ \def ESYS_TR_PCR22 TPM Resource PCR 22.
+ \def ESYS_TR_PCR23 TPM Resource PCR 23.
+ \def ESYS_TR_PCR24 TPM Resource PCR 24.
+ \def ESYS_TR_PCR25 TPM Resource PCR 25.
+ \def ESYS_TR_PCR26 TPM Resource PCR 26.
+ \def ESYS_TR_PCR27 TPM Resource PCR 27.
+ \def ESYS_TR_PCR28 TPM Resource PCR 28.
+ \def ESYS_TR_PCR29 TPM Resource PCR 29.
+ \def ESYS_TR_PCR30 TPM Resource PCR 30.
+ \def ESYS_TR_PCR31 TPM Resource PCR 31.
+ \def ESYS_TR_RH_OWNER TPM Resource Owner Hierarchy
+ \def ESYS_TR_RH_NULL TPM Resource Ephemeral Hierarchy
+ \def ESYS_TR_RH_LOCKOUT TPM Resource for Lockout Authorization
+ \def ESYS_TR_RH_ENDORSEMENT TPM Resource Endorsement Hierarchy
+ \def ESYS_TR_RH_PLATFORM TPM Resource Platform Hierarchy
+ \def ESYS_TR_RH_PLATFORM_NV Identifier for ESYS_TR used for phEnableNV
+ \def ESYS_TR_RH_AUTH_00 Identifier for ESYS_TR for the start of a range of authorization values that are vendor-specific.
+ \def ESYS_TR_RH_AUTH_FF Identifier for ESYS_TR for the end of a range of authorization values that are vendor-specific.
+ \def ESYS_TR_MIN_OBJECT The first non-global ESYS_TR object identifier. These are assigned by ESAPI and beyond this value.
+ \}
+*/
+
+/*!
+ \defgroup esys_tpm Esys TPM Commands
+ \ingroup esys
+ The following function represent interactions with the corresponding TPM
+ commands.
+ \{
+ \defgroup Esys_ActivateCredential The ESAPI function for the TPM2_ActivateCredential command.
+ * ESAPI function to invoke the TPM2_ActivateCredential command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ActivateCredential_Async(ESYS_CONTEXT *esysContext, ESYS_TR activateHandle, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ID_OBJECT *credentialBlob, const TPM2B_ENCRYPTED_SECRET *secret)
+ \fn TSS2_RC Esys_ActivateCredential(ESYS_CONTEXT *esysContext, ESYS_TR activateHandle, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ID_OBJECT *credentialBlob, const TPM2B_ENCRYPTED_SECRET *secret, TPM2B_DIGEST **certInfo)
+ \fn TSS2_RC Esys_ActivateCredential_Finish(ESYS_CONTEXT *esysContext, TPM2B_DIGEST **certInfo)
+ \}
+ \defgroup Esys_Certify The ESAPI function for the TPM2_Certify command.
+ * ESAPI function to invoke the TPM2_Certify command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Certify_Async(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme)
+ \fn TSS2_RC Esys_Certify(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, TPM2B_ATTEST **certifyInfo, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_Certify_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **certifyInfo, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_CertifyCreation The ESAPI function for the TPM2_CertifyCreation command.
+ * ESAPI function to invoke the TPM2_CertifyCreation command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_CertifyCreation_Async(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR objectHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPM2B_DIGEST *creationHash, const TPMT_SIG_SCHEME *inScheme, const TPMT_TK_CREATION *creationTicket)
+ \fn TSS2_RC Esys_CertifyCreation(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR objectHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPM2B_DIGEST *creationHash, const TPMT_SIG_SCHEME *inScheme, const TPMT_TK_CREATION *creationTicket, TPM2B_ATTEST **certifyInfo, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_CertifyCreation_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **certifyInfo, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_ChangeEPS The ESAPI function for the TPM2_ChangeEPS command.
+ * ESAPI function to invoke the TPM2_ChangeEPS command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ChangeEPS_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ChangeEPS(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ChangeEPS_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_ChangePPS The ESAPI function for the TPM2_ChangePPS command.
+ * ESAPI function to invoke the TPM2_ChangePPS command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ChangePPS_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ChangePPS(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ChangePPS_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Clear The ESAPI function for the TPM2_Clear command.
+ * ESAPI function to invoke the TPM2_Clear command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Clear_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \}
+ \defgroup Esys_ClearControl The ESAPI function for the TPM2_ClearControl command.
+ * ESAPI function to invoke the TPM2_ClearControl command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ClearControl_Async(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO disable)
+ \fn TSS2_RC Esys_ClearControl(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO disable)
+ \fn TSS2_RC Esys_ClearControl_Finish(ESYS_CONTEXT *esysContext)
+ \fn TSS2_RC Esys_Clear(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_Clear_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_ClockRateAdjust The ESAPI function for the TPM2_ClockRateAdjust command.
+ * ESAPI function to invoke the TPM2_ClockRateAdjust command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ClockRateAdjust_Async(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CLOCK_ADJUST rateAdjust)
+ \fn TSS2_RC Esys_ClockRateAdjust(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CLOCK_ADJUST rateAdjust)
+ \fn TSS2_RC Esys_ClockRateAdjust_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_ClockSet The ESAPI function for the TPM2_ClockSet command.
+ * ESAPI function to invoke the TPM2_ClockSet command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ClockSet_Async(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT64 newTime)
+ \fn TSS2_RC Esys_ClockSet(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT64 newTime)
+ \fn TSS2_RC Esys_ClockSet_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Commit The ESAPI function for the TPM2_Commit command.
+ * ESAPI function to invoke the TPM2_Commit command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Commit_Async(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ECC_POINT *P1, const TPM2B_SENSITIVE_DATA *s2, const TPM2B_ECC_PARAMETER *y2)
+ \fn TSS2_RC Esys_Commit(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ECC_POINT *P1, const TPM2B_SENSITIVE_DATA *s2, const TPM2B_ECC_PARAMETER *y2, TPM2B_ECC_POINT **K, TPM2B_ECC_POINT **L, TPM2B_ECC_POINT **E, UINT16 *counter)
+ \fn TSS2_RC Esys_Commit_Finish(ESYS_CONTEXT *esysContext, TPM2B_ECC_POINT **K, TPM2B_ECC_POINT **L, TPM2B_ECC_POINT **E, UINT16 *counter)
+ \}
+ \defgroup Esys_ContextLoad The ESAPI function for the TPM2_ContextLoad command.
+ * ESAPI function to invoke the TPM2_ContextLoad command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ContextLoad_Async(ESYS_CONTEXT *esysContext, const TPMS_CONTEXT *context)
+ \fn TSS2_RC Esys_ContextLoad(ESYS_CONTEXT *esysContext, const TPMS_CONTEXT *context, ESYS_TR *loadedHandle)
+ \fn TSS2_RC Esys_ContextLoad_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *loadedHandle)
+ \}
+ \defgroup Esys_ContextSave The ESAPI function for the TPM2_ContextSave command.
+ * ESAPI function to invoke the TPM2_ContextSave command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ContextSave_Async(ESYS_CONTEXT *esysContext, ESYS_TR saveHandle)
+ \fn TSS2_RC Esys_ContextSave(ESYS_CONTEXT *esysContext, ESYS_TR saveHandle, TPMS_CONTEXT **context)
+ \fn TSS2_RC Esys_ContextSave_Finish(ESYS_CONTEXT *esysContext, TPMS_CONTEXT **context)
+ \}
+ \defgroup Esys_Create The ESAPI function for the TPM2_Create command.
+ * ESAPI function to invoke the TPM2_Create command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Create_Async(ESYS_CONTEXT *esysContext, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE_CREATE *inSensitive, const TPM2B_PUBLIC *inPublic, const TPM2B_DATA *outsideInfo, const TPML_PCR_SELECTION *creationPCR)
+ \fn TSS2_RC Esys_Create(ESYS_CONTEXT *esysContext, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE_CREATE *inSensitive, const TPM2B_PUBLIC *inPublic, const TPM2B_DATA *outsideInfo, const TPML_PCR_SELECTION *creationPCR, TPM2B_PRIVATE **outPrivate, TPM2B_PUBLIC **outPublic, TPM2B_CREATION_DATA **creationData, TPM2B_DIGEST **creationHash, TPMT_TK_CREATION **creationTicket)
+ \fn TSS2_RC Esys_Create_Finish(ESYS_CONTEXT *esysContext, TPM2B_PRIVATE **outPrivate, TPM2B_PUBLIC **outPublic, TPM2B_CREATION_DATA **creationData, TPM2B_DIGEST **creationHash, TPMT_TK_CREATION **creationTicket)
+ \}
+ \defgroup Esys_CreatePrimary The ESAPI function for the TPM2_CreatePrimary command.
+ * ESAPI function to invoke the TPM2_CreatePrimary command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_CreatePrimary_Async(ESYS_CONTEXT *esysContext, ESYS_TR primaryHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE_CREATE *inSensitive, const TPM2B_PUBLIC *inPublic, const TPM2B_DATA *outsideInfo, const TPML_PCR_SELECTION *creationPCR)
+ \fn TSS2_RC Esys_CreatePrimary(ESYS_CONTEXT *esysContext, ESYS_TR primaryHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE_CREATE *inSensitive, const TPM2B_PUBLIC *inPublic, const TPM2B_DATA *outsideInfo, const TPML_PCR_SELECTION *creationPCR, ESYS_TR *objectHandle, TPM2B_PUBLIC **outPublic, TPM2B_CREATION_DATA **creationData, TPM2B_DIGEST **creationHash, TPMT_TK_CREATION **creationTicket)
+ \fn TSS2_RC Esys_CreatePrimary_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *objectHandle, TPM2B_PUBLIC **outPublic, TPM2B_CREATION_DATA **creationData, TPM2B_DIGEST **creationHash, TPMT_TK_CREATION **creationTicket)
+ \}
+ \defgroup Esys_DictionaryAttackLockReset The ESAPI function for the TPM2_DictionaryAttackLockReset command.
+ * ESAPI function to invoke the TPM2_DictionaryAttackLockReset command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_DictionaryAttackLockReset_Async(ESYS_CONTEXT *esysContext, ESYS_TR lockHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_DictionaryAttackLockReset(ESYS_CONTEXT *esysContext, ESYS_TR lockHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_DictionaryAttackLockReset_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_DictionaryAttackParameters The ESAPI function for the TPM2_DictionaryAttackParameters command.
+ * ESAPI function to invoke the TPM2_DictionaryAttackParameters command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_DictionaryAttackParameters_Async(ESYS_CONTEXT *esysContext, ESYS_TR lockHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT32 newMaxTries, UINT32 newRecoveryTime, UINT32 lockoutRecovery)
+ \fn TSS2_RC Esys_DictionaryAttackParameters(ESYS_CONTEXT *esysContext, ESYS_TR lockHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT32 newMaxTries, UINT32 newRecoveryTime, UINT32 lockoutRecovery)
+ \fn TSS2_RC Esys_DictionaryAttackParameters_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Duplicate The ESAPI function for the TPM2_Duplicate command.
+ * ESAPI function to invoke the TPM2_Duplicate command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Duplicate_Async(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR newParentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *encryptionKeyIn, const TPMT_SYM_DEF_OBJECT *symmetricAlg)
+ \fn TSS2_RC Esys_Duplicate(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR newParentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *encryptionKeyIn, const TPMT_SYM_DEF_OBJECT *symmetricAlg, TPM2B_DATA **encryptionKeyOut, TPM2B_PRIVATE **duplicate, TPM2B_ENCRYPTED_SECRET **outSymSeed)
+ \fn TSS2_RC Esys_Duplicate_Finish(ESYS_CONTEXT *esysContext, TPM2B_DATA **encryptionKeyOut, TPM2B_PRIVATE **duplicate, TPM2B_ENCRYPTED_SECRET **outSymSeed)
+ \}
+ \defgroup Esys_ECC_Parameters The ESAPI function for the TPM2_ECC_Parameters command.
+ * ESAPI function to invoke the TPM2_ECC_Parameters command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ECC_Parameters_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_ECC_CURVE curveID)
+ \fn TSS2_RC Esys_ECC_Parameters(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_ECC_CURVE curveID, TPMS_ALGORITHM_DETAIL_ECC **parameters)
+ \fn TSS2_RC Esys_ECC_Parameters_Finish(ESYS_CONTEXT *esysContext, TPMS_ALGORITHM_DETAIL_ECC **parameters)
+ \}
+ \defgroup Esys_ECDH_KeyGen The ESAPI function for the TPM2_ECDH_KeyGen command.
+ * ESAPI function to invoke the TPM2_ECDH_KeyGen command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ECDH_KeyGen_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ECDH_KeyGen(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_ECC_POINT **zPoint, TPM2B_ECC_POINT **pubPoint)
+ \fn TSS2_RC Esys_ECDH_KeyGen_Finish(ESYS_CONTEXT *esysContext, TPM2B_ECC_POINT **zPoint, TPM2B_ECC_POINT **pubPoint)
+ \}
+ \defgroup Esys_ECDH_ZGen The ESAPI function for the TPM2_ECDH_ZGen command.
+ * ESAPI function to invoke the TPM2_ECDH_ZGen command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ECDH_ZGen_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ECC_POINT *inPoint)
+ \fn TSS2_RC Esys_ECDH_ZGen(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ECC_POINT *inPoint, TPM2B_ECC_POINT **outPoint)
+ \fn TSS2_RC Esys_ECDH_ZGen_Finish(ESYS_CONTEXT *esysContext, TPM2B_ECC_POINT **outPoint)
+ \}
+ \defgroup Esys_EC_Ephemeral The ESAPI function for the TPM2_EC_Ephemeral command.
+ * ESAPI function to invoke the TPM2_EC_Ephemeral command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_EC_Ephemeral_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_ECC_CURVE curveID)
+ \fn TSS2_RC Esys_EC_Ephemeral(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_ECC_CURVE curveID, TPM2B_ECC_POINT **Q, UINT16 *counter)
+ \fn TSS2_RC Esys_EC_Ephemeral_Finish(ESYS_CONTEXT *esysContext, TPM2B_ECC_POINT **Q, UINT16 *counter)
+ \}
+ \defgroup Esys_EncryptDecrypt The ESAPI function for the TPM2_EncryptDecrypt command.
+ * ESAPI function to invoke the TPM2_EncryptDecrypt command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_EncryptDecrypt_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO decrypt, TPMI_ALG_CIPHER_MODE mode, const TPM2B_IV *ivIn, const TPM2B_MAX_BUFFER *inData)
+ \fn TSS2_RC Esys_EncryptDecrypt(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO decrypt, TPMI_ALG_CIPHER_MODE mode, const TPM2B_IV *ivIn, const TPM2B_MAX_BUFFER *inData, TPM2B_MAX_BUFFER **outData, TPM2B_IV **ivOut)
+ \fn TSS2_RC Esys_EncryptDecrypt_Finish(ESYS_CONTEXT *esysContext, TPM2B_MAX_BUFFER **outData, TPM2B_IV **ivOut)
+ \}
+ \defgroup Esys_EventSequenceComplete The ESAPI function for the TPM2_EventSequenceComplete command.
+ * ESAPI function to invoke the TPM2_EventSequenceComplete command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_EventSequenceComplete_Async(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR sequenceHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer)
+ \fn TSS2_RC Esys_EventSequenceComplete(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR sequenceHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer, TPML_DIGEST_VALUES **results)
+ \fn TSS2_RC Esys_EventSequenceComplete_Finish(ESYS_CONTEXT *esysContext, TPML_DIGEST_VALUES **results)
+ \}
+ \defgroup Esys_EvictControl The ESAPI function for the TPM2_EvictControl command.
+ * ESAPI function to invoke the TPM2_EvictControl command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_EvictControl_Async(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR objectHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_DH_PERSISTENT persistentHandle)
+ \fn TSS2_RC Esys_EvictControl(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR objectHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_DH_PERSISTENT persistentHandle, ESYS_TR *newObjectHandle)
+ \fn TSS2_RC Esys_EvictControl_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *newObjectHandle)
+ \}
+ \defgroup Esys_FlushContext The ESAPI function for the TPM2_FlushContext command.
+ * ESAPI function to invoke the TPM2_FlushContext command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_FlushContext_Async(ESYS_CONTEXT *esysContext, ESYS_TR flushHandle)
+ \fn TSS2_RC Esys_FlushContext(ESYS_CONTEXT *esysContext, ESYS_TR flushHandle)
+ \fn TSS2_RC Esys_FlushContext_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_GetCapability The ESAPI function for the TPM2_GetCapability command.
+ * ESAPI function to invoke the TPM2_GetCapability command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_GetCapability_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CAP capability, UINT32 property, UINT32 propertyCount)
+ \fn TSS2_RC Esys_GetCapability(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CAP capability, UINT32 property, UINT32 propertyCount, TPMI_YES_NO *moreData, TPMS_CAPABILITY_DATA **capabilityData)
+ \fn TSS2_RC Esys_GetCapability_Finish(ESYS_CONTEXT *esysContext, TPMI_YES_NO *moreData, TPMS_CAPABILITY_DATA **capabilityData)
+ \}
+ \defgroup Esys_GetCommandAuditDigest The ESAPI function for the TPM2_GetCommandAuditDigest command.
+ * ESAPI function to invoke the TPM2_GetCommandAuditDigest command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_GetCommandAuditDigest_Async(ESYS_CONTEXT *esysContext, ESYS_TR privacyHandle, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme)
+ \fn TSS2_RC Esys_GetCommandAuditDigest(ESYS_CONTEXT *esysContext, ESYS_TR privacyHandle, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, TPM2B_ATTEST **auditInfo, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_GetCommandAuditDigest_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **auditInfo, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_GetRandom The ESAPI function for the TPM2_GetRandom command.
+ * ESAPI function to invoke the TPM2_GetRandom command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_GetRandom_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT16 bytesRequested)
+ \fn TSS2_RC Esys_GetRandom(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT16 bytesRequested, TPM2B_DIGEST **randomBytes)
+ \fn TSS2_RC Esys_GetRandom_Finish(ESYS_CONTEXT *esysContext, TPM2B_DIGEST **randomBytes)
+ \}
+ \defgroup Esys_GetSessionAuditDigest The ESAPI function for the TPM2_GetSessionAuditDigest command.
+ * ESAPI function to invoke the TPM2_GetSessionAuditDigest command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_GetSessionAuditDigest_Async(ESYS_CONTEXT *esysContext, ESYS_TR privacyAdminHandle, ESYS_TR signHandle, ESYS_TR sessionHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme)
+ \fn TSS2_RC Esys_GetSessionAuditDigest(ESYS_CONTEXT *esysContext, ESYS_TR privacyAdminHandle, ESYS_TR signHandle, ESYS_TR sessionHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, TPM2B_ATTEST **auditInfo, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_GetSessionAuditDigest_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **auditInfo, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_GetTestResult The ESAPI function for the TPM2_GetTestResult command.
+ * ESAPI function to invoke the TPM2_GetTestResult command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_GetTestResult_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_GetTestResult(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_MAX_BUFFER **outData, TPM2_RC *testResult)
+ \fn TSS2_RC Esys_GetTestResult_Finish(ESYS_CONTEXT *esysContext, TPM2B_MAX_BUFFER **outData, TPM2_RC *testResult)
+ \}
+ \defgroup Esys_GetTime The ESAPI function for the TPM2_GetTime command.
+ * ESAPI function to invoke the TPM2_GetTime command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_GetTime_Async(ESYS_CONTEXT *esysContext, ESYS_TR privacyAdminHandle, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme)
+ \fn TSS2_RC Esys_GetTime(ESYS_CONTEXT *esysContext, ESYS_TR privacyAdminHandle, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, TPM2B_ATTEST **timeInfo, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_GetTime_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **timeInfo, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_Hash The ESAPI function for the TPM2_Hash command.
+ * ESAPI function to invoke the TPM2_Hash command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Hash_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *data, TPMI_ALG_HASH hashAlg, TPMI_RH_HIERARCHY hierarchy)
+ \fn TSS2_RC Esys_Hash(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *data, TPMI_ALG_HASH hashAlg, TPMI_RH_HIERARCHY hierarchy, TPM2B_DIGEST **outHash, TPMT_TK_HASHCHECK **validation)
+ \fn TSS2_RC Esys_Hash_Finish(ESYS_CONTEXT *esysContext, TPM2B_DIGEST **outHash, TPMT_TK_HASHCHECK **validation)
+ \}
+ \defgroup Esys_HashSequenceStart The ESAPI function for the TPM2_HashSequenceStart command.
+ * ESAPI function to invoke the TPM2_HashSequenceStart command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_HashSequenceStart_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *auth, TPMI_ALG_HASH hashAlg)
+ \fn TSS2_RC Esys_HashSequenceStart(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *auth, TPMI_ALG_HASH hashAlg, ESYS_TR *sequenceHandle)
+ \fn TSS2_RC Esys_HashSequenceStart_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *sequenceHandle)
+ \}
+ \defgroup Esys_HierarchyChangeAuth The ESAPI function for the TPM2_HierarchyChangeAuth command.
+ * ESAPI function to invoke the TPM2_HierarchyChangeAuth command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_HierarchyChangeAuth_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *newAuth)
+ \fn TSS2_RC Esys_HierarchyChangeAuth(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *newAuth)
+ \fn TSS2_RC Esys_HierarchyChangeAuth_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_HierarchyControl The ESAPI function for the TPM2_HierarchyControl command.
+ * ESAPI function to invoke the TPM2_HierarchyControl command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_HierarchyControl_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_RH_ENABLES enable, TPMI_YES_NO state)
+ \fn TSS2_RC Esys_HierarchyControl(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_RH_ENABLES enable, TPMI_YES_NO state)
+ \fn TSS2_RC Esys_HierarchyControl_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_HMAC The ESAPI function for the TPM2_HMAC command.
+ * ESAPI function to invoke the TPM2_HMAC command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_HMAC_Async(ESYS_CONTEXT *esysContext, ESYS_TR handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer, TPMI_ALG_HASH hashAlg)
+ \fn TSS2_RC Esys_HMAC(ESYS_CONTEXT *esysContext, ESYS_TR handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer, TPMI_ALG_HASH hashAlg, TPM2B_DIGEST **outHMAC)
+ \fn TSS2_RC Esys_HMAC_Finish(ESYS_CONTEXT *esysContext, TPM2B_DIGEST **outHMAC)
+ \}
+ \defgroup Esys_HMAC_Start The ESAPI function for the TPM2_HMAC_Start command.
+ * ESAPI function to invoke the TPM2_HMAC_Start command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_HMAC_Start_Async(ESYS_CONTEXT *esysContext, ESYS_TR handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *auth, TPMI_ALG_HASH hashAlg)
+ \fn TSS2_RC Esys_HMAC_Start(ESYS_CONTEXT *esysContext, ESYS_TR handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *auth, TPMI_ALG_HASH hashAlg, ESYS_TR *sequenceHandle)
+ \fn TSS2_RC Esys_HMAC_Start_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *sequenceHandle)
+ \}
+ \defgroup Esys_Import The ESAPI function for the TPM2_Import command.
+ * ESAPI function to invoke the TPM2_Import command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Import_Async(ESYS_CONTEXT *esysContext, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *encryptionKey, const TPM2B_PUBLIC *objectPublic, const TPM2B_PRIVATE *duplicate, const TPM2B_ENCRYPTED_SECRET *inSymSeed, const TPMT_SYM_DEF_OBJECT *symmetricAlg)
+ \fn TSS2_RC Esys_Import(ESYS_CONTEXT *esysContext, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *encryptionKey, const TPM2B_PUBLIC *objectPublic, const TPM2B_PRIVATE *duplicate, const TPM2B_ENCRYPTED_SECRET *inSymSeed, const TPMT_SYM_DEF_OBJECT *symmetricAlg, TPM2B_PRIVATE **outPrivate)
+ \fn TSS2_RC Esys_Import_Finish(ESYS_CONTEXT *esysContext, TPM2B_PRIVATE **outPrivate)
+ \}
+ \defgroup Esys_IncrementalSelfTest The ESAPI function for the TPM2_IncrementalSelfTest command.
+ * ESAPI function to invoke the TPM2_IncrementalSelfTest command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_IncrementalSelfTest_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_ALG *toTest)
+ \fn TSS2_RC Esys_IncrementalSelfTest(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_ALG *toTest, TPML_ALG **toDoList)
+ \fn TSS2_RC Esys_IncrementalSelfTest_Finish(ESYS_CONTEXT *esysContext, TPML_ALG **toDoList)
+ \}
+ \defgroup Esys_Load The ESAPI function for the TPM2_Load command.
+ * ESAPI function to invoke the TPM2_Load command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Load_Async(ESYS_CONTEXT *esysContext, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PRIVATE *inPrivate, const TPM2B_PUBLIC *inPublic)
+ \fn TSS2_RC Esys_Load(ESYS_CONTEXT *esysContext, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PRIVATE *inPrivate, const TPM2B_PUBLIC *inPublic, ESYS_TR *objectHandle)
+ \}
+ \defgroup Esys_LoadExternal The ESAPI function for the TPM2_LoadExternal command.
+ * ESAPI function to invoke the TPM2_LoadExternal command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_LoadExternal_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE *inPrivate, const TPM2B_PUBLIC *inPublic, TPMI_RH_HIERARCHY hierarchy)
+ \fn TSS2_RC Esys_LoadExternal(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE *inPrivate, const TPM2B_PUBLIC *inPublic, TPMI_RH_HIERARCHY hierarchy, ESYS_TR *objectHandle)
+ \fn TSS2_RC Esys_LoadExternal_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *objectHandle)
+ \fn TSS2_RC Esys_Load_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *objectHandle)
+ \}
+ \defgroup Esys_MakeCredential The ESAPI function for the TPM2_MakeCredential command.
+ * ESAPI function to invoke the TPM2_MakeCredential command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_MakeCredential_Async(ESYS_CONTEXT *esysContext, ESYS_TR handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *credential, const TPM2B_NAME *objectName)
+ \fn TSS2_RC Esys_MakeCredential(ESYS_CONTEXT *esysContext, ESYS_TR handle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *credential, const TPM2B_NAME *objectName, TPM2B_ID_OBJECT **credentialBlob, TPM2B_ENCRYPTED_SECRET **secret)
+ \fn TSS2_RC Esys_MakeCredential_Finish(ESYS_CONTEXT *esysContext, TPM2B_ID_OBJECT **credentialBlob, TPM2B_ENCRYPTED_SECRET **secret)
+ \}
+ \defgroup Esys_NV_Certify The ESAPI function for the TPM2_NV_Certify command.
+ * ESAPI function to invoke the TPM2_NV_Certify command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_Certify_Async(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, UINT16 size, UINT16 offset)
+ \fn TSS2_RC Esys_NV_Certify(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, UINT16 size, UINT16 offset, TPM2B_ATTEST **certifyInfo, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_NV_Certify_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **certifyInfo, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_NV_ChangeAuth The ESAPI function for the TPM2_NV_ChangeAuth command.
+ * ESAPI function to invoke the TPM2_NV_ChangeAuth command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_ChangeAuth_Async(ESYS_CONTEXT *esysContext, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *newAuth)
+ \fn TSS2_RC Esys_NV_ChangeAuth(ESYS_CONTEXT *esysContext, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *newAuth)
+ \fn TSS2_RC Esys_NV_ChangeAuth_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_DefineSpace The ESAPI function for the TPM2_NV_DefineSpace command.
+ * ESAPI function to invoke the TPM2_NV_DefineSpace command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_DefineSpace_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *auth, const TPM2B_NV_PUBLIC *publicInfo)
+ \fn TSS2_RC Esys_NV_DefineSpace(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *auth, const TPM2B_NV_PUBLIC *publicInfo, ESYS_TR *nvHandle)
+ \fn TSS2_RC Esys_NV_DefineSpace_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *nvHandle)
+ \}
+ \defgroup Esys_NV_Extend The ESAPI function for the TPM2_NV_Extend command.
+ * ESAPI function to invoke the TPM2_NV_Extend command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_Extend_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_NV_BUFFER *data)
+ \fn TSS2_RC Esys_NV_Extend(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_NV_BUFFER *data)
+ \fn TSS2_RC Esys_NV_Extend_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_GlobalWriteLock The ESAPI function for the TPM2_NV_GlobalWriteLock command.
+ * ESAPI function to invoke the TPM2_NV_GlobalWriteLock command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_GlobalWriteLock_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_GlobalWriteLock(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_GlobalWriteLock_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_Increment The ESAPI function for the TPM2_NV_Increment command.
+ * ESAPI function to invoke the TPM2_NV_Increment command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_Increment_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_Increment(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_Increment_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_Read The ESAPI function for the TPM2_NV_Read command.
+ * ESAPI function to invoke the TPM2_NV_Read command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_Read_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT16 size, UINT16 offset)
+ \fn TSS2_RC Esys_NV_Read(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT16 size, UINT16 offset, TPM2B_MAX_NV_BUFFER **data)
+ \fn TSS2_RC Esys_NV_Read_Finish(ESYS_CONTEXT *esysContext, TPM2B_MAX_NV_BUFFER **data)
+ \}
+ \defgroup Esys_NV_ReadLock The ESAPI function for the TPM2_NV_ReadLock command.
+ * ESAPI function to invoke the TPM2_NV_ReadLock command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_ReadLock_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_ReadLock(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_ReadLock_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_ReadPublic The ESAPI function for the TPM2_NV_ReadPublic command.
+ * ESAPI function to invoke the TPM2_NV_ReadPublic command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_ReadPublic_Async(ESYS_CONTEXT *esysContext, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_ReadPublic(ESYS_CONTEXT *esysContext, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_NV_PUBLIC **nvPublic, TPM2B_NAME **nvName)
+ \fn TSS2_RC Esys_NV_ReadPublic_Finish(ESYS_CONTEXT *esysContext, TPM2B_NV_PUBLIC **nvPublic, TPM2B_NAME **nvName)
+ \}
+ \defgroup Esys_NV_SetBits The ESAPI function for the TPM2_NV_SetBits command.
+ * ESAPI function to invoke the TPM2_NV_SetBits command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_SetBits_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT64 bits)
+ \fn TSS2_RC Esys_NV_SetBits(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT64 bits)
+ \fn TSS2_RC Esys_NV_SetBits_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_UndefineSpace The ESAPI function for the TPM2_NV_UndefineSpace command.
+ * ESAPI function to invoke the TPM2_NV_UndefineSpace command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_UndefineSpace_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_UndefineSpace(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_UndefineSpace_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_UndefineSpaceSpecial The ESAPI function for the TPM2_NV_UndefineSpaceSpecial command.
+ * ESAPI function to invoke the TPM2_NV_UndefineSpaceSpecial command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_UndefineSpaceSpecial_Async(ESYS_CONTEXT *esysContext, ESYS_TR nvIndex, ESYS_TR platform, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_UndefineSpaceSpecial(ESYS_CONTEXT *esysContext, ESYS_TR nvIndex, ESYS_TR platform, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_UndefineSpaceSpecial_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_Write The ESAPI function for the TPM2_NV_Write command.
+ * ESAPI function to invoke the TPM2_NV_Write command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_Write_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_NV_BUFFER *data, UINT16 offset)
+ \fn TSS2_RC Esys_NV_Write(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_NV_BUFFER *data, UINT16 offset)
+ \fn TSS2_RC Esys_NV_Write_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_NV_WriteLock The ESAPI function for the TPM2_NV_WriteLock command.
+ * ESAPI function to invoke the TPM2_NV_WriteLock command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_NV_WriteLock_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_WriteLock(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_NV_WriteLock_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_ObjectChangeAuth The ESAPI function for the TPM2_ObjectChangeAuth command.
+ * ESAPI function to invoke the TPM2_ObjectChangeAuth command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ObjectChangeAuth_Async(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *newAuth)
+ \fn TSS2_RC Esys_ObjectChangeAuth(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR parentHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_AUTH *newAuth, TPM2B_PRIVATE **outPrivate)
+ \fn TSS2_RC Esys_ObjectChangeAuth_Finish(ESYS_CONTEXT *esysContext, TPM2B_PRIVATE **outPrivate)
+ \}
+ \defgroup Esys_PCR_Allocate The ESAPI function for the TPM2_PCR_Allocate command.
+ * ESAPI function to invoke the TPM2_PCR_Allocate command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_Allocate_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_PCR_SELECTION *pcrAllocation)
+ \fn TSS2_RC Esys_PCR_Allocate(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_PCR_SELECTION *pcrAllocation, TPMI_YES_NO *allocationSuccess, UINT32 *maxPCR, UINT32 *sizeNeeded, UINT32 *sizeAvailable)
+ \fn TSS2_RC Esys_PCR_Allocate_Finish(ESYS_CONTEXT *esysContext, TPMI_YES_NO *allocationSuccess, UINT32 *maxPCR, UINT32 *sizeNeeded, UINT32 *sizeAvailable)
+ \}
+ \defgroup Esys_PCR_Event The ESAPI function for the TPM2_PCR_Event command.
+ * ESAPI function to invoke the TPM2_PCR_Event command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_Event_Async(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_EVENT *eventData)
+ \fn TSS2_RC Esys_PCR_Event(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_EVENT *eventData, TPML_DIGEST_VALUES **digests)
+ \fn TSS2_RC Esys_PCR_Event_Finish(ESYS_CONTEXT *esysContext, TPML_DIGEST_VALUES **digests)
+ \}
+ \defgroup Esys_PCR_Extend The ESAPI function for the TPM2_PCR_Extend command.
+ * ESAPI function to invoke the TPM2_PCR_Extend command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_Extend_Async(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_DIGEST_VALUES *digests)
+ \fn TSS2_RC Esys_PCR_Extend(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_DIGEST_VALUES *digests)
+ \fn TSS2_RC Esys_PCR_Extend_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PCR_Read The ESAPI function for the TPM2_PCR_Read command.
+ * ESAPI function to invoke the TPM2_PCR_Read command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_Read_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_PCR_SELECTION *pcrSelectionIn)
+ \fn TSS2_RC Esys_PCR_Read(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_PCR_SELECTION *pcrSelectionIn, UINT32 *pcrUpdateCounter, TPML_PCR_SELECTION **pcrSelectionOut, TPML_DIGEST **pcrValues)
+ \fn TSS2_RC Esys_PCR_Read_Finish(ESYS_CONTEXT *esysContext, UINT32 *pcrUpdateCounter, TPML_PCR_SELECTION **pcrSelectionOut, TPML_DIGEST **pcrValues)
+ \}
+ \defgroup Esys_PCR_Reset The ESAPI function for the TPM2_PCR_Reset command.
+ * ESAPI function to invoke the TPM2_PCR_Reset command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_Reset_Async(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PCR_Reset(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PCR_Reset_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PCR_SetAuthPolicy The ESAPI function for the TPM2_PCR_SetAuthPolicy command.
+ * ESAPI function to invoke the TPM2_PCR_SetAuthPolicy command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_SetAuthPolicy_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *authPolicy, TPMI_ALG_HASH hashAlg, TPMI_DH_PCR pcrNum)
+ \fn TSS2_RC Esys_PCR_SetAuthPolicy(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *authPolicy, TPMI_ALG_HASH hashAlg, TPMI_DH_PCR pcrNum)
+ \fn TSS2_RC Esys_PCR_SetAuthPolicy_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PCR_SetAuthValue The ESAPI function for the TPM2_PCR_SetAuthValue command.
+ * ESAPI function to invoke the TPM2_PCR_SetAuthValue command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PCR_SetAuthValue_Async(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *auth)
+ \fn TSS2_RC Esys_PCR_SetAuthValue(ESYS_CONTEXT *esysContext, ESYS_TR pcrHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *auth)
+ \fn TSS2_RC Esys_PCR_SetAuthValue_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyAuthorize The ESAPI function for the TPM2_PolicyAuthorize command.
+ * ESAPI function to invoke the TPM2_PolicyAuthorize command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyAuthorize_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *approvedPolicy, const TPM2B_NONCE *policyRef, const TPM2B_NAME *keySign, const TPMT_TK_VERIFIED *checkTicket)
+ \fn TSS2_RC Esys_PolicyAuthorize(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *approvedPolicy, const TPM2B_NONCE *policyRef, const TPM2B_NAME *keySign, const TPMT_TK_VERIFIED *checkTicket)
+ \fn TSS2_RC Esys_PolicyAuthorize_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyAuthValue The ESAPI function for the TPM2_PolicyAuthValue command.
+ * ESAPI function to invoke the TPM2_PolicyAuthValue command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyAuthValue_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyAuthValue(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyAuthValue_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyCommandCode The ESAPI function for the TPM2_PolicyCommandCode command.
+ * ESAPI function to invoke the TPM2_PolicyCommandCode command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyCommandCode_Async(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CC code)
+ \fn TSS2_RC Esys_PolicyCommandCode(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_CC code)
+ \fn TSS2_RC Esys_PolicyCommandCode_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyCounterTimer The ESAPI function for the TPM2_PolicyCounterTimer command.
+ * ESAPI function to invoke the TPM2_PolicyCounterTimer command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyCounterTimer_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_OPERAND *operandB, UINT16 offset, TPM2_EO operation)
+ \fn TSS2_RC Esys_PolicyCounterTimer(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_OPERAND *operandB, UINT16 offset, TPM2_EO operation)
+ \fn TSS2_RC Esys_PolicyCounterTimer_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyCpHash The ESAPI function for the TPM2_PolicyCpHash command.
+ * ESAPI function to invoke the TPM2_PolicyCpHash command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyCpHash_Async(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3,  const TPM2B_DIGEST *cpHashA)
+ \fn TSS2_RC Esys_PolicyCpHash(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *cpHashA)
+ \fn TSS2_RC Esys_PolicyCpHash_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyDuplicationSelect The ESAPI function for the TPM2_PolicyDuplicationSelect command.
+ * ESAPI function to invoke the TPM2_PolicyDuplicationSelect command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyDuplicationSelect_Async(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NAME *objectName, const TPM2B_NAME *newParentName, TPMI_YES_NO includeObject)
+ \fn TSS2_RC Esys_PolicyDuplicationSelect(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NAME *objectName, const TPM2B_NAME *newParentName, TPMI_YES_NO includeObject)
+ \fn TSS2_RC Esys_PolicyDuplicationSelect_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyGetDigest The ESAPI function for the TPM2_PolicyGetDigest command.
+ * ESAPI function to invoke the TPM2_PolicyGetDigest command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyGetDigest_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyGetDigest(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_DIGEST **policyDigest)
+ \fn TSS2_RC Esys_PolicyGetDigest_Finish(ESYS_CONTEXT *esysContext, TPM2B_DIGEST **policyDigest)
+ \}
+ \defgroup Esys_PolicyLocality The ESAPI function for the TPM2_PolicyLocality command.
+ * ESAPI function to invoke the TPM2_PolicyLocality command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyLocality_Async(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMA_LOCALITY locality)
+ \fn TSS2_RC Esys_PolicyLocality(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMA_LOCALITY locality)
+ \fn TSS2_RC Esys_PolicyLocality_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyNameHash The ESAPI function for the TPM2_PolicyNameHash command.
+ * ESAPI function to invoke the TPM2_PolicyNameHash command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyNameHash_Async(ESYS_CONTEXT *esysContext, ESYS_TR  policySession,  ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *nameHash)
+ \fn TSS2_RC Esys_PolicyNameHash(ESYS_CONTEXT *esysContext, ESYS_TR  policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *nameHash)
+ \fn TSS2_RC Esys_PolicyNameHash_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyNV The ESAPI function for the TPM2_PolicyNV command.
+ * ESAPI function to invoke the TPM2_PolicyNV command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyNV_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_OPERAND *operandB, UINT16 offset, TPM2_EO operation)
+ \fn TSS2_RC Esys_PolicyNV(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR nvIndex, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_OPERAND *operandB, UINT16 offset, TPM2_EO operation)
+ \fn TSS2_RC Esys_PolicyNV_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyNvWritten The ESAPI function for the TPM2_PolicyNvWritten command.
+ * ESAPI function to invoke the TPM2_PolicyNvWritten command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyNvWritten_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO writtenSet)
+ \fn TSS2_RC Esys_PolicyNvWritten(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO writtenSet)
+ \fn TSS2_RC Esys_PolicyNvWritten_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyOR The ESAPI function for the TPM2_PolicyOR command.
+ * ESAPI function to invoke the TPM2_PolicyOR command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyOR_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_DIGEST *pHashList)
+ \fn TSS2_RC Esys_PolicyOR(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_DIGEST *pHashList)
+ \fn TSS2_RC Esys_PolicyOR_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyPassword The ESAPI function for the TPM2_PolicyPassword command.
+ * ESAPI function to invoke the TPM2_PolicyPassword command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyPassword_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyPassword(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyPassword_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyPCR The ESAPI function for the TPM2_PolicyPCR command.
+ * ESAPI function to invoke the TPM2_PolicyPCR command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyPCR_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *pcrDigest, const TPML_PCR_SELECTION *pcrs)
+ \fn TSS2_RC Esys_PolicyPCR(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *pcrDigest, const TPML_PCR_SELECTION *pcrs)
+ \fn TSS2_RC Esys_PolicyPCR_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyPhysicalPresence The ESAPI function for the TPM2_PolicyPhysicalPresence command.
+ * ESAPI function to invoke the TPM2_PolicyPhysicalPresence command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyPhysicalPresence_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyPhysicalPresence(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyPhysicalPresence_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicyRestart The ESAPI function for the TPM2_PolicyRestart command.
+ * ESAPI function to invoke the TPM2_PolicyRestart command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyRestart_Async(ESYS_CONTEXT *esysContext, ESYS_TR sessionHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyRestart(ESYS_CONTEXT *esysContext, ESYS_TR sessionHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_PolicyRestart_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PolicySecret The ESAPI function for the TPM2_PolicySecret command.
+ * ESAPI function to invoke the TPM2_PolicySecret command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicySecret_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NONCE *nonceTPM, const TPM2B_DIGEST *cpHashA, const TPM2B_NONCE *policyRef, INT32 expiration)
+ \fn TSS2_RC Esys_PolicySecret(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NONCE *nonceTPM, const TPM2B_DIGEST *cpHashA, const TPM2B_NONCE *policyRef, INT32 expiration, TPM2B_TIMEOUT **timeout, TPMT_TK_AUTH **policyTicket)
+ \fn TSS2_RC Esys_PolicySecret_Finish(ESYS_CONTEXT *esysContext, TPM2B_TIMEOUT **timeout, TPMT_TK_AUTH **policyTicket)
+ \}
+ \defgroup Esys_PolicySigned The ESAPI function for the TPM2_PolicySigned command.
+ * ESAPI function to invoke the TPM2_PolicySigned command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicySigned_Async(ESYS_CONTEXT *esysContext, ESYS_TR authObject, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NONCE *nonceTPM, const TPM2B_DIGEST *cpHashA, const TPM2B_NONCE *policyRef, INT32 expiration, const TPMT_SIGNATURE *auth)
+ \fn TSS2_RC Esys_PolicySigned(ESYS_CONTEXT *esysContext, ESYS_TR authObject, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NONCE *nonceTPM, const TPM2B_DIGEST *cpHashA, const TPM2B_NONCE *policyRef, INT32 expiration, const TPMT_SIGNATURE *auth, TPM2B_TIMEOUT **timeout, TPMT_TK_AUTH **policyTicket)
+ \fn TSS2_RC Esys_PolicySigned_Finish(ESYS_CONTEXT *esysContext, TPM2B_TIMEOUT **timeout, TPMT_TK_AUTH **policyTicket)
+ \}
+ \defgroup Esys_PolicyTicket The ESAPI function for the TPM2_PolicyTicket command.
+ * ESAPI function to invoke the TPM2_PolicyTicket command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PolicyTicket_Async(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_TIMEOUT *timeout, const TPM2B_DIGEST *cpHashA, const TPM2B_NONCE *policyRef, const TPM2B_NAME *authName, const TPMT_TK_AUTH *ticket)
+ \fn TSS2_RC Esys_PolicyTicket(ESYS_CONTEXT *esysContext, ESYS_TR policySession, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_TIMEOUT *timeout, const TPM2B_DIGEST *cpHashA, const TPM2B_NONCE *policyRef, const TPM2B_NAME *authName, const TPMT_TK_AUTH *ticket)
+ \fn TSS2_RC Esys_PolicyTicket_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_PP_Commands The ESAPI function for the TPM2_PP_Commands command.
+ * ESAPI function to invoke the TPM2_PP_Commands command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_PP_Commands_Async(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_CC *setList, const TPML_CC *clearList)
+ \fn TSS2_RC Esys_PP_Commands(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPML_CC *setList, const TPML_CC *clearList)
+ \fn TSS2_RC Esys_PP_Commands_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Quote The ESAPI function for the TPM2_Quote command.
+ * ESAPI function to invoke the TPM2_Quote command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Quote_Async(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, const TPML_PCR_SELECTION *PCRselect)
+ \fn TSS2_RC Esys_Quote(ESYS_CONTEXT *esysContext, ESYS_TR signHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *qualifyingData, const TPMT_SIG_SCHEME *inScheme, const TPML_PCR_SELECTION *PCRselect, TPM2B_ATTEST **quoted, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_Quote_Finish(ESYS_CONTEXT *esysContext, TPM2B_ATTEST **quoted, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_ReadClock The ESAPI function for the TPM2_ReadClock command.
+ * ESAPI function to invoke the TPM2_ReadClock command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ReadClock_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ReadClock(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMS_TIME_INFO **currentTime)
+ \fn TSS2_RC Esys_ReadClock_Finish(ESYS_CONTEXT *esysContext, TPMS_TIME_INFO **currentTime)
+ \}
+ \defgroup Esys_ReadPublic The ESAPI function for the TPM2_ReadPublic command.
+ * ESAPI function to invoke the TPM2_ReadPublic command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ReadPublic_Async(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_ReadPublic(ESYS_CONTEXT *esysContext, ESYS_TR objectHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_PUBLIC **outPublic, TPM2B_NAME **name, TPM2B_NAME **qualifiedName)
+ \fn TSS2_RC Esys_ReadPublic_Finish(ESYS_CONTEXT *esysContext, TPM2B_PUBLIC **outPublic, TPM2B_NAME **name, TPM2B_NAME **qualifiedName)
+ \}
+ \defgroup Esys_Rewrap The ESAPI function for the TPM2_Rewrap command.
+ * ESAPI function to invoke the TPM2_Rewrap command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Rewrap_Async(ESYS_CONTEXT *esysContext, ESYS_TR oldParent, ESYS_TR newParent, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PRIVATE *inDuplicate, const TPM2B_NAME *name, const TPM2B_ENCRYPTED_SECRET *inSymSeed)
+ \fn TSS2_RC Esys_Rewrap(ESYS_CONTEXT *esysContext, ESYS_TR oldParent, ESYS_TR newParent, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PRIVATE *inDuplicate, const TPM2B_NAME *name, const TPM2B_ENCRYPTED_SECRET *inSymSeed, TPM2B_PRIVATE **outDuplicate, TPM2B_ENCRYPTED_SECRET **outSymSeed)
+ \fn TSS2_RC Esys_Rewrap_Finish(ESYS_CONTEXT *esysContext, TPM2B_PRIVATE **outDuplicate, TPM2B_ENCRYPTED_SECRET **outSymSeed)
+ \}
+ \defgroup Esys_RSA_Decrypt The ESAPI function for the TPM2_RSA_Decrypt command.
+ * ESAPI function to invoke the TPM2_RSA_Decrypt command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_RSA_Decrypt_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PUBLIC_KEY_RSA *cipherText, const TPMT_RSA_DECRYPT *inScheme, const TPM2B_DATA *label)
+ \fn TSS2_RC Esys_RSA_Decrypt(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PUBLIC_KEY_RSA *cipherText, const TPMT_RSA_DECRYPT *inScheme, const TPM2B_DATA *label, TPM2B_PUBLIC_KEY_RSA **message)
+ \fn TSS2_RC Esys_RSA_Decrypt_Finish(ESYS_CONTEXT *esysContext, TPM2B_PUBLIC_KEY_RSA **message)
+ \}
+ \defgroup Esys_RSA_Encrypt The ESAPI function for the TPM2_RSA_Encrypt command.
+ * ESAPI function to invoke the TPM2_RSA_Encrypt command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_RSA_Encrypt_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PUBLIC_KEY_RSA *message, const TPMT_RSA_DECRYPT *inScheme, const TPM2B_DATA *label)
+ \fn TSS2_RC Esys_RSA_Encrypt(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_PUBLIC_KEY_RSA *message, const TPMT_RSA_DECRYPT *inScheme, const TPM2B_DATA *label, TPM2B_PUBLIC_KEY_RSA **outData)
+ \fn TSS2_RC Esys_RSA_Encrypt_Finish(ESYS_CONTEXT *esysContext, TPM2B_PUBLIC_KEY_RSA **outData)
+ \}
+ \defgroup Esys_SelfTest The ESAPI function for the TPM2_SelfTest command.
+ * ESAPI function to invoke the TPM2_SelfTest command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_SelfTest_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO fullTest)
+ \fn TSS2_RC Esys_SelfTest(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_YES_NO fullTest)
+ \fn TSS2_RC Esys_SelfTest_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_SequenceComplete The ESAPI function for the TPM2_SequenceComplete command.
+ * ESAPI function to invoke the TPM2_SequenceComplete command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_SequenceComplete_Async(ESYS_CONTEXT *esysContext, ESYS_TR sequenceHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer, TPMI_RH_HIERARCHY hierarchy)
+ \fn TSS2_RC Esys_SequenceComplete(ESYS_CONTEXT *esysContext, ESYS_TR sequenceHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer, TPMI_RH_HIERARCHY hierarchy, TPM2B_DIGEST **result, TPMT_TK_HASHCHECK **validation)
+ \fn TSS2_RC Esys_SequenceComplete_Finish(ESYS_CONTEXT *esysContext, TPM2B_DIGEST **result, TPMT_TK_HASHCHECK **validation)
+ \}
+ \defgroup Esys_SequenceUpdate The ESAPI function for the TPM2_SequenceUpdate command.
+ * ESAPI function to invoke the TPM2_SequenceUpdate command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_SequenceUpdate_Async(ESYS_CONTEXT *esysContext, ESYS_TR sequenceHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer)
+ \fn TSS2_RC Esys_SequenceUpdate(ESYS_CONTEXT *esysContext, ESYS_TR sequenceHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_MAX_BUFFER *buffer)
+ \fn TSS2_RC Esys_SequenceUpdate_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_SetAlgorithmSet The ESAPI function for the TPM2_SetAlgorithmSet command.
+ * ESAPI function to invoke the TPM2_SetAlgorithmSet command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_SetAlgorithmSet_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT32 algorithmSet)
+ \fn TSS2_RC Esys_SetAlgorithmSet(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, UINT32 algorithmSet)
+ \fn TSS2_RC Esys_SetAlgorithmSet_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_SetCommandCodeAuditStatus The ESAPI function for the TPM2_SetCommandCodeAuditStatus command.
+ * ESAPI function to invoke the TPM2_SetCommandCodeAuditStatus command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_SetCommandCodeAuditStatus_Async(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_ALG_HASH auditAlg, const TPML_CC *setList, const TPML_CC *clearList)
+ \fn TSS2_RC Esys_SetCommandCodeAuditStatus(ESYS_CONTEXT *esysContext, ESYS_TR auth, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPMI_ALG_HASH auditAlg, const TPML_CC *setList, const TPML_CC *clearList)
+ \fn TSS2_RC Esys_SetCommandCodeAuditStatus_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_SetPrimaryPolicy The ESAPI function for the TPM2_SetPrimaryPolicy command.
+ * ESAPI function to invoke the TPM2_SetPrimaryPolicy command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_SetPrimaryPolicy_Async(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *authPolicy, TPMI_ALG_HASH hashAlg)
+ \fn TSS2_RC Esys_SetPrimaryPolicy(ESYS_CONTEXT *esysContext, ESYS_TR authHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *authPolicy, TPMI_ALG_HASH hashAlg)
+ \fn TSS2_RC Esys_SetPrimaryPolicy_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Shutdown The ESAPI function for the TPM2_Shutdown command.
+ * ESAPI function to invoke the TPM2_Shutdown command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Shutdown_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_SU shutdownType)
+ \fn TSS2_RC Esys_Shutdown(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2_SU shutdownType)
+ \fn TSS2_RC Esys_Shutdown_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Sign The ESAPI function for the TPM2_Sign command.
+ * ESAPI function to invoke the TPM2_Sign command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Sign_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *digest, const TPMT_SIG_SCHEME *inScheme, const TPMT_TK_HASHCHECK *validation)
+ \fn TSS2_RC Esys_Sign(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *digest, const TPMT_SIG_SCHEME *inScheme, const TPMT_TK_HASHCHECK *validation, TPMT_SIGNATURE **signature)
+ \fn TSS2_RC Esys_Sign_Finish(ESYS_CONTEXT *esysContext, TPMT_SIGNATURE **signature)
+ \}
+ \defgroup Esys_StartAuthSession The ESAPI function for the TPM2_StartAuthSession command.
+ * ESAPI function to invoke the TPM2_StartAuthSession command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_StartAuthSession_Async(ESYS_CONTEXT *esysContext, ESYS_TR tpmKey, ESYS_TR bind, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NONCE *nonceCaller, TPM2_SE sessionType, const TPMT_SYM_DEF *symmetric, TPMI_ALG_HASH authHash)
+
+ \fn TSS2_RC Esys_StartAuthSession(ESYS_CONTEXT *esysContext, ESYS_TR tpmKey, ESYS_TR bind, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_NONCE *nonceCaller, TPM2_SE sessionType, const TPMT_SYM_DEF *symmetric, TPMI_ALG_HASH authHash, ESYS_TR *sessionHandle)
+ \fn TSS2_RC Esys_StartAuthSession_Finish(ESYS_CONTEXT *esysContext, ESYS_TR *sessionHandle, TPM2B_NONCE **nonceTPM)
+ \}
+ \defgroup Esys_Startup The ESAPI function for the TPM2_Startup command.
+ * ESAPI function to invoke the TPM2_Startup command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Startup_Async(ESYS_CONTEXT *esysContext, TPM2_SU startupType)
+ \fn TSS2_RC Esys_Startup(ESYS_CONTEXT *esysContext, TPM2_SU startupType)
+ \fn TSS2_RC Esys_Startup_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_StirRandom The ESAPI function for the TPM2_StirRandom command.
+ * ESAPI function to invoke the TPM2_StirRandom command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_StirRandom_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE_DATA *inData)
+ \fn TSS2_RC Esys_StirRandom(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_SENSITIVE_DATA *inData)
+ \fn TSS2_RC Esys_StirRandom_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_TestParms The ESAPI function for the TPM2_TestParms command.
+ * ESAPI function to invoke the TPM2_TestParms command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_TestParms_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPMT_PUBLIC_PARMS *parameters)
+ \fn TSS2_RC Esys_TestParms(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPMT_PUBLIC_PARMS *parameters)
+ \fn TSS2_RC Esys_TestParms_Finish(ESYS_CONTEXT *esysContext)
+ \}
+ \defgroup Esys_Unseal The ESAPI function for the TPM2_Unseal command.
+ * ESAPI function to invoke the TPM2_Unseal command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Unseal_Async(ESYS_CONTEXT *esysContext, ESYS_TR itemHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3)
+ \fn TSS2_RC Esys_Unseal(ESYS_CONTEXT *esysContext, ESYS_TR itemHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, TPM2B_SENSITIVE_DATA **outData)
+ \fn TSS2_RC Esys_Unseal_Finish(ESYS_CONTEXT *esysContext, TPM2B_SENSITIVE_DATA **outData)
+ \}
+ \defgroup Esys_Vendor_TCG_Test The ESAPI function for the TPM2_Vendor_TCG_Test command.
+ * ESAPI function to invoke the TPM2_Vendor_TCG_Test command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_Vendor_TCG_Test_Async(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *inputData)
+ \fn TSS2_RC Esys_Vendor_TCG_Test(ESYS_CONTEXT *esysContext, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DATA *inputData, TPM2B_DATA **outputData)
+ \fn TSS2_RC Esys_Vendor_TCG_Test_Finish(ESYS_CONTEXT *esysContext, TPM2B_DATA **outputData)
+ \}
+ \defgroup Esys_VerifySignature The ESAPI function for the TPM2_VerifySignature command.
+ * ESAPI function to invoke the TPM2_VerifySignature command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_VerifySignature_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *digest, const TPMT_SIGNATURE *signature)
+ \fn TSS2_RC Esys_VerifySignature(ESYS_CONTEXT *esysContext, ESYS_TR keyHandle, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_DIGEST *digest, const TPMT_SIGNATURE *signature, TPMT_TK_VERIFIED **validation)
+ \fn TSS2_RC Esys_VerifySignature_Finish(ESYS_CONTEXT *esysContext, TPMT_TK_VERIFIED **validation)
+ \}
+ \defgroup Esys_ZGen_2Phase The ESAPI function for the TPM2_ZGen_2Phase command.
+ * ESAPI function to invoke the TPM2_ZGen_2Phase command
+ * either as a one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Esys_ZGen_2Phase_Async(ESYS_CONTEXT *esysContext, ESYS_TR keyA, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ECC_POINT *inQsB, const TPM2B_ECC_POINT *inQeB, TPMI_ECC_KEY_EXCHANGE inScheme, UINT16 counter)
+ \fn TSS2_RC Esys_ZGen_2Phase(ESYS_CONTEXT *esysContext, ESYS_TR keyA, ESYS_TR shandle1, ESYS_TR shandle2, ESYS_TR shandle3, const TPM2B_ECC_POINT *inQsB, const TPM2B_ECC_POINT *inQeB, TPMI_ECC_KEY_EXCHANGE inScheme, UINT16 counter, TPM2B_ECC_POINT **outZ1, TPM2B_ECC_POINT **outZ2)
+ \fn TSS2_RC Esys_ZGen_2Phase_Finish(ESYS_CONTEXT *esysContext, TPM2B_ECC_POINT **outZ1, TPM2B_ECC_POINT **outZ2)
+ \}
+ \}
+*/
+
+/*!
+ \defgroup iesys Internals of Enhanced System API
+ \ingroup esys
+ This module holds internal APIs of the ESAPI implementation.
+ \{
+ \}
+*/
+
+/* Note: all *_IN and the union IESYS_CMD_IN_PARAM are excluded from documentation */
+/*!
+ \defgroup esys_int Internal ESAPI Types
+ \ingroup iesys
+ The ESAPI implementation requires a set of internal type definitions.
+ \{
+ \struct RSRC_NODE_T
+ \typedef RSRC_NODE_T
+ \enum _ESYS_STATE
+ \struct ESYS_CONTEXT
+ \def _ESYS_MAX_SUBMISSIONS
+ \def _ESYS_ASSERT_NON_NULL
+ \typedef IESYSC_RESOURCE_TYPE_CONSTANT
+ \def IESYSC_KEY_RSRC
+ \def IESYSC_NV_RSRC
+ \def IESYSC_SESSION_RSRC
+ \def IESYSC_WITHOUT_MISC_RSRC
+ \typedef IESYSC_PARAM_ENCRYPT
+ \def ENCRYPT
+ \def NO_ENCRYPT
+ \typedef IESYSC_PARAM_DECRYPT
+ \def DECRYPT
+ \def NO_DECRYPT
+ \typedef IESYSC_TYPE_POLICY_AUTH
+ \def POLICY_PASSWORD
+ \def POLICY_AUTH
+ \def NO_POLICY_AUTH
+ \struct IESYS_SESSION
+ \typedef IESYSC_RESOURCE_TYPE
+ \union IESYS_RSRC_UNION
+ \struct IESYS_RESOURCE
+ \struct IESYS_METADATA
+ \struct IESYS_CONTEXT_DATA
+ \}
+*/
+
+/*!
+ \defgroup iesys_crypto Internal Cryptographic Backend
+ \ingroup iesys
+ The types and functions used internally by ESAPI for cryptographic operations.
+ Multiple implementations of these functions may exist for different
+ cryptographic backends.
+ \{
+ \def IESYS_CRYPTO_CONTEXT_BLOB
+ \fn TSS2_RC iesys_crypto_hash_get_digest_size(TPM2_ALG_ID hashAlg, size_t *size)
+ \fn TSS2_RC iesys_cryptossl_hash_start(IESYS_CRYPTO_CONTEXT_BLOB **context, TPM2_ALG_ID hashAlg)
+ \fn TSS2_RC iesys_cryptossl_hash_update(IESYS_CRYPTO_CONTEXT_BLOB *context, const uint8_t *buffer, size_t size)
+ \fn TSS2_RC iesys_cryptossl_hash_finish(IESYS_CRYPTO_CONTEXT_BLOB **context, uint8_t *buffer, size_t *size)
+ void iesys_cryptossl_hash_abort(IESYS_CRYPTO_CONTEXT_BLOB **context)
+ \fn TSS2_RC iesys_cryptossl_hmac_start(IESYS_CRYPTO_CONTEXT_BLOB **context, TPM2_ALG_ID hashAlg, const uint8_t *key, size_t size)
+ \fn TSS2_RC iesys_cryptossl_hmac_update(IESYS_CRYPTO_CONTEXT_BLOB *context, const uint8_t *buffer, size_t size)
+ \fn TSS2_RC iesys_cryptossl_hmac_finish(IESYS_CRYPTO_CONTEXT_BLOB **context, uint8_t *buffer, size_t *size)
+ \fn void iesys_cryptossl_hmac_abort(IESYS_CRYPTO_CONTEXT_BLOB **context)
+ \fn TSS2_RC iesys_crypto_pHash(TPM2_ALG_ID alg, const uint8_t rcBuffer[4], const uint8_t ccBuffer[4], const TPM2B_NAME *name1, const TPM2B_NAME *name2, const TPM2B_NAME *name3, const uint8_t *pBuffer, size_t pBuffer_size, uint8_t *pHash, size_t *pHash_size)
+ \fn TSS2_RC iesys_crypto_authHmac(TPM2_ALG_ID alg, uint8_t *hmacKey, size_t hmacKeySize, const uint8_t *pHash, size_t pHash_size, const TPM2B_NONCE *nonceNewer, const TPM2B_NONCE *nonceOlder, const TPM2B_NONCE *nonceDecrypt, const TPM2B_NONCE *nonceEncrypt, TPMA_SESSION sessionAttributes, TPM2B_AUTH *hmac)
+ \fn TSS2_RC iesys_cryptossl_random2b(TPM2B_NONCE *nonce, size_t num_bytes)
+ \fn TSS2_RC iesys_cryptossl_pk_encrypt(TPM2B_PUBLIC *pub_tpm_key, size_t in_size, BYTE *in_buffer, size_t max_out_size, BYTE *out_buffer, size_t *out_size, const char *label)
+ \fn TSS2_RC iesys_crypto_KDFaHmac(TPM2_ALG_ID alg, uint8_t *hmacKey, size_t hmacKeySize, uint32_t counter, const char *label, TPM2B_NONCE *contextU, TPM2B_NONCE *contextV, uint32_t bitlength, uint8_t *hmac, size_t *hmacSize)
+ \fn TSS2_RC iesys_crypto_KDFa(TPM2_ALG_ID hashAlg, uint8_t *hmacKey, size_t hmacKeySize, const char *label, TPM2B_NONCE *contextU, TPM2B_NONCE *contextV, uint32_t bitLength, uint32_t *counterInOut, BYTE *outKey, BOOL use_digest_size)
+ \fn TSS2_RC iesys_crypto_KDFe(TPM2_ALG_ID hashAlg, TPM2B_ECC_PARAMETER *Z, const char *label, TPM2B_ECC_PARAMETER *partyUInfo, TPM2B_ECC_PARAMETER *partyVInfo, UINT32 bit_size, BYTE *key)
+ \fn TSS2_RC iesys_cryptossl_sym_aes_encrypt(uint8_t *key, TPM2_ALG_ID tpm_sym_alg, TPMI_AES_KEY_BITS key_bits, TPM2_ALG_ID tpm_mode, size_t blk_len, uint8_t *dst, size_t dst_size, uint8_t *iv)
+ \fn TSS2_RC iesys_cryptossl_sym_aes_decrypt(uint8_t *key, TPM2_ALG_ID tpm_sym_alg, TPMI_AES_KEY_BITS key_bits, TPM2_ALG_ID tpm_mode, size_t blk_len, uint8_t *dst, size_t dst_size, uint8_t *iv)
+ \fn TSS2_RC iesys_xor_parameter_obfuscation(TPM2_ALG_ID hash_alg, uint8_t *key, size_t key_size, TPM2B_NONCE * contextU, TPM2B_NONCE * contextV, BYTE *data, size_t data_size)
+ \fn TSS2_RC iesys_cryptossl_get_ecdh_point(TPM2B_PUBLIC * key, size_t max_out_size, TPM2B_ECC_PARAMETER *Z, TPMS_ECC_POINT *Q, BYTE * out_buffer, size_t * out_size)
+  \}
+*/
+
+/*!
+ \defgroup iesys_util Internal ESAPI utility functions.
+ \ingroup iesys
+ \todo Description and Documentat of functions
+ \{
+ \struct HASH_TAB_ITEM
+ \}
+*/
+
+/*!
+ \defgroup Testgroup Testing
+ Description of the test plan.
+*/
+
+/*!
+ \defgroup EsysTestgroup Esys-Testing
+ \ingroup Testgroup
+ \{
+ @brief \{
+ For every integration test a function with a name corresponding to the name of the source code
+file of the test is created:
+test_esys_<test_name>(ESYS_CONTEXT * esys_context).
+This function is called by the standard function test_invoke_esapi in every integration test.
+
+For some tests different test cases can be created with compiler defines to avoid duplicate
+code in different test cases.The following defines are used and listed in the function's
+documentation if used:
+- TEST_ECC Create an ECC key instead of an RSA key.
+- TEST_SESSION Use session authentication instead of password authentication.
+- TEST_READ_LOCK Activate test of Esys_NV_ReadLock.
+- TEST_WRITE_LOCK Activate test of Esys_NV_WriteLock.
+- TEST_XOR_OBFUSCATION Use xor obfuscation for parameter encryption.
+- TEST_AES_ENCRYPTION Use AES for parameter encryption.
+- TEST_BOUND_SESSION Run test with a bound session.
+
+The ESAPI command calls which are used in a test are listed in the function's documentation
+and are marked according to the PC Client Profile Revision 01.03 v22:
+- (M) Mandatory
+- (O) Optional
+- (F) Commands added after TPM Specification Rev. 1.16 is integrated.
+\}
+\{
+\fn test_esys_evict_control_serialization(ESYS_CONTEXT * esys_context)
+ \fn test_esys_lock(ESYS_CONTEXT * esys_context)
+ \fn test_esys_get_capability(ESYS_CONTEXT * esys_context)
+ \fn test_esys_zgen_2phase(ESYS_CONTEXT * esys_context)
+ \fn test_esys_verify_signature(ESYS_CONTEXT * esys_context)
+ \fn test_esys_import(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_regression(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_authorize_nv_opt(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_physical_presence_opt(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_template_opt(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_ticket(ESYS_CONTEXT * esys_context)
+ \fn test_esys_change_eps(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_nv_undefine_special(ESYS_CONTEXT * esys_context)
+ \fn test_esys_create_fail(ESYS_CONTEXT * esys_context)
+ \fn test_esys_testparms(ESYS_CONTEXT * esys_context)
+ \fn test_esys_create_password_auth(ESYS_CONTEXT * esys_context)
+ \fn test_esys_stir_random(ESYS_CONTEXT * esys_context)
+ \fn test_esys_clockset(ESYS_CONTEXT * esys_context)
+ \fn test_esys_clear_control(ESYS_CONTEXT * esys_context)
+ \fn test_esys_nv_ram_extend_index(ESYS_CONTEXT * esys_context)
+ \fn test_esys_save_and_load_context(ESYS_CONTEXT * esys_context)
+ \fn test_esys_encrypt_decrypt(ESYS_CONTEXT * esys_context)
+ \fn test_esys_createloaded(ESYS_CONTEXT * esys_context)
+ \fn test_esys_audit(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_password(ESYS_CONTEXT * esys_context)
+ \fn test_esys_hierarchy_control(ESYS_CONTEXT * esys_context)
+ \fn test_esys_tpm_tests(ESYS_CONTEXT * esys_context)
+ \fn test_esys_certify(ESYS_CONTEXT * esys_context)
+ \fn test_esys_pcr_basic(ESYS_CONTEXT * esys_context)
+ \fn test_esys_quote(ESYS_CONTEXT * esys_context)
+ \fn test_esys_tr_getName_hierarchy(ESYS_CONTEXT * ectx)
+ \fn test_esys_field_upgrade(ESYS_CONTEXT * esys_context)
+ \fn test_esys_unseal_password_auth(ESYS_CONTEXT * esys_context)
+ \fn test_esys_nv_ram_set_bits(ESYS_CONTEXT * esys_context)
+ \fn test_esys_nv_certify(ESYS_CONTEXT * esys_context)
+ \fn test_esys_ecdh_keygen(ESYS_CONTEXT * esys_context)
+ \fn test_esys_tr_fromTpmPublic_key(ESYS_CONTEXT * ectx)
+ \fn test_esys_ecdh_zgen(ESYS_CONTEXT * esys_context)
+ \fn test_esys_certify_creation(ESYS_CONTEXT * esys_context)
+ \fn test_esys_nv_ram_counter(ESYS_CONTEXT * esys_context)
+ \fn test_esys_event_sequence_complete(ESYS_CONTEXT * esys_context)
+ \fn test_esys_create_session_auth(ESYS_CONTEXT * esys_context)
+ \fn test_esys_tr_fromTpmPublic_nv(ESYS_CONTEXT * ectx)
+ \fn test_esys_create_primary_hmac(ESYS_CONTEXT * esys_context)
+ \fn test_esys_firmware_read(ESYS_CONTEXT * esys_context)
+ \fn test_esys_hmacsequencestart(ESYS_CONTEXT * esys_context)
+ \fn test_esys_hmac(ESYS_CONTEXT * esys_context)
+ \fn test_esys_ecc_parameters(ESYS_CONTEXT * esys_context)
+ \fn test_esys_hierarchychangeauth(ESYS_CONTEXT * esys_context)
+ \fn test_esys_pcr_auth_value(ESYS_CONTEXT * esys_context)
+ \fn test_esys_nv_ram_ordinary_index(ESYS_CONTEXT * esys_context)
+ \fn test_esys_duplicate(ESYS_CONTEXT * esys_context)
+ \fn test_esys_rsa_encrypt_decrypt(ESYS_CONTEXT * esys_context)
+ \fn test_esys_set_algorithm_set(ESYS_CONTEXT * esys_context)
+ \fn test_esys_object_changeauth(ESYS_CONTEXT * esys_context)
+ \fn test_esys_pp_commands(ESYS_CONTEXT * esys_context)
+ \fn test_esys_hash(ESYS_CONTEXT * esys_context)
+ \fn test_esys_hashsequencestart(ESYS_CONTEXT * esys_context)
+ \fn test_esys_clear(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_authorize(ESYS_CONTEXT * esys_context)
+ \fn test_esys_get_time(ESYS_CONTEXT * esys_context)
+ \fn test_esys_make_credential(ESYS_CONTEXT * esys_context)
+ \fn test_esys_commit(ESYS_CONTEXT * esys_context)
+ \fn test_esys_policy_nv_changeauth(ESYS_CONTEXT * esys_context)
+ \}
+ \}
+*/
+
+/*!
+ \defgroup fapi Feature API
+ Feature API (FAPI) as described in the [TSS 2.0 Feature API (FAPI) Specification](https://trustedcomputinggroup.org/wp-content/uploads/todo.pdf).
+ This API provides a very abstract view on TPM functionalities most suitable for 80 percent of applications. In mostly uses standard types in its parameter list. Policies are encoded in JSON, whereas most key material is encoded as PEM.
+ Both the synchronous and asynchronous API are exposed through a single library: libtss2-fapi.
+ In order to perform an asynchronous invocation of FAPI functions, the following code serves as a template:
+ do { r = Fapi_GetPollHandles(fc, &ph, &nph);
+      if (r == TSS2_RC_SUCCESS) { poll(ph, nph, -1); Fapi_Free(ph); }
+      r = Fapi_*_Finish(fc, ...); } while (r == TSS2_FAPI_RC_TRY_AGAIN);
+ \{
+ \typedef FAPI_CONTEXT
+ Reference to the FAPI_CONTEXT that holds data for the connection to the TPM as
+ well as the metadata for TPM Resource as well as links to the key- and policy
+ store or key material for encrypted sessions.
+ \defgroup Fapi_Initialize Fapi_Initialize
+ FAPI functions to invoke Initialize either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Initialize(FAPI_CONTEXT **context, char const *uri)
+ \fn Fapi_Initialize_Async(FAPI_CONTEXT **context, char const *uri)
+ \fn Fapi_Initialize_Finish(FAPI_CONTEXT **context)
+ \}
+ \defgroup Fapi_Finalize Fapi_Finalize
+ FAPI function to invoke Finalize.
+ \{
+ \fn Fapi_Finalize(FAPI_CONTEXT **context)
+ \}
+ \defgroup Fapi_GetTcti Fapi_GetTcti
+ FAPI function to retrieve the TSS2_TCTI_CONTEXT currently used by the corresponding FAPI_CONTEXT.
+ \{
+ \fn Fapi_GetTcti(FAPI_CONTEXT *context, TSS2_TCTI_CONTEXT **tcti)
+ \}
+ \defgroup Fapi_GetPollHandles Fapi_GetPollHandles
+ FAPI function to retrieve the poll handles currently used by the corresponding FAPI_CONTEXT.
+ \{
+ \fn Fapi_GetPollHandles(FAPI_CONTEXT *context, FAPI_POLL_HANDLE **handles, size_t *num_handles)
+ \}
+ \defgroup Fapi_Free Fapi_Free
+ FAPI function to invoke Free.
+ \{
+ \fn Fapi_Free(void *ptr)
+ \}
+ \defgroup Fapi_GetInfo Fapi_GetInfo
+ FAPI functions to invoke GetInfo either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetInfo(FAPI_CONTEXT *context, char **info)
+ \fn Fapi_GetInfo_Async(FAPI_CONTEXT *context)
+ \fn Fapi_GetInfo_Finish(FAPI_CONTEXT *context, char **info)
+ \}
+ \defgroup Fapi_Provision Fapi_Provision
+ FAPI functions to invoke Provision either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Provision(FAPI_CONTEXT *context, char const *authValueEh, char const *authValueSh, char const *authValueLockout)
+ \fn Fapi_Provision_Async(FAPI_CONTEXT *context, char const *authValueEh, char const *authValueSh, char const *authValueLockout)
+ \fn Fapi_Provision_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_GetPlatformCertificates Fapi_GetPlatformCertificates
+ FAPI functions to invoke GetPlatformCertificates either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetPlatformCertificates(FAPI_CONTEXT *context, uint8_t **certificates, size_t *certificatesSize)
+ \fn Fapi_GetPlatformCertificates_Async(FAPI_CONTEXT *context)
+ \fn Fapi_GetPlatformCertificates_Finish(FAPI_CONTEXT *context, uint8_t **certificates, size_t *certificatesSize)
+ \}
+ \defgroup Fapi_GetEsysBlobs Fapi_GetEsysBlobs
+ FAPI functions to invoke GetEsysBlobs either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetEsysBlob(FAPI_CONTEXT *context, charconst *path, uint8_t *type, uint8_t **data, size_t *length)
+ \fn Fapi_GetEsysBlob_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_GetEsysBlob_Finish(FAPI_CONTEXT *context, uint8_t *type, uint8_t **data, size_t *length)
+ \}
+ \defgroup Fapi_GetRandom Fapi_GetRandom
+ FAPI functions to invoke GetRandom either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetRandom(FAPI_CONTEXT *context, size_t numBytes, uint8_t **data)
+ \fn Fapi_GetRandom_Async(FAPI_CONTEXT *context, size_t numBytes)
+ \fn Fapi_GetRandom_Finish(FAPI_CONTEXT *context, uint8_t **data)
+ \}
+ \defgroup Fapi_Import Fapi_Import
+ FAPI functions to invoke Import either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Import(FAPI_CONTEXT *context, char const *path, char const *importData)
+ \fn Fapi_Import_Async(FAPI_CONTEXT *context, char const *path, char const *importData)
+ \fn Fapi_Import_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_List Fapi_List
+ FAPI functions to invoke List either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_List(FAPI_CONTEXT *context, char const *searchPath, char **pathList)
+ \fn Fapi_List_Async(FAPI_CONTEXT *context, char const *searchPath)
+ \fn Fapi_List_Finish(FAPI_CONTEXT *context, char **pathlist)
+ \}
+ \defgroup Fapi_Delete Fapi_Delete
+ FAPI functions to invoke Delete either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Delete(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_Delete_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_Delete_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_ChangeAuth Fapi_ChangeAuth
+ FAPI functions to invoke ChangeAuth either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_ChangeAuth(FAPI_CONTEXT *context, char const *entityPath, char const *authValue)
+ \fn Fapi_ChangeAuth_Async(FAPI_CONTEXT *context, char const *entityPath, char const *authValue)
+ \fn Fapi_ChangeAuth_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_SetDescription Fapi_SetDescription
+ FAPI functions to invoke SetDescription either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_SetDescription(FAPI_CONTEXT *context, char const *path, char const *description)
+ \fn Fapi_SetDescription_Async(FAPI_CONTEXT *context, char const *path, char const *description)
+ \fn Fapi_SetDescription_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_GetDescription Fapi_GetDescription
+ FAPI functions to invoke GetDescription either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetDescription(FAPI_CONTEXT *context, char const *path, char **description)
+ \fn Fapi_GetDescription_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_GetDescription_Finish(FAPI_CONTEXT *context, char **description)
+ \}
+ \defgroup Fapi_SetAppData Fapi_SetAppData
+ FAPI functions to invoke SetAppData either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_SetAppData(FAPI_CONTEXT *context, char const *path, uint8_t const *appData, size_t appDataSize)
+ \fn Fapi_SetAppData_Async(FAPI_CONTEXT *context, char const *path, uint8_t const *appData, size_t appDataSize)
+ \fn Fapi_SetAppData_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_GetAppData Fapi_GetAppData
+ FAPI functions to invoke GetAppData either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetAppData(FAPI_CONTEXT *context, char const *path, uint8_t **appData, size_t *appDataSize)
+ \fn Fapi_GetAppData_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_GetAppData_Finish(FAPI_CONTEXT *context, uint8_t **appData, size_t *appDataSize)
+ \}
+ \defgroup Fapi_GetTpmBlobs Fapi_GetTpmBlobs
+ FAPI functions to invoke GetTPMBlobs either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_GetTpmBlobs(FAPI_CONTEXT *context, char const *path, uint8_t **tpm2bPublic, size_t *tpm2bPublicSize, uint8_t **tpm2bPrivate, size_t *tpm2bPrivateSize, char **policy)
+ \fn Fapi_GetTpmBlobs_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_GetTpmBlobs_Finish(FAPI_CONTEXT *context, uint8_t **tpm2bPublic, size_t *tpm2bPublicSize, uint8_t **tpm2bPrivate, size_t *tpm2bPrivateSize, char **policy)
+ \}
+ \defgroup Fapi_CreateKey Fapi_CreateKey
+ FAPI functions to invoke CreateKey either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_CreateKey(FAPI_CONTEXT *context, char const *path, char const *type, char const *policyPath, char const *authvalue)
+ \fn Fapi_CreateKey_Async(FAPI_CONTEXT *context, char const *keyPath, char const *type, char const *policyPath, char const *authvalue)
+ \fn Fapi_CreateKey_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_Sign Fapi_Sign
+ FAPI functions to invoke Sign either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Sign(FAPI_CONTEXT *context, char const *keyPath, char const *padding, uint8_t const *digest, size_t digestSize, uint8_t **signature, size_t *signatureSize, char **publicKey, char **certificate)
+ \fn Fapi_Sign_Async(FAPI_CONTEXT *context, char const *keyPath, char const *padding, uint8_t const *digest, size_t digestSize)
+ \fn Fapi_Sign_Finish(FAPI_CONTEXT *context, uint8_t **signature, size_t *signatureSize, char **publicKey, char **certificate)
+ \}
+ \defgroup Fapi_VerifySignature Fapi_VerifySignature
+ FAPI functions to invoke VerifySignature either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_VerifySignature(FAPI_CONTEXT *context, char const *keyPath, uint8_t const *digest, size_t digestSize, uint8_t const *signature, size_t signatureSize)
+ \fn Fapi_VerifySignature_Async(FAPI_CONTEXT *context, char const *keyPath, uint8_t const *digest, size_t digestSize, uint8_t const *signature, size_t signatureSize)
+ \fn Fapi_VerifySignature_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_Encrypt Fapi_Encrypt
+ FAPI functions to invoke Encrypt either as one-call or in an asynchronous manner.
+ \{
+\fn TSS2_RC Fapi_Encrypt(
+    FAPI_CONTEXT   *context,
+    char     const *keyPath,
+    uint8_t  const *plainText,
+    size_t          plainTextSize,
+    uint8_t       **cipherText,
+    size_t         *cipherTextSize)
+
+\fn TSS2_RC Fapi_Encrypt_Async(
+    FAPI_CONTEXT   *context,
+    char     const *keyPath,
+    uint8_t  const *plainText,
+    size_t          plainTextSize)
+
+\fn TSS2_RC Fapi_Encrypt_Finish(
+    FAPI_CONTEXT   *context,
+    uint8_t       **cipherText,
+    size_t         *cipherTextSize )
+
+ \}
+ \defgroup Fapi_Decrypt Fapi_Decrypt
+ FAPI functions to invoke Decrypt either as one-call or in an asynchronous manner.
+ \{
+\fn TSS2_RC Fapi_Decrypt(
+    FAPI_CONTEXT   *context,
+    char     const *keyPath,
+    uint8_t  const *cipherText,
+    size_t          cipherTextSize,
+    uint8_t       **plainText,
+    size_t         *plainTextSize)
+
+\fn TSS2_RC Fapi_Decrypt_Async(
+    FAPI_CONTEXT   *context,
+    char     const *keyPath,
+    uint8_t  const *cipherText,
+    size_t          cipherTextSize);
+
+\fn TSS2_RC Fapi_Decrypt_Finish(
+    FAPI_CONTEXT   *context,
+    uint8_t       **plainText,
+    size_t         *plainTextSize)
+ \}
+ \defgroup Fapi_SetCertificate Fapi_SetCertificate
+ FAPI functions to invoke SetCertificate either as one-call or in an asynchronous manner.
+ \{
+\fn TSS2_RC Fapi_SetCertificate(
+    FAPI_CONTEXT   *context,
+    char     const *path,
+    char     const *x509certData)
+
+\fn TSS2_RC Fapi_SetCertificate_Async(
+    FAPI_CONTEXT   *context,
+    char     const *path,
+    char     const *x509certData)
+
+\fn TSS2_RC Fapi_SetCertificate_Finish(
+    FAPI_CONTEXT   *context)
+ \}
+ \defgroup Fapi_GetCertificate Fapi_GetCertificate
+ FAPI functions to invoke GetCertificate either as one-call or in an asynchronous manner.
+ \{
+\fn TSS2_RC Fapi_GetCertificate(
+    FAPI_CONTEXT   *context,
+    char     const *path,
+    char          **x509certData)
+
+\fn TSS2_RC Fapi_GetCertificate_Async(
+    FAPI_CONTEXT   *context,
+    char     const *path)
+
+\fn TSS2_RC Fapi_GetCertificate_Finish(
+    FAPI_CONTEXT   *context,
+    char          **x509certData)
+ \}
+ \defgroup Fapi_ExportKey Fapi_ExportKey
+ FAPI functions to invoke ExportKey either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_ExportKey(FAPI_CONTEXT *context, char const *pathOfKeyToDuplicate, char const *pathToPublicKeyOfNewParent, char **exportedData)
+ \fn Fapi_ExportKey_Async(FAPI_CONTEXT *context, char const *pathOfKeyToDuplicate, char const *pathToPublicKeyOfNewParent)
+ \fn Fapi_ExportKey_Finish(FAPI_CONTEXT *context, char **exportedData)
+ \}
+ \defgroup Fapi_CreateSeal Fapi_CreateSeal
+ FAPI functions to invoke CreateSeal either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_CreateSeal(FAPI_CONTEXT *context, char const *path, char const *type, size_t size, char const *policyPath, char const *authValue, uint8_t const *data)
+ \fn Fapi_CreateSeal_Async(FAPI_CONTEXT *context, char const *path, char const *type, size_t size, char const *policyPath, char const *authValue, uint8_t const *data)
+ \fn Fapi_CreateSeal_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_Unseal Fapi_Unseal
+ FAPI functions to invoke Unseal either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Unseal(FAPI_CONTEXT *context, char const *path, uint8_t **data, size_t *size)
+ \fn Fapi_Unseal_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_Unseal_Finish(FAPI_CONTEXT *context, uint8_t **data, size_t *size)
+ \}
+ \defgroup Fapi_ExportPolicy Fapi_ExportPolicy
+ FAPI functions to invoke ExportPolicy either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_ExportPolicy(FAPI_CONTEXT *context, char const *path, char **jsonPolicy)
+ \fn Fapi_ExportPolicy_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_ExportPolicy_Finish(FAPI_CONTEXT *context, char **jsonPolicy)
+ \}
+ \defgroup Fapi_AuthorizePolicy Fapi_AuthorizePolicy
+ FAPI functions to invoke AuthorizePolicy either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_AuthorizePolicy(FAPI_CONTEXT *context, char const *policyPath, char const *keyPath, uint8_t const *policyRef, size_t policyRefSize)
+ \fn Fapi_AuthorizePolicy_Async(FAPI_CONTEXT *context, char const *policyPath, char const *keyPath, uint8_t const *policyRef, size_t policyRefSize)
+ \fn Fapi_AuthorizePolicy_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_WriteAuthorizeNv Fapi_WriteAuthorizeNv
+ FAPI functions to invoke WriteAuthorizeNv either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_WriteAuthorizeNv(FAPI_CONTEXT *context, char const *nvPath, char const *policyPath)
+ \fn Fapi_WriteAuthorizeNv_Async(FAPI_CONTEXT *context, char const *nvPath, char const *policyPath)
+ \fn Fapi_WriteAuthorizeNv_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_PcrRead Fapi_PcrRead
+ FAPI functions to invoke PcrRead either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_PcrRead(FAPI_CONTEXT *context, uint32_t pcrIndex, uint8_t **pcrValue, size_t *pcrValueSize, char **pcrLog)
+ \fn Fapi_PcrRead_Async(FAPI_CONTEXT *context, uint32_t pcrIndex)
+ \fn Fapi_PcrRead_Finish(FAPI_CONTEXT *context, uint8_t **pcrValue, size_t *pcrValueSize, char **pcrLog)
+ \}
+ \defgroup Fapi_PcrExtend Fapi_PcrExtend
+ FAPI functions to invoke PcrExtend either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_PcrExtend(FAPI_CONTEXT *context, uint32_t pcr, uint8_t const *data, size_t dataSize, char const *logData)
+ \fn Fapi_PcrExtend_Async(FAPI_CONTEXT *context, uint32_t pcr, uint8_t const *data, size_t dataSize, char const *logData)
+ \fn Fapi_PcrExtend_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_Quote Fapi_Quote
+ FAPI functions to invoke Quote either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_Quote(FAPI_CONTEXT *context, uint32_t *pcrList, size_t pcrListSize, char const *keyPath, char const *quoteType, uint8_t const *qualifyingData, size_t qualifyingDataSize, char **quoteInfo, uint8_t **signature, size_t *signatureSize, char **pcrLog, char **certificate)
+ \fn Fapi_Quote_Async(FAPI_CONTEXT *context, uint32_t *pcrList, size_t pcrListSize, char const *keyPath, char const *quoteType, uint8_t const *qualifyingData, size_t qualifyingDataSize)
+ \fn Fapi_Quote_Finish(FAPI_CONTEXT *context, char **quoteInfo, uint8_t **signature, size_t *signatureSize, char **pcrLog, char **certificate)
+ \}
+ \defgroup Fapi_VerifyQuote Fapi_VerifyQuote
+ FAPI functions to invoke VerifyQuote either as one-call or in an asynchronous manner.
+ \{
+\fn TSS2_RC Fapi_VerifyQuote(
+    FAPI_CONTEXT   *context,
+    char     const *publicKeyPath,
+    uint8_t  const *qualifyingData,
+    size_t          qualifyingDataSize,
+    char     const *quoteInfo,
+    uint8_t  const *signature,
+    size_t          signatureSize,
+    char     const *pcrLog)
+
+\fn TSS2_RC Fapi_VerifyQuote_Async(
+    FAPI_CONTEXT   *context,
+    char     const *publicKeyPath,
+    uint8_t  const *qualifyingData,
+    size_t          qualifyingDataSize,
+    char     const *quoteInfo,
+    uint8_t  const *signature,
+    size_t          signatureSize,
+    char     const *pcrLog)
+
+\fn TSS2_RC Fapi_VerifyQuote_Finish(
+    FAPI_CONTEXT   *context)
+ \}
+ \defgroup Fapi_CreateNv Fapi_CreateNv
+ FAPI functions to invoke CreateNv either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_CreateNv(FAPI_CONTEXT *context, char const *path, char const *type, size_t size, char const *policyPath, char const *authValue)
+ \fn Fapi_CreateNv_Async(FAPI_CONTEXT *context, char const *path, char const *type, size_t size, char const *policyPath, char const *authValue)
+ \fn Fapi_CreateNv_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_NvRead Fapi_NvRead
+ FAPI functions to invoke NvRead either as one-call or in an asynchronous manner.
+ \{
+\fn TSS2_RC Fapi_NvRead(
+    FAPI_CONTEXT   *context,
+    char     const *path,
+    uint8_t      **data,
+    size_t        *size,
+    char         **logData)
+
+\fn TSS2_RC Fapi_NvRead_Async(
+    FAPI_CONTEXT   *context,
+    char     const *path)
+
+\fn TSS2_RC Fapi_NvRead_Finish(
+    FAPI_CONTEXT   *context,
+    uint8_t       **data,
+    size_t         *size,
+    char          **logData)
+ \}
+ \defgroup Fapi_NvWrite Fapi_NvWrite
+ FAPI functions to invoke NvWrite either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_NvWrite(FAPI_CONTEXT *context, char const *path, uint8_t const *data, size_t size)
+ \fn Fapi_NvWrite_Async(FAPI_CONTEXT *context, char const *path, uint8_t const *data, size_t size)
+ \fn Fapi_NvWrite_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_NvExtend Fapi_NvExtend
+ FAPI functions to invoke NvExtend either as one-call or in an asynchronous manner.
+ \{
+ \fn TSS2_RC Fapi_NvExtend(
+    FAPI_CONTEXT  *context,
+    char    const *path,
+    uint8_t const *data,
+    size_t         size,
+    char    const *logData);
+
+ \fn TSS2_RC Fapi_NvExtend_Async(
+    FAPI_CONTEXT  *context,
+    char    const *path,
+    uint8_t const *data,
+    size_t         size,
+    char    const *logData);
+
+\fn TSS2_RC Fapi_NvExtend_Finish(
+    FAPI_CONTEXT  *context);
+ \}
+ \defgroup Fapi_NvIncrement Fapi_NvIncrement
+ FAPI functions to invoke NvIncrement either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_NvIncrement(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_NvIncrement_Async(FAPI_CONTEXT *context, char const *path)
+ \fn Fapi_NvIncrement_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_NvSetBits Fapi_NvSetBits
+ FAPI functions to invoke NvSetBits either as one-call or in an asynchronous manner.
+ \{
+ \fn Fapi_NvSetBits(FAPI_CONTEXT *context, char const *path, uint64_t bitmap)
+ \fn Fapi_NvSetBits_Async(FAPI_CONTEXT *context, char const *path, uint64_t bitmap)
+ \fn Fapi_NvSetBits_Finish(FAPI_CONTEXT *context)
+ \}
+ \defgroup Fapi_SetAuthCB Fapi_SetAuthCB
+ FAPI functions to invoke SetAuthCB.
+ \{
+ \fn Fapi_SetAuthCB(FAPI_CONTEXT *context, Fapi_CB_Auth callback,  void *userData)
+ \typedef (*Fapi_CB_Auth)(char const *objectPath, char const *description, char **auth,  void *userData)
+ \}
+ \defgroup Fapi_SetBranchCB Fapi_SetBranchCB
+ FAPI functions to invoke SetBranchCB.
+ \{
+ \fn Fapi_SetBranchCB(FAPI_CONTEXT *context, Fapi_CB_Branch callback,  void *userData)
+ \typedef (*Fapi_CB_Branch)(char const *objectPath, char const *description, char const **branchNames, size_t numBranches, size_t *selectedBranch, void *userData)
+ \}
+ \defgroup Fapi_SetSignCB Fapi_SetSignCB
+ FAPI functions to invoke SetSignCB.
+ \{
+ \fn Fapi_SetSignCB(FAPI_CONTEXT *context, Fapi_CB_Sign callback, void *userData)
+ \typedef (*Fapi_CB_Sign)(char const *objectPath, char const *description, char const *publicKey, char const *publicKeyHint, uint32_t hashAlg, uint8_t const *dataToSign, size_t dataToSignSize, uint8_t **signature, size_t *signatureSize,  void *userData)
+ \fn Fapi_SetPolicyActionCB(
+    FAPI_CONTEXT        *context,
+    Fapi_CB_PolicyAction callback,
+    void                *userData)
+   \typedef TSS2_RC (*Fapi_CB_PolicyAction)(char const *objectPath, char cnst *action, void *userData)
+ \}
+ \}
+*/
+
+/*!
+ \defgroup ifapi Internals of Feature API
+ \ingroup fapi
+ This module holds internal APIs of the FAPI implementation.
+
+ Async programming style:
+
+ The tss2-fapi implementation uses an asynchronous programming style internally.
+ This means that whenever a piece of code performs a potentially blocking operation
+ it will instead return TSS2_FAPI_RC_TRY_AGAIN (similarly to ESAPI). Then this function
+ is called again once the Poll returns ok.
+ In order to carry the state of execution information over between the different invocation
+ of the same function, the current state is stored in a state variable and all variables
+ are stored in some kind of context variables.
+ On the next entry to the function the state is evaluated using a swtich() statement and
+ execution is resumed.
+
+ In order to understand the functional flow of code in FAPI, one can read the functions
+ continuously over all fallthrough; and statecase(); statements. The statecase
+ statements are the re-entry points of each function. The return_try_again() and FAPI_SYNC()
+ statements are the preempt statements.
+ \{
+ \}
+*/
+
+/*!
+ \defgroup fapi_crypto Internal Cryptographic Backend
+ \ingroup ifapi
+ The types and functions used internally by FAPI for cryptographic operations.
+ Multiple implementations of these functions for different
+ cryptographic backends may exist.
+ \{
+\fn static TSS2_RC ecdsa_verify_signature(
+    EVP_PKEY *publicKey,
+    const uint8_t *signature,
+    size_t signatureSize,
+    const uint8_t *digest,
+    size_t digestSize)
+\fn TSS2_RC get_crl_from_cert(X509 *cert, X509_CRL **crl)
+\fn static TSS2_RC get_ecc_tpm2b_public_from_evp(
+    EVP_PKEY *publicKey,
+    TPM2B_PUBLIC *tpmPublic)
+\fn static const EVP_MD * get_ossl_hash_md(TPM2_ALG_ID hashAlgorithm)
+\fn static TSS2_RC get_rsa_tpm2b_public_from_evp(
+    EVP_PKEY *publicKey,
+    TPM2B_PUBLIC *tpmPublic)
+\fn static int get_sig_scheme(TPM2_ALG_ID signatureScheme)
+\fn static int ifapi_bn2binpad(const BIGNUM *bn, unsigned char *bin, int binSize)
+\fn TSS2_RC ifapi_cert_to_pem(
+    const uint8_t *certBuffer,
+    size_t certBufferSize,
+    char **pemCert,
+    TPM2_ALG_ID *certAlgorithmId,
+    TPM2B_PUBLIC *tpmPublic)
+\fn void ifapi_crypto_hash_abort(IFAPI_CRYPTO_CONTEXT_BLOB **context)
+\fn TSS2_RC ifapi_crypto_hash_finish(IFAPI_CRYPTO_CONTEXT_BLOB **context,
+                         uint8_t *digest, size_t *digestSize)
+\fn TSS2_RC ifapi_crypto_hash_start(IFAPI_CRYPTO_CONTEXT_BLOB **context,
+                        TPM2_ALG_ID hashAlgorithm)
+\fn TSS2_RC ifapi_crypto_hash_update(IFAPI_CRYPTO_CONTEXT_BLOB *context,
+                         const uint8_t *buffer, size_t size)
+\fn TSS2_RC ifapi_der_sig_to_tpm(
+    const TPMT_PUBLIC *tpmPublic,
+    const unsigned char *signature,
+    size_t signatureSize,
+    TPMI_ALG_HASH hashAlgorithm,
+    TPMT_SIGNATURE *tpmSignature)
+\fn static TSS2_RC ifapi_ecc_der_sig_to_tpm(
+    const unsigned char *signature,
+    size_t signatureSize,
+    int keySize,
+    TPMI_ALG_HASH hashAlgorithm,
+    TPMT_SIGNATURE *tpmSignature)
+\fn static TSS2_RC ifapi_get_evp_from_pem(const char *pemKey, EVP_PKEY **publicKey)
+\fn TSS2_RC ifapi_get_hash_alg_for_size(uint16_t size, TPMI_ALG_HASH *hashAlgorithm)
+\fn TPM2_RC ifapi_get_profile_sig_scheme(
+    const IFAPI_PROFILE *profile,
+    const TPMT_PUBLIC *tpmPublic,
+    TPMT_SIG_SCHEME *signatureScheme)
+\fn TSS2_RC ifapi_get_public_from_pem_cert(const char* pem_cert, TPM2B_PUBLIC *tpm_public)
+\fn TPM2_ALG_ID ifapi_get_signature_algorithm_from_pem(const char *pemKey)
+\fn TSS2_RC ifapi_get_tpm2b_public_from_pem(
+    const char *pemKey,
+    TPM2B_PUBLIC *tpmPublic)
+\fn TSS2_RC ifapi_get_tpm_key_fingerprint(
+    const TPM2B_PUBLIC *tpmPublicKey,
+    TPMI_ALG_HASH hashAlg,
+    TPM2B_DIGEST *fingerprint)
+\fn size_t ifapi_hash_get_digest_size(TPM2_ALG_ID hashAlgorithm)
+\fn TSS2_RC ifapi_initialize_sign_public(TPM2_ALG_ID signatureAlgorithm,
+        TPM2B_PUBLIC *public)
+\fn TSS2_RC ifapi_pub_pem_key_from_tpm(
+    const TPM2B_PUBLIC *tpmPublicKey,
+    char **pemKey,
+    int *pemKeySize)
+\fn TSS2_RC ifapi_tpm_ecc_sig_to_der(
+    const TPMT_SIGNATURE *tpmSignature,
+    uint8_t **signature,
+    size_t *signatureSize)
+\fn TSS2_RC ifapi_curl_verify_ek_cert(
+    char* root_cert_pem,
+    char* intermed_cert_pem,
+    char* ek_cert_pem)
+\fn TSS2_RC ifapi_verify_signature(
+    const IFAPI_OBJECT *keyObject,
+    const uint8_t *signature,
+    size_t signatureSize,
+    const uint8_t *digest,
+    size_t digestSize)
+\fn TSS2_RC ifapi_verify_signature_quote(
+    const IFAPI_OBJECT *keyObject,
+    const uint8_t *signature,
+    size_t signatureSize,
+    const uint8_t *digest,
+    size_t digestSize,
+    const TPMT_SIG_SCHEME *signatureScheme)
+\fn static TSS2_RC ossl_ecc_pub_from_tpm(const TPM2B_PUBLIC *tpmPublicKey, EVP_PKEY *evpPublicKey)
+\fn static TSS2_RC ossl_rsa_pub_from_tpm(const TPM2B_PUBLIC *tpmPublicKey, EVP_PKEY *evpPublicKey)
+\fn static TSS2_RC rsa_verify_signature(
+    EVP_PKEY *publicKey,
+    const uint8_t *signature,
+    size_t signatureSize,
+    const uint8_t *digest,
+    size_t digestSize)
+\}
+*/
+
+/*!
+ \defgroup ifapi_policy_intantiate Policy instantiation module
+ \ingroup ifapi
+ Provides functions for instantiation of the policies. The defaults will be initialized according to the given values.
+ \{
+\fn static TSS2_RC get_policy_elements(TPML_POLICYELEMENTS *policy, NODE_OBJECT_T **policy_element_list)
+\fn TSS2_RC ifapi_policyeval_instantiate_async(
+    IFAPI_POLICY_EVAL_INST_CTX *context,
+    TPMS_POLICY *policy,
+    ifapi_policyeval_INST_CB *callbacks)
+\fn TSS2_RC ifapi_policyeval_instantiate_finish(
+    IFAPI_POLICY_EVAL_INST_CTX *context)
+ \}
+*/
+
+ /*!
+ \defgroup ifapi_policy Policy calculation module
+ \ingroup ifapi
+ Provides functions for policy calculation (without TPM).
+ \{
+
+\fn TSS2_RC ifapi_calculate_tree(
+    FAPI_CONTEXT *context,
+    const char *policyPath,
+    TPMS_POLICY *policy,
+    TPMI_ALG_HASH hash_alg,
+    size_t *digest_idx,
+    size_t *hash_size)
+
+\fn static TSS2_RC calculate_policy_key_param(
+    TPM2_CC command_code,
+    TPM2B_NAME *name,
+    TPM2B_NONCE *policyRef,
+    size_t hash_size,
+    TPMI_ALG_HASH current_hash_alg,
+    TPMU_HA *digest)
+\fn static void copy_policy_digest(TPML_DIGEST_VALUES *dest, TPML_DIGEST_VALUES *src,
+                   size_t digest_idx, size_t hash_size, char *txt)
+\fn TSS2_RC ifapi_calculate_policy(
+    TPML_POLICYELEMENTS *policy,
+    TPML_DIGEST_VALUES *policyDigests,
+    TPMI_ALG_HASH hash_alg,
+    size_t hash_size,
+    size_t digest_idx)
+\fn TSS2_RC ifapi_calculate_policy_auth_value(
+    TPMS_POLICYAUTHVALUE *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_authorize(
+    TPMS_POLICYAUTHORIZE *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_authorize_nv(
+    TPMS_POLICYAUTHORIZENV *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_command_code(
+    TPMS_POLICYCOMMANDCODE *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_counter_timer(
+    TPMS_POLICYCOUNTERTIMER *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_cp_hash(
+    TPMS_POLICYCPHASH *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_digest_hash(
+    TPM2B_DIGEST *digest,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg,
+    TPM2_CC command_code)
+\fn TSS2_RC ifapi_calculate_policy_duplicate(
+    TPMS_POLICYDUPLICATIONSELECT *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_locality(
+    TPMS_POLICYLOCALITY *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_name_hash(
+    TPMS_POLICYNAMEHASH *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_nv(
+    TPMS_POLICYNV *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_nv_written(
+    TPMS_POLICYNVWRITTEN *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_or(
+    TPMS_POLICYOR *policyOr,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH hash_alg,
+    size_t hash_size,
+    size_t digest_idx)
+\fn TSS2_RC ifapi_calculate_policy_password(
+    TPMS_POLICYPASSWORD *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_physical_presence(
+    TPMS_POLICYPHYSICALPRESENCE *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_secret(
+    TPMS_POLICYSECRET *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_policy_signed(
+    TPMS_POLICYSIGNED *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_calculate_simple_policy(
+    TPM2_CC command_code1,
+    TPM2_CC command_code2,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn TSS2_RC ifapi_compute_policy_pcr(
+    TPMS_POLICYPCR *policy,
+    TPML_DIGEST_VALUES *current_digest,
+    TPMI_ALG_HASH current_hash_alg)
+\fn static void log_policy_digest(TPML_DIGEST_VALUES *dest, size_t digest_idx, size_t hash_size,
+                  char *txt)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_policy_callbacks Policy callback functions.
+ \ingroup ifapi
+ Provides internal callbacks functions for policy execution.
+ \{
+\fn static void cleanup_policy_list(struct POLICY_LIST * list)
+\fn static TSS2_RC compare_policy_digest(
+    TPMS_POLICY *policy,
+    void *authPolicyVoid,
+    void *nameAlgVoid,
+    bool *equal)
+\fn static TSS2_RC equal_policy_authorization(
+    TPMS_POLICY *policy,
+    void *publicVoid,
+    void *nameAlgVoid,
+    bool *equal)
+\fn static void get_nv_auth_object(
+    IFAPI_OBJECT *nv_object,
+    ESYS_TR nv_index,
+    IFAPI_OBJECT *auth_object,
+    ESYS_TR *auth_index)
+\fn static TSS2_RC get_policy_digest(TPMS_POLICY *policy,
+                  TPMI_ALG_HASH hashAlg,
+                  TPM2B_DIGEST *digest)
+\fn static TSS2_RC get_policy_signature(
+    TPMS_POLICY *policy,
+    TPMT_PUBLIC *public,
+    TPMT_SIGNATURE *signature)
+\fn TSS2_RC ifapi_branch_selection(
+    TPML_POLICYBRANCHES *branches,
+    size_t *branch_idx,
+    void *userdata)
+\fn TSS2_RC ifapi_exec_auth_nv_policy(
+    TPM2B_NV_PUBLIC *nv_public,
+    TPMI_ALG_HASH hash_alg,
+    void *userdata)
+\fn TSS2_RC ifapi_exec_auth_policy(
+    TPMT_PUBLIC *key_public,
+    TPMI_ALG_HASH hash_alg,
+    TPM2B_DIGEST *digest,
+    TPMT_SIGNATURE *signature,
+    void *userdata)
+\fn TSS2_RC ifapi_get_duplicate_name(
+    TPM2B_NAME *name,
+    void *userdata)
+\fn TSS2_RC ifapi_get_key_public(
+    const char *path,
+    TPMT_PUBLIC *public,
+    void *ctx)
+\fn TSS2_RC ifapi_get_nv_public(
+    const char *path,
+    TPM2B_NV_PUBLIC *nv_public,
+    void *ctx)
+\fn TSS2_RC ifapi_get_object_name(
+    const char *path,
+    TPM2B_NAME *name,
+    void *ctx)
+\fn TSS2_RC ifapi_policy_action(
+    const char *action,
+    void *userdata)
+\fn TSS2_RC ifapi_policyeval_cbauth(
+    TPM2B_NAME *name,
+    ESYS_TR *object_handle,
+    ESYS_TR *auth_handle,
+    ESYS_TR *authSession,
+    void *userdata)
+\fn TSS2_RC ifapi_read_pcr(
+    TPMS_PCR_SELECT *pcr_select,
+    TPML_PCR_SELECTION *pcr_selection,
+    TPML_PCRVALUES **pcr_values,
+    void *ctx)
+\fn TSS2_RC ifapi_sign_buffer(
+    char *key_pem,
+    char *public_key_hint,
+    TPMI_ALG_HASH key_pem_hash_alg,
+    uint8_t *buffer,
+    size_t buffer_size,
+    uint8_t **signature,
+    size_t *signature_size,
+    void *userdata)
+\fn static TSS2_RC search_policy(
+    FAPI_CONTEXT *context,
+    Policy_Compare_Object compare,
+    bool all_objects,
+    void *object1,
+    void *object2,
+    struct POLICY_LIST **policy_found)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_policy_execution Policy execution functions.
+ \ingroup ifapi
+ Provides internal functions for policy execution.
+ \{
+\fn static TSS2_RC compute_or_digest_list(
+    TPML_POLICYBRANCHES *branches,
+    TPMI_ALG_HASH current_hash_alg,
+    TPML_DIGEST *digest_list)
+\fn static TSS2_RC compute_policy_list(
+    IFAPI_POLICY_EXEC_CTX *pol_ctx,
+    TPML_POLICYELEMENTS *elements)
+\fn static TSS2_RC execute_policy_action(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYACTION *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_auth_value(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYAUTHVALUE *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_authorize(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYAUTHORIZE *policy,
+    TPMI_ALG_HASH hash_alg,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_authorize_nv(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYAUTHORIZENV *policy,
+    TPMI_ALG_HASH hash_alg,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_command_code(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYCOMMANDCODE *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_counter_timer(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYCOUNTERTIMER *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_cp_hash(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYCPHASH *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_duplicate(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYDUPLICATIONSELECT *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_element(
+    ESYS_CONTEXT *esys_ctx,
+    TPMT_POLICYELEMENT *policy,
+    TPMI_ALG_HASH hash_alg,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_locality(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYLOCALITY *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_name_hash(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYNAMEHASH *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_nv(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYNV *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_nv_written(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYNVWRITTEN *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_or(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYOR *policy,
+    TPMI_ALG_HASH current_hash_alg,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_password(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYPASSWORD *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_pcr(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYPCR *policy,
+    TPMI_ALG_HASH current_hash_alg,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_physical_presence(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYPHYSICALPRESENCE *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_secret(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYSECRET *policy,
+    TPMI_ALG_HASH hash_alg,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn static TSS2_RC execute_policy_signed(
+    ESYS_CONTEXT *esys_ctx,
+    TPMS_POLICYSIGNED *policy,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn TSS2_RC get_policy_digest_idx(TPML_DIGEST_VALUES *digest_values, TPMI_ALG_HASH hashAlg,
+                      size_t *idx)
+\fn TSS2_RC ifapi_extend_authorization(
+    TPMS_POLICY *policy,
+    TPMS_POLICYAUTHORIZATION *authorization)
+\fn TSS2_RC ifapi_policyeval_execute(
+    ESYS_CONTEXT *esys_ctx,
+    IFAPI_POLICY_EXEC_CTX *current_policy)
+\fn TSS2_RC ifapi_policyeval_execute_prepare(
+    IFAPI_POLICY_EXEC_CTX *pol_ctx,
+    TPMI_ALG_HASH hash_alg,
+    TPMS_POLICY *policy)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_policy_util_exec Policy utilitiy module
+ \ingroup ifapi
+ Provides functions for the execution of policies for object authorization.
+\{
+
+\fn static TSS2_RC clear_current_policy(FAPI_CONTEXT *context)
+\fn static TSS2_RC create_session(
+    FAPI_CONTEXT *context,
+    ESYS_TR *session,
+    TPMI_ALG_HASH hash_alg)
+\fn TSS2_RC ifapi_policyutil_execute(FAPI_CONTEXT *context, ESYS_TR *session)
+\fn TSS2_RC ifapi_policyutil_execute_prepare(
+    FAPI_CONTEXT *context,
+    TPMI_ALG_HASH hash_alg,
+    TPMS_POLICY *policy)
+\fn static TSS2_RC new_policy(
+    FAPI_CONTEXT *context,
+    TPMS_POLICY *policy,
+    IFAPI_POLICYUTIL_STACK **current_policy)
+
+\}
+    */
+
+ /*!
+ \defgroup ifapi_helper Helper functions module
+ \ingroup ifapi
+ Provides helper functions.
+ \{
+\fn bool add_string_to_list(NODE_STR_T *str_list, char *string)
+\fn TSS2_RC append_object_to_list(void *object, NODE_OBJECT_T **object_list)
+\fn static void cleanup_policy_element(TPMT_POLICYELEMENT *policy)
+\fn static void cleanup_policy_elements(TPML_POLICYELEMENTS *policy)
+\fn static TSS2_RC copy_policy(TPMS_POLICY * dest,
+        const TPMS_POLICY * src)
+\fn static TPML_POLICYBRANCHES * copy_policy_branches(const TPML_POLICYBRANCHES *from_branches)
+\fn static TSS2_RC copy_policy_element(const TPMT_POLICYELEMENT *from_policy, TPMT_POLICYELEMENT *to_policy)
+\fn static TPML_POLICYELEMENTS * copy_policy_elements(const TPML_POLICYELEMENTS *from_policy)
+\fn static TSS2_RC create_dirs(const char *supdir, NODE_STR_T *dir_list, mode_t mode)
+\fn void free_string_list(NODE_STR_T *node)
+\fn char * get_description(IFAPI_OBJECT *object)
+\fn bool ifapi_TPM2B_DIGEST_cmp(TPM2B_DIGEST *in1, TPM2B_DIGEST *in2)
+\fn bool ifapi_TPM2B_ECC_PARAMETER_cmp(TPM2B_ECC_PARAMETER *in1,
+                              TPM2B_ECC_PARAMETER *in2)
+\fn bool ifapi_TPM2B_PUBLIC_KEY_RSA_cmp(TPM2B_PUBLIC_KEY_RSA *in1,
+                               TPM2B_PUBLIC_KEY_RSA *in2)
+\fn bool ifapi_TPMS_ECC_POINT_cmp(TPMS_ECC_POINT *in1, TPMS_ECC_POINT *in2)
+\fn bool ifapi_TPMT_PUBLIC_cmp(TPMT_PUBLIC *in1, TPMT_PUBLIC *in2)
+\fn bool ifapi_TPMU_PUBLIC_ID_cmp(TPMU_PUBLIC_ID *in1, UINT32 selector1,
+                         TPMU_PUBLIC_ID *in2, UINT32 selector2)
+\fn TSS2_RC ifapi_asprintf(char **str, const char *fmt, ...)
+\fn TSS2_RC ifapi_calculate_pcr_digest(
+    json_object *jso_event_list,
+    const FAPI_QUOTE_INFO *quote_info,
+    TPM2B_DIGEST *pcr_digest)
+\fn TSS2_RC ifapi_check_profile_pcr_selection(
+    const TPML_PCR_SELECTION *pcr_profile,
+    const TPML_PCR_SELECTION *pcr_capablity)
+\fn void ifapi_cleanup_policy(TPMS_POLICY *policy)
+\fn bool ifapi_cmp_public_key(
+    TPM2B_PUBLIC *key1,
+    TPM2B_PUBLIC *key2)
+\fn TSS2_RC ifapi_compute_policy_digest(
+    TPML_PCRVALUES *pcrs,
+    TPML_PCR_SELECTION *pcr_selection,
+    TPMI_ALG_HASH hash_alg,
+    TPM2B_DIGEST *pcr_digest)
+\fn TSS2_RC ifapi_compute_quote_info(
+    IFAPI_OBJECT *sig_key_object,
+    TPM2B_ATTEST *tpm_quoted,
+    char **quoteInfo)
+\fn TPMS_POLICY * ifapi_copy_policy(
+    const TPMS_POLICY *from_policy)
+\fn TSS2_RC ifapi_create_dirs(const char *supdir, const char *path)
+\fn TSS2_RC ifapi_extend_vpcr(
+    TPM2B_DIGEST *vpcr,
+    TPMI_ALG_HASH bank,
+    const IFAPI_EVENT *event)
+\fn TSS2_RC ifapi_filter_pcr_selection_by_index(
+    TPML_PCR_SELECTION *pcr_selection,
+    const TPM2_HANDLE *pcr_index,
+    size_t pcr_count)
+\fn void ifapi_free_node_list(NODE_OBJECT_T *node)
+\fn void ifapi_free_object_list(NODE_OBJECT_T *node)
+\fn int ifapi_get_curl_buffer(unsigned char * url, unsigned char ** buffer,
+                          size_t *buffer_size)
+\fn ESYS_TR ifapi_get_hierary_handle(const char *path)
+\fn TSS2_RC ifapi_get_name(TPMT_PUBLIC *publicInfo, TPM2B_NAME *name)
+\fn TSS2_RC ifapi_get_nv_start_index(const char *path, TPM2_HANDLE *start_nv_index)
+\fn TSS2_RC ifapi_get_quote_info(
+    char const *quoteInfo,
+    TPM2B_ATTEST *tpm_quoted,
+    FAPI_QUOTE_INFO *fapi_quote_info)
+\fn bool ifapi_hierarchy_path_p(const char *path)
+\fn void ifapi_init_hierarchy_object(
+    IFAPI_OBJECT *hierarchy,
+    ESYS_TR esys_handle)
+\fn TSS2_RC ifapi_nv_get_name(TPM2B_NV_PUBLIC *publicInfo, TPM2B_NAME *name)
+\fn TSS2_RC ifapi_object_cmp_name(IFAPI_OBJECT *object, void *name, bool *equal)
+\fn TSS2_RC ifapi_object_cmp_nv_public(IFAPI_OBJECT *object, void *nv_public, bool *equal)
+\fn size_t ifapi_path_length(NODE_STR_T *node)
+\fn TSS2_RC ifapi_path_string(char **dest, const char *supdir, NODE_STR_T *node, char *name)
+\fn TSS2_RC ifapi_path_string_n(char **dest, const char *supdir, NODE_STR_T *node, char *name,
+                    size_t n)
+\fn bool ifapi_path_type_p(const char *path, const char *type)
+\fn TSS2_RC ifapi_set_key_flags(const char *type, bool policy, IFAPI_KEY_TEMPLATE *template)
+\fn TSS2_RC ifapi_set_nv_flags(const char *type, IFAPI_NV_TEMPLATE *template,
+                   const char *policy)
+\fn TSS2_RC ifapi_tpm_to_fapi_signature(
+    IFAPI_OBJECT *sig_key_object,
+    TPMT_SIGNATURE *tpm_signature,
+    uint8_t **signature,
+    size_t *signatureSize)
+\fn NODE_STR_T * init_string_list(const char *string)
+\fn bool object_with_auth(IFAPI_OBJECT *object)
+\fn static size_t path_str_length(NODE_STR_T *node, int delim_length)
+\fn TSS2_RC push_object_to_list(void *object, NODE_OBJECT_T **object_list)
+\fn NODE_STR_T * split_string(const char *string, char *delimiter)
+\fn int vasprintf(char **str, const char *fmt, va_list args)
+\fn static size_t write_curl_buffer_cb(void *contents, size_t size, size_t nmemb, void *userp)
+\fn ifapi_check_nv_index(const char *path, TPM2_HANDLE nv_index)
+\fn ifapi_null_primary_p(const char *path);
+ \}
+*/
+
+ /*!
+ \defgroup ifapi_utility Utility module
+ \ingroup ifapi
+ Provides internal utility functions.
+ \{
+\fn static void full_path_to_fapi_path(IFAPI_KEYSTORE *keystore, char *path)
+\fn static TSS2_RC get_explicit_key_path(
+    IFAPI_KEYSTORE *keystore,
+    const char *ipath,
+    NODE_STR_T **result)
+\fn static size_t get_name_alg(FAPI_CONTEXT *context, IFAPI_OBJECT *object)
+\fn TSS2_RC ifapi_authorize_object(FAPI_CONTEXT *context, IFAPI_OBJECT *object, ESYS_TR *session)
+\fn TPM2_RC ifapi_capability_get(FAPI_CONTEXT *context, TPM2_CAP capability,
+                     UINT32 count, TPMS_CAPABILITY_DATA **capability_data)
+\fn TPM2_RC ifapi_capability_init(FAPI_CONTEXT *context)
+\fn TSS2_RC ifapi_change_auth_hierarchy(
+    FAPI_CONTEXT *context,
+    ESYS_TR handle,
+    IFAPI_OBJECT *hierarchy_object,
+    TPM2B_AUTH *newAuthValue)
+\fn TSS2_RC ifapi_change_policy_hierarchy(
+    FAPI_CONTEXT *context,
+    ESYS_TR handle,
+    IFAPI_OBJECT *hierarchy_object,
+    TPMS_POLICY *policy)
+\fn TSS2_RC ifapi_cleanup_session(FAPI_CONTEXT *context)
+\fn TSS2_RC ifapi_esys_serialize_object(ESYS_CONTEXT *ectx, IFAPI_OBJECT *object)
+\fn TSS2_RC ifapi_flush_object(FAPI_CONTEXT *context, ESYS_TR handle)
+\fn void ifapi_flush_policy_session(FAPI_CONTEXT *context, ESYS_TR session, TSS2_RC r)
+\fn void ifapi_free_object(FAPI_CONTEXT *context, IFAPI_OBJECT **object)
+\fn void ifapi_free_objects(FAPI_CONTEXT *context)
+\fn TSS2_RC ifapi_get_certificates(
+    FAPI_CONTEXT *context,
+    UINT32 min_handle,
+    UINT32 max_handle,
+    NODE_OBJECT_T **cert_list)
+\fn TSS2_RC ifapi_get_description(IFAPI_OBJECT *object, char **description)
+\fn TSS2_RC ifapi_get_free_handle_async(FAPI_CONTEXT *fctx, TPM2_HANDLE *handle)
+\fn TSS2_RC ifapi_get_free_handle_finish(FAPI_CONTEXT *fctx, TPM2_HANDLE *handle,
+                             TPM2_HANDLE max)
+\fn TSS2_RC ifapi_get_json(FAPI_CONTEXT *context, IFAPI_OBJECT *object, char **json_string)
+\fn TSS2_RC ifapi_get_random(FAPI_CONTEXT *context, size_t numBytes, uint8_t **data)
+\fn TSS2_RC ifapi_get_session_async(ESYS_CONTEXT *esys, ESYS_TR saltkey, const IFAPI_PROFILE *profile,
+                        TPMI_ALG_HASH hashAlg)
+\fn TSS2_RC ifapi_get_session_finish(ESYS_CONTEXT *esys, ESYS_TR *session,
+                         TPMA_SESSION flags)
+\fn TSS2_RC ifapi_get_sessions_async(FAPI_CONTEXT *context,
+                         IFAPI_SESSION_TYPE session_flags,
+                         TPMA_SESSION attribute_flags1,
+                         TPMA_SESSION attribute_flags2)
+\fn TSS2_RC ifapi_get_sessions_finish(
+    FAPI_CONTEXT *context,
+    const IFAPI_PROFILE *profile,
+    TPMI_ALG_HASH hash_alg)
+\fn TSS2_RC ifapi_get_sig_scheme(
+    FAPI_CONTEXT *context,
+    IFAPI_OBJECT *object,
+    char const *padding,
+    TPM2B_DIGEST *digest,
+    TPMT_SIG_SCHEME *sig_scheme)
+\fn TSS2_RC ifapi_init_primary_async(FAPI_CONTEXT *context, TSS2_KEY_TYPE ktype)
+\fn TSS2_RC ifapi_init_primary_finish(FAPI_CONTEXT *context, TSS2_KEY_TYPE ktype)
+\fn TSS2_RC ifapi_initialize_object(
+    ESYS_CONTEXT *ectx,
+    IFAPI_OBJECT *object)
+\fn TSS2_RC ifapi_key_create(
+    FAPI_CONTEXT *context,
+    IFAPI_KEY_TEMPLATE *template)
+\fn TSS2_RC ifapi_key_create_prepare(
+    FAPI_CONTEXT  *context,
+    char   const *keyPath,
+    char   const *policyPath)
+\fn TSS2_RC ifapi_key_create_prepare_auth(
+    FAPI_CONTEXT  *context,
+    char   const *keyPath,
+    char   const *policyPath,
+    char   const *authValue)
+\fn TSS2_RC ifapi_key_create_prepare_sensitive(
+    FAPI_CONTEXT  *context,
+    char    const *keyPath,
+    char    const *policyPath,
+    size_t         dataSize,
+    char    const *authValue,
+    uint8_t const *data)
+\fn TSS2_RC ifapi_key_sign(
+    FAPI_CONTEXT     *context,
+    IFAPI_OBJECT     *sig_key_object,
+    char const       *padding,
+    TPM2B_DIGEST     *digest,
+    TPMT_SIGNATURE  **tpm_signature,
+    char            **publicKey,
+    char            **certificate)
+\fn TSS2_RC ifapi_load_key(
+    FAPI_CONTEXT  *context,
+    char    const *keyPath,
+    IFAPI_OBJECT **key_object)
+\fn TSS2_RC ifapi_load_key_async(FAPI_CONTEXT *context, size_t position)
+\fn TSS2_RC ifapi_load_key_finish(FAPI_CONTEXT *context, bool flush_parent)
+\fn TSS2_RC ifapi_load_keys_async(FAPI_CONTEXT *context, char const *keyPath)
+\fn TSS2_RC ifapi_load_keys_finish(
+    FAPI_CONTEXT *context,
+    bool flush_parent,
+    ESYS_TR *handle,
+    IFAPI_OBJECT **key_object)
+\fn TSS2_RC ifapi_load_primary_async(FAPI_CONTEXT *context, char *path)
+\fn TSS2_RC ifapi_load_primary_finish(FAPI_CONTEXT *context, ESYS_TR *handle)
+\fn TSS2_RC ifapi_merge_profile_into_nv_template(
+    FAPI_CONTEXT *context,
+    IFAPI_NV_TEMPLATE *template)
+\fn TSS2_RC ifapi_merge_profile_into_template(
+    const IFAPI_PROFILE *profile,
+    IFAPI_KEY_TEMPLATE *template)
+\fn TSS2_RC ifapi_non_tpm_mode_init(FAPI_CONTEXT *context)
+\fn TSS2_RC ifapi_nv_read(
+    FAPI_CONTEXT *context,
+    uint8_t     **data,
+    size_t       *size)
+\fn TSS2_RC ifapi_nv_write(
+    FAPI_CONTEXT *context,
+    char         *nvPath,
+    size_t         param_offset,
+    uint8_t const *data,
+    size_t         size)
+\fn void ifapi_primary_clean(FAPI_CONTEXT *context)
+\fn void ifapi_session_clean(FAPI_CONTEXT *context)
+\fn TSS2_RC ifapi_session_init(FAPI_CONTEXT *context)
+\fn TSS2_RC ifapi_set_auth(
+    FAPI_CONTEXT *context,
+    IFAPI_OBJECT *auth_object,
+    const char *description)
+\fn void ifapi_set_description(IFAPI_OBJECT *object, char *description)
+\fn static TSS2_RC init_explicit_key_path(
+    const char *context_profile,
+    const char *ipath,
+    NODE_STR_T **list_node1,
+    NODE_STR_T **current_list_node,
+    NODE_STR_T **result)
+\fn static size_t policy_digest_size(IFAPI_OBJECT *object)
+\fn static TSS2_RC pop_object_from_list(FAPI_CONTEXT *context, NODE_OBJECT_T **object_list)
+\fn static TSS2_RC push_object_with_size_to_list(void *object, size_t size, NODE_OBJECT_T **object_list)
+\fn ifapi_allocate_object(FAPI_CONTEXT *context)
+\fn ifapi_create_primary(FAPI_CONTEXT *context, IFAPI_KEY_TEMPLATE *template)
+\fn ifapi_get_key_properties(
+    FAPI_CONTEXT *context,
+    char const *key_path,
+    bool *is_primary,
+    bool *in_null_hierarchy)
+\fn ifapi_get_object_path(IFAPI_OBJECT *object)
+\fn ifapi_load_parent_keys_async(FAPI_CONTEXT *context, char const *keyPath)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_io Basic IO module
+ \ingroup ifapi
+ Provides internal basic IO functions for policy and key store module.
+ \{
+\fn static TSS2_RC dirfiles_all(const char *dir_name, NODE_OBJECT_T **list, size_t *n)
+\fn TSS2_RC ifapi_io_check_create_dir(
+    const char *dirname)
+\fn TSS2_RC ifapi_io_check_file_writeable(
+    const char *file)
+\fn TSS2_RC ifapi_io_dirfiles(
+    const char *dirname,
+    char ***files,
+    size_t *numfiles)
+\fn TSS2_RC ifapi_io_dirfiles_all(
+    const char *searchPath,
+    char ***pathlist,
+    size_t *numPaths)
+\fn bool ifapi_io_path_exists(const char *path)
+\fn TSS2_RC ifapi_io_poll(IFAPI_IO * io)
+\fn TSS2_RC ifapi_io_poll_handles(IFAPI_IO *io, FAPI_POLL_HANDLE **handles, size_t *num_handles)
+\fn TSS2_RC ifapi_io_read_async(
+    struct IFAPI_IO *io,
+    const char *filename)
+\fn TSS2_RC ifapi_io_read_finish(
+    struct IFAPI_IO *io,
+    uint8_t **buffer,
+    size_t *length)
+\fn TSS2_RC ifapi_io_remove_directories(
+    const char *dirname)
+\fn TSS2_RC ifapi_io_remove_file(const char *file)
+\fn TSS2_RC ifapi_io_write_async(
+    struct IFAPI_IO *io,
+    const char *filename,
+    const uint8_t *buffer,
+    size_t length)
+\fn TSS2_RC ifapi_io_write_finish(
+    struct IFAPI_IO *io)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_keystore Key store module
+ \ingroup ifapi
+ Provides internal fapi functions for reading and writing to the key store.
+ \{
+\fn static TSS2_RC copy_uint8_ary(UINT8_ARY *dest, const UINT8_ARY * src)
+\fn static TSS2_RC expand_directory(IFAPI_KEYSTORE *keystore, const char *path, char **directory_name)
+\fn static TSS2_RC expand_path(IFAPI_KEYSTORE *keystore, const char *path, char **file_name)
+\fn static TSS2_RC expand_path_to_object(
+    IFAPI_KEYSTORE *keystore,
+    const char *path,
+    const char *dir,
+    char **file_name)
+\fn void full_path_to_fapi_path(IFAPI_KEYSTORE *keystore, char *path)
+\fn static TSS2_RC get_explicit_key_path(
+    IFAPI_KEYSTORE *keystore,
+    const char *ipath,
+    NODE_STR_T **result)
+\fn void ifapi_cleanup_ifapi_duplicate(IFAPI_DUPLICATE * duplicate)
+\fn void ifapi_cleanup_ifapi_ext_pub_key(IFAPI_EXT_PUB_KEY * key)
+\fn void ifapi_cleanup_ifapi_hierarchy(IFAPI_HIERARCHY * hierarchy)
+\fn void ifapi_cleanup_ifapi_key(IFAPI_KEY * key)
+\fn void ifapi_cleanup_ifapi_keystore(IFAPI_KEYSTORE * keystore)
+\fn void ifapi_cleanup_ifapi_nv(IFAPI_NV * nv)
+\fn void ifapi_cleanup_ifapi_object(
+    IFAPI_OBJECT * object)
+\fn TSS2_RC ifapi_copy_ifapi_key(IFAPI_KEY * dest, const IFAPI_KEY * src)
+\fn TSS2_RC ifapi_copy_ifapi_key_object(IFAPI_OBJECT * dest, const IFAPI_OBJECT * src)
+\fn TSS2_RC ifapi_keystore_check_overwrite(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    const char *path)
+\fn TSS2_RC ifapi_keystore_check_writeable(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    const char *path)
+\fn TSS2_RC ifapi_keystore_delete(
+    IFAPI_KEYSTORE * keystore,
+    char *path)
+\fn TSS2_RC ifapi_keystore_initialize(
+    IFAPI_KEYSTORE *keystore,
+    const char *config_systemdir,
+    const char *config_userdir,
+    const char *config_defaultprofile)
+\fn TSS2_RC ifapi_keystore_list_all(
+    IFAPI_KEYSTORE *keystore,
+    const char *searchpath,
+    char ***results,
+    size_t *numresults)
+\fn TSS2_RC ifapi_keystore_load_async(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    const char *path)
+\fn TSS2_RC ifapi_keystore_load_finish(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    IFAPI_OBJECT *object)
+\fn TSS2_RC ifapi_keystore_remove_directories(IFAPI_KEYSTORE *keystore, const char *dir_name)
+\fn TSS2_RC ifapi_keystore_search_nv_obj(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    TPM2B_NV_PUBLIC *nv_public,
+    char **found_path)
+\fn TSS2_RC ifapi_keystore_search_obj(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    TPM2B_NAME *name,
+    char **found_path)
+\fn TSS2_RC ifapi_keystore_store_async(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    const char *path,
+    const IFAPI_OBJECT *object)
+\fn TSS2_RC ifapi_keystore_store_finish(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io)
+\fn static TSS2_RC initialize_explicit_key_path(
+    const char *context_profile,
+    const char *ipath,
+    NODE_STR_T **list_node1,
+    NODE_STR_T **current_list_node,
+    NODE_STR_T **result)
+\fn static TSS2_RC keystore_list_all_abs(
+    IFAPI_KEYSTORE *keystore,
+    const char *searchpath,
+    char ***results,
+    size_t *numresults)
+\fn static TSS2_RC keystore_search_obj(
+    IFAPI_KEYSTORE *keystore,
+    IFAPI_IO *io,
+    void *cmp_object,
+    ifapi_keystore_object_cmp cmp_function,
+    char **found_path)
+\fn     static TSS2_RC rel_path_to_abs_path(
+        IFAPI_KEYSTORE *keystore,
+        const char *rel_path,
+        char **abs_path)
+\fn ifapi_copy_ifapi_hierarchy(IFAPI_HIERARCHY * dest, const IFAPI_HIERARCHY * src)
+\fn ifapi_copy_ifapi_hierarchy_object(IFAPI_OBJECT * dest, const IFAPI_OBJECT * src)
+\fn ifapi_keystore_object_does_not_exist(
+    IFAPI_KEYSTORE *keystore,
+    const char *path,
+    const IFAPI_OBJECT *object)
+ \}
+*/
+
+/*!
+ \defgroup ifapi_policy_store Policy store module
+ \ingroup ifapi
+ Provides internal fapi functions for reading and writing to the policy store.
+ \{
+\fn TSS2_RC ifapi_policy_delete(
+    IFAPI_POLICY_STORE * pstore,
+    char *path)
+\fn TSS2_RC ifapi_policy_store_initialize(
+    IFAPI_POLICY_STORE *pstore,
+    const char *config_policydir)
+\fn TSS2_RC ifapi_policy_store_load_async(
+    IFAPI_POLICY_STORE *pstore,
+    IFAPI_IO *io,
+    const char *path)
+\fn TSS2_RC ifapi_policy_store_load_finish(
+    IFAPI_POLICY_STORE *pstore,
+    IFAPI_IO *io,
+    TPMS_POLICY *policy)
+\fn TSS2_RC ifapi_policy_store_store_async(
+    IFAPI_POLICY_STORE *pstore,
+    IFAPI_IO *io,
+    const char *path,
+    const TPMS_POLICY *policy)
+\fn TSS2_RC ifapi_policy_store_store_finish(
+    IFAPI_POLICY_STORE *pstore,
+    IFAPI_IO *io)
+\fn static TSS2_RC policy_rel_path_to_abs_path(
+    IFAPI_POLICY_STORE *pstore,
+    const char *rel_path,
+    char **abs_path)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_configuration  Configuration utilities.
+ \ingroup ifapi
+ Provides internal fapi functions for deserialization of the configuration data and
+ the initialization of the configuration.
+ \{
+
+\fn static TSS2_RC ifapi_json_IFAPI_CONFIG_deserialize(json_object *jso, IFAPI_CONFIG *out)
+\fn TSS2_RC ifapi_config_initialize_async(IFAPI_IO *io)
+\fn TSS2_RC ifapi_config_initialize_finish(IFAPI_IO *io, IFAPI_CONFIG *config)
+\fn static TSS2_RC ifapi_json_IFAPI_CONFIG_deserialize(json_object *jso, IFAPI_CONFIG *out)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_eventlog  Event log utilities.
+ \ingroup ifapi
+ Provides internal fapi functions for the handling of event logs
+\{
+\fn void ifapi_cleanup_event(IFAPI_EVENT * event)
+\fn TSS2_RC ifapi_eventlog_append_check(
+    IFAPI_EVENTLOG *eventlog,
+    IFAPI_IO *io)
+\fn TSS2_RC ifapi_eventlog_append_finish(
+    IFAPI_EVENTLOG *eventlog,
+    IFAPI_IO *io,
+    const IFAPI_EVENT *pcr_event)
+\fn TSS2_RC ifapi_eventlog_get_async(
+    IFAPI_EVENTLOG *eventlog,
+    IFAPI_IO *io,
+    const TPM2_HANDLE *pcrList,
+    size_t pcrListSize)
+\fn TSS2_RC ifapi_eventlog_get_finish(
+    IFAPI_EVENTLOG *eventlog,
+    IFAPI_IO *io,
+    char **log)
+\fn TSS2_RC ifapi_eventlog_initialize(
+    IFAPI_EVENTLOG *eventlog,
+    const char *log_dir)
+ \}
+*/
+
+/*!
+ \defgroup ifapi_profile  Profile module
+ \ingroup ifapi
+ Provides functions for the handling of profiles stored in the object store.
+\{
+
+\fn static TSS2_RC ifapi_profile_checkpcrs(const TPML_PCR_SELECTION *pcr_profile)
+\fn static TSS2_RC ifapi_profile_json_deserialize(
+    json_object *jso,
+    IFAPI_PROFILE *out)
+\fn void ifapi_profiles_finalize(
+    IFAPI_PROFILES *profiles)
+\fn TSS2_RC ifapi_profiles_get(
+    const IFAPI_PROFILES *profiles,
+    const char *name,
+    const IFAPI_PROFILE **profile)
+\fn TSS2_RC ifapi_profiles_initialize_async(
+    IFAPI_PROFILES *profiles,
+    IFAPI_IO *io,
+    const char *profilesdir,
+    const char *defaultprofile)
+\fn TSS2_RC ifapi_profiles_initialize_finish(
+    IFAPI_PROFILES *profiles,
+    IFAPI_IO *io)
+
+\}
+*/
+
+/*!
+ \defgroup ifapi_serialization FAPI object serialization module
+ \ingroup ifapi
+ Provides functions for the serialization of FAPI objects to JSON.
+ \{
+\fn TSS2_RC ifapi_json_FAPI_QUOTE_INFO_serialize(const FAPI_QUOTE_INFO *in,
+                                     json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_CAP_INFO_serialize(const IFAPI_CAP_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_DUPLICATE_serialize(const IFAPI_DUPLICATE *in,
+                                     json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_TYPE_serialize(const IFAPI_EVENT_TYPE in,
+                                      json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_TYPE_serialize_txt(
+    const IFAPI_EVENT_TYPE in,
+    json_object **str_jso)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_UNION_serialize(const IFAPI_EVENT_UNION *in,
+                                       UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_serialize(const IFAPI_EVENT *in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_EXT_PUB_KEY_serialize(const IFAPI_EXT_PUB_KEY *in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_HIERARCHY_serialize(const IFAPI_HIERARCHY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_IMA_EVENT_serialize(const IFAPI_IMA_EVENT *in,
+                                     json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_INFO_serialize(const IFAPI_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_KEY_serialize(const IFAPI_KEY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_NV_serialize(const IFAPI_NV *in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_OBJECT_TYPE_CONSTANT_serialize(const IFAPI_OBJECT_TYPE_CONSTANT
+        in, json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_OBJECT_serialize(const IFAPI_OBJECT *in,
+                                  json_object **jso)
+\fn TSS2_RC ifapi_json_IFAPI_TSS_EVENT_serialize(const IFAPI_TSS_EVENT *in,
+                                     json_object **jso)
+\fn TSS2_RC ifapi_json_UINT8_ARY_serialize(const UINT8_ARY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_char_serialize(
+    const char *in,
+    json_object **jso)
+\fn TSS2_RC ifapi_json_INT32_serialize(const INT32 in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_CREATION_DATA_serialize(const TPM2B_CREATION_DATA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_DATA_serialize(const TPM2B_DATA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_DIGEST_serialize(const TPM2B_DIGEST *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_ECC_PARAMETER_serialize(const TPM2B_ECC_PARAMETER *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_ENCRYPTED_SECRET_serialize(const TPM2B_ENCRYPTED_SECRET *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_EVENT_serialize(const TPM2B_EVENT *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_MAX_NV_BUFFER_serialize(const TPM2B_MAX_NV_BUFFER *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_NAME_serialize(const TPM2B_NAME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_NONCE_serialize(const TPM2B_NONCE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_NV_PUBLIC_serialize(const TPM2B_NV_PUBLIC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_OPERAND_serialize(const TPM2B_OPERAND *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_PRIVATE_serialize(const TPM2B_PRIVATE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_PUBLIC_KEY_RSA_serialize(const TPM2B_PUBLIC_KEY_RSA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2B_PUBLIC_serialize(const TPM2B_PUBLIC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_ALG_ID_serialize(const TPM2_ALG_ID in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_CAP_serialize(const TPM2_CAP in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_CC_serialize(const TPM2_CC in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_ECC_CURVE_serialize(const TPM2_ECC_CURVE in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_EO_serialize(const TPM2_EO in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_GENERATED_serialize(const TPM2_GENERATED in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_HANDLE_serialize(const TPM2_HANDLE in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_NT_serialize(const TPM2_NT in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_PT_PCR_serialize(const TPM2_PT_PCR in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_PT_serialize(const TPM2_PT in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPM2_ST_serialize(const TPM2_ST in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMA_ALGORITHM_serialize(const TPMA_ALGORITHM in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMA_CC_serialize(const TPMA_CC in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMA_LOCALITY_serialize(const TPMA_LOCALITY in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMA_NV_serialize(const TPMA_NV in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMA_OBJECT_serialize(const TPMA_OBJECT in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_AES_KEY_BITS_serialize(const TPMI_AES_KEY_BITS in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_ASYM_SCHEME_serialize(const TPMI_ALG_ASYM_SCHEME in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_ECC_SCHEME_serialize(const TPMI_ALG_ECC_SCHEME in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_HASH_serialize(const TPMI_ALG_HASH in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_KDF_serialize(const TPMI_ALG_KDF in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_KEYEDHASH_SCHEME_serialize(const TPMI_ALG_KEYEDHASH_SCHEME in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_PUBLIC_serialize(const TPMI_ALG_PUBLIC in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_RSA_SCHEME_serialize(const TPMI_ALG_RSA_SCHEME in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SIG_SCHEME_serialize(const TPMI_ALG_SIG_SCHEME in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SYM_MODE_serialize(const TPMI_ALG_SYM_MODE in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_CIPHER_MODE_serialize(const TPMI_ALG_CIPHER_MODE in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SYM_OBJECT_serialize(const TPMI_ALG_SYM_OBJECT in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ECC_CURVE_serialize(const TPMI_ECC_CURVE in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_RH_HIERARCHY_serialize(const TPMI_RH_HIERARCHY in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_RH_NV_INDEX_serialize(const TPMI_RH_NV_INDEX in,
+                                      json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_RSA_KEY_BITS_serialize(const TPMI_RSA_KEY_BITS in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_ST_ATTEST_serialize(const TPMI_ST_ATTEST in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_YES_NO_serialize(const TPMI_YES_NO in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_ALG_PROPERTY_serialize(const TPML_ALG_PROPERTY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_CCA_serialize(const TPML_CCA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_CC_serialize(const TPML_CC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_DIGEST_VALUES_serialize(const TPML_DIGEST_VALUES *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_ECC_CURVE_serialize(const TPML_ECC_CURVE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_HANDLE_serialize(const TPML_HANDLE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_PCR_SELECTION_serialize(const TPML_PCR_SELECTION *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_TAGGED_PCR_PROPERTY_serialize(const TPML_TAGGED_PCR_PROPERTY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_TAGGED_TPM_PROPERTY_serialize(const TPML_TAGGED_TPM_PROPERTY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_ALG_PROPERTY_serialize(const TPMS_ALG_PROPERTY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_ATTEST_serialize(const TPMS_ATTEST *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_CAPABILITY_DATA_serialize(const TPMS_CAPABILITY_DATA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_CERTIFY_INFO_serialize(const TPMS_CERTIFY_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_CLOCK_INFO_serialize(const TPMS_CLOCK_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_COMMAND_AUDIT_INFO_serialize(const TPMS_COMMAND_AUDIT_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_CREATION_DATA_serialize(const TPMS_CREATION_DATA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_CREATION_INFO_serialize(const TPMS_CREATION_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_ECC_PARMS_serialize(const TPMS_ECC_PARMS *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_ECC_POINT_serialize(const TPMS_ECC_POINT *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_EMPTY_serialize(const TPMS_EMPTY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_ENC_SCHEME_OAEP_serialize(const TPMS_ENC_SCHEME_OAEP *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_ENC_SCHEME_RSAES_serialize(const TPMS_ENC_SCHEME_RSAES *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_KEYEDHASH_PARMS_serialize(const TPMS_KEYEDHASH_PARMS *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_KEY_SCHEME_ECDH_serialize(const TPMS_KEY_SCHEME_ECDH *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_NV_CERTIFY_INFO_serialize(const TPMS_NV_CERTIFY_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_NV_PUBLIC_serialize(const TPMS_NV_PUBLIC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_PCR_SELECTION_serialize(const TPMS_PCR_SELECTION *in,
+                                        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_PCR_SELECT_serialize(const TPMS_PCR_SELECT *in,
+                                        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_QUOTE_INFO_serialize(const TPMS_QUOTE_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_RSA_PARMS_serialize(const TPMS_RSA_PARMS *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_ECDAA_serialize(const TPMS_SCHEME_ECDAA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_HASH_serialize(const TPMS_SCHEME_HASH *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_HMAC_serialize(const TPMS_SCHEME_HMAC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_KDF1_SP800_108_serialize(const TPMS_SCHEME_KDF1_SP800_108 *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_KDF1_SP800_56A_serialize(const TPMS_SCHEME_KDF1_SP800_56A *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_MGF1_serialize(const TPMS_SCHEME_MGF1 *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_XOR_serialize(const TPMS_SCHEME_XOR *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SESSION_AUDIT_INFO_serialize(const TPMS_SESSION_AUDIT_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECC_serialize(const TPMS_SIGNATURE_ECC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECDAA_serialize(const TPMS_SIGNATURE_ECDAA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECDSA_serialize(const TPMS_SIGNATURE_ECDSA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECSCHNORR_serialize(const TPMS_SIGNATURE_ECSCHNORR *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_RSAPSS_serialize(const TPMS_SIGNATURE_RSAPSS *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_RSASSA_serialize(const TPMS_SIGNATURE_RSASSA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_RSA_serialize(const TPMS_SIGNATURE_RSA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_SM2_serialize(const TPMS_SIGNATURE_SM2 *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_ECDAA_serialize(const TPMS_SIG_SCHEME_ECDAA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_ECDSA_serialize(const TPMS_SIG_SCHEME_ECDSA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_ECSCHNORR_serialize(const TPMS_SIG_SCHEME_ECSCHNORR *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_RSAPSS_serialize(const TPMS_SIG_SCHEME_RSAPSS *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_RSASSA_serialize(const TPMS_SIG_SCHEME_RSASSA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_SM2_serialize(const TPMS_SIG_SCHEME_SM2 *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_SYMCIPHER_PARMS_serialize(const TPMS_SYMCIPHER_PARMS *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_TAGGED_PCR_SELECT_serialize(const TPMS_TAGGED_PCR_SELECT *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_TAGGED_PROPERTY_serialize(const TPMS_TAGGED_PROPERTY *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_TIME_ATTEST_INFO_serialize(const TPMS_TIME_ATTEST_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_TIME_INFO_serialize(const TPMS_TIME_INFO *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_ASYM_SCHEME_serialize(const TPMT_ASYM_SCHEME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_ECC_SCHEME_serialize(const TPMT_ECC_SCHEME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_HA_serialize(const TPMT_HA *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_KDF_SCHEME_serialize(const TPMT_KDF_SCHEME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_KEYEDHASH_SCHEME_serialize(const TPMT_KEYEDHASH_SCHEME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_PUBLIC_serialize(const TPMT_PUBLIC *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_RSA_SCHEME_serialize(const TPMT_RSA_SCHEME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_SIGNATURE_serialize(const TPMT_SIGNATURE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_SIG_SCHEME_serialize(const TPMT_SIG_SCHEME *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_SYM_DEF_OBJECT_serialize(const TPMT_SYM_DEF_OBJECT *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_TK_CREATION_serialize(const TPMT_TK_CREATION *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_ASYM_SCHEME_serialize(const TPMU_ASYM_SCHEME *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_ATTEST_serialize(const TPMU_ATTEST *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_CAPABILITIES_serialize(const TPMU_CAPABILITIES *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_HA_serialize(const TPMU_HA *in, UINT32 selector,
+                             json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_KDF_SCHEME_serialize(const TPMU_KDF_SCHEME *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_PUBLIC_ID_serialize(const TPMU_PUBLIC_ID *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_PUBLIC_PARMS_serialize(const TPMU_PUBLIC_PARMS *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_SCHEME_KEYEDHASH_serialize(const TPMU_SCHEME_KEYEDHASH *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_SIGNATURE_serialize(const TPMU_SIGNATURE *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_SIG_SCHEME_serialize(const TPMU_SIG_SCHEME *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_SYM_KEY_BITS_serialize(const TPMU_SYM_KEY_BITS *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_SYM_MODE_serialize(const TPMU_SYM_MODE *in, UINT32 selector, json_object **jso)
+\fn TSS2_RC ifapi_json_UINT16_serialize(const UINT16 in, json_object **jso)
+\fn TSS2_RC ifapi_json_UINT32_serialize(const UINT32 in, json_object **jso)
+\fn TSS2_RC ifapi_json_UINT64_serialize(UINT64 in, json_object **jso)
+\fn TSS2_RC ifapi_json_pcr_select_serialize(
+    const UINT8 sizeofSelect,
+    const BYTE pcrSelect[],
+    json_object **jso)
+    \fn TSS2_RC ifapi_json_TPMI_POLICYTYPE_serialize(const TPMI_POLICYTYPE in,
+                                     json_object **jso)
+\fn TSS2_RC ifapi_json_TPMI_POLICYTYPE_serialize_txt(
+    const TPMI_POLICYTYPE in,
+    json_object **str_jso)
+\fn TSS2_RC ifapi_json_TPML_PCRVALUES_serialize(const TPML_PCRVALUES *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_POLICYAUTHORIZATIONS_serialize(const TPML_POLICYAUTHORIZATIONS
+        *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_POLICYBRANCHES_serialize(const TPML_POLICYBRANCHES *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPML_POLICYELEMENTS_serialize(const TPML_POLICYELEMENTS *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_PCRVALUE_serialize(const TPMS_PCRVALUE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYACTION_serialize(const TPMS_POLICYACTION *in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHORIZATION_serialize(
+    const TPMS_POLICYAUTHORIZATION *in,
+    json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHORIZENV_serialize(const TPMS_POLICYAUTHORIZENV *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHORIZE_serialize(const TPMS_POLICYAUTHORIZE *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHVALUE_serialize(const TPMS_POLICYAUTHVALUE *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYBRANCH_serialize(const TPMS_POLICYBRANCH *in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYCOMMANDCODE_serialize(const TPMS_POLICYCOMMANDCODE *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYCOUNTERTIMER_serialize(const TPMS_POLICYCOUNTERTIMER *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYCPHASH_serialize(const TPMS_POLICYCPHASH *in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYDUPLICATIONSELECT_serialize(const
+        TPMS_POLICYDUPLICATIONSELECT *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYLOCALITY_serialize(const TPMS_POLICYLOCALITY *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYNAMEHASH_serialize(const TPMS_POLICYNAMEHASH *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYNVWRITTEN_serialize(const TPMS_POLICYNVWRITTEN *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYNV_serialize(const TPMS_POLICYNV *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYOR_serialize(const TPMS_POLICYOR *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYPASSWORD_serialize(const TPMS_POLICYPASSWORD *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYPCR_serialize(const TPMS_POLICYPCR *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYPHYSICALPRESENCE_serialize(const
+        TPMS_POLICYPHYSICALPRESENCE *in, json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYSECRET_serialize(const TPMS_POLICYSECRET *in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYSIGNED_serialize(const TPMS_POLICYSIGNED *in,
+                                       json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICYTEMPLATE_serialize(const TPMS_POLICYTEMPLATE *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMS_POLICY_serialize(const TPMS_POLICY *in,
+        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMT_POLICYELEMENT_serialize(const TPMT_POLICYELEMENT *in,
+                                        json_object **jso)
+\fn TSS2_RC ifapi_json_TPMU_POLICYELEMENT_serialize(const TPMU_POLICYELEMENT *in,
+                                        UINT32 selector, json_object **jso)
+\fn static TSS2_RC ifapi_json_char_serialize(
+    const char *in,
+    json_object **jso)
+\fn ifapi_json_IFAPI_CONFIG_serialize(const IFAPI_CONFIG *in, json_object **jso)
+
+
+ \}
+*/
+
+
+/*!
+ \defgroup ifapi_deserialization FAPI object deserialization module
+ \ingroup ifapi
+ Provides functions for the deserialization from JSON to FAPI objects.
+ \{
+\fn static bool get_number(const char *token, int64_t *num)
+\fn static int get_token_start_idx(const char *token)
+\fn TSS2_RC ifapi_json_FAPI_QUOTE_INFO_deserialize(json_object *jso,  FAPI_QUOTE_INFO *out)
+\fn TSS2_RC ifapi_json_IFAPI_DUPLICATE_deserialize(json_object *jso, IFAPI_DUPLICATE *out)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_TYPE_deserialize(json_object *jso, IFAPI_EVENT_TYPE *out)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_TYPE_deserialize_txt(json_object *jso,
+        IFAPI_EVENT_TYPE *out)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_UNION_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    IFAPI_EVENT_UNION *out)
+\fn TSS2_RC ifapi_json_IFAPI_EVENT_deserialize(json_object *jso,  IFAPI_EVENT *out)
+\fn TSS2_RC ifapi_json_IFAPI_EXT_PUB_KEY_deserialize(json_object *jso,
+        IFAPI_EXT_PUB_KEY *out)
+\fn TSS2_RC ifapi_json_IFAPI_HIERARCHY_deserialize(json_object *jso,  IFAPI_HIERARCHY *out)
+\fn TSS2_RC ifapi_json_IFAPI_IMA_EVENT_deserialize(json_object *jso,  IFAPI_IMA_EVENT *out)
+\fn TSS2_RC ifapi_json_IFAPI_KEY_deserialize(json_object *jso,  IFAPI_KEY *out)
+\fn TSS2_RC ifapi_json_IFAPI_NV_deserialize(json_object *jso,  IFAPI_NV *out)
+\fn TSS2_RC ifapi_json_IFAPI_OBJECT_TYPE_CONSTANT_deserialize(json_object *jso,
+        IFAPI_OBJECT_TYPE_CONSTANT *out)
+\fn TSS2_RC ifapi_json_IFAPI_OBJECT_deserialize(json_object *jso, IFAPI_OBJECT *out)
+\fn TSS2_RC ifapi_json_IFAPI_TSS_EVENT_deserialize(json_object *jso,  IFAPI_TSS_EVENT *out)
+\fn TSS2_RC ifapi_json_char_deserialize(
+    json_object *jso,
+    char **out)
+\fn static TSS2_RC get_boolean_from_json(json_object *jso, TPMI_YES_NO *value)
+\fn static bool get_number(const char *token, int64_t *num)
+\fn static TSS2_RC get_number_from_json(json_object *jso, int64_t *num)
+\fn bool ifapi_get_sub_object(json_object *jso, char *name, json_object **sub_jso)
+\fn static TSS2_RC ifapi_hex_to_byte_ary(const char hex[], UINT32 vlen, BYTE val[])
+\fn TSS2_RC ifapi_json_BYTE_array_deserialize(size_t max, json_object *jso, BYTE *out)
+\fn TSS2_RC ifapi_json_BYTE_deserialize(json_object *jso, BYTE *out)
+\fn TSS2_RC ifapi_json_TPM2B_CREATION_DATA_deserialize(json_object *jso,
+        TPM2B_CREATION_DATA *out)
+\fn TSS2_RC ifapi_json_TPM2B_DATA_deserialize(json_object *jso,  TPM2B_DATA *out)
+\fn TSS2_RC ifapi_json_TPM2B_DIGEST_deserialize(json_object *jso,  TPM2B_DIGEST *out)
+\fn TSS2_RC ifapi_json_TPM2B_ECC_PARAMETER_deserialize(json_object *jso,
+        TPM2B_ECC_PARAMETER *out)
+\fn TSS2_RC ifapi_json_TPM2B_ENCRYPTED_SECRET_deserialize(json_object *jso,
+        TPM2B_ENCRYPTED_SECRET *out)
+\fn TSS2_RC ifapi_json_TPM2B_EVENT_deserialize(json_object *jso,  TPM2B_EVENT *out)
+\fn TSS2_RC ifapi_json_TPM2B_MAX_NV_BUFFER_deserialize(json_object *jso,
+        TPM2B_MAX_NV_BUFFER *out)
+\fn TSS2_RC ifapi_json_TPM2B_NAME_deserialize(json_object *jso,  TPM2B_NAME *out)
+\fn TSS2_RC ifapi_json_TPM2B_NONCE_deserialize(json_object *jso, TPM2B_NONCE *out)
+\fn TSS2_RC ifapi_json_TPM2B_NV_PUBLIC_deserialize(json_object *jso, TPM2B_NV_PUBLIC *out)
+\fn TSS2_RC ifapi_json_TPM2B_OPERAND_deserialize(json_object *jso, TPM2B_OPERAND *out)
+\fn TSS2_RC ifapi_json_TPM2B_PRIVATE_deserialize(json_object *jso,  TPM2B_PRIVATE *out)
+\fn TSS2_RC ifapi_json_TPM2B_PUBLIC_KEY_RSA_deserialize(json_object *jso,
+        TPM2B_PUBLIC_KEY_RSA *out)
+\fn TSS2_RC ifapi_json_TPM2B_PUBLIC_deserialize(json_object *jso, TPM2B_PUBLIC *out)
+\fn TSS2_RC ifapi_json_TPM2_ALG_ID_deserialize(json_object *jso, TPM2_ALG_ID *out)
+\fn TSS2_RC ifapi_json_TPM2_CC_deserialize(json_object *jso, TPM2_CC *out)
+\fn TSS2_RC ifapi_json_TPM2_ECC_CURVE_deserialize(json_object *jso, TPM2_ECC_CURVE *out)
+\fn TSS2_RC ifapi_json_TPM2_EO_deserialize(json_object *jso, TPM2_EO *out)
+\fn TSS2_RC ifapi_json_TPM2_GENERATED_deserialize(json_object *jso, TPM2_GENERATED *out)
+\fn TSS2_RC ifapi_json_TPM2_HANDLE_deserialize(json_object *jso, TPM2_HANDLE *out)
+\fn TSS2_RC ifapi_json_TPM2_NT_deserialize(json_object *jso, TPM2_NT *out)
+\fn TSS2_RC ifapi_json_TPM2_PT_PCR_deserialize(json_object *jso, TPM2_PT_PCR *out)
+\fn TSS2_RC ifapi_json_TPM2_ST_deserialize(json_object *jso, TPM2_ST *out)
+\fn TSS2_RC ifapi_json_TPMA_LOCALITY_deserialize(json_object *jso, TPMA_LOCALITY *out)
+\fn TSS2_RC ifapi_json_TPMA_NV_deserialize(json_object *jso, TPMA_NV *out)
+\fn TSS2_RC ifapi_json_TPMA_OBJECT_deserialize(json_object *jso, TPMA_OBJECT *out)
+\fn TSS2_RC ifapi_json_TPMI_AES_KEY_BITS_deserialize(json_object *jso, TPMI_AES_KEY_BITS *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_ECC_SCHEME_deserialize(json_object *jso,
+        TPMI_ALG_ECC_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_HASH_deserialize(json_object *jso, TPMI_ALG_HASH *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_KDF_deserialize(json_object *jso, TPMI_ALG_KDF *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_KEYEDHASH_SCHEME_deserialize(json_object *jso,
+        TPMI_ALG_KEYEDHASH_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_PUBLIC_deserialize(json_object *jso, TPMI_ALG_PUBLIC *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_RSA_DECRYPT_deserialize(json_object *jso,
+        TPMI_ALG_RSA_DECRYPT *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_RSA_SCHEME_deserialize(json_object *jso,
+        TPMI_ALG_RSA_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SIG_SCHEME_deserialize(json_object *jso,
+        TPMI_ALG_SIG_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SYM_MODE_deserialize(json_object *jso,
+        TPMI_ALG_SYM_MODE *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_CIPHER_MODE_deserialize(json_object *jso,
+        TPMI_ALG_CIPHER_MODE *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SYM_OBJECT_deserialize(json_object *jso,
+        TPMI_ALG_SYM_OBJECT *out)
+\fn TSS2_RC ifapi_json_TPMI_ALG_SYM_deserialize(json_object *jso, TPMI_ALG_SYM *out)
+\fn TSS2_RC ifapi_json_TPMI_ECC_CURVE_deserialize(json_object *jso, TPMI_ECC_CURVE *out)
+\fn TSS2_RC ifapi_json_TPMI_RH_HIERARCHY_deserialize(json_object *jso,
+        TPMI_RH_HIERARCHY *out)
+\fn TSS2_RC ifapi_json_TPMI_RH_NV_INDEX_deserialize(json_object *jso, TPMI_RH_NV_INDEX *out)
+\fn TSS2_RC ifapi_json_TPMI_RSA_KEY_BITS_deserialize(json_object *jso,
+        TPMI_RSA_KEY_BITS *out)
+\fn TSS2_RC ifapi_json_TPMI_ST_ATTEST_deserialize(json_object *jso, TPMI_ST_ATTEST *out)
+\fn TSS2_RC ifapi_json_TPMI_YES_NO_deserialize(json_object *jso, TPMI_YES_NO *out)
+\fn TSS2_RC ifapi_json_TPML_DIGEST_VALUES_deserialize(json_object *jso,
+        TPML_DIGEST_VALUES *out)
+\fn TSS2_RC ifapi_json_TPML_PCR_SELECTION_deserialize(json_object *jso,
+        TPML_PCR_SELECTION *out)
+\fn TSS2_RC ifapi_json_TPMS_ATTEST_deserialize(json_object *jso,  TPMS_ATTEST *out)
+\fn TSS2_RC ifapi_json_TPMS_CERTIFY_INFO_deserialize(json_object *jso,
+        TPMS_CERTIFY_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_CLOCK_INFO_deserialize(json_object *jso,  TPMS_CLOCK_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_COMMAND_AUDIT_INFO_deserialize(json_object *jso,
+        TPMS_COMMAND_AUDIT_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_CREATION_DATA_deserialize(json_object *jso,
+        TPMS_CREATION_DATA *out)
+\fn TSS2_RC ifapi_json_TPMS_CREATION_INFO_deserialize(json_object *jso,
+        TPMS_CREATION_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_ECC_PARMS_deserialize(json_object *jso,  TPMS_ECC_PARMS *out)
+\fn TSS2_RC ifapi_json_TPMS_ECC_POINT_deserialize(json_object *jso,  TPMS_ECC_POINT *out)
+\fn TSS2_RC ifapi_json_TPMS_EMPTY_deserialize(json_object *jso, TPMS_EMPTY *out)
+\fn TSS2_RC ifapi_json_TPMS_ENC_SCHEME_OAEP_deserialize(json_object *jso,
+        TPMS_ENC_SCHEME_OAEP *out)
+\fn TSS2_RC ifapi_json_TPMS_ENC_SCHEME_RSAES_deserialize(json_object *jso,
+        TPMS_ENC_SCHEME_RSAES *out)
+\fn TSS2_RC ifapi_json_TPMS_KEYEDHASH_PARMS_deserialize(json_object *jso,
+        TPMS_KEYEDHASH_PARMS *out)
+\fn TSS2_RC ifapi_json_TPMS_KEY_SCHEME_ECDH_deserialize(json_object *jso,
+        TPMS_KEY_SCHEME_ECDH *out)
+\fn TSS2_RC ifapi_json_TPMS_NV_CERTIFY_INFO_deserialize(json_object *jso,
+        TPMS_NV_CERTIFY_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_NV_PUBLIC_deserialize(json_object *jso,  TPMS_NV_PUBLIC *out)
+\fn TSS2_RC ifapi_json_TPMS_PCR_SELECTION_deserialize(json_object *jso,
+        TPMS_PCR_SELECTION *out)
+\fn TSS2_RC ifapi_json_TPMS_PCR_SELECT_deserialize(json_object *jso,  TPMS_PCR_SELECT *out)
+\fn TSS2_RC ifapi_json_TPMS_QUOTE_INFO_deserialize(json_object *jso,  TPMS_QUOTE_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_RSA_PARMS_deserialize(json_object *jso,  TPMS_RSA_PARMS *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_ECDAA_deserialize(json_object *jso,
+        TPMS_SCHEME_ECDAA *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_HASH_deserialize(json_object *jso,
+                                        TPMS_SCHEME_HASH *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_HMAC_deserialize(json_object *jso, TPMS_SCHEME_HMAC *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_KDF1_SP800_108_deserialize(json_object *jso,
+        TPMS_SCHEME_KDF1_SP800_108 *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_KDF1_SP800_56A_deserialize(json_object *jso,
+        TPMS_SCHEME_KDF1_SP800_56A *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_MGF1_deserialize(json_object *jso, TPMS_SCHEME_MGF1 *out)
+\fn TSS2_RC ifapi_json_TPMS_SCHEME_XOR_deserialize(json_object *jso,  TPMS_SCHEME_XOR *out)
+\fn TSS2_RC ifapi_json_TPMS_SESSION_AUDIT_INFO_deserialize(json_object *jso,
+        TPMS_SESSION_AUDIT_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECC_deserialize(json_object *jso,
+        TPMS_SIGNATURE_ECC *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECDAA_deserialize(json_object *jso,
+        TPMS_SIGNATURE_ECDAA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECDSA_deserialize(json_object *jso,
+        TPMS_SIGNATURE_ECDSA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_ECSCHNORR_deserialize(json_object *jso,
+        TPMS_SIGNATURE_ECSCHNORR *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_RSAPSS_deserialize(json_object *jso,
+        TPMS_SIGNATURE_RSAPSS *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_RSASSA_deserialize(json_object *jso,
+        TPMS_SIGNATURE_RSASSA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_RSA_deserialize(json_object *jso,
+        TPMS_SIGNATURE_RSA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIGNATURE_SM2_deserialize(json_object *jso,
+        TPMS_SIGNATURE_SM2 *out)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_ECDAA_deserialize(json_object *jso,
+        TPMS_SIG_SCHEME_ECDAA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_ECDSA_deserialize(json_object *jso,
+        TPMS_SIG_SCHEME_ECDSA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_ECSCHNORR_deserialize(json_object *jso,
+        TPMS_SIG_SCHEME_ECSCHNORR *out)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_RSAPSS_deserialize(json_object *jso,
+        TPMS_SIG_SCHEME_RSAPSS *out)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_RSASSA_deserialize(json_object *jso,
+        TPMS_SIG_SCHEME_RSASSA *out)
+\fn TSS2_RC ifapi_json_TPMS_SIG_SCHEME_SM2_deserialize(json_object *jso,
+        TPMS_SIG_SCHEME_SM2 *out)
+\fn TSS2_RC ifapi_json_TPMS_SYMCIPHER_PARMS_deserialize(json_object *jso,
+        TPMS_SYMCIPHER_PARMS *out)
+\fn TSS2_RC ifapi_json_TPMS_TIME_ATTEST_INFO_deserialize(json_object *jso,
+        TPMS_TIME_ATTEST_INFO *out)
+\fn TSS2_RC ifapi_json_TPMS_TIME_INFO_deserialize(json_object *jso,  TPMS_TIME_INFO *out)
+\fn TSS2_RC ifapi_json_TPMT_ECC_SCHEME_deserialize(json_object *jso,  TPMT_ECC_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMT_HA_deserialize(json_object *jso,  TPMT_HA *out)
+\fn TSS2_RC ifapi_json_TPMT_KDF_SCHEME_deserialize(json_object *jso,  TPMT_KDF_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMT_KEYEDHASH_SCHEME_deserialize(json_object *jso,
+        TPMT_KEYEDHASH_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMT_PUBLIC_deserialize(json_object *jso,  TPMT_PUBLIC *out)
+\fn TSS2_RC ifapi_json_TPMT_RSA_DECRYPT_deserialize(json_object *jso,
+                                        TPMT_RSA_DECRYPT *out)
+\fn TSS2_RC ifapi_json_TPMT_RSA_SCHEME_deserialize(json_object *jso,  TPMT_RSA_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMT_SIGNATURE_deserialize(json_object *jso,  TPMT_SIGNATURE *out)
+\fn TSS2_RC ifapi_json_TPMT_SIG_SCHEME_deserialize(json_object *jso,  TPMT_SIG_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMT_SYM_DEF_OBJECT_deserialize(json_object *jso,
+        TPMT_SYM_DEF_OBJECT *out)
+\fn TSS2_RC ifapi_json_TPMT_SYM_DEF_deserialize(json_object *jso,  TPMT_SYM_DEF *out)
+\fn TSS2_RC ifapi_json_TPMT_TK_CREATION_deserialize(json_object *jso,
+                                        TPMT_TK_CREATION *out)
+\fn TSS2_RC ifapi_json_TPMU_ASYM_SCHEME_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_ASYM_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMU_ATTEST_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_ATTEST *out)
+\fn TSS2_RC ifapi_json_TPMU_HA_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_HA *out)
+\fn TSS2_RC ifapi_json_TPMU_KDF_SCHEME_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_KDF_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMU_PUBLIC_ID_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_PUBLIC_ID *out)
+\fn TSS2_RC ifapi_json_TPMU_PUBLIC_PARMS_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_PUBLIC_PARMS *out)
+\fn TSS2_RC ifapi_json_TPMU_SCHEME_KEYEDHASH_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_SCHEME_KEYEDHASH *out)
+\fn TSS2_RC ifapi_json_TPMU_SIGNATURE_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_SIGNATURE *out)
+\fn TSS2_RC ifapi_json_TPMU_SIG_SCHEME_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_SIG_SCHEME *out)
+\fn TSS2_RC ifapi_json_TPMU_SYM_KEY_BITS_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_SYM_KEY_BITS *out)
+\fn TSS2_RC ifapi_json_TPMU_SYM_MODE_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_SYM_MODE *out)
+\fn TSS2_RC ifapi_json_UINT16_deserialize(json_object *jso, UINT16 *out)
+\fn TSS2_RC ifapi_json_UINT32_deserialize(json_object *jso, UINT32 *out)
+\fn TSS2_RC ifapi_json_UINT64_deserialize(json_object *jso, UINT64 *out)
+\fn TSS2_RC ifapi_json_UINT8_ARY_deserialize(
+    json_object *jso,
+    UINT8_ARY *out)
+\fn TSS2_RC ifapi_json_UINT8_deserialize(json_object *jso, UINT8 *out)
+\fn TSS2_RC ifapi_json_byte_deserialize(
+    json_object *jso,
+    UINT32 max,
+    BYTE *out,
+    UINT16 *out_size)
+\fn TSS2_RC ifapi_json_pcr_selection_deserialize(
+    json_object *jso,
+    UINT8 *sizeofSelect,
+    BYTE pcrSelect[])
+\fn static const char * strip_prefix(const char *in, ...)
+    \fn static bool get_number(const char *token, int64_t *num)
+\fn static int get_token_start_idx(const char *token)
+\fn TSS2_RC ifapi_json_TPMI_POLICYTYPE_deserialize(json_object *jso, TPMI_POLICYTYPE *out)
+\fn TSS2_RC ifapi_json_TPMI_POLICYTYPE_deserialize_txt(json_object *jso,
+        TPMI_POLICYTYPE *out)
+\fn TSS2_RC ifapi_json_TPML_PCRVALUES_deserialize(json_object *jso,  TPML_PCRVALUES **out)
+\fn TSS2_RC ifapi_json_TPML_POLICYAUTHORIZATIONS_deserialize(json_object *jso,
+        TPML_POLICYAUTHORIZATIONS **out)
+\fn TSS2_RC ifapi_json_TPML_POLICYBRANCHES_deserialize(json_object *jso,
+        TPML_POLICYBRANCHES **out)
+\fn TSS2_RC ifapi_json_TPML_POLICYELEMENTS_deserialize(json_object *jso,
+        TPML_POLICYELEMENTS **out)
+\fn TSS2_RC ifapi_json_TPMS_PCRVALUE_deserialize(json_object *jso,  TPMS_PCRVALUE *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYACTION_deserialize(json_object *jso,
+        TPMS_POLICYACTION *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHORIZATION_deserialize(json_object *jso,
+        TPMS_POLICYAUTHORIZATION *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHORIZENV_deserialize(json_object *jso,
+        TPMS_POLICYAUTHORIZENV *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHORIZE_deserialize(json_object *jso,
+        TPMS_POLICYAUTHORIZE *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYAUTHVALUE_deserialize(json_object *jso,
+        TPMS_POLICYAUTHVALUE *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYBRANCH_deserialize(json_object *jso,
+        TPMS_POLICYBRANCH *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYCOMMANDCODE_deserialize(json_object *jso,
+        TPMS_POLICYCOMMANDCODE *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYCOUNTERTIMER_deserialize(json_object *jso,
+        TPMS_POLICYCOUNTERTIMER *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYCPHASH_deserialize(json_object *jso,
+        TPMS_POLICYCPHASH *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYDUPLICATIONSELECT_deserialize(json_object *jso,
+        TPMS_POLICYDUPLICATIONSELECT *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYLOCALITY_deserialize(json_object *jso,
+        TPMS_POLICYLOCALITY *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYNAMEHASH_deserialize(json_object *jso,
+        TPMS_POLICYNAMEHASH *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYNVWRITTEN_deserialize(json_object *jso,
+        TPMS_POLICYNVWRITTEN *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYNV_deserialize(json_object *jso,  TPMS_POLICYNV *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYOR_deserialize(json_object *jso,  TPMS_POLICYOR *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYPASSWORD_deserialize(json_object *jso,
+        TPMS_POLICYPASSWORD *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYPCR_deserialize(json_object *jso,  TPMS_POLICYPCR *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYPHYSICALPRESENCE_deserialize(json_object *jso,
+        TPMS_POLICYPHYSICALPRESENCE *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYSECRET_deserialize(json_object *jso,
+        TPMS_POLICYSECRET *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYSIGNED_deserialize(json_object *jso,
+        TPMS_POLICYSIGNED *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICYTEMPLATE_deserialize(json_object *jso,
+        TPMS_POLICYTEMPLATE *out)
+\fn TSS2_RC ifapi_json_TPMS_POLICY_deserialize(json_object *jso,
+        TPMS_POLICY *out)
+\fn TSS2_RC ifapi_json_TPMT_POLICYELEMENT_deserialize(json_object *jso,
+        TPMT_POLICYELEMENT *out)
+\fn TSS2_RC ifapi_json_TPMU_POLICYELEMENT_deserialize(
+    UINT32 selector,
+    json_object *jso,
+    TPMU_POLICYELEMENT *out)
+\fn ifapi_json_import_IFAPI_KEY_deserialize(json_object *jso,  IFAPI_KEY *out)
+
+ \}
+*/
+
+/*!
+ \defgroup ifapi_vendor  Vendor specific module
+ \ingroup ifapi
+\{
+ Provides functions implementing vendor specific extensions.
+\fn TSS2_RC ifapi_get_intl_ek_certificate(FAPI_CONTEXT *context, TPM2B_PUBLIC *ek_public,
+                              unsigned char ** cert_buffer, size_t *cert_size)
+
+
+\}
+*/
+
+/*!
+ \defgroup FapiTestgroup Fapi-Testing
+ Testing of FAPI functionality. The tested FAPI functions are listed in each
+ of the testcase functions' descriptions.
+ \ingroup Testgroup
+ \{
+ \fn test_fapi_data_crypt(FAPI_CONTEXT *context)
+ \fn test_fapi_duplicate(FAPI_CONTEXT *context)
+ \fn test_fapi_ext_public_key(FAPI_CONTEXT *context)
+ \fn test_fapi_get_random(FAPI_CONTEXT *context)
+ \fn test_fapi_info(FAPI_CONTEXT *context)
+ \fn test_fapi_key_change_auth(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_ckda_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policies_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_authorize_nv(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_authorize_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_nv_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_or_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_pcr_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_secret_nv_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_policy_signed(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_sign(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_sign_password_provision(FAPI_CONTEXT *context)
+ \fn test_fapi_key_create_sign_policy_provision(FAPI_CONTEXT *context)
+ \fn test_fapi_nv_extend(FAPI_CONTEXT *context)
+ \fn test_fapi_nv_increment(FAPI_CONTEXT *context)
+ \fn test_fapi_nv_ordinary(FAPI_CONTEXT *context)
+ \fn test_fapi_nv_set_bits(FAPI_CONTEXT *context)
+ \fn test_fapi_nv_written_policy(FAPI_CONTEXT *context)
+ \fn test_fapi_pcr_test(FAPI_CONTEXT *context)
+ \fn test_fapi_platform_certificates(FAPI_CONTEXT *context)
+ \fn test_fapi_quote(FAPI_CONTEXT *context)
+ \fn test_fapi_unseal(FAPI_CONTEXT *context)
+ \}
+*/

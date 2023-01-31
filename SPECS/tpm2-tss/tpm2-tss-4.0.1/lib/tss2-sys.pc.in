@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: tss2-sys
+Description: TPM2 System API library.
+URL: https://github.com/tpm2-software/tpm2-tss
+Version: @VERSION@
+Requires.private: tss2-mu
+Cflags: -I${includedir} -I${includedir}/tss2
+Libs: -ltss2-sys -L${libdir}
+Libs.private: @LIBSOCKET_LDFLAGS@

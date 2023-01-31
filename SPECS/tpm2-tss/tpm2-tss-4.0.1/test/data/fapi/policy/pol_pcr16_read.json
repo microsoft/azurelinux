@@ -1,0 +1,10 @@
+{
+    "description":"Description pol_16_0",
+
+    "policy":[
+        {
+            "type":"POLICYPCR",
+            "currentPCRs":[ 16 ]
+        }
+    ]
+}

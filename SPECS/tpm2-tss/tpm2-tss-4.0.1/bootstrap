@@ -1,0 +1,95 @@
+#!/bin/sh
+set -e
+
+git describe --tags --always --dirty > VERSION
+
+# generate list of source files for use in Makefile.am
+# if you add new source files, you must run ./bootstrap again
+src_listvar () {
+    basedir=$1
+    suffix=$2
+    var=$3
+
+    find "${basedir}" -name "${suffix}" | LC_ALL=C sort | tr '\n' ' ' | (printf "${var} = " && cat)
+    echo ""
+}
+
+# remove source files from list if their usage depends on a configure option
+remove_src () {
+    files=$1
+    shift
+    for x in $*
+    do
+      x=$(echo "$x" | sed 's/\//\\\//g')
+      files=$(echo $files | sed -e "s/$x//")
+    done
+    echo $files
+}
+
+# generate list of eys source files for use in Makefile.am
+# if you add new source files, you must run ./bootstrap again
+# files after the var name will be elimenated from list list
+src_esys_listvar () {
+    basedir=$1;
+    shift;
+    suffix=$1
+    shift;
+    var=$1
+    shift;
+
+    files=$(find "${basedir}" -name "${suffix}" | LC_ALL=C sort | tr '\n' ' ')
+    files=$(remove_src "${files}" $*)
+    printf "${var} = ${files}"
+    echo ""
+}
+
+VARS_FILE=src_vars.mk
+AUTORECONF=${AUTORECONF:-autoreconf}
+
+echo "Generating file lists: ${VARS_FILE}"
+(
+  src_listvar "src/util" "*.c" "UTIL_C"
+  src_listvar "src/util" "*.h" "UTIL_H"
+  printf "UTIL_SRC = \$(UTIL_C) \$(UTIL_H)\n"
+
+  src_listvar "src/tss2-sys/" "*.c" "TSS2_SYS_C"
+  src_listvar "src/tss2-sys/" "*.h" "TSS2_SYS_H"
+  printf "TSS2_SYS_SRC = \$(TSS2_SYS_H) \$(TSS2_SYS_C)\n"
+
+  src_esys_listvar "src/tss2-esys/" "*.h" "TSS2_ESYS_H"  src/tss2-esys/esys_crypto_ossl.h src/tss2-esys/esys_crypto_mbed.h
+  src_esys_listvar "src/tss2-esys/" "*.c" "TSS2_ESYS_C" src/tss2-esys/esys_crypto_ossl.c src/tss2-esys/esys_crypto_mbed.c
+  printf "TSS2_ESYS_SRC = \$(TSS2_ESYS_H) \$(TSS2_ESYS_C)\n"
+
+  src_listvar "src/tss2-fapi/" "*.h" "TSS2_FAPI_H"
+  src_listvar "src/tss2-fapi/" "*.c" "TSS2_FAPI_C"
+  printf "TSS2_FAPI_SRC = \$(TSS2_FAPI_H) \$(TSS2_FAPI_C)\n"
+
+  src_listvar "src/tss2-mu" "*.c" "TSS2_MU_C"
+  src_listvar "src/tss2-mu" "*.h" "TSS2_MU_H"
+  printf "TSS2_MU_SRC = \$(TSS2_MU_C) \$(TSS2_MU_H)\n"
+
+  src_listvar "src/tss2-rc" "*.c" "TSS2_RC_C"
+  src_listvar "src/tss2-rc" "*.h" "TSS2_RC_H"
+  printf "TSS2_RC_SRC = \$(TSS2_RC_C) \$(TSS2_RC_H)\n"
+
+  src_listvar "src/tss2-policy" "*.c" "TSS2_POLICY_C"
+  src_listvar "src/tss2-policy" "*.h" "TSS2_POLICY_H"
+  printf "TSS2_POLICY_SRC = \$(TSS2_POLICY_C) \$(TSS2_POLICY_H)"
+) > ${VARS_FILE}
+
+# Do not generate fuzz tests unless environment variable GEN_FUZZ is set to 1
+rm -rf Makefile-fuzz-generated.am
+if test "${GEN_FUZZ}0" -eq 10; then
+  echo "Generating fuzz tests"
+  script/gen_fuzz.py
+else
+  touch Makefile-fuzz-generated.am
+fi
+
+${AUTORECONF} --install --sym $@
+
+if grep "Invalid policy. Valid policies: git-directory, minor-version." configure >/dev/null; then
+    echo "ERROR: ax_is_release.m4 is outdated. ./configure will fail."
+    echo "Please download from http://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2019.01.06.tar.xz"
+    exit 1
+fi

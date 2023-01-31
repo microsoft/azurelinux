@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: tss2-policy
+Description: TPM2 policy library.
+URL: https://github.com/tpm2-software/tpm2-tss
+Version: @VERSION@
+Cflags: -I${includedir} -I${includedir}/tss2
+Libs: -ltss2-policy -L${libdir}

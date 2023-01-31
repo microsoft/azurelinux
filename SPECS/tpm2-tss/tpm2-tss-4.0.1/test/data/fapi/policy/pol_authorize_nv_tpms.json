@@ -1,0 +1,38 @@
+{
+    "description":"Description pol_authorize_nv",
+    "policy":[
+      {
+        "type":"POLICYAUTHORIZENV",
+        "nvPublic":{
+          "nvIndex":25165824,
+          "nameAlg":"SHA256",
+          "attributes":{
+            "PPWRITE":0,
+            "OWNERWRITE":0,
+            "AUTHWRITE":1,
+            "POLICYWRITE":0,
+            "POLICY_DELETE":0,
+            "WRITELOCKED":0,
+            "WRITEALL":0,
+            "WRITEDEFINE":0,
+            "WRITE_STCLEAR":1,
+            "GLOBALLOCK":0,
+            "PPREAD":0,
+            "OWNERREAD":0,
+            "AUTHREAD":1,
+            "POLICYREAD":0,
+            "NO_DA":1,
+            "ORDERLY":0,
+            "CLEAR_STCLEAR":0,
+            "READLOCKED":0,
+            "WRITTEN":1,
+            "PLATFORMCREATE":0,
+            "READ_STCLEAR":1,
+            "TPM2_NT":"ORDINARY"
+          },
+          "authPolicy":"",
+          "dataSize":34
+        }
+      }
+    ]
+}

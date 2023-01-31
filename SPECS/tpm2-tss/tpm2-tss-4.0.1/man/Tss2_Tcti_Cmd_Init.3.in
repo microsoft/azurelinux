@@ -1,0 +1,121 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH Tss2_Tcti_Cmd_Init 3 "MAY 2020" "TPM2 Software Stack"
+.SH NAME
+Tss2_Tcti_Cmd_Init \- Initialization function for the Cmd TCTI library.
+.SH SYNOPSIS
+.B #include <tss2/tss2_tcti_cmd.h>
+.sp
+.BI "TSS2_RC Tss2_Tcti_Cmd_Init (TSS2_TCTI_CONTEXT " "*tctiContext" ", size_t " "*contextSize" ", const char " "*conf" ");"
+.sp
+The
+.BR  Tss2_Tcti_Cmd_Init ()
+function initializes a TCTI context used to communicate with a subprocess specified in the conf string.
+TCTI send and receives utilize the sub-process's stdio and stdout respectively.
+.SH DESCRIPTION
+.BR Tss2_Tcti_Cmd_Init ()
+attempts to initialize a caller allocated
+.I tcti_context
+of size
+.I size
+using caller provided configuration string
+.I conf
+\&. Since the
+.I tcti_context
+must be a caller allocated buffer, the caller needs to know the buffer size
+required by the TCTI library. The minimum size of this context can be
+discovered by providing
+.BR NULL
+for the
+.I tcti_context
+and a non-
+.BR NULL
+.I size
+parameter. The initialization function will then populate the
+.I size
+parameter with the minimum size of the
+.I tcti_context
+buffer. The caller must then allocate a buffer of this size (or larger) and
+call
+.B Tss2_Tcti_Cmd_Init ()
+again providing the newly allocated
+.I tcti_context
+and the size of this context in the
+.I size
+parameter. This pattern is common to all TCTI initialization functions. We
+provide an example of this pattern using the
+.BR Tss2_Tcti_Cmd_Init ()
+function in the section titled
+.B EXAMPLE.
+.sp
+The
+.I conf
+parameter is a C string used to configure the TCTI context. This
+configuration string is the command used for popen(3). The conf string
+cannot be NULL for this TCTI.
+.sp
+Once initialized, the TCTI context returned exposes the Trusted Computing
+Group (TCG) defined API for the lowest level communication with the TPM.
+Using this API the caller can exchange (send / receive) TPM2 command and
+response buffers with a service that can excahnge TPM2 command and response
+buffers. In nearly all cases however, the caller will initialize a context
+using this function before passing the context to a higher level API like
+the System API (SAPI), Enhanced System API (ESAPI) or Feature API (FAPI)
+and then never touch it again.
+.sp
+For a more thorough discussion of the TCTI API see the \*(lqTSS System Level
+API and TPM Command Transmission Interface Specification\*(rq as published by
+the TCG:
+\%https://trustedcomputinggroup.org/tss-system-level-api-tpm-command-transmission-interface-specification/
+.SH RETURN VALUE
+A successful call to
+.BR Tss2_Tcti_Cmd_Init ()
+will return
+.B TSS2_RC_SUCCESS.
+An unsuccessful call will produce a response code described in section
+.B ERRORS.
+.SH ERRORS
+.B TSS2_TCTI_RC_BAD_VALUE
+is returned if both the
+.I tcti_context
+and the
+.I size
+parameters are NULL, or if the
+.I config
+parameter is NULL.
+.SH EXAMPLE
+.sp
+TCTI initialization fragment:
+.sp
+.nf
+#include <inttypes.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <tcti/tcti_mssim.h>
+
+TSS2_RC rc;
+TSS2_TCTI_CONTEXT *tcti_context;
+size_t size;
+const char *conf = "XXX TODO SAMPLE"
+
+rc = Tss2_Tcti_Cmd_Init (NULL, &size, NULL);
+if (rc != TSS2_RC_SUCCESS) {
+    fprintf (stderr, "Failed to get allocation size for mssim TCTI "
+             " context: 0x%" PRIx32 "\n", rc);
+    exit (EXIT_FAILURE);
+}
+tcti_context = calloc (1, size);
+if (tcti_context == NULL) {
+    fprintf (stderr, "Allocation for TCTI context failed: %s\n",
+             strerror (errno));
+    exit (EXIT_FAILURE);
+}
+rc = Tss2_Tcti_Cmd_Init (&tcti_context, &size, conf);
+if (rc != TSS2_RC_SUCCESS) {
+    fprintf (stderr, "Failed to initialize mssim TCTI context: "
+             "0x%" PRIx32 "\n", rc);
+    free (tcti_context);
+    exit (EXIT_FAILURE);
+}
+.fi

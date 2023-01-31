@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{BE0516D7-994C-4133-BD91-A21239D8B087}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TSS2ESYS_EXPORTS;MAXLOGLEVEL=6;strtok_r=strtok_s;OSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\src;$(SolutionDir)\include\tss2;$(SolutionDir)\src\tss2-mu;$(SolutionDir)\src\tss2-sys;$(SolutionDir)\src\tss2-esys;C:\OpenSSL-v11-Win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>$(OutDir)\tss2-mu.lib;$(OutDir)\tss2-sys.lib;$(OutDir)\tss2-tctildr.lib;C:\OpenSSL-v11-Win32\lib\libcrypto.lib;C:\OpenSSL-v11-Win32\lib\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>$(SolutionDir)\lib\tss2-esys.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TSS2ESYS_EXPORTS;MAXLOGLEVEL=6;strtok_r=strtok_s;OSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\src;$(SolutionDir)\include\tss2;$(SolutionDir)\src\tss2-mu;$(SolutionDir)\src\tss2-sys;$(SolutionDir)\src\tss2-esys;C:\OpenSSL-v11-Win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>$(OutDir)\tss2-mu.lib;$(OutDir)\tss2-sys.lib;$(OutDir)\tss2-tctildr.lib;C:\OpenSSL-v11-Win32\lib\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>$(SolutionDir)\lib\tss2-esys.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\src;$(SolutionDir)\include\tss2;$(SolutionDir)\src\tss2-mu;$(SolutionDir)\src\tss2-sys;$(SolutionDir)\src\tss2-esys;C:\OpenSSL-v11-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;TSS2ESYS_EXPORTS;MAXLOGLEVEL=6;strtok_r=strtok_s;OSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(OutDir)\tss2-mu.lib;$(OutDir)\tss2-sys.lib;$(OutDir)\tss2-tctildr.lib;C:\OpenSSL-v11-Win64\lib\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>$(SolutionDir)\lib\tss2-esys.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\src;$(SolutionDir)\include\tss2;$(SolutionDir)\src\tss2-mu;$(SolutionDir)\src\tss2-sys;$(SolutionDir)\src\tss2-esys;C:\OpenSSL-v11-Win64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;TSS2ESYS_EXPORTS;MAXLOGLEVEL=6;strtok_r=strtok_s;OSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(OutDir)\tss2-mu.lib;$(OutDir)\tss2-sys.lib;$(OutDir)\tss2-tctildr.lib;C:\OpenSSL-v11-Win64\lib\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>$(SolutionDir)\lib\tss2-esys.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\util\log.c" />
+    <ClCompile Include="api\Esys_AC_GetCapability.c" />
+    <ClCompile Include="api\Esys_AC_Send.c" />
+    <ClCompile Include="api\Esys_ACT_SetTimeout.c" />
+    <ClCompile Include="api\Esys_ActivateCredential.c" />
+    <ClCompile Include="api\Esys_Certify.c" />
+    <ClCompile Include="api\Esys_CertifyCreation.c" />
+    <ClCompile Include="api\Esys_CertifyX509.c" />
+    <ClCompile Include="api\Esys_ChangeEPS.c" />
+    <ClCompile Include="api\Esys_ChangePPS.c" />
+    <ClCompile Include="api\Esys_Clear.c" />
+    <ClCompile Include="api\Esys_ClearControl.c" />
+    <ClCompile Include="api\Esys_ClockRateAdjust.c" />
+    <ClCompile Include="api\Esys_ClockSet.c" />
+    <ClCompile Include="api\Esys_Commit.c" />
+    <ClCompile Include="api\Esys_ContextLoad.c" />
+    <ClCompile Include="api\Esys_ContextSave.c" />
+    <ClCompile Include="api\Esys_Create.c" />
+    <ClCompile Include="api\Esys_CreateLoaded.c" />
+    <ClCompile Include="api\Esys_CreatePrimary.c" />
+    <ClCompile Include="api\Esys_DictionaryAttackLockReset.c" />
+    <ClCompile Include="api\Esys_DictionaryAttackParameters.c" />
+    <ClCompile Include="api\Esys_Duplicate.c" />
+    <ClCompile Include="api\Esys_ECC_Parameters.c" />
+    <ClCompile Include="api\Esys_ECDH_KeyGen.c" />
+    <ClCompile Include="api\Esys_ECDH_ZGen.c" />
+    <ClCompile Include="api\Esys_EC_Ephemeral.c" />
+    <ClCompile Include="api\Esys_EncryptDecrypt.c" />
+    <ClCompile Include="api\Esys_EncryptDecrypt2.c" />
+    <ClCompile Include="api\Esys_EventSequenceComplete.c" />
+    <ClCompile Include="api\Esys_EvictControl.c" />
+    <ClCompile Include="api\Esys_FieldUpgradeData.c" />
+    <ClCompile Include="api\Esys_FieldUpgradeStart.c" />
+    <ClCompile Include="api\Esys_FirmwareRead.c" />
+    <ClCompile Include="api\Esys_FlushContext.c" />
+    <ClCompile Include="api\Esys_GetCapability.c" />
+    <ClCompile Include="api\Esys_GetCommandAuditDigest.c" />
+    <ClCompile Include="api\Esys_GetRandom.c" />
+    <ClCompile Include="api\Esys_GetSessionAuditDigest.c" />
+    <ClCompile Include="api\Esys_GetTestResult.c" />
+    <ClCompile Include="api\Esys_GetTime.c" />
+    <ClCompile Include="api\Esys_Hash.c" />
+    <ClCompile Include="api\Esys_HashSequenceStart.c" />
+    <ClCompile Include="api\Esys_HierarchyChangeAuth.c" />
+    <ClCompile Include="api\Esys_HierarchyControl.c" />
+    <ClCompile Include="api\Esys_HMAC.c" />
+    <ClCompile Include="api\Esys_HMAC_Start.c" />
+    <ClCompile Include="api\Esys_Import.c" />
+    <ClCompile Include="api\Esys_IncrementalSelfTest.c" />
+    <ClCompile Include="api\Esys_Load.c" />
+    <ClCompile Include="api\Esys_LoadExternal.c" />
+    <ClCompile Include="api\Esys_MakeCredential.c" />
+    <ClCompile Include="api\Esys_MAC.c" />
+    <ClCompile Include="api\Esys_MAC_Start.c" />
+    <ClCompile Include="api\Esys_NV_Certify.c" />
+    <ClCompile Include="api\Esys_NV_ChangeAuth.c" />
+    <ClCompile Include="api\Esys_NV_DefineSpace.c" />
+    <ClCompile Include="api\Esys_NV_Extend.c" />
+    <ClCompile Include="api\Esys_NV_GlobalWriteLock.c" />
+    <ClCompile Include="api\Esys_NV_Increment.c" />
+    <ClCompile Include="api\Esys_NV_Read.c" />
+    <ClCompile Include="api\Esys_NV_ReadLock.c" />
+    <ClCompile Include="api\Esys_NV_ReadPublic.c" />
+    <ClCompile Include="api\Esys_NV_SetBits.c" />
+    <ClCompile Include="api\Esys_NV_UndefineSpace.c" />
+    <ClCompile Include="api\Esys_NV_UndefineSpaceSpecial.c" />
+    <ClCompile Include="api\Esys_NV_Write.c" />
+    <ClCompile Include="api\Esys_NV_WriteLock.c" />
+    <ClCompile Include="api\Esys_ObjectChangeAuth.c" />
+    <ClCompile Include="api\Esys_PCR_Allocate.c" />
+    <ClCompile Include="api\Esys_PCR_Event.c" />
+    <ClCompile Include="api\Esys_PCR_Extend.c" />
+    <ClCompile Include="api\Esys_PCR_Read.c" />
+    <ClCompile Include="api\Esys_PCR_Reset.c" />
+    <ClCompile Include="api\Esys_PCR_SetAuthPolicy.c" />
+    <ClCompile Include="api\Esys_PCR_SetAuthValue.c" />
+    <ClCompile Include="api\Esys_Policy_AC_SendSelect.c" />
+    <ClCompile Include="api\Esys_PolicyAuthorize.c" />
+    <ClCompile Include="api\Esys_PolicyAuthorizeNV.c" />
+    <ClCompile Include="api\Esys_PolicyAuthValue.c" />
+    <ClCompile Include="api\Esys_PolicyCommandCode.c" />
+    <ClCompile Include="api\Esys_PolicyCounterTimer.c" />
+    <ClCompile Include="api\Esys_PolicyCpHash.c" />
+    <ClCompile Include="api\Esys_PolicyDuplicationSelect.c" />
+    <ClCompile Include="api\Esys_PolicyGetDigest.c" />
+    <ClCompile Include="api\Esys_PolicyLocality.c" />
+    <ClCompile Include="api\Esys_PolicyNameHash.c" />
+    <ClCompile Include="api\Esys_PolicyNV.c" />
+    <ClCompile Include="api\Esys_PolicyNvWritten.c" />
+    <ClCompile Include="api\Esys_PolicyOR.c" />
+    <ClCompile Include="api\Esys_PolicyPassword.c" />
+    <ClCompile Include="api\Esys_PolicyPCR.c" />
+    <ClCompile Include="api\Esys_PolicyPhysicalPresence.c" />
+    <ClCompile Include="api\Esys_PolicyRestart.c" />
+    <ClCompile Include="api\Esys_PolicySecret.c" />
+    <ClCompile Include="api\Esys_PolicySigned.c" />
+    <ClCompile Include="api\Esys_PolicyTemplate.c" />
+    <ClCompile Include="api\Esys_PolicyTicket.c" />
+    <ClCompile Include="api\Esys_PP_Commands.c" />
+    <ClCompile Include="api\Esys_Quote.c" />
+    <ClCompile Include="api\Esys_ReadClock.c" />
+    <ClCompile Include="api\Esys_ReadPublic.c" />
+    <ClCompile Include="api\Esys_Rewrap.c" />
+    <ClCompile Include="api\Esys_RSA_Decrypt.c" />
+    <ClCompile Include="api\Esys_RSA_Encrypt.c" />
+    <ClCompile Include="api\Esys_SelfTest.c" />
+    <ClCompile Include="api\Esys_SequenceComplete.c" />
+    <ClCompile Include="api\Esys_SequenceUpdate.c" />
+    <ClCompile Include="api\Esys_SetAlgorithmSet.c" />
+    <ClCompile Include="api\Esys_SetCommandCodeAuditStatus.c" />
+    <ClCompile Include="api\Esys_SetPrimaryPolicy.c" />
+    <ClCompile Include="api\Esys_Shutdown.c" />
+    <ClCompile Include="api\Esys_Sign.c" />
+    <ClCompile Include="api\Esys_StartAuthSession.c" />
+    <ClCompile Include="api\Esys_Startup.c" />
+    <ClCompile Include="api\Esys_StirRandom.c" />
+    <ClCompile Include="api\Esys_TestParms.c" />
+    <ClCompile Include="api\Esys_Unseal.c" />
+    <ClCompile Include="api\Esys_Vendor_TCG_Test.c" />
+    <ClCompile Include="api\Esys_VerifySignature.c" />
+    <ClCompile Include="api\Esys_ZGen_2Phase.c" />
+    <ClCompile Include="esys_context.c" />
+    <ClCompile Include="esys_crypto.c" />
+    <ClCompile Include="esys_crypto_ossl.c" />
+    <ClCompile Include="esys_free.c" />
+    <ClCompile Include="esys_iutil.c" />
+    <ClCompile Include="esys_mu.c" />
+    <ClCompile Include="esys_tr.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\util\log.h" />
+    <ClInclude Include="esys_crypto.h" />
+    <ClInclude Include="esys_crypto_ossl.h" />
+    <ClInclude Include="esys_int.h" />
+    <ClInclude Include="esys_iutil.h" />
+    <ClInclude Include="esys_mu.h" />
+    <ClInclude Include="esys_types.h" />
+    <ClInclude Include="../tss2-tcti/tctildr.h" />
+    <ClInclude Include="../tss2-tcti/tctildr-interface.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

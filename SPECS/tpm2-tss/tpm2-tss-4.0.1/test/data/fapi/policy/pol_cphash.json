@@ -1,0 +1,9 @@
+{
+    "description":"Policy CpHash",
+    "policy":[
+        {
+            "type": "POLICYCPHASH",
+			"cpHash": "d1b4d44f20fa696f638e4f8a9cfceae97f9dee388143929eeea8982259b8f402"
+		}
+    ]
+}

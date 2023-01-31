@@ -1,0 +1,94 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH Tss2_TctiLdr_GetInfo 3 "JUNE 2019" "TPM2 Software Stack"
+.SH NAME
+Tss2_TctiLdr_GetInfo \- Query TctiLdr library for the TSS2_TCTI_INFO
+structure associated with a TCTI library.
+.SH SYNOPSIS
+.B #include <tss2/tss2_tctildr.h>
+.sp
+.sp
+.BI "TSS2_RC Tss2_TctiLdr_GetInfo ("const char " "*name" ", TSS2_TCTI_INFO " "**info" ");"
+.sp
+.SH DESCRIPTION
+The
+.BR  Tss2_TctiLdr_GetInfo ()
+function attempts to instantiate a TSS2_TCTI_INFO structure appropriate
+for the TCTI library associated with the provided
+.I name.
+The TSS2_TCTI_INFO* reference returned by this function must be freed by
+the
+.I Tss2_TctiLdr_FreeInfo ()
+function.
+.sp
+The
+.I name
+parameter is a C string. If this string is
+.BR NULL
+then the library will select a default TCTI for the caller. This is the same
+TCTI library that will be used to initialize the context returned by
+.B Tss2_TctiLdr_Initialize
+when passed a NULL
+.I name.
+If non-NULL,
+the
+.B Tss2_TctiLdr_GetInfo ()
+uses the same algorithm to map the string to the name of an installed TCTI
+library as the
+.B Tss2_TctiLdr_Initialize ()
+function.
+.sp
+The
+.I info
+parameter is a reference to a
+.I TSS2_TCTI_INFO*.
+The reference returned will be allocated by the function and must be freed
+by the caller.
+.SH RETURN VALUE
+A successful call to this function will return TSS2_RC_SUCCESS. An
+unsuccessful call to this function will return a response code described
+below in section
+.B ERRORS.
+.SH ERRORS
+.B TSS2_TCTI_RC_MEMORY
+is returned if memory allocation fails
+.sp
+.B TSS2_TCTI_RC_NOT_SUPPORTED
+is returned when the loader is unable to locate a TCTI library with the
+provided
+.I name
+.sp
+.B TSS2_TCTI_RC_IO_ERROR
+is returned if a failure occurs in the underlying library loading mechanism
+.sp
+.B TSS2_TCTI_RC_BAD_REFERENCE
+is returned if the
+.I info
+parameter is NULL
+.sp
+.SH EXAMPLE
+Example code.
+.sp
+.nf
+#include <inttypes.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tss2/tss2_tctildr.h>
+
+TSS2_TCTI_INFO *info = NULL;
+TSS2_RC rc = Tss2_TctiLdr_GetInfo (NULL, &info);
+if (rc != TSS2_RC_SUCCESS) {
+    fprintf (stderr, "Initialization of default TCTI context failed with "
+             "response code: 0x%" PRIx32 "\n", rc);
+    exit (EXIT_FAILURE);
+}
+
+if (info != NULL) {
+    Tss2_TctiLdr_FreeInfo (info);
+    info = NULL;
+}
+
+exit (EXIT_SUCCESS);
+.fi

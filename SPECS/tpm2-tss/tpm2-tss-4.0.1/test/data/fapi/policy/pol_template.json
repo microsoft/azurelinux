@@ -1,0 +1,44 @@
+{
+    "description":"Description pol_template",
+    "policy":[
+        {
+            "type": "POLICYTEMPLATE",
+            "templatePublic": {
+                    "type":"ECC",
+                    "nameAlg":"sha256",
+                    "objectAttributes":{
+                        "fixedTPM":1,
+                        "stClear":0,
+                        "fixedParent":1,
+                        "sensitiveDataOrigin":1,
+                        "userWithAuth":1,
+                        "adminWithPolicy":0,
+                        "noDA":0,
+                        "encryptedDuplication":0,
+                        "restricted":1,
+                        "decrypt":1,
+                        "sign":0
+                    },
+                    "authPolicy":"",
+                    "parameters":{
+                        "symmetric":{
+                            "algorithm":"AES",
+                            "keyBits":128,
+                            "mode":"CFB"
+                        },
+                        "scheme":{
+                            "scheme":"NULL"
+                        },
+                        "curveID":"NIST_P256",
+                        "kdf":{
+                            "scheme":"NULL"
+                        }
+                    },
+                   "unique":{
+                       "x":"",
+                       "y":""
+      }
+            }
+        }
+    ]
+}

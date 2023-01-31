@@ -1,0 +1,14 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TCTI-SPI 7 "OCTOBER 2020" "TPM2 Software Stack"
+.SH NAME
+tcti-spi-helper \- device driver TCTI library
+.SH SYNOPSIS
+A TPM Command Transmission Interface (TCTI) module for communication via SPI.
+TPM device driver.
+.SH DESCRIPTION
+tcti-spi-helper is a library that abstracts the details of communication with a TPM
+via SPI protocol. It uses user supplied methods for SPI and timing operations
+in order to be platform independent. These methods are supplied to `Tss2_Tcti_Spi_Init`
+via the `TSS2_TCTI_SPI_PLATFORM` struct.

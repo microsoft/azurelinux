@@ -1,0 +1,65 @@
+oid_section = tcg_oids
+
+[ tcg_oids ]
+tcg-sv-tpm20            = 2.23.133.1.2
+tcg-at-tpmManufacturer  = 2.23.133.2.1
+tcg-at-tpmModel         = 2.23.133.2.2
+tcg-at-tpmVersion       = 2.23.133.2.3
+tcg-at-tpmSpecification = 2.23.133.2.16
+tcg-at-tpmSecurityAssertions = 2.23.133.2.18
+tcg-kp-EKCertificate    = 2.23.133.8.1
+
+[ req ]
+prompt                  = no
+distinguished_name      = distinguished_name
+subjectAltName          = subject_alt_name
+
+[ distinguished_name ]
+commonName              = this-tpm-sim
+organizationName        = tpm2-tss-testsuit
+
+[ req_ext ]
+subjectKeyIdentifier    = hash
+
+[ ek_ext ]
+certificatePolicies     = @polsect
+subjectAltName          = dirName:subAltName
+basicConstraints        = critical, CA:FALSE
+subjectDirectoryAttributes = ASN1:SEQUENCE:subDirAttr
+authorityKeyIdentifier  = keyid:always
+authorityInfoAccess     = caIssuers;URI.0:INTERMEDCRT
+crlDistributionPoints   = URI.0:INTERMEDCRL
+keyUsage                = critical, keyEncipherment
+#extendedKeyUsage        = tcg-kp-EKCertificate
+extendedKeyUsage        = 2.23.133.8.1
+
+[ polsect ]
+policyIdentifier = anyPolicy
+CPS.1="http://my.host.name/"
+
+[ subAltName ]
+#TPMManufacturer = 'TSS2'
+.2.23.133.2.1 = id:54535332
+.2.23.133.2.2 = tpmsimulator
+.2.23.133.2.3 = id:00020008
+
+#TODO: Remove
+[ subAltName1 ]
+C=DE
+O=Testing
+OU=whatever
+commonName=abc
+
+[ subDirAttr ]
+tcg-at-tpmSpecification = SEQUENCE:tpmspec
+#tcg-at-tpmSecurityAssertions = SEQUENCE:secassert
+
+[ tpmspec ]
+family = UTF8:2.0
+level = INT:0
+revision = INT:138
+
+#[ secassert ]
+#version = INT:0
+#fieldUpgradable = BOOL:false
+#...

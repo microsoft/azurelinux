@@ -1,0 +1,7 @@
+{
+    global:
+        Tss2_Tcti_Info;
+        Tss2_Tcti_Pcap_Init;
+    local:
+        *;
+};

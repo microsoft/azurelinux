@@ -1,0 +1,52 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH Tss2_TctiLdr_Finalize 3 "MARCH 2019" "TPM2 Software Stack"
+.SH NAME
+Tss2_TctiLdr_Finalize \- Function to finalize a TCTI context instantiated
+by the Tss2_TctiLdr_Initialize function.
+.SH SYNOPSIS
+.B #include <tss2/tss2_tctildr.h>
+.sp
+.sp
+.BI "TSS2_RC Tss2_TctiLdr_Finalize (TSS2_TCTI_CONTEXT " "**CONTEXT" ");"
+.sp
+.SH DESCRIPTION
+The
+.BR  Tss2_TctiLdr_Finalize ()
+function destroys an instance of a TCTI context instantiated by the
+.BR Tss2_TctLdr_Initialize ()
+function. It also frees any resources associated with loading the
+required TCTI library.
+.sp
+The
+.I context
+parameter is a double pointer to a TCTI context. When successfully
+finalized the provided reference will be set to NULL by the function.
+.sp
+
+.SH RETURN VALUE
+This function returns no value.
+.SH EXAMPLE
+Example code.
+.sp
+.nf
+#include <inttypes.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tss2/tss2_tctildr.h>
+
+TSS2_TCTI_CONTEXT *ctx = NULL;
+TSS2_RC rc = Tss2_TctiLdr_Initialize (NULL, NULL, &ctx);
+if (rc != TSS2_RC_SUCCESS) {
+    fprintf (stderr, "Initialization of default TCTI context failed with "
+             "response code: 0x%" PRIx32 "\n", rc);
+    exit (EXIT_FAILURE);
+}
+
+if (ctx != NULL)
+    Tss2_TctiLdr_Finalize (&ctx);
+
+exit (EXIT_SUCCESS);
+.fi

@@ -1,0 +1,8 @@
+{
+    global:
+        Tss2_Tcti_Info;
+        Tss2_Tcti_Swtpm_Init;
+        Tss2_Tcti_Swtpm_Reset;
+    local:
+        *;
+};

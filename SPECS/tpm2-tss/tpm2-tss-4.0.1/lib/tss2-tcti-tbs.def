@@ -1,0 +1,4 @@
+LIBRARY tss2-tcti-tbs
+EXPORTS
+    Tss2_Tcti_Info
+    Tss2_Tcti_Tbs_Init

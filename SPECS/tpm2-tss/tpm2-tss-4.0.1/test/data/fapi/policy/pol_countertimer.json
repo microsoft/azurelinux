@@ -1,0 +1,10 @@
+{
+    "description":"Description pol_countertimer",
+    "policy":[
+        {
+            "type": "POLICYCOUNTERTIMER",
+		    "operandB": "ff",
+		    "operation": "UNSIGNED_LT"
+		}
+    ]
+}

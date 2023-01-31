@@ -1,0 +1,14 @@
+{
+    global:
+        Tss2_PolicyInit;
+        Tss2_PolicyFinalize;
+        Tss2_PolicySetCalcCallbacks;
+        Tss2_PolicySetExecCallbacks;
+        Tss2_PolicyCalculate;
+        Tss2_PolicyExecute;
+        Tss2_PolicyGetCalculatedJSON;
+        Tss2_PolicyGetCalculatedDigest;
+        Tss2_PolicyGetDescription;
+    local:
+        *;
+};

@@ -1,0 +1,11 @@
+{
+    "description":"Description pol_nv",
+    "policy":[
+        {
+            "type": "POLICYNV",
+            "nvIndex": 25165824,
+            "operandB": "01020304",
+            "operation": "EQ"
+        }
+    ]
+}

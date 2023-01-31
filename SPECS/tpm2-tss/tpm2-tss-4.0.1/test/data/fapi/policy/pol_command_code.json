@@ -1,0 +1,9 @@
+{
+    "description":"Description pol_auth_value",
+    "policy":[
+        {
+            "type": "POLICYCOMMANDCODE",
+            "code": 349
+		}
+    ]
+}

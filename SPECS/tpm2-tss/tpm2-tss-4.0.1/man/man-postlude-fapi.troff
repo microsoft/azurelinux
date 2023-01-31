@@ -1,0 +1,5 @@
+.SH COLOPHON
+This page is part of release @VERSION@ of Open Source implementation of the
+TCG TPM2 Software Stack (TSS2). A description of the project, information
+about reporting bugs, and the latest version of this page can be found at
+\%https://github.com/tpm2-software/tpm2-tss/.

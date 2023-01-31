@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\sapi\sys_api_part3.h" />
+    <ClInclude Include="..\include\sapi\tpmb.h" />
+    <ClInclude Include="..\include\sapi\tss2_common.h" />
+    <ClInclude Include="..\include\sapi\tss2_mu.h" />
+    <ClInclude Include="..\include\sapi\tss2_sys.h" />
+    <ClInclude Include="..\include\sapi\tss2_tcti.h" />
+    <ClInclude Include="..\include\sapi\tss2_tpm2_types.h" />
+    <ClInclude Include="..\util\log.h" />
+    <ClInclude Include="..\util\tss2_endian.h" />
+    <ClInclude Include="sysapi\include\sysapi_util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\util\log.c" />
+    <ClCompile Include="api\Tss2_Sys_CreateLoaded.c" />
+    <ClCompile Include="api\Tss2_Sys_GetRspAuths.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyAuthorizeNV.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyTemplate.c" />
+    <ClCompile Include="api\Tss2_Sys_SetCmdAuths.c" />
+    <ClCompile Include="api\Tss2_Sys_Initialize.c" />
+    <ClCompile Include="api\Tss2_Sys_GetContextSize.c" />
+    <ClCompile Include="api\Tss2_Sys_GetDecryptParam.c" />
+    <ClCompile Include="api\Tss2_Sys_SetDecryptParam.c" />
+    <ClCompile Include="api\Tss2_Sys_GetEncryptParam.c" />
+    <ClCompile Include="api\Tss2_Sys_SetEncryptParam.c" />
+    <ClCompile Include="api\Tss2_Sys_Execute.c" />
+    <ClCompile Include="api\Tss2_Sys_GetCommandCode.c" />
+    <ClCompile Include="api\Tss2_Sys_GetCpBuffer.c" />
+    <ClCompile Include="api\Tss2_Sys_GetRpBuffer.c" />
+    <ClCompile Include="api\Tss2_Sys_GetTctiContext.c" />
+    <ClCompile Include="api\Tss2_Sys_ActivateCredential.c" />
+    <ClCompile Include="api\Tss2_Sys_AC_GetCapability.c" />
+    <ClCompile Include="api\Tss2_Sys_AC_Send.c" />
+    <ClCompile Include="api\Tss2_Sys_ACT_SetTimeout.c" />
+    <ClCompile Include="api\Tss2_Sys_Certify.c" />
+    <ClCompile Include="api\Tss2_Sys_CertifyCreation.c" />
+    <ClCompile Include="api\Tss2_Sys_CertifyX509.c" />
+    <ClCompile Include="api\Tss2_Sys_ChangeEPS.c" />
+    <ClCompile Include="api\Tss2_Sys_ChangePPS.c" />
+    <ClCompile Include="api\Tss2_Sys_Clear.c" />
+    <ClCompile Include="api\Tss2_Sys_ClearControl.c" />
+    <ClCompile Include="api\Tss2_Sys_ClockRateAdjust.c" />
+    <ClCompile Include="api\Tss2_Sys_ClockSet.c" />
+    <ClCompile Include="api\Tss2_Sys_Commit.c" />
+    <ClCompile Include="api\Tss2_Sys_ContextLoad.c" />
+    <ClCompile Include="api\Tss2_Sys_ContextSave.c" />
+    <ClCompile Include="api\Tss2_Sys_Create.c" />
+    <ClCompile Include="api\Tss2_Sys_CreatePrimary.c" />
+    <ClCompile Include="api\Tss2_Sys_DictionaryAttackLockReset.c" />
+    <ClCompile Include="api\Tss2_Sys_DictionaryAttackParameters.c" />
+    <ClCompile Include="api\Tss2_Sys_Duplicate.c" />
+    <ClCompile Include="api\Tss2_Sys_ECC_Parameters.c" />
+    <ClCompile Include="api\Tss2_Sys_ECDH_KeyGen.c" />
+    <ClCompile Include="api\Tss2_Sys_ECDH_ZGen.c" />
+    <ClCompile Include="api\Tss2_Sys_EC_Ephemeral.c" />
+    <ClCompile Include="api\Tss2_Sys_EncryptDecrypt.c" />
+    <ClCompile Include="api\Tss2_Sys_EncryptDecrypt2.c" />
+    <ClCompile Include="api\Tss2_Sys_EventSequenceComplete.c" />
+    <ClCompile Include="api\Tss2_Sys_EvictControl.c" />
+    <ClCompile Include="api\Tss2_Sys_FieldUpgradeData.c" />
+    <ClCompile Include="api\Tss2_Sys_FieldUpgradeStart.c" />
+    <ClCompile Include="api\Tss2_Sys_Finalize.c" />
+    <ClCompile Include="api\Tss2_Sys_FirmwareRead.c" />
+    <ClCompile Include="api\Tss2_Sys_FlushContext.c" />
+    <ClCompile Include="api\Tss2_Sys_GetCapability.c" />
+    <ClCompile Include="api\Tss2_Sys_GetCommandAuditDigest.c" />
+    <ClCompile Include="api\Tss2_Sys_GetRandom.c" />
+    <ClCompile Include="api\Tss2_Sys_GetSessionAuditDigest.c" />
+    <ClCompile Include="api\Tss2_Sys_GetTestResult.c" />
+    <ClCompile Include="api\Tss2_Sys_GetTime.c" />
+    <ClCompile Include="api\Tss2_Sys_Hash.c" />
+    <ClCompile Include="api\Tss2_Sys_HashSequenceStart.c" />
+    <ClCompile Include="api\Tss2_Sys_HierarchyChangeAuth.c" />
+    <ClCompile Include="api\Tss2_Sys_HierarchyControl.c" />
+    <ClCompile Include="api\Tss2_Sys_HMAC.c" />
+    <ClCompile Include="api\Tss2_Sys_HMAC_Start.c" />
+    <ClCompile Include="api\Tss2_Sys_Import.c" />
+    <ClCompile Include="api\Tss2_Sys_IncrementalSelfTest.c" />
+    <ClCompile Include="api\Tss2_Sys_Load.c" />
+    <ClCompile Include="api\Tss2_Sys_LoadExternal.c" />
+    <ClCompile Include="api\Tss2_Sys_MakeCredential.c" />
+    <ClCompile Include="api\Tss2_Sys_MAC.c" />
+    <ClCompile Include="api\Tss2_Sys_MAC_Start.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_Certify.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_ChangeAuth.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_DefineSpace.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_Extend.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_GlobalWriteLock.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_Increment.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_Read.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_ReadLock.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_ReadPublic.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_SetBits.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_UndefineSpace.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_UndefineSpaceSpecial.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_Write.c" />
+    <ClCompile Include="api\Tss2_Sys_NV_WriteLock.c" />
+    <ClCompile Include="api\Tss2_Sys_ObjectChangeAuth.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_Allocate.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_Event.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_Extend.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_Read.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_Reset.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_SetAuthPolicy.c" />
+    <ClCompile Include="api\Tss2_Sys_PCR_SetAuthValue.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyAuthorize.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyAuthValue.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyCommandCode.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyCounterTimer.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyCpHash.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyDuplicationSelect.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyGetDigest.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyLocality.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyNameHash.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyNV.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyNvWritten.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyOR.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyPassword.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyPCR.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyPhysicalPresence.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyRestart.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicySecret.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicySigned.c" />
+    <ClCompile Include="api\Tss2_Sys_PolicyTicket.c" />
+    <ClCompile Include="api\Tss2_Sys_Policy_AC_SendSelect.c" />
+    <ClCompile Include="api\Tss2_Sys_PP_Commands.c" />
+    <ClCompile Include="api\Tss2_Sys_Quote.c" />
+    <ClCompile Include="api\Tss2_Sys_ReadClock.c" />
+    <ClCompile Include="api\Tss2_Sys_ReadPublic.c" />
+    <ClCompile Include="api\Tss2_Sys_Rewrap.c" />
+    <ClCompile Include="api\Tss2_Sys_RSA_Decrypt.c" />
+    <ClCompile Include="api\Tss2_Sys_RSA_Encrypt.c" />
+    <ClCompile Include="api\Tss2_Sys_SelfTest.c" />
+    <ClCompile Include="api\Tss2_Sys_SequenceComplete.c" />
+    <ClCompile Include="api\Tss2_Sys_SequenceUpdate.c" />
+    <ClCompile Include="api\Tss2_Sys_SetAlgorithmSet.c" />
+    <ClCompile Include="api\Tss2_Sys_SetCommandCodeAuditStatus.c" />
+    <ClCompile Include="api\Tss2_Sys_SetPrimaryPolicy.c" />
+    <ClCompile Include="api\Tss2_Sys_Shutdown.c" />
+    <ClCompile Include="api\Tss2_Sys_Sign.c" />
+    <ClCompile Include="api\Tss2_Sys_StartAuthSession.c" />
+    <ClCompile Include="api\Tss2_Sys_Startup.c" />
+    <ClCompile Include="api\Tss2_Sys_StirRandom.c" />
+    <ClCompile Include="api\Tss2_Sys_TestParms.c" />
+    <ClCompile Include="api\Tss2_Sys_Unseal.c" />
+    <ClCompile Include="api\Tss2_Sys_Vendor_TCG_Test.c" />
+    <ClCompile Include="api\Tss2_Sys_VerifySignature.c" />
+    <ClCompile Include="api\Tss2_Sys_ZGen_2Phase.c" />
+    <ClCompile Include="sysapi_util.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{10d9862f-0e36-4acc-af19-930b00a88a98}</ProjectGuid>
+    <Keyword>Clang</Keyword>
+    <RootNamespace>tss2_sys</RootNamespace>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_DEBUG;_WINDOWS;_USRDLL;tss2_sys_EXPORTS;MAXLOGLEVEL=6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;_WINDOWS;_USRDLL;tss2_sys_EXPORTS;MAXLOGLEVEL=3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;_USRDLL;tss2_sys_EXPORTS;MAXLOGLEVEL=6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;_USRDLL;tss2_sys_EXPORTS;MAXLOGLEVEL=3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\src;$(SolutionDir)\include\tss2;$(SolutionDir)\src\tss2-mu;$(SolutionDir)\src\tss2-sys;(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>$(SolutionDir)\lib\tss2-sys.def</ModuleDefinitionFile>
+      <AdditionalDependencies>$(OutDir)\tss2-mu.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

@@ -1,0 +1,15 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TCTI-SOCKET 7 "JUNE 2017" "TPM2 Software Stack"
+.SH NAME
+tcti-socket \- TPM simulator TCTI library
+.SH SYNOPSIS
+A TPM Command Transmission Interface (TCTI) module for interaction with the
+Microsoft TPM2 simulator.
+.SH DESCRIPTION
+tcti-socket is a library that abstracts the details of direct communication
+with the interface and protocol exposed by the daemon hosting the TPM2
+reference implementation. The interface exposed by this library is defined
+in the \*(lqTSS System Level API and TPM Command Transmission Interface
+Specification\*(rq specification.
