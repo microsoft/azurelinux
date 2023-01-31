@@ -39,6 +39,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
+Patch1:         disable-static-library.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -68,10 +69,23 @@ This package contains the header files and libraries for building
 programs using Influx data language.
 
 %prep
-%autosetup
+%setup -q
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
+
+patch -p2 < %{PATCH1}
+patch -p2 <<EOF
+--- a/libflux/flux/build.rs
++++ b/libflux/flux/build.rs
+@@ -82,5 +82,7 @@ fn main() -> Result<()> {
+     let path = dir.join("stdlib.data");
+     serialize(Environment::from(imports), fb::build_env, &path)?;
+
++    println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libflux.so.%{version}");
++
+     Ok(())
+ }
 popd
 
 %build
@@ -82,7 +96,8 @@ popd
 
 %install
 install -D -m 644 libflux/include/influxdata/flux.h %{buildroot}%{_includedir}/influxdata/flux.h
-install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so
+install -D -m 755 libflux/target/release/libflux.so %{buildroot}%{_libdir}/libflux.so.%{version}
+ln -sf ./libflux.so.%{version} %{buildroot}%{_libdir}/libflux.so
 
 cat > flux.pc <<EOF
 prefix=%{_prefix}
@@ -109,7 +124,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %postun -n libflux -p /sbin/ldconfig
 
 %files -n libflux
-%{_libdir}/libflux.so
+%{_libdir}/libflux.so.%{version}
 
 %files -n libflux-devel
 %defattr(-,root,root)
@@ -122,6 +137,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.191.0-1
+- Upgrade to version 0.191.0
+
 * Fri Jan 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.179.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
