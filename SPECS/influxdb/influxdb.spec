@@ -17,7 +17,7 @@
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
-Version:        2.4.0
+Version:        2.6.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -57,7 +57,8 @@ Source5:        config.yaml
 Source6:        influxdb-user.conf
 BuildRequires:  go >= 1.18
 BuildRequires:  golang-packaging >= 15.0.8
-BuildRequires:  pkgconfig(flux) >= 0.179.0
+# IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
+BuildRequires:  pkgconfig(flux) >= 0.191.0
 BuildRequires:  protobuf-devel
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.60.0
@@ -65,7 +66,6 @@ BuildRequires:  clang
 BuildRequires:  tzdata
 BuildRequires:  systemd-rpm-macros
 Requires:       tzdata
-Requires:       libflux
 Conflicts:      influxdb
 %{?systemd_requires}
 Requires(post): systemd
@@ -79,7 +79,6 @@ Summary:        InfluxDB development files
 Group:          Development/Languages/Golang
 Requires:       go
 Requires:       tzdata
-Requires:       libflux-devel
 Conflicts:      influxdb
 
 %description devel
@@ -146,6 +145,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-1
+- Upgrade to version 2.6.1
+
 * Fri Jan 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.4.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
