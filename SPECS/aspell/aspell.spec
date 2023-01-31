@@ -1,7 +1,7 @@
 Summary:        Spell checker
 Name:           aspell
 Version:        0.60.8
-Release:        7%{?dist}
+Release:        8%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
@@ -12,7 +12,7 @@ License:        LGPLv2+ AND LGPLv2 AND GPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://aspell.net/
-Source:         ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
+Source:         https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
 Patch2:         aspell-0.60.7-mp.patch
@@ -116,6 +116,10 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 0.60.8-8
+- Update URI to a valid HTTPS URI.
+- Remove trailing whitespace from changelog.
+
 * Fri Oct 14 2022 Henry Li <lihl@microsoft.com> - 0.60.8-7
 - Rename aspell-0.60.8-objstack.patch to CVE-2019-25051.patch to make the CVE
   scanner tool recognize the fix patch
@@ -329,11 +333,11 @@ rm -f %{buildroot}%{_infodir}/dir
 - rebuilt
 
 * Fri Jul 15 2005 Ivana Varekova <varekova@redhat.com> 12:0.60.3-2
-- fix install-info problem 
+- fix install-info problem
 
 * Wed Jul 13 2005 Ivana Varekova <varekova@redhat.com> 12:0.60.3-1
-- update to 0.60.3 - (bug 141968) thanks to Dawid Gajownik 
-- add BuildRequires: ncurses-devel, gettext 
+- update to 0.60.3 - (bug 141968) thanks to Dawid Gajownik
+- add BuildRequires: ncurses-devel, gettext
 - add config script patch (thanks tmraz@redhat.com)
 
 * Mon Mar  7 2005 Ivana Varekova <varekova@redhat.com> 12:0.50.5-6
@@ -531,12 +535,12 @@ rm -f %{buildroot}%{_infodir}/dir
 * Tue Aug 01 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - remember to obsolete ispell
 - build the Canadian and British dictionaries here now,
-  as part of the main package. Same package names and 
+  as part of the main package. Same package names and
   descriptions.
 
 * Mon Jul 24 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - .32
-- remove old patches, add a patch since namespace isn't 
+- remove old patches, add a patch since namespace isn't
   polluted as much anymore (as opposed to older toolchain)
 
 * Wed Jul 19 2000 Trond Eivind Glomsrød <teg@redhat.com>
