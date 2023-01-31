@@ -1,0 +1,14 @@
+{
+ "Signatures": {
+  "cache_swap.sh": "266f97f9541f49b715c3b3b468871528b70660415016cae4592c7fab249f6ba4",
+  "perl-requires-squid.sh": "6d142ffcfb64d9dedbed785c85d96fe15293feb589e7d8170c4d825302021401",
+  "pgp.asc": "25f81e90f11bb81f5adc7d777d26ac1edf076ee03f2f6e4deffef88500f58d05",
+  "squid-4.13.tar.xz": "6891a0f540e60779b4f24f1802a302f813c6f473ec7336a474ed68c3e2e53ee0",
+  "squid-4.13.tar.xz.asc": "3e145c4af6322ff55bf299ff166c824c092ba2b62f822c8fdd7f885ec90c2ad2",
+  "squid.logrotate": "a6954fdc5cfaff414645b6c2d5f4d1ed952681fd47c75b0fdb7d5db8ebbf28d2",
+  "squid.nm": "f7a1b043d4ad9bb1b14a11035594db65ae414012ee8b414e9b701338d5b2828d",
+  "squid.pam": "7b2ccad84e5f2b337985c983b6085e17c47643abaa0b7033c36145864f123a62",
+  "squid.service": "23ba45e089ee7b292e18fc03ad6d26673794f4d0ced2f6f5974ee8f6908bdc5b",
+  "squid.sysconfig": "4c6f7398a7ab025c0d6c85ccdf965a0ce7eef4ea13f5220b9a4d23e19d63b381"
+ }
+}
