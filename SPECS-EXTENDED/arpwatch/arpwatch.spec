@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name: arpwatch
 Version: 2.1a15
-Release: 51%{?dist}
+Release: 52%{?dist}
 Summary: Network monitoring tools for tracking IP addresses on a network
 License: BSD with advertising
 URL: http://ee.lbl.gov/
@@ -17,7 +17,7 @@ Requires: /usr/sbin/sendmail
 BuildRequires:  gcc
 BuildRequires: /usr/sbin/sendmail libpcap-devel perl-interpreter systemd
 
-Source0: ftp://ftp.ee.lbl.gov/arpwatch-%{version}.tar.gz
+Source0: https://ee.lbl.gov/downloads/%{name}/%{name}-%{version}.tar.gz
 Source1: arpwatch.service
 Source2: %{name}-LICENSE.txt
 # created by:
@@ -157,6 +157,9 @@ fi
 %attr(0644,-,arpwatch) %verify(not md5 size mtime) %config(noreplace) %{_vararpwatch}/ethercodes.dat
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 2.1a15-52
+- Update Source URI to a valid HTTPS URI.
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.1a15-51
 - License verified
 
