@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.9
-Release:        2%{?dist}
+Version:        10.9.4
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -459,6 +459,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Tue Jan 31 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.9.4-1
+- Auto-upgrade to 10.9.4 - to fix CVE-2022-47015
+
 * Wed Sep 07 2022 Andrew Phelps <anphel@microsoft.com> - 10.6.9-2
 - Add shadow-utils pre/postun requirements
 
