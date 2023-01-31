@@ -13,7 +13,7 @@ Distribution:   Mariner
 
 Name:       whois       
 Version:    5.5.7
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    Improved WHOIS client
 License:    GPLv2+
 URL:        http://www.linux.it/~md/software/
@@ -44,6 +44,7 @@ BuildRequires:  perl(warnings)
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 Requires:   whois-nls = %{version}-%{release}
+Requires:   iana-etc
 
 %global genname whois
 %global alternative md
@@ -141,6 +142,9 @@ fi
 %endif
 
 %changelog
+* Tue Jan 31 2023 Toshi Aoyama <toaoyama@microsoft.com> - 5.5.7-3
+- Add requirement of iana-etc package.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.7-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
