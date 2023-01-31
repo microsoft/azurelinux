@@ -1,0 +1,22 @@
+diff -ru squid-4.13-orig/src/acl/ConnMark.h squid-4.13/src/acl/ConnMark.h
+--- squid-4.13-orig/src/acl/ConnMark.h	2023-01-25 11:18:33.219747591 +0000
++++ squid-4.13/src/acl/ConnMark.h	2023-01-29 02:05:45.150272509 +0000
+@@ -13,6 +13,7 @@
+ #include "ip/forward.h"
+ #include "parser/Tokenizer.h"
+ 
++#include <limits>
+ #include <vector>
+ 
+ namespace Acl {
+diff -ru squid-4.13-orig/src/security/ServerOptions.h squid-4.13/src/security/ServerOptions.h
+--- squid-4.13-orig/src/security/ServerOptions.h	2023-01-25 11:18:33.199747731 +0000
++++ squid-4.13/src/security/ServerOptions.h	2023-01-29 02:26:17.217825442 +0000
+@@ -17,6 +17,7 @@
+ #include <openssl/x509.h>
+ #endif
+ #endif
++#include <limits>
+ 
+ namespace Security
+ {

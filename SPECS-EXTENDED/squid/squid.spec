@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:     squid
 Version:  4.13
-Release:  3%{?dist}
+Release:  4%{?dist}
 Summary:  The Squid proxy caching server
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
@@ -34,6 +34,7 @@ Patch202: squid-3.1.0.9-location.patch
 Patch203: squid-3.0.STABLE1-perlpath.patch
 Patch204: squid-3.5.9-include-guards.patch
 Patch205: squid-4.0.21-large-acl.patch
+Patch206: squid-4.13-limits-header.patch
 
 # cache_swap.sh
 Requires: bash gawk
@@ -55,7 +56,8 @@ BuildRequires: krb5-devel
 # time_quota requires DB
 BuildRequires: libdb-devel
 # ESI support requires Expat & libxml2
-BuildRequires: expat-devel libxml2-devel
+BuildRequires: expat-devel
+BuildRequires: libxml2-devel = 2.9.14
 # TPROXY requires libcap, and also increases security somewhat
 BuildRequires: libcap-devel
 # eCAP support
@@ -104,6 +106,7 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch203 -p1 -b .perlpath
 %patch204 -p0 -b .include-guards
 %patch205 -p1 -b .large_acl
+%patch206 -p1 -b .limits-header
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
@@ -299,6 +302,10 @@ fi
 
 
 %changelog
+* Mon Jan 30 2023 Sindhu <lakarri@microsoft.com> - 4.13-4
+- Added patch206 to include limits header
+- Added build requires an earlier version 2.9.14 of libxml2-devel
+
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 4.13-3
 - Remove epoch
 
