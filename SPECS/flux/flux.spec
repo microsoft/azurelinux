@@ -139,6 +139,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %changelog
 * Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.191.0-1
 - Upgrade to version 0.191.0
+- Added patches to fix libflux.so file linking issues
 
 * Fri Jan 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.179.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
