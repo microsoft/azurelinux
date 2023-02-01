@@ -1,8 +1,0 @@
-{
-    global:
-        tcti_platform_command;
-        Tss2_Tcti_Info;
-        Tss2_Tcti_Mssim_Init;
-    local:
-        *;
-};

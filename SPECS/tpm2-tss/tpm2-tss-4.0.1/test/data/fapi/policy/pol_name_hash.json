@@ -1,9 +1,0 @@
-{
-    "description":"Policy NameHash",
-    "policy":[
-        {
-            "type": "POLICYNAMEHASH",
-			"namePaths":  [ "/HS/SRK/mySignKey" ]
-		}
-    ]
-}

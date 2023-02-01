@@ -11,6 +11,7 @@ Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{ve
 
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
+BuildRequires:  shadow-utils
 %if %{with_check}
 BuildRequires:  libcmocka-devel
 %endif
@@ -84,7 +85,19 @@ fi
 %{_sysconfdir}/udev/rules.d/tpm-udev.rules
 %{_sysconfdir}/tmpfiles.d/tpm2-tss-fapi.conf
 %{_sysconfdir}/tpm2-tss/*
-%{_libdir}/*.so.0.0.0
+%{_libdir}/libtss2-mu.so.0*
+%{_libdir}/libtss2-sys.so.1*
+%{_libdir}/libtss2-esys.so.0*
+%{_libdir}/libtss2-fapi.so.1*
+%{_libdir}/libtss2-policy.so.0*
+%{_libdir}/libtss2-rc.so.0*
+%{_libdir}/libtss2-tctildr.so.0*
+%{_libdir}/libtss2-tcti-cmd.so.0*
+%{_libdir}/libtss2-tcti-device.so.0*
+%{_libdir}/libtss2-tcti-mssim.so.0*
+%{_libdir}/libtss2-tcti-pcap.so.0*
+%{_libdir}/libtss2-tcti-spi-helper.so.0*
+%{_libdir}/libtss2-tcti-swtpm.so.0*
 %exclude %{_sysconfdir}/sysusers.d/tpm2-tss.conf
 
 %files devel
@@ -99,7 +112,12 @@ fi
 %{_mandir}/man7
 
 %changelog
-* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.6-1
+* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.1-1
+- Upgrade to version 4.0.1 to resolve CVE-2023-22745
+- Add shadow-utils as BR
+- Update %file to include additional binaries
+
+* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.6-1
 - Updating to version 2.4.6 to fix CVE-2020-24455.
 - Updated spec to use 'make' build and install macros, and '%%autosetup'.
 - Enabled running unit tests.
