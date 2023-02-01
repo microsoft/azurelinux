@@ -121,6 +121,7 @@ make check PYTHON=%{python} PYTEST=%{pytest} FLAKE8=%{flake8}
 %changelog
 * Wed Feb 01 2023 Henry Li <lihl@microsoft.com> - 1.11-8
 - Remove AGPL-related licenses from rpmlint.config
+- License Verified
 
 * Tue Jun 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-7
 - Removing option to build with Python 2.
