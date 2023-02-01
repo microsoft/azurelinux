@@ -4,7 +4,7 @@ Name:           python-enchant
 Version:        3.2.2
 Release:        7%{?dist}
 Summary:        Python bindings for Enchant spellchecking library
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://packages.python.org/pyenchant/
