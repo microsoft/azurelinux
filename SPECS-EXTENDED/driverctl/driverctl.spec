@@ -1,18 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global commit	fa9dce43d1a667d6e6e26895fbed01b3b04362c9
 
-Name:		driverctl
-Version:	0.111
-Release:	2%{?dist}
-Summary:	Device driver control utility
+Name:           driverctl
+Version:        0.111
+Release:        2%{?dist}
+Summary:        Device driver control utility
 
-License:	LGPLv2
-URL:		https://gitlab.com/driverctl/driverctl
-BuildArch:	noarch
+License:        LGPLv2
+URL:            https://gitlab.com/driverctl/driverctl
+BuildArch:      noarch
 
 # rpm doesn't grok the gitlab url but spectool understands this monster
-Source0:	https://gitlab.com/driverctl/%{name}/repository/archive.tar.gz?ref=%{version}#/%{name}-%{version}-%{commit}.tar.gz
+Source: https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz
 
 # for udev macros
 BuildRequires: systemd
@@ -62,6 +61,10 @@ by default.
 %udev_rules_update
 
 %changelog
+* Wed Feb 01 2023 Mateusz Malisz <mamalisz@microsoft.com> - 0.111-3
+- Update Source URI to point to a valid HTTPS URI.
+- Replace tabs with spaces.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.111-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
