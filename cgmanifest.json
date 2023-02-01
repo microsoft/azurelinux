@@ -2869,7 +2869,7 @@
         "other": {
           "name": "driverctl",
           "version": "0.111",
-          "downloadUrl": "https://gitlab.com/driverctl/driverctl/~/archive/0.111/driverctl-0.111.tar.gz"
+          "downloadUrl": "https://gitlab.com/driverctl/driverctl/-/archive/0.111/driverctl-0.111.tar.gz"
         }
       }
     },
