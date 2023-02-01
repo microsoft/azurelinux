@@ -2549,7 +2549,7 @@
         "other": {
           "name": "diffstat",
           "version": "1.63",
-          "downloadUrl": "ftp://ftp.invisible-island.net/pub/diffstat/diffstat-1.63.tgz"
+          "downloadUrl": "https://invisible-mirror.net/archives/diffstat/diffstat-1.63.tgz"
         }
       }
     },

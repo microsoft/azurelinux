@@ -1,12 +1,12 @@
 Summary: A utility which provides statistics based on the output of diff
 Name: diffstat
 Version: 1.63
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://invisible-island.net/diffstat
-Source0: ftp://ftp.invisible-island.net/pub/diffstat/%{name}-%{version}.tgz
+Source0: https://invisible-mirror.net/archives/%{name}/%{name}-%{version}.tgz
 # Taken from diffstat.c.
 Source1: COPYING
 
@@ -43,6 +43,9 @@ make check
 %{_mandir}/*/*
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 1.63-4
+- Update Source URI to a valid HTTPS URI.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
