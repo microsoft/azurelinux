@@ -1,6 +1,6 @@
 Name: docbook-utils
 Version: 0.6.14
-Release: 50%{?dist}
+Release: 51%{?dist}
 
 Summary: Shell scripts for managing DocBook documents
 Vendor:         Microsoft Corporation
@@ -22,7 +22,7 @@ BuildRequires: perl-generators
 BuildRequires: perl-SGMLSpm, openjade, docbook-style-dsssl
 
 BuildArch: noarch
-Source0: ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tar.gz
+Source0: https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tar.gz
 Source1: db2html
 Source2: gdp-both.dsl
 #We will ship newer version of docbook2man-spec.pl for better handling of docbook2man conversion
@@ -113,6 +113,9 @@ rm -rf %{buildroot}%{_mandir}/*/docbook2ps.*
 %{_mandir}/*/*-spec.*
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 0.6.14-51
+- Update URI to a valid HTTPS URI.
+
 * Wed Jan 20 2021 Joe Schmitt <joschmit@microsoft.com> - 0.6.14-50
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove pdf utils

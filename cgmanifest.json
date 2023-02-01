@@ -2719,7 +2719,7 @@
         "other": {
           "name": "docbook-utils",
           "version": "0.6.14",
-          "downloadUrl": "ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/docbook-utils-0.6.14.tar.gz"
+          "downloadUrl": "https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/docbook-utils-0.6.14.tar.gz"
         }
       }
     },
