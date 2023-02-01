@@ -1,10 +1,10 @@
 Summary:	    Dynamic host configuration protocol
 Name:		    dhcp
 Version:	    4.4.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
-Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://ftp.ripe.net/mirrors/sites/ftp.isc.org/isc/%{name}/%{version}/%{name}-%{version}.tar.gz
 Patch1:         CVE-2021-25217.patch
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -172,6 +172,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 4.4.2-5
+- Update Source URI to a valid HTTPS URI.
+
 * Wed Nov 10 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 4.4.2-4
 - Modified "CFLAGS" to include CBL-Mariner defaults.
 
