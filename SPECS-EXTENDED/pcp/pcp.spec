@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:     https://pcp.io
 
-Source: https://github.com/performancecopilot/pcp/archive/refs/tags/5.1.1.tar.gz
+Source: https://github.com/performancecopilot/pcp/archive/refs/tags/5.1.1.tar.gz#/%{name}-%{version}.tar.gz
 
 %global __python2 python2
 
