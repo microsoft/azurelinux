@@ -112,7 +112,7 @@ fi
 %{_mandir}/man7
 
 %changelog
-* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.1-1
+* Tue Jan 31 2023 Henry Li <lihl@microsoft.com> - 4.0.1-1
 - Upgrade to version 4.0.1 to resolve CVE-2023-22745
 - Add shadow-utils as BR
 - Update %file to include additional binaries
