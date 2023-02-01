@@ -20154,8 +20154,8 @@
         "type": "other",
         "other": {
           "name": "pkgconf",
-          "version": "1.8.0",
-          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.8.0.tar.xz"
+          "version": "1.9.4",
+          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.9.4.tar.xz"
         }
       }
     },

@@ -10,8 +10,8 @@
 %global pkgconf_libdirs %{_libdir}/pkgconfig:%{_datadir}/pkgconfig
 Summary:        Package compiler and linker metadata toolkit
 Name:           pkgconf
-Version:        1.8.0
-Release:        2%{?dist}
+Version:        1.9.4
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -178,6 +178,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Wed Feb 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
+- Auto-upgrade to 1.9.4 - to fix CVE-2023-24056
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.0-2
 - Removing epoch.
 

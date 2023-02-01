@@ -184,8 +184,8 @@ libmpc-debuginfo-1.2.1-1.cm2.x86_64.rpm
 libpipeline-1.5.5-2.cm2.x86_64.rpm
 libpipeline-debuginfo-1.5.5-2.cm2.x86_64.rpm
 libpipeline-devel-1.5.5-2.cm2.x86_64.rpm
-libpkgconf-1.8.0-2.cm2.x86_64.rpm
-libpkgconf-devel-1.8.0-2.cm2.x86_64.rpm
+libpkgconf-1.9.4-1.cm2.x86_64.rpm
+libpkgconf-devel-1.9.4-1.cm2.x86_64.rpm
 libselinux-3.2-1.cm2.x86_64.rpm
 libselinux-debuginfo-3.2-1.cm2.x86_64.rpm
 libselinux-devel-3.2-1.cm2.x86_64.rpm
@@ -493,10 +493,10 @@ perl-XML-Parser-2.46-2.cm2.x86_64.rpm
 perl-XML-Parser-debuginfo-2.46-2.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm
 pinentry-debuginfo-1.2.0-1.cm2.x86_64.rpm
-pkgconf-1.8.0-2.cm2.x86_64.rpm
-pkgconf-debuginfo-1.8.0-2.cm2.x86_64.rpm
+pkgconf-1.9.4-1.cm2.x86_64.rpm
+pkgconf-debuginfo-1.9.4-1.cm2.x86_64.rpm
 pkgconf-m4-1.8.0-2.cm2.noarch.rpm
-pkgconf-pkg-config-1.8.0-2.cm2.x86_64.rpm
+pkgconf-pkg-config-1.9.4-1.cm2.x86_64.rpm
 popt-1.18-1.cm2.x86_64.rpm
 popt-debuginfo-1.18-1.cm2.x86_64.rpm
 popt-devel-1.18-1.cm2.x86_64.rpm
