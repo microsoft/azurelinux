@@ -15115,7 +15115,7 @@
         "other": {
           "name": "pcp",
           "version": "5.1.1",
-          "downloadUrl": "https://bintray.com/artifact/download/pcp/source/pcp-5.1.1.src.tar.gz"
+          "downloadUrl": "https://github.com/performancecopilot/pcp/archive/refs/tags/5.1.1.tar.gz"
         }
       }
     },

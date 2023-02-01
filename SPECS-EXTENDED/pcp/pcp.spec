@@ -2,15 +2,14 @@
 
 Name:    pcp
 Version: 5.1.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: System-level performance monitoring and performance management
 License: GPLv2+ and LGPLv2+ and CC-BY
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:     https://pcp.io
 
-%global  bintray https://bintray.com/artifact/download
-Source0: %{bintray}/pcp/source/pcp-%{version}.src.tar.gz
+Source: https://github.com/performancecopilot/pcp/archive/refs/tags/5.1.1.tar.gz
 
 %global __python2 python2
 
@@ -429,7 +428,7 @@ Requires: pcp-pmda-libvirt
 
 %endif
 %if !%{disable_mssql}
-Requires: pcp-pmda-mssql 
+Requires: pcp-pmda-mssql
 %endif
 %if !%{disable_snmp}
 Requires: pcp-pmda-snmp
@@ -3256,6 +3255,9 @@ chown -R pcp:pcp %{_logsdir}/pmproxy 2>/dev/null
 %endif
 
 %changelog
+* Wed Feb 01 2023 Mateusz Malisz <mamalisz@microsoft.com> - 5.1.1-4
+- Update Source link and signature.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1.1-3
 - Making binaries paths compatible with CBL-Mariner's paths.
 
