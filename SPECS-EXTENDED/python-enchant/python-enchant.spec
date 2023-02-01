@@ -7,7 +7,7 @@ Summary:        Python bindings for Enchant spellchecking library
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://packages.python.org/pyenchant/
+URL:            https://github.com/pyenchant/pyenchant
 Source0:        https://files.pythonhosted.org/packages/source/p/py%{srcname}/py%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
