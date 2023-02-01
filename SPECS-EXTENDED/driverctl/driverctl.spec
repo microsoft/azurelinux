@@ -3,7 +3,7 @@ Distribution:   Mariner
 
 Name:           driverctl
 Version:        0.111
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Device driver control utility
 
 License:        LGPLv2
