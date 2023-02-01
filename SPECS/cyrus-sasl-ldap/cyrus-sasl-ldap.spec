@@ -148,6 +148,10 @@ make %{?_smp_mflags} check
 
 %files
 %defattr(-,root,root)
+%{_plugindir2}/libldapdb.so
+%{_plugindir2}/libldapdb.so.%{_soversion}*
+
+# %files -n %{_base_name}
 %exclude %{_sysconfdir}/sysconfig/saslauthd
 %exclude /lib/systemd/system/saslauthd.service
 %exclude %{_libdir}/systemd/system-preset/50-saslauthd.preset
@@ -155,25 +159,21 @@ make %{?_smp_mflags} check
 %exclude %{_datadir}/licenses/%{name}/LICENSE
 %exclude %{_mandir}/man8/*
 
-# %files devel
+# %files -n %{_base_name}-devel
 %exclude %{_includedir}/*
 %exclude %{_libdir}/libsasl2.so
 %exclude %{_libdir}/pkgconfig/*.pc
 %exclude %{_mandir}/man3/*
 
-# %files gs2
+# %files -n %{_base_name}-gs2
 %exclude %{_plugindir2}/libgs2.so
 %exclude %{_plugindir2}/libgs2.so.%{_soversion}*
 
-# %files gssapi
+# %files -n %{_base_name}-gssapi
 %exclude %{_plugindir2}/libgssapiv2.so
 %exclude %{_plugindir2}/libgssapiv2.so.%{_soversion}*
 
-# %files ldap
-%{_plugindir2}/libldapdb.so
-%{_plugindir2}/libldapdb.so.%{_soversion}*
-
-# %files lib
+# %files -n %{_base_name}-lib
 #%exclude COPYING
 #%exclude doc/html/*.html
 %exclude %{_libdir}/libsasl2.so.%{_soversion}*
@@ -185,27 +185,27 @@ make %{?_smp_mflags} check
 %exclude %{_sbindir}/saslpasswd2
 %exclude %{_sbindir}/sasldblistusers2
 
-# %files md5
+# %files -n %{_base_name}-md5
 %exclude %{_plugindir2}/libcrammd5.so
 %exclude %{_plugindir2}/libcrammd5.so.%{_soversion}*
 %exclude %{_plugindir2}/libdigestmd5.so
 %exclude %{_plugindir2}/libdigestmd5.so.%{_soversion}*
 
-# %files ntlm
+# %files -n %{_base_name}-ntlm
 %exclude %{_plugindir2}/libntlm.so
 %exclude %{_plugindir2}/libntlm.so.%{_soversion}*
 
-# %files plain
+# %files -n %{_base_name}-plain
 %exclude %{_plugindir2}/liblogin.so
 %exclude %{_plugindir2}/liblogin.so.%{_soversion}*
 %exclude %{_plugindir2}/libplain.so
 %exclude %{_plugindir2}/libplain.so.%{_soversion}*
 
-# %files scram
+# %files -n %{_base_name}-scram
 %exclude %{_plugindir2}/libscram.so
 %exclude %{_plugindir2}/libscram.so.%{_soversion}*
 
-# %files sql
+# %files -n %{_base_name}-sql
 %exclude %{_plugindir2}/libsql.so
 %exclude %{_plugindir2}/libsql.so.%{_soversion}*
 
@@ -213,4 +213,6 @@ make %{?_smp_mflags} check
 * Tue Jan 31 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
 - Cloning from the cyrus-sasl spec version 2.1.28-1
 - Resolve cyclic dependency with openldap on cyrus-sasl
+- Initial CBL-Mariner import from Photon (license: Apache2).
+- License verified
 
