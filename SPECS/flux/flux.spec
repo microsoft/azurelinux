@@ -21,7 +21,7 @@
 
 Summary:        Influx data language
 Name:           flux
-Version:        0.179.0
+Version:        0.191.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -39,6 +39,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
+Patch1:         disable-static-library.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -51,7 +52,7 @@ implementation of the language core.
 
 %package -n libflux
 Summary:        Influx data language
-Provides:       libflux = %{version}-%{release}
+Provides:       libflux = %{libflux_suffix}
 
 %description -n libflux
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
@@ -61,23 +62,35 @@ implementation of the language core.
 
 %package -n libflux-devel
 Summary:        Development libraries and header files for Influx data language
-Requires:       libflux = %{version}-%{release}
+Requires:       libflux = %{libflux_suffix}
 
 %description -n libflux-devel
 This package contains the header files and libraries for building
 programs using Influx data language.
 
 %prep
-%autosetup
+%setup -q
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
+
+patch -p2 < %{PATCH1}
+patch -p2 <<EOF
+--- a/libflux/flux/build.rs
++++ b/libflux/flux/build.rs
+@@ -82,5 +82,7 @@ fn main() -> Result<()> {
+     let path = dir.join("stdlib.data");
+     serialize(Environment::from(imports), fb::build_env, &path)?;
+
++    println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libflux.so.%{version}");
++
+     Ok(())
+ }
 popd
 
 %build
 pushd libflux
 RUSTFLAGS=%{rustflags} cargo build --release
-RUSTFLAGS=%{rustflags} cargo build --release --bin fluxc
 RUSTFLAGS=%{rustflags} cargo build --features=doc --release --bin fluxdoc
 popd
 
@@ -101,8 +114,6 @@ Cflags: -I%{_includedir}
 EOF
 
 install -D -m 644 flux.pc %{buildroot}%{_libdir}/pkgconfig/flux.pc
-
-install -D -m 755 libflux/target/release/fluxc %{buildroot}%{_bindir}/fluxc
 install -D -m 755 libflux/target/release/fluxdoc %{buildroot}%{_bindir}/fluxdoc
 
 %check
@@ -119,7 +130,6 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %defattr(-,root,root)
 %license LICENSE
 %doc README.md
-%{_bindir}/fluxc
 %{_bindir}/fluxdoc
 %{_libdir}/libflux.so
 %{_libdir}/pkgconfig/flux.pc
@@ -127,6 +137,10 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.191.0-1
+- Upgrade to version 0.191.0
+- Added patches to fix libflux.so file linking issues
+
 * Fri Jan 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.179.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
