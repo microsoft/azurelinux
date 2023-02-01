@@ -2528,8 +2528,8 @@
         "type": "other",
         "other": {
           "name": "dialog",
-          "version": "1.3",
-          "downloadUrl": "ftp://ftp.invisible-island.net/dialog/dialog-1.3-20180621.tgz"
+          "version": "1.3-20180621",
+          "downloadUrl": "https://invisible-mirror.net/archives/dialog/dialog-1.3-20180621.tgz"
         }
       }
     },

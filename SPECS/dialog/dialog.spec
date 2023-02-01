@@ -3,13 +3,13 @@
 Summary:       A utility for creating TTY dialog boxes
 Name:          dialog
 Version:       1.3
-Release:       4%{?dist}
+Release:       5%{?dist}
 License:       LGPLv2+
 URL:           https://invisible-island.net/dialog/dialog.html
 Group:         Applications/System
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-Source0:       ftp://ftp.invisible-island.net/dialog/%{name}-%{version}-%{dialogsubversion}.tgz
+Source0:       https://invisible-mirror.net/archives/%{name}/%{name}-%{version}-%{dialogsubversion}.tgz
 BuildRequires: ncurses-devel
 BuildRequires: gettext
 BuildRequires: findutils
@@ -86,6 +86,9 @@ chmod +x %{buildroot}%{_libdir}/*
 %{_mandir}/man3/dialog.*
 
 %changelog
+* Wed Feb 01 2023 Mateusz Malisz <mamalisz@microsoft.com> - 1.3-5
+- Update Source URI to a valid HTTPS URI.
+
 * Tue Oct 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
