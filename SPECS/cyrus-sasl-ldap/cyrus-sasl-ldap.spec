@@ -1,3 +1,5 @@
+# NOTE: this is a copy of 'cyrus-sasl.spec' with the only difference being the `--with-ldap` config option meant to enable building the `openldap`-dependent bits of `cyrus-sasl-ldap`.
+# The spec was split to break the cyclic build dependency between `openldap` and `cyrus-sasl`.
 %define _soversion 3
 %global _plugindir2 %{_libdir}/sasl2
 %global _base_name cyrus-sasl
