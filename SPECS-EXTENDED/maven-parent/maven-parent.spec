@@ -20,12 +20,12 @@ Distribution:   Mariner
 
 Name:           maven-parent
 Version:        27
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Apache Maven parent POM
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            http://maven.apache.org
-Source0:        http://repo1.maven.org/maven2/org/apache/maven/%{name}/%{version}/%{name}-%{version}-source-release.zip
+Source0:        https://repo1.maven.org/maven2/org/apache/maven/%{name}/%{version}/%{name}-%{version}-source-release.zip
 BuildRequires:  apache-parent
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
@@ -53,6 +53,9 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{name}.pom
 %doc NOTICE
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 27-3
+- Update Source URI to a valid one.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 27-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
