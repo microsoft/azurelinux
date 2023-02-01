@@ -1,32 +1,26 @@
-%global srcname enchant
-
+Summary:        Python bindings for Enchant spellchecking library
 Name:           python-enchant
 Version:        3.2.2
 Release:        7%{?dist}
-Summary:        Python bindings for Enchant spellchecking library
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pyenchant/pyenchant
 Source0:        https://files.pythonhosted.org/packages/source/p/py%{srcname}/py%{srcname}-%{version}.tar.gz
-
-BuildArch:      noarch
+%global srcname enchant
 BuildRequires:  enchant-devel
+BuildArch:      noarch
 
 %description
 PyEnchant is a spellchecking library for Python, based on the Enchant
 library by Dom Lachowicz.
 
-
 %package -n python3-%{srcname}
 Summary:        Python 3 bindings for Enchant spellchecking library
-
+%{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-
 Requires:       enchant2
-
-%{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}
 PyEnchant is a spellchecking library for Python 3, based on the Enchant
@@ -37,7 +31,7 @@ library by Dom Lachowicz.
 # Remove bundled egg-info
 rm -rf py%{srcname}.egg-info
 
-find . -name '*.py' | xargs sed -i '1s|^#!python|#!%{__python3}|'
+find . -name '*.py' | xargs sed -i '1s|^#!python|#!python3|'
 
 %build
 %py3_build
@@ -46,8 +40,8 @@ find . -name '*.py' | xargs sed -i '1s|^#!python|#!%{__python3}|'
 %py3_install
 
 # Directories used in windows build
-rm -rf $RPM_BUILD_ROOT/%{python3_sitelib}/%{srcname}/lib
-rm -rf $RPM_BUILD_ROOT/%{python3_sitelib}/%{srcname}/share
+rm -rf %{buildroot}/%{python3_sitelib}/%{srcname}/lib
+rm -rf %{buildroot}/%{python3_sitelib}/%{srcname}/share
 
 
 # Tests are not included in the upstream tarball
@@ -71,11 +65,11 @@ rm -rf $RPM_BUILD_ROOT/%{python3_sitelib}/%{srcname}/share
 %{python3_sitelib}/%{srcname}/tokenize/__pycache__/*.py[co]
 %{python3_sitelib}/py%{srcname}-%{version}-py%{python3_version}.egg-info
 
-
 %changelog
 * Fri Jan 27 2023 Henry Li <lihl@microsoft.com> - 3.2.2-7
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified
+- Fix bogus URL
 
 * Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
