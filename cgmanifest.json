@@ -10072,7 +10072,7 @@
         "other": {
           "name": "libpinyin",
           "version": "2.3.0",
-          "downloadUrl": "http://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.3.0.tar.gz"
+          "downloadUrl": "https://github.com/libpinyin/libpinyin/releases/download/2.3.0/libpinyin-2.3.0.tar.gz"
         }
       }
     },
