@@ -4,12 +4,12 @@ Distribution:   Mariner
 
 Name: libmwaw
 Version: 0.3.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: A library for import of many old Mac document formats
 
 License: LGPLv2+ or MPLv2.0
-URL: http://sourceforge.net/projects/libmwaw/
-Source: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+URL: https://sourceforge.net/projects/libmwaw/
+Source: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: doxygen
 BuildRequires: gcc-c++
@@ -108,6 +108,9 @@ install -m 0644 mwaw2*.1 %{buildroot}/%{_mandir}/man1
 %{_mandir}/man1/mwaw2text.1*
 
 %changelog
+* Tue Jan 31 2023 Mateusz Malisz <mamalisz@microsoft.com> - 0.3.17-3
+- Update URL and Source URIs to valid ones.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.17-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
