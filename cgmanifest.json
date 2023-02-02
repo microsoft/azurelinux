@@ -9940,6 +9940,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liboggz",
+          "version": "1.1.1",
+          "downloadUrl": "https://downloads.xiph.org/releases/liboggz/liboggz-1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liboil",
           "version": "0.3.16",
           "downloadUrl": "http://liboil.freedesktop.org/download/liboil-0.3.16.tar.gz"
