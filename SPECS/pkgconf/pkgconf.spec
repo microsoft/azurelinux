@@ -20,6 +20,8 @@ URL:            http://pkgconf.org/
 Source0:        https://distfiles.dereferenced.org/%{name}/%{name}-%{version}.tar.xz
 # Simple wrapper script to offer platform versions of pkgconfig
 Source1:        platform-pkg-config.in
+# CVE-2023-24056 Resloved in version 1.9.4
+Patch0:         CVE-2023-24056.patch
 # For regenerating autotools scripts
 BuildRequires:  autoconf
 BuildRequires:  automake
