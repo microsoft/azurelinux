@@ -1,39 +1,24 @@
+%global dbver_rel 4.0
+%global dbver_snap 20201104
+Summary:        Database of printers and printer drivers
+Name:           foomatic-db
+Version:        %{dbver_rel}
+Release:        70%{?dist}
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global dbver_rel 4.0
-# When you change dbver_snap, rebuild also foomatic against this build to pick up new IEEE 1284 Device IDs.
-# The postscriptdriver tags get put onto foomatic, because that's there the actual CUPS driver lives.
-%global dbver_snap 20201104
-
-Summary: Database of printers and printer drivers
-Name: foomatic-db
-Version: %{dbver_rel}
-Release: 69%{?dist}
-License: GPLv2+
-Requires: %{name}-filesystem = %{version}-%{release}
-Requires: %{name}-ppds = %{version}-%{release}
-
-Source0: http://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
-
-Patch1: foomatic-db-device-ids.patch
-Patch2: foomatic-db-invalid.patch
-
-Url: http://www.openprinting.org
-BuildArch: noarch
-
-# Make sure we get postscriptdriver tags.
-BuildRequires: python3-cups
-
-# Build requires cups so that configure knows where to put PPDs.
-BuildRequires: cups
-# uses make
-BuildRequires: make
-
-# Build requires for perl
-BuildRequires: perl-interpreter
-
-# we needed sed for prep phase - removing perl from ppds
-BuildRequires: sed
+URL:            https://www.openprinting.org
+Source0:        https://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
+Patch1:         foomatic-db-device-ids.patch
+Patch2:         foomatic-db-invalid.patch
+BuildRequires:  cups
+BuildRequires:  make
+BuildRequires:  perl-interpreter
+BuildRequires:  python3-cups
+BuildRequires:  sed
+Requires:       %{name}-filesystem = %{version}-%{release}
+Requires:       %{name}-ppds = %{version}-%{release}
+BuildArch:      noarch
 
 %description
 This is the database of printers, printer drivers, and driver options
@@ -42,20 +27,19 @@ for Foomatic.
 The site http://www.openprinting.org/ is based on this database.
 
 %package filesystem
-Summary: Directory layout for the foomatic package
-License: Public Domain
+Summary:        Directory layout for the foomatic package
+License:        Public Domain
 
 %description filesystem
 Directory layout for the foomatic package.
 
 %package ppds
-Summary: PPDs from printer manufacturers
-License: GPLv2+ and MIT
-# We ship a symlink in a directory owned by cups
-BuildRequires: cups
-Requires: cups
-Requires: sed
-Requires: %{name}-filesystem = %{version}-%{release}
+Summary:        PPDs from printer manufacturers
+License:        GPLv2+ AND MIT
+BuildRequires:  cups
+Requires:       %{name}-filesystem = %{version}-%{release}
+Requires:       cups
+Requires:       sed
 
 %description ppds
 PPDs from printer manufacturers.
@@ -67,13 +51,11 @@ find -type d | xargs chmod g-s
 
 pushd db/source
 
-# For gutenprint printers, use gutenprint-ijs-simplified.5.2.
 for i in printer/*.xml
 do
   perl -pi -e 's,>gutenprint<,>gutenprint-ijs-simplified.5.2<,' $i
 done
 
-# Remove references to SpliX (Samsung/Xerox/Dell)
 find printer -name '*.xml' |xargs grep -l "<driver>splix"|xargs rm -vf
 rm -f driver/splix.xml
 
@@ -141,7 +123,7 @@ make PREFIX=%{_prefix}
 
 
 %install
-make	DESTDIR=%buildroot PREFIX=%{_prefix} \
+make	DESTDIR=%{buildroot} PREFIX=%{_prefix} \
 	install
 
 # Remove ghostscript UPP drivers that are gone in 7.07
@@ -177,11 +159,14 @@ ln -sf ../../foomatic/db/source/PPD %{buildroot}%{_datadir}/cups/model/foomatic-
 %{_datadir}/foomatic/xmlschema
 
 %files ppds
-%doc COPYING
+%license COPYING
 %{_datadir}/foomatic/db/source/PPD/*
 %{_datadir}/cups/model/foomatic-db-ppds
 
 %changelog
+* Thu Feb 02 2023 Muhammad Falak <mwani@microsoft.com> - 4.0-70
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0-69
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
