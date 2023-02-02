@@ -1,7 +1,7 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        libtiff
 URL:            https://gitlab.com/libtiff/libtiff
 Group:          System Environment/Libraries
@@ -17,6 +17,7 @@ Patch3:         CVE-2022-3570.patch
 Patch4:         CVE-2022-3597.patch
 Patch5:         CVE-2022-3599.patch
 Patch6:         CVE-2022-3970.patch
+Patch7:         CVE-2022-48281.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -76,6 +77,9 @@ make %{?_smp_mflags} -k check
 %{_datadir}/man/man3/*
 
 %changelog
+* Thu Feb 02 2023 Henry Li <lihl@microsoft.com> - 4.4.0-7
+- Patch CVE-2022-48281
+
 * Fri Nov 18 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.4.0-6
 - Patching CVE-2022-3970.
 
