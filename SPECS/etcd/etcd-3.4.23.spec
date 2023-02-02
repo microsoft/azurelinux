@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.4.13
-Release:        14%{?dist}
+Version:        3.4.23
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,6 +93,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/etcd-dump-*
 
 %changelog
+* Fri Jan 27 2023 Muhammad Falak <mwani@microsoft.com> - 3.4.23-1
+- Bump version to address CVE-2022-3064
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.4.13-14
 - Bump release to rebuild with go 1.18.8-2
 
