@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,6 +26,8 @@ Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch3:         CVE-2022-37454.patch
 Patch4:         CVE-2022-45061.patch
 Patch5:         CVE-2022-42919.patch
+# Patch for setuptools, resolved in 65.5.1
+Patch1000:        CVE-2022-40897.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -155,7 +157,9 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%autosetup -p1 -n Python-%{version}
+# We need to patch setuptools later, so manually manage patches with -N
+%autosetup -p1 -n Python-%{version} -N
+%autopatch -p1 -M 999
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -204,6 +208,10 @@ pip3 install --no-cache-dir --no-index --ignore-installed \
     setuptools-%{setuptools_version}-py3-none-any.whl \
     pip-%{pip_version}-py3-none-any.whl
 popd
+
+# Manually patch CVE-2022-40897 which is a bundled wheel. We can only update the source code after install
+echo "Patching CVE-2022-40897 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py
+patch %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py < %{PATCH1000}
 
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
@@ -305,6 +313,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Feb 02 20223 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-6
+- Patch CVE-2022-40897 in the bundled setuptools wheel
+
 * Wed Dec 07 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.14-5
 - Add CVE-2022-42919 patch from upstream.
 
