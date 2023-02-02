@@ -210,7 +210,7 @@ pip3 install --no-cache-dir --no-index --ignore-installed \
 popd
 
 # Manually patch CVE-2022-40897 which is a bundled wheel. We can only update the source code after install
-echo "Patching CVE-2022-40897 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py
+echo 'Patching CVE-2022-40897 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py'
 patch %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py < %{PATCH1000}
 
 # Windows executables get installed by pip and setuptools- we don't need these.
