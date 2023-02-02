@@ -1,13 +1,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.1189
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-0433.patch
 %define debug_package %{nil}
 BuildRequires:  ncurses-devel
 
@@ -191,6 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Feb 02 2023 Henry Li <lihl@microsoft.com> - 9.0.1189-2
+- Add patch to resolve CVE-2023-0433  
+
 * Fri Jan 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1189-1
 - Auto-upgrade to 9.0.1189 - to fix CVE-2023-0288
 
