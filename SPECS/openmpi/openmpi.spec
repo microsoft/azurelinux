@@ -52,7 +52,7 @@ BuildRequires:  perl(File::Find)
 %endif
 BuildRequires:  valgrind-devel
 %if %{with rdma}
-BuildRequires:  opensm-devel #extended
+BuildRequires:  opensm-devel
 BuildRequires:  rdma-core-devel
 %endif
 # Doesn't compile:
