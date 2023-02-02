@@ -12,8 +12,8 @@ Distribution:   Mariner
 %{bcond_without whois_enables_libidn2}
 
 Name:       whois       
-Version:    5.5.7
-Release:    3%{?dist}
+Version:    5.5.15
+Release:    1%{?dist}
 Summary:    Improved WHOIS client
 License:    GPLv2+
 URL:        http://www.linux.it/~md/software/
@@ -142,6 +142,10 @@ fi
 %endif
 
 %changelog
+* Thu Feb 02 2023 Toshi Aoyama <toaoyama@microsoft.com> - 5.5.15-1
+- 5.5.15 bump
+- License verified
+
 * Tue Jan 31 2023 Toshi Aoyama <toaoyama@microsoft.com> - 5.5.7-3
 - Add requirement of iana-etc package.
 
