@@ -59,7 +59,7 @@ BuildRequires:  rdma-core-devel
 # vt_dyn.cc:958:28: error: 'class BPatch_basicBlockLoop' has no member named 'getLoopHead'
 #                      loop->getLoopHead()->getStartAddress(), loop_stmts );
 #BuildRequires:  dyninst-devel
-BuildRequires:  hwloc-devel #extended - moved but needs cleaning
+BuildRequires:  hwloc-devel
 # So configure can find lstopo
 # BuildRequires:  hwloc-gui
 %if %{with java}
@@ -74,15 +74,15 @@ BuildRequires:  libfabric-devel
 # %ifnarch s390 s390x
 # BuildRequires:  papi-devel
 # %endif
-BuildRequires:  orangefs-devel #extended - move but needs cleaning
+BuildRequires:  orangefs-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Getopt::Long)
-BuildRequires:  pmix-devel #extended - moved but needs cleaning
+BuildRequires:  pmix-devel
 BuildRequires:  python%{python3_pkgversion}-devel
 %ifarch x86_64
-BuildRequires:  infinipath-psm-devel #extended
-BuildRequires:  libpsm2-devel #extended
+BuildRequires:  infinipath-psm-devel
+BuildRequires:  libpsm2-devel
 %endif
 %if %{with ucx}
 BuildRequires:  ucx-devel
@@ -113,7 +113,7 @@ researchers. For more information, see http://www.open-mpi.org/ .
 Summary:	Development files for openmpi
 Requires:	%{name} = %{version}-%{release}, gcc-gfortran
 Provides:	mpi-devel
-Requires:	rpm-mpi-hooks #extended
+Requires:	rpm-mpi-hooks
 # Make sure this package is rebuilt with correct Python version when updating
 # Otherwise mpi.req from rpm-mpi-hooks doesn't work
 # https://bugzilla.redhat.com/show_bug.cgi?id=1705296
