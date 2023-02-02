@@ -13103,8 +13103,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.31",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.31.tar.gz"
+          "version": "8.0.32",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.32.tar.gz"
         }
       }
     },
@@ -21386,6 +21386,16 @@
           "name": "python-ecdsa",
           "version": "0.17.0",
           "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.17.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-enchant",
+          "version": "3.2.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyenchant/pyenchant-3.2.2.tar.gz"
         }
       }
     },
