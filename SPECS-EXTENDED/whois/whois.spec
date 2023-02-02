@@ -13,7 +13,7 @@ Distribution:   Mariner
 
 Name:       whois       
 Version:    5.5.7
-Release:    2%{?dist}
+Release:    2%{?dist}fdgfgd
 Summary:    Improved WHOIS client
 License:    GPLv2+
 URL:        http://www.linux.it/~md/software/
