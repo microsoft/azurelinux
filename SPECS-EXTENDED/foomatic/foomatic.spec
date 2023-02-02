@@ -1,50 +1,39 @@
+Summary:        Tools for using the foomatic database of printers and printer drivers
+Name:           foomatic
+Version:        4.0.13
+Release:        17%{?dist}
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: Tools for using the foomatic database of printers and printer drivers
-Name:       foomatic
-Version:    4.0.13
-Release:    16%{?dist}
-License:    GPLv2+
-
-# The database engine.
-Source0: http://www.openprinting.org/download/foomatic/foomatic-db-engine-%{version}.tar.gz
-
-## PATCHES FOR FOOMATIC-DB-ENGINE (PATCHES 101 TO 200)
-Patch101:  foomatic-manpages.patch
-# backported from upstream https://github.com/OpenPrinting/foomatic-db-engine/commit/75de02d
-Patch102:  0001-Recognize-fractional-numbers-in-PageSize.patch
-
-## PATCHES FOR FOOMATIC-DB-HPIJS (PATCHES 201 TO 300)
-
-Url:            http://www.linuxfoundation.org/collaborate/workgroups/openprinting/database/foomatic
-
-# gcc is no longer in buildroot by default
-BuildRequires:  gcc
-# uses make
-BuildRequires:  make
-BuildRequires:  perl-interpreter >= 3:5.8.1
-BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  libxml2-devel
-BuildRequires:  autoconf, automake
+URL:            https://www.linuxfoundation.org/collaborate/workgroups/openprinting/database/foomatic
+Source0:        https://www.openprinting.org/download/foomatic/foomatic-db-engine-%{version}.tar.gz
+Patch101:       foomatic-manpages.patch
+Patch102:       0001-Recognize-fractional-numbers-in-PageSize.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  cups
 BuildRequires:  cups-devel
 BuildRequires:  dbus-devel
-# Make sure we get postscriptdriver tags.  Safe to comment out when
-# bootstrapping a new architecture.
-BuildRequires:  python3-cups, cups
-%if 0%{!?perl_bootstrap:1}
-BuildRequires:  foomatic, foomatic-db
-%endif
-
-Requires:       dbus
+BuildRequires:  gcc
+BuildRequires:  libxml2-devel
+BuildRequires:  make
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter >= 3:5.8.1
+BuildRequires:  python3-cups
+BuildRequires:  perl(ExtUtils::MakeMaker)
+Requires:       colord
+Requires:       cups
 Requires:       cups-filters >= 1.0.42
+Requires:       dbus
+Requires:       foomatic-db
+Requires:       ghostscript
 Requires:       perl-interpreter >= 3:5.8.1
 Requires:       %(eval `perl -V:version`; echo "perl(:MODULE_COMPAT_$version)")
 Requires(post): coreutils
-Requires:       foomatic-db
-Requires:       cups
-Requires:       ghostscript
-Requires:       colord
+%if 0%{!?perl_bootstrap:1}
+BuildRequires:  foomatic
+BuildRequires:  foomatic-db
+%endif
 
 %description
 Foomatic is a comprehensive, spooler-independent database of printers,
@@ -64,9 +53,7 @@ The site http://www.linuxprinting.org/ is based on this database.
 %prep
 %setup -q -n foomatic-db-engine-%{version}
 
-# Ship more manpages.
 %patch101 -p1 -b .manpages
-# backported from upstream https://github.com/OpenPrinting/foomatic-db-engine/commit/75de02d
 %patch102 -p1 -b .pagesize-fract
 
 chmod a+x mkinstalldirs
@@ -80,36 +67,32 @@ export CUPS_PPDS=%{_datadir}/cups/model
 aclocal
 autoconf
 %configure --disable-xmltest
-make PREFIX=%{_prefix} CFLAGS="$RPM_OPT_FLAGS"
+make PREFIX=%{_prefix} CFLAGS="%{optflags}"
 
 %install
-make    DESTDIR=%buildroot PREFIX=%{_prefix} \
+make    DESTDIR=%{buildroot} PREFIX=%{_prefix} \
         INSTALLSITELIB=%{perl_vendorlib} \
         INSTALLSITEARCH=%{perl_vendorarch} \
         install
 
-# Use relative, not absolute, symlink for CUPS driver.
 ln -sf ../../../bin/foomatic-ppdfile %{buildroot}%{_cups_serverbin}/driver/foomatic
 
 mkdir -p %{buildroot}%{_var}/cache/foomatic
 
 echo cups > %{buildroot}%{_sysconfdir}/foomatic/defaultspooler
 
-# Remove things we don't ship.
 rm -rf  \
         %{buildroot}%{_libdir}/ppr \
         %{buildroot}%{_sysconfdir}/foomatic/filter.conf.sample \
         %{buildroot}%{_datadir}/foomatic/templates
-#%{buildroot}%%{_libdir}/perl5/site_perl
 find %{buildroot} -name .packlist | xargs rm -f
 
 %post
-/bin/rm -f /var/cache/foomatic/*
+/bin/rm -f %{_var}/cache/foomatic/*
 exit 0
 
-
 %files
-%doc COPYING
+%license COPYING
 %dir %{_sysconfdir}/foomatic
 %config(noreplace) %{_sysconfdir}/foomatic/defaultspooler
 %{_bindir}/foomatic-combo-xml
@@ -145,6 +128,9 @@ exit 0
 %{_var}/cache/foomatic
 
 %changelog
+* Thu Feb 02 2023 Muhammad Falak <mwani@microsoft.com> - 4.0.13-17
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.13-16
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
