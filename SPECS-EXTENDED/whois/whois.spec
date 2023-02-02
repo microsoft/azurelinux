@@ -1,26 +1,37 @@
+Summary:        Improved WHOIS client
+Name:           whois
+Version:        5.5.15
+Release:        1%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://www.linux.it/~md/software/
+Source0:        http://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
+%global genname whois
+%global alternative md
+%global cfgfile %{name}.conf
+BuildRequires:  coreutils
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  make
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(autodie)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+Requires:       iana-etc
+Requires:       whois-nls = %{version}-%{release}
+Requires(post): %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
+# Add IDN support
+%{bcond_without whois_enables_idn}
+# Use libidn2 instead of libidn
+%{bcond_without whois_enables_libidn2}
 # Package mkpasswd tool
 %if 0%{?rhel}
 %{bcond_with whois_enables_mkpasswd}
 %else
 %{bcond_without whois_enables_mkpasswd}
 %endif
-# Add IDN support
-%{bcond_without whois_enables_idn}
-# Use libidn2 instead of libidn
-%{bcond_without whois_enables_libidn2}
-
-Name:       whois       
-Version:    5.5.15
-Release:    1%{?dist}
-Summary:    Improved WHOIS client
-License:    GPLv2+
-URL:        http://www.linux.it/~md/software/
-Source0:    http://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
-BuildRequires:  coreutils
-BuildRequires:  gcc
-BuildRequires:  gettext
 %if %{with whois_enables_idn}
 %if %{with whois_enables_libidn2}
 BuildRequires:  pkgconfig(libidn2) >= 2.0.3
@@ -36,19 +47,6 @@ BuildConflicts: pkgconfig(libidn2)
 BuildRequires:  pkgconfig(libcrypt)
 BuildRequires:  pkgconfig(libxcrypt) >= 4.1
 %endif
-BuildRequires:  make
-BuildRequires:  perl-interpreter
-BuildRequires:  perl(autodie)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-Requires(post): %{_sbindir}/update-alternatives
-Requires(postun): %{_sbindir}/update-alternatives
-Requires:   whois-nls = %{version}-%{release}
-Requires:   iana-etc
-
-%global genname whois
-%global alternative md
-%global cfgfile %{name}.conf
 
 %description
 Searches for an object in a RFC 3912 database.
@@ -60,15 +58,15 @@ addresses and network names.
 
 %if %{with whois_enables_mkpasswd}
 %package -n mkpasswd
-Summary:    Encrypt a password with crypt(3) function using a salt
+Summary:        Encrypt a password with crypt(3) function using a salt
+Requires:       whois-nls = %{version}-%{release}
 # /usr/bin/mkpasswd was provided by "expect" package, bug #1649426
-Conflicts:  expect < 5.45.4-8.fc30
-Requires:   whois-nls = %{version}-%{release}
+Conflicts:      expect < 5.45.4-8.fc30
 # whois-mkpasswd package renamed to mkpasswd in 5.4.0-2.fc30, bug #1649426
-Obsoletes:  whois-mkpasswd <= 5.4.0-1.fc30
+Obsoletes:      whois-mkpasswd <= 5.4.0-1.fc30
 # but we continued upgrading whois in Fedoras < 30 without the rename
-Obsoletes:  whois-mkpasswd <= 5.5.3-1.fc29
-Provides:   whois-mkpasswd = %{version}-%{release}
+Obsoletes:      whois-mkpasswd <= 5.5.3-1.fc29
+Provides:       whois-mkpasswd = %{version}-%{release}
 
 %description -n mkpasswd
 mkpasswd tool encrypts a given password with the crypt(3) libc function
@@ -78,9 +76,9 @@ using a given salt.
 # The same gettext catalogs are used by whois tool and mkpasswd tool. But we
 # want to have the tools installable independently.
 %package nls
-Summary:    Gettext catalogs for whois tools
-Conflicts:  whois < 5.3.2-2
-BuildArch:  noarch
+Summary:        Gettext catalogs for whois tools
+Conflicts:      whois < 5.3.2-2
+BuildArch:      noarch
 
 %description nls
 whois tools messages translated into different natural languages.
@@ -89,31 +87,31 @@ whois tools messages translated into different natural languages.
 %setup -q -n %{name}
 
 %build
-%{make_build} CONFIG_FILE="%{_sysconfdir}/%{cfgfile}" \
+%make_build CONFIG_FILE="%{_sysconfdir}/%{cfgfile}" \
     HAVE_ICONV=1 \
-    CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="%{__global_ldflags}"
+    CFLAGS="%{optflags}" LDFLAGS="%{__global_ldflags}"
 
 %install
 %if %{with whois_enables_mkpasswd}
-make install-mkpasswd install-pos BASEDIR=$RPM_BUILD_ROOT
+make install-mkpasswd install-pos BASEDIR=%{buildroot}
 %endif
-make install-whois install-pos BASEDIR=$RPM_BUILD_ROOT
-install -p -m644 -D %{cfgfile} $RPM_BUILD_ROOT%{_sysconfdir}/%{cfgfile}
+make install-whois install-pos BASEDIR=%{buildroot}
+install -p -m644 -D %{cfgfile} %{buildroot}%{_sysconfdir}/%{cfgfile}
 %find_lang %{name}
 
 # Rename to alternative names
-mv $RPM_BUILD_ROOT%{_bindir}/%{name}{,.%{alternative}}
-touch $RPM_BUILD_ROOT%{_bindir}/%{name}
-chmod 755 $RPM_BUILD_ROOT%{_bindir}/%{name}
-mv $RPM_BUILD_ROOT%{_mandir}/man1/%{name}{,.%{alternative}}.1
-touch $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
+mv %{buildroot}%{_bindir}/%{name}{,.%{alternative}}
+touch %{buildroot}%{_bindir}/%{name}
+chmod 755 %{buildroot}%{_bindir}/%{name}
+mv %{buildroot}%{_mandir}/man1/%{name}{,.%{alternative}}.1
+touch %{buildroot}%{_mandir}/man1/%{name}.1
 
 %post
 %{_sbindir}/update-alternatives \
     --install %{_bindir}/%{name} \
         %{genname} %{_bindir}/%{name}.%{alternative} 30 \
     --slave %{_mandir}/man1/%{name}.1.gz \
-        %{genname}-man %{_mandir}/man1/%{name}.%{alternative}.1.gz 
+        %{genname}-man %{_mandir}/man1/%{name}.%{alternative}.1.gz
 
 %postun
 if [ $1 -eq 0 ] ; then
@@ -414,4 +412,3 @@ fi
 
 * Wed Sep 29 2010 Petr Pisar <ppisar@redhat.com> - 5.0.7-1
 - 5.0.7 imported
-
