@@ -8,7 +8,7 @@ License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.openprinting.org
-Source0:        https://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
+Source0:        foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
 Patch1:         foomatic-db-device-ids.patch
 Patch2:         foomatic-db-invalid.patch
 BuildRequires:  cups

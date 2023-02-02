@@ -3761,7 +3761,7 @@
         "other": {
           "name": "foomatic-db",
           "version": "4.0",
-          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-4.0-20201104.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/foomatic-db-4.0-20201104.tar.gz"
         }
       }
     },
