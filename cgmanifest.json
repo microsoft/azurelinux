@@ -23803,6 +23803,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pytorch",
+          "version": "1.13.1",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytz",
           "version": "2021.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytz/pytz-2021.3.tar.gz"
