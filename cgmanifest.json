@@ -3749,6 +3749,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "foomatic",
+          "version": "4.0.13",
+          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-engine-4.0.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "foomatic-db",
+          "version": "4.0",
+          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-4.0-20201104.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fping",
           "version": "5.0",
           "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
