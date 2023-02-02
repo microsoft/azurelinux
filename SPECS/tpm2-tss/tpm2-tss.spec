@@ -100,7 +100,10 @@ fi
 %{_mandir}/man7
 
 %changelog
-* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.6-1
+* Tue Jan 31 2023 Henry Li <lihl@microsoft.com> - 2.4.6-2
+- Add patch to resolve CVE-2023-22745
+
+* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.6-1
 - Updating to version 2.4.6 to fix CVE-2020-24455.
 - Updated spec to use 'make' build and install macros, and '%%autosetup'.
 - Enabled running unit tests.
