@@ -2336,6 +2336,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cyrus-sasl-ldap",
+          "version": "2.1.28",
+          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.28/cyrus-sasl-2.1.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "Cython",
           "version": "0.29.32",
           "downloadUrl": "https://github.com/cython/cython/archive/0.29.32.tar.gz"
@@ -9923,6 +9933,16 @@
           "name": "libogg",
           "version": "1.3.4",
           "downloadUrl": "http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liboggz",
+          "version": "1.1.1",
+          "downloadUrl": "https://downloads.xiph.org/releases/liboggz/liboggz-1.1.1.tar.gz"
         }
       }
     },
