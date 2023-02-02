@@ -117,7 +117,7 @@ Requires:	rpm-mpi-hooks
 # Make sure this package is rebuilt with correct Python version when updating
 # Otherwise mpi.req from rpm-mpi-hooks doesn't work
 # https://bugzilla.redhat.com/show_bug.cgi?id=1705296
-Requires:	(python(abi) = %{python3_version} if python3)
+Requires:	python(abi) 
 
 
 %description devel
@@ -149,7 +149,7 @@ Contains development wrapper for compiling Java with openmpi.
 %package -n python%{python3_pkgversion}-openmpi
 Summary:        OpenMPI support for Python 3
 Requires:       %{name} = %{version}-%{release}
-Requires:       python(abi) = %{python3_version}
+Requires:       python(abi)
 
 %description -n python%{python3_pkgversion}-openmpi
 OpenMPI support for Python 3.
