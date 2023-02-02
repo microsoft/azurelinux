@@ -55,7 +55,7 @@ liboggz.
 %configure --disable-static
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
+%make_build
 
 
 %check
@@ -63,7 +63,7 @@ make %{?_smp_mflags}
 #make check
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf ${buildroot}
 %makeinstall docdir=$PWD/__docs_staging INSTALL="%{__install} -p"
 
 # remove unpackaged files from the buildroot
@@ -76,7 +76,7 @@ rm -rf __docs_staging/latex
 # independent of build time
 (cd include/oggz &&
     touch -r oggz_off_t_generated.h.in.multilib \
-      $RPM_BUILD_ROOT%{_includedir}/oggz/oggz_off_t_generated.h
+      %{buildroot}%{_includedir}/oggz/oggz_off_t_generated.h
 )
 
 
@@ -86,8 +86,6 @@ rm -rf __docs_staging/latex
 %files
 %license COPYING
 %doc AUTHORS ChangeLog README
-# 0 length NEWS file
-# %doc NEWS
 %{_libdir}/liboggz.so.*
 %{_mandir}/man1/*
 %{_bindir}/oggz*
