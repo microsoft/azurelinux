@@ -21393,6 +21393,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-enchant",
+          "version": "3.2.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyenchant/pyenchant-3.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-entrypoints",
           "version": "0.3",
           "downloadUrl": "https://github.com/takluyver/entrypoints/archive/0.3/entrypoints-0.3.tar.gz"
