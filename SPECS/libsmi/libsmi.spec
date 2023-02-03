@@ -79,10 +79,9 @@ make check ||:
 
 
 %files
-%license COPYING
+%license COPYING IETF-MIB-LICENSE.txt
 %doc ANNOUNCE ChangeLog README THANKS TODO
 %doc doc/draft-irtf-nmrg-sming-02.txt smi.conf-example
-%license IETF-MIB-LICENSE.txt
 %config(noreplace) %{_sysconfdir}/smi.conf
 %{_bindir}/*
 %{_libdir}/*.so.*
