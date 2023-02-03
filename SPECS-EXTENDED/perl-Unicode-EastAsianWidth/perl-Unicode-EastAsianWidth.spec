@@ -1,27 +1,26 @@
-Name:		perl-Unicode-EastAsianWidth
-Version:	12.0
-Release:	4%{?dist}
-Summary:	East Asian Width properties
-License:	CC0
+Summary:        East Asian Width properties
+Name:           perl-Unicode-EastAsianWidth
+Version:        12.0
+Release:        4%{?dist}
+License:        CC0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		https://metacpan.org/release/Unicode-EastAsianWidth
-Source0:	https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-%{version}.tar.gz#/perl-Unicode-EastAsianWidth-%{version}.tar.gz
-Patch0:		perl-Unicode-EastAsianWidth-no-inc.patch
-BuildArch:	noarch
-BuildRequires:	perl-generators
-BuildRequires:	perl(base)
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(ExtUtils::MakeMaker)
-BuildRequires:	perl(Test)
-BuildRequires:	perl(FindBin)
-BuildRequires:	perl(File::Remove)
-BuildRequires:	perl(Module::CoreList)
-BuildRequires:	perl(Module::Package)
-BuildRequires:	perl(Pod::Markdown)
-BuildRequires:	perl(Module::Package::Au)
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-
+URL:            https://metacpan.org/release/Unicode-EastAsianWidth
+Source0:        https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-%{version}.tar.gz#/perl-Unicode-EastAsianWidth-%{version}.tar.gz
+Patch0:         perl-Unicode-EastAsianWidth-no-inc.patch
+BuildRequires:  perl-generators
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(File::Remove)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::CoreList)
+BuildRequires:  perl(Module::Package)
+BuildRequires:  perl(Module::Package::Au)
+BuildRequires:  perl(Pod::Markdown)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(base)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildArch:      noarch
 # Don't "provide" private Perl libs
 %{?perl_default_filter}
 
