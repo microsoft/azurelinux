@@ -8,17 +8,16 @@
 %bcond_without perl_libnet_enables_sasl
 # SSL support
 %bcond_without perl_libnet_enables_ssl
-
+Summary:        Perl clients for various network protocols
 Name:           perl-libnet
 Version:        3.11
 Release:        443%{?dist}
-Summary:        Perl clients for various network protocols
 # other files:  GPL+ or Artistic
 ## Not in binary packages
 # repackage.sh: GPLv2+
 ## Removed from upstream sources:
 # lib/Net/libnetFAQ.pod:    Artistic    (CPAN RT#117888)
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/libnet
@@ -32,25 +31,28 @@ Source1:        libnetFAQ.pod
 Patch0:         libnet-3.09-Normalize-Changes-encoding.patch
 # Do not create Net/libnet.cfg, bug #1238689
 Patch1:         libnet-3.08-Do-not-create-Net-libnet.cfg.patch
-BuildArch:      noarch
+# Filter under-specified dependencies
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((IO::Socket|Socket)\\)$
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-# Getopt::Std not used because of Do-not-create-Net-libnet.cfg.patch
-# IO::File not used because of Do-not-create-Net-libnet.cfg.patch
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(constant)
+# MD5 not used because we prefer Digest::MD5
+# MIME::Base64 not used at tests
+# Tests:
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Cwd)
 # Convert::EBCDIC not used
 BuildRequires:  perl(Errno)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Fcntl)
+BuildRequires:  perl(File::Temp)
 # File::Basename not used at tests
 BuildRequires:  perl(FileHandle)
+BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IO::Socket) >= 1.05
 # Prefer IO::Socket::IP over IO::Socket::INET6 and IO::Socket::INET
@@ -59,7 +61,24 @@ BuildRequires:  perl(IO::Socket::IP) >= 0.25
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Socket) >= 2.016
 BuildRequires:  perl(Symbol)
+BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Time::Local)
+BuildRequires:  perl(constant)
+# Getopt::Std not used because of Do-not-create-Net-libnet.cfg.patch
+# IO::File not used because of Do-not-create-Net-libnet.cfg.patch
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Digest::MD5 or MD5
+Requires:       perl(Digest::MD5)
+Requires:       perl(File::Basename)
+Requires:       perl(IO::Socket) >= 1.05
+# Prefer IO::Socket::IP over IO::Socket::INET6 and IO::Socket::INET
+Requires:       perl(IO::Socket::IP) >= 0.25
+Requires:       perl(POSIX)
+Requires:       perl(Socket) >= 2.016
+Conflicts:      perl < 4:5.22.0-347
+BuildArch:      noarch
 # Optional run-time:
 # Authen::SASL not used at tests
 # Digest::MD5 not used at tests
@@ -67,14 +86,6 @@ BuildRequires:  perl(Time::Local)
 # Core modules must be built without non-core dependencies
 BuildRequires:  perl(IO::Socket::SSL) >= 2.007
 %endif
-# MD5 not used because we prefer Digest::MD5
-# MIME::Base64 not used at tests
-# Tests:
-BuildRequires:  perl(Config)
-BuildRequires:  perl(Cwd)
-BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(IO::File)
-BuildRequires:  perl(Test::More)
 %if %{with perl_libnet_enables_optional_test}
 # Optional tests:
 %if %{with perl_libnet_enables_ssl} && !%{defined perl_bootstrap}
@@ -86,28 +97,6 @@ BuildRequires:  perl(IO::Socket::SSL::Utils)
 # Test::Pod 1.00 not used
 # Test::Pod::Coverage 0.08 not used
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(File::Basename)
-Requires:       perl(IO::Socket) >= 1.05
-# Prefer IO::Socket::IP over IO::Socket::INET6 and IO::Socket::INET
-Requires:       perl(IO::Socket::IP) >= 0.25
-Requires:       perl(POSIX)
-Requires:       perl(Socket) >= 2.016
-# Optional run-time:
-# Core modules must be built without non-core dependencies
-%if %{with perl_libnet_enables_sasl} && !%{defined perl_bootstrap}
-Suggests:       perl(Authen::SASL)
-Suggests:       perl(MIME::Base64)
-%endif
-# Digest::MD5 or MD5
-Requires:       perl(Digest::MD5)
-%if %{with perl_libnet_enables_ssl} && !%{defined perl_bootstrap}
-Suggests:       perl(IO::Socket::SSL) >= 2.007
-%endif
-Conflicts:      perl < 4:5.22.0-347
-
-# Filter under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((IO::Socket|Socket)\\)$
 
 %description
 This is a collection of Perl modules which provides a simple and
@@ -126,8 +115,8 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 </dev/null
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
