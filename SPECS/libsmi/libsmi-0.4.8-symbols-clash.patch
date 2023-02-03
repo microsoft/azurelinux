@@ -1,0 +1,941 @@
+diff -up libsmi-0.4.8/lib/data.c.clash libsmi-0.4.8/lib/data.c
+--- libsmi-0.4.8/lib/data.c.clash	2012-10-24 18:07:24.251036502 +0200
++++ libsmi-0.4.8/lib/data.c	2012-10-24 18:14:14.709159698 +0200
+@@ -79,6 +79,7 @@ static Handle   *lastHandlePtr  = NULL;
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Handle *addHandle(const char *name)
+ {
+     Handle *handlePtr;
+@@ -113,7 +114,7 @@ Handle *addHandle(const char *name)
+  *
+  *----------------------------------------------------------------------
+  */
+-
++__attribute__ ((visibility ("internal")))
+ void removeHandle(Handle *handlePtr)
+ {
+     if (handlePtr->prevPtr) {
+@@ -150,6 +151,7 @@ void removeHandle(Handle *handlePtr)
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Handle *findHandleByName(const char *name)
+ {
+     Handle *handlePtr;
+@@ -186,7 +188,7 @@ Handle *findHandleByName(const char *nam
+  *
+  *----------------------------------------------------------------------
+  */
+-
++__attribute__ ((visibility ("internal")))
+ View *addView(const char *modulename)
+ {
+     View	      *viewPtr;
+@@ -221,6 +223,7 @@ View *addView(const char *modulename)
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ int isInView(const char *modulename)
+ {
+     View	      *viewPtr;
+@@ -257,6 +260,7 @@ int isInView(const char *modulename)
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Module *addModule(char *modulename, char *path, ModuleFlags flags,
+ 		  Parser *parserPtr)
+ {
+@@ -320,6 +324,7 @@ Module *addModule(char *modulename, char
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setModuleIdentityObject(Module *modulePtr, Object *objectPtr)
+ {
+     modulePtr->objectPtr = objectPtr;
+@@ -343,6 +348,7 @@ void setModuleIdentityObject(Module *mod
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setModuleLastUpdated(Module *modulePtr, time_t lastUpdated)
+ {
+     modulePtr->lastUpdated = lastUpdated;
+@@ -366,6 +372,7 @@ void setModuleLastUpdated(Module *module
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setModuleOrganization(Module *modulePtr, char *organization)
+ {
+     modulePtr->export.organization = organization;
+@@ -392,6 +399,7 @@ void setModuleOrganization(Module *modul
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setModuleContactInfo(Module *modulePtr, char *contactinfo)
+ {
+     modulePtr->export.contactinfo = contactinfo;
+@@ -415,6 +423,7 @@ void setModuleContactInfo(Module *module
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setModuleDescription(Module *modulePtr, char *description,
+ 			  Parser *parserPtr)
+ {
+@@ -446,6 +455,7 @@ void setModuleDescription(Module *module
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setModuleReference(Module *modulePtr, char *reference, Parser *parserPtr)
+ {
+     if (modulePtr->export.reference)
+@@ -477,6 +487,7 @@ void setModuleReference(Module *modulePt
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Module *findModuleByName(const char *modulename)
+ {
+     Module	*modulePtr;
+@@ -510,6 +521,7 @@ Module *findModuleByName(const char *mod
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Revision *addRevision(time_t date, char *description, Parser *parserPtr)
+ {
+     Revision	  *revisionPtr, *r;
+@@ -574,6 +586,7 @@ Revision *addRevision(time_t date, char
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setRevisionLine(Revision *revisionPtr, int line, Parser *parserPtr)
+ {
+     if (line) {
+@@ -603,6 +616,7 @@ void setRevisionLine(Revision *revisionP
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Import *addImport(char *name, Parser *parserPtr)
+ {
+     Import        *importPtr;
+@@ -649,6 +663,7 @@ Import *addImport(char *name, Parser *pa
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void addImportFlags(Import *importPtr, ImportFlags flags)
+ {
+     importPtr->flags |= flags;
+@@ -672,6 +687,7 @@ void addImportFlags(Import *importPtr, I
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setImportModulename(Import *importPtr, char *modulename)
+ {
+     if (importPtr->export.module) {
+@@ -700,6 +716,7 @@ void setImportModulename(Import *importP
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ int checkImports(Module *modulePtr, Parser *parserPtr)
+ {
+     int         n = 0;
+@@ -767,6 +784,7 @@ int checkImports(Module *modulePtr, Pars
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Import *findImportByName(const char *name, Module *modulePtr)
+ {
+     Import           *importPtr;
+@@ -806,6 +824,7 @@ Import *findImportByName(const char *nam
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Import *findImportByModulenameAndName(const char *modulename,
+ 				      const char *name, Module *modulePtr)
+ {
+@@ -843,6 +862,7 @@ Import *findImportByModulenameAndName(co
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *addObject(char *objectname, Node *parentNodePtr, SmiSubid subid,
+ 		  ObjectFlags flags, Parser *parserPtr)
+ {
+@@ -940,6 +960,7 @@ Object *addObject(char *objectname, Node
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *duplicateObject(Object *templatePtr, ObjectFlags flags,
+ 			Parser *parserPtr)
+ {
+@@ -1020,6 +1041,7 @@ Object *duplicateObject(Object *template
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *addNode (Node *parentNodePtr, SmiSubid subid, NodeFlags flags,
+ 	       Parser *parserPtr)
+ {
+@@ -1097,6 +1119,7 @@ Node *addNode (Node *parentNodePtr, SmiS
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *createNodes(unsigned int oidlen, SmiSubid *oid)
+ {
+     Node	 *parentNodePtr, *nodePtr;
+@@ -1134,6 +1157,7 @@ Node *createNodes(unsigned int oidlen, S
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *createNodesByOidString(const char *oid)
+ {
+     char		*p, *elements;
+@@ -1176,6 +1200,7 @@ Node *createNodesByOidString(const char
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *getParentNode(Node *nodePtr)
+ {
+     return nodePtr->parentPtr;
+@@ -1200,6 +1225,7 @@ Node *getParentNode(Node *nodePtr)
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ static void mergeNodeTrees(Node *toNodePtr, Node *fromNodePtr,
+ 			   Parser *parserPtr)
+ {
+@@ -1300,6 +1326,7 @@ static void mergeNodeTrees(Node *toNodeP
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *setObjectName(Object *objectPtr, char *name, Parser *parserPtr)
+ {
+     Node	      *nodePtr, *nextPtr;
+@@ -1400,6 +1427,7 @@ Object *setObjectName(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectType(Object *objectPtr, Type *typePtr)
+ {
+     objectPtr->typePtr = typePtr;
+@@ -1423,6 +1451,7 @@ void setObjectType(Object *objectPtr, Ty
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectAccess(Object *objectPtr, SmiAccess access)
+ {
+     objectPtr->export.access = access;
+@@ -1446,6 +1475,7 @@ void setObjectAccess(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectStatus(Object *objectPtr, SmiStatus status)
+ {
+     objectPtr->export.status = status;
+@@ -1469,6 +1499,7 @@ void setObjectStatus(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectDescription(Object *objectPtr, char *description,
+ 			  Parser *parserPtr)
+ {
+@@ -1500,6 +1531,7 @@ void setObjectDescription(Object *object
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectReference(Object *objectPtr, char *reference, Parser *parserPtr)
+ {
+     if (objectPtr->export.reference)
+@@ -1529,6 +1561,7 @@ void setObjectReference(Object *objectPt
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectFormat(Object *objectPtr, char *format)
+ {
+     if (objectPtr->export.format) smiFree(objectPtr->export.format);
+@@ -1553,6 +1586,7 @@ void setObjectFormat(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectUnits(Object *objectPtr, char *units)
+ {
+     if (objectPtr->export.units) smiFree(objectPtr->export.units);
+@@ -1577,6 +1611,7 @@ void setObjectUnits(Object *objectPtr, c
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectDecl(Object *objectPtr, SmiDecl decl)
+ {
+     objectPtr->export.decl = decl;
+@@ -1600,6 +1635,7 @@ void setObjectDecl(Object *objectPtr, Sm
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectLine(Object *objectPtr, int line, Parser *parserPtr)
+ {
+     if (line) {
+@@ -1627,6 +1663,7 @@ void setObjectLine(Object *objectPtr, in
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectNodekind(Object *objectPtr, SmiNodekind nodekind)
+ {
+     objectPtr->export.nodekind = nodekind;
+@@ -1650,6 +1687,7 @@ void setObjectNodekind(Object *objectPtr
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void addObjectFlags(Object *objectPtr, ObjectFlags flags)
+ {
+     objectPtr->flags |= flags;
+@@ -1673,6 +1711,7 @@ void addObjectFlags(Object *objectPtr, O
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void deleteObjectFlags(Object *objectPtr, ObjectFlags flags)
+ {
+     objectPtr->flags &= ~flags;
+@@ -1696,6 +1735,7 @@ void deleteObjectFlags(Object *objectPtr
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ int checkObjectFlags(Object *objectPtr, ObjectFlags flags)
+ {
+     return ((objectPtr->flags & flags) == flags);
+@@ -1746,6 +1786,7 @@ void setObjectIndex(Object *objectPtr, I
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectList(Object *objectPtr, List *listPtr)
+ {
+     objectPtr->listPtr = listPtr;
+@@ -1769,6 +1810,7 @@ void setObjectList(Object *objectPtr, Li
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectRelated(Object *objectPtr, Object *relatedPtr)
+ {
+     objectPtr->relatedPtr = relatedPtr;
+@@ -1792,6 +1834,7 @@ void setObjectRelated(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectImplied(Object *objectPtr, int implied)
+ {
+     objectPtr->export.implied = implied;
+@@ -1815,6 +1858,7 @@ void setObjectImplied(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectCreate(Object *objectPtr, int create)
+ {
+     objectPtr->export.create = create;
+@@ -1838,6 +1882,7 @@ void setObjectCreate(Object *objectPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectIndexkind(Object *objectPtr, SmiIndexkind indexkind)
+ {
+     objectPtr->export.indexkind = indexkind;
+@@ -1861,6 +1906,7 @@ void setObjectIndexkind(Object *objectPt
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectValue(Object *objectPtr, SmiValue *valuePtr)
+ {
+     objectPtr->export.value = *valuePtr;
+@@ -1885,6 +1931,7 @@ void setObjectValue(Object *objectPtr, S
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setObjectUniqueness(Object *objectPtr, List *listPtr)
+ {
+     objectPtr->uniquenessPtr = listPtr;
+@@ -1932,6 +1979,7 @@ void setObjectUniqueness(Object *objectP
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *findNodeByParentAndSubid(Node *parentNodePtr, SmiSubid subid)
+ {
+     Node *nodePtr;
+@@ -1968,6 +2016,7 @@ Node *findNodeByParentAndSubid(Node *par
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *findNodeByOid(unsigned int oidlen, SmiSubid *oid)
+ {
+     Node          *nodePtr;
+@@ -2000,6 +2049,7 @@ Node *findNodeByOid(unsigned int oidlen,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Node *findNodeByOidString(char *oid)
+ {
+     Node *nodePtr;
+@@ -2037,6 +2087,7 @@ Node *findNodeByOidString(char *oid)
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findObjectByNode(Node *nodePtr)
+ {
+     Object    *objectPtr;
+@@ -2079,6 +2130,7 @@ Object *findObjectByNode(Node *nodePtr)
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findObjectByModuleAndNode(Module *modulePtr, Node *nodePtr)
+ {
+     Object    *objectPtr;
+@@ -2114,6 +2166,7 @@ Object *findObjectByModuleAndNode(Module
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findObjectByModulenameAndNode(const char *modulename, Node *nodePtr)
+ {
+     Object     *objectPtr;
+@@ -2149,6 +2202,7 @@ Object *findObjectByModulenameAndNode(co
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findObjectByName(const char *objectname)
+ {
+     Module	     *modulePtr;
+@@ -2193,6 +2247,7 @@ Object *findObjectByName(const char *obj
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findNextObjectByName(const char *objectname, Object *prevObjectPtr)
+ {
+     Module	     *modulePtr;
+@@ -2236,6 +2291,7 @@ Object *findNextObjectByName(const char
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findObjectByModulenameAndName(const char *modulename,
+ 				      const char *objectname)
+ {
+@@ -2285,6 +2341,7 @@ Object *findObjectByModulenameAndName(co
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Object *findObjectByModuleAndName(Module *modulePtr, const char *objectname)
+ {
+     Object	  *objectPtr;
+@@ -2334,6 +2391,7 @@ Object *findObjectByModuleAndName(Module
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type *addType(char *type_name, SmiBasetype basetype, TypeFlags flags,
+ 	      Parser *parserPtr)
+ {
+@@ -2395,6 +2453,7 @@ Type *addType(char *type_name, SmiBasety
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type *duplicateType(Type *templatePtr, TypeFlags flags, Parser *parserPtr)
+ {
+     Type		  *typePtr;
+@@ -2451,6 +2510,7 @@ Type *duplicateType(Type *templatePtr, T
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type *setTypeName(Type *typePtr, char *name)
+ {
+     Type              *type2Ptr;
+@@ -2543,6 +2603,7 @@ Type *setTypeName(Type *typePtr, char *n
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeParent(Type *typePtr, Type *parentPtr)
+ {
+     typePtr->parentPtr = parentPtr;
+@@ -2566,6 +2627,7 @@ void setTypeParent(Type *typePtr, Type *
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeStatus(Type *typePtr, SmiStatus status)
+ {
+     typePtr->export.status = status;
+@@ -2589,6 +2651,7 @@ void setTypeStatus(Type *typePtr, SmiSta
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeBasetype(Type *typePtr, SmiBasetype basetype)
+ {
+     typePtr->export.basetype = basetype;
+@@ -2612,6 +2675,7 @@ void setTypeBasetype(Type *typePtr, SmiB
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeDescription(Type *typePtr, char *description, Parser *parserPtr)
+ {
+     if (typePtr->export.description)
+@@ -2642,6 +2706,7 @@ void setTypeDescription(Type *typePtr, c
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeReference(Type *typePtr, char *reference, Parser *parserPtr)
+ {
+     if (typePtr->export.reference)
+@@ -2676,6 +2741,7 @@ void setTypeReference(Type *typePtr, cha
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeList(Type *typePtr, List *listPtr)
+ {
+     if (!typePtr->listPtr) {
+@@ -2701,6 +2767,7 @@ void setTypeList(Type *typePtr, List *li
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeFormat(Type *typePtr, char *format)
+ {
+     if (typePtr->export.format) smiFree(typePtr->export.format);
+@@ -2726,6 +2793,7 @@ void setTypeFormat(Type *typePtr, char *
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeUnits(Type *typePtr, char *units)
+ {
+     if (typePtr->export.units) smiFree(typePtr->export.units);
+@@ -2750,6 +2818,7 @@ void setTypeUnits(Type *typePtr, char *u
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeDecl(Type *typePtr, SmiDecl decl)
+ {
+     typePtr->export.decl = decl;
+@@ -2773,6 +2842,7 @@ void setTypeDecl(Type *typePtr, SmiDecl
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeLine(Type *typePtr, int line, Parser *parserPtr)
+ {
+     if (line) {
+@@ -2800,6 +2870,7 @@ void setTypeLine(Type *typePtr, int line
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setTypeValue(Type *typePtr, SmiValue *valuePtr)
+ {
+     typePtr->export.value = *valuePtr;
+@@ -2823,6 +2894,7 @@ void setTypeValue(Type *typePtr, SmiValu
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void addTypeFlags(Type *typePtr, TypeFlags flags)
+ {
+     typePtr->flags |= flags;
+@@ -2846,6 +2918,7 @@ void addTypeFlags(Type *typePtr, TypeFla
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void deleteTypeFlags(Type *typePtr, TypeFlags flags)
+ {
+     typePtr->flags &= ~flags;
+@@ -2870,6 +2943,7 @@ void deleteTypeFlags(Type *typePtr, Type
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type * findTypeByName(const char *type_name)
+ {
+     Module *modulePtr;
+@@ -2908,6 +2982,7 @@ Type * findTypeByName(const char *type_n
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type *findNextTypeByName(const char *type_name, Type *prevTypePtr)
+ {
+     Module *modulePtr;
+@@ -2946,6 +3021,7 @@ Type *findNextTypeByName(const char *typ
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type *findTypeByModulenameAndName(const char *modulename,
+ 				  const char *type_name)
+ {
+@@ -2985,6 +3061,7 @@ Type *findTypeByModulenameAndName(const
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Type *findTypeByModuleAndName(Module *modulePtr, const char *type_name)
+ {
+     Type        *typePtr;
+@@ -3017,6 +3094,7 @@ Type *findTypeByModuleAndName(Module *mo
+  *
+  *---------------------------------------------------------------------- */
+ 
++__attribute__ ((visibility ("internal")))
+ NamedNumber *findTypeNamedNumber(Type *typePtr,
+ 				 SmiInteger32 number)
+ {
+@@ -3050,6 +3128,7 @@ NamedNumber *findTypeNamedNumber(Type *t
+  *
+  *---------------------------------------------------------------------- */
+ 
++__attribute__ ((visibility ("internal")))
+ Identity *addIdentity(char *identityname, Parser *parserPtr)
+ {
+ 	Identity  *identityPtr;
+@@ -3096,6 +3175,7 @@ Identity *addIdentity(char *identityname
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setIdentityDecl(Identity *identityPtr, SmiDecl decl)
+ {
+     identityPtr->export.decl = decl;
+@@ -3117,6 +3197,7 @@ void setIdentityDecl(Identity *identityP
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setIdentityStatus(Identity *identityPtr, SmiStatus status)
+ {
+     identityPtr->export.status = status;
+@@ -3140,6 +3221,7 @@ void setIdentityStatus(Identity *identit
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setIdentityDescription(Identity *identityPtr, char *description, Parser *parserPtr)
+ {
+     if (identityPtr->export.description) smiFree(identityPtr->export.description);
+@@ -3169,6 +3251,7 @@ void setIdentityDescription(Identity *id
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setIdentityReference(Identity *identityPtr, char *reference, Parser *parserPtr)
+ {
+     if (identityPtr->export.reference)
+@@ -3197,6 +3280,7 @@ void setIdentityReference(Identity *iden
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setIdentityParent(Identity *identityPtr, Identity *parentPtr)
+ {
+     if(identityPtr) identityPtr->parentPtr = parentPtr;
+@@ -3220,6 +3304,7 @@ void setIdentityParent(Identity *identit
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Identity *findIdentityByName(const char *identityname)
+ {
+     Module *modulePtr;
+@@ -3256,6 +3341,7 @@ Identity *findIdentityByName(const char
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Identity *findIdentityByModuleAndName(Module *modulePtr,
+ 									const char *identityname)
+ {
+@@ -3291,6 +3377,7 @@ Identity *findIdentityByModuleAndName(Mo
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Identity *findIdentityByModulenameAndName(const char *modulename,
+ 				  const char *identity_name)
+ {
+@@ -3329,6 +3416,7 @@ Identity *findIdentityByModulenameAndNam
+  *
+  *---------------------------------------------------------------------- */
+ 
++__attribute__ ((visibility ("internal")))
+ Class *addClass(char *classname, Parser *parserPtr)
+ {
+ 	Class  *classPtr;
+@@ -3380,6 +3468,7 @@ Class *addClass(char *classname, Parser
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setClassDecl(Class *classPtr, SmiDecl decl)
+ {
+     classPtr->export.decl = decl;
+@@ -3401,6 +3490,7 @@ void setClassDecl(Class *classPtr, SmiDe
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setClassStatus(Class *classPtr, SmiStatus status)
+ {
+     classPtr->export.status = status;
+@@ -3424,6 +3514,7 @@ void setClassStatus(Class *classPtr, Smi
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setClassDescription(Class *classPtr, char *description, Parser *parserPtr)
+ {
+     if (classPtr->export.description) smiFree(classPtr->export.description);
+@@ -3453,6 +3544,7 @@ void setClassDescription(Class *classPtr
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setClassReference(Class *classPtr, char *reference, Parser *parserPtr)
+ {
+     if (classPtr->export.reference)
+@@ -3481,6 +3573,7 @@ void setClassReference(Class *classPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setClassParent(Class *classPtr, Class *parentPtr)
+ {
+     if(classPtr) classPtr->parentPtr = parentPtr;
+@@ -3502,6 +3595,7 @@ void setClassParent(Class *classPtr, Cla
+  *
+  *----------------------------------------------------------------------
+  */
++__attribute__ ((visibility ("internal")))
+ Class *findClassByModuleAndName(Module *modulePtr,char *name)
+ {
+     Class   *classPtr;
+@@ -3534,6 +3628,7 @@ Class *findClassByModuleAndName(Module *
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Class *findClassByModulenameAndName(const char *modulename,
+ 				  const char *class_name)
+ {
+@@ -3572,6 +3667,7 @@ Class *findClassByModulenameAndName(cons
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Attribute *duplicateTypeToAttribute(Type *templatePtr, Class *classPtr, Parser *parserPtr)
+ {
+     Attribute		  *attributePtr;
+@@ -3626,6 +3722,7 @@ Attribute *duplicateTypeToAttribute(Type
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Attribute *addAttribute(char *attribute_name,
+ 	      Class *classPtr, Parser *parserPtr)
+ {
+@@ -3680,6 +3777,7 @@ Attribute *addAttribute(char *attribute_
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setAttributeDecl(Attribute *attributePtr, SmiDecl decl)
+ {
+     attributePtr->export.decl = decl;
+@@ -3701,6 +3799,7 @@ void setAttributeDecl(Attribute *attribu
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setAttributeParentType(Attribute *attributePtr, Type *parentPtr)
+ {
+     attributePtr->parentTypePtr = parentPtr;
+@@ -3722,6 +3821,7 @@ void setAttributeParentType(Attribute *a
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setAttributeParentClass(Attribute *attributePtr, Class *parentPtr)
+ {
+     attributePtr->parentClassPtr = parentPtr;
+@@ -3746,6 +3846,7 @@ void setAttributeParentClass(Attribute *
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setAttributeList(Attribute *attributePtr, List *listPtr)
+ {
+     if (!attributePtr->listPtr) {
+@@ -3769,6 +3870,7 @@ void setAttributeList(Attribute *attribu
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setAttributeName(Attribute *attributePtr, char *name)
+ {
+     
+@@ -3790,6 +3892,7 @@ void setAttributeName(Attribute *attribu
+  *
+  *----------------------------------------------------------------------
+  */
++__attribute__ ((visibility ("internal")))
+ void setAttributeAccess(Attribute *attributePtr,SmiAccess access)
+ {
+ 	attributePtr->export.access = access;
+@@ -3812,6 +3915,7 @@ void setAttributeAccess(Attribute *attri
+  *
+  *----------------------------------------------------------------------
+  */
++__attribute__ ((visibility ("internal")))
+ Event *addEvent(char *eventname, Class *classPtr, 
+ 		             Parser *parserPtr)
+ {
+@@ -3861,6 +3965,7 @@ Event *addEvent(char *eventname, Class *
+  *
+  *---------------------------------------------------------------------- */
+ 
++__attribute__ ((visibility ("internal")))
+ Macro *addMacro(char *macroname, MacroFlags flags, Parser *parserPtr)
+ {
+     Macro	  *macroPtr;
+@@ -3910,6 +4015,7 @@ Macro *addMacro(char *macroname, MacroFl
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setMacroStatus(Macro *macroPtr, SmiStatus status)
+ {
+     macroPtr->export.status = status;
+@@ -3933,6 +4039,7 @@ void setMacroStatus(Macro *macroPtr, Smi
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setMacroDescription(Macro *macroPtr, char *description, Parser *parserPtr)
+ {
+     if (macroPtr->export.description) smiFree(macroPtr->export.description);
+@@ -3962,6 +4069,7 @@ void setMacroDescription(Macro *macroPtr
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setMacroReference(Macro *macroPtr, char *reference, Parser *parserPtr)
+ {
+     if (macroPtr->export.reference)
+@@ -3990,6 +4098,7 @@ void setMacroReference(Macro *macroPtr,
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setMacroAbnf(Macro *macroPtr, char *abnf, Parser *parserPtr)
+ {
+     if (macroPtr->export.abnf)
+@@ -4020,6 +4129,7 @@ void setMacroAbnf(Macro *macroPtr, char
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setMacroDecl(Macro *macroPtr, SmiDecl decl)
+ {
+     macroPtr->export.decl = decl;
+@@ -4043,6 +4153,7 @@ void setMacroDecl(Macro *macroPtr, SmiDe
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ void setMacroLine(Macro *macroPtr, int line, Parser *parserPtr)
+ {
+     if (line) {
+@@ -4071,6 +4182,7 @@ void setMacroLine(Macro *macroPtr, int l
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Macro *findMacroByName(const char *macroname)
+ {
+     Module *modulePtr;
+@@ -4109,6 +4221,7 @@ Macro *findMacroByName(const char *macro
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Macro *findMacroByModuleAndName(Module *modulePtr, const char *macroname)
+ {
+     Macro      *macroPtr;
+@@ -4144,6 +4257,7 @@ Macro *findMacroByModuleAndName(Module *
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ NamedNumber *findNamedNumberByName(Type *typePtr,const char *name)
+ {
+ 	List *listPtr;
+@@ -4580,6 +4694,7 @@ void smiFreeData()
+  *----------------------------------------------------------------------
+  */
+ 
++__attribute__ ((visibility ("internal")))
+ Module *loadModule(const char *modulename, Parser *parserPtr)
+ {
+     Parser	    parser;
