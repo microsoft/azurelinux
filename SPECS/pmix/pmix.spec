@@ -111,7 +111,6 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/*.conf
 %{_datadir}/%{name}/*.txt
-%{_libdir}/libmca_common_dstore.so.1*
 %{_libdir}/libpmix.so.2*
 %{_libdir}/%{name}/*.so
 %{_mandir}/man1/*.1*
