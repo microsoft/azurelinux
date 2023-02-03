@@ -118,8 +118,8 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %files devel
 %{_datadir}/%{name}/*.supp
 %{_includedir}/pmix*.h
-%{_libdir}/libmca_common_dstore.so
 %{_libdir}/libpmix.so
+%{_libdir}/pkgconfig/*.pc
 
 %files pmi
 %{_libdir}/libpmi.so.1*
