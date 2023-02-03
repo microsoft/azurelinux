@@ -3,11 +3,11 @@
 # Support output to PDF
 %{bcond_with perl_Module_Install_ReadmeFromPod_enables_pdf}
 
+Summary:        Module::Install extension to automatically convert POD to a README
 Name:           perl-Module-Install-ReadmeFromPod
 Version:        0.30
 Release:        13%{?dist}
-Summary:        Module::Install extension to automatically convert POD to a README
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Install-ReadmeFromPod
@@ -19,19 +19,19 @@ Patch1:         Module-Install-ReadmeFromPod-0.30-Do-not-test-PDF-file-for-new-l
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
-BuildRequires:  perl(inc::Module::Install)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(FindBin)
 BuildRequires:  perl(File::Remove)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Module::CoreList)
-BuildRequires:  perl(Module::Install::AutoLicense)
 BuildRequires:  perl(Module::Install::AuthorRequires) >= 0.02
+BuildRequires:  perl(Module::Install::AutoLicense)
 BuildRequires:  perl(Module::Install::GithubMeta)
 BuildRequires:  perl(Module::Install::Metadata)
+BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(lib)
 BuildRequires:  perl(strict)
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  sed
 # Build script uses lib/Module/Install/ReadmeFromPod.pm
 # Run-time:
