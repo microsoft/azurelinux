@@ -1,13 +1,13 @@
+Summary:        Perl module for interfacing to GNOME's libxslt
+Name:           perl-XML-LibXSLT
+# NOTE: also update perl-XML-LibXML to a compatible version.  See below why.
+Version:        1.99
+Release:        4%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:       perl-XML-LibXSLT
-# NOTE: also update perl-XML-LibXML to a compatible version.  See below why.
-Version:    1.99
-Release:    4%{?dist}
-Summary:    Perl module for interfacing to GNOME's libxslt
-License:    GPL+ or Artistic
-URL:        https://metacpan.org/release/XML-LibXSLT
-Source0:    https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{version}.tar.gz#/perl-XML-LibXSLT-%{version}.tar.gz
+URL:            https://metacpan.org/release/XML-LibXSLT
+Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{version}.tar.gz#/perl-XML-LibXSLT-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -15,6 +15,7 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  pkgconfig
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Cwd)
@@ -26,25 +27,20 @@ BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Socket::INET)
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
-BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(libxslt) >= 1.1.28
-Requires:   perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-# the package shares code with perl-XML-LibXML, we have to require a compatible version
-# see https://bugzilla.redhat.com/show_bug.cgi?id=469480
-# for testing is needed the same version of XML::LibXML
-# BUT XML::LibXML has new bugfix releases, but XML::LibXSLT not
+BuildRequires:  perl(XML::LibXML) >= %{version}
 BuildRequires:  perl(XML::LibXML::Boolean)
 BuildRequires:  perl(XML::LibXML::Literal)
 BuildRequires:  perl(XML::LibXML::NodeList)
 BuildRequires:  perl(XML::LibXML::Number)
-BuildRequires:  perl(XML::LibXML) >= %{version}
-Requires:   perl(XML::LibXML) >= %{version}
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+BuildRequires:  pkgconfig(libxslt) >= 1.1.28
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(XML::LibXML) >= %{version}
 
 %description
 This module is a fast XSLT library, based on the Gnome libxslt engine
@@ -57,10 +53,10 @@ that you can find at http://www.xmlsoft.org/XSLT/
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}" NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
