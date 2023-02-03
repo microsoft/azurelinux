@@ -1,58 +1,56 @@
+# Filter example dependencies
+%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_docdir}
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_docdir}
+
 # Run optional tests
 %if ! (0%{?rhel})
 %bcond_without perl_Test_Harness_enables_optional_test
 %else
 %bcond_with perl_Test_Harness_enables_optional_test
 %endif
-
+Summary:        Run Perl standard test scripts with statistics
 Name:           perl-Test-Harness
 Version:        3.42
 Release:        444%{?dist}
-Summary:        Run Perl standard test scripts with statistics
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Harness
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/perl-Test-Harness-%{version}.tar.gz
 # Remove hard-coded shell bangs
 Patch0:         Test-Harness-3.38-Remove-shell-bangs.patch
-BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-# Run-time:
-BuildRequires:  perl(base)
 BuildRequires:  perl(Benchmark)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(constant)
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(POSIX)
-BuildRequires:  perl(Text::ParseWords)
-# Optional run-time:
-BuildRequires:  perl(Encode)
-# Keep Pod::Usage 1.12 really optional
-BuildRequires:  perl(Term::ANSIColor)
-BuildRequires:  perl(Time::HiRes)
-# Tests:
-BuildRequires:  perl(Data::Dumper)
-# Dev::Null bundled for bootstrap
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(IO::File)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Symbol)
+BuildRequires:  perl(Term::ANSIColor)
 BuildRequires:  perl(Test::More)
-# Optional tests:
+BuildRequires:  perl(Text::ParseWords)
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(base)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildArch:      noarch
 %if %{with perl_Test_Harness_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta::YAML)
 BuildRequires:  perl(File::Temp)
@@ -62,13 +60,6 @@ BuildRequires:  perl(TAP::Harness::Archive)
 BuildRequires:  perl(YAML)
 %endif
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Suggests:       perl(Term::ANSIColor)
-Suggests:       perl(Time::HiRes)
-
-# Filter example dependencies
-%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_datadir}/doc
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_datadir}/doc
 
 %description
 This package allows tests to be run and results automatically aggregated and
@@ -88,8 +79,8 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
