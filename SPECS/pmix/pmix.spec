@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           pmix
-Version:        3.1.5
-Release:        2%{?dist}
+Version:        4.1.2
+Release:        1%{?dist}
 Summary:        Process Management Interface Exascale (PMIx)
 License:        BSD
 URL:            https://pmix.org/
@@ -114,6 +114,7 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %{_libdir}/libmca_common_dstore.so.1*
 %{_libdir}/libpmix.so.2*
 %{_libdir}/%{name}/*.so
+%{_mandir}/man1/*.1*
 
 %files devel
 %{_datadir}/%{name}/*.supp
@@ -134,6 +135,11 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %{_bindir}/*
 
 %changelog
+* Thu Feb 02 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.2-1
+- Move from Extended to core
+- Update to 4.1.2
+- License verified
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.1.5-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add build requirement perl-File-Find.
