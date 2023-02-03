@@ -2519,7 +2519,6 @@
                 "cronie",
                 "curl",
                 "cyrus-sasl",
-                "cyrus-sasl-ldap",
                 "dbus",
                 "dbus-glib",
                 "dejagnu",
