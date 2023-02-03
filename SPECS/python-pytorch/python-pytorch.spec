@@ -94,8 +94,8 @@ mv %{buildroot}/doclist.lst .
 %{_docdir}/*
 
 %changelog
-* Thu Feb 2 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.13.1-1
-- Initial CBL-Mariner import from openEuler (licensed under PyTorch)
+* Thu Feb 02 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.13.1-1
+- Initial CBL-Mariner import from OpenEuler
 - License verified
 - Upgrade version to 1.13.1
 
