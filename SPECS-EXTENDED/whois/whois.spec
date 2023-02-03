@@ -1,3 +1,7 @@
+%global alternative md
+%global cfgfile %{name}.conf
+%global genname whois
+
 Summary:        Improved WHOIS client
 Name:           whois
 Version:        5.5.15
@@ -7,9 +11,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.linux.it/~md/software/
 Source0:        http://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
-%global genname whois
-%global alternative md
-%global cfgfile %{name}.conf
 BuildRequires:  coreutils
 BuildRequires:  gcc
 BuildRequires:  gettext
