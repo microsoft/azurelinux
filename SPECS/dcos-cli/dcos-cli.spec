@@ -1,7 +1,7 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,9 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.0-6
+- Bump release to rebuild with go 1.19.5
+
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.0-5
 - Bump release to rebuild with go 1.19.4
 
