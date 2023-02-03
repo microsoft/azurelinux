@@ -3,65 +3,61 @@
 %else
 %bcond_with perl_Test_Simple_enables_optional_test
 %endif
-
-Name:           perl-Test-Simple
 Summary:        Basic utilities for writing tests
+Name:           perl-Test-Simple
 Version:        1.302174
 Release:        4%{?dist}
-# CC0: lib/ok.pm
-# Public Domain: lib/Test/Tutorial.pod
-# GPL+ or Artistic: the rest of the distribution
-License:        (GPL+ or Artistic) and CC0 and Public Domain
+License:        (GPL+ OR Artistic) AND CC0 AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Simple
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-%{version}.tar.gz#/perl-Test-Simple-%{version}.tar.gz
-BuildArch:      noarch
-# Module Build
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-# Module Runtime
-BuildRequires:  perl(base)
+BuildRequires:  perl(CPAN::Meta)
+BuildRequires:  perl(CPAN::Meta::Requirements) >= 2.120920
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
+BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(IO::Pipe)
+BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(JSON::PP)
 BuildRequires:  perl(List::Util)
-# mro used since Perl 5.010
-BuildRequires:  perl(mro)
-BuildRequires:  perl(overload)
-BuildRequires:  perl(PerlIO) >= 1.02
+BuildRequires:  perl(Module::Metadata)
 BuildRequires:  perl(POSIX)
+BuildRequires:  perl(PerlIO) >= 1.02
 BuildRequires:  perl(Scalar::Util) >= 1.13
 BuildRequires:  perl(Storable)
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Term::ANSIColor)
+BuildRequires:  perl(Test::Harness) >= 2.03
+BuildRequires:  perl(base)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(mro)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(threads)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Data::Dumper)
+Requires:       perl(JSON::PP)
+Requires:       perl(Term::ANSIColor)
+Requires:       perl(mro)
+BuildArch:      noarch
+%{?perl_default_filter}
 %if !%{defined perl_bootstrap}
 BuildRequires:  perl(Term::Table)
 %endif
-BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
-# Test Suite
-BuildRequires:  perl(Cwd)
-BuildRequires:  perl(File::Basename)
-BuildRequires:  perl(IO::Pipe)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(threads)
-# Optional Tests
-BuildRequires:  perl(CPAN::Meta)
-BuildRequires:  perl(CPAN::Meta::Requirements) >= 2.120920
-BuildRequires:  perl(IPC::Open3)
-BuildRequires:  perl(Module::Metadata)
-BuildRequires:  perl(POSIX)
-BuildRequires:  perl(Test::Harness) >= 2.03
 %if !%{defined perl_bootstrap}
 %if %{with perl_Test_Simple_enables_optional_test}
 BuildRequires:  perl(Test::Class)
@@ -69,18 +65,9 @@ BuildRequires:  perl(Test::Pod) >= 0.95
 BuildRequires:  perl(Test::Script)
 %endif
 %endif
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Data::Dumper)
-Requires:       perl(JSON::PP)
-# mro used since Perl 5.010
-Requires:       perl(mro)
-Requires:       perl(Term::ANSIColor)
 %if !%{defined perl_bootstrap}
 Requires:       perl(Term::Table)
 %endif
-
-%{?perl_default_filter}
 
 %description
 This package provides the bulk of the core testing facilities. For more
@@ -93,10 +80,10 @@ This package is the CPAN component of the dual-lifed core package Test-Simple.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} -c %{buildroot}
 
 %check
