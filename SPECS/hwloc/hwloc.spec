@@ -125,8 +125,10 @@ LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 %ldconfig_scriptlets libs
 
 %files
+%{_datadir}/bash-completion/completions/*
 %{_bindir}/%{name}*
 %{_bindir}/lstopo-no-graphics
+%{_datadir}/hwloc/hwloc-ps.www/
 %{_mandir}/man1/%{name}*
 %{_mandir}/man1/lstopo-no-graphics*
 %ifarch %{ix86} x86_64
