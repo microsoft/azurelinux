@@ -1,32 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Programmable DNS resolver class for offline emulation of DNS
 Name:           perl-Net-DNS-Resolver-Programmable
 Version:        0.009
 Release:        10%{?dist}
-Summary:        Programmable DNS resolver class for offline emulation of DNS
-License:        GPLv2+ or Artistic
+License:        GPLv2+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Net-DNS-Resolver-Programmable
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BIGPRESH/Net-DNS-Resolver-Programmable-%{version}.tar.gz#/perl-Net-DNS-Resolver-Programmable-%{version}.tar.gz
-BuildArch:      noarch
-# Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-generators
 BuildRequires:  perl%{?fedora:-interpreter}
+BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
-# Module Runtime
-BuildRequires:  perl(base)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Net::DNS) >= 0.69
 BuildRequires:  perl(Net::DNS::Packet)
 BuildRequires:  perl(Net::DNS::Resolver)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(base)
+BuildRequires:  perl(constant)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-# Test Suite
-BuildRequires:  perl(Test::More)
-# Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildArch:      noarch
 
 %description
 Net::DNS::Resolver::Programmable is a Net::DNS::Resolver descendant class
