@@ -11,7 +11,7 @@ Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        smi.conf
 Source2:        IETF-MIB-LICENSE.txt
 Patch0:         libsmi-0.4.8-wget111.patch
-Patch1:         libsmi-0.4.8-CVE-2010-2891.patch
+Patch1:         CVE-2010-2891.patch
 Patch2:         libsmi-0.4.8-symbols-clash.patch
 Patch3:         libsmi-0.4.8-format-security-fix.patch
 BuildRequires:  bison
@@ -56,14 +56,14 @@ cp %{SOURCE2} .
     --enable-sming \
     --enable-shared \
     --disable-static
-make LIBTOOL=%{_bindir}/libtool %{?_smp_mflags}
+%make_build LIBTOOL=%{_bindir}/libtool
 
 iconv -f latin1 -t utf-8 <COPYING >COPYING.utf8
 mv COPYING.utf8 COPYING
 
 %install
 
-make install DESTDIR=%{buildroot}
+%make_install
 
 install -d -m 755 %{buildroot}%{_sysconfdir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/smi.conf
