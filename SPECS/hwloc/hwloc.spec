@@ -1,7 +1,7 @@
 Summary:   Portable Hardware Locality - portable abstraction of hierarchical architectures
 Name:      hwloc
-Version:   2.0.4
-Release:   5%{?dist}
+Version:   2.5.0
+Release:   1%{?dist}
 License:   BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -159,6 +159,11 @@ LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 %{_libdir}/%{name}/hwloc*
 
 %changelog
+* Thu Feb 02 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.5.0-1
+- Move from Extended to core
+- Update to 2.5.0
+- License verified
+
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.4-5
 - Use pkgconfig(cairo) instead of cairo-devel build requirement
 
