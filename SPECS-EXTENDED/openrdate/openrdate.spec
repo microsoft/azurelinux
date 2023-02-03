@@ -20,8 +20,7 @@ Good-old date- and time-setting rdate software implementing RFC 868
 of OpenBSD's rdate program.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 %configure
