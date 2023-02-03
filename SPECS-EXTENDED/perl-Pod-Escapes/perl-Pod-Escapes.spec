@@ -1,29 +1,29 @@
+Summary:        Resolve POD escape sequences
 Name:           perl-Pod-Escapes
 # Compete with perl.spec
 Version:        1.07
 Release:        443%{?dist}
-Summary:        Resolve POD escape sequences
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Escapes
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-%{version}.tar.gz#/perl-Pod-Escapes-%{version}.tar.gz
-BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(strict)
+BuildRequires:  perl-interpreter
 # Run-time:
 BuildRequires:  perl(Exporter)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
+BuildRequires:  perl(ExtUtils::MakeMaker)
 # Tests:
 BuildRequires:  perl(Test)
+BuildRequires:  perl(strict)
 BuildRequires:  perl(utf8)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildArch:      noarch
 
 %description
 This module provides things that are useful in decoding Pod E<...> sequences.
@@ -36,9 +36,9 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -exec rm -f {} \;
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
