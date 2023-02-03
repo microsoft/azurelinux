@@ -1246,6 +1246,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bsf",
+          "version": "2.4.0",
+          "downloadUrl": "https://downloads.apache.org/commons/bsf/source/bsf-src-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "btrfs-progs",
           "version": "5.16",
           "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v5.16.tar.xz"
@@ -1746,6 +1756,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "clutter",
+          "version": "1.26.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clutter-gst3",
+          "version": "3.0.27",
+          "downloadUrl": "https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-3.0.27.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "clutter-gtk",
+          "version": "1.8.4",
+          "downloadUrl": "https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cmake",
           "version": "3.21.4",
           "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
@@ -1789,6 +1829,16 @@
           "name": "cni-plugins",
           "version": "0.9.1",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cogl",
+          "version": "1.22.8",
+          "downloadUrl": "https://download.gnome.org/sources/cogl/1.22/cogl-1.22.8.tar.xz"
         }
       }
     },
@@ -1967,6 +2017,16 @@
         "type": "other",
         "other": {
           "name": "coredns",
+          "version": "1.8.6",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
           "version": "1.9.3",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.9.3.tar.gz"
         }
@@ -2069,6 +2129,16 @@
           "name": "cpuid",
           "version": "20200427",
           "downloadUrl": "http://www.etallen.com/cpuid/cpuid-20200427.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cpulimit",
+          "version": "2.8",
+          "downloadUrl": "https://downloads.sourceforge.net/limitcpu/cpulimit-2.8.tar.gz"
         }
       }
     },
@@ -3547,6 +3617,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "flux",
+          "version": "0.191.0",
+          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.191.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fmt",
           "version": "8.1.1",
           "downloadUrl": "https://github.com/fmtlib/fmt/archive/refs/tags/8.1.1.tar.gz"
@@ -4320,8 +4400,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.4",
-          "downloadUrl": "https://golang.org/dl/go1.19.4.src.tar.gz"
+          "version": "1.19.5",
+          "downloadUrl": "https://golang.org/dl/go1.19.5.src.tar.gz"
         }
       }
     },
@@ -6130,8 +6210,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -6800,6 +6880,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "influx-cli",
+          "version": "2.6.1",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "influxdb",
+          "version": "2.6.1",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "infinipath-psm",
           "version": "3.3",
           "downloadUrl": "https://github.com/intel/psm/archive/refs/tags/v3.3.tar.gz"
@@ -7170,6 +7270,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jansi",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/fusesource/jansi/archive/refs/tags/jansi-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jansi-native",
           "version": "1.7",
           "downloadUrl": "https://github.com/fusesource/jansi-native/archive/jansi-native-1.7.tar.gz"
@@ -7373,6 +7483,16 @@
           "name": "jlex",
           "version": "1.2.6",
           "downloadUrl": "http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jline",
+          "version": "2.14.6",
+          "downloadUrl": "https://github.com/jline/jline2/archive/refs/tags/jline-2.14.6.tar.gz"
         }
       }
     },
@@ -7661,8 +7781,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -7681,8 +7801,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -7691,8 +7811,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
+          "version": "5.15.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
         }
       }
     },
@@ -8230,6 +8350,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libblockdev",
+          "version": "2.28",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.28-1/libblockdev-2.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libbpf",
           "version": "1.0.1",
           "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.0.1.tar.gz"
@@ -8523,6 +8653,16 @@
           "name": "libdc1394",
           "version": "2.2.2",
           "downloadUrl": "http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.2.2/libdc1394-2.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libdeflate",
+          "version": "1.9",
+          "downloadUrl": "https://github.com/ebiggers/libdeflate/archive/v1.9.tar.gz"
         }
       }
     },
@@ -9790,9 +9930,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libofa",
+          "version": "0.9.3",
+          "downloadUrl": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/musicip-libofa/libofa-0.9.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libogg",
           "version": "1.3.4",
           "downloadUrl": "http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liboggz",
+          "version": "1.1.1",
+          "downloadUrl": "https://downloads.xiph.org/releases/liboggz/liboggz-1.1.1.tar.gz"
         }
       }
     },
@@ -11490,6 +11650,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.90.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lksctp-tools",
           "version": "1.0.18",
           "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
@@ -11753,6 +11923,16 @@
           "name": "lua",
           "version": "5.4.3",
           "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "luajit",
+          "version": "2.1.0",
+          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
         }
       }
     },
@@ -12933,8 +13113,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.31",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.31.tar.gz"
+          "version": "8.0.32",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.32.tar.gz"
         }
       }
     },
@@ -21223,6 +21403,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-enchant",
+          "version": "3.2.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyenchant/pyenchant-3.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-entrypoints",
           "version": "0.3",
           "downloadUrl": "https://github.com/takluyver/entrypoints/archive/0.3/entrypoints-0.3.tar.gz"
@@ -26506,6 +26696,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "subscription-manager",
+          "version": "1.29.30",
+          "downloadUrl": "https://github.com/candlepin/subscription-manager/archive/refs/tags/subscription-manager-1.29.30-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "subunit",
           "version": "1.4.0",
           "downloadUrl": "https://launchpad.net/subunit/trunk/1.4.0/+download/subunit-1.4.0.tar.gz"
@@ -26826,6 +27026,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tclx",
+          "version": "8.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/tclx/tclx8.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tcpdump",
           "version": "4.99.1",
           "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.99.1.tar.gz"
@@ -26976,9 +27186,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tix",
+          "version": "8.4.3",
+          "downloadUrl": "https://downloads.sourceforge.net/project/tix/tix/8.4.3/Tix8.4.3-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tk",
           "version": "8.6.10",
-          "downloadUrl": "http://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
+          "downloadUrl": "https://download.sourceforge.net/sourceforge/tcl/tk8.6.10-src.tar.gz"
         }
       }
     },
@@ -27756,6 +27976,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "vorbis-tools",
+          "version": "1.4.2",
+          "downloadUrl": "https://ftp.osuosl.org/pub/xiph/releases/vorbis/vorbis-tools-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vsftpd",
           "version": "3.0.5",
           "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.5.tar.gz"
@@ -27926,6 +28156,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "wordnet",
+          "version": "3.0",
+          "downloadUrl": "https://wordnetcode.princeton.edu/3.0/WordNet-3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "words",
           "version": "3.0",
           "downloadUrl": "https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z"
@@ -28000,6 +28240,16 @@
           "name": "xalan-j2",
           "version": "2.7.2",
           "downloadUrl": "http://www.apache.org/dist/xalan/xalan-j/source/xalan-j_2_7_2-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xapian-core",
+          "version": "1.4.20",
+          "downloadUrl": "https://www.oligarchy.co.uk/xapian/1.4.20/xapian-core-1.4.20.tar.xz"
         }
       }
     },

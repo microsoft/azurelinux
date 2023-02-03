@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-2
+- Bump release to rebuild with go 1.19.5
+
 * Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-1
 - Auto-upgrade to 1.9.3 - version required by Kubernetes
 
