@@ -1,29 +1,27 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Mock a DNS Resolver object for testing
 Name:           perl-Net-DNS-Resolver-Mock
 Version:        1.20200215
 Release:        3%{?dist}
-Summary:        Mock a DNS Resolver object for testing
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Net-DNS-Resolver-Mock
 Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Net-DNS-Resolver-Mock-%{version}.tar.gz#/perl-Net-DNS-Resolver-Mock-%{version}.tar.gz
-BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.6
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-# Run-time
 BuildRequires:  perl(Net::DNS::Packet)
 BuildRequires:  perl(Net::DNS::Question)
 BuildRequires:  perl(Net::DNS::Resolver)
 BuildRequires:  perl(Net::DNS::ZoneFile)
-# Tests
-BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Exception)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildArch:      noarch
 
 %description
 A subclass of Net::DNS::Resolver which parses a zonefile for it's data
@@ -34,11 +32,11 @@ source. Primarily for use in testing.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
