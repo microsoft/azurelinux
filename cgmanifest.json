@@ -10512,7 +10512,7 @@
         "other": {
           "name": "libsmi",
           "version": "0.4.8",
-          "downloadUrl": "ftp://ftp.ibr.cs.tu-bs.de/pub/local/libsmi/libsmi-0.4.8.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libsmi-0.4.8.tar.gz"
         }
       }
     },

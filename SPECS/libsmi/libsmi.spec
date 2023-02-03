@@ -6,7 +6,8 @@ License:        TCL AND BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.ibr.cs.tu-bs.de/projects/libsmi/index.html
-Source0:        ftp://ftp.ibr.cs.tu-bs.de/pub/local/libsmi/%{name}-%{version}.tar.gz
+#Upstream Source0 url is dead
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        smi.conf
 Source2:        IETF-MIB-LICENSE.txt
 Patch0:         libsmi-0.4.8-wget111.patch
