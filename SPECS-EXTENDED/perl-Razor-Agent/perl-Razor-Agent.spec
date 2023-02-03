@@ -1,23 +1,27 @@
+Summary:        Use a Razor catalogue server to filter spam messages
+Name:           perl-Razor-Agent
+Version:        2.85
+Release:        37%{?dist}
+License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://razor.sourceforge.net/
+Source:         http://dl.sourceforge.net/razor/razor-agents-%{version}.tar.bz2
+Patch0:         razor-agents-2.85-use-sha-not-sha1.patch
+Patch1:         perl-Razor-Agent-2.85-mandir.patch
+Patch2:         perl-Razor-Agent-2.85-parallel-make.patch
+BuildRequires:  gcc
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl(Digest::SHA1)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Net::DNS)
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(URI)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Net::DNS)
 # Filter the Perl extension module
 %{?perl_default_filter}
-
-Summary:	Use a Razor catalogue server to filter spam messages
-Name:		perl-Razor-Agent
-Version:	2.85
-Release:	37%{?dist}
-License:	Artistic 2.0
-URL:		http://razor.sourceforge.net/
-Source:		http://dl.sourceforge.net/razor/razor-agents-%{version}.tar.bz2
-Patch0:		razor-agents-2.85-use-sha-not-sha1.patch
-Patch1:		perl-Razor-Agent-2.85-mandir.patch
-Patch2:		perl-Razor-Agent-2.85-parallel-make.patch
-Requires:	perl(Net::DNS), perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-BuildRequires:	gcc
-BuildRequires:	perl-devel
-BuildRequires:	perl-generators
-BuildRequires:	perl(Net::DNS), perl(Digest::SHA1), perl(Time::HiRes), perl(URI), perl(ExtUtils::MakeMaker)
 
 %description
 Vipul's Razor is a distributed, collaborative, spam detection and
@@ -39,30 +43,30 @@ Agents on the network.
 %setup -q -n razor-agents-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p0
+%patch2
 
 %build
-export CFLAGS="$RPM_OPT_FLAGS"
-%{__perl} Makefile.PL INSTALLDIRS=vendor
+export CFLAGS="%{optflags}"
+perl Makefile.PL INSTALLDIRS=vendor
 cd Razor2-Preproc-deHTMLxs
-%{__perl} Makefile.PL INSTALLDIRS=vendor
+perl Makefile.PL INSTALLDIRS=vendor
 cd ..
-make %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS"
+make %{?_smp_mflags} OPTIMIZE="%{optflags}"
 
 %install
 make install -C Razor2-Preproc-deHTMLxs \
-  PERL_INSTALL_ROOT=$RPM_BUILD_ROOT \
-  INSTALLARCHLIB=$RPM_BUILD_ROOT%{perl_archlib}
-make install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT \
-  PERL_INSTALL_ROOT=$RPM_BUILD_ROOT \
-  INSTALLARCHLIB=$RPM_BUILD_ROOT%{perl_archlib} \
+  PERL_INSTALL_ROOT=%{buildroot} \
+  INSTALLARCHLIB=%{buildroot}%{perl_archlib}
+make install PERL_INSTALL_ROOT=%{buildroot} \
+  PERL_INSTALL_ROOT=%{buildroot} \
+  INSTALLARCHLIB=%{buildroot}%{perl_archlib} \
   INSTALLMAN5DIR=%{_mandir}/man5 \
-  PERL5LIB=$RPM_BUILD_ROOT%{perl_vendorarch}
+  PERL5LIB=%{buildroot}%{perl_vendorarch}
 
-find $RPM_BUILD_ROOT -type f -a \( -name perllocal.pod -o -name .packlist \
+find %{buildroot} -type f -a \( -name perllocal.pod -o -name .packlist \
   -o \( -name '*.bs' -a -empty \) \) -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w $RPM_BUILD_ROOT/*
+find %{buildroot} -type d -depth -exec rmdir {} 2>/dev/null ';'
+chmod -R u+w %{buildroot}/*
 
 %check
 make test
