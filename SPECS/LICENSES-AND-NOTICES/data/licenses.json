@@ -2318,7 +2318,7 @@
         "OpenEuler": {
             "license": "[BSD-3 License](https://github.com/pytorch/pytorch/blob/master/LICENSE)",
             "specs": [
-                "pytorch"
+                "python-pytorch"
             ]
         },
         "OpenMamba": {
