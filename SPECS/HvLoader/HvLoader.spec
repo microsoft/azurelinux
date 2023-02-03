@@ -22,6 +22,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  nasm
 BuildRequires:  python3
 BuildRequires:  python3-devel
+ExclusiveArch:  x86_64
 
 %description
 HvLoader.efi is an EFI application for loading an external hypervisor loader.
