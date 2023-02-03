@@ -159,7 +159,15 @@ The test package contains all regression tests for Python as well as the modules
 %prep
 # We need to patch setuptools later, so manually manage patches with -N
 %autosetup -p1 -n Python-%{version} -N
-%autopatch -p1 -M 999
+
+# Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
+# We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -313,7 +321,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Thu Feb 02 20223 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-6
+* Thu Feb 02 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.9.14-6
 - Patch CVE-2022-40897 in the bundled setuptools wheel
 
 * Wed Dec 07 2022 Henry Beberman <henry.beberman@microsoft.com> - 3.9.14-5
