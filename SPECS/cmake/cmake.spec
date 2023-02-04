@@ -11,6 +11,9 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
+# Please note that this is an empty patch file whose only purpose is to serve as a placeholder to notify
+# the CVE scanning tool that the CVE is resolved. The real fix for the vulnerability is to add --system-curl
+# to the bootstrap phase down below
 Patch1:         CVE-2022-43551.patch
 
 BuildRequires:  bzip2
@@ -48,6 +51,7 @@ operating system and in a compiler-independent manner.
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
+    --system-curl \
     --system-zlib \
     --system-libarchive \
     --system-bzip2 \
@@ -81,7 +85,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %changelog
 * Fri Feb 03 2022 Henry Li <lihl@microsoft.com> - 3.21.4-3
-- Resolve CVE-2022-43551
+- Add --system-curl to bootstrap stage to use system curl to resolve CVE-2022-43551
 
 * Sun Dec 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-2
 - Adding a workaround for two failing "ParseImplicitLinkInfo" test cases until a fix is available.
