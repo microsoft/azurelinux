@@ -4,13 +4,11 @@
 #global _cc_name_suffix -gcc
 
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-
 %ifarch aarch64 ppc64le x86_64
 %bcond_without ucx
 %else
 %bcond_with ucx
 %endif
-
 # ARM 32-bit is not supported by rdma
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
 %ifarch %{arm}
@@ -18,48 +16,63 @@
 %else
 %bcond_without rdma
 %endif
-
 # No more Java on i686
 %ifarch %{java_arches}
 %bcond_without java
 %else
 %bcond_with java
 %endif
-
+# Private openmpi libraries
+%global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
+%global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 # Run autogen - needed for some patches
 %bcond_with autogen
-
+Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.4
-Release:        8%{?dist}
-Summary:        Open Message Passing Interface
-License:        BSD and MIT and Romio
-URL:            http://www.open-mpi.org/
-
+Release:        9%{?dist}
+License:        BSD AND MIT AND Romio
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.open-mpi.org/
 # We can't use %%{name} here because of _cc_name_suffix
 Source0:        https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-%{version}.tar.bz2
 Source1:        openmpi.module.in
 Source3:        openmpi.pth.py3
 Source4:        macros.openmpi
-
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
-BuildRequires:  make
-%if %{with autogen}
-BuildRequires:  libtool
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(File::Find)
-%endif
-BuildRequires:  valgrind-devel
-%if %{with rdma}
-BuildRequires:  opensm-devel
-BuildRequires:  rdma-core-devel
-%endif
 # Doesn't compile:
 # vt_dyn.cc:958:28: error: 'class BPatch_basicBlockLoop' has no member named 'getLoopHead'
 #                      loop->getLoopHead()->getStartAddress(), loop_stmts );
 #BuildRequires:  dyninst-devel
 BuildRequires:  hwloc-devel
+# Old libevent causes issues
+BuildRequires:  libevent-devel
+BuildRequires:  libfabric-devel
+BuildRequires:  make
+BuildRequires:  orangefs-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  pmix-devel
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  valgrind-devel
+BuildRequires:  zlib-devel
+BuildRequires:  perl(Getopt::Long)
+Requires:       environment(modules)
+# openmpi currently requires ssh to run
+# https://svn.open-mpi.org/trac/ompi/ticket/4228
+Requires:       openssh-clients
+Provides:       mpi
+%if %{with autogen}
+BuildRequires:  libtool
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(File::Find)
+%endif
+%if %{with rdma}
+BuildRequires:  opensm-devel
+BuildRequires:  rdma-core-devel
+%endif
 # So configure can find lstopo
 # BuildRequires:  hwloc-gui
 %if %{with java}
@@ -68,18 +81,6 @@ BuildRequires:  java-devel
 Obsoletes:      %{name}-java < %{version}-%{release}
 Obsoletes:      %{name}-java-devel < %{version}-%{release}
 %endif
-# Old libevent causes issues
-BuildRequires:  libevent-devel
-BuildRequires:  libfabric-devel
-# %ifnarch s390 s390x
-# BuildRequires:  papi-devel
-# %endif
-BuildRequires:  orangefs-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  perl(Getopt::Long)
-BuildRequires:  pmix-devel
-BuildRequires:  python%{python3_pkgversion}-devel
 %ifarch x86_64
 BuildRequires:  infinipath-psm-devel
 BuildRequires:  libpsm2-devel
@@ -87,18 +88,6 @@ BuildRequires:  libpsm2-devel
 %if %{with ucx}
 BuildRequires:  ucx-devel
 %endif
-BuildRequires:  zlib-devel
-
-
-Provides:       mpi
-Requires:       environment(modules)
-# openmpi currently requires ssh to run
-# https://svn.open-mpi.org/trac/ompi/ticket/4228
-Requires:       openssh-clients
-
-# Private openmpi libraries
-%global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
-%global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 
 %description
 Open MPI is an open source, freely available implementation of both the
@@ -110,15 +99,15 @@ software vendors, application developers, and computer science
 researchers. For more information, see http://www.open-mpi.org/ .
 
 %package devel
-Summary:	Development files for openmpi
-Requires:	%{name} = %{version}-%{release}, gcc-gfortran
-Provides:	mpi-devel
-Requires:	rpm-mpi-hooks
+Summary:        Development files for openmpi
+Requires:       %{name} = %{version}-%{release}
+Requires:       gcc-gfortran
 # Make sure this package is rebuilt with correct Python version when updating
 # Otherwise mpi.req from rpm-mpi-hooks doesn't work
 # https://bugzilla.redhat.com/show_bug.cgi?id=1705296
-Requires:	python(abi)
-
+Requires:       python(abi)
+Requires:       rpm-mpi-hooks
+Provides:       mpi-devel
 
 %description devel
 Contains development headers and libraries for openmpi.
@@ -145,7 +134,6 @@ Contains development wrapper for compiling Java with openmpi.
 # particular package, version, compiler
 %global namearch openmpi-%{_arch}%{?_cc_name_suffix}
 
-
 %package -n python%{python3_pkgversion}-openmpi
 Summary:        OpenMPI support for Python 3
 Requires:       %{name} = %{version}-%{release}
@@ -153,7 +141,6 @@ Requires:       python(abi)
 
 %description -n python%{python3_pkgversion}-openmpi
 OpenMPI support for Python 3.
-
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -163,7 +150,7 @@ OpenMPI support for Python 3.
 
 
 %build
-%set_build_flags
+%{set_build_flags}
 ./configure --prefix=%{_libdir}/%{name} \
 	--mandir=%{_mandir}/%{namearch} \
 	--includedir=%{_includedir}/%{namearch} \
@@ -174,14 +161,14 @@ OpenMPI support for Python 3.
 	--enable-ipv6 \
 %if %{with java}
 	--enable-mpi-java \
-	--with-jdk-bindir=/usr/lib/jvm/msopenjdk-17/bin \
-	--with-jdk-headers=/usr/lib/jvm/msopenjdk-17/include \
+	--with-jdk-bindir=%{_libdir}/jvm/msopenjdk-17/bin \
+	--with-jdk-headers=%{_libdir}/jvm/msopenjdk-17/include \
 %endif
 	--enable-mpi1-compatibility \
 	--with-sge \
 	--with-valgrind \
 	--enable-memchecker \
-	--with-hwloc=/usr \
+	--with-hwloc=%{_prefix} \
 	--with-libevent=external \
 	--with-pmix=external \
 
@@ -189,7 +176,7 @@ OpenMPI support for Python 3.
 
 %install
 %make_install
-find %{buildroot}%{_libdir}/%{name}/lib -name \*.la | xargs rm
+find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot}%{_mandir}/%{namearch} -type f | xargs gzip -9
 ln -s mpicc.1.gz %{buildroot}%{_mandir}/%{namearch}/man1/mpiCC.1.gz
 # Remove dangling symlink
@@ -339,8 +326,11 @@ make check
 %dir %{python3_sitearch}/%{name}
 %{python3_sitearch}/openmpi.pth
 
-
 %changelog
+* Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.4-9
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License Verified.
+
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.4-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
@@ -1147,4 +1137,3 @@ make check
 
 * Fri Nov 18 2005 Ed Hill <ed@eh3.com> - 1.0-1
 - initial specfile created
-

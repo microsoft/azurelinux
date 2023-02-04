@@ -1,24 +1,31 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-
+Summary:        Provides dynamic modification of a user's environment
 Name:           environment-modules
 Version:        5.2.0
 Release:        1%{?dist}
-Summary:        Provides dynamic modification of a user's environment
-
 License:        GPLv2+
-URL:            http://modules.sourceforge.net/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://modules.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.bz2
-
+BuildRequires:  dejagnu
 BuildRequires:  gcc
+BuildRequires:  hostname
+BuildRequires:  less
+BuildRequires:  make
+BuildRequires:  man
+BuildRequires:  procps
+BuildRequires:  sed
 BuildRequires:  tcl-devel
-BuildRequires:  dejagnu, sed, procps, hostname, man, less, make
-Requires:       tcl, sed, procps, man, less
-Requires(post): coreutils
+Requires:       less
+Requires:       man
+Requires:       procps
+Requires:       sed
+Requires:       tcl
 Requires(post): %{_sbindir}/update-alternatives
+Requires(post): coreutils
 Requires(postun): %{_sbindir}/update-alternatives
-Provides:	environment(modules)
+Provides:       environment(modules)
 Obsoletes:      environment-modules-compat <= 4.8.99
 
 %description
@@ -45,7 +52,6 @@ suite of different applications.
 NOTE: You will need to get a new shell after installing this package to
 have access to the module alias.
 
-
 %prep
 %setup -q -n modules-%{version}
 
@@ -64,10 +70,10 @@ have access to the module alias.
            --enable-multilib-support \
            --disable-doc-install \
            --enable-modulespath \
-           --with-python=/usr/bin/python3 \
+           --with-python=%{_bindir}/python3 \
            --with-modulepath=%{_datadir}/Modules/modulefiles:%{_sysconfdir}/modulefiles:%{_datadir}/modulefiles \
            --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD'
-	
+
 %make_build
 
 
@@ -112,7 +118,7 @@ make test QUICKTEST=1
 [ ! -L %{buildroot}%{_bindir}/modulecmd ] &&  rm -f %{_bindir}/modulecmd
 
 # Migration from version 3.x to 4
-if [ "$(readlink /etc/alternatives/modules.sh)" = '%{_datadir}/Modules/init/modules.sh' ]; then
+if [ "$(readlink %{_sysconfdir}/alternatives/modules.sh)" = '%{_datadir}/Modules/init/modules.sh' ]; then
   %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/modules.sh
 fi
 
@@ -120,12 +126,10 @@ fi
   --install %{_sysconfdir}/profile.d/modules.sh modules.sh %{_datadir}/Modules/init/profile.sh 40 \
   --slave %{_sysconfdir}/profile.d/modules.csh modules.csh %{_datadir}/Modules/init/profile.csh \
   --slave %{_bindir}/modulecmd modulecmd %{_datadir}/Modules/libexec/modulecmd.tcl \
-
 %postun
 if [ $1 -eq 0 ] ; then
   %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/profile.sh
 fi
-
 
 %files
 %license COPYING.GPLv2
@@ -164,13 +168,11 @@ fi
 %dir %{_datadir}/Modules/nagelfar
 %{_datadir}/Modules/nagelfar/*
 
-
-
 %changelog
 * Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 5.2.0-1
 - Move from extended to Core.
 - Update to 5.2.0 (from Fedora 38(license: MIT)).
-- License verified. 
+- License verified.
 - Remove compat.
 
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.4.1-3

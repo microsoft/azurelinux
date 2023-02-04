@@ -1,13 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Process Management Interface Exascale (PMIx)
 Name:           pmix
 Version:        4.1.2
 Release:        1%{?dist}
-Summary:        Process Management Interface Exascale (PMIx)
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://pmix.org/
 Source0:        https://github.com/pmix/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  flex
@@ -16,8 +15,8 @@ BuildRequires:  hwloc-devel
 BuildRequires:  libevent-devel
 BuildRequires:  libtool
 BuildRequires:  munge-devel
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-File-Find
+BuildRequires:  perl-interpreter
 
 %description
 The Process Management Interface (PMI) has been used for quite some time as
@@ -41,14 +40,15 @@ scalability.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %package        tools
 Summary:        Tools for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description    tools
 The %{name}-tools package contains for use with PMIx-based RMs and language-
 based starters (e.g., mpirun).
@@ -58,7 +58,7 @@ based starters (e.g., mpirun).
 * pevent - inject an event into the system
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 echo touching lexer sources to recompile them ...
 find src -name \*.l -print -exec touch --no-create {} \;
@@ -83,7 +83,7 @@ find src -name \*.l -print -exec touch --no-create {} \;
 %make_install
 
 # remove libtool archives
-find %{buildroot} -name '*.la' | xargs rm -f
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 %ldconfig_scriptlets devel
@@ -105,7 +105,6 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %{_includedir}/pmix*.h
 %{_libdir}/libpmix.so
 %{_libdir}/pkgconfig/*.pc
-
 
 %files tools
 %{_bindir}/*

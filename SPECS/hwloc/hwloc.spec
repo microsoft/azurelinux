@@ -1,66 +1,66 @@
-Summary:   Portable Hardware Locality - portable abstraction of hierarchical architectures
-Name:      hwloc
-Version:   2.5.0
-Release:   1%{?dist}
-License:   BSD
+Summary:        Portable Hardware Locality - portable abstraction of hierarchical architectures
+Name:           hwloc
+Version:        2.5.0
+Release:        1%{?dist}
+License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:       http://www.open-mpi.org/projects/hwloc/
-Source0:   http://www.open-mpi.org/software/hwloc/v2.0/downloads/%{name}-%{version}.tar.bz2
-Requires:  %{name}-libs%{?_isa} = %{version}-%{release}
-
-BuildRequires: gcc
+URL:            https://www.open-mpi.org/projects/hwloc/
+Source0:        http://www.open-mpi.org/software/hwloc/v2.0/downloads/%{name}-%{version}.tar.bz2
+BuildRequires:  gcc
 # C++ only for hwloc-hello-cpp test:
-BuildRequires: gcc-c++
-BuildRequires: pkgconfig(cairo)
-BuildRequires: libpciaccess-devel
-BuildRequires: libtool-ltdl-devel
-BuildRequires: libxml2-devel
-BuildRequires: ncurses-devel
+BuildRequires:  gcc-c++
+BuildRequires:  libpciaccess-devel
+BuildRequires:  libtool-ltdl-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(cairo)
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %ifnarch s390 %{arm}
-BuildRequires: numactl-devel
+BuildRequires:  numactl-devel
 %endif
 %ifnarch %{arm}
-BuildRequires: rdma-core-devel
+BuildRequires:  rdma-core-devel
 %endif
 %ifarch %{ix86} x86_64
+BuildRequires:  systemd
 %{?systemd_requires}
-BuildRequires: systemd
 %endif
 
 %description
-The Portable Hardware Locality (hwloc) software package provides 
-a portable abstraction (across OS, versions, architectures, ...) 
-of the hierarchical topology of modern architectures, including 
+The Portable Hardware Locality (hwloc) software package provides
+a portable abstraction (across OS, versions, architectures, ...)
+of the hierarchical topology of modern architectures, including
 NUMA memory nodes,  shared caches, processor sockets, processor cores
 and processing units (logical processors or "threads"). It also gathers
 various system attributes such as cache and memory information. It primarily
 aims at helping applications with gathering information about modern
 computing hardware so as to exploit it accordingly and efficiently.
 
-hwloc may display the topology in multiple convenient formats. 
-It also offers a powerful programming interface (C API) to gather information 
+hwloc may display the topology in multiple convenient formats.
+It also offers a powerful programming interface (C API) to gather information
 about the hardware, bind processes, and much more.
 
 %package devel
-Summary:   Headers and shared development libraries for hwloc
-Requires:  %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Headers and shared development libraries for hwloc
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %ifnarch %{arm}
-Requires:  rdma-core-devel%{?_isa}
+Requires:       rdma-core-devel%{?_isa}
 %endif
 
 %description devel
 Headers and shared object symbolic links for the hwloc.
 
 %package libs
-Summary:   Run time libraries for the hwloc
+Summary:        Run time libraries for the hwloc
 
 %description libs
 Run time libraries for the hwloc
 
 %package plugins
-Summary:   Plugins for hwloc
-Requires:  %{name}-plugins%{?_isa} = %{version}-%{release}
+Summary:        Plugins for hwloc
+Requires:       %{name}-plugins%{?_isa} = %{version}-%{release}
 
 %description plugins
  This package contains plugins for hwloc. This includes
@@ -82,10 +82,10 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="%{__install} -p"
+make install DESTDIR=%{buildroot} INSTALL="install -p"
 
 # We don't ship .la files.
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 cp -p AUTHORS COPYING NEWS README VERSION %{buildroot}%{_pkgdocdir}
 cp -pr doc/examples %{buildroot}%{_pkgdocdir}
