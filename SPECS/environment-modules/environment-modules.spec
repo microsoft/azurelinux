@@ -18,6 +18,7 @@ Requires:       tcl, sed, procps, man, less
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 Provides:	environment(modules)
+Obsoletes:      environment-modules-compat <= 4.8.99
 
 %description
 The Environment Modules package provides for the dynamic modification of
@@ -42,17 +43,6 @@ suite of different applications.
 
 NOTE: You will need to get a new shell after installing this package to
 have access to the module alias.
-
-%package compat
-Summary:        Environment Modules compatibility version
-Requires:       environment-modules = %{version}-%{release}
-Requires:       hostname
-
-%description compat
-The Environment Modules package provides for the dynamic modification of
-a user's environment via modulefiles.
-
-This package provides Environment Modules compatibility version (3.2).
 
 
 %prep
@@ -93,9 +83,6 @@ mv %{buildroot}%{_mandir}/man4/modulefile{,-c}.4
 # Major utilities go to regular bin dir.
 mv %{buildroot}%{_datadir}/Modules/bin/envml %{buildroot}%{_bindir}/
 
-# Rename compat docs to find them in files section.
-mv compat/ChangeLog ChangeLog-compat
-mv compat/NEWS NEWS-compat
 
 mv {doc/build/,}NEWS.txt
 mv {doc/build/,}MIGRATING.txt
@@ -136,21 +123,11 @@ fi
   --slave %{_mandir}/man1/module.1.gz module.1.gz %{_mandir}/man1/module-c.1.gz \
   --slave %{_mandir}/man4/modulefile.4.gz modulefile.4.gz %{_mandir}/man4/modulefile-c.4.gz
 
-%post compat
-%{_sbindir}/update-alternatives \
-  --install %{_sysconfdir}/profile.d/modules.sh modules.sh %{_datadir}/Modules/init/profile-compat.sh 10 \
-  --slave %{_sysconfdir}/profile.d/modules.csh modules.csh %{_datadir}/Modules/init/profile-compat.csh \
-  --slave %{_bindir}/modulecmd modulecmd %{_datadir}/Modules/libexec/modulecmd-compat
-
 %postun
 if [ $1 -eq 0 ] ; then
   %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/profile.sh
 fi
 
-%postun compat
-if [ $1 -eq 0 ] ; then
-  %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/profile-compat.sh
-fi
 
 
 %files
@@ -181,18 +158,13 @@ fi
 %{macrosdir}/macros.%{name}
 
 
-%files compat
-%doc ChangeLog-compat NEWS-compat
-%{_datadir}/Modules/libexec/modulecmd-compat
-%{_mandir}/man1/module-compat.1.gz
-%{_mandir}/man4/modulefile-compat.4.gz
-
 
 %changelog
 * Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 5.2.0-1
 - Move from extended to Core.
 - Update to 5.2.0.
 - License verified. 
+- Remove compat.
 
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.4.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
