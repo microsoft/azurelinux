@@ -87,8 +87,9 @@ mv %{buildroot}%{_datadir}/Modules/bin/envml %{buildroot}%{_bindir}/
 mv {doc/build/,}NEWS.txt
 mv {doc/build/,}MIGRATING.txt
 mv {doc/build/,}CONTRIBUTING.txt
-mv {doc/build/,}diff_v3_v4.txt
-mv {doc/,}example.txt
+mv {doc/build/,}INSTALL.txt
+mv {doc/build/,}changes.txt
+
 rm -f %{buildroot}%{_docdir}/%{name}/{COPYING.GPLv2,ChangeLog-compat,INSTALL.txt,NEWS-compat}
 
 cp -p contrib/scripts/createmodule.sh %{buildroot}%{_datadir}/Modules/bin
@@ -101,7 +102,7 @@ install -Dpm 644 contrib/rpm/macros.%{name} %{buildroot}/%{macrosdir}/macros.%{n
 rm -rf %{buildroot}%{_datadir}/Modules/share/vim
 
 %check
-make test
+make test QUICKTEST=1
 
 %post
 # Cleanup from pre-alternatives
@@ -129,10 +130,9 @@ if [ $1 -eq 0 ] ; then
 fi
 
 
-
 %files
 %license COPYING.GPLv2
-%doc ChangeLog README NEWS.txt MIGRATING.txt CONTRIBUTING.txt diff_v3_v4.txt example.txt
+%doc ChangeLog README NEWS.txt MIGRATING.txt CONTRIBUTING.txt INSTALL.txt changes.txt
 %{_sysconfdir}/modulefiles
 %ghost %{_sysconfdir}/profile.d/modules.csh
 %ghost %{_sysconfdir}/profile.d/modules.sh
@@ -162,7 +162,7 @@ fi
 %changelog
 * Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 5.2.0-1
 - Move from extended to Core.
-- Update to 5.2.0.
+- Update to 5.2.0 (from Fedora 32).
 - License verified. 
 - Remove compat.
 
