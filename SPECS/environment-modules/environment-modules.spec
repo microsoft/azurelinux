@@ -119,8 +119,6 @@ fi
   --install %{_sysconfdir}/profile.d/modules.sh modules.sh %{_datadir}/Modules/init/profile.sh 40 \
   --slave %{_sysconfdir}/profile.d/modules.csh modules.csh %{_datadir}/Modules/init/profile.csh \
   --slave %{_bindir}/modulecmd modulecmd %{_datadir}/Modules/libexec/modulecmd.tcl \
-  --slave %{_mandir}/man1/module.1.gz module.1.gz %{_mandir}/man1/module-c.1.gz \
-  --slave %{_mandir}/man4/modulefile.4.gz modulefile.4.gz %{_mandir}/man4/modulefile-c.4.gz
 
 %postun
 if [ $1 -eq 0 ] ; then
@@ -158,7 +156,7 @@ fi
 %config(noreplace) %{_sysconfdir}/%{name}/siteconfig.tcl
 %{_datadir}/Modules/modulefiles
 %{_datadir}/modulefiles
-%{_mandir}/man1/module.1.gz
+%{_mandir}/man1/ml.1.gz
 %{_mandir}/man1/module.1.gz
 %{_mandir}/man4/modulefile.4.gz
 %{macrosdir}/macros.%{name}
