@@ -138,13 +138,22 @@ fi
 %ghost %{_sysconfdir}/profile.d/modules.sh
 %ghost %{_bindir}/modulecmd
 %{_bindir}/envml
-%{_libdir}/libtclenvmodules.so
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/libtclenvmodules.so
 %dir %{_datadir}/Modules
 %{_datadir}/Modules/bin
 %dir %{_datadir}/Modules/libexec
 %{_datadir}/Modules/libexec/modulecmd.tcl
 %dir %{_datadir}/Modules/init
 %{_datadir}/Modules/init/*
+# do not need to require shell package as we "own" completion dir
+%dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/module
+%{_datadir}/bash-completion/completions/ml
+%dir %{_datadir}/zsh/site-functions
+%{_datadir}/zsh/site-functions/_module
+%dir %{_datadir}/fish/vendor_completions.d
+%{_datadir}/fish/vendor_completions.d/module.fish
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/initrc
 %config(noreplace) %{_sysconfdir}/%{name}/modulespath
