@@ -45,21 +45,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%package        pmi
-Summary:        The %{name} implementation of libpmi and libpmi2
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Conflicts:      slurm-pmi
-%description    pmi
-The %{name}-pmi package contains the %{name} implementation of
-the libpmi and libpmi2 backward-compatibility libraries.
-
-%package        pmi-devel
-Summary:        Development files for %{name}-pmi
-Requires:       %{name}-pmi%{?_isa} = %{version}-%{release}
-Conflicts:      slurm-pmi-devel
-%description    pmi-devel
-The %{name}-pmi-devel package contains the development files for
-the libpmi and libpmi2 backward-compatibility libraries.
 
 %package        tools
 Summary:        Tools for %{name}
@@ -121,14 +106,6 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %{_libdir}/libpmix.so
 %{_libdir}/pkgconfig/*.pc
 
-%files pmi
-%{_libdir}/libpmi.so.1*
-%{_libdir}/libpmi2.so.1*
-
-%files pmi-devel
-%{_includedir}/{pmi,pmi2}.h
-%{_libdir}/libpmi.so
-%{_libdir}/libpmi2.so
 
 %files tools
 %{_bindir}/*
