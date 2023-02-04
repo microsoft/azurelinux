@@ -95,6 +95,7 @@ rm -f %{buildroot}%{_docdir}/%{name}/{COPYING.GPLv2,ChangeLog-compat,INSTALL.txt
 # install the rpm config file
 install -Dpm 644 contrib/rpm/macros.%{name} %{buildroot}/%{macrosdir}/macros.%{name}
 
+rm -rf %{buildroot}%{_datadir}/Modules/share/vim
 
 %check
 make test QUICKTEST=1
