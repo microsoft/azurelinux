@@ -15,6 +15,7 @@ BuildRequires:  gcc
 BuildRequires:  tcl-devel
 BuildRequires:  dejagnu, sed, procps, hostname, man, less, make
 Requires:       tcl, sed, procps, man, less
+Requires(post): coreutils
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 Provides:	environment(modules)
@@ -65,11 +66,12 @@ have access to the module alias.
            --with-python=/usr/bin/python3 \
            --with-modulepath=%{_datadir}/Modules/modulefiles:%{_sysconfdir}/modulefiles:%{_datadir}/modulefiles \
            --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD'
-make %{?_smp_mflags}
+	
+%make_build
 
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 mkdir -p %{buildroot}%{_sysconfdir}/modulefiles
 mkdir -p %{buildroot}%{_datadir}/modulefiles
@@ -81,8 +83,6 @@ touch %{buildroot}%{_sysconfdir}/profile.d/modules.{csh,sh}
 touch %{buildroot}%{_bindir}/modulecmd
 # remove modulecmd wrapper as it will be handled by alternatives
 rm -f %{buildroot}%{_datadir}/Modules/bin/modulecmd
-mv %{buildroot}%{_mandir}/man1/module{,-c}.1
-mv %{buildroot}%{_mandir}/man4/modulefile{,-c}.4
 
 # Major utilities go to regular bin dir.
 mv %{buildroot}%{_datadir}/Modules/bin/envml %{buildroot}%{_bindir}/
@@ -106,8 +106,6 @@ make test QUICKTEST=1
 
 %post
 # Cleanup from pre-alternatives
-[ ! -L %{_mandir}/man1/module.1.gz ] && rm -f %{_mandir}/man1/module.1.gz
-[ ! -L %{_mandir}/man4/modulefile.4.gz ] && rm -f %{_mandir}/man4/modulefile.4.gz
 [ ! -L %{_sysconfdir}/profile.d/modules.sh ] &&  rm -f %{_sysconfdir}/profile.d/modules.sh
 [ ! -L %{_sysconfdir}/profile.d/modules.csh ] &&  rm -f %{_sysconfdir}/profile.d/modules.csh
 [ ! -L %{buildroot}%{_bindir}/modulecmd ] &&  rm -f %{_bindir}/modulecmd
@@ -160,10 +158,9 @@ fi
 %config(noreplace) %{_sysconfdir}/%{name}/siteconfig.tcl
 %{_datadir}/Modules/modulefiles
 %{_datadir}/modulefiles
-%ghost %{_mandir}/man1/module.1.gz
-%ghost %{_mandir}/man4/modulefile.4.gz
-%{_mandir}/man1/module-c.1.gz
-%{_mandir}/man4/modulefile-c.4.gz
+%{_mandir}/man1/module.1.gz
+%{_mandir}/man1/module.1.gz
+%{_mandir}/man4/modulefile.4.gz
 %{macrosdir}/macros.%{name}
 
 
