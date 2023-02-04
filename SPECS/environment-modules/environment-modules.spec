@@ -13,7 +13,7 @@ Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.
 
 BuildRequires:  gcc
 BuildRequires:  tcl-devel
-BuildRequires:  dejagnu, sed, procps, hostname, man, less
+BuildRequires:  dejagnu, sed, procps, hostname, man, less, make
 Requires:       tcl, sed, procps, man, less
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
@@ -51,16 +51,20 @@ have access to the module alias.
 
 %build
 %configure --prefix=%{_datadir}/Modules \
-           --libdir=%{_libdir} \
+           --libdir=%{_libdir}/%{name} \
            --etcdir=%{_sysconfdir}/%{name} \
            --bindir=%{_datadir}/Modules/bin \
            --libexecdir=%{_datadir}/Modules/libexec \
-           --docdir=%{_docdir}/%{name} \
-           --enable-dotmodulespath \
-           --disable-set-shell-startup \
-           --with-initconf-in=etcdir \
+           --mandir=%{_mandir} \
+           --with-bashcompletiondir=%{_datadir}/bash-completion/completions \
+           --with-fishcompletiondir=%{_datadir}/fish/vendor_completions.d \
+           --with-zshcompletiondir=%{_datadir}/zsh/site-functions \
+           --enable-multilib-support \
+           --disable-doc-install \
+           --enable-modulespath \
+           --with-python=/usr/bin/python3 \
            --with-modulepath=%{_datadir}/Modules/modulefiles:%{_sysconfdir}/modulefiles:%{_datadir}/modulefiles \
-           --with-quarantine-vars=LD_LIBRARY_PATH
+           --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD'
 make %{?_smp_mflags}
 
 
