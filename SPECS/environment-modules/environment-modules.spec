@@ -92,13 +92,9 @@ mv {doc/build/,}changes.txt
 
 rm -f %{buildroot}%{_docdir}/%{name}/{COPYING.GPLv2,ChangeLog-compat,INSTALL.txt,NEWS-compat}
 
-cp -p contrib/scripts/createmodule.py %{buildroot}%{_datadir}/Modules/bin
-sed -i -e 1s,/usr/bin/python,/usr/bin/python3, \
-    %{buildroot}%{_datadir}/Modules/bin/createmodule.py
-
+# install the rpm config file
 install -Dpm 644 contrib/rpm/macros.%{name} %{buildroot}/%{macrosdir}/macros.%{name}
 
-rm -rf %{buildroot}%{_datadir}/Modules/share/vim
 
 %check
 make test QUICKTEST=1
