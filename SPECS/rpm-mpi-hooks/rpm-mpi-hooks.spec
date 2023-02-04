@@ -1,12 +1,12 @@
 Name:           rpm-mpi-hooks
-Version:        6
-Release:        8%{?dist}
+Version:        8
+Release:        1%{?dist}
 Summary:        RPM dependency generator hooks for MPI packages
 
 License:        MIT
 BuildArch:      noarch
 URL:            https://src.fedoraproject.org/rpms/rpm-mpi-hooks
-Source0:        https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/rawhide/f/mpi.attr
+Source0:        https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/f37/f/mpi.attr
 Source1:        mpilibsymlink.attr
 Source2:        mpi.prov
 Source3:        mpi.req
@@ -46,6 +46,10 @@ install -Dpm 0755 %{SOURCE3} %{buildroot}%{_rpmconfigdir}/mpi.req
 
 
 %changelog
+* Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 8-1
+- Move from extended to Core.
+- Update to 9.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6-8
 - Fixing source URL.
 
