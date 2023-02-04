@@ -3,8 +3,8 @@ Distribution:   Mariner
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           environment-modules
-Version:        4.4.1
-Release:        3%{?dist}
+Version:        5.2.0
+Release:        1%{?dist}
 Summary:        Provides dynamic modification of a user's environment
 
 License:        GPLv2+
@@ -189,6 +189,11 @@ fi
 
 
 %changelog
+* Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 5.2.0-1
+- Move from extended to Core.
+- Update to 5.2.0.
+- License verified. 
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.4.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove X11 dependencies.
