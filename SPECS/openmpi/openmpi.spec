@@ -31,7 +31,7 @@ Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.4
 Release:        9%{?dist}
-License:        BSD AND MIT AND Romio
+License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.open-mpi.org/
