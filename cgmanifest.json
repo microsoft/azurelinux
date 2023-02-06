@@ -2145,6 +2145,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "httpd",
+          "version": "2.4.55",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.55.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hyperscan",
           "version": "5.4.0",
           "downloadUrl": "https://github.com/intel/hyperscan/archive/v5.4.0.tar.gz"
