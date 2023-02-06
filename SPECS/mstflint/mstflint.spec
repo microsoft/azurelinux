@@ -37,7 +37,7 @@ find . -type f -iname '*.cpp' -exec chmod a-x '{}' ';'
 
 %build
 ./autogen.sh
-%configure --enable-fw-mgr
+%configure --enable-fw-mgr --enable-adb-generic-tools
 %make_build
 
 %install
