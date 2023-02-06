@@ -56,7 +56,6 @@ Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
 BuildRequires:  golang <= 1.18.8
-BuildRequires:  golang-packaging >= 15.0.8
 # IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
 BuildRequires:  pkgconfig(flux) >= 0.191.0
 BuildRequires:  protobuf-devel

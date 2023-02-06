@@ -41,7 +41,6 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang <= 1.18.8
-BuildRequires:  golang-packaging >= 15.0.8
 BuildRequires:  systemd-rpm-macros
 
 %description
