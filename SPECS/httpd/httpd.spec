@@ -1,6 +1,6 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.54
+Version:        2.4.55
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
@@ -207,6 +207,9 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+* Mon Feb 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.55-1
+- Auto-upgrade to 2.4.55 - to fix CVE-2022-36760, CVE-2022-37436
+
 * Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.54-1
 - Auto-upgrade to 2.4.54 - Fixing_CVE-2022s:_28615_and_31813
 
