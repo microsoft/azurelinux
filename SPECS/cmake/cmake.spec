@@ -81,7 +81,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
-* Mon Feb 06 20223 Daniel McIlvaney <damcilva@microsoft.com> - 3.21.4-3
+* Mon Feb 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.21.4-3
 - Patch CVE-2022-43551 in bundled curl
 
 * Sun Dec 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-2
