@@ -3,16 +3,13 @@ Summary:        Tensors and Dynamic neural networks in Python with strong GPU ac
 Name:           pytorch
 Version:        1.13.1
 Release:        1%{?dist}
-License:        BSD-3
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/pytorch-v%{version}.tar.gz#/pytorch-%{version}.tar.gz
 Source1:        %{name}-%{version}-submodules.tar.gz
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
-Requires:       python3-numpy
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -23,6 +20,8 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 %package -n     python3-pytorch
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-devel
 BuildRequires:  python3-filelock
@@ -31,7 +30,9 @@ BuildRequires:  python3-jinja2
 BuildRequires:  python3-numpy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-typing-extensions
-BuildRequires:  setools-python3
+Requires:       python3-filelock
+Requires:       python3-numpy
+Requires:       python3-typing-extensions
 Provides:       python-torch
 
 %description -n python3-pytorch
@@ -95,7 +96,7 @@ mv %{buildroot}/doclist.lst .
 
 %changelog
 * Thu Feb 02 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.13.1-1
-- Initial CBL-Mariner import from OpenEuler
+- Initial CBL-Mariner import from OpenEuler (license: BSD)
 - License verified
 - Upgrade version to 1.13.1
 
