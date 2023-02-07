@@ -186,7 +186,7 @@ This package provides the SQLite driver for the apr-util DBD
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
-* Mon Feb 06 2023 Rachel Menge <rachelmenge@microsoft.com> -1.6.3-1
+* Mon Feb 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.6.3-1
 - Upgrade to 1.6.3
 
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.6.1-6
