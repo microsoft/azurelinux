@@ -1,3 +1,5 @@
+%define     apuver    1
+
 Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
 Version:        1.6.3
@@ -8,7 +10,6 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
-%define     apuver    1
 
 BuildRequires:   apr-devel
 BuildRequires:   expat-devel
