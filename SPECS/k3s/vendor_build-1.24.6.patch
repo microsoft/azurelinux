@@ -1,4 +1,4 @@
-From bf8717d49b3b396d74096322b32186b3a8e6b3d9 Mon Sep 17 00:00:00 2001
+From cb484822743c3cfde06c41ae8af989c82bb420d2 Mon Sep 17 00:00:00 2001
 From: Lior Lustgarten <lilustg@microsoft.com>
 Date: Thu, 21 Jul 2022 13:20:43 -0700
 Subject: [PATCH 1/2] enable vendor build
@@ -81,7 +81,7 @@ index 4dc2c80db1..d813ec8959 100755
 2.25.1
 
 
-From a4cbc923a6ac449f7be4d2c839598b7fa10706ae Mon Sep 17 00:00:00 2001
+From e7f67ee7b8e9d581112d3daf61ba3911fef08fd2 Mon Sep 17 00:00:00 2001
 From: Lior Lustgarten <lilustg@microsoft.com>
 Date: Thu, 21 Jul 2022 18:06:07 -0700
 Subject: [PATCH 2/2] Adds install fix for vhdx
