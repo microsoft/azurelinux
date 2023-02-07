@@ -106,8 +106,8 @@
         "type": "other",
         "other": {
           "name": "apr-util",
-          "version": "1.6.1",
-          "downloadUrl": "http://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz"
+          "version": "1.6.3",
+          "downloadUrl": "http://archive.apache.org/dist/apr/apr-util-1.6.3.tar.gz"
         }
       }
     },
