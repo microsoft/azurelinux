@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,8 @@ Source4:        pam_ssh_agent-rmheaders
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
+# Introduced at openssh 9.1
+Patch101:       CVE-2023-25136.nopatch
 # --- pam_ssh-agent ---
 # make it build reusing the openssh sources
 Patch300:       pam_ssh_agent_auth-0.9.3-build.patch
@@ -261,6 +263,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Feb 07 2023 Dan Streetman <ddstreet@microsoft.com> - 8.8p1-8
+- Nopatch CVE-2023-25136
+
 * Tue Jul 26 2022 Minghe Ren <mingheren@microsoft.com> - 8.8p1-7
 - Update sshd_config to imporve SSH security
 
