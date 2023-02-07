@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.9p1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,8 @@ Patch0:         blfs_systemd_fixes.patch
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
+# Introduced at openssh 9.1
+Patch101:       CVE-2023-25136.nopatch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -185,6 +187,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Feb 07 2023 Dan Streetman <ddstreet@microsoft.com> - 8.9p1-2
+- Nopatch CVE-2023-25136
+
 * Mon Oct 24 2022 Aurélien Bombo <abombo@microsoft.com> - 8.9p1-1
 - Update to 8.9p1 to fix CVE-2021-36368.
 
