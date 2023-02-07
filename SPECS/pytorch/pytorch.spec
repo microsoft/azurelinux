@@ -9,16 +9,9 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
 
-%description
-PyTorch is a Python package that provides two high-level features:
-- Tensor computation (like NumPy) with strong GPU acceleration
-- Deep neural networks built on a tape-based autograd system
-You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
-
-%package -n     python3-pytorch
-Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -30,10 +23,20 @@ BuildRequires:  python3-jinja2
 BuildRequires:  python3-numpy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-typing-extensions
+
 Requires:       python3-filelock
 Requires:       python3-numpy
 Requires:       python3-typing-extensions
-Provides:       python-torch
+Provides:       python3-pytorch
+
+%description
+PyTorch is a Python package that provides two high-level features:
+- Tensor computation (like NumPy) with strong GPU acceleration
+- Deep neural networks built on a tape-based autograd system
+You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
+
+%package -n     python3-pytorch
+Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 
 %description -n python3-pytorch
 PyTorch is a Python package that provides two high-level features:
@@ -41,19 +44,18 @@ PyTorch is a Python package that provides two high-level features:
 - Deep neural networks built on a tape-based autograd system
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
-%package help
+%package -n python3-pytorch-doc
 Summary:        Development documents and examples for torch
 Provides:       python3-pytorch-doc
 
-%description help
+%description -n python3-pytorch-doc
 PyTorch is a Python package that provides two high-level features:
 - Tensor computation (like NumPy) with strong GPU acceleration
 - Deep neural networks built on a tape-based autograd system
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%setup -q
-%setup -q -T -D -a 1
+%autosetup -a 1
 
 %build
 export USE_CUDA=0
@@ -63,35 +65,24 @@ export BUILD_CAFFE2=0
 %install
 %py3_install
 install -d -m755 %{buildroot}/%{_pkgdocdir}
-if [ -d doc ]; then cp -arf doc %{buildroot}/%{_pkgdocdir}; fi
-if [ -d docs ]; then cp -arf docs %{buildroot}/%{_pkgdocdir}; fi
-if [ -d example ]; then cp -arf example %{buildroot}/%{_pkgdocdir}; fi
-if [ -d examples ]; then cp -arf examples %{buildroot}/%{_pkgdocdir}; fi
-pushd %{buildroot}
-if [ -d usr/lib ]; then
-    find usr/lib -type f -printf "/%h/%f\n" >> filelist.lst
-fi
-if [ -d usr/lib64 ]; then
-    find usr/lib64 -type f -printf "/%h/%f\n" >> filelist.lst
-fi
-if [ -d usr/bin ]; then
-    find usr/bin -type f -printf "/%h/%f\n" >> filelist.lst
-fi
-if [ -d usr/sbin ]; then
-    find usr/sbin -type f -printf "/%h/%f\n" >> filelist.lst
-fi
-touch doclist.lst
+for directory in doc docs example examples; do
+  if [ -d $directory ]; then
+    cp -arf $directory %{buildroot}/%{_pkgdocdir}
+  fi
+done
+for directory in lib lib64 bin sbin; do
+  if [ -d $directory ]; then
+    find %{buildroot}%{_prefix}/$directory -type f -printf "/%h/%f\n" >> filelist.lst
+  fi
+done
 if [ -d usr/share/man ]; then
-    find usr/share/man -type f -printf "/%h/%f.gz\n" >> doclist.lst
+    find %{buildroot}%{_prefix}/share/man -type f -printf "/%h/%f.gz\n" >> doclist.lst
 fi
-popd
-mv %{buildroot}/filelist.lst .
-mv %{buildroot}/doclist.lst .
 
 %files -n python3-pytorch -f filelist.lst
 %dir %{python3_sitearch}/*
 
-%files help -f doclist.lst
+%files -n python3-pytorch-doc -f doclist.lst
 %{_docdir}/*
 
 %changelog
