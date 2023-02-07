@@ -1,4 +1,3 @@
-%global _hardened_build 1
 %global desc OrangeFS (formerly PVFS2) is a high-performance parallel \
 network file system designed for use on high performance computing \
 systems.  It provides very high performance access to disk storage for \
@@ -8,9 +7,6 @@ and MPI-IO. \
 \
 This package provides the pvfs2-client-core which is required to use \
 the kernel module.
-# Workaround for -fcommon issue
-# https://github.com/waltligon/orangefs/issues/80
-%define _legacy_common_support 1
 Summary:        Parallel network file system client
 Name:           orangefs
 Version:        2.9.8
@@ -32,7 +28,7 @@ License:        ASL 2.0 AND BSD AND GPLv2 AND LGPLv2+ AND LGPLv2 AND MIT AND Ope
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.orangefs.org/
-Source0:        https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-%{version}.tar.gz
+Source0:        https://s3.amazonaws.com/download.orangefs.org/current/source/%{name}-%{version}.tar.gz
 Source1:        orangefs-server.service
 Source2:        orangefs-client.service
 Source3:        orangefs.conf
@@ -64,15 +60,13 @@ BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(Term::ReadLine)
-%ifnarch armv7hl
 BuildRequires:  libibverbs-devel
-%endif
 
 %description
 %{desc}
 
 %prep
-%autosetup -p1 -n orangefs-v.%{version}
+%autosetup -p1 -n %{name}-v.%{version}
 
 rm -r src/apps/devel/lmdb
 rm -r src/common/lmdb

@@ -57,7 +57,7 @@ echo "d /run/munge 0755 munge munge -" > src/etc/munge.tmpfiles.conf.in
 # Get rid of some rpaths for /usr/sbin
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
+%make_build
 
 
 %install
@@ -70,7 +70,6 @@ install -p -D -m 644 munge.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/mun
 
 # rm unneeded files.
 rm %{buildroot}/%{_sysconfdir}/sysconfig/munge
-#
 rm %{buildroot}/%{_initddir}/munge
 
 # Exclude .la files
