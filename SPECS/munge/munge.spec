@@ -62,7 +62,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %install
 
-make install DESTDIR=%{buildroot}
+%make_install
 
 # Install extra files.
 install -p -m 755 create-munge-key %{buildroot}/%{_sbindir}/create-munge-key

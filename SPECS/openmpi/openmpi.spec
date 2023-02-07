@@ -4,6 +4,10 @@
 #global _cc_name_suffix -gcc
 
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+# We set this to for convenience, since this is the unique dir we use for this
+# particular package, version, compiler
+%global namearch openmpi-%{_arch}%{?_cc_name_suffix}
+
 %ifarch aarch64 ppc64le x86_64
 %bcond_without ucx
 %else
@@ -57,11 +61,9 @@ Requires:       environment(modules)
 # https://svn.open-mpi.org/trac/ompi/ticket/4228
 Requires:       openssh-clients
 Provides:       mpi
-%if %{with autogen}
 BuildRequires:  libtool
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(File::Find)
-%endif
 %if %{with rdma}
 BuildRequires:  opensm-devel
 BuildRequires:  rdma-core-devel
@@ -121,9 +123,6 @@ Requires:       java-devel
 Contains development wrapper for compiling Java with openmpi.
 %endif
 
-# We set this to for convenience, since this is the unique dir we use for this
-# particular package, version, compiler
-%global namearch openmpi-%{_arch}%{?_cc_name_suffix}
 
 %package -n python%{python3_pkgversion}-openmpi
 Summary:        OpenMPI support for Python 3
@@ -135,9 +134,8 @@ OpenMPI support for Python 3.
 
 %prep
 %autosetup -p1 -n openmpi-%{version}
-%if %{with autogen}
 ./autogen.pl --force
-%endif
+
 
 
 %build
@@ -152,8 +150,8 @@ OpenMPI support for Python 3.
 	--enable-ipv6 \
 %if %{with java}
 	--enable-mpi-java \
-	--with-jdk-bindir=%{_libdir}/jvm/msopenjdk-17/bin \
-	--with-jdk-headers=%{_libdir}/jvm/msopenjdk-17/include \
+	--with-jdk-bindir=%{_libdir}/jvm/msopenjdk-11/bin \
+	--with-jdk-headers=%{_libdir}/jvm/msopenjdk-11/include \
 %endif
 	--enable-mpi1-compatibility \
 	--with-sge \
@@ -265,9 +263,7 @@ make check
 %if %{with rdma}
 %{_libdir}/%{name}/share/openmpi/mca-btl-openib-device-params.ini
 %endif
-%if 0%{?el7}
-%{_libdir}/%{name}/share/pmix/
-%endif
+
 
 %files devel
 %dir %{_includedir}/%{namearch}
