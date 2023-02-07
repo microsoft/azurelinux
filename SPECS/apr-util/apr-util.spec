@@ -2,13 +2,12 @@ Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
 Version:        1.6.3
 Release:        1%{?dist}
-License:        Apache License 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
-%define     sha1      %{name}=5bae4ff8f1dad3d7091036d59c1c0b2e76903bf4
 %define     apuver    1
 
 BuildRequires:   apr-devel
@@ -124,6 +123,7 @@ rm -rf %{buildroot}
 %changelog
 * Mon Feb 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.6.3-1
 - Upgrade to 1.6.3
+- Fix license
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.1-4
 - Added %%license line automatically
