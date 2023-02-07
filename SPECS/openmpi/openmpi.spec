@@ -25,8 +25,6 @@
 # Private openmpi libraries
 %global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
 %global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
-# Run autogen - needed for some patches
-%bcond_with autogen
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.4
@@ -42,12 +40,7 @@ Source3:        openmpi.pth.py3
 Source4:        macros.openmpi
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
-# Doesn't compile:
-# vt_dyn.cc:958:28: error: 'class BPatch_basicBlockLoop' has no member named 'getLoopHead'
-#                      loop->getLoopHead()->getStartAddress(), loop_stmts );
-#BuildRequires:  dyninst-devel
 BuildRequires:  hwloc-devel
-# Old libevent causes issues
 BuildRequires:  libevent-devel
 BuildRequires:  libfabric-devel
 BuildRequires:  make
@@ -73,8 +66,6 @@ BuildRequires:  perl(File::Find)
 BuildRequires:  opensm-devel
 BuildRequires:  rdma-core-devel
 %endif
-# So configure can find lstopo
-# BuildRequires:  hwloc-gui
 %if %{with java}
 BuildRequires:  java-devel
 %else
@@ -143,7 +134,7 @@ Requires:       python(abi)
 OpenMPI support for Python 3.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1 -n openmpi-%{version}
 %if %{with autogen}
 ./autogen.pl --force
 %endif
@@ -320,7 +311,6 @@ make check
 %{_libdir}/%{name}/share/doc/
 %{_mandir}/%{namearch}/man1/mpijavac.1.gz
 %endif
-
 
 %files -n python%{python3_pkgversion}-openmpi
 %dir %{python3_sitearch}/%{name}
