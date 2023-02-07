@@ -4,7 +4,7 @@ Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
 Version:        1.6.3
 Release:        1%{?dist}
-License:        Apache License 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
