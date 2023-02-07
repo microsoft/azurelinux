@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pytorch.org/
-Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/pytorch-v%{version}.tar.gz#/pytorch-%{version}.tar.gz
+Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-submodules.tar.gz
 
 %description
