@@ -1,0 +1,732 @@
+diff --git a/lib/binsrch.c b/lib/binsrch.c
+index 85436f3..8b71216 100644
+--- a/lib/binsrch.c
++++ b/lib/binsrch.c
+@@ -28,7 +28,7 @@ char *read_index(long offset, FILE *fp) {
+     char *linep;
+ 
+     linep = line;
+-    line[0] = '0';
++    line[0] = '\0';
+ 
+     fseek( fp, offset, SEEK_SET );
+     fgets(linep, LINE_LEN, fp);
+@@ -58,6 +58,8 @@ char *bin_search(char *searchkey, FILE *fp)
+         last_bin_search_offset = ftell( fp );
+ 	fgets(linep, LINE_LEN, fp);
+ 	length = (int)(strchr(linep, ' ') - linep);
++	if (length > (sizeof(key) - 1))
++            return(NULL);
+ 	strncpy(key, linep, length);
+ 	key[length] = '\0';
+ 	if(strcmp(key, searchkey) < 0) {
+@@ -110,6 +112,8 @@ static int bin_search_key(char *searchkey, FILE *fp)
+ 	line[length++] =  c;
+     if (getc(fp) == EOF) {	/* only 1 line in file */
+ 	length = (int)(strchr(linep, ' ') - linep);
++	if (length > (sizeof(key) - 1))
++            return(0);
+ 	strncpy(key, linep, length);
+ 	key[length] = '\0';
+ 	if(strcmp(key, searchkey) > 0) {
+@@ -132,6 +136,8 @@ static int bin_search_key(char *searchkey, FILE *fp)
+ 	if (fgets(linep, LINE_LEN, fp) != NULL) {
+   	    offset2 = ftell(fp); /* offset at start of next line */
+ 	    length = (int)(strchr(linep, ' ') - linep);
++	    if (length > (sizeof(key) - 1))
++                return(0);
+ 	    strncpy(key, linep, length);
+ 	    key[length] = '\0';
+ 	    if(strcmp(key, searchkey) < 0) {	/* further in file */
+diff --git a/lib/morph.c b/lib/morph.c
+index 0cff594..ea4b4f8 100644
+--- a/lib/morph.c
++++ b/lib/morph.c
+@@ -51,24 +51,24 @@ static struct {
+     char *str;
+     int strlen;
+ } prepositions[NUMPREPS] = {
+-    "to", 2,
+-    "at", 2,
+-    "of", 2,
+-    "on", 2,
+-    "off", 3,
+-    "in", 2,
+-    "out", 3,
+-    "up", 2,
+-    "down", 4,
+-    "from", 4,
+-    "with", 4,
+-    "into", 4,
+-    "for", 3,
+-    "about", 5,
+-    "between", 7,
++    { "to", 2 },
++    { "at", 2 },
++    { "of", 2 },
++    { "on", 2 },
++    { "off", 3 },
++    { "in", 2 },
++    { "out", 3 },
++    { "up", 2 },
++    { "down", 4 },
++    { "from", 4 },
++    { "with", 4 },
++    { "into", 4 },
++    { "for", 3 },
++    { "about", 5 },
++    { "between", 7 }
+ };
+ 
+-static FILE *exc_fps[NUMPARTS + 1];
++static FILE *exc_fps[NUMPARTS];
+ 
+ static int do_init();
+ static int strend(char *, char *);
+@@ -100,7 +100,7 @@ int re_morphinit(void)
+ {
+     int i;
+ 
+-    for (i = 1; i <= NUMPARTS; i++) {
++    for (i = 0; i < NUMPARTS; i++) {
+ 	if (exc_fps[i] != NULL) {
+ 	    fclose(exc_fps[i]); exc_fps[i] = NULL;
+ 	}
+@@ -144,18 +144,19 @@ static int do_init(void)
+     } else
+ 	sprintf(searchdir, DEFAULTPATH);
+ #else
+-    if ((env = getenv("WNSEARCHDIR")) != NULL)
+-	strcpy(searchdir, env);
+-    else if ((env = getenv("WNHOME")) != NULL)
+-	sprintf(searchdir, "%s%s", env, DICTDIR);
+-    else
++    if ((env = getenv("WNSEARCHDIR")) != NULL) {
++	snprintf(searchdir, sizeof(searchdir), "%s", env);
++    } else if ((env = getenv("WNHOME")) != NULL) {
++	snprintf(searchdir, sizeof(searchdir), "%s%s", env, DICTDIR);
++    } else {
+ 	strcpy(searchdir, DEFAULTPATH);
++    }
+ #endif
+ 
+-    for (i = 1; i <= NUMPARTS; i++) {
+-	sprintf(fname, EXCFILE, searchdir, partnames[i]);
++    for (i = 0; i < NUMPARTS; i++) {
++	snprintf(fname, sizeof(fname), EXCFILE, searchdir, partnames[i+1]);
+ 	if ((exc_fps[i] = fopen(fname, "r")) == NULL) {
+-	    sprintf(msgbuf,
++	    snprintf(msgbuf, sizeof(msgbuf),
+ 		    "WordNet library error: Can't open exception file(%s)\n\n",
+ 		    fname);
+ 	    display_message(msgbuf);
+@@ -178,13 +179,16 @@ char *morphstr(char *origstr, int pos)
+     int prep;
+     char *end_idx1, *end_idx2;
+     char *append;
+-    
++
+     if (pos == SATELLITE)
+ 	pos = ADJ;
+ 
+     /* First time through for this string */
+ 
+     if (origstr != NULL) {
++        if (strlen(origstr) > WORDBUF - 1)
++            return(NULL);
++
+ 	/* Assume string hasn't had spaces substitued with '_' */
+ 	strtolower(strsubst(strcpy(str, origstr), ' ', '_'));
+ 	searchstr[0] = '\0';
+@@ -232,7 +236,7 @@ char *morphstr(char *origstr, int pos)
+ 		if (end_idx < 0) return(NULL);		/* shouldn't do this */
+ 		strncpy(word, str + st_idx, end_idx - st_idx);
+ 		word[end_idx - st_idx] = '\0';
+-		if(tmp = morphword(word, pos))
++		if ((tmp = morphword(word, pos)) != NULL)
+ 		    strcat(searchstr,tmp);
+ 		else
+ 		    strcat(searchstr,word);
+@@ -240,7 +244,7 @@ char *morphstr(char *origstr, int pos)
+ 		st_idx = end_idx + 1;
+ 	    }
+ 	    
+-	    if(tmp = morphword(strcpy(word, str + st_idx), pos)) 
++	    if ((tmp = morphword(strcpy(word, str + st_idx), pos)) != NULL)
+ 		strcat(searchstr,tmp);
+ 	    else
+ 		strcat(searchstr,word);
+@@ -270,16 +274,15 @@ char *morphword(char *word, int pos)
+ {
+     int offset, cnt;
+     int i;
+-    static char retval[WORDBUF];
+-    char *tmp, tmpbuf[WORDBUF], *end;
+-    
+-    sprintf(retval,"");
+-    sprintf(tmpbuf, "");
+-    end = "";
+-    
++    static char retval[WORDBUF] = "";
++    char *tmp, tmpbuf[WORDBUF] = "", *end = "";
++
+     if(word == NULL) 
+ 	return(NULL);
+ 
++    if (strlen(word) > WORDBUF - 1)
++        return(NULL);
++
+     /* first look for word on exception list */
+     
+     if((tmp = exc_lookup(word, pos)) != NULL)
+@@ -335,7 +338,10 @@ static char *wordbase(char *word, int ender)
+ {
+     char *pt1;
+     static char copy[WORDBUF];
+-    
++
++    if (strlen(word) > WORDBUF - 1)
++        return(NULL);
++
+     strcpy(copy, word);
+     if(strend(copy,sufx[ender])) {
+ 	pt1=strchr(copy,'\0');
+@@ -368,13 +374,14 @@ static char *exc_lookup(char *word, int pos)
+ {
+     static char line[WORDBUF], *beglp, *endlp;
+     char *excline;
+-    int found = 0;
+ 
+     if (exc_fps[pos] == NULL)
+ 	return(NULL);
+ 
+     /* first time through load line from exception file */
+     if(word != NULL){
++        if (strlen(word) > WORDBUF - 1)
++           return(NULL);
+ 	if ((excline = bin_search(word, exc_fps[pos])) != NULL) {
+ 	    strcpy(line, excline);
+ 	    endlp = strchr(line,' ');
+@@ -403,6 +410,9 @@ static char *morphprep(char *s)
+     char word[WORDBUF], end[WORDBUF];
+     static char retval[WORDBUF];
+ 
++    if (strlen(s) > WORDBUF - 1)
++        return (NULL);
++
+     /* Assume that the verb is the first word in the phrase.  Strip it
+        off, check for validity, then try various morphs with the
+        rest of the phrase tacked on, trying to find a match. */
+@@ -410,7 +420,7 @@ static char *morphprep(char *s)
+     rest = strchr(s, '_');
+     last = strrchr(s, '_');
+     if (rest != last) {		/* more than 2 words */
+-	if (lastwd = morphword(last + 1, NOUN)) {
++	if ((lastwd = morphword(last + 1, NOUN)) != NULL) {
+ 	    strncpy(end, rest, last - rest + 1);
+ 	    end[last-rest+1] = '\0';
+ 	    strcat(end, lastwd);
+diff --git a/lib/search.c b/lib/search.c
+index 1cdedc3..bc781cd 100644
+--- a/lib/search.c
++++ b/lib/search.c
+@@ -13,6 +13,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <assert.h>
++#include <limits.h>
+ 
+ #include "wn.h"
+ 
+@@ -119,33 +120,22 @@ IndexPtr parse_index(long offset, int dbase, char *line) {
+     if ( !line )
+       line = read_index( offset, indexfps[dbase] );
+     
+-    idx = (IndexPtr)malloc(sizeof(Index));
++    idx = (IndexPtr)calloc(1, sizeof(Index));
+     assert(idx);
+ 
+     /* set offset of entry in index file */
+     idx->idxoffset = offset;
+     
+-    idx->wd='\0';
+-    idx->pos='\0';
+-    idx->off_cnt=0;
+-    idx->tagged_cnt = 0;
+-    idx->sense_cnt=0;
+-    idx->offset='\0';
+-    idx->ptruse_cnt=0;
+-    idx->ptruse='\0';
+-    
+     /* get the word */
+     ptrtok=strtok(line," \n");
+     
+-    idx->wd = malloc(strlen(ptrtok) + 1);
++    idx->wd = strdup(ptrtok);
+     assert(idx->wd);
+-    strcpy(idx->wd, ptrtok);
+     
+     /* get the part of speech */
+     ptrtok=strtok(NULL," \n");
+-    idx->pos = malloc(strlen(ptrtok) + 1);
++    idx->pos = strdup(ptrtok);
+     assert(idx->pos);
+-    strcpy(idx->pos, ptrtok);
+     
+     /* get the collins count */
+     ptrtok=strtok(NULL," \n");
+@@ -154,7 +144,12 @@ IndexPtr parse_index(long offset, int dbase, char *line) {
+     /* get the number of pointers types */
+     ptrtok=strtok(NULL," \n");
+     idx->ptruse_cnt = atoi(ptrtok);
+-    
++
++    if (idx->ptruse_cnt < 0 || (unsigned int)idx->ptruse_cnt > UINT_MAX/sizeof(int)) {
++        free_index(idx);
++        return(NULL);
++    }
++
+     if (idx->ptruse_cnt) {
+ 	idx->ptruse = (int *) malloc(idx->ptruse_cnt * (sizeof(int)));
+ 	assert(idx->ptruse);
+@@ -173,9 +168,14 @@ IndexPtr parse_index(long offset, int dbase, char *line) {
+     /* get the number of senses that are tagged */
+     ptrtok=strtok(NULL," \n");
+     idx->tagged_cnt = atoi(ptrtok);
+-        
++
++    if (idx->off_cnt < 0 || (unsigned long)idx->off_cnt > ULONG_MAX/sizeof(long)) {
++        free_index(idx);
++        return(NULL);
++    }
++
+     /* make space for the offsets */
+-    idx->offset = (long *) malloc(idx->off_cnt * (sizeof(long)));
++    idx->offset = (unsigned long *) malloc(idx->off_cnt * sizeof(long));
+     assert(idx->offset);
+     
+     /* get the offsets */
+@@ -197,15 +197,21 @@ IndexPtr getindex(char *searchstr, int dbase)
+     char strings[MAX_FORMS][WORDBUF]; /* vector of search strings */
+     static IndexPtr offsets[MAX_FORMS];
+     static int offset;
+-    
++
+     /* This works like strrok(): if passed with a non-null string,
+        prepare vector of search strings and offsets.  If string
+        is null, look at current list of offsets and return next
+        one, or NULL if no more alternatives for this word. */
+ 
+     if (searchstr != NULL) {
+-
+-	offset = 0;
++        /* Bail out if the input is too long for us to handle */
++        if (strlen(searchstr) > (WORDBUF - 1)) {
++            strcpy(msgbuf, "WordNet library error: search term is too long\n");
++                   display_message(msgbuf);
++            return(NULL);
++        }
++
++    	offset = 0;
+ 	strtolower(searchstr);
+ 	for (i = 0; i < MAX_FORMS; i++) {
+ 	    strcpy(strings[i], searchstr);
+@@ -229,11 +235,11 @@ IndexPtr getindex(char *searchstr, int dbase)
+ 	/* Get offset of first entry.  Then eliminate duplicates
+ 	   and get offsets of unique strings. */
+ 
+-	if (strings[0][0] != NULL)
++	if (strings[0] != NULL)
+ 	    offsets[0] = index_lookup(strings[0], dbase);
+ 
+ 	for (i = 1; i < MAX_FORMS; i++)
+-	    if ((strings[i][0]) != NULL && (strcmp(strings[0], strings[i])))
++	    if (strings[i] != NULL && (strcmp(strings[0], strings[i])))
+ 		offsets[i] = index_lookup(strings[i], dbase);
+     }
+ 
+@@ -272,7 +278,7 @@ SynsetPtr read_synset(int dbase, long boffset, char *word)
+ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+ {
+     static char line[LINEBUF];
+-    char tbuf[SMLINEBUF];
++    char tbuf[SMLINEBUF] = "";
+     char *ptrtok;
+     char *tmpptr;
+     int foundpert = 0;
+@@ -286,33 +292,11 @@ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+     if ((tmpptr = fgets(line, LINEBUF, fp)) == NULL)
+ 	return(NULL);
+     
+-    synptr = (SynsetPtr)malloc(sizeof(Synset));
++    synptr = (SynsetPtr)calloc(1, sizeof(Synset));
+     assert(synptr);
+-    
+-    synptr->hereiam = 0;
++
+     synptr->sstype = DONT_KNOW;
+-    synptr->fnum = 0;
+-    synptr->pos = '\0';
+-    synptr->wcount = 0;
+-    synptr->words = '\0';
+-    synptr->whichword = 0;
+-    synptr->ptrcount = 0;
+-    synptr->ptrtyp = '\0';
+-    synptr->ptroff = '\0';
+-    synptr->ppos = '\0';
+-    synptr->pto = '\0';
+-    synptr->pfrm = '\0';
+-    synptr->fcount = 0;
+-    synptr->frmid = '\0';
+-    synptr->frmto = '\0';
+-    synptr->defn = '\0';
+-    synptr->key = 0;
+-    synptr->nextss = NULL;
+-    synptr->nextform = NULL;
+     synptr->searchtype = -1;
+-    synptr->ptrlist = NULL;
+-    synptr->headword = NULL;
+-    synptr->headsense = 0;
+ 
+     ptrtok = line;
+     
+@@ -322,7 +306,7 @@ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+ 
+     /* sanity check - make sure starting file offset matches first field */
+     if (synptr->hereiam != loc) {
+-	sprintf(msgbuf, "WordNet library error: no synset at location %d\n",
++	sprintf(msgbuf, "WordNet library error: no synset at location %ld\n",
+ 		loc);
+ 	display_message(msgbuf);
+ 	free(synptr);
+@@ -335,16 +319,20 @@ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+     
+     /* looking at POS */
+     ptrtok = strtok(NULL, " \n");
+-    synptr->pos = malloc(strlen(ptrtok) + 1);
++    synptr->pos = strdup(ptrtok);
+     assert(synptr->pos);
+-    strcpy(synptr->pos, ptrtok);
+     if (getsstype(synptr->pos) == SATELLITE)
+ 	synptr->sstype = INDIRECT_ANT;
+     
+     /* looking at numwords */
+     ptrtok = strtok(NULL, " \n");
+     synptr->wcount = strtol(ptrtok, NULL, 16);
+-    
++
++    if (synptr->wcount < 0 || (unsigned int)synptr->wcount > UINT_MAX/sizeof(char *)) {
++        free_syns(synptr);
++        return(NULL);
++    }
++
+     synptr->words = (char **)malloc(synptr->wcount  * sizeof(char *));
+     assert(synptr->words);
+     synptr->wnsns = (int *)malloc(synptr->wcount * sizeof(int));
+@@ -354,9 +342,8 @@ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+     
+     for (i = 0; i < synptr->wcount; i++) {
+ 	ptrtok = strtok(NULL, " \n");
+-	synptr->words[i] = malloc(strlen(ptrtok) + 1);
++	synptr->words[i] = strdup(ptrtok);
+ 	assert(synptr->words[i]);
+-	strcpy(synptr->words[i], ptrtok);
+ 	
+ 	/* is this the word we're looking for? */
+ 	
+@@ -371,6 +358,12 @@ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+     ptrtok = strtok(NULL," \n");
+     synptr->ptrcount = atoi(ptrtok);
+ 
++    /* Should we check for long here as well? */
++    if (synptr->ptrcount < 0 || (unsigned int)synptr->ptrcount > UINT_MAX/sizeof(int)) {
++        free_syns(synptr);
++        return(NULL);
++    }
++
+     if (synptr->ptrcount) {
+ 
+ 	/* alloc storage for the pointers */
+@@ -455,21 +448,23 @@ SynsetPtr parse_synset(FILE *fp, int dbase, char *word)
+     ptrtok = strtok(NULL," \n");
+     if (ptrtok) {
+ 	ptrtok = strtok(NULL," \n");
+-	sprintf(tbuf, "");
+ 	while (ptrtok != NULL) {
++	    if (strlen(ptrtok) + strlen(tbuf) + 1 + 1 > sizeof(tbuf)) {
++                free_syns(synptr);
++                return(NULL);
++	    }
+ 	    strcat(tbuf,ptrtok);
+ 	    ptrtok = strtok(NULL, " \n");
+ 	    if(ptrtok)
+ 		strcat(tbuf," ");
+ 	}
+-	assert((1 + strlen(tbuf)) < sizeof(tbuf));
+-	synptr->defn = malloc(strlen(tbuf) + 4);
++	synptr->defn = malloc(strlen(tbuf) + 3);
+ 	assert(synptr->defn);
+ 	sprintf(synptr->defn,"(%s)",tbuf);
+     }
+ 
+     if (keyindexfp) { 		/* we have unique keys */
+-	sprintf(tmpbuf, "%c:%8.8d", partchars[dbase], synptr->hereiam);
++	sprintf(tmpbuf, "%c:%8.8ld", partchars[dbase], synptr->hereiam);
+ 	synptr->key = GetKeyForOffset(tmpbuf);
+     }
+ 
+@@ -635,7 +630,7 @@ static void traceptrs(SynsetPtr synptr, int ptrtyp, int dbase, int depth)
+ 
+ 	    if ((ptrtyp == PERTPTR || ptrtyp == PPLPTR) &&
+ 		synptr->pto[i] != 0) {
+-		sprintf(tbuf, " (Sense %d)\n",
++		snprintf(tbuf, sizeof(tbuf), " (Sense %d)\n",
+ 			cursyn->wnsns[synptr->pto[i] - 1]);
+ 		printsynset(prefix, cursyn, tbuf, DEFOFF, synptr->pto[i],
+ 			    SKIP_ANTS, PRINT_MARKER);
+@@ -656,7 +651,7 @@ static void traceptrs(SynsetPtr synptr, int ptrtyp, int dbase, int depth)
+ 		    traceptrs(cursyn, HYPERPTR, getpos(cursyn->pos), 0);
+ 		}
+ 	    } else if (ptrtyp == ANTPTR && dbase != ADJ && synptr->pto[i] != 0) {
+-		sprintf(tbuf, " (Sense %d)\n",
++		snprintf(tbuf, sizeof(tbuf), " (Sense %d)\n",
+ 			cursyn->wnsns[synptr->pto[i] - 1]);
+ 		printsynset(prefix, cursyn, tbuf, DEFOFF, synptr->pto[i],
+ 			    SKIP_ANTS, PRINT_MARKER);
+@@ -817,7 +812,7 @@ static void tracenomins(SynsetPtr synptr, int dbase)
+ 	    	    
+ 	    cursyn = read_synset(synptr->ppos[i], synptr->ptroff[i], "");
+ 
+-	    sprintf(tbuf, "#%d\n",
++	    snprintf(tbuf, sizeof(tbuf), "#%d\n",
+ 		    cursyn->wnsns[synptr->pto[i] - 1]);
+ 	    printsynset(prefix, cursyn, tbuf, DEFOFF, synptr->pto[i],
+ 			SKIP_ANTS, SKIP_MARKER);
+@@ -989,12 +984,12 @@ void getexample(char *offset, char *wd)
+     char sentbuf[512];
+     
+     if (vsentfilefp != NULL) {
+-	if (line = bin_search(offset, vsentfilefp)) {
++	if ((line = bin_search(offset, vsentfilefp)) != NULL) {
+ 	    while(*line != ' ') 
+ 		line++;
+ 
+ 	    printbuffer("          EX: ");
+-	    sprintf(sentbuf, line, wd);
++	    snprintf(sentbuf, sizeof(sentbuf), line, wd);
+ 	    printbuffer(sentbuf);
+ 	}
+     }
+@@ -1011,7 +1006,7 @@ int findexample(SynsetPtr synptr)
+     if (vidxfilefp != NULL) {
+ 	wdnum = synptr->whichword - 1;
+ 
+-	sprintf(tbuf,"%s%%%-1.1d:%-2.2d:%-2.2d::",
++	snprintf(tbuf, sizeof(tbuf), "%s%%%-1.1d:%-2.2d:%-2.2d::",
+ 		synptr->words[wdnum],
+ 		getpos(synptr->pos),
+ 		synptr->fnum,
+@@ -1124,7 +1119,7 @@ static void freq_word(IndexPtr index)
+ 	if (cnt >= 17 && cnt <= 32) familiar = 6;
+ 	if (cnt > 32 ) familiar = 7;
+ 	
+-	sprintf(tmpbuf,
++	snprintf(tmpbuf, sizeof(tmpbuf),
+ 		"\n%s used as %s is %s (polysemy count = %d)\n",
+ 		index->wd, a_an[getpos(index->pos)], freqcats[familiar], cnt);
+ 	printbuffer(tmpbuf);
+@@ -1147,6 +1142,9 @@ void wngrep (char *word_passed, int pos) {
+    }
+    rewind(inputfile);
+ 
++   if (strlen(word_passed) + 1 > sizeof(word))
++       return;
++
+    strcpy (word, word_passed);
+    ToLowerCase(word);		/* map to lower case for index file search */
+    strsubst (word, ' ', '_');	/* replace spaces with underscores */
+@@ -1169,7 +1167,7 @@ void wngrep (char *word_passed, int pos) {
+             ((line[loc + wordlen] == '-') || (line[loc + wordlen] == '_')))
+          ) {
+             strsubst (line, '_', ' ');
+-            sprintf (tmpbuf, "%s\n", line);
++            snprintf (tmpbuf, sizeof(tmpbuf), "%s\n", line);
+             printbuffer (tmpbuf);
+             break;
+          }
+@@ -1570,7 +1568,8 @@ char *findtheinfo(char *searchstr, int dbase, int ptrtyp, int whichsense)
+ 			bufstart[0] = '\n';
+ 			bufstart++;
+ 		    }
+-		    strncpy(bufstart, tmpbuf, strlen(tmpbuf));
++		    /* Don't include the \0 */
++		    memcpy(bufstart, tmpbuf, strlen(tmpbuf));
+ 		    bufstart = searchbuffer + strlen(searchbuffer);
+ 		}
+ 	    }
+@@ -1683,9 +1682,8 @@ SynsetPtr traceptrs_ds(SynsetPtr synptr, int ptrtyp, int dbase, int depth)
+ 		cursyn = read_synset(synptr->ppos[i],
+ 				      synptr->ptroff[i],
+ 				      "");
+-		synptr->headword = malloc(strlen(cursyn->words[0]) + 1);
++		synptr->headword = strdup(cursyn->words[0]);
+ 		assert(synptr->headword);
+-		strcpy(synptr->headword, cursyn->words[0]);
+ 		synptr->headsense = cursyn->lexid[0];
+ 		free_synset(cursyn);
+ 		break;
+@@ -2013,7 +2011,7 @@ static int getsearchsense(SynsetPtr synptr, int whichword)
+     strsubst(strcpy(wdbuf, synptr->words[whichword - 1]), ' ', '_');
+     strtolower(wdbuf);
+ 		       
+-    if (idx = index_lookup(wdbuf, getpos(synptr->pos))) {
++    if ((idx = index_lookup(wdbuf, getpos(synptr->pos))) != NULL) {
+ 	for (i = 0; i < idx->off_cnt; i++)
+ 	    if (idx->offset[i] == synptr->hereiam) {
+ 		free_index(idx);
+@@ -2037,7 +2035,7 @@ static void printsynset(char *head, SynsetPtr synptr, char *tail, int definition
+        by flags */
+ 
+     if (offsetflag)		/* print synset offset */
+-	sprintf(tbuf + strlen(tbuf),"{%8.8d} ", synptr->hereiam);
++	sprintf(tbuf + strlen(tbuf),"{%8.8ld} ", synptr->hereiam);
+     if (fileinfoflag) {		/* print lexicographer file information */
+ 	sprintf(tbuf + strlen(tbuf), "<%s> ", lexfiles[synptr->fnum]);
+ 	prlexid = 1;		/* print lexicographer id after word */
+@@ -2072,7 +2070,7 @@ static void printantsynset(SynsetPtr synptr, char *tail, int anttype, int defini
+     tbuf[0] = '\0';
+ 
+     if (offsetflag)
+-	sprintf(tbuf,"{%8.8d} ", synptr->hereiam);
++	sprintf(tbuf,"{%8.8ld} ", synptr->hereiam);
+     if (fileinfoflag) {
+ 	sprintf(tbuf + strlen(tbuf),"<%s> ", lexfiles[synptr->fnum]);
+ 	prlexid = 1;
+diff --git a/lib/wnutil.c b/lib/wnutil.c
+index 5ee5d76..7b7948a 100644
+--- a/lib/wnutil.c
++++ b/lib/wnutil.c
+@@ -48,7 +48,7 @@ int wninit(void)
+     char *env;
+ 
+     if (!done) {
+-	if (env = getenv("WNDBVERSION")) {
++	if ((env = getenv("WNDBVERSION")) != NULL) {
+ 	    wnrelease = strdup(env);	/* set release */
+ 	    assert(wnrelease);
+ 	}
+@@ -70,7 +70,7 @@ int re_wninit(void)
+ 
+     closefps();
+ 
+-    if (env = getenv("WNDBVERSION")) {
++    if ((env = getenv("WNDBVERSION")) != NULL) {
+ 	wnrelease = strdup(env);	/* set release */
+ 	assert(wnrelease);
+     }
+@@ -149,25 +149,25 @@ static int do_init(void)
+ 	sprintf(searchdir, DEFAULTPATH);
+ #else
+     if ((env = getenv("WNSEARCHDIR")) != NULL)
+-	strcpy(searchdir, env);
++	snprintf(searchdir, sizeof(searchdir), "%s", env);
+     else if ((env = getenv("WNHOME")) != NULL)
+-	sprintf(searchdir, "%s%s", env, DICTDIR);
++	snprintf(searchdir, sizeof(searchdir), "%s%s", env, DICTDIR);
+     else
+ 	strcpy(searchdir, DEFAULTPATH);
+ #endif
+ 
+     for (i = 1; i < NUMPARTS + 1; i++) {
+-	sprintf(tmpbuf, DATAFILE, searchdir, partnames[i]);
++	snprintf(tmpbuf, sizeof(tmpbuf), DATAFILE, searchdir, partnames[i]);
+ 	if((datafps[i] = fopen(tmpbuf, "r")) == NULL) {
+-	    sprintf(msgbuf,
++	    snprintf(msgbuf, sizeof(msgbuf),
+ 		    "WordNet library error: Can't open datafile(%s)\n",
+ 		    tmpbuf);
+ 	    display_message(msgbuf);
+ 	    openerr = -1;
+ 	}
+-	sprintf(tmpbuf, INDEXFILE, searchdir, partnames[i]);
++	snprintf(tmpbuf, sizeof(tmpbuf), INDEXFILE, searchdir, partnames[i]);
+ 	if((indexfps[i] = fopen(tmpbuf, "r")) == NULL) {
+-	    sprintf(msgbuf,
++	    snprintf(msgbuf, sizeof(msgbuf),
+ 		    "WordNet library error: Can't open indexfile(%s)\n",
+ 		    tmpbuf);
+ 	    display_message(msgbuf);
+@@ -178,35 +178,35 @@ static int do_init(void)
+     /* This file isn't used by the library and doesn't have to
+        be present.  No error is reported if the open fails. */
+ 
+-    sprintf(tmpbuf, SENSEIDXFILE, searchdir);
++    snprintf(tmpbuf, sizeof(tmpbuf), SENSEIDXFILE, searchdir);
+     sensefp = fopen(tmpbuf, "r");
+ 
+     /* If this file isn't present, the runtime code will skip printint out
+        the number of times each sense was tagged. */
+ 
+-    sprintf(tmpbuf, CNTLISTFILE, searchdir);
++    snprintf(tmpbuf, sizeof(tmpbuf), CNTLISTFILE, searchdir);
+     cntlistfp = fopen(tmpbuf, "r");
+ 
+     /* This file doesn't have to be present.  No error is reported if the
+        open fails. */
+ 
+-    sprintf(tmpbuf, KEYIDXFILE, searchdir);
++    snprintf(tmpbuf, sizeof(tmpbuf), KEYIDXFILE, searchdir);
+     keyindexfp = fopen(tmpbuf, "r");
+ 
+-    sprintf(tmpbuf, REVKEYIDXFILE, searchdir);
++    snprintf(tmpbuf, sizeof(tmpbuf), REVKEYIDXFILE, searchdir);
+     revkeyindexfp = fopen(tmpbuf, "r");
+ 
+-    sprintf(tmpbuf, VRBSENTFILE, searchdir);
++    snprintf(tmpbuf, sizeof(tmpbuf), VRBSENTFILE, searchdir);
+     if ((vsentfilefp = fopen(tmpbuf, "r")) == NULL) {
+-	sprintf(msgbuf,
++	snprintf(msgbuf, sizeof(msgbuf),
+ "WordNet library warning: Can't open verb example sentence file(%s)\n",
+ 		tmpbuf);
+ 	display_message(msgbuf);
+     }
+ 
+-    sprintf(tmpbuf, VRBIDXFILE, searchdir);
++    snprintf(tmpbuf, sizeof(tmpbuf), VRBIDXFILE, searchdir);
+     if ((vidxfilefp = fopen(tmpbuf, "r")) == NULL) {
+-	sprintf(msgbuf,
++	snprintf(msgbuf, sizeof(msgbuf),
+ "WordNet library warning: Can't open verb example sentence index file(%s)\n",
+ 		tmpbuf);
+ 	display_message(msgbuf);
+diff --git a/src/wn.c b/src/wn.c
+index ddb27aa..5c6a255 100644
+--- a/src/wn.c
++++ b/src/wn.c
+@@ -129,7 +129,7 @@ static void printusage(), printlicense(),
+        printsearches(char *, int, unsigned long);
+ static int error_message(char *);
+ 
+-main(int argc,char *argv[])
++int main(int argc,char *argv[])
+ {
+     display_message = error_message;
+     
+@@ -225,14 +225,14 @@ static int do_search(char *searchword, int pos, int search, int whichsense,
+ 	printf("\n%s of %s %s\n%s",
+ 	       label, partnames[pos], searchword, outbuf);
+ 
+-    if (morphword = morphstr(searchword, pos))
++    if ((morphword = morphstr(searchword, pos)) != NULL)
+ 	do {
+ 	    outbuf = findtheinfo(morphword, pos, search, whichsense);
+ 	    totsenses += wnresults.printcnt;
+ 	    if (strlen(outbuf) > 0) 
+ 		printf("\n%s of %s %s\n%s",
+ 		       label, partnames[pos], morphword, outbuf);
+-	} while (morphword = morphstr(NULL, pos));
++	} while ((morphword = morphstr(NULL, pos)) != NULL);
+ 
+     return(totsenses);
+ }
