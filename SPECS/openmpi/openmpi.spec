@@ -15,17 +15,13 @@
 %endif
 # ARM 32-bit is not supported by rdma
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
-%ifarch %{arm}
-%bcond_with rdma
-%else
-%bcond_without rdma
-%endif
-# No more Java on i686
-%ifarch %{java_arches}
-%bcond_without java
-%else
-%bcond_with java
-%endif
+
+# enable rdma as we will only build for ARM64
+%bcond rdma 1
+
+# enable java openmpi subpackage by default
+%bcond java 1
+
 # Private openmpi libraries
 %global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
 %global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
@@ -240,9 +236,6 @@ make check
 %{_libdir}/%{name}/lib/libmca_common_ofi.so.10*
 %{_libdir}/%{name}/lib/libmca*.so.41*
 %{_libdir}/%{name}/lib/libmca*.so.50*
-%if 0%{?el7}
-%{_libdir}/%{name}/lib/pmix/
-%endif
 %{_mandir}/%{namearch}/man1/mpi[er]*
 %{_mandir}/%{namearch}/man1/ompi*
 %{_mandir}/%{namearch}/man1/orte[-dr_]*

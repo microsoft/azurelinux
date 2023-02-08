@@ -7,7 +7,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://modules.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.bz2
+Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
 BuildRequires:  dejagnu
 BuildRequires:  gcc
 BuildRequires:  hostname

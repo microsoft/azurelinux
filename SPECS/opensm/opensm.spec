@@ -21,19 +21,18 @@ BuildRequires:  gcc
 BuildRequires:  libibumad-devel
 BuildRequires:  systemd
 BuildRequires:  systemd-units
+%if %{__remake_config}
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+%endif
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       logrotate
 Requires:       rdma
 Requires(post): systemd
 Requires(postun): systemd
 Requires(preun): systemd
-# RDMA is not currently built on 32-bit ARM: #1484155
-ExcludeArch:    s390 %{arm}
-%if %{__remake_config}
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
-%endif
+
 
 %description
 OpenSM is the OpenIB project's Subnet Manager for Infiniband networks.

@@ -51,6 +51,7 @@ BuildRequires:  flex
 BuildRequires:  fuse-devel
 BuildRequires:  gcc
 BuildRequires:  libattr-devel
+BuildRequires:  libibverbs-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  lmdb-devel
 BuildRequires:  make
@@ -60,10 +61,38 @@ BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(Term::ReadLine)
-BuildRequires:  libibverbs-devel
 
 %description
 %{desc}
+
+%package devel
+Summary:        Parallel network file system development libraries
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+%{desc}
+
+This package contains the headers and libraries necessary for client
+development.
+
+%package server
+Summary:        Parallel network file system server
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       perl(Math::BigInt)
+
+%description server
+%{desc}
+
+This package contains the server.
+
+%package fuse
+Summary:        Parallel network file system FUSE client
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description fuse
+%{desc}
+
+This package contains the FUSE client.
 
 %prep
 %autosetup -p1 -n %{name}-v.%{version}
@@ -80,13 +109,7 @@ autoreconf -vif -I maint/config
 
 %build
 export LDFLAGS="%{optflags} -Wl,--as-needed"
-%ifarch armv7hl
-%configure --enable-external-lmdb --enable-shared --disable-static \
-    --enable-fuse --disable-usrint --with-db-backend=lmdb
-%else
-%configure --enable-external-lmdb --enable-shared --disable-static \
-   --enable-fuse --disable-usrint --with-db-backend=lmdb --with-openib=%{_prefix}
-%endif
+%configure --enable-external-lmdb --enable-shared --disable-static --enable-fuse --disable-usrint --with-db-backend=lmdb --with-openib=%{_prefix}
 %make_build
 
 %install
@@ -98,6 +121,8 @@ mkdir -p %{buildroot}%{_sharedstatedir}/orangefs
 mkdir -p %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
+
+%ldconfig_scriptlets
 
 %files
 %license COPYING
@@ -181,17 +206,6 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 %{_mandir}/man1/setmattr.1.gz
 %{_mandir}/man5/pvfs2tab.5.gz
 
-%ldconfig_scriptlets
-
-%package devel
-Summary:        Parallel network file system development libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description devel
-%{desc}
-
-This package contains the headers and libraries necessary for client
-development.
 
 %files devel
 %{_bindir}/pvfs2-config
@@ -210,15 +224,6 @@ development.
 %{_includedir}/pvfs2.h
 %{_libdir}/libpvfs2.so
 
-%package server
-Summary:        Parallel network file system server
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       perl(Math::BigInt)
-
-%description server
-%{desc}
-
-This package contains the server.
 
 %files server
 %dir %{_sysconfdir}/orangefs
@@ -234,15 +239,6 @@ This package contains the server.
 %{_mandir}/man1/pvfs2-showcoll.1.gz
 %{_mandir}/man5/orangefs.conf.5.gz
 %dir %{_sharedstatedir}/orangefs
-
-%package fuse
-Summary:        Parallel network file system FUSE client
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description fuse
-%{desc}
-
-This package contains the FUSE client.
 
 %files fuse
 %{_bindir}/pvfs2fuse
