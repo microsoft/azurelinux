@@ -1,10 +1,11 @@
 Summary:	pixel manipulation library.
 Name:		pixman
 Version:    0.36.0
-Release:    2%{?dist}
+Release:    3%{?dist}
 License:	MIT
 URL:        https://cgit.freedesktop.org/pixman/
 Source0:    https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Patch0:     CVE-2022-44638.patch
 Group:		System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +23,8 @@ Provides:	pkgconfig(pixman-1)
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
+
 %build
 ./configure \
 	--prefix=%{_prefix} \
@@ -57,6 +59,9 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Feb 08 2023 Dan Streetman <ddstreet@microsoft.com> - 0.36.0-3
+- CVE-2022-44638
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.36.0-2
 - Added %%license line automatically
 
