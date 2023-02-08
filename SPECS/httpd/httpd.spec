@@ -2,9 +2,9 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.54
+Version:        2.4.55
 Release:        1%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -342,6 +342,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Tue Feb 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.4.55-1
+- Upgrade to version 2.4.55. Fixes CVE-2022-36760
+
 * Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.54-1
 - Auto-upgrade to 2.4.54 - CVE-2022-31813,CVE-2022-28615
 
