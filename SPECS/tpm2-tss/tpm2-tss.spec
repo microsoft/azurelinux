@@ -1,13 +1,14 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-tss
 Version:        2.4.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tss
 Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-22745.patch
 
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
@@ -33,7 +34,7 @@ Requires:       %{name} = %{version}-%{release}
 The libraries and header files needed for TSS2 development.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -99,7 +100,10 @@ fi
 %{_mandir}/man7
 
 %changelog
-* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 2.4.6-1
+* Tue Jan 31 2023 Henry Li <lihl@microsoft.com> - 2.4.6-2
+- Add patch to resolve CVE-2023-22745
+
+* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.6-1
 - Updating to version 2.4.6 to fix CVE-2020-24455.
 - Updated spec to use 'make' build and install macros, and '%%autosetup'.
 - Enabled running unit tests.

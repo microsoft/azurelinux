@@ -402,7 +402,7 @@
         "efivar",
         "elfutils",
         "erlang",
-        "etcd-3.4.13",
+        "etcd-3.4.23",
         "etcd-3.5.0",
         "etcd-3.5.1",
         "ethtool",

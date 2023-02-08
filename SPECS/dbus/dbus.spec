@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.13.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-12749.patch
+Patch1:         CVE-2022-42010.patch
+Patch2:         CVE-2022-42011.patch
+Patch3:         CVE-2022-42012.patch
 BuildRequires:  expat-devel
 BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
@@ -79,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Fri Feb 03 2023 Henry Li <lihl@microsoft.com> - 1.13.6-6
+- Resolve CVE-2022-42010, CVE-2022-42011 and CVE-2022-42012
+
 * Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> - 1.13.6-5
 - Enable SELinux support
 
