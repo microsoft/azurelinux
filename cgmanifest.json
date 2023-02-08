@@ -8512,7 +8512,7 @@
         "other": {
           "name": "libcmpiutil",
           "version": "0.5.7",
-          "downloadUrl": "ftp://libvirt.org/libvirt-cim/libcmpiutil-0.5.7.tar.gz"
+          "downloadUrl": "https://libvirt.org/sources/CIM/libcmpiutil-0.5.7.tar.gz"
         }
       }
     },
