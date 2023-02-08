@@ -6179,9 +6179,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "HvLoader",
+          "name": "hvloader",
           "version": "1.0.0",
-          "downloadUrl": "https://github.com/Camelron/HvLoader/releases/download/v1.0.0/HvLoader-1.0.0.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/HvLoader/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
