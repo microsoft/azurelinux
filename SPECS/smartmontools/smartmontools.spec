@@ -2,7 +2,7 @@ Summary:	Tools for monitoring SMART capable hard disks
 Name:		smartmontools
 Version:	7.3
 Release:	1%{?dist}
-License:	GPLv2+
+License:	MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:		http://smartmontools.sourceforge.net/
@@ -85,6 +85,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sharedstatedir}/%{name}
 %changelog
 * Thu Feb 02 2023 Vince Perri <viperri@microsoft.com> - 7.3-1
 - Upgrade to 7.3
+- License verified.
 
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 7.1-10
 - Remove epoch
