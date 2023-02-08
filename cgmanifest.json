@@ -25964,6 +25964,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "scotch",
+          "version": "6.1.2",
+          "downloadUrl": "https://gitlab.inria.fr/scotch/scotch/-/archive/v6.1.2/scotch-v6.1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "screen",
           "version": "4.9.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/screen/screen-4.9.0.tar.gz"
