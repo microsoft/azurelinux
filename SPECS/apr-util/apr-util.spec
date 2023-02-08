@@ -2,9 +2,9 @@
 
 Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
-Version:        1.6.1
-Release:        6%{?dist}
-License:        ASL 2.0
+Version:        1.6.3
+Release:        1%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
@@ -186,6 +186,10 @@ This package provides the SQLite driver for the apr-util DBD
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
+* Mon Feb 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.6.3-1
+- Upgrade to 1.6.3
+- Fix license tag
+
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.6.1-6
 - Add libdb dependencies to berkleydb subpackage.
 
