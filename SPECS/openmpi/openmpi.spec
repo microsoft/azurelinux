@@ -16,11 +16,11 @@
 # ARM 32-bit is not supported by rdma
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
 
-# enable rdma as we will only build for ARM64
-%bcond_without rdma 1
+# enable rdma as we will only build for ARM64 and AMD64
+%bcond_without rdma 
 
 # enable java openmpi subpackage by default
-%bcond_without java 1
+%bcond_without java 
 
 # Private openmpi libraries
 %global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
@@ -105,7 +105,7 @@ Contains development headers and libraries for openmpi.
 %package java
 Summary:        Java library
 Requires:       %{name} = %{version}-%{release}
-Requires:       java-headless
+Requires:       java
 
 %description java
 Java library.
