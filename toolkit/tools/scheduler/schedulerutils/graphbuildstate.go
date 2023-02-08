@@ -20,12 +20,12 @@ type nodeState struct {
 
 // GraphBuildState represents the build state of a graph.
 type GraphBuildState struct {
-	activeBuilds     map[int64]*BuildRequest
-	nodeToState      map[*pkggraph.PkgNode]*nodeState
-	failures         []*BuildResult
-	reservedFiles    map[string]bool
-	conflictingRPMs  map[string]bool
-	conflictingSRPMs map[string]bool
+	activeBuilds           map[int64]*BuildRequest
+	nodeToState            map[*pkggraph.PkgNode]*nodeState
+	failures               []*BuildResult
+	reservedFiles          map[string]bool
+	conflictingRPMs        map[string]bool
+	conflictingSRPMs       map[string]bool
 	supressConflictingRPMs bool
 }
 
@@ -37,11 +37,11 @@ func NewGraphBuildState(reservedFiles []string, supressConflictingRPMs bool) (g 
 		filesMap[file] = true
 	}
 	return &GraphBuildState{
-		activeBuilds:     make(map[int64]*BuildRequest),
-		nodeToState:      make(map[*pkggraph.PkgNode]*nodeState),
-		reservedFiles:    filesMap,
-		conflictingRPMs:  make(map[string]bool),
-		conflictingSRPMs: make(map[string]bool),
+		activeBuilds:           make(map[int64]*BuildRequest),
+		nodeToState:            make(map[*pkggraph.PkgNode]*nodeState),
+		reservedFiles:          filesMap,
+		conflictingRPMs:        make(map[string]bool),
+		conflictingSRPMs:       make(map[string]bool),
 		supressConflictingRPMs: supressConflictingRPMs,
 	}
 }

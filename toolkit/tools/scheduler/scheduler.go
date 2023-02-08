@@ -61,20 +61,20 @@ var (
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
 	baseDirPath = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
 
-	distTag              = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
-	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with.").Required().String()
-	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with.").Required().String()
-	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
-	buildAttempts        = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
+	distTag                = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
+	distroReleaseVersion   = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with.").Required().String()
+	distroBuildNumber      = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with.").Required().String()
+	rpmmacrosFile          = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
+	buildAttempts          = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
 	checkAttempts        = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
-	runCheck             = app.Flag("run-check", "Run the check during package builds.").Bool()
-	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
-	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
-	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
-	reservedFileListFile = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
-	deltaBuild           = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
-	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
-	supressConflictingRPMs = app.Flag("allow-prebuilt-rebuild", "Allow conflicting RPMS to not cause the failure").Bool()
+	runCheck               = app.Flag("run-check", "Run the check during package builds.").Bool()
+	noCleanup              = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
+	noCache                = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
+	stopOnFailure          = app.Flag("stop-on-failure", "Stop on failed build").Bool()
+	reservedFileListFile   = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
+	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
+	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
+	supressConflictingRPMs = app.Flag("allow-prebuilt-rebuild", "Don't report the toolchain rebuild error").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -283,10 +283,6 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
-	
-	//TODO: pass supressRPMs
-	//Pass one of the toolchain RPMs to cause the error
-	//2.0-stable (git fetch upstream --tags)
 
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles, supressConflictingRPMs)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)

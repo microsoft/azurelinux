@@ -241,7 +241,7 @@ To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTAL
 sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
 ```
 
-# Further Readingsu
+# Further Reading
 
 ## Packages
 
