@@ -17,10 +17,10 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
 
 # enable rdma as we will only build for ARM64
-%bcond rdma 1
+%bcond_without rdma 1
 
 # enable java openmpi subpackage by default
-%bcond java 1
+%bcond_without java 1
 
 # Private openmpi libraries
 %global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
