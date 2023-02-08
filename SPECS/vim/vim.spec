@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1225
+Version:        9.0.1247
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -196,6 +196,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Feb 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1247-1
+- Auto-upgrade to 9.0.1247 - to fix CVE-2023-0512
+
 * Mon Feb 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1225-1
 - Auto-upgrade to 9.0.1225 - to fix CVE-2023-0433
 
