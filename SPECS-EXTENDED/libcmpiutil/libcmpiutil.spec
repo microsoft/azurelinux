@@ -3,11 +3,11 @@ Summary:        CMPI Utility Library
 Name:           libcmpiutil
 Version:        0.5.7
 Release:        20%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://libvirt.org/CIM/
-Source:         ftp://libvirt.org/libvirt-cim/libcmpiutil-%{version}.tar.gz
+URL:            https://gitlab.com/libvirt/libvirt-cim
+Source:         https://libvirt.org/sources/CIM/libcmpiutil-%{version}.tar.gz
 Patch0:         libcmpiutil-0.5.6-cast-align.patch
 BuildRequires:  bison
 BuildRequires:  flex
