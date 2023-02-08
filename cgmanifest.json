@@ -24184,8 +24184,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.7",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.7.tar.gz"
+          "version": "6.2.9",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.9.tar.gz"
         }
       }
     },
