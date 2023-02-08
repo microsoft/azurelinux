@@ -8186,8 +8186,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p1",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p1.tar.gz"
+          "version": "1.9.12p2",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
         }
       }
     },
