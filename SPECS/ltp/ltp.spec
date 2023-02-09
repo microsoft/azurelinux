@@ -9,13 +9,13 @@
 
 Summary:        Linux Test Project
 Name:           ltp
-Version:        20220930
-Release:        3%{?dist}
+Version:        20230127
+Release:        1%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
-URL:            https://aka.ms/cbl-mariner
+URL:            https://github.com/linux-test-project/ltp
 Source0:        https://github.com/linux-test-project/ltp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_submodules_tarball.sh script to create a tarball during version updates.
 Source1:        %{name}_submodules-%{version}.tar.gz
@@ -92,6 +92,10 @@ rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 %{_mandir}/*
 
 %changelog
+* Wed Feb 08 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230127-1
+- Updating to version 20230127.
+- Fixed project URL.
+
 * Tue Jan 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220930-3
 - Adding missing dependency on 'ethtool' and 'diffutils'.
 

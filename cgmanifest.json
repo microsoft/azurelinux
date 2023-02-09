@@ -6880,6 +6880,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "infinipath-psm",
+          "version": "3.3",
+          "downloadUrl": "https://github.com/intel/psm/archive/refs/tags/v3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "influx-cli",
           "version": "2.6.1",
           "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.6.1.tar.gz"
@@ -6893,16 +6903,6 @@
           "name": "influxdb",
           "version": "2.6.1",
           "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.6.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "infinipath-psm",
-          "version": "3.3",
-          "downloadUrl": "https://github.com/intel/psm/archive/refs/tags/v3.3.tar.gz"
         }
       }
     },
@@ -11871,8 +11871,8 @@
         "type": "other",
         "other": {
           "name": "ltp",
-          "version": "20220930",
-          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20220930.tar.gz"
+          "version": "20230127",
+          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20230127.tar.gz"
         }
       }
     },
@@ -11923,16 +11923,6 @@
           "name": "lua",
           "version": "5.4.3",
           "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "luajit",
-          "version": "2.1.0",
-          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
         }
       }
     },
@@ -11993,6 +11983,16 @@
           "name": "lua-term",
           "version": "0.07",
           "downloadUrl": "https://github.com/hoelzro/lua-term/archive/0.07.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "luajit",
+          "version": "2.1.0",
+          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
         }
       }
     },
