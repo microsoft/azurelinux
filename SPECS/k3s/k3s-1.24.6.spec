@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.24.3
-Release:        6%{?dist}
+Version:        1.24.6
+Release:        1%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -15,13 +15,13 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone --single-branch --branch="v1.6.6-k3s1" --depth=1 https://github.com/k3s-io/containerd
+# 6. git clone --single-branch --branch="v1.6.8-k3s1" --depth=1 https://github.com/k3s-io/containerd
 # 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
-# 8. git clone --single-branch --branch="v1.1.3" --depth=1 https://github.com/opencontainers/runc
+# 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         vendor_build-1.24.3.patch
+Patch0:         vendor_build-1.24.6.patch
 %global debug_package %{nil}
 %define install_path  /usr/local/bin
 %define util_path     %{_datadir}/k3s
@@ -79,6 +79,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue Feb 07 2023 Vinayak Gupta <guptavinayak@microsoft.com> - 1.24.6-1
+- Updated k3s to 1.24.6
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.3-6
 - Bump release to rebuild with go 1.19.5
 
