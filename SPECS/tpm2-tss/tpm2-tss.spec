@@ -29,7 +29,7 @@ Requires:       %{name} = %{version}-%{release}
 The libraries and header files needed for TSS2 development.
 
 %prep
-%autosetup -p1 
+%autosetup -p1
 
 %build
 %configure \
