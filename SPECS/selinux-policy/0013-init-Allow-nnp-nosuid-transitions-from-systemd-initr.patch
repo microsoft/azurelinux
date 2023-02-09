@@ -1,0 +1,27 @@
+From 0e990d820ec1c3bd657076ccc9799f52e6e317c6 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 29 Aug 2022 19:21:11 +0000
+Subject: [PATCH 13/36] init: Allow nnp/nosuid transitions from systemd
+ initrc_t.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/init.if | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index ba2561048..e1ce1363d 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -553,6 +553,8 @@ interface(`init_system_domain',`
+ 
+ 	ifdef(`init_systemd',`
+ 		init_domain($1, $2)
++
++		allow initrc_t $1:process2 { nnp_transition nosuid_transition };
+ 	')
+ ')
+ 
+-- 
+2.34.1
+

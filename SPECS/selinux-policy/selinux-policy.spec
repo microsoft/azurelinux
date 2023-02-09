@@ -3,13 +3,13 @@
 %define monolithic n
 %define policy_name targeted
 %define refpolicy_major 2
-%define refpolicy_minor 20220106
+%define refpolicy_minor 20221101
 %define POLICYCOREUTILSVER 3.2
 %define CHECKPOLICYVER 3.2
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        12%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,56 +19,42 @@ Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Source3:        modules_targeted.conf
 Source4:        macros.selinux-policy
-Patch1:         0001-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
-Patch2:         0002-cronyd-Add-dac_read_search.patch
-Patch3:         0003-Temporary-fix-for-wrong-audit-log-directory.patch
-Patch4:         0004-Set-default-login-to-unconfined_u.patch
-Patch5:         0005-systemd-Add-systemd-homed-and-systemd-userdbd.patch
-Patch6:         0006-systemd-ssh-Crypto-sysctl-use.patch
-Patch7:         0007-systemd-Additional-fixes-for-fs-getattrs.patch
-Patch8:         0008-systemd-Updates-for-generators-and-kmod-static-nodes.patch
-Patch9:         0009-Add-containers-policy.patch
-Patch10:        0010-domain-Allow-lockdown-for-all-domains.patch
-Patch11:        0011-systemd-Drop-systemd_detect_virt_t.patch
-Patch12:        0012-fstools-Handle-resizes-of-the-root-filesystem.patch
-Patch13:        0013-mount-Get-the-attributes-of-all-filesystems.patch
-Patch14:        0014-systemd-Misc-updates.patch
-Patch15:        0015-rpm-Add-dnf-and-tdnf-labeling.patch
-Patch16:        0016-logging-Change-to-systemd-interface-for-tmpfilesd.patch
-Patch17:        0017-Add-cloud-init.patch
-Patch18:        0018-Add-compatibility-for-container-selinux.patch
-Patch19:        0019-systemd-Remove-systemd-run-domain.patch
-Patch20:        0020-unconfined-Add-missing-capability2-perms.patch
-Patch21:        0021-lvm-Updates-for-multipath-LVM.patch
-Patch22:        0022-locallogin-Use-init-file-descriptors.patch
-Patch23:        0023-systemd-Misc-fixes.patch
-Patch24:        0024-isns-Updates-from-testing.patch
-Patch25:        0025-container-docker-Fixes-for-containerd-and-kubernetes.patch
-Patch26:        0026-devices-Add-type-for-SAS-management-devices.patch
-Patch27:        0027-devices-Add-file-context-for-dev-vhost-vsock.patch
-Patch28:        0028-Add-dac_read_search-perms.patch
-Patch29:        0029-iptables-Ioctl-cgroup-dirs.patch
-Patch30:        0030-container-allow-containers-to-manipulate-own-fds.patch
-Patch31:        0031-devices-Add-type-for-infiniband-devices.patch
-Patch32:        0032-storage-Add-fc-for-dev-ng-n-devices.patch
-Patch33:        0033-files-Add-prerequisite-access-for-files_mounton_non_.patch
-Patch34:        0034-files-Make-etc_runtime_t-a-config-file.patch
-Patch35:        0035-systemd-Fixes-for-coredumps-in-containers.patch
-Patch36:        0036-container-Allow-container-engines-to-connect-to-http.patch
-Patch37:        0037-container-Getattr-generic-device-nodes.patch
-Patch38:        0038-application-Allow-apps-to-use-init-fds.patch
-Patch39:        0039-unconfined-Manage-own-fds.patch
-Patch40:        0040-usermanage-Add-sysctl-access-for-groupadd-to-get-num.patch
-Patch41:        0041-systemd-systemd-cgroups-reads-kernel.cap_last_cap-sy.patch
-Patch42:        0042-kernel-hv_utils-shutdown-on-systemd-systems.patch
-Patch43:        0043-Container-Minor-fixes-from-interactive-container-use.patch
-Patch44:        0044-systemd-Minor-coredump-fixes.patch
-Patch45:        0045-rpm-Minor-fixes.patch
-Patch46:        0046-init-Allow-nnp-nosuid-transitions-from-systemd-initr.patch
-Patch47:        0047-selinuxutil-Semanage-reads-policy-for-export.patch
-Patch48:        0048-sysnetwork-ifconfig-searches-debugfs.patch
-Patch49:        0049-usermanage-Add-dac_read_search-to-useradd.patch
-Patch50:        0050-Temp-kubernetes-fix.patch
+Patch1:         0001-cronyd-Add-dac_read_search.patch
+Patch2:         0002-Temporary-fix-for-wrong-audit-log-directory.patch
+Patch3:         0003-Set-default-login-to-unconfined_u.patch
+Patch4:         0004-systemd-Misc-updates.patch
+Patch5:         0005-Add-compatibility-for-container-selinux.patch
+Patch6:         0006-Add-dac_read_search-perms.patch
+Patch7:         0007-unconfined-Manage-own-fds.patch
+Patch8:         0008-systemd-systemd-cgroups-reads-kernel.cap_last_cap-sy.patch
+Patch9:         0009-kernel-hv_utils-shutdown-on-systemd-systems.patch
+Patch10:        0010-Container-Minor-fixes-from-interactive-container-use.patch
+Patch11:        0011-systemd-Minor-coredump-fixes.patch
+Patch12:        0012-rpm-Minor-fixes.patch
+Patch13:        0013-init-Allow-nnp-nosuid-transitions-from-systemd-initr.patch
+Patch14:        0014-selinuxutil-Semanage-reads-policy-for-export.patch
+Patch15:        0015-sysnetwork-ifconfig-searches-debugfs.patch
+Patch16:        0016-usermanage-Add-dac_read_search-to-useradd.patch
+Patch17:        0017-Temp-kubernetes-fix.patch
+Patch18:        0018-usermanage-Add-sysctl-access-for-groupadd-to-get-num.patch
+Patch19:        0019-container-docker-Fixes-for-containerd-and-kubernetes.patch
+Patch20:        0020-iscsi-Read-initiatorname.iscsi.patch
+Patch21:        0021-lvm-Add-fc-entry-for-etc-multipath.patch
+Patch22:        0022-files-Handle-symlinks-for-media-and-srv.patch
+Patch23:        0023-cloudinit-Add-support-for-installing-RPMs-and-settin.patch
+Patch24:        0024-kdump-Fixes-from-testing-kdumpctl.patch
+Patch25:        0025-usermanage-Handle-symlinks-in-usr-share-cracklib.patch
+Patch26:        0026-unconfined-Add-remaining-watch_-permissions.patch
+Patch27:        0027-chronyd-Read-dev-urandom.patch
+Patch28:        0028-cloud-init-Allow-use-of-sudo-in-runcmd.patch
+Patch29:        0029-cloud-init-Add-systemd-permissions.patch
+Patch30:        0030-usermanage-Add-dac_read_search-to-passwd_t.patch
+Patch31:        0031-cloud-init-Change-udev-rules.patch
+Patch32:        0032-Port-tomcat-module-from-Fedora-policy.patch
+Patch33:        0033-Port-PKI-module-from-Fedora-policy.patch
+Patch34:        0034-domain-Unconfined-can-transition-to-other-domains.patch
+Patch35:        0035-systemd-Updates-for-systemd-locale.patch
+Patch36:        0036-modutils-Handle-running-dracut-during-rpm-postinst.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -136,6 +122,7 @@ enforced by the kernel when running with SELinux enabled.
 %config(noreplace) %{_sysconfdir}/selinux/%{policy_name}/contexts/users/user_u
 %config(noreplace) %{_sysconfdir}/selinux/%{policy_name}/contexts/users/staff_u
 %config(noreplace) %{_sysconfdir}/selinux/%{policy_name}/contexts/users/unconfined_u
+%config(noreplace) %{_sysconfdir}/selinux/%{policy_name}/contexts/users/xdm
 %{_sharedstatedir}/selinux/%{policy_name}/active/commit_num
 %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra
 %{_sharedstatedir}/selinux/%{policy_name}/active/homedir_template
@@ -353,6 +340,15 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Mar 01 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-1
+- Update to new upstream release.
+- Fix iscsid access to initiatorname.iscsi.
+- Add file context for /etc/multipath/*
+- Handle /media and /srv symlinks.
+- Add cloud-init support for installing RPMs and setting passwords.
+- Port tomcat and pki modules from the Fedora policy.
+- Fix running dracut in RPM scripts.
+
 * Fri Nov 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20220106-12
 - Added 'selinux-policy' RPM macros.
 
