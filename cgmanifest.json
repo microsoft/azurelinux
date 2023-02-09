@@ -26046,6 +26046,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "squid",
+          "version": "5.7",
+          "downloadUrl": "http://www.squid-cache.org/Versions/v5/squid-5.7.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sriov-network-device-plugin",
           "version": "3.4.0",
           "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.4.0.tar.gz"
