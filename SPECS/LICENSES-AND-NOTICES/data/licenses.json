@@ -560,6 +560,7 @@
                 "libchewing",
                 "libcli",
                 "libcmis",
+                "libcmpiutil",
                 "libcomps",
                 "libcroco",
                 "libdaemon",
