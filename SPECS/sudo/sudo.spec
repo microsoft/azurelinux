@@ -97,7 +97,6 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
-
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.9.12p2-1
 - Upgrade to 1.9.12p2 for CVE-2023-22809
 
