@@ -11891,8 +11891,8 @@
         "type": "other",
         "other": {
           "name": "ltp",
-          "version": "20220930",
-          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20220930.tar.gz"
+          "version": "20230127",
+          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20230127.tar.gz"
         }
       }
     },
