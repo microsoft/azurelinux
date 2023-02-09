@@ -284,7 +284,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
 
-	buildState := schedulerutils.NewGraphBuildState(reservedFiles, supressConflictingRPMs)
+	buildState := schedulerutils.NewGraphBuildState(reservedFiles, *supressConflictingRPMs)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
