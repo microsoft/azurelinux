@@ -2,7 +2,7 @@ Summary:        Thunderbolt device manager
 Name:           bolt
 Version:        0.9.2
 Release:        2%{?dist}
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.freedesktop.org/bolt/bolt
@@ -17,13 +17,6 @@ BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  pkgconfig(gio-2.0)
 %{?systemd_requires}
-# for the integration test (optional)
-%if 0%{?fedora} || 0%{?rhel} > 8
-BuildRequires:  pygobject3-devel
-BuildRequires:  python3-dbus
-BuildRequires:  python3-dbusmock
-BuildRequires:  umockdev-devel
-%endif
 
 %description
 bolt is a system daemon to manage Thunderbolt devices via a D-BUS
