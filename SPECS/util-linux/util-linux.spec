@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{
 Source1:        runuser
 Source2:        runuser-l
 Source3:        su
+Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -19,8 +20,6 @@ BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
-# util-linux contains su, which conflicts with shadow-utils < 4.9-10 that also contained su
-Conflicts:      shadow-utils < 4.9-10
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
@@ -64,7 +63,7 @@ Group:          Development/Libraries
 These are library files of util-linux.
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/adjtime' .)
 
 %build
@@ -149,6 +148,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 06 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.37.4-5
+- Add patch to prevent cdrom probe on Azure VMs
+
 * Wed Jul 20 2022 Minghe Ren <mingheren@microsoft.com> - 2.37.4-4
 - Modify su to improve security
 - Change file permission on mount and umount to improve security
