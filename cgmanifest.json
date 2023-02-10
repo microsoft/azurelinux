@@ -1717,8 +1717,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "28.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v28.0.tar.gz"
+          "version": "29.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v29.0.tar.gz"
         }
       }
     },
@@ -7821,8 +7821,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.80.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.80.mshv2.tar.gz"
+          "version": "5.15.86.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.86.mshv2.tar.gz"
         }
       }
     },
