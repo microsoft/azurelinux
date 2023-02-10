@@ -1,13 +1,14 @@
 Summary:        Terminal multiplexer
 Name:           tmux
 Version:        3.2a
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-47016.patch
 Requires:       libevent ncurses
 BuildRequires:  libevent-devel ncurses-devel
 
@@ -15,7 +16,7 @@ BuildRequires:  libevent-devel ncurses-devel
 Terminal multiplexer
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -37,6 +38,9 @@ make  %{?_smp_mflags} check
 %exclude /usr/src
 
 %changelog
+* Fri Feb 10 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.2a-3
+- Patch CVE-2022-47016
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.2a-2
 - Remove unused `%%define sha1` lines
 
