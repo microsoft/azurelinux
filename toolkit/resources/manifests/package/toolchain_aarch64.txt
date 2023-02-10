@@ -407,8 +407,8 @@ tdnf-plugin-repogpgcheck-2.1.0-7.cm1.aarch64.rpm
 tdnf-python-2.1.0-7.cm1.aarch64.rpm
 texinfo-6.5-7.cm1.aarch64.rpm
 texinfo-debuginfo-6.5-7.cm1.aarch64.rpm
-unzip-6.0-18.cm1.aarch64.rpm
-unzip-debuginfo-6.0-18.cm1.aarch64.rpm
+unzip-6.0-19.cm1.aarch64.rpm
+unzip-debuginfo-6.0-19.cm1.aarch64.rpm
 util-linux-2.32.1-7.cm1.aarch64.rpm
 util-linux-debuginfo-2.32.1-7.cm1.aarch64.rpm
 util-linux-devel-2.32.1-7.cm1.aarch64.rpm
