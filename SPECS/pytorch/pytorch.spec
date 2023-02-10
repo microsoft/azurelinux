@@ -65,19 +65,31 @@ export BUILD_CAFFE2=0
 %install
 %py3_install
 install -d -m755 %{buildroot}/%{_pkgdocdir}
+
 for directory in doc docs example examples; do
   if [ -d $directory ]; then
     cp -arf $directory %{buildroot}/%{_pkgdocdir}
   fi
 done
-for directory in lib lib64 bin sbin; do
+
+pushd %{buildroot}
+
+for directory in usr/{lib,lib64,bin,sbin}; do
   if [ -d $directory ]; then
-    find %{buildroot}%{_prefix}/$directory -type f -printf "/%h/%f\n" >> filelist.lst
+    find $directory -type f -printf "/%h/%f\n" >> filelist.lst
   fi
 done
-if [ -d usr/share/man ]; then
-    find %{buildroot}%{_prefix}/share/man -type f -printf "/%h/%f.gz\n" >> doclist.lst
+
+man_dir="usr/share/man"
+
+if [ -d $man_dir ]; then
+    find $man_dir -type f -printf "/%h/%f.gz\n" >> doclist.lst
 fi
+
+popd
+
+mv %{buildroot}/filelist.lst .
+mv %{buildroot}/doclist.lst .
 
 %files -n python3-pytorch -f filelist.lst
 %dir %{python3_sitearch}/*
