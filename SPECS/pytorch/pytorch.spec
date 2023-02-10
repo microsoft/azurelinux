@@ -81,7 +81,7 @@ for directory in usr/{lib,lib64,bin,sbin}; do
 done
 
 man_dir="usr/share/man"
-
+touch doclist.lst
 if [ -d $man_dir ]; then
     find $man_dir -type f -printf "/%h/%f.gz\n" >> doclist.lst
 fi
