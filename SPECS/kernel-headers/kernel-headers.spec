@@ -36,8 +36,8 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Wed Jan 04 2023 Minghe Ren <mingheren@microsoft.com> - 5.15.86.1-2
-- Disable CONFIG_INIT_ON_ALLOC_DEFAULT_ON and CONFIG_INIT_ON_FREE_DEFAULT_ON
+* Thu Feb 09 2023 Minghe Ren <mingheren@microsoft.com> - 5.15.86.1-2
+- Disable CONFIG_INIT_ON_FREE_DEFAULT_ON
 
 * Tue Jan 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.86.1-1
 - Auto-upgrade to 5.15.86.1
