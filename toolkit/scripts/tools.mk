@@ -54,7 +54,7 @@ define go_util_rule
 go-$(notdir $(tool))=$(tool)
 .PHONY: go-$(notdir $(tool))
 go-$(notdir $(tool)): $(tool)
-$(tool): $(shell find $(TOOLS_DIR)/$(notdir $(tool))/ -type f -name '*.go')
+$(tool): $(call shell_real_build_only, find $(TOOLS_DIR)/$(notdir $(tool))/ -type f -name '*.go')
 endef
 $(foreach tool,$(go_tool_targets),$(eval $(go_util_rule)))
 
@@ -107,7 +107,7 @@ go-fmt-all:
 
 # Formats the test coverage for the tools
 .PHONY: $(BUILD_DIR)/tools/all_tools.coverage
-$(BUILD_DIR)/tools/all_tools.coverage: $(shell find $(TOOLS_DIR)/ -type f -name '*.go')
+$(BUILD_DIR)/tools/all_tools.coverage: $(call shell_real_build_only, find $(TOOLS_DIR)/ -type f -name '*.go')
 	cd $(TOOLS_DIR) && go test -coverpkg=./... -covermode=atomic -coverprofile=$@ ./...
 $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 	cd $(TOOLS_DIR) && go tool cover -html=$(BUILD_DIR)/tools/all_tools.coverage -o $@

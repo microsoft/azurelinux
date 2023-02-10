@@ -33,7 +33,7 @@ BuildRequires:  meson >= 0.59.0
 BuildRequires:  gcc
 BuildRequires:  g++
 BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(libudev)
+#BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.32
 BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.32
@@ -47,7 +47,7 @@ BuildRequires:  pkgconfig(fdk-aac)
 BuildRequires:  pkgconfig(vulkan)
 %endif
 BuildRequires:  pkgconfig(bluez)
-BuildRequires:  systemd
+#BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  alsa-lib-devel
 BuildRequires:  libv4l-devel
@@ -259,6 +259,16 @@ touch %{buildroot}%{_datadir}/pipewire/media-session.d/with-alsa
 mkdir -p %{buildroot}%{_libdir}/udev/rules.d
 mv -fv %{buildroot}/lib/udev/rules.d/90-pipewire-alsa.rules %{buildroot}%{_libdir}/udev/rules.d
 
+# AMD64-Build-Fix:
+# Build requires pkg "gstreamer1" installs fileattrs to provide rpm dependency generation
+# macros for shared libraries installed under "%{_libdir}/gstreamer-1.0/" path.
+# However, the generator script gstreamer1.prov is stuck when generating the provides list
+# causing the build to hang when building in amd64 docker enviroment.
+# The plugin loader helper binary "gst-plugin-scanner" causes this hang issue.
+# Disabling the binary fixes the hang and gst-inspect-1.0 binary successfully parses the
+# plugin and generates the rpm provides information.
+rm %{_libexecdir}/gstreamer-1.0/gst-plugin-scanner
+
 %check
 %meson_test
 
@@ -269,8 +279,8 @@ getent passwd pipewire >/dev/null || \
 exit 0
 
 %post
-%{systemd_user_post} pipewire.service
-%{systemd_user_post} pipewire.socket
+%systemd_user_post pipewire.service
+%systemd_user_post pipewire.socket
 
 %triggerun -- %{name} < 0.3.6-2
 # This is for upgrades from previous versions which had a static symlink.
@@ -279,12 +289,12 @@ exit 0
 systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %post pulseaudio
-%{systemd_user_post} pipewire-pulse.service
-%{systemd_user_post} pipewire-pulse.socket
+%systemd_user_post pipewire-pulse.service
+%systemd_user_post pipewire-pulse.socket
 
 %if %{with media_session}
 %post media-session
-%{systemd_user_post} pipewire-media-session.service
+%systemd_user_post pipewire-media-session.service
 %endif
 
 %files

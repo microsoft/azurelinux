@@ -104,12 +104,14 @@ SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/co
 
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
+PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
 ifeq ($(USE_PREVIEW_REPO),y)
    PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
    PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
    SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
    ifneq ($(wildcard $(PREVIEW_REPO)),)
       override REPO_LIST += $(PREVIEW_REPO)
@@ -122,38 +124,9 @@ ifeq ($(USE_PREVIEW_REPO),y)
    endif
 endif
 
-ifneq ($(strip $(SRPM_PACK_LIST)),)
-LOCAL_SPECS = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(strip SRPM_PACK_LIST))))
-else # Empty pack list, build all under $(SPECS_DIR)
-LOCAL_SPECS = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
-endif
-
-LOCAL_SPEC_DIRS = $(foreach spec,$(LOCAL_SPECS),$(dir $(spec)))
-
 CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
-
-# Build defines
-DIST_TAG           ?= .cm2
-# Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
-BUILD_NUMBER       ?= $(shell runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD)
-# an empty BUILD_NUMBER breaks the build later on
-ifeq ($(BUILD_NUMBER),)
-   BUILD_NUMBER = non-git
-endif
-RELEASE_MAJOR_ID   ?= 2.0
-# use minor ID defined in file (if exist) otherwise define it
-# note this file must be single line
-ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
-   RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
-else
-   RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
-endif
-RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
-
-# Image tag - empty by default. Does not apply to the initrd.
-IMAGE_TAG          ?=
 
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
@@ -171,6 +144,9 @@ all: toolchain go-tools chroot-tools
 # Misc function defines
 # Variable prerequisite tracking
 include $(SCRIPTS_DIR)/utils.mk
+
+# Set the variables for build number, distro tag, etc
+include $(SCRIPTS_DIR)/build_tag.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
@@ -216,6 +192,38 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(toolkit_root)/out
 
-# output version number
-get-version:
-	@echo $(RELEASE_VERSION)
+######## VARIABLE PRINTING ########
+
+# Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
+get-version: printvar-RELEASE_VERSION
+get-dist-tag: printvar-DIST_TAG
+get-release-major: printvar-RELEASE_MAJOR_ID
+
+# Make an easy way to print out the build variables. These must be the last entries in the makefile so that all other
+# files have their variables inluded
+
+# Print out all variables to stdout, either or of the form "<VALUE>" or the verbose form "varname: <VALUE>"
+#   printvar-all-vars
+#   printvar-verbose-all-vars
+
+# Print a specific variable to stdout, using the same format as above
+#   printvar-*
+#   printvar-verbose-*
+
+# Use these targets like so:  `my-var=$(make printvar-MY_VAR --quiet)`
+# The --quiet flag is important to avoid printing extra output
+.PHONY: printvar-all-vars printvar-verbose-all-vars
+
+# Gather the variables we want to print out, removing any automatic .* variables, and the self reference, along with special characters that may interfere with Make
+sanitize_variables = $(subst ',,$(subst ",,$(subst `,,$(subst \#,,$(subst $$,,$(subst :,,$1))))))
+interesting_variables  = $(filter-out .% interesting_variables, $(sort $(call sanitize_variables,$(.VARIABLES))))
+
+printvar-all-vars: $(foreach var,$(interesting_variables),printvar-$(var))
+printvar-all-vars: ;
+printvar-verbose-all-vars: $(foreach var,$(interesting_variables),printvar-verbose-$(var))
+printvar-verbose-all-vars: ;
+
+printvar-%: ; $(info $($(subst printvar-,,$@)))
+	@: # We want to supress 'make: Nothing to be done for ...' so execute a command so make thinks it has done something
+printvar-verbose-%: ; $(info $(subst printvar-verbose-,,$@): $($(subst printvar-verbose-,,$@)))
+	@: # We want to supress 'make: Nothing to be done for ...' so execute a command so make thinks it has done something

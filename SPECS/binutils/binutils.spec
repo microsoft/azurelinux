@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Patch1:         linker-script-readonly-keyword-support.patch
 Patch2:         thin_archive_descriptor.patch
 Patch3:         CVE-2021-45078.patch
 Patch4:         CVE-2022-38533.patch
+Patch5:         CVE-2022-4285.patch
 Provides:       bundled(libiberty)
 
 %description
@@ -130,7 +131,10 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
-* Thu Sep 1 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.37-4
+* Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.37-5
+- Backport upstream patch to fix CVE-2022-4285
+
+* Thu Sep 01 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.37-4
 - Backport upstream patch to fix CVE-2022-38533
 
 * Wed Apr 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.37-3

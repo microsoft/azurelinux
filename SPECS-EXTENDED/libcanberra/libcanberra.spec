@@ -73,7 +73,7 @@ Development Files for libcanberra Client Development
 %autosetup -p1
 
 %build
-%configure --disable-static --enable-pulse --enable-alsa --enable-null --disable-oss --with-builtin=dso --with-systemdsystemunitdir=%{_libdir}systemd/system
+%configure --disable-static --enable-pulse --enable-alsa --enable-null --disable-oss --with-builtin=dso --with-systemdsystemunitdir=%{_libdir}/systemd/system
 %make_build %{?_smp_mflags}
 
 %install

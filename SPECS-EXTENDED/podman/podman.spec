@@ -36,7 +36,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -47,7 +47,7 @@ Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commi
 Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-%{shortcommit_gvproxy}.tar.gz
 Provides:       %{name}-manpages = %{version}-%{release}
 BuildRequires:  go-md2man
-BuildRequires:  golang
+BuildRequires:  golang <= 1.18.8
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
@@ -386,6 +386,15 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Thu Feb 09 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.1-7
+- Force building with golang 1.18.8 to resolve build issue
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-6
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-5
+- Bump release to rebuild with go 1.19.4
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.1.1-4
 - Bump release to rebuild with go 1.18.8
 

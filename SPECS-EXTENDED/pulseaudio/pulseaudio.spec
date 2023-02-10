@@ -1,3 +1,5 @@
+%bcond_with missing_dependencies
+
 %undefine _strict_symbol_defs_build
 %global with_webrtc 1
 %global enable_lirc 0
@@ -97,7 +99,9 @@ Enlightened Sound Daemon (ESOUND).
 Summary:        Pulseaudio equalizer interface
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       python3-dbus
+%if 0%{with missing_dependencies}
 Requires:       python3-qt5-base
+%endif
 
 %description qpaeq
 qpaeq is a equalizer interface for pulseaudio's equalizer sinks.
@@ -264,12 +268,12 @@ exit 0
 %post
 %{?ldconfig}
 %if 0%{?systemd}
-%{systemd_user_post} pulseaudio.socket
+%systemd_user_post pulseaudio.socket
 %endif
 
 %if 0%{?systemd}
 %preun
-%{systemd_user_preun} pulseaudio.socket
+%systemd_user_preun pulseaudio.socket
 %endif
 
 %ldconfig_postun

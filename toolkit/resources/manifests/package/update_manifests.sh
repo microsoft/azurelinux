@@ -34,7 +34,7 @@ echo Updating files...
 generate_toolchain () {
     # First generate toolchain_*.txt from TOOLCHAIN_ARCHIVE (toolchain_built_rpms_all.tar.gz)
     # This file is a sorted list of all toolchain packages in the tarball.
-    tar -ztf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
+    tar -tf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
     # Now sort the file in place
     LC_COLLATE=C sort -f -o "$ToolchainManifest" "$ToolchainManifest"
 }
@@ -80,6 +80,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/lua-rpm/d' $TmpPkgGen
     sed -i '/lua-srpm/d' $TmpPkgGen
     sed -ri '/mariner-repos-(debug|extended|extras|microsoft)/d' $TmpPkgGen
+    sed -i '/nghttp2-devel/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-5/d' $TmpPkgGen
@@ -266,6 +267,7 @@ generate_pkggen_core () {
         grep "^libsolv-" $TmpPkgGen
         grep "^libssh2-" $TmpPkgGen
         grep "^krb5-" $TmpPkgGen
+        grep "^nghttp2-" $TmpPkgGen
         grep "^curl-" $TmpPkgGen
         grep "^tdnf-" $TmpPkgGen
         grep "^createrepo_c-" $TmpPkgGen
