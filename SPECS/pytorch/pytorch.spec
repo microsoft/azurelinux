@@ -24,11 +24,6 @@ BuildRequires:  python3-numpy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-typing-extensions
 
-Requires:       python3-filelock
-Requires:       python3-numpy
-Requires:       python3-typing-extensions
-Provides:       python3-pytorch
-
 %description
 PyTorch is a Python package that provides two high-level features:
 - Tensor computation (like NumPy) with strong GPU acceleration
@@ -38,6 +33,10 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 %package -n     python3-pytorch
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 
+Requires:       python3-filelock
+Requires:       python3-numpy
+Requires:       python3-typing-extensions
+
 %description -n python3-pytorch
 PyTorch is a Python package that provides two high-level features:
 - Tensor computation (like NumPy) with strong GPU acceleration
@@ -46,7 +45,6 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 
 %package -n python3-pytorch-doc
 Summary:        Development documents and examples for torch
-Provides:       python3-pytorch-doc
 
 %description -n python3-pytorch-doc
 PyTorch is a Python package that provides two high-level features:
@@ -66,35 +64,14 @@ export BUILD_CAFFE2=0
 %py3_install
 install -d -m755 %{buildroot}/%{_pkgdocdir}
 
-for directory in doc docs example examples; do
-  if [ -d $directory ]; then
-    cp -arf $directory %{buildroot}/%{_pkgdocdir}
-  fi
-done
-
-pushd %{buildroot}
-
-for directory in usr/{lib,lib64,bin,sbin}; do
-  if [ -d $directory ]; then
-    find $directory -type f -printf "/%h/%f\n" >> filelist.lst
-  fi
-done
-
-man_dir="usr/share/man"
-touch doclist.lst
-if [ -d $man_dir ]; then
-    find $man_dir -type f -printf "/%h/%f.gz\n" >> doclist.lst
-fi
-
-popd
-
-mv %{buildroot}/filelist.lst .
-mv %{buildroot}/doclist.lst .
-
-%files -n python3-pytorch -f filelist.lst
-%dir %{python3_sitearch}/*
-
-%files -n python3-pytorch-doc -f doclist.lst
+cp -arf docs %{buildroot}/%{_pkgdocdir}
+%files -n python3-pytorch
+%{_bindir}/convert-caffe2-to-onnx
+%{_bindir}/convert-onnx-to-caffe2
+%{_bindir}/torchrun
+%{python3_sitearch}/*
+ 
+%files -n python3-pytorch-doc
 %{_docdir}/*
 
 %changelog
