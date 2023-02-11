@@ -99,19 +99,19 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 
 %changelog
 * Fri Feb 10 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-4
-- Fixing spec supplement of bash-completion library to not conflict with existing bash-completion.
+- Fixing spec supplement of bash-completion library to not conflict with existing bash-completion
 
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-3
 - Bump release to rebuild with go 1.19.5
 
 * Wed Feb 1 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-2
-- Fixed build issue by requring to use golang 1.18.8. Does not work on 1.19 yet.
+- Fixed build issue by requring to use golang 1.18.8. Does not work on 1.19 yet
 
 * Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-1
 - Upgrade to version 2.6.1
 
 * Wed Jan 18 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.4.0-1
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License verified
 - Upgrade to version 2.4.0
 
