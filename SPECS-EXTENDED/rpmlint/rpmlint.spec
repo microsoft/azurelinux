@@ -12,7 +12,7 @@ Name:           rpmlint
 Version:        1.11
 Release:        8%{?dist}
 Summary:        Tool for checking common errors in RPM packages
-License:        GPLv2
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/rpmlint
