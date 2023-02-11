@@ -1,3 +1,4 @@
+%global _empty_manifest_terminate_build 0
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        1.13.1
@@ -10,7 +11,6 @@ URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
-%global _empty_manifest_terminate_build 0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
