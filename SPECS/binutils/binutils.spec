@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -131,6 +131,9 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
+* Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.37-6
+- TEST FOR FAILURE
+
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.37-5
 - Backport upstream patch to fix CVE-2022-4285
 
