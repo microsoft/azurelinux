@@ -1,4 +1,3 @@
-%global _empty_manifest_terminate_build 0
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        1.13.1
@@ -12,6 +11,7 @@ Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}
 # Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
 
+%global _empty_manifest_terminate_build 0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -32,7 +32,6 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 
 %package -n     python3-pytorch
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
-
 Requires:       python3-filelock
 Requires:       python3-numpy
 Requires:       python3-typing-extensions
@@ -65,12 +64,13 @@ export BUILD_CAFFE2=0
 install -d -m755 %{buildroot}/%{_pkgdocdir}
 
 cp -arf docs %{buildroot}/%{_pkgdocdir}
+
 %files -n python3-pytorch
 %{_bindir}/convert-caffe2-to-onnx
 %{_bindir}/convert-onnx-to-caffe2
 %{_bindir}/torchrun
 %{python3_sitearch}/*
- 
+
 %files -n python3-pytorch-doc
 %{_docdir}/*
 
