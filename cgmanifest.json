@@ -3107,6 +3107,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "elinks",
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.16.0/elinks-0.16.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "emacs",
           "version": "28.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz"
@@ -8273,6 +8283,16 @@
           "name": "libao",
           "version": "1.2.0",
           "downloadUrl": "https://downloads.xiph.org/releases/ao/libao-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libappstream-glib",
+          "version": "0.8.2",
+          "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.2.tar.xz"
         }
       }
     },
