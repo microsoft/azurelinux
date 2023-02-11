@@ -1,23 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A library to access SMI MIB information
 Name:           libsmi
 Version:        0.4.8
-Release:        27%{?dist}
-Summary:        A library to access SMI MIB information
-
-License:        GPLv2+ and BSD
-URL:            http://www.ibr.cs.tu-bs.de/projects/libsmi/index.html
-Source0:        ftp://ftp.ibr.cs.tu-bs.de/pub/local/libsmi/%{name}-%{version}.tar.gz
+Release:        28%{?dist}
+License:        TCL AND BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.ibr.cs.tu-bs.de/projects/libsmi/index.html
+#Upstream Source0 url is dead
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        smi.conf
-Source2:	IETF-MIB-LICENSE.txt
-Patch0:		libsmi-0.4.8-wget111.patch
-Patch1:		libsmi-0.4.8-CVE-2010-2891.patch
-Patch2:		libsmi-0.4.8-symbols-clash.patch
-Patch3:		libsmi-0.4.8-format-security-fix.patch
-
+Source2:        IETF-MIB-LICENSE.txt
+Patch0:         libsmi-0.4.8-wget111.patch
+Patch1:         CVE-2010-2891.patch
+Patch2:         libsmi-0.4.8-symbols-clash.patch
+Patch3:         libsmi-0.4.8-format-security-fix.patch
+BuildRequires:  bison
+BuildRequires:  flex
 BuildRequires:  libtool
-BuildRequires:  flex, bison
-Requires:       gawk, wget
+Requires:       gawk
+Requires:       wget
 
 %description
 Libsmi is a C library to access MIB module information through
@@ -28,11 +29,10 @@ This package contains tools to check, dump, and convert MIB
 definitions and a steadily maintained and revised archive
 of all IETF and IANA maintained standard MIB modules.
 
-
 %package devel
 Summary:        Development environment for libsmi library
-Requires:       %name = %version-%release
-Requires:       pkgconfig
+Requires:       %{name} = %{version}-%{release}
+Requires:       pkg-config
 
 %description devel
 Libsmi is a C library to access MIB module information through
@@ -56,21 +56,20 @@ cp %{SOURCE2} .
     --enable-sming \
     --enable-shared \
     --disable-static
-make LIBTOOL=/usr/bin/libtool %{?_smp_mflags}
+%make_build LIBTOOL=%{_bindir}/libtool
 
 iconv -f latin1 -t utf-8 <COPYING >COPYING.utf8
 mv COPYING.utf8 COPYING
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}
-install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/smi.conf
+install -d -m 755 %{buildroot}%{_sysconfdir}
+install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/smi.conf
 
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f %{buildroot}%{_libdir}/*.a
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # fails a couple of tests (2 in {0.4.4, 0.4.5})
@@ -80,9 +79,9 @@ make check ||:
 
 
 %files
-%doc ANNOUNCE ChangeLog COPYING README THANKS TODO
+%license COPYING IETF-MIB-LICENSE.txt
+%doc ANNOUNCE ChangeLog README THANKS TODO
 %doc doc/draft-irtf-nmrg-sming-02.txt smi.conf-example
-%doc IETF-MIB-LICENSE.txt
 %config(noreplace) %{_sysconfdir}/smi.conf
 %{_bindir}/*
 %{_libdir}/*.so.*
@@ -97,8 +96,11 @@ make check ||:
 %{_includedir}/*
 %{_mandir}/man3/*.3*
 
-
 %changelog
+* Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.4.8-28
+- Move from extended to core.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.8-27
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -200,5 +202,4 @@ make check ||:
 
 * Fri Apr  7 2006 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.4.3-1
 - First build.
-
 # vim:set ai ts=4 sw=4 sts=4 et:

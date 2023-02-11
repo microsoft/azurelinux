@@ -562,6 +562,7 @@
                 "libchewing",
                 "libcli",
                 "libcmis",
+                "libcmpiutil",
                 "libcomps",
                 "libcroco",
                 "libdaemon",
@@ -572,6 +573,7 @@
                 "libdbi-drivers",
                 "libdbusmenu",
                 "libdc1394",
+                "libdeflate",
                 "libdmx",
                 "libdnf",
                 "libdrm",
@@ -664,7 +666,9 @@
                 "libnumbertext",
                 "liboauth",
                 "libodfgen",
+                "libofa",
                 "libogg",
+                "liboggz",
                 "liboil",
                 "libomp",
                 "libomxil-bellagio",
@@ -1559,6 +1563,7 @@
                 "python-dns",
                 "python-dtopt",
                 "python-dulwich",
+                "python-enchant",
                 "python-entrypoints",
                 "python-ethtool",
                 "python-evdev",
@@ -1807,6 +1812,7 @@
                 "sblim-testsuite",
                 "sblim-wbemcli",
                 "scl-utils",
+                "scotch",
                 "screen",
                 "scrub",
                 "SDL",
@@ -2109,6 +2115,7 @@
                 "livepatch-5.15.86.1-1.cm2",
                 "livepatch-5.15.87.1-1.cm2",
                 "livepatch-5.15.90.1-1.cm2",
+                "livepatch-5.15.92.1-1.cm2",
                 "livepatching",
                 "lld",
                 "local-path-provisioner",
@@ -2963,7 +2970,7 @@
             "specs": [
                 "k3s",
                 "k3s-1.23.8",
-                "k3s-1.24.3"
+                "k3s-1.24.6"
             ]
         },
         "Sysbench source": {

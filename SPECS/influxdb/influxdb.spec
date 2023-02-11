@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,8 +55,7 @@ Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
-BuildRequires:  go >= 1.18
-BuildRequires:  golang-packaging >= 15.0.8
+BuildRequires:  golang <= 1.18.8
 # IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
 BuildRequires:  pkgconfig(flux) >= 0.191.0
 BuildRequires:  protobuf-devel
@@ -145,6 +144,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Feb 1 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-2
+- Fixed build issue by requring to use golang 1.18.8. Does not work on 1.19 yet.
+
 * Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-1
 - Upgrade to version 2.6.1
 
