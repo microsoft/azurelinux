@@ -6,7 +6,7 @@ Summary:   Library for AppStream metadata
 Name:      libappstream-glib
 Version:   0.8.2
 Release:   3%{?dist}
-License:   LGPLv2+
+License:   LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:       http://people.freedesktop.org/~hughsient/appstream-glib/
