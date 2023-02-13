@@ -1,6 +1,6 @@
 Summary:        The Apache Portable Runtime
 Name:           apr
-Version:        1.7.0
+Version:        1.7.2
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://apr.apache.org/
@@ -62,6 +62,8 @@ make -j1 check
 %{_libdir}/pkgconfig
 
 %changelog
+* Tue Jan 13 2022 Suresh Thelkar <sthelkar@microsoft.com> - 1.7.2-1
+- Upgrade to version 1.7.2 to fix CVE-2022-24963
 * Tue Jan 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.0-1
 - Upgrade to version 1.7.0.
 * Thu Oct 28 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.6.5-6
