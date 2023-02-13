@@ -44,7 +44,7 @@ pip3 install -r test-requirements.txt
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
-%doc *.txt Demos Doc Tools
+%doc *.txt Demos docs Tools
 %{_bindir}/cython
 %{_bindir}/cygdb
 %{_bindir}/cythonize
