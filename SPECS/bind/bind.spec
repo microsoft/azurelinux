@@ -1,6 +1,6 @@
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.33
+Version:        9.16.37
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.isc.org/downloads/bind/
@@ -84,6 +84,9 @@ fi
 %{_prefix}/lib/tmpfiles.d/named.conf
 
 %changelog
+* Mon Feb 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.37-1
+- Auto-upgrade to 9.16.37 - to fix CVE-2022-3736, CVE-2022-3094, CVE-2022-3924
+
 * Mon Nov 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.33-1
 - Auto-upgrade to 9.16.33 - CVE-2022-2795,CVE-2022-3080
 
