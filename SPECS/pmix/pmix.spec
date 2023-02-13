@@ -112,7 +112,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Thu Feb 02 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.2-1
 - Move from Extended to core
-- Update to 4.1.2(from Fedora 38(license: MIT))
+- Update to 4.1.2 (from Fedora 38 (license: MIT))
 - License verified
 
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.1.5-2
