@@ -130,7 +130,6 @@ OpenMPI support for Python 3.
 
 %prep
 %autosetup -p1 -n openmpi-%{version}
-./autogen.pl --force
 
 
 
