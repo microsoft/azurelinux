@@ -211,7 +211,7 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
-* Wed Feb 4 2023 Kanika Nema <kanikanema@microsoft.com> - 0.58.0-4
+* Wed Feb 04 2023 Kanika Nema <kanikanema@microsoft.com> - 0.58.0-4
 - Add a upstream patch (from v0.59.0-alpha2) without which virt-handler
   containers don't start.
 
