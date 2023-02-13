@@ -109,7 +109,13 @@ autoreconf -vif -I maint/config
 
 %build
 export LDFLAGS="%{optflags} -Wl,--as-needed"
-%configure --enable-external-lmdb --enable-shared --disable-static --enable-fuse --disable-usrint --with-db-backend=lmdb --with-openib=%{_prefix}
+%configure  --enable-external-lmdb \
+            --enable-shared \
+            --disable-static \
+            --enable-fuse \
+            --disable-usrint \
+            --with-db-backend=lmdb \
+            --with-openib=%{_prefix}
 %make_build
 
 %install
