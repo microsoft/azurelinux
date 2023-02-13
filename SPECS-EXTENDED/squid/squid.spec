@@ -1,87 +1,79 @@
+%define __perl_requires %{SOURCE98}
+Summary:        The Squid proxy caching server
+Name:           squid
+Version:        5.7
+Release:        5%{?dist}
+Epoch:          7
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%define __perl_requires %{SOURCE98}
-
-Name:     squid
-Version:  5.7
-Release:  5%{?dist}
-Summary:  The Squid proxy caching server
-Epoch:    7
-License:  GPLv2
-URL:      http://www.squid-cache.org
-
-Source0:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
-Source1:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz.asc
-Source2:  http://www.squid-cache.org/pgp.asc
-Source3:  squid.logrotate
-Source4:  squid.sysconfig
-Source5:  squid.pam
-Source6:  squid.nm
-Source7:  squid.service
-Source8:  cache_swap.sh
-Source9:  squid.sysusers
-
-Source98: perl-requires-squid.sh
-
+URL:            http://www.squid-cache.org
+Source0:        http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
+Source1:        squid.logrotate
+Source2:        squid.sysconfig
+Source3:        squid.pam
+Source4:        squid.nm
+Source5:        squid.service
+Source6:        cache_swap.sh
+Source7:        squid.sysusers
+Source98:       perl-requires-squid.sh
 # Upstream patches
-
 # Backported patches
-Patch101: squid-5.7-ip-bind-address-no-port.patch
-
+Patch101:       squid-5.7-ip-bind-address-no-port.patch
 # Local patches
 # Applying upstream patches first makes it less likely that local patches
 # will break upstream ones.
-Patch201: squid-4.0.11-config.patch
-Patch202: squid-3.1.0.9-location.patch
-Patch203: squid-3.0.STABLE1-perlpath.patch
-Patch204: squid-3.5.9-include-guards.patch
+Patch201:       squid-4.0.11-config.patch
+Patch202:       squid-3.1.0.9-location.patch
+Patch203:       squid-3.0.STABLE1-perlpath.patch
+Patch204:       squid-3.5.9-include-guards.patch
 # revert this upstream patch - https://bugzilla.redhat.com/show_bug.cgi?id=1936422
 # workaround for #1934919
-Patch205: squid-5.0.5-symlink-lang-err.patch
-
-# cache_swap.sh
-Requires: bash gawk
-# for httpd conf file - cachemgr script alias
-Requires: httpd-filesystem
-
-# squid_ldap_auth and other LDAP helpers require OpenLDAP
-BuildRequires: make
-BuildRequires: openldap-devel
-# squid_pam_auth requires PAM development libs
-BuildRequires: pam-devel
-# SSL support requires OpenSSL
-BuildRequires: openssl-devel
-# squid_kerb_aut requires Kerberos development libs
-BuildRequires: krb5-devel
-# time_quota requires TrivialDB
-BuildRequires: libtdb-devel
+Patch205:       squid-5.0.5-symlink-lang-err.patch
+# required for SASL authentication
+BuildRequires:  cyrus-sasl-devel
 # ESI support requires Expat & libxml2
-BuildRequires: expat-devel libxml2-devel
-# TPROXY requires libcap, and also increases security somewhat
-BuildRequires: libcap-devel
-# eCAP support
-BuildRequires: libecap-devel
+BuildRequires:  expat-devel
 #ip_user helper requires
-BuildRequires: gcc-c++
-BuildRequires: libtool libtool-ltdl-devel
-BuildRequires: perl-generators
-# For test suite
-BuildRequires: pkgconfig(cppunit)
+BuildRequires:  gcc-c++
 # For verifying downloded src tarball
-BuildRequires: gnupg2
+BuildRequires:  gnupg2
+# squid_kerb_aut requires Kerberos development libs
+BuildRequires:  krb5-devel
+# TPROXY requires libcap, and also increases security somewhat
+BuildRequires:  libcap-devel
+# eCAP support
+BuildRequires:  libecap-devel
+# time_quota requires TrivialDB
+BuildRequires:  libtdb-devel
+BuildRequires:  libtool
+BuildRequires:  libtool-ltdl-devel
+BuildRequires:  libxml2-devel
+# squid_ldap_auth and other LDAP helpers require OpenLDAP
+BuildRequires:  make
+BuildRequires:  openldap-devel
+# SSL support requires OpenSSL
+BuildRequires:  openssl-devel
+# squid_pam_auth requires PAM development libs
+BuildRequires:  pam-devel
+BuildRequires:  perl-generators
+BuildRequires:  pkg-config
+# systemd notify
+BuildRequires:  systemd-devel
 # for _tmpfilesdir and _unitdir macro
 # see https://docs.fedoraproject.org/en-US/packaging-guidelines/Systemd/#_packaging
-BuildRequires: systemd-rpm-macros
-# systemd notify
-BuildRequires: systemd-devel
-# required for SASL authentication
-BuildRequires: cyrus-sasl-devel
-
+BuildRequires:  systemd-rpm-macros
+# For test suite
+BuildRequires:  pkgconfig(cppunit)
+# cache_swap.sh
+Requires:       bash
+Requires:       gawk
+# for httpd conf file - cachemgr script alias
+Requires:       httpd-filesystem
+# Old NetworkManager expects the dispatcher scripts in a different place
+Conflicts:      NetworkManager < 1.20
 %{?systemd_requires}
 %{?sysusers_requires_compat}
-
-# Old NetworkManager expects the dispatcher scripts in a different place
-Conflicts: NetworkManager < 1.20
 
 %description
 Squid is a high-performance proxy caching server for Web clients,
@@ -96,7 +88,6 @@ lookup program (dnsserver), a program for retrieving FTP data
 (ftpget), and some management and client tools.
 
 %prep
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q
 
 # Upstream patches
@@ -108,7 +99,7 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch201 -p1 -b .config
 %patch202 -p1 -b .location
 %patch203 -p1 -b .perlpath
-%patch204 -p0 -b .include-guards
+%patch204  -b .include-guards
 %patch205 -p1 -R -b .symlink-lang-err
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
@@ -189,51 +180,51 @@ ScriptAlias /Squid/cgi-bin/cachemgr.cgi %{_libdir}/squid/cachemgr.cgi
  Require local
  # Add additional allowed hosts as needed
  # Require host example.com
-</Location>" > $RPM_BUILD_ROOT/squid.httpd.tmp
+</Location>" > %{buildroot}/squid.httpd.tmp
 
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pam.d
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/squid
-install -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/squid
-install -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/squid
-install -m 644 %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/squid
-install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_unitdir}
-install -m 755 %{SOURCE8} $RPM_BUILD_ROOT%{_libexecdir}/squid
-install -m 644 $RPM_BUILD_ROOT/squid.httpd.tmp $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/squid.conf
-install -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d/20-squid
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/squid
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/spool/squid
-mkdir -p $RPM_BUILD_ROOT/run/squid
+mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
+mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
+mkdir -p %{buildroot}%{_sysconfdir}/pam.d
+mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
+mkdir -p %{buildroot}%{_libdir}/NetworkManager/dispatcher.d
+mkdir -p %{buildroot}%{_unitdir}
+mkdir -p %{buildroot}%{_libexecdir}/squid
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/logrotate.d/squid
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/squid
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/squid
+install -m 644 %{SOURCE5} %{buildroot}%{_unitdir}
+install -m 755 %{SOURCE6} %{buildroot}%{_libexecdir}/squid
+install -m 644 %{buildroot}/squid.httpd.tmp %{buildroot}%{_sysconfdir}/httpd/conf.d/squid.conf
+install -m 755 %{SOURCE4} %{buildroot}%{_libdir}/NetworkManager/dispatcher.d/20-squid
+mkdir -p %{buildroot}%{_localstatedir}/log/squid
+mkdir -p %{buildroot}%{_localstatedir}/spool/squid
+mkdir -p %{buildroot}/run/squid
 chmod 644 contrib/url-normalizer.pl contrib/user-agents.pl
 
 # install /usr/lib/tmpfiles.d/squid.conf
-mkdir -p ${RPM_BUILD_ROOT}%{_tmpfilesdir}
-cat > ${RPM_BUILD_ROOT}%{_tmpfilesdir}/squid.conf <<EOF
+mkdir -p %{buildroot}%{_tmpfilesdir}
+cat > %{buildroot}%{_tmpfilesdir}/squid.conf <<EOF
 # See tmpfiles.d(5) for details
 
 d /run/squid 0755 squid squid - -
 EOF
 
 # Move the MIB definition to the proper place (and name)
-mkdir -p $RPM_BUILD_ROOT/usr/share/snmp/mibs
-mv $RPM_BUILD_ROOT/usr/share/squid/mib.txt $RPM_BUILD_ROOT/usr/share/snmp/mibs/SQUID-MIB.txt
+mkdir -p %{buildroot}%{_datadir}/snmp/mibs
+mv %{buildroot}%{_datadir}/squid/mib.txt %{buildroot}%{_datadir}/snmp/mibs/SQUID-MIB.txt
 
 # squid.conf.documented is documentation. We ship that in doc/
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/squid/squid.conf.documented
+rm -f %{buildroot}%{_sysconfdir}/squid/squid.conf.documented
 
 # remove unpackaged files from the buildroot
-rm -f $RPM_BUILD_ROOT/squid.httpd.tmp
+rm -f %{buildroot}/squid.httpd.tmp
 
 # sysusers.d
-install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
+install -p -D -m 0644 %{SOURCE7} %{buildroot}%{_sysusersdir}/squid.conf
 
 %files
-%license COPYING 
+%license COPYING
 %doc CONTRIBUTORS README ChangeLog QUICKSTART src/squid.conf.documented
 %doc contrib/url-normalizer.pl contrib/user-agents.pl
 
@@ -262,7 +253,7 @@ install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 
 %dir %{_datadir}/squid
 %attr(-,root,root) %{_datadir}/squid/errors
-%{_prefix}/lib/NetworkManager
+%{_libdir}/NetworkManager
 %{_datadir}/squid/icons
 %{_sbindir}/squid
 %{_bindir}/squidclient
@@ -275,9 +266,9 @@ install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 %{_sysusersdir}/squid.conf
 
 %pre
-%sysusers_create_compat %{SOURCE9}
+%{sysusers_create_compat} %{SOURCE7}
 
-for i in /var/log/squid /var/spool/squid ; do
+for i in %{_var}/log/squid %{_var}/spool/squid ; do
         if [ -d $i ] ; then
                 for adir in `find $i -maxdepth 0 \! -user squid`; do
                         chown -R squid:squid $adir
@@ -290,18 +281,18 @@ exit 0
 %pretrans -p <lua>
 -- temporarilly commented until https://bugzilla.redhat.com/show_bug.cgi?id=1936422 is resolved
 --
--- previously /usr/share/squid/errors/es-mx was symlink, now it is directory since squid v5
+-- previously %{_datadir}/squid/errors/es-mx was symlink, now it is directory since squid v5
 -- see https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement/
 -- Define the path to the symlink being replaced below.
 --
--- path = "/usr/share/squid/errors/es-mx"
+-- path = "%{_datadir}/squid/errors/es-mx"
 -- st = posix.stat(path)
 -- if st and st.type == "link" then
 --   os.remove(path)
 -- end
 
 -- Due to a bug #447156
-paths = {"/usr/share/squid/errors/zh-cn", "/usr/share/squid/errors/zh-tw"}
+paths = {"%{_datadir}/squid/errors/zh-cn", "%{_datadir}/squid/errors/zh-tw"}
 for key,path in ipairs(paths)
 do
   st = posix.stat(path)
@@ -329,15 +320,14 @@ end
 
 %triggerin -- samba-common
 if ! getent group wbpriv >/dev/null 2>&1 ; then
-  /usr/sbin/groupadd -g 88 wbpriv >/dev/null 2>&1 || :
+  %{_sbindir}/groupadd -g 88 wbpriv >/dev/null 2>&1 || :
 fi
-/usr/sbin/usermod -a -G wbpriv squid >/dev/null 2>&1 || \
-    chgrp squid /var/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
-
-
+%{_sbindir}/usermod -a -G wbpriv squid >/dev/null 2>&1 || \
+    chgrp squid %{_var}/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
 %changelog
 * Thu Feb 09 2023 Sindhu Karri <lakarri@microsoft.com> - 7:5.7-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
+- Making binaries paths compatible with CBL-Mariner's paths
 - Added missing BR on 'cyrus-sasl-devel'
 - License verified
 
@@ -1407,7 +1397,6 @@ fi
 * Tue Sep 28 2004 Jay Fenlason <fenlason@redhat.com> 7:2.5.STABLE6-1
 - New upstream version, with 32 upstream patches.
   This closes #133970, #133931, #131728, #128143, #126726
-
 - Change the permissions on /etc/squid/squid.conf to 640.  This closes
   bugzilla #125007
 
@@ -1785,4 +1774,3 @@ fi
 - first build against glibc
 - patched out the use of setresuid(), which is available only on kernels
   2.1.44 and later
-
