@@ -4,11 +4,10 @@ Distribution:   Mariner
 
 Name:     squid
 Version:  5.7
-Release:  4%{?dist}
+Release:  5%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
-# See CREDITS for breakdown of non GPLv2+ code
-License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
+License:  GPLv2
 URL:      http://www.squid-cache.org
 
 Source0:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
@@ -340,6 +339,7 @@ fi
 * Thu Feb09 2023 Sindhu Karri <lakarri@microsoft.com> - 7:5.7-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Added missing BR on 'cyrus-sasl-devel'
+- License verified
 
 * Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7:5.7-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
