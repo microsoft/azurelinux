@@ -65,12 +65,14 @@ install -d -m755 %{buildroot}/%{_pkgdocdir}
 cp -arf docs %{buildroot}/%{_pkgdocdir}
 
 %files -n python3-pytorch
+%license LICENSE
 %{_bindir}/convert-caffe2-to-onnx
 %{_bindir}/convert-onnx-to-caffe2
 %{_bindir}/torchrun
 %{python3_sitearch}/*
 
 %files -n python3-pytorch-doc
+%license LICENSE
 %{_docdir}/*
 
 %changelog
