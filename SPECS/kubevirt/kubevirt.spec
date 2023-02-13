@@ -29,7 +29,7 @@ URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
 # Upstream patch to fix issue #8544, PR #8594
-Patch:          fgetxattr-for-relabel.patch
+Patch0:          fgetxattr-for-relabel.patch
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang
