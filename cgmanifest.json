@@ -2607,6 +2607,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dleyna-core",
+          "version": "0.6.0",
+          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-core-0.6.0.tar_3.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dleyna-connector-dbus",
           "version": "0.3.0",
           "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-connector-dbus-0.3.0.tar_2.gz"
