@@ -2524,6 +2524,7 @@
                 "cronie",
                 "curl",
                 "cyrus-sasl",
+                "cyrus-sasl-bootstrap",
                 "dbus",
                 "dbus-glib",
                 "dejagnu",

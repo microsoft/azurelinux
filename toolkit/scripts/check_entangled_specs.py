@@ -37,6 +37,10 @@ version_release_matching_groups = [
     frozenset([
         "SPECS/jflex/jflex.spec",
         "SPECS/jflex/jflex-bootstrap.spec"
+    ]),
+    frozenset([
+        "SPECS/cyrus-sasl/cyrus-sasl.spec",
+        "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
     ])
 ]
 

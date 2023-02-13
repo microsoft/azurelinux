@@ -1,8 +1,9 @@
 %define _soversion 3
 %global _plugindir2 %{_libdir}/sasl2
+%global _base_name cyrus-sasl
 
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
-Name:           cyrus-sasl
+Name:           %{_base_name}-bootstrap
 Version:        2.1.28
 Release:        2%{?dist}
 License:        BSD with advertising
@@ -10,18 +11,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.cyrusimap.org/sasl/
-Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/cyrusimap/%{_base_name}/releases/download/%{_base_name}-%{version}/%{_base_name}-%{version}.tar.gz
 
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
-BuildRequires:  mariadb-devel
-BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
-BuildRequires:  postgresql-devel
-BuildRequires:  postgresql-libs
 BuildRequires:  systemd
-BuildRequires:  libdb-devel
 
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
@@ -29,8 +25,6 @@ Requires:       openssl
 Requires:       pam
 Requires:       systemd
 Requires:       libdb
-
-Obsoletes:      %{name}-bootstrap
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
@@ -47,39 +41,10 @@ Summary:        Files needed for developing applications with Cyrus SASL
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       pkg-config
-Obsoletes:      %{name}-bootstrap-devel
 
 %description devel
 The %{name}-devel package contains files needed for developing and
 compiling applications which use the Cyrus SASL library.
-
-%package gs2
-Summary:        GS2 support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description gs2
-The %{name}-gs2 package contains the Cyrus SASL plugin which supports
-the GS2 authentication scheme.
-
-%package gssapi
-Summary:        GSSAPI authentication support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description gssapi
-The %{name}-gssapi package contains the Cyrus SASL plugins which
-support GSSAPI authentication. GSSAPI is commonly used for Kerberos
-authentication.
-
-%package ldap
-Summary:        LDAP auxprop support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description ldap
-The %{name}-ldap package contains the Cyrus SASL plugin which supports using
-a directory server, accessed using LDAP, for storing shared secrets.
 
 %package lib
 Summary:        Shared libraries needed by applications which use Cyrus SASL
@@ -88,75 +53,10 @@ Summary:        Shared libraries needed by applications which use Cyrus SASL
 The %{name}-lib package contains shared libraries which are needed by
 applications which use the Cyrus SASL library.
 
-%package md5
-Summary:        CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-Obsoletes:      %{name}-bootstrap-lib
-
-%description md5
-The %{name}-md5 package contains the Cyrus SASL plugins which support
-CRAM-MD5 and DIGEST-MD5 authentication schemes.
-
-%package ntlm
-Summary:        NTLM authentication support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description ntlm
-The %{name}-ntlm package contains the Cyrus SASL plugin which supports
-the NTLM authentication scheme.
-
-%package plain
-Summary:        PLAIN and LOGIN authentication support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description plain
-The %{name}-plain package contains the Cyrus SASL plugins which support
-PLAIN and LOGIN authentication schemes.
-
-%package scram
-Summary:        SCRAM auxprop support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description scram
-The %{name}-scram package contains the Cyrus SASL plugin which supports
-the SCRAM authentication scheme.
-
-%package sql
-Summary:        SQL auxprop support for Cyrus SASL
-
-Requires:       %{name}-lib = %{version}-%{release}
-
-%description sql
-The %{name}-sql package contains the Cyrus SASL plugin which supports
-using a RDBMS for storing shared secrets.
-
 %prep
-%autosetup -p1
+%autosetup -n %{_base_name}-%{version} -p1
 
 %build
-# Find the MySQL libraries used needed by the SQL auxprop plugin.
-INC_DIR="`mysql_config --include`"
-if test x"$INC_DIR" != "x-I%{_includedir}"; then
-        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
-fi
-LIB_DIR="`mysql_config --libs | sed -e 's,-[^L][^ ]*,,g' -e 's,^ *,,' -e 's, *$,,' -e 's,  *, ,g'`"
-if test x"$LIB_DIR" != "x-L%{_libdir}"; then
-        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
-fi
-
-# Find the PostgreSQL libraries used needed by the SQL auxprop plugin.
-INC_DIR="-I`pg_config --includedir`"
-if test x"$INC_DIR" != "x-I%{_includedir}"; then
-        CPPFLAGS="$INC_DIR $CPPFLAGS"; export CPPFLAGS
-fi
-LIB_DIR="-L`pg_config --libdir`"
-if test x"$LIB_DIR" != "x-L%{_libdir}"; then
-        LDFLAGS="$LIB_DIR $LDFLAGS"; export LDFLAGS
-fi
 
 autoreconf -fi
 %configure \
@@ -172,17 +72,10 @@ autoreconf -fi
     --enable-fast-install \
     --enable-gss_mutexes \
     --enable-krb4 \
-    --enable-ldapdb \
     --enable-login \
     --enable-ntlm \
     --enable-plain \
     --enable-shared \
-    --enable-sql \
-    --with-bdb=db \
-    --with-dblib=berkeley \
-    --with-ldap \
-    --with-mysql=yes \
-    --with-pgsql=yes \
     --with-plugindir=%{_plugindir2} \
     --with-saslauthd=/run/saslauthd \
     --without-authdaemond \
@@ -261,18 +154,6 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/*
 
-%files gs2
-%{_plugindir2}/libgs2.so
-%{_plugindir2}/libgs2.so.%{_soversion}*
-
-%files gssapi
-%{_plugindir2}/libgssapiv2.so
-%{_plugindir2}/libgssapiv2.so.%{_soversion}*
-
-%files ldap
-%{_plugindir2}/libldapdb.so
-%{_plugindir2}/libldapdb.so.%{_soversion}*
-
 %files lib
 %license COPYING
 %doc AUTHORS doc/html/*.html
@@ -285,33 +166,34 @@ make %{?_smp_mflags} check
 %{_sbindir}/saslpasswd2
 %{_sbindir}/sasldblistusers2
 
-%files md5
-%{_plugindir2}/libcrammd5.so
-%{_plugindir2}/libcrammd5.so.%{_soversion}*
-%{_plugindir2}/libdigestmd5.so
-%{_plugindir2}/libdigestmd5.so.%{_soversion}*
+%exclude %{_plugindir2}/libgs2.so
+%exclude %{_plugindir2}/libgs2.so.%{_soversion}*
 
-%files ntlm
-%{_plugindir2}/libntlm.so
-%{_plugindir2}/libntlm.so.%{_soversion}*
+%exclude %{_plugindir2}/libgssapiv2.so
+%exclude %{_plugindir2}/libgssapiv2.so.%{_soversion}*
 
-%files plain
-%{_plugindir2}/liblogin.so
-%{_plugindir2}/liblogin.so.%{_soversion}*
-%{_plugindir2}/libplain.so
-%{_plugindir2}/libplain.so.%{_soversion}*
+%exclude %{_plugindir2}/libcrammd5.so
+%exclude %{_plugindir2}/libcrammd5.so.%{_soversion}*
+%exclude %{_plugindir2}/libdigestmd5.so
+%exclude %{_plugindir2}/libdigestmd5.so.%{_soversion}*
 
-%files scram
-%{_plugindir2}/libscram.so
-%{_plugindir2}/libscram.so.%{_soversion}*
+%exclude %{_plugindir2}/libntlm.so
+%exclude %{_plugindir2}/libntlm.so.%{_soversion}*
 
-%files sql
-%{_plugindir2}/libsql.so
-%{_plugindir2}/libsql.so.%{_soversion}*
+%exclude %{_plugindir2}/liblogin.so
+%exclude %{_plugindir2}/liblogin.so.%{_soversion}*
+%exclude %{_plugindir2}/libplain.so
+%exclude %{_plugindir2}/libplain.so.%{_soversion}*
+
+%exclude %{_plugindir2}/libscram.so
+%exclude %{_plugindir2}/libscram.so.%{_soversion}*
+
+%exclude %{_plugindir2}/libsql.so
+%exclude %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
-* Mon Feb 13 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
-- Indicate this package obsoletes cyrus-sasl-bootstrap
+* Fri Feb 03 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
+- Create cyrus-sasl-bootstrap spec to help resolve circular dependencies
 
 * Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.28-1
 - Updating to version 2.1.28 to address CVE-2022-24407.
