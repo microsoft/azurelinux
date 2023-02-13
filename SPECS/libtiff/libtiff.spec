@@ -1,7 +1,7 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Patch3:         CVE-2022-3570.patch
 Patch4:         CVE-2022-3597.patch
 Patch5:	        CVE-2022-3599.patch
 Patch6:         CVE-2022-3970.patch
+Patch7:         CVE-2022-48281.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -75,7 +76,10 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
-* Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com - 4.4.0-6
+* Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 4.4.0-7
+- Add patch for CVE-2022-48281
+
+* Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 4.4.0-6
 - Add patch for critical CVE-2022-3970
 - Patch CVE-2022-3599
 - Add nopatch for CVE-2022s: 3598, 3626, and 3627

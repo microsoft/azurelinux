@@ -1,8 +1,5 @@
 {
-    "Signatures": {
-     "cached-property-1.5.2.tar.gz": "b566d247a65ece61c62d6fefda082cf3ddca46e800576196657d44d9c4cc5cec",
-     "267.patch":"6351cac76d2cbf0816aa751ff6d4700f1c59ad1c1d0fa4c22a60a74d983d07da",
-     "0001-Disable-checks-broken-with-freezegun-0.3.11-131.patch":"d0da421ffdaa5fe3207cc0b85e296ff5cf5d2e83a991555fdd17e5498e9c0446"
-
-    }
-   }
+ "Signatures": {
+  "cached-property-1.5.2.tar.gz": "b566d247a65ece61c62d6fefda082cf3ddca46e800576196657d44d9c4cc5cec"
+ }
+}

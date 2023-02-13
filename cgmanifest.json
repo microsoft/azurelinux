@@ -1717,8 +1717,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "28.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v28.0.tar.gz"
+          "version": "29.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v29.0.tar.gz"
         }
       }
     },
@@ -3100,6 +3100,16 @@
           "name": "elfutils",
           "version": "0.186",
           "downloadUrl": "https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "elinks",
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.16.0/elinks-0.16.0.tar.xz"
         }
       }
     },
@@ -7691,8 +7701,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.24.3",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.3+k3s1.tar.gz"
+          "version": "1.24.6",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.6+k3s1.tar.gz"
         }
       }
     },
@@ -7821,8 +7831,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.80.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.80.mshv2.tar.gz"
+          "version": "5.15.86.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.86.mshv2.tar.gz"
         }
       }
     },
@@ -8273,6 +8283,16 @@
           "name": "libao",
           "version": "1.2.0",
           "downloadUrl": "https://downloads.xiph.org/releases/ao/libao-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libappstream-glib",
+          "version": "0.8.2",
+          "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.2.tar.xz"
         }
       }
     },
@@ -24204,8 +24224,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.7",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.7.tar.gz"
+          "version": "6.2.9",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.9.tar.gz"
         }
       }
     },
@@ -26767,8 +26787,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p1",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p1.tar.gz"
+          "version": "1.9.12p2",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
         }
       }
     },
