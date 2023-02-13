@@ -310,6 +310,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Feb 13 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
+- Indicate this package obsoletes cyrus-sasl-bootstrap
+
 * Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.28-1
 - Updating to version 2.1.28 to address CVE-2022-24407.
 
