@@ -4699,6 +4699,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gssdp",
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/GNOME/gssdp/archive/refs/tags/gssdp-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "grep",
           "version": "3.7",
           "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz"
