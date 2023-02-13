@@ -74,7 +74,7 @@ sed -i 's/\(.*\)gupnp-1.2\(.*\)/\1gupnp-1.6\2/' meson.build
 %changelog
 * Wed Feb 01 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.2.0-7
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- Patch build to use api versions 1.2 for BR's gssdp and gupnp
+- Patch build to use api versions 1.6 for BR's gssdp and gupnp
 - License verified
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-6
