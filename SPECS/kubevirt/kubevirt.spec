@@ -29,7 +29,7 @@ URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
 # Upstream patch to fix issue #8544, PR #8594
-Patch0:          fgetxattr-for-relabel.patch
+Patch0:         fgetxattr-for-relabel.patch
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang
@@ -211,8 +211,8 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
-* Wed Feb 04 2023 Kanika Nema <kanikanema@microsoft.com> - 0.58.0-4
-- Add a upstream patch (from v0.59.0-alpha2) without which virt-handler
+* Mon Feb 13 2023 Kanika Nema <kanikanema@microsoft.com> - 0.58.0-4
+- Add an upstream patch (from v0.59.0-alpha2) without which virt-handler
   containers don't start.
 
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58.0-3
