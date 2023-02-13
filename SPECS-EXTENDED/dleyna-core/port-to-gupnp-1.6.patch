@@ -1,0 +1,22 @@
+diff -Naur dleyna-core-0.6.0-orig/configure.ac dleyna-core-0.6.0/configure.ac
+--- dleyna-core-0.6.0-orig/configure.ac	2017-03-04 23:40:11.000000000 +0530
++++ dleyna-core-0.6.0/configure.ac	2023-02-01 12:48:56.378813142 +0530
+@@ -39,7 +39,7 @@
+ PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.28])
+ PKG_CHECK_MODULES([GIO], [gio-2.0 >= 2.28])
+ PKG_CHECK_MODULES([GMODULE], [gmodule-2.0 >= 2.28])
+-PKG_CHECK_MODULES([GUPNP], [gupnp-1.0 >= 0.20.5])
++PKG_CHECK_MODULES([GUPNP], [gupnp-1.6 >= 1.6.3])
+ 
+ # Checks for header files.
+ AC_CHECK_HEADERS([stdlib.h string.h syslog.h])
+diff -Naur dleyna-core-0.6.0-orig/dleyna-core-1.0.pc.in dleyna-core-0.6.0/dleyna-core-1.0.pc.in
+--- dleyna-core-0.6.0-orig/dleyna-core-1.0.pc.in	2017-03-04 23:40:11.000000000 +0530
++++ dleyna-core-0.6.0/dleyna-core-1.0.pc.in	2023-02-01 12:49:20.250643806 +0530
+@@ -8,5 +8,5 @@
+ Description: UPnP & DLNA core library
+ Libs: -L${libdir} -ldleyna-core-1.0
+ Cflags: -I${includedir}/dleyna-1.0
+-Requires: glib-2.0 gio-2.0 gmodule-2.0 gupnp-1.0
++Requires: glib-2.0 gio-2.0 gmodule-2.0 gupnp-1.6
+ Version: @VERSION@
