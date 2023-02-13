@@ -1,15 +1,14 @@
-%global upname cython
 %global _description \
 Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (baded on Pyrex). It makes writing C extensions for Python as easy as Python itself.}
 Summary:        Language for writing Python extension modules
 Name:           Cython
-Version:        0.29.32
+Version:        0.29.33
 Release:        1%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.cython.org
-Source0:        https://github.com/%{upname}/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
+Source0:        https://github.com/cython/cython/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -30,7 +29,7 @@ Provides:       %{name}%{?_isa} = %{version}-%{release}
 %{_description}
 
 %prep
-%autosetup -p1 -n %{upname}-%{version}
+%autosetup -p1
 
 %build
 %py3_build
@@ -52,10 +51,15 @@ pip3 install -r test-requirements.txt
 %{python3_sitearch}/%{name}-*.egg-info/
 %{python3_sitearch}/%{name}/
 %{python3_sitearch}/pyximport/
-%{python3_sitearch}/%{upname}.py
-%{python3_sitearch}/__pycache__/%{upname}.*
+%{python3_sitearch}/cython.py
+%{python3_sitearch}/__pycache__/cython.*
 
 %changelog
+* Mon Feb 13 2023 Olivia Crain <oliviacrain@microsoft.com> - 0.29.33-1
+- Update to latest upstream patch version to fix failing package tests
+- Use release tarball instead of git snapshot of release commit
+- Use SPDX license expression in license tag
+
 * Fri Nov 04 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.29.32-1
 - Update version to 0.29.32
 
