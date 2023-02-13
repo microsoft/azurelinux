@@ -336,7 +336,7 @@ fi
 
 
 %changelog
-* Thu Feb09 2023 Sindhu Karri <lakarri@microsoft.com> - 7:5.7-5
+* Thu Feb 09 2023 Sindhu Karri <lakarri@microsoft.com> - 7:5.7-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Added missing BR on 'cyrus-sasl-devel'
 - License verified
