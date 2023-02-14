@@ -131,8 +131,6 @@ OpenMPI support for Python 3.
 %prep
 %autosetup -p1 -n openmpi-%{version}
 
-
-
 %build
 %{set_build_flags}
 ./configure --prefix=%{_libdir}/%{name} \
