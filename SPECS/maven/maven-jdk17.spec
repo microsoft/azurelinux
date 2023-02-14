@@ -67,7 +67,7 @@ popd
 # Changing distribution dir to BUILD directory as install macro clears buildroot prior to creating a fresh directory, thus clearing artifacts copied by maven. We copy them later.
 MAVEN_DIST_DIR=%{_builddir}%{_prefixmvn}
 
-export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 
 sed -i 's/www.opensource/opensource/g' DEPENDENCIES
