@@ -26,7 +26,7 @@ toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.t
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
-	$(shell find $(SCRIPTS_DIR)/toolchain -name *.sh) \
+	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain -name *.sh) \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
 
 TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
@@ -249,7 +249,7 @@ $(toolchain_local_temp)%: ;
 #	that all of the toolchain .rpms are correct. The different toolchain sources may have identical files but with
 #	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take 
 #	responsibility for updating the .rpms in the final destination if needed.
-$(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(shell find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
+$(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(call shell_real_build_only, find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $(toolchain_local_temp) && \
 	rm -f $(toolchain_local_temp)/* && \
 	tar -xf $(selected_toolchain_archive) -C $(toolchain_local_temp) --strip-components 1 && \

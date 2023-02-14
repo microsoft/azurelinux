@@ -13,7 +13,8 @@ then
 fi
 
 # Additional macros required to parse spec files.
-DEFINES=(-D "with_check 1" -D "dist $(grep -P "DIST_TAG" "$REPO_ROOT"/toolkit/Makefile | grep -oP "\.cm\d+")")
+DIST_TAG=$(make -s -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
+DEFINES=(-D "with_check 1" -D "dist $DIST_TAG")
 
 SPECS_DIR="$REPO_ROOT/SPECS"
 
