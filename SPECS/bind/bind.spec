@@ -3,22 +3,24 @@ Name:           bind
 Version:        9.16.37
 Release:        1%{?dist}
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Development/Tools
 URL:            https://www.isc.org/downloads/bind/
 Source0:        https://ftp.isc.org/isc/bind9/%{version}/%{name}-%{version}.tar.xz
 # CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
 Patch0:         CVE-2019-6470.nopatch
-Group:          Development/Tools
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Requires:       openssl
-Requires:       libuv
-Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
-Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
-BuildRequires:  openssl-devel
 BuildRequires:  libcap-devel
-BuildRequires:  python3
-BuildRequires:  python-ply
 BuildRequires:  libuv-devel
+BuildRequires:  openssl-devel
+BuildRequires:  python-ply
+BuildRequires:  python3
+Requires:       libuv
+Requires:       openssl
+Requires(postun): %{_sbindir}/groupdel
+Requires(postun): %{_sbindir}/userdel
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
 # Enforce fix for CVE-2019-6470
 Conflicts:      dhcp < 4.4.1
 
@@ -28,13 +30,14 @@ for the Internet. It is a reference implementation of those protocols, but it is
 also production-grade software, suitable for use in high-volume and high-reliability applications.
 
 %package utils
-Summary: BIND utilities
+Summary:        BIND utilities
+
 %description utils
 %{summary}.
 
-
 %prep
 %autosetup -p1
+
 %build
 ./configure \
     --prefix=%{_prefix}
@@ -44,29 +47,30 @@ make -C lib/bind9 %{?_smp_mflags}
 make -C lib/isccfg %{?_smp_mflags}
 make -C lib/irs %{?_smp_mflags}
 make -C bin/dig %{?_smp_mflags}
+
 %install
 make -C bin/dig DESTDIR=%{buildroot} install
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 mkdir -p %{buildroot}/%{_sysconfdir}
-mkdir -p %{buildroot}/%{_prefix}/lib/tmpfiles.d
+mkdir -p %{buildroot}/%{_libdir}/tmpfiles.d
 cat << EOF >> %{buildroot}/%{_sysconfdir}/named.conf
 zone "." in {
     type master;
     allow-update {none;}; // no DDNS by default
 };
 EOF
-echo "d /run/named 0755 named named - -" > %{buildroot}/%{_prefix}/lib/tmpfiles.d/named.conf
+echo "d /run/named 0755 named named - -" > %{buildroot}/%{_libdir}/tmpfiles.d/named.conf
 
 %pre
 if ! getent group named >/dev/null; then
     groupadd -r named
 fi
 if ! getent passwd named >/dev/null; then
-    useradd -g named -d /var/lib/bind\
+    useradd -g named -d %{_sharedstatedir}/bind\
         -s /bin/false -M -r named
 fi
-%post -p /sbin/ldconfig
 
+%post -p /sbin/ldconfig
 %postun
 /sbin/ldconfig
 if getent passwd named >/dev/null; then
@@ -81,7 +85,7 @@ fi
 %license LICENSE
 %{_bindir}/*
 %{_sysconfdir}/*
-%{_prefix}/lib/tmpfiles.d/named.conf
+%{_libdir}/tmpfiles.d/named.conf
 
 %changelog
 * Mon Feb 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.37-1
