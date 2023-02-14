@@ -2737,6 +2737,7 @@
                 "man-pages",
                 "mariadb",
                 "maven",
+                "maven-jdk17",
                 "mc",
                 "mercurial",
                 "meson",
