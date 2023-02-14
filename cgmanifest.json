@@ -6211,7 +6211,7 @@
         "other": {
           "name": "hwloc",
           "version": "2.5.0",
-          "downloadUrl": " http://www.open-mpi.org/software/hwloc/v2.5/downloads/hwloc-2.5.0.tar.bz2"
+          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.5/downloads/hwloc-2.5.0.tar.bz2"
         }
       }
     },
