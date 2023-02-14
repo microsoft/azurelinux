@@ -1,23 +1,32 @@
+%global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+Summary:        Provides dynamic modification of a user's environment
+Name:           environment-modules
+Version:        5.2.0
+Release:        1%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-
-Name:           environment-modules
-Version:        4.4.1
-Release:        3%{?dist}
-Summary:        Provides dynamic modification of a user's environment
-
-License:        GPLv2+
-URL:            http://modules.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.bz2
-
+URL:            https://modules.sourceforge.net/
+Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
+BuildRequires:  dejagnu
 BuildRequires:  gcc
+BuildRequires:  hostname
+BuildRequires:  less
+BuildRequires:  make
+BuildRequires:  man
+BuildRequires:  procps
+BuildRequires:  sed
 BuildRequires:  tcl-devel
-BuildRequires:  dejagnu, sed, procps, hostname, man, less
-Requires:       tcl, sed, procps, man, less
+Requires:       less
+Requires:       man
+Requires:       procps
+Requires:       sed
+Requires:       tcl
 Requires(post): %{_sbindir}/update-alternatives
+Requires(post): coreutils
 Requires(postun): %{_sbindir}/update-alternatives
-Provides:	environment(modules)
+Provides:       environment(modules)
+Obsoletes:      environment-modules-compat <= 4.8.99
 
 %description
 The Environment Modules package provides for the dynamic modification of
@@ -43,39 +52,33 @@ suite of different applications.
 NOTE: You will need to get a new shell after installing this package to
 have access to the module alias.
 
-%package compat
-Summary:        Environment Modules compatibility version
-Requires:       environment-modules = %{version}-%{release}
-Requires:       hostname
-
-%description compat
-The Environment Modules package provides for the dynamic modification of
-a user's environment via modulefiles.
-
-This package provides Environment Modules compatibility version (3.2).
-
-
 %prep
 %setup -q -n modules-%{version}
 
 
 %build
 %configure --prefix=%{_datadir}/Modules \
-           --libdir=%{_libdir} \
+           --libdir=%{_libdir}/%{name} \
            --etcdir=%{_sysconfdir}/%{name} \
            --bindir=%{_datadir}/Modules/bin \
            --libexecdir=%{_datadir}/Modules/libexec \
-           --docdir=%{_docdir}/%{name} \
-           --enable-dotmodulespath \
-           --disable-set-shell-startup \
-           --with-initconf-in=etcdir \
+           --mandir=%{_mandir} \
+           --nagelfardatadir=%{_datadir}/Modules/nagelfar \
+           --with-bashcompletiondir=%{_datadir}/bash-completion/completions \
+           --with-fishcompletiondir=%{_datadir}/fish/vendor_completions.d \
+           --with-zshcompletiondir=%{_datadir}/zsh/site-functions \
+           --enable-multilib-support \
+           --disable-doc-install \
+           --enable-modulespath \
+           --with-python=%{_bindir}/python3 \
            --with-modulepath=%{_datadir}/Modules/modulefiles:%{_sysconfdir}/modulefiles:%{_datadir}/modulefiles \
-           --with-quarantine-vars=LD_LIBRARY_PATH
-make %{?_smp_mflags}
+           --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD'
+
+%make_build
 
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 mkdir -p %{buildroot}%{_sysconfdir}/modulefiles
 mkdir -p %{buildroot}%{_datadir}/modulefiles
@@ -87,45 +90,35 @@ touch %{buildroot}%{_sysconfdir}/profile.d/modules.{csh,sh}
 touch %{buildroot}%{_bindir}/modulecmd
 # remove modulecmd wrapper as it will be handled by alternatives
 rm -f %{buildroot}%{_datadir}/Modules/bin/modulecmd
-mv %{buildroot}%{_mandir}/man1/module{,-c}.1
-mv %{buildroot}%{_mandir}/man4/modulefile{,-c}.4
 
 # Major utilities go to regular bin dir.
 mv %{buildroot}%{_datadir}/Modules/bin/envml %{buildroot}%{_bindir}/
 
-# Rename compat docs to find them in files section.
-mv compat/ChangeLog ChangeLog-compat
-mv compat/NEWS NEWS-compat
 
 mv {doc/build/,}NEWS.txt
 mv {doc/build/,}MIGRATING.txt
 mv {doc/build/,}CONTRIBUTING.txt
-mv {doc/build/,}diff_v3_v4.txt
-mv {doc/,}example.txt
+mv {doc/build/,}INSTALL.txt
+mv {doc/build/,}changes.txt
+
 rm -f %{buildroot}%{_docdir}/%{name}/{COPYING.GPLv2,ChangeLog-compat,INSTALL.txt,NEWS-compat}
 
-cp -p contrib/scripts/createmodule.sh %{buildroot}%{_datadir}/Modules/bin
-cp -p contrib/scripts/createmodule.py %{buildroot}%{_datadir}/Modules/bin
-sed -i -e 1s,/usr/bin/python,/usr/bin/python3, \
-    %{buildroot}%{_datadir}/Modules/bin/createmodule.py
-
+# install the rpm config file
 install -Dpm 644 contrib/rpm/macros.%{name} %{buildroot}/%{macrosdir}/macros.%{name}
 
 rm -rf %{buildroot}%{_datadir}/Modules/share/vim
 
 %check
-make test
+make test QUICKTEST=1
 
 %post
 # Cleanup from pre-alternatives
-[ ! -L %{_mandir}/man1/module.1.gz ] && rm -f %{_mandir}/man1/module.1.gz
-[ ! -L %{_mandir}/man4/modulefile.4.gz ] && rm -f %{_mandir}/man4/modulefile.4.gz
 [ ! -L %{_sysconfdir}/profile.d/modules.sh ] &&  rm -f %{_sysconfdir}/profile.d/modules.sh
 [ ! -L %{_sysconfdir}/profile.d/modules.csh ] &&  rm -f %{_sysconfdir}/profile.d/modules.csh
 [ ! -L %{buildroot}%{_bindir}/modulecmd ] &&  rm -f %{_bindir}/modulecmd
 
 # Migration from version 3.x to 4
-if [ "$(readlink /etc/alternatives/modules.sh)" = '%{_datadir}/Modules/init/modules.sh' ]; then
+if [ "$(readlink %{_sysconfdir}/alternatives/modules.sh)" = '%{_datadir}/Modules/init/modules.sh' ]; then
   %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/modules.sh
 fi
 
@@ -133,62 +126,55 @@ fi
   --install %{_sysconfdir}/profile.d/modules.sh modules.sh %{_datadir}/Modules/init/profile.sh 40 \
   --slave %{_sysconfdir}/profile.d/modules.csh modules.csh %{_datadir}/Modules/init/profile.csh \
   --slave %{_bindir}/modulecmd modulecmd %{_datadir}/Modules/libexec/modulecmd.tcl \
-  --slave %{_mandir}/man1/module.1.gz module.1.gz %{_mandir}/man1/module-c.1.gz \
-  --slave %{_mandir}/man4/modulefile.4.gz modulefile.4.gz %{_mandir}/man4/modulefile-c.4.gz
-
-%post compat
-%{_sbindir}/update-alternatives \
-  --install %{_sysconfdir}/profile.d/modules.sh modules.sh %{_datadir}/Modules/init/profile-compat.sh 10 \
-  --slave %{_sysconfdir}/profile.d/modules.csh modules.csh %{_datadir}/Modules/init/profile-compat.csh \
-  --slave %{_bindir}/modulecmd modulecmd %{_datadir}/Modules/libexec/modulecmd-compat
-
 %postun
 if [ $1 -eq 0 ] ; then
   %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/profile.sh
 fi
 
-%postun compat
-if [ $1 -eq 0 ] ; then
-  %{_sbindir}/update-alternatives --remove modules.sh %{_datadir}/Modules/init/profile-compat.sh
-fi
-
-
 %files
 %license COPYING.GPLv2
-%doc ChangeLog README NEWS.txt MIGRATING.txt CONTRIBUTING.txt diff_v3_v4.txt example.txt
+%doc ChangeLog README NEWS.txt MIGRATING.txt CONTRIBUTING.txt INSTALL.txt changes.txt
 %{_sysconfdir}/modulefiles
 %ghost %{_sysconfdir}/profile.d/modules.csh
 %ghost %{_sysconfdir}/profile.d/modules.sh
 %ghost %{_bindir}/modulecmd
 %{_bindir}/envml
-%{_libdir}/libtclenvmodules.so
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/libtclenvmodules.so
 %dir %{_datadir}/Modules
 %{_datadir}/Modules/bin
 %dir %{_datadir}/Modules/libexec
 %{_datadir}/Modules/libexec/modulecmd.tcl
 %dir %{_datadir}/Modules/init
 %{_datadir}/Modules/init/*
+# do not need to require shell package as we "own" completion dir
+%dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/module
+%{_datadir}/bash-completion/completions/ml
+%dir %{_datadir}/zsh/site-functions
+%{_datadir}/zsh/site-functions/_module
+%dir %{_datadir}/fish/vendor_completions.d
+%{_datadir}/fish/vendor_completions.d/module.fish
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/initrc
 %config(noreplace) %{_sysconfdir}/%{name}/modulespath
 %config(noreplace) %{_sysconfdir}/%{name}/siteconfig.tcl
 %{_datadir}/Modules/modulefiles
 %{_datadir}/modulefiles
-%ghost %{_mandir}/man1/module.1.gz
-%ghost %{_mandir}/man4/modulefile.4.gz
-%{_mandir}/man1/module-c.1.gz
-%{_mandir}/man4/modulefile-c.4.gz
+%{_mandir}/man1/ml.1.gz
+%{_mandir}/man1/module.1.gz
+%{_mandir}/man4/modulefile.4.gz
 %{macrosdir}/macros.%{name}
-
-
-%files compat
-%doc ChangeLog-compat NEWS-compat
-%{_datadir}/Modules/libexec/modulecmd-compat
-%{_mandir}/man1/module-compat.1.gz
-%{_mandir}/man4/modulefile-compat.4.gz
-
+%dir %{_datadir}/Modules/nagelfar
+%{_datadir}/Modules/nagelfar/*
 
 %changelog
+* Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 5.2.0-1
+- Move from extended to Core.
+- Update to 5.2.0 (from Fedora 38 (license: MIT)).
+- License verified.
+- Remove compat.
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.4.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove X11 dependencies.

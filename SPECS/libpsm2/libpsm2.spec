@@ -50,39 +50,36 @@
 #
 # Copyright (c) 2014-2015 Intel Corporation. All rights reserved.
 #
-Summary: Intel PSM Libraries
-Name: libpsm2
-Version: 11.2.206
-Release: 1%{?dist}
-License: BSD or GPLv2
+Summary:        Intel PSM Libraries
+Name:           libpsm2
+Version:        11.2.206
+Release:        2%{?dist}
+License:        BSD-3-Clause OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: https://github.com/cornelisnetworks/opa-psm2/
-
-Source0: https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz#/opa-psm2-PSM2_%{version}.tar.gz
-
+URL:            https://github.com/cornelisnetworks/opa-psm2/
+Source0:        https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz#/opa-psm2-PSM2_%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  libuuid-devel
+BuildRequires:  make
+BuildRequires:  numactl-devel
+BuildRequires:  systemd
+Obsoletes:      hfi1-psm < 1.0.0
 # The OPA product is supported on x86_64 only:
-ExclusiveArch: x86_64
-BuildRequires: libuuid-devel
-BuildRequires: numactl-devel
-BuildRequires: systemd
-BuildRequires: gcc
-BuildRequires: make
-Obsoletes: hfi1-psm < 1.0.0
+ExclusiveArch:  x86_64
 
 %package devel
-Summary: Development files for Intel PSM
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: libuuid-devel
+Summary:        Development files for Intel PSM
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       libuuid-devel
 
 %package compat
-Summary: Compat library for Intel PSM
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: systemd-udev
-
 %global _privatelibs libpsm_infinipath[.]so[.]1.*
 %global __provides_exclude ^(%{_privatelibs})$
 %global __requires_exclude ^(%{_privatelibs})$
+Summary:        Compat library for Intel PSM
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       systemd-udev
 
 %description
 The PSM Messaging API, or PSM API, is the low-level
@@ -102,7 +99,7 @@ Support for MPIs linked with PSM versions < 2
 
 %build
 %{set_build_flags}
-%{make_build}
+%make_build
 
 %install
 export DISTRO=mariner
@@ -127,10 +124,13 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 %files compat
 %{_lib64dir}/psm2-compat
 /lib/udev/rules.d/40-psm-compat.rules
-%{_prefix}/lib/libpsm2
+%{_libdir}/libpsm2
 %{_sysconfdir}/modprobe.d/libpsm2-compat.conf
 
 %changelog
+* Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 11.2.206-2
+- Move from Extended to Core.
+
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.206-1
 - Upgrading to version 11.2.206 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.
