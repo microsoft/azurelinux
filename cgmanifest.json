@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.7.0",
-          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.0.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.2.tar.gz"
         }
       }
     },
