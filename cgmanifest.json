@@ -12440,6 +12440,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "maven-jdk17",
+          "version": "3.8.7",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "maven-parent",
           "version": "27",
           "downloadUrl": "http://repo1.maven.org/maven2/org/apache/maven/maven-parent/27/maven-parent-27-source-release.zip"
