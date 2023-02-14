@@ -70,6 +70,12 @@ Requires:       %{name}-plugins%{?_isa} = %{version}-%{release}
 
 %prep
 %autosetup -p1
+%if %{with_check}
+#Remove the failing test 
+sed -i '/hwloc_get_area_memlocation/d' tests/hwloc/Makefile.am
+#updating Makefile.am needs a rerun of autoreconf
+autoreconf 
+%endif
 
 %build
 # The ./configure script will support --runstatedir= when generated with
@@ -109,8 +115,6 @@ rm %{buildroot}%{_datadir}/%{name}/hwloc-dump-hwdata.service
 %endif
 
 %check
-#Remove the failing test
-sed -i '/hwloc_get_area_memlocation/d' $PWD/hwloc/Makefile.am
 LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 
 %ifarch %{ix86} x86_64
