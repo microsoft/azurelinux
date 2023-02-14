@@ -3,7 +3,7 @@
 ## CBL-MARINER builds do not have access to internet when building rpms.
 ## Generating build cache as tarballs to be used when buidling offline.
 
-set -eux pipefail
+set -euo pipefail
 
 # Maven version used to build caches.
 VERSION=""
@@ -27,16 +27,16 @@ while getopts "a:v:h" options; do
 	case "${options}" in
 		h)
 			usage
-			;;
+			exit;;
 		v|version)
 			VERSION="$OPTARG"
 			echo $VERSION
 			;;
 		a|abi)
 			BUILDARCH="$OPTARG"
-			echo $ABI
+			echo $BUILDARCH
 			;;
-		?)
+		\?)
 			echo "Empty Value provide."
 			usage
 			exit 1
