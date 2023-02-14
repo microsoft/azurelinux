@@ -71,6 +71,7 @@ Requires:       %{name}-plugins%{?_isa} = %{version}-%{release}
 %prep
 %autosetup -p1
 # Remove the failing test 
+# test fails in docker containers because of blockage of "move_pages" syscall by docker in a default seccomp security profile.
 sed -i '/hwloc_get_area_memlocation/d' tests/hwloc/Makefile.am
 
 # Updating Makefile.am needs a rerun of autoreconf
