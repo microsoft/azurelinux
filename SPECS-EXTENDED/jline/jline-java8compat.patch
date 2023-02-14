@@ -1,0 +1,67 @@
+diff -urEbwB jline2-jline-2.14.6/src/main/java/jline/internal/InputStreamReader.java jline2-jline-2.14.6.new/src/main/java/jline/internal/InputStreamReader.java
+--- jline2-jline-2.14.6/src/main/java/jline/internal/InputStreamReader.java	2018-03-26 11:14:37.000000000 +0200
++++ jline2-jline-2.14.6.new/src/main/java/jline/internal/InputStreamReader.java	2019-09-27 09:31:17.518979605 +0200
+@@ -13,6 +13,7 @@
+ import java.io.OutputStreamWriter;
+ import java.io.Reader;
+ import java.io.UnsupportedEncodingException;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.CharBuffer;
+ import java.nio.charset.Charset;
+@@ -68,7 +69,7 @@
+         decoder = Charset.defaultCharset().newDecoder().onMalformedInput(
+                 CodingErrorAction.REPLACE).onUnmappableCharacter(
+                 CodingErrorAction.REPLACE);
+-        bytes.limit(0);
++        ((Buffer)bytes).limit(0);
+     }
+ 
+     /**
+@@ -101,7 +102,7 @@
+             throw (UnsupportedEncodingException)
+                     new UnsupportedEncodingException(enc).initCause(e);
+         }
+-        bytes.limit(0);
++        ((Buffer)bytes).limit(0);
+     }
+ 
+     /**
+@@ -118,7 +119,7 @@
+         dec.averageCharsPerByte();
+         this.in = in;
+         decoder = dec;
+-        bytes.limit(0);
++        ((Buffer)bytes).limit(0);
+     }
+ 
+     /**
+@@ -136,7 +137,7 @@
+         decoder = charset.newDecoder().onMalformedInput(
+                 CodingErrorAction.REPLACE).onUnmappableCharacter(
+                 CodingErrorAction.REPLACE);
+-        bytes.limit(0);
++        ((Buffer)bytes).limit(0);
+     }
+ 
+     /**
+@@ -262,7 +263,7 @@
+                     } else if (was_red == 0) {
+                         break;
+                     }
+-                    bytes.limit(bytes.limit() + was_red);
++                    ((Buffer)bytes).limit(bytes.limit() + was_red);
+                     needInput = false;
+                 }
+ 
+@@ -273,8 +274,8 @@
+                     // compact the buffer if no space left
+                     if (bytes.limit() == bytes.capacity()) {
+                         bytes.compact();
+-                        bytes.limit(bytes.position());
+-                        bytes.position(0);
++                        ((Buffer)bytes).limit(bytes.position());
++                        ((Buffer)bytes).position(0);
+                     }
+                     needInput = true;
+                 } else {

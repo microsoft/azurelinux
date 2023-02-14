@@ -1,0 +1,47 @@
+diff --new-file -r -u bsf-2.4.0-orig/build-properties.xml bsf-2.4.0/build-properties.xml
+--- bsf-2.4.0-orig/build-properties.xml	1970-01-01 01:00:00.000000000 +0100
++++ bsf-2.4.0/build-properties.xml	2007-05-23 15:33:04.000000000 +0200
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="utf-8"?>
++<project name="props">
++    <property name="project.name" value="bsf"/>
++    <property name="project.fullName" value="Bean Scripting Framework"/>
++    <property name="project.version" value="2.4.0"/>
++    <property name="project.debug" value="on"/>
++    <property name="project.deprecation" value="on"/>
++
++    <property name="build.file" value="build.xml"/>
++    <property name="build.dir" value="build"/>
++    <property name="build.dest" value="build/classes"/>
++    <property name="build.lib" value="build/lib"/>
++    <property name="build.lib.win32" value="build/lib/win32"/>
++    <property name="build.samples" value="build/samples"/>
++    <property name="build.samples.calc" value="build/samples/calc"/>
++    <property name="build.samples.scriptedui" value="build/samples/scriptedui"/>
++    <property name="build.samples.xsl" value="build/samples/xsl"/>
++    <property name="build.javadocs" value="build/javadocs"/>
++    <property name="build.tests" value="build/testcases" />
++
++    <property name="dist.dir" value="dist"/>
++    <property name="dist.dir.root" value="${dist.dir}/${project.name}-${project.version}"/>
++    <property name="dist.bin.file" value="${dist.dir}/${project.name}-bin-${project.version}"/>
++    <property name="dist.src.file" value="${dist.dir}/${project.name}-src-${project.version}"/>
++
++    <property name="packages" value="org.apache.*"/>
++
++    <property name="samples.dir" value="samples"/>
++
++    <property name="site.src" location="xdocs"/>
++    <property name="site.dest" location="docs"/>
++    <property name="site.projectFile" value="stylesheets/project.xml"/>
++
++    <property name="source.level" value="8" />
++
++    <property name="src.dir" value="src"/>
++
++    <property name="templ.path" location="xdocs/stylesheets"/>
++
++    <property name="tests.dir" value="test"/>
++
++    <property name="velocity.props" location="${site.src}/velocity.properties"/>
++</project>

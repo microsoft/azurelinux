@@ -1,0 +1,2 @@
+g squid 23 -
+u squid 23 "Squid proxy user" /var/spool/squid /sbin/nologin

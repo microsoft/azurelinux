@@ -78,7 +78,7 @@ git clone --depth 1 https://github.com/MariaDB/server.git -b mariadb-$PKG_VERSIO
 pushd server
 git submodule update --depth 1 --init --recursive 
 popd
-mv server mariadb-$1
+mv server mariadb-$PKG_VERSION
 
 if [[ -n $SRC_TARBALL ]]; then
     TARBALL_NAME="$(basename $SRC_TARBALL)"
@@ -95,6 +95,6 @@ NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -zcf $NEW_TARBALL mariadb-$1
+    -zcf $NEW_TARBALL mariadb-$PKG_VERSION
 
 echo "Source tarball $NEW_TARBALL successfully created!"

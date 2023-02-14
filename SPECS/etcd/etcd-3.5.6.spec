@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -143,6 +143,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-2
+- Bump release to rebuild with go 1.19.5
+
 * Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-1
 - Auto-upgrade to 3.5.6 - version required by Kubernetes
 

@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        8.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -107,6 +107,9 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.0-9
+- Bump release to rebuild with go 1.19.5
+
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.0-8
 - Bump release to rebuild with go 1.19.4
 
