@@ -66,7 +66,7 @@ popd
 # Changing distribution dir to BUILD directory as install macro clears buildroot prior to creating a fresh directory, thus clearing artifacts copied by maven. We copy them later.
 MAVEN_DIST_DIR=%{_builddir}%{_prefixmvn}
 
-export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 
 sed -i 's/www.opensource/opensource/g' DEPENDENCIES
@@ -128,7 +128,6 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %changelog
 * Wed Feb 15 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.7-1
 - Update to version 3.8.7
-- Minor fixes in maven_build_caches script
 
 * Wed Oct 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.4-3
 - Replacing hard-coded source URL with the '_mariner_sources_url' macro.
