@@ -171,7 +171,7 @@ fi
 %changelog
 * Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 5.2.0-1
 - Move from extended to Core.
-- Update to 5.2.0 (from Fedora 38(license: MIT)).
+- Update to 5.2.0 (from Fedora 38 (license: MIT)).
 - License verified.
 - Remove compat.
 
