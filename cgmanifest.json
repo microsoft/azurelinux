@@ -3198,8 +3198,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "24.2",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-24.2/otp-OTP-24.2.tar.gz"
+          "version": "25.2",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.2/otp-OTP-25.2.tar.gz"
         }
       }
     },
