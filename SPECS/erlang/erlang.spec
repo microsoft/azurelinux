@@ -12,7 +12,7 @@ Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{v
 BuildRequires:  unzip
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-BuildRequires:  unixODBC
+BuildRequires:  unixODBC-devel
 
 %description
 erlang programming language
@@ -27,7 +27,7 @@ make
 
 %install
 
-%make_install
+%make_install DESTDIR=%{buildroot}
 
 %post
 
@@ -41,7 +41,7 @@ make
 
 %changelog
 * Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
-- Update to version 24.2
+- Update to version 25.2
 
 * Wed Jan 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 24.2-1
 - Update to version 24.2
