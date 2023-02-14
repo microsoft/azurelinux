@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.48.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,16 @@ ExclusiveArch:  x86_64
 %description
 The kernel package contains the Linux kernel.
 
+%package devel
+Summary:        Lightweight kernel Devel package
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+Requires:       gawk
+Requires:       python3
+
+%description devel
+This package contains the kernel UVM devel files
+
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
@@ -89,6 +99,8 @@ make KCFLAGS="-Wa,-mx86-used-note=no" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1"
 
 %install
 install -vdm 700 %{buildroot}/boot
+install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
+make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/compressed/vmlinux.bin %{buildroot}/boot/vmlinux.bin
@@ -96,13 +108,39 @@ mkdir -p %{buildroot}/lib/modules/%{name}
 cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
 
+#    Cleanup dangling symlinks
+rm -rf %{buildroot}/lib/modules/%{uname_r}/source
+rm -rf %{buildroot}/lib/modules/%{uname_r}/build
+
+find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+%ifarch x86_64
+# CONFIG_STACK_VALIDATION=y requires objtool to build external modules
+install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+%endif
+
+cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
+ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
+find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
+
 %files
 %defattr(-,root,root)
 %license COPYING
 /boot/vmlinux.bin
 /lib/modules/%{name}
 
+%files devel
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/build
+%{_prefix}/src/linux-headers-%{uname_r}
+
 %changelog
+* Tue Mar 30 2023 Chris Co <chrco@microsoft.com> - 5.15.48.1-10
+- Generate devel subpackage
+
 * Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
 - Enable Hyper-V enlightenments.
 
