@@ -247,6 +247,7 @@
                 "genwqe-tools",
                 "GeoIP",
                 "geolite2",
+                "geos",
                 "gfs2-utils",
                 "ghc-srpm-macros",
                 "giflib",
