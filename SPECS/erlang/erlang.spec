@@ -40,7 +40,7 @@ make
 %exclude %{_libdir}/debug
 
 %changelog
-* Wed Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
+* Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
 - Update to version 24.2
 
 * Wed Jan 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 24.2-1
