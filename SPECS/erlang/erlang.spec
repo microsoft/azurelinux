@@ -1,5 +1,6 @@
 %define  debug_package %{nil}
 %define  usr_local_bin /usr/local/bin
+%define  usr_local_lib /usr/local/lib
 Summary:        erlang
 Name:           erlang
 Version:        25.2
@@ -44,7 +45,7 @@ make
 %{usr_local_bin}/run_erl
 %{usr_local_bin}/to_erl
 %{usr_local_bin}/typer
-/usr/local/bin/erlang/*
+%{usr_local_lib}/erlang/*
 
 %changelog
 * Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
