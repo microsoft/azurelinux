@@ -100,7 +100,7 @@ make KCFLAGS="-Wa,-mx86-used-note=no" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1"
 %install
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
-make INSTALL_MOD_PATH=%{buildroot} modules_install
+install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/compressed/vmlinux.bin %{buildroot}/boot/vmlinux.bin
@@ -124,7 +124,7 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
-find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
+find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %files
 %defattr(-,root,root)
