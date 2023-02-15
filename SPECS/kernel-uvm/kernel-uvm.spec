@@ -95,7 +95,7 @@ if [ -s config_diff ]; then
 fi
 
 %build
-make KCFLAGS="-Wa,-mx86-used-note=no" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+make KCFLAGS="-Wa,-mx86-used-note=no" VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 %install
 install -vdm 700 %{buildroot}/boot
