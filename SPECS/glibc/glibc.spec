@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Patch3:         CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         glibc-2.34_pthread_cond_wait.patch
+Patch6:         CVE-2023-0687.patch
 BuildRequires:  bison
 BuildRequires:  gettext
 BuildRequires:  kernel-headers
@@ -318,6 +319,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Wed Feb 15 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.35-4
+- Patch CVE-2023-0687
+- License verified.
+
 * Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 2.35-3
 - Split `glibc-static` into an actual package containing static libraries and runtime
 
