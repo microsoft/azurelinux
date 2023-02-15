@@ -138,6 +138,7 @@ find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
 %changelog
 * Tue Feb 14 2023 Chris Co <chrco@microsoft.com> - 5.15.48.1-9
+- Enable loadable kernel module support
 - Generate devel subpackage
 
 * Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-8
