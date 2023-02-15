@@ -200,7 +200,10 @@ func parseCheckSection(logFile string) (err error) {
 	for scanner := bufio.NewScanner(file); scanner.Scan(); {
 		currLine := scanner.Text()
 		// Anything besides 0 is a failed test
-		if strings.Contains(currLine, "CHECK DONE") && !strings.Contains(currLine, "EXIT STATUS 0") {
+		if strings.Contains(currLine, "CHECK DONE") {
+			if strings.Contains(currLine, "EXIT STATUS 0") {
+				return
+			}
 			failedLogFile := strings.TrimSuffix(logFile, ".log")
 			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
 			err = os.Rename(logFile, failedLogFile)
@@ -209,8 +212,6 @@ func parseCheckSection(logFile string) (err error) {
 				return
 			}
 			err = fmt.Errorf("package test failed. Test status line: %s", currLine)
-			return
-		} else if strings.Contains(currLine, "CHECK DONE") {
 			return
 		}
 	}
@@ -229,7 +230,6 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, ou
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
 		// If the package builds with no errors and RUN_CHECK=y, check logs to see if the %check section passed, and if not, return as the build error.
 		if buildErr != nil {
-			buildErr = fmt.Errorf("buildErr: %v", buildErr)
 			return
 		}
 
@@ -247,7 +247,6 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, ou
 	}
 	if err != nil {
 		err = fmt.Errorf(strings.TrimPrefix(err.Error(), "checkErr: "))
-		err = fmt.Errorf(strings.TrimPrefix(err.Error(), "buildErr: "))
 	}
 
 	return
