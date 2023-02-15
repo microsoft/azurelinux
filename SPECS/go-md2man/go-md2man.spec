@@ -1,7 +1,7 @@
 Summary:    Converts markdown into roff (man pages)
 Name:       go-md2man
 Version:    2.0.0
-Release:    16%{?dist}
+Release:    17%{?dist}
 License:    MIT
 Group:      Tools/Container
 
@@ -49,6 +49,9 @@ cp go-md2man-2.0.0/LICENSE.md %{buildroot}/usr/share/doc/%{name}-%{version}/LICE
 %{_bindir}/go-md2man
 
 %changelog
+* Wed Feb 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-17
+- Bump release to rebuild with go 1.19.6
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0.0-16
 - Bump release to rebuild with go 1.18.8-2
 

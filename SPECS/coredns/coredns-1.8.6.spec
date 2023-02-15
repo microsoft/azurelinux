@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.8.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/%{name}
 
 %changelog
+* Wed Feb 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.6-7
+- Bump release to rebuild with go 1.19.6
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.6-6
 - Bump release to rebuild with go 1.18.8-2
 

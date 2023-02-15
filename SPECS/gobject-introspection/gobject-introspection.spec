@@ -5,7 +5,7 @@ Name:           gobject-introspection
 Summary:        Introspection system for GObject-based libraries
 %define BaseVersion 1.58
 Version:        %{BaseVersion}.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 Group:          Development/Libraries
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://github.com/GNOME/gobject-introspection
@@ -139,6 +139,9 @@ make  %{?_smp_mflags} check
 %doc %{_mandir}/man1/*.gz
 
 %changelog
+* Wed Feb 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.58.0-21
+- Bump release to rebuild with go 1.19.6
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.58.0-20
 - Bump release to rebuild with go 1.18.8-2
 

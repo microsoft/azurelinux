@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -141,6 +141,9 @@ rm -rf %{buildroot}/*
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Feb 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-10
+- Bump release to rebuild with go 1.19.6
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.5.0-9
 - Bump release to rebuild with go 1.18.8-2
 

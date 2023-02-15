@@ -4,7 +4,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
 Patch0:         refuse-manual-stop.patch
 License:        GPLv2+
@@ -166,6 +166,9 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-20
+- Bump release to rebuild with go 1.19.6
+
 *   Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.0-19
 -   Bump release to rebuild with go 1.18.8-2
 
