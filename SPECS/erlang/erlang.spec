@@ -1,4 +1,5 @@
 %define  debug_package %{nil}
+%define  usr_local_bin /usr/local/bin
 Summary:        erlang
 Name:           erlang
 Version:        25.2
@@ -34,8 +35,16 @@ make
 %files
 %defattr(-,root,root)
 %license LICENSE.txt
-%{_libdir}/*
-%{_bindir}/*
+%{usr_local_bin}/ct_run
+%{usr_local_bin}/dialyzer
+%{usr_local_bin}/epmd
+%{usr_local_bin}/erl
+%{usr_local_bin}/erlc
+%{usr_local_bin}/escript
+%{usr_local_bin}/run_erl
+%{usr_local_bin}/to_erl
+%{usr_local_bin}/typer
+/usr/local/bin/erlang/*
 
 %changelog
 * Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
