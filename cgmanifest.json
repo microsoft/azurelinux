@@ -26377,8 +26377,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.9.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.11.0.tar.gz"
         }
       }
     },
