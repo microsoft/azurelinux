@@ -208,6 +208,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--distro-build-number="$(BUILD_NUMBER)" \
 		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
+		--check-attempts="$(CHECK_BUILD_RETRIES)" \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
