@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.7
-Release:        3%{?dist}
+Version:        6.2.9
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,9 +11,6 @@ Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         disable_active_defrag_big_keys.patch
 Patch2:         disable_defrag_test.patch
-Patch3:         CVE-2022-3647.patch
-Patch4:         CVE-2022-35977.patch
-Patch5:         CVE-2023-22458.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  systemd
@@ -87,8 +84,8 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
-* Fri Feb 03 2023 Henry Li <lihl@microsoft.com> - 6.2.7-3
-- Add patch for CVE-2022-35977 and CVE-2023-22458
+* Mon Feb 13 2023 Henry Li <lihl@microsoft.com> - 6.2.9-1
+- Upgrade to version 6.2.9 to resolve CVE-2022-35977 and CVE-2023-22458
 
 * Wed Oct 26 2022 Aurélien Bombo <abombo@microsoft.com> - 6.2.7-2
 - Apply patch for CVE-2022-3647.
