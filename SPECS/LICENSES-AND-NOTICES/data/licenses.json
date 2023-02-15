@@ -193,6 +193,7 @@
                 "efi-rpm-macros",
                 "egl-wayland",
                 "eglexternalplatform",
+                "elinks",
                 "enca",
                 "enchant",
                 "enchant2",
@@ -542,6 +543,7 @@
                 "libabw",
                 "libaec",
                 "libao",
+                "libappstream-glib",
                 "libart_lgpl",
                 "libasyncns",
                 "libatasmart",
@@ -560,6 +562,7 @@
                 "libchewing",
                 "libcli",
                 "libcmis",
+                "libcmpiutil",
                 "libcomps",
                 "libcroco",
                 "libdaemon",
@@ -982,6 +985,7 @@
                 "OpenEXR",
                 "openjade",
                 "openjpeg2",
+                "openmpi",
                 "openobex",
                 "openoffice-lv",
                 "opensc",
@@ -1809,6 +1813,7 @@
                 "sblim-testsuite",
                 "sblim-wbemcli",
                 "scl-utils",
+                "scotch",
                 "screen",
                 "scrub",
                 "SDL",
@@ -1854,6 +1859,7 @@
                 "spirv-tools",
                 "splix",
                 "squashfs-tools",
+                "squid",
                 "sratom",
                 "sscg",
                 "star",
@@ -2318,6 +2324,12 @@
                 "perftest"
             ]
         },
+        "OpenEuler": {
+            "license": "[BSD-3 License](https://github.com/pytorch/pytorch/blob/master/LICENSE)",
+            "specs": [
+                "pytorch"
+            ]
+        },
         "OpenMamba": {
             "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
             "specs": [
@@ -2520,6 +2532,7 @@
                 "cronie",
                 "curl",
                 "cyrus-sasl",
+                "cyrus-sasl-bootstrap",
                 "dbus",
                 "dbus-glib",
                 "dejagnu",
@@ -2966,7 +2979,7 @@
             "specs": [
                 "k3s",
                 "k3s-1.23.8",
-                "k3s-1.24.3"
+                "k3s-1.24.6"
             ]
         },
         "Sysbench source": {

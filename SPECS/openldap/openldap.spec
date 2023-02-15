@@ -2,7 +2,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.57
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Patch1:         openldap-2.4.44-consolidated-2.patch
 Patch2:         CVE-2015-3276.patch
 Patch3:         CVE-2021-27212.patch
 Patch4:         CVE-2022-29155.patch
+BuildRequires:  cyrus-sasl-bootstrap-devel >= 2.1
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  openssl-devel >= 1.0.1
@@ -44,8 +45,7 @@ export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D
         --enable-dynamic    \
         --disable-debug     \
         --disable-slapd     \
-        --with-tls=openssl  \
-        --without-cyrus-sasl
+        --with-tls=openssl
 %make_build depend
 %make_build
 
@@ -72,6 +72,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
+* Fri Feb 10 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.4.57-8
+- Let openldap depend on cyrus-sasl.
+
 * Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.57-7
 - Fix CVE-2022-29155
 

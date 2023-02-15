@@ -1717,8 +1717,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "28.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v28.0.tar.gz"
+          "version": "29.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v29.0.tar.gz"
         }
       }
     },
@@ -2336,9 +2336,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cyrus-sasl-bootstrap",
+          "version": "2.1.28",
+          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.28/cyrus-sasl-2.1.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "Cython",
-          "version": "0.29.32",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.32.tar.gz"
+          "version": "0.29.33",
+          "downloadUrl": "https://github.com/cython/cython/releases/download/0.29.33/Cython-0.29.33.tar.gz"
         }
       }
     },
@@ -3107,6 +3117,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "elinks",
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.16.0/elinks-0.16.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "emacs",
           "version": "28.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz"
@@ -3158,8 +3178,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "4.4.1",
-          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-4.4.1.tar.bz2"
+          "version": "5.2.0",
+          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-5.2.0.tar.bz2"
         }
       }
     },
@@ -6190,8 +6210,8 @@
         "type": "other",
         "other": {
           "name": "hwloc",
-          "version": "2.0.4",
-          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.0/downloads/hwloc-2.0.4.tar.bz2"
+          "version": "2.5.0",
+          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.5/downloads/hwloc-2.5.0.tar.bz2"
         }
       }
     },
@@ -7691,8 +7711,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.24.3",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.3+k3s1.tar.gz"
+          "version": "1.24.6",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.6+k3s1.tar.gz"
         }
       }
     },
@@ -7821,8 +7841,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.80.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.80.mshv2.tar.gz"
+          "version": "5.15.86.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.86.mshv2.tar.gz"
         }
       }
     },
@@ -8280,6 +8300,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libappstream-glib",
+          "version": "0.8.2",
+          "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libarchive",
           "version": "3.6.1",
           "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.6.1/libarchive-3.6.1.tar.gz"
@@ -8503,6 +8533,16 @@
           "name": "libcmis",
           "version": "0.5.2",
           "downloadUrl": "https://github.com/tdf/libcmis/releases/download/v0.5.2/libcmis-0.5.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libcmpiutil",
+          "version": "0.5.7",
+          "downloadUrl": "https://libvirt.org/sources/CIM/libcmpiutil-0.5.7.tar.gz"
         }
       }
     },
@@ -11881,8 +11921,8 @@
         "type": "other",
         "other": {
           "name": "ltp",
-          "version": "20220930",
-          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20220930.tar.gz"
+          "version": "20230127",
+          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20230127.tar.gz"
         }
       }
     },
@@ -14646,6 +14686,16 @@
           "name": "openldap",
           "version": "2.4.57",
           "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openmpi",
+          "version": "4.1.4",
+          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.4.tar.bz2"
         }
       }
     },
@@ -20294,8 +20344,8 @@
         "type": "other",
         "other": {
           "name": "pmix",
-          "version": "3.1.5",
-          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v3.1.5/pmix-3.1.5.tar.bz2"
+          "version": "4.1.2",
+          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v4.1.2/pmix-4.1.2.tar.bz2"
         }
       }
     },
@@ -23823,6 +23873,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pytorch",
+          "version": "1.13.1",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytz",
           "version": "2021.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytz/pytz-2021.3.tar.gz"
@@ -24194,8 +24254,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.7",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.7.tar.gz"
+          "version": "6.2.9",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.9.tar.gz"
         }
       }
     },
@@ -24375,8 +24435,8 @@
         "type": "other",
         "other": {
           "name": "rpm-mpi-hooks",
-          "version": "6",
-          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/rawhide/f/mpi.attr"
+          "version": "8",
+          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/f37/f/mpi.attr"
         }
       }
     },
@@ -25964,6 +26024,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "scotch",
+          "version": "6.1.2",
+          "downloadUrl": "https://gitlab.inria.fr/scotch/scotch/-/archive/v6.1.2/scotch-v6.1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "screen",
           "version": "4.9.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/screen/screen-4.9.0.tar.gz"
@@ -26357,8 +26427,8 @@
         "type": "other",
         "other": {
           "name": "smartmontools",
-          "version": "7.1",
-          "downloadUrl": "http://downloads.sourceforge.net/smartmontools/smartmontools-7.1.tar.gz"
+          "version": "7.3",
+          "downloadUrl": "http://downloads.sourceforge.net/smartmontools/smartmontools-7.3.tar.gz"
         }
       }
     },
@@ -26606,6 +26676,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "squid",
+          "version": "5.7",
+          "downloadUrl": "http://www.squid-cache.org/Versions/v5/squid-5.7.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sratom",
           "version": "0.6.10",
           "downloadUrl": "https://download.drobilla.net/sratom-0.6.10.tar.bz2"
@@ -26737,8 +26817,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p1",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p1.tar.gz"
+          "version": "1.9.12p2",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
         }
       }
     },
