@@ -5,7 +5,7 @@ Release:        4%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://trac.osgeo.org/geos/
+URL:            https://trac.osgeo.org/geos/
 Source0:        http://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
 # Fix doxygen errors
 Patch0:         geos_docs.patch
@@ -80,6 +80,7 @@ make docs -C %{__cmake_builddir}
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - Removed building for mingw environment
 - License verified
+- Updated geos project URL from http to https
 
 * Tue Jan 24 2023 Sandro Mani <manisandro@gmail.com> - 3.11.1-3
 - Add geos_gcc13.patch
