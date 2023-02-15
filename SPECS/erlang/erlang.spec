@@ -34,8 +34,8 @@ make
 %files
 %defattr(-,root,root)
 %license LICENSE.txt
-${_libdir}/*
-${_bindir}/*
+%{_libdir}/*
+%{_bindir}/*
 
 %changelog
 * Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
