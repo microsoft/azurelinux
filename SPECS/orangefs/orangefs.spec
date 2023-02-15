@@ -1,10 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Name: orangefs
-Version: 2.9.8
-Release: 1%{?dist}
-Summary: Parallel network file system client
-URL: https://www.orangefs.org/
+%global desc OrangeFS (formerly PVFS2) is a high-performance parallel \
+network file system designed for use on high performance computing \
+systems.  It provides very high performance access to disk storage for \
+parallel applications.  It is accessible through a variety of \
+interfaces, including the native OrangeFS library, the kernel, FUSE, \
+and MPI-IO. \
+\
+This package provides the pvfs2-client-core which is required to use \
+the kernel module.
+Summary:        Parallel network file system client
+Name:           orangefs
+Version:        2.9.8
+Release:        2%{?dist}
 # ASL 2.0 src/client/jni
 # BSD (2 clause) maint/config/ssl.m4
 # BSD (3 clause) src/client/usrint/fts.c
@@ -18,59 +24,78 @@ URL: https://www.orangefs.org/
 # Public Domain src/common/hash/murmur3.c
 # zlib src/common/misc/md5.c
 # zlib src/common/misc/md5.h
-License: ASL 2.0 and BSD and GPLv2 and LGPLv2+ and LGPLv2 and MIT and OpenLDAP and Public Domain and zlib
-BuildRequires: make
-BuildRequires:  gcc
-BuildRequires: automake
-BuildRequires: bison flex libattr-devel openssl-devel
-BuildRequires: perl(Math::BigInt) perl(Getopt::Long) perl(Term::ReadLine) perl(FindBin)
-BuildRequires: systemd
-BuildRequires: libselinux-devel
-BuildRequires: lmdb-devel
-BuildRequires: fuse-devel
-%ifnarch armv7hl
-BuildRequires: libibverbs-devel
-%endif
-
-Source0: https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-%version.tar.gz
-Source1: orangefs-server.service
-Source2: orangefs-client.service
-Source3: orangefs.conf
-Source4: pvfs2tab
+License:        ASL 2.0 AND BSD AND GPLv2 AND LGPLv2+ AND LGPLv2 AND MIT AND OpenLDAP AND Public Domain AND zlib
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.orangefs.org/
+Source0:        https://s3.amazonaws.com/download.orangefs.org/current/source/%{name}-%{version}.tar.gz
+Source1:        orangefs-server.service
+Source2:        orangefs-client.service
+Source3:        orangefs.conf
+Source4:        pvfs2tab
 # Change the configuration generator to default to options and paths
 # appropriate to Fedora.  This causes genconfig to enable syslog logging
 # and to use /var/lib/orangefs for the storage paths.
-Patch0: orangefs-genconfig.patch
+Patch0:         orangefs-genconfig.patch
 # Remove bundled LMDB, so it cannot be built.
-Patch1: orangefs-lmdb.patch
+Patch1:         orangefs-lmdb.patch
 # These are scripts which connect to several machines and start or stop
 # the server.  They would require editing and don't work with systemd,
 # so this removes them.
-Patch2: orangefs-no-start-stop.patch
+Patch2:         orangefs-no-start-stop.patch
 # Autoconf 2.71 fix, https://github.com/waltligon/orangefs/pull/87
-Patch3: orangefs-autotools-2.71.patch
-
-%global _hardened_build 1
-
-%global desc OrangeFS (formerly PVFS2) is a high-performance parallel \
-network file system designed for use on high performance computing \
-systems.  It provides very high performance access to disk storage for \
-parallel applications.  It is accessible through a variety of \
-interfaces, including the native OrangeFS library, the kernel, FUSE, \
-and MPI-IO. \
-\
-This package provides the pvfs2-client-core which is required to use \
-the kernel module.
-
-# Workaround for -fcommon issue
-# https://github.com/waltligon/orangefs/issues/80
-%define _legacy_common_support 1
+Patch3:         orangefs-autotools-2.71.patch
+BuildRequires:  automake
+BuildRequires:  bison
+BuildRequires:  flex
+BuildRequires:  fuse-devel
+BuildRequires:  gcc
+BuildRequires:  libattr-devel
+BuildRequires:  libibverbs-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  lmdb-devel
+BuildRequires:  make
+BuildRequires:  openssl-devel
+BuildRequires:  systemd
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Term::ReadLine)
 
 %description
-%desc
+%{desc}
+
+%package devel
+Summary:        Parallel network file system development libraries
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+%{desc}
+
+This package contains the headers and libraries necessary for client
+development.
+
+%package server
+Summary:        Parallel network file system server
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       perl(Math::BigInt)
+
+%description server
+%{desc}
+
+This package contains the server.
+
+%package fuse
+Summary:        Parallel network file system FUSE client
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description fuse
+%{desc}
+
+This package contains the FUSE client.
 
 %prep
-%autosetup -p1 -n orangefs-v.%version
+%autosetup -p1 -n %{name}-v.%{version}
 
 rm -r src/apps/devel/lmdb
 rm -r src/common/lmdb
@@ -84,13 +109,13 @@ autoreconf -vif -I maint/config
 
 %build
 export LDFLAGS="%{optflags} -Wl,--as-needed"
-%ifarch armv7hl
-%configure --enable-external-lmdb --enable-shared --disable-static \
-    --enable-fuse --disable-usrint --with-db-backend=lmdb
-%else
-%configure --enable-external-lmdb --enable-shared --disable-static \
-   --enable-fuse --disable-usrint --with-db-backend=lmdb --with-openib=/usr
-%endif
+%configure  --enable-external-lmdb \
+            --enable-shared \
+            --disable-static \
+            --enable-fuse \
+            --disable-usrint \
+            --with-db-backend=lmdb \
+            --with-openib=%{_prefix}
 %make_build
 
 %install
@@ -102,6 +127,8 @@ mkdir -p %{buildroot}%{_sharedstatedir}/orangefs
 mkdir -p %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
+
+%ldconfig_scriptlets
 
 %files
 %license COPYING
@@ -185,19 +212,6 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 %{_mandir}/man1/setmattr.1.gz
 %{_mandir}/man5/pvfs2tab.5.gz
 
-%ldconfig_scriptlets
-
-%package devel
-
-Summary: Parallel network file system development libraries
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description devel
-%desc
-
-This package contains the headers and libraries necessary for client
-development.
 
 %files devel
 %{_bindir}/pvfs2-config
@@ -216,17 +230,6 @@ development.
 %{_includedir}/pvfs2.h
 %{_libdir}/libpvfs2.so
 
-%package server
-
-Summary: Parallel network file system server
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: perl(Math::BigInt)
-
-%description server
-%desc
-
-This package contains the server.
 
 %files server
 %dir %{_sysconfdir}/orangefs
@@ -243,21 +246,13 @@ This package contains the server.
 %{_mandir}/man5/orangefs.conf.5.gz
 %dir %{_sharedstatedir}/orangefs
 
-%package fuse
-
-Summary: Parallel network file system FUSE client
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description fuse
-%desc
-
-This package contains the FUSE client.
-
 %files fuse
 %{_bindir}/pvfs2fuse
 
 %changelog
+* Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.9.8-2
+- Move from Extended to Core.
+
 * Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.8-1
 - Updating to version 2.9.8 using Fedora 36 spec (license:MIT) for guidance.
 

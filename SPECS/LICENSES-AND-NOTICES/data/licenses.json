@@ -986,6 +986,7 @@
                 "OpenEXR",
                 "openjade",
                 "openjpeg2",
+                "openmpi",
                 "openobex",
                 "openoffice-lv",
                 "opensc",
@@ -2322,6 +2323,12 @@
                 "nvidia-docker2",
                 "ofed-scripts",
                 "perftest"
+            ]
+        },
+        "OpenEuler": {
+            "license": "[BSD-3 License](https://github.com/pytorch/pytorch/blob/master/LICENSE)",
+            "specs": [
+                "pytorch"
             ]
         },
         "OpenMamba": {

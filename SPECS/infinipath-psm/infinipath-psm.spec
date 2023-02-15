@@ -1,14 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global git_version 26_g604758e_open
 %global MAKEARG PSM_HAVE_SCIF=0 MIC=0
-
-Name:           infinipath-psm
 Summary:        Intel Performance Scaled Messaging (PSM) Libraries
+Name:           infinipath-psm
 Version:        3.3
-Release:        28%{?dist}
-License:        GPLv2 or BSD
-ExclusiveArch:  x86_64
+Release:        29%{?dist}
+License:        GPLv2 OR BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/01org/psm
 Source0:        https://github.com/intel/psm/archive/refs/tags/v%{version}.tar.gz#/psm-%{version}.tar.gz
 Source1:        ipath.rules
@@ -24,13 +22,13 @@ Patch8:         infinipath-psm-gcc11.patch
 # - https://github.com/intel/psm/commit/28489fd4ca1672fe84fa4c471bf6fb9d2a30a853
 # - https://github.com/intel/psm/commit/3b6306adaa9acf9ce7297129eb2215823de5b70a
 Patch9:         3.3_upstream_fixes_for_gcc6.patch
-
-Requires:       udev
 BuildRequires:  gcc
 BuildRequires:  libuuid-devel
 BuildRequires:  make
 BuildRequires:  systemd-rpm-macros
+Requires:       udev
 Obsoletes:      infinipath-libs <= %{version}-%{release}
+ExclusiveArch:  x86_64
 
 %description
 The PSM Messaging API, or PSM API, is Intel's low-level
@@ -54,7 +52,7 @@ Development files for the %{name} library.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p0
+%patch6
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
@@ -90,6 +88,9 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_udevrulesdir}/60-ipath.rules
 %{_includedir}/psm_mq.h
 
 %changelog
+* Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.3-29
+- Move from extended to Core.
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3-28
 - Adding GCC 11 patch from Fedora 36 (license: MIT).
 - License verified.

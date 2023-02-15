@@ -1,39 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Enables uid & gid authentication across a host cluster
 Name:           munge
 Version:        0.5.13
-Release:        8%{?dist}
-Summary:        Enables uid & gid authentication across a host cluster
-
+Release:        9%{?dist}
 # The libs and devel package is GPLv3+ and LGPLv3+ where as the main package is GPLv3 only.
-License:        GPLv3+ and LGPLv3+
+License:        GPLv3+ AND LGPLv3+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://dun.github.io/munge/
 Source0:        https://github.com/dun/munge/releases/download/munge-%{version}/munge-%{version}.tar.xz
 Source1:        create-munge-key
 Source2:        munge.logrotate
-
+BuildRequires:  bzip2-devel
 BuildRequires:  gcc
+BuildRequires:  openssl-devel
 BuildRequires:  systemd-units
-BuildRequires:  zlib-devel bzip2-devel openssl-devel
-Requires:       munge-libs = %{version}-%{release}
+BuildRequires:  zlib-devel
 Requires:       logrotate
-
-Requires(pre):    shadow-utils
-
-Requires(post):   systemd
-Requires(preun):  systemd
+Requires:       munge-libs = %{version}-%{release}
+Requires(post): systemd
 Requires(postun): systemd
-
+Requires(pre):  shadow-utils
+Requires(preun): systemd
 
 %description
-MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating 
-and validating credentials. It is designed to be highly scalable for use 
-in an HPC cluster environment. 
-It allows a process to authenticate the UID and GID of another local or 
-remote process within a group of hosts having common users and groups. 
-These hosts form a security realm that is defined by a shared cryptographic 
-key. Clients within this security realm can create and validate credentials 
-without the use of root privileges, reserved ports, or platform-specific 
+MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
+and validating credentials. It is designed to be highly scalable for use
+in an HPC cluster environment.
+It allows a process to authenticate the UID and GID of another local or
+remote process within a group of hosts having common users and groups.
+These hosts form a security realm that is defined by a shared cryptographic
+key. Clients within this security realm can create and validate credentials
+without the use of root privileges, reserved ports, or platform-specific
 methods.
 
 %package devel
@@ -49,7 +46,6 @@ Summary:        Runtime libs for uid * gid authentication across a host cluster
 %description libs
 Runtime libraries for using MUNGE.
 
-
 %prep
 %setup -q
 cp -p %{SOURCE1} create-munge-key
@@ -61,13 +57,12 @@ echo "d /run/munge 0755 munge munge -" > src/etc/munge.tmpfiles.conf.in
 # Get rid of some rpaths for /usr/sbin
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags} 
+%make_build
 
 
 %install
 
-rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
+%make_install
 
 # Install extra files.
 install -p -m 755 create-munge-key %{buildroot}/%{_sbindir}/create-munge-key
@@ -75,24 +70,23 @@ install -p -D -m 644 munge.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/mun
 
 # rm unneeded files.
 rm %{buildroot}/%{_sysconfdir}/sysconfig/munge
-# 
 rm %{buildroot}/%{_initddir}/munge
 
-# Exclude .la files 
+# Exclude .la files
 rm %{buildroot}/%{_libdir}/libmunge.la
 
 
 # Fix a few permissions
-chmod 700 %{buildroot}%{_var}/lib/munge %{buildroot}%{_var}/log/munge
+chmod 700 %{buildroot}%{_sharedstatedir}/munge %{buildroot}%{_var}/log/munge
 chmod 700 %{buildroot}%{_sysconfdir}/munge
 
 # Create and empty key file and pid file to be marked as a ghost file below.
-# i.e it is not actually included in the rpm, only the record 
+# i.e it is not actually included in the rpm, only the record
 # of it is.
 touch %{buildroot}%{_var}/run/munge/munged.pid
 mv %{buildroot}%{_var}/run %{buildroot}
 
-%postun 
+%postun
 %systemd_postun_with_restart munge.service
 
 %preun
@@ -101,10 +95,9 @@ mv %{buildroot}%{_var}/run %{buildroot}
 %pre
 getent group munge >/dev/null || groupadd -r munge
 getent passwd munge >/dev/null || \
-useradd -r -g munge -d /run/munge -s /usr/sbin/nologin \
+useradd -r -g munge -d /run/munge -s %{_sbindir}/nologin \
   -c "Runs Uid 'N' Gid Emporium" munge
 exit 0
-
 
 %post
 %systemd_post munge.service
@@ -124,10 +117,10 @@ exit 0
 %{_mandir}/man8/munged.8.gz
 %{_unitdir}/munge.service
 
-%attr(0700,munge,munge) %dir  %{_var}/log/munge
-%attr(0700,munge,munge) %dir  %{_var}/lib/munge
+%attr(0700,munge,munge) %dir %{_var}/log/munge
+%attr(0700,munge,munge) %dir %{_sharedstatedir}/munge
 %attr(0700,munge,munge) %dir %{_sysconfdir}/munge
-%attr(0755,munge,munge) %dir   /run/munge/
+%attr(0755,munge,munge) %dir /run/munge/
 %attr(0644,munge,munge) %ghost /run/munge/munged.pid
 
 %config(noreplace) %{_tmpfilesdir}/munge.conf
@@ -135,7 +128,7 @@ exit 0
 
 %license COPYING COPYING.LESSER
 %doc AUTHORS
-%doc JARGON META NEWS QUICKSTART README 
+%doc JARGON META NEWS QUICKSTART README
 %doc doc
 
 %files libs
@@ -162,8 +155,11 @@ exit 0
 %{_mandir}/man3/munge_enum_str_to_int.3.gz
 %{_mandir}/man3/munge_strerror.3.gz
 
-
 %changelog
+* Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.13-9
+- Move from Extended to Core.
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.13-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
@@ -241,6 +237,7 @@ exit 0
 - Fix incorrect dates in changelogs.
 - Fix systemd scriptlets #850219
 - Use buildroot macro everywhere.
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.5.10-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
@@ -273,18 +270,23 @@ exit 0
 
 * Sat Mar 27 2010 Steve Traylen <steve.traylen@cern.ch> - 0.5.9-3
 - Release Bump
+
 * Fri Mar 26 2010 Steve Traylen <steve.traylen@cern.ch> - 0.5.9-2
 - Remove initd-pass-rpmlint.patch, has been applied upstream.
 - Remove remove-GPL_LICENSED-cpp.patch, has been applied upstream.
+
 * Fri Mar 26 2010 Steve Traylen <steve.traylen@cern.ch> - 0.5.9-1
 - New upstream 0.5.9
+
 * Wed Oct 21 2009 Steve Traylen <steve.traylen@cern.ch> - 0.5.8-8
 - Requirment on munge removed from munge-libs.
 - Explicit exact requirment on munge-libs for munge and munge-devel
   added.
+
 * Wed Oct 21 2009 Steve Traylen <steve.traylen@cern.ch> - 0.5.8-7
 - rhbz#530128 Move runtime libs to a new -libs package.
   ldconfig moved to new -libs package as a result.
+
 * Sat Sep 26 2009 Steve Traylen <steve.traylen@cern.ch> - 0.5.8-6
 - Patch for rhbz #525732 - Loads /etc/sysconfig/munge 
   correctly.
@@ -319,8 +321,5 @@ exit 0
   default anyway.
 - Mark the munge.key as a ghost file.
 
-
 * Fri Jun 12 2009 Steve Traylen <steve@traylen.net> - 0.5.8-1
 - First Build
-
-

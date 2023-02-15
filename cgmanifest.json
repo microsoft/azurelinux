@@ -2347,8 +2347,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.29.32",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.32.tar.gz"
+          "version": "0.29.33",
+          "downloadUrl": "https://github.com/cython/cython/releases/download/0.29.33/Cython-0.29.33.tar.gz"
         }
       }
     },
@@ -3178,8 +3178,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "4.4.1",
-          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-4.4.1.tar.bz2"
+          "version": "5.2.0",
+          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-5.2.0.tar.bz2"
         }
       }
     },
@@ -6220,8 +6220,8 @@
         "type": "other",
         "other": {
           "name": "hwloc",
-          "version": "2.0.4",
-          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.0/downloads/hwloc-2.0.4.tar.bz2"
+          "version": "2.5.0",
+          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.5/downloads/hwloc-2.5.0.tar.bz2"
         }
       }
     },
@@ -14703,6 +14703,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openmpi",
+          "version": "4.1.4",
+          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openobex",
           "version": "1.7.2",
           "downloadUrl": "http://downloads.sourceforge.net/openobex/openobex-1.7.2-Source.tar.gz"
@@ -20344,8 +20354,8 @@
         "type": "other",
         "other": {
           "name": "pmix",
-          "version": "3.1.5",
-          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v3.1.5/pmix-3.1.5.tar.bz2"
+          "version": "4.1.2",
+          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v4.1.2/pmix-4.1.2.tar.bz2"
         }
       }
     },
@@ -23873,6 +23883,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pytorch",
+          "version": "1.13.1",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytz",
           "version": "2021.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytz/pytz-2021.3.tar.gz"
@@ -24425,8 +24445,8 @@
         "type": "other",
         "other": {
           "name": "rpm-mpi-hooks",
-          "version": "6",
-          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/rawhide/f/mpi.attr"
+          "version": "8",
+          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/f37/f/mpi.attr"
         }
       }
     },

@@ -1,13 +1,12 @@
+Summary:        Process Management Interface Exascale (PMIx)
+Name:           pmix
+Version:        4.1.2
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:           pmix
-Version:        3.1.5
-Release:        2%{?dist}
-Summary:        Process Management Interface Exascale (PMIx)
-License:        BSD
 URL:            https://pmix.org/
 Source0:        https://github.com/pmix/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  flex
@@ -16,8 +15,8 @@ BuildRequires:  hwloc-devel
 BuildRequires:  libevent-devel
 BuildRequires:  libtool
 BuildRequires:  munge-devel
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-File-Find
+BuildRequires:  perl-interpreter
 
 %description
 The Process Management Interface (PMI) has been used for quite some time as
@@ -41,29 +40,15 @@ scalability.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%package        pmi
-Summary:        The %{name} implementation of libpmi and libpmi2
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Conflicts:      slurm-pmi
-%description    pmi
-The %{name}-pmi package contains the %{name} implementation of
-the libpmi and libpmi2 backward-compatibility libraries.
-
-%package        pmi-devel
-Summary:        Development files for %{name}-pmi
-Requires:       %{name}-pmi%{?_isa} = %{version}-%{release}
-Conflicts:      slurm-pmi-devel
-%description    pmi-devel
-The %{name}-pmi-devel package contains the development files for
-the libpmi and libpmi2 backward-compatibility libraries.
-
 %package        tools
 Summary:        Tools for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description    tools
 The %{name}-tools package contains for use with PMIx-based RMs and language-
 based starters (e.g., mpirun).
@@ -73,7 +58,7 @@ based starters (e.g., mpirun).
 * pevent - inject an event into the system
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 echo touching lexer sources to recompile them ...
 find src -name \*.l -print -exec touch --no-create {} \;
@@ -98,7 +83,7 @@ find src -name \*.l -print -exec touch --no-create {} \;
 %make_install
 
 # remove libtool archives
-find %{buildroot} -name '*.la' | xargs rm -f
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 %ldconfig_scriptlets devel
@@ -111,29 +96,25 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/*.conf
 %{_datadir}/%{name}/*.txt
-%{_libdir}/libmca_common_dstore.so.1*
 %{_libdir}/libpmix.so.2*
 %{_libdir}/%{name}/*.so
+%{_mandir}/man1/*.1*
 
 %files devel
 %{_datadir}/%{name}/*.supp
 %{_includedir}/pmix*.h
-%{_libdir}/libmca_common_dstore.so
 %{_libdir}/libpmix.so
-
-%files pmi
-%{_libdir}/libpmi.so.1*
-%{_libdir}/libpmi2.so.1*
-
-%files pmi-devel
-%{_includedir}/{pmi,pmi2}.h
-%{_libdir}/libpmi.so
-%{_libdir}/libpmi2.so
+%{_libdir}/pkgconfig/*.pc
 
 %files tools
 %{_bindir}/*
 
 %changelog
+* Thu Feb 02 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.2-1
+- Move from Extended to core
+- Update to 4.1.2 (from Fedora 38 (license: MIT))
+- License verified
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 3.1.5-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add build requirement perl-File-Find.

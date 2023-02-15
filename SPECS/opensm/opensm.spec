@@ -1,34 +1,38 @@
 %global __remake_config 1
-
-Name:    opensm
-Version: 3.3.23
-Release: 2%{?dist}
-Summary: OpenIB InfiniBand Subnet Manager and management utilities
-License: GPLv2 or BSD
+Summary:        OpenIB InfiniBand Subnet Manager and management utilities
+Name:           opensm
+Version:        3.3.23
+Release:        3%{?dist}
+License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:     https://github.com/linux-rdma/opensm
-
-Source0: https://github.com/linux-rdma/opensm/releases/download/%{version}/%{name}-%{version}.tar.gz
-Source2: opensm.logrotate
-Source4: opensm.sysconfig
-Source5: opensm.service
-Source6: opensm.launch
-Source7: opensm.rwtab
-Source8: opensm.partitions
-
+URL:            https://github.com/linux-rdma/opensm
+Source0:        https://github.com/linux-rdma/opensm/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source2:        opensm.logrotate
+Source4:        opensm.sysconfig
+Source5:        opensm.service
+Source6:        opensm.launch
+Source7:        opensm.rwtab
+Source8:        opensm.partitions
+BuildRequires:  bison
+BuildRequires:  byacc
+BuildRequires:  flex
 BuildRequires:  gcc
-BuildRequires: libibumad-devel, systemd, systemd-units
-BuildRequires: bison, flex, byacc
+BuildRequires:  libibumad-devel
+BuildRequires:  systemd
+BuildRequires:  systemd-units
 %if %{__remake_config}
-BuildRequires: libtool, autoconf, automake
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 %endif
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}, logrotate, rdma
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       logrotate
+Requires:       rdma
 Requires(post): systemd
-Requires(preun): systemd
 Requires(postun): systemd
-# RDMA is not currently built on 32-bit ARM: #1484155
-ExcludeArch: s390 %{arm}
+Requires(preun): systemd
+
 
 %description
 OpenSM is the OpenIB project's Subnet Manager for Infiniband networks.
@@ -39,21 +43,22 @@ that can be used from any machine and do not need to be run on a machine
 running the opensm daemon.
 
 %package libs
-Summary: Libraries used by opensm and included utilities
+Summary:        Libraries used by opensm and included utilities
 
 %description libs
 Shared libraries for Infiniband user space access
 
 %package devel
-Summary: Development files for the opensm-libs libraries
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Development files for the opensm-libs libraries
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 Development environment for the opensm libraries
 
 %package static
-Summary: Static version of the opensm libraries
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
+Summary:        Static version of the opensm libraries
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+
 %description static
 Static version of opensm libraries
 
@@ -72,7 +77,7 @@ cd opensm
 %install
 make install DESTDIR=%{buildroot}
 # remove unpackaged files from the buildroot
-rm -f %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -fr %{buildroot}%{_sysconfdir}/init.d
 install -D -m644 opensm-%{version}.conf %{buildroot}%{_sysconfdir}/rdma/opensm.conf
 install -D -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/opensm
@@ -81,7 +86,7 @@ install -D -m644 %{SOURCE5} %{buildroot}%{_unitdir}/opensm.service
 install -D -m755 %{SOURCE6} %{buildroot}%{_libexecdir}/opensm-launch
 install -D -m644 %{SOURCE7} %{buildroot}%{_sysconfdir}/rwtab.d/opensm
 install -D -m644 %{SOURCE8} %{buildroot}%{_sysconfdir}/rdma/partitions.conf
-mkdir -p ${RPM_BUILD_ROOT}/var/cache/opensm
+mkdir -p %{buildroot}%{_var}/cache/opensm
 
 %post
 %systemd_post opensm.service
@@ -90,15 +95,15 @@ mkdir -p ${RPM_BUILD_ROOT}/var/cache/opensm
 %systemd_preun opensm.service
 
 %postun
-if [ -d /var/cache/opensm ]; then
-	rm -fr /var/cache/opensm
+if [ -d %{_var}/cache/opensm ]; then
+	rm -fr %{_var}/cache/opensm
 fi
 %systemd_postun_with_restart opensm.service
 
 %ldconfig_scriptlets libs
 
 %files
-%dir /var/cache/opensm
+%dir %{_var}/cache/opensm
 %{_sbindir}/*
 %{_mandir}/*/*
 %{_unitdir}/*
@@ -122,6 +127,10 @@ fi
 %{_libdir}/lib*.a
 
 %changelog
+* Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.23-3
+- Move from Extended to Core.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.23-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,29 +1,28 @@
-Name:           rpm-mpi-hooks
-Version:        6
-Release:        8%{?dist}
 Summary:        RPM dependency generator hooks for MPI packages
-
+Name:           rpm-mpi-hooks
+Version:        8
+Release:        1%{?dist}
 License:        MIT
-BuildArch:      noarch
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://src.fedoraproject.org/rpms/rpm-mpi-hooks
-Source0:        https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/rawhide/f/mpi.attr
+Source0:        https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/f37/f/mpi.attr
 Source1:        mpilibsymlink.attr
 Source2:        mpi.prov
 Source3:        mpi.req
 Source4:        LICENSE
-
-Requires:       filesystem
 # Instead of adding a BuildRequires to every MPI implementation spec
 Requires:       environment(modules)
+Requires:       filesystem
+BuildArch:      noarch
 
 %description
 RPM dependency generator hooks for MPI packages. This package should be added
 as a BuildRequires to all mpi implementations (i.e. openmpi, mpich) as well as
 a Requires to the their -devel packages.
 
-
 %prep
-cp -a %SOURCE4 .
+cp -a %{SOURCE4} .
 
 
 %build
@@ -44,8 +43,11 @@ install -Dpm 0755 %{SOURCE3} %{buildroot}%{_rpmconfigdir}/mpi.req
 %{_rpmconfigdir}/mpi.req
 %{_rpmconfigdir}/mpi.prov
 
-
 %changelog
+* Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 8-1
+- Move from extended to Core.
+- Update to 8.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6-8
 - Fixing source URL.
 
