@@ -108,10 +108,6 @@ mkdir -p %{buildroot}/lib/modules/%{name}
 cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
 
-#    Cleanup dangling symlinks
-rm -rf %{buildroot}/lib/modules/%{uname_r}/source
-rm -rf %{buildroot}/lib/modules/%{uname_r}/build
-
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
