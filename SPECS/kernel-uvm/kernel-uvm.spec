@@ -139,7 +139,7 @@ find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
 %changelog
 * Tue Mar 30 2023 Chris Co <chrco@microsoft.com> - 5.15.48.1-10
-- Generate devel subpackage
+- Generate devel subpackage and enable loadable kernel module support
 
 * Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
 - Enable Hyper-V enlightenments.
