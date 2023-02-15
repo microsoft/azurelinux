@@ -2,7 +2,7 @@ Summary:        An URL retrieval utility and library
 Name:           curl
 # Heads up: 7.87 breaks perl-WWW-Curl (see #4588).
 Version:        7.86.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-43551.patch
+Patch1:         CVE-2022-43552.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -90,6 +91,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.4*
 
 %changelog
+* Mon Feb 13 2023 Dallas Delaney <dadelan@microsoft.com> - 7.86.0-3
+- Apply patch to fix CVE-2022-43552
+
 * Thu Jan 12 2023 Aurélien Bombo <abombo@microsoft.com> - 7.86.0-2
 - Apply patch to fix CVE-2022-43551.
 
