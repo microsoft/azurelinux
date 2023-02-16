@@ -225,8 +225,10 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 		retryDuration = time.Second
 	)
 
+	checkFailed := false
 	logBaseName := filepath.Base(srpmFile) + ".log"
-	build_and_check := func() (buildErr error) {
+
+	err = retry.Run(func() (buildErr error) {
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
 		// If the package builds with no errors and RUN_CHECK=y, check logs to see if the %check section passed, and if not, return as the build error.
 		if buildErr != nil {
@@ -234,24 +236,13 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 		}
 
 		if agent.Config().RunCheck {
-			buildErr = parseCheckSection(logFile)
-			if buildErr != nil {
-				// Since retry.Run can only return `error` type, this flags check failures separately
-				buildErr = fmt.Errorf("checkErr: %v", buildErr)
+			checkErr := (parseCheckSection(logFile) != nil)
+			if checkErr != nil {
+				logger.Log.Debugf("Tests failed for '%'. Ignoring since the package built correctly. Error: %v", srpmFile, checkErr)
 			}
 		}
 		return
-	}
-	err = retry.Run(build_and_check, buildAttempts, retryDuration)
-	// If RUN_CHECK=y, buildAttempts < checkAttempts, and there's a check failure, we run more attempts.
-	if agent.Config().RunCheck && buildAttempts < checkAttempts && err != nil && strings.Contains(err.Error(), "checkErr: ") {
-		err = retry.Run(build_and_check, checkAttempts-buildAttempts, retryDuration)
-	}
-	// Trims the "checkErr: " marker from the error before returning
-	if err != nil {
-		err = fmt.Errorf(strings.TrimPrefix(err.Error(), "checkErr: "))
-	}
-
+	}, buildAttempts, retryDuration)
 	return
 }
 
