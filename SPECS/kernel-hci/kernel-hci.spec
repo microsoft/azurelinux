@@ -419,7 +419,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Mon Feb 27 2023 Vince Perri <viperri@microsoft.com> - 5.15.94.1-2
-- Add net/mlx5 patches (patchs 21-25) for QinQ support
+- Add net/mlx5 patches (patches 21-25) for QinQ support
 
 * Wed Feb 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.94.1-1
 - Auto-upgrade to 5.15.94.1
