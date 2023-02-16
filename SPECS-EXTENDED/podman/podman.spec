@@ -36,7 +36,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
