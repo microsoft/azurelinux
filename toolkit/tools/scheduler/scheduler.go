@@ -74,7 +74,7 @@ var (
 	reservedFileListFile   = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
 	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
-	supressConflictingRPMs = app.Flag("allow-prebuilt-rebuild", "Don't report the toolchain rebuild error").Bool()
+	supressConflictingRPMs = app.Flag("allow-prebuilt-rebuilds", "Don't report the toolchain rebuild error").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
