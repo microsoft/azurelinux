@@ -1,7 +1,7 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.4.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        libtiff
 URL:            https://gitlab.com/libtiff/libtiff
 Group:          System Environment/Libraries
@@ -78,6 +78,9 @@ make %{?_smp_mflags} -k check
 %{_datadir}/man/man3/*
 
 %changelog
+* Thu Feb 16 2023 Dallas Delaney <dadelan@microsoft.com> - 4.4.0-8
+- Patch CVE-2023-0800 CVE-2023-0801 CVE-2023-0802 CVE-2023-0803 CVE-2023-0804
+
 * Thu Feb 02 2023 Henry Li <lihl@microsoft.com> - 4.4.0-7
 - Patch CVE-2022-48281
 
