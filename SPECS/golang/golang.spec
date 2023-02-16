@@ -36,7 +36,6 @@ mv -v go go-bootstrap
 
 # Setup go source and patch
 %setup -q -n go
-patch -Np1 --ignore-whitespace < %{PATCH1}
 
 %build
 # Build go 1.4 bootstrap
