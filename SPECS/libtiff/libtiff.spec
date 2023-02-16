@@ -18,6 +18,7 @@ Patch4:         CVE-2022-3597.patch
 Patch5:         CVE-2022-3599.patch
 Patch6:         CVE-2022-3970.patch
 Patch7:         CVE-2022-48281.patch
+Patch8:         CVE-2023-0800.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
