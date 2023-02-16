@@ -189,6 +189,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 	return
 }
 
+// parseCheckSection reads the package build log file to determine if the %check section passed or not
 func parseCheckSection(logFile string) (err error) {
 	file, err := os.Open(logFile)
 	// If we can't open the log file, that's a build error.
@@ -225,7 +226,6 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 	)
 
 	logBaseName := filepath.Base(srpmFile) + ".log"
-	logger.Log.Debugf("osamatest: checkAttempts is %d", checkAttempts)
 	build_and_check := func() (buildErr error) {
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
 		// If the package builds with no errors and RUN_CHECK=y, check logs to see if the %check section passed, and if not, return as the build error.
@@ -236,15 +236,18 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 		if agent.Config().RunCheck {
 			buildErr = parseCheckSection(logFile)
 			if buildErr != nil {
+				// Since retry.Run can only return `error` type, this flags check failures separately
 				buildErr = fmt.Errorf("checkErr: %v", buildErr)
 			}
 		}
 		return
 	}
 	err = retry.Run(build_and_check, buildAttempts, retryDuration)
+	// If RUN_CHECK=y, buildAttempts < checkAttempts, and there's a check failure, we run more attempts.
 	if agent.Config().RunCheck && buildAttempts < checkAttempts && err != nil && strings.Contains(err.Error(), "checkErr: ") {
 		err = retry.Run(build_and_check, checkAttempts-buildAttempts, retryDuration)
 	}
+	// Trims the "checkErr: " marker from the error before returning
 	if err != nil {
 		err = fmt.Errorf(strings.TrimPrefix(err.Error(), "checkErr: "))
 	}
