@@ -4,7 +4,7 @@ glibc-2.35-4.cm2.x86_64.rpm
 glibc-devel-2.35-4.cm2.x86_64.rpm
 glibc-i18n-2.35-4.cm2.x86_64.rpm
 glibc-iconv-2.35-4.cm2.x86_64.rpm
-glibc-lang-2.3543.cm2.x86_64.rpm
+glibc-lang-2.35-4.cm2.x86_64.rpm
 glibc-nscd-2.35-4.cm2.x86_64.rpm
 glibc-tools-2.35-4.cm2.x86_64.rpm
 zlib-1.2.12-2.cm2.x86_64.rpm
