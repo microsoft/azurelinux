@@ -5,7 +5,7 @@
 Summary:   Library for AppStream metadata
 Name:      libappstream-glib
 Version:   0.8.2
-Release:   3%{?dist}
+Release:   4%{?dist}
 License:   LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,7 +80,7 @@ from a directory of packages.
 
 %build
 %meson \
-    -Dgtk-doc=true \
+    -Dgtk-doc=false \
     -Dstemmer=true \
     -Ddep11=false
 %meson_build
@@ -110,7 +110,6 @@ from a directory of packages.
 %{_libdir}/pkgconfig/appstream-glib.pc
 %dir %{_includedir}/libappstream-glib
 %{_includedir}/libappstream-glib/*.h
-%{_datadir}/gtk-doc/html/appstream-glib
 %{_datadir}/gir-1.0/AppStreamGlib-1.0.gir
 %{_datadir}/aclocal/*.m4
 %{_datadir}/installed-tests/appstream-glib/*.test
@@ -131,6 +130,9 @@ from a directory of packages.
 %{_mandir}/man1/appstream-builder.1.gz
 
 %changelog
+* Tue Feb 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.8.2-4
+- Drop docs generation to fix build
+
 * Wed Jan 25 2023 Henry Li <lihl@microsoft.com> - 0.8.2-3
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified
