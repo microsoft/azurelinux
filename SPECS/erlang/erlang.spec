@@ -1,6 +1,6 @@
 %define  debug_package %{nil}
-%define  usr_local_bin /usr/local/bin
-%define  usr_local_lib /usr/local/lib
+%define  usr_local_bin %{_prefix}/local/bin
+%define  usr_local_lib %{_prefix}/local/lib
 Summary:        erlang
 Name:           erlang
 Version:        25.2
@@ -11,10 +11,10 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
-BuildRequires:  unzip
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
+BuildRequires:  unzip
 
 %description
 erlang programming language
