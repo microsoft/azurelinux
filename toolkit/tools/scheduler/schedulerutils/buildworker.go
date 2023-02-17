@@ -243,6 +243,7 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 		}
 		return
 	}, buildAttempts, retryDuration)
+	// don't forget checkAttempts
 	return
 }
 
