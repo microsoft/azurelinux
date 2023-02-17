@@ -25,7 +25,7 @@ jobs:
           python-version: 3.9
 
       - name: Get Python dependencies
-        run: sudo python3 -m pip install python-rpm-spec
+        run: sudo python3 -m pip install python-rpm-spec rpm-py-installer
 
       - name: Check livepatch specs are valid
         run: |
