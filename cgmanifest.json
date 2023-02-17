@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.7.0",
-          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.0.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.2.tar.gz"
         }
       }
     },
@@ -12401,8 +12401,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.8.4",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.4/source/apache-maven-3.8.4-src.tar.gz"
+          "version": "3.8.7",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
@@ -12453,6 +12453,16 @@
           "name": "maven-resources-plugin-bootstrap",
           "version": "3.1.0",
           "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.1.0/maven-resources-plugin-3.1.0-source-release.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven3",
+          "version": "3.8.7",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
@@ -26377,8 +26387,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.9.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.11.0.tar.gz"
         }
       }
     },

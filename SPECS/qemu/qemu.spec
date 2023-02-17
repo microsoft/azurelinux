@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -874,6 +874,13 @@ Requires(postun): systemd-units
 %description user-binfmt
 This package provides the user mode emulation of qemu targets
 
+%package        ipxe
+Summary:        PXE and EFI ROM images for qemu
+Requires:       %{name}-common = %{version}-%{release}
+
+%description ipxe
+This package provides PXE and EFI ROM images for qemu
+
 %package        system-aarch64
 Summary:        QEMU system emulator for AArch64
 Requires:       %{name}-system-aarch64-core = %{version}-%{release}
@@ -888,6 +895,7 @@ Requires:       %{name}-common = %{version}-%{release}
 %if %{have_edk2}
 Requires:       edk2-aarch64
 %endif
+Requires:       %{name}-ipxe = %{version}-%{release}
 
 %description system-aarch64-core
 This package provides the QEMU system emulator for AArch64.
@@ -913,6 +921,7 @@ Requires:       sgabios-bin
 %if %{have_edk2}
 Requires:       edk2-ovmf
 %endif
+Requires:       %{name}-ipxe = %{version}-%{release}
 
 %description system-x86-core
 This package provides the QEMU system emulator for x86. When being run in a x86
@@ -1680,12 +1689,6 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc32
 rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
-
-%ifarch aarch64
-rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
-rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
-%endif
-
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
 # Provided by package seabios
@@ -2100,6 +2103,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-aarch64*.stp
 %{_mandir}/man1/qemu-system-aarch64.1*
 
+%files ipxe
+%{_datadir}/%{name}/pxe*rom
+%{_datadir}/%{name}/efi*rom
+
 %ifarch x86_64
 %files system-x86
 
@@ -2118,8 +2125,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/%{name}/multiboot_dma.bin
 %{_datadir}/%{name}/pvh.bin
 %{_datadir}/%{name}/qboot.rom
-%{_datadir}/%{name}/pxe*rom
-%{_datadir}/%{name}/efi*rom
 %if %{need_qemu_kvm}
 %{_bindir}/qemu-kvm
 %{_mandir}/man1/qemu-kvm.1*
@@ -2298,6 +2303,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Wed Feb 15 2023 Vince Perri <viperri@microsoft.com> - 6.2.0-14
+- Move PXE and EFI ROM images from system-x86-core to new ipxe subpackage
+- Require ipxe for both system-x86-core and system-aarch64-core packages
+
 * Tue Dec 20 2022 Nan Liu <liunan@microsoft.com> - 6.2.0-13
 - Address CVE-2021-3929, CVE-2021-4207
 
