@@ -744,6 +744,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "authbind",
+          "version": "2.1.2",
+          "downloadUrl": "https://deb.debian.org/debian/pool/main/a/authbind/authbind_2.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "authd",
           "version": "1.4.4",
           "downloadUrl": "https://github.com/InfrastructureServices/authd/releases/download/v1.4.4/authd-1.4.4.tar.gz"

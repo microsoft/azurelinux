@@ -67,6 +67,7 @@
                 "attr",
                 "audiofile",
                 "augeas",
+                "authbind",
                 "authd",
                 "authselect",
                 "autoconf213",
