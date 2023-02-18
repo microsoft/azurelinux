@@ -128,8 +128,8 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
-* Fri Feb 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.105.2-1
-- Auto-upgrade to 0.105.2 - CVE-2023-20032
+* Fri Feb 17 2023 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.105.2-1
+- Upgrade to 0.105.2 to fix CVE-2023-20032 and CVE-2023-20052
 
 * Wed Sep 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.105.0-3
 - Add pre/postun requirements on shadow-utils
