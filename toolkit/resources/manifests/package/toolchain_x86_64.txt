@@ -31,9 +31,9 @@ check-0.12.0-4.cm1.x86_64.rpm
 check-debuginfo-0.12.0-4.cm1.x86_64.rpm
 cmake-3.21.4-3.cm1.x86_64.rpm
 cmake-debuginfo-3.21.4-3.cm1.x86_64.rpm
-coreutils-8.30-11.cm1.x86_64.rpm
-coreutils-debuginfo-8.30-11.cm1.x86_64.rpm
-coreutils-lang-8.30-11.cm1.x86_64.rpm
+coreutils-8.30-12.cm1.x86_64.rpm
+coreutils-debuginfo-8.30-12.cm1.x86_64.rpm
+coreutils-lang-8.30-12.cm1.x86_64.rpm
 cpio-2.13-3.cm1.x86_64.rpm
 cpio-debuginfo-2.13-3.cm1.x86_64.rpm
 cpio-lang-2.13-3.cm1.x86_64.rpm
