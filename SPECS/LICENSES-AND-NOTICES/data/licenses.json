@@ -2120,6 +2120,7 @@
                 "livepatch-5.15.90.1-1.cm2",
                 "livepatch-5.15.92.1-1.cm2",
                 "livepatch-5.15.92.1-2.cm2",
+                "livepatch-5.15.94.1-1.cm2",
                 "livepatching",
                 "lld",
                 "local-path-provisioner",
