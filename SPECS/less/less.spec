@@ -34,7 +34,6 @@ The Less package contains a text file viewer
 %changelog
 * Fri Feb 17 2023 Suresh Thelkar <sthelkar@microsoft.com> - 590-2
 - Patch CVE-2022-46663
-- License verified.
 
 * Wed Dec 08 2021 Mateusz Malisz <mamalisz@microsoft.com> - 590-1
 - Update to version 590
