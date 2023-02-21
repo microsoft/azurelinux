@@ -67,6 +67,7 @@
                 "attr",
                 "audiofile",
                 "augeas",
+                "authbind",
                 "authd",
                 "authselect",
                 "autoconf213",
@@ -985,6 +986,7 @@
                 "OpenEXR",
                 "openjade",
                 "openjpeg2",
+                "openmpi",
                 "openobex",
                 "openoffice-lv",
                 "opensc",
@@ -1858,6 +1860,7 @@
                 "spirv-tools",
                 "splix",
                 "squashfs-tools",
+                "squid",
                 "sratom",
                 "sscg",
                 "star",
@@ -2116,6 +2119,7 @@
                 "livepatch-5.15.87.1-1.cm2",
                 "livepatch-5.15.90.1-1.cm2",
                 "livepatch-5.15.92.1-1.cm2",
+                "livepatch-5.15.92.1-2.cm2",
                 "livepatching",
                 "lld",
                 "local-path-provisioner",
@@ -2125,6 +2129,7 @@
                 "mariner-release",
                 "mariner-repos",
                 "mariner-rpm-macros",
+                "maven3",
                 "mm-common",
                 "moby-buildx",
                 "moby-cli",
@@ -2320,6 +2325,12 @@
                 "nvidia-docker2",
                 "ofed-scripts",
                 "perftest"
+            ]
+        },
+        "OpenEuler": {
+            "license": "[BSD-3 License](https://github.com/pytorch/pytorch/blob/master/LICENSE)",
+            "specs": [
+                "pytorch"
             ]
         },
         "OpenMamba": {

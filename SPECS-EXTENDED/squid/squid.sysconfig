@@ -1,0 +1,5 @@
+# default squid options
+SQUID_OPTS=""
+
+# default squid conf file
+SQUID_CONF="/etc/squid/squid.conf"
