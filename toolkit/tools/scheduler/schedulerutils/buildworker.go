@@ -225,8 +225,14 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 		retryDuration = time.Second
 	)
 
+	// checkFailed is a flag to see if a non-null buildErr is from the %check section
 	checkFailed := false
 	logBaseName := filepath.Base(srpmFile) + ".log"
+	// temporary solution; potential fix: build normally for buildAttempts, then run rmpbuild -bi --short-circuit to just do the checks
+	maxAttempts := buildAttempts
+	if checkAttempts > maxAttempts {
+		maxAttempts = checkAttempts
+	}
 
 	err = retry.Run(func() (buildErr error) {
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
@@ -236,14 +242,17 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 		}
 
 		if agent.Config().RunCheck {
-			checkErr := (parseCheckSection(logFile) != nil)
-			if checkErr != nil {
-				logger.Log.Debugf("Tests failed for '%'. Ignoring since the package built correctly. Error: %v", srpmFile, checkErr)
-			}
+			buildErr := parseCheckSection(logFile)
+			checkFailed = (buildErr != nil)
 		}
 		return
-	}, buildAttempts, retryDuration)
-	// don't forget checkAttempts
+	}, maxAttempts, retryDuration)
+
+	// temporary solution; potential fix: once stable, fail builds if %check section fails?
+	if err != nil && checkFailed {
+		logger.Log.Debugf("Tests failed for '%'. Ignoring since the package built correctly. Error: %v", srpmFile, checkErr)
+		err = nil
+	}
 	return
 }
 
