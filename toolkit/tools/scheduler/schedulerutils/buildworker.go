@@ -250,7 +250,7 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 
 	// temporary solution; potential fix: once stable, fail builds if %check section fails?
 	if err != nil && checkFailed {
-		logger.Log.Debugf("Tests failed for '%'. Ignoring since the package built correctly. Error: %v", srpmFile, err)
+		logger.Log.Debugf("Tests failed for '%s'. Ignoring since the package built correctly. Error: %v", srpmFile, err)
 		err = nil
 	}
 	return
