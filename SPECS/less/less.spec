@@ -1,13 +1,14 @@
 Summary:        Text file viewer
 Name:           less
 Version:        590
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.greenwoodsoftware.com/less
 Source0:        https://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-46663.patch
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
@@ -31,6 +32,9 @@ The Less package contains a text file viewer
 %{_mandir}/*/*
 
 %changelog
+* Tue Feb 21 2023 Minghe Ren <mingheren@microsoft.com> - 590-2
+- Add upstream patch for CVE-2022-46663
+
 * Wed Dec 08 2021 Mateusz Malisz <mamalisz@microsoft.com> - 590-1
 - Update to version 590
 - License verified.
