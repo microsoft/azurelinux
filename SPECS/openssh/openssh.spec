@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ Patch306:       pam_ssh_agent_auth-0.10.2-compat.patch
 # Fix NULL dereference from getpwuid() return value
 # https://sourceforge.net/p/pamsshagentauth/bugs/22/
 Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
+Patch308:    CVE-2023-25136.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -100,6 +101,7 @@ pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch306 -p2 -b .psaa-compat
 %patch305 -p2 -b .psaa-agent
 %patch307 -p2 -b .psaa-deref
+%patch308 -p1
 # Remove duplicate headers and library files
 rm -f $(cat %{SOURCE4})
 autoreconf
@@ -261,6 +263,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Feb 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.8p1-8
+- Add patch for CVE-2023-25136
+
 * Tue Jul 26 2022 Minghe Ren <mingheren@microsoft.com> - 8.8p1-7
 - Update sshd_config to imporve SSH security
 
