@@ -28,7 +28,7 @@ make test
 
 %files
 %license LICENSE NOTICE
-%doc docs CONTRIBUTING.md OWNERS SECURITY.md SECURITY_CONTACTS VERSION code-of-conduct.md 
+%doc docs CONTRIBUTING.md OWNERS SECURITY.md SECURITY_CONTACTS VERSION code-of-conduct.md
 %doc README.md RELEASE.md
 %{_bindir}/*
 
