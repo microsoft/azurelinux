@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.7.0",
-          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.0.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.2.tar.gz"
         }
       }
     },
@@ -737,6 +737,16 @@
           "name": "augeas",
           "version": "1.12.0",
           "downloadUrl": "http://download.augeas.net/augeas-1.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "authbind",
+          "version": "2.1.2",
+          "downloadUrl": "https://deb.debian.org/debian/pool/main/a/authbind/authbind_2.1.2.tar.gz"
         }
       }
     },
@@ -1687,8 +1697,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.105.0",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.0.tar.gz"
+          "version": "0.105.2",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.2.tar.gz"
         }
       }
     },
@@ -2347,8 +2357,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.29.32",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.32.tar.gz"
+          "version": "0.29.33",
+          "downloadUrl": "https://github.com/cython/cython/releases/download/0.29.33/Cython-0.29.33.tar.gz"
         }
       }
     },
@@ -3178,8 +3188,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "4.4.1",
-          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-4.4.1.tar.bz2"
+          "version": "5.2.0",
+          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-5.2.0.tar.bz2"
         }
       }
     },
@@ -6210,8 +6220,8 @@
         "type": "other",
         "other": {
           "name": "hwloc",
-          "version": "2.0.4",
-          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.0/downloads/hwloc-2.0.4.tar.bz2"
+          "version": "2.5.0",
+          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.5/downloads/hwloc-2.5.0.tar.bz2"
         }
       }
     },
@@ -11710,6 +11720,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.92.1-2.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.92.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lksctp-tools",
           "version": "1.0.18",
           "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
@@ -12401,8 +12421,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.8.4",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.4/source/apache-maven-3.8.4-src.tar.gz"
+          "version": "3.8.7",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
@@ -12453,6 +12473,16 @@
           "name": "maven-resources-plugin-bootstrap",
           "version": "3.1.0",
           "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.1.0/maven-resources-plugin-3.1.0-source-release.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven3",
+          "version": "3.8.7",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
@@ -14686,6 +14716,16 @@
           "name": "openldap",
           "version": "2.4.57",
           "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openmpi",
+          "version": "4.1.4",
+          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.4.tar.bz2"
         }
       }
     },
@@ -20334,8 +20374,8 @@
         "type": "other",
         "other": {
           "name": "pmix",
-          "version": "3.1.5",
-          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v3.1.5/pmix-3.1.5.tar.bz2"
+          "version": "4.1.2",
+          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v4.1.2/pmix-4.1.2.tar.bz2"
         }
       }
     },
@@ -23863,6 +23903,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pytorch",
+          "version": "1.13.1",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytz",
           "version": "2021.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytz/pytz-2021.3.tar.gz"
@@ -24415,8 +24465,8 @@
         "type": "other",
         "other": {
           "name": "rpm-mpi-hooks",
-          "version": "6",
-          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/rawhide/f/mpi.attr"
+          "version": "8",
+          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/f37/f/mpi.attr"
         }
       }
     },
@@ -26357,8 +26407,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.9.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.11.0.tar.gz"
         }
       }
     },
@@ -26649,6 +26699,16 @@
           "name": "squashfs-tools",
           "version": "4.5.1",
           "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "squid",
+          "version": "5.7",
+          "downloadUrl": "http://www.squid-cache.org/Versions/v5/squid-5.7.tar.xz"
         }
       }
     },
