@@ -66,7 +66,7 @@ var (
 	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with.").Required().String()
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
 	buildAttempts        = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
-	checkAttempts        = app.Flag("check-attempts", "Sets the minimum number of times to test a package.").Default(defaultCheckAttempts).Int()
+	checkAttempts        = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
 	runCheck             = app.Flag("run-check", "Run the check during package builds.").Bool()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()

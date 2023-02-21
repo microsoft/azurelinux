@@ -229,6 +229,7 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 	checkFailed := false
 	logBaseName := filepath.Base(srpmFile) + ".log"
 	// temporary solution; potential fix: build normally for buildAttempts, then run rmpbuild -bi --short-circuit to just do the checks
+	// relevant bug https://microsoft.visualstudio.com/OS/_workitems/edit/43454529
 	maxAttempts := buildAttempts
 	if checkAttempts > maxAttempts {
 		maxAttempts = checkAttempts
