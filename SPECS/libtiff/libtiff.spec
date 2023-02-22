@@ -23,12 +23,10 @@ Patch7:         CVE-2022-48281.patch
 Patch8:         CVE-2023-0795.patch
 #Also fixes CVE-2023-0801/0802/0803/0804
 Patch9:         CVE-2023-0800.patch
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libtool
-
 Requires:       libjpeg-turbo
 Provides:       %{name}-tools = %{version}-%{release}
 
@@ -37,7 +35,6 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
-
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
 
@@ -82,9 +79,8 @@ make %{?_smp_mflags} -k check
 %changelog
 * Wed Feb 22 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.0-8
 - Add patch for CVE-2023-0795,CVE-2023-0796,CVE-2023-0797,CVE-2023-0798 & CVE-2023-0799
-  Also includes fixes for
-  . tiffcrop correctly update buffersize after rotateImage(). fix#520
-  . TIFFClose() avoid NULL pointer dereferencing. fix#515
+- Add fix for: tiffcrop correctly update buffersize after rotateImage(). fix#520
+- Add fix for: TIFFClose() avoid NULL pointer dereferencing. fix#515
 - Add patch for CVE-2023-0800,CVE-2023-0801,CVE-2023-0802,CVE-2023-0803 & CVE-2023-0804
 
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 4.4.0-7
