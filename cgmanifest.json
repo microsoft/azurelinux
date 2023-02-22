@@ -12762,6 +12762,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mksh",
+          "version": "59c",
+          "downloadUrl": "https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mlnx-ofa_kernel",
           "version": "5.6",
           "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz"
