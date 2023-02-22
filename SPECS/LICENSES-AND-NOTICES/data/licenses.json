@@ -2155,6 +2155,7 @@
                 "pigz",
                 "prebuilt-ca-certificates",
                 "prebuilt-ca-certificates-base",
+                "prometheus-adapter",
                 "python-cachetools",
                 "python-cherrypy",
                 "python-execnet",
