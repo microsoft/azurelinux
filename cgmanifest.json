@@ -24215,7 +24215,7 @@
         "other": {
           "name": "rcs",
           "version": "5.10.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/rcs/rcs-5.10.1.tar.lz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/rcs/rcs-5.10.1.tar.lz"
         }
       }
     },
