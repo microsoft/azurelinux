@@ -74,6 +74,8 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config-%{kernel_version_release}
 Source2:        mariner-%{kernel_version_release}.pem
 Patch0:         CVE-2023-0266.patch
+Patch1:         CVE-2022-47929.patch
+Patch2:         CVE-2023-0394.patch
 
 ExclusiveArch:  x86_64
 
@@ -186,7 +188,7 @@ addressing CVEs present in Mariner's %{kernel_version_release} kernel.
 
 %changelog
 * Wed Feb 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
-- Patching CVE-2023-0266.
+- Patching CVEs: 2022-47929, 2023-0266, 2023-0394.
 
 * Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.

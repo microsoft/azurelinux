@@ -66,6 +66,8 @@ A set of kernel livepatches addressing CVEs present in Mariner's
 
 Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):
 *CVE-2023-0266
+*CVE-2022-47929
+*CVE-2023-0394
 
 %package -n     %{livepatch_unsigned_name}
 Summary:        %{summary}
@@ -86,6 +88,8 @@ A set of kernel livepatches addressing CVEs present in Mariner's
 
 Patches list ('*' - fixed, '!' - unfixable through livepatching, kernel update required):
 *CVE-2023-0266
+*CVE-2022-47929
+*CVE-2023-0394
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
@@ -116,7 +120,7 @@ install -m 744 %{SOURCE0} %{buildroot}%{livepatch_module_path}
 
 %changelog
 * Wed Feb 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
-- Patching CVE-2023-0266.
+- Patching CVEs: 2022-47929, 2023-0266, 2023-0394.
 
 * Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
