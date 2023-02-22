@@ -52,7 +52,7 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 DELTA_BUILD                     ?= n
 TARGET_ARCH                     ?=
-ALLOW_PREBUILT_REBUILDS         ?= n
+ALLOW_TOOLCHAIN_REBUILDS         ?= n
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
