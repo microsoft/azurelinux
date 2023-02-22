@@ -60,7 +60,7 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 
 %changelog
 * Wed Feb 22 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.22-1
-- Update to patch version 2.4.22 to fix CVE-2023-25725
+- Update to 2.4.22 to fix CVE-2023-25725
 
 * Thu Feb 24 2022 Minghe Ren <mingheren@microsoft.com> - 2.4.13-1
 - Update to 2.4.13
