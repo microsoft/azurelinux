@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "22.2",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.2/+download/cloud-init-22.2.tar.gz"
+          "version": "22.4",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.4/+download/cloud-init-22.4.tar.gz"
         }
       }
     },
