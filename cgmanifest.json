@@ -12764,7 +12764,7 @@
         "other": {
           "name": "mksh",
           "version": "59c",
-          "downloadUrl": "https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
+          "downloadUrl": "http://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
         }
       }
     },
