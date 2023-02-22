@@ -24213,6 +24213,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rcs",
+          "version": "5.10.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/rcs/rcs-5.10.1.tar.lz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rdist",
           "version": "6.1.5",
           "downloadUrl": "http://www.MagniComp.com/download/rdist/rdist-6.1.5.tar.gz"
