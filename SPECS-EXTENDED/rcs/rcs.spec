@@ -6,7 +6,7 @@ License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.gnu.org/software/rcs/
-Source:         http://ftp.gnu.org/gnu/rcs/%{name}-%{version}.tar.lz
+Source:         https://ftp.gnu.org/gnu/rcs/%{name}-%{version}.tar.lz
 BuildRequires:  autoconf
 # BuildRequires: ghostscript
 BuildRequires:  ed
