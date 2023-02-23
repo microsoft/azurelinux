@@ -1,13 +1,16 @@
+# Work around a problem with libenchant versioning
+# (python-enchant-1.3.1 failed to work with enchant-1.4.2-2.fc10)
+%global enchant_dep enchant >= 1.5.0
+%global srcname enchant
 Summary:        Python bindings for Enchant spellchecking library
 Name:           python-enchant
 Version:        3.2.2
-Release:        7%{?dist}
-License:        LGPL-2.0-or-later
+Release:        3%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/pyenchant/pyenchant
+URL:            http://packages.python.org/pyenchant/
 Source0:        https://files.pythonhosted.org/packages/source/p/py%{srcname}/py%{srcname}-%{version}.tar.gz
-%global srcname enchant
 BuildRequires:  enchant-devel
 BuildArch:      noarch
 
@@ -16,11 +19,11 @@ PyEnchant is a spellchecking library for Python, based on the Enchant
 library by Dom Lachowicz.
 
 %package -n python3-%{srcname}
-Summary:        Python 3 bindings for Enchant spellchecking library
 %{?python_provide:%python_provide python3-%{srcname}}
+Summary:        Python 3 bindings for Enchant spellchecking library
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-Requires:       enchant2
+Requires:       %{enchant_dep}
 
 %description -n python3-%{srcname}
 PyEnchant is a spellchecking library for Python 3, based on the Enchant
@@ -66,22 +69,9 @@ rm -rf %{buildroot}/%{python3_sitelib}/%{srcname}/share
 %{python3_sitelib}/py%{srcname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
-* Fri Jan 27 2023 Henry Li <lihl@microsoft.com> - 3.2.2-7
-- Initial CBL-Mariner import from Fedora 38 (license: MIT)
-- License Verified
-- Fix bogus URL
-
-* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Sun Aug 28 2022 Jens Petersen <petersen@redhat.com> - 3.2.2-5
-- switch to using enchant2 (#2121993)
-
-* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.2.2-3
-- Rebuilt for Python 3.11
+* Tue Jan 03 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.2.2-3
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
