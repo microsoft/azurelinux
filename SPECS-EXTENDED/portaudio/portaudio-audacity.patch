@@ -1,0 +1,219 @@
+From 42dc9c90a703b8dd251d71389a7e6220a50a43a9 Mon Sep 17 00:00:00 2001
+From: Uwe Klotz <uwe.klotz@gmail.com>
+Date: Fri, 26 Mar 2021 10:43:46 +0100
+Subject: [PATCH] portaudio-audacity.patch
+
+---
+ configure.in                  |  1 +
+ include/pa_unix_oss.h         | 52 +++++++++++++++++++++++++++++++++++
+ include/portaudio.h           |  9 ++++++
+ src/common/pa_front.c         | 32 ++++++++++++++++++++-
+ src/common/pa_stream.c        |  2 ++
+ src/common/pa_stream.h        |  1 +
+ src/hostapi/oss/pa_unix_oss.c | 26 ++++++++++++++++++
+ 7 files changed, 122 insertions(+), 1 deletion(-)
+ create mode 100644 include/pa_unix_oss.h
+
+diff --git a/configure.in b/configure.in
+index bb4ae96..fe0e112 100644
+--- a/configure.in
++++ b/configure.in
+@@ -415,6 +415,7 @@ case "${host_os}" in
+                    DLL_LIBS="$DLL_LIBS -lossaudio"
+                    LIBS="$LIBS -lossaudio"
+            fi
++           INCLUDES="$INCLUDES pa_unix_oss.h"
+            AC_DEFINE(PA_USE_OSS,1)
+         fi
+
+diff --git a/include/pa_unix_oss.h b/include/pa_unix_oss.h
+new file mode 100644
+index 0000000..2351e64
+--- /dev/null
++++ b/include/pa_unix_oss.h
+@@ -0,0 +1,52 @@
++#ifndef PA_UNIX_OSS_H
++#define PA_UNIX_OSS_H
++
++/*
++ * $Id: portaudio.patch,v 1.10 2009-06-30 04:52:59 llucius Exp $
++ * PortAudio Portable Real-Time Audio Library
++ * OSS-specific extensions
++ *
++ * Copyright (c) 1999-2000 Ross Bencina and Phil Burk
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files
++ * (the "Software"), to deal in the Software without restriction,
++ * including without limitation the rights to use, copy, modify, merge,
++ * publish, distribute, sublicense, and/or sell copies of the Software,
++ * and to permit persons to whom the Software is furnished to do so,
++ * subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * Any person wishing to distribute modifications to the Software is
++ * requested to send the modifications to the original developer so that
++ * they can be incorporated into the canonical version.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
++ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
++ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
++ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++/** @file
++ * OSS-specific PortAudio API extension header file.
++ */
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++const char *PaOSS_GetStreamInputDevice( PaStream *s );
++
++const char *PaOSS_GetStreamOutputDevice( PaStream *s );
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/include/portaudio.h b/include/portaudio.h
+index 5d84731..7660c8a 100644
+--- a/include/portaudio.h
++++ b/include/portaudio.h
+@@ -1200,6 +1200,15 @@ signed long Pa_GetStreamReadAvailable( PaStream* stream );
+ signed long Pa_GetStreamWriteAvailable( PaStream* stream );
+
+
++/** Retrieve the host type handling an open stream.
++
++ @return Returns a non-negative value representing the host API type
++ handling an open stream or, a PaErrorCode (which are always negative)
++ if PortAudio is not initialized or an error is encountered.
++*/
++PaHostApiTypeId Pa_GetStreamHostApiType( PaStream* stream );
++
++
+ /* Miscellaneous utilities */
+
+
+diff --git a/src/common/pa_front.c b/src/common/pa_front.c
+index 65a656f..02a67a8 100644
+--- a/src/common/pa_front.c
++++ b/src/common/pa_front.c
+@@ -1257,8 +1257,10 @@ PaError Pa_OpenStream( PaStream** stream,
+                                   hostApiInputParametersPtr, hostApiOutputParametersPtr,
+                                   sampleRate, framesPerBuffer, streamFlags, streamCallback, userData );
+
+-    if( result == paNoError )
++    if( result == paNoError ) {
+         AddOpenStream( *stream );
++        PA_STREAM_REP(*stream)->hostApiType = hostApi->info.type;
++    }
+
+
+     PA_LOGAPI(("Pa_OpenStream returned:\n" ));
+@@ -1771,6 +1773,34 @@ signed long Pa_GetStreamWriteAvailable( PaStream* stream )
+ }
+
+
++PaHostApiTypeId Pa_GetStreamHostApiType( PaStream* stream )
++{
++    PaError error = PaUtil_ValidateStreamPointer( stream );
++    PaHostApiTypeId result;
++
++#ifdef PA_LOG_API_CALLS
++    PaUtil_DebugPrint("Pa_GetStreamHostApiType called:\n" );
++    PaUtil_DebugPrint("\tPaStream* stream: 0x%p\n", stream );
++#endif
++
++    if( error == paNoError )
++    {
++        result = PA_STREAM_REP(stream)->hostApiType;
++    }
++    else
++    {
++        result = (PaHostApiTypeId) error;
++    }
++
++#ifdef PA_LOG_API_CALLS
++    PaUtil_DebugPrint("Pa_GetStreamHostApiType returned:\n" );
++    PaUtil_DebugPrint("\tPaError: %d ( %s )\n\n", result, Pa_GetErrorText( result ) );
++#endif
++
++    return result;
++}
++
++
+ PaError Pa_GetSampleSize( PaSampleFormat format )
+ {
+     int result;
+diff --git a/src/common/pa_stream.c b/src/common/pa_stream.c
+index ffbf530..305f7c8 100644
+--- a/src/common/pa_stream.c
++++ b/src/common/pa_stream.c
+@@ -93,6 +93,8 @@ void PaUtil_InitializeStreamRepresentation( PaUtilStreamRepresentation *streamRe
+     streamRepresentation->streamInfo.inputLatency = 0.;
+     streamRepresentation->streamInfo.outputLatency = 0.;
+     streamRepresentation->streamInfo.sampleRate = 0.;
++
++    streamRepresentation->hostApiType = 0;
+ }
+
+
+diff --git a/src/common/pa_stream.h b/src/common/pa_stream.h
+index 4afda39..0a5cd1e 100644
+--- a/src/common/pa_stream.h
++++ b/src/common/pa_stream.h
+@@ -152,6 +152,7 @@ typedef struct PaUtilStreamRepresentation {
+     PaStreamFinishedCallback *streamFinishedCallback;
+     void *userData;
+     PaStreamInfo streamInfo;
++    PaHostApiTypeId hostApiType;
+ } PaUtilStreamRepresentation;
+
+
+diff --git a/src/hostapi/oss/pa_unix_oss.c b/src/hostapi/oss/pa_unix_oss.c
+index 20113e2..9dedc3f 100644
+--- a/src/hostapi/oss/pa_unix_oss.c
++++ b/src/hostapi/oss/pa_unix_oss.c
+@@ -2050,3 +2050,29 @@ error:
+     return result;
+ #endif
+ }
++
++
++const char *PaOSS_GetStreamInputDevice( PaStream* s )
++{
++    PaOssStream *stream = (PaOssStream*)s;
++
++    if( stream->capture )
++    {
++      return stream->capture->devName;
++    }
++
++   return NULL;
++}
++
++
++const char *PaOSS_GetStreamOutputDevice( PaStream* s )
++{
++    PaOssStream *stream = (PaOssStream*)s;
++
++    if( stream->playback )
++    {
++      return stream->playback->devName;
++    }
++
++   return NULL;
++}
+--
+2.30.2
+

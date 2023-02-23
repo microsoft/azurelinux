@@ -1,0 +1,21 @@
+diff -Naupr portaudio.orig/Doxyfile portaudio/Doxyfile
+--- portaudio.orig/Doxyfile	2006-08-23 10:15:11.000000000 +0200
++++ portaudio/Doxyfile	2008-12-22 14:11:16.558309299 +0100
+@@ -124,7 +124,7 @@ GENERATE_HTML          = YES
+ HTML_OUTPUT            = html
+ HTML_FILE_EXTENSION    = .html
+ HTML_HEADER            = 
+-HTML_FOOTER            = 
++HTML_FOOTER            = no_date_footer.html
+ HTML_STYLESHEET        = 
+ HTML_ALIGN_MEMBERS     = YES
+ GENERATE_HTMLHELP      = NO
+diff -Naupr portaudio.orig/no_date_footer.html portaudio/no_date_footer.html
+--- portaudio.orig/no_date_footer.html	1970-01-01 01:00:00.000000000 +0100
++++ portaudio/no_date_footer.html	2008-12-22 14:11:01.144246196 +0100
+@@ -0,0 +1,5 @@
++<hr size="1"><address style="text-align: right;"><small>Generated for $projectname by&nbsp;
++<a href="http://www.doxygen.org/index.html">
++<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a>$doxygenversion</small></address>
++</body>
++</html>
