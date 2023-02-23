@@ -65,9 +65,9 @@ PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
+CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 
 # Sub-folder defines
-CCACHE_DIR       ?= $(BUILD_DIR)/ccache
 LOGS_DIR         ?= $(BUILD_DIR)/logs
 PKGBUILD_DIR     ?= $(BUILD_DIR)/pkg_artifacts
 CACHED_RPMS_DIR  ?= $(BUILD_DIR)/rpm_cache
