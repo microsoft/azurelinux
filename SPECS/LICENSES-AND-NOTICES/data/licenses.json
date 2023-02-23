@@ -242,6 +242,7 @@
                 "fribidi",
                 "fros",
                 "frr",
+                "fstrm",
                 "fuse-overlayfs",
                 "fuse-sshfs",
                 "fuse-zip",
