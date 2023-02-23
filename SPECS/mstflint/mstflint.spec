@@ -1,7 +1,7 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.21.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
