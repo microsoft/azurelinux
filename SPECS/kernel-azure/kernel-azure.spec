@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-azure
-Version:        5.15.92.1
-Release:        2%{?dist}
+Version:        5.15.94.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -406,6 +406,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Feb 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.94.1-1
+- Auto-upgrade to 5.15.94.1
+
 * Wed Feb 15 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.92.1-2
 - Install vmlinux as root executable for debuginfo
 
