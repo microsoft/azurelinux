@@ -29,7 +29,7 @@ make
 
 %install
 
-%make_install DESTDIR=%{buildroot}
+%make_install
 
 %post
 
