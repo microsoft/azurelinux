@@ -37,7 +37,7 @@ find . -type f -iname '*.cpp' -exec chmod a-x '{}' ';'
 
 %build
 ./autogen.sh
-%configure --enable-fw-mgr
+%configure --enable-fw-mgr --enable-adb-generic-tools
 %make_build
 
 %install
@@ -58,6 +58,9 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
+* Thu Feb 23 2023 Elaheh Dehghani <edehghani@microsoft.com> - 4.21.0-3
+- Enabled 'adb-generic-tools' in build config (license: MIT)
+
 * Tue Aug 30 2022 Zhichun Wan <zhichunwan@microsoft.com> - 4.21.0-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Removed Obsoletes
