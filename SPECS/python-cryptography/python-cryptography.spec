@@ -58,7 +58,7 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 This is a Python 3 version.
 
 %prep
-%autosetup -n cryptography-%{version}
+%autosetup -p1 -n cryptography-%{version}
 rm -rf ../p3dir
 cp -a . ../p3dir
 
