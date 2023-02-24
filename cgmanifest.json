@@ -6219,6 +6219,17 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hvloader",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/HvLoader/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hwdata",
           "version": "0.356",
           "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.356.tar.gz"
@@ -7861,8 +7872,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.86.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.86.mshv2.tar.gz"
+          "version": "5.15.90.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.90.mshv2.tar.gz"
         }
       }
     },
