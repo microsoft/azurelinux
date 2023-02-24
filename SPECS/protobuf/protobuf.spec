@@ -50,6 +50,19 @@ Requires:       python3
 Requires:       python3-libs
 Provides:       %{name}-python3 = %{version}-%{release}
 
+%package -n     java-%{name}
+Summary:        protobuf java lib
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+BuildRequires:  chkconfig
+BuildRequires:  temurin-8-jdk >= 1.8.0.45
+BuildRequires:  maven >= 3.3.3
+Requires:       temurin-8-jdk >= 1.8.0.45
+Provides:       %{name}-java = %{version}-%{release}
+
+%description    java
+This contains protobuf java package.
+
 %description -n python3-%{name}
 This contains protobuf python3 libraries.
 
@@ -58,15 +71,34 @@ This contains protobuf python3 libraries.
 
 %build
 %configure --disable-silent-rules
+export JAVA_HOME=$(find /usr/lib/jvm -name "OpenJDK*")
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 %make_build
+
+# build python subpackage
 pushd python
 %py3_build
 popd
 
+# build java subpackage
+pushd java
+mvn package -o
+popd
+
 %install
 %make_install
+
+# install python subpackage
 pushd python
 %py3_install
+popd
+
+# install java subpackage
+pushd java
+mvn install -o
+install -vdm755 %{buildroot}%{_libdir}/java/protobuf
+install -vm644 core/target/protobuf-java-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
+install -vm644 util/target/protobuf-java-util-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
 popd
 
 %ldconfig_scriptlets
@@ -98,6 +130,9 @@ popd
 
 %files -n python3-%{name}
 %{python3_sitelib}/*
+
+%files -n java-%{name}
+%{_libdir}/java/protobuf/*.jar
 
 %changelog
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1
