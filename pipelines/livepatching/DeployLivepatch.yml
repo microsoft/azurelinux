@@ -67,7 +67,7 @@ extends:
 
         steps:
         - bash: |
-            pipelines/common/Configure-1ES.sh
+            pipelines/common/utilities/Configure-1ES.sh
           displayName: 'Install 1ES host machine applications'
 
         - bash: |
