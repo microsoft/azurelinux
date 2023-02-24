@@ -8,6 +8,8 @@ Distribution:   Mariner
 Group:          Productivity/Databases/Servers
 URL:            http://hadoop.apache.org/
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-vendor.tar.gz
+Source2:        settings.xml
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # Use generate_source_tarbbal.sh to get this generated from a source code file.
@@ -31,7 +33,6 @@ BuildRequires:  make
 BuildRequires:  g++
 BuildRequires:  gcc
 BuildRequires:  clang
-BuildRequires:  git
 BuildRequires:  maven
 BuildRequires:  file
 BuildRequires:  pkgconfig(snappy-devel)
@@ -54,3 +55,31 @@ Requires:       temurin-8-jdk
 %description
 Hadoop is a software platform that lets one easily write and
 run applications that process vast amounts of data.
+
+%prep
+%autosetup
+
+# populate maven m2 cache
+tar -xf %{source1} -C /root/.m2
+
+# replace default maven settings with ours that disables blocking of vendored packages that used http protocol to be downloaded
+cp -f %{source3} /var/opt/apache-maven/conf/settings.xml
+
+%build
+# setting up encoding
+export LANG='en_US.UTF-8'
+export LANGUAGE='en_US:en'
+export LC_ALL='en_US.UTF-8'
+export PYTHONIOENCODING=utf-8
+
+# setting up protobuf enviroment
+export PROTOBUF_HOME=/bin/protoc
+export PATH="${PATH}:/bin/protoc"
+
+# setting up java and maven enviroment
+export MAVEN_HOME=/usr
+export JAVA_HOME=/usr/lib/jvm/temurin-8-jdk
+export MAVEN_OPTS="-Xms256m -Xmx1536m"
+export HADOOP_SKIP_YETUS_VERIFICATION=true
+
+
