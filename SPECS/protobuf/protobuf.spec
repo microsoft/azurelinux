@@ -58,9 +58,9 @@ Summary:        protobuf java lib
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 BuildRequires:  chkconfig
-BuildRequires:  temurin-8-jdk >= 8.0.362
+BuildRequires:  temurin-8-jdk >= 8.0.362.0.0.9
 BuildRequires:  maven >= 3.8.6
-Requires:       temurin-8-jdk >= 8.0.362
+Requires:       temurin-8-jdk >= 8.0.362.0.0.9
 Provides:       %{name}-java = %{version}-%{release}
 
 %description -n java-%{name}
