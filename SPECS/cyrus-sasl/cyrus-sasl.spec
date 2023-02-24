@@ -311,7 +311,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Thu Feb 23 2023 Saul Paredes <saulparedes@microsoft.com> - 2.1.28-3
-- Bump release
+- Bump release to solve dependency issue
 
 * Mon Feb 13 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
 - Indicate this package obsoletes cyrus-sasl-bootstrap
