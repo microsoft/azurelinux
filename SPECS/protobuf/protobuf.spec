@@ -63,7 +63,7 @@ BuildRequires:  maven >= 3.8.6
 Requires:       temurin-8-jdk >= 8.0.362
 Provides:       %{name}-java = %{version}-%{release}
 
-%description    java
+%description -n java-%{name}
 This contains protobuf java package.
 
 %prep
