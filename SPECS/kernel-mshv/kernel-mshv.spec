@@ -10,8 +10,10 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.86.mshv2
-Release:        2%{?dist}
+# Currently branch user/askariv/feature/new-hvloader
+# 9d8a735048df953da83ed387234cbb9ae19dcb90
+Version:        5.15.90.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          Development/Tools
@@ -237,6 +239,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Wed Feb 08 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.90.mshv2-1
+- Update to v5.15.90.mshv2.
+
 * Tue Feb 21 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.86.mshv2-2
 - Install vmlinux as root executable for debuginfo
 
