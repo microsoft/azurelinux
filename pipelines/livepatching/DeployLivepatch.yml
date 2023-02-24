@@ -7,9 +7,6 @@ variables:
   value: 'LOGS'
 
 parameters:
-- name: repoBranch
-  displayName: 'Branch, tag or PR in the "PR-<number>" format to build against.'
-  type: string
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
   type: string
@@ -65,7 +62,7 @@ extends:
           displayName: 'Install 1ES host machine applications'
 
         - bash: |
-            mariner_version="$(make -C toolkit get-version)"
+            mariner_version="$(make -C toolkit printvar-RELEASE_MAJOR_ID)"
             download_tags="$mariner_version-stable"
             if [[ "${{ parameters.useKernelBuildArtifacts }}" =~ [Tt]rue ]]
             then
@@ -96,7 +93,6 @@ extends:
           inputs:
             filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/BuildLivepatch.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
-                        -b "${{ parameters.repoBranch }}"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
                         -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"

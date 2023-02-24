@@ -69,15 +69,13 @@ hydrate_build_artifacts() {
 # Script parameters:
 #
 # -a -> input artifacts directory path
-# -b -> git branch to build from
 # -k -> kernel version to be livepatched
 # -l -> published logs directory path
 # -p -> published artifacts directory path
 # -s -> use toolkit's RPMs snapshot to populate the packages cache
-while getopts "a:b:k:l:p:s:" OPTIONS; do
+while getopts "a:k:l:p:s:" OPTIONS; do
   case "${OPTIONS}" in
     a ) ARTIFACTS_DIR=$OPTARG ;;
-    b ) GIT_BRANCH=$OPTARG ;;
     k ) KERNEL_VERSION=$OPTARG ;;
     l ) LOG_PUBLISH_DIR=$OPTARG ;;
     p ) ARTIFACT_PUBLISH_DIR=$OPTARG ;;
@@ -95,8 +93,6 @@ while getopts "a:b:k:l:p:s:" OPTIONS; do
 done
 
 print_variables_with_check ARTIFACTS_DIR GIT_BRANCH KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACT_PUBLISH_DIR USE_RPMS_SNAPSHOT
-
-change_github_branch "$GIT_BRANCH"
 
 hydrate_build_artifacts "$ARTIFACTS_DIR"
 
