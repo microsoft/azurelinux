@@ -59,7 +59,7 @@ find %{buildroot} -type f -name '*.a' -delete
 
 %changelog
 * Thu Feb 23 2023 Elaheh Dehghani <edehghani@microsoft.com> - 4.21.0-3
-- Enabled 'adb-generic-tools' in build config (license: MIT)
+- Enabled 'adb-generic-tools' in build config.
 
 * Tue Aug 30 2022 Zhichun Wan <zhichunwan@microsoft.com> - 4.21.0-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
