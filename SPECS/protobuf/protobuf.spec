@@ -50,6 +50,9 @@ Requires:       python3
 Requires:       python3-libs
 Provides:       %{name}-python3 = %{version}-%{release}
 
+%description -n python3-%{name}
+This contains protobuf python3 libraries.
+
 %package -n     java-%{name}
 Summary:        protobuf java lib
 Group:          Development/Libraries
@@ -62,9 +65,6 @@ Provides:       %{name}-java = %{version}-%{release}
 
 %description    java
 This contains protobuf java package.
-
-%description -n python3-%{name}
-This contains protobuf python3 libraries.
 
 %prep
 %autosetup
