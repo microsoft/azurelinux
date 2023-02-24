@@ -27197,8 +27197,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.23.0",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.23.0.tar.gz"
+          "version": "1.25.2",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.25.2.tar.gz"
         }
       }
     },
