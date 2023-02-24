@@ -99,7 +99,7 @@ extends:
         - task: Bash@3
           displayName: 'Build livepatch'
           inputs:
-            filePath: '$(Build.SourcesDirectory)/pipelines/livepatches/BuildLivepatch.sh'
+            filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/BuildLivepatch.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -b "${{ parameters.repoBranch }}"
                         -k "${{ parameters.livepatchKernelVersion }}"
