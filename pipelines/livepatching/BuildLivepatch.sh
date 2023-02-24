@@ -8,17 +8,15 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 source "$ROOT_DIR/pipelines/common/utilities/build_tools.sh"
 
 build_package() {
-    local repo_dir
     local package_name
     local package_cache_summary
     local toolkit_dir
     local use_rpms_snapshot
 
-    repo_dir="$1"
-    package_name="$2"
-    use_rpms_snapshot="$3"
+    package_name="$1"
+    use_rpms_snapshot="$2"
 
-    toolkit_dir="$repo_dir/toolkit"
+    toolkit_dir="toolkit"
 
     if $use_rpms_snapshot
     then
@@ -37,13 +35,11 @@ build_package() {
 
 hydrate_build_artifacts() {
     local artifacts_dir
-    local repo_dir
     local rpms_archive
     local toolchain_archive
     local toolkit_archive
 
-    repo_dir="$1"
-    artifacts_dir="$2"
+    artifacts_dir="$1"
 
     rpms_archive="$(find "$artifacts_dir" -name '*rpms.tar.gz' -type f -print -quit)"
     if [[ ! -f "$rpms_archive" ]]
@@ -66,11 +62,9 @@ hydrate_build_artifacts() {
         return 1
     fi
 
-    overwrite_toolkit "$repo_dir" "$toolkit_archive"
-    hydrate_cache "$repo_dir" "$toolchain_archive" "$rpms_archive"
+    overwrite_toolkit "$toolkit_archive"
+    hydrate_cache "$toolchain_archive" "$rpms_archive"
 }
-
-MARINER_REPO_DIR="CBL-Mariner"
 
 # Script parameters:
 #
@@ -104,13 +98,13 @@ print_variables_with_check ARTIFACTS_DIR GIT_BRANCH KERNEL_VERSION LOG_PUBLISH_D
 
 change_github_branch "$GIT_BRANCH"
 
-hydrate_build_artifacts . "$ARTIFACTS_DIR"
+hydrate_build_artifacts "$ARTIFACTS_DIR"
 
 # Making sure we publish build logs even if the build fails.
-build_package . "livepatch-$KERNEL_VERSION" "$USE_RPMS_SNAPSHOT" || BUILD_SUCCEEDED=false
+build_package "livepatch-$KERNEL_VERSION" "$USE_RPMS_SNAPSHOT" || BUILD_SUCCEEDED=false
 
-publish_build_logs . "$LOG_PUBLISH_DIR"
+publish_build_logs "$LOG_PUBLISH_DIR"
 
-publish_build_artifacts . "$ARTIFACT_PUBLISH_DIR"
+publish_build_artifacts "$ARTIFACT_PUBLISH_DIR"
 
 ${BUILD_SUCCEEDED:-true}

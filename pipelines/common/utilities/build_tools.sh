@@ -6,12 +6,7 @@ change_github_branch() {
     local repo_dir
 
     git_branch="$1"
-    repo_dir="$2"
-
-    if [[ -z "$repo_dir" ]]
-    then
-        repo_dir="."
-    fi
+    repo_dir="$(resolve_repo_dir "$2")"
 
     if [[ $git_branch == PR-* ]]
     then
@@ -28,28 +23,6 @@ change_github_branch() {
     git -C "$repo_dir" log -1
 }
 
-clone_github_repo() {
-    local git_branch
-    local git_url
-    local pr_number
-    local repo_dir
-
-    git_branch="$1"
-    git_url="$2"
-    repo_dir="$3"
-
-    if [[ -z "$repo_dir" ]]
-    then
-        repo_dir="$(basename "$git_url" .git)"
-    fi
-
-    echo "-- Cloning '$git_branch' from '$git_url'."
-
-    git clone --depth 1 "$git_url" "$repo_dir"
-
-    change_github_branch "$git_branch" "$repo_dir"
-}
-
 hydrate_cache() {
     local make_status
     local repo_dir
@@ -57,9 +30,9 @@ hydrate_cache() {
     local toolchain_archive
     local toolkit_dir
 
-    repo_dir="$1"
-    toolchain_archive="$2"
-    rpms_archive="$3"
+    toolchain_archive="$1"
+    rpms_archive="$2"
+    repo_dir="$(resolve_repo_dir "$3")"
 
     toolkit_dir="$repo_dir/toolkit"
 
@@ -90,12 +63,18 @@ overwrite_toolkit() {
     local repo_dir
     local toolkit_tarball
 
-    repo_dir="$1"
-    toolkit_tarball="$2"
+    toolkit_tarball="$1"
+    repo_dir="$(resolve_repo_dir "$2")"
+
+    toolkit_dir="$repo_dir/toolkit"
+
+    pushd -q "$repo_dir" || true
 
     echo "-- Extracting toolkit from '$toolkit_tarball' into '$repo_dir'."
-    rm -rf "$repo_dir/toolkit"
+    rm -rf "$toolkit_dir"
     tar -C "$repo_dir" -xf "$toolkit_tarball"
+
+    popd -q || true
 }
 
 parse_pipeline_boolean() {
@@ -132,8 +111,8 @@ publish_build_artifacts() {
     local toolkit_dir
     local out_dir
 
-    repo_dir="$1"
-    artifact_publish_dir="$2"
+    artifact_publish_dir="$1"
+    repo_dir="$(resolve_repo_dir "$2")"
 
     toolkit_dir="$repo_dir/toolkit"
     out_dir="$repo_dir/out"
@@ -157,8 +136,8 @@ publish_build_logs() {
     local package_build_artifacts_dir
     local repo_dir
 
-    repo_dir="$1"
-    logs_publish_dir="$2"
+    logs_publish_dir="$1"
+    repo_dir="$(resolve_repo_dir "$2")"
 
     logs_dir="$repo_dir/build/logs"
     package_build_artifacts_dir="$repo_dir/build/pkg_artifacts"
@@ -180,4 +159,17 @@ publish_build_logs() {
     else
         echo "-- WARNING: no '$package_build_artifacts_dir' directory found."
     fi
+}
+
+resolve_repo_dir() {
+    local repo_dir
+
+    repo_dir="$1"
+
+    if [[ -z "$repo_dir" ]]
+    then
+        repo_dir="$(git rev-parse --show-toplevel)"
+    fi
+
+    realpath "$repo_dir"
 }
