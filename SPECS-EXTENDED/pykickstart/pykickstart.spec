@@ -1,58 +1,56 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Disable tests by default because they fail to run inside mock builds
 # at the moment, but can run locally.  To build and run tests, do:
 #     rpmbuild -ba --with runtests pykickstart.spec
 %bcond_with runtests
-
-Name:      pykickstart
-Version:   3.36
-Release:   2%{?dist}
-License:   GPLv2 and MIT
-Summary:   Python utilities for manipulating kickstart files.
-Url:       https://github.com/pykickstart/pykickstart
-Source0:   https://github.com/pykickstart/pykickstart/archive/refs/tags/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:   %{name}-%{version}.tar.gz.asc
-
-BuildArch: noarch
-
-BuildRequires: gettext
-BuildRequires: python3-devel
-BuildRequires: python3-requests
-BuildRequires: python3-setuptools
-BuildRequires: make
-
+Summary:        Python utilities for manipulating kickstart files.
+Name:           pykickstart
+Version:        3.36
+Release:        2%{?dist}
+License:        GPLv2 AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://fedoraproject.org/wiki/pykickstart
+# This is a Red Hat maintained package which is specific to
+# our distribution.  Thus the source is only available from
+# within this srpm.
+Source0:        https://github.com/pykickstart/%{name}/releases/download/r%{version}/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}.tar.gz.asc
+BuildRequires:  gettext
+BuildRequires:  make
+BuildRequires:  python3-devel
+BuildRequires:  python3-requests
+BuildRequires:  python3-setuptools
+Requires:       python3-kickstart = %{version}-%{release}
+BuildArch:      noarch
 # Only required when building with runtests
 %if %{with runtests}
-BuildRequires: python3-coverage
-BuildRequires: python3-sphinx
+BuildRequires:  python3-coverage
+BuildRequires:  python3-sphinx
 %endif
-
-Requires: python3-kickstart = %{version}-%{release}
 
 %description
 Python utilities for manipulating kickstart files.
 
 %package -n python3-kickstart
-Summary:  Python 3 library for manipulating kickstart files.
-Requires: python3-requests
+Summary:        Python 3 library for manipulating kickstart files.
+Requires:       python3-requests
 
 %description -n python3-kickstart
 Python 3 library for manipulating kickstart files.  The binaries are found in
 the pykickstart package.
 
 %prep
-%setup -q
+%setup -q -n %{name}-r%{version}
 
 %build
-make PYTHON=%{__python3}
+make PYTHON=python3
 
 %install
-make PYTHON=%{__python3} DESTDIR=%{buildroot} install
+make PYTHON=python3 DESTDIR=%{buildroot} install
 
 %check
 %if %{with runtests}
-make PYTHON=%{__python3} test
+make PYTHON=python3 test
 %endif
 
 %files
@@ -71,12 +69,12 @@ make PYTHON=%{__python3} test
 %files -n python3-kickstart
 %doc docs/2to3
 %doc docs/programmers-guide
-%doc docs/kickstart-docs.txt
+%doc docs/kickstart-docs.rst
 %{python3_sitelib}/pykickstart
 %{python3_sitelib}/pykickstart*.egg-info
 
 %changelog
-* Mon Jan 02 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.36-2
+* Wed Nov 02 2022 Suresh Thelkar <sthelkar@microsoft.com> - 3.36-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified
 
