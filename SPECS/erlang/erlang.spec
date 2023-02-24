@@ -1,11 +1,9 @@
 %define  debug_package %{nil}
-%define  usr_local_bin %{_prefix}/local/bin
-%define  usr_local_lib %{_prefix}/local/lib
 Summary:        erlang
 Name:           erlang
 Version:        25.2
 Release:        1%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
@@ -24,7 +22,7 @@ erlang programming language
 
 %build
 export ERL_TOP=`pwd`
-./configure
+%configure
 make
 
 %install
@@ -36,16 +34,16 @@ make
 %files
 %defattr(-,root,root)
 %license LICENSE.txt
-%{usr_local_bin}/ct_run
-%{usr_local_bin}/dialyzer
-%{usr_local_bin}/epmd
-%{usr_local_bin}/erl
-%{usr_local_bin}/erlc
-%{usr_local_bin}/escript
-%{usr_local_bin}/run_erl
-%{usr_local_bin}/to_erl
-%{usr_local_bin}/typer
-%{usr_local_lib}/erlang/*
+%{_bindir}/ct_run
+%{_bindir}/dialyzer
+%{_bindir}/epmd
+%{_bindir}/erl
+%{_bindir}/erlc
+%{_bindir}/escript
+%{_bindir}/run_erl
+%{_bindir}/to_erl
+%{_bindir}/typer
+%{_libdir}/erlang/*
 
 %changelog
 * Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
