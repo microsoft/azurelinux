@@ -13,12 +13,6 @@ parameters:
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
   type: string
-- name: marinerRelease
-  displayName: 'Release of Mariner to build against.'
-  type: string
-  default: '2.0'
-  values:
-  - "2.0"
 - name: useKernelBuildArtifacts
   displayName: 'Use toolkit and packages from the time the kernel was built.'
   type: boolean
@@ -71,7 +65,8 @@ extends:
           displayName: 'Install 1ES host machine applications'
 
         - bash: |
-            download_tags="${{ parameters.marinerRelease }}-stable"
+            mariner_version="$(make -C toolkit get-version)"
+            download_tags="$mariner_version-stable"
             if [[ "${{ parameters.useKernelBuildArtifacts }}" =~ [Tt]rue ]]
             then
               download_tags+=",kernel-${{ parameters.livepatchKernelVersion }}"
