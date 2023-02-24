@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "clamav-0.103.6.tar.gz": "aaa12e3dc19f1d323b1c50d7a10fa8af557e4390149e864d59bde39b6ad9ba33"
- }
+  "Signatures": {
+    "clamav-0.103.8.tar.gz": "6f49da6ee927936de13d359e559d3944248e3a257d40b80b6c99ebe6fe8c8c3f"
+  }
 }

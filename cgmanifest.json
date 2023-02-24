@@ -676,8 +676,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.6",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.6.tar.gz"
+          "version": "0.103.8",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.8.tar.gz"
         }
       }
     },
