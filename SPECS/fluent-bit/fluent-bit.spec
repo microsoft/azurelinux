@@ -1,8 +1,8 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        1.9.6
+Version:        2.0.9
 Release:        1%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
@@ -74,6 +74,10 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Fri Feb 24 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.0.9-1
+- Upgrade version to 2.0.9
+- Use SPDX license expression in license tag
+
 * Wed Aug 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.9.6-1
 - Upgrade version to 1.9.6
 - Add build time dependency libyaml-devel
