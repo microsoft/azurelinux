@@ -43,7 +43,7 @@ extends:
     stages:
     - stage: Build
       jobs:
-      - job: 'Build_livepatch'
+      - job:
         templateContext:
           outputs:
           - output: pipelineArtifact
@@ -100,21 +100,21 @@ extends:
 
     - stage: Sign
       jobs:
-      - job: 'Signing_placeholder'
+      - job:
         steps:
         - bash: |
             sleep 1
           displayName: 'Signing placeholder'
     - stage: Test
       jobs:
-      - job: 'Test_placeholder'
+      - job:
         steps:
         - bash: |
             sleep 1
           displayName: 'Test placeholder'
     - stage: Publish
       jobs:
-      - job: 'Publishing_placeholder'
+      - job:
         steps:
         - bash: |
             sleep 1
