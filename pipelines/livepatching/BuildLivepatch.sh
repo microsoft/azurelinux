@@ -78,7 +78,7 @@ while getopts "a:k:l:p:s:" OPTIONS; do
     a ) ARTIFACTS_DIR=$OPTARG ;;
     k ) KERNEL_VERSION=$OPTARG ;;
     l ) LOG_PUBLISH_DIR=$OPTARG ;;
-    p ) ARTIFACT_PUBLISH_DIR=$OPTARG ;;
+    p ) ARTIFACTS_PUBLISH_DIR=$OPTARG ;;
     s ) USE_RPMS_SNAPSHOT="$(parse_pipeline_boolean "$OPTARG")" ;;
 
     \? )
@@ -92,7 +92,7 @@ while getopts "a:k:l:p:s:" OPTIONS; do
   esac
 done
 
-print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACT_PUBLISH_DIR USE_RPMS_SNAPSHOT
+print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_PUBLISH_DIR USE_RPMS_SNAPSHOT
 
 hydrate_build_artifacts "$ARTIFACTS_DIR"
 
@@ -101,6 +101,6 @@ build_package "livepatch-$KERNEL_VERSION" "$USE_RPMS_SNAPSHOT" || BUILD_SUCCEEDE
 
 publish_build_logs "$LOG_PUBLISH_DIR"
 
-publish_build_artifacts "$ARTIFACT_PUBLISH_DIR"
+publish_build_artifacts "$ARTIFACTS_PUBLISH_DIR"
 
 ${BUILD_SUCCEEDED:-true}
