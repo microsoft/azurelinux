@@ -92,7 +92,7 @@ while getopts "a:k:l:p:s:" OPTIONS; do
   esac
 done
 
-print_variables_with_check ARTIFACTS_DIR GIT_BRANCH KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACT_PUBLISH_DIR USE_RPMS_SNAPSHOT
+print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACT_PUBLISH_DIR USE_RPMS_SNAPSHOT
 
 hydrate_build_artifacts "$ARTIFACTS_DIR"
 
