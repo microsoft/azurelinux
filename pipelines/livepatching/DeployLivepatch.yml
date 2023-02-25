@@ -62,7 +62,7 @@ extends:
           displayName: 'Install 1ES host machine applications'
 
         - bash: |
-            mariner_version="$(make -C toolkit printvar-RELEASE_MAJOR_ID)"
+            mariner_version="$(make -sC toolkit printvar-RELEASE_MAJOR_ID CONFIG_FILE=)"
             download_tags="$mariner_version-stable"
             if [[ "${{ parameters.useKernelBuildArtifacts }}" =~ [Tt]rue ]]
             then
