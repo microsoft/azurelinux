@@ -1,7 +1,7 @@
 Summary:        Terminal multiplexer
 Name:           tmux
 Version:        2.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 URL:            https://tmux.github.io/
 Group:          Applications/System
@@ -9,12 +9,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
 %define sha1    tmux=a12bb094bf0baf0275b6d5cc718c938639712e97
+Patch0:         CVE-2022-47016.patch
 Requires:       libevent ncurses
 BuildRequires:  libevent-devel ncurses-devel
 %description
 Terminal multiplexer
 %prep
-%setup -q
+%autosetup -p1
+
 %build
 ./configure \
     --prefix=%{_prefix}
@@ -33,6 +35,9 @@ make  %{?_smp_mflags} check
 /usr/share/*
 %exclude /usr/src
 %changelog
+* Wed Feb 08 2023 Dan Streetman <ddstreet@microsoft.com> - 2.7-4
+- CVE-2022-47016
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7-3
 - Added %%license line automatically
 

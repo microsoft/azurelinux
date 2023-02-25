@@ -1,7 +1,7 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
 Version:        5.7.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Patch1:         0001-Extending-timeout-for-test-cases-with-multiple-read-.patch
 Patch2:         CVE-2021-41990.patch
 Patch3:         CVE-2021-41991.patch
 Patch4:         CVE-2021-45079.patch
+Patch5:         CVE-2022-40617.patch
 BuildRequires:  autoconf
 BuildRequires:  gmp-devel
 
@@ -50,6 +51,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_datadir}/strongswan/*
 
 %changelog
+* Fri Feb 10 2023 Dan Streetman <ddstreet@microsoft.com> - 5.7.2-6
+- CVE-2022-40617
+
 * Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.7.2-5
 - Patch for CVE-2021-45079
 

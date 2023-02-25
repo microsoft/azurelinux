@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.36.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 Patch0:         CVE-2021-45078.patch
+Patch1:         CVE-2022-4285.patch
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -119,6 +120,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libctf.so.0.*
 
 %changelog
+* Thu Feb 09 2023 Dan Streetman <ddstreet@microsoft.com> 2.36.1-3
+- CVE-2022-4285
+
 * Thu Dec 23 2021 Muhammad Falak <mwani@microsoft.com> 2.36.1-2
 - Fix CVE-2021-45078
 
