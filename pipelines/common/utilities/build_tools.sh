@@ -92,6 +92,8 @@ print_variable() {
 }
 
 print_variables_with_check() {
+    local check_status=0
+
     for arg_name in "$@"
     do
         if [[ -n ${!arg_name} ]]
@@ -99,9 +101,11 @@ print_variables_with_check() {
             print_variable "$arg_name"
         else
             echo "ERROR: Argument '$arg_name' is required." >&2
-            return 1
+            check_status=1
         fi
     done
+
+    return $check_status
 }
 
 publish_build_artifacts() {
