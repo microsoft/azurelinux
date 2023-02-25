@@ -73,7 +73,8 @@ hydrate_build_artifacts() {
 # -l -> published logs directory path
 # -p -> published artifacts directory path
 # -s -> use toolkit's RPMs snapshot to populate the packages cache
-while getopts "a:k:l:p:s:" OPTIONS; do
+while getopts "a:k:l:p:s:" OPTIONS
+do
   case "${OPTIONS}" in
     a ) ARTIFACTS_DIR=$OPTARG ;;
     k ) KERNEL_VERSION=$OPTARG ;;

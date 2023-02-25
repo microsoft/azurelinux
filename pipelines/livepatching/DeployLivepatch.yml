@@ -3,6 +3,7 @@ trigger: none
 variables:
 - name: 'buildArtifactsFolder'
   value: build-artifacts
+
 - name: 'buildLogsFolder'
   value: 'LOGS'
 
@@ -10,10 +11,12 @@ parameters:
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
   type: string
+
 - name: useKernelBuildArtifacts
   displayName: 'Use toolkit and packages from the time the kernel was built.'
   type: boolean
   default: false
+
 - name: useRPMsSnapshot
   displayName: 'Use build RPMs snapshot to populate the packages cache.'
   type: boolean
@@ -105,6 +108,7 @@ extends:
         - bash: |
             sleep 1
           displayName: 'Signing placeholder'
+
     - stage: Test
       jobs:
       - job:
@@ -112,6 +116,7 @@ extends:
         - bash: |
             sleep 1
           displayName: 'Test placeholder'
+
     - stage: Publish
       jobs:
       - job:
