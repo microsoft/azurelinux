@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 arch=$(uname -i)
 ROOT_FOLDER=$(git rev-parse --show-toplevel)
