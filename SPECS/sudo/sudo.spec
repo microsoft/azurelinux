@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.12p1
+Version:        1.9.12p2
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -92,6 +92,9 @@ rm -rf %{buildroot}/*
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Wed Feb 08 2023 Dan Streetman <ddstreet@microsoft.com> - 1.9.12p2-1
+- Upgrade to 1.9.12p2 for CVE-2023-22809
+
 *   Tue Nov 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.12p1-1
 -   Updating to version 1.9.12p1 to fix CVE-2022-43995.
 *   Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
