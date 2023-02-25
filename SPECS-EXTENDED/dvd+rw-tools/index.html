@@ -1,0 +1,1295 @@
+<HTML>
+
+<HEAD>
+<BASE HREF="http://fy.chalmers.se/~appro/linux/DVD+RW/">
+<TITLE>Blu-ray Disc/DVD+RW/+R/-R[W] for Linux</TITLE>
+<META NAME="keywords" CONTENT="dvd, recording, burning, rewritable, mmc,
+			       dvd+rw, dvd+r, dvdplusrw, dvd-rw, dvd-r, dvd-ram,
+			       dvd+r double layer, dvd+r dl, dvd-r dl,
+			       blu-ray, blu-ray disc, bd, bd-r, bd-re,
+			       linux, netbsd, openbsd, solaris, freebsd, hp-ux, irix, unix,
+			       mac os x, windows, mingw, win32, win64,
+			       hp, ricoh, philips, sony, nec, plextor, benq,
+			       optorite, lite-on, pioneer, lg, panasonic, matshita,
+			       multisession, growisofs">
+<META NAME="description" CONTENT="Blu-ray Disc/DVD+RW/+R/-R[W] support for Unix:
+				  user-land utilities and optional Linux
+				  kernel patch">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="icon" HREF="dvdplusrw.ico" TYPE="image/x-icon">
+<LINK REL="shortcut icon" HREF="dvdplusrw.ico" TYPE="image/x-icon">
+</HEAD>
+
+<BODY BGCOLOR="#C0C0C0" TEXT="#000000"
+      LINK="#0000D0" VLINK="#502090" ALINK="#FF0000">
+
+<P><HR>
+<TABLE><TR>
+<TD WIDTH="100%">
+<H1 ALIGN="CENTER"><A HREF="Blu-ray/">Blu-ray Disc</A>/<A
+HREF="http://www.dvdrw.com/">DVD+RW</A>/+R/<A
+HREF="-RW/">-R[W]</A> for Linux</H1>
+<H5 ALIGN="CENTER">by &lt;appro@fy.chalmers.se&gt;,
+September 2006</H5>
+<TD VALIGN="top"><A
+HREF="http://www.ioss.jp/sohodiy/vol02-part01.html"><IMG
+SRC="japanese.gif" WIDTH=48 HEIGHT=19 BORDER=0 ALT="Japanese"></A>
+</TR></TABLE>
+<P><HR>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">What is this page (not) about?</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.<SUP>&nbsp;</SUP>
+	<TD>Maybe to your disappointment it is <B>not</B> about
+	video<SUP>(*)</SUP>. The scope of this page is primarily
+	computer storage applications of Blu-ray Disc and
+	DVD&plusmn;RW/&plusmn;R, things like backup, archiving, data
+	exchange... The downloadable files are an <I>optional</I> <A
+	HREF="linux-2.4.patch">Linux 2.4 kernel DVD+RW patch</A> and a
+	couple of user-land utilities dubbed as <NOBR><A
+	HREF="tools/?M=D">dvd+rw-tools</A></NOBR>.
+
+	<P><TABLE BORDER="0" ALIGN="LEFT">
+	<TR VALIGN="TOP" ALIGN="JUSTIFY">
+	<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+	<TD><FONT SIZE="-1">Though it doesn't mean that you can't burn
+	DVD-Video discs with dvd+rw-tools. [Unlike Video-CD] DVD-Video
+	is &quot;molded&quot; in an ordinary data file system and
+	therefore no explicit support by the burning program is
+	actually required. In other words it is the DVD-Video
+	<I>content preparation</I> which is beyond the scope of this
+	page.</FONT></TR>
+	</TABLE>
+	</TR>
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">Kernel patch? This sounds too complicated
+	already! Can't I just use [vanilla] cdrecord?
+
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>It should be explicitly noted that the <B>user-land
+	utilities, dvd+rw-tools,</B> do suffice for BD/DVD recording
+	without explicit kernel support. So if they <A
+	HREF="#tutorial">fulfill your requirements</A>, <I>then</I>
+	<B>patching the kernel is</B> by all means <B>optional.</B> As
+	for [vanilla] cdrecord, non-CD recording strategies are
+	somewhat different, so it simply doesn't work (nor does
+	dvdrecord with media other than DVD-R[W], despite what <A
+	HREF="http://www.redhat.com/docs/manuals/linux/RHL-7.3-Manual/release-notes/x86/">RedHat
+	7.3 Release Notes</A> say). On additional note Linux kernel
+	version 2.6>=10 is equipped with <A
+	HREF="http://web.telia.com/~u89404340/packet.html">packet
+	writing driver</A> which supports even DVD rewritable media,
+	but I haven't tested it myself, so don't ask:-)</TR>
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">What is the kernel patch good for then?
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>DVD+RW (but not DVD+R nor any DVD-dash) is a true random
+	write access media and therefore is suitable for housing of an
+	arbitrary file system, e.g. <B>udf,</B> vfat, ext2, etc. This,
+	and this alone, qualifies DVD+RW support for kernel
+	implementation. <I>However,</I> I have to recommend to
+	<B>deploy it with caution</B>, see <A HREF="#udf">tutorial</A>
+	for further details. Also note that not all OEMs seem to live
+	up to the promise of true random write access. As for the
+	moment of this writing apparenly only 2nd generation
+	Ricoh-based units (see <A
+	HREF="http://www.dvdplusrw.org/">dvdplusrw.org</A> for
+	generation listings) equipped with later firmware can sustain
+	I/O fragmentation (see Technical Ramblings below for further
+	details) and perform <I>reliably</I>.
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">What are the dvd+rw-tools for?</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>As implied/already mentioned - <B>to master the <A
+	HREF="Blu-ray/">Blu-ray Disc</A> and DVD media, both +RW/+R and
+	<A HREF="-RW/">-R[W]</A>.</B> I could simply refer to the
+	tutorial below, but figured that couple of words about the
+	[original] design ideas behind <B>growisofs, the principal
+	burning utility,</B> wouldn't harm. Even though a modified
+	kernel can let you put for example an ext2 file system on
+	DVD+RW, it's probably not very practical, because you most
+	likely want to access the data on an <I>arbitrary</I> computer.
+	Or in other words you most likely want ISO9660. The trouble is
+	that you might as well want to <I>add</I> data now and then.
+	And what options do you have in the lack of multiple sessions
+	(no, DVD+RW has no notion of multiple sessions)? Complete
+	re-mastering which takes more and more time as data set grows?
+	Well, yes, <I>unless</I> you employ growisofs! Growisofs
+	provides the way to both lay down <I>and</I> grow an ISO9660
+	file system on (as well as to burn an arbitrary pre-mastered
+	image to) all supported optical media.</TR>
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">But if they support  both + and - recording
+	strategies, why are they called dvd+rw-tools?</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>For historical/nostalgical reasons, as originally they did
+	support exclusively DVD+plus. On the other hand now, when the
+	vast majority of DVD burners that are being introduced to the
+	market today are DVD+capable, the name most likely refers to
+	your unit in either case. And you can always consider the plus
+	in the name as notion of a unique quality, such as
+	&quot;seamless&quot; multisessioning, not as reference to some
+	particular format:-)</TR>
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">Do I still need <A
+	HREF="http://cdrecord.berlios.de/old/private/cdrecord.html">cdrtools</A>?
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>Yes. It should be explicitly noted that <B>growisofs is a
+	front-end to mkisofs,</B> i.e. invokes mkisofs to perform the
+	actual ISO9660 file system layout. Secondly, the DVD burners
+	available on the market can burn even CD-R[W] media and
+	cdrecord is the tool for this job [and this job only].</TR>
+</TABLE>
+
+<!--
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">There are dual-format DVD+RW/-RW units
+	available on the market, e.g. SONY DRU500. Can I use
+	dvd+rw-tools with it/them?
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>If the question is if you can use dvd+rw-tools to master the
+	DVD+RW/+R media in a &plusmn;RW drive, then the answer always
+	was &quot;definitely yes.&quot; If the question really is if
+	<B>you can use dvd+rw-tools to burn even DVD-R[W] media,</B>
+	then I have the pleasure to inform you that as of version 5.0
+	dvd+rw-tools provide <I>experimental</I> support even for
+	recording of DVD-R[W] media and refer you to <A HREF="-RW/">a
+	dedicated page</A> for further details.</TR>
+</TABLE>
+-->
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">Does it work with <I>my</I> recorder unit?
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>If your unit is <A
+	HREF="http://www.t10.org/drafts.htm#mmc3">MMC</A> compliant,
+	then the answer is &quot;<A HREF="hcn.html">most likely</A> it
+	just does.&quot; Well, as the probability of your unit being
+	non-MMC compliant is virtually zero, the answer in practice is
+	unconditionally &quot;<A HREF="hcn.html">most likely</A>.&quot;
+	The [core] tools were reported to work with a wide range of
+	drives, including <I>[but not limited to]</I> <NOBR>HP
+	dvd[12345]x0i,</NOBR> <NOBR>Ricoh MP512x,</NOBR> <NOBR>Philips
+	DVDRW[248]xx,</NOBR> <NOBR>SONY DRU-[157]x0,</NOBR> <NOBR>NEC
+	ND-[1234]xx0,</NOBR> <NOBR>TDK indiDVD 4x0N,</NOBR>
+	<NOBR>Plextor PX-[57]xx,</NOBR> <NOBR>Benq DW[48]00A,</NOBR>
+	<NOBR>OptoRite DD0[24]0x,</NOBR> <NOBR>Lite-On
+	LDW-[4816]xxS,</NOBR> as well as <A HREF="-RW/">nonplus</A>
+	units such as <NOBR>Pioneer DVR-x0[45679],</NOBR> <NOBR>LG
+	GxA-40[248]x,</NOBR> <NOBR>Toshiba SD-R[56]112,</NOBR>
+	<NOBR>Panasonic UJ-811</NOBR>, <NOBR>LF-D[35]1x,</NOBR> and not
+	the least <A HREF="Blu-ray/">all-mighty</A>
+	<NOBR>SW-5582...</NOBR></TR>
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">Is there a GUI front-end available for
+	dvd+rw-tools?
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD><A HREF="http://www.k3b.org/">K3b,</A> version 0.10
+	and later, and <A
+	HREF="http://ftp.gnome.org/pub/GNOME/sources/nautilus-cd-burner/">nautilus-cd-burner,</A>
+	version 0.5.1 and later, are both hiding growisofs behind their
+	pretty buttons and menus:-) Keep in mind that those are not
+	directly related to <NOBR>dvd+rw-tools</NOBR> development
+	effort and GUI users should turn elsewhere for <I>end-user</I>
+	support. Oh! dvd+rw-tools 5.10.x is a minimum requirement for
+	GUI frontends...</TR>
+</TABLE>
+
+<P><TABLE CELLPADDING=4>
+<TR VALIGN="top" ALIGN="justify">
+<TH>Q.	<TH ALIGN="left">I don't run Linux. What are my options?
+</TR>
+<TR VALIGN="top" ALIGN="justify">
+<TD>A.	<TD>Version 5.4 adds support for <B><A
+	HREF="http://www.mosha.net/05-dvdrw/dvdrw.shtml">OpenBSD</A>/NetBSD.</B>
+	Version 5.6 adds support for <B>Solaris&nbsp;2.x</B> <FONT
+	SIZE=-1>[<A HREF="solaris.com.html">commercial licensing</A>
+	terms for distribution on Solaris are to be settled with <A
+	HREF="http://www.inserve.se/">Inserve Technology</A>]</FONT>.
+	Version 5.8 features <A
+	HREF="http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/creating-dvds.html"><B>FreeBSD</B></A>
+	port contributed by Matthew Dillon, FreeBSD Development Team
+	alumnus. <NOBR>Hewlett-Packard</NOBR> Company has donated
+	<B><NOBR>HP-UX&nbsp;11</NOBR></B> support for
+	5.14<SUP>(*)</SUP>. <B>IRIX&nbsp;6.x</B> support appears in
+	5.19, <B><A HREF="tools/win32/">Win32</A></B> one - in 6.0,
+	while <NOBR>Mac OS X</NOBR> - in 7.0...
+
+	<P><TABLE BORDER="0" ALIGN="LEFT">
+	<TR VALIGN="TOP" ALIGN="JUSTIFY">
+	<TD><I>&iexcl;</I>
+	<TD><I>Common usage tip!</I><SUP>&nbsp;</SUP>Whenever
+	separately available [and unless stated otherwise], do <B>use
+	character-type device entry with <NOBR>dvd+rw-tools,</NOBR></B>
+	e.g. OpenBSD/NetBSD users should stick to <TT>/dev/<FONT
+	COLOR="red">r</FONT>cdXc</TT>.</TR>
+	<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<!--	<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+	<TD><FONT SIZE="-1">FreeBSD tip! If you have an IDE unit, <A
+	HREF="http://www.cuivre.fr.eu.org/~thomas/atapicam/">atapicam</A>
+	is your mantra! Secondly, if you have <TT>devfs</TT> mounted,
+	you might have to <A HREF="fdescfs.sh">mount</A>
+	<TT>fdescfs</TT> as well.</FONT></TR> -->
+	<TR VALIGN="TOP" ALIGN="JUSTIFY">
+	<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+	<TD><FONT SIZE="-1">As of 5.14 HP-UX support was classified as
+	&quot;initial.&quot; Version 5.18 in turn is the one which has
+	undergone <A HREF="tools/HP/">HP quality assurance</A> testing
+	and is delivered on <A HREF="http://www.software.hp.com/">HP
+	software depot</A>.</FONT></TR>
+	</TABLE>
+	</TR>
+</TABLE>
+
+<P><HR>
+
+<H3>Foreword</H3>
+
+<P ALIGN="JUSTIFY">As of May 2003 I've decided to advise users to
+<B>turn to &lt;<A
+HREF="mailto:cdwrite@other.debian.org">cdwrite@other.debian.org</A>&gt;
+on support matters.</B> It's an open list, meaning that you don't have
+to be <A HREF="http://lists.debian.org/cdwrite/">subscribed</A> to post
+a problem report. List archives can be found at both <A
+HREF="http://lists.debian.org/cdwrite/">subscribe page</A> and <A
+HREF="http://www.mail-archive.com/cdwrite%40other.debian.org/">mail-archive.com</A>.
+<B>When submitting report, provide versioning information, exact
+command line, <I>exact output</I> generated by the program and
+complement it with <NOBR>dvd+rw-mediainfo</NOBR> output for
+<I>resulting</I> recording.</B> Do check couple of last <A
+HREF="http://lists.debian.org/cdwrite/">archived months</A>, as the
+issue might have been  discussed <I>recently</I>. If you've chosen to
+contact me personally and haven't heard back within a week or so, then 
+you most likely overlooked something on this page. Please read it more
+attentively<A HREF="keys.txt">...</A>
+
+<P ALIGN="JUSTIFY">Special thanks for hardware donations [in
+chronological order]:<BR>
+
+<A HREF="http://www.inserve.se/"><IMG SRC="inserve.gif"
+ALT="Inserve Technology" BORDER=0></A>&nbsp;
+
+<A HREF="http://www.hp.com/"><IMG SRC="hp.gif"
+ALT="HP" BORDER=0></A>&nbsp;
+
+<A HREF="http://www.linuxfund.org/"><IMG SRC="linuxfund.gif"
+ALT="LinuxFund" BORDER=0></A>&nbsp;
+
+<A HREF="http://dmu.commtech-fastcom.com/"><IMG
+SRC="commtech.gif" ALT="comm*tech" BORDER=0></A>&nbsp;
+
+<A NAME="tutorial"><P><HR></A>
+
+<H3>Tutorial</H3>
+
+<P><HR WIDTH="50%" ALIGN="LEFT">
+
+<UL>
+
+<P><LI><P ALIGN="JUSTIFY">If your burner unit is managed by some
+<NOBR><B>Linux<SUP>(*)</SUP></NOBR> removable media
+automounting/autoplaying facility</B>, such as autofs, supermount,
+subfs/submount, magicdev, autorun or similar, take it <B>out</B> of its
+control! I can't help you with the latter, check your system
+documentation (such as google perhaps:-) for specific instructions.
+<FONT COLOR="brown"><B>Failure to take your unit out of
+<NOBR>Linux<SUP>(*)</SUP></NOBR> automounting/autoplaying facility
+control can result in busted recording, a coaster!</B></FONT> At the
+very least you have to make sure your unit is not automounted during
+recordings. <!-- Linux kernel should have/implement &quot;open for
+exclusive use,&quot; but it doesn't. Therefore the trouble... --->
+
+<TABLE BORDER="0">
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+<TD><FONT SIZE="-1">dvd+rw-tools support Solaris volume manager and
+IRIX mediad in more gracious manner and it's safe to leave recorder
+under <I>their</I> control.</FONT></TR>
+</TABLE>
+
+<P><LI><P ALIGN="JUSTIFY">Remember to <B>consult <A
+HREF="hcn.html">Hardware Compatibility Notes</A></B> for possible
+caveats or vendor-specific instructions for your unit. Well, such
+reminder belongs at the end of tutorial, but I consider it important
+enough to bring it up already here:-)
+
+<P><LI><P ALIGN="JUSTIFY"><B>If you have an IDE unit and run 2.4.x
+kernel,</B> you most likely want to &quot;route&quot; it through ide-scsi
+emulation layer by either:
+
+<P><UL>
+<LI>passing &quot;<TT>hd<FONT COLOR="red">X</FONT>=ide-scsi</TT>&quot;
+argument to kernel;
+<LI>appending following lines to your /etc/modules.conf:
+<BLOCKQUOTE>
+<PRE>options ide-cd ignore=hd<FONT COLOR="red">X</FONT>
+pre-install sg modprobe ide-scsi
+pre-install sr_mod modprobe ide-scsi
+pre-install ide-scsi modprobe ide-cd
+</PRE></BLOCKQUOTE>
+</UL>
+
+<P ALIGN="JUSTIFY">Keep in mind that once hd<FONT COLOR="red">X</FONT>
+is routed through ide-scsi, you can no longer refer to <TT>/dev/hd<FONT
+COLOR="red">X</FONT></TT><SUP>(*)</SUP>, but to corresponding
+<TT>/dev/scd<FONT COLOR="red">N</FONT></TT> only.
+
+<P><TABLE BORDER="0" WIDTH="95%" ALIGN="CENTER">
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+<TD><FONT SIZE="-1">well, except as in <TT>hdparm -d [0|1] /dev/hd<FONT
+COLOR="red">X</FONT></TT>. <B>As for DMA settings.</B> Several users of
+NEC[-based] units have reported that their systems crash during DVD
+recording. The problem appears to be related to DMA settings, at least
+switching it off reportedly helps. The problem appears to be specific to
+some IDE chipsets...</FONT>
+</TR>
+</TABLE>
+
+<P><LI><P ALIGN="JUSTIFY"><B>If you have an external unit,</B> just get
+it working as CD-ROM first. I myself have no personal experience
+whatsoever with <A HREF="http://www.linux-usb.org/">USB</A> or <A
+HREF="http://www.linux1394.org/">IEEE1394/Firewire</A> optical storage
+devices and have to direct you elsewhere for specific instructions. I
+however am confident that if you manage to get your drive working
+<I>reliably</I> as <NOBR>CD-ROM</NOBR> <I>and</I> <NOBR>CD-R[W]</NOBR>
+burner, then you won't have any troubles with dvd+rw-tools either. USB
+connected drives were reported to be working fine since eternity.
+Firewire connected drives in turn were reported to fail miserably under
+2.4.18. The failure didn't seem to be DVD recording related as it
+reportedly failed burning even CD-R media. Firewire support was
+substantially revamped in 2.4.19, and dvd+rw-tools were reported to
+work with this and later kernels.
+
+<P><LI><P ALIGN="JUSTIFY">If you're running 2.4.19 or .20, consider
+applying <A HREF="sg-2.4.19.patch">this drivers/scsi/sg.c patch</A>.
+The bug is fixed in .21. I write &quot;consider&quot; and not
+&quot;do&quot; for the following reasons:
+
+<P><UL>
+<LI>dvd+rw-tools are not affected by this bug (as they don't use SG_IO
+interface), cdrecord [potentially] is;
+<LI>I however haven't actually experienced the problem with cdrecord
+(maybe yet, kernel could have managed to keep buffers neatly aligned
+while talking to cdrecord those times I tried), it was VMware that has
+failed miserably on me;
+</UL>
+
+<P ALIGN="JUSTIFY">As of version 5.6 dvd+rw-tools add support for SG_IO
+pass-through or in other words support for Linux&nbsp;2&gt;=5[.43],
+where &quot;generic&quot; SCSI interface can be bypassed by issuing
+SG_IO ioctl directly against block device, such as <TT>/dev/hd<FONT
+COLOR="red">X</FONT></TT>. I wish it worked without need for <A
+HREF="http://marc.theaimsgroup.com/?t=105410790500005&r=1&w=2">interim</A>
+patches <A HREF="ide-cd-2.5.69.patch">#1</A> and <A
+HREF="ide-cd-2.5.69.+patch">#2</A>, (the latter is relative to
+2.5.69-75, the 1st problem is addressed in .71, 2nd one - .75-bk3 in
+&quot;<A
+HREF="http://marc.theaimsgroup.com/?l=linux-kernel&m=105787192005635&w=2">last
+minute</A>&quot; prior first 2.6 cut. As for 2.6 in more general sense.
+As you can imagine this new interface renders ide-scsi layer
+superfluous and &quot;the[ir] official plan&trade;&quot; is to scrap
+it. I'm not really fond of the idea, but not for /dev/sg* account. I
+mean I [personally] would prefer to keep ide-scsi and use SG_IO
+pass-through with <TT>/dev/scdN</TT>, rather than with
+<TT>/dev/hdX</TT>:-)
+
+<P ALIGN="JUSTIFY">If you have to make dvd+rw-tools work under Linux
+kernel 2.6.8, then upgrade the tool-chain to 5.21.x or later and
+manually reward the installed binaries with set-root-uid flag. But the
+&quot;supported&quot; recommendation is to just stay away from this
+particular kernel version. <B>As for 2.6&gt;8, dvd+rw-tools 5.21.x is
+requirement.</B> Oh! dvd+rw-booktype utility would require set-root-uid
+privilege then. Given its semi-official status and the fact that this
+utility works only with limited number of units, installation procedure
+<I>abstains</I> from installing dvd+rw-booktype set-root-uid, leaving
+this security sensitive choice to the end-user.
+
+<P><LI><P ALIGN="JUSTIFY"><B>Download, unpack and compile the <A
+HREF="tools/?M=D">the tool-chain</A>.</B> To build the thing do pick the
+.tar.gz archive, which contains Makefile as well as .spec file. You
+will <B>need both C and C++ compilers</B> installed. Separate
+source code files found in the <A HREF="tools/?M=D">download catalog</A>
+are provided mainly for on-line reference purposes (such as <A
+HREF="tools/growisofs.c">revision history</A>:-). 
+
+<P ALIGN="JUSTIFY">If your Linux kernel supports multiple ABIs (e.g.
+Linux-sparc64 can run even 32-bit Linux-sparc applications, as well as
+Linux-x86_64 can execute legacy 32-bit i386 binaries), make sure you
+compile for <I>native</I> 64-bit ABI (which can normally be done with
+'<TT>make TARGET_ARCH=-m64</TT>'). The problem here is that 64-bit
+kernel has to explicitly convert ioctl structures passed by 32-bit
+applications and apparently it does really lousy job when it comes to
+CDROM_SEND_PACKET ioctl deployed by dvd+rw-tools.
+
+<P><LI><P ALIGN="JUSTIFY">As new media products and brands are being
+introduced to the market all the time, it apparently pays off to
+<B><I>periodically</I> check for firmware updates.</B> For elder units
+firmware update might even be an <B>absolute requirement</B> for using
+new media. Special note for HP users. HP no longer posts firmware
+updates on a web-page. Instead they let some Windows auto-update gizmo
+to pick firmware updates among <NOBR><TT>dvd[1-6]00*.exe</TT></NOBR>
+files in <A
+HREF="ftp://ftp.hp.com/pub/information_storage/software/">their FTP
+directory</A>, so that readers of this page tend to miss them...
+
+<P><LI><P ALIGN="JUSTIFY"><B>Formatting the BD and DVD+RW media.</B>
+Virgin BD and DVD+RW media needs to be initally formatted prior usage.
+Once again, <B>only virgin BD and DVD+RW media needs to be
+formatted.</B> As of version 5.10 growisofs detects blanks and applies
+initial formatting procedure automatically. Otherwise same effect can
+be achieved by passing the device name, e.g. <TT>/dev/scd0</TT>, as an
+argument to <A HREF="tools/dvd+rw-format.cpp">dvd+rw-format</A>. Well,
+in <A HREF="Blu-ray">BD case</A> it does offer more flexibility than
+growisofs. To make formatting process reasonably fast, less than 1
+minute, the media gets formatted only partially, as you can notice by
+observing progress indicator displayed by dvd+rw-format. The final
+indicator value varies from firmware to firmware, values as low as 1.6%
+were observed. But it does not mean that you can only write that
+little. The unit keeps formatting <I>transparently</I>, as you add more
+data. Oh! Do keep in mind that DVD capacity of 4.7GB is expressed in
+salesman's&nbsp;GB, i.e. 1000<SUP>3</SUP> and not 1024<SUP>3</SUP>. And
+so is one of BD.
+
+<P ALIGN="JUSTIFY">It was observed that excessive reformats can render
+DVD+RW media unusable already after 10-20 reformats. It appears to be a
+firmware deficiency, not some common media defect [at least it was
+perfectly possible to salvage the media in a unit of different brand],
+but I don't recommend [enforced] reformat in either case.
+
+<P ALIGN="JUSTIFY">Note that <B>re-formatting procedure does not
+substitute for blanking.</B> If you want to nullify the media, e.g. for
+privacy reasons, do it explicitly with '<TT>growisofs <NOBR>-Z</NOBR>
+/dev/scd<FONT COLOR="red">N</FONT>=/dev/zero</TT>'. Otherwise just
+write over previous recording as it simply wasn't there, no
+re-formatting is required.
+
+<!---
+<P ALIGN="JUSTIFY">DVD+R media does not require any formatting
+procedure applied and is ready to use out-of-the-box. Apparently, a
+reminder that 1st generation units (Ricoh MP5120A and derivatives)
+are not capable of burning DVD+R is needed.--->
+
+<A NAME="growisofs"><P></A><LI><P ALIGN="JUSTIFY"><B>Burning with <A
+HREF="tools/growisofs.c">growisofs</A>.</B> There is hardly a need for
+manual for growisofs. In a nutshell growisofs just passes all command
+line arguments to mkisofs and dumps its output directly onto the media.
+The first part means that you basically can [well, <I>should</I>]
+consult <A HREF="mkisofs.8.html">mkisofs manual page</A> and
+accompanying reference documentation (including multisession related
+section[s]) and the second part means that you shouldn't expect an
+ISO-image on the standard output (nor make sure you have enough free
+temporary storage<TT>:-)</TT>. Differences from mkisofs command line
+are:
+
+<P><UL>
+<LI>you may not use -o option;
+<LI>you don't have to specify -C option, growisofs will construct one
+for you;
+<LI>there is internal -Z option for initial session recording, this
+substitutes for originally suggested 'mkisofs | dd of=/dev/scd0';
+</UL>
+
+<P ALIGN="JUSTIFY">Otherwise <I>everything</I> that applies to
+[multisession] mastering with mkisofs applies to growisofs as well. For
+example just like with mkisofs you should make a note on which options
+you used to master the initial &quot;session&quot; with and stick to
+them, e.g.:
+
+<P><BLOCKQUOTE><PRE>
+growisofs -Z /dev/scd0 <FONT COLOR="red">-R -J</FONT> /some/files
+growisofs -M /dev/scd0 <FONT COLOR="red">-R -J</FONT> /more/files
+</PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">Oh! Do make sure you have at least mkisofs <FONT
+COLOR="red">1.14</FONT> on your $PATH (mkisofs 1.14 is part of cdrtools
+1.10). If you consider passing <TT>/same/files</TT> as argument, or in
+other words consider deploying growisofs for <I>incremental</I>
+multisession backups, then you shall find <A
+HREF="mkisofs-2.01a16-root.diff">this '-old-root' extension</A> to
+mkisofs <FONT COLOR="red">2<A
+HREF="mkisofs-2.0-root.diff">.</A>0-2.01</FONT> simply indispensable.
+The idea and implementation by <A
+HREF="http://home.pages.de/~ohly/#mkisofs-root">Patrick Ohly</A> is to
+&quot;graft&quot; recording sessions as separate directories. Each
+backup increment/directory is ment to contain both updated files and
+<I>references</I> to previously backed up ones, which facilitates
+comparison between increments as well as fine-graded restore.
+
+<P ALIGN="justify">Number of users asked about opposite to
+multisessioning: multivolume support. Being essentially a recording
+program growisofs does not support multiple volumes by itself. There're
+couple of front-ends I can recommend that arrange for this: <A
+HREF="http://scdbackup.sourceforge.net/main_eng.html">scdbackup</A> and
+<A HREF="http://www.serice.net/shunt/">shunt</A>. But back to
+growisofs...
+
+<P ALIGN="JUSTIFY"><B>In addition to intuitive -Z interpretation,</B>
+growisofs [version 3.3 and later] recognizes special form of -Z command
+line option which permits burning of arbitrary pre-mastered images. The
+&quot;magic&quot; command is:
+
+<P><BLOCKQUOTE><PRE>
+growisofs -Z /dev/scd0<FONT COLOR="red">=</FONT>image.iso
+</PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">where <TT>image.iso</TT> represents an <I>arbitrary
+object</I> in the file system, such as file, named pipe or device
+entry. No, nothing is &quot;growing&quot; here and command name is
+counter-intuitive in this particular context. And here is even less
+intuitive<TT>:-)</TT> If you wish to burn down output generated by an
+arbitrary program, you can use:
+
+<P><BLOCKQUOTE><PRE>
+dumpsomething | growisofs -Z /dev/scd0=<FONT COLOR="red">/dev/fd/0</FONT>
+</PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">Burning BD-R/DVD&plusmn;R implies extra limitations:
+
+<P><UL>
+
+<LI>Needless to say that you have only one shot with -Z
+option<TT>:-)</TT>
+
+<!---
+<LI>Apparently media needs to be manually reloaded [ejected and pushed
+back again] after every burning session (well, if you haven't patched
+the kernel that is<TT>:-)</TT>
+--->
+
+<LI>Unlike DVD+RW, DVD&plusmn;R media does have notion of multiple
+sessions. <I>However!</I> Not all legacy units can &quot;see&quot;
+beyond the first one. Few DVD-ROM units are capable of DVD-R
+multiborder playback, even fewer support DVD+R multisessioning. In
+other words  your DVD burner might be the only unit in your vicinity
+capable to access data added at different occasions.
+
+<LI>Even if your DVD unit does &quot;sense&quot; multiple sessions,
+Linux kernel [2.4] sometimes fails to pull that information from the
+drive<TT>:-(</TT> Till the problem is looked into and resolved you can
+work it around by reloading corresponding driver, most likely
+'<TT>rmmod sr_mod</TT>'.
+
+<LI>Linux kernel 2.6&lt;<A
+HREF="http://marc.theaimsgroup.com/?l=linux-kernel&m=110330852622064&w=2">10</A>
+users might experience <A
+HREF="http://marc.theaimsgroup.com/?l=linux-kernel&m=108827602322464&w=2">problems
+mounting multisession media</A> with last session starting beyond
+2.2GB boundary. As fast-acting remedy I can suggest to route your unit
+through ide-scsi, the way it was under 2.4. Even though it's declared
+unsupported it actually still works in 2.6 (I for one still use it).
+
+<LI>If you go for BD-R/DVD&plusmn;R multisessioning, you have to use
+mkisofs from <A HREF="ftp://ftp.berlios.de/pub/cdrecord/">cdrtools-2.0
+or later</A> or apply <A HREF="multi.diff">this patch</A>.
+
+<LI>And when it comes to <B>DVD+R Double Layer and <NOBR>DVD-R</NOBR>
+Dual Layer recordings,</B> growisofs applies yet another limitation,
+purely artificial. Taking into consideration Double Layer media prices
+growisofs is programmed to <B>refuse to perform <I>unappendable</I>
+recordings which are less than 1/2 of blank capacity</B> and to advice
+to use single layer media instead.
+
+<LI>DVD-R Dual Layer multisessioning is not supported for a reason
+discussed on the <A HREF="-RW/#nomultisess">-RW companion page</A>. Once
+again, as of the moment of this writing <NOBR>DVD-R</NOBR> Dual Layer
+recordings come out unappendable and can not be grown.
+</UL>
+
+
+<P ALIGN="justify">And once again, do keep in mind that 4.7GB are
+salesman's&nbsp;GB, i.e. 1000<SUP>3</SUP> and not 1024<SUP>3</SUP>. If
+translated to &quot;real&quot;&nbsp;GB, single layer
+<NOBR>DVD&plusmn;R[W]</NOBR> capacity is not larger than 4.4GiB, and BD
+- not larger than 23.3GiB! It should also be noted that earlier
+growisofs versions did not check if there is enough space on media to
+accommodate the data set to be burned, meaning that it was your sole
+responsibility to make sure &quot;overburn&quot; condition is not
+raised. As of version&nbsp;5.2 growisofs performs the necessary checks
+for you and refuses to start recording if &quot;overburn&quot;
+condition appears to be unavoidable. This behaviour can be overridden
+with <TT>-overburn</TT> command-line option.
+
+<P><LI><P ALIGN="justify">If you're satisfied with growisofs, then you
+should <B>just proceed to <A HREF="#compat">the next chapter</A></B>
+and abstain from applying the <B>optional 2.4.x kernel patch.</B> If
+you haven't stopped reading beyond this line, <A
+HREF="linux-2.4.patch">download</A> the patch, apply it, rebuild  the
+kernel or modules and re-install (kernel or cdrom.o and sr_mod.o
+modules, whichever appropriate), but don't ask <I>me</I> <A
+HREF="http://www.linuxhq.com/patch-howto.html">how</A>. As you could
+have noticed, patch targets SCSI CD-ROM module. This means that you
+<I>have to</I> "route" your IDE unit through ide-scsi to get this one
+working. To see it in action, insert formatted DVD+RW media and try to
+access it, '<TT>dd if=/dev/scd<FONT COLOR="red">N</FONT> count=0</TT>'
+would do. Then verify that kernel logs &quot;<TT>sr<FONT
+COLOR="red">N</FONT>: mmc-3 profile: 1Ah</TT>&quot. You should now be
+able to '<TT>mkisofs -pad . | dd of=/dev/scd<FONT COLOR="red">N</FONT>
+obs=32k</TT>' or even '<TT>mke2fs -b 2048 /dev/scd<FONT
+COLOR="red">N</FONT></TT>' and observe kernel logging &quot;<TT>sr<FONT
+COLOR="red">N</FONT>: dirty DVD+RW media</TT>.&quot
+
+<!--<P ALIGN="justify">If you have previous patch version applied, then you
+have to back it out first. The simplest way is probably to restore
+<TT>drivers/scsi/sr*.[ch]</TT> and <TT>drivers/cdrom/cdrom.c</TT> from
+your original Linux source code ditribution.-->
+	
+<P ALIGN="JUSTIFY"><B>Linux 2.6</B> DVD+RW kernel support is planned in
+line with DVD+MRW kernel support. This [unfortunately] means that
+industry has to deliver a DVD+MRW capable unit first. Yes, the last
+sentence means that despite all the promises, there are no such units
+available on the market yet. As of the 1st of August 2003, Ricoh MP5240A,
+Philips DVDRW416K or BenQ DW400A do <B>not</B> actually implement
+Mt.Rainier/EasyWrite support. It remains to be seen if they will offer
+it in form of firmware upgrade. In either case, the [original] project
+goal is not only read-write support for DVD+[M]RW capable units
+themselves, but even playback of DVD+MRW formatted media in legacy
+DVD-ROM units (when defect list will be read and interpreted by OS
+software in opposite to Mt.Rainier firmware).
+
+<A NAME="udf"><P><LI></A><P ALIGN="justify">Even though kernel now
+permits to build and mount arbitrary file system, there is one thing you
+<I>must</I> keep in mind before you just proceed, no matter how
+tempting it might appear.
+
+<P ALIGN="justify">As you might know DVD+RW media can sustain only
+around 1000 overwrites. The thing about fully fledged file systems
+is that every read [or tight bunch of 'em] is accompanied by
+corresponding i-node update or in other words a write! Now, let's say
+you lookup the mount point (e.g. ls /mnt/dvd) ten times a day. This
+gives you a 100 days lifetime on your mountpoint and therefore media.
+Not really much, huh? So do use <TT>noatime</TT> mount option with
+DVD+RW media or have it mounted read-only most of the time. However!
+Every read-write mount &quot;costs&quot; a super-block update. So that
+if you remount the media say 3 times a day, it would last for about a
+year [<A
+HREF="http://people.mandrakesoft.com/~quintela/supermount/">supermount</A>
+would exhaust the &quot;budget&quot; way sooner]... Defect management
+[in firmware, a.k.a. <A
+HREF="http://www.licensing.philips.com/information/mtr/">Mt.Rainier</A>,
+or at file system level] would improve the situation, but ideally
+file system driver should definitely refrain from modifying the
+super-block [marking it dirty] if nothing was actually written since
+last mount. Given the development status of <A
+HREF="http://sourceforge.net/projects/linux-udf/">Linux UDF</A> the
+chances for seeing the latter implemented [for UDF] are more than just
+conceivable. The request is already filed and even possible solution is
+being discussed. But why not give UDF a shot already then? By default
+UDF write support is unfortunately disabled and you might have to
+reconfigure the kernel and rebuild modules. Alternatively [my preferred
+option actually] fetch the code at <A
+HREF="http://sourceforge.net/projects/linux-udf/">SourceForge</A> and
+build the module separately. Of course you will have to fetch and build
+udftools as well. But once it's done just type:
+
+<P><BLOCKQUOTE><PRE>
+mkudffs --spartable=2 --media-type=cdrw /dev/scd<FONT COLOR="red">N</FONT>
+mount -o rw,noatime /dev/scd<FONT COLOR="red">N</FONT> /mnt/cdrom
+</PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY"><TT>mkudffs</TT> command line options were suggested
+by UDF maintainer, Ben Fennema.
+
+<P><LI><P ALIGN="JUSTIFY">Performance optimization. This paragraph
+applies only if you've patched the kernel. As some of you might
+remember the original recommendation was &quot;do use <TT>obs=32k</TT>
+for optimal performance.&quot; Well, it was rather naive of me to say
+so, as common block device layer <I>completely</I> reorganizes the
+stream so that '<TT>&gt;/dev/scd0</TT>' is as good as '<TT>|dd
+of=/dev/scd0 obs=32k</TT>'. It should also be noted that dumping to
+/dev/scd0 puts quite a pressure on VM subsystem, as the data passes
+through block buffer cache. To minimize the pressure and improve
+overall system performance bind the cdrom device to a raw device, e.g.
+'<TT>raw /dev/raw/raw1 /dev/scd0</TT>', growisofs will locate and use
+it automatically. obs=32k makes perfect sense with /dev/raw devices,
+but dd (as well as most other programs, e.g. tar) won't work as
+/dev/raw expects specifically aligned buffer... As <I>temporary</I>
+workaround, just to get you going so that you can start figuring things
+out, consider <A
+HREF="http://fy.chalmers.se/~appro/LD_*-gallery/index.html?aligned_io#aligned_io">this
+&quot;hacklet&quot;</A>...
+
+</UL>
+
+<A NAME="compat"><P><HR></A>
+
+<H3>Compatibility: caveat lector</H3>
+
+<P><HR WIDTH="50%" ALIGN="LEFT">
+
+<P ALIGN="JUSTIFY">This paragraph discusses &quot;DVD-ROM
+compatibility,&quot; or playability of already recorded media in legacy
+units. Blank media compatibility issues, or cases such as failure to
+start or fulfill recording because of poor media support by burner
+firmware, are beyond the current scope. Turn to your vendor for list of
+supported media and/or to the <A
+HREF="mailto:cdwrite@other.debian.org">public</A> to share your
+experience.
+
+<P ALIGN="JUSTIFY">In order to optimize seek times DVD[-ROM] players
+calibrate their mechanics every time the media is loaded by sliding
+the optical head some place, picking up the signal and noting the
+physical block address underneath the lens. In order for this procedure
+to work with re-writable/recordable media, that particular spot has to
+be written to [or de-iced in DVD+RW terms]. Some units slide the head to
+30mm [radial] to calibrate, some to 35mm. In order to keep such players
+&quot;happy,&quot; make sure that at least 1GB is written [before you
+attempt to mount it in <NOBR>DVD-ROM</NOBR> unit].
+
+<P ALIGN="JUSTIFY">Other units attempt to seek to lead-out [or vicinity
+of it] for calibration purposes. Now the catch is that it's perfectly
+possible to produce a DVD+RW disc without lead-out. Most notably media
+initially formatted with <NOBR>dvd+rw-format</NOBR> [apparently]
+doesn't have any lead-out, not to mention that practically whole
+surface remains virgin. If you fail to mount/play DVD+RW media, attempt
+to
+
+<BLOCKQUOTE><PRE>dvd+rw-format -lead-out /dev/scd<FONT
+COLOR="red">N</FONT></PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">which relocates the lead-out next to outermost
+written sector as well as makes sure there is no virgin surface before
+it. Previously written data is <B>not</B> affected by this operation.
+<!-- &quot;Should&quot; is a reminder of the project status,
+&quot;experience gathering.&quot; I mean the best I can do is to state
+that my hp dvd200i unit doesn't wipe any data when relocating the
+lead-out.-->
+
+<P ALIGN="JUSTIFY">Then non-finalized DVD+R and Sequential
+<NOBR>DVD-R[W]</NOBR> discs don't have lead-out either<SUP>(*)</SUP>.
+If you fail to mount/play DVD+R media and wish to sacrifice the
+remaining space for immediate compatibility, just fill the media
+up<SUP>(**)</SUP>. Alternatively if you master volume in a single take
+and don't plan to use it for multisessioning<SUP>(***)</SUP>, you have
+the option to invoke growisofs with <TT>-dvd-compat</TT> option and cut
+the real lead-out directly after the first session.
+
+<P>
+<TABLE BORDER="0" WIDTH="95%" ALIGN="CENTER">
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+<TD><FONT SIZE="-1">Well, there are lead-outs at the session edges, but
+the problem is that &quot;End Physical Sector Number of Data Area&quot;
+field in &quot;Control Data Zone&quot; of the lead-in contains address
+of the largest media sector, which makes affected DVD[-ROM] players
+calibrate at the outermost edge instead of the first session. Actually
+I fail to understand why don't they burn the address of last sector of
+the first session in the lead-in even on multisession discs...
+</FONT></TR>
+
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(**)</SUP></FONT>
+<TD><FONT SIZE="-1">But beware the <A HREF="#isofs4gb">4GB limit</A>!
+If 4GB is already an issue, or if you don't feel like throwing
+unrelated data on the media in question, then invoke '<TT>growisofs
+<FONT COLOR="red">-M</FONT> /dev/scd0<FONT
+COLOR="red">=/dev/zero</FONT></TT>' (supported by 5.6 and later).
+Alternative is to re-master the whole volume, naturally with
+<TT><NOBR>-dvd-compat</NOBR></TT> option.
+<!-- then the easiest way is to create couple of holey
+files with '<TT>touch huge<FONT COLOR="red">M</FONT>.void</TT>' and
+'<TT>perl -e 'truncate (&quot;huge<FONT
+COLOR="red">M</FONT>.void&quot;, 0x7ffffffe)'</TT>', and finally to
+'<TT>growisofs -overburn -M /dev/scd<FONT COLOR="red">N</FONT> ...
+huge*.void</TT>'. Otherwise you might have to re-master the volume with
+<TT>-dvd-compat</TT> option.--></FONT></TR>
+
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(***)</SUP></FONT>
+<TD><FONT SIZE="-1">E.g. when mastering DVD-Video disc:-) Note that
+<TT>-dvd-video</TT> option [passed to mkisofs] engages
+<TT>-dvd-compat</TT> automatically.</FONT></TR>
+</TABLE>
+
+<A NAME="booktype"><P><HR WIDTH="50%" ALIGN="LEFT"></A>
+
+<P ALIGN="JUSTIFY">Then we have logical format compatibility
+issue(s). Probably the very ground for all the controversy around
+DVD+RW, rather around DVD+RW media not being playable in a whole range
+of players. DVD+RW Alliance was keen to blame on DVD-ROM vendors, even
+claiming that they deliberately block playback. But the fact is that
+format specifications don't explicitly say that unrecognized format
+[designated by &quot;Book Type&quot; field in &quot;Control Data
+Zone&quot; of the lead-in] should be treated as <NOBR>DVD-ROM</NOBR>
+and [in my opinion] it was rather naive of them to claim and expect
+that the media will be playable in &quot;virtually all players.&quot;
+This deficiency was recognized by practically all DVD+RW vendors [well,
+apparently by &quot;traditional&quot; DVD+RW vendors and not
+&quot;latest generation&quot; vendors such as Sony, NEC, TDK...] and a
+<A HREF="tools/dvd+rw-booktype.cpp">secret</A> vendor-specific command
+manipulating this &quot;Book Type&quot; field was implemented. So if
+you fail to mount/play DVD+RW media, you <I>might</I> have an option to
+
+<BLOCKQUOTE><PRE>dvd+rw-booktype -dvd-rom -media /dev/scd<FONT
+COLOR="red">N</FONT></PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">Once again. <B>Not all vendors support this and you
+can't expect this utility to work with all recorders.</B>
+
+<P ALIGN="JUSTIFY">It's naturally not possible to manipulate the
+&quot;Book Type&quot; field on DVD+R media, that is not after the
+lead-in is written [which takes place at the moment the first session
+gets closed]. But it might be possible to control how it [lead-in] is
+going to be branded by programming the drive <I>in advance</I>:
+
+<BLOCKQUOTE><PRE>dvd+rw-booktype -dvd-rom -unit+r /dev/scd<FONT
+COLOR="red">N</FONT></PRE></BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">Meaning that if you fail to play DVD+R media, you
+can attempt to burn another disc with more appropriate unit settings.
+For more background information about dvd+rw-booktype, see <A
+HREF="http://www.dvdplusrw.org/Article.asp?aid=42&hl=bitsetting">&quot;Compatibility
+Bitsettings&quot; article at dvdplusrw.org</A>.
+
+<P ALIGN="JUSTIFY">There [potentially] are other logical
+DVD+RW<SUP>(*)</SUP> format incompatibilities, but the &quot;Book
+Type&quot; issue discussed above is the only one &quot;officially&quot;
+recognized. Well, it's actually understandable as it's the only one
+that can be recognized and addressed by a DVD+RW vendor alone.
+Recognition of other incompatibilities would require cooperation from
+<NOBR>DVD[-ROM]</NOBR> player vendors and that's something they
+apparently are not willing to show referring to the fact that DVD+RW
+format is not approved [and apparently never will be] by <A
+HREF="http://www.dvdforum.org/">DVD Forum</A><SUP>(**)</SUP>.
+
+<P>
+<TABLE BORDER="0" WIDTH="95%" ALIGN="CENTER">
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+<TD><FONT SIZE="-1">Finalized DVD+R media branded with
+<NOBR>DVD-ROM</NOBR> &quot;Book Type&quot; is virtually identical to
+<NOBR>DVD-ROM.</NOBR></FONT></TR>
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(**)</SUP></FONT>
+<TD><FONT SIZE="-1">To which I say &quot;so what?&quot; DVD Forum is an
+alliance of manufacturers just like DVD+RW Alliance is. It [or any
+other party for that matter] has no authority to deny a technology
+development initiative.</FONT></TR>
+</TABLE>
+
+<P><HR WIDTH="50%" ALIGN="LEFT">
+
+<P ALIGN="JUSTIFY">Finally there is a physical incompatibility issue.
+They claim that there are optical pick-ups out there not being capable
+to decode the track because of low reflectivity of DVD+RW media
+surface. I write &quot;they claim,&quot; because in the lack of
+cooperation from <NOBR>DVD[-ROM]</NOBR> vendors it's not possible to
+distinguish physical from logical format incompatibility, which I find
+important to tell apart in order to make sure at least logical format
+incompatibility issues don't persist over time. It might be as trivial
+as following. As you surely know [already], DVD+RW has same
+reflectivity as dual-layer <NOBR>DVD-ROM.</NOBR> Now the catch is that
+the linear pit density in turn is same as of single-layer one. Meaning
+that if player makes assumptions about linear pit density based on
+reflectivity, then it won't be able to trace the track... But either
+way, there is very little you can do about this one, but to try another
+player...
+
+<P><HR>
+
+<H3>Technical Ramblings</H3>
+
+<P><HR WIDTH="50%" ALIGN="LEFT">
+
+<A NAME="isofs4gb"><P><IMG SRC="isofs4gb.gif" WIDTH=144 HEIGHT=315
+ALIGN="RIGHT"></A>
+
+<P ALIGN="JUSTIFY"><B>As for multisession ISO9660 [DVD]
+recordings!</B> Unfortunately, Linux ISOFS implementation had certain
+deficiency which limits interoperability of such recordings. In order
+to understand it, have a look at sample ISO9660 layout to the right...
+Now, the problem is that isofs i-nodes<SUP>(*)</SUP> are 32 bits wide
+(on a 32-bit Linux) and represent offsets of corresponding directory
+entries (light-greens), byte offsets from the beginning of media. This
+means that no directory (green areas) may cross 4GB boundary without
+being effectively corrupted<TT>:-(</TT> It should be noted that in
+reality it's a bit better than it looks on the picture, as mkisofs
+collects all the directories in the beginning of any particular session
+(there normally are no blues between greens). The <I>first</I> session
+is therefore never subject to i-node wrap-around, but not the
+<I>subsequent</I> ones! Once again, <FONT COLOR="blue">files</FONT>
+themselves may reside beyond the <FONT COLOR="brown">4GB</FONT>
+boundary, but not <FONT COLOR="green">the directories</FONT>, in
+particular not in further sessions. Having noted that directory entries
+are actually <I>specified</I> to start at even offsets, I figured that
+it's <A HREF="isofs-2.4.patch">perfectly possible</A> to
+&quot;stretch&quot; the limit to 8GB. But in order to <I>assure
+maximum interoperability,</I> you should <B>not let any session
+<I>start</I> past 4GB minus space required for directory
+structures</B>, e.g. if the last session is to fill the media up, it
+has to be >400MB. As of version 5.3 growisofs refuses to <I>append</I>
+a new session beyond 4GB-40MB limit<SUP>(**)</SUP>, where 40MB is
+pretty much arbitrary chosen large value, large for directory catalogs
+that is. Yet it doesn't actually <I>guarantee</I> that you can't suffer
+from i-node wrap-around. Interim <A HREF="isofs-2.4.patch">fs/isofs 2.4
+kernel patch</A> was addressed to those who have actually ran into the
+problem and have to salvage the data. Even though permanent solution
+for this problem appears in Linux kernel 2.6.8 (thanks to Paul Serice
+effort), growisofs keeps checking for this 4GB limit in order to ensure
+broader compatibility of final DVD recordings. This check is not
+performed for Blu-ray Disc recordings, as probability that a member of
+such user community would run something elder than 2.6.9 is considered
+diminishingly low.
+
+<TABLE BORDER="0" WIDTH="95%" ALIGN="CENTER">
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+<TD><FONT SIZE="-1">i-node is a number uniquely identifying a single
+file in a file system</FONT>
+</TR>
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(**)</SUP></FONT>
+<TD><FONT SIZE="-1">well, as DVD+R Double Layer support was introduced
+in 5.20, <TT>-use-the-force-luke=4gms</TT> option was added to override
+this behaviour (naturally recommended for Linux kernel 2.6>=8 users and
+kernel developers only;-)</FONT>
+</TR>
+</TABLE>
+
+<P><BR>
+
+<P ALIGN="JUSTIFY"><B>Why media reload is performed after every
+recording with growisofs?</B> Well, it's performed only if you didn't
+patch the kernel:-) But no, I do not insist on patching the kernel!
+All I'm saying is that in the lack of kernel support, media reload is
+performed for the following reasons. In order to optimize file access
+kernel maintains so called block cache, so that repetitive requests for
+same data are met directly from memory and don't result in multiple
+physical I/O. Now the catch is that block cache layer remains totally
+unaware of growisofs activities, growisofs <I>bypasses</I> the block
+cache. This means that block cache inevitably becomes out of sync,
+which in turn might appear to you as corrupted data. Media reload is
+performed when flushing the block cache is not an option, e.g. only
+privileged user is allowed to perform it. Second reason is to force
+kernel to readjust last addressable block in case it was changed as
+result of recording. This is done to preclude spurious "attempts to
+access beyond end of device."
+
+<P><BR>
+
+<P ALIGN="JUSTIFY"><B>What does [kernel] &quot;DVD+RW support&quot;
+<I>really</I> mean?</B> Even though DVD+RW has no notion of [multiple]
+sessions, to ensure compatibility with DVD-ROM it's essential to issue
+&quot;CLOSE TRACK/SESSION (5Bh)&quot; <A
+HREF="http://www.t10.org/scsi-3.htm">MMC</A> command to
+terminate/suspend background formatting (if any in progress) whenever
+you intend to eject the media or simply stop writing and want better
+read performance (e.g. remount file system read-only). This is what the
+patch is basically about: noting when/if media was written to and
+"finalizing" at unlock door.
+
+<P ALIGN="JUSTIFY"><B>Secondly</B>, whenever you employ fully fledged
+file system, I/O requests get inevitably fragmented.
+&quot;Fragmented&quot; means following. Even though you can address the
+data with 2KB granularity, it [data] is physically laid out in 32KB
+chunks. This in turn means that for example writing of 2KB block
+involves reading of 32KB chunk, replacing corresponding 2KB and writing
+down of modified 32KB chunk. &quot;Fragmented requests&quot; are those
+that are smaller than 32KB or/and cross the modulus 32KB boundaries. In
+order to optimize the process certain caching algorithm is implemented
+in unit's firmware. Obviously it can't adequately meet all possible
+situations. And so in such unfortunate situations the drive apparently
+stops processing I/O requests returning &quot;COMMAND SEQUENCE ERROR
+(2Ch)&quot; ASC. This is the second essential of &quot;DVD+RW
+support,&quot; namely injecting of &quot;SYNCHRONIZE CACHE (35h)&quot;
+MMC command in reply to the error condition in question. The command
+flushes the cached buffers which makes it possible to resume the data
+flow.
+
+<P ALIGN="JUSTIFY"><B>Unfortunately</B> the above paragraph doesn't
+seem to apply to the 1st generation drives, Ricoh MP5120A and
+derivatives<TT>:-(</TT> &quot;SYNCHRONIZE CACHE (35h)&quot; doesn't
+seem to be sufficient and the unit keeps replying with &quot;COMMAND
+SEQUENCE ERROR (2Ch)&quot; going into end-less loop. This makes it
+impossible to deploy arbitrary file system. I'm open for
+suggestions... Meanwhile the I've chosen to simply suspend I/O till the
+media is unmounted. Even 2nd gen unit were reported to exhibit similar
+[but not the same] behaviour under apparently extremely rare
+circumstances. At least I failed to reproduce the problem... The problem
+reportedly disappears with firmware upgrade...
+
+<P ALIGN="JUSTIFY"><B>Then</B> some [most?] of post-2nd gen units, from
+most vendors, seem to not bother about complying with
+<NOBR>DVD+RW</NOBR> specification, &quot;true random write with 2KB
+granularity&quot; part in particular. Instead they apparently expect
+host to apply procedure pretty much equivalent to <NOBR>DVD-RW</NOBR>
+Restricted Overwrite. To be more specific host seems to be expected to
+coalesce 2KB requests and perform aligned writes at native DVD ECC
+blocksize, which is 32KB. Formally this should not be required, but
+it's the reality of marketplace:-(
+
+<P ALIGN="JUSTIFY">This one really beats me. Sometimes the unit
+simply stops writing signaling a vendor specific positioning error,
+03h/15h/82h to be specific. Especially if the media is newly formatted.
+Couple of work theories. One is that block buffer cache reorders
+requests so that they are not sequential anymore, &quot;FLUSH
+CACHE&quot; might do the trick. Another one is that under
+&quot;underrun&quot; condition background formatting kicks off and has
+to be explicitly stopped. &quot;Underrun&quot; is in quotes because
+the unit is supposed to handle temporary data stream outages
+gracefully. If you run into this (you most likely will), try to
+complement growisofs command line with [undocumented]
+<TT>-poor-man</TT> option (which has to be first in the command line).
+This option eliminates request reorders and minimizes possibility for
+&quot;underrun&quot; condition (by releasing the pressure off VM
+subsystem).
+
+<P><BR>
+
+<P ALIGN="JUSTIFY">The original idea was to implement DVD+RW support in
+drivers/cdrom/cdrom.c. Unfortunately SCSI layer maintains private
+&quot;writeable&quot; flag controlling the ability to issue WRITE
+commands. The flag is impossible to reach for from the Unified CD-ROM
+driver. But why am I talking about SCSI when there are only IDE units
+out there (at least for the time being)? Well, as you most likely want
+to occasionally burn even CD-R[W] with cdrecord you want it to go
+through ide-scsi emulation layer anyway. So I figured that SCSI CD-ROM
+driver is the one to aim for even for DVD+RW.
+
+<P ALIGN="JUSTIFY">Unfortunately it was not possible to implement it
+completely in sr_mod.o<TT>:-(</TT> Minor drivers/cdrom/cdrom.c
+modification was required to sense the media before decision about
+whether or not to permit write open. That's because DVD+RW drives are
+morphing their behaviour after currently mounted media and it's
+essential to identify newly inserted media.
+
+<P ALIGN="JUSTIFY">Special comment about &quot;what a dirty
+hack!!!&quot; To my great surprise it turned out that time-out value you
+pass in cdrom_generic_command is simply ignored and time-out is set to
+pre-compiled value of 30 seconds. Unfortunately it's way too low for
+formatting purposes and I had to do something about it. Alternative to
+&quot;the dirty hack&quot; was to add another argument to sr_do_ioctl
+and modify all the calls to it... I've chosen to take over those 31
+unused bits from the &quot;quiet&quot; argument instead of modifying
+all the calls (too boring).
+
+<P ALIGN="JUSTIFY">But even if time-out value passed down to kernel
+(with <I>either</I> CDROM_SEND_PACKET or SG_IO ioctl) is taken into
+consideration, it's apparently not interpreted as user-land code
+expects it to. As I figured... There is no documentation on
+CDROM_SEND_PACKET, but following the common sense most programmers
+(including myself:-) expect it to be interpreted in at least
+platform-independent manner, such as milliseconds maybe? SG_IO timeout
+in turn is <A
+HREF="http://www.torque.net/sg/p/sg_v3_ho.html#AEN215"><I>documented</I></A>
+to be measured in milliseconds... Neither of this holds true! Kernel
+treats these values as &quot;jiffies,&quot; which is a
+<B>platform-dependent</B> value representing time elapsed between timer
+interrupts. But if we attempt to send down &quot;jiffies,&quot; it
+might turn out wrong too [at least for the moment of this writing]. The
+catch is that [IA-32] kernel developers figured it's cool to shorten
+&quot;jiffy,&quot; but didn't care to provide user-land with actual
+value (well, not of actual interest, too much legacy code to deal with)
+<I>nor</I> <A HREF="scsi_ioctl-2.5.69.patch">scale</A> timeouts
+accordingly in respect to the legacy value of 10ms.
+
+<P ALIGN="JUSTIFY">There is another kernel &quot;deficiency&quot; I ran
+into while working on the (original version of) dvd+rw-format utility.
+The drive provides background formatting progress status, but
+unfortunately it's impossible to access it. That's because progress
+counter is returned [in reply to &quot;TEST UNIT READY&quot;] as
+&quot;NO SENSE/LOGICAL UNIT NOT READY/FORMAT IN PROGRESS&quot; sense
+bytes but with &quot;GOOD&quot; status. Apparently any sense data with
+&quot;GOOD&quot; status is discarded by the common SCSI layer.
+
+<!--
+<P ALIGN="JUSTIFY">As you might have noticed the time-out value for
+&quot;CLOSE SESSION&quot; is 3000 seconds. Does it really take that
+long? It might... Disappointed? Don't be! It might happen <I>only</I>
+when <I>reformatting</I> used media. Formatting of the <I>blank</I>
+media doesn't take longer than a couple of minutes. <I>Reformatting</I>
+in turn takes as long as it takes to nullify whatever you had on the
+media which requires corresponding time-outs. But do you <I>have to</I>
+reformat? Well, only if media contains sensitive data, the new data set
+is smaller than the current one and (for some reason) will be easier
+for potentially rival party to get hold of it (in other words when
+there is a risk for sensitive data to get exposed). Another reason is
+when you want to reuse the media as a master copy for DVD-ROM
+manufacturing and want formatted capacity to reflect data set size.
+Otherwise there is <I>no</I> reason to reformat and as long as you
+don't you won't be disappointed with how long does it take to
+&quot;finalize&quot; the media.
+-->
+
+<P ALIGN="JUSTIFY">It was pointed out to me that DVD+RW units work with
+Acard <A HREF="http://www.acard.com/eng/product/scside.html">SCSI to
+IDE bridges</A>.
+
+<A NAME="plusvsminus"><P><HR WIDTH="50%" ALIGN="LEFT"></A>
+
+<P ALIGN="JUSTIFY"><B>What does <A
+HREF="http://www.cdfreaks.com/article/113"><I>plus</I></A> in DVD+RW/+R
+stand for?</B> Originally this paragraph started as following:
+
+<BLOCKQUOTE><P ALIGN="JUSTIFY">The key feature of DVD+RW/+R media is
+high [spatial] frequency wobbled [pre-]groove with addressing
+information modulated into it. This makes it possible to resume
+interrupted [or deliberately suspended] burning process with accuracy
+high enough for DVD[-ROM] player not to &quot;notice&quot; anything at
+playback time. Recovery from buffer underrun condition in DVD-RW/-R
+case in turn is way less accurate procedure, and the problem is that
+the provided accuracy is very much what average player can tolerate.
+Now given that both provided and tolerated inaccuracies are
+proportional to respectively writing and reading velocities there
+basically no guarantee that DVD-RW/-R recording that suffered from
+buffer underrun will be <I>universally</I> playable.</BLOCKQUOTE>
+
+<P ALIGN="JUSTIFY">Well, it turned out that I was wrong about one
+thing. <!--About projecting CD-R[W] buffer underrun recovery procedure
+to DVD-R[W] to be specific.--> I failed to recognize that DVD-R[W]
+groove also provides for <I>adequately</I> accurate recovery from
+buffer underrun condition/lossless linking. Not as accurate as DVD+RW,
+but accurate enough for splices to be playable in virtually any
+DVD-ROM/-Video unit. Yet! When it comes to DVD-R[W] recording
+specificaton apparently insists that you choose between
+
+<UL>
+<LI>buffer underrun protection and
+<LI>full DVD-ROM/-Video compatibility.
+</UL>
+
+<P ALIGN="JUSTIFY">The specification asserts that the latter is
+achieved only in Disc-at-once recording mode and only if data-stream
+was maintained uninterrupted throughout whole recording. Once again.
+Even though most vendors implement lossless linking in DAO
+mode<SUP>(*)</SUP>, <I>full</I> DVD-ROM/-Video compatibility is
+guaranteed only if recording didn't suffer from buffer underruns. The
+problem is that &quot;offended&quot; sectors are denoted with certain
+linking chunk appearing as degraded <I>user data</I>, few bytes, which
+are supposed to be &quot;corrected away&quot; by ECC
+procedure<SUP>(**)</SUP>. DVD+ splices are in turn only few bits large
+and are &quot;accounted&quot; to sync patterns, <I>not to user data
+area</I>. So that even if suffered from buffer underrun, DVD+ sector is
+logically indistiguishable from DVD-ROM. Which is why it's commonly
+referred to that DVD+RW/+R combine DVD-ROM/-Video compatibility with
+[unconditional] buffer underrun protection.
+
+<P ALIGN="JUSTIFY">As already mentioned, DVD+ groove has
+&quot;addressing information modulated into it,&quot; ADIP (ADress In
+Pre-groove). This gives you an advantage of writing DVD+RW in truly
+arbitrary order, even to virgin surface and practically instantly
+(after ~40 seconds long initial format procedure). In addition, DVD+RW
+can be conveniently written to with 2KB granularity<SUP>(***)</SUP>.
+DVD-RW in turn can only be <I>overwritten</I> in arbitrary order.
+Meaning that it either has to be completely formatted first (it takes
+an hour to format 1x media), or initially written to in a sequential
+manner. And it should also be noted that block overwrite is
+<I>never</I> an option if DVD-RW media was recorded in [compatible]
+Disc-at-once or even Incremental mode, only whole disc blanking is.
+
+<P ALIGN="JUSTIFY">Unlike DVD-R[W], DVD+R[W] recordings can be
+suspended at any time without any side effects. Consider following
+scenario. You have a lot of data coming in [at lower rate], which is to
+be recorded into one file. Meanwhile it turns out that you have to
+retrieve previously recorded data. This would naturally require
+suspention of recording. Most notably in DVD-R [and naturally DVD-RW
+Sequential] case it would result in a hole in the file being recorded.
+So called linking area, most commonly 32KB gap, has to be introduced.
+So that you either have to wait till the file is complete or figure out
+how to deal with holey files. Thanks to ADIP, DVD+R recording is
+resumed from the very point it was suspended at. In DVD-RW Restricted
+Overwrite case no gaps are introduced, but if the media was formatted
+only minimally, suspension/resuming procedure has to be applied and it
+takes ~40 seconds to perform one. In DVD+RW case, suspension/resuming
+is instant regardless media state.
+
+<P ALIGN="JUSTIFY">What does all of the above mean in practice? Well, I
+was actually hoping that readers would [be able to] figure it out by
+themselves. Apparently a couple of &quot;guiding&quot; words are
+needed... It means that it's trivial to employ DVD+RW for housing of
+live and arbitrary file system, no special modifications to target file
+system driver are required... Real-time VBR (Variable Bit Rate) Video
+recordings are children's game...
+
+<P ALIGN="JUSTIFY">Sometimes DVD+RW/+R recording strategy is referred
+to as packet writing. I myself am reluctant to call it so (or
+TAO/SAO/DAO) for the following reason. Despite the fact that DVD-R[W]
+provides for lossless linking (within a packet/extent only),
+packets/extents are still denoted with certain linking information
+which distinguishes it (recording mode in question) from e.g.
+Disc-at-once. Now the point is that written DVD+RW/+R media, rather its
+Data Zone, does not contain <I>any</I> linking information and is
+logically indistinguishable from one written in DVD-R[W] Disc-at-once
+mode (or DVD-ROM for that matter).
+
+<P ALIGN="JUSTIFY">It's maintained that signal from DVD+ groove (the
+one essential for recording, not reading) is much stronger, which makes
+it quite resistant to dust, scratches, etc. 
+
+<P ALIGN="JUSTIFY">Now we can also discuss differences between
+Double/Dual Layer implementations. DVD+R Double Layer permits for
+arbitrary layer break positioning yet maintaining <I>contiguous logical
+block addressing</I>. In other words address of the block following the
+break is always address of the block preceding one plus 1, even for
+arbitrarily positioned break. <NOBR>DVD-R</NOBR> Dual Layer on the
+other hand implies unconditionally disjoint logical block addressing
+[for arbitrarily positioned layer break that is]. This is because block
+addresses as recorded by unit are pre-defined by <NOBR>DVD-dash</NOBR>
+groove structure. In practice it means that file system layout has to
+effectively have a hole, which "covers" twice the space between chosen
+layer break position and outermost edge of the recordable area. And in
+even more practical terms this means that mastering programs have to be
+explicitly adapted for <NOBR>DVD-R</NOBR> layer break positioning.
+Unlike DVD+plus that is.
+
+<P>
+<TABLE BORDER="0" WIDTH="95%" ALIGN="CENTER">
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(*)</SUP></FONT>
+<TD><FONT SIZE="-1">According to <A
+HREF="ftp://ftp.avc-pioneer.com/Mtfuji_6/Spec/">Mt. Fuji draft</A>
+buffer underrun protection is not even an option in DVD-R DAO: "If a
+buffer under-run occurs, the logical unit <B><I>shall</I></B> stop
+writing immediately and the logical unit <B><I>shall</I></B> start
+writing of Lead-out." Protection is defined in Incremental Sequential
+mode and DVD-RW context. By the way, note that earlier versions of this
+draft also discuss DVD+RW. You should be aware that they refer to
+abandoned version which has very little to do with DVD+RW/+R
+implementation being discussed here.</FONT></TR>
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(**)</SUP></FONT>
+<TD><FONT SIZE="-1">ECC redundancy does permit for more degradation,
+more that this linking chunk that is, so that it hadly affects the
+playability.</FONT></TR>
+<TR VALIGN="TOP" ALIGN="JUSTIFY">
+<TD><FONT SIZE="-1"><SUP>(***)</SUP></FONT>
+<TD><FONT SIZE="-1">DVD &quot;native&quot; block size is 32KB, and 2KB
+granularity is nothing but a trick, but you're excused from playing it,
+i.e. reading 32KB, replacing corresponding 2KB and writing 32KB
+back.</FONT></TR>
+</TABLE>
+
+<P><HR>
+
+<SPACER TYPE="block" WIDTH="100%" HEIGHT="100%">
+
+</BODY>
+</HTML>
