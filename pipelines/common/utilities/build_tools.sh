@@ -1,28 +1,5 @@
 #!/bin/bash
 
-change_github_branch() {
-    local git_branch
-    local pr_number
-    local repo_dir
-
-    git_branch="$1"
-    repo_dir="$(resolve_repo_dir "$2")"
-
-    if [[ $git_branch == PR-* ]]
-    then
-        pr_number=${git_branch#"PR-"}
-        git_branch="refs/pull/${pr_number}/head"
-    fi
-
-    echo "-- Changing branch to '$git_branch'."
-
-    git -C "$repo_dir" fetch --depth 1 origin "$git_branch"
-    git -C "$repo_dir" checkout FETCH_HEAD
-
-    # Display the current commit
-    git -C "$repo_dir" log -1
-}
-
 hydrate_cache() {
     local make_status
     local repo_dir
@@ -68,13 +45,13 @@ overwrite_toolkit() {
 
     toolkit_dir="$repo_dir/toolkit"
 
-    pushd -q "$repo_dir" || true
+    pushd "$repo_dir" > /dev/null || true
 
     echo "-- Extracting toolkit from '$toolkit_tarball' into '$repo_dir'."
     rm -rf "$toolkit_dir"
     tar -C "$repo_dir" -xf "$toolkit_tarball"
 
-    popd -q || true
+    popd > /dev/null || true
 }
 
 parse_pipeline_boolean() {
@@ -91,16 +68,23 @@ print_variable() {
     printf -- "-- %s%s-> %s\n" "$arg_name" "${padding:${#arg_name}}" "${!arg_name}"
 }
 
+print_variable_with_check() {
+    if [[ -n ${!1} ]]
+    then
+        print_variable "$arg_name"
+    else
+        echo "ERROR: Argument '$arg_name' is required." >&2
+        return 1
+    fi
+}
+
 print_variables_with_check() {
     local check_status=0
 
     for arg_name in "$@"
     do
-        if [[ -n ${!arg_name} ]]
+        if ! print_variable_with_check "$arg_name"
         then
-            print_variable "$arg_name"
-        else
-            echo "ERROR: Argument '$arg_name' is required." >&2
             check_status=1
         fi
     done
