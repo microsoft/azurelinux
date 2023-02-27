@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.2.20
-Release:        3%{?dist}
+Version:        2.2.41
+Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 URL:            https://gnupg.org/index.html
 Group:          Applications/Cryptography.
@@ -65,6 +65,9 @@ make %{?_smp_mflags} check
 %exclude /usr/share/doc/*
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.41-1
+- Auto-upgrade to 2.2.41 - to fix CVE-2022-3515
+
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.2.20-3
 -   Adding a license reference.
 -   License verified.
