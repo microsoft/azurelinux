@@ -42,7 +42,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      2%{?dist}
+Release:      3%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -141,6 +141,7 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
+Patch81:    CVE-2023-25193.patch
 
 ## upstream patches
 
@@ -255,6 +256,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %if 0%{?fedora} > 30
 %patch80 -p1 -b .use-wayland-on-gnome.patch
+%patch81 -p1
 %endif
 
 ## upstream patches
@@ -762,6 +764,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.12.11-3
+- Add patch for CVE-2023-25193
+
 * Mon Aug 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.11-2
 - Fix version number in Qt5.pc
 
