@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
 
-arch=$(uname -i)
-ROOT_FOLDER=$(git rev-parse --show-toplevel)
-echo "Configuring 1ES build machine"
+echo "Configuring CBL-Mariner build machine."
 
-function configure_general {
-    echo "configure_general"
+function verify_image {
+    echo "verify_image"
 
     # Verify proper filesystem type for /mnt
     #
@@ -14,24 +12,15 @@ function configure_general {
     # Bad:  /dev/sda1      fuseblk   128G  125M  128G   1% /mnt
     MNT_FILESYSTEM_TYPE=$(df -Th | grep '/mnt$' | awk '{ print $2 }')
     if [[ "$MNT_FILESYSTEM_TYPE" == "ext4" ]]; then
-        echo "Detected proper /mnt filesystem type (ext4). Continuing."
+        echo "Detected proper /mnt filesystem type is 'ext4'. Continuing."
     else
-        echo "Error detected, /mnt filesystem is '$MNT_FILESYSTEM_TYPE' instead of 'ext4'. Failing build."
-        exit 1
+        echo "Error detected: /mnt filesystem type is '$MNT_FILESYSTEM_TYPE' instead of 'ext4'. Failing build." >&2
+        return 1
     fi
-
-    # Remove extended file ACL entries from ROOT_FOLDER
-    setfacl -bn $ROOT_FOLDER
-
-    # To avoid git "fatal: unsafe repository" warning
-    git config --global --add safe.directory $ROOT_FOLDER
-
-    # Add GitHub to known hosts to avoid the "Host key verification failed" error.
-    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 }
 
-function configure_mariner {
-    echo "configure_mariner"
+function configure_image {
+    echo "configure_image"
     # Install apps applicable to both X64 and ARM64
     sudo tdnf -y install dotnet-sdk-6.0 createrepo jq yum-utils rpm cpio dnf-utils acl
     # ensure golang 1.17 is installed
@@ -43,25 +32,25 @@ function configure_mariner {
     # Enable Docker daemon at boot
     sudo systemctl enable --now docker.service
     # Add current user to docker group
-    sudo usermod -aG docker $USER
+    sudo usermod -aG docker "$USER"
 
     # Install architecture-specific
-    if [[ $arch == "x86_64" ]]; then
-        configure_mariner_x64
+    if [[ "$(uname -i)" == "x86_64" ]]; then
+        configure_image_x64
     else
-        configure_mariner_arm64
+        configure_image_arm64
     fi
 }
 
-function configure_mariner_x64 {
-    echo "configure_mariner_x64"
-    # These are only available for X64
+function configure_image_x64 {
+    echo "configure_image_x64"
+    # These are only available for X64.
     sudo tdnf -y install azure-cli powershell
 }
 
-function configure_mariner_arm64 {
-    echo "configure_mariner_arm64"
-    # Install az cli via script. This requires python3-devel
+function configure_image_arm64 {
+    echo "configure_image_arm64"
+    # Install Azure CLI via script. This requires python3-devel.
     sudo tdnf -y install python3-devel
     install_az_cli_with_script
 }
@@ -80,15 +69,15 @@ EOF
     sed -i 's/echo "Running install script."/echo "Running install script."\n\/tmp\/non_interact.sh \$install_script/g' /tmp/azcli_ins.sh
     sed -i "s/\$python_cmd \$install_script < \$_TTY/\$python_cmd \$install_script/g" /tmp/azcli_ins.sh
     bash /tmp/azcli_ins.sh
-    sudo ln -svf /home/$USER/bin/az /usr/bin/az | true
+    sudo ln -svf /home/"$USER"/bin/az /usr/bin/az | true
     az extension add --name azure-devops
     az devops configure --defaults organization="https://dev.azure.com/mariner-org" project="mariner"
     az version
     popd
 }
 
-function configure_print_app_versions {
-    echo "configure_print_app_versions"
+function print_app_versions {
+    echo "print_app_versions"
 
     echo "Kernel version: $(uname -r)"
     echo "Architecture: $(uname -m)"
@@ -101,8 +90,8 @@ function configure_print_app_versions {
     az version || true
 }
 
-configure_mariner
+configure_image
 
-configure_general
+verify_image
 
-configure_print_app_versions
+print_app_versions
