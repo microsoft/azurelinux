@@ -193,7 +193,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
-- Remove AutoProv no to address build issues in openldap
+- Remove "AutoProv: no" to address build issues in openldap
 
 * Thu Feb 23 2023 Saul Paredes <saulparedes@microsoft.com> - 2.1.28-3
 - Bump release to solve dependency issue
