@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Name:           helm
 Version:        3.4.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        The Kubernetes Package Manager
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -27,6 +27,7 @@ Patch1:         CVE-2021-32690.patch
 Patch2:         CVE-2022-23525.patch
 Patch3:         CVE-2022-23526.patch
 Patch4:         CVE-2022-23524.patch
+Patch5:    CVE-2023-25165.patch
 BuildRequires:  golang >= 1.15.5
 
 %description
@@ -57,6 +58,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.1-16
+- Add patch for CVE-2023-25165
+
 * Fri Feb 10 2023 Dan Streetman <ddstreet@microsoft.com> - 3.4.1-15
 - CVE-2022-23524
 
