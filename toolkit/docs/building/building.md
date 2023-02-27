@@ -137,7 +137,6 @@ A set of bootstrapped toolchain packages (gcc etc.) are used to build CBL-Marine
 ```bash
 # Populate Toolchain from pre-existing binaries
 sudo make toolchain REBUILD_TOOLS=y
-sudo make copy-toolchain-rpms
 ```
 
 ### **Rebuild Toolchain**
@@ -599,7 +598,7 @@ These are the useful build targets:
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
 | compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
-| copy-toolchain-rpms              | Copy all toolchain RPMS from `../build/rpm_cache/cache` to  `../out/RPMS`.
+| copy-toolchain-rpms              | **Generally no longer needed** Copy all toolchain RPMS from `../build/rpm_cache/cache` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
 | fetch-external-image-packages    | Download all external packages required for an image build.
