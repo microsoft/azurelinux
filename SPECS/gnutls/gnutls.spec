@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.6.14
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Patch1:         CVE-2021-20231.patch
 Patch2:         CVE-2021-20232.patch
 Patch3:         CVE-2021-4209.patch
 Patch4:         CVE-2022-2509.patch
+Patch5:    CVE-2023-0361.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  guile-devel
@@ -98,6 +99,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6.14-9
+- Add patch for CVE-2023-0361
+
 * Wed Dec 07 2022 Minghe Ren <mingheren@microsoft.com> - 3.6.14-8
 - Add patch to fix CVE-2022-2509
 
