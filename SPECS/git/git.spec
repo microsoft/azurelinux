@@ -1,13 +1,14 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
+Patch0:    CVE-2023-23946.patch
 BuildRequires:  curl-devel
 BuildRequires:  python2
 Requires:       openssl
@@ -88,6 +89,9 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.33.6-2
+- Add patch for CVE-2023-23946
+
 * Fri Jan 27 2023 Muhammad Falak <mwani@microsoft.com> - 2.33.6-1
 - Bump version to 2.33.6 to address CVE-2022-23521 and CVE-2022-41903
 - Drop un-needed patch
