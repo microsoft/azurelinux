@@ -1,7 +1,7 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
-Version:        2.8.4
-Release:        5%{?dist}
+Version:        2.8.5
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
@@ -76,6 +76,9 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8.5-1
+- Auto-upgrade to 2.8.5 - to fix CVE-2018-25078
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
