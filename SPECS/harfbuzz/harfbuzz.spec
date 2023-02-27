@@ -1,13 +1,14 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
 Version:        2.6.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://harfbuzz.github.io/
 Source0:        https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.xz
+Patch0:    CVE-2023-25193.patch
 BuildRequires:  glib-devel
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(fontconfig)
@@ -67,6 +68,9 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\
 %{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.4-5
+- Add patch for CVE-2023-25193
+
 * Wed Nov 10 2021 Hideyuki Nagase <hideyukn@microsoft.com> - 2.6.4-4
 - Add which and binutils when check is enabled
 - Replace %{python3} with %{_bindir}/python3
