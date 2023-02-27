@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,8 @@ Requires:       pam
 Requires:       systemd
 Requires:       libdb
 
+Obsoletes:      %{name}-bootstrap
+
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
 Layer, a method for adding authentication support to
@@ -45,6 +47,7 @@ Summary:        Files needed for developing applications with Cyrus SASL
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       pkg-config
+Obsoletes:      %{name}-bootstrap-devel
 
 %description devel
 The %{name}-devel package contains files needed for developing and
@@ -89,6 +92,7 @@ applications which use the Cyrus SASL library.
 Summary:        CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
 
 Requires:       %{name}-lib = %{version}-%{release}
+Obsoletes:      %{name}-bootstrap-lib
 
 %description md5
 The %{name}-md5 package contains the Cyrus SASL plugins which support
@@ -306,6 +310,12 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Thu Feb 23 2023 Saul Paredes <saulparedes@microsoft.com> - 2.1.28-3
+- Bump release to solve dependency issue
+
+* Mon Feb 13 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
+- Indicate this package obsoletes cyrus-sasl-bootstrap
+
 * Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.28-1
 - Updating to version 2.1.28 to address CVE-2022-24407.
 

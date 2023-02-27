@@ -5,9 +5,9 @@ $(call create_folder,$(IMAGEGEN_DIR))
 
 # Resources
 config_name              = $(notdir $(CONFIG_FILE:%.json=%))
-config_other_files       = $(if $(CONFIG_FILE),$(shell find $(CONFIG_BASE_DIR)))
+config_other_files       = $(if $(CONFIG_FILE),$(call shell_real_build_only, find $(CONFIG_BASE_DIR)))
 assets_dir               = $(RESOURCES_DIR)/assets/
-assets_files             = $(shell find $(assets_dir))
+assets_files             = $(call shell_real_build_only, find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
@@ -16,12 +16,21 @@ initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
 else
 initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
 endif
+initrd_assets_dir        = $(RESOURCES_DIR)/imageconfigs/additionalfiles/iso_initrd/
+initrd_scripts_dir       = $(RESOURCES_DIR)/imageconfigs/postinstallscripts/iso_initrd/
+ifeq ($(build_arch),aarch64)
+initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages-arm64.json
+else
+initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages.json
+endif
+initrd_packages_json    += $(RESOURCES_DIR)/imageconfigs/packagelists/accessibility-packages.json
+initrd_assets_files      = $(initrd_packages_json) $(call shell_real_build_only, find $(initrd_assets_dir) $(initrd_scripts_dir))
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
 ova_vmxtemplate          = $(assets_dir)/ova/vmx-template
 
 # Built RPMs
-imggen_rpms = $(shell find $(RPMS_DIR) -type f -name '*.rpm')
+imggen_rpms = $(call shell_real_build_only, find $(RPMS_DIR) -type f -name '*.rpm')
 
 # Imagegen workspace and cache
 imggen_config_dir                    = $(IMAGEGEN_DIR)/$(config_name)
@@ -38,20 +47,20 @@ image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
-imager_disk_output_files = $(shell find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
+imager_disk_output_files = $(call shell_real_build_only, find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
 ifeq ($(build_arch),aarch64)
 initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
 else
 initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
 endif
-meta_user_data_iso       = ${IMAGES_DIR)/meta-user-data.iso
+meta_user_data_iso       = $(IMAGES_DIR)/meta-user-data.iso
 
 $(call create_folder,$(workspace_dir))
 $(call create_folder,$(imager_disk_output_dir))
 $(call create_folder,$(artifact_dir))
 $(call create_folder,$(meta_user_data_tmp_dir))
 
-.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso initrd validate-image-config clean-imagegen
+.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso validate-image-config clean-imagegen
 
 clean: clean-imagegen
 clean-imagegen:
@@ -163,16 +172,18 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--output-summary-file=$@ \
 		--output-dir=$(external_rpm_cache)
 
-# Stand alone target to build just the initrd, should not be used in conjunction with other targets. Use the 'iso' target instead.
-initrd: $(go-liveinstaller) $(go-imager)
-	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
-	$(MAKE) image CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
+# We need to ensure that initrd_img recursive build will never run concurrently with another build component, so add all ISO prereqs as 
+# order-only-prerequisites to initrd_img
+iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary)
+# The initrd bundles these files into the image, we should rebuild it if they change
+initrd_bundled_files = $(go-liveinstaller) $(go-imager) $(assets_files) $(initrd_assets_files) $(imggen_local_repo)
 
-iso: $(go-isomaker) $(go-liveinstaller) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(initrd_config_json) $(validate-config) $(image_package_cache_summary)
+$(initrd_img): $(initrd_bundled_files) $(initrd_config_json) $(INITRD_CACHE_SUMMARY) | $(iso_deps)
+	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
+	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
+
+iso: $(initrd_img) $(iso_deps)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
-	# Recursive make call to build the initrd image iso_initrd/iso-initrd.img
-	# Called here instead of as a traditional dependency to make sure package builds are done sequentially for each config.
-	$(MAKE) image CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG= && \
 	$(go-isomaker) \
 		--base-dir $(CONFIG_BASE_DIR) \
 		--build-dir $(workspace_dir) \
@@ -194,4 +205,4 @@ meta-user-data: $(meta_user_data_files)
 	if [ -n "$(TLS_CERT)" ] && [ -n "$(TLS_KEY)" ] && [ -n "$(CA_CERT)" ]; then \
 		$(SCRIPTS_DIR)/addcerts.sh $(meta_user_data_tmp_dir)/user-data $(TLS_CERT) $(TLS_KEY) $(CA_CERT); \
 	fi
-	genisoimage -output $(IMAGES_DIR)/meta-user-data.iso -volid cidata -joliet -rock $(meta_user_data_tmp_dir)/*
+	genisoimage -output $(meta_user_data_iso) -volid cidata -joliet -rock $(meta_user_data_tmp_dir)/*

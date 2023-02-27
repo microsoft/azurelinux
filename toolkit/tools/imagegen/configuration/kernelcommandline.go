@@ -17,6 +17,7 @@ import (
 // - ExtraCommandLine: Arbitrary parameters which will be appended to the
 //   end of the kernel command line
 type KernelCommandLine struct {
+	CGroup           CGroup      `json:"CGroup"`
 	ImaPolicy        []ImaPolicy `json:"ImaPolicy"`
 	SELinux          SELinux     `json:"SELinux"`
 	ExtraCommandLine string      `json:"ExtraCommandLine"`
@@ -30,6 +31,11 @@ func (k *KernelCommandLine) GetSedDelimeter() (delimeter string) {
 
 // IsValid returns an error if the KernelCommandLine is not valid
 func (k *KernelCommandLine) IsValid() (err error) {
+	err = k.CGroup.IsValid()
+	if err != nil {
+		return err
+	}
+
 	for _, ima := range k.ImaPolicy {
 		if err = ima.IsValid(); err != nil {
 			return

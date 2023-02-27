@@ -529,14 +529,6 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		setupChrootPackages = append(setupChrootPackages, verityPackages...)
 	}
 
-	for _, setupChrootPackage := range setupChrootPackages {
-		_, err = installutils.TdnfInstall(setupChrootPackage, rootDir)
-		if err != nil {
-			err = fmt.Errorf("failed to install required setup chroot package '%s': %w", setupChrootPackage, err)
-			return
-		}
-	}
-
 	// Create new chroot for the new image
 	installChroot := safechroot.NewChroot(installRoot, existingChrootDir)
 	extraInstallMountPoints := []*safechroot.MountPoint{}
@@ -547,6 +539,26 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		return
 	}
 	defer installChroot.Close(leaveChrootOnDisk)
+
+	// Update package repo files for upcoming package installation
+	if len(systemConfig.PackageRepos) > 0 {
+		if systemConfig.IsIsoInstall {
+			err = configuration.UpdatePackageRepo(installChroot, systemConfig)
+			if err != nil {
+				return
+			}
+		} else {
+			return fmt.Errorf("custom package repos should not be specified unless performing ISO installation")
+		}
+	}
+
+	for _, setupChrootPackage := range setupChrootPackages {
+		_, err = installutils.TdnfInstall(setupChrootPackage, rootDir)
+		if err != nil {
+			err = fmt.Errorf("failed to install required setup chroot package '%s': %w", setupChrootPackage, err)
+			return
+		}
+	}
 
 	// Populate image contents
 	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
@@ -670,6 +682,12 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
+		return
+	}
+
+	err = installutils.InstallGrubEnv(installChroot.RootDir())
+	if err != nil {
+		err = fmt.Errorf("failed to install grubenv file: %s", err)
 		return
 	}
 

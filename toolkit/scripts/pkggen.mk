@@ -9,6 +9,7 @@ $(call create_folder,$(RPMS_DIR))
 $(call create_folder,$(CACHED_RPMS_DIR))
 $(call create_folder,$(PKGBUILD_DIR))
 $(call create_folder,$(CHROOT_DIR))
+$(call create_folder,$(CCACHE_DIR))
 
 ######## PACKAGE DEPENDENCY CALCULATIONS ########
 
@@ -17,15 +18,15 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-build_specs     = $(shell find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
-pkggen_rpms     = $(shell find $(RPMS_DIR)/*  2>/dev/null )
+pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
 # Pkggen workspace
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_files        = $(shell find $(CACHED_RPMS_DIR)/)
+rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
@@ -40,7 +41,7 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-spec-parse graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
@@ -57,6 +58,8 @@ clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
 	rm -rf $(parse_working_dir)
+clean-ccache:
+	rm -rf $(CCACHE_DIR)
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
@@ -122,7 +125,7 @@ ifeq ($(STOP_ON_FETCH_FAIL),y)
 graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -198,12 +201,14 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--rpm-dir="$(RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
+		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
 		--distro-build-number="$(BUILD_NUMBER)" \
 		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
+		--check-attempts="$(CHECK_BUILD_RETRIES)" \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
@@ -217,6 +222,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
+		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
 		$(logging_command) && \
 	touch $@
 

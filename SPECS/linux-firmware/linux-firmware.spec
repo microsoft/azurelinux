@@ -5,7 +5,7 @@
 Summary:        Linux Firmware
 Name:           linux-firmware
 Version:        20211216
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ AND GPLv2+ AND MIT AND Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,8 +14,37 @@ URL:            https://www.kernel.org/
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/%{name}.git/snapshot/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
+Requires:       %{name}-broadcom = %{version}-%{release}
+Requires:       %{name}-intel = %{version}-%{release}
+Requires:       %{name}-qlogic = %{version}-%{release}
+Requires:       %{name}-qualcomm = %{version}-%{release}
+
 %description
 This package includes firmware files required for some devices to operate.
+
+%package       broadcom
+Summary:       Firmware for Broadcom devices
+
+%description   broadcom
+Firmware for Broadcom devices.
+
+%package       intel
+Summary:       Firmware for Intel devices
+
+%description   intel
+Firmware for Intel devices.
+
+%package       qlogic
+Summary:       Firmware for QLogic devices
+
+%description   qlogic
+Firmware for QLogic devices.
+
+%package       qualcomm
+Summary:       Firmware for Qualcomm devices
+
+%description   qualcomm
+Firmware for Qualcomm devices.
 
 %prep
 %setup -q
@@ -36,17 +65,40 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 
 %files
 %defattr(-,root,root)
-%license WHENCE
 %license GPL*
-%license LICENCE.broadcom_bcm43xx LICENCE.cypress
-%license LICENSE.QualcommAtheros_ath10k
-%license LICENSE.i915
+%license WHENCE LICENCE.iwlwifi_firmware
+%{_firmwarepath}/rsi
+%{_firmwarepath}/rsi_91x.fw
+%{_firmwarepath}/iwlwifi-8000C-*.ucode
+
+%files broadcom
+%defattr(-,root,root)
+%license WHENCE LICENCE.broadcom_bcm43xx LICENCE.cypress
+%{_firmwarepath}/bnx2x
+%{_firmwarepath}/brcm
+
+%files qlogic
+%defattr(-,root,root)
+%license WHENCE LICENCE.qla1280
+%{_firmwarepath}/qed
+
+%files qualcomm
+%defattr(-,root,root)
+%license WHENCE LICENSE.QualcommAtheros_ath10k
+%{_firmwarepath}/ath10k
+
+%files intel
+%defattr(-,root,root)
+%license WHENCE LICENSE.i915
 %license LICENSE.ipu3_firmware LICENCE.ibt_firmware LICENCE.fw_sst_0f28
 %license LICENCE.IntcSST2 LICENCE.adsp_sst LICENSE.ice
-%license LICENCE.iwlwifi_firmware
-%{_firmwarepath}/*
+%{_firmwarepath}/i915
+%{_firmwarepath}/intel
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 20211216-2
+- Split linux-firmware to sub packages.
+
 * Tue Feb 01 2022 Chris Co <chrco@microsoft.com> - 20211216-1
 - Update to 20211216.
 

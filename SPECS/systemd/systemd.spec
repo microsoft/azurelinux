@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        9%{?dist}
+Release:        14%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://github.com/%{name}/%{name}-stable/archive/v%{version}.ta
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
+Source4:        99-mariner.preset
 Patch0:         fix-journald-audit-logging.patch
 # Patch1 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
@@ -18,6 +19,12 @@ Patch1:         add-fsync-sysusers-passwd.patch
 # Patch2 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/d5cb053cd93d516f516e0b748271b55f9dfb3a29
 Patch2:         gpt-auto-devno-not-determined.patch
+# Patch3 can be removed once we update to major version 251 or higher:
+Patch3:         CVE-2022-3821.patch
+# Patch4 can be removed once we update to version 252
+Patch4:         CVE-2022-45873.patch
+Patch5:         backport-helper-util-macros.patch
+Patch6:         CVE-2022-4415.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -161,6 +168,8 @@ rm %{buildroot}%{_libdir}/systemd/system/default.target
 ln -sfv multi-user.target %{buildroot}%{_libdir}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
+install -D -m 0644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/99-mariner.preset
+
 %find_lang %{name} ../%{name}.lang
 
 %check
@@ -169,7 +178,13 @@ meson test -C build
 # Enable default systemd units.
 %post
 /sbin/ldconfig
-systemctl preset-all
+# Only force the presets to default values when first installing systemd ($1 = # of currently installed pacakges,
+# $1 >= 2 for upgrades). This will resolve issues where systemd may be installed after a package that enables a service
+# during the same transaction, leaving the service disabled unexpectedly. Once systemd is installed all future attempts
+# to enable/disable services should succeed.
+if [ $1 -eq 1 ]; then
+     systemctl preset-all
+fi
 
 %postun -p /sbin/ldconfig
 
@@ -220,6 +235,7 @@ systemctl preset-all
 %config(noreplace) /boot/systemd.cfg
 %{_libdir}/udev/*
 %{_libdir}/systemd/*
+%{_libdir}/systemd/system-preset/99-mariner.preset
 %{_libdir}/environment.d/99-environment.conf
 %exclude %{_libdir}/debug
 %exclude %{_datadir}/locale
@@ -261,6 +277,22 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Jan 25 2023 Adit Jha <aditjha@microsoft.com> - 250.3-14
+- Add 99-mariner.preset to disable systemd-oomd by default
+
+* Mon Jan 23 2023 Cameron Baird <cameronbaird@microsoft.com> - 250.3-13
+- Add patch for CVE-2022-4415
+- Add patch backport-helper-util-macros.patch to backport needed macros for CVE-2022-4415.patch
+
+* Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-12
+- Add patch for CVE-2022-45873
+
+* Wed Nov 29 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-11
+- Conditionally run systemctl preset-all only when first installing systemd, not on upgrades
+
+* Thu Nov 17 2022 Sam Meluch <sammeluch@microsoft.com> - 250.3-10
+- Add patch for CVE-2022-3821
+
 * Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-9
 - Fixing default log location.
 

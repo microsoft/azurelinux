@@ -5,7 +5,7 @@ Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        1.1.2
-Release:        4%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
@@ -13,6 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0001-cgroups-cpuset-fix-byte-order-while-parsing-cpuset-r.patch
 
 BuildRequires:  git
 BuildRequires:  golang => 1.16
@@ -36,6 +37,7 @@ runC is a CLI tool for spawning and running containers according to the OCI spec
 
 %prep
 %setup -q -n %{upstream_name}-%{version}
+%patch0 -p1
 
 %build
 export CGO_ENABLED=1
@@ -57,6 +59,18 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %{_mandir}/*
 
 %changelog
+* Fri Feb 03 2023 Vince Perri <viperri@microsoft.com> - 1.1.2-8
+- Add 0001-cgroups-cpuset-fix-byte-order-while-parsing-cpuset-r.patch
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-7
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-6
+- Bump release to rebuild with go 1.19.4
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.1.2-5
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1.2-4
 - Bump release to rebuild with go 1.18.8
 

@@ -1,7 +1,7 @@
 Summary:        PyNaCl is a Python binding to libsodium
 Name:           python-pynacl
 Version:        1.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,7 @@ export SODIUM_INSTALL=system
 %py3_install
 
 %check
-pip3 install tox
+pip3 install 'tox>=3.27.1,<4.0.0'
 tox -e py%{python3_version_nodots}
 
 %files -n python3-pynacl
@@ -47,6 +47,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.5.0-2
+- Update version of tox used for package tests
+
 * Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
 - Upgrade to latest upstream version
 - Use system libsodium instead of bundled version

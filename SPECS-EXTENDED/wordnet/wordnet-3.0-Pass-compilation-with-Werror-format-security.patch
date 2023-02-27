@@ -1,0 +1,55 @@
+From ab6d29e9056173145cf49ebf9804e6caf2f870ea Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 4 Dec 2013 15:58:30 +0100
+Subject: [PATCH] Pass compilation with -Werror=format-security
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<https://bugzilla.redhat.com/show_bug.cgi?id=1037386>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/binsrch.c | 4 ++--
+ src/wn.c      | 3 +--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/lib/binsrch.c b/lib/binsrch.c
+index 8b71216..6b17325 100644
+--- a/lib/binsrch.c
++++ b/lib/binsrch.c
+@@ -193,7 +193,7 @@ char *replace_line(char *new_line, char *searchkey, FILE *fp)
+     copyfile(fp, tfp);
+     if (fseek(fp, offset, 0) == -1)
+ 	return(NULL);		/* could not seek to offset */
+-    fprintf(fp, new_line);	/* write line */
++    fputs(new_line, fp);	/* write line */
+     rewind(tfp);
+     copyfile(tfp, fp);
+ 
+@@ -220,7 +220,7 @@ char *insert_line(char *new_line, char *searchkey, FILE *fp)
+     copyfile(fp, tfp);
+     if (fseek(fp, offset, 0) == -1)
+ 	return(NULL);		/* could not seek to offset */
+-    fprintf(fp, new_line);	/* write line */
++    fputs(new_line, fp);	/* write line */
+     rewind(tfp);
+     copyfile(tfp, fp);
+ 
+diff --git a/src/wn.c b/src/wn.c
+index 6870a60..7eef283 100644
+--- a/src/wn.c
++++ b/src/wn.c
+@@ -284,8 +284,7 @@ static void printsearches(char *word, int dbase, unsigned long search)
+ 	    printf("\t");
+ 	    printf(searchstr[j].template,
+ 		   partchars[dbase], partchars[dbase]);
+-	    printf(searchstr[j].helpstr);
+-	    printf("\n");
++	    printf("%s\n", searchstr[j].helpstr);
+ 	}
+ }
+ 
+-- 
+1.8.3.1
+

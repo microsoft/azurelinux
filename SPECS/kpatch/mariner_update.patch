@@ -1,41 +1,19 @@
-From 4f97bfb7590a10b6e8b267dc1f595a57a8d9659f Mon Sep 17 00:00:00 2001
+From 6a1f573561d06edecad15b9e93a423bf2e4fdd4d Mon Sep 17 00:00:00 2001
 From: Pawel Winogrodzki <pawelwi@microsoft.com>
-Date: Wed, 15 Jun 2022 10:51:00 -0700
+Date: Wed, 30 Nov 2022 11:25:58 -0800
 Subject: [PATCH] Adjustments for CBL-Mariner.
 
 ---
- kpatch-build/kpatch-build | 61 ++++++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 30 deletions(-)
+ kpatch-build/kpatch-build | 37 +++++++++++++++++++++++++------------
+ 1 file changed, 25 insertions(+), 12 deletions(-)
 
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index 634095d..7766e0d 100755
+index 296fa48..12ab099 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
-@@ -205,21 +205,6 @@ rhel_kernel_version_gte() {
-         [  "${ARCHVERSION}" = "$(echo -e "${ARCHVERSION}\\n$1" | sort -rV | head -n1)" ]
- }
+@@ -639,13 +639,23 @@ fi
  
--# klp.arch relocations were supported prior to v5.8
--# and prior to 4.18.0-240.el8
--use_klp_arch()
--{
--	if kernel_is_rhel; then
--		! rhel_kernel_version_gte 4.18.0-240.el8
--	else
--		! kernel_version_gte 5.8.0
--	fi
--}
--
--rhel_kernel_version_gte() {
--        [  "${ARCHVERSION}" = "$(echo -e "${ARCHVERSION}\\n$1" | sort -rV | head -n1)" ]
--}
--
- # klp.arch relocations were supported prior to v5.8
- # and prior to 4.18.0-284.el8
- use_klp_arch()
-@@ -638,13 +623,23 @@ if [[ $DEBUG -eq 1 ]] || [[ $DEBUG -ge 3 ]]; then
- 	set -o xtrace
- fi
+ trace_on
  
 +# Don't check external file.
 +# shellcheck disable=SC1090
@@ -58,7 +36,7 @@ index 634095d..7766e0d 100755
  	ARCHVERSION="${ARCHVERSION#kernel-}"
  	ARCHVERSION="${ARCHVERSION#alt-}"
  fi
-@@ -699,20 +694,15 @@ fi
+@@ -700,20 +710,15 @@ fi
  KVER="${ARCHVERSION%%-*}"
  if [[ "$ARCHVERSION" =~ - ]]; then
  	KREL="${ARCHVERSION##*-}"
@@ -83,37 +61,40 @@ index 634095d..7766e0d 100755
  	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
  	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
  
-@@ -748,9 +738,8 @@ elif [[ -n "$OOT_MODULE" ]]; then
- 	fi
- elif [[ -e "$KERNEL_SRCDIR"/.config ]] && [[ -e "$VERSIONFILE" ]] && [[ "$(cat "$VERSIONFILE")" = "$ARCHVERSION" ]]; then
+@@ -751,13 +756,14 @@ elif [[ -e "$KERNEL_SRCDIR"/.config ]] && [[ -e "$VERSIONFILE" ]] && [[ "$(cat "
  	echo "Using cache at $KERNEL_SRCDIR"
--
+ 
  else
--	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]]; then
-+	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = mariner ]]; then
+-	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]]; then
++	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
  
- 		echo "Fedora/Red Hat distribution detected"
+ 		[[ "$DISTRO" = fedora ]] && echo "Fedora distribution detected"
+ 		[[ "$DISTRO" = rhel ]] && echo "RHEL distribution detected"
+ 		[[ "$DISTRO" = ol ]] && echo "Oracle Linux distribution detected"
+ 		[[ "$DISTRO" = centos ]] && echo "CentOS distribution detected"
+ 		[[ "$DISTRO" = openEuler ]] && echo "OpenEuler distribution detected"
++		[[ "$DISTRO" = mariner ]] && echo "CBL-Mariner distribution detected"
  
-@@ -760,6 +749,9 @@ else
+ 		clean_cache
+ 
+@@ -765,6 +771,8 @@ else
  		if [[ -z "$SRCRPM" ]]; then
  			if [[ "$DISTRO" = fedora ]]; then
  				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
 +			elif [[ "$DISTRO" = mariner ]]; then
-+				source "$RELEASE_FILE"
 +				wget -P "$TEMPDIR" "https://packages.microsoft.com/cbl-mariner/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
  			else
  				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
  				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die
-@@ -773,17 +765,26 @@ else
- 		rpmbuild -D "_topdir $RPMTOPDIR" -bp --nodeps "--target=$(uname -m)" "$RPMTOPDIR"/SPECS/kernel$ALT.spec 2>&1 | logger ||
- 			die "rpmbuild -bp failed.  you may need to run 'yum-builddep kernel' first."
- 
--		mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
-+		if [[ "$DISTRO" = mariner ]]; then
+@@ -782,13 +790,15 @@ else
+ 			# openEuler has two directories with the same content after 'rpm -D'
+ 			# openEuler 21.09 has linux-* and linux-*-source while openEuler 20.03 has linux-* and linux-*-Source
+ 			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-*[sS]ource "$KERNEL_SRCDIR" 2>&1 | logger || die
++		elif [[ "$DISTRO" = mariner ]]; then
 +			mv "$RPMTOPDIR"/BUILD/CBL-Mariner-Linux-Kernel-* "$KERNEL_SRCDIR" 2>&1 | logger || die
-+		else
-+			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
-+		fi
+ 		else
+ 			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
+ 		fi
  		rm -rf "$RPMTOPDIR"
  		rm -rf "$KERNEL_SRCDIR/.git"
  
@@ -122,18 +103,16 @@ index 634095d..7766e0d 100755
  			sed -i "s/^EXTRAVERSION.*/EXTRAVERSION = -${ARCHVERSION##*-}/" "$KERNEL_SRCDIR/Makefile" || die
  		fi
  
- 		echo "$ARCHVERSION" > "$VERSIONFILE" || die
+@@ -796,6 +806,9 @@ else
  
--		[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
-+		if [[ "$DISTRO" = mariner ]]; then
+ 		if [[ "$DISTRO" = openEuler ]]; then
+ 			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="/boot/config-${ARCHVERSION}"
++		elif [[ "$DISTRO" = mariner ]]; then
 +			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/new_config"
 +			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-$KREL\"/" "$CONFIGFILE"
-+		else
-+			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
-+		fi
- 
- 		(cd "$KERNEL_SRCDIR" && make mrproper 2>&1 | logger) || die
- 
+ 		else
+ 			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/configs/kernel$ALT-$KVER-$ARCH.config"
+ 		fi
 -- 
 2.34.1
 

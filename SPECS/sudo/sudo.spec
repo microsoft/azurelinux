@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.10
+Version:        1.9.12p2
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -97,92 +97,98 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
-*   Tue Mar 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.9.10
--   Upgrade to Latest Stable sudo version for CBL-Mariner 2.0
+* Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.9.12p2-1
+- Upgrade to 1.9.12p2 for CVE-2023-22809
 
-*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.5p2-3
--   Removing the explicit %%clean stage.
+* Thu Nov 10 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.9.12p1-1
+- Upgrade sudo to version 1.9.12p1 to fix CVE-2022-43995.
 
-*   Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
--   Move sudo/wheel groups before @includedir to not override user's settings.
+* Tue Mar 08 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.9.10
+- Upgrade to Latest Stable sudo version for CBL-Mariner 2.0
 
-*   Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1
--   Update to version 1.9.5.p2 to fix CVE-2021-3156.
--   Change the password prompt to include ": " at the end.
--   Unconditionally add wheel/sudo groups.
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.5p2-3
+- Removing the explicit %%clean stage.
 
-*   Fri Jan 15 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p1-1
--   Update to version 1.9.5.p1 to fix CVE-2021-23240.
+* Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
+- Move sudo/wheel groups before @includedir to not override user's settings.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.31p1-4
--   Added %%license line automatically
+* Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1
+- Update to version 1.9.5.p2 to fix CVE-2021-3156.
+- Change the password prompt to include ": " at the end.
+- Unconditionally add wheel/sudo groups.
 
-*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-3
--   Renaming Linux-PAM to pam
+* Fri Jan 15 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p1-1
+- Update to version 1.9.5.p1 to fix CVE-2021-23240.
 
-*   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-2
--   Rename shadow to shadow-utils.
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.31p1-4
+- Added %%license line automatically
 
-*   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.8.31p1-1
--   Update to 1.8.31p1. License verified.
+* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-3
+- Renaming Linux-PAM to pam
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.23-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.31p1-2
+- Rename shadow to shadow-utils.
 
-*   Tue Sep 11 2018 Keerthana K <keerthanak@vmware.com> 1.8.23-1
--   Update to version 1.8.23.
+* Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 1.8.31p1-1
+- Update to 1.8.31p1. License verified.
 
-*   Thu Mar 01 2018 Anish Swaminathan <anishs@vmware.com> 1.8.20p2-5
--   Move includedir sudoers.d to end of sudoers file
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.23-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.20p2-4
--   No direct toybox dependency, shadow depends on toybox
+* Tue Sep 11 2018 Keerthana K <keerthanak@vmware.com> 1.8.23-1
+- Update to version 1.8.23.
 
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.20p2-3
--   Requires shadow or toybox
+* Thu Mar 01 2018 Anish Swaminathan <anishs@vmware.com> 1.8.20p2-5
+- Move includedir sudoers.d to end of sudoers file
 
-*   Fri Jul 07 2017 Chang Lee <changlee@vmware.com> 1.8.20p2-2
--   Including /usr/lib/tmpfiles.d/sudo.conf from %files
+* Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.20p2-4
+- No direct toybox dependency, shadow depends on toybox
 
-*   Thu Jun 15 2017 Kumar Kaushik <kaushikk@vmware.com> 1.8.20p2-1
--   Udating version to 1.8.20p2, fixing CVE-2017-1000367 and CVE-2017-1000368
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.20p2-3
+- Requires shadow or toybox
 
-*   Wed Apr 12 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.8.19p2-1
--   Update to version 1.8.19p2
+* Fri Jul 07 2017 Chang Lee <changlee@vmware.com> 1.8.20p2-2
+- Including /usr/lib/tmpfiles.d/sudo.conf from %files
 
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.8.18p1-3
--   BuildRequires Linux-PAM-devel
+* Thu Jun 15 2017 Kumar Kaushik <kaushikk@vmware.com> 1.8.20p2-1
+- Udating version to 1.8.20p2, fixing CVE-2017-1000367 and CVE-2017-1000368
 
-*   Thu Oct 20 2016 Alexey Makhalov <amakhalov@vmware.com> 1.8.18p1-2
--   Remove --with-pam-login to use /etc/pam.d/sudo for `sudo -i`
--   Fix groupadd wheel warning during the %post action
+* Wed Apr 12 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.8.19p2-1
+- Update to version 1.8.19p2
 
-*   Tue Oct 18 2016 Alexey Makhalov <amakhalov@vmware.com> 1.8.18p1-1
--   Update to 1.8.18p1
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.8.18p1-3
+- BuildRequires Linux-PAM-devel
 
-*   Mon Oct 04 2016 ChangLee <changlee@vmware.com> 1.8.15-4
--   Modified %check
+* Thu Oct 20 2016 Alexey Makhalov <amakhalov@vmware.com> 1.8.18p1-2
+- Remove --with-pam-login to use /etc/pam.d/sudo for `sudo -i`
+- Fix groupadd wheel warning during the %post action
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-3
--   GA - Bump release of all rpms
+* Tue Oct 18 2016 Alexey Makhalov <amakhalov@vmware.com> 1.8.18p1-1
+- Update to 1.8.18p1
 
-*   Wed May 4 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-2
--   Fix for upgrade issues
+* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 1.8.15-4
+- Modified %check
 
-*   Wed Jan 20 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-1
--   Update to 1.8.15-1.
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-3
+- GA - Bump release of all rpms
 
-*   Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 1.8.11p1-5
--   Edit post script.
+* Wed May 4 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-2
+- Fix for upgrade issues
 
-*   Mon Jun 22 2015 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-4
--   Fixing permissions on /etc/sudoers file
+* Wed Jan 20 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-1
+- Update to 1.8.15-1.
 
-*   Fri May 29 2015 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-3
--   Adding sudo configuration and PAM config file
+* Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 1.8.11p1-5
+- Edit post script.
 
-*   Wed May 27 2015 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-2
--   Adding PAM support
+* Mon Jun 22 2015 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-4
+- Fixing permissions on /etc/sudoers file
 
-*   Thu Oct 09 2014 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-1
--   Initial build.  First version
+* Fri May 29 2015 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-3
+- Adding sudo configuration and PAM config file
+
+* Wed May 27 2015 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-2
+- Adding PAM support
+
+* Thu Oct 09 2014 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-1
+- Initial build.  First version

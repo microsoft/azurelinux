@@ -1,37 +1,27 @@
-%global builddate $(date +"%%Y%%m%%d-%%T")
-%global commit_version "d48f381d9a4e68c83283ce5233844807dfdc5ba5"
-
-Name:           prometheus
-Version:        2.36.0
-Release:        4%{?dist}
+# When upgrading Prometheus, run `./generate_source_tarball.sh --pkgVersion <version>`
+# The script will spit out custom tarballs for `prometheus` and `promu` (More details in the script)
+%global promu_version 0.13.0
 Summary:        Prometheus monitoring system and time series database
+Name:           prometheus
+Version:        2.37.0
+Release:        2%{?dist}
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-License:        ASL 2.0
 URL:            https://github.com/prometheus/prometheus
 Source0:        https://github.com/prometheus/prometheus/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# unzip Source0
-# run 'make build' in it
-# tar       --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf web-ui-%%{version}.tar.gz web/ui
-Source10:       web-ui-%{version}.tar.gz
 Source1:        prometheus.service
 Source2:        prometheus.sysconfig
 Source3:        prometheus.yml
 Source4:        prometheus.conf
 Source5:        prometheus.logrotate
-# On version updates run "toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz"
-Source6:        %{name}-%{version}-vendor.tar.gz
-
+Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-
-BuildRequires:  systemd-rpm-macros
 BuildRequires:  golang
-Requires(pre):  /usr/bin/systemd-sysusers
+BuildRequires:  nodejs
+BuildRequires:  systemd-rpm-macros
+Requires(pre):  %{_bindir}/systemd-sysusers
 
 %description
 The Prometheus monitoring system and time series database
@@ -40,21 +30,11 @@ The Prometheus monitoring system and time series database
 %autosetup -p1
 
 %build
-rm -rf web/ui
-tar -xf %{SOURCE10}
-
-rm -rf vendor
-tar -xf %{SOURCE6} --no-same-owner
-
-export LDFLAGS="-X github.com/prometheus/common/version.Version=%{version} \
-                -X github.com/prometheus/common/version.Revision=%{commit_version} \
-                -X github.com/prometheus/common/version.Branch=master \
-                -X github.com/prometheus/common/version.BuildUser=mockbuild \
-                -X github.com/prometheus/common/version.BuildDate=%{builddate} "
-export BUILDTAGS="netgo builtinassets"
-for cmd in cmd/* ; do
-  go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o $(basename $cmd) ./$cmd
-done
+tar -xf %{SOURCE6} -C ..
+cd ../promu-%{promu_version}
+make build
+cd ../%{name}-%{version}
+make build
 
 %install
 install -m 0755 -vd                     %{buildroot}%{_bindir}
@@ -142,6 +122,20 @@ fi
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-2
+- Bump release to rebuild with go 1.19.5
+
+* Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.36.0-6
+- Bump release to rebuild with go 1.19.4
+
+* Tue Jan 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0-1
+- Upgrade to LTS v2.37.0 (next LTS is v2.41.0)
+- Created generate_source_tarball.sh for handling the custom tarballs for prometheus/promu
+- Simplified %build section to use the custom tarballs
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.0-5
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.36.0-4
 - Bump release to rebuild with go 1.18.8
 

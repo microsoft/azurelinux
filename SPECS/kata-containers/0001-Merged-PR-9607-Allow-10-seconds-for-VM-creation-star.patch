@@ -16,9 +16,9 @@ index aaa8e288..118e1b4d 100644
  	span, _ := katatrace.Trace(ctx, clh.Logger(), "StartVM", clhTracingTags, map[string]string{"sandbox_id": clh.id})
  	defer span.End()
  
--	ctx, cancel := context.WithTimeout(context.Background(), clhAPITimeout*time.Second)
+-	ctx, cancel := context.WithTimeout(context.Background(), clh.getClhAPITimeout()*time.Second)
 +	// FIXME - for now allow more than one second to create and start the VM.
-+	// ctx, cancel := context.WithTimeout(context.Background(), clhAPITimeout*time.Second)
++	// ctx, cancel := context.WithTimeout(context.Background(), clh.getClhAPITimeout()*time.Second)
 +	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
  	defer cancel()
  

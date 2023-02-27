@@ -263,7 +263,6 @@ build_rpm_in_chroot_no_install readline
 build_rpm_in_chroot_no_install bash
 build_rpm_in_chroot_no_install bzip2
 build_rpm_in_chroot_no_install gdbm
-build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install gettext
 build_rpm_in_chroot_no_install sqlite
 build_rpm_in_chroot_no_install expat
@@ -274,7 +273,6 @@ build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
 build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
-build_rpm_in_chroot_no_install findutils
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
 build_rpm_in_chroot_no_install gzip
@@ -286,6 +284,7 @@ build_rpm_in_chroot_no_install procps-ng
 build_rpm_in_chroot_no_install sed
 build_rpm_in_chroot_no_install check
 build_rpm_in_chroot_no_install cpio
+build_rpm_in_chroot_no_install nghttp2
 
 # perl needs gdbm, bzip2, zlib
 chroot_and_install_rpms gdbm
@@ -395,9 +394,10 @@ build_rpm_in_chroot_no_install kbd
 chroot_and_install_rpms e2fsprogs
 build_rpm_in_chroot_no_install krb5
 
-# curl needs libssh2, krb5
+# curl needs libssh2, krb5, nghttp2
 chroot_and_install_rpms libssh2
 chroot_and_install_rpms krb5
+chroot_and_install_rpms nghttp2
 build_rpm_in_chroot_no_install curl
 
 # cracklib needs python3-setuptools (installed with python3)
@@ -420,6 +420,9 @@ build_rpm_in_chroot_no_install docbook-style-xsl
 # libsolv needs cmake
 chroot_and_install_rpms cmake
 build_rpm_in_chroot_no_install libsolv
+
+# ccache needs cmake
+build_rpm_in_chroot_no_install ccache
 
 # glib needs perl-XML-Parser, python3-libs, gtk-doc, meson, libselinux
 chroot_and_install_rpms perl-XML-Parser
@@ -466,6 +469,11 @@ chroot_and_install_rpms swig
 build_rpm_in_chroot_no_install libselinux
 
 chroot_and_install_rpms libselinux
+
+# coreutils and findutils require libselinux
+# for SELinux support.
+build_rpm_in_chroot_no_install coreutils
+build_rpm_in_chroot_no_install findutils
 
 build_rpm_in_chroot_no_install glib
 build_rpm_in_chroot_no_install libassuan

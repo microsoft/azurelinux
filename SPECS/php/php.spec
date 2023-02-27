@@ -32,8 +32,8 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.11
-Release:        2%{?dist}
+Version:        8.1.12
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -1515,6 +1515,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Thu Dec 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.12-1
+- Auto-upgrade to 8.1.12 - CVE-2022-37454
+
 * Fri Oct 07 2022 Osama Esmail <osamaesmail@microsoft.com> - 8.1.11-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Replaced conditional flags with global variables

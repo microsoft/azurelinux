@@ -1,5 +1,8 @@
 {
  "Signatures": {
-  "WALinuxAgent-2.3.1.1.tar.gz": "2f87ff20d93fd6f28b0f9c61d9c3a511475c08b465479aad0c92774bb01f39f6"
+  "WALinuxAgent-2.3.1.1.tar.gz": "2f87ff20d93fd6f28b0f9c61d9c3a511475c08b465479aad0c92774bb01f39f6",
+  "ephemeral-disk-warning": "8b18fc001e5dfa43a1f559a074e334330e6fc4fe5b8c586eafc894800cc1c1ad",
+  "ephemeral-disk-warning.conf": "128e531c029e04afdab591f44d2b0a69d5a4eb9dec8867282d0acb1ebded76d0",
+  "ephemeral-disk-warning.service": "627b06ab9692aafd20b8c2af4cc779675329426d2ad0c82ddc787d762027d0e9"
  }
 }

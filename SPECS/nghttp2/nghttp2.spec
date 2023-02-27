@@ -1,22 +1,18 @@
 Summary:        nghttp2 is an implementation of HTTP/2 and its header compression algorithm, HPACK.
 Name:           nghttp2
 Version:        1.46.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://nghttp2.org
 Source0:        https://github.com/nghttp2/nghttp2/releases/download/v%{version}/%{name}-%{version}.tar.xz
-
-BuildRequires:  c-ares-devel
-BuildRequires:  jansson-devel
-BuildRequires:  libevent-devel
-BuildRequires:  libxml2-devel
-BuildRequires:  openssl-devel
-BuildRequires:  systemd
-BuildRequires:  zlib-devel
-
+BuildRequires:  gcc
+BuildRequires:  make
+%if %{with_check}
+BuildRequires:  cunit
+%endif
 Provides:       libnghttp2 = %{version}-%{release}
 
 %description
@@ -24,28 +20,29 @@ Implementation of the Hypertext Transfer Protocol version 2 in C.
 
 %package devel
 Summary:        Header files for nghttp2
-
-Provides:       libnghttp2-devel = %{version}-%{release}
-
 Requires:       %{name} = %{version}-%{release}
+Provides:       libnghttp2-devel = %{version}-%{release}
 
 %description devel
 These are the header files of nghttp2.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-./configure --prefix=%{_prefix}        \
-            --disable-static           \
-            --enable-lib-only          \
-            --disable-python-bindings
+%configure \
+    --disable-static           \
+    --enable-lib-only          \
+    --disable-python-bindings
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-rm %{buildroot}/%{_libdir}/*.la
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
+
+%check
+%make_build -k check
 
 %files
 %defattr(-,root,root)
@@ -62,6 +59,12 @@ rm %{buildroot}/%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jan 10 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.46.0-2
+- Remove dependencies not needed to build library
+- Add %%check sections with unit tests
+- License verified, no SPDX expression conversion necessary
+- Lint spec
+
 * Mon Jan 31 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.46.0-1
 - Upgrading to v1.46.0
 

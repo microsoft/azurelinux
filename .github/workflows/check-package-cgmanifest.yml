@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 name: Check Package CGManifests
 
 on:
@@ -39,4 +42,5 @@ jobs:
 
     - name: Check each spec
       run: |
+        .github/workflows/overwrite_shell_link.sh
         .github/workflows/validate-cg-manifest.sh ${{ env.updated-specs }}

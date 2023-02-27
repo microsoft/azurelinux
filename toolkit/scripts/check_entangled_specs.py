@@ -18,6 +18,14 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/kernel-hci-signed/kernel-hci-signed.spec",
+        "SPECS/kernel-hci/kernel-hci.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/kernel-azure-signed/kernel-azure-signed.spec",
+        "SPECS/kernel-azure/kernel-azure.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
@@ -29,6 +37,10 @@ version_release_matching_groups = [
     frozenset([
         "SPECS/jflex/jflex.spec",
         "SPECS/jflex/jflex-bootstrap.spec"
+    ]),
+    frozenset([
+        "SPECS/cyrus-sasl/cyrus-sasl.spec",
+        "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
     ])
 ]
 
@@ -40,6 +52,10 @@ version_matching_groups = [
     frozenset([
         "SPECS/python-flit/python-flit.spec",
         "SPECS/python-flit-core/python-flit-core.spec"
+    ]),
+    frozenset([
+        "SPECS/influxdb/influxdb.spec",
+        "SPECS/influx-cli/influx-cli.spec"
     ])
 ]
 
