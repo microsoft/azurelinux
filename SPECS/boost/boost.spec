@@ -1,13 +1,14 @@
 Summary:	Boost
 Name:		boost
 Version:	1.66.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	Boost Software License V1
 URL:		http://www.boost.org/
 Group:		System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2
+Patch0:    CVE-2018-14040.patch
 %define sha1 boost=b6b284acde2ad7ed49b44e856955d7b1ea4e9459
 BuildRequires:	bzip2-devel
 
@@ -34,6 +35,7 @@ The boost-static package contains boost static libraries.
 
 %prep
 %setup -qn boost_1_66_0
+%patch0 -p1
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
@@ -63,6 +65,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libboost_*.a
 
 %changelog
+* Mon Feb 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.66.0-4
+- Add patch for CVE-2018-14040
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.66.0-3
 - Added %%license line automatically
 
