@@ -1,0 +1,92 @@
+From 1c4b8fb30aa4262238260b5eedd33aa4a33423c8 Mon Sep 17 00:00:00 2001
+From: Vlad Buslov <vladbu@nvidia.com>
+Date: Thu, 26 May 2022 19:42:04 +0300
+Subject: [PATCH 1/9] net/mlx5: Bridge, refactor groups sizes and indices
+
+Following patches in the series introduce additional flow groups for QinQ
+support. With increased number of groups it becomes cumbersome to calculate
+groups sizes as fractions of the table size. Instead, manually define sizes
+of specific group types and ensure that totals are still correct by static
+assertions. Having specific table size is important for firmware resource
+management.
+
+This commit doesn't change functionality.
+
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Roi Dayan <roid@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Change-Id: I20a472caa0f8e93da4b215891c855e79e2af4032
+---
+ .../ethernet/mellanox/mlx5/core/esw/bridge.c  | 41 +++++++++++++------
+ 1 file changed, 29 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+index 05e08cec5a8c..6547b848242a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
+ /* Copyright (c) 2021 Mellanox Technologies. */
+ 
++#include <linux/build_bug.h>
+ #include <linux/list.h>
+ #include <linux/notifier.h>
+ #include <net/netevent.h>
+@@ -12,26 +13,42 @@
+ #define CREATE_TRACE_POINTS
+ #include "diag/bridge_tracepoint.h"
+ 
+-#define MLX5_ESW_BRIDGE_INGRESS_TABLE_SIZE 64000
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_SIZE 16000
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_UNTAGGED_GRP_SIZE 32000
+ #define MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_IDX_FROM 0
+-#define MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_IDX_TO (MLX5_ESW_BRIDGE_INGRESS_TABLE_SIZE / 4 - 1)
+-#define MLX5_ESW_BRIDGE_INGRESS_TABLE_FILTER_GRP_IDX_FROM \
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_IDX_TO		\
++	(MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_SIZE - 1)
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_FILTER_GRP_IDX_FROM	\
+ 	(MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_IDX_TO + 1)
+-#define MLX5_ESW_BRIDGE_INGRESS_TABLE_FILTER_GRP_IDX_TO \
+-	(MLX5_ESW_BRIDGE_INGRESS_TABLE_SIZE / 2 - 1)
+-#define MLX5_ESW_BRIDGE_INGRESS_TABLE_MAC_GRP_IDX_FROM \
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_FILTER_GRP_IDX_TO			\
++	(MLX5_ESW_BRIDGE_INGRESS_TABLE_FILTER_GRP_IDX_FROM +		\
++	 MLX5_ESW_BRIDGE_INGRESS_TABLE_VLAN_GRP_SIZE - 1)
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_MAC_GRP_IDX_FROM		\
+ 	(MLX5_ESW_BRIDGE_INGRESS_TABLE_FILTER_GRP_IDX_TO + 1)
+-#define MLX5_ESW_BRIDGE_INGRESS_TABLE_MAC_GRP_IDX_TO (MLX5_ESW_BRIDGE_INGRESS_TABLE_SIZE - 1)
+-
+-#define MLX5_ESW_BRIDGE_EGRESS_TABLE_SIZE 64000
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_MAC_GRP_IDX_TO			\
++	(MLX5_ESW_BRIDGE_INGRESS_TABLE_MAC_GRP_IDX_FROM +		\
++	 MLX5_ESW_BRIDGE_INGRESS_TABLE_UNTAGGED_GRP_SIZE - 1)
++#define MLX5_ESW_BRIDGE_INGRESS_TABLE_SIZE			\
++	(MLX5_ESW_BRIDGE_INGRESS_TABLE_MAC_GRP_IDX_TO + 1)
++static_assert(MLX5_ESW_BRIDGE_INGRESS_TABLE_SIZE == 64000);
++
++#define MLX5_ESW_BRIDGE_EGRESS_TABLE_VLAN_GRP_SIZE 32000
++#define MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_SIZE (32000 - 1)
+ #define MLX5_ESW_BRIDGE_EGRESS_TABLE_VLAN_GRP_IDX_FROM 0
+-#define MLX5_ESW_BRIDGE_EGRESS_TABLE_VLAN_GRP_IDX_TO (MLX5_ESW_BRIDGE_EGRESS_TABLE_SIZE / 2 - 1)
++#define MLX5_ESW_BRIDGE_EGRESS_TABLE_VLAN_GRP_IDX_TO		\
++	(MLX5_ESW_BRIDGE_EGRESS_TABLE_VLAN_GRP_SIZE - 1)
+ #define MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_IDX_FROM \
+ 	(MLX5_ESW_BRIDGE_EGRESS_TABLE_VLAN_GRP_IDX_TO + 1)
+-#define MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_IDX_TO (MLX5_ESW_BRIDGE_EGRESS_TABLE_SIZE - 2)
++#define MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_IDX_TO			\
++	(MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_IDX_FROM +		\
++	 MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_SIZE - 1)
+ #define MLX5_ESW_BRIDGE_EGRESS_TABLE_MISS_GRP_IDX_FROM \
+ 	(MLX5_ESW_BRIDGE_EGRESS_TABLE_MAC_GRP_IDX_TO + 1)
+-#define MLX5_ESW_BRIDGE_EGRESS_TABLE_MISS_GRP_IDX_TO (MLX5_ESW_BRIDGE_EGRESS_TABLE_SIZE - 1)
++#define MLX5_ESW_BRIDGE_EGRESS_TABLE_MISS_GRP_IDX_TO	\
++	MLX5_ESW_BRIDGE_EGRESS_TABLE_MISS_GRP_IDX_FROM
++#define MLX5_ESW_BRIDGE_EGRESS_TABLE_SIZE			\
++	(MLX5_ESW_BRIDGE_EGRESS_TABLE_MISS_GRP_IDX_TO + 1)
++static_assert(MLX5_ESW_BRIDGE_EGRESS_TABLE_SIZE == 64000);
+ 
+ #define MLX5_ESW_BRIDGE_SKIP_TABLE_SIZE 0
+ 
+-- 
+2.21.3
+

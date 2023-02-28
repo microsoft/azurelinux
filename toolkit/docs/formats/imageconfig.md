@@ -337,6 +337,10 @@ The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` 
 This will instruct init (systemd) to set the configured mode on boot.  The `force_enforcing` option will set enforcing in the config and also add `enforcing=1` in the kernel command line,
 which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
 
+The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`. 
+The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
+For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
+
 A sample KernelCommandLine enabling a basic IMA mode and passing two additional parameters:
 
 ``` json
@@ -351,6 +355,14 @@ A sample KernelCommandLine enabling SELinux and booting in enforcing mode:
 ``` json
 "KernelCommandLine": {
     "SELinux": "enforcing"
+},
+```
+
+A sample KernelCommandLine enabling CGroup and booting with cgroupv2 enabled:
+
+``` json
+"KernelCommandLine": {
+    "CGroup": "version_two"
 },
 ```
 

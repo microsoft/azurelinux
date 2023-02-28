@@ -5,7 +5,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           %{_base_name}-bootstrap
 Version:        2.1.28
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -192,6 +192,12 @@ make %{?_smp_mflags} check
 %exclude %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
+- Remove AutoProv no to address build issues in openldap
+
+* Thu Feb 23 2023 Saul Paredes <saulparedes@microsoft.com> - 2.1.28-3
+- Bump release to solve dependency issue
+
 * Fri Feb 03 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.1.28-2
 - Create cyrus-sasl-bootstrap spec to help resolve circular dependencies
 
