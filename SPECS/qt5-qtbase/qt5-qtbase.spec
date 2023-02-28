@@ -42,7 +42,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      2%{?dist}
+Release:      3%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -762,6 +762,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 5.12.11-3
+- Bump release number due to harfbuzz upgrade.
+
 * Mon Aug 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.11-2
 - Fix version number in Qt5.pc
 
