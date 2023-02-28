@@ -81,8 +81,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       msopenjdk-11
 Provides:       %{name}-java = %{version}-%{release}
 
-%description -n java-%{name}
-This contains protobuf java package.
+%description    java
+This contains protobuf java libraries.
 
 %prep
 %autosetup
