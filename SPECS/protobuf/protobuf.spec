@@ -1,13 +1,31 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.17.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated maven modules and plugins from this tarball, since network is disabled during build time.
+# Use generate_source_tarbbal.sh to get this generated from a source code file.
+# Unfortunately it is not possible to just run mvn dependency:go-offline as it does not download things reqires for specific targets.
+# So you would need to run all targets used in this spec file such as: "mvn package", "mvn install", "maven test" to download all dependecies.
+# How to re-build this file:
+#   1. wget https://github.com/protocolbuffers/protobuf/releases/download/v%%{version}/%%{name}-all-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. mvm verify --fail-never
+#   5. cd /home/{user}/.m2
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-m2.tar.gz repository/
+#
+Source1:        %{name}-%{version}-m2.tar.gz
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  make
@@ -58,9 +76,9 @@ Summary:        protobuf java lib
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 BuildRequires:  chkconfig
-BuildRequires:  temurin-8-jdk >= 8.0.362.0.0.9
-BuildRequires:  maven >= 3.8.6
-Requires:       temurin-8-jdk >= 8.0.362.0.0.9
+BuildRequires:  msopenjdk-11
+BuildRequires:  maven
+BuildRequires:  msopenjdk-11
 Provides:       %{name}-java = %{version}-%{release}
 
 %description -n java-%{name}
@@ -68,6 +86,11 @@ This contains protobuf java package.
 
 %prep
 %autosetup
+# populate m2 cache
+mkdir /root/.m2
+pushd /root/.m2
+tar -xf %{SOURCE1} --no-same-owner
+popd
 
 %build
 %configure --disable-silent-rules
@@ -82,7 +105,7 @@ popd
 
 # build java subpackage
 pushd java
-mvn package -o
+mvn -o package -DskipTests
 popd
 
 %install
@@ -95,13 +118,21 @@ popd
 
 # install java subpackage
 pushd java
-mvn install -o
+mvn -o install -DskipTests
 install -vdm755 %{buildroot}%{_libdir}/java/protobuf
 install -vm644 core/target/protobuf-java-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
 install -vm644 util/target/protobuf-java-util-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
 popd
 
 %ldconfig_scriptlets
+
+%check
+# run C++ unit tests
+%make_build check
+
+# run java subpackage tests
+cd java
+mvn -o test
 
 %files
 %defattr(-,root,root)
@@ -135,6 +166,10 @@ popd
 %{_libdir}/java/protobuf/*.jar
 
 %changelog
+* Fri Feb 24 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
+- Re-added back java subpackage
+- Added check section for running tests
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1
 - Upgrade to latest upstream version, using upstream release tarball
 - Add soname version to %%file packaging
