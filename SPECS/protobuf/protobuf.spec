@@ -71,7 +71,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 %description -n python3-%{name}
 This contains protobuf python3 libraries.
 
-%package -n     java-%{name}
+%package        java
 Summary:        protobuf java lib
 Group:          Development/Libraries
 BuildRequires:  chkconfig
@@ -162,7 +162,7 @@ mvn -o test
 %files -n python3-%{name}
 %{python3_sitelib}/*
 
-%files -n java-%{name}
+%files java
 %{_libdir}/java/protobuf/*.jar
 
 %changelog
