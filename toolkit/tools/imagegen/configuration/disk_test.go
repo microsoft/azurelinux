@@ -72,6 +72,18 @@ func TestShouldSucceedParsingValidDisk_Disk(t *testing.T) {
 	assert.Equal(t, validDisk, checkedDisk)
 }
 
+func TestShouldSucceedParsingValidDiskEmptyTarget_Disk(t *testing.T) {
+	var checkedDisk Disk
+
+	diskWithNoTarget := validDisk
+	diskWithNoTarget.TargetDisk = TargetDisk{}
+
+	assert.NoError(t, diskWithNoTarget.IsValid())
+	err := remarshalJSON(diskWithNoTarget, &checkedDisk)
+	assert.NoError(t, err)
+	assert.Equal(t, diskWithNoTarget, checkedDisk)
+}
+
 func TestShouldFailParsingDiskWithBadPartition_Disk(t *testing.T) {
 	var checkedDisk Disk
 	invalidDisk := validDisk
@@ -102,7 +114,7 @@ func TestShouldFailParsingInvalidDisk_Disk(t *testing.T) {
 	assert.Equal(t, "failed to parse [Disk]: failed to parse [PartitionTableType]: invalid value for PartitionTableType (not_a_partition_type)", err.Error())
 }
 
-func TestShouldFailPartitionsOverlapping(t *testing.T) {
+func TestShouldFailPartitionsOverlapping_Disk(t *testing.T) {
 	var checkedDisk Disk
 	invalidDisk := validDisk
 
@@ -135,12 +147,13 @@ func TestShouldFailPartitionsOverlapping(t *testing.T) {
 	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: a [Partition] with an end location 514 overlaps with a [Partition] with a start location 512", err.Error())
 }
 
-func TestShouldFailMaxSizeInsufficient(t *testing.T) {
+func TestShouldFailMaxSizeInsufficient_Disk(t *testing.T) {
 	var checkedDisk Disk
 	invalidDisk := validDisk
 
 	invalidDisk.MaxSize = uint64(512)
 	invalidDisk.TargetDisk.Type = ""
+	invalidDisk.TargetDisk.Value = ""
 	err := invalidDisk.IsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024.", err.Error())
@@ -149,4 +162,20 @@ func TestShouldFailMaxSizeInsufficient(t *testing.T) {
 	err = remarshalJSON(invalidDisk, &checkedDisk)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024.", err.Error())
+}
+
+func TestShouldFailInvalidTargetDisk_Disk(t *testing.T) {
+	var checkedDisk Disk
+	invalidDisk := validDisk
+
+	invalidDisk.MaxSize = uint64(512)
+	invalidDisk.TargetDisk.Type = "path"
+	invalidDisk.TargetDisk.Value = ""
+	err := invalidDisk.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [TargetDisk]: Value must be specified for TargetDiskType of 'path'", err.Error())
+
+	err = remarshalJSON(invalidDisk, &checkedDisk)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Disk]: failed to parse [TargetDisk]: invalid [TargetDisk]: Value must be specified for TargetDiskType of 'path'", err.Error())
 }

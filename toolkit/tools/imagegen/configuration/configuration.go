@@ -33,13 +33,6 @@ type RawBinary struct {
 	Seek      uint64 `json:"Seek"`
 }
 
-// TargetDisk [kickstart-only] defines the physical disk, to which
-// Mariner should be installed.
-type TargetDisk struct {
-	Type  string `json:"Type"`
-	Value string `json:"Value"`
-}
-
 // InstallScript defines a script to be run before or after other installation
 // steps and provides a way to pass parameters to it.
 type InstallScript struct {
