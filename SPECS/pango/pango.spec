@@ -67,7 +67,7 @@ make -k check
 
 %changelog
 *   Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> 1.40.4-6
--   Bump release number due to harfbuzz upgrade.
+-   Bump release number due to harfbuzz upgrade to fix CVE-2023-25193.
 *   Fri Dec 04 2020 Andrew Phelps <anphel@microsoft.com> 1.40.4-5
 -   Skip test-layout test.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.40.4-4

@@ -763,7 +763,7 @@ fi
 
 %changelog
 * Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 5.12.11-3
-- Bump release number due to harfbuzz upgrade.
+- Bump release number due to harfbuzz upgrade to fix CVE-2023-25193.
 
 * Mon Aug 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.11-2
 - Fix version number in Qt5.pc
