@@ -74,11 +74,11 @@ This contains protobuf python3 libraries.
 %package -n     java-%{name}
 Summary:        protobuf java lib
 Group:          Development/Libraries
-Requires:       %{name} = %{version}-%{release}
 BuildRequires:  chkconfig
-BuildRequires:  msopenjdk-11
 BuildRequires:  maven
 BuildRequires:  msopenjdk-11
+Requires:       msopenjdk-11
+Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-java = %{version}-%{release}
 
 %description -n java-%{name}
@@ -94,7 +94,7 @@ popd
 
 %build
 %configure --disable-silent-rules
-export JAVA_HOME=$(find /usr/lib/jvm -name "OpenJDK*")
+export JAVA_HOME=$(find %{_lib}/jvm -name "openjdk*")
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 %make_build
 
