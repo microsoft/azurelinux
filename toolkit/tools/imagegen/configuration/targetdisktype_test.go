@@ -38,39 +38,39 @@ func TestShouldSucceedValidTargetDiskTypesMatch_TargetDiskType(t *testing.T) {
 
 func TestShouldSucceedParsingValidPolicies_TargetDiskType(t *testing.T) {
 	for _, validPolicy := range validTargetDiskTypes {
-		var checkedPolicy TargetDiskType
+		var checkedTargetDiskTyp TargetDiskType
 
 		assert.NoError(t, validPolicy.IsValid())
-		err := remarshalJSON(validPolicy, &checkedPolicy)
+		err := remarshalJSON(validPolicy, &checkedTargetDiskTyp)
 		assert.NoError(t, err)
-		assert.Equal(t, validPolicy, checkedPolicy)
+		assert.Equal(t, validPolicy, checkedTargetDiskTyp)
 	}
 }
 
 func TestShouldFailParsingInvalidPolicy_TargetDiskType(t *testing.T) {
-	var checkedPolicy TargetDiskType
+	var checkedTargetDiskTyp TargetDiskType
 
 	err := invalidTargetDiskType.IsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for TargetDiskType (not_a_disk_type)", err.Error())
 
-	err = remarshalJSON(invalidTargetDiskType, &checkedPolicy)
+	err = remarshalJSON(invalidTargetDiskType, &checkedTargetDiskTyp)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [TargetDiskType]: invalid value for TargetDiskType (not_a_disk_type)", err.Error())
 }
 
 func TestShouldSucceedParsingValidJSON_TargetDiskType(t *testing.T) {
-	var checkedPolicy TargetDiskType
+	var checkedTargetDiskTyp TargetDiskType
 
-	err := marshalJSONString(validTargetDiskTypeJSON, &checkedPolicy)
+	err := marshalJSONString(validTargetDiskTypeJSON, &checkedTargetDiskTyp)
 	assert.NoError(t, err)
-	assert.Equal(t, validTargetDiskTypes[0], checkedPolicy)
+	assert.Equal(t, validTargetDiskTypes[0], checkedTargetDiskTyp)
 }
 
 func TestShouldFailParsingInvalidJSON_TargetDiskType(t *testing.T) {
-	var checkedPolicy TargetDiskType
+	var checkedTargetDiskTyp TargetDiskType
 
-	err := marshalJSONString(invalidTargetDiskTypeJSON, &checkedPolicy)
+	err := marshalJSONString(invalidTargetDiskTypeJSON, &checkedTargetDiskTyp)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [TargetDiskType]: json: cannot unmarshal number into Go value of type configuration.IntermediateTypeTargetDiskType", err.Error())
 }
