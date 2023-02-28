@@ -32,7 +32,7 @@ Requires:       python3
 Werkzeug started as simple collection of various utilities for WSGI applications and has become one of the most advanced WSGI utility modules. It includes a powerful debugger, full featured request and response objects, HTTP utilities to handle entity tags, cache control headers, HTTP dates, cookie handling, file uploads, a powerful URL routing system and a bunch of community contributed addon modules.
 
 %prep
-%autosetup -n werkzeug-%{version}
+%autosetup -n werkzeug-%{version} -p1
 
 %build
 %py3_build
