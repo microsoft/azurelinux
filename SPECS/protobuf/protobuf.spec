@@ -77,8 +77,8 @@ Group:          Development/Libraries
 BuildRequires:  chkconfig
 BuildRequires:  maven
 BuildRequires:  msopenjdk-11
-Requires:       msopenjdk-11
 Requires:       %{name} = %{version}-%{release}
+Requires:       msopenjdk-11
 Provides:       %{name}-java = %{version}-%{release}
 
 %description -n java-%{name}
