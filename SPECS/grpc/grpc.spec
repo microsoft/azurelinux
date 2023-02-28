@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.42.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,6 @@ Requires:       protobuf
 Requires:       zlib
 
 # Python
-%ifarch x86_64
 BuildRequires:      build-essential
 BuildRequires:      python3-devel
 BuildRequires:      python3-Cython
@@ -34,7 +33,7 @@ BuildRequires:      python3-six
 BuildRequires:      python3-wheel
 BuildRequires:      python3-setuptools
 BuildRequires:      python3-protobuf
-%endif
+
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -93,26 +92,23 @@ pushd cmake/build
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %cmake_build 
 popd
-#python
-%ifarch x86_64
-   export GRPC_PYTHON_BUILD_WITH_CYTHON=True
-   export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
-   export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
-   export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
-   export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
-   export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-   %py3_build
-%endif
+
 
 %install
 pushd cmake/build
 %cmake_install
 find %{buildroot} -name '*.cmake' -delete
 popd
+
 #python
-%ifarch x86_64
-   %py3_install
-%endif
+export GRPC_PYTHON_BUILD_WITH_CYTHON=True
+export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
+export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
+export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
+export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
+export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
+%py3_install
+
 
 %files
 %license LICENSE
@@ -144,12 +140,14 @@ popd
 
 %files -n python3-grpcio
 %license LICENSE
-%ifarch x86_64
 %{python3_sitearch}/grpc
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
-%endif
+
 
 %changelog
+* Tue Feb 28 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-4
+- Add grpcio for aarch64.
+
 * Wed Nov 09 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.42.0-3
 - Add 'python3-grpcio' subpackage using Fedora 37 spec for guidance.
 
