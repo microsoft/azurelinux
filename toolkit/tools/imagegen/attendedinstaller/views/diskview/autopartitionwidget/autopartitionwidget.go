@@ -130,7 +130,7 @@ func (ap *AutoPartitionWidget) SelectedSystemDevice() int {
 
 func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.SystemConfig, cfg *configuration.Config) {
 	const (
-		targetDiskType     = "path"
+		targetDiskType     = configuration.TargetDiskTypePath
 		partitionTableType = "gpt"
 
 		bootPartitionName     = "esp"

@@ -520,7 +520,7 @@ func (mp *ManualPartitionWidget) mustRemovePartition() {
 
 func (mp *ManualPartitionWidget) unmarshalPartitionTable() (err error) {
 	const (
-		targetDiskType     = "path"
+		targetDiskType     = configuration.TargetDiskTypePath
 		partitionTableType = "gpt"
 
 		rootMountPoint     = "/"

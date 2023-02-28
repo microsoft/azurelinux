@@ -333,10 +333,7 @@ func setupRootFS(outputDir, installRoot string) (extraMountPoints []*safechroot.
 }
 
 func setupDisk(outputDir, diskName string, liveInstallFlag bool, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPath string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isLoopDevice bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
-	const (
-		realDiskType = "path"
-	)
-	if diskConfig.TargetDisk.Type == realDiskType {
+	if diskConfig.TargetDisk.Type == configuration.TargetDiskTypePath {
 		if liveInstallFlag {
 			diskDevPath = diskConfig.TargetDisk.Value
 			partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)

@@ -34,7 +34,7 @@ func TestShouldPassTypePath_TargetDisk(t *testing.T) {
 	var checkedTargetDisk TargetDisk
 	pathTargetDisk := validTargetDisk
 
-	pathTargetDisk.Type = "path"
+	pathTargetDisk.Type = TargetDiskTypePath
 	pathTargetDisk.Value = "/dev/sda"
 
 	err := pathTargetDisk.IsValid()
@@ -49,7 +49,7 @@ func TestShouldFailTypePathNoValue_TargetDisk(t *testing.T) {
 	var checkedTargetDisk TargetDisk
 	PathTargetDisk := validTargetDisk
 
-	PathTargetDisk.Type = "path"
+	PathTargetDisk.Type = TargetDiskTypePath
 	PathTargetDisk.Value = ""
 
 	err := PathTargetDisk.IsValid()

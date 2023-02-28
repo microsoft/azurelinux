@@ -49,11 +49,8 @@ func checkOverlappingePartitions(disk *Disk) (err error) {
 // also confirms that the MaxSize defined is large enough to accomodate all partitions. No partition should have an
 // end position that exceeds the MaxSize
 func checkMaxSizeCorrectness(disk *Disk) (err error) {
-	const (
-		realDiskType = "path"
-	)
 	//MaxSize is not relevant if target disk is specified.
-	if disk.TargetDisk.Type != realDiskType {
+	if disk.TargetDisk.Type != TargetDiskTypePath {
 		//Complain about 0 maxSize only when partitions are defined.
 		if disk.MaxSize <= 0 && len(disk.Partitions) != 0 {
 			return fmt.Errorf("a configuration without a defined target disk must have a non-zero MaxSize")

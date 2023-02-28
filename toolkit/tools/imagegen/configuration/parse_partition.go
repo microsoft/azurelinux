@@ -170,7 +170,7 @@ func processDisk(inputDiskValue string) (err error) {
 		disks[latestDiskIndex].PartitionTableType = partitionTableType
 
 		// Set TargetDisk and TargetDiskType for unattended installation
-		disks[latestDiskIndex].TargetDisk.Type = "path"
+		disks[latestDiskIndex].TargetDisk.Type = TargetDiskTypePath
 		disks[latestDiskIndex].TargetDisk.Value = diskValue
 
 		diskInfo[diskValue] = latestDiskIndex
