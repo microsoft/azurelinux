@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.105.0
-Release:        3%{?dist}
+Version:        0.105.2
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -128,6 +128,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Fri Feb 17 2023 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.105.2-1
+- Upgrade to 0.105.2 to fix CVE-2023-20032 and CVE-2023-20052
+
 * Wed Sep 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.105.0-3
 - Add pre/postun requirements on shadow-utils
 
