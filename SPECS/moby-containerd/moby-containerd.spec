@@ -4,7 +4,7 @@
 Summary:        Industry-standard container runtime
 Name:           moby-%{upstream_name}
 Version:        1.6.6+azure
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Patch0:         Makefile.patch
 Patch1:         CVE-2022-23471.patch
 Patch2:         add_ptrace_readby_tracedby_to_apparmor.patch
 Patch3:         CVE-2023-25173.patch
+Patch4:         CVE-2023-25153.patch
 
 %{?systemd_requires}
 
@@ -106,6 +107,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-9
+- Add patch to fix CVE-2023-25153
+
 * Tue Feb 28 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-8
 - Add patch to fix CVE-2023-25173
 
