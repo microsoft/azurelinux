@@ -4049,6 +4049,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "geos",
+          "version": "3.11.1",
+          "downloadUrl": "https://download.osgeo.org/geos/geos-3.11.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "geronimo-specs",
           "version": "1.2",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/geronimo-specs-1.2.tar.gz"
