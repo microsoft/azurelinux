@@ -96,11 +96,11 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		chrootLocalRpmsDir      = "/localrpms"
 		chrootLocalToolchainDir = "/toolchainrpms"
 
-		overlayWorkDirectoryRpms       = "/overlaywork/workdir_rpms"
-		overlayUpperDirectoryRpms      = "/overlaywork/upper_rpms"
-		overlayWorkDirectoryToolchain  = "/overlaywork/workdir_toolchain"
-		overlayUpperDirectoryToolchain = "/overlaywork/upper_toolchain"
 		overlaySource                  = "overlay"
+		overlayUpperDirectoryRpms      = "/overlaywork/upper_rpms"
+		overlayWorkDirectoryRpms       = "/overlaywork/workdir_rpms"
+		overlayUpperDirectoryToolchain = "/overlaywork/upper_toolchain"
+		overlayWorkDirectoryToolchain  = "/overlaywork/workdir_toolchain"
 	)
 
 	r.usePreviewRepo = usePreviewRepo
