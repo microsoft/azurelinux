@@ -94,8 +94,6 @@ for FILE in .gitmodules .gitignore .npmignore .travis.yml \*.py[co]; do
   find %{buildroot}%{_libdir}/node_modules/ -name "$FILE" -delete
 done
 
-install -m 644 -d %{buildroot}%{_datadir}/systemtap/tapset/node.stp
-
 %check
 make cctest
 
