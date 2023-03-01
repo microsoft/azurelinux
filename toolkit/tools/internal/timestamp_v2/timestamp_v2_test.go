@@ -6,6 +6,7 @@
 package timestamp_v2
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"os"
@@ -693,6 +694,7 @@ func TestAddByPath(t *testing.T) {
 	runAsserts(t, a, err)
 	c, err := StartMeasuringEventByPath(t.Name()+"/A/B/C///", 3)
 	runAsserts(t, c, err)
+	assert.Equal(t, t.Name()+"/A/B/C", c.Path())
 
 	new_a, err := GetNodeByPath(t.Name() + "/A")
 	runAsserts(t, new_a, err)
@@ -727,6 +729,7 @@ func TestAddByPathMutipleRecordings(t *testing.T) {
 	runAsserts(t, ts, err)
 
 	//Need to manually clear the locks here since we didn't end timing normally
+	FlushData()
 	unlockFileLock(StampMgr.dataFileDescriptor)
 	StampMgr = nil
 
@@ -737,6 +740,7 @@ func TestAddByPathMutipleRecordings(t *testing.T) {
 	// Intentionally don't stop /B
 
 	//Need to manually clear the locks here since we didn't end timing normally
+	FlushData()
 	unlockFileLock(StampMgr.dataFileDescriptor)
 	StampMgr = nil
 
@@ -827,6 +831,8 @@ func TestReadParallel(t *testing.T) {
 	runAsserts(t, a, err)
 	ts, err = StopMeasurement()
 	runAsserts(t, ts, err)
+
+	FlushData()
 
 	ts, err = ReadTimingData("./testout/" + t.Name() + ".json")
 	runAsserts(t, ts, err)
@@ -1059,4 +1065,53 @@ func TestWeights(t *testing.T) {
 	ts.Steps = append(ts.Steps,
 		&TimeStamp{StartTime: &now, EndTime: &future, ExpectedWeight: 2.0, Weight: 6}) // 2st step on 2nd layer is done
 	assert.Equal(t, (7.0 / 8.0), ts.Progress())
+}
+
+const expectedCSVOut = `tool,path_1,path_2,path_3,time
+A,90.000000
+A,B,66.000000
+A,C,0.000000
+A,C,D,0.000000
+A,C,D,E,0.000000
+A,C,D,E/F,44.000000
+`
+
+func TestCSV(t *testing.T) {
+	//const YYYMMDDHHMMSS = "2022"
+
+	files := []string{
+		"/home/damcilva/temp/timestamp/build_mariner_toolchain.json",
+		"/home/damcilva/temp/timestamp/chroot.json",
+		"/home/damcilva/temp/timestamp/create_toolchain_in_container.json",
+		"/home/damcilva/temp/timestamp/graph_cache.json",
+		"/home/damcilva/temp/timestamp/grapher.json",
+		"/home/damcilva/temp/timestamp/imageconfigvalidator.json",
+		"/home/damcilva/temp/timestamp/imagepkgfetcher.json",
+		"/home/damcilva/temp/timestamp/imager.json",
+		"/home/damcilva/temp/timestamp/roast.json",
+		"/home/damcilva/temp/timestamp/scheduler.json",
+		"/home/damcilva/temp/timestamp/specreader.json",
+		"/home/damcilva/temp/timestamp/srpm_packer.json",
+		"/home/damcilva/temp/timestamp/srpm_toolchain_packer.json",
+	}
+
+	ts, err := ReadTimingData("./testdata/to_csv.json")
+	runAsserts(t, ts, err)
+
+	var buf bytes.Buffer
+	ConvertToCSV([]*TimeStamp{ts}, &buf)
+
+	assert.Equal(t, expectedCSVOut, buf.String())
+
+	err = WriteToCSV([]*TimeStamp{ts}, "./testout/test.csv")
+	assert.NoError(t, err)
+
+	roots := []*TimeStamp{}
+	for _, f := range files {
+		root, err := ReadTimingData(f)
+		runAsserts(t, root, err)
+		roots = append(roots, root)
+	}
+	outName := filepath.Join(".", "test.csv")
+	WriteToCSV(roots, outName)
 }

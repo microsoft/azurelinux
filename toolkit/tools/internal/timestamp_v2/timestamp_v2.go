@@ -23,16 +23,15 @@ type TimeStamp struct {
 	EndTime *time.Time `json:"EndTime"`
 	// Calculated once completed, should be -1 if uninitialized. To the nearest 10 milliseconds
 	ElapsedSeconds float64 `json:"ElapsedSeconds"`
-
 	// Roughly how many sub-steps do we expect this step to take, and how much
 	// weight should they have.
 	// We can use this to estimate the progress bar. If its wrong just use the actual
-	// data we have as we go along.
+	// data we have as we go along. We assume the default weight per step is 1.
 	ExpectedWeight float64 `json:"ExpectedWeight"`
-	// Sub-steps. This timestamp reaches 100% when it has both a start & end time,
-	// and all the sub steps are also completed.
+	// Sub-steps. This timestamp reaches 100% when it has both a start & end time.
+	// Otherwise, progress is calculated by summing each sub steps' Progress() * Weight / ExpectedWeight
 	Steps []*TimeStamp `json:"Steps"`
-	// Maybe we can scale each sub-step somehow?
+	// How much relative weight this step has compared to others. Default is 1.0
 	Weight float64 `json:"Weight"`
 
 	parent   *TimeStamp
@@ -96,13 +95,6 @@ func (node *TimeStamp) implementInheritMeasurements() *time.Time {
 	return node.EndTime
 }
 
-// SetWeight sets a steps relative weight to a custom value rather than the default 1.0. Progress is calculated based on the sum of all sub-steps' weights.
-func (node *TimeStamp) SetWeight(weight float64) {
-	if weight > 0 {
-		node.Weight = weight
-	}
-}
-
 // InheritMeasurements is the opposite of FinishAllMeasurements(). Each step will inherit the longest end time from the
 // substeps nested at it.
 func (node *TimeStamp) InheritMeasurements() (err error) {
@@ -111,6 +103,13 @@ func (node *TimeStamp) InheritMeasurements() (err error) {
 		err = fmt.Errorf("could not inherit time, no substeps are completed")
 	}
 	return
+}
+
+// SetWeight sets a steps relative weight to a custom value rather than the default 1.0. Progress is calculated based on the sum of all sub-steps' weights.
+func (node *TimeStamp) SetWeight(weight float64) {
+	if weight > 0 {
+		node.Weight = weight
+	}
 }
 
 // FinishAllMeasurements will recursively scan the timing data tree starting from `node` and ensure that all child nodes
@@ -144,6 +143,15 @@ func (t *TimeStamp) searchSubSteps(name string) (match *TimeStamp) {
 	return nil
 }
 
+// restoreNode recursively re-establishes the parent/child links for nodes read from disk and checks if they have been completed
+func (ts *TimeStamp) restoreNode() {
+	ts.finished = ts.StartTime != nil && ts.EndTime != nil
+	for _, child := range ts.Steps {
+		child.parent = ts
+		child.restoreNode()
+	}
+}
+
 func (t *TimeStamp) Path() string {
 	path := t.Name
 	node := t
@@ -168,8 +176,9 @@ func (t *TimeStamp) Progress() float64 {
 
 	totalWeight := 0.0
 	for _, step := range t.Steps {
-		totalWeight += step.Weight
-		progress += step.Progress() * step.Weight
+		weight := math.Max(step.Weight, 0.0)
+		totalWeight += weight
+		progress += step.Progress() * weight
 	}
 
 	totalWeight = math.Max(totalWeight, t.ExpectedWeight)

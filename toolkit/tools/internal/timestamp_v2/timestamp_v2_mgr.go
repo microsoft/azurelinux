@@ -48,7 +48,8 @@ var (
 )
 
 const (
-	blockTimeMilliseconds = 250 // Maximum time to wait for a contested file
+	blockTimeMilliseconds     = 250  // Maximum time to wait for a contested file
+	writeCooldownMilliseconds = 1000 // How often to write data back to file
 )
 
 // A TimeStampManager tracks an active set of timing measurements, allowing nested sub-steps to be added easily. The root of the timing tree
@@ -60,6 +61,8 @@ type TimeStampManager struct {
 	dataFileDescriptor *os.File   // Used to coordinate access to the file via flock
 	lock               sync.Mutex // Mutex for controlling writes to the data from cooperating threads (cooperating threads will share a file descriptor which means they can't use flock)
 	isAtomic           bool       // This manager is operating in exclusive mode, no other manager may edit its file while it exists
+	lastUpdate         time.Time  // When was the data last writtent to file
+	shouldWrite        bool       // Should we actually write to file next time we try
 }
 
 // This code should be callable from anywhere, regardless of if a logger is configured
@@ -93,6 +96,8 @@ func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescripto
 		dataFileDescriptor: outputFileDescriptor,
 		root:               rootNode,
 		isAtomic:           atomicMode,
+		shouldWrite:        true,
+		lastUpdate:         time.Now(),
 	}
 	newMgr.activeNode = newMgr.root
 	return
@@ -119,7 +124,7 @@ func waitOnFileLock(flockFile *os.File, blockMillis int64, exclusive bool) (err 
 		if err == nil || time.Since(start).Milliseconds() > blockMillis {
 			break
 		}
-		time.Sleep(time.Millisecond * 5)
+		time.Sleep(time.Millisecond * 15)
 	}
 
 	if err != nil {
@@ -210,9 +215,23 @@ func ensureExclusiveFileLock(fd *os.File) (err error) {
 	return
 }
 
+// Checks if we should write data out to the file. Sets mgr.shouldWrite to true if so.
+// updateFile() is responsible for resetting the flag.
+func (mgr *TimeStampManager) checkWriteTimeout() bool {
+	if !mgr.shouldWrite {
+		cooldown := time.Duration(writeCooldownMilliseconds) * time.Millisecond
+		mgr.shouldWrite = mgr.lastUpdate.Add(cooldown).Before(time.Now())
+	}
+	return mgr.shouldWrite
+}
+
 func (mgr *TimeStampManager) establishWriteLocks() (err error) {
 	mgr.lock.Lock()
-	return ensureExclusiveFileLock(mgr.dataFileDescriptor)
+	if mgr.checkWriteTimeout() {
+		return ensureExclusiveFileLock(mgr.dataFileDescriptor)
+	} else {
+		return nil
+	}
 }
 
 func (mgr *TimeStampManager) releaseWriteLocks() (err error) {
@@ -226,13 +245,17 @@ func (mgr *TimeStampManager) releaseWriteLocks() (err error) {
 
 // updateFile will write the current state of the manager's timing data back to file. It expects the file to be locked prior to writing.
 func (mgr *TimeStampManager) updateFile() {
-	err := jsonutils.WriteJSONDescriptor(mgr.dataFileDescriptor, &(mgr.root))
-	if err != nil {
-		failsafeLoggerWarnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
-	}
-	mgr.dataFileDescriptor.Sync()
-	if err != nil {
-		failsafeLoggerWarnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
+	if mgr.shouldWrite {
+		err := jsonutils.WriteJSONDescriptor(mgr.dataFileDescriptor, &(mgr.root))
+		if err != nil {
+			failsafeLoggerWarnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
+		}
+		mgr.dataFileDescriptor.Sync()
+		if err != nil {
+			failsafeLoggerWarnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
+		}
+		mgr.lastUpdate = time.Now()
+		mgr.shouldWrite = false
 	}
 }
 
@@ -279,15 +302,6 @@ func BeginTiming(toolName, outputFile string, expectedWeight float64, atomicOper
 		return &TimeStamp{}, fmt.Errorf("could not begin timing: %w", err)
 	}
 	return StampMgr.activeNode, err
-}
-
-// restoreNode recursively re-establishes the parent/child links for nodes read from disk and checks if they have been completed
-func (ts *TimeStamp) restoreNode() {
-	ts.finished = ts.StartTime != nil && ts.EndTime != nil
-	for _, child := range ts.Steps {
-		child.parent = ts
-		child.restoreNode()
-	}
 }
 
 // ResumeTiming will begin appending timing data for a high level component 'toolName' into the file at `outputFile`.
@@ -396,6 +410,7 @@ func ReadTimingData(existingTimingFile string) (node *TimeStamp, err error) {
 		failsafeLoggerWarnf(err.Error())
 		return &TimeStamp{}, err
 	}
+	existingroot.restoreNode()
 	return &existingroot, nil
 }
 
@@ -407,6 +422,9 @@ func EndTiming() (err error) {
 	if err = ensureExistsManager(); err != nil {
 		return err
 	}
+
+	// We are tearing down, flus any data now
+	StampMgr.shouldWrite = true
 
 	// Will manually tear down locks at the end of this function
 	StampMgr.establishWriteLocks()
@@ -644,6 +662,8 @@ func FlushData() (err error) {
 	if err := ensureExistsManager(); err != nil {
 		return err
 	}
+
+	StampMgr.shouldWrite = true
 
 	if err = StampMgr.establishWriteLocks(); err != nil {
 		return fmt.Errorf("failed FlushData: %w", err)
