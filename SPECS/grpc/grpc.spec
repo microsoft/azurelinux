@@ -93,7 +93,7 @@ pushd cmake/build
 %cmake_build 
 popd
 #uncommenting below line causes the whole build to get stuck in aarch64 machine 
-##%py3_build
+#py3_build
 
 %install
 pushd cmake/build
@@ -109,7 +109,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
 export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
 export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 #uncommenting below line causes the whole build to get stuck in aarch64 machine 
-##%py3_install
+#py3_install
 #using macros causes build to get stuck forever
 %{__python3} setup.py install -O1 --root %{buildroot}
 
