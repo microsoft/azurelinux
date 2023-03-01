@@ -61,7 +61,7 @@ extends:
 
         steps:
         - bash: |
-            pipelines/common/utilities/Configure-1ES.sh
+            pipelines/common/scripts/Configure-1ES.sh
           displayName: 'Install 1ES host machine applications'
 
         - bash: |
@@ -105,9 +105,38 @@ extends:
       jobs:
       - job:
         steps:
-        - bash: |
-            sleep 1
-          displayName: 'Signing placeholder'
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download livepatch RPM'
+          inputs:
+            source: current
+            artifact: 'build-artifacts'
+            patterns: '**/rpms.tar.gz'
+            path: '$(System.ArtifactsDirectory)'
+
+        - task: Bash@3
+          displayName: 'Extract livepatch module'
+          inputs:
+            filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/ExtractLivepatchModule.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"'
+
+        # - task: DownloadsecureFile@1
+        #   name: esrpAuthCert
+        #   displayName: 'Download ESRP certificate'
+        #   inputs:
+        #     secureFile: 'MarinerSecureBootProductionSigningCUDA.pfx'
+
+        # - task: Bash@3
+        #   displayName: 'Sign OOT kernel modules'
+        #   inputs:
+        #     filePath: '$(Build.SourcesDirectory)/.pipelines/SecureBoot-SignOOTModules.sh'
+        #     arguments: '-s $(ob_outputDirectory)/$(secureBootArtifactsFolder)/$(signingSubfolderFolder)'
+        #   env:
+        #     AAD_CLIENT_ID: "27560572-01df-4c91-89a0-422a57db3c0a"
+        #     AAD_AUTH_CLIENT_SECRET: $(ESRP_OOT_PRODAPP_PAT)
+        #     AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+        #     ESRP_AUTH_CERT_PATH: $(esrpAuthCert.secureFilePath)
+        #     ESRP_CERT_PWD: $(ESRP_CERT_TOKEN)
+        #     KEY_CODE: $(SECUREBOOT_KEYCODE)
 
     - stage: Test
       jobs:

@@ -4,8 +4,8 @@ set -e
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 
-# shellcheck source=../common/utilities/build_tools.sh
-source "$ROOT_DIR/pipelines/common/utilities/build_tools.sh"
+# shellcheck source=../common/libs/build_tools.sh
+source "$ROOT_DIR/pipelines/common/libs/build_tools.sh"
 
 build_package() {
     local package_name

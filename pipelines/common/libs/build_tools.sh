@@ -1,4 +1,5 @@
-#!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 hydrate_cache() {
     local make_status
