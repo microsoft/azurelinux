@@ -37,17 +37,17 @@ func TestShouldSucceedValidTargetDiskTypesMatch_TargetDiskType(t *testing.T) {
 }
 
 func TestShouldSucceedParsingValidPolicies_TargetDiskType(t *testing.T) {
-	for _, validPolicy := range validTargetDiskTypes {
+	for _, validTargetDiskType := range validTargetDiskTypes {
 		var checkedTargetDiskTyp TargetDiskType
 
-		assert.NoError(t, validPolicy.IsValid())
-		err := remarshalJSON(validPolicy, &checkedTargetDiskTyp)
+		assert.NoError(t, validTargetDiskType.IsValid())
+		err := remarshalJSON(validTargetDiskType, &checkedTargetDiskTyp)
 		assert.NoError(t, err)
-		assert.Equal(t, validPolicy, checkedTargetDiskTyp)
+		assert.Equal(t, validTargetDiskType, checkedTargetDiskTyp)
 	}
 }
 
-func TestShouldFailParsingInvalidPolicy_TargetDiskType(t *testing.T) {
+func TestShouldFailParsingInvalidTargetDiskType_TargetDiskType(t *testing.T) {
 	var checkedTargetDiskTyp TargetDiskType
 
 	err := invalidTargetDiskType.IsValid()
