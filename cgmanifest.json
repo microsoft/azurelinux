@@ -12863,8 +12863,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.12",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.12.tar.gz"
+          "version": "1.6.19",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.19.tar.gz"
         }
       }
     },
