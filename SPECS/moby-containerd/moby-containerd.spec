@@ -16,7 +16,6 @@ Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{
 Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
-Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
 
 %{?systemd_requires}
 
