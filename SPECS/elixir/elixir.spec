@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://elixir-lang.org
 Source0:        https://github.com/elixir-lang/elixir/archive/v%{version}/elixir-%{version}.tar.gz
-BuildRequires:  elixir
+BuildRequires:  erlang
 BuildRequires:  glibc-lang
 
 %description
