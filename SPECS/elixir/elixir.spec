@@ -22,12 +22,16 @@ export LANG="en_US.UTF-8"
 make
 
 %install
-%make_install
+%make_install PREFIX=/usr
 
 %post
 
 %files
-
+%license LICENSE
+%{_bindir}/elixir
+%{_bindir}/elixirrc
+%{_bindir}/iex
+%{_bindir}/mix
 
 %changelog
 * Mon Feb 27 2023 Sam Meluch <sammeluch@microsoft.com> - 1.14.3-1
