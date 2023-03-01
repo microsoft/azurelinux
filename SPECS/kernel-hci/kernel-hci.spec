@@ -9,7 +9,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.94.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,11 @@ Patch17:        0018-net-mlx5-Bridge-pop-VLAN-on-egress-table-miss.patch
 Patch18:        0019-net-mlx5-Bridge-provide-flow-source-hints.patch
 Patch19:        0020-net-mlx5-Bridge-extract-code-to-lookup-and-del-notif.patch
 Patch20:        0021-net-mlx5-Bridge-support-replacing-existing-FDB-entry.patch
+Patch21:        0022-net-mlx5-Bridge-refactor-groups-sizes-and-indices.patch
+Patch22:        0023-net-mlx5-Bridge-rename-filter-fg-to-vlan_filter.patch
+Patch23:        0024-net-mlx5-Bridge-extract-VLAN-push-pop-actions-creati.patch
+Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
+Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -175,6 +180,11 @@ manipulation of eBPF programs and maps.
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
 
 make mrproper
 
@@ -408,6 +418,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Feb 27 2023 Vince Perri <viperri@microsoft.com> - 5.15.94.1-2
+- Add net/mlx5 patches (patches 21-25) for QinQ support
+
 * Wed Feb 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.94.1-1
 - Auto-upgrade to 5.15.94.1
 
