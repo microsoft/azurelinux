@@ -105,11 +105,23 @@ extends:
       jobs:
       - job:
         steps:
+        # - task: DownloadPipelineArtifact@2
+        #   displayName: 'Download livepatch RPM'
+        #   inputs:
+        #     source: current
+        #     artifact: 'build-artifacts'
+        #     patterns: '**/rpms.tar.gz'
+        #     path: '$(System.ArtifactsDirectory)'
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download livepatch RPM'
+          displayName: '[TEST] Download livepatch RPM'
           inputs:
-            source: current
-            artifact: 'build-artifacts'
+            source: specific
+            project: 'mariner'
+            pipeline: 1141
+            runVersion: specific
+            runId: 318883
+            tags: '$(downloadTags)'
+            artifact: $(buildArtifactsFolder)
             patterns: '**/rpms.tar.gz'
             path: '$(System.ArtifactsDirectory)'
 
