@@ -109,6 +109,10 @@ export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
 export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 %py3_install
 
+#hacky way to make the python3-grpcio to build 
+grpc_location=$(find  %{buildroot}%{python3_sitearch}/ -name "grpcio-*" | head -n 1)
+install  %{grpc_location}/grpc                             %{grpc_location}/grpc
+install  %{grpc_location}/EGG-INFO                         %{grpc_location}/grpc-%{version}-py%{python3_version}.egg-info
 
 %files
 %license LICENSE
