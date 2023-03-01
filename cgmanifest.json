@@ -6917,7 +6917,7 @@
         "other": {
           "name": "qt5-qtbase",
           "version": "5.12.11",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.11/submodules/qtbase-everywhere-src-5.12.11.tar.xz"
+          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtbase-everywhere-src-5.12.11.tar.xz"
         }
       }
     },

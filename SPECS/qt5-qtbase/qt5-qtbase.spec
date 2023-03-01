@@ -49,7 +49,7 @@ Vendor:       Microsoft Corporation
 Distribution: Mariner
 URL:          https://qt-project.org/
 %global       majmin %(echo %{version} | cut -d. -f1-2)
-Source0:      https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0:      https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 BuildRequires: build-essential
 BuildRequires: systemd
@@ -764,6 +764,7 @@ fi
 %changelog
 * Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 5.12.11-3
 - Bump release number due to harfbuzz upgrade to fix CVE-2023-25193.
+- Update Source0 URL.
 
 * Mon Aug 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.11-2
 - Fix version number in Qt5.pc
