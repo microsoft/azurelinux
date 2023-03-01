@@ -29,7 +29,7 @@ make
 %files
 %license LICENSE
 %{_bindir}/elixir
-%{_bindir}/elixirrc
+%{_bindir}/elixirc
 %{_bindir}/iex
 %{_bindir}/mix
 
