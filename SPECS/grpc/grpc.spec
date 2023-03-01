@@ -107,7 +107,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
 export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
 export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
 export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-%py3_install
+%{__python3} setup.py install
 
 #hacky way to make the python3-grpcio to build 
 grpc_location=$(find  %{buildroot}%{python3_sitearch}/ -name "grpcio-*" | head -n 1)
