@@ -1,0 +1,48 @@
+{
+    "Name": "A",
+    "ExpectedWeight": 3.0,
+    "ElapsedSeconds": 200,
+    "Steps": [
+        {
+            "Name": "B",
+            "ExpectedWeight": 3.0,
+            "ElapsedSeconds": 11
+        },
+        {
+            "Name": "C",
+            "ExpectedWeight": 3.0,
+            "ElapsedSeconds": 44,
+            "Steps": [
+                {
+                    "Name": "D",
+                    "ExpectedWeight": 3.0,
+                    "ElapsedSeconds": 44,
+                    "Steps": [
+                        {
+                            "Name": "E",
+                            "ExpectedWeight": 3.0,
+                            "ElapsedSeconds": 44,
+                            "Steps": [
+                                {
+                                    "Name": "F",
+                                    "ExpectedWeight": 3.0,
+                                    "ElapsedSeconds": 44
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Name": "B",
+            "ExpectedWeight": 3.0,
+            "ElapsedSeconds": 22
+        },{
+            "Name": "B",
+            "ExpectedWeight": 3.0,
+            "ElapsedSeconds": 33
+        }
+        
+    ]
+}

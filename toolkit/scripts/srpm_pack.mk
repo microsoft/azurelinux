@@ -111,6 +111,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--pack-list=$(toolchain_spec_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
-		--log-level=$(LOG_LEVEL) && \
+		--log-level=$(LOG_LEVEL) \
+		--timestamp-file=$(TIMESTAMP_DIR)/srpm_toolchain_packer.json && \
 	touch $@
 endif

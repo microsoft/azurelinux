@@ -39,8 +39,6 @@ import (
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"golang.org/x/sys/unix"
 )
 
 var (
@@ -48,7 +46,6 @@ var (
 )
 
 const (
-	blockTimeMilliseconds     = 250  // Maximum time to wait for a contested file
 	writeCooldownMilliseconds = 1000 // How often to write data back to file
 )
 
@@ -63,27 +60,6 @@ type TimeStampManager struct {
 	isAtomic           bool       // This manager is operating in exclusive mode, no other manager may edit its file while it exists
 	lastUpdate         time.Time  // When was the data last writtent to file
 	shouldWrite        bool       // Should we actually write to file next time we try
-}
-
-// This code should be callable from anywhere, regardless of if a logger is configured
-func failsafeLoggerErrorf(format string, args ...interface{}) {
-	if logger.Log != nil {
-		logger.Log.Errorf(format, args...)
-	}
-}
-
-// This code should be callable from anywhere, regardless of if a logger is configured
-func failsafeLoggerWarnf(format string, args ...interface{}) {
-	if logger.Log != nil {
-		logger.Log.Errorf(format, args...)
-	}
-}
-
-// This code should be callable from anywhere, regardless of if a logger is configured
-func failsafeLoggerTracef(format string, args ...interface{}) {
-	if logger.Log != nil {
-		logger.Log.Tracef(format, args...)
-	}
 }
 
 // newStampMgr creates a new instance of the global stamp manager object with a root timing node `rootNode`. The root node may
@@ -103,93 +79,6 @@ func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescripto
 	return
 }
 
-// waitOnFileLock will synchronize access to the file `fileToLock` across processes/threads, blocking for at most `blockMillis` milliseconds.
-// The lock may be acquired in either shared or exclusive mode. Multiple callers may hold the lock in shared mode.
-// Each file descriptor may only be locked once, this is used to coordinate multiple readers/writers across independent threads.
-func waitOnFileLock(flockFile *os.File, blockMillis int64, exclusive bool) (err error) {
-	lockMode := unix.LOCK_NB
-	if exclusive {
-		lockMode |= unix.LOCK_EX
-	} else {
-		lockMode |= unix.LOCK_SH
-	}
-	if flockFile == nil {
-		err = fmt.Errorf("failed to open timing data lock on nil file descriptor")
-		return
-	}
-
-	start := time.Now()
-	for {
-		err = unix.Flock(int(flockFile.Fd()), lockMode)
-		if err == nil || time.Since(start).Milliseconds() > blockMillis {
-			break
-		}
-		time.Sleep(time.Millisecond * 15)
-	}
-
-	if err != nil {
-		err = fmt.Errorf("failed to secure timing data lock after %d milliseconds- %w", blockMillis, err)
-	} else {
-		if exclusive {
-			failsafeLoggerTracef("waitOnFileLock: LOCK EXCLUSIVE\n")
-		} else {
-			failsafeLoggerTracef("waitOnFileLock: LOCK SHARED\n")
-		}
-	}
-
-	return
-}
-
-// unlockFileLock will set the lock to shared
-func relaxToSharedLock(flockFile *os.File) (err error) {
-	err = unix.Flock(int(flockFile.Fd()), unix.LOCK_SH)
-	if err != nil {
-		failsafeLoggerErrorf("failed to relax timing data lock - %s", err.Error())
-	} else {
-		failsafeLoggerTracef("relaxToSharedLock: RELAX TO SHARED\n")
-	}
-	return
-}
-
-// unlockFileLock will release the synchronization lock around a file.
-func unlockFileLock(flockFile *os.File) (err error) {
-	lockMode := unix.LOCK_UN
-
-	err = unix.Flock(int(flockFile.Fd()), lockMode)
-	if err != nil {
-		failsafeLoggerErrorf("failed to release timing data lock - %s", err.Error())
-	} else {
-		failsafeLoggerTracef("unlockFileLock: RELEASE")
-	}
-	return
-}
-
-// pathSearchInternal checks if a node exists based  on a path like '/Path/To/Time Stamp'.
-// The manager lock MUST be held when running this code.
-func pathSearchInternal(path string) (node *TimeStamp) {
-	path = strings.Trim(path, pathSeparator)
-	pathComponents := strings.Split(path, pathSeparator)
-	// Check the root first
-	cur := StampMgr.root
-	node = nil
-	if pathComponents[0] == cur.Name {
-		// Now loop through the tree and see if we can find a node
-		for _, pathComponent := range pathComponents[1:] {
-			// Convert A/B////C into A/B/C by skipping empty steps
-			if pathComponent == "" {
-				continue
-			}
-			cur = cur.searchSubSteps(pathComponent)
-			if cur == nil {
-				break
-			}
-		}
-
-		node = cur
-	}
-	return
-}
-
 func ensureNoManager() (err error) {
 	if StampMgr != nil {
 		err = fmt.Errorf("already recording timing data for a tool into file (%s)", StampMgr.dataFilePath)
@@ -206,37 +95,30 @@ func ensureExistsManager() (err error) {
 	return
 }
 
-func ensureExclusiveFileLock(fd *os.File) (err error) {
-	err = waitOnFileLock(fd, blockTimeMilliseconds, true)
-	if err != nil {
-		err = fmt.Errorf("can't lock timestamp file: %w", err)
-		failsafeLoggerWarnf(err.Error())
-	}
-	return
-}
+// establishWriteLocks checks if a write should be performed, and locks the file if so
+func (mgr *TimeStampManager) establishWriteLocks() (err error) {
+	mgr.lock.Lock()
 
-// Checks if we should write data out to the file. Sets mgr.shouldWrite to true if so.
-// updateFile() is responsible for resetting the flag.
-func (mgr *TimeStampManager) checkWriteTimeout() bool {
+	// Check if we should attempt to write to disk now. updateFile() will reset this flag after
+	// a successful write.
 	if !mgr.shouldWrite {
 		cooldown := time.Duration(writeCooldownMilliseconds) * time.Millisecond
 		mgr.shouldWrite = mgr.lastUpdate.Add(cooldown).Before(time.Now())
 	}
-	return mgr.shouldWrite
-}
 
-func (mgr *TimeStampManager) establishWriteLocks() (err error) {
-	mgr.lock.Lock()
-	if mgr.checkWriteTimeout() {
-		return ensureExclusiveFileLock(mgr.dataFileDescriptor)
+	if mgr.shouldWrite {
+		return ensureExclusiveFileLockOnFile(mgr.dataFileDescriptor)
 	} else {
 		return nil
 	}
 }
 
+// releaseWriteLocks resets the write lock back to normal. If the manager is in atomic mode it will maintain exclusive rights to the lock.
 func (mgr *TimeStampManager) releaseWriteLocks() (err error) {
 	// If we are in atomic mode we will never release the file lock until the manager is torn down or the thread ends
 	if !StampMgr.isAtomic {
+		// Make sure we never try to write to disk without the lock established.
+		mgr.shouldWrite = false
 		err = relaxToSharedLock(StampMgr.dataFileDescriptor)
 	}
 	mgr.lock.Unlock()
@@ -244,7 +126,10 @@ func (mgr *TimeStampManager) releaseWriteLocks() (err error) {
 }
 
 // updateFile will write the current state of the manager's timing data back to file. It expects the file to be locked prior to writing.
+// The write may be skipped based on writeCooldownMilliseconds.
+// Use FlushData() to explicitly write data back to disk immediately.
 func (mgr *TimeStampManager) updateFile() {
+	// mgr.shouldWrite is controlled by establishWriteLocks()
 	if mgr.shouldWrite {
 		err := jsonutils.WriteJSONDescriptor(mgr.dataFileDescriptor, &(mgr.root))
 		if err != nil {
@@ -261,7 +146,7 @@ func (mgr *TimeStampManager) updateFile() {
 
 // BeginTiming will begin collecting fresh timing data for a high level component 'toolName' into the file at `outputFile`.
 // This function synchronizes with ReadTimingData(), ResumeTiming(), EndTiming() to ensure there is no data partially
-// written to the file. Expected steps is used to inform the dashboarding tools how many substeps the root node is expecting to have.
+// written to the file. Expected weight is used to inform the dashboarding tools how many substeps the root node is expecting to have.
 // The function will NEVER return a nil TimeStamp pointer, in event of an error it will return an empty timestamp object instead.
 func BeginTiming(toolName, outputFile string, expectedWeight float64, atomicOperation bool) (node *TimeStamp, err error) {
 	if err = ensureNoManager(); err != nil {
@@ -278,7 +163,7 @@ func BeginTiming(toolName, outputFile string, expectedWeight float64, atomicOper
 	// We will not close the file handle here unless there is an error, we will use it for synchronization going forwards.
 
 	// We will keep a shared lock on this file until we are done with timing. Grab in exclusive mode for now while we initialize the file
-	if err = ensureExclusiveFileLock(outFileDescriptor); err != nil {
+	if err = ensureExclusiveFileLockOnFile(outFileDescriptor); err != nil {
 		outFileDescriptor.Close()
 		return &TimeStamp{}, err
 	}
@@ -329,7 +214,7 @@ func ResumeTiming(toolName, existingTimingFile string, createIfMissing bool, ato
 	}
 	// We will not close the file handle here unless there is an error, we will use it for synchronization going forwards.
 
-	if err = ensureExclusiveFileLock(outFileDescriptor); err != nil {
+	if err = ensureExclusiveFileLockOnFile(outFileDescriptor); err != nil {
 		outFileDescriptor.Close()
 		return &TimeStamp{}, err
 	}
@@ -617,6 +502,32 @@ func StopMeasurementSpecific(currentNode *TimeStamp) (node *TimeStamp, err error
 	}
 	StampMgr.updateFile()
 	return StampMgr.activeNode, err
+}
+
+// pathSearchInternal checks if a node exists based  on a path like '/Path/To/Time Stamp'.
+// The manager lock should be held when running this code.
+func pathSearchInternal(path string) (node *TimeStamp) {
+	path = strings.Trim(path, pathSeparator)
+	pathComponents := strings.Split(path, pathSeparator)
+	// Check the root first
+	cur := StampMgr.root
+	node = nil
+	if pathComponents[0] == cur.Name {
+		// Now loop through the tree and see if we can find a node
+		for _, pathComponent := range pathComponents[1:] {
+			// Convert A/B////C into A/B/C by skipping empty steps
+			if pathComponent == "" {
+				continue
+			}
+			cur = cur.searchSubSteps(pathComponent)
+			if cur == nil {
+				break
+			}
+		}
+
+		node = cur
+	}
+	return
 }
 
 // StopMeasurementByPath behaves similarly to StopMeasurement() except instead of completing the currently active node,

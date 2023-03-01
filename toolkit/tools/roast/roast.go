@@ -163,7 +163,7 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 
 	close(convertRequests)
 
-	timestamp_v2.StopMeasurementSpecific(artifactTimeStampRoot)
+	timestamp_v2.StopMeasurementSpecific(artifactTimeStampRoot) // convert artifacts
 
 	failedArtifacts := []string{}
 	for i := 0; i < numberOfArtifacts; i++ {

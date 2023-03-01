@@ -379,7 +379,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
 // - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
 func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
-	timestamp_v2.StartMeasuringEvent("populating install root", 3)
+	timestamp_v2.StartMeasuringEvent("populating install root", 4)
 	defer timestamp_v2.StopMeasurement()
 	const (
 		filesystemPkg = "filesystem"
@@ -455,7 +455,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 			return
 		}
 	}
-	timestamp_v2.StopMeasurement()
+
+	timestamp_v2.StopMeasurement() // installing packages
+	timestamp_v2.StartMeasuringEvent("final image configuration", 0)
 
 	// Copy additional files
 	err = copyAdditionalFiles(installChroot, config)
@@ -507,6 +509,8 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	if err != nil {
 		return
 	}
+
+	timestamp_v2.StopMeasurement() // final image configuration
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
@@ -2195,6 +2199,9 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 // - partIDToDevPathMap is a map of partition IDs to partition device paths
 // - mountPointToOverlayMap is a map of mountpoints to the overlay details for this mount if any
 func ExtractPartitionArtifacts(setupChrootDirPath, workDirPath string, diskIndex int, disk configuration.Disk, systemConfig configuration.SystemConfig, partIDToDevPathMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
+	timestamp_v2.StartMeasuringEvent("create partition artifacts", 0)
+	defer timestamp_v2.StopMeasurement()
+
 	const (
 		ext4ArtifactType  = "ext4"
 		diffArtifactType  = "diff"

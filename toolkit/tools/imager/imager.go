@@ -72,10 +72,8 @@ func main() {
 	}
 
 	// Parse Config
-	timestamp_v2.StartMeasuringEvent("load config", 1)
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
-	timestamp_v2.StopMeasurement()
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
 
@@ -95,7 +93,7 @@ func main() {
 		if err != nil {
 			logger.PanicOnError(err, "Invalid image configuration: %s", err)
 		}
-		timestamp_v2.StopMeasurement()
+		timestamp_v2.StopMeasurement() // applying kickstart
 	}
 
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
@@ -167,7 +165,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 	} else {
 		timestamp_v2.StartMeasuringEvent("creating raw disk", 1)
-		defer timestamp_v2.StopMeasurement()
+
 		diskConfig := disks[defaultDiskIndex]
 		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisk(buildDir, defaultTempDiskName, *liveInstallFlag, diskConfig, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
 		if err != nil {
@@ -199,6 +197,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 
 		logger.Log.Infof("Selected (%s) for the kernel", kernelPkg)
 		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
+		timestamp_v2.StopMeasurement() // creating raw disk
 	}
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
@@ -214,11 +213,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			logger.Log.Error("Failed to create the partition map")
 			return
 		}
-		timestamp_v2.StopMeasurement()
+		timestamp_v2.StopMeasurement() // creating delta disks
 	}
 
 	if isOfflineInstall {
-		timestamp_v2.StartMeasuringEvent("offline install", 1)
+		timestamp_v2.StartMeasuringEvent("create offline install env", 0)
 		// Create setup chroot
 		additionalExtraMountPoints := []*safechroot.MountPoint{
 			safechroot.NewMountPoint(*assets, assetsMountPoint, "", safechroot.BindMountPointFlags, ""),
@@ -242,6 +241,8 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			logger.Log.Error("Failed to copy extra files into setup chroot")
 			return
 		}
+
+		timestamp_v2.StopMeasurement() // create offline install env
 
 		err = setupChroot.Run(func() error {
 			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
@@ -275,15 +276,12 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 				}
 			}
 		}
-		timestamp_v2.StopMeasurement()
 	} else {
-		timestamp_v2.StartMeasuringEvent("online install", 0)
 		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
 		}
-		timestamp_v2.StopMeasurement()
 	}
 
 	// Cleanup encrypted disks
@@ -540,7 +538,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 			return
 		}
 	}
-	timestamp_v2.StopMeasurement()
+	timestamp_v2.StopMeasurement() // install chroot packages
 
 	// Create new chroot for the new image
 	installChroot := safechroot.NewChroot(installRoot, existingChrootDir)
@@ -596,7 +594,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 				err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
 				return
 			}
-			timestamp_v2.StopMeasurement()
+			timestamp_v2.StopMeasurement() // configure DM Verity
 		}
 	}
 

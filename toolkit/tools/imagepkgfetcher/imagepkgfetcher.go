@@ -45,9 +45,8 @@ var (
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
-
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
@@ -79,16 +78,15 @@ func main() {
 		}
 	}
 
-	timestamp_v2.StopMeasurement()
-	timestamp_v2.StartMeasuringEvent("Clone packages", 1)
+	timestamp_v2.StopMeasurement() // initialize and configure cloner
 
 	if strings.TrimSpace(*inputSummaryFile) != "" {
-		timestamp_v2.StartMeasuringEvent("Restore packages", 0)
+		timestamp_v2.StartMeasuringEvent("restore packages", 0)
 
 		// If an input summary file was provided, simply restore the cache using the file.
 		err = repoutils.RestoreClonedRepoContents(cloner, *inputSummaryFile)
 
-		timestamp_v2.StopMeasurement()
+		timestamp_v2.StopMeasurement() // restore packages
 	} else {
 		err = cloneSystemConfigs(cloner, *configFile, *baseDirPath, *externalOnly, *inputGraph)
 	}
@@ -110,7 +108,7 @@ func main() {
 		logger.PanicOnError(err, "Failed to save cloned repo contents")
 	}
 
-	timestamp_v2.StopMeasurement()
+	timestamp_v2.StopMeasurement() // finalize cloned packages
 
 }
 

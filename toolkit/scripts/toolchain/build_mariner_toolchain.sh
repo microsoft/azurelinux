@@ -23,7 +23,7 @@ MARINER_REHYDRATED_RPMS_DIR=${12}
 #  Time stamp components
 # =====================================================
 BLDTRACKER=${13}
-TIMESTAMP_DIR=${14}
+TIMESTAMP_FILE_PATH=${14}
 # =====================================================
 
 # Create toolchain subdirectory in out folder
@@ -44,7 +44,7 @@ mkdir -pv $MARINER_RPM_DIR/$(uname -m)
     "$MARINER_OUTPUT_SRPMS_DIR" \
     "$MARINER_REHYDRATED_RPMS_DIR" \
     "$BLDTRACKER" \
-    "$TIMESTAMP_DIR"
+    "$TIMESTAMP_FILE_PATH"
 
 # Output:
 # out/toolchain/built_rpms

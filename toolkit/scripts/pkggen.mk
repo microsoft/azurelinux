@@ -76,6 +76,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
+		--timestamp-file=$(TIMESTAMP_DIR)/specreader.json \
 		--output $@
 
 # Convert the dependency information in the json file into a graph structure
@@ -87,6 +88,7 @@ $(graph_file): $(specs_file) $(go-grapher)
 	$(go-grapher) \
 		--input $(specs_file) \
 		$(logging_command) \
+		--timestamp-file=$(TIMESTAMP_DIR)/grapher.json \
 		--output $@
 
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
@@ -132,6 +134,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		$(logging_command) \
 		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \
+		--timestamp-file=$(TIMESTAMP_DIR)/graph_cache.json \
 		--output=$(cached_file) && \
 	touch $@
 
@@ -205,6 +208,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
 		--reserved-file-list-file="$(TOOLCHAIN_MANIFEST)" \
+		--timestamp-file=$(TIMESTAMP_DIR)/scheduler.json \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \

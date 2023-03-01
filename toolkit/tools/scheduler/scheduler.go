@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
@@ -81,8 +82,9 @@ var (
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
@@ -90,6 +92,10 @@ func main() {
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp_v2.BeginTiming("pkg build", *timestampFile, 101, false)
+	defer timestamp_v2.EndTiming()
+
+	timestamp_v2.StartMeasuringEvent("prepare to build", 0)
 
 	if *workers <= 0 {
 		*workers = runtime.NumCPU()
@@ -166,6 +172,8 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
+	timestamp_v2.StopMeasurement() // prepare to build
+
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, reservedFiles, *deltaBuild)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
@@ -203,10 +211,15 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 		return
 	}
 
+	// Approximately 1 management + 1 idle node per package build, so take size of graph x3 for expected weight
+	rootTS, _ := timestamp_v2.StartMeasuringEvent("build graph", float64(pkgGraph.Nodes().Len()*3))
+	rootTS.SetWeight(100.0)
+	defer timestamp_v2.StopMeasurementSpecific(rootTS)
+
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
 
-	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex, ignoredPackages)
+	channels := startWorkerPool(agent, workers, buildAttempts, numberOfNodes, &graphMutex, ignoredPackages, rootTS)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
@@ -227,7 +240,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 // startWorkerPool starts the worker pool and returns the communication channels between the workers and the scheduler.
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
-func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string) (channels *schedulerChannels) {
+func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string, tsRoot *timestamp_v2.TimeStamp) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
 		Requests:         make(chan *schedulerutils.BuildRequest, channelBufferSize),
 		PriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
@@ -248,7 +261,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 	// Start the workers now so they begin working as soon as a new job is queued.
 	for i := 0; i < workers; i++ {
 		logger.Log.Debugf("Starting worker #%d", i)
-		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, ignoredPackages)
+		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, ignoredPackages, tsRoot)
 	}
 
 	return
@@ -280,6 +293,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
+		timestamp_v2.StartMeasuringEvent("management", 0)
+
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
@@ -325,8 +340,13 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			}
 		}
 
+		timestamp_v2.StopMeasurement() // management
+
 		// Process the the next build result
 		res := <-channels.Results
+
+		timestamp_v2.StartMeasuringEvent("process results", 0)
+
 		schedulerutils.PrintBuildResult(res)
 		buildState.RecordBuildResult(res)
 
@@ -384,6 +404,8 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		if res.Node.Type == pkggraph.TypeBuild {
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
 		}
+
+		timestamp_v2.StopMeasurement() // process results
 	}
 
 	// Let the workers know they are done

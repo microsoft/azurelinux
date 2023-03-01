@@ -636,10 +636,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 		default:
 		}
 
-		ts, err := timestamp_v2.StartMeasuringEventWithParent(tsRoot, filepath.Base(specState.specFile), 0)
-		if err != nil {
-			logger.Log.Errorf(err.Error())
-		}
+		ts, _ := timestamp_v2.StartMeasuringEventWithParent(tsRoot, filepath.Base(specState.specFile), 0)
 
 		result := &packResult{
 			specFile: specState.specFile,

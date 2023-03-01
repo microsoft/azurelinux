@@ -9,12 +9,16 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 )
 
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
 func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool, deltaBuild bool) (requests []*BuildRequest) {
+	timestamp_v2.StartMeasuringEvent("generate requests", 0)
+	defer timestamp_v2.StopMeasurement()
+
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 

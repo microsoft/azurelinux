@@ -268,7 +268,7 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // The cloner will mark any package that locally built by setting preBuilt = true
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
 	if timestamp_v2.StampMgr != nil {
-		timestamp_v2.StartMeasuringEvent("Cloning packages", float64(len(packagesToClone)))
+		timestamp_v2.StartMeasuringEvent("cloning packages", float64(len(packagesToClone)))
 		defer timestamp_v2.StopMeasurement()
 	}
 	for _, pkg := range packagesToClone {
@@ -309,7 +309,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		}
 
 		if timestamp_v2.StampMgr != nil {
-			timestamp_v2.StopMeasurement()
+			timestamp_v2.StopMeasurement() // pkg.Name
 		}
 	}
 

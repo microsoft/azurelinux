@@ -54,7 +54,11 @@ func cleanupFiles() {
 	if err != nil {
 		logger.Log.Panicf("Failed to tidy up timestamp tests: '%s'", err.Error())
 	}
-	for _, file := range append(files1, files2...) {
+	files3, err := filepath.Glob("./testout/*.csv")
+	if err != nil {
+		logger.Log.Panicf("Failed to tidy up timestamp tests: '%s'", err.Error())
+	}
+	for _, file := range append(files1, append(files2, files3...)...) {
 		err = os.Remove(file)
 		if err != nil {
 			logger.Log.Panicf("Failed to tidy up timestamp tests: '%s'", err.Error())

@@ -210,7 +210,7 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(SRPMS_DIR) \
 			$(toolchain_from_repos) \
 			$(go-bldtracker) \
-			$(TIMESTAMP_DIR) && \
+			$(TIMESTAMP_DIR)/build_mariner_toolchain.json && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 

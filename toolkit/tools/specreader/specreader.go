@@ -22,6 +22,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 
 	"github.com/jinzhu/copier"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -38,24 +39,28 @@ type parseResult struct {
 }
 
 var (
-	app       = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
-	specsDir  = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	output    = exe.OutputFlag(app, "Output file to export the JSON")
-	workers   = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
-	buildDir  = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
-	srpmsDir  = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
-	rpmsDir   = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
-	distTag   = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
-	runCheck  = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
+	app           = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
+	specsDir      = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	output        = exe.OutputFlag(app, "Output file to export the JSON")
+	workers       = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
+	buildDir      = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
+	srpmsDir      = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
+	rpmsDir       = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
+	distTag       = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	workerTar     = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
+	runCheck      = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	timestamp_v2.BeginTiming("specreader", *timestampFile, 1, false)
+	defer timestamp_v2.EndTiming()
 
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
@@ -180,6 +185,9 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int, runChe
 		return
 	}
 
+	tsRoot, _ := timestamp_v2.StartMeasuringEvent("parse specs ", float64(len(specFiles)))
+	defer timestamp_v2.StopMeasurement()
+
 	results := make(chan *parseResult, len(specFiles))
 	requests := make(chan string, len(specFiles))
 	cancel := make(chan struct{})
@@ -187,7 +195,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, distTag string, workers int, runChe
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, runCheck)
+		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, runCheck, tsRoot)
 	}
 
 	for _, specFile := range specFiles {
@@ -247,7 +255,7 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 // readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available filehandles.
-func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir string, runCheck bool) {
+func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir string, runCheck bool, tsRoot *timestamp_v2.TimeStamp) {
 	const (
 		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
@@ -259,6 +267,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 	defines := rpm.DefaultDefines(runCheck)
 	defines[rpm.DistTagDefine] = distTag
 
+	var ts *timestamp_v2.TimeStamp = nil
 	for specfile := range requests {
 		select {
 		case <-cancel:
@@ -266,6 +275,13 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			return
 		default:
 		}
+
+		// Many code paths hit 'continue', finish timing those here.
+		if ts != nil {
+			timestamp_v2.StopMeasurementSpecific(ts)
+			ts = nil
+		}
+		ts, _ = timestamp_v2.StartMeasuringEventWithParent(tsRoot, filepath.Base(specfile), 0)
 
 		result := &parseResult{}
 
@@ -341,6 +357,9 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 		// Submit the result to the main thread, the deferred function will clear the semaphore.
 		results <- result
+	}
+	if ts != nil {
+		timestamp_v2.StopMeasurementSpecific(ts)
 	}
 }
 

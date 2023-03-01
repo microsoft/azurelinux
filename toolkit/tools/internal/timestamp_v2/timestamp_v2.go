@@ -10,8 +10,6 @@ import (
 	"math"
 	"strings"
 	"time"
-
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 type TimeStamp struct {
@@ -58,7 +56,7 @@ func createTimeStamp(name string, startTime time.Time, expectedWeight float64) (
 	return &ts, err
 }
 
-// AddStep adds a sub-step to a specific parent step while guessing how many sub-steps there will be
+// AddStep adds a sub-step to this step .The expected weight of the new step will be used to estimate progress. '1.0' is a good default weight.
 func (t *TimeStamp) addStep(name string, startTime time.Time, expectedWeight float64) (newTS *TimeStamp, err error) {
 	if t.finished {
 		return &TimeStamp{}, fmt.Errorf("parent timestamp has already completed measurement, can't add another substep")
@@ -74,6 +72,7 @@ func (t *TimeStamp) addStep(name string, startTime time.Time, expectedWeight flo
 	return
 }
 
+// Marks the timestamp as completed. Will not allow additional sub-steps to be added after.
 func (t *TimeStamp) completeTimeStamp(stopTime time.Time) {
 	t.EndTime = &stopTime
 	t.finished = true
@@ -121,7 +120,7 @@ func (node *TimeStamp) FinishAllMeasurements() (err error) {
 		if node.parent.EndTime == nil {
 			return fmt.Errorf("could not finalize orphaned times for node '%s' since it has no parent with an end time", node.Name)
 		} else {
-			logger.Log.Warnf("Found orphaned node '%s' with incomplete timing", node.Path())
+			failsafeLoggerWarnf("Found orphaned node '%s' with incomplete timing", node.Path())
 			node.completeTimeStamp(*node.parent.EndTime)
 		}
 	}
@@ -143,7 +142,7 @@ func (t *TimeStamp) searchSubSteps(name string) (match *TimeStamp) {
 	return nil
 }
 
-// restoreNode recursively re-establishes the parent/child links for nodes read from disk and checks if they have been completed
+// restoreNode recursively re-establishes the child -> parent links for nodes read from disk
 func (ts *TimeStamp) restoreNode() {
 	ts.finished = ts.StartTime != nil && ts.EndTime != nil
 	for _, child := range ts.Steps {
@@ -152,6 +151,7 @@ func (ts *TimeStamp) restoreNode() {
 	}
 }
 
+// Path returns the full path of the step
 func (t *TimeStamp) Path() string {
 	path := t.Name
 	node := t
@@ -162,6 +162,8 @@ func (t *TimeStamp) Path() string {
 	return path
 }
 
+// Progress estimates the progress of a step from  0.0 to 1.0 based on ExpectedWeight and currently
+// completed substeps. It will never report above 95% until the current node is actually completed.
 func (t *TimeStamp) Progress() float64 {
 	progress := 0.0
 	// We assume each sub-step has weight 1.0 unless we find otherwise.

@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"gonum.org/v1/gonum/graph"
@@ -46,14 +47,17 @@ var (
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp_v2.BeginTiming("graphpkgfetcher", *timestampFile, 101, false)
+	defer timestamp_v2.EndTiming()
 
 	dependencyGraph := pkggraph.NewPkgGraph()
 
@@ -96,9 +100,19 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 	return false
 }
 
+func findUnresolvedNodes(runNodes []*pkggraph.PkgNode) (unreslovedNodes []*pkggraph.PkgNode) {
+	for _, n := range runNodes {
+		if n.State == pkggraph.StateUnresolved {
+			unreslovedNodes = append(unreslovedNodes, n)
+		}
+	}
+	return
+}
+
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, disableUpstreamRepos, stopOnFailure bool) (err error) {
+	timestamp_v2.StartMeasuringEvent("initialize and configure cloner", 0)
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
 	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
@@ -116,32 +130,44 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		}
 	}
 
+	timestamp_v2.StopMeasurement() // initialize and configure cloner
+	ts, _ := timestamp_v2.StartMeasuringEvent("Clone packages", 1)
+	ts.SetWeight(100)
+	defer timestamp_v2.StopMeasurement()
+
 	cachingSucceeded := true
 	if strings.TrimSpace(inputSummaryFile) == "" {
 		// Cache an RPM for each unresolved node in the graph.
 		fetchedPackages := make(map[string]bool)
 		prebuiltPackages := make(map[string]bool)
-		for _, n := range dependencyGraph.AllRunNodes() {
-			if n.State == pkggraph.StateUnresolved {
-				resolveErr := resolveSingleNode(cloner, n, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
-				// Failing to clone a dependency should not halt a build.
-				// The build should continue and attempt best effort to build as many packages as possible.
-				if resolveErr != nil {
-					cachingSucceeded = false
-					errorMessage := strings.Builder{}
-					errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
-					errorMessage.WriteString("Nodes which have this as a dependency:\n")
-					for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
-						errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
-					}
-					logger.Log.Debugf(errorMessage.String())
+		unresolvedNodes := findUnresolvedNodes(dependencyGraph.AllRunNodes())
+
+		timestamp_v2.StartMeasuringEvent("clone graph", float64(len(unresolvedNodes)))
+
+		for _, n := range unresolvedNodes {
+			resolveErr := resolveSingleNode(cloner, n, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
+			// Failing to clone a dependency should not halt a build.
+			// The build should continue and attempt best effort to build as many packages as possible.
+			if resolveErr != nil {
+				cachingSucceeded = false
+				errorMessage := strings.Builder{}
+				errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
+				errorMessage.WriteString("Nodes which have this as a dependency:\n")
+				for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
+					errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
 				}
+				logger.Log.Debugf(errorMessage.String())
 			}
 		}
+		timestamp_v2.StopMeasurement() // clone graph
 	} else {
+		timestamp_v2.StartMeasuringEvent("restore packages", 0)
+
 		// If an input summary file was provided, simply restore the cache using the file.
 		err = repoutils.RestoreClonedRepoContents(cloner, inputSummaryFile)
 		cachingSucceeded = err == nil
+
+		timestamp_v2.StopMeasurement() // restore packages
 	}
 	if stopOnFailure && !cachingSucceeded {
 		return fmt.Errorf("failed to cache unresolved nodes")
