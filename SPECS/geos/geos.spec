@@ -39,23 +39,17 @@ use GEOS.
 %prep
 %autosetup -p1
 
-
 %build
 # Native build
 %cmake -DDISABLE_GEOS_INLINE=ON -DBUILD_DOCUMENTATION=ON
 %cmake_build
 
-
 %install
 %cmake_install
 make docs -C %{__cmake_builddir}
 
-
 %check
-%ifnarch s390x
 %ctest
-%endif
-
 
 %files
 %doc AUTHORS NEWS.md README.md
