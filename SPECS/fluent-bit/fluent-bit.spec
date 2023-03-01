@@ -42,19 +42,20 @@ Development files for %{name}
 %build
 
 %cmake\
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo\
-    -DFLB_EXAMPLES=Off\
-    -DFLB_OUT_SLACK=Off\
-    -DFLB_IN_SYSTEMD=On\
-    -DFLB_OUT_TD=Off\
-    -DFLB_OUT_ES=Off\
-    -DFLB_SHARED_LIB=On\
-    -DFLB_TESTS_RUNTIME=On\
-    -DFLB_TESTS_INTERNAL=Off\
-    -DFLB_RELEASE=On\
-    -DFLB_DEBUG=Off\
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DFLB_EXAMPLES=Off \
+    -DFLB_OUT_SLACK=Off \
+    -DFLB_IN_SYSTEMD=On \
+    -DFLB_OUT_TD=Off \
+    -DFLB_OUT_ES=Off \
+    -DFLB_SHARED_LIB=On \
+    -DFLB_TESTS_RUNTIME=On \
+    -DFLB_TESTS_INTERNAL=Off \
+    -DFLB_RELEASE=On \
+    -DFLB_DEBUG=Off \
     -DFLB_TLS=On \
-    -DFLB_JEMALLOC=on
+    -DFLB_JEMALLOC=On \
+    -DFLB_LUAJIT=Off \
 
 %cmake_build
 
@@ -77,6 +78,7 @@ Development files for %{name}
 * Fri Feb 24 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.0.9-1
 - Upgrade version to 2.0.9
 - Use SPDX license expression in license tag
+- Explicitly disable luajit
 
 * Wed Aug 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.9.6-1
 - Upgrade version to 1.9.6
