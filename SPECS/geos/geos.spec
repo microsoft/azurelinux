@@ -75,6 +75,7 @@ make docs -C %{__cmake_builddir}
 - Removed building for mingw environment
 - License verified
 - Updated geos project URL from http to https
+- Remove macro referencing unsupported arch s390x in run check tests
 
 * Tue Jan 24 2023 Sandro Mani <manisandro@gmail.com> - 3.11.1-3
 - Add geos_gcc13.patch
