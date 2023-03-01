@@ -115,6 +115,11 @@ popd
 # run C++ unit tests
 %make_build check
 
+# run python subpackage tests
+cd python
+%py3_check
+cd ..
+
 # run java subpackage tests
 cd java
 mvn -o test

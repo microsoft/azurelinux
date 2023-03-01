@@ -50,6 +50,11 @@
   rm -rfv %{buildroot}%{_bindir}/__pycache__
 }
 
+%py3_check() %{expand:\\\
+  CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}"\\\
+  %{__python3} %{py_setup} %{?py_setup_args} test --executable="%{__python3} %{py3_shbang_opts}" %{?*}
+}
+
 # This only supports Python 3.5+ and will never work with Python 2.
 # Hence, it has no Python version in the name.
 %pycached() %{lua:
