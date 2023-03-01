@@ -84,7 +84,7 @@ extends:
             pipeline: 1141
             runVersion: latestFromBranch
             tags: '$(downloadTags)'
-            artifact: drop_build_rpms_build
+            artifact: $(buildArtifactsFolder)
             patterns: |
               **/toolkit-*.tar.gz
               **/toolchain_built_rpms_all.tar.gz
@@ -121,7 +121,7 @@ extends:
             runVersion: specific
             runId: 318883
             tags: '$(downloadTags)'
-            artifact: $(buildArtifactsFolder)
+            artifact: drop_build_rpms_build
             patterns: '**/rpms.tar.gz'
             path: '$(System.ArtifactsDirectory)'
 
