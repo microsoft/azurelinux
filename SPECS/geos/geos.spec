@@ -6,7 +6,7 @@ License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://trac.osgeo.org/geos/
-Source0:        http://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
+Source0:        https://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
 # Fix doxygen errors
 Patch0:         geos_docs.patch
 # Fix GCC13 FTBFS
