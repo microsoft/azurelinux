@@ -27,11 +27,6 @@ make
 %post
 
 %files
-%license LICENSE.txt
-%{_bindir}/elixir
-%{_bindir}/elixirrc
-%{_bindir}/iex
-%{_bindir}/mix
 
 
 %changelog
