@@ -54,7 +54,7 @@ Requires:       grubby
 The package provides a tool to enable or disable the system FIPS mode.
 
 %prep
-%setup -q -n fedora-crypto-policies-f32-updates
+%autosetup -n fedora-crypto-policies-f32-updates
 # Fix path to asciidoc xsl documents
 # asciidoc installs these in %{_sysconfdir} by default, not %{_datadir}
 sed -i 's#/usr/share/asciidoc#%{_sysconfdir}/asciidoc#g' Makefile
@@ -179,7 +179,8 @@ end
 %{_mandir}/man8/fips-finish-install.8*
 
 %changelog
-* Mon Jan 16 2023 Muhammad Falak <mwani@microsoft.com> - 20200619-5
+* Wed Mar 01 2023 Muhammad Falak <mwani@microsoft.com> - 20200619-5
+- Switch to autosetup
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200619-4
