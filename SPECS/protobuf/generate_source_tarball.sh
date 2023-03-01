@@ -94,7 +94,9 @@ echo "Vendor m.2 modules..."
 cd $NAME_VER
 cd java
 
-# This will download sources and compile
+# Unfortunately it is not possible to just run mvn dependency:go-offline as it does not download things reqires for specific targets.
+# So you would need to run all targets used in this spec file such as: "mvn package", "mvn install", "maven test" to download all dependecies.
+# This will download sources and compile code.
 mvn package -DskipTests
 mvn install -DskipTests
 mvn test

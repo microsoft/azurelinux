@@ -11,20 +11,6 @@ Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%
 # Below is a manually created tarball, no download link.
 # We're using pre-populated maven modules and plugins from this tarball, since network is disabled during build time.
 # Use generate_source_tarbbal.sh to get this generated from a source code file.
-# Unfortunately it is not possible to just run mvn dependency:go-offline as it does not download things reqires for specific targets.
-# So you would need to run all targets used in this spec file such as: "mvn package", "mvn install", "maven test" to download all dependecies.
-# How to re-build this file:
-#   1. wget https://github.com/protocolbuffers/protobuf/releases/download/v%%{version}/%%{name}-all-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. mvm verify --fail-never
-#   5. cd /home/{user}/.m2
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-m2.tar.gz repository/
-#
 Source1:        %{name}-%{version}-m2.tar.gz
 BuildRequires:  curl
 BuildRequires:  libstdc++
@@ -79,7 +65,6 @@ BuildRequires:  maven
 BuildRequires:  msopenjdk-11
 Requires:       %{name} = %{version}-%{release}
 Requires:       msopenjdk-11
-Provides:       %{name}-java = %{version}-%{release}
 
 %description    java
 This contains protobuf java libraries.
