@@ -92,7 +92,8 @@ pushd cmake/build
    -DgRPC_ZLIB_PROVIDER:STRING='package'
 %cmake_build 
 popd
-
+#uncommenting below line causes the whole build to get stuck in aarch64 machine 
+#%py3_build
 
 %install
 pushd cmake/build
@@ -107,13 +108,10 @@ export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
 export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
 export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
 export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
+#uncommenting below line causes the whole build to get stuck in aarch64 machine 
+#%py3_install
+#using macros causes build to get stuck forever
 %{__python3} setup.py install -O1 --root %{buildroot}
-
-#hacky way to make the python3-grpcio to build 
-grpc_location=$(find  %{buildroot}%{python3_sitearch}/ -name "grpcio-*" | head -n 1)
-echo %{grpc_location}
-# install  %{grpc_location}/grpc                             %{grpc_location}/grpc
-# install  %{grpc_location}/EGG-INFO                         %{grpc_location}/grpc-%{version}-py%{python3_version}.egg-info
 
 %files
 %license LICENSE
