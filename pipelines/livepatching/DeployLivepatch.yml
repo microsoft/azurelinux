@@ -22,12 +22,20 @@ parameters:
   type: boolean
   default: false
 
+# Required by used templates.
+- group: "Mariner Automation"
+
 resources:
   repositories:
   - repository: 1ESPipelineTemplates
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/canary
+
+  - repository: CBL-Mariner-Pipelines
+    type: git
+    name: mariner/CBL-Mariner-Pipelines
+    ref: refs/remotes/origin/pawelwi/signing_livepatches
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
@@ -131,24 +139,9 @@ extends:
             filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/ExtractLivepatchModule.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"'
 
-        # - task: DownloadsecureFile@1
-        #   name: esrpAuthCert
-        #   displayName: 'Download ESRP certificate'
-        #   inputs:
-        #     secureFile: 'MarinerSecureBootProductionSigningCUDA.pfx'
-
-        # - task: Bash@3
-        #   displayName: 'Sign OOT kernel modules'
-        #   inputs:
-        #     filePath: '$(Build.SourcesDirectory)/.pipelines/SecureBoot-SignOOTModules.sh'
-        #     arguments: '-s $(ob_outputDirectory)/$(secureBootArtifactsFolder)/$(signingSubfolderFolder)'
-        #   env:
-        #     AAD_CLIENT_ID: "27560572-01df-4c91-89a0-422a57db3c0a"
-        #     AAD_AUTH_CLIENT_SECRET: $(ESRP_OOT_PRODAPP_PAT)
-        #     AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
-        #     ESRP_AUTH_CERT_PATH: $(esrpAuthCert.secureFilePath)
-        #     ESRP_CERT_PWD: $(ESRP_CERT_TOKEN)
-        #     KEY_CODE: $(SECUREBOOT_KEYCODE)
+        - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
+          parameters:
+            artifactsFolder: '$(System.ArtifactsDirectory)'
 
     - stage: Test
       jobs:
