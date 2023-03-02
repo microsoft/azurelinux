@@ -9,7 +9,7 @@ Release:	5%{?dist}
 Summary:	Test helper for ordering threaded code
 License:	MIT
 URL:		https://github.com/JoshCheek/thread_order
-Source0:	https://github.com/JoshCheek/thread_order/archive/refs/tags/v1.1.1.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
+Source0:	https://github.com/JoshCheek/thread_order/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
