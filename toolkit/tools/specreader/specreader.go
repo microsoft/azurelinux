@@ -82,7 +82,7 @@ func main() {
 
 // parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir string, toolchainRPMs []string, toolchainDir, distTag, outputFile, workerTar string, workers int, runCheck bool) (err error) {
+func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -195,7 +195,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 }
 
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, distTag, arch string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
@@ -627,11 +627,12 @@ func filterOutDynamicDependencies(pkgVers []*pkgjson.PackageVer) (filteredPkgVer
 	return
 }
 
-// convertToToolchainRpmPath updates the .rpm path to point the the toolchain directory rather than the normal out/RPMs
+// convertToToolchainRpmPath updates the RPM path to point the the toolchain directory rather than the normal out/RPMs
 // directory
-func convertToToolchainRpmPath(currentRpmPath, arch string, toolchainDir string) (toolchainPath string) {
-	dir := filepath.Join(toolchainDir, arch)
-	toolchainPath = filepath.Join(dir, filepath.Base(currentRpmPath))
-	logger.Log.Debugf("Toolchain changing %s to %s", currentRpmPath, toolchainPath)
+func convertToToolchainRpmPath(currentRpmPath, arch, toolchainDir string) (toolchainPath string) {
+	rpmFileName := filepath.Base(currentRpmPath)
+	toolchainPath = filepath.Join(toolchainDir, arch)
+	toolchainPath = filepath.Join(toolchainPath, rpmFileName)
+	logger.Log.Debugf("Toolchain changing '%s' to '%s'.", currentRpmPath, toolchainPath)
 	return toolchainPath
 }
