@@ -16,7 +16,7 @@ Release:	1%{?dist}
 Summary:	Common functionality to Rspec series
 License:	MIT
 URL:		https://github.com/rspec/rspec-support
-Source0:	https://github.com/rspec/rspec-support/archive/refs/tags/v3.12.0.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
+Source0:	https://github.com/rspec/rspec-support/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
