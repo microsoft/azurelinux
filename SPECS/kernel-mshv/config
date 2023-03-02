@@ -6735,8 +6735,8 @@ CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tom
 # Memory initialization
 #
 CONFIG_INIT_STACK_NONE=y
-#CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y is not set
-#CONFIG_INIT_ON_FREE_DEFAULT_ON=y is not set
+# CONFIG_INIT_ON_ALLOC_DEFAULT_ON is not set
+# CONFIG_INIT_ON_FREE_DEFAULT_ON is not set
 # end of Memory initialization
 # end of Kernel hardening options
 # end of Security options
