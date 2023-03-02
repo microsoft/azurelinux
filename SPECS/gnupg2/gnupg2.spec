@@ -17,6 +17,7 @@ BuildRequires:  libassuan
 BuildRequires:  libksba >= 1.0.7
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libgpg-error >= 1.24
+BuildRequires:  gpgme
 
 Requires:       libksba
 Requires:       libgcrypt >= 1.7.0
