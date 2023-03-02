@@ -20623,6 +20623,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ptlib",
+          "version": "2.10.11",
+          "downloadUrl": "https://download.gnome.org/sources/ptlib/2.10/ptlib-2.10.11.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "popt",
           "version": "1.18",
           "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
