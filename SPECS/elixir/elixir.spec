@@ -31,6 +31,7 @@ make
 %{_bindir}/elixirc
 %{_bindir}/iex
 %{_bindir}/mix
+%{_libdir}/elixir/*
 
 %changelog
 * Mon Feb 27 2023 Sam Meluch <sammeluch@microsoft.com> - 1.14.3-1
