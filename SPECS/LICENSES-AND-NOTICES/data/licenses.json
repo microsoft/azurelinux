@@ -287,6 +287,7 @@
                 "gsl",
                 "gsm",
                 "gspell",
+                "gssdp",
                 "gssntlmssp",
                 "gstreamer1",
                 "gstreamer1-plugins-base",
