@@ -27566,6 +27566,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "udisks2",
+          "version": "2.9.4",
+          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.9.4/udisks-2.9.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tofrodos",
           "version": "1.7.13",
           "downloadUrl": "http://tofrodos.sourceforge.net/download/tofrodos-1.7.13.tar.gz"
