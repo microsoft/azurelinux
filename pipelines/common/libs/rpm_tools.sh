@@ -27,6 +27,6 @@ rpm_extract_files() {
 
     echo "Extracting ($files_pattern) from ($rpm_path) inside ($workspace_dir)."
 
-    rpm2cpio "$rpm_path" | cpio -D "$workspace_dir" -idmv "$files_pattern"
-    mv -v "$workspace_dir"/$files_pattern .
+    rpm2cpio "$rpm_path" | cpio --quiet -D "$workspace_dir" -idmv "$files_pattern"
+    find "$workspace_dir" -name "$files_pattern" -exec mv -v {} . \;
 }
