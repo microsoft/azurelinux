@@ -1,3 +1,4 @@
+%define  debug_package %{nil}
 Summary:        elixir
 Name:           elixir
 Version:        1.14.3
@@ -23,8 +24,6 @@ make
 
 %install
 %make_install PREFIX=/usr
-
-%post
 
 %files
 %license LICENSE
