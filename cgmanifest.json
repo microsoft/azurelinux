@@ -3496,8 +3496,8 @@
         "type": "other",
         "other": {
           "name": "libtiff",
-          "version": "4.4.0",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.4.0/libtiff-v4.4.0.tar.gz"
+          "version": "4.5.0",
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.5.0/libtiff-v4.5.0.tar.gz"
         }
       }
     },
