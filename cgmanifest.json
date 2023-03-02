@@ -3789,6 +3789,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "frr",
+          "version": "8.4.2",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "freeglut",
           "version": "3.2.1",
           "downloadUrl": "https://downloads.sourceforge.net/freeglut/freeglut-3.2.1.tar.gz"
