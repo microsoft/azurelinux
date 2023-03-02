@@ -81,7 +81,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
-		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
@@ -130,7 +130,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--input=$(graph_file) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
 		--rpm-dir=$(RPMS_DIR) \
-		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
@@ -195,7 +195,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--worker-tar="$(chroot_worker)" \
 		--repo-file="$(pkggen_local_repo)" \
 		--rpm-dir="$(RPMS_DIR)" \
-		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
 		--ccache-dir="$(CCACHE_DIR)" \

@@ -314,18 +314,18 @@ endif
 ifeq ($(REBUILD_TOOLCHAIN),y)
 $(RPMS_DIR): $(toolchain_out_rpms)
 
-# For each toolchain rpm in ./out/RPMS, add a dependency on its counterpart in the normal toolchain directory:
+# For each toolchain rpm in ./out/RPMS, add a dependency on the counterparts in the normal toolchain directory:
 # Each path in $(toolchain_out_rpms) corresponds to a .rpm file we expect to have been built by the toolchain target and made available in ./out/RPMS.
 # Those rpms however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS 
-# we will need to copy it over. Dynamically add a rule for each entry in $(toolchain_out_rpms) that maps to the matching .rpm found 
-# in $(toolchain_rpms), and run a copy command on each one if it has been updated and (aka is newer).
-$(foreach toolchain_out_rpm,$(toolchain_out_rpms),$(eval $(toolchain_out_rpm): $(filter %/$(notdir $(toolchain_out_rpm)),$(toolchain_rpms))))
-$(toolchain_out_rpms): ; $(warning $^)
-	@if [ ! -f "$@" \
-			-o "$^" -nt "$@" ] ; then \
+# we will need to copy it over. We can filter the list of toolchain rpms $(toolchain_rpms) to find the source that matches the target ($@),
+# then copy it over.
+$(toolchain_out_rpms): $(toolchain_rpms)
+	@src_rpm='$(filter %/$(notdir $@),$(toolchain_rpms))'  && \
+	if [ ! -f "$@" \
+			-o "$$src_rpm" -nt "$@" ] ; then \
 		echo "Placing built toolchain RPM $(notdir $@) into $(RPMS_DIR)" && \
-		cp $^ $@; \
-	fi || $(call print_error, Failed to duplicate '$^' to '$@' )
+		cp $$src_rpm $@; \
+	fi || $(call print_error, Failed to duplicate '$$src_rpm' to '$@' )
 else
 $(toolchain_out_rpms):
 	@$(call print_error, Cannot build toolchain rpm ($@) unless REBUILD_TOOLCHAIN=y is set)

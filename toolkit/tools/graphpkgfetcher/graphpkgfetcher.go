@@ -30,7 +30,7 @@ var (
 	outDir      = exe.OutputDirFlag(app, "Directory to download packages into.")
 
 	existingRpmDir          = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
-	existingToolchainRpmDir = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	existingToolchainRpmDir = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	tmpDir                  = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
 
 	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
@@ -63,13 +63,9 @@ func main() {
 		logger.Log.Panicf("Failed to read graph to file. Error: %s", err)
 	}
 
-	var toolchainPackages []string
-	toolchainManifest := *toolchainManifest
-	if len(toolchainManifest) > 0 {
-		toolchainPackages, err = schedulerutils.ReadToolchainPackageManifest(toolchainManifest)
-		if err != nil {
-			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifest, err)
-		}
+	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
+	if err != nil {
+		logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 	}
 
 	if hasUnresolvedNodes(dependencyGraph) {

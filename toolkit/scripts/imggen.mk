@@ -105,7 +105,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		--log-file=$(LOGS_DIR)/imggen/imagepkgfetcher.log \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
-		--toolchain-rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tdnf-worker=$(chroot_worker) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \

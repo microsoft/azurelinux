@@ -48,7 +48,7 @@ var (
 	srpmsDir                = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
 	rpmsDir                 = app.Flag("rpm-dir", "Directory containing built RPMs.").Required().ExistingDir()
 	toolchainManifest       = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
-	existingToolchainRpmDir = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	existingToolchainRpmDir = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	distTag                 = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	workerTar               = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
 	targetArch              = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
@@ -70,7 +70,7 @@ func main() {
 	var err error
 	toolchainManifestPath := *toolchainManifest
 	if len(toolchainManifestPath) > 0 {
-		toolchainRPMs, err = schedulerutils.ReadToolchainPackageManifest(toolchainManifestPath)
+		toolchainRPMs, err = schedulerutils.ReadReservedFilesList(toolchainManifestPath)
 		if err != nil {
 			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifestPath, err)
 		}
@@ -456,7 +456,7 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 				return
 			}
 
-			isToolchain := schedulerutils.IsToolchainRPM(rpmPath, toolchainRPMs)
+			isToolchain := schedulerutils.IsReservedFile(rpmPath, toolchainRPMs)
 			if isToolchain {
 				rpmPath = convertToToolchainRpmPath(rpmPath, packagearch, toolchainDir)
 			}

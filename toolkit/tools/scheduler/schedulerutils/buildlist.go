@@ -17,10 +17,10 @@ import (
 
 // CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
 // The build list is a superset of:
-//	- packagesNamesToBuild,
-//	- packagesNamesToRebuild,
-//	- local packages listed in the image config, and
-//	- kernels in the image config (if built locally).
+//   - packagesNamesToBuild,
+//   - packagesNamesToRebuild,
+//   - local packages listed in the image config, and
+//   - kernels in the image config (if built locally).
 func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []string, inputGraphFile, imageConfig, baseDirPath string) (packageVersToBuild []*pkgjson.PackageVer, err error) {
 	packageVersToBuild = convertPackageNamesIntoPackageVers(packagesNamesToBuild)
 	packageVersToBuild = append(packageVersToBuild, convertPackageNamesIntoPackageVers(packagesNamesToRebuild)...)
@@ -102,9 +102,15 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inpu
 	return
 }
 
-// ReadToolchainPackageManifest updates the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
-// Entries will be returned in the form '<rpm>-<version>-<release>.rpm' with any preceding path removed.
-func ReadToolchainPackageManifest(path string) (reservedFiles []string, err error) {
+// ReadReservedFilesList updates the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
+// Entries will be returned in the form '<rpm>-<version>-<release>.rpm' with any preceding path removed. If the file path is
+// empty, an empty list will be returned.
+func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
+	// If the path is empty, return an empty list.
+	if len(path) == 0 {
+		return reservedFiles, nil
+	}
+
 	file, err := os.Open(path)
 	if err != nil {
 		logger.Log.Errorf("Failed to open file manifest %s with error %s", path, err)
@@ -127,9 +133,10 @@ func ReadToolchainPackageManifest(path string) (reservedFiles []string, err erro
 	return reservedFiles, nil
 }
 
-// IsToolchainRPM determines if a given RPM path is found in a list of reserved RPMs.
-// rpmsToFind should be an absolute path to the expected RPM, while toolchainRPMs is a list of '<name>-<version>-<release>.rpm'.
-func IsToolchainRPM(rpmPath string, reservedRPMs []string) bool {
+// IsReservedFile determines if a given file path or filename is found in a list of reserved RPMs.
+// reservedRPMs may be a list of filenames or paths to reserved files. (e.g. 'foo-1.0.0-1.cm1.x86_64.rpm' or
+// '/path/to/foo-1.0.0-1.cm1.x86_64.rpm').
+func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 	base := filepath.Base(rpmPath)
 	for _, reservedRPM := range reservedRPMs {
 		reservedBase := filepath.Base(reservedRPM)

@@ -53,7 +53,7 @@ var (
 	workerTar        = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFile         = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
 	rpmDir           = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
-	toolchainDirPath = app.Flag("toolchain-rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	toolchainDirPath = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	srpmDir          = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	cacheDir         = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
 	ccacheDir        = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().ExistingDir()
@@ -107,7 +107,6 @@ func main() {
 	}
 
 	ignoredPackages := exe.ParseListArgument(*ignoredPackages)
-	toolchainManifest := *toolchainManifest
 
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
@@ -124,12 +123,9 @@ func main() {
 		logger.Log.Fatalf("Unable to generate package build list, error: %s", err)
 	}
 
-	var toolchainPackages []string
-	if len(toolchainManifest) > 0 {
-		toolchainPackages, err = schedulerutils.ReadToolchainPackageManifest(toolchainManifest)
-		if err != nil {
-			logger.Log.Fatalf("unable to read reserved file list %s: %s", toolchainManifest, err)
-		}
+	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
+	if err != nil {
+		logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 	}
 
 	// Setup a build agent to handle build requests from the scheduler.

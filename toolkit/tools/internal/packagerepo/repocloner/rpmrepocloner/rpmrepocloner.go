@@ -148,12 +148,10 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		safechroot.NewMountPoint(destinationDir, chrootDownloadDir, bindFsType, safechroot.BindMountPointFlags, bindData),
 	}
 
-	// Optionally include the special toolchain package directory if it is provided
-	if len(chrootLocalToolchainDir) > 0 {
-		toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainRpmsDir, overlayUpperDirectoryToolchain, overlayWorkDirectoryToolchain)
-		extraMountPoints = append(extraMountPoints, toolchainRpmsOverlayMount)
-		overlayExtraDirs = append(overlayExtraDirs, toolchainRpmsOverlayExtraDirs...)
-	}
+	// Include the special toolchain package directory
+	toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainRpmsDir, overlayUpperDirectoryToolchain, overlayWorkDirectoryToolchain)
+	extraMountPoints = append(extraMountPoints, toolchainRpmsOverlayMount)
+	overlayExtraDirs = append(overlayExtraDirs, toolchainRpmsOverlayExtraDirs...)
 
 	// Also request that /overlaywork is created before any chroot mounts happen so the overlay can
 	// be created successfully
@@ -166,10 +164,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	// The 'cacheRepoDir' repo is only used during Docker based builds, which don't
 	// use overlay so cache repo must be explicitly initialized.
 	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
-	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir}
-	if len(chrootLocalToolchainDir) > 0 {
-		reposToInitialize = append(reposToInitialize, chrootLocalToolchainDir)
-	}
+	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir, chrootLocalToolchainDir}
 	for _, repoToInitialize := range reposToInitialize {
 		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
 		err = r.initializeMountedChrootRepo(repoToInitialize)
