@@ -294,6 +294,7 @@
                 "gtk2",
                 "gtk3",
                 "gtkspell",
+                "gupnp",
                 "gupnp-av",
                 "gupnp-dlna",
                 "gupnp-igd",
