@@ -45,7 +45,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        2.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -318,6 +318,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Thu Feb 23 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-10
+- Adding Microsoft-owned root CAs to the base bundle.
+
 * Tue Dec 06 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-9
 - Updating Microsoft trusted root CAs.
 
