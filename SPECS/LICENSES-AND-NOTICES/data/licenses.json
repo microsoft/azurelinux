@@ -229,6 +229,8 @@
                 "fmt",
                 "fontawesome-fonts",
                 "fontpackages",
+                "foomatic",
+                "foomatic-db",
                 "freeglut",
                 "freeipmi",
                 "freeradius",
