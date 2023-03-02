@@ -1,6 +1,9 @@
 trigger: none
 
 variables:
+# Required by used templates.
+- group: "Mariner Automation"
+
 - name: 'buildArtifactsFolder'
   value: build-artifacts
 
@@ -21,9 +24,6 @@ parameters:
   displayName: 'Use build RPMs snapshot to populate the packages cache.'
   type: boolean
   default: false
-
-# Required by used templates.
-- group: "Mariner Automation"
 
 resources:
   repositories:
