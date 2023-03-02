@@ -141,6 +141,7 @@
                 "cpptest",
                 "cpuid",
                 "criu",
+                "crypto-policies",
                 "cryptsetup",
                 "cscope",
                 "ctags",
