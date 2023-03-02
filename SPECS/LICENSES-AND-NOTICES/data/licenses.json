@@ -295,6 +295,7 @@
                 "gtk3",
                 "gtkspell",
                 "gupnp-av",
+                "gupnp-dlna",
                 "hardening-check",
                 "hdf5",
                 "heimdal",
