@@ -3,7 +3,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-source ../common/libs/rpm_tools.sh
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+# shellcheck source=../common/libs/rpm_tools.sh
+source "$ROOT_DIR"/pipelines/common/libs/rpm_tools.sh
 
 set -e
 
