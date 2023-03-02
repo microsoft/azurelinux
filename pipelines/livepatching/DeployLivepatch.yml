@@ -35,7 +35,7 @@ resources:
   - repository: CBL-Mariner-Pipelines
     type: git
     name: mariner/CBL-Mariner-Pipelines
-    ref: refs/remotes/origin/pawelwi/signing_livepatches
+    ref: refs/heads/pawelwi/signing_livepatches
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
