@@ -163,6 +163,7 @@
                 "ding-libs",
                 "discount",
                 "distribution-gpg-keys",
+                "dleyna-connector-dbus",
                 "dmraid",
                 "dnf",
                 "dnf-plugins-core",
