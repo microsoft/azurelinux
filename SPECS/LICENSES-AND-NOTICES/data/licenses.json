@@ -164,6 +164,7 @@
                 "discount",
                 "distribution-gpg-keys",
                 "dleyna-connector-dbus",
+                "dleyna-core",
                 "dmraid",
                 "dnf",
                 "dnf-plugins-core",
