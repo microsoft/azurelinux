@@ -76,7 +76,7 @@ func main() {
 		}
 	}
 
-	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, toolchainRPMs, *existingToolchainRpmDir, *distTag, *output, *workerTar, *workers, *runCheck)
+	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
@@ -106,13 +106,13 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 		var parseError error
 
 		if *targetArch == "" {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, distTag, buildArch, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("Failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, distTag, *targetArch, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("Failed to parse cross specs (%w)", parseError)
 				return err
@@ -195,7 +195,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 }
 
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
@@ -467,7 +467,6 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 				RpmPath:      rpmPath,
 				Architecture: packagearch,
 				Requires:     reqlist,
-				IsToolchain:  isToolchain,
 			}
 
 			providerlist = append(providerlist, providerPkgVer)
