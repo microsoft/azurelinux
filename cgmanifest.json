@@ -24954,6 +24954,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-bson",
+          "version": "4.15.0",
+          "downloadUrl": "https://github.com/mongodb/bson-ruby/archive/refs/tags/v4.15.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-coderay",
           "version": "1.1.3",
           "downloadUrl": "https://github.com/rubychan/coderay/archive/refs/tags/v1.1.3.tar.gz"
@@ -25007,6 +25017,16 @@
           "name": "rubygem-deep_merge",
           "version": "1.2.1",
           "downloadUrl": "https://github.com/danielsdeleo/deep_merge/archive/refs/tags/1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-diff-lcs",
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/halostatue/diff-lcs/archive/refs/tags/v1.5.0.tar.gz"
         }
       }
     },
@@ -25197,6 +25217,16 @@
           "name": "rubygem-fiber-local",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/socketry/fiber-local/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-flexmock",
+          "version": "2.3.6",
+          "downloadUrl": "https://github.com/doudou/flexmock/archive/refs/tags/v2.3.6.tar.gz"
         }
       }
     },
@@ -25454,6 +25484,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-maruku",
+          "version": "0.7.3",
+          "downloadUrl": "https://github.com/bhollis/maruku/archive/refs/tags/v0.7.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-metaclass",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/floehopper/metaclass/archive/refs/tags/v0.0.4.tar.gz"
@@ -25537,6 +25577,16 @@
           "name": "rubygem-mustache",
           "version": "1.1.1",
           "downloadUrl": "https://github.com/mustache/mustache/archive/refs/tags/v1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-mysql2",
+          "version": "0.5.4",
+          "downloadUrl": "https://github.com/brianmario/mysql2/archive/refs/tags/0.5.4.tar.gz"
         }
       }
     },
@@ -25774,6 +25824,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-rspec-expectations",
+          "version": "3.12.0",
+          "downloadUrl": "https://github.com/rspec/rspec-expectations/archive/refs/tags/v3.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rspec-mocks",
+          "version": "3.12.1",
+          "downloadUrl": "https://github.com/rspec/rspec-mocks/archive/refs/tags/v3.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rspec-support",
+          "version": "3.12.0",
+          "downloadUrl": "https://github.com/rspec/rspec-support/archive/refs/tags/v3.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-ruby-kafka",
           "version": "1.4.0",
           "downloadUrl": "https://github.com/zendesk/ruby-kafka/archive/refs/tags/v1.4.0.tar.gz"
@@ -25907,6 +25987,16 @@
           "name": "rubygem-thor",
           "version": "1.2.1",
           "downloadUrl": "https://github.com/rails/thor/archive/refs/tags/v1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-thread_order",
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/JoshCheek/thread_order/archive/refs/tags/v1.1.1.tar.gz"
         }
       }
     },
