@@ -20334,8 +20334,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.12",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.12.tar.xz"
+          "version": "8.1.16",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.16.tar.xz"
         }
       }
     },
