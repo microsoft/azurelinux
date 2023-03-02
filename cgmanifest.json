@@ -4829,6 +4829,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gupnp-igd",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/GNOME/gupnp-igd/archive/refs/tags/1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gupnp-dlna",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/GNOME/gupnp-dlna/archive/refs/tags/gupnp-dlna-0.12.0.tar.gz"
