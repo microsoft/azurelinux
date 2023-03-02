@@ -159,7 +159,8 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	rpmCacheMount := safechroot.NewMountPoint(*cacheDir, chrootLocalRpmsCacheDir, "", safechroot.BindMountPointFlags, "")
 	ccacheMount := safechroot.NewMountPoint(*ccacheDir, chrootCcacheDir, "", safechroot.BindMountPointFlags, "")
 	mountPoints := []*safechroot.MountPoint{outRpmsOverlayMount, toolchainRpmsOverlayMount, rpmCacheMount, ccacheMount}
-	extraDirs := append(outRpmsOverlayExtraDirs, append(toolchainRpmsOverlayExtraDirs, chrootLocalRpmsCacheDir, chrootCcacheDir)...)
+	extraDirs := append(outRpmsOverlayExtraDirs, chrootLocalRpmsCacheDir, chrootCcacheDir)
+	extraDirs = append(extraDirs, toolchainRpmsOverlayExtraDirs...)
 
 	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
 	if err != nil {
