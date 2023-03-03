@@ -29,14 +29,14 @@
 # https://github.com/containers/gvisor-tap-vsock
 %global import_path_gvproxy %%{provider}.%{provider_tld}/%{project}/%{repo_gvproxy}
 %global git_gvproxy https://%{import_path_gvproxy}
-%global commit_gvproxy 4ee84d66bd86668f011733d8873989b5862bcd07
+%global commit_gvproxy aab0ac9367fc5142f5857c36ac2352bcb3c60ab7
 %global shortcommit_gvproxy %(c=%{commit_gvproxy}; echo ${c:0:7})
 
 %global built_tag v4.1.1
 
 Name:           podman
 Version:        4.1.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -386,6 +386,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Fri Feb 17 2023 Muhammad Falak <mwani@microsoft.com> - 4.1.1-6
+- Bump version of gvproxy to enable build with go1.19
+
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-5
 - Bump release to rebuild with go 1.19.4
 

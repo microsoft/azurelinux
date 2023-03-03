@@ -1,0 +1,39 @@
+--- opal-3.10.10/configure	2013-02-20 03:18:59.000000000 +0100
++++ opal-3.10.10/configure	2015-03-02 14:03:47.402134349 +0100
+@@ -6952,8 +6952,8 @@ fi
+ 
+           old_CFLAGS="$CFLAGS"
+           old_LIBS="$LIBS"
+-          CFLAGS=
+-          LIBS=
++#          CFLAGS=
++#          LIBS=
+ 
+           # The cast to long int works around a bug in the HP C Compiler
+ # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+--- opal-3.10.10/opal.m4	2013-02-20 03:18:59.000000000 +0100
++++ opal-3.10.10/opal.m4	2015-03-02 14:03:47.402134349 +0100
+@@ -575,8 +575,8 @@ AC_DEFUN([OPAL_SPEEX_TYPES],
+          [
+           old_CFLAGS="$CFLAGS"
+           old_LIBS="$LIBS"
+-          CFLAGS=
+-          LIBS=
++#          CFLAGS=
++#          LIBS=
+ 
+           AC_CHECK_SIZEOF(short)
+           AC_CHECK_SIZEOF(int)
+--- opal-3.10.10/plugins/configure	2013-02-20 03:18:10.000000000 +0100
++++ opal-3.10.10/plugins/configure	2015-03-02 14:08:07.894124027 +0100
+@@ -8637,8 +8637,8 @@ fi
+ 
+           old_CFLAGS="$CFLAGS"
+           old_LIBS="$LIBS"
+-          CFLAGS=
+-          LIBS=
++#          CFLAGS=
++#          LIBS=
+ 
+           # The cast to long int works around a bug in the HP C Compiler
+ # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects

@@ -1,0 +1,126 @@
+trigger: none
+
+variables:
+- name: 'buildArtifactsFolder'
+  value: build-artifacts
+
+- name: 'buildLogsFolder'
+  value: 'LOGS'
+
+parameters:
+- name: livepatchKernelVersion
+  displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
+  type: string
+
+- name: useKernelBuildArtifacts
+  displayName: 'Use toolkit and packages from the time the kernel was built.'
+  type: boolean
+  default: false
+
+- name: useRPMsSnapshot
+  displayName: 'Use build RPMs snapshot to populate the packages cache.'
+  type: boolean
+  default: false
+
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/canary
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    pool:
+      name: mariner-core-x64-1es-mariner2-gpt-test
+      os: linux
+    sdl:
+      sourceAnalysisPool:
+        name: windows-server-2022-x64-1es-gpt-test
+        os: windows
+      sbom:
+        enabled: true
+      gitCheckout_all_repos: true
+
+    stages:
+    - stage: Build
+      jobs:
+      - job:
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: build-artifacts
+
+          - output: pipelineArtifact
+            displayName: 'Publish logs'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
+            artifactName: LOGS
+
+        steps:
+        - bash: |
+            pipelines/common/utilities/Configure-1ES.sh
+          displayName: 'Install 1ES host machine applications'
+
+        - bash: |
+            mariner_version="$(make -sC toolkit printvar-RELEASE_MAJOR_ID CONFIG_FILE=)"
+            download_tags="$mariner_version-stable"
+            if [[ "${{ parameters.useKernelBuildArtifacts }}" =~ [Tt]rue ]]
+            then
+              download_tags+=",kernel-${{ parameters.livepatchKernelVersion }}"
+            fi
+
+            echo "##vso[task.setvariable variable=downloadTags]$download_tags"
+            echo "Will download artifacts from build with tags '$download_tags'."
+          displayName: 'Determine artifacts source'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download artifacts from a kernel build'
+          inputs:
+            source: specific
+            project: 'mariner'
+            pipeline: 1141
+            runVersion: latestFromBranch
+            tags: '$(downloadTags)'
+            artifact: $(buildArtifactsFolder)
+            patterns: |
+              **/toolkit-*.tar.gz
+              **/toolchain_built_rpms_all.tar.gz
+              **/rpms.tar.gz
+            path: '$(System.ArtifactsDirectory)'
+
+        - task: Bash@3
+          displayName: 'Build livepatch'
+          inputs:
+            filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/BuildLivepatch.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -k "${{ parameters.livepatchKernelVersion }}"
+                        -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
+                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
+                        -s "${{ parameters.useRPMsSnapshot }}"'
+
+    - stage: Sign
+      jobs:
+      - job:
+        steps:
+        - bash: |
+            sleep 1
+          displayName: 'Signing placeholder'
+
+    - stage: Test
+      jobs:
+      - job:
+        steps:
+        - bash: |
+            sleep 1
+          displayName: 'Test placeholder'
+
+    - stage: Publish
+      jobs:
+      - job:
+        steps:
+        - bash: |
+            sleep 1
+          displayName: 'Publishing placeholder'

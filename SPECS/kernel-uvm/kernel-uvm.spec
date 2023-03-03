@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.48.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,7 @@ ExclusiveArch:  x86_64
 #  1. Extract the linux sources into a folder
 #  2. Add the current config file to the folder
 #  3. Run `make menuconfig` to edit the file (Manually editing is not recommended)
+#     * You might have to install the following dependencies: libncurses5-dev flex
 #  4. Save the config file
 #  5. Copy the config file back into the kernel spec folder
 #  6. Revert any undesired changes (GCC related changes, etc)
@@ -102,6 +103,9 @@ cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 /lib/modules/%{name}
 
 %changelog
+* Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
+- Enable Hyper-V enlightenments.
+
 * Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-8
 - Create modules folder and copy vmlinux
 
