@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           python-memcached
 Version:        1.59
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A Python memcached client library
 
 License:        Python
@@ -70,6 +70,10 @@ kill $(cat $pidfile)
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.59-7
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.59-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
