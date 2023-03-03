@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        6%{?dist}
+Release:        9%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.gnu.org/software/coreutils
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
+Source2:        coreutils-provides.inc
 # The following two patches are sourced from RedHat via Photon
 Patch0:         coreutils-8.32-i18n-1.patch
 Patch1:         coreutils-8.10-uname-1.patch
@@ -22,6 +23,7 @@ Requires:       gmp
 Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
+%include        %{SOURCE2}
 %if %{with_check}
 BuildRequires:  perl
 BuildRequires:  perl(File::Find)
@@ -103,6 +105,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Thu Mar 02 2023 Minghe Ren <mingheren@microsoft.com> - 8.32-7
+- Add coreutils-provides.inc for LinkedIn.
+
 * Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 8.32-6
 - Force rebuild to address missing SELinux features.
 

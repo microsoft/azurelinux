@@ -1,0 +1,31 @@
+Provides: bundled(gnulib)
+
+# make it possible for LinkedIn to install packages which have depedency on those binaries
+Provides: /usr/bin/cat
+Provides: /usr/bin/chmod
+Provides: /usr/bin/echo
+Provides: /usr/bin/ln
+Provides: /usr/bin/rm
+Provides: /usr/bin/touch
+Provides: /usr/bin/mkdir
+Provides: /usr/bin/arch
+Provides: /usr/bin/chgrp
+Provides: /usr/bin/chown
+Provides: /usr/bin/cp
+Provides: /usr/bin/date
+Provides: /usr/bin/dd
+Provides: /usr/bin/mv
+Provides: /usr/bin/pwd
+Provides: /usr/bin/false
+Provides: /usr/bin/df
+Provides: /usr/bin/ls
+Provides: /usr/bin/mknod
+Provides: /usr/bin/mdir
+Provides: /usr/bin/stty
+Provides: /usr/bin/sync
+Provides: /usr/bin/true
+Provides: /usr/bin/uname
+Provides: /usr/bin/test
+Provides: /usr/bin/head
+Provides: /usr/bin/sleep
+Provides: /usr/bin/nice
