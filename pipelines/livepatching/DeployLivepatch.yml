@@ -10,11 +10,17 @@ variables:
 - name: 'buildLogsFolder'
   value: 'LOGS'
 
-- name: 'pipelinesRepoCheckoutPath'
+- name: 'pipelinesRepoFolder'
   value: '$CBL-Mariner-Pipelines'
 
-- name: 'selfRepoCheckoutPath'
+- name: 'pipelinesRepoRoot'
+  value: '$(Agent.BuildDirectory)/$(pipelinesRepoFolder)'
+
+- name: 'selfRepoFolder'
   value: 'CBL-Mariner'
+
+- name: 'selfRepoRoot'
+  value: '$(Agent.BuildDirectory)/$(selfRepoFolder)'
 
 parameters:
 - name: livepatchKernelVersion
@@ -104,7 +110,7 @@ extends:
         - task: Bash@3
           displayName: 'Build livepatch'
           inputs:
-            filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/BuildLivepatch.sh'
+            filePath: '$(selfRepoRoot)/pipelines/livepatching/BuildLivepatch.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
@@ -116,9 +122,9 @@ extends:
       - job:
         steps:
         - checkout: self
-          path: '$(selfRepoCheckoutPath)'
+          path: '$(selfRepoFolder)'
         - checkout: CBL-Mariner-Pipelines
-          path: '$(pipelinesRepoCheckoutPath)'
+          path: '$(pipelinesRepoFolder)'
         # - task: DownloadPipelineArtifact@2
         #   displayName: 'Download livepatch RPM'
         #   inputs:
@@ -142,14 +148,14 @@ extends:
         - task: Bash@3
           displayName: 'Extract livepatch module'
           inputs:
-            filePath: 'pipelines/livepatching/ExtractLivepatchModule.sh'
-            workingDirectory: '$(Agent.BuildDirectory)/$(selfRepoCheckoutPath)'
+            filePath: '$(selfRepoRoot)/pipelines/livepatching/ExtractLivepatchModule.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"'
+            workingDirectory: '$(selfRepoRoot)'
 
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
           parameters:
             artifactsFolder: '$(System.ArtifactsDirectory)'
-            repoRootPath: '$(Agent.BuildDirectory)/$(pipelinesRepoCheckoutPath)'
+            repoRootPath: '$(pipelinesRepoRoot)'
 
     - stage: Test
       jobs:
