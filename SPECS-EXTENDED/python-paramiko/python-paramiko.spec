@@ -52,30 +52,15 @@ Recommends:    %{py3_dist pyasn1} >= 0.1.7
 
 Python 3 version.
 
-%package doc
-Summary:       Docs and demo for SSH2 protocol library for python
-BuildRequires: /usr/bin/sphinx-build
-Requires:      %{name} = %{version}-%{release}
-
-%description doc
-%{paramiko_desc}
-
-This is the documentation and demos.
 
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
-
-chmod -c a-x demos/*
-sed -i -e '/^#!/,1d' demos/*
 
 %build
 %py3_build
 
 %install
 %py3_install
-
-sphinx-build -b html sites/docs/ html/
-rm html/.buildinfo
 
 %check
 PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version}
@@ -85,9 +70,6 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version}
 %doc NEWS README.rst
 %{python3_sitelib}/%{srcname}-*.egg-info/
 %{python3_sitelib}/%{srcname}/
-
-%files doc
-%doc html/ demos/
 
 %changelog
 * Sun Nov  6 2022 Paul Howarth <paul@city-fan.org> - 2.12.0-1
