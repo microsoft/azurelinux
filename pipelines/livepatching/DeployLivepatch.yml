@@ -10,6 +10,9 @@ variables:
 - name: 'buildLogsFolder'
   value: 'LOGS'
 
+- name: 'pipelinesRepoCheckoutPath'
+  value: '$(Build.SourcesDirectory)/CBL-Mariner-Pipelines'
+
 parameters:
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
@@ -109,6 +112,10 @@ extends:
       jobs:
       - job:
         steps:
+        - checkout: self
+          path: '$(Build.SourcesDirectory)'
+        - checkout: CBL-Mariner-Pipelines
+          path: '$(pipelinesRepoCheckoutPath)'
         # - task: DownloadPipelineArtifact@2
         #   displayName: 'Download livepatch RPM'
         #   inputs:
@@ -138,7 +145,7 @@ extends:
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
           parameters:
             artifactsFolder: '$(System.ArtifactsDirectory)'
-            repo: 'CBL-Mariner-Pipelines'
+            repoRootPath: '$(pipelinesRepoCheckoutPath)'
 
     - stage: Test
       jobs:
