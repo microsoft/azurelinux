@@ -1,10 +1,11 @@
+%global srcname paramiko
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global srcname paramiko
 
 Name:          python-%{srcname}
 Version:       2.12.0
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       SSH2 protocol library for python
 
 # No version specified
@@ -72,6 +73,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version}
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.12.0-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Sun Nov  6 2022 Paul Howarth <paul@city-fan.org> - 2.12.0-1
 - Update to 2.12.0 (rhbz#2140281)
   - Add a 'transport_factory' kwarg to 'SSHClient.connect' for advanced users
