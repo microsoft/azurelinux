@@ -138,6 +138,7 @@ extends:
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
           parameters:
             artifactsFolder: '$(System.ArtifactsDirectory)'
+            repo: 'CBL-Mariner-Pipelines'
 
     - stage: Test
       jobs:
