@@ -1137,8 +1137,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.1.tar.gz"
+          "version": "2.0.2",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.2.tar.gz"
         }
       }
     },
@@ -2266,6 +2266,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "crypto-policies",
+          "version": "20200619",
+          "downloadUrl": "https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/f32-updates/fedora-crypto-policies-f32-updates.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cryptsetup",
           "version": "2.4.3",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.4/cryptsetup-2.4.3.tar.xz"
@@ -2590,6 +2600,26 @@
           "name": "diffutils",
           "version": "3.8",
           "downloadUrl": "https://ftp.gnu.org/gnu/diffutils/diffutils-3.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dleyna-core",
+          "version": "0.6.0",
+          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-core-0.6.0.tar_3.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dleyna-connector-dbus",
+          "version": "0.3.0",
+          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-connector-dbus-0.3.0.tar_2.gz"
         }
       }
     },
@@ -3218,8 +3248,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "24.2",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-24.2/otp-OTP-24.2.tar.gz"
+          "version": "25.2",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.2/otp-OTP-25.2.tar.gz"
         }
       }
     },
@@ -3648,8 +3678,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "1.9.6",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v1.9.6.tar.gz"
+          "version": "2.0.9",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.0.9.tar.gz"
         }
       }
     },
@@ -3739,6 +3769,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "foomatic",
+          "version": "4.0.13",
+          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-engine-4.0.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "foomatic-db",
+          "version": "4.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/foomatic-db-4.0-20201104.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fping",
           "version": "5.0",
           "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
@@ -3752,6 +3802,16 @@
           "name": "freefont",
           "version": "20120503",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/freefont/freefont-ttf-20120503.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "frr",
+          "version": "8.4.2",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.4.2.tar.gz"
         }
       }
     },
@@ -4042,6 +4102,16 @@
           "name": "geolite2",
           "version": "20191217",
           "downloadUrl": "https://geolite.maxmind.com/download/geoip/database/GeoLite2-ASN_20191217.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "geos",
+          "version": "3.11.1",
+          "downloadUrl": "https://download.osgeo.org/geos/geos-3.11.1.tar.bz2"
         }
       }
     },
@@ -4629,6 +4699,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gssdp",
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/GNOME/gssdp/archive/refs/tags/gssdp-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "grep",
           "version": "3.7",
           "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz"
@@ -4739,9 +4819,39 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gupnp",
+          "version": "1.6.3",
+          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gstreamer1",
           "version": "1.20.0",
           "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gupnp-igd",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/GNOME/gupnp-igd/archive/refs/tags/1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gupnp-dlna",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/GNOME/gupnp-dlna/archive/refs/tags/gupnp-dlna-0.12.0.tar.gz"
         }
       }
     },
@@ -7861,8 +7971,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.86.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.86.mshv2.tar.gz"
+          "version": "5.15.92.mshv1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.92.mshv1.tar.gz"
         }
       }
     },
@@ -12782,6 +12892,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mksh",
+          "version": "59c",
+          "downloadUrl": "http://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mlnx-ofa_kernel",
           "version": "5.6",
           "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz"
@@ -14455,6 +14575,16 @@
           "name": "ocaml-re",
           "version": "1.9.0",
           "downloadUrl": "https://github.com/ocaml/ocaml-re/archive/1.9.0/ocaml-re-1.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "opal",
+          "version": "3.10.11",
+          "downloadUrl": "https://sourceforge.net/projects/opalvoip/files/v3.10%20Luyten/Stable%2011/opal-3.10.11.tar.bz2"
         }
       }
     },
@@ -20214,8 +20344,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.12",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.12.tar.xz"
+          "version": "8.1.16",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.16.tar.xz"
         }
       }
     },
@@ -20496,6 +20626,16 @@
           "name": "polkit-pkla-compat",
           "version": "0.1",
           "downloadUrl": "http://releases.pagure.org/polkit-pkla-compat/polkit-pkla-compat-0.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ptlib",
+          "version": "2.10.11",
+          "downloadUrl": "https://download.gnome.org/sources/ptlib/2.10/ptlib-2.10.11.tar.xz"
         }
       }
     },
@@ -24824,6 +24964,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-bson",
+          "version": "4.15.0",
+          "downloadUrl": "https://github.com/mongodb/bson-ruby/archive/refs/tags/v4.15.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-coderay",
           "version": "1.1.3",
           "downloadUrl": "https://github.com/rubychan/coderay/archive/refs/tags/v1.1.3.tar.gz"
@@ -24877,6 +25027,16 @@
           "name": "rubygem-deep_merge",
           "version": "1.2.1",
           "downloadUrl": "https://github.com/danielsdeleo/deep_merge/archive/refs/tags/1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-diff-lcs",
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/halostatue/diff-lcs/archive/refs/tags/v1.5.0.tar.gz"
         }
       }
     },
@@ -25067,6 +25227,16 @@
           "name": "rubygem-fiber-local",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/socketry/fiber-local/archive/refs/tags/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-flexmock",
+          "version": "2.3.6",
+          "downloadUrl": "https://github.com/doudou/flexmock/archive/refs/tags/v2.3.6.tar.gz"
         }
       }
     },
@@ -25324,6 +25494,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-maruku",
+          "version": "0.7.3",
+          "downloadUrl": "https://github.com/bhollis/maruku/archive/refs/tags/v0.7.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-metaclass",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/floehopper/metaclass/archive/refs/tags/v0.0.4.tar.gz"
@@ -25407,6 +25587,16 @@
           "name": "rubygem-mustache",
           "version": "1.1.1",
           "downloadUrl": "https://github.com/mustache/mustache/archive/refs/tags/v1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-mysql2",
+          "version": "0.5.4",
+          "downloadUrl": "https://github.com/brianmario/mysql2/archive/refs/tags/0.5.4.tar.gz"
         }
       }
     },
@@ -25644,6 +25834,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-rspec-expectations",
+          "version": "3.12.0",
+          "downloadUrl": "https://github.com/rspec/rspec-expectations/archive/refs/tags/v3.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rspec-mocks",
+          "version": "3.12.1",
+          "downloadUrl": "https://github.com/rspec/rspec-mocks/archive/refs/tags/v3.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rspec-support",
+          "version": "3.12.0",
+          "downloadUrl": "https://github.com/rspec/rspec-support/archive/refs/tags/v3.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-ruby-kafka",
           "version": "1.4.0",
           "downloadUrl": "https://github.com/zendesk/ruby-kafka/archive/refs/tags/v1.4.0.tar.gz"
@@ -25777,6 +25997,16 @@
           "name": "rubygem-thor",
           "version": "1.2.1",
           "downloadUrl": "https://github.com/rails/thor/archive/refs/tags/v1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-thread_order",
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/JoshCheek/thread_order/archive/refs/tags/v1.1.1.tar.gz"
         }
       }
     },
@@ -27429,6 +27659,16 @@
           "name": "tn5250",
           "version": "0.17.4",
           "downloadUrl": "http://downloads.sourceforge.net/tn5250/tn5250-0.17.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "udisks2",
+          "version": "2.9.4",
+          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.9.4/udisks-2.9.4.tar.bz2"
         }
       }
     },

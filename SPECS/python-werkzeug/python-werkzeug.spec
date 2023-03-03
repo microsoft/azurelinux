@@ -1,13 +1,14 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
 Version:        2.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
+Patch0:         CVE-2023-25577.patch
 BuildArch:      noarch
 
 %description
@@ -31,7 +32,7 @@ Requires:       python3
 Werkzeug started as simple collection of various utilities for WSGI applications and has become one of the most advanced WSGI utility modules. It includes a powerful debugger, full featured request and response objects, HTTP utilities to handle entity tags, cache control headers, HTTP dates, cookie handling, file uploads, a powerful URL routing system and a bunch of community contributed addon modules.
 
 %prep
-%autosetup -n werkzeug-%{version}
+%autosetup -n werkzeug-%{version} -p1
 
 %build
 %py3_build
@@ -49,6 +50,9 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 24 2023 Minghe Ren <mingheren@microsoft.com> - 2.0.3-2
+- Add patch for CVE-2023-25577
+
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.3-1
 - Updated to version 2.0.3
 - Switch to github source and URL
