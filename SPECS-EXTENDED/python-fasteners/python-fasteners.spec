@@ -1,24 +1,13 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.6)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 1;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
 %bcond_without tests
-
 # The python-diskcache package, used in some of the tests, has been retired.
 %bcond_with diskcache
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           python-fasteners
 Version:        0.18
-Release:        %autorelease
+Release:        2%{?dist}
 Summary:        A python package that provides useful locks
-
 License:        Apache-2.0
 URL:            https://github.com/harlowja/fasteners
 # We need to use the GitHub archive instead of the PyPI sdist to get tests.
@@ -94,6 +83,11 @@ sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.18-2
+- Convert 'Release' tag to '[number].[distribution]' format
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Sep 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.18-1
 - Update to 0.18 (close RHBZ#2126965)
 - The separate -doc subpackage is dropped since upstream switched from
