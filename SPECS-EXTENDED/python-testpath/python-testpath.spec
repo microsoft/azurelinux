@@ -1,24 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name testpath
 
+Summary:        Test utilities for code working with files and commands
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           python-%{pypi_name}
 Version:        0.5.0
-Release:        3%{?dist}
-Summary:        Test utilities for code working with files and commands
-
+Release:        4%{?dist}
 License:        MIT
 URL:            https://github.com/jupyter/testpath
-
 Source0:        %pypi_source
-
 BuildArch:      noarch
 
 BuildRequires:  python3-pip
 BuildRequires:  python3-devel
-
 BuildRequires:  python3-flit
-
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
@@ -87,6 +82,10 @@ rm -rf html/.{doctrees,buildinfo}
 %doc html
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.5.0-4
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
