@@ -59,6 +59,11 @@ sed -i 's/decorator>=4,<5/decorator>=4,<6/' setup.py
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.0.0-1
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Bump version to 2.0.0
+- License verified
+
 * Mon May 02 2022 Miro Hrončok <mhroncok@redhat.com> - 1.1.5^20220502git000bba0e-1
 - Initial package from upstream pull request #22
   https://github.com/bitprophet/pytest-relaxed/pull/22
