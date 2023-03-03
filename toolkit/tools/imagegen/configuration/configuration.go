@@ -228,7 +228,7 @@ func checkInvalidMountIdentifiers(config *Config) (err error) {
 	return
 }
 
-func CheckInvalidMultiDiskConfig(config *Config) (err error) {
+func checkInvalidMultiDiskConfig(config *Config) (err error) {
 	if len(config.Disks) > 1 {
 		for _, sysConfig := range config.SystemConfigs {
 			if sysConfig.PrimaryDisk == "" {
@@ -252,6 +252,20 @@ func checkMismatchedDiskTypes(config *Config) (err error) {
 			if config.Disks[0].TargetDisk.Type != config.Disks[i].TargetDisk.Type {
 				return fmt.Errorf("[Disk] '%d' has a target type of '%s' while [Disk] '0' has a target type of '%s', ensure all disk target types match", i, config.Disks[i].TargetDisk.Type, config.Disks[0].TargetDisk.Type)
 			}
+		}
+	}
+	return err
+}
+
+func checkDuplicateArtifactNames(config *Config) (err error) {
+	artifactNames := make(map[string]bool)
+	for i, disk := range config.Disks {
+		for _, artifact := range disk.Artifacts {
+			filename := artifact.Name + artifact.Type
+			if _, exists := artifactNames[filename]; exists {
+				return fmt.Errorf("[Disk] '%d' has an [Artifact] with a duplicate name '%s' and type '%s'", i, artifact.Name, artifact.Type)
+			}
+			artifactNames[filename] = true
 		}
 	}
 	return err
@@ -292,7 +306,12 @@ func (c *Config) IsValid() (err error) {
 		return fmt.Errorf("invalid [Config]: %w", err)
 	}
 
-	err = CheckInvalidMultiDiskConfig(c)
+	err = checkInvalidMultiDiskConfig(c)
+	if err != nil {
+		return fmt.Errorf("invalid [Config]: %w", err)
+	}
+
+	err = checkDuplicateArtifactNames(c)
 	if err != nil {
 		return fmt.Errorf("invalid [Config]: %w", err)
 	}
