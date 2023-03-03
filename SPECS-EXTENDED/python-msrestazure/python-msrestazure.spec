@@ -1,33 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.5)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 9;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
-# Enable tests everywhere except EPEL 9, where python-httpretty is not backported.
-%if 0%{?el9}
-%bcond_without tests
-%else
 %bcond_with    tests
-%endif
-
 
 %global         srcname     msrestazure
 %global         forgeurl    https://github.com/Azure/msrestazure-for-python/
-Version:        0.6.4
-%global         tag         v%{version}
-%forgemeta
 
-Name:           python-%{srcname}
-Release:        %autorelease
 Summary:        The runtime library "msrestazure" for AutoRest generated Python clients
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Version:        0.6.4
+Name:           python-%{srcname}
+Release:        9%{?dist}
 
 License:        MIT
+%global         tag         v%{version}
+%forgemeta
 URL:            %forgeurl
 Source0:        %forgesource
 
@@ -88,6 +73,11 @@ Summary:        %{summary}
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.6.4-9
+- Convert 'Release' tag to '[number].[distribution]' format
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Mon Apr 25 2022 Major Hayden <major@mhtx.net> 0.6.4-8
 - Disable tests in EPEL 9
 
