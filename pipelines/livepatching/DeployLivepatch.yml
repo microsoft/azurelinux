@@ -143,6 +143,7 @@ extends:
           displayName: 'Extract livepatch module'
           inputs:
             filePath: '$(Agent.BuildDirectory)/$(selfRepoCheckoutPath)/pipelines/livepatching/ExtractLivepatchModule.sh'
+            workingDirectory: '$(Agent.BuildDirectory)/$(selfRepoCheckoutPath)'
             arguments: '-a "$(System.ArtifactsDirectory)"'
 
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
