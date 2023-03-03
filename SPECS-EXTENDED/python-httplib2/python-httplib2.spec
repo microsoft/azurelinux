@@ -1,10 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global srcname httplib2
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           python-%{srcname}
 Version:        0.20.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Comprehensive HTTP client library
 License:        MIT
 URL:            https://pypi.python.org/pypi/httplib2
@@ -71,6 +71,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.20.3-3
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
