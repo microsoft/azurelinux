@@ -142,7 +142,7 @@ extends:
         - task: Bash@3
           displayName: 'Extract livepatch module'
           inputs:
-            filePath: '$(Agent.BuildDirectory)/$(selfRepoCheckoutPath)/pipelines/livepatching/ExtractLivepatchModule.sh'
+            filePath: 'pipelines/livepatching/ExtractLivepatchModule.sh'
             workingDirectory: '$(Agent.BuildDirectory)/$(selfRepoCheckoutPath)'
             arguments: '-a "$(System.ArtifactsDirectory)"'
 
