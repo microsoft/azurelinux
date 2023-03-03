@@ -167,10 +167,10 @@ libgcrypt-debuginfo-1.9.4-1.cm2.aarch64.rpm
 libgcrypt-devel-1.9.4-1.cm2.aarch64.rpm
 libgomp-11.2.0-4.cm2.aarch64.rpm
 libgomp-devel-11.2.0-4.cm2.aarch64.rpm
-libgpg-error-1.43-2.cm2.aarch64.rpm
-libgpg-error-debuginfo-1.43-2.cm2.aarch64.rpm
-libgpg-error-devel-1.43-2.cm2.aarch64.rpm
-libgpg-error-lang-1.43-2.cm2.aarch64.rpm
+libgpg-error-1.46-1.cm2.aarch64.rpm
+libgpg-error-debuginfo-1.46-1.cm2.aarch64.rpm
+libgpg-error-devel-1.46-1.cm2.aarch64.rpm
+libgpg-error-lang-1.46-1.cm2.aarch64.rpm
 libksba-1.6.3-1.cm2.aarch64.rpm
 libksba-debuginfo-1.6.3-1.cm2.aarch64.rpm
 libksba-devel-1.6.3-1.cm2.aarch64.rpm
