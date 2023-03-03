@@ -1,0 +1,212 @@
+https://build.opensuse.org/package/view_file/network:telephony/libpt2/libpt2-openssl11.patch
+by mgorse@suse.com, see also:
+
+ - https://build.opensuse.org/request/show/518821
+ - https://bugzilla.opensuse.org/show_bug.cgi?id=1055477
+
+--- ptlib-2.10.11/src/ptclib/pssl.cxx			2013-08-14 18:20:27.000000000 -0500
++++ ptlib-2.10.11/src/ptclib/pssl.cxx.openssl11		2017-08-25 17:25:44.824287596 -0500
+@@ -140,7 +140,11 @@ PFACTORY_CREATE_SINGLETON(PProcessStartu
+ class PSSL_BIO
+ {
+   public:
++#if OPENSSL_VERSION_NUMBER >= 0x10100000
++    PSSL_BIO(const BIO_METHOD *method = BIO_s_file())
++#else
+     PSSL_BIO(BIO_METHOD *method = BIO_s_file_internal())
++#endif
+       { bio = BIO_new(method); }
+ 
+     ~PSSL_BIO()
+@@ -627,10 +631,18 @@ PSSLDiffieHellman::PSSLDiffieHellman(con
+   if (dh == NULL)
+     return;
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++  DH_set0_pqg (dh, BN_bin2bn(pData, pSize, NULL), NULL, BN_bin2bn(gData, gSize, NULL));
++  const BIGNUM *p, *g;
++  DH_get0_pqg(dh, &p, NULL, &g);
++  if (p != NULL && g != NULL)
++    return;
++#else
+   dh->p = BN_bin2bn(pData, pSize, NULL);
+   dh->g = BN_bin2bn(gData, gSize, NULL);
+   if (dh->p != NULL && dh->g != NULL)
+     return;
++#endif
+ 
+   DH_free(dh);
+   dh = NULL;
+@@ -805,9 +817,11 @@ void PSSLContext::Construct(Method metho
+   SSL_METHOD * meth;
+ 
+   switch (method) {
++#ifndef OPENSSL_NO_SSL3
+     case SSLv3:
+       meth = SSLv3_method();
+       break;
++#endif
+     case TLSv1:
+       meth = TLSv1_method(); 
+       break;
+@@ -1117,7 +1131,11 @@ PBoolean PSSLChannel::RawSSLRead(void *
+ //
+ 
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++#define PSSLCHANNEL(bio)      ((PSSLChannel *)(BIO_get_data (bio)))
++#else
+ #define PSSLCHANNEL(bio)      ((PSSLChannel *)(bio->ptr))
++#endif
+ 
+ extern "C" {
+ 
+@@ -1130,10 +1148,16 @@ typedef long (*lfptr)();
+ 
+ static int Psock_new(BIO * bio)
+ {
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++  BIO_set_init (bio, 0);
++  BIO_set_data (bio, NULL);;    // this is really (PSSLChannel *)
++  BIO_set_flags (bio, 0);
++#else
+   bio->init     = 0;
+   bio->num      = 0;
+   bio->ptr      = NULL;    // this is really (PSSLChannel *)
+   bio->flags    = 0;
++#endif
+ 
+   return(1);
+ }
+@@ -1144,13 +1168,23 @@ static int Psock_free(BIO * bio)
+   if (bio == NULL)
+     return 0;
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++  if (BIO_get_shutdown (bio)) {
++    if (BIO_get_init (bio)) {
++#else
+   if (bio->shutdown) {
+     if (bio->init) {
++#endif
+       PSSLCHANNEL(bio)->Shutdown(PSocket::ShutdownReadAndWrite);
+       PSSLCHANNEL(bio)->Close();
+     }
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++    BIO_set_init (bio, 0);
++    BIO_set_flags (bio, 0);
++#else
+     bio->init  = 0;
+     bio->flags = 0;
++#endif
+   }
+   return 1;
+ }
+@@ -1160,11 +1194,19 @@ static long Psock_ctrl(BIO * bio, int cm
+ {
+   switch (cmd) {
+     case BIO_CTRL_SET_CLOSE:
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++      BIO_set_shutdown (bio, (int)num);
++#else
+       bio->shutdown = (int)num;
++#endif
+       return 1;
+ 
+     case BIO_CTRL_GET_CLOSE:
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++      return BIO_get_shutdown (bio);
++#else
+       return bio->shutdown;
++#endif
+ 
+     case BIO_CTRL_FLUSH:
+       return 1;
+@@ -1239,41 +1281,64 @@ static int Psock_puts(BIO * bio, const c
+ };
+ 
+ 
+-static BIO_METHOD methods_Psock =
+-{
+-  BIO_TYPE_SOCKET,
+-  "PTLib-PSSLChannel",
+-#if (OPENSSL_VERSION_NUMBER < 0x00906000)
+-  (ifptr)Psock_write,
+-  (ifptr)Psock_read,
+-  (ifptr)Psock_puts,
+-  NULL,
+-  (lfptr)Psock_ctrl,
+-  (ifptr)Psock_new,
+-  (ifptr)Psock_free
+-#else
+-  Psock_write,
+-  Psock_read,
+-  Psock_puts,
+-  NULL,
+-  Psock_ctrl,
+-  Psock_new,
+-  Psock_free
+-#endif
+-};
+-
+ 
+ PBoolean PSSLChannel::OnOpen()
+ {
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++  static BIO_METHOD *methods_pSock = NULL;
++
++  if (methods_pSock == NULL) {
++    methods_pSock = BIO_meth_new (BIO_TYPE_SOCKET, "PTLib-PSSLChannel");
++    if (!methods_pSock)
++      return FALSE;
++    BIO_meth_set_write (methods_pSock, Psock_write);
++    BIO_meth_set_read (methods_pSock, Psock_read);
++    BIO_meth_set_puts (methods_pSock, Psock_puts);
++    BIO_meth_set_ctrl (methods_pSock, Psock_ctrl);
++    BIO_meth_set_create (methods_pSock, Psock_new);
++    BIO_meth_set_destroy (methods_pSock, Psock_free);
++  }
++
++  BIO * bio = BIO_new(methods_pSock);
++#else
++  static BIO_METHOD methods_Psock =
++  {
++    BIO_TYPE_SOCKET,
++    "PTLib-PSSLChannel",
++  #if (OPENSSL_VERSION_NUMBER < 0x00906000)
++    (ifptr)Psock_write,
++    (ifptr)Psock_read,
++    (ifptr)Psock_puts,
++    NULL,
++    (lfptr)Psock_ctrl,
++    (ifptr)Psock_new,
++    (ifptr)Psock_free
++  #else
++    Psock_write,
++    Psock_read,
++    Psock_puts,
++    NULL,
++    Psock_ctrl,
++    Psock_new,
++    Psock_free
++  #endif
++  };
++
+   BIO * bio = BIO_new(&methods_Psock);
++#endif
+   if (bio == NULL) {
+     SSLerr(SSL_F_SSL_SET_FD,ERR_R_BUF_LIB);
+     return PFalse;
+   }
+ 
+   // "Open" then bio
++#if OPENSSL_VERSION_NUMBER >= 0x10100000l
++  BIO_set_data (bio, this);
++  BIO_set_init (bio, 1);
++#else
+   bio->ptr  = this;
+   bio->init = 1;
++#endif
+ 
+   SSL_set_bio(ssl, bio, bio);
+   return PTrue;

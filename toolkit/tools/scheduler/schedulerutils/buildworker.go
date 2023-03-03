@@ -4,8 +4,11 @@
 package schedulerutils
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -87,7 +90,7 @@ func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish 
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, ignoredPackages []string) {
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages []string) {
 	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
 
 		res := &BuildResult{
@@ -97,7 +100,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeBuild:
-			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
+			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
@@ -121,7 +124,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
 	var missingFiles []string
 
 	baseSrpmName := node.SRPMFileName()
@@ -148,7 +151,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
 	logger.Log.Infof("Building %s", baseSrpmName)
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, node.Architecture, dependencies)
+	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, checkAttempts, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
@@ -186,18 +189,71 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 	return
 }
 
+// parseCheckSection reads the package build log file to determine if the %check section passed or not
+func parseCheckSection(logFile string) (err error) {
+	file, err := os.Open(logFile)
+	// If we can't open the log file, that's a build error.
+	if err != nil {
+		logger.Log.Errorf("Failed to open log file '%s' while checking package test results. Error: %v", logFile, err)
+		return
+	}
+	defer file.Close()
+	for scanner := bufio.NewScanner(file); scanner.Scan(); {
+		currLine := scanner.Text()
+		// Anything besides 0 is a failed test
+		if strings.Contains(currLine, "CHECK DONE") {
+			if strings.Contains(currLine, "EXIT STATUS 0") {
+				return
+			}
+			failedLogFile := strings.TrimSuffix(logFile, ".log")
+			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
+			err = os.Rename(logFile, failedLogFile)
+			if err != nil {
+				logger.Log.Errorf("Log file rename failed. Error: %v", err)
+				return
+			}
+			err = fmt.Errorf("package test failed. Test status line: %s", currLine)
+			return
+		}
+	}
+	return
+}
+
 // buildSRPMFile sends an SRPM to a build agent to build.
-func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
+func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
 	const (
 		retryDuration = time.Second
 	)
 
+	// checkFailed is a flag to see if a non-null buildErr is from the %check section
+	checkFailed := false
 	logBaseName := filepath.Base(srpmFile) + ".log"
+	// temporary solution; potential fix: build normally for buildAttempts, then run rmpbuild -bi --short-circuit to just do the checks
+	// relevant bug https://microsoft.visualstudio.com/OS/_workitems/edit/43454529
+	maxAttempts := buildAttempts
+	if checkAttempts > maxAttempts {
+		maxAttempts = checkAttempts
+	}
+
 	err = retry.Run(func() (buildErr error) {
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
-		return
-	}, buildAttempts, retryDuration)
+		// If the package builds with no errors and RUN_CHECK=y, check logs to see if the %check section passed, and if not, return as the build error.
+		if buildErr != nil {
+			return
+		}
 
+		if agent.Config().RunCheck {
+			buildErr = parseCheckSection(logFile)
+			checkFailed = (buildErr != nil)
+		}
+		return
+	}, maxAttempts, retryDuration)
+
+	// temporary solution; potential fix: once stable, fail builds if %check section fails?
+	if err != nil && checkFailed {
+		logger.Log.Warnf("Tests failed for '%s'. Ignoring since the package built correctly. Error: %v", srpmFile, err)
+		err = nil
+	}
 	return
 }
 

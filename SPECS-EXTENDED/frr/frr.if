@@ -1,0 +1,162 @@
+## <summary>policy for frr</summary>
+
+########################################
+## <summary>
+##	Execute frr_exec_t in the frr domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`frr_domtrans',`
+	gen_require(`
+		type frr_t, frr_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, frr_exec_t, frr_t)
+')
+
+######################################
+## <summary>
+##	Execute frr in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`frr_exec',`
+	gen_require(`
+		type frr_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1, frr_exec_t)
+')
+
+########################################
+## <summary>
+##	Read frr's log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`frr_read_log',`
+	gen_require(`
+		type frr_log_t;
+	')
+
+	read_files_pattern($1, frr_log_t, frr_log_t)
+	optional_policy(`
+		logging_search_logs($1)
+	')
+')
+
+########################################
+## <summary>
+##	Append to frr log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`frr_append_log',`
+	gen_require(`
+		type frr_log_t;
+	')
+
+	append_files_pattern($1, frr_log_t, frr_log_t)
+	optional_policy(`
+		logging_search_logs($1)
+	')
+')
+
+########################################
+## <summary>
+##	Manage frr log files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`frr_manage_log',`
+	gen_require(`
+		type frr_log_t;
+	')
+
+	manage_dirs_pattern($1, frr_log_t, frr_log_t)
+	manage_files_pattern($1, frr_log_t, frr_log_t)
+	manage_lnk_files_pattern($1, frr_log_t, frr_log_t)
+	optional_policy(`
+		logging_search_logs($1)
+	')
+')
+
+########################################
+## <summary>
+##	Read frr PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`frr_read_pid_files',`
+	gen_require(`
+		type frr_var_run_t;
+	')
+
+	files_search_pids($1)
+	read_files_pattern($1, frr_var_run_t, frr_var_run_t)
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an frr environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`frr_admin',`
+	gen_require(`
+		type frr_t;
+		type frr_log_t;
+		type frr_var_run_t;
+	')
+
+	allow $1 frr_t:process { signal_perms };
+	ps_process_pattern($1, frr_t)
+
+	tunable_policy(`deny_ptrace',`',`
+		allow $1 frr_t:process ptrace;
+	')
+
+	admin_pattern($1, frr_log_t)
+
+	files_search_pids($1)
+	admin_pattern($1, frr_var_run_t)
+	optional_policy(`
+		logging_search_logs($1)
+	')
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')

@@ -1,0 +1,78 @@
+diff --git a/lib/subdir.am b/lib/subdir.am
+index 0b7af18..0533e24 100644
+--- a/lib/subdir.am
++++ b/lib/subdir.am
+@@ -41,7 +41,6 @@ lib_libfrr_la_SOURCES = \
+ 	lib/log.c \
+ 	lib/log_filter.c \
+ 	lib/log_vty.c \
+-	lib/md5.c \
+ 	lib/memory.c \
+ 	lib/mlag.c \
+ 	lib/module.c \
+@@ -64,7 +64,6 @@ lib_libfrr_la_SOURCES = \
+ 	lib/routemap_northbound.c \
+ 	lib/sbuf.c \
+ 	lib/seqlock.c \
+-	lib/sha256.c \
+ 	lib/sigevent.c \
+ 	lib/skiplist.c \
+ 	lib/sockopt.c \
+@@ -170,7 +170,6 @@ pkginclude_HEADERS += \
+ 	lib/link_state.h \
+ 	lib/log.h \
+ 	lib/log_vty.h \
+-	lib/md5.h \
+ 	lib/memory.h \
+ 	lib/module.h \
+ 	lib/monotime.h \
+@@ -191,7 +190,6 @@ pkginclude_HEADERS += \
+ 	lib/route_opaque.h \
+ 	lib/sbuf.h \
+ 	lib/seqlock.h \
+-	lib/sha256.h \
+ 	lib/sigevent.h \
+ 	lib/skiplist.h \
+ 	lib/smux.h \
+diff --git a/isisd/isis_lsp.c b/isisd/isis_lsp.c
+index 1991666..2e4fe55 100644
+--- a/isisd/isis_lsp.c
++++ b/isisd/isis_lsp.c
+@@ -35,7 +35,9 @@
+ #include "hash.h"
+ #include "if.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "table.h"
+ #include "srcdest_table.h"
+ #include "lib_errors.h"
+diff --git a/isisd/isis_pdu.c b/isisd/isis_pdu.c
+index 9c63311..7cf594c 100644
+--- a/isisd/isis_pdu.c
++++ b/isisd/isis_pdu.c
+@@ -33,7 +33,9 @@
+ #include "prefix.h"
+ #include "if.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "lib_errors.h"
+ 
+ #include "isisd/isis_constants.h"
+diff --git a/isisd/isis_te.c b/isisd/isis_te.c
+index 4ea6c2c..72ff0d2 100644
+--- a/isisd/isis_te.c
++++ b/isisd/isis_te.c
+@@ -38,7 +38,9 @@
+ #include "if.h"
+ #include "vrf.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "sockunion.h"
+ #include "network.h"
+ #include "sbuf.h"

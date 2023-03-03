@@ -1,0 +1,8 @@
+# .mkshrc
+
+# Source global definitions
+if [ -f /etc/mkshrc ]; then
+	. /etc/mkshrc
+fi
+
+# User specific aliases and functions
