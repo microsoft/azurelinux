@@ -1,14 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global srcname waitress
-
 %global _docdir_fmt %{name}
 
+Summary:        Waitress WSGI server
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           python-%{srcname}
 Version:        1.4.4
-Release:        6%{?dist}
-Summary:        Waitress WSGI server
-
+Release:        7%{?dist}
 License:        ZPLv2.1
 URL:            https://github.com/Pylons/%{srcname}
 Source0:        v%{version}-nodocs.tar.gz
@@ -53,10 +51,6 @@ Python 3 version.
 %install
 %py3_install
 
-#check
-# disable checks for now as they fail trying to lookup localhost in koji.
-#
-
 %files -n python3-%{srcname}
 %license COPYRIGHT.txt LICENSE.txt
 %doc README.rst CHANGES.txt
@@ -65,6 +59,10 @@ Python 3 version.
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.4.4-7
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.4-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
