@@ -18,7 +18,7 @@ BuildRequires:  libgcrypt-devel > 1.9.1
 BuildRequires:  libgpg-error-devel >= 1.41
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
-Requires:       libgpg-error >= 1.41
+Requires:       libgpg-error >= 1.46
 Requires:       npth >= 1.2
 Requires:       libassuan >= 2.5.0
 Requires:       pinentry
@@ -91,6 +91,7 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %changelog
 * Mon Jan 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-1
 - Auto-upgrade to 2.4.0 - to fix CVE-2022-3515
+- Update libgpg-error dependency to 1.46
 
 * Tue Aug 09 2022 Andrew Phelps <anphel@microsoft.com> - 2.3.7-1
 - Update to version 2.3.7 to resolve CVE-2022-34903
