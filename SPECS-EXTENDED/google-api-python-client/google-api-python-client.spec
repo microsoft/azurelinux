@@ -1,23 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-## START: Set by rpmautospec
-## (rpmautospec version 0.3.1)
-## RPMAUTOSPEC: autorelease, autochangelog
-%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 1;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
-## END: Set by rpmautospec
-
 %global sum Google APIs Client Library for Python
 %global srcname google-api-client
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           google-api-python-client
 Summary:        %{sum}
-Epoch:          2
 Version:        2.73.0
-Release:        %autorelease
+Release:        2%{?dist}
 
 License:        ASL 2.0
 URL:            https://github.com/googleapis/google-api-python-client
@@ -25,10 +14,10 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 
@@ -61,6 +50,11 @@ Python 3 client library for accessing Google APIs.
 %doc README.md
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.73.0-2
+- Convert 'Release' tag to '[number].[distribution]' format
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Thu Jan 19 2023 Mikel Olasagasti Uranga <mikel@olasagasti.info> - 2:2.73.0-1
 - Update to 2.73.0 - Closes rhbz#2160094
 
