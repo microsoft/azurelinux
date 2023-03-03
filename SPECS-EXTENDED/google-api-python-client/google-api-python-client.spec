@@ -1,10 +1,10 @@
 %global sum Google APIs Client Library for Python
 %global srcname google-api-client
 
+Summary:        %{sum}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           google-api-python-client
-Summary:        %{sum}
 Version:        2.73.0
 Release:        2%{?dist}
 
