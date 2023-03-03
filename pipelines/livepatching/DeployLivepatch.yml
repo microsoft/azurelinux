@@ -13,6 +13,9 @@ variables:
 - name: 'pipelinesRepoCheckoutPath'
   value: '$(Build.SourcesDirectory)/CBL-Mariner-Pipelines'
 
+- name: 'selfRepoCheckoutPath'
+  value: '$(Build.SourcesDirectory)/CBL-Mariner'
+
 parameters:
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
@@ -113,7 +116,7 @@ extends:
       - job:
         steps:
         - checkout: self
-          path: '$(Build.SourcesDirectory)'
+          path: '$(selfRepoCheckoutPath)'
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoCheckoutPath)'
         # - task: DownloadPipelineArtifact@2
@@ -139,7 +142,7 @@ extends:
         - task: Bash@3
           displayName: 'Extract livepatch module'
           inputs:
-            filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/ExtractLivepatchModule.sh'
+            filePath: '$(selfRepoCheckoutPath)/pipelines/livepatching/ExtractLivepatchModule.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"'
 
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
