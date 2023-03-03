@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # what it's called on pypi
 %global srcname ddt
 # what it's imported as
@@ -16,10 +14,11 @@ combination with other testing frameworks like unittest and nose.}
 
 %bcond_without  tests
 
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           python-%{pkgname}
 Version:        1.4.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Python library to multiply test cases
 License:        MIT
 URL:            https://github.com/datadriventests/ddt
@@ -70,6 +69,10 @@ rm -rf %{eggname}.egg-info
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.4.2-6
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
