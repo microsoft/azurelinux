@@ -1,17 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           python-pytest-relaxed
-# Build from a fork for now for pytest 5+ support
-# https://github.com/bitprophet/pytest-relaxed/pull/22
-%global date    20220502
-%global commit  000bba0e55ffc726c398485a1cefad63e28c9d2b
-%global short   000bba0e
-Version:        1.1.5^%{date}git%{short}
+Version:        2.0.0
 Release:        1%{?dist}
 Summary:        Relaxed test discovery/organization for pytest
 License:        BSD-2-Clause
 URL:            https://github.com/bitprophet/pytest-relaxed
-Source:         %{url}/archive/%{commit}/pytest-relaxed-%{short}.tar.gz
+Source:         %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
@@ -38,7 +33,7 @@ Summary:        %{summary}
 
 
 %prep
-%autosetup -p1 -n pytest-relaxed-%{commit}
+%autosetup -p1 -n pytest-relaxed-%{version}
 sed -i 's/decorator>=4,<5/decorator>=4,<6/' setup.py
 
 
