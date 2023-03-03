@@ -110,7 +110,7 @@ extends:
         - task: Bash@3
           displayName: 'Build livepatch'
           inputs:
-            filePath: '$(selfRepoRoot)/pipelines/livepatching/BuildLivepatch.sh'
+            filePath: 'pipelines/livepatching/BuildLivepatch.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
@@ -123,8 +123,10 @@ extends:
         steps:
         - checkout: self
           path: '$(selfRepoFolder)'
+
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoFolder)'
+
         - task: DownloadPipelineArtifact@2
           displayName: 'Download livepatch RPM'
           inputs:
