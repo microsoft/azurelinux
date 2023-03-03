@@ -11,10 +11,10 @@ variables:
   value: 'LOGS'
 
 - name: 'pipelinesRepoCheckoutPath'
-  value: '$(Agent.BuildDirectory)/CBL-Mariner-Pipelines'
+  value: '$CBL-Mariner-Pipelines'
 
 - name: 'selfRepoCheckoutPath'
-  value: '$(Agent.BuildDirectory)/CBL-Mariner'
+  value: 'CBL-Mariner'
 
 parameters:
 - name: livepatchKernelVersion
@@ -142,13 +142,13 @@ extends:
         - task: Bash@3
           displayName: 'Extract livepatch module'
           inputs:
-            filePath: '$(selfRepoCheckoutPath)/pipelines/livepatching/ExtractLivepatchModule.sh'
+            filePath: '$(Agent.BuildDirectory)/$(selfRepoCheckoutPath)/pipelines/livepatching/ExtractLivepatchModule.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"'
 
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
           parameters:
             artifactsFolder: '$(System.ArtifactsDirectory)'
-            repoRootPath: '$(pipelinesRepoCheckoutPath)'
+            repoRootPath: '$(Agent.BuildDirectory)/$(pipelinesRepoCheckoutPath)'
 
     - stage: Test
       jobs:
