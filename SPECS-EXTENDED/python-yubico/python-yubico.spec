@@ -1,13 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %{?python_enable_dependency_generator}
 %global srcname yubico
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:           python-%{srcname}
 Version:        1.3.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Pure-python library for interacting with Yubikeys
-
 License:        BSD
 URL:            https://github.com/Yubico/%{name}
 Source0:        https://github.com/Yubico/%{name}/archive/%{name}-%{version}.tar.gz
@@ -55,6 +54,10 @@ Pure-python library for interacting with Yubikeys. For Python 3.
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.73.0-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.3-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
