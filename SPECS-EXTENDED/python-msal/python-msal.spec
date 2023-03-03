@@ -1,26 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.6)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 1;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
-# Most of the tests require network access, so they are disabled by default.
-%bcond_with     tests
-
 %global         srcname         msal
 %global         forgeurl        https://github.com/AzureAD/microsoft-authentication-library-for-python/
-Version:        1.18.0~b1
 %global         pypi_version    1.18.0b1
 %global         tag             %{pypi_version}
 %forgemeta
 
+# Most of the tests require network access, so they are disabled by default.
+%bcond_with     tests
+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Version:        1.18.0~b1
 Name:           python-%{srcname}
-Release:        %autorelease
+Release:        2%{?dist}
 Summary:        Microsoft Authentication Library (MSAL) for Python
 
 License:        MIT
@@ -85,6 +76,11 @@ Summary:        %{summary}
 
 
 %changelog
+* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.18.0~b1-2
+- Convert 'Release' tag to '[number].[distribution]' format
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified
+
 * Tue May 24 2022 Major Hayden <major@mhtx.net> 1.18.0~b1-1
 - Update to 1.18.0~b1
 
