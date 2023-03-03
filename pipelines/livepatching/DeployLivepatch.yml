@@ -11,10 +11,10 @@ variables:
   value: 'LOGS'
 
 - name: 'pipelinesRepoCheckoutPath'
-  value: '$(Build.SourcesDirectory)/CBL-Mariner-Pipelines'
+  value: 'CBL-Mariner-Pipelines'
 
 - name: 'selfRepoCheckoutPath'
-  value: '$(Build.SourcesDirectory)/CBL-Mariner'
+  value: 'CBL-Mariner'
 
 parameters:
 - name: livepatchKernelVersion
