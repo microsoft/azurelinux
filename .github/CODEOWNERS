@@ -4,6 +4,9 @@
 # Modification to this file require admin approval.
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
 
+# Modifications to the livepatches build pipelines require admin approval.
+/pipelines/livepatching/* @microsoft/cbl-mariner-admins
+
 # Modification to what is considered "core packages" require admin approval.
 /SPECS/core-packages/* @microsoft/cbl-mariner-admins
 
