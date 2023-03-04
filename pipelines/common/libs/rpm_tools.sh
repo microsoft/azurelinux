@@ -18,7 +18,7 @@ rpm_extract_file() {
     local rpm_path
     local work_dir
 
-    while getopts "f:i:o:p:w:" OPTIONS
+    while getopts "fi:o:p:w:" OPTIONS
     do
         case "${OPTIONS}" in
             f ) flatten=true ;;
@@ -95,7 +95,7 @@ rpm_extract_files() {
     local rpm_path
     local work_dir
 
-    while getopts "f:i:o:p:w:" OPTIONS
+    while getopts "fi:o:p:w:" OPTIONS
     do
         case "${OPTIONS}" in
             f ) flatten_arg="-f" ;;

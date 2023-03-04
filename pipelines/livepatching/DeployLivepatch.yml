@@ -122,7 +122,7 @@ extends:
 
     - stage: Sign
       jobs:
-      - job:
+      - job: Kernel_modules
         templateContext:
           outputs:
           - output: pipelineArtifact
@@ -186,6 +186,26 @@ extends:
                         -m "$(kernelModulesFolder)""
                         -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
             workingDirectory: '$(selfRepoRoot)'
+
+      - job: RPMs
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: build-artifacts
+
+          - output: pipelineArtifact
+            displayName: 'Publish logs'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
+            artifactName: LOGS
+
+        steps:
+        - checkout: self
+          path: '$(selfRepoFolder)'
+
+        - checkout: CBL-Mariner-Pipelines
+          path: '$(pipelinesRepoFolder)'
 
     - stage: Test
       jobs:
