@@ -18,6 +18,7 @@ rpm_extract_file() {
     local rpm_path
     local work_dir
 
+    local OPTIND
     while getopts "fi:o:p:w:" OPTIONS
     do
         case "${OPTIONS}" in
@@ -95,6 +96,7 @@ rpm_extract_files() {
     local rpm_path
     local work_dir
 
+    local OPTIND
     while getopts "fi:o:p:w:" OPTIONS
     do
         case "${OPTIONS}" in
