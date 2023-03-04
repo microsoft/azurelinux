@@ -123,7 +123,7 @@ trap cleanup EXIT
 
 hydrate_built_rpms "$ARTIFACTS_DIR"
 
-# Saving the unsigned version for the sake of later comparison with the signed one.
+# Saving the unsigned version for the sake of comparing with the signed one after it's built.
 find "out" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$tmpdir" \;
 
 hydrate_signed_sources "$KERNEL_VERSION" "$KERNEL_MODULES_DIR"
