@@ -106,7 +106,7 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 
 %changelog
 * Thu Mar 02 2023 Minghe Ren <mingheren@microsoft.com> - 8.32-7
-- Add coreutils-provides.inc for LinkedIn.
+- Add coreutils-provides.inc for LinkedIn to resolve dependency issue as we moved some binaries into /bin/ from /usr/bin/.
 
 * Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 8.32-6
 - Force rebuild to address missing SELinux features.
