@@ -1,32 +1,134 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-rpm_extract_files() {
-    local files_pattern
+# Extracts files from the specified RPM file.
+# If no pattern is specified, all files are extracted.
+# Arguments:
+#  -f -> flatten the extracted files into the output directory
+#        WARNING: this will overwrite files with the same name.
+#  -i -> input RPM file.
+#  -o -> output directory.
+#  -p -> files pattern.
+#        Default: '*'.
+#  -w -> temporary work directory.
+rpm_extract_file() {
+    local files_pattern="*"
+    local flatten
     local rpm_name
     local rpm_path
-    local workspace_dir
+    local work_dir
 
-    rpm_path="$1"
-    files_pattern="$2"
-    workspace_dir="$3"
+    while getopts "f:i:o:p:w:" OPTIONS
+    do
+        case "${OPTIONS}" in
+            f ) flatten=true ;;
+            i ) rpm_path="$OPTARG" ;;
+            o ) output_dir="$OPTARG" ;;
+            p ) files_pattern="$OPTARG" ;;
+            w ) work_dir="$OPTARG" ;;
 
-    rpm_name="$(basename "$rpm_path" .rpm)"
+            \? )
+                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                exit 1
+                ;;
+            : )
+                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                exit 1
+                ;;
+        esac
+    done
 
-    if [[ ! -f "$rpm_path" ]]; then
-        echo "ERROR: package RPMs ($rpm_path) not found." >&2
+    if [[ ! -f "$rpm_path" ]]
+    then
+        echo "ERROR: RPM file ($rpm_path) not found." >&2
         return 1
     fi
 
-    if [[ ! -d "$workspace_dir" ]]; then
-        workspace_dir="$(mktemp -d)"
+    if [[ -z "$output_dir" ]]
+    then
+        echo "ERROR: output path not specified." >&2
+        return 1
     fi
 
-    workspace_dir="$workspace_dir/$rpm_name"
-    mkdir -p "$workspace_dir"
+    if [[ -f "$output_dir" ]]
+    then
+        echo "ERROR: output path ($output_dir) is a file. Expected a directory." >&2
+        return 1
+    fi
 
-    echo "Extracting ($files_pattern) from ($rpm_path) inside ($workspace_dir)."
+    rpm_name="$(basename "$rpm_path" .rpm)"
 
-    rpm2cpio "$rpm_path" | cpio --quiet -D "$workspace_dir" -idmv "$files_pattern"
-    find "$workspace_dir" -name "$files_pattern" -exec mv -v {} . \;
+    if [[ ! -d "$work_dir" ]]
+    then
+        work_dir="$(mktemp -d)"
+    fi
+    work_dir="$work_dir/$rpm_name"
+    mkdir -p "$work_dir"
+
+    mkdir -p "$output_dir"
+
+    echo "Extracting ($files_pattern) from ($rpm_path) into ($output_dir)."
+
+    rpm2cpio "$rpm_path" | cpio --quiet -D "$work_dir" -idmv "$files_pattern"
+    if $flatten
+    then
+        find "$work_dir" -name "$files_pattern" -exec mv -v {} "$output_dir" \;
+    else
+        mv "$work_dir" "$output_dir"
+    fi
+}
+
+# Extracts files from the specified directory or RPM file.
+# If no pattern is specified, all files are extracted.
+# Arguments:
+#  -f -> flatten the extracted files into the output directory
+#        WARNING: this will overwrite files with the same name.
+#  -i -> input directory or RPM file.
+#  -o -> output directory.
+#  -p -> files pattern.
+#        Default: '*'.
+#  -w -> temporary work directory.
+rpm_extract_files() {
+    local files_pattern="*"
+    local flatten_arg
+    local rpm_name
+    local rpm_path
+    local work_dir
+
+    while getopts "f:i:o:p:w:" OPTIONS
+    do
+        case "${OPTIONS}" in
+            f ) flatten_arg="-f" ;;
+            i ) input="$OPTARG" ;;
+            o ) output_dir="$OPTARG" ;;
+            p ) files_pattern="$OPTARG" ;;
+            w ) work_dir="$OPTARG" ;;
+
+            \? )
+                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                exit 1
+                ;;
+            : )
+                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [[ ! -d "$input" && ! -f "$input" ]]
+    then
+        echo "ERROR: input ($input) not found." >&2
+        return 1
+    fi
+
+    if ! find "$input" -name "*.rpm" -type f -print0 | grep -q .
+    then
+        echo "ERROR: input ($input) is neither an RPM file nor a directory containing RPM files." >&2
+        return 1
+    fi
+
+    find "$input" -name "*.rpm" -type f -print0 | while IFS= read -r -d '' rpm_path
+    do
+        rpm_extract_file -i "$rpm_path" -p "$files_pattern" -w "$work_dir" -o "$output_dir" $flatten_arg
+    done
 }

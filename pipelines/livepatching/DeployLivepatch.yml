@@ -22,6 +22,9 @@ variables:
 - name: 'selfRepoRoot'
   value: '$(Agent.BuildDirectory)/$(selfRepoFolder)'
 
+- name: 'kernelModulesFolder'
+  value: '$(Pipeline.Workspace)/kernel_modules'
+
 parameters:
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
@@ -128,10 +131,10 @@ extends:
           path: '$(pipelinesRepoFolder)'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download livepatch RPM'
+          displayName: 'Download RPMs archive'
           inputs:
             source: current
-            artifact: 'build-artifacts'
+            artifact: '$(buildArtifactsFolder)'
             patterns: '**/rpms.tar.gz'
             path: '$(System.ArtifactsDirectory)'
         # - task: DownloadPipelineArtifact@2
@@ -148,16 +151,28 @@ extends:
         #     path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
-          displayName: 'Extract livepatch module'
+          displayName: 'Extract kernel modules'
           inputs:
-            filePath: '$(selfRepoRoot)/pipelines/livepatching/ExtractLivepatchModule.sh'
-            arguments: '-a "$(System.ArtifactsDirectory)"'
+            filePath: '$(selfRepoRoot)/pipelines/livepatching/ExtractKernelModules.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -o "$(kernelModulesFolder)"'
             workingDirectory: '$(selfRepoRoot)'
 
         # - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
         #   parameters:
-        #     artifactsFolder: '$(System.ArtifactsDirectory)'
+        #     artifactsFolder: '$(kernelModulesFolder)'
         #     repoRootPath: '$(pipelinesRepoRoot)'
+
+        - task: Bash@3
+          displayName: 'Build livepatch-signed RPM'
+          inputs:
+            filePath: '$(selfRepoRoot)/pipelines/livepatching/BuildLivepatchSigned.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -k "${{ parameters.livepatchKernelVersion }}"
+                        -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
+                        -m "$(kernelModulesFolder)""
+                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
+            workingDirectory: '$(selfRepoRoot)'
 
     - stage: Test
       jobs:
