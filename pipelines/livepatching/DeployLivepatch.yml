@@ -130,25 +130,26 @@ extends:
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoFolder)'
 
-        - task: DownloadPipelineArtifact@2
-          displayName: 'Download RPMs archive'
-          inputs:
-            source: current
-            artifact: '$(buildArtifactsFolder)'
-            patterns: '**/rpms.tar.gz'
-            path: '$(System.ArtifactsDirectory)'
         # - task: DownloadPipelineArtifact@2
-        #   displayName: '[TEST] Download livepatch RPM'
+        #   displayName: 'Download RPMs archive'
         #   inputs:
-        #     source: specific
-        #     project: 'mariner'
-        #     pipeline: 1141
-        #     runVersion: specific
-        #     runId: 318883
-        #     tags: '$(downloadTags)'
-        #     artifact: drop_build_rpms_build
+        #     source: current
+        #     artifact: '$(buildArtifactsFolder)'
         #     patterns: '**/rpms.tar.gz'
         #     path: '$(System.ArtifactsDirectory)'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: '[TEST] Download livepatch RPM'
+          inputs:
+            source: specific
+            project: 'mariner'
+            pipeline: 1141
+            runVersion: specific
+            runId: 318883
+            tags: '$(downloadTags)'
+            artifact: drop_build_rpms_build
+            patterns: '**/rpms.tar.gz'
+            path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
           displayName: 'Extract kernel modules'
