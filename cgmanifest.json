@@ -4559,6 +4559,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "google-api-python-client",
+          "version": "2.73.0",
+          "downloadUrl": "https://github.com/googleapis/google-api-python-client/archive/v2.73.0/google-api-python-client-2.73.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "google-crosextra-caladea-fonts",
           "version": "1.002",
           "downloadUrl": "http://gsdview.appspot.com/chromeos-localmirror/distfiles/crosextrafonts-20130214.tar.gz"
@@ -21573,6 +21583,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-dbusmock",
+          "version": "0.28.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-dbusmock/python-dbusmock-0.28.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-ddt",
+          "version": "1.4.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/ddt/ddt-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-debtcollector",
           "version": "1.22.0",
           "downloadUrl": "https://tarballs.openstack.org/debtcollector/debtcollector-1.22.0.tar.gz"
@@ -21756,6 +21786,16 @@
           "name": "python-faker",
           "version": "4.0.0",
           "downloadUrl": "https://github.com/joke2k/faker/archive/v4.0.0/faker-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-fasteners",
+          "version": "0.18",
+          "downloadUrl": "https://github.com/harlowja/fasteners/archive/0.18/fasteners-0.18.tar.gz"
         }
       }
     },
@@ -21966,6 +22006,16 @@
           "name": "python-html5lib",
           "version": "1.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/h/html5lib/html5lib-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-httplib2",
+          "version": "0.20.3",
+          "downloadUrl": "https://github.com/httplib2/httplib2/archive/v0.20.3/httplib2-0.20.3.tar.gz"
         }
       }
     },
@@ -22423,6 +22473,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-memcached",
+          "version": "1.59",
+          "downloadUrl": "https://github.com/linsomniac/python-memcached/archive/1.59.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mimeparse",
           "version": "1.6.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-mimeparse/python-mimeparse-1.6.0.tar.gz"
@@ -22473,9 +22533,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-msal",
+          "version": "1.18.0~b1",
+          "downloadUrl": "https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/1.18.0b1/microsoft-authentication-library-for-python-1.18.0b1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-msgpack",
           "version": "1.0.3",
           "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-msrestazure",
+          "version": "0.6.4",
+          "downloadUrl": "https://github.com/Azure/msrestazure-for-python/archive/v0.6.4/msrestazure-for-python-0.6.4.tar.gz"
         }
       }
     },
@@ -22626,6 +22706,16 @@
           "name": "python-pam",
           "version": "1.8.4",
           "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-1.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-paramiko",
+          "version": "2.12.0",
+          "downloadUrl": "https://github.com/paramiko/paramiko/archive/2.12.0/paramiko-2.12.0.tar.gz"
         }
       }
     },
@@ -22996,6 +23086,16 @@
           "name": "python-pytest-mock",
           "version": "3.7.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/pytest-mock-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pytest-relaxed",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/bitprophet/pytest-relaxed/archive/refs/tags/2.0.0.tar.gz"
         }
       }
     },
@@ -23683,6 +23783,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-testpath",
+          "version": "0.5.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/testpath/testpath-0.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-testrepository",
           "version": "0.0.20",
           "downloadUrl": "http://pypi.python.org/packages/source/t/testrepository/testrepository-0.0.20.tar.gz"
@@ -23923,6 +24033,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-waitress",
+          "version": "1.4.4",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-waitress-1.4.4-nodocs.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-wcwidth",
           "version": "0.2.5",
           "downloadUrl": "https://github.com/jquast/wcwidth/archive/0.2.5.tar.gz"
@@ -24026,6 +24146,16 @@
           "name": "python-yamlloader",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Phynix/yamlloader/archive/1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-yubico",
+          "version": "1.3.3",
+          "downloadUrl": "https://github.com/Yubico/python-yubico/archive/python-yubico-1.3.3.tar.gz"
         }
       }
     },
