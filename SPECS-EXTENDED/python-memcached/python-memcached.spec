@@ -7,7 +7,7 @@ Summary:        A Python memcached client library
 
 License:        Python
 URL:            https://github.com/linsomniac/python-memcached
-Source0:        https://github.com/linsomniac/python-memcached/archive/%{version}.tar.gz
+Source0:        https://github.com/linsomniac/python-memcached/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
