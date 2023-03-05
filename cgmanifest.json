@@ -2607,26 +2607,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dleyna-core",
-          "version": "0.6.0",
-          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-core-0.6.0.tar_3.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dleyna-connector-dbus",
-          "version": "0.3.0",
-          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-connector-dbus-0.3.0.tar_2.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ding-libs",
           "version": "0.6.1",
           "downloadUrl": "https://releases.pagure.org/SSSD/ding-libs/ding-libs-0.6.1.tar.gz"
@@ -2660,6 +2640,26 @@
           "name": "dkms",
           "version": "3.0.3",
           "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dleyna-connector-dbus",
+          "version": "0.3.0",
+          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-connector-dbus-0.3.0.tar_2.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dleyna-core",
+          "version": "0.6.0",
+          "downloadUrl": "https://01.org/sites/default/files/downloads/dleyna/dleyna-core-0.6.0.tar_3.gz"
         }
       }
     },
@@ -3809,16 +3809,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "frr",
-          "version": "8.4.2",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.4.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "freeglut",
           "version": "3.2.1",
           "downloadUrl": "https://downloads.sourceforge.net/freeglut/freeglut-3.2.1.tar.gz"
@@ -3882,6 +3872,16 @@
           "name": "fros",
           "version": "1.1",
           "downloadUrl": "https://github.com/mozeq/fros/archive/30275a07dab7891b9f31ff115743f67d757c7c1a/fros-1.1-30275a0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "frr",
+          "version": "8.4.2",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.4.2.tar.gz"
         }
       }
     },
@@ -4699,16 +4699,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "gssdp",
-          "version": "1.6.2",
-          "downloadUrl": "https://github.com/GNOME/gssdp/archive/refs/tags/gssdp-1.6.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "grep",
           "version": "3.7",
           "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz"
@@ -4809,6 +4799,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gssdp",
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/GNOME/gssdp/archive/refs/tags/gssdp-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gssntlmssp",
           "version": "0.9.0",
           "downloadUrl": "https://fedorahosted.org/released/gss-ntlmssp/gssntlmssp-0.9.0.tar.gz"
@@ -4819,39 +4819,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "gupnp",
-          "version": "1.6.3",
-          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "gstreamer1",
           "version": "1.20.0",
           "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "gupnp-igd",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/GNOME/gupnp-igd/archive/refs/tags/1.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "gupnp-dlna",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/GNOME/gupnp-dlna/archive/refs/tags/gupnp-dlna-0.12.0.tar.gz"
         }
       }
     },
@@ -4959,9 +4929,39 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gupnp",
+          "version": "1.6.3",
+          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gupnp-av",
           "version": "0.12.11",
           "downloadUrl": "http://download.gnome.org/sources/gupnp-av/0.12/gupnp-av-0.12.11.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gupnp-dlna",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/GNOME/gupnp-dlna/archive/refs/tags/gupnp-dlna-0.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gupnp-igd",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/GNOME/gupnp-igd/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
@@ -14582,16 +14582,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "opal",
-          "version": "3.10.11",
-          "downloadUrl": "https://sourceforge.net/projects/opalvoip/files/v3.10%20Luyten/Stable%2011/opal-3.10.11.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ocaml-react",
           "version": "1.2.1",
           "downloadUrl": "http://erratique.ch/software/react/releases/react-1.2.1.tbz"
@@ -14776,6 +14766,16 @@
           "name": "opa",
           "version": "0.31.0",
           "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.31.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "opal",
+          "version": "3.10.11",
+          "downloadUrl": "https://sourceforge.net/projects/opalvoip/files/v3.10%20Luyten/Stable%2011/opal-3.10.11.tar.bz2"
         }
       }
     },
@@ -20633,16 +20633,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ptlib",
-          "version": "2.10.11",
-          "downloadUrl": "https://download.gnome.org/sources/ptlib/2.10/ptlib-2.10.11.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "popt",
           "version": "1.18",
           "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
@@ -20866,6 +20856,16 @@
           "name": "pth",
           "version": "2.0.7",
           "downloadUrl": "https://ftp.gnu.org/gnu/pth/pth-2.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ptlib",
+          "version": "2.10.11",
+          "downloadUrl": "https://download.gnome.org/sources/ptlib/2.10/ptlib-2.10.11.tar.xz"
         }
       }
     },
@@ -27666,16 +27666,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "udisks2",
-          "version": "2.9.4",
-          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.9.4/udisks-2.9.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tofrodos",
           "version": "1.7.13",
           "downloadUrl": "http://tofrodos.sourceforge.net/download/tofrodos-1.7.13.tar.gz"
@@ -27939,6 +27929,16 @@
           "name": "udica",
           "version": "0.2.1",
           "downloadUrl": "https://github.com/containers/udica/archive/v0.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "udisks2",
+          "version": "2.9.4",
+          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.9.4/udisks-2.9.4.tar.bz2"
         }
       }
     },
