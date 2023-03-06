@@ -1,7 +1,7 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.21.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,11 +23,31 @@ BuildRequires:  libxml2-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
+BuildRequires:  kernel-devel
+BuildRequires:  kmod
 Requires:       python3
+Requires:       kernel
+
+# set package name
+%{!?_name: %global _name mstflint}
+
+%global kver %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-devel))
+%global ksrc %{_libdir}/modules/%{kver}/build
+%global debug_package %{nil}
+%global kernel_source() %{ksrc}
+%global kernel_release() %{kver}
+%global install_mod_dir extra/%{_name}
 
 %description
 This package contains firmware update tool, vpd dump and register dump tools
 for network adapters based on Mellanox Technologies chips.
+
+%package kernel
+Summary:        mstflint Kernel Modules
+Group:          System Environment/Kernel
+
+%description kernel
+This package contains mstflint kernel module for secure boot.
 
 %prep
 %autosetup -p1
@@ -40,12 +60,26 @@ find . -type f -iname '*.cpp' -exec chmod a-x '{}' ';'
 %configure --enable-fw-mgr --enable-adb-generic-tools
 %make_build
 
+#Compile mstflint driver
+export K_BUILD=%{kernel_source $flavor}
+export KVERSION=%{kernel_release $K_BUILD}
+cd kernel
+make KPVER=$KVERSION
+cd -
+
 %install
 %make_install
 # Remove the devel files that we don't ship
 rm -fr %{buildroot}%{_includedir}
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -type f -name '*.a' -delete
+
+export INSTALL_MOD_PATH=$RPM_BUILD_ROOT
+mkdir -p %{install_mod_dir}
+export KSRC=%{kernel_source $flavor}
+export KVERSION=%{kernel_release $KSRC}
+install -d $INSTALL_MOD_PATH/lib/modules/$KVERSION/%{install_mod_dir}
+cp $PWD/kernel/mstflint_access.ko $INSTALL_MOD_PATH/lib/modules/$KVERSION/%{install_mod_dir}
 
 %files
 %license COPYING
@@ -57,7 +91,17 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_datadir}/mstflint
 %{_mandir}/man1/*
 
+%post kernel
+depmod %{kver} -a
+
+%files kernel
+%defattr(-,root,root,-)
+/lib/modules/%{kver}/%{install_mod_dir}/
+
 %changelog
+* Thu Mar 06 2023 Elaheh Dehghani <edehghani@microsoft.com> - 4.21.0-4
+- Add mstflint driver for secure boot.
+
 * Thu Feb 23 2023 Elaheh Dehghani <edehghani@microsoft.com> - 4.21.0-3
 - Enabled 'adb-generic-tools' in build config.
 
