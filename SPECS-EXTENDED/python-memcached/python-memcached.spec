@@ -13,9 +13,10 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
-# Required for running test suite
+%if %{with_check}
 BuildRequires:  %{_bindir}/memcached
 BuildRequires:  python3-pytest
+%endif
 
 %global _description\
 This software is a 100% Python interface to the memcached memory cache\
