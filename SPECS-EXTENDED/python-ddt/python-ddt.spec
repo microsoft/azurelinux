@@ -12,8 +12,6 @@ DDT (Data-Driven Tests) allows you to multiply one test case by running it with
 different test data, and make it appear as multiple test cases. It is used in
 combination with other testing frameworks like unittest and nose.}
 
-%bcond_without  tests
-
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           python-%{pkgname}
@@ -33,7 +31,7 @@ BuildArch:      noarch
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  %{py3_dist setuptools}
-%if %{with tests}
+%if %{with_check}
 BuildRequires:  %{py3_dist pytest pyyaml six}
 %endif
 %{?python_provide:%python_provide python3-%{pkgname}}
@@ -55,10 +53,8 @@ rm -rf %{eggname}.egg-info
 %py3_install
 
 
-%if %{with tests}
 %check
 %pytest --verbose
-%endif
 
 
 %files -n python3-%{pkgname}
