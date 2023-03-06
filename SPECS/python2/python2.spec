@@ -258,7 +258,7 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
-* Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.7.18-12
+* Mon Mar 06 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.7.18-12
 - Patch CVE-2023-24329.
 
 * Wed Oct 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.18-11
