@@ -1,17 +1,12 @@
+%global tls_priority "@LIBVIRT,SYSTEM"
+%global verdir 1.3
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# -*- rpm-spec -*-
-
-# This spec file assumes you are building for Fedora 32 or newer,
-# or for RHEL 8 or newer. It may need some tweaks for other distros.
-
-%global tls_priority "@LIBVIRT,SYSTEM"
-%global verdir %(echo ${version} | cut -d. -f1,2)
-
 Summary: A GTK widget for VNC clients
 Name: gtk-vnc
 Version: 1.3.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2+
 Source: https://download.gnome.org/sources/%{name}/%{verdir}/%{name}-%{version}.tar.xz
 URL: https://gitlab.gnome.org/GNOME/gtk-vnc
@@ -171,6 +166,10 @@ chmod -x examples/*.pl examples/*.js examples/*.py
 %{_datadir}/gir-1.0/GtkVnc-2.0.gir
 
 %changelog
+* Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.3.0-3
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License Verified
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
