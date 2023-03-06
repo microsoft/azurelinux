@@ -1,11 +1,12 @@
+%global         _hardened_build 1
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global         _hardened_build 1
 
 Summary:        Optimizer for PNG (Portable Network Graphics) files
 Name:           pngcrush
 Version:        1.8.13
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        zlib
 URL:            http://pmt.sourceforge.net/%{name}/
 Source0:        http://downloads.sourceforge.net/pmt/%{name}-%{version}-nolib.tar.xz
@@ -25,7 +26,7 @@ remove unwanted ancillary chunks, or to add certain chunks including gAMA,
 tRNS, iCCP, and textual chunks. 
 
 %prep
-%setup -q -n %{name}-%{version}-nolib
+%autosetup -n %{name}-%{version}-nolib
 cp %{SOURCE1} . 
 
 %build
@@ -45,6 +46,10 @@ docbook2man %{name}.sgml
 %doc %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.8.13-11
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License Verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.13-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
