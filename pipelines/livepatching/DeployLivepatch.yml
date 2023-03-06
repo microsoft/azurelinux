@@ -183,7 +183,7 @@ extends:
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
-                        -m "$(kernelModulesFolder)""
+                        -m "$(kernelModulesFolder)"
                         -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
             workingDirectory: '$(selfRepoRoot)'
 

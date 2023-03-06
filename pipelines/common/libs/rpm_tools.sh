@@ -92,6 +92,8 @@ rpm_extract_file() {
 rpm_extract_files() {
     local files_pattern="*"
     local flatten_arg
+    local input
+    local output_dir
     local rpm_name
     local rpm_path
     local work_dir
@@ -131,6 +133,8 @@ rpm_extract_files() {
 
     find "$input" -name "*.rpm" -type f -print0 | while IFS= read -r -d '' rpm_path
     do
-        rpm_extract_file -i "$rpm_path" -p "$files_pattern" -w "$work_dir" -o "$output_dir" $flatten_arg
+        rpm_name="$(basename "$rpm_path" .rpm)"
+        output_subdir="$output_dir/$rpm_name"
+        rpm_extract_file -i "$rpm_path" -p "$files_pattern" -w "$work_dir" -o "$output_subdir" $flatten_arg
     done
 }

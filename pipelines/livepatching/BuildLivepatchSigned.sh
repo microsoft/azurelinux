@@ -48,7 +48,7 @@ hydrate_signed_sources() {
     livepatch_folder="livepatch-$1"
     kernel_modules_dir="$2"
     
-    cp "$kernel_modules_dir/$livepatch_folder"/*.ko SPECS-SIGNED/"$livepatch_folder-signed"
+    cp "$kernel_modules_dir/$livepatch_folder"*/*.ko SPECS-SIGNED/"$livepatch_folder-signed"
 }
 
 verify_built_package() {
