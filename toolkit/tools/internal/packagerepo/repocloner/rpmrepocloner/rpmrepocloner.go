@@ -148,7 +148,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		safechroot.NewMountPoint(destinationDir, chrootDownloadDir, bindFsType, safechroot.BindMountPointFlags, bindData),
 	}
 
-	// Include the special toolchain package directory
+	// Include the special toolchain packages directory.
 	toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainRpmsDir, overlayUpperDirectoryToolchain, overlayWorkDirectoryToolchain)
 	extraMountPoints = append(extraMountPoints, toolchainRpmsOverlayMount)
 	overlayExtraDirs = append(overlayExtraDirs, toolchainRpmsOverlayExtraDirs...)

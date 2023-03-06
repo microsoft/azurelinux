@@ -314,9 +314,9 @@ endif
 ifeq ($(REBUILD_TOOLCHAIN),y)
 $(RPMS_DIR): $(toolchain_out_rpms)
 
-# For each toolchain rpm in ./out/RPMS, add a dependency on the counterparts in the normal toolchain directory:
+# For each toolchain RPM in ./out/RPMS, add a dependency on the counterparts in the normal toolchain directory:
 # Each path in $(toolchain_out_rpms) corresponds to a .rpm file we expect to have been built by the toolchain target and made available in ./out/RPMS.
-# Those rpms however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS 
+# Those RPMs however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS 
 # we will need to copy it over. We can filter the list of toolchain rpms $(toolchain_rpms) to find the source that matches the target ($@),
 # then copy it over.
 $(toolchain_out_rpms): $(toolchain_rpms)

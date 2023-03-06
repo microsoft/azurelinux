@@ -102,7 +102,7 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inpu
 	return
 }
 
-// ReadReservedFilesList updates the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
+// ReadReservedFilesList reads the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
 // Entries will be returned in the form '<rpm>-<version>-<release>.rpm' with any preceding path removed. If the file path is
 // empty, an empty list will be returned.
 func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
