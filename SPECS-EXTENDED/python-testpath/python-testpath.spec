@@ -17,8 +17,10 @@ BuildRequires:  python3-flit
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
+%if %{with_check}
 # Tests:
 BuildRequires:  python3-pytest
+%endif
 
 %global _description \
 Testpath is a collection of utilities for Python code working with files and \
