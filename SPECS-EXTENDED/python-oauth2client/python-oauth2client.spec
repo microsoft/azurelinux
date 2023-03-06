@@ -66,13 +66,6 @@ rm oauth2client/contrib/keyring_storage.py tests/contrib/test_keyring_storage.py
 %install
 %py3_install
 
-%check
-#tox -v --sitepackages -e py%%{python3_version_nodots}
-
-# We remove tests currently, we will ship them eventually
-# This is a bit of a hack until I package the test scripts in a separate package
-rm -r $(find %{_buildrootdir} -type d -name 'tests') || /bin/true
-
 
 %files -n python3-%{srcname}
 %license LICENSE 
