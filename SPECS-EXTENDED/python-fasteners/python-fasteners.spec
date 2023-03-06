@@ -11,7 +11,7 @@ Summary:        A python package that provides useful locks
 License:        Apache-2.0
 URL:            https://github.com/harlowja/fasteners
 # We need to use the GitHub archive instead of the PyPI sdist to get tests.
-Source0:        %{url}/archive/%{version}/fasteners-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/fasteners-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Backport 80a3eaed75276faf21034e7e6c626fd19485ea39 “Move eventlet tests to
 # main folder and to child process”. Fixes “Tests hang with eventlet support”
