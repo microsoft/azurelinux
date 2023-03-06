@@ -38,8 +38,10 @@ hydrate_signed_sources() {
 verify_built_package() {
     local kernel_version
     local result=0
+    local signed_rpm_name
     local signed_rpm_path
     local tmpdir
+    local unsigned_rpm_name
     local unsigned_rpm_path
 
     kernel_version="$1"
@@ -47,15 +49,17 @@ verify_built_package() {
 
     while IFS= read -r -d '' signed_rpm_path
     do
-        rpm_name="$(basename "$signed_rpm_path")"
+        signed_rpm_name="$(basename "$signed_rpm_path")"
+        unsigned_rpm_name="${signed_rpm_name/-signed/}"
 
-        echo "Verifying RPM ($rpm_name)."
+        echo "Verifying RPM ($signed_rpm_name)."
 
-        unsigned_rpm_path="$(find "$tmpdir" -name "$rpm_name" -print -quit)"
+        unsigned_rpm_path="$(find "$tmpdir" -name "$unsigned_rpm_name" -print -quit)"
         if [[ -z "$unsigned_rpm_path" ]]
         then
-            echo "ERROR: RPM ($rpm_name) not found in the unsigned version." >&2
+            echo "ERROR: RPM ($unsigned_rpm_name) not found in the unsigned version." >&2
             result=1
+            continue
         fi
 
         if ! command_diff "rpm -qp --provides" "$unsigned_rpm_path" "$signed_rpm_path" || \
@@ -64,7 +68,7 @@ verify_built_package() {
         then
             result=1
         fi
-    done < <(find "out" -name "livepatch-$kernel_version*.rpm" -and -not -name "*debuginfo*" -print0)
+    done < <(find "out/RPMS" -name "livepatch-$kernel_version*.rpm" -and -not -name "*debuginfo*" -print0)
 
     return "$result"
 }
@@ -110,7 +114,7 @@ overwrite_toolkit -t "$ARTIFACTS_DIR"
 hydrate_artifacts -r "$ARTIFACTS_DIR"
 
 # Saving the unsigned version for the sake of comparing with the signed one after it's built.
-find "out" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$tmpdir" \;
+find "out/RPMS" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$tmpdir" \;
 
 hydrate_signed_sources "$KERNEL_VERSION" "$KERNEL_MODULES_DIR"
 
