@@ -23,7 +23,7 @@
   "macros.pybytecompile": "4adea0fca2118af964997d0bf9932a28f3148ea72323fb161c1fb3bd6e2a8bdb",
   "macros.python": "791e0b9070d49790ef437d89e541287ce305d8e424afe42dafdab89f59106362",
   "macros.python-srpm": "34876cbf3bae90136bec7b36f75ed590d251c47c123faddf700a963aaa9a2c14",
-  "macros.python3": "b5a82a6bdfa40cd481c5139c957b95d0b126ff108cc964432d0b6b90972b743b",
+  "macros.python3": "556e35a8c46bac6719ff9516d579e232055e6a37aa89e5a60c03063384554907",
   "macros.rust-srpm": "ea69ab49a243c44ab75cfe506ba5d73046bf31e561698cc389ad5b4edb82f2b2",
   "macros.suse": "7cd64820e12a37fb22f3b09e4c5184b1f9eac94acbeea2783b1ec4940248e310",
   "pythondist.attr": "9162c91b09e01bc0c9c2e8b730424eda11ca4de35304434353dc3c8d9469419d",
