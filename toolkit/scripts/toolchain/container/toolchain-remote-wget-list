@@ -29,8 +29,8 @@ https://www.lua.org/ftp/lua-5.4.3.tar.gz
 http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz
 https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
-https://git.centos.org/rpms/python-rpm-generators/blob/c8s/f/SOURCES/pythondeps.sh
-https://git.centos.org/rpms/python-rpm-generators/blob/c8s/f/SOURCES/pythondistdeps.py
+https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
+https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.3-shared_library-1.patch
 https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz
