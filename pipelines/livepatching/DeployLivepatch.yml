@@ -159,7 +159,7 @@ extends:
             project: 'mariner'
             pipeline: 1141
             runVersion: specific
-            runId: 318883
+            runId: 319502
             tags: '$(downloadTags)'
             artifact: drop_build_rpms_build
             patterns: |
