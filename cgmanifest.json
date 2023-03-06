@@ -3178,8 +3178,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "28.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz"
+          "version": "28.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz"
         }
       }
     },
