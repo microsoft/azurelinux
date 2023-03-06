@@ -118,7 +118,7 @@ CFLAGS="$RPM_OPT_FLAGS -D_FILE_OFFSET_BITS=64"
            --with-distro=Fedora \
            --with-dyn-default
 
-make V=1 %{?_smp_mflags}
+%make_build
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
