@@ -14,6 +14,7 @@
 rpm_extract_file() {
     local files_pattern="*"
     local flatten
+    local output_dir
     local rpm_name
     local rpm_path
     local work_dir
@@ -94,6 +95,7 @@ rpm_extract_files() {
     local flatten_arg
     local input
     local output_dir
+    local output_subdir
     local rpm_name
     local rpm_path
     local work_dir
