@@ -20,29 +20,27 @@ type nodeState struct {
 
 // GraphBuildState represents the build state of a graph.
 type GraphBuildState struct {
-	activeBuilds           map[int64]*BuildRequest
-	nodeToState            map[*pkggraph.PkgNode]*nodeState
-	failures               []*BuildResult
-	reservedFiles          map[string]bool
-	conflictingRPMs        map[string]bool
-	conflictingSRPMs       map[string]bool
-	supressConflictingRPMs bool
+	activeBuilds     map[int64]*BuildRequest
+	nodeToState      map[*pkggraph.PkgNode]*nodeState
+	failures         []*BuildResult
+	reservedFiles    map[string]bool
+	conflictingRPMs  map[string]bool
+	conflictingSRPMs map[string]bool
 }
 
 // NewGraphBuildState returns a new GraphBuildState.
 // - reservedFiles is a list of reserved files which should NOT be rebuilt. Any files that ARE rebuilt will be recorded.
-func NewGraphBuildState(reservedFiles []string, supressConflictingRPMs bool) (g *GraphBuildState) {
+func NewGraphBuildState(reservedFiles []string) (g *GraphBuildState) {
 	filesMap := make(map[string]bool)
 	for _, file := range reservedFiles {
 		filesMap[file] = true
 	}
 	return &GraphBuildState{
-		activeBuilds:           make(map[int64]*BuildRequest),
-		nodeToState:            make(map[*pkggraph.PkgNode]*nodeState),
-		reservedFiles:          filesMap,
-		conflictingRPMs:        make(map[string]bool),
-		conflictingSRPMs:       make(map[string]bool),
-		supressConflictingRPMs: supressConflictingRPMs,
+		activeBuilds:     make(map[int64]*BuildRequest),
+		nodeToState:      make(map[*pkggraph.PkgNode]*nodeState),
+		reservedFiles:    filesMap,
+		conflictingRPMs:  make(map[string]bool),
+		conflictingSRPMs: make(map[string]bool),
 	}
 }
 
@@ -128,7 +126,7 @@ func (g *GraphBuildState) isConflictWithToolchain(fileToCheck string) (hadConfli
 // RecordBuildResult records a build result in the graph build state.
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
-func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {
+func (g *GraphBuildState) RecordBuildResult(res *BuildResult, supressConflictingRPMs bool) {
 
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
@@ -147,9 +145,13 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {
 		g.nodeToState[node] = state
 	}
 
-	if !res.Skipped && !res.UsedCache {
+	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
+
+	logger.Log.Infof("Rebuild toolchain flagsss: %t", supressConflictingRPMs)
+
+	if !supressConflictingRPMs && !res.Skipped && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
-			if !g.supressConflictingRPMs && g.isConflictWithToolchain(file) {
+			if g.isConflictWithToolchain(file) {
 				g.conflictingRPMs[filepath.Base(file)] = true
 				g.conflictingSRPMs[filepath.Base(res.Node.SrpmPath)] = true
 			}

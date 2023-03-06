@@ -223,7 +223,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
 		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
-		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-prebuilt-rebuilds) \
+		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		$(logging_command) && \
 	touch $@
 

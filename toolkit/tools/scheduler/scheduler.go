@@ -74,7 +74,7 @@ var (
 	reservedFileListFile   = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
 	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
-	supressConflictingRPMs = app.Flag("allow-prebuilt-rebuilds", "Don't report the toolchain rebuild error").Bool()
+	supressConflictingRPMs = app.Flag("allow-toolchain-rebuilds", "Don't report the toolchain rebuild error").Bool()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -284,7 +284,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
 
-	buildState := schedulerutils.NewGraphBuildState(reservedFiles, supressConflictingRPMs)
+	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
@@ -336,7 +336,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		// Process the the next build result
 		res := <-channels.Results
 		schedulerutils.PrintBuildResult(res)
-		buildState.RecordBuildResult(res)
+		buildState.RecordBuildResult(res, supressConflictingRPMs)
 
 		if !stopBuilding {
 			if res.Err == nil {
@@ -402,7 +402,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	time.Sleep(time.Second)
 
 	builtGraph = pkgGraph
-	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
+	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, supressConflictingRPMs)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 
 	return
