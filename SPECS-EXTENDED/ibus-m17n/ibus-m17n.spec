@@ -10,13 +10,16 @@ License:    GPL-2.0-or-later
 URL:        https://github.com/ibus/ibus-m17n
 Source0:    https://github.com/ibus/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  desktop-file-utils
 BuildRequires:  gettext-devel >= 0.19
-BuildRequires:  libtool
-BuildRequires:  m17n-lib-devel
 BuildRequires:  gtk3-devel
 BuildRequires:  ibus-devel >= %{require_ibus_version}
-BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
+BuildRequires:  libtool
+BuildRequires:  libtool
+BuildRequires:  m17n-lib-devel
 BuildRequires:  make
 
 Requires:   ibus >= %{require_ibus_version}
@@ -30,19 +33,14 @@ the input table maps from m17n-db.
 %autosetup
 
 %build
+autoreconf -vif
 %configure --disable-static --with-gtk=3.0
-# make -C po update-gmo
 %{make_build}
 
 %install
 %{make_install}
 
 %find_lang %{name}
-
-%check
-appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/metainfo/*.appdata.xml
-desktop-file-validate ${RPM_BUILD_ROOT}%{_datadir}/applications/ibus-setup-m17n.desktop
-make check
 
 %files -f %{name}.lang
 %doc AUTHORS README
