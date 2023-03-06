@@ -163,8 +163,8 @@ extends:
             tags: '$(downloadTags)'
             artifact: '$(buildArtifactsFolder)'
             patterns: |
-              '**/rpms.tar.gz'
-              '**/toolkit-*.tar.gz'
+              **/rpms.tar.gz
+              **/toolkit-*.tar.gz
             path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
