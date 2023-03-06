@@ -1,24 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global srcname oauth2client
 %global sum Python client library for OAuth 2.0
 # Share doc between python- and python3-
 %global _docdir_fmt %{name}
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+
 Name:           python-%{srcname}
 Version:        4.1.3
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        %{sum}
 
 License:        ASL 2.0
 URL:            https://github.com/google/%{srcname}
-Source0:        https://github.com/google/%{srcname}/archive/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/google/%{srcname}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         docs-build-fix.patch
 Patch1:         doc-fix.patch
 Patch2:         keyring-remove.patch
 
 BuildArch:      noarch
-#BuildRequires:  %{_bindir}/tox
 BuildRequires:  python3-devel
 
 BuildRequires:  python3-setuptools
@@ -81,6 +81,10 @@ rm -r $(find %{_buildrootdir} -type d -name 'tests') || /bin/true
 %{python3_sitelib}/%{srcname}*.egg-info
 
 %changelog
+* Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 4.1.3-17
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License Verified
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.3-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
