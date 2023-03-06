@@ -38,10 +38,9 @@ hydrate_signed_sources() {
 verify_built_package() {
     local kernel_version
     local result=0
-    local signed_rpm_name
+    local rpm_name
     local signed_rpm_path
     local tmpdir
-    local unsigned_rpm_name
     local unsigned_rpm_path
 
     kernel_version="$1"
@@ -49,15 +48,14 @@ verify_built_package() {
 
     while IFS= read -r -d '' signed_rpm_path
     do
-        signed_rpm_name="$(basename "$signed_rpm_path")"
-        unsigned_rpm_name="${signed_rpm_name/-signed/}"
+        rpm_name="$(basename "$signed_rpm_path")"
 
-        echo "Verifying RPM ($signed_rpm_name)."
+        echo "Verifying RPM ($rpm_name)."
 
-        unsigned_rpm_path="$(find "$tmpdir" -name "$unsigned_rpm_name" -print -quit)"
+        unsigned_rpm_path="$(find "$tmpdir" -name "$rpm_name" -print -quit)"
         if [[ -z "$unsigned_rpm_path" ]]
         then
-            echo "ERROR: RPM ($unsigned_rpm_name) not found in the unsigned version." >&2
+            echo "ERROR: RPM ($rpm_name) not found in the unsigned version." >&2
             result=1
             continue
         fi
