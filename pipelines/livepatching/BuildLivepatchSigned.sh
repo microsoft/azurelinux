@@ -21,7 +21,7 @@ build_package_signed() {
         PACKAGE_BUILD_LIST="$package_name" \
         SRPM_PACK_LIST="$package_name-signed" \
         SRPM_FILE_SIGNATURE_HANDLING=update \
-        SPECS_DIR="SPECS-SIGNED" \
+        SPECS_DIR="../SPECS-SIGNED" \
         LOG_LEVEL=info
 }
 
