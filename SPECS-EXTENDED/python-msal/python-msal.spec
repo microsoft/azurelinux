@@ -27,7 +27,7 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 
-%if %{with tests}
+%if %{with_check}
 BuildRequires:  python3dist(pytest)
 %endif
 
@@ -65,10 +65,8 @@ Summary:        %{summary}
 %pyproject_save_files msal
 
 
-%if %{with tests}
 %check
 %pytest --disable-warnings tests
-%endif
 
 
 %files -n python3-%{srcname} -f %{pyproject_files}
