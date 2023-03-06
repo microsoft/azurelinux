@@ -27,12 +27,13 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
-# This is listed as a test requirement, but doesn't seem to actually be used.
-#BuildRequires:  python3-pytest-forked
-BuildRequires:  python3-pytest-timeout
 BuildRequires:  python3-six
 BuildRequires:  python3-cryptography
+
+%if %{with_check}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-timeout
+%endif
 
 %description -n python3-%{srcname} %{_description}
 
