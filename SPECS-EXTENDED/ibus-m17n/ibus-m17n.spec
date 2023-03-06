@@ -1,10 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global require_ibus_version 1.4.0
 
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Name:       ibus-m17n
 Version:    1.4.18
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    The M17N engine for IBus platform
 License:    GPL-2.0-or-later
 URL:        https://github.com/ibus/ibus-m17n
@@ -27,7 +27,7 @@ M17N engine for IBus input platform. It allows input of many languages using
 the input table maps from m17n-db.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %configure --disable-static --with-gtk=3.0
@@ -65,6 +65,10 @@ make check
 %{_datadir}/glib-2.0/schemas/org.freedesktop.ibus.engine.m17n.gschema.xml
 
 %changelog
+* Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.4.18-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License Verified
+
 * Wed Dec 07 2022 Mike FABIAN <mfabian@redhat.com> - 1.4.18-1
 - Update to 1.4.18
 - Add new icon
