@@ -26,7 +26,7 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 
 
-%if %{with tests}
+%if %{with_check}
 BuildRequires:  python3dist(httpretty)
 BuildRequires:  python3dist(pytest)
 %endif
@@ -61,10 +61,8 @@ Summary:        %{summary}
 %pyproject_save_files %{srcname}
 
 
-%if %{with tests}
 %check
 %pytest
-%endif
 
 
 %files -n python3-%{srcname} -f %{pyproject_files}
