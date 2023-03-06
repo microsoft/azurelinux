@@ -25,22 +25,6 @@ build_package_signed() {
         LOG_LEVEL=info
 }
 
-hydrate_built_rpms() {
-    local artifacts_dir
-    local rpms_archive
-
-    artifacts_dir="$1"
-
-    rpms_archive="$(find "$artifacts_dir" -name '*rpms.tar.gz' -type f -print -quit)"
-    if [[ ! -f "$rpms_archive" ]]
-    then
-        echo "ERROR: No RPMs archive found in '$artifacts_dir'." >&2
-        return 1
-    fi
-
-    sudo make -C "toolkit" -j"$(nproc)" hydrate-rpms PACKAGE_ARCHIVE="$rpms_archive"
-}
-
 hydrate_signed_sources() {
     local kernel_modules_dir
     local livepatch_folder
@@ -121,7 +105,9 @@ function cleanup {
 }
 trap cleanup EXIT
 
-hydrate_built_rpms "$ARTIFACTS_DIR"
+overwrite_toolkit -t "$ARTIFACTS_DIR"
+
+hydrate_artifacts -r "$ARTIFACTS_DIR"
 
 # Saving the unsigned version for the sake of comparing with the signed one after it's built.
 find "out" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$tmpdir" \;

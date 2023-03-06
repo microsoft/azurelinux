@@ -33,39 +33,6 @@ build_package() {
         LOG_LEVEL=info
 }
 
-hydrate_build_artifacts() {
-    local artifacts_dir
-    local rpms_archive
-    local toolchain_archive
-    local toolkit_archive
-
-    artifacts_dir="$1"
-
-    rpms_archive="$(find "$artifacts_dir" -name '*rpms.tar.gz' -type f -print -quit)"
-    if [[ ! -f "$rpms_archive" ]]
-    then
-        echo "ERROR: No RPMs archive found in '$artifacts_dir'." >&2
-        return 1
-    fi
-
-    toolchain_archive="$(find "$artifacts_dir" -name '*toolchain_built_rpms_all.tar.gz' -type f -print -quit)"
-    if [[ ! -f "$toolchain_archive" ]]
-    then
-        echo "ERROR: No toolchain archive found in '$artifacts_dir'." >&2
-        return 1
-    fi
-
-    toolkit_archive="$(find "$artifacts_dir" -name '*toolkit-*.tar.gz' -type f -print -quit)"
-    if [[ ! -f "$toolkit_archive" ]]
-    then
-        echo "ERROR: No toolkit tarball found in '$artifacts_dir'." >&2
-        return 1
-    fi
-
-    overwrite_toolkit "$toolkit_archive"
-    hydrate_cache "$toolchain_archive" "$rpms_archive"
-}
-
 # Script parameters:
 #
 # -a -> input artifacts directory path
@@ -95,7 +62,9 @@ done
 
 print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_PUBLISH_DIR USE_RPMS_SNAPSHOT
 
-hydrate_build_artifacts "$ARTIFACTS_DIR"
+overwrite_toolkit -t "$ARTIFACTS_DIR"
+
+hydrate_artifacts -c -t "$ARTIFACTS_DIR" -r "$ARTIFACTS_DIR"
 
 # Making sure we publish build logs even if the build fails.
 build_package "livepatch-$KERNEL_VERSION" "$USE_RPMS_SNAPSHOT" || BUILD_SUCCEEDED=false
@@ -103,5 +72,7 @@ build_package "livepatch-$KERNEL_VERSION" "$USE_RPMS_SNAPSHOT" || BUILD_SUCCEEDE
 publish_build_logs "$LOG_PUBLISH_DIR"
 
 publish_build_artifacts "$ARTIFACTS_PUBLISH_DIR"
+
+publish_toolkit "$ARTIFACTS_PUBLISH_DIR"
 
 ${BUILD_SUCCEEDED:-true}

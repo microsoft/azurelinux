@@ -91,7 +91,7 @@ extends:
               download_tags+=",kernel-${{ parameters.livepatchKernelVersion }}"
             fi
 
-            echo "##vso[task.setvariable variable=downloadTags]$download_tags"
+            echo "##vso[task.setvariable variable=downloadTags;isoutput=true]$download_tags"
             echo "Will download artifacts from build with tags '$download_tags'."
           displayName: 'Determine artifacts source'
 
@@ -105,9 +105,9 @@ extends:
             tags: '$(downloadTags)'
             artifact: $(buildArtifactsFolder)
             patterns: |
-              **/toolkit-*.tar.gz
-              **/toolchain_built_rpms_all.tar.gz
               **/rpms.tar.gz
+              **/toolchain_built_rpms_all.tar.gz
+              **/toolkit-*.tar.gz
             path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
@@ -147,7 +147,9 @@ extends:
         #   inputs:
         #     source: current
         #     artifact: '$(buildArtifactsFolder)'
-        #     patterns: '**/rpms.tar.gz'
+        #     patterns: |
+        #       '**/rpms.tar.gz'
+        #       '**/toolkit-*.tar.gz'
         #     path: '$(System.ArtifactsDirectory)'
 
         - task: DownloadPipelineArtifact@2
@@ -160,7 +162,9 @@ extends:
             runId: 318883
             tags: '$(downloadTags)'
             artifact: drop_build_rpms_build
-            patterns: '**/rpms.tar.gz'
+            patterns: |
+              '**/rpms.tar.gz'
+              '**/toolkit-*.tar.gz'
             path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3

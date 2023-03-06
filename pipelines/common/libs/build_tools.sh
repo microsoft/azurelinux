@@ -1,37 +1,86 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-hydrate_cache() {
+hydrate_artifacts() {
     local make_status
     local repo_dir
     local rpms_archive
+    local rpms_input
+    local rpms_dir
     local toolchain_archive
+    local toolchain_input
     local toolkit_dir
 
-    toolchain_archive="$1"
-    rpms_archive="$2"
-    repo_dir="$(resolve_repo_dir "$3")"
+    local OPTIND
+    while getopts "cd:r:t:" OPTIONS
+    do
+        case "${OPTIONS}" in
+            c ) rpms_dir="RPMS_DIR=../build/rpms_cache/cache" ;;
+            d ) repo_dir="$OPTARG" ;;
+            r ) rpms_input="$OPTARG" ;;
+            t ) toolchain_input="$OPTARG" ;;
 
-    toolkit_dir="$repo_dir/toolkit"
+            \? )
+                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                exit 1
+                ;;
+            : )
+                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                exit 1
+                ;;
+        esac
+    done
 
-    echo "-- Hydrating cache of repo '$repo_dir' with toolchain from '$toolchain_archive'."
-
-    sudo make -C "$toolkit_dir" -j"$(nproc)" toolchain chroot-tools TOOLCHAIN_ARCHIVE="$toolchain_archive"
-    make_status=$?
-    if [[ $make_status != 0 ]]; then
-        echo "-- ERROR: failed to hydrate repo's toolchain." >&2
-        return $make_status
+    if [[ -z "$toolchain_input" && -z "$rpms_input" ]]
+    then
+        echo "-- ERROR: neither toolchain nor RPMs paths specified to hydrate. Must specify at least one." >&2
+        return 1
     fi
+
+    if [[ -n "$rpms_input" ]]
+    then
+        rpms_archive="$(resolve_archive "$rpms_input" "*rpms.tar.gz")"
+        if [[ ! -f "$rpms_archive" ]]
+        then
+            echo "ERROR: No RPMs archive found in '$rpms_input'." >&2
+            return 1
+        fi
+    fi
+
+    if [[ -n "$toolchain_input" ]]
+    then
+        toolchain_archive="$(resolve_archive "$toolchain_input" "*toolchain_built_rpms_all.tar.gz")"
+        if [[ ! -f "$toolchain_archive" ]]
+        then
+            echo "ERROR: No toolchain archive found in '$toolchain_input'." >&2
+            return 1
+        fi
+    fi
+
+    repo_dir="$(resolve_repo_dir "$repo_dir")"
+    toolkit_dir="$repo_dir/toolkit"
 
     if [[ -n "$rpms_archive" ]]
     then
         # We put the RPMs into the cache directory, so that the built RPMs directory only contains the built packages.
-        echo "-- Hydrating cache of repo '$repo_dir' with RPMS from '$rpms_archive'."
+        echo "-- Hydrating cache of repo '$repo_dir' with RPMs from '$rpms_archive'."
 
-        sudo make -C "$toolkit_dir" -j"$(nproc)" hydrate-rpms PACKAGE_ARCHIVE="$rpms_archive" RPMS_DIR="$repo_dir/build/rpms_cache/cache"
+        sudo make -C "$toolkit_dir" -j"$(nproc)" hydrate-rpms PACKAGE_ARCHIVE="$rpms_archive" $rpms_dir
         make_status=$?
         if [[ $make_status != 0 ]]; then
             echo "-- ERROR: failed to hydrate repo's RPMs." >&2
+            return $make_status
+        fi
+    fi
+
+    if [[ -n "$toolchain_archive" ]]
+    then
+        echo "-- Hydrating cache of repo '$repo_dir' with toolchain from '$toolchain_archive'."
+
+        sudo make -C "$toolkit_dir" -j"$(nproc)" toolchain chroot-tools TOOLCHAIN_ARCHIVE="$toolchain_archive"
+        make_status=$?
+        if [[ $make_status != 0 ]]; then
+            echo "-- ERROR: failed to hydrate repo's toolchain." >&2
             return $make_status
         fi
     fi
@@ -39,20 +88,40 @@ hydrate_cache() {
 
 overwrite_toolkit() {
     local repo_dir
+    local toolkit_input
     local toolkit_tarball
 
-    toolkit_tarball="$1"
-    repo_dir="$(resolve_repo_dir "$2")"
+    local OPTIND
+    while getopts "d:t:" OPTIONS
+    do
+        case "${OPTIONS}" in
+            d ) repo_dir="$OPTARG" ;;
+            t ) toolkit_input="$OPTARG" ;;
 
+            \? )
+                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                exit 1
+                ;;
+            : )
+                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                exit 1
+                ;;
+        esac
+    done
+
+    toolkit_tarball="$(resolve_archive "$toolkit_input" "*toolkit-*.tar.gz")"
+    if [[ ! -f "$toolkit_tarball" ]]
+    then
+        echo "ERROR: No toolkit tarball found in '$toolkit_input'." >&2
+        return 1
+    fi
+
+    repo_dir="$(resolve_repo_dir "$repo_dir")"
     toolkit_dir="$repo_dir/toolkit"
-
-    pushd "$repo_dir" > /dev/null || true
 
     echo "-- Extracting toolkit from '$toolkit_tarball' into '$repo_dir'."
     rm -rf "$toolkit_dir"
     tar -C "$repo_dir" -xf "$toolkit_tarball"
-
-    popd > /dev/null || true
 }
 
 parse_pipeline_boolean() {
@@ -147,6 +216,45 @@ publish_build_logs() {
         tar -C "$package_build_artifacts_dir" -czf "$logs_publish_dir/pkg_artifacts.tar.gz" .
     else
         echo "-- WARNING: no '$package_build_artifacts_dir' directory found."
+    fi
+}
+
+publish_toolkit() {
+    local make_status
+    local repo_dir
+    local toolkit_dir
+    local toolkit_publish_dir
+
+    toolkit_publish_dir="$1"
+    repo_dir="$(resolve_repo_dir "$2")"
+
+    toolkit_dir="$repo_dir/toolkit"
+
+    echo "-- Packing toolkit."
+    sudo make -C "$toolkit_dir" -j"$(nproc)" REBUILD_TOOLS=y package-toolkit
+    make_status=$?
+    if [[ $make_status != 0 ]]; then
+        echo "-- ERROR: failed to pack toolkit." >&2
+        return $make_status
+    fi
+
+    echo "-- Publishing toolkit to '$toolkit_publish_dir'."
+    mkdir -p "$toolkit_publish_dir"
+    sudo mv "$toolkit_dir"/out/toolkit*.tar.gz "$toolkit_publish_dir"
+}
+
+resolve_archive() {
+    local archive_path
+    local archive_pattern
+
+    archive_path="$1"
+    archive_pattern="$2"
+
+    archive_path="$(find "$archive_path" -name "$archive_pattern" -type f -print -quit)"
+
+    if [[ -f "$archive_path" ]]
+    then
+        realpath "$archive_path"
     fi
 }
 
