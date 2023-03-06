@@ -61,6 +61,7 @@ This contains protobuf python3 libraries.
 Summary:        protobuf java lib
 Group:          Development/Libraries
 BuildRequires:  chkconfig
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  maven
 BuildRequires:  msopenjdk-11
 Requires:       %{name} = %{version}-%{release}
@@ -79,7 +80,7 @@ popd
 
 %build
 %configure --disable-silent-rules
-export JAVA_HOME=$(find %{_lib}/jvm -name "openjdk*")
+export JAVA_HOME=%{java_home}
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 %make_build
 
@@ -113,16 +114,18 @@ popd
 
 %check
 # run C++ unit tests
-%make_build check
+%make_build check || test_succeeded=false
 
 # run python subpackage tests
 cd python
-%py3_check
+%py3_check || test_succeeded=false
 cd ..
 
 # run java subpackage tests
 cd java
-mvn -o test
+mvn -o test || test_succeeded=false
+
+${test_succeeded:-true}
 
 %files
 %defattr(-,root,root)
