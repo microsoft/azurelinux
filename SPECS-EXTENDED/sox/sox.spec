@@ -6,7 +6,7 @@ Name: sox
 # This workaround will go away with rebase to 14.4.3
 # it affects Source, %%prep and Version
 Version: 14.4.2.0
-Release: 32%{?dist}
+Release: 33%{?dist}
 License: GPLv2+ and LGPLv2+ and MIT
 # Modified source tarball with libgsm license, without unlicensed liblpc10:
 # _Source: http://downloads.sourceforge.net/%%{name}/%%{name}-%%{version}.tar.gz
@@ -150,6 +150,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/sox/*.a
 
 
 %changelog
+* Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 14.4.2.0-33
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License Verified
+
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 14.4.2.0-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
