@@ -326,7 +326,4 @@ $(toolchain_out_rpms): $(toolchain_rpms)
 		echo "Placing built toolchain RPM $(notdir $@) into $(RPMS_DIR)" && \
 		cp $$src_rpm $@; \
 	fi || $(call print_error, Failed to duplicate '$$src_rpm' to '$@' )
-else
-$(toolchain_out_rpms):
-	@$(call print_error, Cannot build toolchain rpm ($@) unless REBUILD_TOOLCHAIN=y is set)
 endif
