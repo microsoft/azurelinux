@@ -404,7 +404,9 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, supressConflictingRPMs)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
-
+	if !supressConflictingRPMs && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
+		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use '--allow-prebuilt-rebuilds' to suppress this error")
+	}
 	return
 }
 
