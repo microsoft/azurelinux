@@ -8,7 +8,7 @@ jobs:
 
   build:
     name: Check Spec for version and/or release update and parsing
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
 
     - name: Check out code
