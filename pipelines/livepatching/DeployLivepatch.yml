@@ -91,7 +91,7 @@ extends:
               download_tags+=",kernel-${{ parameters.livepatchKernelVersion }}"
             fi
 
-            echo "##vso[task.setvariable variable=downloadTags;isoutput=true]$download_tags"
+            echo "##vso[task.setvariable variable=downloadTags]$download_tags"
             echo "Will download artifacts from build with tags '$download_tags'."
           displayName: 'Determine artifacts source'
 
@@ -143,7 +143,7 @@ extends:
           path: '$(pipelinesRepoFolder)'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download RPMs archive'
+          displayName: 'Download livepatch RPMs and toolkit'
           inputs:
             source: current
             artifact: '$(buildArtifactsFolder)'
@@ -212,12 +212,20 @@ extends:
           path: '$(pipelinesRepoFolder)'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download RPMs archive'
+          displayName: 'Download RPMs and SRPMs archives'
           inputs:
             source: current
             artifact: '$(buildArtifactsFolder)'
-            patterns: '**/rpms.tar.gz'
+            patterns: '**/*rpms.tar.gz'
             path: '$(System.ArtifactsDirectory)'
+
+        - bash: |
+            for archive in $(System.ArtifactsDirectory)/**/*rpms.tar.gz
+            do
+              echo "Extracting archive '$archive'."
+              tar -C "$(System.ArtifactsDirectory)" -xzf "$archive"
+            done
+          displayName: 'Expand SRPM/RPM tarballs'
 
           # - task: onebranch.pipeline.signing@1
           #   displayName: 'Sign RPMs & SRPMS'
