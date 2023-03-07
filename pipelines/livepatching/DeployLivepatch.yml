@@ -75,12 +75,12 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish build artifacts'
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-            artifactName: build-artifacts
+            artifactName: $(buildArtifactsFolder)_BUILD
 
           - output: pipelineArtifact
             displayName: 'Publish logs'
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-            artifactName: LOGS
+            artifactName: LOGS_BUILD
 
         steps:
         - bash: |
@@ -128,12 +128,12 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish build artifacts'
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-            artifactName: build-artifacts
+            artifactName: $(buildArtifactsFolder)_KERNEL_MODULES
 
           - output: pipelineArtifact
             displayName: 'Publish logs'
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-            artifactName: LOGS
+            artifactName: LOGS_KERNEL_MODULES
 
         steps:
         - checkout: self
@@ -146,7 +146,7 @@ extends:
           displayName: 'Download livepatch RPMs and toolkit'
           inputs:
             source: current
-            artifact: '$(buildArtifactsFolder)'
+            artifact: '$(buildArtifactsFolder)_BUILD'
             patterns: |
               **/rpms.tar.gz
               **/toolkit-*.tar.gz
@@ -197,7 +197,7 @@ extends:
         #   - output: pipelineArtifact
         #     displayName: 'Publish build artifacts'
         #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-        #     artifactName: build-artifacts
+        #     artifactName: $(buildArtifactsFolder)
 
         #   - output: pipelineArtifact
         #     displayName: 'Publish logs'
@@ -215,16 +215,16 @@ extends:
           displayName: 'Download RPMs and SRPMs archives'
           inputs:
             source: current
-            artifact: '$(buildArtifactsFolder)'
+            artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
             patterns: '**/*rpms.tar.gz'
             path: '$(System.ArtifactsDirectory)'
 
         - bash: |
-            for archive in $(System.ArtifactsDirectory)/**/*rpms.tar.gz
+            while IFS= read -r -d '' archive
             do
               echo "Extracting archive '$archive'."
               tar -C "$(System.ArtifactsDirectory)" -xzf "$archive"
-            done
+            done < <(find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -print0)
           displayName: 'Expand SRPM/RPM tarballs'
 
           # - task: onebranch.pipeline.signing@1
