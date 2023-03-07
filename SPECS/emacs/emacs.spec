@@ -2,19 +2,18 @@ Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        28.2
 Release:        1%{?dist}
+License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-License:        GPLv3+ and CC0-1.0
-URL:            https://www.gnu.org/software/emacs/
 Group:          Applications/Editors
+URL:            https://www.gnu.org/software/emacs/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2022-45939.patch
-
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
+BuildRequires:  gnutls-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  systemd-devel
-BuildRequires:  gnutls-devel
 Requires:       %{name}-filesystem = %{version}-%{release}
 
 %description
@@ -24,8 +23,8 @@ language (elisp), and the capability to read mail, news, and more
 without leaving the editor.
 
 %package filesystem
-Summary:       Emacs filesystem layout
-BuildArch:     noarch
+Summary:        Emacs filesystem layout
+BuildArch:      noarch
 
 %description filesystem
 This package provides some directories which are required by other
@@ -74,7 +73,7 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %{_includedir}/emacs-module.h
 %{_libdir}/systemd/user/emacs.service
 %{_libexecdir}/emacs
-%{_datadir}/emacs/%{version}/etc/*
+%{_datadir}/emacs/%{version}%{_sysconfdir}/*
 %{_datadir}/emacs/%{version}/lisp/*
 %{_datadir}/emacs/%{version}/site-lisp/subdirs.el
 %{_datadir}/emacs/site-lisp/subdirs.el
