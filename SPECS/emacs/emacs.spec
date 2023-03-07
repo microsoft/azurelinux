@@ -1,7 +1,7 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        28.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,6 +86,9 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Tue Mar 07 2023 Sindhu Karri <lakarri@microsoft.com> - 28.2-2
+- Apply upstream patch for CVE-2022-48337
+
 * Mon Mar 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 28.2-1
 - Auto-upgrade to 28.2 - fix CVE-2022-48338, CVE-2022-48339
 
