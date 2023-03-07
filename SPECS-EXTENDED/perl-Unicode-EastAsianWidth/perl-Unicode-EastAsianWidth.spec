@@ -53,7 +53,7 @@ make test
 %{_mandir}/man3/Unicode::EastAsianWidth.3pm*
 
 %changelog
-* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 12.0-4
+* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 12.0-4
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0-3

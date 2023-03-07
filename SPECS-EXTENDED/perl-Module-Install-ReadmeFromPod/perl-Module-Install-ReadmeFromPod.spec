@@ -110,7 +110,7 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 0.30-13
+* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 0.30-13
 - License verified
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.30-12

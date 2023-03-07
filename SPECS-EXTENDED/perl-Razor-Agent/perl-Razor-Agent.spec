@@ -83,7 +83,7 @@ make test
 %{_mandir}/man*/*
 
 %changelog
-* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 2.85-37
+* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 2.85-37
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.85-36

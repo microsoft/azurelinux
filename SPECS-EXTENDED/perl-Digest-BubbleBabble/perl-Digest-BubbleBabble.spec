@@ -74,7 +74,7 @@ make test TEST_FILES="xt/*.t"
 %{_mandir}/man3/Digest::BubbleBabble.3*
 
 %changelog
-* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 0.02-29
+* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 0.02-29
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-28

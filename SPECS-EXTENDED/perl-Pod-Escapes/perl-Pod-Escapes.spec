@@ -49,7 +49,7 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Wed Jan 25 2023 Muhammad Falak <mwani@microsoft.com> - 1.07-443
+* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 1.07-443
 - License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.07-442
