@@ -37,7 +37,7 @@ hydrate_signed_sources() {
 
 verify_built_package() {
     local kernel_version
-    local result=0
+    local no_errors
     local rpm_name
     local signed_rpm_path
     local tmpdir
@@ -56,7 +56,7 @@ verify_built_package() {
         if [[ -z "$unsigned_rpm_path" ]]
         then
             echo "ERROR: RPM ($rpm_name) not found in the unsigned version." >&2
-            result=1
+            no_errors=false
             continue
         fi
 
@@ -64,11 +64,11 @@ verify_built_package() {
            ! command_diff "rpm -qp --requires" "$unsigned_rpm_path" "$signed_rpm_path" || \
            ! command_diff "rpm -qlp" "$unsigned_rpm_path" "$signed_rpm_path"
         then
-            result=1
+            no_errors=false
         fi
     done < <(find "out/RPMS" -name "livepatch-$kernel_version*.rpm" -and -not -name "*debuginfo*" -print0)
 
-    return "$result"
+    ${no_errors:-true}
 }
 
 # Script parameters:
