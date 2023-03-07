@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.25.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -21,6 +21,8 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:    CVE-2023-25173.patch
+Patch0:    CVE-2023-25153.patch
 Patch0:         vendor_build.patch
 %global debug_package %{nil}
 %define install_path  /usr/local/bin
@@ -79,6 +81,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue Mar 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-6
+- Add patch for CVE-2023-25153, CVE-2023-25173
+
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-5
 - - Set golang <= 1.18.8 build requires
 
