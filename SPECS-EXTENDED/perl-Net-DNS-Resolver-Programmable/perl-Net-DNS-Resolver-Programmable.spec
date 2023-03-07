@@ -8,7 +8,6 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/Net-DNS-Resolver-Programmable
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BIGPRESH/Net-DNS-Resolver-Programmable-%{version}.tar.gz#/perl-Net-DNS-Resolver-Programmable-%{version}.tar.gz
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl%{?fedora:-interpreter}
 BuildRequires:  perl-generators

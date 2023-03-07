@@ -9,7 +9,6 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/XML-LibXSLT
 Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{version}.tar.gz#/perl-XML-LibXSLT-%{version}.tar.gz
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  perl-devel

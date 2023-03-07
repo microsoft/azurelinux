@@ -9,7 +9,6 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Escapes
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-%{version}.tar.gz#/perl-Pod-Escapes-%{version}.tar.gz
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter

@@ -8,7 +8,6 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/Image-Info
 Source0:        https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-%{version}.tar.gz#/perl-Image-Info-%{version}.tar.gz
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter

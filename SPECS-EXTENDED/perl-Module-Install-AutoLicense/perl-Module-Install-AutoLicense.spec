@@ -9,7 +9,6 @@ URL:            https://metacpan.org/release/Module-Install-AutoLicense
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-AutoLicense-%{version}.tar.gz#/perl-Module-Install-AutoLicense-%{version}.tar.gz
 Patch0:         Use-Module-Install-AutoLicense-for-tarball.patch
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter

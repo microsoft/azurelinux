@@ -8,7 +8,6 @@ Distribution:   Mariner
 URL:            https://metacpan.org/release/Digest-BubbleBabble
 Source0:        https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-%{version}.tar.gz#/perl-Digest-BubbleBabble-%{version}.tar.gz
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
