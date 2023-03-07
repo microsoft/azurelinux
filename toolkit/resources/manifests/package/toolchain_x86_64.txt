@@ -95,9 +95,9 @@ findutils-lang-4.6.0-8.cm1.x86_64.rpm
 flex-2.6.4-6.cm1.x86_64.rpm
 flex-debuginfo-2.6.4-6.cm1.x86_64.rpm
 flex-devel-2.6.4-6.cm1.x86_64.rpm
-freetype-2.12.1-1.cm1.x86_64.rpm
-freetype-debuginfo-2.12.1-1.cm1.x86_64.rpm
-freetype-devel-2.12.1-1.cm1.x86_64.rpm
+freetype-2.12.1-2.cm1.x86_64.rpm
+freetype-debuginfo-2.12.1-2.cm1.x86_64.rpm
+freetype-devel-2.12.1-2.cm1.x86_64.rpm
 gawk-4.2.1-4.cm1.x86_64.rpm
 gawk-debuginfo-4.2.1-4.cm1.x86_64.rpm
 gcc-9.1.0-7.cm1.x86_64.rpm
