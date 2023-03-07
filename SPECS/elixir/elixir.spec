@@ -3,7 +3,7 @@ Summary:        elixir
 Name:           elixir
 Version:        1.14.3
 Release:        1%{?dist}
-License:        Apache-2.0
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
@@ -40,4 +40,4 @@ make
 
 %changelog
 * Mon Feb 27 2023 Sam Meluch <sammeluch@microsoft.com> - 1.14.3-1
-- Add elixir v1.14.3 to Mariner.
+- Original version for CBL-Mariner

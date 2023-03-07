@@ -2067,6 +2067,7 @@
                 "distroless-packages",
                 "doxygen",
                 "dtc",
+                "elixir",
                 "espeak-ng",
                 "espeakup",
                 "flannel",
