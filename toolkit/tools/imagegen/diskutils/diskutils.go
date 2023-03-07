@@ -321,81 +321,81 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 }
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
-func CreatePartitions(diskDevPaths []string, disks []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot *EncryptedRootDevice, readOnlyRoot *VerityDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
 
-	for i, diskDevPath := range diskDevPaths {
-		// Clear any old partition table info to prevent errors during partition creation
-		_, stderr, err := shell.Execute("sfdisk", "--delete", diskDevPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to clear partition table. Expected if the disk is blank: %v", stderr)
-		}
+	// Clear any old partition table info to prevent errors during partition creation
+	_, stderr, err := shell.Execute("sfdisk", "--delete", diskDevPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to clear partition table. Expected if the disk is blank: %v", stderr)
+	}
 
-		// Create new partition table
-		partitionTableType := disks[i].PartitionTableType
-		logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
-		partedArgument, err := partitionTableType.ConvertToPartedArgument()
-		if err != nil {
-			logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-		}
-		_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
-		if err != nil {
-			logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-		}
+	// Create new partition table
+	partitionTableType := disk.PartitionTableType
+	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
+	partedArgument, err := partitionTableType.ConvertToPartedArgument()
+	if err != nil {
+		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
+		return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+	}
+	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
+		return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+	}
 
-		usingExtendedPartition := (len(disks[i].Partitions) > maxPrimaryPartitionsForMBR) && (partitionTableType == configuration.PartitionTableTypeMbr)
+	usingExtendedPartition := (len(disk.Partitions) > maxPrimaryPartitionsForMBR) && (partitionTableType == configuration.PartitionTableTypeMbr)
 
-		// Partitions assumed to be defined in sorted order
-		for idx, partition := range disks[i].Partitions {
-			partType, partitionNumber := obtainPartitionDetail(idx, usingExtendedPartition)
-			// Insert an extended partition
-			if partType == extendedPartitionType {
-				err = createExtendedPartition(diskDevPath, partitionTableType.String(), disks[i].Partitions, partIDToFsTypeMap, partDevPathMap)
-				if err != nil {
-					return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-				}
-
-				// Update partType and partitionNumber
-				partType = logicalPartitionType
-				partitionNumber = partitionNumber + 1
-			}
-
-			partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
+	// Partitions assumed to be defined in sorted order
+	for idx, partition := range disk.Partitions {
+		partType, partitionNumber := obtainPartitionDetail(idx, usingExtendedPartition)
+		// Insert an extended partition
+		if partType == extendedPartitionType {
+			err = createExtendedPartition(diskDevPath, partitionTableType.String(), disk.Partitions, partIDToFsTypeMap, partDevPathMap)
 			if err != nil {
-				logger.Log.Warnf("Failed to create single partition")
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 
-			partFsType, err := FormatSinglePartition(partDevPath, partition)
+			// Update partType and partitionNumber
+			partType = logicalPartitionType
+			partitionNumber = partitionNumber + 1
+		}
+
+		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
+		if err != nil {
+			logger.Log.Warnf("Failed to create single partition")
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+		}
+
+		partFsType, err := FormatSinglePartition(partDevPath, partition)
+		if err != nil {
+			logger.Log.Warnf("Failed to format partition")
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+		}
+
+		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
+			newEncryptedRootPtr, err := encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
-				logger.Log.Warnf("Failed to format partition")
+				logger.Log.Warnf("Failed to initialize encrypted root")
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
-
-			if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
-				encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
-				if err != nil {
-					logger.Log.Warnf("Failed to initialize encrypted root")
-					return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-				}
-				partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
-			} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
-				readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
-				if err != nil {
-					logger.Log.Warnf("Failed to initialize read only root")
-					return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-				}
-				partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
-			} else {
-				partDevPathMap[partition.ID] = partDevPath
+			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
+			encryptedRoot = &newEncryptedRootPtr
+		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
+			newReadOnlyRootPtr, err := PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
+			if err != nil {
+				err = fmt.Errorf("failed to initialize read only root: %w", err)
+				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
-
-			partIDToFsTypeMap[partition.ID] = partFsType
+			partDevPathMap[partition.ID] = newReadOnlyRootPtr.MappedDevice
+			readOnlyRoot = &newReadOnlyRootPtr
+		} else {
+			partDevPathMap[partition.ID] = partDevPath
 		}
+
+		partIDToFsTypeMap[partition.ID] = partFsType
 	}
 	return
 }
