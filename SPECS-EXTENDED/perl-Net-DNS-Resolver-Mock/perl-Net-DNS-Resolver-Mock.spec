@@ -6,7 +6,7 @@ License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Net-DNS-Resolver-Mock
-Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Net-DNS-Resolver-Mock-%{version}.tar.gz#/perl-Net-DNS-Resolver-Mock-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Net-DNS-Resolver-Mock-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter

@@ -6,7 +6,7 @@ License:	CC0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:		https://metacpan.org/release/Module-Package-Au
-Source0:	https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Module-Package-Au-%{version}.tar.gz#/perl-Module-Package-Au-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Module-Package-Au-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:		perl-Module-Package-Au-no-bundle.patch
 BuildArch:	noarch
 BuildRequires:	perl-generators

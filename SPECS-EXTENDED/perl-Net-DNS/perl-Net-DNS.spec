@@ -11,7 +11,7 @@ Summary:       DNS resolver modules for Perl
 # contrib/check_soa:    GPL+ or Artistic
 License:       (GPL+ or Artistic) and MIT
 URL:           https://metacpan.org/release/Net-DNS
-Source0:       https://cpan.metacpan.org/authors/id/N/NL/NLNETLABS/Net-DNS-%{version}.tar.gz#/perl-Net-DNS-%{version}.tar.gz
+Source0:       https://cpan.metacpan.org/authors/id/N/NL/NLNETLABS/Net-DNS-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:     noarch
 # Build
 BuildRequires: coreutils

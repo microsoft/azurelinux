@@ -7,7 +7,7 @@ License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/XML-LibXSLT
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{version}.tar.gz#/perl-XML-LibXSLT-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  gcc
 BuildRequires:  make

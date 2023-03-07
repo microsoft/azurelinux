@@ -7,7 +7,7 @@ License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Alien-Libxml2/
-Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Libxml2-%{version}.tar.gz#/perl-Alien-Libxml2-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Libxml2-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter

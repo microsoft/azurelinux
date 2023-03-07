@@ -11,7 +11,7 @@ License:        (GPL+ OR Artistic) AND CC0 AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Simple
-Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-%{version}.tar.gz#/perl-Test-Simple-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators

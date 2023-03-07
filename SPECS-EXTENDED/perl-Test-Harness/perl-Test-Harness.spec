@@ -16,7 +16,7 @@ License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Harness
-Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/perl-Test-Harness-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove hard-coded shell bangs
 Patch0:         Test-Harness-3.38-Remove-shell-bangs.patch
 BuildRequires:  make

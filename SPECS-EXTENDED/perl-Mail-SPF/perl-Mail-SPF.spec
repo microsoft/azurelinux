@@ -6,7 +6,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Mail-SPF
-Source0:        https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v%{version}.tar.gz#/perl-Mail-SPF-v%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
 Patch0:         Mail-SPF-v2.8.0-POD.patch
 Patch1:         Mail-SPF-v2.8.0-testsuite.patch
 BuildRequires:  coreutils

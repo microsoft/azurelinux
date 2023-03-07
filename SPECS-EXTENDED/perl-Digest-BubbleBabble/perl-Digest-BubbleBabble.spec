@@ -6,7 +6,7 @@ License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Digest-BubbleBabble
-Source0:        https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-%{version}.tar.gz#/perl-Digest-BubbleBabble-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators

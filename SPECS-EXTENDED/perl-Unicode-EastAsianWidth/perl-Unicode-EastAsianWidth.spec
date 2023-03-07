@@ -6,7 +6,7 @@ License:        CC0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Unicode-EastAsianWidth
-Source0:        https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-%{version}.tar.gz#/perl-Unicode-EastAsianWidth-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         perl-Unicode-EastAsianWidth-no-inc.patch
 BuildRequires:  perl-generators
 BuildRequires:  perl(Exporter)

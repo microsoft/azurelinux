@@ -1,13 +1,12 @@
 Summary:        Resolve POD escape sequences
 Name:           perl-Pod-Escapes
-# Compete with perl.spec
 Version:        1.07
 Release:        443%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Escapes
-Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-%{version}.tar.gz#/perl-Pod-Escapes-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
