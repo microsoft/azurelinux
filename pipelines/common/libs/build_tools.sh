@@ -240,7 +240,7 @@ publish_toolkit() {
 
     echo "-- Publishing toolkit to '$toolkit_publish_dir'."
     mkdir -p "$toolkit_publish_dir"
-    sudo mv "$toolkit_dir"/out/toolkit*.tar.gz "$toolkit_publish_dir"
+    sudo mv "$repo_dir"/out/toolkit*.tar.gz "$toolkit_publish_dir"
 }
 
 resolve_archive() {
