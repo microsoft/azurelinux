@@ -240,29 +240,29 @@ extends:
           #     timeout: 7200
           #   retryCountOnTaskFailure: 2
 
-          - task: 1ES.Signing@1
-            displayName: 'Sign RPMs & SRPMs'
-            inputs:
-              directory: $(System.ArtifactsDirectory)
-              pattern: '**/*.rpm'
-              operations: |
-                [
-                  {
-                    "KeyCode": "CP-459159",
-                    "OperationCode": "SigntoolSign",
-                    "Parameters": {
-                      "OpusName": "Microsoft",
-                      "OpusInfo": "http://www.microsoft.com",
-                      "FileDigest": "/fd \"SHA256\"",
-                      "PageHash": "/NPH",
-                      "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
-                    },
-                    "ToolName": "sign",
-                    "ToolVersion": "1.0"
-                  }
-                ]
-              clientId: '?'
-              tenantId: '?'
+        - task: 1ES.Signing@1
+          displayName: 'Sign RPMs & SRPMs'
+          inputs:
+            directory: $(System.ArtifactsDirectory)
+            pattern: '**/*.rpm'
+            operations: |
+              [
+                {
+                  "KeyCode": "CP-459159",
+                  "OperationCode": "SigntoolSign",
+                  "Parameters": {
+                    "OpusName": "Microsoft",
+                    "OpusInfo": "http://www.microsoft.com",
+                    "FileDigest": "/fd \"SHA256\"",
+                    "PageHash": "/NPH",
+                    "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+                  },
+                  "ToolName": "sign",
+                  "ToolVersion": "1.0"
+                }
+              ]
+            clientId: '?'
+            tenantId: '?'
 
     - stage: Test
       jobs:
