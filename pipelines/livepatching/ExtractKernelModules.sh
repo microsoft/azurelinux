@@ -9,7 +9,6 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 source "$ROOT_DIR"/pipelines/common/libs/rpm_tools.sh
 
 set -e
-set -x
 
 # Script parameters:
 #
