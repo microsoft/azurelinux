@@ -15,7 +15,6 @@ Source0:       https://cpan.metacpan.org/authors/id/N/NL/NLNETLABS/Net-DNS-%{ver
 BuildArch:     noarch
 # Build
 BuildRequires: coreutils
-BuildRequires: glibc-common
 BuildRequires: make
 BuildRequires: sed
 BuildRequires: perl-generators
