@@ -4430,8 +4430,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.3.7",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.3.7.tar.bz2"
+          "version": "2.4.0",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.0.tar.bz2"
         }
       }
     },
@@ -9271,8 +9271,8 @@
         "type": "other",
         "other": {
           "name": "libgpg-error",
-          "version": "1.43",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.43.tar.bz2"
+          "version": "1.46",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.46.tar.bz2"
         }
       }
     },
