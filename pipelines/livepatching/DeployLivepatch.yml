@@ -148,8 +148,8 @@ extends:
             source: current
             artifact: '$(buildArtifactsFolder)'
             patterns: |
-              '**/rpms.tar.gz'
-              '**/toolkit-*.tar.gz'
+              **/rpms.tar.gz
+              **/toolkit-*.tar.gz
             path: '$(System.ArtifactsDirectory)'
 
         # - task: DownloadPipelineArtifact@2
@@ -192,17 +192,17 @@ extends:
             workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
-        templateContext:
-          outputs:
-          - output: pipelineArtifact
-            displayName: 'Publish build artifacts'
-            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-            artifactName: build-artifacts
+        # templateContext:
+        #   outputs:
+        #   - output: pipelineArtifact
+        #     displayName: 'Publish build artifacts'
+        #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+        #     artifactName: build-artifacts
 
-          - output: pipelineArtifact
-            displayName: 'Publish logs'
-            targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-            artifactName: LOGS
+        #   - output: pipelineArtifact
+        #     displayName: 'Publish logs'
+        #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
+        #     artifactName: LOGS
 
         steps:
         - checkout: self
@@ -210,6 +210,27 @@ extends:
 
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoFolder)'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download RPMs archive'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)'
+            patterns: '**/rpms.tar.gz'
+            path: '$(System.ArtifactsDirectory)'
+
+          # - task: onebranch.pipeline.signing@1
+          #   displayName: 'Sign RPMs & SRPMS'
+          #   env:
+          #     ESRP_XSIGN_TOTAL_TIMEOUT_IN_MINUTES: 360
+          #     ESRP_XSIGN_SINGLE_FILE_TIMEOUT_IN_MINUTES: 90
+          #   inputs:
+          #     command: 'sign'
+          #     signing_profile: 'CP-459159-pgpdetached'
+          #     files_to_sign: '**/*.rpm'
+          #     search_root: '$(ob_outputDirectory)'
+          #     timeout: 7200
+          #   retryCountOnTaskFailure: 2
 
     - stage: Test
       jobs:
