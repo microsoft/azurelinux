@@ -36,7 +36,7 @@ rm -rf inc/*
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}

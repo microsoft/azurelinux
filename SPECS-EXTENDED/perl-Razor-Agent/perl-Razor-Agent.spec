@@ -51,7 +51,7 @@ perl Makefile.PL INSTALLDIRS=vendor
 cd Razor2-Preproc-deHTMLxs
 perl Makefile.PL INSTALLDIRS=vendor
 cd ..
-make %{?_smp_mflags} OPTIMIZE="%{optflags}"
+%make_build OPTIMIZE="%{optflags}"
 
 %install
 make install -C Razor2-Preproc-deHTMLxs \

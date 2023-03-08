@@ -100,6 +100,7 @@ consistent programming interface (API) to the client side of various
 protocols used in the internet community.
 
 %prep
+# Avoid autosetup
 %setup -q -n libnet-%{version}
 # Provide dummy Net::libnetFAQ document, CPAN RT#117888
 install -m 0644 %{SOURCE1} lib/Net
@@ -108,7 +109,7 @@ install -m 0644 %{SOURCE1} lib/Net
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 </dev/null
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}
