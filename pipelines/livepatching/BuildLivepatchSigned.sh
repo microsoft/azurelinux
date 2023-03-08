@@ -100,12 +100,7 @@ done
 
 print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_PUBLISH_DIR
 
-tmpdir=$(mktemp -d)
-function cleanup {
-    echo "Cleaning up '$tmpdir'."
-    rm -rf "$tmpdir"
-}
-trap cleanup EXIT
+tmpdir="$(prepare_temp_dir)"
 
 overwrite_toolkit -t "$ARTIFACTS_DIR"
 

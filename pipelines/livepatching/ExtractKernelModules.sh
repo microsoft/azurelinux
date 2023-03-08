@@ -5,6 +5,9 @@
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 
+# shellcheck source=../common/libs/file_tools.sh
+source "$ROOT_DIR"/pipelines/common/libs/file_tools.sh
+
 # shellcheck source=../common/libs/rpm_tools.sh
 source "$ROOT_DIR"/pipelines/common/libs/rpm_tools.sh
 
@@ -50,12 +53,7 @@ then
     exit 1
 fi
 
-tmpdir=$(mktemp -d)
-function cleanup {
-    echo "Cleaning up '$tmpdir'."
-    rm -rf "$tmpdir"
-}
-trap cleanup EXIT
+tmpdir="$(prepare_temp_dir)"
 
 tar -C "$tmpdir" -xf "$rpms_archive"
 
