@@ -1,7 +1,7 @@
 Summary:        software font engine.
 Name:           freetype
 Version:        2.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD WITH advertising OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.12.1-2
+- Bump release number due to harfbuzz upgrade to fix CVE-2023-25193.
+
 * Thu Aug 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.12.1-1
 - Updating to version 2.12.1 to address CVEs: 2022-27405 and 2022-27406.
 
