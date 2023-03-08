@@ -1,7 +1,7 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
 Version:        3.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 %{_libdir}/libharfbuzz-icu.so.*
 
 %changelog
+* Wed Mar 08 2023 Muhammad Falak <mwani@microsoft.com> - 3.4.0-2
+- Add BR on cairo instead of pkgconfig(cairo)
+
 * Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 3.4.0-1
 - Upgrade version to match with version in Mariner 2.0
 - Bring patch from Mariner 2.0 to fix CVE-2023-25193
