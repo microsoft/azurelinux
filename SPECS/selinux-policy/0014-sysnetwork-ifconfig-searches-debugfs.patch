@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/sysnetwork.te | 1 +
  1 file changed, 1 insertion(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
 index 47811a554..9ef1300ef 100644
 --- a/policy/modules/system/sysnetwork.te

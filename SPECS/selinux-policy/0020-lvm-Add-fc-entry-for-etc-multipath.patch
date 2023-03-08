@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
  policy/modules/system/lvm.fc | 2 ++
  1 file changed, 2 insertions(+)
 
+MSFT_TAG: upstreamed
+
 diff --git a/policy/modules/system/lvm.fc b/policy/modules/system/lvm.fc
 index 836a472f1..cb3742b66 100644
 --- a/policy/modules/system/lvm.fc

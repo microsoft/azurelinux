@@ -9,6 +9,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/usermanage.te | 1 +
  2 files changed, 2 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/usermanage.if b/policy/modules/admin/usermanage.if
 index 340d02456..75589e353 100644
 --- a/policy/modules/admin/usermanage.if

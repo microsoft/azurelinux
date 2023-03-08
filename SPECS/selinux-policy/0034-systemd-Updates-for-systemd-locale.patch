@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/systemd.te | 5 +++++
  1 file changed, 5 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
 index 84d14eb18..4ae907781 100644
 --- a/policy/modules/system/systemd.te

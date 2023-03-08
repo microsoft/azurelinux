@@ -7,6 +7,8 @@ Subject: [PATCH 02/35] Temporary fix for wrong audit log directory
  policy/modules/system/logging.fc | 4 ++++
  1 file changed, 4 insertions(+)
 
+MSFT_TAG: not upstreamable
+
 diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
 index 5681acb51..5cbad8178 100644
 --- a/policy/modules/system/logging.fc

@@ -12,6 +12,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/modutils.te |  7 ++++
  3 files changed, 83 insertions(+)
 
+MSFT_TAG: not upstreamable
+
 diff --git a/policy/modules/admin/rpm.if b/policy/modules/admin/rpm.if
 index 2b5e0768e..ce62d846f 100644
 --- a/policy/modules/admin/rpm.if

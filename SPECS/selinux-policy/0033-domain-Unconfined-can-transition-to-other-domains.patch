@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/kernel/domain.te | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+MSFT_TAG: needs investigation
+
 diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
 index 25e296421..32caab422 100644
 --- a/policy/modules/kernel/domain.te

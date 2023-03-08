@@ -9,6 +9,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/usermanage.te | 4 ++++
  1 file changed, 4 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
 index 82fc1dc42..636d0afdf 100644
 --- a/policy/modules/admin/usermanage.te

@@ -7,6 +7,8 @@ Subject: [PATCH 03/35] Set default login to unconfined_u.
  config/appconfig-mcs/seusers | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+MSFT_TAG: not upstreamable.
+
 diff --git a/config/appconfig-mcs/seusers b/config/appconfig-mcs/seusers
 index ce614b41b..5fbab95af 100644
 --- a/config/appconfig-mcs/seusers

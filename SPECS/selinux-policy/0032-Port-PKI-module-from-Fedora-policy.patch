@@ -16,6 +16,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  create mode 100644 policy/modules/services/pki.if
  create mode 100644 policy/modules/services/pki.te
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
 index b465af7de..dcedc5653 100644
 --- a/policy/modules/kernel/corenetwork.te.in

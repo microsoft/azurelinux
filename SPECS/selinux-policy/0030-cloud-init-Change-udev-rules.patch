@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/cloudinit.te | 1 +
  1 file changed, 1 insertion(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
 index 6ae0bf993..80c17374b 100644
 --- a/policy/modules/admin/cloudinit.te

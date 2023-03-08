@@ -11,6 +11,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/rpm.te       |  4 ++++
  3 files changed, 35 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
 index 4469d7b17..604f56dc4 100644
 --- a/policy/modules/admin/cloudinit.if

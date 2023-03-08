@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/rpm.te | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
 index 81b6ad3d2..14d65ae13 100644
 --- a/policy/modules/admin/rpm.te

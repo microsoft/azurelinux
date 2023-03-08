@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/unconfined.if | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
 index 4393242d5..c4818431c 100644
 --- a/policy/modules/system/unconfined.if

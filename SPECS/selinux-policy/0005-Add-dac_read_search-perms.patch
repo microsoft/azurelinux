@@ -9,6 +9,8 @@ May be Mariner-specific.
  policy/modules/system/authlogin.te | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
+MSFT_TAG: not upstreamable
+
 diff --git a/policy/modules/services/chronyd.te b/policy/modules/services/chronyd.te
 index e914cde3f..5ae7650d4 100644
 --- a/policy/modules/services/chronyd.te

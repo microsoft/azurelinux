@@ -9,6 +9,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/init.if | 2 ++
  1 file changed, 2 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
 index ba2561048..e1ce1363d 100644
 --- a/policy/modules/system/init.if

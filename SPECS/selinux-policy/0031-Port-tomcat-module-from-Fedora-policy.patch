@@ -14,6 +14,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  create mode 100644 policy/modules/services/tomcat.if
  create mode 100644 policy/modules/services/tomcat.te
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
 index 2bc259678..b465af7de 100644
 --- a/policy/modules/kernel/corenetwork.te.in

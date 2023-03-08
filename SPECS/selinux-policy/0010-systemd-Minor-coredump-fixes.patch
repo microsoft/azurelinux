@@ -9,6 +9,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/systemd.te      | 11 ++++-------
  2 files changed, 24 insertions(+), 7 deletions(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/kernel/corecommands.if b/policy/modules/kernel/corecommands.if
 index 231aa69d9..328fc4419 100644
 --- a/policy/modules/kernel/corecommands.if

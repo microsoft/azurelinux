@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/kdump.te | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/kdump.te b/policy/modules/admin/kdump.te
 index ec3d2f4d5..77c7e2803 100644
 --- a/policy/modules/admin/kdump.te

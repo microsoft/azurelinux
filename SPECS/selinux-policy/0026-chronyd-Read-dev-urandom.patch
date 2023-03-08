@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/services/chronyd.te | 1 +
  1 file changed, 1 insertion(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/services/chronyd.te b/policy/modules/services/chronyd.te
 index 5ae7650d4..500ce6fe2 100644
 --- a/policy/modules/services/chronyd.te

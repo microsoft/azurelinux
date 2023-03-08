@@ -10,6 +10,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/services/container.te |  7 ++++++-
  3 files changed, 29 insertions(+), 1 deletion(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
 index 27cc4acef..477300ede 100644
 --- a/policy/modules/kernel/filesystem.if

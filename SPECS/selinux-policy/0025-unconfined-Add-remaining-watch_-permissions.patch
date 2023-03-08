@@ -11,6 +11,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/kernel/kernel.te     | 24 ++++++++++++------------
  4 files changed, 29 insertions(+), 29 deletions(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/kernel/devices.te b/policy/modules/kernel/devices.te
 index 5e2c77cbb..966769c2d 100644
 --- a/policy/modules/kernel/devices.te

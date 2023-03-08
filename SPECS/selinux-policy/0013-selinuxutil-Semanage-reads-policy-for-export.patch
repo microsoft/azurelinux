@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/selinuxutil.te | 1 +
  1 file changed, 1 insertion(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
 index d7f047c2d..a96ce4784 100644
 --- a/policy/modules/system/selinuxutil.te

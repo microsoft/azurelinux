@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/kernel/files.fc | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/kernel/files.fc b/policy/modules/kernel/files.fc
 index f6ff6b079..0a72dd356 100644
 --- a/policy/modules/kernel/files.fc

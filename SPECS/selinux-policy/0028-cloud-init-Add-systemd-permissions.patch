@@ -11,6 +11,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/init.if     | 19 +++++++++++++++++++
  2 files changed, 27 insertions(+), 4 deletions(-)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
 index ec0db3209..6ae0bf993 100644
 --- a/policy/modules/admin/cloudinit.te

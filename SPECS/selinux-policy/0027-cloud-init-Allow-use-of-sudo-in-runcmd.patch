@@ -9,6 +9,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/sudo.if      | 19 +++++++++++++++++++
  2 files changed, 33 insertions(+)
 
+MSFT_TAG: pending
+
 diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
 index 377891941..ec0db3209 100644
 --- a/policy/modules/admin/cloudinit.te

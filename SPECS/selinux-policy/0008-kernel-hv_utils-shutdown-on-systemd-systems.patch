@@ -8,6 +8,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/kernel/kernel.te | 5 +++++
  1 file changed, 5 insertions(+)
 
+MSFT_TAG: needs investigation, may need more policy.
+
 diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
 index 5124ae016..1f31200b6 100644
 --- a/policy/modules/kernel/kernel.te
