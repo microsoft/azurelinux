@@ -1,6 +1,7 @@
 Summary:        Perl module for interfacing to GNOME's libxslt
 Name:           perl-XML-LibXSLT
 # NOTE: also update perl-XML-LibXML to a compatible version.  See below why.
+# https://bugzilla.redhat.com/show_bug.cgi?id=469480
 Version:        1.99
 Release:        4%{?dist}
 License:        GPL+ OR Artistic
