@@ -13,7 +13,7 @@ URL:            https://fedoraproject.org/wiki/pykickstart
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
-Source0:        https://github.com/pykickstart/%{name}/releases/download/r%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/pykickstart/%{name}/archive/refs/tags/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}.tar.gz.asc
 BuildRequires:  gettext
 BuildRequires:  make
