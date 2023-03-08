@@ -321,10 +321,13 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 }
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
+// encryptedRoot and readOnlyRoot are pointers and will be nil if the disk config does not specify encryption or read-only roots.
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot *EncryptedRootDevice, readOnlyRoot *VerityDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
+	encryptedRoot = nil
+	readOnlyRoot = nil
 
 	// Clear any old partition table info to prevent errors during partition creation
 	_, stderr, err := shell.Execute("sfdisk", "--delete", diskDevPath)

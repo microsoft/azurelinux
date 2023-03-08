@@ -119,7 +119,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 
 	var (
 		isRootFS               bool
-		isLoopDevice           bool
+		areDisksLoopDevices    []bool
 		isOfflineInstall       bool
 		diskDevPaths           []string
 		kernelPkg              string
@@ -165,15 +165,17 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		for i, _ := range disks {
 			defaultTempDiskNames = append(defaultTempDiskNames, fmt.Sprintf("%s%d.%s", defaultTempDiskName, i, defaultTempDiskExtension))
 		}
-		logger.Log.Info("Creating raw disk in build directory")
-		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisks(buildDir, defaultTempDiskNames, *liveInstallFlag, disks, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
+		logger.Log.Info("Creating raw disk(s) in build directory")
+		//  For each disk, create a temporary disk image () and attach it to a loopback device
+		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, areDisksLoopDevices, encryptedRoot, readOnlyRoot, err = setupDisks(buildDir, defaultTempDiskNames, *liveInstallFlag, disks, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
 		if err != nil {
 			return
 		}
 
-		if isLoopDevice {
-			isOfflineInstall = true
-			for _, diskDevPath := range diskDevPaths {
+		// If any of the disks are loop devices, we need to detach them after the install and mark this as an offline install
+		for i, diskDevPath := range diskDevPaths {
+			if areDisksLoopDevices[i] {
+				isOfflineInstall = true
 				defer diskutils.DetachLoopbackDevice(diskDevPath)
 				defer diskutils.BlockOnDiskIO(diskDevPath)
 			}
@@ -338,7 +340,15 @@ func setupRootFS(outputDir, installRoot string) (extraMountPoints []*safechroot.
 	return
 }
 
-func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disks []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPaths []string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isLoopDevice bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
+// setupDisks sets up a loopback device for each 'real' disk a virtual device or special disks.
+// The function will return:
+//   - diskDevPaths: A list of disk device paths (ie /dev/sda, /dev/sdb, etc)
+//   - partIDToDevPathMap: A map of partition ID to device path (ie 'bootID' -> '/dev/sda', etc)
+//   - partIDToFsTypeMap: A map of partition ID to filesystem type (ie 'bootID' -> 'vfat', etc)
+//   - areDisksLoopDevices: A slice of booleans indicating if each disks in order is a loopback device
+//   - encryptedRoot: An EncryptedRootDevice struct containing information about the encrypted root device, or nil if not encrypted
+//   - readOnlyRoot: A VerityDevice struct containing information about the read-only root device, or nil if not read-only
+func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disks []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPaths []string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, areDisksLoopDevices []bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	const (
 		realDiskType = "path"
 	)
@@ -365,6 +375,7 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 	)
 	partIDToDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
+	areDisksLoopDevices = make([]bool, len(disks))
 
 	for discNum, diskConfig := range disks {
 		var (
@@ -373,6 +384,8 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 			newEncryptedRoot                            *diskutils.EncryptedRootDevice
 			newReadOnlyRoot                             *diskutils.VerityDevice
 		)
+		areDisksLoopDevices[discNum] = false
+
 		if DiskType == realDiskType {
 			if liveInstallFlag {
 				newDiskDevPath = diskConfig.TargetDisk.Value
@@ -383,7 +396,7 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 			}
 		} else {
 			newDiskDevPath, newPartIDToDevPathMap, newPartIDToFsTypeMap, newEncryptedRoot, newReadOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskNames[discNum], diskConfig, rootEncryption, readOnlyRootConfig)
-			isLoopDevice = true
+			areDisksLoopDevices[discNum] = true
 		}
 		if err != nil {
 			err = fmt.Errorf("failed to setup disk %s: %w", diskConfig.ID, err)
