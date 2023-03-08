@@ -1,9 +1,5 @@
 # Run optional test
-%if ! (0%{?rhel})
 %bcond_without perl_libnet_enables_optional_test
-%else
-%bcond_with perl_libnet_enables_optional_test
-%endif
 # SASL support
 %bcond_without perl_libnet_enables_sasl
 # SSL support

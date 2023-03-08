@@ -27,11 +27,11 @@ BuildArch:      noarch
 This module provides things that are useful in decoding Pod E<...> sequences.
 
 %prep
-%setup -q -n Pod-Escapes-%{version}
+%autosetup -n Pod-Escapes-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}
@@ -42,6 +42,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 make test
 
 %files
+%license META.yml
 %doc Changes README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*

@@ -49,15 +49,14 @@ a LICENSE file automatically whenever the author runs Makefile.PL. On the
 user side it does nothing.
 
 %prep
-%setup -q -n Module-Install-AutoLicense-%{version}
-%patch0 -p1
+%autosetup -n Module-Install-AutoLicense-%{version} -p1
 rm -r inc
 sed -i -e '/^inc\// d' MANIFEST
 find -type f -exec chmod -x {} +
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}
@@ -68,6 +67,7 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*

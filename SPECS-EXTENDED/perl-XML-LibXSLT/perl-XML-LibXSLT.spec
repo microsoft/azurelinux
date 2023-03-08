@@ -48,7 +48,7 @@ that you can find at http://www.xmlsoft.org/XSLT/
 %{?perl_default_filter}
 
 %prep
-%setup -q -n XML-LibXSLT-%{version}
+%autosetup -n XML-LibXSLT-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}" NO_PERLLOCAL=1
@@ -63,6 +63,7 @@ find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes README benchmark example
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/XML

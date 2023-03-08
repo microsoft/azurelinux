@@ -83,9 +83,7 @@ POD, whenever the author runs Makefile.PL. Several output formats are
 supported: plain-text, HTML, PDF or manual page.
 
 %prep
-%setup -q -n Module-Install-ReadmeFromPod-%{version}
-%patch0 -p1
-%patch1 -p1
+%autosetup -n Module-Install-ReadmeFromPod-%{version} -p1
 # Remove bundled modules
 rm -r inc
 sed -i -e '/^inc\// d' MANIFEST

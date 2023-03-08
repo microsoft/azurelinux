@@ -48,7 +48,8 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 make test
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorlib}/Unicode/
 %{_mandir}/man3/Unicode::EastAsianWidth.3pm*
 

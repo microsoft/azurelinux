@@ -48,7 +48,7 @@ digested using Digest::SHA1, and run through bubblebabble to create the key
 fingerprint.
 
 %prep
-%setup -q -n Digest-BubbleBabble-%{version}
+%autosetup -n Digest-BubbleBabble-%{version}
 
 # Remove bundled libraries
 rm -r inc
@@ -68,7 +68,8 @@ make test
 make test TEST_FILES="xt/*.t"
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorlib}/Digest/
 %{_mandir}/man3/Digest::BubbleBabble.3*
 

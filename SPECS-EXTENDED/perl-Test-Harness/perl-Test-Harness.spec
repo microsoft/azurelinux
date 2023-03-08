@@ -3,11 +3,7 @@
 %global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_docdir}
 
 # Run optional tests
-%if ! (0%{?rhel})
 %bcond_without perl_Test_Harness_enables_optional_test
-%else
-%bcond_with perl_Test_Harness_enables_optional_test
-%endif
 Summary:        Run Perl standard test scripts with statistics
 Name:           perl-Test-Harness
 Version:        3.42
@@ -71,12 +67,11 @@ that is somewhat backwards compatible with Test::Harness 2.xx. If you're
 writing new code consider using TAP::Harness directly instead.
 
 %prep
-%setup -q -n Test-Harness-%{version}
-%patch0 -p1
+%autosetup -p1 -n Test-Harness-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}
@@ -86,7 +81,8 @@ make pure_install DESTDIR=%{buildroot}
 make test
 
 %files
-%doc Changes Changes-2.64 examples README
+%license README
+%doc Changes Changes-2.64 examples
 %{perl_vendorlib}/*
 %{_bindir}/*
 %{_mandir}/man1/*

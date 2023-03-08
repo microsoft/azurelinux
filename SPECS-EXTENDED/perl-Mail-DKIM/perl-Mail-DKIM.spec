@@ -41,7 +41,7 @@ It is required if you wish to enable DKIM checking in SpamAssassin via the
 Mail::SpamAssassin::Plugin::DKIM plugin.
 
 %prep
-%setup -q -n Mail-DKIM-%{version}
+%autosetup -n Mail-DKIM-%{version}
 # Make the example scripts non-executable
 chmod -x scripts/*.pl
 # Use the real path in the shebang
@@ -62,7 +62,8 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %make_build test
 
 %files
-%doc ChangeLog Changes doc HACKING.DKIM README.md TODO scripts/*.pl
+%license README.md
+%doc ChangeLog Changes doc HACKING.DKIM TODO scripts/*.pl
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
 

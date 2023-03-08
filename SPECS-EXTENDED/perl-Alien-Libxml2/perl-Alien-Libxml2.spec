@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+
 Summary:        Install the C libxml2 library on your system
 Name:           perl-Alien-Libxml2
 Version:        0.14
@@ -31,13 +32,11 @@ Requires:       perl(Alien::Base) >= 2.12
 # This RPM package ensures libxml2 is installed on the system
 Requires:       pkgconfig(libxml-2.0) = %(type -p pkgconf >/dev/null && pkgconf --exists libxml-2.0 && pkg-config --modversion libxml-2.0 || echo 0)
 
-# Remove under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(Alien::Base\\)$
 %description
 This module provides libxml2 for other modules to use.
 
 %prep
-%setup -q -n Alien-Libxml2-%{version}
+%autosetup -n Alien-Libxml2-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1

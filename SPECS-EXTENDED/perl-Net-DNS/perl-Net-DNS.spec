@@ -28,10 +28,7 @@ BuildRequires: perl(Carp)
 # Config not used
 BuildRequires: perl(constant)
 BuildRequires: perl(Data::Dumper)
-%if ! (0%{?rhel} >= 7)
-# Digest::BubbleBabble is optional
 BuildRequires: perl(Digest::BubbleBabble)
-%endif
 # Digest::GOST is optional and intentionally unavailable
 # Digest::GOST::CryptoPro is optional and intentionally unavailable
 BuildRequires: perl(Digest::HMAC) >= 1.03
@@ -93,16 +90,6 @@ Suggests:      perl(Scalar::Util) >= 1.25
 
 %{?perl_default_filter}
 
-# Do not export under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Digest::HMAC\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Digest::MD5\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Digest::SHA\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(MIME::Base64\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(CONFIG\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(OS_CONF\\)$
-# Do not export under-specified provides
-%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((Net::DNS::Text)\\)$
-%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((Net::DNS::RR::OPT)\\)$
 
 %description
 Net::DNS is a collection of Perl modules that act as a Domain Name System
@@ -121,7 +108,7 @@ Recommends:     perl(IO::Socket::IP) >= 0.32
 Instances of the "Net::DNS::Nameserver" class represent DNS server objects.
 
 %prep
-%setup -q -n Net-DNS-%{version} 
+%autosetup -n Net-DNS-%{version} 
 chmod -x demo/*
 sed -i -e '1 s,^#!/usr/local/bin/perl,#!%{__perl},' demo/*
 for i in Changes; do
@@ -133,7 +120,7 @@ done
 %build
 export PERL_MM_USE_DEFAULT=yes
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 --no-online-tests
-make %{?_smp_mflags} OPTIMIZE="%{optflags}"
+%make_build OPTIMIZE="%{optflags}"
 
 %install
 make pure_install DESTDIR=%{buildroot}
@@ -144,7 +131,8 @@ chmod -R u+w %{buildroot}/*
 make test
 
 %files
-%doc README Changes demo
+%license README
+%doc Changes demo
 %{perl_vendorlib}/Net/
 %exclude %{perl_vendorlib}/Net/DNS/Resolver/cygwin.pm
 %exclude %{perl_vendorlib}/Net/DNS/Resolver/MSWin32.pm

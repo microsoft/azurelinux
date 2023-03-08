@@ -31,11 +31,11 @@ specified as a means for retrieving DNS records, or even generating them
 on the fly.
 
 %prep
-%setup -q -n Net-DNS-Resolver-Programmable-%{version}
+%autosetup -n Net-DNS-Resolver-Programmable-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}

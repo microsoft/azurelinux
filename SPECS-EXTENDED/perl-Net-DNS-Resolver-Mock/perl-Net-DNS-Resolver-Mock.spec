@@ -28,7 +28,7 @@ A subclass of Net::DNS::Resolver which parses a zonefile for it's data
 source. Primarily for use in testing.
 
 %prep
-%setup -q -n Net-DNS-Resolver-Mock-%{version}
+%autosetup -n Net-DNS-Resolver-Mock-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1

@@ -1,8 +1,5 @@
-%if ! (0%{?rhel})
 %bcond_without perl_Test_Simple_enables_optional_test
-%else
-%bcond_with perl_Test_Simple_enables_optional_test
-%endif
+
 Summary:        Basic utilities for writing tests
 Name:           perl-Test-Simple
 Version:        1.302174
@@ -76,7 +73,7 @@ information, see perldoc for Test::Simple, Test::More, etc.
 This package is the CPAN component of the dual-lifed core package Test-Simple.
 
 %prep
-%setup -q -n Test-Simple-%{version}
+%autosetup -n Test-Simple-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1

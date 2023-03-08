@@ -31,8 +31,7 @@ This module defines a set of standard configurations for Makefile.PL
 files based on Module::Package.
 
 %prep
-%setup -q -n Module-Package-Au-%{version}
-%patch0 -p1 -b .no-bundle
+%autosetup -n Module-Package-Au-%{version} -p1
 rm -rf inc/*
 
 # Work around goofy perl versioning mistakes of the past
@@ -41,7 +40,7 @@ sed -i 's|1.110730|1.301|g' META.yml
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+%make_build
 
 %install
 make pure_install DESTDIR=%{buildroot}
@@ -53,7 +52,8 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 make test
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorlib}/Module/Package/
 %{_mandir}/man3/Module::Package::Au.3pm*
 
