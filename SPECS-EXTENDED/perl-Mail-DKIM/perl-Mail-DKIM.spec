@@ -53,7 +53,6 @@ perl -pi -e 's/\r//' doc/qp1.txt
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %make_build
 
-
 %install
 %make_install
 %{_fixperms} %{buildroot}/*
