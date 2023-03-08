@@ -15553,6 +15553,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Alien-Libxml2",
+          "version": "0.14",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Libxml2-0.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Alien-pkgconf",
           "version": "0.17",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-pkgconf-0.17.tar.gz"
@@ -16733,6 +16743,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Digest-BubbleBabble",
+          "version": "0.02",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-0.02.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Digest-CRC",
           "version": "0.22.2",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OL/OLIMAUL/Digest-CRC-0.22.2.tar.gz"
@@ -17443,6 +17463,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Image-Info",
+          "version": "1.42",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-1.42.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Image-Xbm",
           "version": "1.10",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SU/SUMMER/Image-Xbm-1.10.tar.gz"
@@ -17733,6 +17763,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-libnet",
+          "version": "3.11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/perl-libnet_repackaged-3.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-libwww-perl",
           "version": "6.49",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.49.tar.gz"
@@ -17883,9 +17923,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Mail-DKIM",
+          "version": "0.58",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Mail-DKIM-0.58.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Mail-IMAPTalk",
           "version": "4.04",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBN/Mail-IMAPTalk-4.04.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Mail-SPF",
+          "version": "2.9.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v2.9.0.tar.gz"
         }
       }
     },
@@ -18053,6 +18113,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Module-Install-AutoLicense",
+          "version": "0.10",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-AutoLicense-0.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Module-Install-GithubMeta",
           "version": "0.30",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-GithubMeta-0.30.tar.gz"
@@ -18066,6 +18136,16 @@
           "name": "perl-Module-Install-ManifestSkip",
           "version": "0.24",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Install-ManifestSkip-0.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-Install-ReadmeFromPod",
+          "version": "0.30",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-ReadmeFromPod-0.30.tar.gz"
         }
       }
     },
@@ -18136,6 +18216,16 @@
           "name": "perl-Module-Package",
           "version": "0.30",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Package-0.30.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-Package-Au",
+          "version": "2",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Module-Package-Au-2.tar.gz"
         }
       }
     },
@@ -18276,6 +18366,36 @@
           "name": "perl-Net-Daemon",
           "version": "0.48",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MN/MNOONING/Net-Daemon-0.48.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Net-DNS",
+          "version": "1.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NL/NLNETLABS/Net-DNS-1.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Net-DNS-Resolver-Mock",
+          "version": "1.20200215",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Net-DNS-Resolver-Mock-1.20200215.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Net-DNS-Resolver-Programmable",
+          "version": "0.009",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BIGPRESH/Net-DNS-Resolver-Programmable-0.009.tar.gz"
         }
       }
     },
@@ -18743,6 +18863,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Pod-Escapes",
+          "version": "1.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-1.07.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Pod-Eventual",
           "version": "0.094001",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-0.094001.tar.gz"
@@ -18876,6 +19006,16 @@
           "name": "perl-Probe-Perl",
           "version": "0.03",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/K/KW/KWILLIAMS/Probe-Perl-0.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Razor-Agent",
+          "version": "2.85",
+          "downloadUrl": "https://downloads.sourceforge.net/project/razor/razor-agents/2.85/razor-agents-2.85.tar.bz2"
         }
       }
     },
@@ -19453,6 +19593,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Test-Harness",
+          "version": "3.42",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.42.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Test-HasVersion",
           "version": "0.014",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-HasVersion-0.014.tar.gz"
@@ -19943,6 +20093,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Unicode-EastAsianWidth",
+          "version": "12.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Unicode-LineBreak",
           "version": "2019.001",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEZUMI/Unicode-LineBreak-2019.001.tar.gz"
@@ -20136,6 +20296,16 @@
           "name": "perl-XML-LibXML",
           "version": "2.0207",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-2.0207.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-XML-LibXSLT",
+          "version": "1.99",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-1.99.tar.gz"
         }
       }
     },
