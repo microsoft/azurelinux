@@ -1,29 +1,32 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
-Version:        2.6.4
-Release:        4%{?dist}
+Version:        3.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://harfbuzz.github.io/
-Source0:        https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.xz
-BuildRequires:  glib-devel
-BuildRequires:  pkg-config
-BuildRequires:  pkgconfig(fontconfig)
+Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-25193.patch
+BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(freetype2)
+BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(icu-uc)
-Requires:       glib
+BuildRequires:  gcc
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  gtk-doc
+BuildRequires:  make
+%global with_check 1
 %if %{with_check}
-BuildRequires:  binutils
 BuildRequires:  python3-devel
-BuildRequires:  which
 %endif
+Requires:       glib
 
 %description
 HarfBuzz is an implementation of the OpenType Layout engine.
 
-%package        devel
+%package	    devel
 Summary:        Header and development files
 Requires:       %{name} = %{version}-%{release}
 Requires:       pkgconfig(glib-2.0)
@@ -33,28 +36,32 @@ Provides:       %{name}-icu = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
-%configure
-%make_build
+%configure --disable-static --with-gobject --enable-introspection
+%{make_build}
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+%{make_install}
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %check
 # Remove all instances of "/usr/bin/env python" shabangs from test code
-find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\d\?|#! %{_bindir}/python3|' {} +
+find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3\d\?|#! %{python3}|' {} +
 %make_build -k check
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
+
+%ldconfig_scriptlets devel
 
 %files
 %defattr(-,root,root)
 %license COPYING
+%doc NEWS AUTHORS README
 %{_libdir}/*.so*
+%dir %{_libdir}/girepository-1.0
+%{_libdir}/girepository-1.0/HarfBuzz-0.0.typelib
 %{_bindir}/*
 
 %files devel
@@ -65,8 +72,15 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
+%dir %{_datadir}/gir-1.0
+%{_datadir}/gir-1.0/HarfBuzz-0.0.gir
+%{_libdir}/libharfbuzz-icu.so.*
 
 %changelog
+* Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 3.4.0-1
+- Upgrade version to match with version in Mariner 2.0
+- Bring patch from Mariner 2.0 to fix CVE-2023-25193
+
 * Wed Nov 10 2021 Hideyuki Nagase <hideyukn@microsoft.com> - 2.6.4-4
 - Add which and binutils when check is enabled
 - Replace %{python3} with %{_bindir}/python3
