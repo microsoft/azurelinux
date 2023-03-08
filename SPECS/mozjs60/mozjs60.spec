@@ -17,7 +17,8 @@ Patch3:         copy-headers.patch
 Patch4:         Always-use-the-equivalent-year-to-determine-the-time-zone.patch
 Patch5:         icu_sources_data.py-Decouple-from-Mozilla-build-system.patch
 Patch6:         icu_sources_data-Write-command-output-to-our-stderr.patch
-Patch7:    CVE-2023-22895.patch
+Patch7:         CVE-2023-22895.patch
+Patch8:         CVE-2022-48285.nopatch
 BuildRequires:  autoconf213
 BuildRequires:  gcc
 BuildRequires:  libffi
@@ -124,7 +125,7 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
-* Wed Mar 8 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 60.9.0-12
+* Wed Mar 08 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 60.9.0-12
 - Adding no-patch for CVE-2022-48285
 
 * Tue Jan 17 2023 Muhammad Falak <mwani@microsoft.com> - 60.9.0-11
