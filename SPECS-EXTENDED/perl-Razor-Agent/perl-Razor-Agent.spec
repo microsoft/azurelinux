@@ -6,7 +6,7 @@ License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://razor.sourceforge.net/
-Source:         http://dl.sourceforge.net/razor/razor-agents-%{version}.tar.bz2
+Source:         https://downloads.sourceforge.net/project/razor/razor-agents/%{version}/razor-agents-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
 Patch0:         razor-agents-2.85-use-sha-not-sha1.patch
 Patch1:         perl-Razor-Agent-2.85-mandir.patch
 Patch2:         perl-Razor-Agent-2.85-parallel-make.patch

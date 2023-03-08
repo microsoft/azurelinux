@@ -20,7 +20,7 @@ URL:            https://metacpan.org/release/libnet
 # Origin source archive contains Artistic only files, CPAN RT#117888.
 # Local archive produced by "./repackage.sh %%{version}" command.
 # http://www.cpan.org/authors/id/S/SH/SHAY/libnet-%%{version}.tar.gz
-Source0:        %{_mariner_sources_url}/libnet-%{version}_repackaged.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}_repackaged-%{version}.tar.gz
 # Replacement for the Artistic only file, CPAN RT#117888.
 Source1:        libnetFAQ.pod
 # Convert Changes to UTF-8
