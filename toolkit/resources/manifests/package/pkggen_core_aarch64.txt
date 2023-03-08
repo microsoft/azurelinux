@@ -193,10 +193,10 @@ nghttp2-1.46.0-2.cm2.aarch64.rpm
 curl-7.86.0-3.cm2.aarch64.rpm
 curl-devel-7.86.0-3.cm2.aarch64.rpm
 curl-libs-7.86.0-3.cm2.aarch64.rpm
-tdnf-3.2.2-5.cm2.aarch64.rpm
-tdnf-cli-libs-3.2.2-5.cm2.aarch64.rpm
-tdnf-devel-3.2.2-5.cm2.aarch64.rpm
-tdnf-plugin-repogpgcheck-3.2.2-5.cm2.aarch64.rpm
+tdnf-3.2.2-6.cm2.aarch64.rpm
+tdnf-cli-libs-3.2.2-6.cm2.aarch64.rpm
+tdnf-devel-3.2.2-6.cm2.aarch64.rpm
+tdnf-plugin-repogpgcheck-3.2.2-6.cm2.aarch64.rpm
 createrepo_c-0.17.5-1.cm2.aarch64.rpm
 libxml2-2.10.3-1.cm2.aarch64.rpm
 libxml2-devel-2.10.3-1.cm2.aarch64.rpm

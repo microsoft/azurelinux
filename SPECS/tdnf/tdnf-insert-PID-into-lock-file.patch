@@ -1,0 +1,46 @@
+From 587c8b1e0412f9a468e0d1b7b37a64fd52db34da Mon Sep 17 00:00:00 2001
+From: azaugg <azaugg@linkedin.com>
+Date: Wed, 8 Mar 2023 20:45:37 +0000
+Subject: [PATCH] Insert PID into lock file
+
+Insert the PID of the running process into the lock file
+
+https://github.com/vmware/tdnf/pull/403
+---
+ tools/cli/main.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/tools/cli/main.c b/tools/cli/main.c
+index 203f50a..05646b6 100644
+--- a/tools/cli/main.c
++++ b/tools/cli/main.c
+@@ -228,13 +228,24 @@ static bool IsTdnfAlreadyRunning(void)
+ {
+     bool ret = false;
+     int i;
+-
+-    glockfd = open(TDNF_INSTANCE_LOCK_FILE, O_CREAT | O_RDONLY, S_IRWXU);
++    glockfd = open(TDNF_INSTANCE_LOCK_FILE, O_CREAT | O_WRONLY, S_IRWXU);
+     if (glockfd < 0)
+     {
+         pr_err("ERROR: failed to create instance lock file\n");
+         goto end;
+     }
++    char pid_buffer[128] = {0};
++    int rsnpf;
++    rsnpf = snprintf(pid_buffer, sizeof(pid_buffer), "%ld\n", (long) getpid());
++    if (rsnpf > 0)
++    {
++        int wr;
++        wr = write(glockfd, pid_buffer, strlen(pid_buffer));
++        if (wr == 0)
++        {
++            sync();
++        }
++    }
+
+     for (i = 0; i < TDNF_LOCK_MAX_RETRIES; i++)
+     {
+--
+2.33.4
+

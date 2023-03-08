@@ -1,7 +1,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.2.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,9 @@ Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 Patch3:         tdnf-add-download-command.patch
 Patch4:         tdnf-add-support-for-tsflags-nodocs.patch
+Patch5:         tdnf-bugfix-segfault-caused-due-to-missing-name-param.patch
+Patch6:         tdnf-insert-PID-into-lock-file.patch
+Patch7:         tdnf-return-exit-status-100.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -179,6 +182,11 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tdnf-automatic
 
 %changelog
+* Wed Mar 08 2023 Andy Zaugg <azaugg@linkedin.com> - 3.2.2-6
+- Bug Fix for segmentation fault due to missing name parameter
+- Insert PID into lock file
+- Set standard yum/dnf check-update exit code behaviour
+
 * Mon Feb 27 2023 Andy Zaugg <azaugg@linkedin.com> - 3.2.2-5
 - Backported tsflags nodocs support from tdnf upstream project
 

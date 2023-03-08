@@ -1,0 +1,32 @@
+From 25fef2f4ec5916c6e7c50ebb3c54489466044bba Mon Sep 17 00:00:00 2001
+From: azaugg <andy.zaugg@gmail.com>
+Date: Fri, 24 Feb 2023 15:10:05 -0800
+Subject: [PATCH] BugFix segfault caused due to missing name param
+
+If a repository definition is missing the name parameter
+the repositroy is later processed and a segfault occurs.
+
+Set the repository name to the repo stanza in the event that
+the name parameter is missing.
+
+fixes #400
+---
+ client/repolist.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/repolist.c b/client/repolist.c
+index 63ea28e..d6efce8 100644
+--- a/client/repolist.c
++++ b/client/repolist.c
+@@ -487,7 +487,7 @@ TDNFLoadReposFromFile(
+         dwError = TDNFReadKeyValue(
+                       pSections,
+                       TDNF_REPO_KEY_NAME,
+-                      NULL,
++                      pszRepo,
+                       &pRepo->pszName);
+         BAIL_ON_TDNF_ERROR(dwError);
+
+--
+2.27.0
+

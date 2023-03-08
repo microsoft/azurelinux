@@ -1,0 +1,125 @@
+From 21d3dd7a5eaf111145dcdf3e1279aa5b19d98966 Mon Sep 17 00:00:00 2001
+From: Martin Minkus <mminkus@linkedin.com>
+Date: Fri, 17 Feb 2023 16:33:44 +0000
+Subject: [PATCH] Return exit status 100 if there are package updates
+ available. Fix formatting of check-update to match that of list so that it
+ can be parsed by puppet correctly.
+
+---
+ include/tdnfclierror.h |  1 +
+ tools/cli/lib/api.c    | 53 ++++++++++++++++++++++++++++++++++++++----
+ tools/cli/main.c       |  5 ++++
+ 3 files changed, 55 insertions(+), 4 deletions(-)
+
+diff --git a/include/tdnfclierror.h b/include/tdnfclierror.h
+index 263a586..cf6c6e9 100644
+--- a/include/tdnfclierror.h
++++ b/include/tdnfclierror.h
+@@ -9,6 +9,7 @@
+ #ifndef __TDNF_CLI_ERR_H__
+ #define __TDNF_CLI_ERR_H__
+
++#define ERROR_TDNF_CLI_CHECK_UPDATES_AVAILABLE           100
+ #define ERROR_TDNF_CLI_BASE                              900
+ #define ERROR_TDNF_CLI_NO_MATCH                          (ERROR_TDNF_CLI_BASE + 1)
+ #define ERROR_TDNF_CLI_INVALID_ARGUMENT                  (ERROR_TDNF_CLI_BASE + 2)
+diff --git a/tools/cli/lib/api.c b/tools/cli/lib/api.c
+index f277b7c..62fb73b 100644
+--- a/tools/cli/lib/api.c
++++ b/tools/cli/lib/api.c
+@@ -621,6 +621,15 @@ TDNFCliCheckUpdateCommand(
+     char** ppszPackageArgs = NULL;
+     int nPackageCount = 0;
+
++    #define MAX_COL_LEN 256
++    char szNameAndArch[MAX_COL_LEN] = {0};
++    char szVersionAndRelease[MAX_COL_LEN] = {0};
++
++    #define COL_COUNT 3
++    //Name.Arch | Version-Release | Repo
++    int nColPercents[COL_COUNT] = {55, 25, 15};
++    int nColWidths[COL_COUNT] = {0};
++
+     if(!pContext || !pContext->hTdnf || !pCmdArgs || !pContext->pFnCheckUpdate)
+     {
+         dwError = ERROR_TDNF_CLI_INVALID_ARGUMENT;
+@@ -639,13 +648,45 @@ TDNFCliCheckUpdateCommand(
+                                        &dwCount);
+     BAIL_ON_CLI_ERROR(dwError);
+
++    dwError = GetColumnWidths(COL_COUNT, nColPercents, nColWidths);
++    BAIL_ON_CLI_ERROR(dwError);
++
+     for(dwIndex = 0; dwIndex < dwCount; ++dwIndex)
+     {
+         pPkg = &pPkgInfo[dwIndex];
+-        pr_crit("%*s\r", 80, pPkg->pszRepoName);
+-        pr_crit("%*s-%s\r", 50, pPkg->pszVersion, pPkg->pszRelease);
+-        pr_crit("%s.%s", pPkg->pszName, pPkg->pszArch);
+-        pr_crit("\n");
++
++        memset(szNameAndArch, 0, MAX_COL_LEN);
++        if(snprintf(
++            szNameAndArch,
++            MAX_COL_LEN,
++            "%s.%s",
++            pPkg->pszName,
++            pPkg->pszArch) < 0)
++        {
++            dwError = errno;
++            BAIL_ON_CLI_ERROR(dwError);
++        }
++
++        memset(szVersionAndRelease, 0, MAX_COL_LEN);
++        if(snprintf(
++            szVersionAndRelease,
++            MAX_COL_LEN,
++            "%s-%s",
++            pPkg->pszVersion,
++            pPkg->pszRelease) < 0)
++        {
++            dwError = errno;
++            BAIL_ON_CLI_ERROR(dwError);
++        }
++
++        pr_crit(
++            "%-*s%-*s%*s\n",
++            nColWidths[0],
++            szNameAndArch,
++            nColWidths[1],
++            szVersionAndRelease,
++            nColWidths[2],
++            pPkg->pszRepoName);
+     }
+
+ cleanup:
+@@ -654,6 +695,10 @@ cleanup:
+     {
+         TDNFFreePackageInfoArray(pPkgInfo, dwCount);
+     }
++    /* yum and dnf return 100 if there are package updates available.
++       puppet depends on this behaviour, even with tdnf. */
++    if(dwCount > 0)
++        return ERROR_TDNF_CLI_CHECK_UPDATES_AVAILABLE;
+     return dwError;
+
+ error:
+diff --git a/tools/cli/main.c b/tools/cli/main.c
+index 203f50a..a1788f4 100644
+--- a/tools/cli/main.c
++++ b/tools/cli/main.c
+@@ -271,6 +271,11 @@ TDNFCliPrintError(
+         return dwError;
+     }
+
++    if (dwErrorCode == ERROR_TDNF_CLI_CHECK_UPDATES_AVAILABLE)
++    {
++        return;
++    }
++
+     if (dwErrorCode < ERROR_TDNF_BASE)
+     {
+         dwError = TDNFCliGetErrorString(dwErrorCode, &pszError);
+--
+2.27.0
+
