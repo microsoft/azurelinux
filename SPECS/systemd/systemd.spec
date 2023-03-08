@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ Patch8:         serve-stale-0002-resolved-Initialize-until_valid-while-storing-n
 Patch9:         mariner-2-do-not-default-zstd-journal-files-for-backwards-compatibility.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
+BuildRequires:  dbus
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -44,11 +45,14 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
+BuildRequires:  mariner-release
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  python3-jinja2
+BuildRequires:  sudo
 BuildRequires:  tpm2-tss-devel
+BuildRequires:  tzdata
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
 BuildRequires:  zstd-devel
@@ -182,6 +186,12 @@ install -D -m 0644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/99-ma
 %find_lang %{name} ../%{name}.lang
 
 %check
+# Generate machine-id using dbus
+%{_bindir}/dbus-uuidgen --ensure=%{_sysconfdir}/machine-id
+sudo su
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
 meson test -C build
 
 # Enable default systemd units.
@@ -287,6 +297,11 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Sun Dec 17 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 250.3-20
+- Add BR: dbus, mariner-release, tzdata, sudo to systemd.spec
+- Generate machine-id using dbus-uuidgen
+- Set UTF8 encoding in %check section of systemd.spec
+
 * Thu Nov 02 2023 Chris Co <chrco@microsoft.com> - 250.3-19
 - Add zstd-libs as a requires to ensure libzstd.so.1 is present
 
