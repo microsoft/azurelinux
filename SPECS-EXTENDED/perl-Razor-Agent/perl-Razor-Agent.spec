@@ -72,7 +72,6 @@ chmod -R u+w %{buildroot}/*
 make test
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license LICENSE
 %doc BUGS Changes CREDITS FAQ README SERVICE_POLICY
 %{_bindir}/*
