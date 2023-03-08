@@ -1,7 +1,7 @@
 From c60f9651ef327b26a8b26d7a80b81c4f8c0315c5 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 20:30:29 +0000
-Subject: [PATCH 03/36] Set default login to unconfined_u.
+Subject: [PATCH 03/35] Set default login to unconfined_u.
 
 ---
  config/appconfig-mcs/seusers | 4 ++--
