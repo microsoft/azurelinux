@@ -8,8 +8,8 @@
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.62.1
-Release:        4%{?dist}
+Version:        1.65.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -135,6 +135,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Wed Mar 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.65.0-1
+- Auto-upgrade to 1.65.0 - none
+
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
 - Split out separate 'doc' subpackage to reduce default package size.
 - Updated license information.
