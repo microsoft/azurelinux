@@ -1,0 +1,40 @@
+From fa340260b66e9056c5662a6bdbfcc90fee5578b3 Mon Sep 17 00:00:00 2001
+From: azaugg <andy.zaugg@gmail.com>
+Date: Fri, 24 Feb 2023 15:29:32 -0800
+Subject: [PATCH] Add support for tsflags=nodocs
+
+Allow tdnf to honor the nodocs tsflags.
+---
+ client/rpmtrans.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/client/rpmtrans.c b/client/rpmtrans.c
+index 8fa055a..cb829e4 100644
+--- a/client/rpmtrans.c
++++ b/client/rpmtrans.c
+@@ -65,8 +65,8 @@ TDNFRpmExecTransaction(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+
+-    /* parse transaction flags - so far only tsflags=noscripts is
+-       supported. */
++    /* parse transaction flags - so far only tsflags=noscripts and
++       tsflags=nodocs are supported  */
+     ts.nTransFlags = RPMTRANS_FLAG_NONE;
+     for (pSetOpt = pTdnf->pArgs->pSetOpt; pSetOpt; pSetOpt = pSetOpt->pNext)
+     {
+@@ -80,6 +80,11 @@ TDNFRpmExecTransaction(
+         {
+             ts.nTransFlags |= RPMTRANS_FLAG_NOSCRIPTS;
+         }
++
++        if (!strcasecmp(pSetOpt->pszOptValue, "nodocs"))
++        {
++            ts.nTransFlags |= RPMTRANS_FLAG_NODOCS;
++        }
+     }
+
+     if(rpmtsSetRootDir (ts.pTS, pTdnf->pArgs->pszInstallRoot))
+--
+2.27.0
+

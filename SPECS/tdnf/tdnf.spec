@@ -1,7 +1,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.2.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 Patch3:         tdnf-add-download-command.patch
+Patch4:         tdnf-add-support-for-tsflags-nodocs.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -178,6 +179,9 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tdnf-automatic
 
 %changelog
+* Mon Feb 27 2023 Andy Zaugg <azaugg@linkedin.com> - 3.2.2-5
+- Backported tsflags nodocs support from tdnf upstream project
+
 * Tue May 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
 - Reverting usage of "rpm" in RPM scripts since "/var/lib/rpm/.rpm.lock" is always taken.
 
