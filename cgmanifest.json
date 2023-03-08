@@ -7851,16 +7851,6 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.23.8",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.8+k3s2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
           "version": "1.24.6",
           "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.6+k3s1.tar.gz"
         }
