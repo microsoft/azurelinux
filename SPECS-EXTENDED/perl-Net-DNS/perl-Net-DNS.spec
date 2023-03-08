@@ -1,9 +1,9 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:       DNS resolver modules for Perl
 Name:          perl-Net-DNS
 Version:       1.21
 Release:       4%{?dist}
-Summary:       DNS resolver modules for Perl
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 # Other files:          MIT
 # demo/mresolv:         GPL+ or Artistic
 ## Not in a binary package
