@@ -69,7 +69,7 @@ rm -rf %{buildroot}/%{python3_sitelib}/%{srcname}/share
 %{python3_sitelib}/py%{srcname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
-* Tue Jan 03 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.2.2-3
+* Wed Mar 08 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.2.2-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified
 
