@@ -94,6 +94,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "advancecomp",
+          "version": "2.4",
+          "downloadUrl": "https://github.com/amadvance/advancecomp/archive/v2.4/advancecomp-2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "adwaita-icon-theme",
           "version": "3.36.1",
           "downloadUrl": "https://download.gnome.org/sources/adwaita-icon-theme/3.36/adwaita-icon-theme-3.36.1.tar.xz"
