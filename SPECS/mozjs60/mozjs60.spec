@@ -2,7 +2,7 @@
 Summary:        SpiderMonkey JavaScript library
 Name:           mozjs%{major}
 Version:        60.9.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        MPLv2.0 AND MPLv1.1 AND BSD AND GPLv2+ AND GPLv3+ AND LGPLv2+ AND AFL AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -124,6 +124,9 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
+* Wed Mar 8 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 60.9.0-12
+- Adding no-patch for CVE-2022-48285
+
 * Tue Jan 17 2023 Muhammad Falak <mwani@microsoft.com> - 60.9.0-11
 - Patch CVE-2023-22895
 
