@@ -1,3 +1,16 @@
+%{?perl_default_filter}
+
+# Do not export under-specified dependencies
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Digest::HMAC\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Digest::MD5\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Digest::SHA\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(MIME::Base64\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(CONFIG\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(OS_CONF\\)$
+# Do not export under-specified provides
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((Net::DNS::Text)\\)$
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((Net::DNS::RR::OPT)\\)$
+
 Summary:       DNS resolver modules for Perl
 Name:          perl-Net-DNS
 Version:       1.21
@@ -87,8 +100,6 @@ Suggests:      perl(Net::DNS::SEC::RSA)
 # Prefer Net::LibIDN2 over Net::LibIDN, both are optional
 Suggests:      perl(Net::LibIDN2) >= 1
 Suggests:      perl(Scalar::Util) >= 1.25
-
-%{?perl_default_filter}
 
 
 %description

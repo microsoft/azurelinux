@@ -1,5 +1,8 @@
 %global debug_package %{nil}
 
+# Remove under-specified dependencies
+%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(Alien::Base\\)$
+
 Summary:        Install the C libxml2 library on your system
 Name:           perl-Alien-Libxml2
 Version:        0.14
