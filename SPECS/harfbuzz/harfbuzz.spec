@@ -9,6 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://harfbuzz.github.io/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-25193.patch
+BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(glib-2.0)
