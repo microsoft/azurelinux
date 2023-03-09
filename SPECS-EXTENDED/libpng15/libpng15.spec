@@ -9,7 +9,7 @@ URL: http://www.libpng.org/pub/png/
 
 # Note: non-current tarballs get moved to the history/ subdirectory,
 # so look there if you fail to retrieve the version you want
-Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng15/libpng-%{version}.tar.xz
+Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng15/libpng-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 
 Source1: pngusr.dfa
 
@@ -27,11 +27,7 @@ This version should be used only if you are unable to use the current
 version of libpng.
 
 %prep
-%setup -q -n libpng-%{version}
-
-%patch0 -p1
-%patch1 -p1
-
+%autosetup -n libpng-%{version} -p1
 # Provide pngusr.dfa for build.
 cp -p %{SOURCE1} .
 
@@ -52,7 +48,7 @@ rm -rf $RPM_BUILD_ROOT%{_includedir}/*
 rm -rf $RPM_BUILD_ROOT%{_bindir}/*
 
 %files
-%doc LICENSE
+%license LICENSE
 %{_libdir}/libpng15.so.*
 
 %changelog
