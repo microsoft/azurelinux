@@ -1750,6 +1750,7 @@
                 "python-sphinxcontrib-qthelp",
                 "python-sphinxcontrib-serializinghtml",
                 "python-sqlalchemy",
+                "python-stestr",
                 "python-stevedore",
                 "python-suds",
                 "python-systemd",

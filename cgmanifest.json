@@ -23923,6 +23923,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-stestr",
+          "version": "3.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/stestr/stestr-3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-stevedore",
           "version": "1.31.0",
           "downloadUrl": "https://tarballs.openstack.org/stevedore/stevedore-1.31.0.tar.gz"
