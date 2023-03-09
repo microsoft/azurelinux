@@ -1578,6 +1578,7 @@
                 "python-async-generator",
                 "python-augeas",
                 "python-azure-sdk",
+                "python-beautifulsoup4",
                 "python-betamax",
                 "python-blinker",
                 "python-blivet",
