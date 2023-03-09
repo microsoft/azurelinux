@@ -166,7 +166,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			defaultTempDiskNames = append(defaultTempDiskNames, fmt.Sprintf("%s%d.%s", defaultTempDiskName, i, defaultTempDiskExtension))
 		}
 		logger.Log.Info("Creating raw disk(s) in build directory")
-		//  For each disk, create a temporary disk image () and attach it to a loopback device
+		//  For each disk, create a temporary disk image (.raw file) and attach it to a loopback device
 		diskDevPaths, partIDToDevPathMap, partIDToFsTypeMap, areDisksLoopDevices, encryptedRoot, readOnlyRoot, err = setupDisks(buildDir, defaultTempDiskNames, *liveInstallFlag, disks, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
 		if err != nil {
 			return
@@ -342,33 +342,16 @@ func setupRootFS(outputDir, installRoot string) (extraMountPoints []*safechroot.
 
 // setupDisks sets up a loopback device for each 'real' disk a virtual device or special disks.
 // The function will return:
-//   - diskDevPaths: A list of disk device paths (ie /dev/sda, /dev/sdb, etc)
+//   - diskDevPaths: A list of actual disk device paths (ie /dev/sda, /dev/loop10, etc)
 //   - partIDToDevPathMap: A map of partition ID to device path (ie 'bootID' -> '/dev/sda', etc)
 //   - partIDToFsTypeMap: A map of partition ID to filesystem type (ie 'bootID' -> 'vfat', etc)
-//   - areDisksLoopDevices: A slice of booleans indicating if each disks in order is a loopback device
-//   - encryptedRoot: An EncryptedRootDevice struct containing information about the encrypted root device, or nil if not encrypted
-//   - readOnlyRoot: A VerityDevice struct containing information about the read-only root device, or nil if not read-only
+//   - areDisksLoopDevices: A slice of booleans indicating if each disk, in order, is a loopback device
+//   - encryptedRoot: An EncryptedRootDevice struct containing information about the encrypted root device, or nil if root is not encrypted
+//   - readOnlyRoot: A VerityDevice struct containing information about the read-only root device, or nil if root is not read-only
 func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disks []configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (diskDevPaths []string, partIDToDevPathMap, partIDToFsTypeMap map[string]string, areDisksLoopDevices []bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
 	const (
 		realDiskType = "path"
 	)
-	var (
-		DiskType = realDiskType
-	)
-
-	logger.Log.Infof("configs (%d)", len(disks))
-
-	for i, disk := range disks {
-		if i == 0 {
-			DiskType = disk.TargetDisk.Type
-			continue
-		}
-		if disk.TargetDisk.Type != DiskType {
-			err = fmt.Errorf("only one disk type can be specified, found (%s) and (%s)", DiskType, disk.TargetDisk.Type)
-			return
-		}
-
-	}
 	var (
 		haveSetReadonlyRoot  bool = false
 		haveSetEncryptedRoot bool = false
@@ -386,7 +369,7 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 		)
 		areDisksLoopDevices[discNum] = false
 
-		if DiskType == realDiskType {
+		if diskConfig.TargetDisk.Type == realDiskType {
 			if liveInstallFlag {
 				newDiskDevPath = diskConfig.TargetDisk.Value
 				newPartIDToDevPathMap, newPartIDToFsTypeMap, newEncryptedRoot, newReadOnlyRoot, err = setupRealDisk(newDiskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
@@ -435,8 +418,16 @@ func setupDisks(outputDir string, diskNames []string, liveInstallFlag bool, disk
 		}
 	}
 
-	logger.Log.Tracef("Final partIDToDevPathMap: %v", partIDToDevPathMap)
-	logger.Log.Tracef("Final partIDToFsTypeMap: %v", partIDToFsTypeMap)
+	// Print out our final disk configurations for debugging purposes
+	for discNum, diskConfig := range disks {
+		logger.Log.Infof("Disk #%d (ID:%s) has device path: '%s'", discNum, diskConfig.ID, diskDevPaths[discNum])
+		for _, partition := range diskConfig.Partitions {
+			logger.Log.Infof("\tPartition (ID:%s), devPath: '%s', fsType: '%s'", partition.ID, partIDToDevPathMap[partition.ID], partIDToFsTypeMap[partition.ID])
+		}
+	}
+	logger.Log.Infof("Encrypted Root Device: %s", encryptedRoot.Device)
+	logger.Log.Infof("Read Only Root Device: %s", readOnlyRoot.MappedDevice)
+
 	return
 }
 
@@ -579,16 +570,16 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func findPrimaryDisk(diskDevPaths []string, disks []configuration.Disk, systemConfig configuration.SystemConfig) (primaryDiskLocation string) {
+func findPrimaryDisk(diskDevPaths []string, disks []configuration.Disk, systemConfig configuration.SystemConfig) (primaryDiskID, primaryDiskLocation string) {
 	if len(disks) == 1 {
-		return diskDevPaths[0]
+		return disks[0].ID, diskDevPaths[0]
 	}
 	for i, disk := range disks {
 		if disk.ID == systemConfig.PrimaryDisk {
-			return diskDevPaths[i]
+			return disk.ID, diskDevPaths[i]
 		}
 	}
-	return ""
+	return "", ""
 }
 
 func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPaths []string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool, disks []configuration.Disk) (err error) {
@@ -672,10 +663,10 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {
 
-		var primaryDisk = findPrimaryDisk(diskDevPaths, disks, systemConfig)
+		var primaryDiskId, primaryDiskPath = findPrimaryDisk(diskDevPaths, disks, systemConfig)
 
-		logger.Log.Infof("configuring bootloader for %s", primaryDisk)
-		err = configureDiskBootloader(systemConfig, installChroot, primaryDisk, installMap, encryptedRoot, readOnlyRoot)
+		logger.Log.Infof("Configuring bootloader for disk '%s' at '%s'", primaryDiskId, primaryDiskPath)
+		err = configureDiskBootloader(systemConfig, installChroot, primaryDiskPath, installMap, encryptedRoot, readOnlyRoot)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
