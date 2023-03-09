@@ -4109,6 +4109,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "geoclue2",
+          "version": "2.7.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/2.7.0/geoclue-2.7.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "GeoIP",
           "version": "1.6.12",
           "downloadUrl": "https://github.com/maxmind/geoip-api-c/releases/download/v1.6.12/GeoIP-1.6.12.tar.gz"
