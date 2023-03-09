@@ -644,6 +644,7 @@
                 "libiec61883",
                 "libieee1284",
                 "libimobiledevice",
+                "libindicator",
                 "libinput",
                 "libiodbc",
                 "libipt",
