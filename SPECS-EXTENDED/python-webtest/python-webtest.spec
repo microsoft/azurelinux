@@ -13,7 +13,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/Pylons/webtest
-Source0:        https://github.com/Pylons/webtest/archive/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/Pylons/webtest/archive/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
