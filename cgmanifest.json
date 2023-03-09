@@ -24103,6 +24103,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-webtest",
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/Pylons/webtest/archive/3.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-tornado",
           "version": "6.2.0",
           "downloadUrl": "https://github.com/tornadoweb/tornado/archive/refs/tags/v6.2.0.tar.gz"
