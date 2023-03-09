@@ -20563,6 +20563,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "phodav",
+          "version": "3.0",
+          "downloadUrl": "https://download.gnome.org/sources/phodav/3.0/phodav-3.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "php",
           "version": "8.1.16",
           "downloadUrl": "https://www.php.net/distributions/php-8.1.16.tar.xz"
