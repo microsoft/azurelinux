@@ -9300,6 +9300,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgovirt",
+          "version": "0.3.9",
+          "downloadUrl": "https://download.gnome.org/sources/libgovirt/0.3/libgovirt-0.3.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgpg-error",
           "version": "1.46",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.46.tar.bz2"
