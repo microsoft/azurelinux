@@ -55,8 +55,9 @@ then
     exit 1
 fi
 
-tmpdir="$(prepare_temp_dir)"
+TEMP_DIR="$(mktemp -d)"
+trap temp_dir_cleanup EXIT
 
-tar -C "$tmpdir" -xf "$rpms_archive"
+tar -C "$TEMP_DIR" -xf "$rpms_archive"
 
-rpm_extract_files -f -i "$tmpdir" -p "*.ko" -o "$OUTPUT_DIR" -w "$tmpdir"
+rpm_extract_files -f -i "$TEMP_DIR" -p "*.ko" -o "$OUTPUT_DIR" -w "$TEMP_DIR"

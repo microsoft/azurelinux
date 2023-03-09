@@ -100,14 +100,15 @@ done
 
 print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_PUBLISH_DIR
 
-tmpdir="$(prepare_temp_dir)"
+TEMP_DIR="$(mktemp -d)"
+trap temp_dir_cleanup EXIT
 
 overwrite_toolkit -t "$ARTIFACTS_DIR"
 
 hydrate_artifacts -r "$ARTIFACTS_DIR"
 
 # Saving the unsigned version for the sake of comparing with the signed one after it's built.
-find "out/RPMS" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$tmpdir" \;
+find "out/RPMS" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$TEMP_DIR" \;
 
 hydrate_signed_sources "$KERNEL_VERSION" "$KERNEL_MODULES_DIR"
 
@@ -120,4 +121,4 @@ publish_build_artifacts "$ARTIFACTS_PUBLISH_DIR"
 
 ${BUILD_SUCCEEDED:-true}
 
-verify_built_package "$KERNEL_VERSION" "$tmpdir"
+verify_built_package "$KERNEL_VERSION" "$TEMP_DIR"

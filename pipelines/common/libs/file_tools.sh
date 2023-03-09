@@ -1,15 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-__TEMP_DIR=""
-
-__tempdir_cleanup() {
-    if [[ -d "$__TEMP_DIR" ]]
-    then
-        echo "Cleaning up '$__TEMP_DIR'."
-        rm -rf "$__TEMP_DIR"
-    fi
-}
+TEMP_DIR=""
 
 command_diff() {
     local input_command
@@ -26,9 +18,10 @@ command_diff() {
     fi
 }
 
-prepare_temp_dir() {
-    __TEMP_DIR="$(mktemp -d)"
-    trap __tempdir_cleanup EXIT
-
-    echo "$__TEMP_DIR"
+temp_dir_cleanup() {
+    if [[ -d "$TEMP_DIR" ]]
+    then
+        echo "Cleaning up '$TEMP_DIR'."
+        rm -rf "$TEMP_DIR"
+    fi
 }
