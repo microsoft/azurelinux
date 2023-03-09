@@ -95,7 +95,7 @@ Version:        2.1.5
 Release:        4%{?dist}
 License:        GPLv2+ and LGPLv2+
 Url:            https://www.clusterlabs.org/
-Source0:        https://github.com/ClusterLabs/pacemaker/archive/refs/tags/Pacemaker-2.1.5.tar.gz
+Source0:        https://github.com/ClusterLabs/pacemaker/archive/refs/tags/Pacemaker-2.1.5.tar.gz#/%{name}-%{version}.tar.gz
 Requires:       resource-agents
 Requires:       %{pkgname_pcmk_libs}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-cluster-libs%{?_isa} = %{version}-%{release}
