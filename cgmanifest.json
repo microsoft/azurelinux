@@ -1226,6 +1226,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "booth",
+          "version": "1.0",
+          "downloadUrl": "https://github.com/ClusterLabs/booth/archive/5d837d2b5bf1c240a5f1c5efe4e8d79f55727cca/booth-5d837d2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "botan2",
           "version": "2.14.0",
           "downloadUrl": "https://botan.randombit.net/releases/Botan-2.14.0.tar.xz"
