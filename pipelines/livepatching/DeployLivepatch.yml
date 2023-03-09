@@ -40,6 +40,11 @@ parameters:
   type: boolean
   default: false
 
+- name: debugBuild
+  displayName: '[REMOVE ME!] Test param.'
+  type: boolean
+  default: false
+
 resources:
   repositories:
   - repository: 1ESPipelineTemplates
@@ -68,6 +73,7 @@ extends:
 
     stages:
     - stage: Build
+      condition: eq('${{ parameters.debugBuild }}', false)
       jobs:
       - job:
         templateContext:
@@ -142,30 +148,32 @@ extends:
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoFolder)'
 
-        - task: DownloadPipelineArtifact@2
-          displayName: 'Download livepatch RPMs and toolkit'
-          inputs:
-            source: current
-            artifact: '$(buildArtifactsFolder)_BUILD'
-            patterns: |
-              **/rpms.tar.gz
-              **/toolkit-*.tar.gz
-            path: '$(System.ArtifactsDirectory)'
+        - ${{ if eq(parameters.debugBuild, false) }}:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download livepatch RPMs and toolkit'
+            inputs:
+              source: current
+              artifact: '$(buildArtifactsFolder)_BUILD'
+              patterns: |
+                **/rpms.tar.gz
+                **/toolkit-*.tar.gz
+              path: '$(System.ArtifactsDirectory)'
 
-        # - task: DownloadPipelineArtifact@2
-        #   displayName: '[TEST] Download livepatch RPM'
-        #   inputs:
-        #     source: specific
-        #     project: 'mariner'
-        #     pipeline: 1141
-        #     runVersion: specific
-        #     runId: 273008
-        #     tags: '$(downloadTags)'
-        #     artifact: '$(buildArtifactsFolder)'
-        #     patterns: |
-        #       **/rpms.tar.gz
-        #       **/toolkit-*.tar.gz
-        #     path: '$(System.ArtifactsDirectory)'
+        - ${{ if eq(parameters.debugBuild, true) }}:
+          - task: DownloadPipelineArtifact@2
+            displayName: '[TEST] Download livepatch RPMs and toolkit'
+            inputs:
+              source: specific
+              project: 'mariner'
+              pipeline: 1141
+              runVersion: specific
+              runId: 273008
+              tags: '$(downloadTags)'
+              artifact: '$(buildArtifactsFolder)'
+              patterns: |
+                **/rpms.tar.gz
+                **/toolkit-*.tar.gz
+              path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
           displayName: 'Extract kernel modules'
