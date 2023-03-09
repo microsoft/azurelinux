@@ -127,6 +127,7 @@ extends:
                         -s "${{ parameters.useRPMsSnapshot }}"'
 
     - stage: Sign
+      condition: always()
       jobs:
       - job: Kernel_modules
         templateContext:
@@ -205,12 +206,12 @@ extends:
         #   - output: pipelineArtifact
         #     displayName: 'Publish build artifacts'
         #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-        #     artifactName: $(buildArtifactsFolder)
+        #     artifactName: $(buildArtifactsFolder)_RPMS
 
         #   - output: pipelineArtifact
         #     displayName: 'Publish logs'
         #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-        #     artifactName: LOGS
+        #     artifactName: LOGS_RPMS
 
         steps:
         - checkout: self
@@ -265,30 +266,6 @@ extends:
           #     search_root: '$(ob_outputDirectory)'
           #     timeout: 7200
           #   retryCountOnTaskFailure: 2
-
-        # - task: 1ES.Signing@1
-        #   displayName: 'Sign RPMs & SRPMs'
-        #   inputs:
-        #     directory: $(System.ArtifactsDirectory)
-        #     pattern: '**/*.rpm'
-        #     operations: |
-        #       [
-        #         {
-        #           "KeyCode": "CP-459159",
-        #           "OperationCode": "SigntoolSign",
-        #           "Parameters": {
-        #             "OpusName": "Microsoft",
-        #             "OpusInfo": "http://www.microsoft.com",
-        #             "FileDigest": "/fd \"SHA256\"",
-        #             "PageHash": "/NPH",
-        #             "TimeStamp": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
-        #           },
-        #           "ToolName": "sign",
-        #           "ToolVersion": "1.0"
-        #         }
-        #       ]
-        #     clientId: '?'
-        #     tenantId: '?'
 
     - stage: Test
       jobs:
