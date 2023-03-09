@@ -926,6 +926,7 @@
                 "netcf",
                 "netlabel_tools",
                 "netpbm",
+                "netsniff-ng",
                 "nfs4-acl-tools",
                 "nftables",
                 "nilfs-utils",
