@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: Old version of libpng, needed to run old binaries
 Name: libpng15
 Version: 1.5.30
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: zlib
 URL: http://www.libpng.org/pub/png/
 
@@ -50,6 +50,10 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}/*
 %{_libdir}/libpng15.so.*
 
 %changelog
+* Thu Mar 09 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.5.30-15
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified.
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.30-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
@@ -560,4 +564,3 @@ Resolves: #226038
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

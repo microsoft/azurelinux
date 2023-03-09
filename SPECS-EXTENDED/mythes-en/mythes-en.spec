@@ -3,7 +3,7 @@ Distribution:   Mariner
 Name: mythes-en
 Summary: English thesaurus
 Version: 3.0
-Release: 33%{?dist}
+Release: 34%{?dist}
 # https source does not exist
 Source: http://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz#/%{name}-%{version}.tgz
 URL: http://www.danielnaber.de/wn2ooo/
@@ -51,6 +51,10 @@ popd
 %{_datadir}/mythes/*
 
 %changelog
+* Thu Mar 09 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 3.0-34
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified.
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
