@@ -7,9 +7,7 @@ Release: 14%{?dist}
 License: zlib
 URL: http://www.libpng.org/pub/png/
 
-# Note: non-current tarballs get moved to the history/ subdirectory,
-# so look there if you fail to retrieve the version you want
-Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng15/libpng-%{version}.tar.xz#/%{name}-%{version}.tar.xz
+Source0: https://downloads.sourceforge.net/project/libpng/%{name}/%{version}/libpng-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 
 Source1: pngusr.dfa
 
