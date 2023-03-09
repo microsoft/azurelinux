@@ -7,7 +7,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.freedesktop.org/wiki/Software/GeoClue/
-Source0:        https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/%{version}/geoclue-%{version}.tar.bz2
+Source0:        https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/%{version}/geoclue-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
 BuildRequires:  avahi-glib-devel
 BuildRequires:  gettext
 BuildRequires:  glib2-devel
