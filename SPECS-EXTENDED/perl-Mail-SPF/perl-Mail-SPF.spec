@@ -7,7 +7,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Mail-SPF
 Source0:        https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
+# Fix broken POD (CPAN RT#86060)
 Patch0:         Mail-SPF-v2.8.0-POD.patch
+# Work around test suite failures with Net::DNS ≥ 0.68 (CPAN RT#78214)
 Patch1:         Mail-SPF-v2.8.0-testsuite.patch
 BuildRequires:  coreutils
 BuildRequires:  perl-generators
@@ -44,11 +46,7 @@ Mail::SPF is an object-oriented implementation of Sender Policy Framework
 (SPF). See http://www.openspf.org for more information about SPF.
 
 %prep
-%setup -q -n Mail-SPF-v%{version}
-# Fix broken POD (CPAN RT#86060)
-%patch0
-# Work around test suite failures with Net::DNS ≥ 0.68 (CPAN RT#78214)
-%patch1
+%autosetup -n Mail-SPF-v%{version} -p0
 chmod -x bin/* sbin/*
 
 %build
