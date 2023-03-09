@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-__TEMP_DIR
+__TEMP_DIR=""
 
 __tempdir_cleanup() {
     if [[ -d "$__TEMP_DIR" ]]
