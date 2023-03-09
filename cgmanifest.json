@@ -13782,6 +13782,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netsniff-ng",
+          "version": "0.6.8",
+          "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netavark",
           "version": "1.0.3",
           "downloadUrl": "https://github.com/containers/netavark/archive/v1.0.3/1.0.3.tar.gz"
