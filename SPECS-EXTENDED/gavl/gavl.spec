@@ -6,21 +6,15 @@ Release:        20%{?dist}
 Summary:        A library for handling uncompressed audio and video data
 
 License:        GPLv3+
-URL:            http://gmerlin.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/gmerlin/gavl-%{version}.tar.gz
+URL:            https://gmerlin.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/gmerlin/%{name}-%{version}.tar.gz
 Patch1:         gavl-1.1.1-system_libgdither.patch
 
 BuildRequires:  libtool
-
 BuildRequires:  doxygen
-
 BuildRequires:  libpng-devel >= 1.0.8
 BuildRequires:  libgdither-devel
-BuildRequires: make
-# Gavl use an internal tweaked libsamplerate version
-# ufortunately the libsamplerate doesn't want a patch 
-# that will break ABI
-#BuildRequires: libsamplerate-devel
+BuildRequires:  make
 
 
 
@@ -63,12 +57,12 @@ sh autogen.sh
   --enable-libgdither
 
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 # Prevent timestamps build difference
@@ -80,7 +74,8 @@ touch -r include/gavl/gavl.h $RPM_BUILD_ROOT%{_includedir}/gavl/gavl_version.h
 
 
 %files
-%doc AUTHORS COPYING README TODO
+%license COPYING
+%doc AUTHORS README TODO
 %exclude %{_docdir}/gavl/apiref
 %{_libdir}/*.so.*
 
