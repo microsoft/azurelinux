@@ -18,6 +18,7 @@ Source3:        %{_mariner_sources_url}/GeoLiteCityv6.dat.gz
 Source4:        %{_mariner_sources_url}/GeoIPASNum.dat.gz
 Source5:        %{_mariner_sources_url}/GeoIPASNumv6.dat.gz
 # The data was unbundled from GeoIP at 1.6.4-3
+Source6:        LICENSE
 Conflicts:      GeoIP < 1.6.4-3
 Obsoletes:      GeoIP-data < 1.6.4-10
 Provides:       GeoIP-data = %{version}
@@ -80,6 +81,8 @@ ln -sf GeoIPASNumv6.dat %{buildroot}%{_datadir}/GeoIP/GeoLiteASNumv6.dat
 ln -sf GeoLiteCity.dat %{buildroot}%{_datadir}/GeoIP/GeoIPCity.dat
 ln -sf GeoLiteCityv6.dat %{buildroot}%{_datadir}/GeoIP/GeoIPCityv6.dat
 
+install -m 644 %{SOURCE6} LICENSE
+
 %preun
 # If the package is being uninstalled (rather than upgraded), we remove
 # the GeoIP.dat symlink, provided that it points to GeoLiteCountry.dat;
@@ -118,6 +121,7 @@ fi
 exit 0
 
 %files
+%license LICENSE
 %dir %{_datadir}/GeoIP/
 # The databases are %%verify(not md5 size mtime) so that they can be updated
 # via cron scripts and rpm will not moan about the files having changed

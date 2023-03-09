@@ -5,6 +5,7 @@
   "GeoIPASNumv6.dat.gz": "ffdcd59026e6e0b821f66f9ea0d730a1a890c2e47698b7aaab38bf4f41ebdce6",
   "GeoIPv6.dat.gz": "76c39b3072b11299d9516ad42c6301391560fdcb46c68cff7d62007624f2cdfe",
   "GeoLiteCity.dat.gz": "90db2e52195e3d1bcdb2c2789209006d09de5c742812dbd9a1b36c12675ec4cd",
-  "GeoLiteCityv6.dat.gz": "5a0d4ff110e7efecc20a414187a0223d4ef8892b3d8bc330d7e28cec0dca6b62"
+  "GeoLiteCityv6.dat.gz": "5a0d4ff110e7efecc20a414187a0223d4ef8892b3d8bc330d7e28cec0dca6b62",
+  "LICENSE": "d0c01186cb63bcbfded70b18b8271864cfcab29618d4bf35918380d49ce1af3d"
  }
 }
