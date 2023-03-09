@@ -21463,6 +21463,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-beautifulsoup4",
+          "version": "4.11.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-betamax",
           "version": "0.8.1",
           "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.8.1/betamax-0.8.1.tar.gz"
