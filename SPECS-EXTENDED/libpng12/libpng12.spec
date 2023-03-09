@@ -12,7 +12,7 @@ Obsoletes: libpng-compat <= 2:1.5.10
 
 # Note: non-current tarballs get moved to the history/ subdirectory,
 # so look there if you fail to retrieve the version you want
-Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng12/libpng-%{version}.tar.xz
+Source0: https://ftp-osl.osuosl.org/pub/libpng/src/libpng12/libpng-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 
 Patch0: libpng12-multilib.patch
 Patch1: libpng12-pngconf.patch
@@ -38,20 +38,17 @@ The libpng12-devel package contains header files and documentation necessary
 for developing programs using libpng12.
 
 %prep
-%setup -q -n libpng-%{version}
-
-%patch0 -p1
-%patch1 -p1
+%autosetup -n libpng-%{version} -p1
 
 %build
 %configure \
   --disable-static \
   --without-libpng-compat
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 
 ## unpackaged files
 # We don't ship .la files.
@@ -70,13 +67,11 @@ rm -fv $RPM_BUILD_ROOT%{_mandir}/man3/{libpng,libpngpf}.3*
 make check
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license LICENSE
 %doc libpng-%{version}.txt README TODO CHANGES
 %{_libdir}/libpng12.so.0*
 
 %files devel
-#doc example.c
 %{_bindir}/libpng12-config
 %{_includedir}/libpng12/
 %{_libdir}/libpng12.so
