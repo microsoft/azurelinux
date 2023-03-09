@@ -236,22 +236,22 @@ extends:
           displayName: 'Expand SRPM/RPM tarballs'
 
         - task: EsrpCodeSigning@2
-        displayName: 'Sign RPMs'
-        inputs:
-          ConnectedServiceName: 'Mariner RPM Signing'
-          FolderPath: '$(System.ArtifactsDirectory)'
-          Pattern: '*.rpm'
-          signConfigType: inlineSignParams
-          inlineOperation: |
-            [
-              {
-                "KeyCode": "CP-459159-Pgp",
-                "OperationCode": "LinuxSign",
-                "Parameters": {},
-                "ToolName": "sign",
-                "ToolVersion": "1.0"
-              }
-            ]
+          displayName: 'Sign RPMs'
+          inputs:
+            ConnectedServiceName: 'Mariner RPM Signing'
+            FolderPath: '$(System.ArtifactsDirectory)'
+            Pattern: '*.rpm'
+            signConfigType: inlineSignParams
+            inlineOperation: |
+              [
+                {
+                  "KeyCode": "CP-459159-Pgp",
+                  "OperationCode": "LinuxSign",
+                  "Parameters": {},
+                  "ToolName": "sign",
+                  "ToolVersion": "1.0"
+                }
+              ]
 
           # - task: onebranch.pipeline.signing@1
           #   displayName: 'Sign RPMs & SRPMS'
