@@ -788,6 +788,7 @@
                 "libxkbcommon",
                 "libxkbfile",
                 "libxklavier",
+                "libxmlb",
                 "libXmu",
                 "libXpm",
                 "libXrandr",
