@@ -4139,6 +4139,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "GeoIP-GeoLite-data",
+          "version": "2018.06",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/GeoIP.dat.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "geolite2",
           "version": "20191217",
           "downloadUrl": "https://geolite.maxmind.com/download/geoip/database/GeoLite2-ASN_20191217.tar.gz"
