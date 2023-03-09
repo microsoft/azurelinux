@@ -9520,6 +9520,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libindicator",
+          "version": "12.10.1",
+          "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libinput",
           "version": "1.21.0",
           "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.21.0/libinput-1.21.0.tar.bz2"
