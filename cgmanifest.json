@@ -20543,16 +20543,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "phodav",
-          "version": "3.0",
-          "downloadUrl": "https://download.gnome.org/sources/phodav/3.0/phodav-3.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "pesign",
           "version": "0.112",
           "downloadUrl": "https://github.com/vathpela/pesign/releases/download/0.112/pesign-0.112.tar.bz2"
@@ -20566,6 +20556,16 @@
           "name": "pgbouncer",
           "version": "1.16.1",
           "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.16.1/pgbouncer-1.16.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "phodav",
+          "version": "3.0",
+          "downloadUrl": "https://download.gnome.org/sources/phodav/3.0/phodav-3.0.tar.xz"
         }
       }
     },
