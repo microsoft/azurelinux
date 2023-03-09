@@ -4,7 +4,8 @@ Name: mythes-en
 Summary: English thesaurus
 Version: 3.0
 Release: 33%{?dist}
-Source: http://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz
+# https source does not exist
+Source: http://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz#/%{name}-%{version}.tgz
 URL: http://www.danielnaber.de/wn2ooo/
 BuildRequires: python3-devel
 BuildRequires: perl-interpreter
@@ -45,7 +46,8 @@ popd
 
 
 %files
-%doc wn2ooo/LICENSE_th_gen_idx.txt wn2ooo/README.txt
+%license wn2ooo/LICENSE_th_gen_idx.txt
+%doc wn2ooo/README.txt
 %{_datadir}/mythes/*
 
 %changelog
