@@ -4119,6 +4119,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "GeoIP-GeoLite-data",
+          "version": "2018.06",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/GeoIP.dat.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "geoclue2",
           "version": "2.7.0",
           "downloadUrl": "https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/2.7.0/geoclue-2.7.0.tar.bz2"
