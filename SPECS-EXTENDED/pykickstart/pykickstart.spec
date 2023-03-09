@@ -1,7 +1,3 @@
-# Disable tests by default because they fail to run inside mock builds
-# at the moment, but can run locally.  To build and run tests, do:
-#     rpmbuild -ba --with runtests pykickstart.spec
-%bcond_with runtests
 Summary:        Python utilities for manipulating kickstart files.
 Name:           pykickstart
 Version:        3.36
