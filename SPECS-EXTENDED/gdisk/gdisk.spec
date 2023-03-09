@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.rodsbooks.com/gdisk/
 Source0:        https://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# https://sourceforge.net/p/gptfdisk/code/ci/6a8416cbd12d55f882bb751993b94f72d338d96f/
 Patch0:         gdisk-libuuid.patch
 BuildRequires:  gcc-c++
 BuildRequires:  libuuid-devel
