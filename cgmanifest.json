@@ -23713,16 +23713,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-stestr",
-          "version": "3.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/stestr/stestr-3.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-simpleline",
           "version": "1.6",
           "downloadUrl": "https://github.com/rhinstaller/python-simpleline/archive/simpleline-1.6.tar.gz"
@@ -23926,6 +23916,16 @@
           "name": "python-sqlalchemy",
           "version": "1.4.32",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLAlchemy-1.4.32.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-stestr",
+          "version": "3.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/stestr/stestr-3.2.0.tar.gz"
         }
       }
     },
