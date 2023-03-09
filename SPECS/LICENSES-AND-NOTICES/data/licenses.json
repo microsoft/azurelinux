@@ -255,6 +255,7 @@
                 "gdk-pixbuf2",
                 "generic-logos",
                 "genwqe-tools",
+                "geoclue2",
                 "GeoIP",
                 "geolite2",
                 "geos",
