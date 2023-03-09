@@ -11520,16 +11520,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libxmlb",
-          "version": "0.3.11",
-          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.11/libxmlb-0.3.11.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libxml++",
           "version": "5.0.1",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libxml++/5.0/libxml++-5.0.1.tar.xz"
@@ -11543,6 +11533,16 @@
           "name": "libxml2",
           "version": "2.10.3",
           "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.3/libxml2-v2.10.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxmlb",
+          "version": "0.3.11",
+          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.11/libxmlb-0.3.11.tar.xz"
         }
       }
     },
