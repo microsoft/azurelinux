@@ -626,6 +626,7 @@
                 "libgit2-glib",
                 "libglade2",
                 "libglvnd",
+                "libgovirt",
                 "libgphoto2",
                 "libgsf",
                 "libguestfs",
