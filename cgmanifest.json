@@ -9500,16 +9500,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libindicator",
-          "version": "12.10.1",
-          "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libieee1284",
           "version": "0.2.11",
           "downloadUrl": "http://downloads.sourceforge.net/libieee1284/libieee1284-0.2.11.tar.bz2"
@@ -9523,6 +9513,16 @@
           "name": "libimobiledevice",
           "version": "1.2.1",
           "downloadUrl": "http://www.libimobiledevice.org/downloads/libimobiledevice-1.2.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libindicator",
+          "version": "12.10.1",
+          "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
         }
       }
     },
