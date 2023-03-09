@@ -56,6 +56,7 @@ cp -a CHANGELOG.rst docs/
 %pytest
 
 %files -n python3-webtest
+%license license.rst
 %doc docs/* CHANGELOG.rst
 %{python3_sitelib}/webtest
 %{python3_sitelib}/*.egg-info
