@@ -251,6 +251,7 @@
                 "GConf2",
                 "gcovr",
                 "gcr",
+                "gdisk",
                 "gdk-pixbuf2",
                 "generic-logos",
                 "genwqe-tools",
