@@ -1779,6 +1779,7 @@
                 "python-voluptuous",
                 "python-waitress",
                 "python-webencodings",
+                "python-webtest",
                 "python-wheel",
                 "python-whoosh",
                 "python-winrm",
