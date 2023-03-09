@@ -1676,6 +1676,7 @@
                 "python-openpyxl",
                 "python-openstackdocstheme",
                 "python-os-service-types",
+                "python-oslo-i18n",
                 "python-oslo-sphinx",
                 "python-paramiko",
                 "python-pexpect",
