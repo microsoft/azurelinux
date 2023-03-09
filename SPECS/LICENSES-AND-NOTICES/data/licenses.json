@@ -258,6 +258,7 @@
                 "genwqe-tools",
                 "geoclue2",
                 "GeoIP",
+                "GeoIP-GeoLite-data",
                 "geolite2",
                 "geos",
                 "gfs2-utils",
