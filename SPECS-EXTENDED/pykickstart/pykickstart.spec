@@ -10,11 +10,7 @@ License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fedoraproject.org/wiki/pykickstart
-# This is a Red Hat maintained package which is specific to
-# our distribution.  Thus the source is only available from
-# within this srpm.
 Source0:        https://github.com/pykickstart/%{name}/archive/refs/tags/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}.tar.gz.asc
 BuildRequires:  gettext
 BuildRequires:  make
 BuildRequires:  python3-devel
@@ -22,8 +18,8 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-setuptools
 Requires:       python3-kickstart = %{version}-%{release}
 BuildArch:      noarch
-# Only required when building with runtests
-%if %{with runtests}
+# Only required when building with RUN_CHECK=y
+%if %{with_check}
 BuildRequires:  python3-coverage
 BuildRequires:  python3-sphinx
 %endif
@@ -40,7 +36,7 @@ Python 3 library for manipulating kickstart files.  The binaries are found in
 the pykickstart package.
 
 %prep
-%setup -q -n %{name}-r%{version}
+%autosetup -n %{name}-r%{version}
 
 %build
 make PYTHON=python3
@@ -49,9 +45,7 @@ make PYTHON=python3
 make PYTHON=python3 DESTDIR=%{buildroot} install
 
 %check
-%if %{with runtests}
 make PYTHON=python3 test
-%endif
 
 %files
 %license COPYING
