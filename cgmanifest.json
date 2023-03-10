@@ -21333,6 +21333,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pykickstart",
+          "version": "3.36",
+          "downloadUrl": "https://github.com/pykickstart/pykickstart/archive/refs/tags/r3.36.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pylint",
           "version": "2.4.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pylint/pylint-2.4.4.tar.gz"
