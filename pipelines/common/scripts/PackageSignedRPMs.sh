@@ -41,7 +41,7 @@ validate_rpm_signatures() {
 
     signatures_ok=true
 
-    echo "-- Validating RPM signature keys with key ID ($key_id)."
+    echo "-- Validating RPM signatures with key ID ($key_id)."
 
     while IFS= read -r -d '' rpm_path
     do
