@@ -2,6 +2,11 @@
 
 set -e
 
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+# shellcheck source=../common/libs/build_tools.sh
+source "$ROOT_DIR/pipelines/common/libs/build_tools.sh"
+
 compress_rpms() {
     local artifacts_dir
     local publish_dir
