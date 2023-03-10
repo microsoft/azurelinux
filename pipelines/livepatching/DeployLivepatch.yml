@@ -130,7 +130,7 @@ extends:
       condition: always()
       jobs:
       - job: Kernel_modules
-        condition: false
+        condition: eq('${{ parameters.debugBuild }}', false)
         templateContext:
           outputs:
           - output: pipelineArtifact
@@ -202,7 +202,7 @@ extends:
             workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
-        # dependsOn: Kernel_modules
+        dependsOn: Kernel_modules
         # templateContext:
         #   outputs:
         #   - output: pipelineArtifact
