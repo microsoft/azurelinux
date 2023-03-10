@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 # Heads up: 7.87 breaks perl-WWW-Curl (see #4588).
-Version:        7.88.0
+Version:        7.88.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -89,8 +89,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.4*
 
 %changelog
-* Thu Mar 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 7.88.0-1
-- Upgrade to version 7.88.0 to fix CVE-2023-23914, CVE-2023-23915, CVE-2023-23916
+* Thu Mar 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 7.88.1-1
+- Upgrade to version 7.88.1 to fix CVE-2023-23914, CVE-2023-23915, CVE-2023-23916
 - Removing old patches that are fixed in version 7.87.0
 
 * Mon Feb 13 2023 Dallas Delaney <dadelan@microsoft.com> - 7.86.0-3
