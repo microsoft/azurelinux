@@ -1,16 +1,13 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.86.0
-Release:        3%{?dist}
+Version:        7.88.1
+Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
-# CVE-2022-43551 and CVE-2022-43552 will be resolved by version 7.87.0
-Patch0:         CVE-2022-43551.patch
-Patch1:         CVE-2022-43552.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  nghttp2-devel
@@ -88,6 +85,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Thu Mar 09 2023 Nan Liu <liunan@microsoft.com> - 7.88.1-1
+- Upgrade to version 7.88.1 to fix CVE-2023-23914, CVE-2023-23915, CVE-2023-23916
+- Removing old patches that are fixed in version 7.87.0
+
 * Tue Jan 10 2023 Olivia Crain <oliviacrain@microsoft.com> - 7.86.0-3
 - Build with HTTP/2 support
 - Remove comment about metalink- no longer supported
