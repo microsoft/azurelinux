@@ -1,7 +1,7 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
 Version:        1.4.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -76,6 +76,9 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
+* Thu Mar 09 2023 Nan Liu <liunan@microsoft.com> - 1.4.5-2
+- Promote to Mariner base repo
+
 * Thu Mar 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.5-1
 - Auto-upgrade to 1.4.5 - none
 
