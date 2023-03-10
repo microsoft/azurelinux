@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.62.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
+BuildRequires:  libgit2-devel
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 %endif
@@ -135,6 +136,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Mar 09 2023 Nan Liu <liunan@microsoft.com> - 1.62.1-5
+- Add BuildRequires on libgit2 to use system libgit2 instead of the embeded version.
+
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
 - Split out separate 'doc' subpackage to reduce default package size.
 - Updated license information.
