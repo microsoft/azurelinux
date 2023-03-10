@@ -203,8 +203,8 @@ extends:
             workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
-        - ${{ if eq(parameters.debugBuild, false) }}:
-          dependsOn: Kernel_modules
+      - ${{ if eq(parameters.debugBuild, false) }}:
+        dependsOn: Kernel_modules
         # templateContext:
         #   outputs:
         #   - output: pipelineArtifact
