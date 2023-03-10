@@ -241,11 +241,7 @@ extends:
               path: '$(System.ArtifactsDirectory)'
 
         - bash: |
-            while IFS= read -r -d '' archive
-            do
-              echo "Extracting archive '$archive'."
-              tar -C "$(System.ArtifactsDirectory)" -xf "$archive"
-            done < <(find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -print0)
+            find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -exec tar -C "$(System.ArtifactsDirectory)" -xf {} \;
           displayName: 'Expand SRPM/RPM tarballs'
 
         - task: EsrpCodeSigning@2
