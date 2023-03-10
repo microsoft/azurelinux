@@ -126,7 +126,7 @@ func (g *GraphBuildState) isConflictWithToolchain(fileToCheck string) (hadConfli
 // RecordBuildResult records a build result in the graph build state.
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
-func (g *GraphBuildState) RecordBuildResult(res *BuildResult, supressConflictingRPMs bool) {
+func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) {
 
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
@@ -147,9 +147,9 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, supressConflicting
 
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
-	logger.Log.Infof("Rebuild toolchain flagsss: %t", supressConflictingRPMs)
+	logger.Log.Infof("Rebuild toolchain flagsss: %t", allowToolchainRebuilds)
 
-	if !supressConflictingRPMs && !res.Skipped && !res.UsedCache {
+	if !allowToolchainRebuilds && !res.Skipped && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
 			if g.isConflictWithToolchain(file) {
 				g.conflictingRPMs[filepath.Base(file)] = true
