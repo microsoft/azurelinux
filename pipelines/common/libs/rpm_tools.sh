@@ -30,11 +30,11 @@ rpm_extract_file() {
             w ) work_dir="$OPTARG" ;;
 
             \? )
-                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG" 1>&2
                 exit 1
                 ;;
             : )
-                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG requires an argument" 1>&2
                 exit 1
                 ;;
         esac
@@ -111,11 +111,11 @@ rpm_extract_files() {
             w ) work_dir="$OPTARG" ;;
 
             \? )
-                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG" 1>&2
                 exit 1
                 ;;
             : )
-                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG requires an argument" 1>&2
                 exit 1
                 ;;
         esac

@@ -21,11 +21,11 @@ hydrate_artifacts() {
             t ) toolchain_input="$OPTARG" ;;
 
             \? )
-                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG" 1>&2
                 exit 1
                 ;;
             : )
-                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG requires an argument" 1>&2
                 exit 1
                 ;;
         esac
@@ -99,11 +99,11 @@ overwrite_toolkit() {
             t ) toolkit_input="$OPTARG" ;;
 
             \? )
-                echo "Error - Invalid Option: -$OPTARG" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG" 1>&2
                 exit 1
                 ;;
             : )
-                echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+                echo "ERROR: Invalid Option: -$OPTARG requires an argument" 1>&2
                 exit 1
                 ;;
         esac

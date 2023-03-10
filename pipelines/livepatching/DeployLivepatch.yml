@@ -10,6 +10,9 @@ variables:
 - name: 'buildLogsFolder'
   value: 'LOGS'
 
+- name: 'kernelModulesFolder'
+  value: '$(Pipeline.Workspace)/kernel_modules'
+
 - name: 'pipelinesRepoFolder'
   value: '$CBL-Mariner-Pipelines'
 
@@ -22,8 +25,8 @@ variables:
 - name: 'selfRepoRoot'
   value: '$(Agent.BuildDirectory)/$(selfRepoFolder)'
 
-- name: 'kernelModulesFolder'
-  value: '$(Pipeline.Workspace)/kernel_modules'
+- name: 'signingKeyID'
+  value: '3135ce90'
 
 parameters:
 - name: livepatchKernelVersion
@@ -203,25 +206,14 @@ extends:
 
       - job: RPMs
         dependsOn: Kernel_modules
-        # templateContext:
-        #   outputs:
-        #   - output: pipelineArtifact
-        #     displayName: 'Publish build artifacts'
-        #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-        #     artifactName: $(buildArtifactsFolder)_RPMS
-
-        #   - output: pipelineArtifact
-        #     displayName: 'Publish logs'
-        #     targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-        #     artifactName: LOGS_RPMS
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: $(buildArtifactsFolder)_RPMS
 
         steps:
-        - checkout: self
-          path: '$(selfRepoFolder)'
-
-        - checkout: CBL-Mariner-Pipelines
-          path: '$(pipelinesRepoFolder)'
-
         - ${{ if eq(parameters.debugBuild, false) }}:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download RPMs and SRPMs archives'
@@ -271,18 +263,13 @@ extends:
                 }
               ]
 
-          # - task: onebranch.pipeline.signing@1
-          #   displayName: 'Sign RPMs & SRPMS'
-          #   env:
-          #     ESRP_XSIGN_TOTAL_TIMEOUT_IN_MINUTES: 360
-          #     ESRP_XSIGN_SINGLE_FILE_TIMEOUT_IN_MINUTES: 90
-          #   inputs:
-          #     command: 'sign'
-          #     signing_profile: 'CP-459159-pgpdetached'
-          #     files_to_sign: '**/*.rpm'
-          #     search_root: '$(ob_outputDirectory)'
-          #     timeout: 7200
-          #   retryCountOnTaskFailure: 2
+        - task: Bash@3
+          displayName: 'Validate and package signed RPMs'
+          inputs:
+            filePath: 'pipelines/common/scripts/PackageSignedRPMs.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -k "$(signingKeyID)"
+                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
 
     - stage: Test
       jobs:

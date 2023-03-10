@@ -88,11 +88,11 @@ do
     p ) ARTIFACTS_PUBLISH_DIR=$OPTARG ;;
 
     \? )
-        echo "Error - Invalid Option: -$OPTARG" 1>&2
+        echo "ERROR: Invalid Option: -$OPTARG" 1>&2
         exit 1
         ;;
     : )
-        echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+        echo "ERROR: Invalid Option: -$OPTARG requires an argument" 1>&2
         exit 1
         ;;
   esac
