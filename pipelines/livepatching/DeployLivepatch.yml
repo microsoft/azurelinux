@@ -130,8 +130,8 @@ extends:
       condition: always()
       jobs:
       - job: Kernel_modules
-        - ${{ if eq(parameters.debugBuild, true) }}:
-          enabled: false
+      - ${{ if eq(parameters.debugBuild, true) }}:
+        enabled: false
         templateContext:
           outputs:
           - output: pipelineArtifact
