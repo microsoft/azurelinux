@@ -131,7 +131,7 @@ extends:
       jobs:
       - job: Kernel_modules
       - ${{ if eq(parameters.debugBuild, true) }}:
-        enabled: false
+        condition: false
         templateContext:
           outputs:
           - output: pipelineArtifact
