@@ -208,7 +208,7 @@ extends:
             workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
-        # dependsOn: Kernel_modules
+        dependsOn: Kernel_modules
         templateContext:
           outputs:
           - output: pipelineArtifact
