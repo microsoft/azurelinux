@@ -1573,6 +1573,7 @@
                 "pyflakes",
                 "pygobject3",
                 "PyGreSQL",
+                "pykickstart",
                 "pylint",
                 "pyparted",
                 "pyproject-rpm-macros",
