@@ -146,6 +146,9 @@ extends:
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
             artifactName: LOGS_KERNEL_MODULES
 
+        pool:
+          name: mariner-core-x64-1es-ubuntu2204-gpt-test
+
         steps:
         - checkout: self
           path: '$(selfRepoFolder)'
@@ -188,10 +191,10 @@ extends:
                         -o "$(kernelModulesFolder)"'
             workingDirectory: '$(selfRepoRoot)'
 
-        # - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
-        #   parameters:
-        #     artifactsFolder: '$(kernelModulesFolder)'
-        #     repoRootPath: '$(pipelinesRepoRoot)'
+        - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
+          parameters:
+            artifactsFolder: '$(kernelModulesFolder)'
+            repoRootPath: '$(pipelinesRepoRoot)'
 
         - task: Bash@3
           displayName: 'Build livepatch-signed RPM'
