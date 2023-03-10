@@ -130,7 +130,6 @@ extends:
       condition: always()
       jobs:
       - job: Kernel_modules
-      - ${{ if eq(parameters.debugBuild, true) }}:
         condition: false
         templateContext:
           outputs:
