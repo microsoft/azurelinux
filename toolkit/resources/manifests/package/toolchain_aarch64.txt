@@ -51,10 +51,10 @@ cryptsetup-debuginfo-2.3.7-1.cm1.aarch64.rpm
 cryptsetup-devel-2.3.7-1.cm1.aarch64.rpm
 cryptsetup-libs-2.3.7-1.cm1.aarch64.rpm
 cryptsetup-reencrypt-2.3.7-1.cm1.aarch64.rpm
-curl-7.86.0-3.cm1.aarch64.rpm
-curl-debuginfo-7.86.0-3.cm1.aarch64.rpm
-curl-devel-7.86.0-3.cm1.aarch64.rpm
-curl-libs-7.86.0-3.cm1.aarch64.rpm
+curl-7.88.1-1.cm1.aarch64.rpm
+curl-debuginfo-7.88.1-1.cm1.aarch64.rpm
+curl-devel-7.88.1-1.cm1.aarch64.rpm
+curl-libs-7.88.1-1.cm1.aarch64.rpm
 cyrus-sasl-2.1.28-1.cm1.aarch64.rpm
 cyrus-sasl-debuginfo-2.1.28-1.cm1.aarch64.rpm
 device-mapper-2.03.05-6.cm1.aarch64.rpm
