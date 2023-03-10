@@ -130,6 +130,8 @@ extends:
       condition: always()
       jobs:
       - job: Kernel_modules
+        - ${{ if eq(parameters.debugBuild, true) }}:
+          enabled: false
         templateContext:
           outputs:
           - output: pipelineArtifact
@@ -201,7 +203,8 @@ extends:
             workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
-        dependsOn: Kernel_modules
+        - ${{ if eq(parameters.debugBuild, false) }}:
+          dependsOn: Kernel_modules
         # templateContext:
         #   outputs:
         #   - output: pipelineArtifact
@@ -221,19 +224,34 @@ extends:
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoFolder)'
 
-        - task: DownloadPipelineArtifact@2
-          displayName: 'Download RPMs and SRPMs archives'
-          inputs:
-            source: current
-            artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
-            patterns: '**/*rpms.tar.gz'
-            path: '$(System.ArtifactsDirectory)'
+        - ${{ if eq(parameters.debugBuild, false) }}:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download RPMs and SRPMs archives'
+            inputs:
+              source: current
+              artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
+              patterns: '**/*rpms.tar.gz'
+              path: '$(System.ArtifactsDirectory)'
+
+        - ${{ if eq(parameters.debugBuild, true) }}:
+          - task: DownloadPipelineArtifact@2
+            displayName: '[TEST] Download livepatch RPMs and toolkit'
+            inputs:
+              source: specific
+              project: 'mariner'
+              pipeline: 1141
+              runVersion: specific
+              runId: 273008
+              tags: '$(downloadTags)'
+              artifact: '$(buildArtifactsFolder)'
+              patterns: '**/rpms.tar.gz'
+              path: '$(System.ArtifactsDirectory)'
 
         - bash: |
             while IFS= read -r -d '' archive
             do
               echo "Extracting archive '$archive'."
-              tar -C "$(System.ArtifactsDirectory)" -xzf "$archive"
+              tar -C "$(System.ArtifactsDirectory)" -xf "$archive"
             done < <(find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -print0)
           displayName: 'Expand SRPM/RPM tarballs'
 
