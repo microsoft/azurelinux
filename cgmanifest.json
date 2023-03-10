@@ -3979,6 +3979,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gavl",
+          "version": "1.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/gmerlin/gavl-1.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gawk",
           "version": "5.1.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/gawk/gawk-5.1.0.tar.xz"
@@ -10420,6 +10430,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libpng12",
+          "version": "1.2.57",
+          "downloadUrl": "https://downloads.sourceforge.net/project/libpng/libpng12/older-releases/1.2.57/libpng-1.2.57.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpng15",
+          "version": "1.5.30",
+          "downloadUrl": "https://downloads.sourceforge.net/project/libpng/libpng15/1.5.30/libpng-1.5.30.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libproxy",
           "version": "0.4.17",
           "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
@@ -13535,6 +13565,16 @@
           "name": "mythes-el",
           "version": "0.20070412",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/th_el.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mythes-en",
+          "version": "3.0",
+          "downloadUrl": "http://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz"
         }
       }
     },
