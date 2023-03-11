@@ -1,18 +1,18 @@
 
 # Build Requirements on `Mariner`
 
-## Requirements were validated on `Mariner 1.0`
+## Requirements were validated on `Mariner 2.0`
 
-This works regardless of installing `core` or `full` version of mariner.
-If you installed `full` version of mariner, some of these packages are already installed, so less packages will be downloaded.
-
-Requirements for building images with a toolkit:
+This page lists host machine requirements for building with the CBL-Mariner toolkit. They cover building the toolchain, packages, and images on a Mariner host.
 
 ```bash
 # Install required dependencies.
-sudo dnf -y install git make tar rpm-build gcc glibc-devel binutils \
-kernel-headers wget curl rpm qemu-img golang cdrkit python2 bison \
-gawk parted dosfstools pigz moby-engine moby-cli
+sudo tdnf -y install binutils cdrkit curl dosfstools gawk glibc-devel \
+genisoimage git "golang < 1.18" kernel-headers make moby-cli moby-engine \
+parted qemu-img rpm rpm-build sudo tar wget
+
+# Recommended but not required: `pigz` for faster compression operations.
+sudo tdnf -y install pigz
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service
