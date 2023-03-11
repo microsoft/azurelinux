@@ -208,7 +208,7 @@ pcre-8.45-2.cm2.x86_64.rpm
 pcre-libs-8.45-2.cm2.x86_64.rpm
 lua-5.4.3-4.cm2.x86_64.rpm
 lua-libs-5.4.3-4.cm2.x86_64.rpm
-mariner-rpm-macros-2.0-20.cm2.noarch.rpm
+mariner-rpm-macros-2.0-21.cm2.noarch.rpm
 mariner-check-macros-2.0-20.cm2.noarch.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm

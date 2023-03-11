@@ -74,7 +74,7 @@
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
-    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
+    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e "s@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @" {} \
     %{nil}
 
 %__os_install_post    \

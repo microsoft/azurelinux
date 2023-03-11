@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -125,6 +125,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Fri Mar 10 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0-21
+- Changed single quotes to douple quotes to prevent macros from eating single quotes
+
 * Mon Dec 05 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-20
 - Add support to build with ccache when 'mariner_ccache_enabled' is set.
 
