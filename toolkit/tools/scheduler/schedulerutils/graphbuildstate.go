@@ -146,9 +146,6 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	}
 
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
-
-	logger.Log.Infof("Rebuild toolchain flagsss: %t", allowToolchainRebuilds)
-
 	if !allowToolchainRebuilds && !res.Skipped && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
 			if g.isConflictWithToolchain(file) {
