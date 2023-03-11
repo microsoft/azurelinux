@@ -147,7 +147,7 @@ extends:
             artifactName: LOGS_KERNEL_MODULES
 
         pool:
-          name: OneBranchPipelines
+          name: mariner-core-x64-1es-ubuntu2204-gpt-test
 
         steps:
         - checkout: self
