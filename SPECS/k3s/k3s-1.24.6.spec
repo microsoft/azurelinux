@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.24.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -79,47 +79,8 @@ exit 0
 %{install_sh}
 
 %changelog
+* Fri Mar 10 2023 Vinayak Gupta <guptavinayak@microsoft.com> - 1.24.6-2
+- Updated k3s vendor tarball to fix CVE-2023-25153 & CVE-2023-25173
+
 * Tue Feb 07 2023 Vinayak Gupta <guptavinayak@microsoft.com> - 1.24.6-1
-- Updated k3s to 1.24.6
-
-* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.3-6
-- Bump release to rebuild with go 1.19.5
-
-* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.3-5
-- Bump release to rebuild with go 1.19.4
-
-* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.24.3-4
-- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
-
-* Thu Dec 08 2022 Vinayak Gupta <guptavinayak@microsoft.com> - 1.24.3-3
-- Update the vendor tarball with the corrected versions of the dependencies
-
-* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.24.3-2
-- Bump release to rebuild with go 1.18.8
-
-* Tue Aug 30 2022 Animesh Garg <animeshgarg@microsoft.com> - 1.24.3-1
-- Updated k3s to 1.24.3
-
-* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.23.6-4
-- Bump release to rebuild against Go 1.18.5
-
-* Thu Jul 21 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-3
-- Fixes the install section. Allows integration of k3s at runtime in the Mariner build environment.
-
-* Wed Jun 29 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-2
-- Fixed uninstall path
-- Added exclusivity for x86_64
-
-* Thu Jun 23 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
-- Switched to building using the upstream k3s tarball and a separate vendor tarball
-
-* Tue May 24 2022 Manuel Huber <mahuber@microsoft.com> 1.23.6-1
-- Changes to install phase on Mariner
-
-* Fri May 20 2022 Lior Lustgarten <lilustga@microsoft.com> 1.23.6-1
-- License verified
-- Initial changes to build for Mariner
-- Initial CBL-Mariner import from Rancher (license: ASL 2.0).
-
-* Mon Mar 2 2020 Erik Wilson <erik@rancher.com> 0.1-1
-- Initial version
+- Initial spec file for k3s 1.24.6
