@@ -83,4 +83,6 @@ exit 0
 - Updated k3s vendor tarball to fix CVE-2023-25153 & CVE-2023-25173
 
 * Tue Feb 07 2023 Vinayak Gupta <guptavinayak@microsoft.com> - 1.24.6-1
-- Initial spec file for k3s 1.24.6
+- License verified
+- Initial changes to build for Mariner
+- Initial CBL-Mariner import from Rancher (license: ASL 2.0).
