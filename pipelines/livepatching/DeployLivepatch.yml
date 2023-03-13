@@ -155,10 +155,6 @@ extends:
         - checkout: CBL-Mariner-Pipelines
           path: '$(pipelinesRepoFolder)'
 
-        - bash: |
-            sudo apt-get update
-          displayName: 'Repo update test'
-
         - ${{ if eq(parameters.debugBuild, false) }}:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download livepatch RPMs and toolkit'
