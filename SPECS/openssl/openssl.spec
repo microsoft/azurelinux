@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -310,6 +310,8 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %exclude %{_mandir}/man1*/openssl-tsget*
 
 %files libs
+%{!?_licensedir:%global license %%doc}
+%license LICENSE
 %dir %{_sysconfdir}/pki/tls
 %dir %{_sysconfdir}/pki/tls/certs
 %dir %{_sysconfdir}/pki/tls/misc
@@ -347,6 +349,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Mon Mar 13 2023 Tom Fay <tomfay@microsoft.com> - 1.1.1k-22
+- Add LICENSE to libs subpackage
+
 * Tue Feb 07 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1k-21
 - Add upstream patches for CVE-2022-4304, CVE-2022-4450, CVE-2023-0215, CVE-2024-0286
 
