@@ -157,6 +157,11 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	rpmConflicts := buildState.ConflictingRPMs()
 	srpmConflicts := buildState.ConflictingSRPMs()
 
+	conflictsLogger := logger.Log.Errorf
+	if allowToolchainRebuilds || (len(rpmConflicts) == 0 && len(srpmConflicts) == 0) {
+		conflictsLogger = logger.Log.Infof
+	}
+
 	buildNodes := pkgGraph.AllBuildNodes()
 	for _, node := range buildNodes {
 		if buildState.IsNodeCached(node) {
@@ -189,16 +194,13 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Infof("Number of blocked SRPMs:           %d", len(unbuiltSRPMs))
 	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
 
-	if allowToolchainRebuilds {
-		logger.Log.Infof("Toolchain conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=true")
+	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
+		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
 
-	if !allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
-		logger.Log.Errorf("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
-		logger.Log.Errorf("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
-	} else {
-		logger.Log.Infof("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
-		logger.Log.Infof("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
+	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
+		conflictsLogger("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
+		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
 	}
 
 	if len(builtSRPMs) != 0 {
@@ -237,30 +239,16 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(rpmConflicts) != 0 {
-		if !allowToolchainRebuilds {
-			logger.Log.Infof("RPM conflicts with toolchain: ")
-			for _, conflict := range rpmConflicts {
-				logger.Log.Infof("--> %s", conflict)
-			}
-		} else {
-			logger.Log.Error("RPM conflicts with toolchain: ")
-			for _, conflict := range rpmConflicts {
-				logger.Log.Errorf("--> %s", conflict)
-			}
+		conflictsLogger("RPM conflicts with toolchain: ")
+		for _, conflict := range rpmConflicts {
+			conflictsLogger("--> %s", conflict)
 		}
 	}
 
 	if len(srpmConflicts) != 0 {
-		if !allowToolchainRebuilds {
-			logger.Log.Infof("SRPM conflicts with toolchain:")
-			for _, conflict := range srpmConflicts {
-				logger.Log.Infof("--> %s", conflict)
-			}
-		} else {
-			logger.Log.Error("SRPM conflicts with toolchain:")
-			for _, conflict := range srpmConflicts {
-				logger.Log.Errorf("--> %s", conflict)
-			}
+		conflictsLogger("SRPM conflicts with toolchain: ")
+		for _, conflict := range srpmConflicts {
+			conflictsLogger("--> %s", conflict)
 		}
 	}
 }

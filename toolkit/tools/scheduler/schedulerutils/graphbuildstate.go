@@ -145,7 +145,6 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 		g.nodeToState[node] = state
 	}
 
-	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 	if !allowToolchainRebuilds && !res.Skipped && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
 			if g.isConflictWithToolchain(file) {
@@ -154,7 +153,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 			}
 		}
 	} else {
-		logger.Log.Debugf("skipping checking conflicts since this is not a built node (%v)", res.Node)
+		logger.Log.Debugf("skipping checking conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'", res.Node)
 	}
 
 	return
