@@ -15,8 +15,8 @@ Distribution: Mariner
 Source0: https://saultestsigstorage.blob.core.windows.net/source-tars/containerd-cc.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
-Patch0:  Makefile.patch
-Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
+#Patch0:  Makefile.patch
+#Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
 
 %{?systemd_requires}
 
