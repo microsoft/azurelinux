@@ -9,6 +9,8 @@ source "$ROOT_DIR/pipelines/common/libs/build_tools.sh"
 
 compress_rpms() {
     local artifacts_dir
+    local compressed_dir
+    local compressed_dir_lowercase
     local publish_dir
 
     artifacts_dir="$1"
@@ -16,17 +18,16 @@ compress_rpms() {
 
     mkdir -p "$publish_dir"
 
-    if [[ -d "$artifacts_dir/RPMS" ]]
-    then
-        echo "-- Compressing RPMs into ($publish_dir)."
-        tar -C "$artifacts_dir" -cf "$publish_dir/rpms.tar.gz" RPMS
-    fi
+    for compressed_dir in RPMS SRPMS
+    do
+        if [[ -d "$artifacts_dir/$compressed_dir" ]]
+        then
+            compressed_dir_lowercase="${compressed_dir,,}"
 
-    if [[ -d "$artifacts_dir/SRPMS" ]]
-    then
-        echo "-- Compressing SRPMs into ($publish_dir)."
-        tar -C "$artifacts_dir" -cf "$publish_dir/srpms.tar.gz" SRPMS
-    fi
+            echo "-- Compressing the '$compressed_dir' directory into ($publish_dir)."
+            tar -C "$artifacts_dir" -cf "$publish_dir/$compressed_dir_lowercase.tar.gz" "$compressed_dir"
+        fi
+    done
 }
 
 validate_rpm_signatures() {
