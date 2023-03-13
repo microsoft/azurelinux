@@ -1,7 +1,7 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.4.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ Patch7:         CVE-2022-48281.patch
 Patch8:         CVE-2023-0795.patch
 #Also fixes CVE-2023-0801/0802/0803/0804
 Patch9:         CVE-2023-0800.patch
+Patch10:    CVE-2022-4645.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
@@ -77,6 +78,9 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.0-9
+- Add patch for CVE-2022-4645
+
 * Wed Feb 22 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.0-8
 - Add patch for CVE-2023-0795,CVE-2023-0796,CVE-2023-0797,CVE-2023-0798 & CVE-2023-0799
 - Add fix for: tiffcrop correctly update buffersize after rotateImage(). fix#520
