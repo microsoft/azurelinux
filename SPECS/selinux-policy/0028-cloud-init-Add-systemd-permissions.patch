@@ -1,0 +1,77 @@
+From d504c432e0c68cfe6925e2236b8654ce3f567f97 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 9 Feb 2023 19:42:55 +0000
+Subject: [PATCH 28/35] cloud-init: Add systemd permissions.
+
+Additional access for controlling systemd units and logind dbus chat.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/cloudinit.te | 12 ++++++++----
+ policy/modules/system/init.if     | 19 +++++++++++++++++++
+ 2 files changed, 27 insertions(+), 4 deletions(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
+index ec0db3209..6ae0bf993 100644
+--- a/policy/modules/admin/cloudinit.te
++++ b/policy/modules/admin/cloudinit.te
+@@ -75,10 +75,6 @@ fstools_domtrans(cloud_init_t)
+ 
+ hostname_domtrans(cloud_init_t)
+ 
+-init_get_system_status(cloud_init_t)
+-init_read_state(cloud_init_t)
+-init_stream_connect(cloud_init_t)
+-
+ kernel_read_system_state(cloud_init_t)
+ kernel_read_kernel_sysctls(cloud_init_t)
+ 
+@@ -129,5 +125,13 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	init_get_system_status(cloud_init_t)
++	init_start_all_units(cloud_init_t)
++	init_stop_all_units(cloud_init_t)
++	init_get_all_units_status(cloud_init_t)
++	init_list_all_units(cloud_init_t)
++
++	systemd_exec_systemctl(cloud_init_t)
+ 	systemd_dbus_chat_hostnamed(cloud_init_t)
++	systemd_dbus_chat_logind(cloud_init_t)
+ ')
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index e1ce1363d..473ea8726 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -3754,6 +3754,25 @@ interface(`init_reload_all_units',`
+ 	allow $1 { init_script_file_type systemdunit }:service reload;
+ ')
+ 
++########################################
++## <summary>
++##	List systemd unit dirs and the files in them
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_list_all_units',`
++	gen_require(`
++		attribute systemdunit;
++	')
++
++	list_dirs_pattern($1, systemdunit, systemdunit)
++	read_lnk_files_pattern($1, systemdunit, systemdunit)
++')
++
+ ########################################
+ ## <summary>
+ ##	Manage systemd unit dirs and the files in them
+-- 
+2.34.1
+
