@@ -23,7 +23,7 @@ Distribution:   Mariner
 %define project_version %{base_ver}-alpha-%{alpha_ver}
 Name:           plexus-component-api
 Version:        %{base_ver}~alpha%{alpha_ver}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Plexus Component API
 License:        ASL 2.0
 Group:          Development/Libraries/Java
@@ -38,7 +38,7 @@ BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  plexus-classworlds
-Requires:       mvn(org.codehaus.plexus:plexus-classworlds)
+Requires:       plexus-classworlds
 BuildArch:      noarch
 
 %description
@@ -86,6 +86,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 13 2023 Sindhu Karr <lakarri@microsoft.com> - 1.0~alpha15-5
+- Runtime requirement modified from mvn artifact to plexus-classworlds package
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.0~alpha15-4
 - Updated source URL.
 
