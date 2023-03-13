@@ -1,20 +1,24 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
+# Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2022-05-19
-%define stage0_version 1.61.0
+%define release_date 2023-02-09
+%define stage0_version 1.67.1
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.62.1
-Release:        4%{?dist}
+Version:        1.68.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
+# Notes: 
+#  - rust source official repo is https://github.com/rust-lang/rust
+#  - cargo source official repo is https://github.com/rust-lang/cargo
+#  - crates.io source official repo is https://github.com/rust-lang/crates.io
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
@@ -32,6 +36,7 @@ BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
+BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
@@ -135,6 +140,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Mon Mar 13 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.68.0-1
+- Updating to version 1.68.0
+
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
 - Split out separate 'doc' subpackage to reduce default package size.
 - Updated license information.
