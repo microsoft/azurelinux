@@ -1,0 +1,74 @@
+diff --git a/go.mod b/go.mod
+index ae51a2598d..c402fe477b 100644
+--- a/go.mod
++++ b/go.mod
+@@ -7,7 +7,7 @@ replace (
+ 	github.com/Mirantis/cri-dockerd => github.com/k3s-io/cri-dockerd v0.2.4-0.20220729204449-bcbb75d5abff // k3s-master
+ 	github.com/cloudnativelabs/kube-router => github.com/k3s-io/kube-router v1.5.1-0.20220630214451-a43bcd8511d2
+ 	github.com/containerd/cgroups => github.com/containerd/cgroups v1.0.1
+-	github.com/containerd/containerd => github.com/k3s-io/containerd v1.5.13-k3s1 // k3s-release/1.5
++	github.com/containerd/containerd => github.com/guptavinayak11/containerd v1.5.14-0.20230311100541-d1bb18d6c070 // k3s-release/1.5
+ 	github.com/coreos/go-systemd => github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
+ 	github.com/docker/distribution => github.com/docker/distribution v2.8.1+incompatible
+ 	github.com/docker/docker => github.com/docker/docker v20.10.12+incompatible
+diff --git a/go.sum b/go.sum
+index 559d376d1b..c4d7f38201 100644
+--- a/go.sum
++++ b/go.sum
+@@ -599,6 +599,8 @@ github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFb
+ github.com/gruntwork-io/go-commons v0.8.0/go.mod h1:gtp0yTtIBExIZp7vyIV9I0XQkVwiQZze678hvDXof78=
+ github.com/gruntwork-io/terratest v0.40.6 h1:kBYzD9gcQoruAoV9vmVLk8kjuZAUI5U72h9IAogL/iI=
+ github.com/gruntwork-io/terratest v0.40.6/go.mod h1:CjHsEgP1Pe987X5N8K5qEqCuLtu1bqERGIAF8bTj1s0=
++github.com/guptavinayak11/containerd v1.5.14-0.20230311100541-d1bb18d6c070 h1:juf2tSGZL5MovGcaSccigPauoe/qWawb4yoDkD6B1Ss=
++github.com/guptavinayak11/containerd v1.5.14-0.20230311100541-d1bb18d6c070/go.mod h1:zUdlwwmj8Xwd65Wz+vPGjonBN3FFAkSGwRloPefnNN4=
+ github.com/hanwen/go-fuse/v2 v2.1.1-0.20220112183258-f57e95bda82d h1:ibbzF2InxMOS+lLCphY9PHNKPURDUBNKaG6ErSq8gJQ=
+ github.com/hanwen/go-fuse/v2 v2.1.1-0.20220112183258-f57e95bda82d/go.mod h1:B1nGE/6RBFyBRC1RRnf23UpwCdyJ31eukw34oAKukAc=
+ github.com/hashicorp/consul/api v1.1.0/go.mod h1:VmuI/Lkw1nC05EYQWNKwWGbkg+FbDBtguAZLlVdkD9Q=
+@@ -706,8 +708,6 @@ github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7V
+ github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
+ github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
+ github.com/k-sone/critbitgo v1.4.0/go.mod h1:7E6pyoyADnFxlUBEKcnfS49b7SUAQGMK+OAp/UQvo0s=
+-github.com/k3s-io/containerd v1.5.13-k3s1 h1:a5qvrZZ5u4dn65XVajzLGUeUGiBXSE5qos3xF4BdRc4=
+-github.com/k3s-io/containerd v1.5.13-k3s1/go.mod h1:zUdlwwmj8Xwd65Wz+vPGjonBN3FFAkSGwRloPefnNN4=
+ github.com/k3s-io/cri-dockerd v0.2.4-0.20220729204449-bcbb75d5abff h1:iyPObk0AH8KArYJ8AEpe5CfJQ2W8ffRbyKMETtT2NwI=
+ github.com/k3s-io/cri-dockerd v0.2.4-0.20220729204449-bcbb75d5abff/go.mod h1:2SAxAoj3lTHgTDwxGcpxUrKEbIWWrCFwNRMbPBR3U7E=
+ github.com/k3s-io/cri-tools v1.24.0-k3s1 h1:Em7IZ/ElBFbHlPLjV0w2ttORxFl5upBxnbP/9IlT/3c=
+diff --git a/scripts/build b/scripts/build
+index b25156f91e..3c8a7e58b2 100755
+--- a/scripts/build
++++ b/scripts/build
+@@ -9,7 +9,7 @@ GO=${GO-go}
+ 
+ PKG="github.com/k3s-io/k3s"
+ PKG_CONTAINERD="github.com/containerd/containerd"
+-PKG_K3S_CONTAINERD="github.com/k3s-io/containerd"
++PKG_K3S_CONTAINERD="github.com/guptavinayak11/containerd"
+ PKG_CRICTL="github.com/kubernetes-sigs/cri-tools/pkg"
+ PKG_K8S_BASE="k8s.io/component-base"
+ PKG_K8S_CLIENT="k8s.io/client-go/pkg"
+diff --git a/scripts/download b/scripts/download
+index 5effc0562a..5f02a367e9 100755
+--- a/scripts/download
++++ b/scripts/download
+@@ -28,7 +28,7 @@ curl --compressed -sfL https://github.com/k3s-io/k3s-root/releases/download/${VE
+ 
+ git clone --single-branch --branch=${VERSION_RUNC} --depth=1 https://github.com/opencontainers/runc ${RUNC_DIR}
+ 
+-git clone --single-branch --branch=${VERSION_CONTAINERD} --depth=1 https://github.com/k3s-io/containerd ${CONTAINERD_DIR}
++git clone --single-branch --branch=${VERSION_CONTAINERD} --depth=1 https://github.com/guptavinayak11/containerd ${CONTAINERD_DIR}
+ 
+ setup_tmp() {
+     TMP_DIR=$(mktemp -d --tmpdir=${CHARTS_DIR})
+diff --git a/scripts/version.sh b/scripts/version.sh
+index d955d965f5..127cc65eea 100755
+--- a/scripts/version.sh
++++ b/scripts/version.sh
+@@ -24,7 +24,7 @@ fi
+ 
+ # We're building k3s against containerd 1.5 in go.mod because 1.6 has dependency
+ # conflicts with Kubernetes, but we still need to bundle containerd 1.6.
+-VERSION_CONTAINERD="v1.6.8-k3s1"
++VERSION_CONTAINERD="1.6.8-k3s1"
+ 
+ VERSION_CRICTL=$(grep github.com/kubernetes-sigs/cri-tools go.mod | head -n1 | awk '{print $4}')
+ if [ -z "$VERSION_CRICTL" ]; then
