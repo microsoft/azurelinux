@@ -53,7 +53,7 @@ resources:
   - repository: 1ESPipelineTemplates
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
-    ref: refs/tags/canary
+    ref: refs/tags/release
 
   - repository: CBL-Mariner-Pipelines
     type: git
