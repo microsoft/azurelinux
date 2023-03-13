@@ -43,6 +43,11 @@ parameters:
   type: boolean
   default: false
 
+- name: publishRPMs
+  displayName: 'PRODUCTION RUN. WILL PUBLISH PACKAGES TO PMC.'
+  type: boolean
+  default: false
+
 - name: debugBuild
   displayName: '[REMOVE ME!] Test param.'
   type: boolean
@@ -278,6 +283,7 @@ extends:
           displayName: 'Test placeholder'
 
     - stage: Publish
+      condition: eq('${{ parameters.publishRPMs }}', false)
       jobs:
       - job:
         steps:
