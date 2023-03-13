@@ -133,7 +133,6 @@ extends:
       condition: always()
       jobs:
       - job: Kernel_modules
-        condition: eq('${{ parameters.debugBuild }}', false)
         templateContext:
           outputs:
           - output: pipelineArtifact
