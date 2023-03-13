@@ -43,11 +43,11 @@ echo 0 > /proc/sys/net/ipv4/tcp_ecn
 # Set a known state
 iptables -P INPUT   DROP
 iptables -P FORWARD DROP
-iptables -P OUTPUT  DROP
+iptables -P OUTPUT  ACCEPT
 
 ip6tables -P INPUT   DROP
 ip6tables -P FORWARD DROP
-ip6tables -P OUTPUT  DROP
+ip6tables -P OUTPUT  ACCEPT
 
 # These lines are here in case rules are already in place and the
 # script is ever rerun on the fly. We want to remove all rules and

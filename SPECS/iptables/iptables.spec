@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 13 2023 Andy Zaugg <azaugg@linkedin.com> - 1.8.7-2
+- Accept all ICMP traffic as part of default netflter ruleset
+- Change default OUTPUT chain policy to ACCEPT
+
 * Wed Jan 05 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-1
 - Update to version 1.8.7
 
