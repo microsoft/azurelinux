@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
+%define commit_hash 2456e983eb9e37e47538f59ea18f2043c9a73640
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
