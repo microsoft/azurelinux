@@ -111,7 +111,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Thu Mar 06 2023 Roaa Sakr <romoh@microsoft.com> - 1.11.0-1
+* Mon Mar 13 2023 Roaa Sakr <romoh@microsoft.com> - 1.11.0-1
 - Update to v1.11.0
 
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-6
