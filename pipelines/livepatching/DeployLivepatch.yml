@@ -283,7 +283,7 @@ extends:
           displayName: 'Test placeholder'
 
     - stage: Publish
-      condition: eq('${{ parameters.publishRPMs }}', false)
+      condition: ${{ parameters.publishRPMs }}
       jobs:
       - job:
         steps:
