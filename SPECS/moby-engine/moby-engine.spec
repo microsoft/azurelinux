@@ -1,5 +1,5 @@
 %define upstream_name moby
-%define commit_hash 87a90dc786bda134c9eb02adbae2c6a7342fb7f6
+%define commit_hash 6051f142912a5c06064e96b92de5e4e8f052131b
 
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
