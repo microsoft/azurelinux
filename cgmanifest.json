@@ -2728,8 +2728,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.86",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.86.tar.xz"
+          "version": "2.89",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
         }
       }
     },
