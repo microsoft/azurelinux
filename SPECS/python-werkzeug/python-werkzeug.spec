@@ -49,8 +49,9 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Mon Mar 13 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.0.3-3
-- Add patch for CVE-2023-23934
+* Mon Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.0.3-3
+- Updated to version 2.2.3 for CVE-2023-23934 adn CVE-2023-25577
+- Remove patch for CVE-2023-25577
 
 * Fri Feb 24 2023 Minghe Ren <mingheren@microsoft.com> - 2.0.3-2
 - Add patch for CVE-2023-25577
