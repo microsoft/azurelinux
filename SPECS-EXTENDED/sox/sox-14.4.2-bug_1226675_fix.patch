@@ -1,0 +1,49 @@
+diff --git a/src/ao.c b/src/ao.c
+index 4791d4e..3d6431d 100644
+--- a/src/ao.c
++++ b/src/ao.c
+@@ -34,9 +34,21 @@ typedef struct {
+ static int startwrite(sox_format_t * ft)
+ {
+   priv_t * ao = (priv_t *)ft->priv;
++  unsigned bytes_per_sample = (ft->encoding.bits_per_sample + 7) >> 3;
+ 
+-  ao->buf_size = sox_globals.bufsiz - (sox_globals.bufsiz % (ft->encoding.bits_per_sample >> 3));
+-  ao->buf_size *= (ft->encoding.bits_per_sample >> 3);
++  if (bytes_per_sample == 0)
++  {
++      lsx_fail("startwrite [ao driver]: Corrupted encoding data (bits per sample should not be zero)");
++      return SOX_EOF;
++  }
++
++  /* Since sox_sw_write_buf works with 16-bit samples, ensure there is an enough room */
++  if (bytes_per_sample < 2)
++    bytes_per_sample = 2;
++  /* Align the buffer size to the boundary divisible by bytes_per_sample */
++  ao->buf_size = sox_globals.bufsiz - (sox_globals.bufsiz % bytes_per_sample);
++  /* - add back possibly truncated bytes */
++  ao->buf_size += bytes_per_sample;
+   ao->buf = lsx_malloc(ao->buf_size);
+ 
+   if (!ao->buf)
+@@ -90,12 +102,17 @@ static void sox_sw_write_buf(char *buf1, sox_sample_t const * buf2, size_t len,
+ static size_t write_samples(sox_format_t *ft, const sox_sample_t *buf, size_t len)
+ {
+   priv_t * ao = (priv_t *)ft->priv;
++  /* This will be always > 0 in the case the format handler is properly used */
++  unsigned bytes_per_sample = (ft->encoding.bits_per_sample + 7) >> 3;
+   uint_32 aobuf_size;
+ 
+-  if (len > ao->buf_size / (ft->encoding.bits_per_sample >> 3))
+-      len = ao->buf_size / (ft->encoding.bits_per_sample >> 3);
++  /* Normalize the number of samples */
++  if (bytes_per_sample < 2)
++      bytes_per_sample = 2;
++  if (len > ao->buf_size / bytes_per_sample)
++      len = ao->buf_size / bytes_per_sample;
+ 
+-  aobuf_size = (ft->encoding.bits_per_sample >> 3) * len;
++  aobuf_size = bytes_per_sample * len;
+ 
+   sox_sw_write_buf(ao->buf, buf, len, ft->encoding.reverse_bytes,
+                    &(ft->clips));

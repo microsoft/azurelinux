@@ -1,0 +1,27 @@
+From 296e900f3b70521d622f8354abe8ae0e9d328f7d Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 29 Aug 2022 19:22:38 +0000
+Subject: [PATCH 13/35] selinuxutil: Semanage reads policy for export.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/selinuxutil.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index d7f047c2d..a96ce4784 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -521,6 +521,7 @@ mls_file_read_all_levels(semanage_t)
+ selinux_validate_context(semanage_t)
+ selinux_get_enforce_mode(semanage_t)
+ selinux_getattr_fs(semanage_t)
++selinux_read_policy(semanage_t)
+ # for setsebool:
+ selinux_set_all_booleans(semanage_t)
+ 
+-- 
+2.34.1
+

@@ -46,10 +46,10 @@ cracklib-lang-2.9.7-5.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-debuginfo-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-devel-0.17.5-1.cm2.x86_64.rpm
-curl-7.86.0-3.cm2.x86_64.rpm
-curl-debuginfo-7.86.0-3.cm2.x86_64.rpm
-curl-devel-7.86.0-3.cm2.x86_64.rpm
-curl-libs-7.86.0-3.cm2.x86_64.rpm
+curl-7.88.1-1.cm2.x86_64.rpm
+curl-debuginfo-7.88.1-1.cm2.x86_64.rpm
+curl-devel-7.88.1-1.cm2.x86_64.rpm
+curl-libs-7.88.1-1.cm2.x86_64.rpm
 Cython-debuginfo-0.29.33-1.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-1.cm2.x86_64.rpm
@@ -135,7 +135,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-kernel-headers-5.15.95.1-1.cm2.noarch.rpm
+kernel-headers-5.15.98.1-1.cm2.noarch.rpm
 kmod-29-1.cm2.x86_64.rpm
 kmod-debuginfo-29-1.cm2.x86_64.rpm
 kmod-devel-29-1.cm2.x86_64.rpm

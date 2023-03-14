@@ -94,6 +94,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "advancecomp",
+          "version": "2.4",
+          "downloadUrl": "https://github.com/amadvance/advancecomp/archive/v2.4/advancecomp-2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "adwaita-icon-theme",
           "version": "3.36.1",
           "downloadUrl": "https://download.gnome.org/sources/adwaita-icon-theme/3.36/adwaita-icon-theme-3.36.1.tar.xz"
@@ -1209,6 +1219,16 @@
           "name": "boost",
           "version": "1.76.0",
           "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_76_0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "booth",
+          "version": "1.0",
+          "downloadUrl": "https://github.com/ClusterLabs/booth/archive/5d837d2b5bf1c240a5f1c5efe4e8d79f55727cca/booth-5d837d2.tar.gz"
         }
       }
     },
@@ -2337,8 +2357,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.86.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.86.0.tar.gz"
+          "version": "7.88.1",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.88.1.tar.gz"
         }
       }
     },
@@ -2708,8 +2728,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.86",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.86.tar.xz"
+          "version": "2.89",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
         }
       }
     },
@@ -3969,6 +3989,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gavl",
+          "version": "1.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/gmerlin/gavl-1.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gawk",
           "version": "5.1.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/gawk/gawk-5.1.0.tar.xz"
@@ -4069,6 +4099,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gdisk",
+          "version": "1.0.9",
+          "downloadUrl": "https://downloads.sourceforge.net/gptfdisk/gptfdisk-1.0.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gdk-pixbuf2",
           "version": "2.40.0",
           "downloadUrl": "https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-2.40.0.tar.xz"
@@ -4099,9 +4139,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "geoclue2",
+          "version": "2.7.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/2.7.0/geoclue-2.7.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "GeoIP",
           "version": "1.6.12",
           "downloadUrl": "https://github.com/maxmind/geoip-api-c/releases/download/v1.6.12/GeoIP-1.6.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "GeoIP-GeoLite-data",
+          "version": "2018.06",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/GeoIP.dat.gz"
         }
       }
     },
@@ -4882,6 +4942,16 @@
           "name": "gtk-update-icon-cache",
           "version": "3.24.26",
           "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.26/gtk-update-icon-cache-3.24.26.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gtk-vnc",
+          "version": "1.3.0",
+          "downloadUrl": "https://download.gnome.org/sources/gtk-vnc/1.3/gtk-vnc-1.3.0.tar.xz"
         }
       }
     },
@@ -6380,8 +6450,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.95.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.95.1.tar.gz"
+          "version": "5.15.98.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
         }
       }
     },
@@ -6882,6 +6952,16 @@
           "name": "ibus-libzhuyin",
           "version": "1.9.1",
           "downloadUrl": "http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ibus-m17n",
+          "version": "1.4.18",
+          "downloadUrl": "https://github.com/ibus/ibus-m17n/archive/1.4.18/ibus-m17n-1.4.18.tar.gz"
         }
       }
     },
@@ -7851,16 +7931,6 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.23.8",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.23.8+k3s2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
           "version": "1.24.6",
           "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.6+k3s1.tar.gz"
         }
@@ -7951,8 +8021,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.95.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.95.1.tar.gz"
+          "version": "5.15.98.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
         }
       }
     },
@@ -7961,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.95.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.95.1.tar.gz"
+          "version": "5.15.98.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
         }
       }
     },
@@ -7971,8 +8041,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.95.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.95.1.tar.gz"
+          "version": "5.15.98.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
         }
       }
     },
@@ -7981,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.95.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.95.1.tar.gz"
+          "version": "5.15.98.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
         }
       }
     },
@@ -9241,8 +9311,8 @@
         "type": "other",
         "other": {
           "name": "libgit2",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.1.0/libgit2-1.1.0.tar.gz"
+          "version": "1.4.5",
+          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.4.5/libgit2-1.4.5.tar.gz"
         }
       }
     },
@@ -9273,6 +9343,16 @@
           "name": "libglvnd",
           "version": "1.3.2",
           "downloadUrl": "https://github.com/NVIDIA/libglvnd/archive/v1.3.2/libglvnd-1.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgovirt",
+          "version": "0.3.9",
+          "downloadUrl": "https://download.gnome.org/sources/libgovirt/0.3/libgovirt-0.3.9.tar.xz"
         }
       }
     },
@@ -9493,6 +9573,16 @@
           "name": "libimobiledevice",
           "version": "1.2.1",
           "downloadUrl": "http://www.libimobiledevice.org/downloads/libimobiledevice-1.2.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libindicator",
+          "version": "12.10.1",
+          "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
         }
       }
     },
@@ -10343,6 +10433,26 @@
           "name": "libpng",
           "version": "1.6.37",
           "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.37.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpng12",
+          "version": "1.2.57",
+          "downloadUrl": "https://downloads.sourceforge.net/project/libpng/libpng12/older-releases/1.2.57/libpng-1.2.57.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpng15",
+          "version": "1.5.30",
+          "downloadUrl": "https://downloads.sourceforge.net/project/libpng/libpng15/1.5.30/libpng-1.5.30.tar.xz"
         }
       }
     },
@@ -11520,6 +11630,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxmlb",
+          "version": "0.3.11",
+          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.11/libxmlb-0.3.11.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libXmu",
           "version": "1.1.3",
           "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
@@ -11893,6 +12013,16 @@
           "name": "livepatch-5.15.95.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.95.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.98.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
         }
       }
     },
@@ -13003,8 +13133,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.12",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.12.tar.gz"
+          "version": "1.6.18",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.18.tar.gz"
         }
       }
     },
@@ -13452,6 +13582,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mythes-en",
+          "version": "3.0",
+          "downloadUrl": "http://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mythes-eo",
           "version": "0.20180330",
           "downloadUrl": "http://esperanto.mv.ru/Download/dict-eo.oxt"
@@ -13765,6 +13905,16 @@
           "name": "netplan",
           "version": "0.95",
           "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "netsniff-ng",
+          "version": "0.6.8",
+          "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.8.tar.xz"
         }
       }
     },
@@ -15243,6 +15393,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pacemaker",
+          "version": "2.1.5",
+          "downloadUrl": "https://github.com/ClusterLabs/pacemaker/archive/refs/tags/Pacemaker-2.1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "packer",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.8.1.tar.gz"
@@ -15536,6 +15696,16 @@
           "name": "perl-Alien-Build",
           "version": "2.17",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Build-2.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Alien-Libxml2",
+          "version": "0.14",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Libxml2-0.14.tar.gz"
         }
       }
     },
@@ -16723,6 +16893,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Digest-BubbleBabble",
+          "version": "0.02",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-0.02.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Digest-CRC",
           "version": "0.22.2",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OL/OLIMAUL/Digest-CRC-0.22.2.tar.gz"
@@ -17433,6 +17613,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Image-Info",
+          "version": "1.42",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-1.42.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Image-Xbm",
           "version": "1.10",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SU/SUMMER/Image-Xbm-1.10.tar.gz"
@@ -17723,6 +17913,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-libnet",
+          "version": "3.11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/perl-libnet_repackaged-3.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-libwww-perl",
           "version": "6.49",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.49.tar.gz"
@@ -17873,9 +18073,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Mail-DKIM",
+          "version": "0.58",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Mail-DKIM-0.58.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Mail-IMAPTalk",
           "version": "4.04",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBN/Mail-IMAPTalk-4.04.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Mail-SPF",
+          "version": "2.9.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v2.9.0.tar.gz"
         }
       }
     },
@@ -18043,6 +18263,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Module-Install-AutoLicense",
+          "version": "0.10",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-AutoLicense-0.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Module-Install-GithubMeta",
           "version": "0.30",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-GithubMeta-0.30.tar.gz"
@@ -18056,6 +18286,16 @@
           "name": "perl-Module-Install-ManifestSkip",
           "version": "0.24",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Install-ManifestSkip-0.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-Install-ReadmeFromPod",
+          "version": "0.30",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-ReadmeFromPod-0.30.tar.gz"
         }
       }
     },
@@ -18126,6 +18366,16 @@
           "name": "perl-Module-Package",
           "version": "0.30",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Package-0.30.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-Package-Au",
+          "version": "2",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Module-Package-Au-2.tar.gz"
         }
       }
     },
@@ -18266,6 +18516,36 @@
           "name": "perl-Net-Daemon",
           "version": "0.48",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MN/MNOONING/Net-Daemon-0.48.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Net-DNS",
+          "version": "1.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NL/NLNETLABS/Net-DNS-1.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Net-DNS-Resolver-Mock",
+          "version": "1.20200215",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Net-DNS-Resolver-Mock-1.20200215.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Net-DNS-Resolver-Programmable",
+          "version": "0.009",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BIGPRESH/Net-DNS-Resolver-Programmable-0.009.tar.gz"
         }
       }
     },
@@ -18733,6 +19013,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Pod-Escapes",
+          "version": "1.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-1.07.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Pod-Eventual",
           "version": "0.094001",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-0.094001.tar.gz"
@@ -18866,6 +19156,16 @@
           "name": "perl-Probe-Perl",
           "version": "0.03",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/K/KW/KWILLIAMS/Probe-Perl-0.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Razor-Agent",
+          "version": "2.85",
+          "downloadUrl": "https://downloads.sourceforge.net/project/razor/razor-agents/2.85/razor-agents-2.85.tar.bz2"
         }
       }
     },
@@ -19443,6 +19743,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Test-Harness",
+          "version": "3.42",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.42.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Test-HasVersion",
           "version": "0.014",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-HasVersion-0.014.tar.gz"
@@ -19933,6 +20243,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Unicode-EastAsianWidth",
+          "version": "12.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Unicode-LineBreak",
           "version": "2019.001",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEZUMI/Unicode-LineBreak-2019.001.tar.gz"
@@ -20126,6 +20446,16 @@
           "name": "perl-XML-LibXML",
           "version": "2.0207",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-2.0207.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-XML-LibXSLT",
+          "version": "1.99",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-1.99.tar.gz"
         }
       }
     },
@@ -20363,6 +20693,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "phodav",
+          "version": "3.0",
+          "downloadUrl": "https://download.gnome.org/sources/phodav/3.0/phodav-3.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "php",
           "version": "8.1.16",
           "downloadUrl": "https://www.php.net/distributions/php-8.1.16.tar.xz"
@@ -20576,6 +20916,16 @@
           "name": "pmix",
           "version": "4.1.2",
           "downloadUrl": "https://github.com/pmix/pmix/releases/download/v4.1.2/pmix-4.1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pngcrush",
+          "version": "1.8.13",
+          "downloadUrl": "http://downloads.sourceforge.net/pmt/pngcrush-1.8.13-nolib.tar.xz"
         }
       }
     },
@@ -21033,6 +21383,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pykickstart",
+          "version": "3.36",
+          "downloadUrl": "https://github.com/pykickstart/pykickstart/archive/refs/tags/r3.36.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pylint",
           "version": "2.4.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pylint/pylint-2.4.4.tar.gz"
@@ -21246,6 +21606,16 @@
           "name": "python-bcrypt",
           "version": "3.2.0",
           "downloadUrl": "https://pypi.io/packages/source/b/bcrypt/bcrypt-3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-beautifulsoup4",
+          "version": "4.11.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.2.tar.gz"
         }
       }
     },
@@ -22643,6 +23013,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-oauth2client",
+          "version": "4.1.3",
+          "downloadUrl": "https://github.com/google/oauth2client/archive/v4.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-oauthlib",
           "version": "2.1.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
@@ -22686,6 +23066,16 @@
           "name": "python-os-service-types",
           "version": "1.7.0",
           "downloadUrl": "https://tarballs.openstack.org/os-service-types/os-service-types-1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-i18n",
+          "version": "5.1.0",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-5.1.0.tar.gz"
         }
       }
     },
@@ -23703,6 +24093,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-stestr",
+          "version": "3.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/stestr/stestr-3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-stevedore",
           "version": "1.31.0",
           "downloadUrl": "https://tarballs.openstack.org/stevedore/stevedore-1.31.0.tar.gz"
@@ -24086,6 +24486,16 @@
           "name": "python-websocket-client",
           "version": "1.3.1",
           "downloadUrl": "https://github.com/websocket-client/websocket-client/archive/v1.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-webtest",
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/Pylons/webtest/archive/3.0.0.tar.gz"
         }
       }
     },
@@ -24634,8 +25044,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.9",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.9.tar.gz"
+          "version": "6.2.11",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.11.tar.gz"
         }
       }
     },
@@ -26615,8 +27025,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20220106",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20220106/refpolicy-2.20220106.tar.bz2"
+          "version": "2.20221101",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20221101/refpolicy-2.20221101.tar.bz2"
         }
       }
     },
@@ -27009,6 +27419,16 @@
           "name": "soundtouch",
           "version": "2.1.1",
           "downloadUrl": "https://gitlab.com/soundtouch/soundtouch/-/archive/2.1.1/soundtouch-2.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sox",
+          "version": "14.4.2.0",
+          "downloadUrl": "https://github.com/i386x/sox-downstream/archive/sox-14.4.2.0.modified.tar.gz"
         }
       }
     },
@@ -28437,8 +28857,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1247",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1247.tar.gz"
+          "version": "9.0.1378",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1378.tar.gz"
         }
       }
     },
