@@ -3,7 +3,7 @@ Summary:        elixir
 Name:           elixir
 Version:        1.14.3
 Release:        1%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
