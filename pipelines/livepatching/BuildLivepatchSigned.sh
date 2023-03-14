@@ -76,16 +76,14 @@ verify_built_package() {
 # -a -> input artifacts directory path
 # -k -> kernel version to be livepatched
 # -l -> published logs directory path
-# -m -> signed kernel modules directory path
-# -p -> published artifacts directory path
-while getopts "a:k:l:m:p:" OPTIONS
+# -o -> built artifacts' output directory path
+while getopts "a:k:l:o:" OPTIONS
 do
   case "${OPTIONS}" in
     a ) ARTIFACTS_DIR=$OPTARG ;;
     k ) KERNEL_VERSION=$OPTARG ;;
     l ) LOG_PUBLISH_DIR=$OPTARG ;;
-    m ) KERNEL_MODULES_DIR=$OPTARG ;;
-    p ) ARTIFACTS_PUBLISH_DIR=$OPTARG ;;
+    o ) ARTIFACTS_OUTPUT_DIR=$OPTARG ;;
 
     \? )
         echo "ERROR: Invalid Option: -$OPTARG" 1>&2
@@ -98,26 +96,26 @@ do
   esac
 done
 
-print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_PUBLISH_DIR
+print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_OUTPUT_DIR
 
 TEMP_DIR="$(mktemp -d)"
 trap temp_dir_cleanup EXIT
 
 overwrite_toolkit -t "$ARTIFACTS_DIR"
 
-hydrate_artifacts -r "$ARTIFACTS_DIR"
+hydrate_artifacts -r "$ARTIFACTS_DIR" -s "$ARTIFACTS_DIR"
 
 # Saving the unsigned version for the sake of comparing with the signed one after it's built.
 find "out/RPMS" -name "livepatch-$KERNEL_VERSION*.rpm" -and -not -name "*debuginfo*" -exec mv {} "$TEMP_DIR" \;
 
-hydrate_signed_sources "$KERNEL_VERSION" "$KERNEL_MODULES_DIR"
+hydrate_signed_sources "$KERNEL_VERSION" "$ARTIFACTS_DIR"
 
 # Making sure we publish build logs even if the build fails.
 build_package_signed "livepatch-$KERNEL_VERSION" || BUILD_SUCCEEDED=false
 
 publish_build_logs "$LOG_PUBLISH_DIR"
 
-publish_build_artifacts "$ARTIFACTS_PUBLISH_DIR"
+publish_build_artifacts "$ARTIFACTS_OUTPUT_DIR"
 
 ${BUILD_SUCCEEDED:-true}
 

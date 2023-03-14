@@ -10,8 +10,8 @@ variables:
 - name: 'buildLogsFolder'
   value: 'LOGS'
 
-- name: 'kernelModulesFolder'
-  value: '$(Pipeline.Workspace)/kernel_modules'
+# - name: 'kernelModulesFolder'
+#   value: '$(Pipeline.Workspace)/kernel_modules'
 
 - name: 'pipelinesRepoFolder'
   value: '$CBL-Mariner-Pipelines'
@@ -131,7 +131,7 @@ extends:
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
-                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
                         -s "${{ parameters.useRPMsSnapshot }}"'
 
     - stage: Sign
@@ -145,12 +145,8 @@ extends:
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
             artifactName: $(buildArtifactsFolder)_KERNEL_MODULES
 
-          - output: pipelineArtifact
-            displayName: 'Publish logs'
-            targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-            artifactName: LOGS_KERNEL_MODULES
-
         pool:
+          # The kernel modules signing task is available only on Ubuntu.
           name: mariner-core-x64-1es-ubuntu2204-gpt-test
 
         steps:
@@ -166,9 +162,7 @@ extends:
             inputs:
               source: current
               artifact: '$(buildArtifactsFolder)_BUILD'
-              patterns: |
-                **/rpms.tar.gz
-                **/toolkit-*.tar.gz
+              patterns: '**/rpms.tar.gz'
               path: '$(System.ArtifactsDirectory)'
 
         - ${{ if eq(parameters.debugBuild, true) }}:
@@ -182,9 +176,7 @@ extends:
               runId: 273008
               tags: '$(downloadTags)'
               artifact: '$(buildArtifactsFolder)'
-              patterns: |
-                **/rpms.tar.gz
-                **/toolkit-*.tar.gz
+              patterns: '**/rpms.tar.gz'
               path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
@@ -192,27 +184,76 @@ extends:
           inputs:
             filePath: '$(selfRepoRoot)/pipelines/livepatching/ExtractKernelModules.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
-                        -o "$(kernelModulesFolder)"'
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
             workingDirectory: '$(selfRepoRoot)'
 
         - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
           parameters:
-            artifactsFolder: '$(kernelModulesFolder)'
+            artifactsFolder: '$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)'
             repoRootPath: '$(pipelinesRepoRoot)'
+
+      - job: Kernel_modules_packaging
+        dependsOn: Kernel_modules
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: $(buildArtifactsFolder)_KERNEL_MODULES_PACKAGING
+
+          - output: pipelineArtifact
+            displayName: 'Publish logs'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
+            artifactName: LOGS_KERNEL_MODULES_PACKAGING
+
+        steps:
+        - ${{ if eq(parameters.debugBuild, false) }}:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download RPMs and toolkit archives'
+            inputs:
+              source: current
+              artifact: '$(buildArtifactsFolder)_BUILD'
+              patterns: |
+                **/*rpms.tar.gz
+                **/toolkit-*.tar.gz
+              path: '$(System.ArtifactsDirectory)'
+
+        - ${{ if eq(parameters.debugBuild, true) }}:
+          - task: DownloadPipelineArtifact@2
+            displayName: '[TEST] Download RPMs and toolkit archive'
+            inputs:
+              source: specific
+              project: 'mariner'
+              pipeline: 1141
+              runVersion: specific
+              runId: 273008
+              tags: '$(downloadTags)'
+              artifact: '$(buildArtifactsFolder)'
+              patterns: |
+                **/*rpms.tar.gz
+                **/toolkit-*.tar.gz
+              path: '$(System.ArtifactsDirectory)'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download signed kernel modules'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
+            patterns: '**/*ko'
+            path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
           displayName: 'Build livepatch-signed RPM'
           inputs:
-            filePath: '$(selfRepoRoot)/pipelines/livepatching/BuildLivepatchSigned.sh'
+            filePath: 'pipelines/livepatching/BuildLivepatchSigned.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
-                        -m "$(kernelModulesFolder)"
-                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
             workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
-        dependsOn: Kernel_modules
+        dependsOn: Kernel_modules_packaging
         templateContext:
           outputs:
           - output: pipelineArtifact
@@ -226,7 +267,7 @@ extends:
             displayName: 'Download RPMs and SRPMs archives'
             inputs:
               source: current
-              artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
+              artifact: '$(buildArtifactsFolder)_KERNEL_MODULES_PACKAGING'
               patterns: '**/*rpms.tar.gz'
               path: '$(System.ArtifactsDirectory)'
 
@@ -272,7 +313,7 @@ extends:
             filePath: 'pipelines/common/scripts/PackageSignedRPMs.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "$(signingKeyID)"
-                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
 
     - stage: Test
       jobs:

@@ -2,22 +2,26 @@
 # Licensed under the MIT License.
 
 hydrate_artifacts() {
-    local make_status
+    local exit_code
+    local out_dir
     local repo_dir
     local rpms_archive
     local rpms_input
     local rpms_dir
+    local srpms_archive
+    local srpms_input
     local toolchain_archive
     local toolchain_input
     local toolkit_dir
 
     local OPTIND
-    while getopts "cd:r:t:" OPTIONS
+    while getopts "cd:r:s:t:" OPTIONS
     do
         case "${OPTIONS}" in
             c ) rpms_dir="RPMS_DIR=../build/rpms_cache/cache" ;;
             d ) repo_dir="$OPTARG" ;;
             r ) rpms_input="$OPTARG" ;;
+            s ) srpms_input="$OPTARG" ;;
             t ) toolchain_input="$OPTARG" ;;
 
             \? )
@@ -31,9 +35,9 @@ hydrate_artifacts() {
         esac
     done
 
-    if [[ -z "$toolchain_input" && -z "$rpms_input" ]]
+    if [[ -z "$toolchain_input" && -z "$rpms_input" && -z "$srpms_input" ]]
     then
-        echo "-- ERROR: neither toolchain nor RPMs paths specified to hydrate. Must specify at least one." >&2
+        echo "-- ERROR: must specify at least one of the following archives to hydrate: RPMs, SRPMs, or toolchain." >&2
         return 1
     fi
 
@@ -43,6 +47,16 @@ hydrate_artifacts() {
         if [[ ! -f "$rpms_archive" ]]
         then
             echo "ERROR: No RPMs archive found in '$rpms_input'." >&2
+            return 1
+        fi
+    fi
+
+    if [[ -n "$srpms_input" ]]
+    then
+        srpms_archive="$(resolve_archive "$srpms_input" "*srpms.tar.gz")"
+        if [[ ! -f "$srpms_archive" ]]
+        then
+            echo "ERROR: No SRPMs archive found in '$srpms_input'." >&2
             return 1
         fi
     fi
@@ -58,6 +72,7 @@ hydrate_artifacts() {
     fi
 
     repo_dir="$(resolve_repo_dir "$repo_dir")"
+    out_dir="$repo_dir/out"
     toolkit_dir="$repo_dir/toolkit"
 
     if [[ -n "$rpms_archive" ]]
@@ -66,10 +81,22 @@ hydrate_artifacts() {
         echo "-- Hydrating cache of repo '$repo_dir' with RPMs from '$rpms_archive'."
 
         sudo make -C "$toolkit_dir" -j"$(nproc)" hydrate-rpms PACKAGE_ARCHIVE="$rpms_archive" $rpms_dir
-        make_status=$?
-        if [[ $make_status != 0 ]]; then
+        exit_code=$?
+        if [[ $exit_code != 0 ]]; then
             echo "-- ERROR: failed to hydrate repo's RPMs." >&2
-            return $make_status
+            return $exit_code
+        fi
+    fi
+
+    if [[ -n "$srpms_archive" ]]
+    then
+        echo "-- Hydrating cache of repo '$repo_dir' with SRPMs from '$srpms_archive'."
+
+        tar --skip-old-files -C "$out_dir" -xf "$srpms_archive"
+        exit_code=$?
+        if [[ $exit_code != 0 ]]; then
+            echo "-- ERROR: failed to hydrate repo's SRPMs." >&2
+            return $exit_code
         fi
     fi
 
@@ -78,10 +105,10 @@ hydrate_artifacts() {
         echo "-- Hydrating cache of repo '$repo_dir' with toolchain from '$toolchain_archive'."
 
         sudo make -C "$toolkit_dir" -j"$(nproc)" toolchain chroot-tools TOOLCHAIN_ARCHIVE="$toolchain_archive"
-        make_status=$?
-        if [[ $make_status != 0 ]]; then
+        exit_code=$?
+        if [[ $exit_code != 0 ]]; then
             echo "-- ERROR: failed to hydrate repo's toolchain." >&2
-            return $make_status
+            return $exit_code
         fi
     fi
 }
@@ -172,8 +199,8 @@ publish_build_artifacts() {
     artifact_publish_dir="$1"
     repo_dir="$(resolve_repo_dir "$2")"
 
-    toolkit_dir="$repo_dir/toolkit"
     out_dir="$repo_dir/out"
+    toolkit_dir="$repo_dir/toolkit"
 
     echo "-- Packing built RPMs and SRPMs."
     sudo make -C "$toolkit_dir" -j"$(nproc)" compress-srpms compress-rpms

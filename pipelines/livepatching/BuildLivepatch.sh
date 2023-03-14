@@ -38,15 +38,15 @@ build_package() {
 # -a -> input artifacts directory path
 # -k -> kernel version to be livepatched
 # -l -> published logs directory path
-# -p -> published artifacts directory path
+# -o -> built artifacts' output directory path
 # -s -> use toolkit's RPMs snapshot to populate the packages cache
-while getopts "a:k:l:p:s:" OPTIONS
+while getopts "a:k:l:o:s:" OPTIONS
 do
   case "${OPTIONS}" in
     a ) ARTIFACTS_DIR=$OPTARG ;;
     k ) KERNEL_VERSION=$OPTARG ;;
     l ) LOG_PUBLISH_DIR=$OPTARG ;;
-    p ) ARTIFACTS_PUBLISH_DIR=$OPTARG ;;
+    o ) ARTIFACTS_OUTPUT_DIR=$OPTARG ;;
     s ) USE_RPMS_SNAPSHOT="$(parse_pipeline_boolean "$OPTARG")" ;;
 
     \? )
@@ -60,7 +60,7 @@ do
   esac
 done
 
-print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_PUBLISH_DIR USE_RPMS_SNAPSHOT
+print_variables_with_check ARTIFACTS_DIR KERNEL_VERSION LOG_PUBLISH_DIR ARTIFACTS_OUTPUT_DIR USE_RPMS_SNAPSHOT
 
 overwrite_toolkit -t "$ARTIFACTS_DIR"
 
@@ -71,8 +71,8 @@ build_package "livepatch-$KERNEL_VERSION" "$USE_RPMS_SNAPSHOT" || BUILD_SUCCEEDE
 
 publish_build_logs "$LOG_PUBLISH_DIR"
 
-publish_build_artifacts "$ARTIFACTS_PUBLISH_DIR"
+publish_build_artifacts "$ARTIFACTS_OUTPUT_DIR"
 
-publish_toolkit "$ARTIFACTS_PUBLISH_DIR"
+publish_toolkit "$ARTIFACTS_OUTPUT_DIR"
 
 ${BUILD_SUCCEEDED:-true}

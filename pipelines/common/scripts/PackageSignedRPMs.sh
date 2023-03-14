@@ -11,12 +11,12 @@ compress_rpms() {
     local artifacts_dir
     local compressed_dir
     local compressed_dir_lowercase
-    local publish_dir
+    local output_dir
 
     artifacts_dir="$1"
-    publish_dir="$2"
+    output_dir="$2"
 
-    mkdir -p "$publish_dir"
+    mkdir -p "$output_dir"
 
     for compressed_dir in RPMS SRPMS
     do
@@ -24,8 +24,8 @@ compress_rpms() {
         then
             compressed_dir_lowercase="${compressed_dir,,}"
 
-            echo "-- Compressing the '$compressed_dir' directory into ($publish_dir)."
-            tar -C "$artifacts_dir" -cf "$publish_dir/$compressed_dir_lowercase.tar.gz" "$compressed_dir"
+            echo "-- Compressing the '$compressed_dir' directory into ($output_dir)."
+            tar -C "$artifacts_dir" -cf "$output_dir/$compressed_dir_lowercase.tar.gz" "$compressed_dir"
         fi
     done
 }
@@ -65,13 +65,13 @@ validate_rpm_signatures() {
 #
 # -a -> input artifacts directory path
 # -k -> signing key ID to verify the RPMs' signatures
-# -s -> use toolkit's RPMs snapshot to populate the packages cache
-while getopts "a:k:p:" OPTIONS
+# -o -> output directory
+while getopts "a:k:o:" OPTIONS
 do
   case "${OPTIONS}" in
     a ) ARTIFACTS_DIR=$OPTARG ;;
     k ) EXPECTED_KEY_ID=$OPTARG ;;
-    p ) PUBLISH_DIR=$OPTARG ;;
+    o ) OUTPUT_DIR=$OPTARG ;;
 
     \? )
         echo "ERROR: Invalid Option: -$OPTARG" 1>&2
@@ -90,8 +90,8 @@ then
     exit 1
 fi
 
-print_variables_with_check ARTIFACTS_DIR EXPECTED_KEY_ID PUBLISH_DIR
+print_variables_with_check ARTIFACTS_DIR EXPECTED_KEY_ID OUTPUT_DIR
 
 validate_rpm_signatures "$ARTIFACTS_DIR" "$EXPECTED_KEY_ID"
 
-compress_rpms "$ARTIFACTS_DIR" "$PUBLISH_DIR"
+compress_rpms "$ARTIFACTS_DIR" "$OUTPUT_DIR"
