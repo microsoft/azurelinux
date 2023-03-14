@@ -43,7 +43,7 @@ hydrate_artifacts() {
 
     if [[ -n "$rpms_input" ]]
     then
-        rpms_archive="$(resolve_archive "$rpms_input" "*rpms.tar.gz")"
+        rpms_archive="$(resolve_archive "$rpms_input" "rpms.tar.gz")"
         if [[ ! -f "$rpms_archive" ]]
         then
             echo "ERROR: No RPMs archive found in '$rpms_input'." >&2
@@ -53,7 +53,7 @@ hydrate_artifacts() {
 
     if [[ -n "$srpms_input" ]]
     then
-        srpms_archive="$(resolve_archive "$srpms_input" "*srpms.tar.gz")"
+        srpms_archive="$(resolve_archive "$srpms_input" "srpms.tar.gz")"
         if [[ ! -f "$srpms_archive" ]]
         then
             echo "ERROR: No SRPMs archive found in '$srpms_input'." >&2
@@ -63,7 +63,7 @@ hydrate_artifacts() {
 
     if [[ -n "$toolchain_input" ]]
     then
-        toolchain_archive="$(resolve_archive "$toolchain_input" "*toolchain_built_rpms_all.tar.gz")"
+        toolchain_archive="$(resolve_archive "$toolchain_input" "toolchain_built_rpms_all.tar.gz")"
         if [[ ! -f "$toolchain_archive" ]]
         then
             echo "ERROR: No toolchain archive found in '$toolchain_input'." >&2
@@ -136,7 +136,7 @@ overwrite_toolkit() {
         esac
     done
 
-    toolkit_tarball="$(resolve_archive "$toolkit_input" "*toolkit-*.tar.gz")"
+    toolkit_tarball="$(resolve_archive "$toolkit_input" "toolkit-*.tar.gz")"
     if [[ ! -f "$toolkit_tarball" ]]
     then
         echo "ERROR: No toolkit tarball found in '$toolkit_input'." >&2
