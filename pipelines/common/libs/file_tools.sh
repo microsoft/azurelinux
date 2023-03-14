@@ -18,6 +18,21 @@ command_diff() {
     fi
 }
 
+find_file_fullpath() {
+    local input_path
+    local file_pattern
+
+    input_path="$1"
+    file_pattern="$2"
+
+    input_path="$(find "$input_path" -name "$file_pattern" -type f -print -quit)"
+
+    if [[ -f "$input_path" ]]
+    then
+        realpath "$input_path"
+    fi
+}
+
 temp_dir_cleanup() {
     if [[ -d "$TEMP_DIR" ]]
     then

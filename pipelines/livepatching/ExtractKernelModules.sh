@@ -5,6 +5,9 @@
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 
+# shellcheck source=../common/libs/build_tools.sh
+source "$ROOT_DIR"/pipelines/common/libs/build_tools.sh
+
 # shellcheck source=../common/libs/file_tools.sh
 source "$ROOT_DIR"/pipelines/common/libs/file_tools.sh
 
@@ -46,7 +49,7 @@ then
     exit 1
 fi
 
-rpms_archive="$(find "$ARTIFACTS_DIR" -name '*rpms.tar.gz' -type f -print -quit)"
+rpms_archive="$(find_file_fullpath "$ARTIFACTS_DIR" "rpms.tar.gz")"
 if [[ ! -f "$rpms_archive" ]]
 then
     echo "ERROR: No RPMs archive found in '$ARTIFACTS_DIR'." >&2

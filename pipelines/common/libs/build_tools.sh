@@ -1,6 +1,15 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+__SAVED_SCRIPT_DIR="$SCRIPT_DIR"
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+# shellcheck source=file_tools.sh
+source "$SCRIPT_DIR/file_tools.sh"
+
+SCRIPT_DIR="$__SAVED_SCRIPT_DIR"
+unset __SAVED_SCRIPT_DIR
+
 hydrate_artifacts() {
     local exit_code
     local out_dir
@@ -43,7 +52,7 @@ hydrate_artifacts() {
 
     if [[ -n "$rpms_input" ]]
     then
-        rpms_archive="$(resolve_archive "$rpms_input" "rpms.tar.gz")"
+        rpms_archive="$(find_file_fullpath "$rpms_input" "rpms.tar.gz")"
         if [[ ! -f "$rpms_archive" ]]
         then
             echo "ERROR: No RPMs archive found in '$rpms_input'." >&2
@@ -53,7 +62,7 @@ hydrate_artifacts() {
 
     if [[ -n "$srpms_input" ]]
     then
-        srpms_archive="$(resolve_archive "$srpms_input" "srpms.tar.gz")"
+        srpms_archive="$(find_file_fullpath "$srpms_input" "srpms.tar.gz")"
         if [[ ! -f "$srpms_archive" ]]
         then
             echo "ERROR: No SRPMs archive found in '$srpms_input'." >&2
@@ -63,7 +72,7 @@ hydrate_artifacts() {
 
     if [[ -n "$toolchain_input" ]]
     then
-        toolchain_archive="$(resolve_archive "$toolchain_input" "toolchain_built_rpms_all.tar.gz")"
+        toolchain_archive="$(find_file_fullpath "$toolchain_input" "toolchain_built_rpms_all.tar.gz")"
         if [[ ! -f "$toolchain_archive" ]]
         then
             echo "ERROR: No toolchain archive found in '$toolchain_input'." >&2
@@ -136,7 +145,7 @@ overwrite_toolkit() {
         esac
     done
 
-    toolkit_tarball="$(resolve_archive "$toolkit_input" "toolkit-*.tar.gz")"
+    toolkit_tarball="$(find_file_fullpath "$toolkit_input" "toolkit-*.tar.gz")"
     if [[ ! -f "$toolkit_tarball" ]]
     then
         echo "ERROR: No toolkit tarball found in '$toolkit_input'." >&2
@@ -268,21 +277,6 @@ publish_toolkit() {
     echo "-- Publishing toolkit to '$toolkit_publish_dir'."
     mkdir -p "$toolkit_publish_dir"
     sudo mv "$repo_dir"/out/toolkit*.tar.gz "$toolkit_publish_dir"
-}
-
-resolve_archive() {
-    local archive_path
-    local archive_pattern
-
-    archive_path="$1"
-    archive_pattern="$2"
-
-    archive_path="$(find "$archive_path" -name "$archive_pattern" -type f -print -quit)"
-
-    if [[ -f "$archive_path" ]]
-    then
-        realpath "$archive_path"
-    fi
 }
 
 resolve_repo_dir() {
