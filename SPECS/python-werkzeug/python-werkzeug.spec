@@ -1,15 +1,13 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        2.0.3
-Release:        3%{?dist}
+Version:        2.2.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
-Patch0:         CVE-2023-25577.patch
-Patch1:         CVE-2023-23934.patch
 BuildArch:      noarch
 
 %description
@@ -51,7 +49,7 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Mon Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.0.3-3
+* Mon Mar 13 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.0.3-3
 - Add patch for CVE-2023-23934
 
 * Fri Feb 24 2023 Minghe Ren <mingheren@microsoft.com> - 2.0.3-2
