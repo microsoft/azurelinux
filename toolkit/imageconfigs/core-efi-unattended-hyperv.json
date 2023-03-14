@@ -10,7 +10,8 @@
                 {
                     "ID": "boot",
                     "Flags": [
-                        "grub"
+                        "esp",
+                        "boot"
                     ],
                     "Start": 1,
                     "End": 9,
@@ -28,11 +29,12 @@
     "SystemConfigs": [
         {
             "Name": "Standard",
-            "BootType": "legacy",
+            "BootType": "efi",
             "PartitionSettings": [
                 {
                     "ID": "boot",
-                    "MountPoint": ""
+                    "MountPoint": "/boot/efi",
+                    "MountOptions" : "umask=0077"
                 },
                 {
                     "ID": "rootfs",
