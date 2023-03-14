@@ -3,7 +3,7 @@ Summary:        elixir
 Name:           elixir
 Version:        1.14.3
 Release:        1%{?dist}
-License:        MIT
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
@@ -16,11 +16,11 @@ BuildRequires:  glibc-lang
 elixir programming language
 
 %prep
-%setup -q -n elixir-%{version}
+%autosetup
 
 %build
 export LANG="en_US.UTF-8"
-make
+%make_build
 
 %install
 %make_install PREFIX=/usr
@@ -41,3 +41,4 @@ make
 %changelog
 * Mon Feb 27 2023 Sam Meluch <sammeluch@microsoft.com> - 1.14.3-1
 - Original version for CBL-Mariner
+- License verified
