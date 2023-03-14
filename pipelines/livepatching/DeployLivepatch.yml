@@ -192,6 +192,7 @@ extends:
             artifactsFolder: '$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)'
             repoRootPath: '$(pipelinesRepoRoot)'
 
+      # Once we enable signing kernel modules on Mariner images, merge this job with the previous one to simplify the pipeline.
       - job: Kernel_modules_packaging
         dependsOn: Kernel_modules
         templateContext:
@@ -250,7 +251,6 @@ extends:
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
                         -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
-            workingDirectory: '$(selfRepoRoot)'
 
       - job: RPMs
         dependsOn: Kernel_modules_packaging
