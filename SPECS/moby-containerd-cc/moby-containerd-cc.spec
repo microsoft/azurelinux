@@ -12,7 +12,7 @@ URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-Source0: https://saultestsigstorage.blob.core.windows.net/source-tars/containerd-cc.tar.gz
+Source0: https://saultestsigstorage.blob.core.windows.net/source-tars/moby-containerd-cc-1.6.18.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 #Patch0:  Makefile.patch
