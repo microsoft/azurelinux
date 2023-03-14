@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "docker-compose-2.16.0-govendor-v1.tar.gz": "253fc6deb6f1af1a64cc75a14a96a7e2d59b29883c3900ac2aa35b8a1635a875",
+  "docker-compose-2.16.0.tar.gz": "556dc59075280442128f5b45a8ff37638fb357c2a956bd751dd0ba747c93e71d"
+ }
+}
