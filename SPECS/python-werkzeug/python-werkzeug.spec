@@ -1,7 +1,7 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        2.0.3
-Release:        2%{?dist}
+Version:        2.2.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.3-1
+- Auto-upgrade to 2.2.3 - fix CVE-2023-23934
+
 * Fri Feb 24 2023 Minghe Ren <mingheren@microsoft.com> - 2.0.3-2
 - Add patch for CVE-2023-25577
 
