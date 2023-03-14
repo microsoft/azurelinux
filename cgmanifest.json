@@ -3197,6 +3197,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "elixir",
+          "version": "1.14.3",
+          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.14.3/elixir-1.14.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "emacs",
           "version": "28.2",
           "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz"
