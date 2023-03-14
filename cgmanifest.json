@@ -2847,6 +2847,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "docker-compose",
+          "version": "2.16.0",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dogtail",
           "version": "0.9.11",
           "downloadUrl": "https://gitlab.com/dogtail/dogtail/raw/released/dogtail-0.9.11.tar.gz"
