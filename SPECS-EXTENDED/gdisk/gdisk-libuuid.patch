@@ -1,0 +1,12 @@
+diff -up gptfdisk-1.0.9/guid.cc.orig gptfdisk-1.0.9/guid.cc
+--- gptfdisk-1.0.9/guid.cc.orig	2022-04-15 01:17:12.000000000 +0200
++++ gptfdisk-1.0.9/guid.cc	2022-05-08 02:12:21.042712891 +0200
+@@ -141,7 +141,7 @@ void GUIDData::Zero(void) {
+ void GUIDData::Randomize(void) {
+    int i, uuidGenerated = 0;
+ 
+-#ifdef _UUID_UUID_H
++#if defined (_UUID_UUID_H) || defined (_UL_LIBUUID_UUID_H)
+    uuid_generate(uuidData);
+    ReverseBytes(&uuidData[0], 4);
+    ReverseBytes(&uuidData[4], 2);
