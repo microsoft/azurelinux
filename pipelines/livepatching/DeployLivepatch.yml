@@ -262,28 +262,13 @@ extends:
             artifactName: $(buildArtifactsFolder)_RPMS
 
         steps:
-        - ${{ if eq(parameters.debugBuild, false) }}:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download RPMs and SRPMs archives'
-            inputs:
-              source: current
-              artifact: '$(buildArtifactsFolder)_KERNEL_MODULES_PACKAGING'
-              patterns: '**/*rpms.tar.gz'
-              path: '$(System.ArtifactsDirectory)'
-
-        - ${{ if eq(parameters.debugBuild, true) }}:
-          - task: DownloadPipelineArtifact@2
-            displayName: '[TEST] Download livepatch RPMs and toolkit'
-            inputs:
-              source: specific
-              project: 'mariner'
-              pipeline: 1141
-              runVersion: specific
-              runId: 273008
-              tags: '$(downloadTags)'
-              artifact: '$(buildArtifactsFolder)'
-              patterns: '**/rpms.tar.gz'
-              path: '$(System.ArtifactsDirectory)'
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download RPMs and SRPMs archives'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)_KERNEL_MODULES_PACKAGING'
+            patterns: '**/*rpms.tar.gz'
+            path: '$(System.ArtifactsDirectory)'
 
         - bash: |
             find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -exec tar -C "$(System.ArtifactsDirectory)" -xf {} \;
