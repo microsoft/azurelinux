@@ -1,6 +1,3 @@
-# Don't depend on bash by default
-%define __requires_exclude ^/(bin|usr/bin).*$
-%define soversion 1.1
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
@@ -53,6 +50,9 @@ Patch29:        CVE-2023-0286.patch
 Patch30:        CVE-2022-4304.patch
 Patch31:        CVE-2022-4450.patch
 Patch32:        CVE-2023-0215.patch
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*$
+%define soversion 1.1
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -310,7 +310,6 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %exclude %{_mandir}/man1*/openssl-tsget*
 
 %files libs
-%{!?_licensedir:%global license %%doc}
 %license LICENSE
 %dir %{_sysconfdir}/pki/tls
 %dir %{_sysconfdir}/pki/tls/certs
