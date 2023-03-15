@@ -11,7 +11,7 @@ variables:
   value: 'LOGS'
 
 - name: 'pipelinesRepoFolder'
-  value: '$CBL-Mariner-Pipelines'
+  value: 'CBL-Mariner-Pipelines'
 
 - name: 'pipelinesRepoRoot'
   value: '$(Agent.BuildDirectory)/$(pipelinesRepoFolder)'
@@ -22,7 +22,7 @@ variables:
 - name: 'selfRepoRoot'
   value: '$(Agent.BuildDirectory)/$(selfRepoFolder)'
 
-- name: 'signingKeyID'
+- name: 'rpmSigningKeyID'
   value: '3135ce90'
 
 parameters:
@@ -137,7 +137,7 @@ extends:
             artifactName: $(buildArtifactsFolder)_KERNEL_MODULES
 
         pool:
-          # The kernel modules signing task is available only on Ubuntu.
+          # The kernel modules signing task works only on Ubuntu.
           name: mariner-core-x64-1es-ubuntu2204-gpt-test
 
         steps:
@@ -258,7 +258,7 @@ extends:
           inputs:
             filePath: 'pipelines/common/scripts/PackageSignedRPMs.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
-                        -k "$(signingKeyID)"
+                        -k "$(rpmSigningKeyID)"
                         -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
 
     - stage: Test
