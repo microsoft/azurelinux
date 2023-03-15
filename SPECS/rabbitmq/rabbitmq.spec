@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rabbitmq.com
-Source0:        https://github.com/rabbitmq/%{name}/archive/refs/tags/v%{version}.tar.gz
+Source0:        https://github.com/rabbitmq/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 BuildRequires:  erlang
 BuildRequires:  elixir
 BuildRequires:  libxslt
