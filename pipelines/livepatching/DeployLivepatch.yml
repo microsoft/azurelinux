@@ -278,7 +278,7 @@ extends:
         - task: EsrpCodeSigning@2
           displayName: 'Sign RPMs'
           inputs:
-            ConnectedServiceName: '[REMOVE PAST 03/15/2023] 1ES PT RPM Signing'
+            ConnectedServiceName: 'ESRP RPM Signing 1ES PTs'
             FolderPath: '$(System.ArtifactsDirectory)'
             Pattern: '*.rpm'
             signConfigType: inlineSignParams
