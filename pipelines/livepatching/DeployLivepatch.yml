@@ -234,6 +234,7 @@ extends:
             find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -exec tar -C "$(System.ArtifactsDirectory)" -xf {} \;
           displayName: 'Expand SRPM/RPM tarballs'
 
+        # JSON config generated from https://portal.esrp.microsoft.com/Onboarding/JSONGenerator
         - task: EsrpCodeSigning@2
           displayName: 'Sign RPMs'
           inputs:
