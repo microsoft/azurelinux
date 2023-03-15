@@ -30,8 +30,8 @@ parameters:
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
   type: string
 
-- name: useKernelBuildArtifacts
-  displayName: 'Use toolkit and packages from the time the kernel was built.'
+- name: downloadKernelBuildArtifacts
+  displayName: 'Download toolkit and packages from the time the kernel was built.'
   type: boolean
   default: false
 
@@ -91,7 +91,7 @@ extends:
         - bash: |
             mariner_version="$(make -sC toolkit printvar-RELEASE_MAJOR_ID CONFIG_FILE=)"
             download_tags="$mariner_version-stable"
-            if [[ "${{ parameters.useKernelBuildArtifacts }}" =~ [Tt]rue ]]
+            if [[ "${{ parameters.downloadKernelBuildArtifacts }}" =~ [Tt]rue ]]
             then
               download_tags+=",kernel-${{ parameters.livepatchKernelVersion }}"
             fi
