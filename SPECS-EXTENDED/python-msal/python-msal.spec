@@ -2,7 +2,6 @@
 %global         forgeurl        https://github.com/AzureAD/microsoft-authentication-library-for-python/
 %global         pypi_version    1.18.0b1
 %global         tag             %{pypi_version}
-%forgemeta
 
 # Most of the tests require network access, so they are disabled by default.
 %bcond_with     tests
@@ -11,12 +10,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Version:        1.18.0~b1
 Name:           python-%{srcname}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Microsoft Authentication Library (MSAL) for Python
 
 License:        MIT
 URL:            %forgeurl
-Source0:        %forgesource
+Source0:        https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/%{pypi_version}/microsoft-authentication-library-for-python-%{pypi_version}.tar.gz#/%{name}-%{pypi_version}.tar.gz
 
 BuildArch:      noarch
 
@@ -49,7 +48,7 @@ Summary:        %{summary}
 
 
 %prep
-%forgeautosetup -p1
+%autosetup -p1 -n microsoft-authentication-library-for-python-%{pypi_version}
 
 
 %generate_buildrequires
@@ -74,6 +73,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Wed Mar 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.18.0~b1-3
+- Rename Source0 to `%{name}-%{version}.extension
+
 * Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.18.0~b1-2
 - Convert 'Release' tag to '[number].[distribution]' format
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
