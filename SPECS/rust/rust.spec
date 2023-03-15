@@ -113,6 +113,8 @@ USER=root SUDO_USER=root %make_build
 %check
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+# remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
+rm -v ./tests/rustdoc-ui/issue-98690.*
 %make_build check
 
 %install
