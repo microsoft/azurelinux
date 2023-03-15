@@ -66,15 +66,8 @@ func main() {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
 
-	var toolchainRPMs []string
-	var err error
-	toolchainManifestPath := *toolchainManifest
-	if len(toolchainManifestPath) > 0 {
-		toolchainRPMs, err = schedulerutils.ReadReservedFilesList(toolchainManifestPath)
-		if err != nil {
-			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifestPath, err)
-		}
-	}
+	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
+	logger.PanicOnError(err, "Unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 
 	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
