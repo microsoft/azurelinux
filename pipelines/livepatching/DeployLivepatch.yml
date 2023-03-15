@@ -209,7 +209,8 @@ extends:
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
-                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
+                        -s "${{ parameters.useRPMsSnapshot }}"'
 
       - job: RPMs
         dependsOn: Kernel_modules_packaging
