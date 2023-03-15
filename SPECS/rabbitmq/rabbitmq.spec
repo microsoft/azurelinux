@@ -14,7 +14,7 @@ BuildRequires:  elixir
 BuildRequires:  libxslt
 BuildRequires:  xmlto
 BuildRequires:  python
-BuildRequires:  python-simplejson
+BuildRequires:  python%{python3_pkgversion}-simplejson
 BuildRequires:  zip
 BuildRequires:  unzip
 
