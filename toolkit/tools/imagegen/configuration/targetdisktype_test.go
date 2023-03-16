@@ -38,39 +38,39 @@ func TestShouldSucceedValidTargetDiskTypesMatch_TargetDiskType(t *testing.T) {
 
 func TestShouldSucceedParsingValidPolicies_TargetDiskType(t *testing.T) {
 	for _, validTargetDiskType := range validTargetDiskTypes {
-		var checkedTargetDiskTyp TargetDiskType
+		var checkedTargetDiskType TargetDiskType
 
 		assert.NoError(t, validTargetDiskType.IsValid())
-		err := remarshalJSON(validTargetDiskType, &checkedTargetDiskTyp)
+		err := remarshalJSON(validTargetDiskType, &checkedTargetDiskType)
 		assert.NoError(t, err)
-		assert.Equal(t, validTargetDiskType, checkedTargetDiskTyp)
+		assert.Equal(t, validTargetDiskType, checkedTargetDiskType)
 	}
 }
 
 func TestShouldFailParsingInvalidTargetDiskType_TargetDiskType(t *testing.T) {
-	var checkedTargetDiskTyp TargetDiskType
+	var checkedTargetDiskType TargetDiskType
 
 	err := invalidTargetDiskType.IsValid()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for TargetDiskType (not_a_disk_type)", err.Error())
 
-	err = remarshalJSON(invalidTargetDiskType, &checkedTargetDiskTyp)
+	err = remarshalJSON(invalidTargetDiskType, &checkedTargetDiskType)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [TargetDiskType]: invalid value for TargetDiskType (not_a_disk_type)", err.Error())
 }
 
 func TestShouldSucceedParsingValidJSON_TargetDiskType(t *testing.T) {
-	var checkedTargetDiskTyp TargetDiskType
+	var checkedTargetDiskType TargetDiskType
 
-	err := marshalJSONString(validTargetDiskTypeJSON, &checkedTargetDiskTyp)
+	err := marshalJSONString(validTargetDiskTypeJSON, &checkedTargetDiskType)
 	assert.NoError(t, err)
-	assert.Equal(t, validTargetDiskTypes[0], checkedTargetDiskTyp)
+	assert.Equal(t, validTargetDiskTypes[0], checkedTargetDiskType)
 }
 
 func TestShouldFailParsingInvalidJSON_TargetDiskType(t *testing.T) {
-	var checkedTargetDiskTyp TargetDiskType
+	var checkedTargetDiskType TargetDiskType
 
-	err := marshalJSONString(invalidTargetDiskTypeJSON, &checkedTargetDiskTyp)
+	err := marshalJSONString(invalidTargetDiskTypeJSON, &checkedTargetDiskType)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [TargetDiskType]: json: cannot unmarshal number into Go value of type configuration.IntermediateTypeTargetDiskType", err.Error())
 }
