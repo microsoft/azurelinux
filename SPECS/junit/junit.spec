@@ -32,6 +32,7 @@ BuildRequires:  hamcrest >= 1.3
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  javapackages-local-bootstrap
 Requires:       mvn(org.hamcrest:hamcrest-core)
+Provides:       mvn(junit:junit)
 Provides:       %{name}-demo = %{version}-%{release}
 Obsoletes:      %{name}-demo < %{version}-%{release}
 Provides:       %{name}4-demo = %{version}-%{release}
