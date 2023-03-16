@@ -14,6 +14,7 @@ import (
 var (
 	validTargetDiskTypes = []TargetDiskType{
 		TargetDiskType("path"),
+		TargetDiskType("raid"),
 		TargetDiskType(""),
 	}
 	invalidTargetDiskType     = TargetDiskType("not_a_disk_type")

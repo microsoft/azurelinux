@@ -49,8 +49,8 @@ func checkOverlappingePartitions(disk *Disk) (err error) {
 // also confirms that the MaxSize defined is large enough to accomodate all partitions. No partition should have an
 // end position that exceeds the MaxSize
 func checkMaxSizeCorrectness(disk *Disk) (err error) {
-	//MaxSize is not relevant if target disk is specified.
-	if disk.TargetDisk.Type != TargetDiskTypePath {
+	//MaxSize is not relevant if target disk is specified, or a virtual disk like a RAID array
+	if !(disk.TargetDisk.Type == TargetDiskTypePath || disk.TargetDisk.Type == TargetDiskTypeRaid) {
 		//Complain about 0 maxSize only when partitions are defined.
 		if disk.MaxSize <= 0 && len(disk.Partitions) != 0 {
 			return fmt.Errorf("a configuration without a defined target disk must have a non-zero MaxSize")
@@ -76,20 +76,23 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 	return
 }
 
+func checkRaidDisk(disk *Disk) (err error) {
+	if disk.TargetDisk.Type == TargetDiskTypeRaid {
+		if len(disk.Partitions) != 1 {
+			return fmt.Errorf("a [Disk] '%s' with a [TargetDisk] of type '%s' must define exactly one [Partition]", disk.ID, TargetDiskTypeRaid)
+		}
+
+		if disk.Partitions[0].Start != 0 || disk.Partitions[0].End != 0 {
+			return fmt.Errorf("RAID disk '%s' cannot have a [Partition] with a Start or End value", disk.ID)
+		}
+	}
+	return
+}
+
 // IsValid returns an error if the PartitionTableType is not valid
 func (d *Disk) IsValid() (err error) {
 	if err = d.PartitionTableType.IsValid(); err != nil {
 		return fmt.Errorf("invalid [PartitionTableType]: %w", err)
-	}
-
-	err = checkOverlappingePartitions(d)
-	if err != nil {
-		return fmt.Errorf("invalid [Disk]: %w", err)
-	}
-
-	err = checkMaxSizeCorrectness(d)
-	if err != nil {
-		return fmt.Errorf("invalid [Disk]: %w", err)
 	}
 
 	// for _, artifact := range disk.Artifacts {
@@ -110,6 +113,28 @@ func (d *Disk) IsValid() (err error) {
 
 	if err = d.TargetDisk.IsValid(); err != nil {
 		return
+	}
+
+	err = checkOverlappingePartitions(d)
+	if err != nil {
+		return fmt.Errorf("invalid [Disk]: %w", err)
+	}
+
+	err = checkMaxSizeCorrectness(d)
+	if err != nil {
+		return fmt.Errorf("invalid [Disk]: %w", err)
+	}
+
+	err = checkRaidDisk(d)
+	if err != nil {
+		return fmt.Errorf("invalid [Disk]: %w", err)
+	}
+
+	// If the disk is a real disk, it must have a partition table type to support partitions
+	if d.TargetDisk.Type != TargetDiskTypeRaid {
+		if d.PartitionTableType == PartitionTableTypeNone && len(d.Partitions) > 0 {
+			return fmt.Errorf("invalid [PartitionTableType]: '%s', must be set to one of '%s' or '%s' when defining a real disk with partitions", d.PartitionTableType, PartitionTableTypeGpt, PartitionTableTypeMbr)
+		}
 	}
 
 	return

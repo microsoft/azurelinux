@@ -7,7 +7,10 @@ Image configuration consists of two sections - Disks and SystemConfigs - that de
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
 ## TargetDisk
-Required when building unattended ISO installer (`sudo make iso UNATTENDED_INSTALLER=y ...`). This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path. Each `Disk` requires its own `TargetDisk`.
+Required when building unattended ISO installer (`sudo make iso UNATTENDED_INSTALLER=y ...`) or using RAID disks. This field defines the target disk to which Mariner should be installed. The `Type` field must be set to `path`, or `raid`.
+
+### Path
+Path targets are physical disks (`/dev/sda` etc.). The `Value` field must be set to the desired target disk path. Each `Disk` requires its own `TargetDisk`.
 
 An example can be seen in [core-legacy-unattended-hyperv.json](/toolkit/imageconfigs/core-legacy-unattended-hyperv.json)
 
@@ -16,6 +19,35 @@ An example can be seen in [core-legacy-unattended-hyperv.json](/toolkit/imagecon
     "Type": "path",
     "Value": "/dev/sda"
 }
+```
+
+### Raid
+Raid targets are 'virtual' disks that are based on other disks to back them. A RAID target must have a `RaidConfig` filled out. Each entry in the `ComponentPartIDs` is a `Partition.ID` on another disk. These partitions will be passed to the `mdadm` tool to create a RAID array. `Level` can be one of `0`, `1`, `4`, `5`, `6`, `10`. Each RAID disk must also have a unique `RaidID` which will correspond to the device's path (`/dev/md/MyID`). Each RAID disk may have only one partition (while `mdadm` can support creating partitionable RAID disks, the Mariner tools only support single partition RAIDs)
+
+An example can be found in [raid.json](/toolkit/imageconfigs/raid.json)
+
+``` json
+{
+    "ID": "raidBoot",
+    "TargetDisk": {
+        "Type": "raid",
+        "RaidConfig": {
+            "ComponentPartIDs": [
+                "boot_1",
+                "boot_2",
+                "boot_3"
+            ],
+            "Level": 5,
+            "RaidID": "boot"
+        }
+    },
+    "Partitions": [
+        {
+            "ID": "boot",
+            "FsType": "ext4"
+        }
+    ]
+},
 ```
 
 ### Artifacts

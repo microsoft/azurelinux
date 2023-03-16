@@ -10,11 +10,12 @@ import (
 	"fmt"
 )
 
-// TargetDisk [kickstart-only] defines the physical disk, to which
+// TargetDisk [kickstart / unattended install only] defines the disk, to which
 // Mariner should be installed.
 type TargetDisk struct {
-	Type  TargetDiskType `json:"Type"`
-	Value string         `json:"Value"`
+	Type       TargetDiskType `json:"Type"`
+	Value      string         `json:"Value"`
+	RaidConfig RaidConfig     `json:"RaidConfig"`
 }
 
 // IsValid returns an error if the RaidConfig is not valid
@@ -32,10 +33,20 @@ func (t *TargetDisk) IsValid() (err error) {
 		}
 	}
 
+	// RAID must have a valid RaidConfig
+	if t.Type == TargetDiskTypeRaid {
+		if err = t.RaidConfig.IsValid(); err != nil {
+			return fmt.Errorf("invalid [TargetDisk]: Valid RaidConfig just be set for TargetDiskType of '%s': %w", TargetDiskTypeRaid, err)
+		}
+		if len(t.RaidConfig.RaidID) == 0 {
+			return fmt.Errorf("invalid [TargetDisk]: RaidID must be set for TargetDiskType of '%s'", TargetDiskTypeRaid)
+		}
+	}
+
 	// Only allow empty struct if target type is empty
 	if t.Type == TargetDiskTypeNone {
-		if t.Value != "" {
-			return fmt.Errorf("invalid [TargetDisk]: Value must be empty for TargetDiskType of '%s'", TargetDiskTypeNone)
+		if t.Value != "" || !t.RaidConfig.IsEmpty() {
+			return fmt.Errorf("invalid [TargetDisk]: Value and RaidConfig must be empty for TargetDiskType of '%s'", TargetDiskTypeNone)
 		}
 	}
 

@@ -16,6 +16,8 @@ type TargetDiskType string
 const (
 	// TargetDiskTypePath means this is a /dev/sda or similar disk that already exists
 	TargetDiskTypePath TargetDiskType = "path"
+	// TargetDiskTypeRAID creates a RAID disk
+	TargetDiskTypeRaid TargetDiskType = "raid"
 	// TargetDiskTypeNone means there is no target disk
 	TargetDiskTypeNone TargetDiskType = ""
 )
@@ -29,6 +31,7 @@ func (t TargetDiskType) String() string {
 func (t *TargetDiskType) GetValidTargetDiskTypes() (types []TargetDiskType) {
 	return []TargetDiskType{
 		TargetDiskTypePath,
+		TargetDiskTypeRaid,
 		TargetDiskTypeNone,
 	}
 }

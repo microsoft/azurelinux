@@ -1,0 +1,131 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 5300,
+            "Artifacts": [
+                {
+                    "Name": "coreA",
+                    "Type": "vhdx"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "efi",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ],
+                    "Start": 1,
+                    "End": 9,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "boot_1",
+                    "Start": 10,
+                    "End": 410
+                },
+                {
+                    "ID": "boot_2",
+                    "Start": 410,
+                    "End": 810
+                },
+                {
+                    "ID": "boot_3",
+                    "Start": 810,
+                    "End": 1210
+                },
+                {
+                    "ID": "rootfs_1",
+                    "Start": 1210,
+                    "End": 3210
+                },
+                {
+                    "ID": "rootfs_2",
+                    "Start": 3210,
+                    "End": 4210
+                },
+                {
+                    "ID": "rootfs_3",
+                    "Start": 4210,
+                    "End": 5210
+                }
+            ]
+        },
+        {
+            "ID": "raidBoot",
+            "TargetDisk": {
+                "Type": "raid",
+                "RaidConfig": {
+                    "ComponentPartIDs": [
+                        "boot_1",
+                        "boot_2",
+                        "boot_3"
+                    ],
+                    "Level": 5,
+                    "RaidID": "boot"
+                }
+            },
+            "Partitions": [
+                {
+                    "ID": "boot",
+                    "FsType": "ext4"
+                }
+            ]
+        },
+        {
+            "TargetDisk": {
+                "Type": "raid",
+                "RaidConfig": {
+                    "ComponentPartIDs": [
+                        "rootfs_1",
+                        "rootfs_2",
+                        "rootfs_3"
+                    ],
+                    "Level": 5,
+                    "RaidID": "rootfs"
+                }
+            },
+            "Partitions": [
+                {
+                    "ID": "rootfs",
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "raid_offline",
+            "BootType": "efi",
+            "PrimaryDisk": "raidBoot",
+            "PartitionSettings": [
+                {
+                    "ID": "efi",
+                    "MountPoint": "/boot/efi",
+                    "MountOptions" : "umask=0077"
+                },
+                {
+                    "ID": "boot",
+                    "MountPoint": "/boot",
+                    "MountIdentifier": "uuid"
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/",
+                    "MountIdentifier": "uuid"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/core-packages-image.json",
+                "packagelists/cloud-init-packages.json",
+                "packagelists/raid-tools.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            },
+            "Hostname": "cbl-mariner"
+        }
+    ]
+}
