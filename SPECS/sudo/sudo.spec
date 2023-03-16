@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.13p2
+Version:        1.9.13p3
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
