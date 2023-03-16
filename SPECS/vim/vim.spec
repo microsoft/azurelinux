@@ -106,6 +106,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
 %{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhighlight.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
