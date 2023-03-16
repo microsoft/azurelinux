@@ -12,8 +12,7 @@ Patch0:         CVE-2022-45939.patch
 Patch1:         CVE-2022-48337.patch
 Patch2:         CVE-2022-48338.patch
 Patch3:         CVE-2022-48339.patch
-Patch4:         CVE-2023-27985.patch
-Patch5:         CVE-2023-27986.patch
+Patch4:         CVE-2023-27986.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
