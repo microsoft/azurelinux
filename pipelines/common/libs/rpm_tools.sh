@@ -54,7 +54,7 @@ rpm_extract_file() {
 
     if [[ -f "$output_dir" ]]
     then
-        echo "ERROR: output path ($output_dir) is a file. Expected a directory." >&2
+        echo "ERROR: output path ($output_dir) is a file. Expected a directory or a non-existing path." >&2
         return 1
     fi
 

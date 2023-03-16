@@ -37,18 +37,6 @@ do
   esac
 done
 
-if [[ -f "$OUTPUT_DIR" ]]
-then
-    echo "ERROR: output path ($OUTPUT_DIR) is a file. Expected a directory." >&2
-    exit 1
-fi
-
-if [[ -z "$OUTPUT_DIR" ]]
-then
-    echo "ERROR: output directory not specified." >&2
-    exit 1
-fi
-
 rpms_archive="$(find_file_fullpath "$ARTIFACTS_DIR" "rpms.tar.gz")"
 if [[ ! -f "$rpms_archive" ]]
 then
