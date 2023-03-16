@@ -1,6 +1,6 @@
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1378
+Version:        v9.0.1402
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -191,6 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Mar 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - v9.0.1402-1
+- Auto-upgrade to v9.0.1402 - Fix CVE-2023-1264
+
 * Fri Mar 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1378-1
 - Auto-upgrade to 9.0.1378 - patch CVE-2023-1175
 
