@@ -393,14 +393,14 @@ func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryp
 	// Set up partitions
 	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {
-		logger.Log.Errorf("Failed to create partitions on disk (%s)", diskDevPath)
+		err = fmt.Errorf("failed to create partitions on disk (%s): %w", diskDevPath, err)
 		return
 	}
 
 	// Apply firmware
 	err = diskutils.ApplyRawBinaries(diskDevPath, diskConfig)
 	if err != nil {
-		logger.Log.Errorf("Failed to add add raw binaries to disk (%s)", diskDevPath)
+		err = fmt.Errorf("failed to add add raw binaries to disk (%s): %w", diskDevPath, err)
 		return
 	}
 
