@@ -19,17 +19,22 @@ command_diff() {
 }
 
 find_file_fullpath() {
-    local input_path
     local file_pattern
+    local input_path
+    local output_path
 
     input_path="$1"
     file_pattern="$2"
 
-    input_path="$(find "$input_path" -name "$file_pattern" -type f -print -quit)"
-
-    if [[ -f "$input_path" ]]
+    output_path="$input_path"
+    if [[ ! -f "$input_path" ]]
     then
-        realpath "$input_path"
+        output_path="$(find "$input_path" -name "$file_pattern" -type f -print -quit)"
+    fi
+
+    if [[ -f "$output_path" ]]
+    then
+        realpath "$output_path"
     fi
 }
 

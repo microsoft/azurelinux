@@ -10,6 +10,20 @@ source "$SCRIPT_DIR/file_tools.sh"
 SCRIPT_DIR="$__SAVED_SCRIPT_DIR"
 unset __SAVED_SCRIPT_DIR
 
+# Hydrates the local build environment.
+# Can hydrate RPMs, SRPMs, and toolchain.
+# At least one of the above must be specified.
+#
+# Arguments:
+#
+#  -c -> Put the RPMs inside the external cache, so that the out/RPMs directory will contain only the locally-built packages.
+#  -d -> repository root directory.
+#  -r -> Path to the RPMs archive or a directory containing it.
+#        In the latter case we look for "rpms.tar.gz".
+#  -s -> Path to the SRPMs archive or a directory containing it.
+#        In the latter case we look for "srpms.tar.gz".
+#  -t -> Path to the toolchain archive or a directory containing it.
+#        In the latter case we look for "toolchain_built_rpms_all.tar.gz".
 hydrate_artifacts() {
     local exit_code
     local out_dir
@@ -55,7 +69,7 @@ hydrate_artifacts() {
         rpms_archive="$(find_file_fullpath "$rpms_input" "rpms.tar.gz")"
         if [[ ! -f "$rpms_archive" ]]
         then
-            echo "ERROR: No RPMs archive found in '$rpms_input'." >&2
+            echo "ERROR: No RPMs archive 'rpms.tar.gz' found inside '$rpms_input'." >&2
             return 1
         fi
     fi
@@ -65,7 +79,7 @@ hydrate_artifacts() {
         srpms_archive="$(find_file_fullpath "$srpms_input" "srpms.tar.gz")"
         if [[ ! -f "$srpms_archive" ]]
         then
-            echo "ERROR: No SRPMs archive found in '$srpms_input'." >&2
+            echo "ERROR: No SRPMs archive 'srpms.tar.gz' found inside '$srpms_input'." >&2
             return 1
         fi
     fi
@@ -75,7 +89,7 @@ hydrate_artifacts() {
         toolchain_archive="$(find_file_fullpath "$toolchain_input" "toolchain_built_rpms_all.tar.gz")"
         if [[ ! -f "$toolchain_archive" ]]
         then
-            echo "ERROR: No toolchain archive found in '$toolchain_input'." >&2
+            echo "ERROR: No toolchain archive 'toolchain_built_rpms_all.tar.gz' found inside '$toolchain_input'." >&2
             return 1
         fi
     fi
@@ -86,7 +100,6 @@ hydrate_artifacts() {
 
     if [[ -n "$rpms_archive" ]]
     then
-        # We put the RPMs into the cache directory, so that the built RPMs directory only contains the built packages.
         echo "-- Hydrating cache of repo '$repo_dir' with RPMs from '$rpms_archive'."
 
         sudo make -C "$toolkit_dir" -j"$(nproc)" hydrate-rpms PACKAGE_ARCHIVE="$rpms_archive" $rpms_dir
@@ -122,6 +135,12 @@ hydrate_artifacts() {
     fi
 }
 
+# Overwrites local toolkit with the one from the provide archive.
+#
+# Arguments:
+#
+#  -d -> repository root directory.
+#  -t -> Path to the toolkit archive or a directory containing it.
 overwrite_toolkit() {
     local repo_dir
     local toolkit_input
@@ -144,6 +163,12 @@ overwrite_toolkit() {
                 ;;
         esac
     done
+
+    if [[ -z "$toolkit_input" ]]
+    then
+        echo "-- ERROR: must specify a path for overwriting the toolkit." >&2
+        return 1
+    fi
 
     toolkit_tarball="$(find_file_fullpath "$toolkit_input" "toolkit-*.tar.gz")"
     if [[ ! -f "$toolkit_tarball" ]]

@@ -3,7 +3,9 @@
 
 # Extracts files from the specified RPM file.
 # If no pattern is specified, all files are extracted.
+#
 # Arguments:
+#
 #  -f -> flatten the extracted files into the output directory
 #        WARNING: this will overwrite files with the same name.
 #  -i -> input RPM file.
