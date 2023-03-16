@@ -34,6 +34,7 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  jsr-305
 BuildRequires:  junit
 Requires:       mvn(com.google.code.findbugs:jsr305)
+Provides:       mvn(com.google.guava:guava)
 BuildArch:      noarch
 
 %description

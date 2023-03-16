@@ -40,6 +40,7 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  junit
 Requires:       java >= 1.8
 Provides:       jakarta-%{short_name} = %{version}-%{release}
+Provides:       mvn(commons-logging:commons-logging)
 Obsoletes:      jakarta-%{short_name} < %{version}
 Provides:       %{short_name} = %{version}-%{release}
 Obsoletes:      %{short_name} < %{version}

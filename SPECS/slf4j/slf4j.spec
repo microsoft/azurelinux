@@ -46,6 +46,7 @@ Requires:       java
 # this is ugly hack, which creates package which requires the same,
 # however slf4j is not splitted between -api and -impl, but pom files are modeled as it was
 Provides:       osgi(slf4j.api)
+Provides:       mvn(org.slf4j:slf4j-api)
 BuildArch:      noarch
 
 %description

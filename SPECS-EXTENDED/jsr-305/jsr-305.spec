@@ -43,6 +43,7 @@ BuildRequires:  ant
 BuildRequires:  dos2unix
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
+Provides:       mvn(com.google.code.findbugs:jsr305)
 BuildArch:      noarch
 
 %package javadoc
