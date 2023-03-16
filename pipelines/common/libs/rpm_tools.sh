@@ -133,10 +133,10 @@ rpm_extract_files() {
         return 1
     fi
 
-    find "$input" -name "*.rpm" -type f -print0 | while IFS= read -r -d '' rpm_path
+    while IFS= read -r -d '' rpm_path
     do
         rpm_name="$(basename "$rpm_path" .rpm)"
         output_subdir="$output_dir/$rpm_name"
         rpm_extract_file -i "$rpm_path" -p "$files_pattern" -w "$work_dir" -o "$output_subdir" $flatten_arg
-    done
+    done < <(find "$input" -name "*.rpm" -type f -print0)
 }
