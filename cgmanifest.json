@@ -286,7 +286,7 @@
         "other": {
           "name": "apache-commons-cli",
           "version": "1.4",
-          "downloadUrl": "http://www.apache.org/dist/commons/cli/source/commons-cli-1.4-src.tar.gz"
+          "downloadUrl": "http://archive.apache.org/dist/commons/cli/source/commons-cli-1.4-src.tar.gz"
         }
       }
     },
@@ -1428,7 +1428,7 @@
         "other": {
           "name": "cal10n",
           "version": "0.7.7",
-          "downloadUrl": "http://cal10n.qos.ch/dist/cal10n-0.7.7.tar.gz"
+          "downloadUrl": "https://github.com/qos-ch/cal10n/archive/refs/tags/v_0.7.7.tar.gz"
         }
       }
     },
