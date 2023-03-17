@@ -18,7 +18,7 @@
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
 Version:        2.6.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %{_datadir}/zsh
 
 %changelog
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-5
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 10 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-4
 - Fixing spec supplement of bash-completion library to not conflict with existing bash-completion
 
