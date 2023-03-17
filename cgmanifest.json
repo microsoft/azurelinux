@@ -7610,6 +7610,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "javapackages-bootstrap",
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages-bootstrap/releases/download/1.5.0/javapackages-bootstrap-1.5.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "javapackages-tools",
           "version": "6.0.0",
           "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
