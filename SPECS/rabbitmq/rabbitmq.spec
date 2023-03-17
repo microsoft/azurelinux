@@ -9,6 +9,12 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
+Source1:        rabbitmq-vendor-%{version}.tar.gz
+# -----------------
+# steps to create the vendor tarball are in the generate-rabbitmq-tarball.sh script
+# running this script will produce the rabbitmq-vendor-3.11.9.tar.gz tarball in your current directory
+# ./generate-rabbitmq-tarball.sh
+# -----------------
 BuildRequires:  erlang
 BuildRequires:  elixir
 BuildRequires:  libxslt
@@ -25,6 +31,7 @@ rabbitmq-server
 %autosetup
 
 %build
+tar -xzf %{SOURCE1} -C deps/
 %make_build
 
 %install
