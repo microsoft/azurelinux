@@ -60,7 +60,7 @@ hydrate_artifacts() {
 
     if [[ -z "$toolchain_input" && -z "$rpms_input" && -z "$srpms_input" ]]
     then
-        echo "-- ERROR: must specify at least one of the following archives to hydrate: RPMs, SRPMs, or toolchain." >&2
+        echo "ERROR: must specify at least one of the following archives to hydrate: RPMs, SRPMs, or toolchain." >&2
         return 1
     fi
 
@@ -105,7 +105,7 @@ hydrate_artifacts() {
         sudo make -C "$toolkit_dir" -j"$(nproc)" hydrate-rpms PACKAGE_ARCHIVE="$rpms_archive" $rpms_dir
         exit_code=$?
         if [[ $exit_code != 0 ]]; then
-            echo "-- ERROR: failed to hydrate repo's RPMs." >&2
+            echo "ERROR: failed to hydrate repo's RPMs." >&2
             return $exit_code
         fi
     fi
@@ -117,7 +117,7 @@ hydrate_artifacts() {
         tar --skip-old-files -C "$out_dir" -xf "$srpms_archive"
         exit_code=$?
         if [[ $exit_code != 0 ]]; then
-            echo "-- ERROR: failed to hydrate repo's SRPMs." >&2
+            echo "ERROR: failed to hydrate repo's SRPMs." >&2
             return $exit_code
         fi
     fi
@@ -129,7 +129,7 @@ hydrate_artifacts() {
         sudo make -C "$toolkit_dir" -j"$(nproc)" toolchain chroot-tools TOOLCHAIN_ARCHIVE="$toolchain_archive"
         exit_code=$?
         if [[ $exit_code != 0 ]]; then
-            echo "-- ERROR: failed to hydrate repo's toolchain." >&2
+            echo "ERROR: failed to hydrate repo's toolchain." >&2
             return $exit_code
         fi
     fi
@@ -166,7 +166,7 @@ overwrite_toolkit() {
 
     if [[ -z "$toolkit_input" ]]
     then
-        echo "-- ERROR: must specify a path for overwriting the toolkit." >&2
+        echo "ERROR: must specify a path for overwriting the toolkit." >&2
         return 1
     fi
 
@@ -240,7 +240,7 @@ publish_build_artifacts() {
     sudo make -C "$toolkit_dir" -j"$(nproc)" compress-srpms compress-rpms
     make_status=$?
     if [[ $make_status != 0 ]]; then
-        echo "-- ERROR: cannot pack built RPMs and SRPMs." >&2
+        echo "ERROR: cannot pack built RPMs and SRPMs." >&2
         return $make_status
     fi
 
@@ -268,7 +268,7 @@ publish_build_logs() {
     then
         tar -C "$logs_dir" -czf "$logs_publish_dir/pkggen.logs.tar.gz" .
     else
-        echo "-- WARNING: no '$logs_dir' directory found." >&2
+        echo "WARNING: no '$logs_dir' directory found." >&2
     fi
 
     echo "-- Packing package build artifacts."
@@ -276,7 +276,7 @@ publish_build_logs() {
     then
         tar -C "$package_build_artifacts_dir" -czf "$logs_publish_dir/pkg_artifacts.tar.gz" .
     else
-        echo "-- WARNING: no '$package_build_artifacts_dir' directory found."
+        echo "WARNING: no '$package_build_artifacts_dir' directory found." >&2
     fi
 }
 
@@ -295,7 +295,7 @@ publish_toolkit() {
     sudo make -C "$toolkit_dir" -j"$(nproc)" REBUILD_TOOLS=y package-toolkit
     make_status=$?
     if [[ $make_status != 0 ]]; then
-        echo "-- ERROR: failed to pack toolkit." >&2
+        echo "ERROR: failed to pack toolkit." >&2
         return $make_status
     fi
 

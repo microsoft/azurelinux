@@ -126,7 +126,6 @@ extends:
                         -s "${{ parameters.useRPMsSnapshot }}"'
 
     - stage: Sign
-      condition: always()
       jobs:
       - job: Kernel_modules
         templateContext:
@@ -148,7 +147,7 @@ extends:
           path: '$(pipelinesRepoFolder)'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download livepatch RPMs and toolkit'
+          displayName: 'Download livepatch RPMs'
           inputs:
             source: current
             artifact: '$(buildArtifactsFolder)_BUILD'

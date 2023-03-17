@@ -13,7 +13,7 @@ command_diff() {
     second_file_path="$3"
 
     if ! diff <(eval "$input_command" "$first_file_path") <(eval "$input_command" "$second_file_path"); then
-        echo "Comparison for command ($input_command) failed! See lines above for details." >&2
+        echo "ERROR: comparison for command ($input_command) failed! See lines above for details." >&2
         return 1
     fi
 }
