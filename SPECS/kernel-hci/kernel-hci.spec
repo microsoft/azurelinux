@@ -8,8 +8,8 @@
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.94.1
-Release:        2%{?dist}
+Version:        5.15.98.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -418,6 +418,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.98.1-1
+- Auto-upgrade to 5.15.98.1
+
+* Sat Feb 25 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.95.1-1
+- Auto-upgrade to 5.15.95.1
+
 * Mon Feb 27 2023 Vince Perri <viperri@microsoft.com> - 5.15.94.1-2
 - Add net/mlx5 patches (patches 21-25) for QinQ support
 

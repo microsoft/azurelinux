@@ -13,11 +13,11 @@ ifeq ($(origin CONFIG_FILE), undefined)
 CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
 $(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
 endif
-CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
-PACKAGE_BUILD_LIST     ?=
-PACKAGE_REBUILD_LIST   ?=
-PACKAGE_IGNORE_LIST    ?=
-SRPM_PACK_LIST         ?=
+CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
+PACKAGE_BUILD_LIST      ?=
+PACKAGE_REBUILD_LIST    ?=
+PACKAGE_IGNORE_LIST     ?=
+SRPM_PACK_LIST          ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
@@ -52,6 +52,7 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 DELTA_BUILD                     ?= n
 TARGET_ARCH                     ?=
+ALLOW_TOOLCHAIN_REBUILDS        ?= n
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))

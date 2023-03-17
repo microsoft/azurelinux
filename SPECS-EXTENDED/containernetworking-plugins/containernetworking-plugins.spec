@@ -24,7 +24,7 @@
 
 Name:          %{project}-%{repo}
 Version:       1.1.1
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       Libraries for writing CNI plugin
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -129,6 +129,9 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %{_unitdir}/cni-dhcp.socket
 
 %changelog
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-6
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-5
 - Bump release to rebuild with go 1.19.5
 

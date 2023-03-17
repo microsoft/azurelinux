@@ -1,0 +1,35 @@
+Use pkg-config to report libpng12 version and installation directories.
+
+
+diff -Naur libpng-1.2.49.orig/scripts/libpng-config.in libpng-1.2.49/scripts/libpng-config.in
+--- libpng-1.2.49.orig/scripts/libpng-config.in	2012-03-29 00:46:55.000000000 -0400
++++ libpng-1.2.49/scripts/libpng-config.in	2012-08-01 15:03:50.564507346 -0400
+@@ -11,11 +11,11 @@
+ 
+ # Modeled after libxml-config.
+ 
+-version="@PNGLIB_VERSION@"
+-prefix="@prefix@"
+-exec_prefix="@exec_prefix@"
+-libdir="@libdir@"
+-includedir="@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
++version=`pkg-config --modversion libpng12`
++prefix=`pkg-config --variable prefix libpng12`
++exec_prefix=`pkg-config --variable exec_prefix libpng12`
++libdir=`pkg-config --variable libdir libpng12`
++includedir=`pkg-config --variable includedir libpng12`
+ libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
+ all_libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ @LIBS@"
+ I_opts="-I${includedir}"
+diff -Naur libpng-1.2.49.orig/scripts/libpng.pc-configure.in libpng-1.2.49/scripts/libpng.pc-configure.in
+--- libpng-1.2.49.orig/scripts/libpng.pc-configure.in	2012-03-29 00:46:55.000000000 -0400
++++ libpng-1.2.49/scripts/libpng.pc-configure.in	2012-08-01 15:04:37.817786337 -0400
+@@ -3,7 +3,7 @@
+ libdir=@libdir@
+ includedir=@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
+ 
+-Name: libpng
++Name: libpng12
+ Description: Loads and saves PNG files
+ Version: @PNGLIB_VERSION@
+ Libs: -L${libdir} -lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
