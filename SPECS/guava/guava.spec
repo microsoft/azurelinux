@@ -20,7 +20,7 @@ Distribution:   Mariner
 
 Name:           guava
 Version:        25.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Google Core Libraries for Java
 License:        Apache-2.0 AND CC0-1.0
 Group:          Development/Libraries/Java
@@ -142,6 +142,9 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
 %files testlib -f .mfiles-guava-testlib
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.0-6
+- Fixing maven provides
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 25.0-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

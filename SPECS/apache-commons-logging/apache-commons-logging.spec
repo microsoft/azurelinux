@@ -23,7 +23,7 @@ Distribution:   Mariner
 %define short_name commons-%{base_name}
 Name:           apache-%{short_name}
 Version:        1.2
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        Apache Commons Logging
 License:        ASL 2.0
 URL:            http://commons.apache.org/%{base_name}
@@ -126,6 +126,9 @@ install -pm 644 tmp.pom %{buildroot}/%{_mavenpomdir}/%{short_name}-adapters-%{ve
 %doc PROPOSAL.html RELEASE-NOTES.txt NOTICE.txt
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2-11
+- Fixing maven provides
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-10
 - Removing 'log4j12' dependency.
 - License verified.
