@@ -253,12 +253,12 @@ Provides:       bundled(xmvn) = 4.0.0~SNAPSHOT
 Provides:       bundled(xz-java) = 1.8
 
 BuildRequires:  byaccj
-BuildRequires:  java-11-openjdk-devel
+BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-generators
 
 Requires:       bash
 Requires:       coreutils
-Requires:       java-11-openjdk-devel
+Requires:       msopenjdk-11
 Requires:       procps-ng
 
 %description
