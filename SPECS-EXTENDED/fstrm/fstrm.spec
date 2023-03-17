@@ -87,7 +87,7 @@ make check
 %changelog
 * Thu Feb 23 2023 Andy Zaugg <azaugg@linkedin.com> - 0.6.1-1
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
-- License verfied
+- License verified
 
 * Thu Apr 05 2018 Tomas Krizek <tomas.krizek@nic.cz> - 0.3.2-1
 - Update to new upstream version 0.3.2
