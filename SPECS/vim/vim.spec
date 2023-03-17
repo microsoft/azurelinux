@@ -1,6 +1,6 @@
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1378
+Version:        9.0.1402
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -106,6 +106,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
 %{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhighlight.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
@@ -191,6 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Mar 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1402-1
+- Auto-upgrade to 9.0.1402 - Fix CVE-2023-1264
+
 * Fri Mar 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1378-1
 - Auto-upgrade to 9.0.1378 - patch CVE-2023-1175
 
