@@ -3919,6 +3919,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fstrm",
+          "version": "0.6.1",
+          "downloadUrl": "https://dl.farsightsecurity.com/dist/fstrm/fstrm-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
