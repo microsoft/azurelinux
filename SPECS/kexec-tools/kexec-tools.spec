@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -324,6 +324,8 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Fri Mar 17 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.23-2
+- Required binary grep missing from squashfs
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.23-1
 - Update version to 2.0.23
 - License verified
