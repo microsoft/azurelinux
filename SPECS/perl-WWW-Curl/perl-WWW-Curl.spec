@@ -22,10 +22,11 @@ Patch3:         WWW-Curl-4.17-Work-around-a-macro-bug-in-curl-7.87.0.patch
 
 BuildRequires:  curl-devel
 BuildRequires:  perl >= 5.28.0
-BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
-BuildRequires:  curl-devel
+BuildRequires:  perl-generators
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       curl
 
@@ -80,6 +81,7 @@ make test
 %changelog
 * Fri Mar 17 2023 Muhammad Falak <mwani@microsoft.com> - 4.17-13
 - Introduce patches to workaround macro bug which breaks build
+- Add BR on perl(FindBin) & perl(Module::CoreList)
 
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.17-12
 - Adding 'BuildRequires: perl-generators'.
