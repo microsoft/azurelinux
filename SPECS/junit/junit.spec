@@ -18,7 +18,7 @@
 Summary:        Java regression test package
 Name:           junit
 Version:        4.13
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        EPL-1.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -121,6 +121,9 @@ java -cp %{buildroot}/%{_javadir}/%{name}.jar: test 2>&1 | \
 %doc doc/*
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.13-5
+- Fixing maven provides
+
 * Fri Apr 01 2022 Henry Li <lihl@microsoft.com> - 4.13-4
 - Remove target to upload docs to sourceforge from build.xml
 

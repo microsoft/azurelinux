@@ -21,7 +21,7 @@ Distribution:   Mariner
 
 Name:           slf4j
 Version:        1.7.30
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Simple Logging Facade for Java
 License:        MIT
 Group:          Development/Libraries/Java
@@ -232,6 +232,9 @@ rm -rf target/site
 %{_docdir}/%{name}-%{version}/site
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.7.30-5
+- Fixing maven provides
+
 * Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.30-4
 - Removing dependency on "log4j12".
 - License verified.
