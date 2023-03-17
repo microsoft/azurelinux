@@ -27,7 +27,7 @@ Summary:        Command Line Interface Library for Java
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}/
-Source0:        https://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/commons-cli-%{version}-src.tar.gz
 Source1:        %{name}-build.xml.tar.bz2
 Patch0:         CLI-253-workaround.patch
 BuildRequires:  ant
