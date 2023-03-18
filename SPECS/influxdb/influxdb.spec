@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -144,6 +144,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-3
+- Bump release to rebuild with go 1.19.6
+
 * Wed Feb 1 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-2
 - Fixed build issue by requring to use golang 1.18.8. Does not work on 1.19 yet.
 

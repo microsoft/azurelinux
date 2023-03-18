@@ -1,0 +1,6 @@
+# Enable use of "safe" default limits on image size and chunk size.
+#option SAFE_LIMITS on
+# However, the default defaults seem a tad too restrictive for general
+# purpose use, so back them off a little.
+setting USER_CHUNK_CACHE_MAX default 1000
+setting USER_CHUNK_MALLOC_MAX default 1000000000

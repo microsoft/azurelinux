@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.12p2
+Version:        1.9.13p3
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -97,6 +97,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Thu Mar 16 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.9.13p3-1
+- Upgrade to 1.9.13p3 to fix CVE-2023-27320
+
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.9.12p2-1
 - Upgrade to 1.9.12p2 for CVE-2023-22809
 

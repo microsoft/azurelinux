@@ -1,0 +1,35 @@
+diff -Naur sox-14.4.2.orig/configure.ac sox-14.4.2/configure.ac
+--- sox-14.4.2.orig/configure.ac	2015-02-22 14:48:57.000000000 -0600
++++ sox-14.4.2/configure.ac	2015-11-06 11:48:26.179858149 -0600
+@@ -471,8 +471,6 @@
+     AC_CHECK_LIB(lpc10, create_lpc10_encoder_state, LPC10_LIBS="$LPC10_LIBS -llpc10", found_liblpc10=no)
+ if test "$found_liblpc10" = yes; then
+     AC_DEFINE(EXTERNAL_LPC10, 1, [Define if you are using an external LPC10 library])
+-else
+-    LIBLPC10_LIBADD=../lpc10/liblpc10.la
+ fi
+ AM_CONDITIONAL(EXTERNAL_LPC10, test x$found_liblpc10 = xyes)
+ AC_SUBST(LIBLPC10_LIBADD)
+@@ -670,7 +668,7 @@
+ AM_CONDITIONAL(STATIC_LIBSOX_ONLY, test "$enable_shared" = "no" -a "$enable_static" = "yes")
+ 
+ dnl Generate output files.
+-AC_CONFIG_FILES(Makefile src/Makefile libgsm/Makefile lpc10/Makefile msvc9/Makefile msvc10/Makefile sox.pc)
++AC_CONFIG_FILES(Makefile src/Makefile libgsm/Makefile msvc9/Makefile msvc10/Makefile sox.pc)
+ AC_OUTPUT
+ 
+ if test "$using_gsm" != "no"; then
+diff -Naur sox-14.4.2.orig/Makefile.am sox-14.4.2/Makefile.am
+--- sox-14.4.2.orig/Makefile.am	2014-10-05 21:02:30.000000000 -0500
++++ sox-14.4.2/Makefile.am	2015-11-06 11:48:26.179858149 -0600
+@@ -2,8 +2,8 @@
+ 
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = lpc10 libgsm src
+-DIST_SUBDIRS = lpc10 libgsm src msvc9 msvc10
++SUBDIRS = libgsm src
++DIST_SUBDIRS = libgsm src msvc9 msvc10
+ 
+ RM = rm -f
+ 

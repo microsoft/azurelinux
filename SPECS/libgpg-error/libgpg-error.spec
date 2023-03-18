@@ -1,7 +1,7 @@
 Summary:        libgpg-error
 Name:           libgpg-error
-Version:        1.43
-Release:        2%{?dist}
+Version:        1.46
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
 Group:          Development/Libraries
@@ -40,6 +40,8 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_infodir}
 %find_lang %{name}
+pwd
+install -m 755 %{_builddir}/%{name}-%{version}/src/gpg-error-config %{buildroot}/%{_bindir}/gpg-error-config
 
 %check
 make %{?_smp_mflags} check
@@ -56,7 +58,6 @@ make %{?_smp_mflags} check
 %{_bindir}/gpg-error
 %{_bindir}/yat2m
 %{_libdir}/libgpg-error.so.*
-%{_mandir}/man1/*
 
 %files devel
 %defattr(-,root,root)
@@ -73,6 +74,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Mar 03 2023 Bala <balakumaran.kannan@microsoft.com> - 1.46-1
+- Upgrade to version 1.46 to support gnupg2
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.43-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 

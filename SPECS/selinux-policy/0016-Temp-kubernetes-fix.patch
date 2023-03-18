@@ -1,0 +1,25 @@
+From 60b78274744112244c8f809405d06ef2380774c8 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Tue, 30 Aug 2022 13:46:15 +0000
+Subject: [PATCH 16/35] Temp kubernetes fix
+
+---
+ policy/modules/services/container.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+MSFT_TAG: not upstreamable
+
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index 75606680f..47da89219 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -798,3 +798,6 @@ optional_policy(`
+        unconfined_domain_noaudit(spc_user_t)
+        domain_ptrace_all_domains(spc_user_t)
+ ')
++
++# temp kubernetes fix
++type_transition initrc_t var_run_t:dir container_runtime_t "k8s.cni.cncf.io";
+-- 
+2.34.1
+
