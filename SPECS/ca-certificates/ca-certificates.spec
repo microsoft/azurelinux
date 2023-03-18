@@ -45,7 +45,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        2.0.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -158,7 +158,7 @@ mkdir -p -m 755 %{buildroot}%{pkidir}/java
 mkdir -p -m 755 %{buildroot}%{_sysconfdir}/ssl
 mkdir -p -m 755 %{buildroot}%{catrustdir}/source
 mkdir -p -m 755 %{buildroot}%{catrustdir}/source/anchors
-mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blacklist
+mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blocklist
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/pem
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/openssl
@@ -166,7 +166,7 @@ mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/java
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blacklist
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
 mkdir -p -m 755 %{buildroot}%{_bindir}
 mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
@@ -286,7 +286,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{_datadir}/pki
 %dir %{_datadir}/pki/ca-trust-source
 %dir %{_datadir}/pki/ca-trust-source/anchors
-%dir %{_datadir}/pki/ca-trust-source/blacklist
+%dir %{_datadir}/pki/ca-trust-source/blocklist
 %dir %{_sysconfdir}/ssl
 %dir %{catrustdir}
 %dir %{catrustdir}/extracted
@@ -296,7 +296,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{catrustdir}/extracted/openssl
 %dir %{catrustdir}/source
 %dir %{catrustdir}/source/anchors
-%dir %{catrustdir}/source/blacklist
+%dir %{catrustdir}/source/blocklist
 %dir %{pkidir}/java
 %dir %{pkidir}/tls
 %dir %{pkidir}/tls/certs
@@ -318,6 +318,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Mar 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-11
+- Aligning source paths with p11-kit's 0.24.0 version changes.
+
 * Thu Feb 23 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-10
 - Adding Microsoft-owned root CAs to the base bundle.
 
