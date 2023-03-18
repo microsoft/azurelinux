@@ -98,13 +98,13 @@ subdirectory in the /etc hierarchy.
 * add it as a new file to directory /etc/pki/ca-trust/source/anchors/
 * run 'update-ca-trust extract'
 
-.*QUICK HELP 2*: If your certificate is in the extended BEGIN TRUSTED file format (which may contain distrust/blocklist trust flags, or trust flags for usages other than TLS) then:
+.*QUICK HELP 2*: If your certificate is in the extended BEGIN TRUSTED file format (which may contain distrust/blacklist trust flags, or trust flags for usages other than TLS) then:
 * add it as a new file to directory /etc/pki/ca-trust/source/
 * run 'update-ca-trust extract'
 
 .In order to offer simplicity and flexibility, the way certificate files are treated depends on the subdirectory they are installed to.
 * simple trust anchors subdirectory: /usr/share/pki/ca-trust-source/anchors/ or /etc/pki/ca-trust/source/anchors/
-* simple blocklist (distrust) subdirectory: /usr/share/pki/ca-trust-source/blocklist/ or /etc/pki/ca-trust/source/blocklist/
+* simple blacklist (distrust) subdirectory: /usr/share/pki/ca-trust-source/blacklist/ or /etc/pki/ca-trust/source/blacklist/
 * extended format directory: /usr/share/pki/ca-trust-source/ or /etc/pki/ca-trust/source/
 
 .In the main directories /usr/share/pki/ca-trust-source/ or /etc/pki/ca-trust/source/ you may install one or multiple files in the following file formats:
@@ -134,7 +134,7 @@ you may install one or multiple certificates in either the DER file
 format or in the PEM (BEGIN/END CERTIFICATE) file format.
 Each certificate will be treated as *trusted* for all purposes.
 
-In the blocklist subdirectories /usr/share/pki/ca-trust-source/blocklist/ or /etc/pki/ca-trust/source/blocklist/
+In the blacklist subdirectories /usr/share/pki/ca-trust-source/blacklist/ or /etc/pki/ca-trust/source/blacklist/
 you may install one or multiple certificates in either the DER file
 format or in the PEM (BEGIN/END CERTIFICATE) file format.
 Each certificate will be treated as *distrusted* for all purposes.

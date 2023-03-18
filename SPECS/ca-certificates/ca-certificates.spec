@@ -158,7 +158,7 @@ mkdir -p -m 755 %{buildroot}%{pkidir}/java
 mkdir -p -m 755 %{buildroot}%{_sysconfdir}/ssl
 mkdir -p -m 755 %{buildroot}%{catrustdir}/source
 mkdir -p -m 755 %{buildroot}%{catrustdir}/source/anchors
-mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blocklist
+mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blacklist
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/pem
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/openssl
@@ -166,7 +166,7 @@ mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/java
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blacklist
 mkdir -p -m 755 %{buildroot}%{_bindir}
 mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
@@ -180,7 +180,7 @@ install -p -m 644 %{SOURCE16} %{buildroot}%{catrustdir}/extracted/pem/README
 install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
 install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
-# base certs
+# Base certs
 %install_bundles %{SOURCE21} %{p11_format_base_bundle}
 
 # Microsoft certs
@@ -223,6 +223,10 @@ ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
     %{buildroot}%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
 ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
+
+# Supporting p11-kit's directory re-name in version 0.24.0.
+ln -s blacklist %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
+ln -s blacklist %{buildroot}%{catrustdir}/source/blocklist
 
 %post
 %{refresh_bundles}
@@ -286,6 +290,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{_datadir}/pki
 %dir %{_datadir}/pki/ca-trust-source
 %dir %{_datadir}/pki/ca-trust-source/anchors
+%dir %{_datadir}/pki/ca-trust-source/blacklist
 %dir %{_datadir}/pki/ca-trust-source/blocklist
 %dir %{_sysconfdir}/ssl
 %dir %{catrustdir}
@@ -296,6 +301,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{catrustdir}/extracted/openssl
 %dir %{catrustdir}/source
 %dir %{catrustdir}/source/anchors
+%dir %{catrustdir}/source/blacklist
 %dir %{catrustdir}/source/blocklist
 %dir %{pkidir}/java
 %dir %{pkidir}/tls
@@ -319,7 +325,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 
 %changelog
 * Fri Mar 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-11
-- Aligning source paths with p11-kit's 0.24.0 version changes.
+- Adding support for p11-kit's 0.24.0+ source certificates paths.
 
 * Thu Feb 23 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-10
 - Adding Microsoft-owned root CAs to the base bundle.
