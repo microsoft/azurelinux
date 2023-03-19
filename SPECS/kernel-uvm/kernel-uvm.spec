@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.48.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,6 +133,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Feb 14 2023 Chris Co <chrco@microsoft.com> - 5.15.48.1-10
+- Enable CONFIG_DM_VERITY
+
 * Tue Feb 14 2023 Chris Co <chrco@microsoft.com> - 5.15.48.1-9
 - Enable loadable kernel module support
 - Generate devel subpackage
