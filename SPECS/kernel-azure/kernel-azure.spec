@@ -18,7 +18,7 @@
 Summary:        Linux Kernel
 Name:           kernel-azure
 Version:        5.15.107.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,11 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-hci
+Conflicts:      kernel-rt
+Conflicts:      kernel-mshv
+Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -122,11 +127,13 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package -n     python3-perf-azure
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Requires:       %{name} = %{version}-%{release}
+Provides:       python3-perf
 
-%description -n python3-perf
+%description -n python3-perf-azure
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package dtb
@@ -136,10 +143,12 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package -n     bpftool
+%package -n     bpftool-azure
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Requires:       %{name} = %{version}-%{release}
+Provides:       bpftool
 
-%description -n bpftool
+%description -n bpftool-azure
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -393,7 +402,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files -n python3-perf
+%files -n python3-perf-azure
 %{python3_sitearch}/*
 
 %ifarch aarch64
@@ -401,11 +410,16 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
-%files -n bpftool
+%files -n bpftool-azure
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
+- Rename bpftool and python3-perf to be kernel specific
+- Add new requires for bpftool and python3-perf for specfic kernel
+- Add kernel conflicts
+
 * Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
 - Auto-upgrade to 5.15.107.1
 

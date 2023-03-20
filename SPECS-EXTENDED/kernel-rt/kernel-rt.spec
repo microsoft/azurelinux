@@ -13,7 +13,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.55.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,11 @@ ExclusiveArch:  x86_64
 %ifarch x86_64
 BuildRequires:  pciutils-devel
 %endif
+Conflicts:      kernel
+Conflicts:      kernel-azure
+Conflicts:      kernel-hci
+Conflicts:      kernel-mshv
+Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -121,11 +126,13 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package -n     python3-perf-rt
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Requires:       %{name} = %{version}-%{release}
+Provides:       python3-perf
 
-%description -n python3-perf
+%description -n python3-perf-rt
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package dtb
@@ -135,10 +142,12 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package -n     bpftool
+%package -n     bpftool-rt
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Requires:       %{name} = %{version}-%{release}
+Provides:       bpftool
 
-%description -n bpftool
+%description -n  bpftool-rt
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -371,14 +380,19 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files -n python3-perf
+%files -n python3-perf-rt
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files -n bpftool-rt
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.55.1-3
+- Rename bpftool and python3-perf to be kernel specific
+- Add new requires for bpftool and python3-perf for specfic kernel
+- Add kernel conflicts
+
 * Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.55.1-2
 - Adjust crashkernel param to crash, dump memory to a file, and recover correctly
 
