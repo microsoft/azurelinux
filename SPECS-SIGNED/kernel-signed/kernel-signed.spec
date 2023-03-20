@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.15.98.1
+Version:        5.15.102.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
+- Auto-upgrade to 5.15.102.1
+
 * Mon Mar 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.98.1-1
 - Auto-upgrade to 5.15.98.1
 
