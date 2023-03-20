@@ -11,6 +11,7 @@
             "specs": [
                 "crash-ptdump-command",
                 "delve",
+                "fstrm",
                 "nodejs-nodemon",
                 "rhnlib",
                 "rt-setup",
@@ -2147,6 +2148,7 @@
                 "distroless-packages",
                 "doxygen",
                 "dtc",
+                "elixir",
                 "espeak-ng",
                 "espeakup",
                 "flannel",

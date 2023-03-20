@@ -2728,8 +2728,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.86",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.86.tar.xz"
+          "version": "2.89",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
         }
       }
     },
@@ -3190,6 +3190,16 @@
           "name": "elinks",
           "version": "0.16.0",
           "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.16.0/elinks-0.16.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "elixir",
+          "version": "1.14.3",
+          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.14.3/elixir-1.14.3.tar.gz"
         }
       }
     },
@@ -3909,6 +3919,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fstrm",
+          "version": "0.6.1",
+          "downloadUrl": "https://dl.farsightsecurity.com/dist/fstrm/fstrm-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
@@ -4570,8 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.5",
-          "downloadUrl": "https://golang.org/dl/go1.19.5.src.tar.gz"
+          "version": "1.19.6",
+          "downloadUrl": "https://golang.org/dl/go1.19.6.src.tar.gz"
         }
       }
     },
@@ -5290,8 +5310,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.55",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.55.tar.bz2"
+          "version": "2.4.56",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.56.tar.bz2"
         }
       }
     },
@@ -24504,8 +24524,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "2.0.3",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.0.3.tar.gz"
+          "version": "2.2.3",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.2.3.tar.gz"
         }
       }
     },
@@ -26655,8 +26675,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.62.1",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.62.1-src.tar.xz"
+          "version": "1.68.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.68.0-src.tar.xz"
         }
       }
     },
@@ -27707,8 +27727,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p2",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
+          "version": "1.9.13p3",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.13p3.tar.gz"
         }
       }
     },
@@ -28857,8 +28877,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1378",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1378.tar.gz"
+          "version": "9.0.1402",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1402.tar.gz"
         }
       }
     },
