@@ -22,7 +22,7 @@ Distribution:   Mariner
 %global short_name      commons-%{base_name}
 Name:           apache-commons-cli
 Version:        1.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Command Line Interface Library for Java
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -90,6 +90,10 @@ cp -pr target/site/api*/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.4-5
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

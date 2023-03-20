@@ -101,6 +101,10 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.1-4
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.1-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

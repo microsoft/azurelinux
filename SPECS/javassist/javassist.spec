@@ -22,7 +22,7 @@ Distribution:   Mariner
 %define tar_version rel_3_23_1_ga
 Name:           javassist
 Version:        3.23.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Java Programming Assistant: bytecode manipulation
 License:        LGPL-2.1-or-later OR MPL-1.1
 Group:          Development/Libraries/Java
@@ -141,6 +141,10 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
 %doc %{_docdir}/%{name}-%{version}/tutorial
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.23.1-7
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.23.1-6
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -21,7 +21,7 @@ Distribution:   Mariner
 %bcond_with tests
 Name:           plexus-interpolation
 Version:        1.26
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Plexus Interpolation API
 License:        Apache-2.0 AND Apache-1.1 AND MIT
 Group:          Development/Libraries/Java
@@ -84,6 +84,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.26-3
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
