@@ -143,6 +143,8 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
 
 %changelog
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.0-6
+- Moved from extended to core
+- License verified
 - Fixing maven provides
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 25.0-5
