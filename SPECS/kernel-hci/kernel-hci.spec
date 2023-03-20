@@ -18,7 +18,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.122.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,11 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-azure
+Conflicts:      kernel-mshv
+Conflicts:      kernel-rt
+Conflicts:      kernel-uvm
 ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -147,11 +152,13 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package -n     python3-perf-hci
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Requires:       %{name} = %{version}-%{release}
+Provides:       python3-perf
 
-%description -n python3-perf
+%description -n python3-perf-hci
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package dtb
@@ -161,10 +168,12 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package -n     bpftool
+%package -n     bpftool-hci
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Requires:       %{name} = %{version}-%{release}
+Provides:       bpftool
 
-%description -n bpftool
+%description -n bpftool-hci
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -423,14 +432,19 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files -n python3-perf
+%files -n python3-perf-hci
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files -n bpftool-hci
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jul 31 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.122.1-3
+- Rename bpftool and python3-perf to be kernel specific
+- Add new requires for bpftool and python3-perf for specfic kernel
+- Add kernel conflicts
+
 * Fri Jul 28 2023 Vince Perri <viperri@microsoft.com> - 5.15.122.1-2
 - Add net/mlx5 patch (27) switching warn message to debug
 
