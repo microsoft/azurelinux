@@ -6460,8 +6460,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8031,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8041,8 +8041,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -11863,6 +11863,16 @@
           "name": "linuxptp",
           "version": "2.0",
           "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.102.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
