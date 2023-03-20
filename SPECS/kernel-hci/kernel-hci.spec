@@ -9,7 +9,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.102.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -136,11 +136,12 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package        python3-perf
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Conflicts:      python3-perf
 
-%description -n python3-perf
+%description python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package dtb
@@ -150,10 +151,11 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package -n     bpftool
+%package        bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Conflicts:      bpftool
 
-%description -n bpftool
+%description bpftool
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -410,14 +412,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files -n python3-perf
+%files python3-perf
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files bpftool
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-2
+- Rename bpftool and python3-perf to be kernel specific
+
 * Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
 - Auto-upgrade to 5.15.102.1
 
