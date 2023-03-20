@@ -25,7 +25,7 @@ Summary:        Compiler assisted localization library (CAL10N)
 License:        MIT
 Group:          Development/Libraries/Java
 Url:            http://cal10n.qos.ch
-Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz
+Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        build.xml-0.7.7.tar.xz
 Patch0:         cal10n-0.7.7-sourcetarget.patch
 BuildRequires:  ant
