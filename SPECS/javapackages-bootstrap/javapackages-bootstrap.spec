@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and BSD with advertising and BSD and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -255,6 +255,7 @@ Provides:       bundled(xz-java) = 1.8
 BuildRequires:  byaccj
 BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-generators
+BuildRequires:  java-devel
 
 Requires:       bash
 Requires:       coreutils
@@ -303,11 +304,13 @@ do
 done
 
 %build
-export LC_ALL=C.utf8
-JAVA_HOME=%{java_home} ./mbi.sh build -parallel
+export LC_ALL=en_US.UTF-8 
+export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
+./mbi.sh build -parallel
 
 %install
-JAVA_HOME=%{java_home} ./mbi.sh dist \
+export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
+./mbi.sh dist \
   -basePackageName=%{name} \
   -installRoot=%{buildroot} \
   -mavenHomePath=%{mavenHomePath} \
@@ -327,6 +330,10 @@ ln -sf %{_datadir}/xmvn/conf/toolchains.xml %{buildroot}%{mavenHomePath}/conf/to
 
 install -d -m 755 %{buildroot}%{_rpmmacrodir}
 echo '%%jpb_env PATH=/usr/libexec/javapackages-bootstrap:$PATH' >%{buildroot}%{_rpmmacrodir}/macros.%{name}
+
+# by default it sets JAVA_HOME to /usr/lib/jvm/java-11-openjdk
+sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{_datadir}/%{name}/bin/mvn
+sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPath}/xmvn-install
 
 %check
 %{buildroot}%{launchersPath}/xmvn --version
