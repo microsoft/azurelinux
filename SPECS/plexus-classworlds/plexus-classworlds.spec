@@ -22,9 +22,9 @@ Distribution:   Mariner
 %bcond_with tests
 Name:           plexus-%{short_name}
 Version:        2.5.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Plexus Classworlds Classloader Framework
-License:        Apache-2.0 AND Plexus
+License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-classworlds
 Source0:        https://github.com/sonatype/%{name}/archive/%{name}-%{version}.tar.gz
@@ -107,6 +107,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.5.2-4
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.2-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
