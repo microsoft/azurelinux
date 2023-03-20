@@ -1,66 +1,55 @@
 {
-    "Disks": [
+  "Disks": [
+    {
+      "PartitionTableType": "gpt",
+      "TargetDisk": {
+        "Type": "path",
+        "Value": "/dev/sda"
+      },
+      "Partitions": [
         {
-            "PartitionTableType": "gpt",
-            "TargetDisk": {
-                "Type": "path",
-                "Value": "/dev/sda"
-            },
-            "Partitions": [
-                {
-                    "ID": "boot",
-                    "Flags": [
-                        "esp",
-                        "boot"
-                    ],
-                    "Start": 1,
-                    "End": 9,
-                    "FsType": "fat32"
-                },
-                {
-                    "ID": "rootfs",
-                    "Start": 9,
-                    "End": 0,
-                    "FsType": "ext4"
-                }
-            ]
-        }
-    ],
-    "SystemConfigs": [
+          "ID": "boot",
+          "Flags": [
+            "esp",
+            "boot"
+          ],
+          "Start": 1,
+          "End": 9,
+          "FsType": "fat32"
+        },
         {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json"
-            ],
-            "Packages": [
-                "openssh-server"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
-            },
-            "Hostname": "cbl-mariner",
-            "Users": [
-                {
-                    "Name": "mariner_user",
-                    "Password": "$6$20m6y6nwlU1K$hKgyNYjVSKPJOTFaAzAf/fwACUV/dZ1NPy5cGNkhvRzKJiKDBKofuvDpdl81Jak4ep756DnZmVm7JfGRMO/n90",
-                    "PasswordHashed": true,
-                    "_comment": "The password is 'p@ssw0rd', this should be regenerated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>', or use the json key 'SSHPubKeyPaths' to use an SSH key for login"
-                }
-            ]
+          "ID": "rootfs",
+          "Start": 9,
+          "End": 0,
+          "FsType": "ext4"
         }
-    ]
+      ]
+    }
+  ],
+  "SystemConfigs": [
+    {
+      "Name": "Standard",
+      "BootType": "efi",
+      "PartitionSettings": [
+        {
+          "ID": "boot",
+          "MountPoint": "/boot/efi",
+          "MountOptions": "umask=0077"
+        },
+        {
+          "ID": "rootfs",
+          "MountPoint": "/"
+        }
+      ],
+      "PackageLists": [
+        "packagelists/hyperv-packages.json",
+        "packagelists/core-packages-image.json",
+        "packagelists/cloud-init-packages.json"
+      ],
+      "KernelOptions": {
+        "default": "kernel"
+      },
+      "Hostname": "cbl-mariner"
+    }
+  ]
 }
