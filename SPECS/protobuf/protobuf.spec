@@ -8,10 +8,6 @@ Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated maven modules and plugins from this tarball, since network is disabled during build time.
-# Use generate_source_tarbbal.sh to get this generated from a source code file.
-Source1:        %{name}-%{version}-m2.tar.gz
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  make
@@ -49,6 +45,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  tox
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 Requires:       python3-libs
@@ -57,41 +54,16 @@ Provides:       %{name}-python3 = %{version}-%{release}
 %description -n python3-%{name}
 This contains protobuf python3 libraries.
 
-%package        java
-Summary:        protobuf java lib
-Group:          Development/Libraries
-BuildRequires:  chkconfig
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  maven
-BuildRequires:  msopenjdk-11
-Requires:       %{name} = %{version}-%{release}
-Requires:       msopenjdk-11
-
-%description    java
-This contains protobuf java libraries.
-
 %prep
 %autosetup
-# populate m2 cache
-mkdir /root/.m2
-pushd /root/.m2
-tar -xf %{SOURCE1} --no-same-owner
-popd
 
 %build
 %configure --disable-silent-rules
-export JAVA_HOME=%{java_home}
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 %make_build
 
 # build python subpackage
 pushd python
 %py3_build
-popd
-
-# build java subpackage
-pushd java
-mvn -o package -DskipTests
 popd
 
 %install
@@ -100,14 +72,6 @@ popd
 # install python subpackage
 pushd python
 %py3_install
-popd
-
-# install java subpackage
-pushd java
-mvn -o install -DskipTests
-install -vdm755 %{buildroot}%{_libdir}/java/protobuf
-install -vm644 core/target/protobuf-java-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
-install -vm644 util/target/protobuf-java-util-%{version}.jar %{buildroot}%{_libdir}/java/protobuf
 popd
 
 %ldconfig_scriptlets
@@ -120,10 +84,6 @@ popd
 cd python
 %py3_check || test_succeeded=false
 cd ..
-
-# run java subpackage tests
-cd java
-mvn -o test || test_succeeded=false
 
 ${test_succeeded:-true}
 
@@ -155,12 +115,8 @@ ${test_succeeded:-true}
 %files -n python3-%{name}
 %{python3_sitelib}/*
 
-%files java
-%{_libdir}/java/protobuf/*.jar
-
 %changelog
-* Fri Feb 24 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
-- Re-added back java subpackage
+* Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1

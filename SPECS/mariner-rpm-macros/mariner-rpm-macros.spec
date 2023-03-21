@@ -125,6 +125,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev> - 2.0-21
+- Add python test macro
+
 * Mon Dec 05 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-20
 - Add support to build with ccache when 'mariner_ccache_enabled' is set.
 
