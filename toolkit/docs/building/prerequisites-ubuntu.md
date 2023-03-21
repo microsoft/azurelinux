@@ -11,10 +11,20 @@ sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
 
 # Install required dependencies.
-sudo apt -y install curl gawk genisoimage git golang-1.17-go make parted qemu-utils rpm tar wget
-
 # Recommended but not required: `pigz` for faster compression operations.
-sudo apt -y install pigz
+sudo apt -y install \
+    curl \
+    gawk \
+    genisoimage \
+    git \
+    golang-1.17-go \
+    make \
+    parted \
+    pigz \
+    qemu-utils \
+    rpm \
+    tar \
+    wget
 
 # Fix go 1.17 link
 sudo ln -vsf /usr/lib/go-1.17/bin/go /usr/bin/go
@@ -23,6 +33,6 @@ sudo ln -vsf /usr/lib/go-1.17/bin/go /usr/bin/go
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
-# Log into the docker group, to avoid needing to first log out / log in
-newgrp docker
 ```
+
+**You will need to log out and log back in** for user changes to take effect.
