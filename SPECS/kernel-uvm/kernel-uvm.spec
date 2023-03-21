@@ -60,7 +60,7 @@ ExclusiveArch:  x86_64
 The kernel package contains the Linux kernel.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%setup -q -c CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 make mrproper
 
