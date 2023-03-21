@@ -82,7 +82,7 @@ popd
 
 # run python subpackage tests
 cd python
-%py3_check || test_succeeded=false
+tox setup.py test || test_succeeded=false
 cd ..
 
 ${test_succeeded:-true}
