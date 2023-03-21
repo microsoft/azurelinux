@@ -17,6 +17,8 @@ BuildRequires:  python
 BuildRequires:  python%{python3_pkgversion}-simplejson
 BuildRequires:  zip
 BuildRequires:  unzip
+BuildRequires:  rsync
+BuildRequires:  glibc-lang
 
 %description
 rabbitmq-server
@@ -25,6 +27,7 @@ rabbitmq-server
 %autosetup
 
 %build
+export LANG="en_US.UTF-8"
 %make_build
 
 %install
