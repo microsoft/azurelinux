@@ -10,8 +10,8 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        5.15.48.1
-Release:        9%{?dist}
+Version:        5.15.99.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,9 @@ cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 /lib/modules/%{name}
 
 %changelog
+* Tue Mar 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.99.1-1
+- Test new config.
+
 * Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
 - Enable Hyper-V enlightenments.
 
