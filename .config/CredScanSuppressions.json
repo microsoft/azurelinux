@@ -1,0 +1,29 @@
+{
+    "tool": "Credential Scanner",
+    "suppressions": [
+        {
+            "file": "\\SPECS\\shadow-utils\\shadow-utils.signatures.json",
+            "_justification": "This is a false positive, probably because it says the word password and has a hash. It is just a measurement of the pam.d system-password configuration file."
+        },
+        {
+            "file": "\\toolkit\\tools\\imagegen\\configuration\\configuration_test.go",
+            "_justification": "Dummy secrets used to unit test configuration code."
+        },
+        {
+            "file": "\\toolkit\\tools\\imagegen\\configuration\\testdata\\test_configuration.json",
+            "_justification": "Dummy secrets used to unit test configuration code."
+        },
+        {
+            "file": "toolkit\\tools\\imagegen\\configuration\\user_test.go",
+            "_justification": "Dummy secrets used to unit test configuration code."
+        },
+        {
+            "file": "\\toolkit\\docs\\quick_start\\quickstart.md",
+            "_justification": "Secrets for sample, non-production Mariner images."
+        },
+        {
+            "file": "\\toolkit\\imageconfigs\\read-only-root-efi.json",
+            "_justification": "Secret for a sample, non-production Mariner image."
+        }
+    ]
+}
