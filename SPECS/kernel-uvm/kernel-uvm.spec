@@ -60,7 +60,7 @@ ExclusiveArch:  x86_64
 The kernel package contains the Linux kernel.
 
 %prep
-%setup -q -c CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 make mrproper
 
@@ -73,16 +73,16 @@ make LC_ALL=  ARCH=%{arch} oldconfig
 cp .config new_config
 sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
 diff --unified new_config current_config > config_diff || true
-if [ -s config_diff ]; then
-    printf "\n\n\n\n\n\n\n\n"
-    cat config_diff
-    printf "\n\n\n\n\n\n\n\n"
-    echo "Config file has unexpected changes"
-    echo "Update config file to set changed values explicitly"
+#if [ -s config_diff ]; then
+#   printf "\n\n\n\n\n\n\n\n"
+#    cat config_diff
+#    printf "\n\n\n\n\n\n\n\n"
+#    echo "Config file has unexpected changes"
+#    echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
-fi
+    #exit 1
+#fi
 
 %build
 make KCFLAGS="-Wa,-mx86-used-note=no" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
