@@ -22,7 +22,7 @@ Name:           plexus-utils
 Version:        3.3.0
 Release:        3%{?dist}
 Summary:        Plexus Common Utilities
-License:        Apache-2.0
+License:        Apache-2.0 AND xpp AND BSD-3-Clause AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
 URL:            https://codehaus-plexus.github.io/plexus-utils/
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
