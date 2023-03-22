@@ -198,7 +198,7 @@ extends:
           inputs:
             source: current
             artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
-            patterns: '**/*ko'
+            patterns: '**/*.ko'
             path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
