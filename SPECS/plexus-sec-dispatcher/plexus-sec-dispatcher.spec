@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-sec-dispatcher
-Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz#/%{name}-%{name}.tar.gz
+Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 BuildArch:      noarch
 
