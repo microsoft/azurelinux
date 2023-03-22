@@ -1,0 +1,32 @@
+diff --git a/pom.xml b/pom.xml
+index 1eb2158..7e7ac5d 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -25,25 +25,17 @@
+     <plugins>
+       <plugin>
+         <groupId>org.codehaus.plexus</groupId>
+-        <artifactId>plexus-maven-plugin</artifactId>
++        <artifactId>plexus-component-metadata</artifactId>
+         <version>1.3.5</version>
+         <executions>
+           <execution>
+             <goals>
+-              <goal>descriptor</goal>
++              <goal>generate-metadata</goal>
+             </goals>
+           </execution>
+         </executions>
+       </plugin>
+       <plugin>
+-        <artifactId>maven-compiler-plugin
+-        </artifactId>
+-        <configuration>
+-          <source>1.4</source>
+-          <target>1.4</target>
+-        </configuration>
+-      </plugin>
+-      <plugin>
+         <groupId>org.codehaus.modello</groupId>
+         <artifactId>modello-maven-plugin</artifactId>
+         <configuration>

@@ -1,7 +1,7 @@
 %bcond_without bootstrap
 
 Name:           plexus-cipher
-Version:        2.0
+Version:        1.7
 Release:        1%{?dist}
 Summary:        Plexus Cipher: encryption/decryption Component
 License:        Apache-2.0
@@ -18,30 +18,42 @@ BuildArch:      noarch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 %else
-BuildRequires:  maven-local-openjdk8
+BuildRequires:  mvn(javax.enterprise:cdi-api)
 BuildRequires:  mvn(javax.inject:javax.inject)
 BuildRequires:  mvn(junit:junit)
-BuildRequires:  mvn(org.codehaus.plexus:plexus:pom:)
-BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.inject)
-BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
+BuildRequires:  mvn(org.sonatype.plugins:sisu-maven-plugin)
 %endif
-
+ 
 %description
 Plexus Cipher: encryption/decryption Component
-
+ 
 %{?javadoc_package}
-
+ 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%setup -q
+ 
+%pom_remove_parent
+%pom_xpath_inject "pom:dependency[pom:artifactId='junit']" "<scope>test</scope>"
+ 
+# replace %{version}-SNAPSHOT with %{version}
+%pom_xpath_replace pom:project/pom:version "<version>%{version}</version>"
+ 
+# fedora moved from sonatype sisu to eclipse sisu. sisu-inject-bean artifact
+# doesn't exist in eclipse sisu. this artifact contains nothing but
+# bundled classes from atinject, cdi-api, aopalliance and maybe others.
+%pom_remove_dep org.sonatype.sisu:sisu-inject-bean
+%pom_add_dep javax.inject:javax.inject:1:provided
+%pom_add_dep javax.enterprise:cdi-api:1.0:provided
+ 
+%pom_xpath_set "pom:plugin[pom:artifactId='maven-compiler-plugin']/pom:configuration/*" 1.6
+ 
 %mvn_file : plexus/%{name}
-%mvn_alias org.codehaus.plexus: org.sonatype.plexus:
-
+ 
 %build
-%mvn_build
-
+%mvn_build -f
+ 
 %install
 %mvn_install
-
 %files -f .mfiles
 %license LICENSE.txt NOTICE.txt
 
@@ -49,24 +61,6 @@ Plexus Cipher: encryption/decryption Component
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0-1
 - Moved from extended to core
 - License verified
-
-* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Sun Apr 24 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.0-1
-- Update to upstream version 2.0
-
-* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 1.8-3
-- Rebuilt for java-17-openjdk as system jdk
-
-* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Wed Aug 25 2021 Didik Supriadi <didiksupriadi41@gmail.com> - 1.8-1
-- Update to version 1.8
 
 * Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-24
 - Second attempt - Rebuilt for
