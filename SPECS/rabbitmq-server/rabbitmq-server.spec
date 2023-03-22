@@ -48,7 +48,7 @@ export LANG="en_US.UTF-8"
 %install
 export LANG="en_US.UTF-8"
 # install mix_task_archive_deps ahead of install
-mix archive.install %{SOURCE1}
+mix archive.install --force %{SOURCE1}
 
 # install hex archive with mix and fill out hex cache ahead of install
 tar -xzf %{SOURCE2} -C deps/.hex/packages/hexpm
@@ -56,7 +56,7 @@ pushd deps/.hex/packages/hexpm
 tar -xzf hex-2.0.6.tar.gz
 pushd hex-2.0.6
 mix archive.build
-mix archive.install hex-2.0.6.ez
+mix archive.install --force hex-2.0.6.ez
 popd
 rm -r hex-2.0.6
 popd
