@@ -4,7 +4,6 @@ Name:           plexus-sec-dispatcher
 Version:        1.4
 Release:        1%{?dist}
 Summary:        Plexus Security Dispatcher Component
-License:        ASL 2.0
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +14,6 @@ Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 # Removed maven-compiler-plugin configuration version in the pom as annotations isn't available in version 1.4.
 Patch0:         %{name}-pom.patch
 BuildArch:      noarch
-
 
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
