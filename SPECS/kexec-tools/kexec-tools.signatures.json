@@ -26,7 +26,7 @@
   "kdump.sysconfig.aarch64": "a829f3a0f88d983ccec2782b048f12a2eafca71aac4dd42acac2eaea8f7dd8d9",
   "kdump.sysconfig.i386": "1175bcc11be49841d4b8c3f9612e68bb7b2e0e8f00067ffa782fd9dba04f821d",
   "kdump.sysconfig.x86_64": "850b3be780165d0721edb8d34b2ba28aafc60b29850ff627daf04190369e359c",
-  "kdumpctl": "988d0e666a3ecd3d5e8d6d98fc07d2922764b39782bf4b0f1235ef72bfa7eca9",
+  "kdumpctl": "d511b5db0ea2de014fb06ec9fa0a6a4fdf508a3ba6c0d73344870f245ebd4c23",
   "kdumpctl.8": "025a39d212eed0584da7c23c1bb50d6ab797a0fa3c686ac6b80391af875dbaec",
   "kexec-kdump-howto.txt": "e783390a9aa582a2b5e7981cd3277081385340b5873a3f0633c789811876eccb",
   "kexec-tools-2.0.23.tar.xz": "aa63cd6c7dd95b06ceba6240a7fdc6792789cada75a655e6714987175224241b",

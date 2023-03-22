@@ -326,6 +326,7 @@ done
 %changelog
 * Fri Mar 17 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.23-2
 - Required binary grep missing from squashfs
+- kdumpctl support for the version of hostname being shipped with Mariner
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.23-1
 - Update version to 2.0.23
 - License verified
