@@ -31,6 +31,7 @@ export LANG="en_US.UTF-8"
 %make_build
 
 %install
+export LANG="en_US.UTF-8"
 %make_install
 
 %files
