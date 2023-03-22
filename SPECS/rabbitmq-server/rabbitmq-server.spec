@@ -9,6 +9,9 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
+Source1:        https://github.com/rabbitmq/mix_task_archive_deps/releases/download/1.0.0/mix_task_archive_deps-1.0.0.ez
+Source2:        rabbitmq-server-hex-vendor-%{version}.tar.gz
+
 BuildRequires:  erlang
 BuildRequires:  elixir
 BuildRequires:  libxslt
@@ -19,6 +22,18 @@ BuildRequires:  zip
 BuildRequires:  unzip
 BuildRequires:  rsync
 BuildRequires:  glibc-lang
+
+Requires:       erlang
+Requires:       elixir
+Requires:       libxslt
+Requires:       xmlto
+Requires:       python
+Requires:       python%{python3_pkgversion}-simplejson
+Requires:       zip
+Requires:       unzip
+Requires:       rsync
+Requires:       glibc-lang
+
 
 %description
 rabbitmq-server
@@ -32,6 +47,21 @@ export LANG="en_US.UTF-8"
 
 %install
 export LANG="en_US.UTF-8"
+# install mix_task_archive_deps ahead of install
+mix archive.install %{SOURCE1}
+
+# install hex archive with mix and fill out hex cache ahead of install
+tar -xzf %{SOURCE2} -C deps/.hex/packages/hexpm
+pushd deps/.hex/packages/hexpm
+tar -xzf hex-2.0.6.tar.gz
+pushd hex-2.0.6
+mix archive.build
+mix archive.install hex-2.0.6.ez
+popd
+rm -r hex-2.0.6
+popd
+
+# install rabbitmq-server
 %make_install
 
 %files
