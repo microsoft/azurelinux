@@ -1,4 +1,4 @@
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Name:           plexus-sec-dispatcher
 Version:        2.0
@@ -12,7 +12,6 @@ URL:            https://github.com/codehaus-plexus/plexus-sec-dispatcher
 Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 BuildArch:      noarch
-
 
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap

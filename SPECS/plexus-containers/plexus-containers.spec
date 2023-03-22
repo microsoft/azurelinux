@@ -1,4 +1,4 @@
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Summary:        Containers for Plexus
 Name:           plexus-containers
