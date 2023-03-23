@@ -1,8 +1,17 @@
+From 14e75895ba19a3a42e5e4ece78ff6fd1e5fb41f3 Mon Sep 17 00:00:00 2001
+From: Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com>
+Date: Thu, 23 Mar 2023 10:10:01 -0700
+Subject: [PATCH] patching pom file
+
+---
+ pom.xml | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
 diff --git a/pom.xml b/pom.xml
 index 1eb2158..7e7ac5d 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -25,25 +25,17 @@
+@@ -25,24 +25,16 @@
      <plugins>
        <plugin>
          <groupId>org.codehaus.plexus</groupId>
@@ -18,7 +27,7 @@ index 1eb2158..7e7ac5d 100644
            </execution>
          </executions>
        </plugin>
-       <plugin>
+-      <plugin>
 -        <artifactId>maven-compiler-plugin
 -        </artifactId>
 -        <configuration>
@@ -26,7 +35,9 @@ index 1eb2158..7e7ac5d 100644
 -          <target>1.4</target>
 -        </configuration>
 -      </plugin>
--      <plugin>
+       <plugin>
          <groupId>org.codehaus.modello</groupId>
          <artifactId>modello-maven-plugin</artifactId>
-         <configuration>
+-- 
+2.38.0.windows.1
+
