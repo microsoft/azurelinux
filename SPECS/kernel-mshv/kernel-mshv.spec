@@ -209,6 +209,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 %exclude /lib/modules/%{uname_r}/build
+%exclude /lib/modules/%{uname_r}
 
 %files devel
 %defattr(-,root,root)
