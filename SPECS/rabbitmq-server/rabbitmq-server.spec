@@ -61,6 +61,9 @@ popd
 rm -r hex-2.0.6
 popd
 
+# since install runs separately from build, we must restore the cache file here manually prior to install
+make restore-hex-cache-ets-file
+
 # install rabbitmq-server
 %make_install
 
