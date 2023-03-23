@@ -1,41 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %define _hardened_build 1
-
+Summary:        An advanced interactive monitor to view the load on system and process level
 Name:           atop
 Version:        2.6.0
 Release:        7%{?dist}
-Summary:        An advanced interactive monitor to view the load on system and process level
-
 License:        GPLv2+
-URL:            http://www.atoptool.nl
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.atoptool.nl
 Source0:        http://www.atoptool.nl/download/%{name}-%{version}.tar.gz
 Source1:        atop.d
-
 Patch0:         nvme_support.patch
 Patch1:         atop-sysconfig.patch
 Patch2:         atop-2.3.0-newer-gcc.patch
 Patch3:         9cb119713b5e6be43671fe1856fb4bd49ff91fa7.patch
-
 BuildRequires:  gcc
-BuildRequires:  zlib-devel
-BuildRequires:  ncurses-devel 
+BuildRequires:  make
+BuildRequires:  ncurses-devel
 BuildRequires:  systemd
-BuildRequires: make
+BuildRequires:  zlib-devel
+Requires(post): systemd
+Requires(postun): systemd
+Requires(preun): systemd
 %if 0%{?rhel} >= 8 || 0%{?fedora}
 Requires:       python3-py3nvml
 %endif
 
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-
-
 %description
-An advanced interactive monitor for Linux-systems to view the load on 
+An advanced interactive monitor for Linux-systems to view the load on
 system-level and process-level.
 The command atop has some major advantages compared to other
-performance-monitors: 
+performance-monitors:
    - Resource consumption by all processes
    - Utilization of all relevant resources
    - Permanent logging of resource utilization
@@ -45,41 +39,40 @@ performance-monitors:
    - Accumulated process activity per user
    - Accumulated process activity per program
 For more informations: http://www.atcomputing.nl/Tools/atop
-The package does not make use of the patches available at 
+The package does not make use of the patches available at
 http://www.atcomputing.nl/Tools/atop/kernpatch.html
 
- 
 %prep
 %setup -q
-%patch0 -p0 -b .nvme
-%patch1 -p0 -b .sysconfig
+%patch0  -b .nvme
+%patch1  -b .sysconfig
 %patch2 -p1 -b .newer-gcc
 %patch3 -p1 -b .service
 
 # Correct unit file path
-sed -i "s|/etc/default/atop|/etc/sysconfig/atop|g" atop.service
+sed -i "s|%{_sysconfdir}/default/atop|%{_sysconfdir}/sysconfig/atop|g" atop.service
 
 %build
-make %{?_smp_mflags} CFLAGS="$RPM_OPT_FLAGS"
+make %{?_smp_mflags} CFLAGS="%{optflags}"
 
 %install
-install -Dp -m 0755 atop $RPM_BUILD_ROOT%{_bindir}/atop
-install -Dp -m 0755 atopconvert $RPM_BUILD_ROOT%{_bindir}/atopconvert
-ln -s atop $RPM_BUILD_ROOT%{_bindir}/atopsar
-install -Dp -m 0644 man/atop.1 $RPM_BUILD_ROOT%{_mandir}/man1/atop.1
-install -Dp -m 0644 man/atopsar.1 $RPM_BUILD_ROOT%{_mandir}/man1/atopsar.1
-install -Dp -m 0755 atop.daily $RPM_BUILD_ROOT%{_datadir}/atop/atop.daily
-install -Dp -m 0644 atop.default $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/atop
-install -Dp -m 0755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/atopd
-install -Dp -m 0644 atop.service $RPM_BUILD_ROOT%{_unitdir}/atop.service
-install -d $RPM_BUILD_ROOT%{_localstatedir}/log/atop
-install -Dp -m 0755 atopacctd $RPM_BUILD_ROOT%{_sbindir}/atopacctd
-install -Dp -m 0644 atopacct.service $RPM_BUILD_ROOT%{_unitdir}/atopacct.service
+install -Dp -m 0755 atop %{buildroot}%{_bindir}/atop
+install -Dp -m 0755 atopconvert %{buildroot}%{_bindir}/atopconvert
+ln -s atop %{buildroot}%{_bindir}/atopsar
+install -Dp -m 0644 man/atop.1 %{buildroot}%{_mandir}/man1/atop.1
+install -Dp -m 0644 man/atopsar.1 %{buildroot}%{_mandir}/man1/atopsar.1
+install -Dp -m 0755 atop.daily %{buildroot}%{_datadir}/atop/atop.daily
+install -Dp -m 0644 atop.default %{buildroot}%{_sysconfdir}/sysconfig/atop
+install -Dp -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/atopd
+install -Dp -m 0644 atop.service %{buildroot}%{_unitdir}/atop.service
+install -d %{buildroot}%{_localstatedir}/log/atop
+install -Dp -m 0755 atopacctd %{buildroot}%{_sbindir}/atopacctd
+install -Dp -m 0644 atopacct.service %{buildroot}%{_unitdir}/atopacct.service
 %if 0%{?rhel} >= 8 || 0%{?fedora}
-install -Dp -m 0755 atopgpud $RPM_BUILD_ROOT%{_sbindir}/atopgpud
-install -Dp -m 0644 atopgpu.service $RPM_BUILD_ROOT%{_unitdir}/atopgpu.service
+install -Dp -m 0755 atopgpud %{buildroot}%{_sbindir}/atopgpud
+install -Dp -m 0644 atopgpu.service %{buildroot}%{_unitdir}/atopgpu.service
 %endif
-install -Dp -m 0644 atop-rotate.* $RPM_BUILD_ROOT%{_unitdir}/
+install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 
 %post
 %systemd_post atop.service atopacct.service atop-rotate.timer
@@ -99,10 +92,9 @@ install -Dp -m 0644 atop-rotate.* $RPM_BUILD_ROOT%{_unitdir}/
 %systemd_postun_with_restart atopgpu.service
 %endif
 
-
 %files
 %if 0%{?rhel}
-%doc COPYING
+%license COPYING
 %else
 %license COPYING
 %endif

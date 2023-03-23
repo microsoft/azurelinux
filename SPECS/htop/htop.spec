@@ -1,23 +1,22 @@
+Summary:        Interactive process viewer
+Name:           htop
+Version:        3.0.5
+Release:        3%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name: htop
-Version: 3.0.5
-Release: 3%{?dist}
-Summary: Interactive process viewer
-License: GPLv2+
-URL: http://hisham.hm/htop/
-Source0: https://github.com/htop-dev/htop/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires: desktop-file-utils
-BuildRequires: ncurses-devel
+URL:            http://hisham.hm/htop/
+Source0:        https://github.com/htop-dev/htop/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  desktop-file-utils
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  ncurses-devel
 %if 0%{?rhel} >= 8
-BuildRequires: platform-python
-BuildRequires: /usr/bin/pathfix.py
+BuildRequires:  %{_bindir}/pathfix.py
+BuildRequires:  platform-python
 %else
-BuildRequires: python3
+BuildRequires:  python3
 %endif
-BuildRequires: libtool
-BuildRequires: make
 
 %description
 htop is an interactive text-mode process viewer for Linux, similar to
@@ -26,7 +25,7 @@ top(1).
 %prep
 %autosetup
 %if 0%{?rhel} >= 8
-pathfix.py -pni "/usr/libexec/platform-python" scripts/
+pathfix.py -pni "%{_libexecdir}/platform-python" scripts/
 %endif
 
 %build
