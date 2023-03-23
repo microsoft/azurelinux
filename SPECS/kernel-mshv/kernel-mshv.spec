@@ -1,7 +1,7 @@
 
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-hvl1.m2
+%define uname_r %{version}-2.cm2
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
@@ -209,7 +209,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 %exclude /lib/modules/%{uname_r}/build
-%exclude /lib/modules/%{uname_r}
 
 %files devel
 %defattr(-,root,root)
