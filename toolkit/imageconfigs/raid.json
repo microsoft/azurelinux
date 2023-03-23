@@ -11,44 +11,69 @@
             ],
             "Partitions": [
                 {
-                    "ID": "efi",
-                    "Flags": [
-                        "esp",
-                        "boot"
-                    ],
+                    "ID": "efi_1",
                     "Start": 1,
-                    "End": 9,
-                    "FsType": "fat32"
+                    "End": 9
+                },
+                {
+                    "ID": "efi_2",
+                    "Start": 9,
+                    "End": 17
                 },
                 {
                     "ID": "boot_1",
-                    "Start": 10,
-                    "End": 410
+                    "Start": 20,
+                    "End": 420
                 },
                 {
                     "ID": "boot_2",
-                    "Start": 410,
-                    "End": 810
+                    "Start": 420,
+                    "End": 820
                 },
                 {
                     "ID": "boot_3",
-                    "Start": 810,
-                    "End": 1210
+                    "Start": 820,
+                    "End": 1220
                 },
                 {
                     "ID": "rootfs_1",
-                    "Start": 1210,
-                    "End": 3210
+                    "Start": 1220,
+                    "End": 3220
                 },
                 {
                     "ID": "rootfs_2",
-                    "Start": 3210,
-                    "End": 4210
+                    "Start": 3220,
+                    "End": 4220
                 },
                 {
                     "ID": "rootfs_3",
-                    "Start": 4210,
-                    "End": 5210
+                    "Start": 4220,
+                    "End": 5220
+                }
+            ]
+        },
+        {
+            "ID": "raidEfi",
+            "TargetDisk": {
+                "Type": "raid",
+                "RaidConfig": {
+                    "ComponentPartIDs": [
+                        "efi_1",
+                        "efi_2"
+                    ],
+                    "Level": 1,
+                    "RaidID": "efi",
+                    "LegacyMetadata": true
+                }
+            },
+            "Partitions": [
+                {
+                    "ID": "efi",
+                    "FsType": "fat32",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ]
                 }
             ]
         },
@@ -103,7 +128,8 @@
                 {
                     "ID": "efi",
                     "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
+                    "MountOptions" : "umask=0077",
+                    "MountIdentifier": "uuid"
                 },
                 {
                     "ID": "boot",
