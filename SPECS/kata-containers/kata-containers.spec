@@ -25,6 +25,8 @@
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
                                 DEFVIRTIOFSCACHESIZE=0 \\\
                                 DEFSANDBOXCGROUPONLY=false \\\
+                                DEFSTATICSANDBOXWORKLOADMEM=1984 \\\
+                                DEFMEMSZ=64 \\\
                                 SKIP_GO_VERSION_CHECK=y \\\
                                 MACHINETYPE=%{machinetype} \\\
                                 DESTDIR=%{buildroot} \\\
@@ -39,7 +41,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -58,6 +60,7 @@ Patch5:         runtime-Support-for-AMD-SEV-SNP-VMs.patch
 Patch6:         runtime-clh-Use-the-new-API-to-boot-with-TDX-firmware-td-shim.patch
 Patch7:         versions-Update-Cloud-Hypervisor.patch
 Patch8:         runtime-Re-generate-the-client-code.patch
+Patch9:         runtime-reduce-uvm-high-mem-footprint.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -224,6 +227,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Mar 22 2023 Manuel Huber <mahuber@microsoft.com> - 3.0.0-6
+- Integrate fix to reduce UVM memory consumption
+
 * Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-5
 - Bump release to rebuild with go 1.19.6
 
