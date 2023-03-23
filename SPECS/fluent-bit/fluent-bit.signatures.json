@@ -1,5 +1,5 @@
 {
-    "Signatures": {
-        "fluent-bit-1.9.6.tar.gz" : "7f4de8d561695d9153dbe39b7f6d919dc849daf57cb7c402a2beb0ebe35a42e0"
-    }
+ "Signatures": {
+  "fluent-bit-2.0.9.tar.gz": "393ad4a6ced48c327607653d610ef273843085a17b6e5c8013877abdf31e6945"
+ }
 }

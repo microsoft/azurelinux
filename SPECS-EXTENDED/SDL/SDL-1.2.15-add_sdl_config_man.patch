@@ -1,0 +1,90 @@
+diff -r 91ad7b43317a Makefile.in
+--- a/Makefile.in	Sun Jun 02 20:48:53 2013 +0600
++++ b/Makefile.in	Wed Jun 19 10:34:27 2013 +0200
+@@ -98,6 +98,11 @@
+ 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(libdir)/pkgconfig
+ 	$(INSTALL) -m 644 sdl.pc $(DESTDIR)$(libdir)/pkgconfig
+ install-man:
++	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(mandir)/man1
++	for src in $(srcdir)/docs/man1/*.1; do \
++	    file=`echo $$src | sed -e 's|^.*/||'`; \
++	    $(INSTALL) -m 644 $$src $(DESTDIR)$(mandir)/man1/$$file; \
++	done
+ 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(mandir)/man3
+ 	for src in $(srcdir)/docs/man3/*.3; do \
+ 	    file=`echo $$src | sed -e 's|^.*/||'`; \
+@@ -120,6 +125,10 @@
+ 	rm -f $(DESTDIR)$(datadir)/aclocal/sdl.m4
+ 	rm -f $(DESTDIR)$(libdir)/pkgconfig/sdl.pc
+ uninstall-man:
++	for src in $(srcdir)/docs/man1/*.1; do \
++	    file=`echo $$src | sed -e 's|^.*/||'`; \
++	    rm -f $(DESTDIR)$(mandir)/man1/$$file; \
++	done
+ 	for src in $(srcdir)/docs/man3/*.3; do \
+ 	    file=`echo $$src | sed -e 's|^.*/||'`; \
+ 	    rm -f $(DESTDIR)$(mandir)/man3/$$file; \
+diff -r 91ad7b43317a docs/man1/sdl-config.1
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/docs/man1/sdl-config.1	Wed Jun 19 10:34:27 2013 +0200
+@@ -0,0 +1,60 @@
++.TH sdl-config 1 "2013-06-19" "SDL 1.2"
++.SH NAME
++sdl-config \- script to get information about the installed version of SDL
++.SH SYNOPSIS
++\fBsdl-config
++[\~--prefix[=\fIDIR\fP]\~]
++[\~--exec-prefix[=\fIDIR\fP]\~]
++[\~--version\~] [\~--cflags\~] [\~--libs\~] [\~--static-libs\~]\fR
++.SH DESCRIPTION
++.B sdl-config
++is a tool that is used to configure and determine the compiler and linker
++flags that should be used to compile and link programs, and libraries, and
++plugins that use SDL.  It is also used internally by the m4 macros that are
++included with SDL.
++.SH OPTIONS
++.TP
++.B --cflags
++Print the compiler flags that are necessary to compile a program or library
++that uses SDL.
++.TP
++.BI --exec-prefix= DIR
++If specified, use
++.I DIR
++instead of the installation exec prefix that SDL was build with when computing
++the output for the --exec-prefix option. This option must be specified before
++any of the --cflags, and --libs options.
++.TP
++.B --libs
++Print the linker flags that are necessary to link a program that uses SDL.
++.TP
++.BI --prefix= DIR
++If specified, use DIR instead of the installation prefix that SDL was built
++with when computing the output for the --prefix, and --exec-prefix options.
++This option is also used for the exec prefix if --exec-prefix was not
++specified. This option must be specified before any of the --cflags, and
++--libs options.
++.TP
++.B --static-libs
++Print the linker flags that are necessary to statically link a program that uses SDL.
++.TP
++.B --version
++Prints the currently installed version of SDL on standard output.
++.SH EXAMPLES
++.TP
++gcc -o main.o $(sdl-config --cflags) main.c
++is how you might use
++.B sdl-config
++to compile a C source file for an executable program.
++.TP
++gcc -o my_app $(sdl-config --libs) main.o util.o
++is how you might use
++.B sdl-config
++to link compiled objects into an executable program.
++.SH AUTHOR
++The Simple DirectMedia Layer (SDL) library was written by Sam Lantinga.
++.PP
++This manual page was written by Branden Robinson, originally for Progeny
++Linux Systems, Inc., and the Debian Project.
++.PP
++This manual page was modified by Petr Pisar to match original SDL distribution.

@@ -45,7 +45,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        2.0.0
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -180,7 +180,7 @@ install -p -m 644 %{SOURCE16} %{buildroot}%{catrustdir}/extracted/pem/README
 install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
 install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
-# base certs
+# Base certs
 %install_bundles %{SOURCE21} %{p11_format_base_bundle}
 
 # Microsoft certs
@@ -223,6 +223,10 @@ ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
     %{buildroot}%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
 ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
+
+# Supporting p11-kit's directory re-name in version 0.24.0.
+ln -s blacklist %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
+ln -s blacklist %{buildroot}%{catrustdir}/source/blocklist
 
 %post
 %{refresh_bundles}
@@ -270,8 +274,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{pkidir}/%{java_bundle}
 
 # symlink directory
+%{_datadir}/pki/ca-trust-source/blocklist
 %{_sysconfdir}/ssl/certs
 %{_libdir}/ssl/certs
+%{catrustdir}/source/blocklist
 
 # README files
 %{_datadir}/pki/ca-trust-source/README
@@ -318,6 +324,12 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Mar 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-11
+- Adding support for p11-kit's 0.24.0+ source certificates paths.
+
+* Thu Feb 23 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-10
+- Adding Microsoft-owned root CAs to the base bundle.
+
 * Tue Dec 06 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-9
 - Updating Microsoft trusted root CAs.
 

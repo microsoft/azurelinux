@@ -1,0 +1,12 @@
+diff -urNad wordnet-3.0/src/stubs.c.orig wordnet-3.0/src/stubs.c
+--- wordnet-3.0/src/stubs.c.orig	2007-01-04 18:47:55.000000000 +0100
++++ wordnet-3.0/src/stubs.c	2007-01-20 19:01:19.000000000 +0100
+@@ -14,7 +14,7 @@
+ #include <tk.h>
+ #include <wn.h>
+ 
+-static char *Id = "$Id: stubs.c,v 1.7 2005/04/29 19:01:57 wn Exp $";
++static const char Id[] = "$Id: stubs.c,v 1.7 2005/04/29 19:01:57 wn Exp $";
+ 
+ static char resultbuf[SEARCHBUF];
+ 

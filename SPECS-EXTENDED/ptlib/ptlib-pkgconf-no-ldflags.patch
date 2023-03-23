@@ -1,0 +1,13 @@
+diff --git ptlib-2.10.11/ptlib.pc.in~ ptlib-2.10.11/ptlib.pc.in
+index dfe2618041..32bf0a851b 100644
+--- ptlib-2.10.11/ptlib.pc.in~
++++ ptlib-2.10.11/ptlib.pc.in
+@@ -11,7 +11,7 @@ objdir=obj_@OSTYPE@_@MACHTYPE@${suffix}
+ Name: ptlib
+ Description: PT Library
+ Version: @PTLIB_VERSION@
+-Libs: @LDFLAGS@ -L${libdir} -lpt${suffix}
++Libs: -L${libdir} -lpt${suffix}
+ Libs.private: @ENDLDLIBS@
+ Cflags: -I${includedir} @STDCCFLAGS@
+ 

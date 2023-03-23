@@ -140,7 +140,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.
-func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState) {
+func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -156,6 +156,11 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	unresolvedDependencies := make(map[string]bool)
 	rpmConflicts := buildState.ConflictingRPMs()
 	srpmConflicts := buildState.ConflictingSRPMs()
+
+	conflictsLogger := logger.Log.Errorf
+	if allowToolchainRebuilds || (len(rpmConflicts) == 0 && len(srpmConflicts) == 0) {
+		conflictsLogger = logger.Log.Infof
+	}
 
 	buildNodes := pkgGraph.AllBuildNodes()
 	for _, node := range buildNodes {
@@ -188,12 +193,14 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Infof("Number of failed SRPMs:            %d", len(failures))
 	logger.Log.Infof("Number of blocked SRPMs:           %d", len(unbuiltSRPMs))
 	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
+
+	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
+		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
+	}
+
 	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
-		logger.Log.Errorf("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
-		logger.Log.Errorf("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
-	} else {
-		logger.Log.Infof("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
-		logger.Log.Infof("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
+		conflictsLogger("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
+		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
 	}
 
 	if len(builtSRPMs) != 0 {
@@ -232,16 +239,16 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(rpmConflicts) != 0 {
-		logger.Log.Error("RPM Conflicts with toolchain:")
+		conflictsLogger("RPM conflicts with toolchain: ")
 		for _, conflict := range rpmConflicts {
-			logger.Log.Errorf("--> %s", conflict)
+			conflictsLogger("--> %s", conflict)
 		}
 	}
 
 	if len(srpmConflicts) != 0 {
-		logger.Log.Error("SRPM Conflicts with toolchain:")
+		conflictsLogger("SRPM conflicts with toolchain: ")
 		for _, conflict := range srpmConflicts {
-			logger.Log.Errorf("--> %s", conflict)
+			conflictsLogger("--> %s", conflict)
 		}
 	}
 }

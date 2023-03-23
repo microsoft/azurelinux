@@ -4,7 +4,7 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.14
-Release: 3%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -19,6 +19,7 @@ Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{vers
 Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_name}-libnetwork-%{version}.tar.gz
 Source3: docker.service
 Source4: docker.socket
+Patch0:  CVE-2023-25153.patch
 
 %{?systemd_requires}
 
@@ -125,6 +126,18 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-7
+- Bump release to rebuild with go 1.19.6
+
+* Wed Mar 15 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.14-6
+- Patch CVE-2023-25153
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-5
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-4
+- Bump release to rebuild with go 1.19.4
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 20.10.14-3
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 

@@ -80,6 +80,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/lua-rpm/d' $TmpPkgGen
     sed -i '/lua-srpm/d' $TmpPkgGen
     sed -ri '/mariner-repos-(debug|extended|extras|microsoft)/d' $TmpPkgGen
+    sed -i '/nghttp2-devel/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-5/d' $TmpPkgGen
@@ -266,6 +267,7 @@ generate_pkggen_core () {
         grep "^libsolv-" $TmpPkgGen
         grep "^libssh2-" $TmpPkgGen
         grep "^krb5-" $TmpPkgGen
+        grep "^nghttp2-" $TmpPkgGen
         grep "^curl-" $TmpPkgGen
         grep "^tdnf-" $TmpPkgGen
         grep "^createrepo_c-" $TmpPkgGen

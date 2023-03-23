@@ -191,45 +191,42 @@ A sample PackageLists entry pointing to three files containing package lists:
     "packagelists/cloud-init-packages.json"
 ],
 ```
-### PreInstallScripts
+
+### Customization Scripts
+The tools offer the option of executing arbitrary shell scripts during various points of the image generation process. There are three points that scripts can be executed: `PreInstall`, `PostInstall`, and `ImageFinalize`.
+
+>Installer starts -> `PreInstallScripts` -> Create Partitions -> Install Packages -> `PostInstallScripts` -> Configure Bootloader (if any) -> Calculate dm-verity hashes (if configured) -> `ImageFinalizeScripts`
+
+Each of the `PreInstallScripts`, `PostInstallScripts`, and `FinalizeImageScripts` entires are an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image. The file paths are relative to the image configuration file. Scripts may be passed without arguments if desired.
+
+All scripts follow the same format in the image config .json file:
+``` json
+"PreInstallScripts | PostInstallScripts | FinalizeImageScripts":[
+    {
+        "Path": "arglessScript.sh"
+    },
+    {
+        "Path": "ScriptWithArguments.sh",
+        "Args": "--input abc --output cba"
+    }
+],
+```
+
+#### PreInstallScripts
 
 There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
 
+The preinstall scripts are run from the context of the installer, NOT the installed system (since it doesn't exist yet).
+
 **NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
 
-PreInstallScripts is an array of file paths and the corresponding input arguments. Mariner tooling currently has the capability to execute the preinstall script and parse the partitioning commands inside /tmp/part-include.
+#### PostInstallScripts
 
-A sample PreInstallScripts entry pointing to two install scripts where one has input arguments and the other doesn't:
-``` json
-"PreInstallScripts":[
-    {
-        "Path": "arglessPreScript.sh"
-    },
-    {
-        "Path": "PreScriptWithArguments.sh",
-        "Args": "--input abc --output cba"
-    }
-],
-```
+PostInstallScripts run immediately after all packages have been installed, but before image finalization steps are taken (configure bootloader, record read-only disks, etc). The postinstall scripts are run from the context of the installed system.
 
-### FinalizeImageScripts
+#### FinalizeImageScripts
 
-FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized.
-
-FinalizeImageScripts is an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image.
-
-Below is a sample FinalizeImageScripts entry pointing to two install scripts, where the first script has no input arguments and the second one has arguments:
-``` json
-"FinalizeImageScripts":[
-    {
-        "Path": "arglessPreScript.sh"
-    },
-    {
-        "Path": "PreScriptWithArguments.sh",
-        "Args": "--input abc --output cba"
-    }
-],
-```
+FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized (converted to .vhdx, etc.). The finalizeimage scripts are run from the context of the installed system.
 
 ### Networks
 
@@ -329,13 +326,21 @@ A sample ReadOnlyVerityRoot specifying a basic read-only root using default erro
 
 KernelCommandLine is an optional key which allows additional parameters to be passed to the kernel when it is launched from Grub.
 
+#### ImaPolicy
 ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enable, they may be any combination of `tcb`, `appraise_tcb`, `secure_boot`.
 
-ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used.
+#### ExtraCommandLine
+ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../resources/assets/grub2/grub.cfg). Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
 
+#### SELinux
 The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` key, with value containing the mode to use on boot.  The `enforcing` and `permissive` values will set the mode in /etc/selinux/config.
 This will instruct init (systemd) to set the configured mode on boot.  The `force_enforcing` option will set enforcing in the config and also add `enforcing=1` in the kernel command line,
 which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
+
+#### CGroup
+The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`. 
+The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
+For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
 
 A sample KernelCommandLine enabling a basic IMA mode and passing two additional parameters:
 
@@ -351,6 +356,14 @@ A sample KernelCommandLine enabling SELinux and booting in enforcing mode:
 ``` json
 "KernelCommandLine": {
     "SELinux": "enforcing"
+},
+```
+
+A sample KernelCommandLine enabling CGroup and booting with cgroupv2 enabled:
+
+``` json
+"KernelCommandLine": {
+    "CGroup": "version_two"
 },
 ```
 

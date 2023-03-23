@@ -9,7 +9,7 @@
 Summary: Relax-and-Recover is a Linux disaster recovery and system migration tool
 Name: rear
 Version: 2.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,43 +65,10 @@ Requires: bc
 ### Optional requirement
 #Requires: cfg2html
 
-%if %{?suse_version:1}0
-Requires: iproute2
-### recent SUSE versions have an extra nfs-client package
-### and switched to genisoimage/wodim
-%if 0%{?suse_version} >= 1020
-Requires: genisoimage
-%else
-Requires: mkisofs
-%endif
-###
-%endif
-
-%if %{?mandriva_version:1}0
-Requires: iproute2
-### Mandriva switched from 2008 away from mkisofs,
-### and as a specialty call the package cdrkit-genisoimage!
-%if 0%{?mandriva_version} >= 2008
-Requires: cdrkit-genisoimage
-%else
-Requires: mkisofs
-%endif
-#Requires: lsb
-%endif
-
-### On RHEL/Fedora the genisoimage packages provides mkisofs
-%if %{?centos_version:1}%{?fedora:1}%{?rhel_version:1}0
-Requires: crontabs
+Requires: cdrkit
+Requires: cronie
 Requires: iproute
-#Requires: mkisofs
-Requires: genisoimage
-#Requires: redhat-lsb
-%endif
-
-# Note that CentOS also has rhel defined so there is no need to use centos
-%if 0%{?rhel}
 Requires: util-linux
-%endif
 
 %description
 Relax-and-Recover is the leading Open Source disaster recovery and system
@@ -152,6 +119,10 @@ echo "30 1 * * * root /usr/sbin/rear checklayout || /usr/sbin/rear mkrescue" >re
 %{_sbindir}/rear
 
 %changelog
+* Tue Jan 10 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.4-7
+- Replacing crontabs with cronie (removing crontabs rpm because of redundancy)
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

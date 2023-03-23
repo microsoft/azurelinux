@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.25.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -28,7 +28,7 @@ Patch0:         vendor_build.patch
 %define install_sh    %{util_path}/setup/install.sh
 %define uninstall_sh  %{util_path}/setup/uninstall.sh
 %define k3s_binary    k3s
-BuildRequires:  golang
+BuildRequires:  golang <= 1.18.8
 BuildRequires:  libseccomp-devel
 BuildRequires:  btrfs-progs-devel
 Requires:       apparmor-parser
@@ -79,6 +79,12 @@ exit 0
 %{install_sh}
 
 %changelog
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-6
+- Bump release to rebuild with go 1.19.6
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-5
+- - Set golang <= 1.18.8 build requires
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.25.0-4
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 

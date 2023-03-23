@@ -1,0 +1,39 @@
+--- ptlib-2.10.11/./src/ptlib/common/getdate.y	2013-08-15 01:20:26.000000000 +0200
++++ /mnt/chroot/cauldron/home/dan/rpm/BUILD/ptlib-2.10.11/src/ptlib/common/getdate.y	2013-12-15 00:24:27.866481490 +0100
+@@ -121,9 +121,9 @@
+ static int yylex();
+ 
+ #ifdef __GNUC__
+-static int yyerror(char const *msg);
++static int yyerror(void *, char const *msg);
+ #else
+-static void yyerror(char const *msg);
++static void yyerror(void *, char const *msg);
+ #endif
+ 
+ 
+@@ -132,7 +132,8 @@
+ 
+ %}
+ 
+-%pure_parser
++%pure-parser
++%parse-param {void *parseParam}
+ 
+ %union {
+     time_t		Number;
+@@ -1018,12 +1019,12 @@
+ #endif
+ 
+ #ifdef __GNUC__
+-int yyerror(const char * s)
++int yyerror(void *var, const char * s)
+ {
+   return 0;
+ }
+ #else
+-static void yyerror(const char * s)
++static void yyerror(void *var, const char * s)
+ {
+ }
+ #endif

@@ -1,20 +1,11 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global with_bundled 1
-
-
 %global with_debug 1
-
-
-
-
 %if 0%{?with_debug}
 %global _find_debuginfo_dwz_opts %{nil}
 %global _dwz_low_mem_die_limit 0
 %else
 %global debug_package   %{nil}
 %endif
-
 %global provider github
 %global provider_tld com
 %global project containers
@@ -22,53 +13,39 @@ Distribution:   Mariner
 # https://github.com/containers/buildah
 %global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
 %global git0 https://%{import_path}
-
 # Used for comparing with latest upstream tag
 # to decide whether to autobuild (non-rawhide only)
 %define built_tag v1.18.0
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
-
-Name: %{repo}
-Version: 1.18.0
-Release: 6%{?dist}
-Summary: A command line tool used for creating OCI Images
-License: ASL 2.0
-URL: https://%{name}.io
-Source: %{download_url}#/%{name}-%{version}.tar.gz
-BuildRequires: device-mapper-devel
-BuildRequires: golang
-BuildRequires: git
-BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.35-3%{?dist}
-BuildRequires: go-md2man
-BuildRequires: go-rpm-macros
-BuildRequires: gpgme-devel
-BuildRequires: libassuan-devel
-BuildRequires: make
-Requires: containers-common
-# No ostree for centos 7
-
-BuildRequires: ostree-devel
-
-# No btrfs for centos 8
-
-BuildRequires: btrfs-progs-devel
-
-
-Requires: crun >= 0.10-1
-BuildRequires: libseccomp-static
-Recommends: container-selinux
-Requires: libseccomp >= 2.4.1-0
-Recommends: slirp4netns >= 0.3-0
-Recommends: fuse-overlayfs
-
-
-
-
-
-
-
+Summary:        A command line tool used for creating OCI Images
+Name:           %{repo}
+Version:        1.18.0
+Release:        10%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://%{name}.io
+Source:         %{download_url}#/%{name}-%{version}.tar.gz
+BuildRequires:  btrfs-progs-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  go-md2man
+BuildRequires:  go-rpm-macros
+BuildRequires:  golang
+BuildRequires:  gpgme-devel
+BuildRequires:  libassuan-devel
+BuildRequires:  libseccomp-static
+BuildRequires:  make
+BuildRequires:  ostree-devel
+Requires:       libcontainers-common
+Requires:       libseccomp >= 2.4.1-0
+Requires:       moby-runc
+Recommends:     container-selinux
+Recommends:     fuse-overlayfs
+Recommends:     slirp4netns >= 0.3-0
 
 %description
 The %{name} package provides a command line tool which can be used to
@@ -79,17 +56,16 @@ or
 * save container's root file system layer to create a new image
 * delete a working container or an image
 
-%package tests
-Summary: Tests for %{name}
-
-Requires: %{name} = %{version}-%{release}
-Requires: bats
-Requires: bzip2
-Requires: podman
-Requires: golang
-Requires: jq
-Requires: httpd-tools
-Requires: openssl
+%package  tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{version}-%{release}
+Requires:       bats
+Requires:       bzip2
+Requires:       golang
+Requires:       httpd-tools
+Requires:       jq
+Requires:       openssl
+Requires:       podman
 
 %description tests
 %{summary}
@@ -146,6 +122,18 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-10
+- Bump release to rebuild with go 1.19.6
+
+* Tue Feb 28 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.18.0-9
+- Fix runtime requirements on libcontainers-common and moby-runc
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-8
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-7
+- Bump release to rebuild with go 1.19.4
+
 * Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.0-6
 - Bump release to rebuild with go 1.18.8
 

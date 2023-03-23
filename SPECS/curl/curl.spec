@@ -1,18 +1,16 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.86.0
-Release:        2%{?dist}
-License:        MIT
+Version:        7.88.1
+Release:        1%{?dist}
+License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
-# CVE-2022-43551 and CVE-2022-43552 will be resolved by version 7.87.0
-Patch0:         CVE-2022-43551.patch
-Patch1:         CVE-2022-43552.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
+BuildRequires:  nghttp2-devel
 BuildRequires:  openssl-devel
 Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
@@ -47,10 +45,6 @@ This package contains minimal set of shared curl libraries.
 %autosetup -p1
 
 %build
-# CVE-2021-22922 and CVE-2021-22923 are vulnerabilities when curl's metalink
-# feature. We do not build with "--with-libmetalink" option and are therefore
-# not affected by these CVEs, but I am placing this comment here as a reminder
-# to leave metalink disabled.
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -59,19 +53,18 @@ This package contains minimal set of shared curl libraries.
     --with-ssl \
     --with-gssapi \
     --with-libssh2 \
+    --with-nghttp2 \
     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=%{_sysconfdir}/ssl/certs
-make %{?_smp_mflags}
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets libs
 
 %files
 %defattr(-,root,root)
@@ -92,6 +85,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Thu Mar 09 2023 Nan Liu <liunan@microsoft.com> - 7.88.1-1
+- Upgrade to version 7.88.1 to fix CVE-2023-23914, CVE-2023-23915, CVE-2023-23916
+- Removing old patches that are fixed in version 7.87.0
+
+* Tue Jan 10 2023 Olivia Crain <oliviacrain@microsoft.com> - 7.86.0-3
+- Build with HTTP/2 support
+- Remove comment about metalink- no longer supported
+- Use SPDX license expression, change license name (MIT -> curl)
+- License verified
+
 * Wed Dec 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 7.86.0-2
 - Patch CVE-2022-43551, CVE-2022-43552
 

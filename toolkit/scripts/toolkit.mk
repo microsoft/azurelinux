@@ -88,7 +88,7 @@ rpms-snapshot: $(rpms_snapshot)
 $(rpms_snapshot): $(rpms_snapshot_per_specs) $(depend_SPECS_DIR)
 	cp $(rpms_snapshot_per_specs) $(rpms_snapshot)
 
-$(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(LOCAL_SPECS) $(LOCAL_SPEC_DIRS) $(SPECS_DIR)
+$(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
 	@mkdir -p "$(rpms_snapshot_build_dir)"
 	$(go-rpmssnapshot) \
 		--input="$(SPECS_DIR)" \

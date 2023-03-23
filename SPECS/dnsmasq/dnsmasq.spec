@@ -1,6 +1,6 @@
 Summary:        DNS proxy with integrated DHCP server
 Name:           dnsmasq
-Version:        2.86
+Version:        2.89
 Release:        1%{?dist}
 License:        GPLv2 or GPLv3
 Group:          System Environment/Daemons
@@ -66,6 +66,9 @@ EOF
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
+* Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.89-1
+- Auto-upgrade to 2.89 - fix CVE-2021-45951 CVE-2021-45952 CVE-2021-45953 CVE-2021-45955 CVE-2021-45956 CVE-2021-45957 CVE-2022-0934
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.86-1
 - Upgrade to version 2.86
 
