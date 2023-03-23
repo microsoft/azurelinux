@@ -1,0 +1,205 @@
+--- sisu-inject/org.eclipse.sisu.inject.tests/src/org/eclipse/sisu/inject/LocatedBeansTest.java~	2014-09-12 08:32:32.899725268 +0200
++++ sisu-inject/org.eclipse.sisu.inject.tests/src/org/eclipse/sisu/inject/LocatedBeansTest.java	2014-09-12 08:37:45.656099710 +0200
+@@ -128,30 +128,6 @@
+         assertSame( a, itr2.next().getValue() );
+     }
+ 
+-    public void testUnrestrictedSearch()
+-    {
+-        final LocatedBeans<Annotation, Bean> beans = locate( Key.get( Bean.class ) );
+-        final Iterator<BeanEntry<Annotation, Bean>> itr = beans.iterator();
+-
+-        assertTrue( itr.hasNext() );
+-        assertEquals( QualifyingStrategy.DEFAULT_QUALIFIER, itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( QualifyingStrategy.BLANK_QUALIFIER, itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( Names.named( "Named1" ), itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( Names.named( "Named2" ), itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( QualifyingStrategy.BLANK_QUALIFIER, itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( MarkedBeanImpl1.class.getAnnotation( Marked.class ), itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( Names.named( "Marked2" ), itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( Names.named( "Marked3" ), itr.next().getKey() );
+-        assertFalse( itr.hasNext() );
+-    }
+-
+     public void testNamedSearch()
+     {
+         final LocatedBeans<Named, Bean> beans = locate( Key.get( Bean.class, Named.class ) );
+@@ -181,20 +156,6 @@
+         assertFalse( itr.hasNext() );
+     }
+ 
+-    public void testMarkedSearch()
+-    {
+-        final LocatedBeans<Marked, Bean> beans = locate( Key.get( Bean.class, Marked.class ) );
+-        final Iterator<BeanEntry<Marked, Bean>> itr = beans.iterator();
+-
+-        assertTrue( itr.hasNext() );
+-        assertEquals( MarkedBeanImpl1.class.getAnnotation( Marked.class ), itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( MarkedBeanImpl2.class.getAnnotation( Marked.class ), itr.next().getKey() );
+-        assertTrue( itr.hasNext() );
+-        assertEquals( MarkedBeanProvider.class.getAnnotation( Marked.class ), itr.next().getKey() );
+-        assertFalse( itr.hasNext() );
+-    }
+-
+     public void testMarkedWithAttributesSearch()
+     {
+         final LocatedBeans<Marked, Bean> beans =
+--- sisu-plexus/org.eclipse.sisu.plexus.tests/src/org/eclipse/sisu/plexus/PlexusXmlScannerTest.java~	2014-08-24 01:48:47.000000000 +0200
++++ sisu-plexus/org.eclipse.sisu.plexus.tests/src/org/eclipse/sisu/plexus/PlexusXmlScannerTest.java	2015-02-04 07:06:49.696531924 +0100
+@@ -159,83 +159,6 @@
+         new PlexusXmlScanner( null, plexusXml, null ).scan( space, true );
+     }
+ 
+-    @SuppressWarnings( "deprecation" )
+-    public void testComponents()
+-    {
+-        final ClassSpace space = new URLClassSpace( PlexusXmlScannerTest.class.getClassLoader() );
+-
+-        final Map<String, PlexusBeanMetadata> metadata = new HashMap<String, PlexusBeanMetadata>();
+-        final PlexusXmlScanner scanner = new PlexusXmlScanner( null, null, metadata );
+-
+-        final Map<Component, DeferredClass<?>> componentMap = scanner.scan( space, true );
+-
+-        assertEquals( 6, componentMap.size() );
+-
+-        final Component component1 =
+-            new ComponentImpl( DefaultBean.class, Hints.DEFAULT_HINT, Strategies.PER_LOOKUP, "" );
+-        assertEquals( DefaultBean.class, componentMap.get( component1 ).load() );
+-
+-        final Component component2 = new ComponentImpl( Bean.class, "debug", Strategies.SINGLETON, "For debugging" );
+-        assertEquals( DebugBean.class, componentMap.get( component2 ).load() );
+-
+-        final Component component3 = new ComponentImpl( Bean.class, Hints.DEFAULT_HINT, Strategies.SINGLETON, "" );
+-        assertEquals( AnotherBean.class, componentMap.get( component3 ).load() );
+-
+-        final Component component4 = new ComponentImpl( Bean.class, "clone", Strategies.SINGLETON, "" );
+-        assertEquals( DefaultBean.class, componentMap.get( component4 ).load().getSuperclass() );
+-        final Class<?> proxy = CustomTestClassLoader.proxy( componentMap.get( component4 ).load() );
+-
+-        try
+-        {
+-            assertNotNull( proxy.getMethod( "TestMe" ) );
+-        }
+-        catch ( final NoSuchMethodException e )
+-        {
+-            fail( "Proxied class is missing 'TestMe' method" );
+-        }
+-
+-        final PlexusBeanMetadata metadata1 = metadata.get( DefaultBean.class.getName() );
+-
+-        assertFalse( metadata1.isEmpty() );
+-
+-        assertEquals( new ConfigurationImpl( "someFieldName", "<some-field-name><item>PRIMARY</item></some-field-name>" ),
+-                      metadata1.getConfiguration( new NamedProperty( "someFieldName" ) ) );
+-
+-        assertEquals( new ConfigurationImpl( "simple", "value" ),
+-                      metadata1.getConfiguration( new NamedProperty( "simple" ) ) );
+-
+-        assertEquals( new ConfigurationImpl( "value", "<value with=\"attribute\"></value>" ),
+-                      metadata1.getConfiguration( new NamedProperty( "value" ) ) );
+-
+-        assertEquals( new ConfigurationImpl( "emptyValue1", "<empty-value1 with=\"attribute\" />" ),
+-                      metadata1.getConfiguration( new NamedProperty( "emptyValue1" ) ) );
+-
+-        assertEquals( new ConfigurationImpl( "emptyValue2", "" ),
+-                      metadata1.getConfiguration( new NamedProperty( "emptyValue2" ) ) );
+-
+-        assertFalse( metadata1.isEmpty() );
+-
+-        assertEquals( new RequirementImpl( Bean.class, true, "debug" ),
+-                      metadata1.getRequirement( new NamedProperty( "bean", TypeLiteral.get( Bean.class ) ) ) );
+-
+-        assertFalse( metadata1.isEmpty() );
+-
+-        metadata1.getConfiguration( new NamedProperty( "foo" ) );
+-
+-        assertEquals( new RequirementImpl( Bean.class, false, Hints.DEFAULT_HINT, "debug" ),
+-                      metadata1.getRequirement( new NamedProperty( "beanMap" ) ) );
+-
+-        assertFalse( metadata1.isEmpty() );
+-
+-        assertEquals( new RequirementImpl( Bean.class, false ),
+-                      metadata1.getRequirement( new NamedProperty( "beanField" ) ) );
+-
+-        assertTrue( metadata1.isEmpty() );
+-
+-        assertNotNull( metadata.get( AnotherBean.class.getName() ) );
+-        assertNull( metadata.get( DebugBean.class.getName() ) );
+-    }
+-
+     static class FixedClassSpace
+         implements ClassSpace
+     {
+@@ -392,64 +315,4 @@
+         }
+     }
+ 
+-    static final class CustomTestClassLoader
+-        extends ClassLoader
+-    {
+-        private static final String PROXY_MARKER = "$proxy";
+-
+-        CustomTestClassLoader( final ClassLoader parent )
+-        {
+-            super( parent );
+-        }
+-
+-        static Class<?> proxy( final Class<?> clazz )
+-        {
+-            try
+-            {
+-                return new CustomTestClassLoader( clazz.getClassLoader() ).loadClass( clazz.getName() + PROXY_MARKER );
+-            }
+-            catch ( final ClassNotFoundException e )
+-            {
+-                throw new TypeNotPresentException( clazz.getName(), e );
+-            }
+-        }
+-
+-        @Override
+-        protected synchronized Class<?> loadClass( final String name, final boolean resolve )
+-            throws ClassNotFoundException
+-        {
+-            return super.loadClass( name, resolve );
+-        }
+-
+-        @Override
+-        protected Class<?> findClass( final String name )
+-            throws ClassNotFoundException
+-        {
+-            final String proxyName = name.replace( '.', '/' );
+-            final String superName = proxyName.substring( 0, proxyName.length() - PROXY_MARKER.length() );
+-
+-            final ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_MAXS );
+-            cw.visit( Opcodes.V1_5, Modifier.PUBLIC | Modifier.FINAL, proxyName, null, superName, null );
+-            MethodVisitor mv = cw.visitMethod( Modifier.PUBLIC, "<init>", "()V", null, null );
+-
+-            mv.visitCode();
+-            mv.visitVarInsn( Opcodes.ALOAD, 0 );
+-            mv.visitMethodInsn( Opcodes.INVOKESPECIAL, superName, "<init>", "()V", false );
+-            mv.visitInsn( Opcodes.RETURN );
+-            mv.visitMaxs( 0, 0 );
+-            mv.visitEnd();
+-
+-            mv = cw.visitMethod( Modifier.PUBLIC, "TestMe", "()V", null, null );
+-
+-            mv.visitCode();
+-            mv.visitInsn( Opcodes.RETURN );
+-            mv.visitMaxs( 0, 0 );
+-            mv.visitEnd();
+-            cw.visitEnd();
+-
+-            final byte[] buf = cw.toByteArray();
+-
+-            return defineClass( name, buf, 0, buf.length );
+-        }
+-    }
+ }

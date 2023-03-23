@@ -1,32 +1,32 @@
 # This is the license breakdown of each component
 
-downstream/ant: ASL 2.0
-downstream/apache-pom: ASL 2.0
-downstream/apiguardian: ASL 2.0
-downstream/asm: BSD
-downstream/assertj-core: ASL 2.0
-downstream/bnd: ASL 2.0 or EPL-2.0
-downstream/build-helper-maven-plugin: MIT
-downstream/byte-buddy: ASL 2.0
-downstream/cdi: ASL 2.0
-downstream/cglib: ASL 2.0
-downstream/common-annotations-api: EPL-2.0 or GPLv2 with exceptions
-downstream/commons-beanutils: ASL 2.0
-downstream/commons-cli: ASL 2.0
-downstream/commons-codec: ASL 2.0
-downstream/commons-collections: ASL 2.0
-downstream/commons-compress: ASL 2.0
-downstream/commons-io: ASL 2.0
-downstream/commons-jxpath: ASL 2.0
-downstream/commons-lang: ASL 2.0
-downstream/commons-logging: ASL 2.0
-downstream/commons-parent-pom: ASL 2.0
-downstream/cup: MIT
-downstream/easymock: ASL 2.0
-downstream/felix-parent-pom: ASL 2.0
-downstream/felix-utils: ASL 2.0
-downstream/fusesource-pom: ASL 2.0
-downstream/guava: ASL 2.0 and CC0
+downstream/ant: ASL 2.0 (License-Verified)
+downstream/apache-pom: ASL 2.0 (License-Verified)
+downstream/apiguardian: ASL 2.0 (License-Verified)
+downstream/asm: BSD-3-Clause (License-Verified)
+downstream/assertj-core: ASL 2.0 (License-Verified)
+downstream/bnd: ASL 2.0 or EPL-2.0 (License-Verified)
+downstream/build-helper-maven-plugin: MIT (License-Verified)
+downstream/byte-buddy: ASL 2.0 (License-Verified)
+downstream/cdi: ASL 2.0 (License-Verified)
+downstream/cglib: ASL 2.0 (License-Verified)
+downstream/common-annotations-api: EPL-2.0 or GPLv2 with exceptions (License-Verified)
+downstream/commons-beanutils: ASL 2.0 (License-Verified)
+downstream/commons-cli: ASL 2.0 (License-Verified)
+downstream/commons-codec: ASL 2.0 (License-Verified)
+downstream/commons-collections: ASL 2.0 (License-Verified)
+downstream/commons-compress: ASL 2.0 (License-Verified)
+downstream/commons-io: ASL 2.0 (License-Verified)
+downstream/commons-jxpath: ASL 2.0 (License-Verified)
+downstream/commons-lang: ASL 2.0 (License-Verified)
+downstream/commons-logging: ASL 2.0 (License-Verified)
+downstream/commons-parent-pom: ASL 2.0 (License-Verified)
+downstream/cup: MIT (License-Verified)
+downstream/easymock: ASL 2.0 (License-Verified)
+downstream/felix-parent-pom: ASL 2.0 (License-Verified)
+downstream/felix-utils: ASL 2.0 (License-Verified)
+downstream/fusesource-pom: ASL 2.0 (License-Verified)
+downstream/guava: ASL 2.0 and CC0 (License-Verified)
 	com/google/common/hash/Striped64.java: CC0
 	com/google/common/hash/LongAdder.java: CC0
 	com/google/common/collect/Hashing.java: ASL 2.0 and CC0
@@ -37,52 +37,52 @@ downstream/guava: ASL 2.0 and CC0
 	com/google/common/util/concurrent/MoreExecutors.java: ASL 2.0 and CC0
 	com/google/common/base/SmallCharMatcher.java: ASL 2.0 and CC0
 	everything else is ASL 2.0
-downstream/guice: ASL 2.0
-downstream/hamcrest: BSD
-downstream/httpcomponents-client: ASL 2.0
-downstream/httpcomponents-core: ASL 2.0
-downstream/httpcomponents-parent-pom: ASL 2.0
-downstream/injection-api: ASL 2.0
-downstream/jansi: ASL 2.0
-downstream/jcommander: ASL 2.0
-downstream/jdom: BSD with advertising
-downstream/jdom2: BSD with advertising
-downstream/jflex: BSD
-downstream/jsoup: MIT
-downstream/jsr-305: BSD
-downstream/junit4: EPL-1.0
-downstream/junit5: EPL-2.0
-downstream/maven: ASL 2.0
-downstream/maven-antrun-plugin: ASL 2.0
-downstream/maven-archiver: ASL 2.0
-downstream/maven-artifact-transfer: ASL 2.0
-downstream/maven-assembly-plugin: ASL 2.0
-downstream/maven-bundle-plugin: ASL 2.0
-downstream/maven-common-artifact-filters: ASL 2.0
-downstream/maven-compiler-plugin: ASL 2.0
-downstream/maven-dependency-analyzer: ASL 2.0
-downstream/maven-dependency-plugin: ASL 2.0
-downstream/maven-dependency-tree: ASL 2.0
-downstream/maven-enforcer: ASL 2.0
-downstream/maven-file-management: ASL 2.0
-downstream/maven-filtering: ASL 2.0
-downstream/maven-jar-plugin: ASL 2.0
-downstream/maven-parent-pom: ASL 2.0
-downstream/maven-plugin-testing: ASL 2.0
-downstream/maven-plugin-tools: ASL 2.0
-downstream/maven-remote-resources-plugin: ASL 2.0
-downstream/maven-resolver: ASL 2.0
-downstream/maven-resources: ASL 2.0
-downstream/maven-resources-plugin: ASL 2.0
-downstream/maven-shared-incremental: ASL 2.0
-downstream/maven-shared-io: ASL 2.0
-downstream/maven-shared-utils: ASL 2.0
-downstream/maven-source-plugin: ASL 2.0
-downstream/maven-surefire: ASL 2.0
-downstream/maven-verifier: ASL 2.0
-downstream/maven-wagon: ASL 2.0
-downstream/mockito: MIT
-downstream/modello: MIT and ASL 2.0
+downstream/guice: ASL 2.0 (License-Verified)
+downstream/hamcrest: BSD (License-Verified)
+downstream/httpcomponents-client: ASL 2.0 (License-Verified)
+downstream/httpcomponents-core: ASL 2.0 (License-Verified)
+downstream/httpcomponents-parent-pom: ASL 2.0 (License-Verified)
+downstream/injection-api: ASL 2.0 (License-Verified)
+downstream/jansi: ASL 2.0 (License-Verified)
+downstream/jcommander: ASL 2.0 (License-Verified)
+downstream/jdom: BSD with advertising (License-Verified)
+downstream/jdom2: BSD with advertising (License-Verified)
+downstream/jflex: BSD-3-Clause (License-Verified)
+downstream/jsoup: MIT (License-Verified)
+downstream/jsr-305: BSD (License-Verified)
+downstream/junit4: EPL-1.0 (License-Verified)
+downstream/junit5: EPL-2.0 (License-Verified)
+downstream/maven: ASL 2.0 (License-Verified)
+downstream/maven-antrun-plugin: ASL 2.0 (License-Verified)
+downstream/maven-archiver: ASL 2.0 (License-Verified)
+downstream/maven-artifact-transfer: ASL 2.0 (License-Verified)
+downstream/maven-assembly-plugin: ASL 2.0 (License-Verified)
+downstream/maven-bundle-plugin: ASL 2.0 (License-Verified)
+downstream/maven-common-artifact-filters: ASL 2.0 (License-Verified)
+downstream/maven-compiler-plugin: ASL 2.0 (License-Verified)
+downstream/maven-dependency-analyzer: ASL 2.0 (License-Verified)
+downstream/maven-dependency-plugin: ASL 2.0 (License-Verified)
+downstream/maven-dependency-tree: ASL 2.0 (License-Verified)
+downstream/maven-enforcer: ASL 2.0 (License-Verified)
+downstream/maven-file-management: ASL 2.0 (License-Verified)
+downstream/maven-filtering: ASL 2.0 (License-Verified)
+downstream/maven-jar-plugin: ASL 2.0 (License-Verified)
+downstream/maven-parent-pom: ASL 2.0 (License-Verified)
+downstream/maven-plugin-testing: ASL 2.0 (License-Verified)
+downstream/maven-plugin-tools: ASL 2.0 (License-Verified)
+downstream/maven-remote-resources-plugin: ASL 2.0 (License-Verified)
+downstream/maven-resolver: ASL 2.0 (License-Verified)
+downstream/maven-resources: ASL 2.0 (License-Verified)
+downstream/maven-resources-plugin: ASL 2.0 (License-Verified)
+downstream/maven-shared-incremental: ASL 2.0 (License-Verified)
+downstream/maven-shared-io: ASL 2.0 (License-Verified)
+downstream/maven-shared-utils: ASL 2.0 (License-Verified)
+downstream/maven-source-plugin: ASL 2.0 (License-Verified)
+downstream/maven-surefire: ASL 2.0 (License-Verified)
+downstream/maven-verifier: ASL 2.0 (License-Verified)
+downstream/maven-wagon: ASL 2.0 (License-Verified)
+downstream/mockito: MIT (License-Verified)
+downstream/modello: MIT and ASL 2.0 (License-Verified)
 	modello-plugins/modello-plugin-java/src/test/java/org/codehaus/modello/plugin/java/BiDirectionalOverrideJavaGeneratorTest.java: Apache License 2.0
 	modello-plugins/modello-plugin-java/src/test/java/org/codehaus/modello/plugin/java/Permission.java: Apache License 2.0
 	modello-plugins/modello-plugin-java/src/test/java/org/codehaus/modello/plugin/java/Role.java: Apache License 2.0
@@ -97,18 +97,18 @@ downstream/modello: MIT and ASL 2.0
 	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdMetadataPlugin.java: Apache License 2.0
 	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdModelMetadata.java: Apache License 2.0
 	everything else is MIT
-downstream/mojo-parent-pom: ASL 2.0
-downstream/munnge-maven-plugin: CDDL-1.0
-downstream/objenesis: ASL 2.0
-downstream/opentest4j: ASL 2.0
-downstream/osgi-annotation: ASL 2.0
-downstream/osgi-cmpn: ASL 2.0
-downstream/osgi-core: ASL 2.0
-downstream/oss-parent-pom: ASL 2.0
-downstream/plexus-archiver: ASL 2.0
-downstream/plexus-cipher: ASL 2.0
-downstream/plexus-classworlds: ASL 2.0
-downstream/plexus-compiler: MIT and ASL 2.0
+downstream/mojo-parent-pom: ASL 2.0 (License-Verified)
+downstream/munnge-maven-plugin: CDDL-1.0 (License-Verified)
+downstream/objenesis: ASL 2.0 (License-Verified)
+downstream/opentest4j: ASL 2.0 (License-Verified)
+downstream/osgi-annotation: ASL 2.0 (License-Verified)
+downstream/osgi-cmpn: ASL 2.0 (License-Verified)
+downstream/osgi-core: ASL 2.0 (License-Verified)
+downstream/oss-parent-pom: ASL 2.0 (License-Verified)
+downstream/plexus-archiver: ASL 2.0 (License-Verified)
+downstream/plexus-cipher: ASL 2.0 (License-Verified)
+downstream/plexus-classworlds: ASL 2.0 (License-Verified)
+downstream/plexus-compiler: MIT and ASL 2.0 (License-Verified)
 	complete breakdown:
 	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerMessage.java: MIT and ASL 2.0
 	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/JavacCompiler.java: MIT and ASL 2.0
@@ -138,8 +138,8 @@ downstream/plexus-compiler: MIT and ASL 2.0
 	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/IsolatedClassLoader.java: MIT
 	
 	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/InProcessCompiler.java: ASL 2.0
-downstream/plexus-components-pom: ASL 2.0
-downstream/plexus-containers: ASL 2.0 and MIT and xpp
+downstream/plexus-components-pom: ASL 2.0 (License-Verified)
+downstream/plexus-containers: ASL 2.0 and MIT and xpp (License-Verified)
 	complete breakdown:
 	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/Driver.java: xpp
 	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/MXParser.java: xpp
@@ -378,7 +378,7 @@ downstream/plexus-containers: ASL 2.0 and MIT and xpp
 	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/PlexusXmlTag.java: ASL 2.0
 	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/RequirementElement.java: MIT
 	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/RequirementsElement.java: MIT
-downstream/plexus-interpolation: ASL 2.0 and ASL 1.1 and MIT
+downstream/plexus-interpolation: ASL 2.0 and ASL 1.1 and MIT (License-Verified)
 	complete breakdown:
 	src/main/java/org/codehaus/plexus/interpolation/AbstractDelegatingValueSource.java: ASL 2.0
 	src/main/java/org/codehaus/plexus/interpolation/AbstractFunctionValueSourceWrapper.java: ASL 2.0
@@ -431,12 +431,12 @@ downstream/plexus-interpolation: ASL 2.0 and ASL 1.1 and MIT
 	src/main/java/org/codehaus/plexus/interpolation/reflection/ReflectionValueExtractor.java: ASL 2.0
 	src/main/java/org/codehaus/plexus/interpolation/util/StringUtils.java: ASL 1.1
 	src/main/java/org/codehaus/plexus/interpolation/util/ValueSourceUtils.java: ASL 2.0
-downstream/plexus-io: ASL 2.0
-downstream/plexus-languages: ASL 2.0
-downstream/plexus-pom: ASL 2.0
-downstream/plexus-resources: MIT
-downstream/plexus-sec-dispatcher: ASL 2.0
-downstream/plexus-utils: ASL 2.0 and ASL 1.1 and BSD and xpp and Public Domain
+downstream/plexus-io: ASL 2.0 (License-Verified)
+downstream/plexus-languages: ASL 2.0 (License-Verified)
+downstream/plexus-pom: ASL 2.0 (License-Verified)
+downstream/plexus-resources: MIT (License-Verified)
+downstream/plexus-sec-dispatcher: ASL 2.0 (License-Verified)
+downstream/plexus-utils: ASL 2.0 and ASL 1.1 and BSD and xpp and Public Domain (License-Verified)
 	complete breakdown:
 	src/main/java/org/codehaus/plexus/util/AbstractScanner.java: ASL 2.0
 	src/main/java/org/codehaus/plexus/util/Base64.java: ASL 2.0
@@ -524,8 +524,8 @@ downstream/plexus-utils: ASL 2.0 and ASL 1.1 and BSD and xpp and Public Domain
 	src/main/java/org/codehaus/plexus/util/SelectorUtils.java: ASL 1.1
 	src/main/java/org/codehaus/plexus/util/StringInputStream.java: ASL 1.1
 	src/main/java/org/codehaus/plexus/util/StringUtils.java: ASL 1.1
-downstream/qdox: ASL 2.0
-downstream/servlet-api: ASL 2.0 and (EPL-2.0 or GPLv2 with exceptions)
+downstream/qdox: ASL 2.0 (License-Verified)
+downstream/servlet-api: ASL 2.0 and (EPL-2.0 or GPLv2 with exceptions) (License-Verified)
 	complete breakdown:
 	api/src/main/java/javax/servlet/RequestDispatcher.java: ASL 2.0
 	api/src/main/java/javax/servlet/annotation/HttpMethodConstraint.java: EPL-2.0 or GPLv2 with exceptions
@@ -604,18 +604,18 @@ downstream/servlet-api: ASL 2.0 and (EPL-2.0 or GPLv2 with exceptions)
 	api/src/main/java/javax/servlet/FilterConfig.java: ASL 2.0
 	api/src/main/java/javax/servlet/ReadListener.java: EPL-2.0 or GPLv2 with exceptions
 	api/src/main/java/javax/servlet/AsyncListener.java: EPL-2.0 or GPLv2 with exceptions
-downstream/sisu-build-api: ASL 2.0
-downstream/sisu-inject: EPL-1.0 and BSD
-	org.eclipse.sisu.inject/src/org/eclipse/sisu/space/asm/*: BSD
+downstream/sisu-build-api: ASL 2.0 (License-Verified)
+downstream/sisu-inject: EPL-1.0 and BSD (License-Verified)
+	org.eclipse.sisu.inject/src/org/eclipse/sisu/space/asm/*: BSD 
 	everything else: EPL-1.0
-downstream/sisu-mojos: EPL-1.0
-downstream/sisu-plexus: EPL-1.0
-downstream/slf4j: MIT
-downstream/testng: ASL 2.0
-downstream/univocity-parsers: ASL 2.0
-downstream/velocity-engine: ASL 2.0
-downstream/xbean: ASL 2.0
-downstream/xmlunit: ASL 2.0
-downstream/xmvn: ASL 2.0
-downstream/xz-java: Public Domain
-mbi: ASL 2.0
+downstream/sisu-mojos: EPL-1.0 (License-Verified) 
+downstream/sisu-plexus: EPL-1.0 (License-Verified)
+downstream/slf4j: MIT (License-Verified)
+downstream/testng: ASL 2.0 (License-Verified)
+downstream/univocity-parsers: ASL 2.0 (License-Verified)
+downstream/velocity-engine: ASL 2.0 (License-Verified)
+downstream/xbean: ASL 2.0 (License-Verified)
+downstream/xmlunit: ASL 2.0 (License-Verified)
+downstream/xmvn: ASL 2.0 (License-Verified)
+downstream/xz-java: Public Domain (License-Verified)
+mbi: ASL 2.0 (License-Verified)
