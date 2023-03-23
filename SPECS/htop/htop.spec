@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: htop
 Version: 3.0.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Interactive process viewer
 License: GPLv2+
 URL: http://hisham.hm/htop/
@@ -14,7 +14,7 @@ BuildRequires: ncurses-devel
 BuildRequires: platform-python
 BuildRequires: /usr/bin/pathfix.py
 %else
-BuildRequires: python
+BuildRequires: python3
 %endif
 BuildRequires: libtool
 BuildRequires: make
@@ -56,6 +56,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_mandir}/man1/htop.1*
 
 %changelog
+* Tue Mar 21 2023 Betty Lakes <bettylakes@microsoft.com> - 3.0.5-3
+- Update python to python3
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.5-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
