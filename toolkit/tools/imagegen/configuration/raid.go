@@ -22,6 +22,7 @@ type RaidConfig struct {
 	ComponentPartIDs []string `json:"ComponentPartIDs"` // PartIDs of the partitions to be used in the raid
 	Level            int      `json:"Level"`            // 0, 1, 4, 5, 6, 10
 	RaidID           string   `json:"RaidID"`           // ID of the raid device used for mdadm
+	LegacyMetadata   bool     `json:"LegacyMetadata"`   // Use legacy metadata for mdadm to support efi boot partitions
 }
 
 // IsEmpty returns true if the RaidConfig is empty

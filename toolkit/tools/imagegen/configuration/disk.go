@@ -85,6 +85,15 @@ func checkRaidDisk(disk *Disk) (err error) {
 		if disk.Partitions[0].Start != 0 || disk.Partitions[0].End != 0 {
 			return fmt.Errorf("RAID disk '%s' cannot have a [Partition] with a Start or End value", disk.ID)
 		}
+
+		if disk.Partitions[0].HasBootLoaderFlag() {
+			if !disk.TargetDisk.RaidConfig.LegacyMetadata {
+				return fmt.Errorf("RAID disk '%s' cannot have a [Partition] with a BootLoaderFlag set to true when the RAID config has LegacyMetadata set to false", disk.ID)
+			}
+			if disk.TargetDisk.RaidConfig.Level != 1 {
+				return fmt.Errorf("RAID disk '%s' cannot have a [Partition] with a BootLoaderFlag set to true without setting the RAID config has Level to '1'", disk.ID)
+			}
+		}
 	}
 	return
 }

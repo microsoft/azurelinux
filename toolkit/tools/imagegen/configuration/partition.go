@@ -47,6 +47,11 @@ func (p *Partition) HasFlag(flag PartitionFlag) bool {
 	return false
 }
 
+// HasBootLoaderFlag returns true if this partition is marked for use by a boot loader
+func (p *Partition) HasBootLoaderFlag() bool {
+	return p.HasFlag(PartitionFlagESP) || p.HasFlag(PartitionFlagGrub) || p.HasFlag(PartitionFlagBiosGrub) || p.HasFlag(PartitionFlagBiosGrubLegacy)
+}
+
 // nameCheck makes sure the Name can fit in the alloted space in the GPT, and since parted works best with ASCII we check
 // for any non-ASCII characters
 // header (72 bytes of UTF-16)

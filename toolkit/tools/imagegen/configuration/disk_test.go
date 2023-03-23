@@ -255,3 +255,64 @@ func TestShouldFailRAIDMultiplePartitions(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: a [Disk] 'MyRaidDisk' with a [TargetDisk] of type 'raid' must define exactly one [Partition]", err.Error())
 }
+
+func TestShouldFailBootLoaderRaidNotLegacy_Disk(t *testing.T) {
+	var checkedDisk Disk
+	diskRaidBootLoader := validDisk
+
+	// Add a new raid disk config
+	diskRaidBootLoader = Disk{ID: "MyRaidBootDisk"}
+	diskRaidBootLoader.Partitions = []Partition{
+		{
+			ID:    "MyRaidBootPart",
+			Flags: []PartitionFlag{PartitionFlagBiosGrub},
+		},
+	}
+	diskRaidBootLoader.TargetDisk = TargetDisk{
+		Type: "raid",
+		RaidConfig: RaidConfig{
+			RaidID:           "MyRaidBootDisk",
+			Level:            1,
+			ComponentPartIDs: []string{"MyRaidBootPart"},
+		},
+	}
+
+	err := diskRaidBootLoader.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Disk]: RAID disk 'MyRaidBootDisk' cannot have a [Partition] with a BootLoaderFlag set to true when the RAID config has LegacyMetadata set to false", err.Error())
+
+	err = remarshalJSON(diskRaidBootLoader, &checkedDisk)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: RAID disk 'MyRaidBootDisk' cannot have a [Partition] with a BootLoaderFlag set to true when the RAID config has LegacyMetadata set to false", err.Error())
+}
+
+func TestShouldFailBootLoaderRaidNotLevel1_Disk(t *testing.T) {
+	var checkedDisk Disk
+	diskRaidBootLoader := validDisk
+
+	// Add a new raid disk config
+	diskRaidBootLoader = Disk{ID: "MyRaidBootDisk"}
+	diskRaidBootLoader.Partitions = []Partition{
+		{
+			ID:    "MyRaidBootPart",
+			Flags: []PartitionFlag{PartitionFlagBiosGrub},
+		},
+	}
+	diskRaidBootLoader.TargetDisk = TargetDisk{
+		Type: "raid",
+		RaidConfig: RaidConfig{
+			RaidID:           "MyRaidBootDisk",
+			Level:            5,
+			ComponentPartIDs: []string{"MyRaidBootPart"},
+			LegacyMetadata:   true,
+		},
+	}
+
+	err := diskRaidBootLoader.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Disk]: RAID disk 'MyRaidBootDisk' cannot have a [Partition] with a BootLoaderFlag set to true without setting the RAID config has Level to '1'", err.Error())
+
+	err = remarshalJSON(diskRaidBootLoader, &checkedDisk)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: RAID disk 'MyRaidBootDisk' cannot have a [Partition] with a BootLoaderFlag set to true without setting the RAID config has Level to '1'", err.Error())
+}
