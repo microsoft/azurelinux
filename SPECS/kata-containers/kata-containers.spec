@@ -41,7 +41,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
