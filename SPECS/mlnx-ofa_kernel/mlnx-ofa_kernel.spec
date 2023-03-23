@@ -70,14 +70,14 @@ Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 # Update OFED version along with version updates
 Version:        5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
 Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz#/%{name}-%{version}.tgz
-BuildRequires:  kernel-devel
+BuildRequires:  kernel-devel = 5.15.87.1
 BuildRequires:  kmod
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -482,6 +482,9 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Thu Mar 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.6-2
+- BuildRequires kernel-devel=5.15.87.1
+
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2).
 - Lint spec to conform to Mariner
