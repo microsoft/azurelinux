@@ -11,15 +11,14 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.92.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
-URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+URL:            https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
-Source1:        config
-Source2:        cbl-mariner-ca-20211013.pem
+Source1:        cbl-mariner-ca-20211013.pem
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -77,11 +76,10 @@ This package contains the 'perf' performance analysis tools for MSHV kernel.
 %autosetup -p1
 
 make mrproper
-
-cp %{SOURCE1} .config
+cp arch/x86/configs/mshv_defconfig .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE2} certs/mariner.pem
+cp %{SOURCE1} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
@@ -237,6 +235,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Mar 23 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.92.mshv1-2
+- Consume config from LSG source
+
 * Tue Feb 28 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.92.mshv1-1
 - Update to v5.15.92.mshv2.
 
