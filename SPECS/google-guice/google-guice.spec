@@ -200,8 +200,8 @@ and above. This package provides Bill of Materials module for Guice.
 
 %changelog
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.3-11
-- Initial CBL-Mariner import from Fedora 36(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild

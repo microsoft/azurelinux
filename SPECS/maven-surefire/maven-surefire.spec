@@ -150,8 +150,8 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 
 %changelog
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
-- Initial CBL-Mariner import from Fedora 36(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0~M4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

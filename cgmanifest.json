@@ -12822,7 +12822,7 @@
         "other": {
           "name": "maven-wagon",
           "version": "3.5.1",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/%{version}/wagon-3.5.1-source-release.zip"
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.1/wagon-3.5.1-source-release.zip"
         }
       }
     },

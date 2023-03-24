@@ -39,8 +39,8 @@ Summary:        Javadoc for %{name}
 
 %changelog
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.0-9
-- Initial CBL-Mariner import from Fedora 38(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 38 (license: MIT)
+- License verified
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

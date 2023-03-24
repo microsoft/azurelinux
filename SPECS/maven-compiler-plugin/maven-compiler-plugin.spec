@@ -47,8 +47,8 @@ sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar juni
 
 %changelog
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.8.1-13
-- Initial CBL-Mariner import from Fedora 36(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified
 
 * Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 3.8.1-12
 - Rebuilt for java-17-openjdk as system jdk

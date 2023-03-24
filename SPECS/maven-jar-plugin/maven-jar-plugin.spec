@@ -43,8 +43,8 @@ API documentation for %{name}.
 
 %changelog
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.2-4
-- Initial CBL-Mariner import from Fedora 38(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 38 (license: MIT)
+- License verified
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild

@@ -65,8 +65,8 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 
 %changelog
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.5-4
-- Initial CBL-Mariner import from Fedora 36(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified
 
 * Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.3.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild

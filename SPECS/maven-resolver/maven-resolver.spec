@@ -92,8 +92,8 @@ done
 
 %changelog
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.3-7
-- Initial CBL-Mariner import from Fedora 36(license: MIT).
-- License Verified.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+- License verified
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.7.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
