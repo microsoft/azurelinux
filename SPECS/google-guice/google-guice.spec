@@ -1,20 +1,18 @@
 %bcond_without bootstrap
-
+Summary:        Lightweight dependency injection framework for Java 5 and above
 Name:           google-guice
 Version:        4.2.3
-Release:        10%{?dist}
-Summary:        Lightweight dependency injection framework for Java 5 and above
+Release:        11%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/google/guice
-BuildArch:      noarch
-
 # ./create-tarball.sh %%{version}
 Source0:        %{name}-%{version}.tar.xz
 Source1:        create-tarball.sh
-
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-
+BuildArch:      noarch
 
 %description
 Put simply, Guice alleviates the need for factories and the use of new
@@ -163,19 +161,19 @@ and above. This package provides Bill of Materials module for Guice.
 %pom_xpath_inject "pom:dependency[pom:artifactId='guice']" "<scope>provided</scope>" extensions
 
 %build
-%mvn_alias "com.google.inject.extensions:" "org.sonatype.sisu.inject:"
+%{mvn_alias} "com.google.inject.extensions:" "org.sonatype.sisu.inject:"
 
-%mvn_package :::no_aop: guice
-%mvn_package :guice:jar:{}: __noinstall
+%{mvn_package} :::no_aop: guice
+%{mvn_package} :guice:jar:{}: __noinstall
 
-%mvn_file  ":guice-{*}"  guice/guice-@1
-%mvn_file  ":guice" guice/%{name} %{name}
-%mvn_alias ":guice" "org.sonatype.sisu:sisu-guice"
+%{mvn_file}  ":guice-{*}"  guice/guice-@1
+%{mvn_file}  ":guice" guice/%{name} %{name}
+%{mvn_alias} ":guice" "org.sonatype.sisu:sisu-guice"
 # Skip tests because of missing dependency guice-testlib
-%mvn_build -f -s
+%{mvn_build} -f -s
 
 %install
-%mvn_install
+%{mvn_install}
 
 %files -n %{?module_prefix}%{name} -f .mfiles-guice
 
@@ -183,17 +181,28 @@ and above. This package provides Bill of Materials module for Guice.
 %license COPYING
 
 %files -n guice-assistedinject -f .mfiles-guice-assistedinject
+
 %files -n guice-extensions -f .mfiles-extensions-parent
+
 %files -n guice-grapher -f .mfiles-guice-grapher
+
 %files -n guice-jmx -f .mfiles-guice-jmx
+
 %files -n guice-jndi -f .mfiles-guice-jndi
+
 %files -n guice-multibindings -f .mfiles-guice-multibindings
+
 %files -n guice-servlet -f .mfiles-guice-servlet
+
 %files -n guice-throwingproviders -f .mfiles-guice-throwingproviders
 
 %files -n guice-bom -f .mfiles-guice-bom
 
 %changelog
+* Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.3-11
+- Initial CBL-Mariner import from Fedora 36(license: MIT).
+- License Verified.
+
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.3-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 

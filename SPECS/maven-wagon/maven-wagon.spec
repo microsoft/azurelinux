@@ -1,24 +1,21 @@
 %bcond_without bootstrap
-
+Summary:        Tools to manage artifacts and deployment
 Name:           maven-wagon
 Version:        3.5.1
-Release:        3%{?dist}
-Summary:        Tools to manage artifacts and deployment
+Release:        4%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://maven.apache.org/wagon
-BuildArch:      noarch
-
 Source0:        https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/%{version}/wagon-%{version}-source-release.zip
-
-
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-
 Provides:       maven-wagon-file = %{version}-%{release}
 Provides:       maven-wagon-http = %{version}-%{release}
 Provides:       maven-wagon-http-shared = %{version}-%{release}
 Provides:       maven-wagon-provider-api = %{version}-%{release}
 Provides:       maven-wagon-providers = %{version}-%{release}
+BuildArch:      noarch
 
 %description
 Maven Wagon is a transport abstraction that is used in Maven's
@@ -58,24 +55,28 @@ following providers:
 
 %pom_remove_plugin :maven-shade-plugin wagon-providers/wagon-http
 
-%mvn_file ":wagon-{*}" %{name}/@1
-%mvn_package ":wagon"
+%{mvn_file} ":wagon-{*}" %{name}/@1
+%{mvn_package} ":wagon"
 
 %build
 # tests are disabled because of missing dependencies
-%mvn_build -f
+%{mvn_build} -f
 
 # Maven requires Wagon HTTP with classifier "shaded"
-%mvn_alias :wagon-http :::shaded:
+%{mvn_alias} :wagon-http :::shaded:
 
 %install
-%mvn_install
+%{mvn_install}
 
 %files -f .mfiles
 %license LICENSE NOTICE
 %doc DEPENDENCIES
 
 %changelog
+* Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.5.1-4
+- Initial CBL-Mariner import from Fedora 38(license: MIT).
+- License Verified.
+
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 

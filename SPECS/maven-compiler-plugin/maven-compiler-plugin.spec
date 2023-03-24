@@ -1,25 +1,20 @@
 %bcond_without bootstrap
-
+Summary:        Maven Compiler Plugin
 Name:           maven-compiler-plugin
 Version:        3.8.1
 Release:        12%{?dist}
-Summary:        Maven Compiler Plugin
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://maven.apache.org/plugins/maven-compiler-plugin
-BuildArch:      noarch
-
 Source0:        https://archive.apache.org/dist/maven/plugins/%{name}-%{version}-source-release.zip
-
 # port to plexus-languages 1.0.3
 Patch0:         0001-plexus-languages-1.0.patch
-
 # Taken from upstream commit: https://github.com/apache/maven-compiler-plugin/commit/116b98153ef5ce7b13c0275324baa28bca8bc887
 Patch1:         0002-MCOMPILER-359-Fix-for-NPE.patch
-
-BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  javapackages-bootstrap
-
-
+BuildRequires:  javapackages-local-bootstrap
+BuildArch:      noarch
 
 %description
 The Compiler Plugin is used to compile the sources of your project.
@@ -39,10 +34,10 @@ API documentation for %{name}.
 sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar junit || find-jar javapackages-bootstrap/junit)"|' src/test/java/org/apache/maven/plugin/compiler/CompilerMojoTestCase.java
 
 %build
-%mvn_build
+%{mvn_build}
 
 %install
-%mvn_install
+%{mvn_install}
 
 %files -f .mfiles
 %license LICENSE NOTICE
@@ -51,6 +46,10 @@ sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar juni
 %license LICENSE NOTICE
 
 %changelog
+* Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.8.1-13
+- Initial CBL-Mariner import from Fedora 36(license: MIT).
+- License Verified.
+
 * Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 3.8.1-12
 - Rebuilt for java-17-openjdk as system jdk
 

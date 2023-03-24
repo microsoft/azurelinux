@@ -1,16 +1,16 @@
 
+Summary:        Maven Resources Plugin
 Name:           maven-resources-plugin
 Version:        3.2.0
-Release:        8%{?dist}
-Summary:        Maven Resources Plugin
+Release:        9%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://maven.apache.org/plugins/maven-resources-plugin
 Source0:        https://repo1.maven.org/maven2/org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
-
-BuildArch:      noarch
-
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
+BuildArch:      noarch
 
 %description
 The Resources Plugin handles the copying of project resources
@@ -20,17 +20,16 @@ to the output directory.
 Summary:        Javadoc for %{name}
 
 %description javadocll
-%mvn_install
+%{mvn_install}
 
 %files -f .mfiles
 %setup -q
 
-
 %build
-%mvn_build
+%{mvn_build}
 
 %install
-%mvn_install
+%{mvn_install}
 
 %files -f .mfiles
 %license LICENSE NOTICE
@@ -39,6 +38,10 @@ Summary:        Javadoc for %{name}
 %license LICENSE NOTICE
 
 %changelog
+* Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.0-9
+- Initial CBL-Mariner import from Fedora 38(license: MIT).
+- License Verified.
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
@@ -185,6 +188,7 @@ Summary:        Javadoc for %{name}
 - delete duplicate maven2-plugin-jar
 - delete source1
 fg: no job control
+
 * Thu May 20 2010 Hui Wang <huwang@redhat.com> - 2.2-5
 - Add maven-resources-plugin-demap.xml
 - Set maven test ignore

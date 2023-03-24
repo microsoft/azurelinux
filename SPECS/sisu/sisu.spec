@@ -1,35 +1,29 @@
 %bcond_without bootstrap
-
-Name:           sisu
-Epoch:          1
-Version:        0.3.5
-Release:        3%{?dist}
 Summary:        Eclipse dependency injection framework
+Name:           sisu
+Version:        0.3.5
+Release:        4%{?dist}
+Epoch:          1
 # sisu is EPL-1.0, the bundled asm is BSD
-License:        EPL-1.0 and BSD
+License:        EPL-1.0 AND BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://eclipse.org/sisu/
-BuildArch:      noarch
-
 Source0:        https://github.com/eclipse/sisu.inject/archive/refs/tags/releases/%{version}.tar.gz#/org.eclipse.sisu.inject-%{version}.tar.gz
 Source1:        https://github.com/eclipse/sisu.plexus/archive/refs/tags/releases/%{version}.tar.gz#/org.eclipse.sisu.plexus-%{version}.tar.gz
-
 Source100:      sisu-parent.pom
 Source101:      sisu-inject.pom
 Source102:      sisu-plexus.pom
-
 Patch0:         sisu-OSGi-import-guava.patch
 Patch2:         sisu-ignored-tests.patch
 Patch3:         sisu-osgi-api.patch
 Patch4:         0001-Remove-dependency-on-glassfish-servlet-api.patch
-
-
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-
-
 Provides:       %{name}-inject = %{epoch}:%{version}-%{release}
 Provides:       %{name}-plexus = %{epoch}:%{version}-%{release}
 Provides:       bundled(objectweb-asm)
+BuildArch:      noarch
 
 %description
 Java dependency injection framework with backward support for plexus and bean
@@ -55,21 +49,25 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 
 %pom_xpath_set -r /pom:project/pom:version %{version}
 
-%mvn_file ":{*}" @1
-%mvn_package ":*{inject,plexus}"
-%mvn_package : __noinstall
-%mvn_alias :org.eclipse.sisu.plexus org.sonatype.sisu:sisu-inject-plexus
+%{mvn_file} ":{*}" @1
+%{mvn_package} ":*{inject,plexus}"
+%{mvn_package} : __noinstall
+%{mvn_alias} :org.eclipse.sisu.plexus org.sonatype.sisu:sisu-inject-plexus
 
 %build
-%mvn_build
+%{mvn_build}
 
 %install
-%mvn_install
+%{mvn_install}
 
 %files -f .mfiles
 %license sisu-inject/LICENSE.txt
 
 %changelog
+* Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.5-4
+- Initial CBL-Mariner import from Fedora 36(license: MIT).
+- License Verified.
+
 * Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.3.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 

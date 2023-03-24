@@ -1,31 +1,26 @@
+%global upstream_version %(echo '%{version}' | tr '~' '-')
 %bcond_without bootstrap
-
+Summary:        Test framework project
 Name:           maven-surefire
 Version:        3.0.0
-Release:        3%{?dist}
-Summary:        Test framework project
-License:        ASL 2.0 and CPL
+Release:        1%{?dist}
+License:        ASL 2.0 AND CPL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://maven.apache.org/surefire/
-BuildArch:      noarch
-
-%global upstream_version %(echo '%{version}' | tr '~' '-')
-
 # ./generate-tarball.sh
 Source0:        %{name}-%{version}.tar.gz
 # Remove bundled binaries which cannot be easily verified for licensing
 Source1:        generate-tarball.sh
 Source2:        cpl-v10.html
-
 Patch1:         0001-Port-to-TestNG-6.11.patch
 Patch2:         0002-Disable-JUnit-4.8-test-grouping.patch
 Patch3:         0003-Port-to-maven-shared-utils-3.3.3.patch
-
-BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  javapackages-bootstrap
-
-
+BuildRequires:  javapackages-local-bootstrap
 # PpidChecker relies on /usr/bin/ps to check process uptime
 Requires:       procps-ng
+BuildArch:      noarch
 
 %description
 Surefire is a test framework project.
@@ -126,30 +121,38 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %pom_remove_dep -r ::::site-source
 
 %build
-%mvn_package ":*{surefire-plugin}*" @1
-%mvn_package ":*junit-platform*" junit5
-%mvn_package ":*{junit,testng,failsafe-plugin}*"  @1
-%mvn_package ":*tests*" __noinstall
+%{mvn_package} ":*{surefire-plugin}*" @1
+%{mvn_package} ":*junit-platform*" junit5
+%{mvn_package} ":*{junit,testng,failsafe-plugin}*"  @1
+%{mvn_package} ":*tests*" __noinstall
 # tests turned off because they need jmock
-%mvn_build -f -- -DcommonsIoVersion=2.8.0 -DcommonsLang3Version=3.11
+%{mvn_build} -f -- -DcommonsIoVersion=2.8.0 -DcommonsLang3Version=3.11
 
 %install
-%mvn_install
+%{mvn_install}
 
 %files -f .mfiles
 %doc README.md
 %license LICENSE NOTICE cpl-v10.html
 
 %files plugin -f .mfiles-surefire-plugin
+
 %files provider-junit -f .mfiles-junit
+
 %files provider-junit5 -f .mfiles-junit5
+
 %files provider-testng -f .mfiles-testng
+
 %files -n maven-failsafe-plugin -f .mfiles-failsafe-plugin
 
 %files javadoc -f .mfiles-javadoc
 %license LICENSE NOTICE cpl-v10.html
 
 %changelog
+* Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
+- Initial CBL-Mariner import from Fedora 36(license: MIT).
+- License Verified.
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0~M4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
