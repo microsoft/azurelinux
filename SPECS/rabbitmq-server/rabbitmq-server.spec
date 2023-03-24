@@ -64,6 +64,7 @@ popd
 
 # since install runs separately from build, we must restore the cache file here manually prior to install
 tar -xzf %{SOURCE3} -C deps/.hex
+rm deps/.hex/cache.ets
 make restore-hex-cache-ets-file
 
 mkdir -p /root/.hex
