@@ -36,6 +36,7 @@ BuildRequires:  wget
 BuildRequires:  which
 Requires:       %{_bindir}/which
 Requires:       msopenjdk-11
+Requires:       %{name}-jdk-binding = %{version}-%{release}
 Conflicts:      maven3
 
 %description
