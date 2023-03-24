@@ -11,6 +11,7 @@ URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Source1:        https://github.com/rabbitmq/mix_task_archive_deps/releases/download/1.0.0/mix_task_archive_deps-1.0.0.ez
 Source2:        rabbitmq-server-hex-vendor-%{version}.tar.gz
+Source3:        rabbitmq-server-hex-cache-%{version}.tar.gz
 
 BuildRequires:  erlang
 BuildRequires:  elixir
@@ -62,6 +63,7 @@ rm -r hex-2.0.6
 popd
 
 # since install runs separately from build, we must restore the cache file here manually prior to install
+tar -xzf %{SOURCE3} -C deps/.hex
 make restore-hex-cache-ets-file
 
 mkdir -p /root/.hex

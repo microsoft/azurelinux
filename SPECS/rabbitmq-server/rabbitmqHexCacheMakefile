@@ -1,0 +1,67 @@
+# The purpose of this small makescript is to generate a new cache.erl file
+# to insert into the rabbitmq-server/deps/.hex directory prior to install.
+# The `generate-hex-cache` target takes an updated cache.ets file and converts
+# it to the cache.erl file format that is expected by rabbitmq-server to create
+# the cache.ets file on-the-fly at time of build and install.
+#
+# To run this target, ensure you have the cache.ets file you intend to convert
+# in the current directory. Then run the following:
+#	make generate-hex-cache -f rabbitmqHexCacheMakefile
+#
+# This will generate a cache.erl file ready to be inserted into deps/.hex/
+# to be used by rabbitmq-server.
+
+# Use the erlang.mk from rabbitmq-server, this is overkill for our use case
+# but the defines/macros we are using are so tangled
+# that this is the easiest short term solution.
+include erlang.mk
+
+# erlang function used to convert 
+define dump_hex_cache_to_erl_term
+  In = "$(1)/cache.ets",
+  Out = "$(1)/cache.erl",
+  {ok, DateStr} = file:read_file("$(2)"),
+  {match, Date} = re:run(DateStr,
+    "^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})\.([0-9]{2})",
+    [{capture, all_but_first, list}]),
+  [Year, Month, Day, Hour, Min, Sec] = [erlang:list_to_integer(V) || V <- Date],
+  {ok, Tab} = ets:file2tab(In),
+  true = ets:insert(Tab, {last_update, {{Year, Month, Day}, {Hour, Min, Sec}}}),
+  Props = [
+    Prop
+    || {Key, _} = Prop <- ets:info(Tab),
+    Key =:= name orelse
+    Key =:= type orelse
+    Key =:= protection orelse
+    Key =:= named_table orelse
+    Key =:= keypos orelse
+    Key =:= heir orelse
+    Key =:= read_concurrency orelse
+    Key =:= write_concurrency orelse
+    Key =:= compressed],
+  Entries = ets:tab2list(Tab),
+  ok = file:write_file(Out, io_lib:format("~w.~n~w.~n", [Props, Entries])),
+  init:stop().
+endef
+
+generate-time-file:
+	$(verbose) echo "$$(date +'%Y%m%d%H%M.%S')" > hex-cache-dump-time.txt
+
+generate-hex-cache: generate-time-file
+# Mix Hex component requires a cache file, otherwise it refuses to build
+# offline... That cache is an ETS table with all the applications we
+# depend on, plus some versioning informations and checksums. There
+# are two problems with that: the table contains a date (`last_update`
+# field) and `ets:tab2file()` produces a different file each time it's
+# called.
+#
+# For Mariner, we fix the time of the `last_update` field to the time of
+# creation for the hex-cache.ets and dump the content of the
+# table as an Erlang term to a text file.
+#
+# The ETS file must be recreated before compiling RabbitMQ. See the
+# `restore-hex-cache-ets-file` Make target.
+#	$(verbose) echo "$(call dump_hex_cache_to_erl_term,$(call core_native_path,$@),$(call core_native_path,hex-cache-dump-time.txt))" > testCall.txt
+	$(verbose) $(call erlang,$(call dump_hex_cache_to_erl_term,$(CURDIR),$(CURDIR)/hex-cache-dump-time.txt))
+# Fix file timestamps to have reproducible source archives.
+
