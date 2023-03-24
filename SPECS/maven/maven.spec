@@ -1,3 +1,5 @@
+%global bundled_slf4j_version 1.7.36
+%global homedir %{_datadir}/%{name}
 %global debug_package %{nil}
 %define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
 %define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
@@ -10,7 +12,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +37,35 @@ BuildRequires:  which
 Requires:       %{_bindir}/which
 Requires:       msopenjdk-11
 Conflicts:      maven3
+
+%package lib
+Summary:        Core part of Maven
+ 
+# Maven upstream uses patched version of SLF4J.  They unpack
+# slf4j-simple-sources.jar, apply non-upstreamable, Maven-specific
+# patch (using a script written in Groovy), compile and package as
+# maven-slf4j-provider.jar, together with Maven-specific additions.
+Provides:       bundled(slf4j) = %{bundled_slf4j_version}
+ 
+%description lib
+Core part of Apache Maven that can be used as a library.
+
+%package openjdk11
+Summary:        cOpenJDK 11 binding for Maven
+Provides: maven-jdk-binding = %{version}-%{release}
+Requires: maven = %{version}-%{release}
+Requires: msopenjdk-11
+Conflicts: maven-jdk-binding
+ 
+%description openjdk11
+Configures Maven to run with OpenJDK 11.
+ 
+%package openjdk17
+Summary:        MSOpenJDK 17 binding for Maven
+Provides: maven-jdk-binding = %{version}-%{release}
+Requires: maven = %{version}-%{release}
+Requires: msopenjdk-17
+Conflicts: maven-jdk-binding
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
@@ -106,6 +137,20 @@ cp %{_builddir}/apache-maven-%{version}/LICENSE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/NOTICE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_prefixmvn}/
 
+echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openjdk11
+echo JAVA_HOME=/usr/lib/jvm/msopenjdk-17 >%{buildroot}/etc/java/maven.conf-openjdk17
+
+%files lib -f .mfiles
+%doc README.md
+%license LICENSE NOTICE
+%{homedir}
+%exclude %{homedir}/bin/mvn*
+%dir %{confdir}
+%dir %{confdir}/logging
+%config(noreplace) %{_sysconfdir}/m2.conf
+%config(noreplace) %{confdir}/settings.xml
+%config(noreplace) %{confdir}/logging/simplelogger.properties
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -126,7 +171,16 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/NOTICE
 %{_prefixmvn}/README.txt
 
+%files openjdk11
+%config /etc/java/maven.conf-openjdk11
+ 
+%files openjdk17
+%config /etc/java/maven.conf-openjdk17
+
 %changelog
+* Thu Mar 23 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+- Added lib, openjdk11 and openjdk17 subpackages
+
 * Thu Feb 16 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.7-1
 - Update to version 3.8.7
 
