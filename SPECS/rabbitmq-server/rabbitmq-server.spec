@@ -58,7 +58,7 @@ popd
 
 # replace rabbitmq-server cache.erl file with our own to support the install-time dependencies
 tar -xzf %{SOURCE3} -C deps/.hex
-rm deps/.hex/cache.ets
+# rm deps/.hex/cache.ets
 make restore-hex-cache-ets-file
 
 mkdir -p /root/.hex
