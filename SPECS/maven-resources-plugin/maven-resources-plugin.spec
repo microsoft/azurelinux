@@ -19,12 +19,12 @@ to the output directory.
 %package javadoc
 Summary:        Javadoc for %{name}
 
-%description javadocll
-%{mvn_install}
-
-%files -f .mfiles
+%description javadoc
+API documentation for %{name}.
+ 
+%prep
 %setup -q
-
+ 
 %build
 %{mvn_build}
 
