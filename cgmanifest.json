@@ -12752,7 +12752,7 @@
         "other": {
           "name": "maven-compiler-plugin",
           "version": "3.8.1",
-          "downloadUrl": "http://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
+          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
         }
       }
     },
@@ -12762,7 +12762,7 @@
         "other": {
           "name": "maven-jar-plugin",
           "version": "3.2.2",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.2/maven-jar-plugin-3.2.2-source-release.zip"
+          "downloadUrl": "https://repo2.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.2/maven-jar-plugin-3.2.2-source-release.zip"
         }
       }
     },
@@ -12802,7 +12802,7 @@
         "other": {
           "name": "maven-resources-plugin",
           "version": "3.2.0",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
+          "downloadUrl": "https://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
         }
       }
     },
