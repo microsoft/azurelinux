@@ -1,7 +1,7 @@
 
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-2.cm2
+%define uname_r %{version}-%{release}.cm2
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
