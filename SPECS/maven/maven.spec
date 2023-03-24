@@ -38,6 +38,9 @@ Requires:       %{_bindir}/which
 Requires:       msopenjdk-11
 Conflicts:      maven3
 
+%description
+Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
+
 %package lib
 Summary:        Core part of Maven
  
@@ -51,7 +54,7 @@ Provides:       bundled(slf4j) = %{bundled_slf4j_version}
 Core part of Apache Maven that can be used as a library.
 
 %package openjdk11
-Summary:        cOpenJDK 11 binding for Maven
+Summary:        MSOpenJDK 11 binding for Maven
 Provides: maven-jdk-binding = %{version}-%{release}
 Requires: maven = %{version}-%{release}
 Requires: msopenjdk-11
@@ -67,8 +70,8 @@ Requires: maven = %{version}-%{release}
 Requires: msopenjdk-17
 Conflicts: maven-jdk-binding
 
-%description
-Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
+%description openjdk17
+Configures Maven to run with MSOpenJDK 17.
 
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
