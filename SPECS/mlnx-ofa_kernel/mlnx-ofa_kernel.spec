@@ -486,8 +486,8 @@ update-alternatives --remove \
 %changelog
 * Thu Mar 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.6-2
 - Add highest_supported_kernel macro = 5.15.87.1
-- Add BuildRequires for kernel-devel >= highest_supported_kernel
-- Add Requires for kernel >= highest_supported_kernel
+- Add BuildRequires for kernel-devel <= highest_supported_kernel
+- Add Requires for kernel <= highest_supported_kernel
 
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2).
