@@ -12802,7 +12802,7 @@
         "other": {
           "name": "maven-resources-plugin",
           "version": "3.2.0",
-          "downloadUrl": "https://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
         }
       }
     },
