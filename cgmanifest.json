@@ -29136,6 +29136,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "wireguard-tools",
+          "version": "1.0.20210914",
+          "downloadUrl": "https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-1.0.20210914.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "wireless-regdb",
           "version": "2022.08.12",
           "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2022.08.12.tar.xz"
