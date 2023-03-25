@@ -61,6 +61,7 @@
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
 
 %global MLNX_OFED_VERSION 5.6-1.0.3
+%global highest_supported_kernel 5.15.87.1
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -70,14 +71,14 @@ Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 # Update OFED version along with version updates
 Version:        5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
 Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz#/%{name}-%{version}.tgz
-BuildRequires:  kernel-devel
+BuildRequires:  kernel-devel <= %{highest_supported_kernel}
 BuildRequires:  kmod
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -90,13 +91,14 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
-Requires: mlnx-tools >= 5.2.0
 Requires: coreutils
-Requires: pciutils
 Requires: grep
-Requires: procps
-Requires: module-init-tools
+Requires: kernel <= %{highest_supported_kernel}
 Requires: lsof
+Requires: mlnx-tools >= 5.2.0
+Requires: module-init-tools
+Requires: pciutils
+Requires: procps
 %description 
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm with OFED release %MLNX_OFED_VERSION.
@@ -482,6 +484,11 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Thu Mar 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.6-2
+- Add highest_supported_kernel macro = 5.15.87.1
+- Add BuildRequires for kernel-devel <= highest_supported_kernel
+- Add Requires for kernel <= highest_supported_kernel
+
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2).
 - Lint spec to conform to Mariner
