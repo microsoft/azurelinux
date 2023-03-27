@@ -44,26 +44,6 @@ rabbitmq-server
 
 %build
 export LANG="en_US.UTF-8"
-
-# install hex archive with mix and fill out hex cache ahead of build
-tar -xzf %{SOURCE2} -C deps/.hex/packages/hexpm
-pushd deps/.hex/packages/hexpm
-tar -xzf hex-2.0.6.tar.gz
-pushd hex-2.0.6
-mix archive.build
-mix archive.install --force hex-2.0.6.ez
-popd
-rm -r hex-2.0.6
-popd
-
-# replace rabbitmq-server cache.erl file with our own to support the install-time dependencies
-tar -xzf %{SOURCE3} -C deps/.hex
-# rm deps/.hex/cache.ets
-make restore-hex-cache-ets-file
-
-mkdir -p /root/.hex
-cp deps/.hex/cache.ets /root/.hex/cache.ets
-
 %make_build
 
 %install
@@ -71,7 +51,34 @@ export LANG="en_US.UTF-8"
 # install mix_task_archive_deps ahead of install
 mix archive.install --force %{SOURCE1}
 
+# unpack hex tar dependency tarball into .hex/packages/hexpm
+mkdir -p /root/.hex/packages/hexpm
+tar -xzf %{SOURCE2} -C /root/.hex/packages/hexpm
 
+# build hex archive to install from source
+pushd /root/.hex/packages/hexpm
+tar -xzf hex-2.0.6.tar.gz
+pushd hex-2.0.6
+mix archive.build
+popd
+popd
+mv /root/.hex/packages/hexpm/hex-2.0.6/hex-2.0.6.ez ./hex-2.0.6.ez
+
+# install mix_task_archive_deps and hex ahead of install
+mix archive.install --force %{SOURCE1}
+mix archive.install --force hex-2.0.6.ez
+
+# make and place hex cache.ets file
+mv deps/.hex/cache.erl deps/.hex/cache.erl.rmq
+mv deps/.hex/cache.ets deps/.hex/cache.ets.rmq
+
+tar -xzf %{SOURCE3} -C deps/.hex
+make restore-hex-cache-ets-file
+mv deps/.hex/cache.ets /root/.hex/cache.ets
+
+mv deps/.hex/cache.erl deps/.hex/cache.erl.ven
+mv deps/.hex/cache.erl.rmq deps/.hex/cache.erl
+mv deps/.hex/cache.ets.rmq deps/.hex/cache.ets
 
 # install rabbitmq-server
 %make_install
