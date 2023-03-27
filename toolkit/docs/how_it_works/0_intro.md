@@ -25,7 +25,7 @@ flowchart TD
 ```
 <br/>
 
-### High level RPM Flow
+### High-level RPM Flow
 Mariner is an RPM based distro. A single package (or RPM) is built using a combination of sources and a spec file. A signature file is used to verify the sources' hashes. 
 
 ```mermaid
@@ -60,7 +60,7 @@ flowchart LR
 ```
 </br>
 
-### High level Build Flow
+### High-level Build Flow
  The build process can be split into three components: tooling, package generation, and image generation. When building, Makefile options can be used to build Mariner entirely from end to end or to download prebuilt artifacts.
 
 
