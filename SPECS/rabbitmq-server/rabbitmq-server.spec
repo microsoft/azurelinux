@@ -96,8 +96,8 @@ done
 
 %files
 %license LICENSE LICENSE-*
-%{_libdir}/rabbitmq/lib/
-%{_libdir}/rabbitmq/bin/
+%dir %{_libdir}/rabbitmq/lib/
+%dir %{_libdir}/rabbitmq/bin/
 %{_sbindir}/rabbitmqctl
 %{_sbindir}/rabbitmq-server
 %{_sbindir}/rabbitmq-plugins
