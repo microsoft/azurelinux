@@ -9,10 +9,19 @@ This section is intended to give an overview of Mariner's build process and tool
 title: Flowchart key
 ---
 flowchart TD
-input[/input or output/]
-process[process]
-decision{{decision}}
-state([state])
+    %% style definitions
+    classDef io fill:#247BA0,stroke:#247BA0,stroke-width:2px;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+
+    %% node definitions
+    input[/input or output/]:::io
+    process[process]:::process
+    decision{{decision}}:::decision
+    goodstate([good state]):::goodState
+    badstate([bad state]):::badState
 ```
 <br/>
 
@@ -21,16 +30,25 @@ Mariner is an RPM based distro. A single package (or RPM) is built using a combi
 
 ```mermaid
 flowchart LR
-    spec[/Spec/]
-    localSourceTar[/Local Sources if present/]
-    sigFile[/Signature file/]
-    remoteSourceTar[/Remote Source/]
-    patches[/Patches/]
-    pack[Pack SRPM]
-    srpm[/SRPM/]
-    buildRPM[Build RPM]
-    rpm[/RPM/]
+    %% style definitions
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
 
+    %% node definitions
+    spec[/Spec/]:::io
+    localSourceTar[/Local Sources if present/]:::io
+    sigFile[/Signature file/]:::io
+    remoteSourceTar[/Remote Source/]:::io
+    patches[/Patches/]:::io
+    pack[Pack SRPM]:::process
+    srpm[/SRPM/]:::io
+    buildRPM[Build RPM]:::process
+    rpm[/RPM/]:::io
+
+    %% node flow
     spec --> pack
     localSourceTar --> pack
     remoteSourceTar --> pack
@@ -48,15 +66,24 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    buildTC[Build toolchain from scratch]
-    pullTC[Pull toolchain from remote]
-    tcRPMS[/Toolchain RPMs/]
-    buildRPMS[Build RPMs from scratch]
-    pullRPMS[Pull RPMs from remote]
-    rpms[/RPMs/]
-    buildImage[Build Image from scratch]
-    image[(Image: Container vhd vhdx iso)]
+    %% style definitions
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
 
+    %% node definitions
+    buildTC[Build toolchain from scratch]:::process
+    pullTC[Pull toolchain from remote]:::process
+    tcRPMS[/Toolchain RPMs/]:::io
+    buildRPMS[Build RPMs from scratch]:::process
+    pullRPMS[Pull RPMs from remote]:::process
+    rpms[/RPMs/]:::io
+    buildImage[Build Image from scratch]:::process
+    image[(Image: Container vhd vhdx iso)]:::io
+
+    %% node flow
     buildTC --> tcRPMS
     pullTC --> tcRPMS
     tcRPMS --> buildRPMS
@@ -74,27 +101,35 @@ The tooling consists of a set of `Makefiles`, various go programs, a bootstrappi
 
 ```mermaid
 flowchart TD
-    start(["Start (make toolchain)"])
-    done([Done])
-    style done fill:#597D35,stroke:#333,stroke-width:4px
-    style start fill:#0074D9,stroke:#333,stroke-width:4px
- %% TC nodes
-    tcManifests[/Local Toolchain Manifests/]
-    tcRebuild{{"Rebuild Toolchain? (REBUILD_TOOLCHAIN=y/n)"}}
-    toolchainChoice{{"Toolchain archive available? (TOOLCHAIN_ARCHIVE=...)"}}
-    tcPopulated([Toolchain populated])
-    tcRPMs[(Toolchain RPMs)]
-    tcArchiveOld[/Old Toolchain archive/]
-    tcArchiveNew[/Toolchain archive/]
-    pullTC([Local Toolchain Archive available])
-    hydrateTC[Extract Toolchain RPMs]
-    buildRawTC[Build Raw Toolchain]
-    localSpecs[/Local SPECS/]
-    bsRPMS[/Bootstrap Toolchain RPMs/]
-    buildTC[Build Toolchain proper]
-    pullRemote[Download remote RPMs]
 
-%% TC flow
+    %% style definitions
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+
+    %% state nodes
+    start(["Start (make toolchain)"]):::goodState
+    done([Done]):::goodState
+
+    %% TC nodes
+    tcManifests[/Local Toolchain Manifests/]:::io
+    tcRebuild{{"Rebuild Toolchain? (REBUILD_TOOLCHAIN=y/n)"}}:::decision
+    toolchainChoice{{"Toolchain archive available? (TOOLCHAIN_ARCHIVE=...)"}}:::decision
+    tcPopulated([Toolchain populated]):::goodState
+    tcRPMs[(Toolchain RPMs)]:::io
+    tcArchiveOld[/Old Toolchain archive/]:::io
+    tcArchiveNew[/Toolchain archive/]:::io
+    pullTC([Local Toolchain Archive available]):::goodState
+    hydrateTC[Extract Toolchain RPMs]:::process
+    buildRawTC[Build Raw Toolchain]:::process
+    localSpecs[/Local SPECS/]:::io
+    bsRPMS[/Bootstrap Toolchain RPMs/]:::io
+    buildTC[Build Toolchain proper]:::process
+    pullRemote[Download remote RPMs]:::process
+
+    %% TC flow
     start --> tcRebuild
     tcRebuild -->|yes| buildRawTC
     tcManifests --> toolchainChoice
@@ -105,8 +140,6 @@ flowchart TD
     pullTC -->hydrateTC
     tcArchiveOld --> pullTC
     hydrateTC --> tcRPMs
-
-    
     localSpecs --> buildRawTC
     buildRawTC --> bsRPMS
     bsRPMS --> buildTC
@@ -124,36 +157,42 @@ Package generation is discussed in detail [here](2_local_packages.md) and [here]
 
 ```mermaid
 flowchart TD
-    start(["Start (make build-packages)"])
-    style done fill:#597D35,stroke:#333,stroke-width:4px
-    style start fill:#0074D9,stroke:#333,stroke-width:4px
-    style error fill:#8B0000,stroke:#333,stroke-width:4px
-%% Rpm nodes
-    tcPopulated([Toolchain populated])
-    localSpecs[/Local SPECS/]
-    buildPackage{{"Make package? (REBUILD_PACKAGES=y/n)"}}
-    remoteRPM{{Pull remote RPM?}}
-    tcRPMs[(Toolchain RPMs)]
-    createChroot[Create Chroot]
-    chroot[/chroot/]
-    iSRPMs[/Intermediate SRPMs/]
-    parse["Parse Specs (specreader) "]
-    specjson[/Spec json/]
-    buildGraph[" Build Graph (grapher) "]
-    depGraph[/"Dependency Graph (graph.dot)"/]
-    cacheGraph[/"Cached Graph (cached_graph.dot)"/]
-    
-    packSRPM[Pack SRPM]
-    beginBuild[Begin Build]
-    pkgFetcher[Package fetcher]
-    rpmCache[(RPM cache)]
-    remoteRepo[(remote repo)]
-    missingDep[/RPMs to fill Missing Dependencies/]
-    outRPMS[(RPMs built locally)]
-    error([error])
-    done([Done])
 
-%% Rpms flow
+    %% style definitions
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+
+    %% state nodes
+    start(["Start (make build-packages)"]):::goodState
+    done([Done]):::goodState
+    error([error]):::badState
+
+    %% Rpm nodes
+    tcPopulated([Toolchain populated]):::goodState
+    localSpecs[/Local SPECS/]:::io
+    buildPackage{{"Make package? (REBUILD_PACKAGES=y/n)"}}:::decision
+    remoteRPM{{Pull remote RPM?}}:::decision
+    tcRPMs[(Toolchain RPMs)]:::io
+    createChroot[Create Chroot]:::process
+    chroot[/chroot/]:::io
+    iSRPMs[/Intermediate SRPMs/]:::io
+    parse["Parse Specs (specreader)"]:::process
+    specjson[/Spec json/]:::io
+    buildGraph[" Build Graph (grapher) "]:::process
+    depGraph[/"Dependency Graph (graph.dot)"/]:::io
+    cacheGraph[/"Cached Graph (cached_graph.dot)"/]:::io
+    packSRPM[Pack SRPM]:::process
+    beginBuild[Begin Build]:::process
+    pkgFetcher[Package fetcher]:::process
+    rpmCache[(RPM cache)]:::io
+    remoteRepo[(remote repo)]:::io
+    missingDep[/RPMs to fill Missing Dependencies/]:::io
+    outRPMS[(RPMs built locally)]:::io
+
+    %% Rpms flow
     start --> tcPopulated
     tcPopulated --> buildPackage
     buildPackage -->|yes|packSRPM
@@ -170,13 +209,11 @@ flowchart TD
     missingDep-->pkgFetcher
     pkgFetcher-->rpmCache
     pkgFetcher-->cacheGraph
-
     createChroot-->chroot
     tcRPMs-->createChroot
     chroot-...->packSRPM
     chroot-...->parse
     chroot-...->pkgFetcher
-    
     rpmCache-->getDeps
     tcRPMs-->getDeps
     chroot-...->worker
@@ -186,28 +223,30 @@ flowchart TD
     leafNodesAvail-->|no|error
     cacheGraph-->currentGraph
 
-%% Subgraph for scheduler
-    subgraph sched ["Scheduler tool (scheduler)"]
-    currentGraph[/Current Graph/]
-    trim[Remove unneeded branches from graph]
-    doneBuild{{Done building all required nodes?}} 
-    leafNodesAvail{{Leaf nodes available?}}
-    worker[Worker to build rpm]
-    builtRPMs[/Built RPMs/]
-    updateDeps[Update Dependency]
-    getDeps[Get dependencies]
+    %% Subgraph for scheduler
+        %% scheduler nodes
+        subgraph sched ["Scheduler tool (scheduler)"]
+        currentGraph[/Current Graph/]:::io
+        trim[Remove unneeded branches from graph]:::process
+        doneBuild{{Done building all required nodes?}}:::decision 
+        leafNodesAvail{{Leaf nodes available?}}:::decision
+        worker[Worker to build rpm]:::process
+        builtRPMs[/Built RPMs/]:::io
+        updateDeps[Update Dependency]:::process
+        getDeps[Get dependencies]:::process
 
-    currentGraph-->trim
-    trim-->doneBuild
-    doneBuild-->|no|leafNodesAvail
-    leafNodesAvail-->|yes|worker
+        %% scheduler flow
+        currentGraph-->trim
+        trim-->doneBuild
+        doneBuild-->|no|leafNodesAvail
+        leafNodesAvail-->|yes|worker
+        builtRPMs-->updateDeps
+        updateDeps-->currentGraph
+        getDeps-->worker
+        worker-->builtRPMs
 
-    builtRPMs-->updateDeps
-    updateDeps-->currentGraph
-    getDeps-->worker
-    worker-->builtRPMs
-    end
-%% end of scheduler
+        end
+    %% end of scheduler
 ```
 
 <br/>
@@ -217,33 +256,39 @@ Image generation is discussed in detail [here](4_image_generation.md). The image
 
 ```mermaid
 flowchart TD
-    start(["Start (make image)"])
-    done([Done])
-    style done fill:#597D35,stroke:#333,stroke-width:4px
-    style start fill:#0074D9,stroke:#333,stroke-width:4px
-%% Image nodes
-    imageConfig[/Image config or json/]
-    raw[/Raw image or file system/]
-    roast[roast]
-    initrd[/initrd/]
-    iso[/"iso (imager tool, pkgs, config files)"/]
-    image[/image/]
-    pkgFetcher[Package fetcher]
-    rpmCache[(local RPMs)]
-    remoteRepo[(remote repo)]
-    missingDep[/RPMs to fill Missing Dependencies/]
-    imager["Image tool (imager)"]
-    isoBuild{{iso installer or offline build?}}
-    isoBuilder[iso maker]
+    %% style definitions
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
 
-%% Image flow
-    
+    %% state nodes
+    start(["Start (make build-packages)"]):::goodState
+    done([Done]):::goodState
+    %% error([error]):::badState
+
+    %% Image nodes
+    imageConfig[/Image config or json/]:::io
+    raw[/Raw image or file system/]:::io
+    roast[roast]:::process
+    initrd[/initrd/]:::io
+    iso[/"iso (imager tool, pkgs, config files)"/]:::io
+    image[/image/]:::io
+    pkgFetcher[Package fetcher]:::process
+    rpmCache[(local RPMs)]:::io
+    remoteRepo[(remote repo)]:::io
+    missingDep[/RPMs to fill Missing Dependencies/]:::io
+    imager["Image tool (imager)"]:::process
+    isoBuild{{iso installer or offline build?}}:::decision
+    isoBuilder[iso maker]:::process
+
+    %% Image flow
     start-->pkgFetcher
     imageConfig-->pkgFetcher
     rpmCache-->pkgFetcher
     remoteRepo-->missingDep
     missingDep-->pkgFetcher
-    
     pkgFetcher-->isoBuild
     isoBuild-->|iso installer|isoBuilder
     initrd-->isoBuilder
@@ -253,7 +298,6 @@ flowchart TD
     imager-->raw
     raw-->roast
     roast-->image
-
     image-->done
     
 ```
