@@ -147,6 +147,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Mar 21 2023 Alejandro Gonzalez-Araya <goalejandro@microsoft.com> - 5.10.174.1-2
+- Bump release number to match kernel release
+
 * Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.174.1-1
 - Auto-upgrade to 5.10.174.1
 
