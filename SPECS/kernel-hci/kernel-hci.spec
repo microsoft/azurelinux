@@ -8,8 +8,8 @@
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.102.1
-Release:        1%{?dist}
+Version:        5.15.94.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,11 @@ Patch22:        0023-net-mlx5-Bridge-rename-filter-fg-to-vlan_filter.patch
 Patch23:        0024-net-mlx5-Bridge-extract-VLAN-push-pop-actions-creati.patch
 Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
+Patch26:        001-net-ice-core-netdevlink.patch
+Patch27:        002-net-ice-intel-iidc.patch
+Patch28:        003-net-ice-net-devlink.patch
+Patch29:        004-net-ice-net-gtp.patch
+Patch30:        005-net-ice.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -185,6 +190,11 @@ manipulation of eBPF programs and maps.
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
+%patch26 -p1
+%patch27 -p1
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
 
 make mrproper
 
@@ -418,15 +428,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
-- Auto-upgrade to 5.15.102.1
-
-* Mon Mar 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.98.1-1
-- Auto-upgrade to 5.15.98.1
-
-* Sat Feb 25 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.95.1-1
-- Auto-upgrade to 5.15.95.1
-
 * Mon Feb 27 2023 Vince Perri <viperri@microsoft.com> - 5.15.94.1-2
 - Add net/mlx5 patches (patches 21-25) for QinQ support
 
