@@ -1,0 +1,44 @@
+Name:                connection
+Version:             0.3.1
+x-revision: 1
+Description:
+    Simple network library for all your connection need.
+    .
+    Features: Really simple to use, SSL/TLS, SOCKS.
+    .
+    This library provides a very simple api to create sockets
+    to a destination with the choice of SSL/TLS, and SOCKS.
+License:             BSD3
+License-file:        LICENSE
+Copyright:           Vincent Hanquez <vincent@snarc.org>
+Author:              Vincent Hanquez <vincent@snarc.org>
+Maintainer:          Vincent Hanquez <vincent@snarc.org>
+Synopsis:            Simple and easy network connections API
+Build-Type:          Simple
+Category:            Network
+stability:           experimental
+Cabal-Version:       >=1.6
+Homepage:            https://github.com/vincenthz/hs-connection
+extra-source-files:  README.md
+                     CHANGELOG.md
+
+Library
+  Build-Depends:     base >= 4.8 && < 5
+                   , basement
+                   , bytestring
+                   , containers
+                   , data-default-class
+                   , network >= 2.6.3
+                   , tls >= 1.4
+                   , socks >= 0.6
+                   , x509 >= 1.5
+                   , x509-store >= 1.5
+                   , x509-system >= 1.5
+                   , x509-validation >= 1.5
+  Exposed-modules:   Network.Connection
+  Other-modules:     Network.Connection.Types
+  ghc-options:       -Wall
+
+source-repository head
+  type: git
+  location: https://github.com/vincenthz/hs-connection

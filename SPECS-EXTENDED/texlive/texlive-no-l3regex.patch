@@ -1,0 +1,42 @@
+diff -up tex/latex/pkgloader/pkgloader.sty.nol3regex tex/latex/pkgloader/pkgloader.sty
+--- tex/latex/pkgloader/pkgloader.sty.nol3regex	2020-05-12 15:43:34.909265349 -0400
++++ tex/latex/pkgloader/pkgloader.sty	2020-05-12 15:44:42.157074791 -0400
+@@ -71,7 +71,6 @@
+ %    \begin{macrocode}
+ \RequirePackage{xparse}
+ \RequirePackage{l3keys2e}
+-\RequirePackage{l3regex}
+ \RequirePackage{lt3graph}
+ %    \end{macrocode}
+ %
+@@ -660,7 +659,7 @@
+ %  
+ %    \begin{macrocode}
+     \prop_map_inline:Nn \g__pkgloader_known_pkg_prop {%%%%%%%%%%%%%%   ##1
+-    \int_step_inline:nncn {1} {1} {g__pkgloader_count_(##1)_int} {%% ####1
++    \int_step_inline:nnvn {1} {1} {g__pkgloader_count_(##1)_int} {%% ####1
+ %    \end{macrocode}
+ %  
+ %  If the current configuration should be loaded but still
+@@ -767,9 +766,8 @@
+ %    \end{macrocode}
+ %    \uninteresting\begin{macrocode}
+ }
+-\cs_generate_variant:Nn \int_step_inline:nnnn  {nncn}
++\cs_generate_variant:Nn \int_step_inline:nnnn  {nnvn}
+ \cs_generate_variant:Nn \bool_if:nT            {vT}
+-\cs_generate_variant:Nn \withargs:nnn          {vvn}
+ \cs_generate_variant:Nn \graph_gput_vertex:Nnn {Nnf}
+ \graph_new:N \l__pkgloader_order_graph
+ \tl_new:N    \l__pkgloader_used_configs_tl
+@@ -836,8 +834,8 @@
+     }
+   }
+ }
+-\cs_generate_variant:Nn \withargs:nn {xn}
+-\cs_generate_variant:Nn \withargs:nnnnn {vvfvn}
++\cs_generate_variant:Nn \withargs:nn {x}
++\cs_generate_variant:Nn \withargs:nnnnn {vvfv}
+ %    \end{macrocode}
+ %  
+ %  And it needs the following auxiliary function to strip

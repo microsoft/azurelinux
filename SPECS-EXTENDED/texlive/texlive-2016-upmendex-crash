@@ -1,0 +1,121 @@
+diff -U0 texlive-2016/source/texk/upmendex/ChangeLog.than texlive-2016/source/texk/upmendex/ChangeLog
+--- texlive-2016/source/texk/upmendex/ChangeLog.than	2017-03-08 15:14:32.529825017 +0100
++++ texlive-2016/source/texk/upmendex/ChangeLog	2017-03-08 15:17:34.235944067 +0100
+@@ -0,0 +1,6 @@
++2016-06-19  TANAKA Takuji  <ttk@t-lab.opal.ne.jp>
++
++	* version 0.51  Beta version.
++	* fwrite.c: Fix bug of option "hanzi_head" in style file.
++	Thanks to Dr. Werner Fink.
++
+diff -up texlive-2016/source/texk/upmendex/fwrite.c.than texlive-2016/source/texk/upmendex/fwrite.c
+--- texlive-2016/source/texk/upmendex/fwrite.c.than	2017-03-08 15:13:29.460213372 +0100
++++ texlive-2016/source/texk/upmendex/fwrite.c	2017-03-08 15:17:34.235944067 +0100
+@@ -67,33 +67,38 @@ static inline int SAPPENDF(char *buf, co
+ 
+ static void fprint_uchar(FILE *fp, const UChar *a, const int mode, const int len)
+ {
+-	int k;
+-	char str[15], *ret;
+-	UChar istr[5];
++	char str[3*INITIALLENGTH+1];
++	UChar istr[INITIALLENGTH];
+ 	int olen, wclen;
+ 	UErrorCode perr;
+ 
+ 	if (len<0) {
+-		for (k=0; a[k] || k<4; k++) istr[k]=a[k];
+-		wclen=k;
++		u_strcpy(istr,a);
++		wclen=u_strlen(istr);
+ 	} else {
+-		wclen = is_surrogate_pair(a) ? 2 : 1;
++		wclen=is_surrogate_pair(a) ? 2 : 1;
+ 			      istr[0]=a[0];
+ 		if (wclen==2) istr[1]=a[1];
++		istr[wclen]=L'\0';
+ 	}
+-	istr[wclen]=L'\0';
+ 	if (mode==M_TO_UPPER) {
+-		perr = U_ZERO_ERROR;
+-		u_strToUpper(istr,5,istr,wclen,"",&perr);
++		perr=U_ZERO_ERROR;
++		olen=u_strToUpper(istr,INITIALLENGTH,istr,wclen,"",&perr);
+ 	} else if (mode==M_TO_LOWER) {
+-		perr = U_ZERO_ERROR;
+-		u_strToLower(istr,5,istr,wclen, istr[0]==0x130&&turkish_i?"tr":"", &perr);
++		perr=U_ZERO_ERROR;
++		olen=u_strToLower(istr,INITIALLENGTH,istr,wclen, istr[0]==0x130&&turkish_i?"tr":"", &perr);
+ 	} else if (mode==M_TO_TITLE) {
+-		perr = U_ZERO_ERROR;
+-		u_strToTitle(istr,5,istr,wclen,NULL,"",&perr);
+-	}
+-	perr = U_ZERO_ERROR;
+-	ret = u_strToUTF8(str, 15, &olen, istr, wclen, &perr);
++		perr=U_ZERO_ERROR;
++		olen=u_strToTitle(istr,INITIALLENGTH,istr,wclen,NULL,"",&perr);
++	} else
++		olen=wclen;
++	if (olen>INITIALLENGTH) {
++		warn_printf(efp, "\nWarning, Too long (%d) header.\n", olen);
++		wclen=INITIALLENGTH;
++	} else
++		wclen=olen;
++	perr=U_ZERO_ERROR;
++	u_strToUTF8(str, 3*INITIALLENGTH+1, &olen, istr, wclen, &perr);
+ 	fprintf(fp,"%s",str);
+ }
+ 
+@@ -844,7 +849,7 @@ static int initial_cmp_char(UChar *ini,
+ static int init_hanzi_header(void)
+ {
+ 	UChar strX[2],*pch0,*pch1;
+-	int k, hzmode;
++	int k, hzmode, len;
+ 	struct hanzi_index *hz_idx_init;
+ 
+ 	strX[0]=0x5B57;  strX[1]=L'\0';
+@@ -878,21 +883,18 @@ static int init_hanzi_header(void)
+ 	for (k=0;k<hz_index_len;k++) {
+ 		if (u_strlen(pch0)==0) break;
+ 		if ((pch1=u_strchr(pch0,L';'))>0) {
+-			if (pch1-pch0>=INITIALLENGTH) {
+-				warn_printf(efp, "\nWarning, Too long hanzi header.\n");
+-				break;
+-			}
+-			u_strncpy(hz_index[k].idx,pch0,pch1-pch0);
+-			hz_index[k].idx[pch1-pch0]=L'\0';
+-			pch0=pch1+1;
++			len=pch1-pch0;
+ 		} else {
+-			if (u_strlen(pch0)>=INITIALLENGTH) {
+-				warn_printf(efp, "\nWarning, Too long hanzi header.\n");
+-				break;
+-			}
+-			u_strcpy(hz_index[k].idx,pch0);
+-			break;
++			len=u_strlen(pch0);
+ 		}
++		if (len>=INITIALLENGTH) {
++			warn_printf(efp, "\nWarning, Too long (%d) hanzi header.\n", len);
++			len=INITIALLENGTH-1;
++		}
++		u_strncpy(hz_index[k].idx,pch0,len);
++		hz_index[k].idx[len]=L'\0';
++		if (pch1>0) pch0=pch1+1;
++		else break;
+ 	}
+ 
+ 	return hzmode;
+diff -up texlive-2016/source/texk/upmendex/main.c.than texlive-2016/source/texk/upmendex/main.c
+--- texlive-2016/source/texk/upmendex/main.c.than	2017-03-08 15:13:49.460455992 +0100
++++ texlive-2016/source/texk/upmendex/main.c	2017-03-08 15:17:34.236944029 +0100
+@@ -19,7 +19,7 @@ char *styfile,*idxfile[256],*indfile,*di
+ #endif
+ KpathseaSupportInfo kp_ist,kp_dict;
+ 
+-#define VERSION "version 0.50"
++#define VERSION "version 0.51"
+ 
+ int main(int argc, char **argv)
+ {

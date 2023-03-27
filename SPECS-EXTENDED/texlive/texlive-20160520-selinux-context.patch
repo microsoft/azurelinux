@@ -1,0 +1,41 @@
+diff -up source/texk/kpathsea/mktexlsr.than source/texk/kpathsea/mktexlsr
+--- source/texk/kpathsea/mktexlsr.than	2015-07-28 21:31:52.595540260 -0400
++++ source/texk/kpathsea/mktexlsr	2015-07-28 21:32:12.347422108 -0400
+@@ -217,7 +217,8 @@ for TEXMFLS_R in "$@"; do
+   until PERMS=`kpsestat = "$db_file"`; do sleep 1; done
+   chmod $PERMS "$db_file_tmp"
+   rm -f "$db_file"
+-  mv "$db_file_tmp" "$db_file"
++  # selinux fix
++  cp "$db_file_tmp" "$db_file"
+   rm -rf "$db_dir_tmp"
+ done
+ 
+diff -up source/texk/texlive/linked_scripts/texlive/fmtutil.pl.orig source/texk/texlive/linked_scripts/texlive/fmtutil.pl
+--- source/texk/texlive/linked_scripts/texlive/fmtutil.pl.orig	2016-06-22 10:58:50.754708661 -0400
++++ source/texk/texlive/linked_scripts/texlive/fmtutil.pl	2016-06-22 11:00:32.566943691 -0400
+@@ -679,7 +679,7 @@ sub rebuild_one_format {
+   }
+   TeXLive::TLUtils::mkdirhier($fulldestdir);
+   
+-  if (!File::Copy::move( "$fmt.log", "$fulldestdir/$fmt.log")) {
++  if (!File::Copy::copy( "$fmt.log", "$fulldestdir/$fmt.log")) {
+     print_deferred_error("Cannot move $fmt.log to $fulldestdir.\n");
+   }
+   if ($opts{'recorder'}) {
+@@ -687,13 +687,13 @@ sub rebuild_one_format {
+     # package dependencies for each format.  Unfortunately omega-based
+     # engines gratuitiously changed the extension from .fls to .ofl.
+     my $recfile = $fmt . ($fmt =~ m/^(aleph|lamed)$/ ? ".ofl" : ".fls");
+-    if (!File::Copy::move( $recfile, "$fulldestdir/$recfile")) {
++    if (!File::Copy::copy( $recfile, "$fulldestdir/$recfile")) {
+       print_deferred_error("Cannot move $recfile to $fulldestdir.\n");
+     }
+   }
+ 
+   my $destfile = "$fulldestdir/$fmtfile";
+-  if (File::Copy::move( $fmtfile, $destfile )) {
++  if (File::Copy::copy( $fmtfile, $destfile )) {
+     print_info("$destfile installed.\n");
+     #
+     # original fmtutil.sh did some magic trick for mplib-luatex.mem

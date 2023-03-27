@@ -1,0 +1,291 @@
+Name:           vector
+Version:        0.12.3.1
+x-revision: 2
+-- don't forget to update the changelog file!
+License:        BSD3
+License-File:   LICENSE
+Author:         Roman Leshchinskiy <rl@cse.unsw.edu.au>
+Maintainer:     Haskell Libraries Team <libraries@haskell.org>
+Copyright:      (c) Roman Leshchinskiy 2008-2012
+Homepage:       https://github.com/haskell/vector
+Bug-Reports:    https://github.com/haskell/vector/issues
+Category:       Data, Data Structures
+Synopsis:       Efficient Arrays
+Description:
+        .
+        An efficient implementation of Int-indexed arrays (both mutable
+        and immutable), with a powerful loop optimisation framework .
+        .
+        It is structured as follows:
+        .
+        ["Data.Vector"] Boxed vectors of arbitrary types.
+        .
+        ["Data.Vector.Unboxed"] Unboxed vectors with an adaptive
+        representation based on data type families.
+        .
+        ["Data.Vector.Storable"] Unboxed vectors of 'Storable' types.
+        .
+        ["Data.Vector.Primitive"] Unboxed vectors of primitive types as
+        defined by the @primitive@ package. "Data.Vector.Unboxed" is more
+        flexible at no performance cost.
+        .
+        ["Data.Vector.Generic"] Generic interface to the vector types.
+        .
+        There is also a (draft) tutorial on common uses of vector.
+        .
+        * <http://haskell.org/haskellwiki/Numeric_Haskell:_A_Vector_Tutorial>
+
+Tested-With:
+  GHC == 7.4.2,
+  GHC == 7.6.3,
+  GHC == 7.8.4,
+  GHC == 7.10.3,
+  GHC == 8.0.2,
+  GHC == 8.2.2,
+  GHC == 8.4.4,
+  GHC == 8.6.5,
+  GHC == 8.8.1,
+  GHC == 8.10.1
+
+
+Cabal-Version:  >=1.10
+Build-Type:     Simple
+
+Extra-Source-Files:
+      changelog.md
+      README.md
+      tests/LICENSE
+      tests/Setup.hs
+      tests/Main.hs
+      benchmarks/vector-benchmarks.cabal
+      benchmarks/LICENSE
+      benchmarks/Setup.hs
+      benchmarks/Main.hs
+      benchmarks/Algo/AwShCC.hs
+      benchmarks/Algo/HybCC.hs
+      benchmarks/Algo/Leaffix.hs
+      benchmarks/Algo/ListRank.hs
+      benchmarks/Algo/Quickhull.hs
+      benchmarks/Algo/Rootfix.hs
+      benchmarks/Algo/Spectral.hs
+      benchmarks/Algo/Tridiag.hs
+      benchmarks/TestData/Graph.hs
+      benchmarks/TestData/ParenTree.hs
+      benchmarks/TestData/Random.hs
+      internal/GenUnboxTuple.hs
+      internal/unbox-tuple-instances
+
+
+
+Flag BoundsChecks
+  Description: Enable bounds checking
+  Default: True
+  Manual: True
+
+Flag UnsafeChecks
+  Description: Enable bounds checking in unsafe operations at the cost of a
+               significant performance penalty
+  Default: False
+  Manual: True
+
+Flag InternalChecks
+  Description: Enable internal consistency checks at the cost of a
+               significant performance penalty
+  Default: False
+  Manual: True
+
+Flag Wall
+  Description: Enable all -Wall warnings
+  Default: False
+  Manual: True
+
+
+Library
+  Default-Language: Haskell2010
+  Other-Extensions:
+        BangPatterns
+        CPP
+        DeriveDataTypeable
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        KindSignatures
+        MagicHash
+        MultiParamTypeClasses
+        Rank2Types
+        ScopedTypeVariables
+        StandaloneDeriving
+        TypeFamilies
+
+  Exposed-Modules:
+        Data.Vector.Internal.Check
+
+        Data.Vector.Fusion.Util
+        Data.Vector.Fusion.Stream.Monadic
+        Data.Vector.Fusion.Bundle.Size
+        Data.Vector.Fusion.Bundle.Monadic
+        Data.Vector.Fusion.Bundle
+
+        Data.Vector.Generic.Mutable.Base
+        Data.Vector.Generic.Mutable
+        Data.Vector.Generic.Base
+        Data.Vector.Generic.New
+        Data.Vector.Generic
+
+        Data.Vector.Primitive.Mutable
+        Data.Vector.Primitive
+
+        Data.Vector.Storable.Internal
+        Data.Vector.Storable.Mutable
+        Data.Vector.Storable
+
+        Data.Vector.Unboxed.Base
+        Data.Vector.Unboxed.Mutable
+        Data.Vector.Unboxed
+
+        Data.Vector.Mutable
+        Data.Vector
+
+  Include-Dirs:
+        include, internal
+
+  Install-Includes:
+        vector.h
+
+  Build-Depends: base >= 4.5 && < 4.18
+               , primitive >= 0.6.4.0 && < 0.8
+               , ghc-prim >= 0.2 && < 0.10
+               , deepseq >= 1.1 && < 1.5
+  if !impl(ghc > 8.0)
+    Build-Depends: fail == 4.9.*
+                 , semigroups >= 0.18 && < 0.21
+
+  Ghc-Options: -O2 -Wall
+
+  if !flag(Wall)
+    Ghc-Options: -fno-warn-orphans
+
+    if impl(ghc >= 8.0) && impl(ghc < 8.1)
+      Ghc-Options:   -Wno-redundant-constraints
+
+  if flag(BoundsChecks)
+    cpp-options: -DVECTOR_BOUNDS_CHECKS
+
+  if flag(UnsafeChecks)
+    cpp-options: -DVECTOR_UNSAFE_CHECKS
+
+  if flag(InternalChecks)
+    cpp-options: -DVECTOR_INTERNAL_CHECKS
+
+source-repository head
+  type:     git
+  location: https://github.com/haskell/vector.git
+
+
+
+test-suite vector-tests-O0
+  Default-Language: Haskell2010
+  type: exitcode-stdio-1.0
+  Main-Is:  Main.hs
+
+  other-modules: Boilerplater
+                 Tests.Bundle
+                 Tests.Move
+                 Tests.Vector
+                 Tests.Vector.Property
+                 Tests.Vector.Boxed
+                 Tests.Vector.Storable
+                 Tests.Vector.Primitive
+                 Tests.Vector.Unboxed
+                 Tests.Vector.UnitTests
+                 Utilities
+
+  hs-source-dirs: tests
+  Build-Depends: base >= 4.5 && < 5, template-haskell, base-orphans >= 0.6, vector,
+                 primitive, random,
+                 QuickCheck >= 2.9 && < 2.15, HUnit, tasty,
+                 tasty-hunit, tasty-quickcheck,
+                 transformers >= 0.2.0.0
+  if !impl(ghc > 8.0)
+    Build-Depends: semigroups
+
+  default-extensions: CPP,
+              ScopedTypeVariables,
+              PatternGuards,
+              MultiParamTypeClasses,
+              FlexibleContexts,
+              Rank2Types,
+              TypeSynonymInstances,
+              TypeFamilies,
+              TemplateHaskell
+
+  Ghc-Options: -O0 -threaded
+  Ghc-Options: -Wall
+
+  if !flag(Wall)
+    Ghc-Options: -fno-warn-orphans -fno-warn-missing-signatures
+    if impl(ghc >= 8.0) && impl( ghc < 8.1)
+      Ghc-Options: -Wno-redundant-constraints
+
+
+test-suite vector-tests-O2
+  Default-Language: Haskell2010
+  type: exitcode-stdio-1.0
+  Main-Is:  Main.hs
+
+  other-modules: Boilerplater
+                 Tests.Bundle
+                 Tests.Move
+                 Tests.Vector
+                 Tests.Vector.Property
+                 Tests.Vector.Boxed
+                 Tests.Vector.Storable
+                 Tests.Vector.Primitive
+                 Tests.Vector.Unboxed
+                 Tests.Vector.UnitTests
+                 Utilities
+
+  hs-source-dirs: tests
+  Build-Depends: base >= 4.5 && < 5, template-haskell, base-orphans >= 0.6, vector,
+                 primitive, random,
+                 QuickCheck >= 2.9 && < 2.15, HUnit, tasty,
+                 tasty-hunit, tasty-quickcheck,
+                 transformers >= 0.2.0.0
+  if !impl(ghc > 8.0)
+    Build-Depends: semigroups
+
+  default-extensions: CPP,
+              ScopedTypeVariables,
+              PatternGuards,
+              MultiParamTypeClasses,
+              FlexibleContexts,
+              Rank2Types,
+              TypeSynonymInstances,
+              TypeFamilies,
+              TemplateHaskell
+
+
+  Ghc-Options: -Wall
+  Ghc-Options:  -O2 -threaded
+  if !flag(Wall)
+    Ghc-Options: -fno-warn-orphans -fno-warn-missing-signatures
+    if impl(ghc >= 8.0) && impl(ghc < 8.1)
+      Ghc-Options: -Wno-redundant-constraints
+
+test-suite vector-doctest
+  type:             exitcode-stdio-1.0
+  main-is:          doctests.hs
+  hs-source-dirs:   tests
+  default-language: Haskell2010
+  -- Older GHC don't support DerivingVia
+  if impl(ghc < 8.6)
+    buildable: False
+  -- GHC 8.10 fails to run doctests for some reason
+  if impl(ghc >= 8.10) && impl(ghc < 8.11)
+    buildable: False
+  build-depends:
+        base      -any
+      , doctest   >=0.15 && <0.19
+      , primitive >= 0.6.4.0 && < 0.8
+      , vector    -any

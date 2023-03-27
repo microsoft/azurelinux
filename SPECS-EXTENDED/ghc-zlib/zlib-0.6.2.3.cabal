@@ -1,0 +1,135 @@
+cabal-version:   >= 1.10
+name:            zlib
+version:         0.6.2.3
+x-revision: 1
+
+copyright:       (c) 2006-2016 Duncan Coutts
+license:         BSD3
+license-file:    LICENSE
+author:          Duncan Coutts <duncan@community.haskell.org>
+maintainer:      Duncan Coutts <duncan@community.haskell.org>, Andrew Lelechenko <andrew.lelechenko@gmail.com>, Emily Pillmore <emilypi@cohomolo.gy>, Herbert Valerio Riedel <hvr@gnu.org>
+bug-reports:     https://github.com/haskell/zlib/issues
+category:        Codec
+synopsis:        Compression and decompression in the gzip and zlib formats
+description:     This package provides a pure interface for compressing and
+                 decompressing streams of data represented as lazy
+                 'ByteString's. It uses the
+                 <https://en.wikipedia.org/wiki/Zlib zlib C library>
+                 so it has high performance. It supports the \"zlib\",
+                 \"gzip\" and \"raw\" compression formats.
+                 .
+                 It provides a convenient high level API suitable for most
+                 tasks and for the few cases where more control is needed it
+                 provides access to the full zlib feature set.
+build-type:      Simple
+
+tested-with:     GHC == 7.0.4
+               , GHC == 7.2.2
+               , GHC == 7.4.2
+               , GHC == 7.6.3
+               , GHC == 7.8.4
+               , GHC == 7.10.3
+               , GHC == 8.0.2
+               , GHC == 8.2.2
+               , GHC == 8.4.4
+               , GHC == 8.6.5
+               , GHC == 8.8.4
+               , GHC == 8.10.3
+
+extra-source-files: changelog
+                    -- zlib C sources (for Windows)
+                    cbits/crc32.h cbits/inffast.h cbits/inflate.h
+                    cbits/trees.h cbits/deflate.h cbits/inffixed.h
+                    cbits/inftrees.h cbits/zutil.h cbits/gzguts.h
+                    -- test data files
+                    test/data/bad-crc.gz test/data/custom-dict.zlib
+                    test/data/custom-dict.zlib-dict test/data/hello.gz
+                    test/data/not-gzip test/data/two-files.gz
+                    -- demo programs:
+                    examples/gzip.hs examples/gunzip.hs
+
+source-repository head
+  type: git
+  location: https://github.com/haskell/zlib.git
+
+flag non-blocking-ffi
+  default:     False
+  manual:      True
+  description: The (de)compression calls can sometimes take a long time, which
+               prevents other Haskell threads running. Enabling this flag
+               avoids this unfairness, but with greater overall cost.
+
+flag pkg-config
+  default:     False
+  manual:      True
+  description: Use @pkg-config(1)@ to locate foreign @zlib@ library.
+
+flag bundled-c-zlib
+  default:     False
+  manual:      True
+  description: Use the bundled zlib C sources. Requires pkg-config to be False.
+               For windows, this is the default.
+
+
+library
+  exposed-modules: Codec.Compression.GZip,
+                   Codec.Compression.Zlib,
+                   Codec.Compression.Zlib.Raw,
+                   Codec.Compression.Zlib.Internal
+  other-modules:   Codec.Compression.Zlib.Stream,
+                   Codec.Compression.Zlib.ByteStringCompat
+
+  if impl(ghc < 7)
+    default-language: Haskell98
+    default-extensions: PatternGuards
+  else
+    default-language: Haskell2010
+
+  other-extensions: CPP, ForeignFunctionInterface, RankNTypes, BangPatterns,
+                    DeriveDataTypeable
+  if impl(ghc >= 7.2)
+    other-extensions: DeriveGeneric
+  if impl(ghc >= 7.6)
+    other-extensions: CApiFFI
+
+  build-depends:   base >= 4 && < 4.17,
+                   bytestring >= 0.9 && < 0.12
+  if impl(ghc >= 7.0 && < 8.0.3)
+    build-depends: ghc-prim
+
+  includes:        zlib.h
+  ghc-options:     -Wall -fwarn-tabs
+  if flag(non-blocking-ffi)
+    cpp-options:   -DNON_BLOCKING_FFI
+  if flag(pkg-config) && !impl(ghcjs) && !os(ghcjs)
+    -- NB: pkg-config is available on windows as well when using msys2
+    pkgconfig-depends: zlib
+  else
+    -- don't use pkg-config
+    if !os(windows) && !flag(bundled-c-zlib) && !impl(ghcjs) && !os(ghcjs)
+      -- Normally we use the the standard system zlib.
+      extra-libraries: z
+    else
+      -- However for the benefit of users of Windows (which does not have zlib
+      -- by default) we bundle a complete copy of the C sources of zlib-1.2.11
+      c-sources:   cbits/adler32.c cbits/compress.c cbits/crc32.c
+                   cbits/deflate.c cbits/infback.c
+                   cbits/inffast.c cbits/inflate.c cbits/inftrees.c
+                   cbits/trees.c cbits/uncompr.c cbits/zutil.c
+      include-dirs:  cbits
+      install-includes: zlib.h zconf.h
+
+test-suite tests
+  type: exitcode-stdio-1.0
+  main-is:         Test.hs
+  other-modules:   Utils,
+                   Test.Codec.Compression.Zlib.Internal,
+                   Test.Codec.Compression.Zlib.Stream
+  hs-source-dirs:  test
+  default-language: Haskell2010
+  build-depends:   base, bytestring, zlib,
+                   QuickCheck       == 2.*,
+                   tasty            >= 0.8 && < 1.5,
+                   tasty-quickcheck >= 0.8 && < 0.11,
+                   tasty-hunit      >= 0.8 && < 0.11
+  ghc-options:     -Wall

@@ -1,0 +1,183 @@
+Name: HTTP
+Version: 4000.3.16
+x-revision: 1
+Cabal-Version: >= 1.10
+Build-type: Simple
+License: BSD3
+License-file: LICENSE
+Author: Warrick Gray <warrick.gray@hotmail.com>
+Maintainer: Ganesh Sittampalam <ganesh@earth.li>
+Homepage: https://github.com/haskell/HTTP
+Category: Network
+Synopsis: A library for client-side HTTP
+Description:
+
+ The HTTP package supports client-side web programming in Haskell. It lets you set up
+ HTTP connections, transmitting requests and processing the responses coming back, all
+ from within the comforts of Haskell. It's dependent on the network package to operate,
+ but other than that, the implementation is all written in Haskell.
+ .
+ A basic API for issuing single HTTP requests + receiving responses is provided. On top
+ of that, a session-level abstraction is also on offer  (the @BrowserAction@ monad);
+ it taking care of handling the management of persistent connections, proxies,
+ state (cookies) and authentication credentials required to handle multi-step
+ interactions with a web server.
+ .
+ The representation of the bytes flowing across is extensible via the use of a type class,
+ letting you pick the representation of requests and responses that best fits your use.
+ Some pre-packaged, common instances are provided for you (@ByteString@, @String@).
+ .
+ Here's an example use:
+ .
+ >
+ >    do
+ >      rsp <- Network.HTTP.simpleHTTP (getRequest "http://www.haskell.org/")
+ >              -- fetch document and return it (as a 'String'.)
+ >      fmap (take 100) (getResponseBody rsp)
+ >
+ >    do
+ >      (_, rsp)
+ >         <- Network.Browser.browse $ do
+ >               setAllowRedirects True -- handle HTTP redirects
+ >               request $ getRequest "http://www.haskell.org/"
+ >      return (take 100 (rspBody rsp))
+ .
+ __Note:__ This package does not support HTTPS connections.
+ If you need HTTPS, take a look at the following packages:
+ .
+ * <http://hackage.haskell.org/package/http-streams http-streams>
+ .
+ * <http://hackage.haskell.org/package/http-client http-client> (in combination with
+ <http://hackage.haskell.org/package/http-client-tls http-client-tls>)
+ .
+ * <http://hackage.haskell.org/package/req req>
+ .
+ * <http://hackage.haskell.org/package/wreq wreq>
+ .
+
+Extra-Source-Files: CHANGES
+
+tested-with: GHC==9.0.1, GHC==8.10.4, GHC==8.8.3, GHC==8.6.5, GHC==8.4.4, GHC==8.2.2, GHC==8.0.2, GHC==7.10.3, GHC==7.8.4, GHC==7.6.3, GHC==7.4.2, GHC==7.2.2, GHC==7.0.4
+
+Source-Repository head
+  type: git
+  location: https://github.com/haskell/HTTP.git
+
+Flag mtl1
+  description: Use the old mtl version 1.
+  default: False
+
+Flag warn-as-error
+  default:     False
+  description: Build with warnings-as-errors
+  manual:      True
+
+Flag conduit10
+  description: Use version 1.0.x or below of the conduit package (for the test suite)
+  default: False
+
+Flag warp-tests
+  description: Test against warp
+  default:     False
+  manual:      True
+
+flag network-uri
+  description: Get Network.URI from the network-uri package
+  default: True
+
+Library
+  Exposed-modules:
+                 Network.BufferType,
+                 Network.Stream,
+                 Network.StreamDebugger,
+                 Network.StreamSocket,
+                 Network.TCP,
+                 Network.HTTP,
+                 Network.HTTP.Headers,
+                 Network.HTTP.Base,
+                 Network.HTTP.Stream,
+                 Network.HTTP.Auth,
+                 Network.HTTP.Cookie,
+                 Network.HTTP.Proxy,
+                 Network.HTTP.HandleStream,
+                 Network.Browser
+  Other-modules:
+                 Network.HTTP.Base64,
+                 Network.HTTP.MD5Aux,
+                 Network.HTTP.Utils
+                 Paths_HTTP
+  GHC-options: -fwarn-missing-signatures -Wall
+
+  -- note the test harness constraints should be kept in sync with these
+  -- where dependencies are shared
+  Build-depends: base >= 4.3.0.0 && < 4.17, parsec >= 2.0 && < 3.2
+  Build-depends: array >= 0.3.0.2 && < 0.6, bytestring >= 0.9.1.5 && < 0.12
+  Build-depends: time >= 1.1.2.3 && < 1.13
+
+  default-language: Haskell98
+  default-extensions: FlexibleInstances
+
+  if flag(mtl1)
+    Build-depends: mtl >= 1.1.1.0 && < 1.2
+    CPP-Options: -DMTL1
+  else
+    Build-depends: mtl >= 2.0 && < 2.3
+
+  if flag(network-uri)
+    Build-depends: network-uri == 2.6.*, network >= 2.6 && < 3.2
+  else
+    Build-depends: network >= 2.4 && < 2.6
+
+  if flag(warn-as-error)
+    ghc-options:      -Werror
+
+  if os(windows)
+    Build-depends: Win32 >= 2.2.0.0 && < 2.14
+
+Test-Suite test
+  type: exitcode-stdio-1.0
+
+  default-language: Haskell98
+  hs-source-dirs: test
+  main-is: httpTests.hs
+
+  other-modules:
+    Httpd
+    UnitTests
+
+  ghc-options: -Wall
+
+  -- note: version constraints for dependencies shared with the library
+  -- should be the same
+  build-depends:     HTTP,
+                     HUnit >= 1.2.0.1 && < 1.7,
+                     httpd-shed >= 0.4 && < 0.5,
+                     mtl >= 1.1.1.0 && < 2.3,
+                     bytestring >= 0.9.1.5 && < 0.12,
+                     deepseq >= 1.3.0.0 && < 1.5,
+                     pureMD5 >= 0.2.4 && < 2.2,
+                     base >= 4.3.0.0 && < 4.16,
+                     split >= 0.1.3 && < 0.3,
+                     test-framework >= 0.2.0 && < 0.9,
+                     test-framework-hunit >= 0.3.0 && <0.4
+
+  if flag(network-uri)
+    Build-depends: network-uri == 2.6.*, network >= 2.6 && < 3.2
+  else
+    Build-depends: network >= 2.3 && < 2.6
+
+  if flag(warp-tests)
+    CPP-Options: -DWARP_TESTS
+    build-depends:
+                       case-insensitive >= 0.4.0.1 && < 1.3,
+                       http-types >= 0.8.0 && < 1.0,
+                       wai >= 2.1.0 && < 3.3,
+                       warp >= 2.1.0 && < 3.4
+
+    if flag(conduit10)
+      build-depends:
+                         conduit >= 1.0.8 && < 1.1
+    else
+      build-depends:
+                         conduit >= 1.1 && < 1.4,
+                         conduit-extra >= 1.1 && < 1.4

@@ -1,0 +1,58 @@
+Name:                split
+Version:             0.2.3.4
+x-revision: 2
+Stability:           stable
+
+Description:         A collection of various methods for splitting
+                     lists into parts, akin to the \"split\" function
+                     found in several mainstream languages. Here is
+                     its tale:
+                     .
+                     Once upon a time the standard "Data.List" module
+                     held no function for splitting a list into parts
+                     according to a delimiter.  Many a brave
+                     lambda-knight strove to add such a function, but
+                     their striving was in vain, for Lo, the Supreme
+                     Council fell to bickering amongst themselves what
+                     was to be the essential nature of the One True
+                     Function which could cleave a list in twain (or
+                     thrain, or any required number of parts).
+                     .
+                     And thus came to pass the split package,
+                     comprising divers functions for splitting a list
+                     asunder, each according to its nature.  And the
+                     Supreme Council had no longer any grounds for
+                     argument, for the favored method of each was
+                     contained therein.
+                     .
+                     To get started, see the "Data.List.Split" module.
+Synopsis:            Combinator library for splitting lists.
+License:             BSD3
+License-file:        LICENSE
+Copyright:           (c) Brent Yorgey, Louis Wasserman 2008-2012
+Extra-source-files:  README, test/Properties.hs, CHANGES
+Author:              Brent Yorgey
+Maintainer:          byorgey@gmail.com
+Category:            List
+Build-type:          Simple
+Cabal-Version:       >= 1.10
+Tested-with:         GHC ==7.0.4 || ==7.2.2 || ==7.4.2 || ==7.6.3 || ==7.8.4 || ==7.10.3 || ==8.0.2 || ==8.2.2 || ==8.4.4 || ==8.6.5 || ==8.8.4 || ==8.10.4 || ==9.0.1
+Bug-reports:         https://github.com/byorgey/split/issues
+
+Test-suite split-tests
+  type:              exitcode-stdio-1.0
+  main-is:           Properties.hs
+  build-depends:     base, QuickCheck >= 2.4, split
+  default-language:  Haskell2010
+  Hs-source-dirs:    test
+
+Source-repository head
+  type:              git
+  location:          http://github.com/byorgey/split.git
+
+Library
+  ghc-options:       -Wall
+  build-depends:     base < 4.17
+  exposed-modules:   Data.List.Split, Data.List.Split.Internals
+  default-language:  Haskell2010
+  Hs-source-dirs:    src

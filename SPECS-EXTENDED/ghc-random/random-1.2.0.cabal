@@ -1,0 +1,194 @@
+cabal-version:      >=1.10
+name:               random
+version:            1.2.0
+x-revision: 6
+license:            BSD3
+license-file:       LICENSE
+maintainer:         core-libraries-committee@haskell.org
+bug-reports:        https://github.com/haskell/random/issues
+synopsis:           Pseudo-random number generation
+description:
+    This package provides basic pseudo-random number generation, including the
+    ability to split random number generators.
+    .
+    == "System.Random": pure pseudo-random number interface
+    .
+    In pure code, use 'System.Random.uniform' and 'System.Random.uniformR' from
+    "System.Random" to generate pseudo-random numbers with a pure pseudo-random
+    number generator like 'System.Random.StdGen'.
+    .
+    As an example, here is how you can simulate rolls of a six-sided die using
+    'System.Random.uniformR':
+    .
+    >>> let roll = uniformR (1, 6)        :: RandomGen g => g -> (Word, g)
+    >>> let rolls = unfoldr (Just . roll) :: RandomGen g => g -> [Word]
+    >>> let pureGen = mkStdGen 42
+    >>> take 10 (rolls pureGen)           :: [Word]
+    [1,1,3,2,4,5,3,4,6,2]
+    .
+    See "System.Random" for more details.
+    .
+    == "System.Random.Stateful": monadic pseudo-random number interface
+    .
+    In monadic code, use 'System.Random.Stateful.uniformM' and
+    'System.Random.Stateful.uniformRM' from "System.Random.Stateful" to generate
+    pseudo-random numbers with a monadic pseudo-random number generator, or
+    using a monadic adapter.
+    .
+    As an example, here is how you can simulate rolls of a six-sided die using
+    'System.Random.Stateful.uniformRM':
+    .
+    >>> let rollM = uniformRM (1, 6)                 :: StatefulGen g m => g -> m Word
+    >>> let pureGen = mkStdGen 42
+    >>> runStateGen_ pureGen (replicateM 10 . rollM) :: [Word]
+    [1,1,3,2,4,5,3,4,6,2]
+    .
+    The monadic adapter 'System.Random.Stateful.runGenState_' is used here to lift
+    the pure pseudo-random number generator @pureGen@ into the
+    'System.Random.Stateful.StatefulGen' context.
+    .
+    The monadic interface can also be used with existing monadic pseudo-random
+    number generators. In this example, we use the one provided in the
+    <https://hackage.haskell.org/package/mwc-random mwc-random> package:
+    .
+    >>> import System.Random.MWC as MWC
+    >>> let rollM = uniformRM (1, 6)       :: StatefulGen g m => g -> m Word
+    >>> monadicGen <- MWC.create
+    >>> replicateM 10 (rollM monadicGen) :: IO [Word]
+    [2,3,6,6,4,4,3,1,5,4]
+    .
+    See "System.Random.Stateful" for more details.
+
+category:           System
+build-type:         Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+tested-with:         GHC == 7.10.2
+                   , GHC == 7.10.3
+                   , GHC == 8.0.2
+                   , GHC == 8.2.2
+                   , GHC == 8.4.3
+                   , GHC == 8.4.4
+                   , GHC == 8.6.3
+                   , GHC == 8.6.4
+                   , GHC == 8.6.5
+                   , GHC == 8.8.1
+                   , GHC == 8.8.2
+                   , GHC == 8.10.1
+
+source-repository head
+    type:     git
+    location: https://github.com/haskell/random.git
+
+
+library
+    exposed-modules:
+        System.Random
+        System.Random.Internal
+        System.Random.Stateful
+
+    hs-source-dirs:   src
+    default-language: Haskell2010
+    ghc-options:
+        -Wall
+    if impl(ghc >= 8.0)
+        ghc-options:
+            -Wincomplete-record-updates -Wincomplete-uni-patterns
+
+    build-depends:
+        base >=4.8 && <4.16,
+        bytestring >=0.10.4 && <0.12,
+        deepseq >=1.1 && <2,
+        mtl >=2.2 && <2.3,
+        splitmix >=0.1 && <0.2
+    if impl(ghc < 8.0)
+       build-depends:
+           transformers
+
+test-suite legacy-test
+    type:             exitcode-stdio-1.0
+    main-is:          Legacy.hs
+    hs-source-dirs:   test-legacy
+    other-modules:
+        T7936
+        TestRandomIOs
+        TestRandomRs
+        Random1283
+        RangeTest
+
+    default-language: Haskell2010
+    ghc-options:      -with-rtsopts=-M4M
+    if impl(ghc >= 8.0)
+        ghc-options:
+            -Wno-deprecations
+    build-depends:
+        base -any,
+        containers >=0.5 && <0.7,
+        random -any
+
+test-suite doctests
+    type:             exitcode-stdio-1.0
+    main-is:          doctests.hs
+    hs-source-dirs:   test
+    default-language: Haskell2010
+    build-depends:
+        base -any,
+        doctest >=0.15 && <0.19,
+        mwc-random >=0.13 && <0.16,
+        primitive >=0.6 && <0.8,
+        random -any,
+        unliftio >=0.2 && <0.3,
+        vector >= 0.10 && <0.14
+
+test-suite spec
+    type:             exitcode-stdio-1.0
+    main-is:          Spec.hs
+    hs-source-dirs:   test
+    other-modules:
+        Spec.Range
+        Spec.Run
+
+    default-language: Haskell2010
+    ghc-options:      -Wall
+    build-depends:
+        base -any,
+        bytestring -any,
+        random -any,
+        smallcheck >=1.2 && <1.3,
+        tasty >=1.0 && <1.5,
+        tasty-smallcheck >=0.8 && <0.9,
+        tasty-expected-failure -any,
+        tasty-hunit >=0.10 && <0.11
+
+benchmark legacy-bench
+    type:             exitcode-stdio-1.0
+    main-is:          SimpleRNGBench.hs
+    hs-source-dirs:   bench-legacy
+    other-modules:    BinSearch
+    default-language: Haskell2010
+    ghc-options:
+        -Wall -O2 -threaded -rtsopts -with-rtsopts=-N
+    if impl(ghc >= 8.0)
+        ghc-options:
+            -Wno-deprecations
+
+    build-depends:
+        base -any,
+        random -any,
+        rdtsc -any,
+        split >=0.2 && <0.3,
+        time >=1.4 && <1.11
+
+benchmark bench
+    type:             exitcode-stdio-1.0
+    main-is:          Main.hs
+    hs-source-dirs:   bench
+    default-language: Haskell2010
+    ghc-options:      -Wall -O2
+    build-depends:
+        base -any,
+        gauge >=0.2.3 && <0.3,
+        mtl,
+        random -any,
+        splitmix >=0.1 && <0.2

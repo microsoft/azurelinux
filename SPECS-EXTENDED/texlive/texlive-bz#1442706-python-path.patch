@@ -1,0 +1,20 @@
+diff -up tex/latex/sympytexpackage/sympytex.sty.than tex/latex/sympytexpackage/sympytex.sty
+--- tex/latex/sympytexpackage/sympytex.sty.than	2017-07-05 14:24:09.206951593 +0200
++++ tex/latex/sympytexpackage/sympytex.sty	2017-07-05 14:25:09.994666464 +0200
+@@ -43,13 +43,13 @@
+ \newwrite\ST@sf
+ \immediate\openout\ST@sf=\jobname.sympy
+ \newcommand{\ST@wsf}[1]{\immediate\write\ST@sf{#1}}
+-\iffalse
++%\iffalse
+ %% To get .sympy files to automatically change the Python path to find
+ %% sympytex.py, delete the \iffalse and \fi lines surrounding this and
+ %% change the directory below to where sympytex.py can be found.
+ \ST@wsf{import sys}
+-\ST@wsf{sys.path.insert(0, 'directory with sympytex.py')}
+-\fi
++\ST@wsf{sys.path.insert(0, '/usr/share/texlive/texmf-dist/scripts/sympytexpackage')}
++%\fi
+ \ST@wsf{import sympy}
+ \ST@wsf{import sympytex}
+ \ST@wsf{sympytex.openout('\jobname')}

@@ -1,0 +1,222 @@
+cabal-version: 2.2
+
+name:           unicode-transforms
+version:        0.3.7.1
+x-revision: 2
+synopsis:       Unicode normalization
+description:    Fast Unicode 13.0.0 normalization in Haskell (NFC, NFKC, NFD, NFKD).
+category:       Data,Text,Unicode
+stability:      Experimental
+homepage:       http://github.com/composewell/unicode-transforms
+bug-reports:    https://github.com/composewell/unicode-transforms/issues
+author:         Harendra Kumar
+maintainer:     harendra.kumar@gmail.com
+copyright:      2016-2017 Harendra Kumar,
+                2014–2015 Antonio Nikishaev
+license:        BSD-3-Clause
+license-file:   LICENSE
+tested-with:    GHC==7.10.3
+              , GHC==8.0.2
+              , GHC==8.2.2
+              , GHC==8.4.4
+              , GHC==8.6.5
+              , GHC==8.8.3
+              , GHC==8.10.1
+build-type:     Simple
+extra-source-files:
+    .gitignore
+    .travis.yml
+    appveyor.yml
+    Changelog.md
+    MAINTAINING.md
+    NOTES.md
+    README.md
+    benchmark/README.md
+    benchmark/NormalizeFile.hs
+    benchmark/data/AllChars.txt
+    benchmark/data/Deutsch.txt
+    benchmark/data/Devanagari.txt
+    benchmark/data/English.txt
+    benchmark/data/Japanese.txt
+    benchmark/data/Korean.txt
+    benchmark/data/Vietnamese.txt
+    stack.yaml
+    stack-7.10.yaml
+    stack-8.0.yaml
+    unicode-data/README.md
+    unicode-data/ucd/NormalizationTest.txt
+    unicode-data/extra/NormalizationTest.txt
+    unicode-data/stack.yaml
+    unicode-data/ucd2haskell.cabal
+    unicode-data/UCD2Haskell.hs
+
+source-repository head
+  type: git
+  location: https://github.com/composewell/unicode-transforms
+
+flag dev
+  description: Developer build
+  manual: True
+  default: False
+
+flag bench-show
+  description: Use bench-show to compare benchmarks
+  manual: True
+  default: False
+
+flag has-icu
+  description: Use text-icu for benchmark and test comparisons
+  manual: True
+  default: False
+
+flag has-llvm
+  description: Use llvm backend (faster) for compilation
+  manual: True
+  default: False
+
+library
+  exposed-modules:
+      Data.ByteString.UTF8.Normalize
+      Data.Text.Normalize
+      Data.Unicode.Types
+      Data.Unicode.Internal.Division
+  other-modules:
+      Data.Unicode.Internal.Bits
+      Data.Unicode.Internal.NormalizeStream
+      Data.Unicode.Properties.CombiningClass
+      Data.Unicode.Properties.Compositions
+      Data.Unicode.Properties.Decomposable
+      Data.Unicode.Properties.DecomposableK
+      Data.Unicode.Properties.Decompose
+      Data.Unicode.Properties.DecomposeHangul
+      Data.Unicode.Properties.Decompositions
+      Data.Unicode.Properties.DecompositionsK
+      Data.Unicode.Properties.DecompositionsK2
+  hs-source-dirs:
+      ./.
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      base >=4.8 && <5
+    , bytestring >=0.9 && <0.12
+    , text >=1.1.1 && <1.3
+    , ghc-prim >= 0.2 && < 0.8
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields -fspec-constr-count=10
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  default-language: Haskell2010
+
+test-suite extras
+  type: exitcode-stdio-1.0
+  main-is: Extra.hs
+  other-modules:
+      QuickCheckUtils
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      QuickCheck >=2.1 && <2.15
+    , base >=4.7 && <5
+    , deepseq >=1.1 && <1.5
+    , text >=1.1.1 && <1.3
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  default-language: Haskell2010
+
+test-suite quickcheck
+  type: exitcode-stdio-1.0
+  main-is: Properties.hs
+  other-modules:
+      QuickCheckUtils
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      QuickCheck >=2.1 && <2.15
+    , base >=4.7 && <5
+    , deepseq >=1.1 && <1.5
+    , hspec >= 2.0 && < 3
+    , text >=1.1.1 && <1.3
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  if flag(has-icu)
+    cpp-options: -DHAS_ICU
+    build-depends:
+        text-icu >=0.6.2.1
+  default-language: Haskell2010
+
+test-suite ucd
+  type: exitcode-stdio-1.0
+  main-is: NormalizationTest.hs
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      base >=4.7 && <5
+    , getopt-generics >=0.11 && <0.14
+    , split >=0.1 && <0.3
+    , text >=1.1.1 && <1.3
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  default-language: Haskell2010
+
+benchmark bench
+  type: exitcode-stdio-1.0
+  main-is: Benchmark.hs
+  hs-source-dirs:
+      benchmark
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      base >=4.7 && <5
+    , deepseq >=1.1.0 && <1.5
+    , filepath >=1.0 && <2
+    , gauge >=0.2.0 && <0.3
+    , path >=0.0.0 && <0.9
+    , path-io >=0.1.0 && <1.7
+    , text >=1.1.1 && <1.3
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  if flag(has-icu)
+    cpp-options: -DBENCH_ICU
+    build-depends:
+        text-icu >=0.6.2.1 && <0.8
+  if impl(ghc < 7.10)
+    build-depends:
+        path (<0.5.12 || >0.5.12)
+  default-language: Haskell2010
+
+executable chart
+  default-language: Haskell2010
+  hs-source-dirs: benchmark
+  main-is: Chart.hs
+  if flag(bench-show)
+    buildable: True
+    build-Depends:
+        base >= 4.8 && < 5
+      , bench-show >= 0.3 && < 0.4
+      , split >= 0.2 && < 0.3
+      , transformers >= 0.4   && < 0.6
+  else
+    buildable: False

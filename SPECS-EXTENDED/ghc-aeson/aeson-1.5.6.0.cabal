@@ -1,0 +1,258 @@
+name:            aeson
+version:         1.5.6.0
+x-revision: 5
+license:         BSD3
+license-file:    LICENSE
+category:        Text, Web, JSON
+copyright:       (c) 2011-2016 Bryan O'Sullivan
+                 (c) 2011 MailRank, Inc.
+author:          Bryan O'Sullivan <bos@serpentine.com>
+maintainer:      Adam Bergmark <adam@bergmark.nl>
+stability:       experimental
+tested-with:     GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.4, GHC == 8.6.5, GHC == 8.8.3, GHC == 8.10.1
+synopsis:        Fast JSON parsing and encoding
+cabal-version:   >= 1.10
+homepage:        https://github.com/haskell/aeson
+bug-reports:     https://github.com/haskell/aeson/issues
+build-type:      Simple
+description:
+    A JSON parsing and encoding library optimized for ease of use
+    and high performance.
+    .
+    To get started, see the documentation for the @Data.Aeson@ module
+    below.
+    .
+    (A note on naming: in Greek mythology, Aeson was the father of Jason.)
+
+extra-source-files:
+    *.yaml
+    README.markdown
+    cbits/*.c
+    changelog.md
+    include/*.h
+    tests/JSONTestSuite/test_parsing/*.json
+    tests/JSONTestSuite/test_transform/*.json
+    tests/golden/*.expected
+    src-ffi/Data/Aeson/Parser/*.hs
+    src-pure/Data/Aeson/Parser/*.hs
+    benchmarks/json-data/*.json
+
+flag developer
+  description: operate in developer mode
+  default: False
+  manual: True
+
+flag fast
+  description: compile without optimizations
+  default: False
+  manual: True
+
+flag bytestring-builder
+  description: Depend on the bytestring-builder package for backwards compatibility.
+  default: False
+  manual: False
+
+flag cffi
+  description: Controls whether to include c-ffi bits or pure haskell. Default to False for security.
+  default: False
+  manual: True
+
+library
+  default-language: Haskell2010
+  hs-source-dirs: src attoparsec-iso8601/src
+
+  exposed-modules:
+    Data.Aeson
+    Data.Aeson.Encoding
+    Data.Aeson.Parser
+    Data.Aeson.Text
+    Data.Aeson.Types
+    Data.Aeson.TH
+    Data.Aeson.QQ.Simple
+
+    Data.Aeson.Encoding.Internal
+    Data.Aeson.Internal
+    Data.Aeson.Internal.Time
+    Data.Aeson.Parser.Internal
+
+  -- Deprecated modules
+  exposed-modules:
+    Data.Aeson.Encode
+
+  other-modules:
+    Data.Aeson.Encoding.Builder
+    Data.Aeson.Internal.Functions
+    Data.Aeson.Parser.Unescape
+    Data.Aeson.Parser.Time
+    Data.Aeson.Types.FromJSON
+    Data.Aeson.Types.Generic
+    Data.Aeson.Types.ToJSON
+    Data.Aeson.Types.Class
+    Data.Aeson.Types.Internal
+    Data.Attoparsec.Time
+    Data.Attoparsec.Time.Internal
+
+  -- GHC bundled libs
+  build-depends:
+    base             >= 4.7.0.0 && < 5,
+    bytestring       >= 0.10.4.0 && < 0.11.2,
+    containers       >= 0.5.5.1 && < 0.7,
+    deepseq          >= 1.3.0.0 && < 1.5,
+    ghc-prim         >= 0.2     && < 0.8,
+    template-haskell >= 2.9.0.0 && < 2.18,
+    text             >= 1.2.3.0 && < 1.3,
+    time             >= 1.4     && < 1.13
+
+  if impl(ghc >= 8.0)
+    build-depends: bytestring >= 0.10.8.1
+
+  -- Compat
+  build-depends:
+    base-compat-batteries >= 0.10.0   && < 0.13,
+    time-compat           >= 1.9.4    && < 1.10
+
+  if !impl(ghc >= 8.6)
+    build-depends:
+      contravariant >=1.4.1    && <1.6
+
+  if !impl(ghc >= 8.0)
+    -- `Data.Semigroup` and `Control.Monad.Fail` and `Control.Monad.IO.Class` are available in base only since GHC 8.0 / base 4.9
+    build-depends:
+      semigroups          >= 0.18.5  && < 0.21,
+      transformers        >= 0.3.0.0 && < 0.7,
+      transformers-compat >= 0.6.2   && < 0.8,
+      fail == 4.9.*
+
+  if !impl(ghc >= 7.10)
+    -- `Numeric.Natural` is available in base only since GHC 7.10 / base 4.8
+    build-depends: nats >= 1.1.1 && < 1.2,
+                   void >= 0.7.2 && < 0.8
+
+  -- Other dependencies
+  build-depends:
+    attoparsec           >= 0.13.2.2 && < 0.15,
+    data-fix             >= 0.3      && < 0.4,
+    dlist                >= 0.8.0.4  && < 1.1,
+    hashable             >= 1.2.7.0  && < 1.4,
+    primitive            >= 0.7.0.1  && < 0.8,
+    scientific           >= 0.3.6.2  && < 0.4,
+    strict               >= 0.4      && < 0.5,
+    tagged               >= 0.8.6    && < 0.9,
+    th-abstraction       >= 0.2.8.0  && < 0.5,
+    these                >= 1.1      && < 1.2,
+    unordered-containers >= 0.2.10.0 && < 0.3,
+    uuid-types           >= 1.0.3    && < 1.1,
+    vector               >= 0.12.0.1 && < 0.13
+
+  ghc-options: -Wall
+
+  if flag(developer)
+    ghc-options: -Werror
+    ghc-prof-options: -auto-all
+
+  if flag(fast)
+    ghc-options: -O0
+  else
+    ghc-options: -O2
+
+  include-dirs: include
+  if impl(ghcjs) || !flag(cffi)
+    hs-source-dirs: src-pure
+    other-modules: Data.Aeson.Parser.UnescapePure
+  else
+    c-sources: cbits/unescape_string.c
+    cpp-options: -DCFFI
+    hs-source-dirs: src-ffi
+    other-modules: Data.Aeson.Parser.UnescapeFFI
+
+test-suite aeson-tests
+  default-language: Haskell2010
+  type: exitcode-stdio-1.0
+  hs-source-dirs: tests src-ffi src-pure
+  main-is: Tests.hs
+  c-sources: cbits/unescape_string.c
+  ghc-options: -Wall -threaded -rtsopts
+
+  other-modules:
+    Data.Aeson.Parser.UnescapeFFI
+    Data.Aeson.Parser.UnescapePure
+    DataFamilies.Properties
+    DataFamilies.Instances
+    DataFamilies.Encoders
+    DataFamilies.Types
+    Encoders
+    ErrorMessages
+    Functions
+    Instances
+    Options
+    PropUtils
+    Properties
+    PropertyGeneric
+    PropertyKeys
+    PropertyRoundTrip
+    PropertyRTFunctors
+    PropertyTH
+    SerializationFormatSpec
+    Types
+    UnitTests
+    UnitTests.NullaryConstructors
+
+  build-depends:
+    QuickCheck >= 2.14.2 && < 2.15,
+    aeson,
+    integer-logarithms >= 1 && <1.1,
+    attoparsec,
+    base,
+    base-compat,
+    base-orphans >= 0.5.3 && <0.9,
+    base16-bytestring,
+    containers,
+    data-fix,
+    directory,
+    dlist,
+    Diff >= 0.4 && < 0.5,
+    filepath,
+    generic-deriving >= 1.10 && < 1.15,
+    ghc-prim >= 0.2,
+    hashable >= 1.2.4.0,
+    hashable-time >= 0.2.1 && <0.3,
+    scientific,
+    strict,
+    tagged,
+    template-haskell,
+    tasty,
+    tasty-golden,
+    tasty-hunit,
+    tasty-quickcheck,
+    text,
+    these,
+    time,
+    time-compat,
+    unordered-containers,
+    uuid-types,
+    vector,
+    quickcheck-instances >= 0.3.25.2 && <0.4
+
+  if flag(bytestring-builder)
+    build-depends: bytestring >= 0.9 && < 0.10.4,
+                   bytestring-builder >= 0.10.4 && < 1
+  else
+    build-depends: bytestring >= 0.10.4
+
+  if !impl(ghc >= 8.0)
+    build-depends:
+      semigroups >= 0.18.2 && < 0.20,
+      transformers >= 0.2.2.0,
+      transformers-compat >= 0.3
+
+  if !impl(ghc >= 7.10)
+    build-depends: nats >=1 && <1.2,
+                   void >=0.7.2 && <0.8
+
+
+  if flag(fast)
+    ghc-options: -fno-enable-rewrite-rules
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell/aeson.git

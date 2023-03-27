@@ -1,0 +1,168 @@
+name:               scientific
+version:            0.3.7.0
+x-revision:         2
+synopsis:           Numbers represented using scientific notation
+description:
+  "Data.Scientific" provides the number type 'Scientific'. Scientific numbers are
+  arbitrary precision and space efficient. They are represented using
+  <http://en.wikipedia.org/wiki/Scientific_notation scientific notation>.
+  The implementation uses a coefficient @c :: 'Integer'@ and a base-10 exponent
+  @e :: 'Int'@. A scientific number corresponds to the
+  'Fractional' number: @'fromInteger' c * 10 '^^' e@.
+  .
+  Note that since we're using an 'Int' to represent the exponent these numbers
+  aren't truly arbitrary precision. I intend to change the type of the exponent
+  to 'Integer' in a future release.
+  .
+  The main application of 'Scientific' is to be used as the target of parsing
+  arbitrary precision numbers coming from an untrusted source. The advantages
+  over using 'Rational' for this are that:
+  .
+  * A 'Scientific' is more efficient to construct. Rational numbers need to be
+  constructed using '%' which has to compute the 'gcd' of the 'numerator' and
+  'denominator'.
+  .
+  * 'Scientific' is safe against numbers with huge exponents. For example:
+  @1e1000000000 :: 'Rational'@ will fill up all space and crash your
+  program. Scientific works as expected:
+  .
+  >>> read "1e1000000000" :: Scientific
+  1.0e1000000000
+  .
+  * Also, the space usage of converting scientific numbers with huge exponents to
+  @'Integral's@ (like: 'Int') or @'RealFloat's@ (like: 'Double' or 'Float')
+  will always be bounded by the target type.
+
+homepage:           https://github.com/basvandijk/scientific
+bug-reports:        https://github.com/basvandijk/scientific/issues
+license:            BSD3
+license-file:       LICENSE
+author:             Bas van Dijk
+maintainer:         Bas van Dijk <v.dijk.bas@gmail.com>
+category:           Data
+build-type:         Simple
+cabal-version:      >=1.10
+extra-source-files: changelog
+tested-with:
+  GHC ==7.6.3
+   || ==7.8.4
+   || ==7.10.3
+   || ==8.0.2
+   || ==8.2.2
+   || ==8.4.4
+   || ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.1
+   || ==9.2.1
+
+source-repository head
+  type:     git
+  location: git://github.com/basvandijk/scientific.git
+
+flag bytestring-builder
+  description:
+    Depend on the bytestring-builder package for backwards compatibility.
+
+  default:     False
+  manual:      False
+
+flag integer-simple
+  description: Use the integer-simple package instead of integer-gmp
+  default:     False
+
+library
+  exposed-modules:
+    Data.ByteString.Builder.Scientific
+    Data.Scientific
+    Data.Text.Lazy.Builder.Scientific
+
+  other-modules:
+    GHC.Integer.Compat
+    Utils
+
+  other-extensions:
+    BangPatterns
+    DeriveDataTypeable
+    Trustworthy
+
+  ghc-options:      -Wall
+  build-depends:
+      base                >=4.5     && <4.17
+    , binary              >=0.5.1   && <0.9
+    , containers          >=0.4.2.1 && <0.7
+    , deepseq             >=1.3.0.0 && <1.5
+    , hashable            >=1.2.7.0 && <1.5
+    , integer-logarithms  >=1.0.3.1 && <1.1
+    , primitive           >=0.7.1.0 && <0.8
+    , template-haskell    >=2.8     && <2.19
+    , text                >=1.2.3.0 && <1.3 || >=2.0 && <2.1
+
+  if flag(bytestring-builder)
+    build-depends:
+        bytestring          >=0.9    && <0.10.4
+      , bytestring-builder  >=0.10.4 && <0.11
+
+  else
+    build-depends: bytestring >=0.10.4 && <0.12
+
+  if impl(ghc >=9.0)
+    build-depends: base >=4.15
+
+    if flag(integer-simple)
+      build-depends: invalid-cabal-flag-settings <0
+
+  else
+    if flag(integer-simple)
+      build-depends: integer-simple
+
+    else
+      build-depends: integer-gmp
+
+  if impl(ghc <8)
+    other-extensions: TemplateHaskell
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+  hs-source-dirs:   src
+  default-language: Haskell2010
+
+test-suite test-scientific
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          test.hs
+  default-language: Haskell2010
+  ghc-options:      -Wall
+  build-depends:
+      base
+    , binary
+    , QuickCheck        >=2.14.2
+    , scientific
+    , smallcheck        >=1.0
+    , tasty             >=1.4.0.1
+    , tasty-hunit       >=0.8
+    , tasty-quickcheck  >=0.8
+    , tasty-smallcheck  >=0.2
+    , text
+
+  if flag(bytestring-builder)
+    build-depends:
+        bytestring
+      , bytestring-builder
+
+  else
+    build-depends: bytestring
+
+benchmark bench-scientific
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   bench
+  main-is:          bench.hs
+  default-language: Haskell2010
+  ghc-options:      -O2
+  build-depends:
+      base
+    , criterion   >=0.5
+    , scientific

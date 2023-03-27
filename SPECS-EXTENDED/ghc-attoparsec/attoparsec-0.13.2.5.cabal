@@ -1,0 +1,205 @@
+name:            attoparsec
+version:         0.13.2.5
+x-revision: 2
+license:         BSD3
+license-file:    LICENSE
+category:        Text, Parsing
+author:          Bryan O'Sullivan <bos@serpentine.com>
+maintainer:      Bryan O'Sullivan <bos@serpentine.com>, Ben Gamari <ben@smart-cactus.org>
+stability:       experimental
+tested-with:     GHC == 7.4.2, GHC ==7.6.3, GHC ==7.8.4, GHC ==7.10.3, GHC ==8.0.2, GHC ==8.2.2, GHC==8.4.4, GHC==8.6.5, GHC==8.8.1, GHC==8.10.1
+synopsis:        Fast combinator parsing for bytestrings and text
+cabal-version:   2.0
+homepage:        https://github.com/bgamari/attoparsec
+bug-reports:     https://github.com/bgamari/attoparsec/issues
+build-type:      Simple
+description:
+    A fast parser combinator library, aimed particularly at dealing
+    efficiently with network protocols and complicated text/binary
+    file formats.
+extra-source-files:
+    README.markdown
+    benchmarks/*.cabal
+    benchmarks/*.hs
+    benchmarks/*.txt
+    benchmarks/json-data/*.json
+    benchmarks/Makefile
+    benchmarks/med.txt.bz2
+    changelog.md
+    examples/*.c
+    examples/*.hs
+    examples/Makefile
+    tests/*.hs
+    tests/QC/*.hs
+    tests/QC/IPv6/*.hs
+
+Flag developer
+  Description: Whether to build the library in development mode
+  Default: False
+  Manual: True
+
+library
+  build-depends: text <1.3
+
+  build-depends: array,
+                 base >= 4.3 && < 5,
+                 bytestring <0.12,
+                 containers,
+                 deepseq,
+                 scientific >= 0.3.1 && < 0.4,
+                 transformers >= 0.2 && (< 0.4 || >= 0.4.1.0) && < 0.6,
+                 text >= 1.1.1.3,
+                 ghc-prim <0.8
+  if impl(ghc < 7.4)
+    build-depends:
+      bytestring < 0.10.4.0
+
+  if !impl(ghc >= 8.0)
+    -- Data.Semigroup && Control.Monad.Fail are available in base-4.9+
+    build-depends: fail == 4.9.*,
+                   semigroups >=0.16.1 && <0.20
+
+  exposed-modules: Data.Attoparsec
+                   Data.Attoparsec.ByteString
+                   Data.Attoparsec.ByteString.Char8
+                   Data.Attoparsec.ByteString.Lazy
+                   Data.Attoparsec.Char8
+                   Data.Attoparsec.Combinator
+                   Data.Attoparsec.Internal
+                   Data.Attoparsec.Internal.Types
+                   Data.Attoparsec.Lazy
+                   Data.Attoparsec.Number
+                   Data.Attoparsec.Text
+                   Data.Attoparsec.Text.Lazy
+                   Data.Attoparsec.Types
+                   Data.Attoparsec.Zepto
+  other-modules:   Data.Attoparsec.ByteString.Buffer
+                   Data.Attoparsec.ByteString.FastSet
+                   Data.Attoparsec.ByteString.Internal
+                   Data.Attoparsec.Internal.Compat
+                   Data.Attoparsec.Internal.Fhthagn
+                   Data.Attoparsec.Text.Buffer
+                   Data.Attoparsec.Text.FastSet
+                   Data.Attoparsec.Text.Internal
+  ghc-options: -O2 -Wall
+
+  default-language: Haskell2010
+
+  if flag(developer)
+    ghc-prof-options: -auto-all
+    ghc-options: -Werror
+
+test-suite tests
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: tests .
+  main-is:        QC.hs
+  other-modules:  QC.Buffer
+                  QC.ByteString
+                  QC.Combinator
+                  QC.Common
+                  QC.IPv6.Internal
+                  QC.IPv6.Types
+                  QC.Rechunked
+                  QC.Simple
+                  QC.Text
+                  QC.Text.FastSet
+                  QC.Text.Regressions
+
+  other-modules:  Data.Attoparsec.ByteString
+                  Data.Attoparsec.ByteString.Buffer
+                  Data.Attoparsec.ByteString.Char8
+                  Data.Attoparsec.ByteString.FastSet
+                  Data.Attoparsec.ByteString.Internal
+                  Data.Attoparsec.ByteString.Lazy
+                  Data.Attoparsec.Combinator
+                  Data.Attoparsec.Internal
+                  Data.Attoparsec.Internal.Compat
+                  Data.Attoparsec.Internal.Fhthagn
+                  Data.Attoparsec.Internal.Types
+                  Data.Attoparsec.Number
+                  Data.Attoparsec.Text
+                  Data.Attoparsec.Text.Buffer
+                  Data.Attoparsec.Text.FastSet
+                  Data.Attoparsec.Text.Internal
+                  Data.Attoparsec.Text.Lazy
+                  Data.Attoparsec.Zepto
+
+  ghc-options:
+    -Wall -threaded -rtsopts
+
+  if flag(developer)
+    ghc-options: -Werror
+
+  build-depends:
+    array,
+    base,
+    bytestring,
+    deepseq >= 1.1,
+    QuickCheck >= 2.13.2 && < 2.15,
+    quickcheck-unicode,
+    scientific,
+    tasty >= 0.11,
+    tasty-quickcheck >= 0.8,
+    text,
+    transformers,
+    vector
+
+  default-language: Haskell2010
+
+  if !impl(ghc >= 8.0)
+    -- Data.Semigroup && Control.Monad.Fail are available in base-4.9+
+    build-depends: fail == 4.9.*,
+                   semigroups >=0.16.1 && <0.19
+
+benchmark benchmarks
+  type: exitcode-stdio-1.0
+  hs-source-dirs: benchmarks benchmarks/warp-3.0.1.1 .
+  ghc-options: -O2 -Wall -rtsopts
+  main-is: Benchmarks.hs
+  other-modules:
+    Common
+    HeadersByteString
+    HeadersByteString.Atto
+    HeadersText
+    Links
+    Network.Wai.Handler.Warp.ReadInt
+    Network.Wai.Handler.Warp.RequestHeader
+    Numbers
+    Sets
+    TextFastSet
+    Warp
+  ghc-options: -O2 -Wall
+
+  if flag(developer)
+    ghc-options: -Werror
+
+  build-depends:
+    array,
+    base == 4.*,
+    bytestring >= 0.10.4.0,
+    case-insensitive,
+    containers,
+    criterion >= 1.0,
+    deepseq >= 1.1,
+    directory,
+    filepath,
+    ghc-prim,
+    http-types,
+    parsec >= 3.1.2,
+    scientific,
+    text >= 1.1.1.0,
+    transformers,
+    unordered-containers,
+    vector
+
+  default-language: Haskell2010
+
+  if !impl(ghc >= 8.0)
+    -- Data.Semigroup && Control.Monad.Fail are available in base-4.9+
+    build-depends: fail == 4.9.*,
+                   semigroups >=0.16.1 && <0.19
+
+source-repository head
+  type:     git
+  location: https://github.com/bgamari/attoparsec
+

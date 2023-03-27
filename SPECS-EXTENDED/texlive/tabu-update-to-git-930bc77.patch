@@ -1,0 +1,39 @@
+--- tabu.sty.old	2019-01-14 17:10:48.000000000 -0500
++++ tabu.sty	2019-12-11 09:16:55.745034664 -0500
+@@ -52,12 +52,12 @@
+ %% lppl copyright 2010-2011 by FC <florent.chervet@free.fr>
+ %%
+ %% Updated 2019-01-11
+-%% Copyright 2019 tabu-fixed github group (LaTeX3 Project members)
+-%% Please report any issues at https://github.com/tabu-fixed/tabu
++%% Copyright 2019 tabu-issues-for-future-maintainer github group (LaTeX3 Project members)
++%% Please report any issues at https://github.com/tabu-issues-for-future-maintainer/tabu
+ %% 
+ 
+ \NeedsTeXFormat{LaTeX2e}
+-\ProvidesPackage{tabu}[2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)]
++\ProvidesPackage{tabu}[2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-issues-for-future-maintainer) + intermediate FMi]
+ \RequirePackage{array}[2008/09/09]
+ \RequirePackage{varwidth}[2009/03/30]
+ \AtEndOfPackage{\tabu@AtEnd \let\tabu@AtEnd \@undefined}
+@@ -727,6 +727,10 @@
+                       \tabu@currentgrouptype\expandafter{\the\currentgrouptype}}%
+ \fi
+ }% \tabu@init
++%%TABU-FIXED set up \tabu@currentgrouptype
++%FMi cancel for nested arrays ...
++\def\@tabarray{\m@th\def\tabu@currentgrouptype{\currentgrouptype}\@ifnextchar[\@array{\@array[c]}}
++
+ \def\tabu@indent{% correction for indentation
+     \ifdim \parindent>\z@\ifx \linewidth\tabudefaulttarget
+     \everypar\expandafter{%
+@@ -1663,6 +1667,9 @@
+         \ifdim \tabu@temp\p@>\z@ \ifdim \tabu@temp\tabucolX<\tabu@target
+                                         \tabu@target=\tabu@temp\tabucolX \fi\fi
+         \setbox\tabu@box  \hbox \bgroup
++%%TABU-FIXED add \color@begingroup
++%%FMi not yet understood why this one is also needed ...
++    \color@begingroup
+             \begin{varwidth}\tabu@target
+                 \let\FV@ListProcessLine \tabu@FV@ListProcessLine  % \hbox to natural width...
+                 \narrowragged \arraybackslash \parfillskip \@flushglue

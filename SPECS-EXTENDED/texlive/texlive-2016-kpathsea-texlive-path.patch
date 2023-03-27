@@ -1,0 +1,40 @@
+diff -up source/texk/kpathsea/texmf.cnf.fixme source/texk/kpathsea/texmf.cnf
+--- source/texk/kpathsea/texmf.cnf.fixme	2016-10-19 15:35:25.804218872 -0400
++++ source/texk/kpathsea/texmf.cnf	2016-10-19 15:37:19.308035612 -0400
+@@ -491,17 +491,17 @@ RUBYINPUTS   = .;$TEXMF/scripts/{$progna
+ %
+ TEXMFCNF = {\
+ $SELFAUTOLOC,\
+-$SELFAUTOLOC/share/texmf-local/web2c,\
+-$SELFAUTOLOC/share/texmf-dist/web2c,\
+-$SELFAUTOLOC/share/texmf/web2c,\
++$SELFAUTOLOC/share/texlive/texmf-local/web2c,\
++$SELFAUTOLOC/share/texlive/texmf-dist/web2c,\
++$SELFAUTOLOC/share/texlive/texmf/web2c,\
+ $SELFAUTOLOC/texmf-local/web2c,\
+ $SELFAUTOLOC/texmf-dist/web2c,\
+ $SELFAUTOLOC/texmf/web2c,\
+ \
+ $SELFAUTODIR,\
+-$SELFAUTODIR/share/texmf-local/web2c,\
+-$SELFAUTODIR/share/texmf-dist/web2c,\
+-$SELFAUTODIR/share/texmf/web2c,\
++$SELFAUTODIR/share/texlive/texmf-local/web2c,\
++$SELFAUTODIR/share/texlive/texmf-dist/web2c,\
++$SELFAUTODIR/share/texlive/texmf/web2c,\
+ $SELFAUTODIR/texmf-local/web2c,\
+ $SELFAUTODIR/texmf-dist/web2c,\
+ $SELFAUTODIR/texmf/web2c,\
+@@ -509,9 +509,9 @@ $SELFAUTODIR/texmf/web2c,\
+ $SELFAUTOGRANDPARENT/texmf-local/web2c,\
+ $SELFAUTOPARENT,\
+ \
+-$SELFAUTOPARENT/share/texmf-local/web2c,\
+-$SELFAUTOPARENT/share/texmf-dist/web2c,\
+-$SELFAUTOPARENT/share/texmf/web2c,\
++$SELFAUTOPARENT/share/texlive/texmf-local/web2c,\
++$SELFAUTOPARENT/share/texlive/texmf-dist/web2c,\
++$SELFAUTOPARENT/share/texlive/texmf/web2c,\
+ $SELFAUTOPARENT/texmf-local/web2c,\
+ $SELFAUTOPARENT/texmf-dist/web2c,\
+ $SELFAUTOPARENT/texmf/web2c\

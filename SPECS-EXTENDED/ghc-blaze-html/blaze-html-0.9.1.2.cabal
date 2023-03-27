@@ -1,0 +1,98 @@
+Name:         blaze-html
+Version:      0.9.1.2
+x-revision: 2
+Homepage:     http://jaspervdj.be/blaze
+Bug-Reports:  http://github.com/jaspervdj/blaze-html/issues
+License:      BSD3
+License-file: LICENSE
+Author:       Jasper Van der Jeugt, Simon Meier
+Maintainer:   Jasper Van der Jeugt <m@jaspervdj.be>
+Stability:    Experimental
+Category:     Text
+Synopsis:     A blazingly fast HTML combinator library for Haskell
+Description:
+  A blazingly fast HTML combinator library for the Haskell
+  programming language. The Text.Blaze module is a good
+  starting point, as well as this tutorial:
+  <http://jaspervdj.be/blaze/tutorial.html>.
+
+Build-type:    Simple
+Cabal-version: >= 1.8
+Tested-with:   GHC == 7.8.4, GHC == 7.10.3,
+               GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.1,
+               GHC == 8.6.3, GHC == 8.8.1, GHC == 9.2.1
+
+Extra-source-files:
+  CHANGELOG
+  src/Util/Sanitize.hs
+  src/Util/GenerateHtmlCombinators.hs
+
+Library
+  Hs-source-dirs: src
+  Ghc-Options:    -Wall
+
+  Exposed-modules:
+    Text.Blaze.Html
+    Text.Blaze.Html.Renderer.Pretty
+    Text.Blaze.Html.Renderer.String
+    Text.Blaze.Html.Renderer.Text
+    Text.Blaze.Html.Renderer.Utf8
+    Text.Blaze.Html4.FrameSet
+    Text.Blaze.Html4.FrameSet.Attributes
+    Text.Blaze.Html4.Strict
+    Text.Blaze.Html4.Strict.Attributes
+    Text.Blaze.Html4.Transitional
+    Text.Blaze.Html4.Transitional.Attributes
+    Text.Blaze.Html5
+    Text.Blaze.Html5.Attributes
+    Text.Blaze.XHtml1.FrameSet
+    Text.Blaze.XHtml1.FrameSet.Attributes
+    Text.Blaze.XHtml1.Strict
+    Text.Blaze.XHtml1.Strict.Attributes
+    Text.Blaze.XHtml1.Transitional
+    Text.Blaze.XHtml1.Transitional.Attributes
+    Text.Blaze.XHtml5
+    Text.Blaze.XHtml5.Attributes
+
+  Build-depends:
+    base          >= 4    && < 5,
+    blaze-builder >= 0.3  && < 0.5,
+    blaze-markup  >= 0.8  && < 0.9,
+    bytestring    >= 0.9  && < 0.12,
+    text          >= 0.10 && < 2.1
+
+Test-suite blaze-html-tests
+  Type:           exitcode-stdio-1.0
+  Hs-source-dirs: src tests
+  Main-is:        TestSuite.hs
+  Ghc-options:    -Wall
+
+  Other-modules:
+    Text.Blaze.Html
+    Text.Blaze.Html.Renderer.String
+    Text.Blaze.Html.Renderer.Text
+    Text.Blaze.Html.Renderer.Utf8
+    Text.Blaze.Html.Tests
+    Text.Blaze.Html.Tests.Util
+    Text.Blaze.Html5
+    Text.Blaze.Html5.Attributes
+    Util.Sanitize
+    Util.Tests
+
+  Build-depends:
+    HUnit                      >= 1.2 && < 1.7,
+    QuickCheck                 >= 2.4 && < 2.15,
+    containers                 >= 0.3 && < 0.7,
+    test-framework             >= 0.4 && < 0.9,
+    test-framework-hunit       >= 0.3 && < 0.4,
+    test-framework-quickcheck2 >= 0.3 && < 0.4,
+    -- Copied from regular dependencies...
+    base          >= 4    && < 5,
+    blaze-builder >= 0.3  && < 0.5,
+    blaze-markup  >= 0.8  && < 0.9,
+    bytestring    >= 0.9  && < 0.12,
+    text          >= 0.10 && < 2.1
+
+Source-repository head
+  Type:     git
+  Location: http://github.com/jaspervdj/blaze-html.git

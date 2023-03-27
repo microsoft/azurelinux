@@ -1,0 +1,79 @@
+cabal-version:   >= 1.14
+
+name:            xml-conduit
+version:         1.9.1.1
+x-revision: 1
+license:         MIT
+license-file:    LICENSE
+author:          Michael Snoyman <michael@snoyman.com>, Aristid Breitkreuz <aristidb@googlemail.com>
+maintainer:      Michael Snoyman <michael@snoyman.com>
+synopsis:        Pure-Haskell utilities for dealing with XML with the conduit package.
+description:     Hackage documentation generation is not reliable. For up to date documentation, please see: <http://www.stackage.org/package/xml-conduit>.
+category:        XML, Conduit
+stability:       Stable
+build-type:      Custom
+homepage:        http://github.com/snoyberg/xml
+extra-source-files: README.md
+                    ChangeLog.md
+tested-with:     GHC >=8.0 && <8.12
+
+custom-setup
+    setup-depends:   base >= 4 && <5, Cabal, cabal-doctest >= 1 && <1.1
+
+library
+    build-depends:   base                      >= 4        && < 5
+                   , conduit                   >= 1.3      && < 1.4
+                   , conduit-extra             >= 1.3      && < 1.4
+                   , resourcet                 >= 1.2      && < 1.3
+                   , bytestring                >= 0.10.2
+                   , text                      >= 0.7
+                   , containers                >= 0.2
+                   , xml-types                 >= 0.3.4    && < 0.4
+                   , attoparsec                >= 0.10
+                   , transformers              >= 0.2      && < 0.7
+                   , data-default-class
+                   , blaze-markup              >= 0.5
+                   , blaze-html                >= 0.5
+                   , deepseq                   >= 1.1.0.0
+    exposed-modules: Text.XML.Stream.Parse
+                     Text.XML.Stream.Render
+                     Text.XML.Unresolved
+                     Text.XML.Cursor
+                     Text.XML.Cursor.Generic
+                     Text.XML
+    other-modules:   Text.XML.Stream.Token
+    ghc-options:     -Wall
+    hs-source-dirs:  src
+    default-language: Haskell2010
+
+test-suite unit
+    type: exitcode-stdio-1.0
+    main-is: unit.hs
+    hs-source-dirs: test
+    build-depends:          base
+                          , containers
+                          , text
+                          , transformers
+                          , bytestring
+                          , xml-conduit
+                          , hspec >= 1.3
+                          , HUnit
+                          , xml-types >= 0.3.1
+                          , conduit
+                          , conduit-extra
+                          , blaze-markup
+                          , resourcet
+    default-language: Haskell2010
+
+test-suite doctest
+    type: exitcode-stdio-1.0
+    main-is: doctest.hs
+    hs-source-dirs: test
+    build-depends:          base
+                          , doctest >= 0.8
+                          , xml-conduit
+    default-language: Haskell2010
+
+source-repository head
+  type:     git
+  location: git://github.com/snoyberg/xml.git

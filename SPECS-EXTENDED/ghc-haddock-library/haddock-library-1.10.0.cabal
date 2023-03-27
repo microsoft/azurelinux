@@ -1,0 +1,127 @@
+cabal-version:        2.2
+name:                 haddock-library
+version:              1.10.0
+x-revision: 3
+synopsis:             Library exposing some functionality of Haddock.
+
+description:          Haddock is a documentation-generation tool for Haskell
+                      libraries. These modules expose some
+                      functionality of it without pulling in the GHC
+                      dependency. Please note that the API is likely
+                      to change so be sure to specify upper bounds in
+                      your projects. For interacting with Haddock
+                      itself, see the [haddock package](https://hackage.haskell.org/package/haddock).
+
+license:              BSD-2-Clause
+license-file:         LICENSE
+maintainer:           Alec Theriault <alec.theriault@gmail.com>, Alex Biehl <alexbiehl@gmail.com>, Simon Hengel <sol@typeful.net>, Mateusz Kowalczyk <fuuzetsu@fuuzetsu.co.uk>
+homepage:             http://www.haskell.org/haddock/
+bug-reports:          https://github.com/haskell/haddock/issues
+category:             Documentation
+tested-with:          GHC == 7.4.2
+                    , GHC == 7.6.3
+                    , GHC == 7.8.4
+                    , GHC == 7.10.3
+                    , GHC == 8.0.2
+                    , GHC == 8.2.2
+                    , GHC == 8.4.4
+                    , GHC == 8.6.5
+                    , GHC == 8.8.3
+                    , GHC == 8.10.1
+                    , GHC == 9.0.1
+
+extra-source-files:
+  CHANGES.md
+  fixtures/examples/*.input
+  fixtures/examples/*.parsed
+
+common lib-defaults
+  default-language: Haskell2010
+
+  build-depends:
+    , base         >= 4.5     && < 4.17
+    , bytestring
+    , containers   ^>= 0.4.2.1 || ^>= 0.5.0.0 || ^>= 0.6.0.1
+    , transformers
+    , text         ^>= 1.2.3.0 || ^>= 2.0
+    , parsec       ^>= 3.1.13.0
+
+  ghc-options: -funbox-strict-fields -Wall
+  if impl(ghc >= 8.0)
+    ghc-options: -Wcompat -Wnoncanonical-monad-instances
+
+library
+  import: lib-defaults
+
+  hs-source-dirs:       src
+
+  exposed-modules:
+    Documentation.Haddock.Doc
+    Documentation.Haddock.Markup
+    Documentation.Haddock.Parser
+    Documentation.Haddock.Types
+
+  other-modules:
+    CompatPrelude
+    Documentation.Haddock.Parser.Util
+    Documentation.Haddock.Parser.Monad
+    Documentation.Haddock.Parser.Identifier
+
+test-suite spec
+  import: lib-defaults
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:
+    test
+    src
+
+  other-modules:
+    CompatPrelude
+    Documentation.Haddock.Doc
+    Documentation.Haddock.Markup
+    Documentation.Haddock.Parser
+    Documentation.Haddock.Parser.Monad
+    Documentation.Haddock.Parser.Util
+    Documentation.Haddock.Parser.UtilSpec
+    Documentation.Haddock.ParserSpec
+    Documentation.Haddock.Types
+    Documentation.Haddock.Parser.Identifier
+
+  build-depends:
+    , base-compat  ^>= 0.9.3 || ^>= 0.11.0
+    , QuickCheck   ^>= 2.11  || ^>= 2.13.2 || ^>= 2.14 
+    , deepseq      ^>= 1.3.0.0 || ^>= 1.4.0.0
+
+  -- NB: build-depends & build-tool-depends have independent
+  --     install-plans, so it's best to limit to a single major
+  --     version of `hspec` & `hspec-discover` to ensure
+  --     intercompatibility
+  build-depends:
+    , hspec                          >= 2.4.4    && < 2.8
+
+  build-tool-depends:
+    , hspec-discover:hspec-discover  >= 2.4.4    && < 2.8
+
+test-suite fixtures
+  type:             exitcode-stdio-1.0
+  default-language: Haskell2010
+  main-is:          Fixtures.hs
+  ghc-options:      -Wall
+  hs-source-dirs:   fixtures
+  build-depends:
+      -- intra-package dependency
+    , haddock-library
+      -- constraints inherited via lib:haddock-library component
+    , base
+
+      -- extra dependencies
+    , base-compat           ^>= 0.9.3 || ^>= 0.11.0
+    , directory             ^>= 1.3.0.2
+    , filepath              ^>= 1.4.1.2
+    , optparse-applicative  ^>= 0.15
+    , tree-diff             ^>= 0.1
+
+source-repository head
+  type:     git
+  subdir:   haddock-library
+  location: https://github.com/haskell/haddock.git

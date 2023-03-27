@@ -1,0 +1,98 @@
+Cabal-Version: >= 1.10
+
+Name:        Glob
+Version:     0.10.2
+x-revision:  3
+Homepage:    http://iki.fi/matti.niemenmaa/glob/
+Synopsis:    Globbing library
+Category:    System
+Stability:   provisional
+Description:
+   A library for globbing: matching patterns against file paths.
+
+Author:       Matti Niemenmaa
+Maintainer:   Matti Niemenmaa <matti.niemenmaa+glob@iki.fi>
+License:      BSD3
+License-File: LICENSE.txt
+
+Build-Type: Simple
+
+Extra-Source-Files: CHANGELOG.txt
+                    CREDITS.txt
+                    README.txt
+
+Source-Repository head
+  Type: git
+  Location: https://github.com/Deewiant/glob
+
+Library
+   Build-Depends: base                >= 4 && < 5
+                , containers
+                , directory
+                , dlist               >= 0.4
+                , filepath            >= 1.1
+                , transformers        >= 0.2
+                , transformers-compat >= 0.3
+
+   if impl(ghc < 8.0)
+      Build-Depends: semigroups >= 0.18
+
+   if os(windows)
+      Build-Depends: Win32 >= 2.5
+
+   Default-Language: Haskell98
+
+   Exposed-Modules: System.FilePath.Glob
+                    System.FilePath.Glob.Primitive
+   Other-Modules:   System.FilePath.Glob.Base
+                    System.FilePath.Glob.Directory
+                    System.FilePath.Glob.Match
+                    System.FilePath.Glob.Simplify
+                    System.FilePath.Glob.Utils
+
+   GHC-Options: -Wall
+
+Test-Suite glob-tests
+   type: exitcode-stdio-1.0
+
+   hs-source-dirs: ., tests
+   main-is: Main.hs
+
+   Build-Depends: base                       >= 4 && < 5
+                , containers
+                , directory
+                , dlist                      >= 0.4
+                , filepath                   >= 1.1
+                , transformers               >= 0.2
+                , transformers-compat        >= 0.3
+                , HUnit                      >= 1.2
+                , QuickCheck                 >= 2
+                , test-framework             >= 0.2
+                , test-framework-hunit       >= 0.2
+                , test-framework-quickcheck2 >= 0.3
+
+   if impl(ghc < 8.0)
+      Build-Depends: semigroups >= 0.18
+
+   if os(windows)
+      Build-Depends: Win32 >= 2
+
+   Default-Language: Haskell98
+
+   Other-Modules: System.FilePath.Glob.Base
+                  System.FilePath.Glob.Directory
+                  System.FilePath.Glob.Match
+                  System.FilePath.Glob.Primitive
+                  System.FilePath.Glob.Simplify
+                  System.FilePath.Glob.Utils
+                  Tests.Base
+                  Tests.Compiler
+                  Tests.Directory
+                  Tests.Instances
+                  Tests.Matcher
+                  Tests.Optimizer
+                  Tests.Regression
+                  Tests.Simplifier
+                  Tests.Utils
+
+   GHC-Options: -Wall

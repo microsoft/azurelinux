@@ -1,0 +1,11 @@
+--- zlib-0.6.2.3/test/Test.hs~	2001-09-09 09:46:40.000000000 +0800
++++ zlib-0.6.2.3/test/Test.hs	2022-03-12 13:04:22.643542774 +0800
+@@ -190,7 +190,7 @@
+     let decomp = decompressIO rawFormat defaultDecompressParams
+     err <- assertDecompressError hnd decomp
+     msg <- assertDataFormatError err
+-    msg @?= "invalid code lengths set"
++    msg @?= "Operation-Ending-Supplemental Code is 0x27"
+ 
+   withSampleData "not-gzip" $ \hnd -> do
+     let decomp = decompressIO gzipOrZlibFormat defaultDecompressParams

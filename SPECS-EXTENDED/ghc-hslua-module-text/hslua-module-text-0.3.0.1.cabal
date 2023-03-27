@@ -1,0 +1,50 @@
+name:                hslua-module-text
+version:             0.3.0.1
+x-revision: 1
+synopsis:            Lua module for text
+description:         UTF-8 aware subset of Lua's `string` module.
+homepage:            https://github.com/hslua/hslua-module-text
+license:             MIT
+license-file:        LICENSE
+author:              Albert Krewinkel
+maintainer:          albert+hslua@zeitkraut.de
+copyright:           © 2017–2021 Albert Krewinkel
+category:            Foreign
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+                     test/test-text.lua
+cabal-version:       >=1.10
+tested-with:         GHC == 8.0.2
+                   , GHC == 8.2.2
+                   , GHC == 8.4.4
+                   , GHC == 8.6.5
+                   , GHC == 8.8.3
+                   , GHC == 8.10.1
+
+source-repository head
+  type:              git
+  location:          https://github.com/hslua/hslua-module-text.git
+
+library
+  exposed-modules:     Foreign.Lua.Module.Text
+  build-depends:       base       >= 4.8    && < 5
+                     , bytestring >= 0.10.2 && < 0.12
+                     , hslua      >= 1.2    && < 1.4
+                     , text       >= 1      && < 1.3
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  other-extensions:    OverloadedStrings
+
+test-suite test-hslua
+  default-language:    Haskell2010
+  type:                exitcode-stdio-1.0
+  main-is:             test-hslua-module-text.hs
+  hs-source-dirs:      test
+  ghc-options:         -Wall -threaded
+  build-depends:       base
+                     , hslua
+                     , hslua-module-text
+                     , tasty
+                     , tasty-hunit
+                     , tasty-lua   >= 0.2    && < 0.3
+                     , text

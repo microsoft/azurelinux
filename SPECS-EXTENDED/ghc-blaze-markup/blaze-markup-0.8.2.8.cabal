@@ -1,0 +1,80 @@
+Name:         blaze-markup
+Version:      0.8.2.8
+x-revision: 2
+Homepage:     http://jaspervdj.be/blaze
+Bug-Reports:  http://github.com/jaspervdj/blaze-markup/issues
+License:      BSD3
+License-file: LICENSE
+Author:       Jasper Van der Jeugt, Simon Meier, Deepak Jois
+Maintainer:   Jasper Van der Jeugt <m@jaspervdj.be>
+Stability:    Experimental
+Category:     Text
+Synopsis:     A blazingly fast markup combinator library for Haskell
+Description:
+  Core modules of a blazingly fast markup combinator library for the Haskell
+  programming language. The Text.Blaze module is a good
+  starting point, as well as this tutorial:
+  <http://jaspervdj.be/blaze/tutorial.html>.
+
+Build-type:    Simple
+Cabal-version: >= 1.10
+Tested-with:   GHC == 7.8.4, GHC == 7.10.3,
+               GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.4,
+               GHC == 8.6.5, GHC == 8.8.4, GHC == 8.10.4,
+               GHC == 9.0.1, GHC == 9.2.1
+
+Extra-source-files:
+  CHANGELOG
+
+Library
+  Hs-source-dirs:   src
+  Ghc-Options:      -Wall
+  Default-language: Haskell2010
+
+  Exposed-modules:
+    Text.Blaze
+    Text.Blaze.Internal
+    Text.Blaze.Renderer.Pretty
+    Text.Blaze.Renderer.String
+    Text.Blaze.Renderer.Text
+    Text.Blaze.Renderer.Utf8
+
+  Build-depends:
+    base          >= 4    && < 4.17,
+    blaze-builder >= 0.3  && < 0.5,
+    text          >= 0.10 && < 2.1,
+    bytestring    >= 0.9  && < 0.12
+
+Test-suite blaze-markup-tests
+  Type:             exitcode-stdio-1.0
+  Hs-source-dirs:   src tests
+  Main-is:          TestSuite.hs
+  Ghc-options:      -Wall
+  Default-language: Haskell2010
+
+  Other-modules:
+    Text.Blaze
+    Text.Blaze.Internal
+    Text.Blaze.Renderer.Pretty
+    Text.Blaze.Renderer.String
+    Text.Blaze.Renderer.Text
+    Text.Blaze.Renderer.Utf8
+    Text.Blaze.Tests
+    Text.Blaze.Tests.Util
+
+  Build-depends:
+    HUnit            >= 1.2  && < 1.7,
+    QuickCheck       >= 2.7  && < 2.15,
+    containers       >= 0.3  && < 0.7,
+    tasty            >= 1.0  && < 1.5,
+    tasty-hunit      >= 0.10 && < 0.11,
+    tasty-quickcheck >= 0.10 && < 0.11,
+    -- Copied from regular dependencies...
+    base          >= 4    && < 4.17,
+    blaze-builder >= 0.3  && < 0.5,
+    text          >= 0.10 && < 2.1,
+    bytestring    >= 0.9  && < 0.12
+
+Source-repository head
+  Type:     git
+  Location: http://github.com/jaspervdj/blaze-markup

@@ -1,0 +1,12 @@
+diff -up texlive-2013/source/texk/kpathsea/progname.c.kpfix texlive-2013/source/texk/kpathsea/progname.c
+--- source/texk/kpathsea/progname.c.kpfix	2013-08-12 09:28:14.422522624 +0200
++++ source/texk/kpathsea/progname.c	2013-08-12 12:16:02.958132658 +0200
+@@ -668,7 +668,7 @@ kpathsea_set_program_name (kpathsea kpse
+   kpathsea_xputenv (kpse, "SELFAUTOLOC", fix_selfdir (sdir));
+   sdir_parent = xdirname (sdir);
+   kpathsea_xputenv (kpse, "SELFAUTODIR", fix_selfdir (sdir_parent));
+-  sdir_grandparent = xdirname (sdir_parent);
++  sdir_grandparent = strdup("/usr/share/texlive");
+   kpathsea_xputenv (kpse, "SELFAUTOPARENT", fix_selfdir (sdir_grandparent));
+   sdir_greatgrandparent = xdirname (sdir_grandparent);
+   kpathsea_xputenv (kpse, "SELFAUTOGRANDPARENT", fix_selfdir (sdir_greatgrandparent));

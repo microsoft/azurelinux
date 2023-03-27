@@ -1,0 +1,83 @@
+cabal-version:  2.0
+name:           aeson-pretty
+version:        0.8.9
+x-revision: 1
+license:        BSD3
+license-file:   LICENSE
+category:       Text, Web, JSON, Pretty Printer
+copyright:      Copyright 2011 Falko Peters
+author:         Falko Peters <falko.peters@gmail.com>
+maintainer:     Martijn Bastiaan <martijn@hmbastiaan.nl>
+stability:      experimental
+homepage:       http://github.com/informatikr/aeson-pretty
+bug-reports:    http://github.com/informatikr/aeson-pretty/issues
+build-type:     Simple
+synopsis:       JSON pretty-printing library and command-line tool.
+description:
+    A JSON pretty-printing library compatible with aeson as well as
+    a command-line tool to improve readabilty of streams of JSON data.
+    .
+    The /library/ provides the function "encodePretty". It is a drop-in
+    replacement for aeson's "encode" function, producing JSON-ByteStrings for
+    human readers.
+    .
+    The /command-line tool/ reads JSON from stdin and writes prettified JSON
+    to stdout. It also offers a complementary "compact"-mode, essentially the
+    opposite of pretty-printing. If you specify @-flib-only@ like this
+    .
+        > cabal install -flib-only aeson-pretty
+    .
+    the command-line tool will NOT be installed.
+
+extra-source-files:
+    README.markdown
+    CHANGELOG.markdown
+
+flag lib-only
+    description: Only build/install the library, NOT the command-line tool.
+    default: False
+
+library
+    exposed-modules:
+        Data.Aeson.Encode.Pretty
+
+    build-depends:
+        aeson ^>= 1.0 || ^>=1.1 || ^>=1.2 || ^>=1.3 || ^>=1.4 || ^>=1.5 || ^>=2.0,
+        base >= 4.5,
+        base-compat >= 0.9,
+        bytestring >= 0.9,
+        scientific >= 0.3,
+        vector >= 0.9,
+        text >= 0.11,
+        unordered-containers >= 0.2.14.0
+
+    if !impl(ghc >= 8.0)
+      build-depends:
+        semigroups >= 0.18.2
+
+    ghc-options: -Wall
+    default-language: Haskell2010
+
+executable aeson-pretty
+    hs-source-dirs: cli-tool
+    main-is: Main.hs
+    other-modules: Paths_aeson_pretty
+    autogen-modules: Paths_aeson_pretty
+
+    if flag(lib-only)
+        buildable: False
+    else
+        build-depends:
+            aeson >= 0.6,
+            aeson-pretty,
+            attoparsec >= 0.10,
+            base == 4.*,
+            bytestring >= 0.9,
+            cmdargs >= 0.7
+
+    ghc-options: -Wall
+    default-language: Haskell2010
+
+source-repository head
+    type:     git
+    location: http://github.com/informatikr/aeson-pretty

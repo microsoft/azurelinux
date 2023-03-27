@@ -1,0 +1,2539 @@
+diff -up ./doc/fonts/gnu-freefont/tools/report/kernclasses.py.py3 ./doc/fonts/gnu-freefont/tools/report/kernclasses.py
+--- ./doc/fonts/gnu-freefont/tools/report/kernclasses.py.py3	2019-08-18 08:17:06.470597138 -0400
++++ ./doc/fonts/gnu-freefont/tools/report/kernclasses.py	2019-08-18 08:27:48.164149606 -0400
+@@ -16,10 +16,10 @@ def get_kern_subtables( font ):
+ 					if font.isKerningClass( st ):
+ 						tables.append( st )
+ 		return tables
+-	except EnvironmentError, ( e ):
+-		print >> sys.stderr, 'EnvironmentError ' + str( e )
+-	except TypeError, ( t ):
+-		print >> sys.stderr, 'TypeError ' + str( t )
++	except EnvironmentError as e:
++		print('EnvironmentError ' + str( e ), file=sys.stderr)
++	except TypeError as t:
++		print('TypeError ' + str( t ), file=sys.stderr)
+ 	return None
+ preamble = """
+ <html>
+@@ -46,20 +46,20 @@ postamble="""
+ 
+ def print_kerns( fontPath ):
+ 	font = fontforge.open( fontPath )
+-	print  '<h2>Kerning classes in  ' + font.fontname + '</h2>'
++	print('<h2>Kerning classes in  ' + font.fontname + '</h2>')
+ 	weight = ''
+ 	if font.os2_weight > 500:
+ 		weight = 'B'
+ 	style = ''
+ 	if font.italicangle < 0.0:
+ 		style = 'I'
+-	print  '<div  style="font-family: ' + font.familyname + '" '  \
+-		+ 'class="' + weight + style + '">'
++	print('<div  style="font-family: ' + font.familyname + '" '  \
++		+ 'class="' + weight + style + '">')
+ 	subtables = get_kern_subtables( font )
+ 	for st in subtables:
+-		print  '<h3>Subtable ' + st + '</h3>'
++		print('<h3>Subtable ' + st + '</h3>')
+ 		printKernsOfSubtable( font, st )
+-	print  '</div>'
++	print('</div>')
+ 	sys.stdout.flush()
+ 
+ def printKernsOfSubtable( font, subtable ):
+@@ -69,38 +69,38 @@ def printKernsOfSubtable( font, subtable
+ 	rightclasses = kclass[1]
+ 	kerns = kclass[2]
+ 	nr = len( rightclasses )
+-	print '<table class="classes"><tr>'
+-	print '<th>left classes: </th>'
+-	print '<th>right classes: </th>'
+-	print '<tr><td>'
++	print('<table class="classes"><tr>')
++	print('<th>left classes: </th>')
++	print('<th>right classes: </th>')
++	print('<tr><td>')
+ 	for lc in leftclasses:
+ 		if lc:
+ 			for c in lc:
+ 				printentity( font, c )
+-		print "<br />"
+-	print "</td>"
+-	print "<td>"
++		print("<br />")
++	print("</td>")
++	print("<td>")
+ 	for rc in rightclasses:
+ 		if rc:
+ 			for c in rc:
+ 				printentity( font, c )
+-		print "<br />"
+-	print "</td>"
+-	print "</tr>"
+-	print "</table>"
+-	print "<table>"
+-	print "<tr>"
+-	print "<th></th>"
++		print("<br />")
++	print("</td>")
++	print("</tr>")
++	print("</table>")
++	print("<table>")
++	print("<tr>")
++	print("<th></th>")
+ 	for rc in rightclasses:
+ 		if rc:
+ 			sys.stdout.write( "<th>" )
+ 			printentity( font, rc[0] )
+ 			sys.stdout.write( "</th>" )
+-	print "</tr>"
++	print("</tr>")
+ 	for lc in leftclasses:
+ 		m = 0
+ 		if lc:
+-			print "<tr>"
++			print("<tr>")
+ 			sys.stdout.write( "<th>" )
+ 			printentity( font, lc[0] )
+ 			sys.stdout.write( "</th>" )
+@@ -122,18 +122,18 @@ def printKernsOfSubtable( font, subtable
+ 					printpair( font, lc[0], rc[0] )
+ 					sys.stdout.write( '</td>' )
+ 				m += 1
+-			print "</tr>"
++			print("</tr>")
+ 		n += 1
+-	print "</table>"
++	print("</table>")
+ 
+ def printentity( font, a ):
+ 	s = font.findEncodingSlot( a )
+ 	v = formatted_hex_value( s )
+ 	if s == -1:
+ 		v = '<span class="nonexistent">&nbsp;</span>'
+-		print >> sys.stderr, font.fullname, 'Missing glyph: ' + a
++		print(font.fullname, 'Missing glyph: ' + a, file=sys.stderr)
+ 	elif not codepointIsInSomeRange( s ):
+-		print >> sys.stderr, font.fullname, 'Non-unicode: ' + v
++		print(font.fullname, 'Non-unicode: ' + v, file=sys.stderr)
+ 	sys.stdout.write( v )
+ 
+ def printpair( font, p, q ):
+@@ -150,9 +150,9 @@ def printlist( lst ):
+ 	for m in lst:
+ 		s += delim + m
+ 		delim = ' '
+-	print s
++	print(s)
+ 
+-print preamble
++print(preamble)
+ #print_kerns( '/home/swhite/font_stuff/urwsr-ttf/URWPalladioL-Roman-test.sfd' )
+ print_kerns( '../../sfd/FreeSerif.sfd' )
+ print_kerns( '../../sfd/FreeSerifItalic.sfd' )
+@@ -166,4 +166,4 @@ print_kerns( '../../sfd/FreeMono.sfd' )
+ print_kerns( '../../sfd/FreeMonoOblique.sfd' )
+ print_kerns( '../../sfd/FreeMonoBold.sfd' )
+ print_kerns( '../../sfd/FreeMonoBoldOblique.sfd' )
+-print postamble
++print(postamble)
+diff -up ./doc/fonts/gnu-freefont/tools/report/ligatureLookups.py.py3 ./doc/fonts/gnu-freefont/tools/report/ligatureLookups.py
+--- ./doc/fonts/gnu-freefont/tools/report/ligatureLookups.py.py3	2019-08-18 08:30:22.164442327 -0400
++++ ./doc/fonts/gnu-freefont/tools/report/ligatureLookups.py	2019-08-18 08:33:04.545533305 -0400
+@@ -60,10 +60,10 @@ def get_ligature_lookups( font ):
+ 				for st in sts:
+ 					tables.append( st )
+ 		return tables
+-	except EnvironmentError, ( e ):
+-		print >> stderr, 'EnvironmentError ' + str( e )
+-	except TypeError, ( t ):
+-		print >> stderr, 'TypeError ' + str( t )
++	except EnvironmentError as e:
++		print('EnvironmentError ' + str( e ), file=stderr)
++	except TypeError as t:
++		print('TypeError ' + str( t ), file=stderr)
+ 	return None
+ 
+ _preamble= """<?xml version="1.0" encoding="utf-8"?>
+@@ -105,8 +105,8 @@ def print_ligatures( fontPath ):
+ 	if font.weight == 'Bold':
+ 		weight = "font-weight: bold; "
+ 
+-	print _style_div_html % ( font.familyname, style, weight )
+-	print _lig_header_html % ( font.fontname )
++	print(_style_div_html % ( font.familyname, style, weight ))
++	print(_lig_header_html % ( font.fontname ))
+ 
+ 	subtable_names = get_ligature_lookups( font )
+ 	for subtable_name in subtable_names:
+@@ -115,7 +115,7 @@ def print_ligatures( fontPath ):
+ 		out = htmlListOfLigSubtable( font, subtable, subtables )
+ 		stdout.writelines( out )
+ 		stdout.flush()
+-	print '</div>'
++	print('</div>')
+ 
+ class Ligature:
+ 	def __init__( self, glyph ):
+@@ -184,7 +184,7 @@ def makeLigatureSubtable( font, subtable
+ 			ligature = Ligature( g )
+ 			for lr in ligs:
+ 				if len( lr ) < 3 or lr[1] != 'Ligature':
+-					print >> stderr, font.fullname, '- non-ligature: ', g.glyphname
++					print(font.fullname, '- non-ligature: ', g.glyphname, file=stderr)
+ 					break
+ 				i = 2
+ 				while i < len( lr ):
+@@ -242,11 +242,11 @@ def nestedEntity( font, subtable, a, sub
+ 	if s >= 0xe000 and s <= 0xf8ff:	# Unicode only
+ 		lig = findLigatureGlyph( s, subtables )
+ 		if lig:
+-			#print >> stderr, 'Nested glyph found: ' + a
++			#print('Nested glyph found: ' + a, file=stderr)
+ 			for p in lig.parts:
+ 				return nestedEntity( font, subtable, p, subtables )
+ 		else:
+-			print >> stderr, font.fullname, '- No nested glyph: ', a
++			print(font.fullname, '- No nested glyph: ', a, file=stderr)
+ 			return '<span class="nonchar">&nbsp;</span>'
+ 	else:
+ 		return entityHTML( font, a )
+@@ -254,7 +254,7 @@ def nestedEntity( font, subtable, a, sub
+ def entityHTML( font, a ):
+ 	s = font.findEncodingSlot( a )
+ 	if s == -1:
+-		print >> stderr, font.fullname, '- Missing glyph: ', a
++		print(font.fullname, '- Missing glyph: ', a, file=stderr)
+ 		return '<span class="nonchar">&nbsp;</span>'
+ 	else:
+ 		return formatted_hex_value( s )
+@@ -266,11 +266,11 @@ def formatted_hex_value( n ):
+ args = argv[1:]
+ 
+ if len( args ) < 1 or len( args[0].strip() ) == 0:
+-	print >> stderr, __usage
++	print(__usage, file=stderr)
+ 	exit( 0 )
+ 
+-print _preamble
++print(_preamble)
+ for font_name in args:
+ 	print_ligatures( font_name )
+-print _postamble
++print(_postamble)
+ 
+diff -up ./doc/fonts/gnu-freefont/tools/report/private_use.py.py3 ./doc/fonts/gnu-freefont/tools/report/private_use.py
+--- ./doc/fonts/gnu-freefont/tools/report/private_use.py.py3	2019-08-18 08:33:25.445030197 -0400
++++ ./doc/fonts/gnu-freefont/tools/report/private_use.py	2019-08-18 08:35:14.606402370 -0400
+@@ -48,32 +48,32 @@ postamble="""
+ def print_private( fontPath ):
+ 	font = fontforge.open( fontPath )
+ 
+-	print  '<div style="font-family: \'' + font.familyname + '\'; ' \
+-			 '\">'
+-	print  '<h2>Private Use Area in  ' + font.fontname + '</h2>'
++	print('<div style="font-family: \'' + font.familyname + '\'; ' \
++			 '\">')
++	print('<h2>Private Use Area in  ' + font.fontname + '</h2>')
+ 
+ 	font.selection.select(("ranges",None),0xe000,0xf8ff)
+-	print  '<table>'
++	print('<table>')
+ 	for g in font.selection.byGlyphs:
+-		print  '<tr><td>'
+-		print '%s%0.4x%s' %( "0x", g.encoding, "" )
+-		print  '</td><td>'
+-		print  '' + g.glyphname
+-		print  '</td><td>'
++		print('<tr><td>')
++		print('%s%0.4x%s' %( "0x", g.encoding, "" ))
++		print('</td><td>')
++		print('' + g.glyphname)
++		print('</td><td>')
+ 		if g.getPosSub( '*' ):
+-			print "is ligature"
++			print("is ligature")
+ 		if g.references:
+-			print "has references"
+-		print  '</td><td>'
+-		print  '</td></tr>'
++			print("has references")
++		print('</td><td>')
++		print('</td></tr>')
+ 		
+-	print  '</table>'
+-	print  '</div>'
++	print('</table>')
++	print('</div>')
+ 	sys.stdout.flush()
+ 
+ def printentity( font, s ):
+ 	if s == -1:
+-		print >> sys.stderr, 'Missing glyph: ' + a
++		print('Missing glyph: ' + a, file=sys.stderr)
+ 		sys.stdout.write( '<span class="nonchar">&nbsp;</span>' )
+ 	else:
+ 		sys.stdout.write( formatted_hex_value( s ) )
+@@ -86,7 +86,7 @@ args = sys.argv[1:]
+ if len( args ) < 1 or len( args[0].strip() ) == 0:
+ 	sys.exit( 0 )
+ 
+-print makePreamble()
++print(makePreamble())
+ for font_name in args:
+ 	print_private( font_name )
+-print postamble
++print(postamble)
+diff -up ./doc/fonts/gnu-freefont/tools/report/range_report.py.py3 ./doc/fonts/gnu-freefont/tools/report/range_report.py
+--- ./doc/fonts/gnu-freefont/tools/report/range_report.py.py3	2019-08-18 08:35:42.417732872 -0400
++++ ./doc/fonts/gnu-freefont/tools/report/range_report.py	2019-08-18 08:39:50.949749956 -0400
+@@ -63,8 +63,8 @@ def count_glyphs_in_intervals( font, int
+ 				for e in g:
+ 					num += 1
+ 			except ValueError:
+-				print >> stderr, "interval " + str( r ) \
+-				+ " not representable in " + font.fontname
++				print("interval " + str( r ) \
++				+ " not representable in " + font.fontname, file=stderr)
+ 				exit( 1 )
+ 	return num
+ 
+@@ -96,7 +96,7 @@ class FontSupport:
+ 
+ 		r = font.os2_unicoderanges
+ 
+-		# print >> stderr, font.fontname, hex( r[0] ), hex( r[1] ),hex( r[2] ),hex( r[3] );
++		# print(font.fontname, hex( r[0] ), hex( r[1] ),hex( r[2] ),hex( r[3] ), file=stderr);
+ 
+ 		nRanges = len( ulUnicodeRange )
+ 
+@@ -111,16 +111,16 @@ class FontSupport:
+ 			cp = g.encoding
+ 			if ( not codepointIsInSomeRange( cp )
+ 				and not codepointIsSpecialTT( cp ) ):
+-				print >> stderr, font.fontname, \
+-					"no range for", hex( cp )
++				print(font.fontname, \
++					"no range for", hex( cp ), file=stderr)
+ 
+ 		""" '''Would like to check that special TT slots are
+ 		present, but don't know how...'''
+ 		for cp in special_TT_points:
+ 			font.selection.all()
+ 			if not cp in font.selection.byGlyphs:
+-				print >> stderr, font.fontname, \
+-					"special TT glyph missing", hex( cp )
++				print(font.fontname, \
++					"special TT glyph missing", hex( cp ), file=stderr)
+ 		"""
+ 
+ 	def collectRangeInfo( self, font, os2supportbyte, bit, index ):
+@@ -135,13 +135,13 @@ class FontSupport:
+ 
+ 	def setRangeSupport( self, idx, supports, total ):
+ 		if self.myInfos.has_key( idx ):
+-			print >> stderr, "OS/2 index ", idx, " duplicated"
++			print("OS/2 index ", idx, " duplicated", file=stderr)
+ 			exit( 1 )
+ 		self.myInfos[idx] = SupportInfo( idx, supports, total )
+ 
+ 	def getInfo( self, idx ):
+ 		if not self.myInfos.has_key( idx ):
+-			print >> stderr, "OS/2 index ", idx, " not found"
++			print("OS/2 index ", idx, " not found", file=stderr)
+ 			exit( 1 )
+ 		return self.myInfos[ idx ]
+ 
+@@ -177,7 +177,7 @@ def print_font_range_table( fontSupportL
+ 	headings = ''
+ 	for fsl in fontSupportList:
+ 		headings += '<th colspan="2">' + fsl.short + '</th>' 
+-	print table_head % ( headings )
++	print(table_head % ( headings ))
+ 
+ 	for r in ulUnicodeRange:
+ 		idx = r[0]
+@@ -190,10 +190,10 @@ def print_font_range_table( fontSupportL
+ 		if idx == 60 or idx == 90:
+ 			rowclass = ' class="private"'
+ 			
+-		print '<tr%s><td>%s</td>' % ( rowclass, range_name )
+-		print '<td class="num">%i</td>' % (
+-				total_intervals( intervals ) )
+-		print '<td></td>' 
++		print('<tr%s><td>%s</td>' % ( rowclass, range_name ))
++		print('<td class="num">%i</td>' % (
++				total_intervals( intervals ) ))
++		print('<td></td>')
+ 		for fsl in fontSupportList:
+ 			supportInfo = fsl.getInfo( idx )
+ 			supportString = ''
+@@ -203,28 +203,28 @@ def print_font_range_table( fontSupportL
+ 			if supportInfo.total:
+ 				totalStr = str( supportInfo.total )
+ 
+-			print '<td class="num">%s</td><td>%s</td>' % (
+-					totalStr, supportString )
++			print('<td class="num">%s</td><td>%s</td>' % (
++					totalStr, supportString ))
+ 
+-		print '</tr>'
+-	print '<tr><th colspan="3">total in Unicode ranges</th>' 
++		print('</tr>')
++	print('<tr><th colspan="3">total in Unicode ranges</th>')
+ 	for fsl in fontSupportList:
+-		print '<td class="num" colspan="2">%i&nbsp;</td>' % (
+-					fsl.totalGlyphs )
+-	print '</tr>'
+-	print '<tr><th colspan="3">total in font</th>' 
++		print('<td class="num" colspan="2">%i&nbsp;</td>' % (
++					fsl.totalGlyphs ))
++	print('</tr>')
++	print('<tr><th colspan="3">total in font</th>')
+ 	for fsl in fontSupportList:
+-		print '<td class="num" colspan="2">%i&nbsp;</td>' % (
+-					fsl.fontTotalGlyphs )
+-	print '</tr>'
+-	print '<tr><th colspan="3">total in Private Use</th>' 
++		print('<td class="num" colspan="2">%i&nbsp;</td>' % (
++					fsl.fontTotalGlyphs ))
++	print('</tr>')
++	print('<tr><th colspan="3">total in Private Use</th>')
+ 	for fsl in fontSupportList:
+-		print '<td class="num" colspan="2">%i&nbsp;</td>' % (
+-					fsl.privateUseGlyphs )
+-	print '</tr>'
++		print('<td class="num" colspan="2">%i&nbsp;</td>' % (
++					fsl.privateUseGlyphs ))
++	print('</tr>')
+ 	# Would also like to total glyphs in ranges for each font,
+ 	# and also print total glyphs in each font.
+-	print '</table>'
++	print('</table>')
+ 
+ table_introduction = """
+ For historical reasons, TrueType classifies Unicode ranges according to
+@@ -286,25 +286,25 @@ Gnu FreeFont character range support
+ '''
+ 
+ def print_font_range_report( fontSupportList ):
+-	print html_heading
++	print(html_heading)
+ 
+-	print '<body>'
+-	print '<h1>'
+-	print 'Gnu FreeFont support for OpenType OS/2 character ranges'
+-	print '</h1>'
+-	print '<p>'
+-	print table_introduction
+-	print '</p>'
++	print('<body>')
++	print('<h1>')
++	print('Gnu FreeFont support for OpenType OS/2 character ranges')
++	print('</h1>')
++	print('<p>')
++	print(table_introduction)
++	print('</p>')
+ 	print_font_range_table( fontSupportList )
+-	print '<p>'
+-	print table_explanation
++	print('<p>')
++	print(table_explanation)
+ 	tzset()
+-	print 'Generated by <code>range_report.py</code> on %s.' % (
+-			strftime('%X %x %Z') )
+-	print '</p>'
+-	print '</body>'
++	print('Generated by <code>range_report.py</code> on %s.' % (
++			strftime('%X %x %Z') ))
++	print('</p>')
++	print('</body>')
+ 
+-	print '</html>'
++	print('</html>')
+ 
+ supportList = []
+ supportList.append( FontSupport( '../../sfd/FreeSerif.sfd', 'Srf' ) )
+diff -up ./doc/fonts/gnu-freefont/tools/script-menu/nameBySlot.py.py3 ./doc/fonts/gnu-freefont/tools/script-menu/nameBySlot.py
+--- ./doc/fonts/gnu-freefont/tools/script-menu/nameBySlot.py.py3	2019-08-18 08:40:25.964907029 -0400
++++ ./doc/fonts/gnu-freefont/tools/script-menu/nameBySlot.py	2019-08-18 08:41:02.911017630 -0400
+@@ -38,7 +38,7 @@ import fontforge
+ 
+ def explain_error_and_quit( e ):
+ 	if e:
+-		print 'Error: ', e
++		print('Error: ', e)
+ 	exit( 1 )
+ 
+ try:
+@@ -54,9 +54,9 @@ try:
+ 			newname = 'uni%0.7x' %( g.encoding )
+ 		elif g.encoding <= 0xFFFFFFFF:
+ 			newname = 'uni%0.8x' %( g.encoding )
+-		print "naming " + str( g.glyphname ) + ' as ' + newname
++		print("naming " + str( g.glyphname ) + ' as ' + newname)
+ 		g.glyphname =  newname
+ 		g.unicode = g.encoding
+-except ValueError, e:
++except ValueError as e:
+ 	explain_error_and_quit( e )
+ 
+diff -up ./doc/fonts/gnu-freefont/tools/script-menu/unnameBySlot.py.py3 ./doc/fonts/gnu-freefont/tools/script-menu/unnameBySlot.py
+--- ./doc/fonts/gnu-freefont/tools/script-menu/unnameBySlot.py.py3	2019-08-18 08:41:15.963703405 -0400
++++ ./doc/fonts/gnu-freefont/tools/script-menu/unnameBySlot.py	2019-08-18 08:42:15.186277750 -0400
+@@ -39,16 +39,16 @@ import fontforge
+ 
+ def explain_error_and_quit( e ):
+ 	if e:
+-		print 'Error: ', e
++		print('Error: ', e)
+ 	exit( 1 )
+ 
+ try:
+ 	glyphs = fontforge.activeFont().selection.byGlyphs
+ 	for g in glyphs:
+ 		newname = 'NameMe.%s' %( str( g.encoding ) )
+-		print "naming " + str( g.glyphname ) + ' as ' + newname
++		print("naming " + str( g.glyphname ) + ' as ' + newname)
+ 		g.glyphname =  newname
+ 		g.unicode = -1
+-except ValueError, e:
++except ValueError as e:
+ 	explain_error_and_quit( e )
+ 
+diff -up ./doc/fonts/gnu-freefont/tools/test/checkGlyphNumbers.py.py3 ./doc/fonts/gnu-freefont/tools/test/checkGlyphNumbers.py
+--- ./doc/fonts/gnu-freefont/tools/test/checkGlyphNumbers.py.py3	2019-08-18 08:42:25.687024974 -0400
++++ ./doc/fonts/gnu-freefont/tools/test/checkGlyphNumbers.py	2019-08-18 08:43:16.562800246 -0400
+@@ -53,12 +53,12 @@ def isSpecialTrueType( glyph ):
+ from os import path
+ def checkGlyphNumbers( fontDir, fontFile ):
+ 	if isinstance( fontFile, ( list, tuple ) ):
+-		print "In directory " + fontDir
++		print("In directory " + fontDir)
+ 		for fontName in fontFile:
+ 			checkGlyphNumbers( fontDir, fontName )
+ 		return
+ 
+-	print "Checking slot numbers in " + fontFile
++	print("Checking slot numbers in " + fontFile)
+ 	font = fontforge.open( path.join( fontDir, fontFile ) )
+ 
+ 	g = font.selection.all()
+@@ -71,13 +71,13 @@ def checkGlyphNumbers( fontDir, fontFile
+ 			pass
+ 		elif inPrivateUseRange( glyph ):
+ 			if glyph.unicode != -1:
+-				print "Glyph at slot " + str( glyph.encoding ) \
+-					+ " is Private Use but has Unicode"
++				print("Glyph at slot " + str( glyph.encoding ) \
++					+ " is Private Use but has Unicode")
+ 				problem = True
+ 		else:
+ 			if glyph.encoding != glyph.unicode:
+-				print "Glyph at slot " + str( glyph.encoding ) \
+-					+ " has wrong Unicode"
++				print("Glyph at slot " + str( glyph.encoding ) \
++					+ " has wrong Unicode")
+ 				problem = True
+ 
+ # --------------------------------------------------------------------------
+diff -up ./doc/fonts/gnu-freefont/tools/test/findBackLayers.py.py3 ./doc/fonts/gnu-freefont/tools/test/findBackLayers.py
+--- ./doc/fonts/gnu-freefont/tools/test/findBackLayers.py.py3	2019-08-18 08:43:27.206544016 -0400
++++ ./doc/fonts/gnu-freefont/tools/test/findBackLayers.py	2019-08-18 08:44:00.456743596 -0400
+@@ -32,7 +32,7 @@ from sys import exit
+ problem = False
+ 
+ def checkBackLayers( fontPath ):
+-	print "Checking " + fontPath
++	print("Checking " + fontPath)
+ 	font = fontforge.open( fontPath )
+ 
+ 	g = font.selection.all()
+@@ -42,7 +42,7 @@ def checkBackLayers( fontPath ):
+ 
+ 	for e in g:
+ 		if e.layer_cnt != 2:
+-			print e
++			print(e)
+ 
+ checkBackLayers( '../sfd/FreeSerif.sfd' )
+ checkBackLayers( '../sfd/FreeSerifItalic.sfd' )
+diff -up ./doc/fonts/gnu-freefont/tools/test/isMonoMono.py.py3 ./doc/fonts/gnu-freefont/tools/test/isMonoMono.py
+--- ./doc/fonts/gnu-freefont/tools/test/isMonoMono.py.py3	2019-08-18 08:44:12.128462618 -0400
++++ ./doc/fonts/gnu-freefont/tools/test/isMonoMono.py	2019-08-18 08:44:55.105428039 -0400
+@@ -35,7 +35,7 @@ import sys
+ problem = False
+ 
+ def ismonomono( fontfilename ):
+-	print "Checking character bounding boxes: " + fontfilename
++	print("Checking character bounding boxes: " + fontfilename)
+ 	font = fontforge.open( fontfilename )
+ 
+ 	g = font.selection.all()
+@@ -49,16 +49,16 @@ def ismonomono( fontfilename ):
+ 				nonzero = e.width
+ 		else:
+ 			if e.width > 0 and e.width != nonzero:
+-				print '  ' + e.glyphname \
++				print('  ' + e.glyphname \
+ 					+ '(' + str( e.encoding ) \
+ 					+ ') width is ' + str( e.width ) \
+-					+ ' not ' + str( nonzero )
++					+ ' not ' + str( nonzero ))
+ 				problem = True
+ 
+ 		( xmin, ymin, xmax, ymax ) = e.boundingBox()
+ 		if ymin < -200 or ymax > 800:
+-			print '  ' + e.glyphname + ' goes between heights ' \
+-				+ str( ymin )  + ' and ' + str( ymax )
++			print('  ' + e.glyphname + ' goes between heights ' \
++				+ str( ymin )  + ' and ' + str( ymax ))
+ 	""" 
+ 	For FontForge handling of TrueType/OpenType magic characters:
+ 	1) check that 0x0000 0x0001, 0x000D exist and have names
+@@ -71,15 +71,15 @@ def ismonomono( fontfilename ):
+ 	if not font[0x0000] \
+ 		or font[0x0000].glyphname != '.notdef' \
+ 		or font[0x0000].width != nonzero:
+-		print 'Should be full-width ".notdef" glyph at 0x0000.'
++		print('Should be full-width ".notdef" glyph at 0x0000.')
+ 	if not font[0x0001] \
+ 		or font[0x0001].glyphname != '.null' \
+ 		or font[0x0001].width != 0:
+-		print 'Should be zero-width ".null" glyph at 0x0001.'
++		print('Should be zero-width ".null" glyph at 0x0001.')
+ 	if not font[0x000D] \
+ 		or font[0x000D].glyphname != 'nonmarkingreturn' \
+ 		or font[0x000D].width != nonzero:
+-		print 'Should be full-width "nonmarkingreturn" glyph at 0x000D.'
++		print('Should be full-width "nonmarkingreturn" glyph at 0x000D.')
+ 
+ scriptname = sys.argv[0];
+ argc = len( sys.argv )
+diff -up ./doc/fonts/gnu-freefont/tools/test/validate.py.py3 ./doc/fonts/gnu-freefont/tools/test/validate.py
+--- ./doc/fonts/gnu-freefont/tools/test/validate.py.py3	2019-08-18 08:45:06.988141993 -0400
++++ ./doc/fonts/gnu-freefont/tools/test/validate.py	2019-08-18 08:45:57.561924523 -0400
+@@ -43,7 +43,7 @@ def countPointsInLayer( layer ):
+ 	return p
+ 
+ def printProblemLine( e, msg ):
+-	print "\t" + e.glyphname + msg 
++	print("\t" + e.glyphname + msg) 
+ 
+ def dealWithValidationState( state, e ):
+ 	if state & 0x2:
+@@ -81,13 +81,13 @@ def dealWithValidationState( state, e ):
+ 	if state & 0x10000:
+ 		printProblemLine( e, " has references deeper than allowed" )
+ 	if state & 0x20000:
+-		print e.glyphname + " fpgm or prep tables longer than allowed" )
++		print(e.glyphname + " fpgm or prep tables longer than allowed" ))
+ 	"""
+ 
+ def validate( dir, fontFile ):
+ 	try:
+ 		font = fontforge.open( dir + fontFile )
+-		print "Validating " + fontFile
++		print("Validating " + fontFile)
+ 
+ 		g = font.selection.all()
+ 		g = font.selection.byGlyphs
+@@ -98,9 +98,9 @@ def validate( dir, fontFile ):
+ 			if state != 0:
+ 				dealWithValidationState( state, e )
+ 		font.validate
+-	except Exception, e:
++	except Exception as e:
+ 		problem = True
+-		print >> sys.stderr, str( e )
++		print(str( e ), file=sys.stderr)
+ 
+ validate( '../sfd/', 'FreeSerif.sfd' )
+ validate( '../sfd/', 'FreeSerifItalic.sfd' )
+diff -up ./doc/fonts/gnu-freefont/tools/utility/hex_range.py.py3 ./doc/fonts/gnu-freefont/tools/utility/hex_range.py
+--- ./doc/fonts/gnu-freefont/tools/utility/hex_range.py.py3	2019-08-18 08:46:09.302641885 -0400
++++ ./doc/fonts/gnu-freefont/tools/utility/hex_range.py	2019-08-18 08:46:58.356461003 -0400
+@@ -40,13 +40,13 @@ postfix = ';'
+ 
+ def explain_error_and_quit( e ):
+ 	if e:
+-		print 'Error: ', e
+-	print "Usage:"
+-	print "       hex_range num1 [num2]"
++		print('Error: ', e)
++	print("Usage:")
++	print("       hex_range num1 [num2]")
+ 	exit( 1 )
+ 
+ def print_formatted_hex_value( n ):
+-	print '%s%0.4x%s' %( prefix, n, postfix )
++	print('%s%0.4x%s' %( prefix, n, postfix ))
+ 
+ if len( sys.argv ) == 3:
+ 	try:
+@@ -54,13 +54,13 @@ if len( sys.argv ) == 3:
+ 		b = int( sys.argv[2], 0 )
+ 		for i in xrange( a, b + 1 ):
+ 			print_formatted_hex_value( i )
+-	except ValueError, e:
++	except ValueError as e:
+ 		explain_error_and_quit( e )
+ elif len( sys.argv ) == 2:
+ 	try:
+ 		a = int( sys.argv[1], 0 )
+ 		print_formatted_hex_value( a )
+-	except ValueError, e:
++	except ValueError as e:
+ 		explain_error_and_quit( e )
+ else:
+ 		explain_error_and_quit()
+diff -up ./doc/fonts/gnu-freefont/tools/utility/metafont/bulk_eps_import.py.py3 ./doc/fonts/gnu-freefont/tools/utility/metafont/bulk_eps_import.py
+--- ./doc/fonts/gnu-freefont/tools/utility/metafont/bulk_eps_import.py.py3	2019-08-18 08:47:10.751162633 -0400
++++ ./doc/fonts/gnu-freefont/tools/utility/metafont/bulk_eps_import.py	2019-08-18 08:47:43.083384292 -0400
+@@ -35,11 +35,11 @@ import fnmatch, re
+ problem = False
+ 
+ def import_glyph( font, name, chrnum ):
+-	print "importing file: " + name + " to slot " + str( chrnum )
++	print("importing file: " + name + " to slot " + str( chrnum ))
+ 
+ 	g = font.createChar( chrnum )
+ 
+-	print "importing outlines " + name 
++	print("importing outlines " + name)
+ 	g.importOutlines( name )
+ 	# The glyphs produced by MetaPost usually have a grid, whose
+ 	# right side seems to correspond to the proper right side bearing
+@@ -56,7 +56,7 @@ re_file_pat = re.compile( file_pat )
+ if argc > 2:
+ 	fontfilename = sys.argv[1]
+ 	font = fontforge.open( fontfilename )
+-	print "bulk importing to font file: " + fontfilename
++	print("bulk importing to font file: " + fontfilename)
+ 	chrnum = 0
+ 	directories = os.listdir('.')
+ 	directories.sort()
+diff -up ./doc/fonts/gnu-freefont/tools/utility/special-purpose/makeBraille.py.py3 ./doc/fonts/gnu-freefont/tools/utility/special-purpose/makeBraille.py
+--- ./doc/fonts/gnu-freefont/tools/utility/special-purpose/makeBraille.py.py3	2019-08-18 08:49:05.631397114 -0400
++++ ./doc/fonts/gnu-freefont/tools/utility/special-purpose/makeBraille.py	2019-08-18 08:49:34.269707707 -0400
+@@ -60,12 +60,12 @@ def createAndName( font, off ):
+ 	return font.createChar( 0x2800 + off, 'braille%0.2X' % off )
+ 
+ def drawtopsix( g, off ):
+-	print 'created', 'braille%0.2X' % off
++	print('created', 'braille%0.2X' % off)
+ 	g.clear()
+ 	g.right_side_bearing = glyphwidth
+ 	for col in range ( 0, 2 ):
+ 		for row in range ( 0, 3 ):
+-			print 'shift', ( 3 * col + row )
++			print('shift', ( 3 * col + row ))
+ 			state = ( 1 << ( 3 * col + row ) ) & off
+ 			drawdot( g, col, row, state )
+ 
+diff -up ./doc/fonts/punknova/tools/build.py.py3 ./doc/fonts/punknova/tools/build.py
+--- ./doc/fonts/punknova/tools/build.py.py3	2019-08-18 08:50:02.077038304 -0400
++++ ./doc/fonts/punknova/tools/build.py	2019-08-18 08:50:52.658820644 -0400
+@@ -22,7 +22,7 @@ def run_mpost(file, tempdir):
+             )
+ 
+ def import_glyphs(font, instance, tempdir):
+-    print "Importing glyph variants set '%s'" % instance
++    print("Importing glyph variants set '%s'" % instance)
+ 
+     glyph_files = glob.glob(os.path.join(tempdir, "*.eps"))
+ 
+@@ -67,7 +67,7 @@ def get_alt(code, name):
+     return alt
+ 
+ def add_gsub(font, instances):
+-    print "Adding glyph substitution rules..."
++    print("Adding glyph substitution rules...")
+ 
+     font.addLookup(
+             "Randomize lookup",
+@@ -90,7 +90,7 @@ def add_gsub(font, instances):
+                         get_alt(glyph.unicode, glyph.glyphname))
+ 
+ def greek_caps(font, instances):
+-    print "Adding missing Greek capitals..."
++    print("Adding missing Greek capitals...")
+ 
+     caps = {
+             "Alpha"  : "A",
+@@ -117,7 +117,7 @@ def greek_caps(font, instances):
+                 get_alt(font.createMappedChar(name).unicode, name))
+ 
+ def autowidth(font):
+-    print "Auto spacing..."
++    print("Auto spacing...")
+ 
+     font.selection.all()
+     if font.fullname.find("Slanted"):
+@@ -131,7 +131,7 @@ def autowidth(font):
+     font.autoHint()
+ 
+ def autokern(font, instances):
+-    print "Auto kerning..."
++    print("Auto kerning...")
+ 
+     font.addLookup(
+             "Kern lookup",
+@@ -166,7 +166,7 @@ def finalise(font):
+     space.width   = 400
+ 
+ def usage():
+-    print "Usage: %s INFILE.mp OUTFILE.otf VERSION" % sys.argv[0]
++    print("Usage: %s INFILE.mp OUTFILE.otf VERSION" % sys.argv[0])
+ 
+ if __name__ == "__main__":
+     if len(sys.argv) < 3:
+@@ -216,6 +216,6 @@ if __name__ == "__main__":
+ 
+     sh.rmtree   (tempdir)
+ 
+-    print "Saving file '%s'..." % outfile
++    print("Saving file '%s'..." % outfile)
+ #   font.save()
+     font.generate(outfile)
+diff -up ./doc/generic/enctex/unimap.py.py3 ./doc/generic/enctex/unimap.py
+--- ./doc/generic/enctex/unimap.py.py3	2019-08-18 08:52:49.201015107 -0400
++++ ./doc/generic/enctex/unimap.py	2019-08-18 08:54:08.301110903 -0400
+@@ -91,12 +91,12 @@ def linetype(line):
+         return LineType.Character, (int(line[:m.end()], 16),
+                                     line[m.end():].strip().lower())
+     if not line.startswith('\t'):
+-        raise ValueError, 'Queer line doesn\'t start with @ or Tab'
++        raise ValueError('Queer line doesn\'t start with @ or Tab')
+     line = line.strip()
+     if not line:
+         return LineType.Empty, None
+     if not LineType.map.has_key(line[0]):
+-        raise ValueError, 'Queer character info line (marker %s)' % line[0]
++        raise ValueError('Queer character info line (marker %s)' % line[0])
+     return line[0], line[1:].strip()
+ 
+ def utf8chars(u):
+@@ -132,7 +132,7 @@ while typ:
+         char = val
+     elif typ == LineType.TeX:
+         if not val.startswith('\\'):
+-            raise ValueError, '%s is not a control seq (U%X)' % (val, char[0])
++            raise ValueError('%s is not a control seq (U%X)' % (val, char[0]))
+         if sect:
+             fw.write('\n%% %s\n' % sect)
+             sect = None
+diff -up ./doc/generic/shapepar/proshap.py.py3 ./doc/generic/shapepar/proshap.py
+--- ./doc/generic/shapepar/proshap.py.py3	2019-08-18 08:54:26.112682120 -0400
++++ ./doc/generic/shapepar/proshap.py	2019-08-18 08:54:51.618068133 -0400
+@@ -342,7 +342,7 @@ result = "\\gdef\\bassshape{{"+ middle
+ 
+ 
+ result = result+ "\\\\{"+str(height) +"}e{"+ middle +"}" + "}\n" 
+-print result
++print(result)
+ f = open("result.tex","w")
+ f.write(result)
+ f.close()       
+diff -up ./doc/latex/aramaic-serto/serto.py.py3 ./doc/latex/aramaic-serto/serto.py
+--- ./doc/latex/aramaic-serto/serto.py.py3	2019-08-18 08:59:12.106797388 -0400
++++ ./doc/latex/aramaic-serto/serto.py	2019-08-18 09:09:54.334337038 -0400
+@@ -13,564 +13,572 @@
+ #  29 September 2007: Possibility to typeset two identical letters without a qusshaya
+ #  31 March 2013: add SERTOFONTDIR environment variable
+ 
+-FONTFILESERTO="serto.font" # specify absolute path
+-FONTFILECHALD="assyr.font"
+-#FONTFILEESTR="estrangelo.font"
++import os.path
++import string
++import sys
++import re
++FONTFILESERTO = "serto.font"  # specify absolute path
++FONTFILECHALD = "assyr.font"
++# FONTFILEESTR="estrangelo.font"
+ 
+ # use the environment variable SERTOFONTDIR to specify the directory of the *.font files
+ 
+-import re, sys, string, os.path
+ 
+ # translating syriac unicode points to serto codings
+ 
++
+ class Letter:
+-    def __init__(self, 
+-		 coding, # what coding to use in .ptex-file
+-		 name,   # name of the letter
+-		 isolated, # what character to take in isolated usage
+-		 initial, # what character to take in word-initial usage
+-		 medial,  # what character to take in word-medial usage
+-		 final,  # what character to take in word-final usage
+-		 link): # does it link to the following (# link 0: next letter is initial, 1: next letter is medial, 2: ignore,  8: character is a superscript symbol  9: character is a subscript symbol
+-	self.coding = coding
+-	self.name = name
+-	self.isolated = map(int, isolated.split('+'))
+-	self.initial = map(int, initial.split('+'))
+-	self.medial = map(int, medial.split('+'))
+-	self.final = map(int, final.split('+'))
+-	self.link = int(link)
+-	
+-	if self.isolated[0] == -1: self.isolated = None
+-	if self.initial[0] == -1: self.initial = None
+-	if self.medial[0] == -1: self.medial = None
+-	if self.final[0] == -1: self.final = None
+-	#sys.stderr.write("%s:%s-%s-%s-%s\n" \
+-	#		 % (name,self.isolated,self.initial,self.medial,self.final))
+-	
++    def __init__(self,
++                 coding,  # what coding to use in .ptex-file
++                 name,   # name of the letter
++                 isolated,  # what character to take in isolated usage
++                 initial,  # what character to take in word-initial usage
++                 medial,  # what character to take in word-medial usage
++                 final,  # what character to take in word-final usage
++                 link):  # does it link to the following (# link 0: next letter is initial, 1: next letter is medial, 2: ignore,  8: character is a superscript symbol  9: character is a subscript symbol
++        self.coding = coding
++        self.name = name
++        self.isolated = list(map(int, isolated.split('+')))
++        self.initial = list(map(int, initial.split('+')))
++        self.medial = list(map(int, medial.split('+')))
++        self.final = list(map(int, final.split('+')))
++        self.link = int(link)
++
++        if self.isolated[0] == -1:
++            self.isolated = None
++        if self.initial[0] == -1:
++            self.initial = None
++        if self.medial[0] == -1:
++            self.medial = None
++        if self.final[0] == -1:
++            self.final = None
++        # sys.stderr.write("%s:%s-%s-%s-%s\n" \
++        #		 % (name,self.isolated,self.initial,self.medial,self.final))
++
+     def getcontext(self, ctx):
+-	if ctx == 0: return   self.isolated[0]
+-	elif ctx == 1: return self.initial[0]
+-	elif ctx == 2: return self.medial[0]
+-	elif ctx == 3: return self.final[0]
++        if ctx == 0:
++            return self.isolated[0]
++        elif ctx == 1:
++            return self.initial[0]
++        elif ctx == 2:
++            return self.medial[0]
++        elif ctx == 3:
++            return self.final[0]
+ 
+     def getChar(self, ctx):
+-	if ctx == 0: 
+-	    if not self.isolated: return ['']
+-	    return map(lambda x: "%c" % x, self.isolated)
+-	    #return int(self.isolated[0])
+-	elif ctx == 1: 
+-	    if not self.initial: return ['']
+-	    return map(lambda x: "%c" % x, self.initial)
+-	    #return int(self.initial[0])
+-	elif ctx == 2: 
+-	    #sys.stderr.write("MEDIAL %s\n" % self.medial)
+-	    if not self.medial: 
+-		#sys.stderr.write("NONE:e\n")
+-		return ['']
+-	    return map(lambda x: "%c" % x, self.medial)
+-	    #return int(self.medial[0])
+-	elif ctx == 3:
+-	    if not self.final: return ['']
+-	    return map(lambda x: "%c" % x, self.final)
+-	    #return int(self.final[0])
++        if ctx == 0:
++            if not self.isolated:
++                return ['']
++            return ["%c" % x for x in self.isolated]
++            # return int(self.isolated[0])
++        elif ctx == 1:
++            if not self.initial:
++                return ['']
++            return ["%c" % x for x in self.initial]
++            # return int(self.initial[0])
++        elif ctx == 2:
++            #sys.stderr.write("MEDIAL %s\n" % self.medial)
++            if not self.medial:
++                # sys.stderr.write("NONE:e\n")
++                return ['']
++            return ["%c" % x for x in self.medial]
++            # return int(self.medial[0])
++        elif ctx == 3:
++            if not self.final:
++                return ['']
++            return ["%c" % x for x in self.final]
++            # return int(self.final[0])
++
+ 
+ class Serto:
+     def __init__(self, elatex=0):
+-	self.elatex=elatex # eLaTeX needs \TeXXeTstate=1
+-	self.tabelle = {} # style: {"_d": Letter-Object}
+-	self.transtabelle = {} # style: "_d": \d{d}
+-	self.usingUTF8 = False
+-
+-	self.inlineS = re.compile("(<S>)(.*?)(</S>)")
+-	self.inlineT = re.compile("(<T>)(.*?)(</T>)")
+-	self.inlineST = re.compile("(<ST>)(.*?)(</ST>)")
+-
+-	self.inlineC = re.compile("(<C>)(.*?)(</C>)")
+-	self.inlineCT = re.compile("(<CT>)(.*?)(</CT>)")
+-
+-	self.inlineE = re.compile("(<E>)(.*?)(</E>)")
+-	self.inlineET = re.compile("(<ET>)(.*?)(</ET>)")
+-
+-	self.tabelle["serto"] = {}
+-	self.transtabelle["serto"] = {}
+-	self.readfont(FONTFILESERTO, 
+-		      self.tabelle["serto"],
+-		      self.transtabelle["serto"])
+-	#print  self.tabelle["serto"]
+-
+-	self.tabelle["chaldean"] = {}
+-	self.transtabelle["chaldean"] = {}
+-	self.readfont(FONTFILECHALD, 
+-		      self.tabelle["chaldean"],
+-		      self.transtabelle["chaldean"])
+-
+-	self.UnicodeTable = { 0x0710: "'",
+-		0x0712: "b",
+-		0x0713: "g",
+-		0x0714: "g", #gamal garshuni
+-		0x0715: "d",
+-		0x0717: "h",
+-		0x0718: "w",
+-		0x0719: "z",
+-		0x071a: ".h",
+-		0x071b: ".t",
+-		0x071c: ".t", # teth garshuni
+-		0x071d: "y",
+-		0x071f: "k",
+-		0x0720: "l",
+-		0x0721: "m",
+-		0x0722: "n",
+-		0x0723: "s",
+-		0x0724: "s", # final semkath
+-		0x0725: "`",
+-		0x0726: "p",
+-		0x0728: ".s",
+-		0x0729: "q",
+-		0x072a: "r",
+-		0x072b: "^s",
+-		0x072c: "t",
+-		0x0308: "P", # syame 
+-		0x0730: "a",
+-		0x0731: "A",
+-		0x0732: ":a",
+-		0x0733: "=a",
+-		0x0734: "=A",
+-		0x0735: ":=a",
+-		0x0736: "e",
+-		0x0737: "E",
+-		0x0738: ":e",
+-		0x0739: ":e",
+-		0x073a: "i",
+-		0x073b: "I",
+-		0x073c: ":i",
+-		0x073d: "u",
+-		0x073e: "U",
+-		0x073f: ":u",
+-		0x0740: ":=a",
+-		0x0741: "*",
+-		0x0742: "+",
+-		#punctuation listed in unicode not completed implemented in serto
+-		0x0700: ".:.",
+-		0x0701: ".",
+-		0x0702: ".",
+-		0x0703: ":",
+-		0x0704: ":",
+-		0x0705: ":",
+-		0x0706: ":",
+-		0x0707: ":",
+-		0x0708: ":",
+-		0x0709: ":",
+-		0x070D: ".X.",
+-	}
+-	
++        self.elatex = elatex  # eLaTeX needs \TeXXeTstate=1
++        self.tabelle = {}  # style: {"_d": Letter-Object}
++        self.transtabelle = {}  # style: "_d": \d{d}
++        self.usingUTF8 = False
++
++        self.inlineS = re.compile("(<S>)(.*?)(</S>)")
++        self.inlineT = re.compile("(<T>)(.*?)(</T>)")
++        self.inlineST = re.compile("(<ST>)(.*?)(</ST>)")
++
++        self.inlineC = re.compile("(<C>)(.*?)(</C>)")
++        self.inlineCT = re.compile("(<CT>)(.*?)(</CT>)")
++
++        self.inlineE = re.compile("(<E>)(.*?)(</E>)")
++        self.inlineET = re.compile("(<ET>)(.*?)(</ET>)")
++
++        self.tabelle["serto"] = {}
++        self.transtabelle["serto"] = {}
++        self.readfont(FONTFILESERTO,
++                      self.tabelle["serto"],
++                      self.transtabelle["serto"])
++        # print  self.tabelle["serto"]
++
++        self.tabelle["chaldean"] = {}
++        self.transtabelle["chaldean"] = {}
++        self.readfont(FONTFILECHALD,
++                      self.tabelle["chaldean"],
++                      self.transtabelle["chaldean"])
++
++        self.UnicodeTable = {0x0710: "'",
++                             0x0712: "b",
++                             0x0713: "g",
++                             0x0714: "g",  # gamal garshuni
++                             0x0715: "d",
++                             0x0717: "h",
++                             0x0718: "w",
++                             0x0719: "z",
++                             0x071a: ".h",
++                             0x071b: ".t",
++                             0x071c: ".t",  # teth garshuni
++                             0x071d: "y",
++                             0x071f: "k",
++                             0x0720: "l",
++                             0x0721: "m",
++                             0x0722: "n",
++                             0x0723: "s",
++                             0x0724: "s",  # final semkath
++                             0x0725: "`",
++                             0x0726: "p",
++                             0x0728: ".s",
++                             0x0729: "q",
++                             0x072a: "r",
++                             0x072b: "^s",
++                             0x072c: "t",
++                             0x0308: "P",  # syame
++                             0x0730: "a",
++                             0x0731: "A",
++                             0x0732: ":a",
++                             0x0733: "=a",
++                             0x0734: "=A",
++                             0x0735: ":=a",
++                             0x0736: "e",
++                             0x0737: "E",
++                             0x0738: ":e",
++                             0x0739: ":e",
++                             0x073a: "i",
++                             0x073b: "I",
++                             0x073c: ":i",
++                             0x073d: "u",
++                             0x073e: "U",
++                             0x073f: ":u",
++                             0x0740: ":=a",
++                             0x0741: "*",
++                             0x0742: "+",
++                             # punctuation listed in unicode not completed implemented in serto
++                             0x0700: ".:.",
++                             0x0701: ".",
++                             0x0702: ".",
++                             0x0703: ":",
++                             0x0704: ":",
++                             0x0705: ":",
++                             0x0706: ":",
++                             0x0707: ":",
++                             0x0708: ":",
++                             0x0709: ":",
++                             0x070D: ".X.",
++                             }
+ 
+-	#print "zzzzzz",UnicodeTable
++        # print "zzzzzz",UnicodeTable
+ 
+     def readfont(self, filename, tabelle, transtabelle):
+-	dirname = os.environ.get("SERTOFONTDIR")
+-	if not dirname:
+-		dirname = os.path.dirname(sys.argv[0])
+-	#print "eeee", dirname
+-	fp = open("%s/%s" % (dirname, filename), "r") 
+-	lines = fp.readlines()
+-	fp.close()
+-
+-
+-	#self.tabelle = {} # "_d": (isol, init, med, fin, link)
+-	#self.tabelle = {} # "_d": Letter-Object
+-	#self.transtabelle = {} # "_d": \d{d}
+-	self.fontname = ""
+-	status = "syriac"
+-	self.errct = 0
+-	for z in lines:
+-	    if len(z) < 2:
+-		continue
+-	    if z[0] == "#":
+-		if z[:6] == "#FONT:":
+-		    a = string.split(z)
+-		    self.fontname = string.strip(a[1])
+-		    #self.textframe.thetext.config(font=self.fontname)
+-		    #self.testlabel.config(font=self.fontname)
+-		elif z[:7] == "#TRANS:":
+-		    status = "transliterate"
+-		continue
+-
+-	    felder = string.split(z)
+-	    if status == "syriac":
+-		if len(felder) < 7:
+-		    self.errct = self.errct + 1
+-		    print "ERROR:", z
+-		else:
+-		    #print z, int(felder[2])
+-		    #self.tabelle[felder[0]] = (int(felder[2]), 
+-			#		       int(felder[3]), 
+-			#		       int(felder[4]),
+-			#		       int(felder[5]),
+-			#		       int(felder[6]))
+-		    tabelle[felder[0]] = Letter(felder[0], 
+-						felder[1], 
+-						felder[2], 
+-						felder[3], 
+-						felder[4],
+-						felder[5],
+-						felder[6])
+-	    else:
+-		if len(felder) < 2:
+-		    #print "WARNING:", z
+-		    transtabelle[felder[0]] = felder[0]
+-		else:
+-		    transtabelle[felder[0]] = felder[1]
+-
++        dirname = os.environ.get("SERTOFONTDIR")
++        if not dirname:
++            dirname = os.path.dirname(sys.argv[0])
++        # print "eeee", dirname
++        fp = open("%s/%s" % (dirname, filename), "r")
++        lines = fp.readlines()
++        fp.close()
++
++        # self.tabelle = {} # "_d": (isol, init, med, fin, link)
++        # self.tabelle = {} # "_d": Letter-Object
++        # self.transtabelle = {} # "_d": \d{d}
++        self.fontname = ""
++        status = "syriac"
++        self.errct = 0
++        for z in lines:
++            if len(z) < 2:
++                continue
++            if z[0] == "#":
++                if z[:6] == "#FONT:":
++                    a = string.split(z)
++                    self.fontname = string.strip(a[1])
++                    # self.textframe.thetext.config(font=self.fontname)
++                    # self.testlabel.config(font=self.fontname)
++                elif z[:7] == "#TRANS:":
++                    status = "transliterate"
++                continue
++
++            felder = string.split(z)
++            if status == "syriac":
++                if len(felder) < 7:
++                    self.errct = self.errct + 1
++                    print("ERROR:", z)
++                else:
++                    # print z, int(felder[2])
++                    # self.tabelle[felder[0]] = (int(felder[2]),
++                        #		       int(felder[3]),
++                        #		       int(felder[4]),
++                        #		       int(felder[5]),
++                        #		       int(felder[6]))
++                    tabelle[felder[0]] = Letter(felder[0],
++                                                felder[1],
++                                                felder[2],
++                                                felder[3],
++                                                felder[4],
++                                                felder[5],
++                                                felder[6])
++            else:
++                if len(felder) < 2:
++                    # print "WARNING:", z
++                    transtabelle[felder[0]] = felder[0]
++                else:
++                    transtabelle[felder[0]] = felder[1]
+ 
+     def tokenize(self, str, xlen, style="serto"):
+-	ix = 0
+-	self.tokens = []
+-	self.digits = []
+-	number = 0 # 
+-
+-	while(ix < xlen): #for ix in range(xlen):
+-	    #print "IX", ix, str
+-	    if str[ix] == "\\":
+-		command = "\\"
+-		ix = ix + 1
+-		while(ix < xlen):
+-		    if not str[ix] in string.letters:
+-			break
+-		    else:
+-			command = command + str[ix]
+-			ix = ix + 1
+-		self.tokens.append(command)
+-	    elif str[ix] in "{}":
+-		self.tokens.append(str[ix])
+-		ix = ix + 1
+-	    else:
+-		for ll in range(5, 0, -1):
+-		    if self.tabelle[style].has_key(str[ix:ix+ll]):
+-			if ll == 1 and str[ix:ix+ll] in "aeiou" \
+-			   and (len(self.tokens) == 0 \
+-				or self.tokens[-1] == "~"):
+-			    #self.tokens.append("'" + str[ix:ix+ll])
+-			    self.tokens.extend(["'", str[ix:ix+ll]])
+-			    #pass
+-			else:
+-			    if len(self.tokens) \
+-			       and str[ix:ix+ll] == self.tokens[-1] \
+-			       and self.tabelle[style][str[ix:ix+ll]].link != 3 \
+-			       and str[ix:ix+ll] not in ["~", "0", "1", 
+-							 "2", "3", "4", 
+-							 "5", "6", "7", 
+-							 "8", "9", "--"]:
+-				# insert shadda
+-				self.tokens.append("Q")
+-			    else:
+-				self.tokens.append(str[ix:ix+ll])
+-			ix = ix + ll
+-			break # for-loop
+-		else:
+-		    ix = ix + 1
+-	
+-	#print "TOKENS",self.tokens
++        ix = 0
++        self.tokens = []
++        self.digits = []
++        number = 0
++
++        while(ix < xlen):  # for ix in range(xlen):
++            # print "IX", ix, str
++            if str[ix] == "\\":
++                command = "\\"
++                ix = ix + 1
++                while(ix < xlen):
++                    if not str[ix] in string.letters:
++                        break
++                    else:
++                        command = command + str[ix]
++                        ix = ix + 1
++                self.tokens.append(command)
++            elif str[ix] in "{}":
++                self.tokens.append(str[ix])
++                ix = ix + 1
++            else:
++                for ll in range(5, 0, -1):
++                    if str[ix:ix+ll] in self.tabelle[style]:
++                        if ll == 1 and str[ix:ix+ll] in "aeiou" \
++                           and (len(self.tokens) == 0
++                                or self.tokens[-1] == "~"):
++                            #self.tokens.append("'" + str[ix:ix+ll])
++                            self.tokens.extend(["'", str[ix:ix+ll]])
++                            # pass
++                        else:
++                            if len(self.tokens) \
++                               and str[ix:ix+ll] == self.tokens[-1] \
++                               and self.tabelle[style][str[ix:ix+ll]].link != 3 \
++                               and str[ix:ix+ll] not in ["~", "0", "1",
++                                                         "2", "3", "4",
++                                                         "5", "6", "7",
++                                                         "8", "9", "--"]:
++                                # insert shadda
++                                self.tokens.append("Q")
++                            else:
++                                self.tokens.append(str[ix:ix+ll])
++                        ix = ix + ll
++                        break  # for-loop
++                else:
++                    ix = ix + 1
++
++        # print "TOKENS",self.tokens
+ 
+     def transtokenize(self, str, xlen, style="serto"):
+-	ix = 0
+-	self.tokens = []
+-	self.digits = []
+-	number = 0 # 
+-	while(ix < xlen): #for ix in range(xlen):
+-	    #print "IX", ix,
+-	    for ll in range(5, 0, -1):
+-		if self.transtabelle[style].has_key(str[ix:ix+ll]):
+-		    if ll == 1 and str[ix:ix+ll] in "aeiou" \
+-		       and (len(self.tokens) == 0 \
+-			    or self.tokens[-1] == "~"):
+-			self.tokens.append("'" + str[ix:ix+ll])
+-			#self.tokens.extend(["'", str[ix:ix+ll]])
+-		    else:
+-			#if len(self.tokens) \
+-			#   and str[ix:ix+ll] == self.tokens[-1] \
+-			#   and self.tabelle[str[ix:ix+ll]][4] != 3 \
+-			#   and str[ix:ix+ll] not in ["~", "0", "1", "2", "3", "4", 
+-			#			     "5", "6", "7", "8", "9"]:
+-			#    """insert shadda"""
+-			#    self.tokens.append("Q")
+-			#else:
+-			    self.tokens.append(str[ix:ix+ll])
+-		    ix = ix + ll
+-		    break # for-loop
+-	    else:
+-		ix = ix + 1
+-	
+-	#print "TRANSTOKENS",self.tokens
+- 
++        ix = 0
++        self.tokens = []
++        self.digits = []
++        number = 0
++        while(ix < xlen):  # for ix in range(xlen):
++            # print "IX", ix,
++            for ll in range(5, 0, -1):
++                if str[ix:ix+ll] in self.transtabelle[style]:
++                    if ll == 1 and str[ix:ix+ll] in "aeiou" \
++                       and (len(self.tokens) == 0
++                            or self.tokens[-1] == "~"):
++                        self.tokens.append("'" + str[ix:ix+ll])
++                        #self.tokens.extend(["'", str[ix:ix+ll]])
++                    else:
++                        # if len(self.tokens) \
++                        #   and str[ix:ix+ll] == self.tokens[-1] \
++                        #   and self.tabelle[str[ix:ix+ll]][4] != 3 \
++                        #   and str[ix:ix+ll] not in ["~", "0", "1", "2", "3", "4",
++                        #			     "5", "6", "7", "8", "9"]:
++                        #    """insert shadda"""
++                        #    self.tokens.append("Q")
++                        # else:
++                        self.tokens.append(str[ix:ix+ll])
++                    ix = ix + ll
++                    break  # for-loop
++            else:
++                ix = ix + 1
+ 
++        # print "TRANSTOKENS",self.tokens
+ 
+     def transliterate(self, syrisch, style="serto"):
+-	if self.usingUTF8:
+-		line = unicode(syrisch, "utf8")
+-		newline = ""
+-		for c in line:
+-			#print "eee %x" % ord(c), self.UnicodeTable.has_key(ord(c)), 
+-			#print c.encode("utf8")
+-			sertocode = self.UnicodeTable.get(ord(c), c) 
+-			newline += sertocode
+-			#print "[%s]"  % sertocode, newline
+-		syrisch = newline
+-
+-	syrisch = string.replace(syrisch, " ", "~")
+-	self.transtokenize(syrisch, len(syrisch), style)
+-	#self.err("TOKEN %s" %self.tokens)
+-	ret = []
+-	oldtok = ""
+-	for tok in self.tokens:
+-	    if tok == "~": # blank
+-		ret.append(" ")
+-	    #elif tok == "Q": # shadda
+-		#ret.append(ret[-1])
+-	    #elif tok == "+": # soft sign under begadkefat
+-		#if len(ret):
+-		#    ret[-1] = self.spec.get(oldtok+tok, oldtok+tok)
+-	    else:
+-		ret.append(self.transtabelle[style].get(tok, tok))
+-	    #oldtok = tok
+-	
+-	return string.join(ret, "")
++        if self.usingUTF8:
++            line = str(syrisch, "utf8")
++            newline = ""
++            for c in line:
++                        # print "eee %x" % ord(c), self.UnicodeTable.has_key(ord(c)),
++                        # print c.encode("utf8")
++                sertocode = self.UnicodeTable.get(ord(c), c)
++                newline += sertocode
++                # print "[%s]"  % sertocode, newline
++            syrisch = newline
++
++        syrisch = string.replace(syrisch, " ", "~")
++        self.transtokenize(syrisch, len(syrisch), style)
++        #self.err("TOKEN %s" %self.tokens)
++        ret = []
++        oldtok = ""
++        for tok in self.tokens:
++            if tok == "~":  # blank
++                ret.append(" ")
++            # elif tok == "Q": # shadda
++                # ret.append(ret[-1])
++            # elif tok == "+": # soft sign under begadkefat
++                # if len(ret):
++                #    ret[-1] = self.spec.get(oldtok+tok, oldtok+tok)
++            else:
++                ret.append(self.transtabelle[style].get(tok, tok))
++            #oldtok = tok
++
++        return string.join(ret, "")
+ 
+     def syriacise(self, style="serto"):
+-	# replace tokens by serto letters, take into account context
+-	ix = 0
+-	out = []
+-	digits = []
+-	self.maxlen = len(self.tokens)
+-	#sys.stderr.write("%s\n" % self.tokens)
+-	number = 0
+-	for i in range(self.maxlen):
+-	    if self.tokens[i][0] in "\\{}":
+-		out.append(self.tokens[i])
+-
+-	    elif self.tabelle[style][self.tokens[i]].medial == -1: 
+-		#print "skipping letter"
+-		continue
+-	    else:
+-		form = self.context(i, style=style)
+-
+-		if self.tokens[i] in ["0", "1", "2", "3", "4", 
+-				      "5", "6", "7", "8", "9"]:
+-		    number = 1
+-		    digits.append(chr(self.tabelle[style][self.tokens[i]].getcontext(form)))
+-		else:
+-		    if number == 1:
+-			number = 0
+-			digits.reverse()
+-			out.extend(digits)
+-			digits = []
+-		    #out.append(chr(self.tabelle[self.tokens[i]][form]))
+-		    #out.append("%c" %(self.tabelle[self.tokens[i]].getcontext(form)))
+-		    for c in self.tabelle[style][self.tokens[i]].getChar(form):
+-			#sys.stderr.write("LETTER: %s\n" % c)
+-			out.append(c)
+-		#print self.tokens[i], form, self.tabelle[self.tokens[i]][form]
+-
+-	if number:
+-	    number = 0
+-	    digits.reverse()
+-	    out.extend(digits)
+-
+-
+-	#for i in out: print "%d" % ord(i),
+-	#print
+-	#if not self.elatex:
+-	#    out.reverse()
+-
+-	# This kills empty letters, caused by -1 in .font-file
+-	return string.join(out, "") 
+-	
++        # replace tokens by serto letters, take into account context
++        ix = 0
++        out = []
++        digits = []
++        self.maxlen = len(self.tokens)
++        #sys.stderr.write("%s\n" % self.tokens)
++        number = 0
++        for i in range(self.maxlen):
++            if self.tokens[i][0] in "\\{}":
++                out.append(self.tokens[i])
++
++            elif self.tabelle[style][self.tokens[i]].medial == -1:
++                # print "skipping letter"
++                continue
++            else:
++                form = self.context(i, style=style)
++
++                if self.tokens[i] in ["0", "1", "2", "3", "4",
++                                      "5", "6", "7", "8", "9"]:
++                    number = 1
++                    digits.append(
++                        chr(self.tabelle[style][self.tokens[i]].getcontext(form)))
++                else:
++                    if number == 1:
++                        number = 0
++                        digits.reverse()
++                        out.extend(digits)
++                        digits = []
++                    # out.append(chr(self.tabelle[self.tokens[i]][form]))
++                    #out.append("%c" %(self.tabelle[self.tokens[i]].getcontext(form)))
++                    for c in self.tabelle[style][self.tokens[i]].getChar(form):
++                        #sys.stderr.write("LETTER: %s\n" % c)
++                        out.append(c)
++                # print self.tokens[i], form, self.tabelle[self.tokens[i]][form]
++
++        if number:
++            number = 0
++            digits.reverse()
++            out.extend(digits)
++
++        # for i in out: print "%d" % ord(i),
++        # print
++        # if not self.elatex:
++        #    out.reverse()
+ 
+-    def context(self, ix, style="serto"):
+-	"""returns 0 if letter is isolated
+-	1 if letter is initial
+-	2 if letter is medial
+-	3 if letter is final"""
+-
+-	if self.before(ix, style) and self.next(ix, style):
+-	    return 2
+-	elif self.before(ix, style) and not self.next(ix, style):
+-	    return 3
+-	elif not self.before(ix, style) and self.next(ix, style):
+-	    return 1
+-	else:
+-	    return 0
++        # This kills empty letters, caused by -1 in .font-file
++        return string.join(out, "")
+ 
++    def context(self, ix, style="serto"):
++        """returns 0 if letter is isolated
++        1 if letter is initial
++        2 if letter is medial
++        3 if letter is final"""
++
++        if self.before(ix, style) and self.next(ix, style):
++            return 2
++        elif self.before(ix, style) and not self.next(ix, style):
++            return 3
++        elif not self.before(ix, style) and self.next(ix, style):
++            return 1
++        else:
++            return 0
+ 
+     def next(self, ix, style="serto"):
+-	"""returns 1 if next token is a letter"""
+-	for i in range(ix+1, self.maxlen):
+-	    if self.tokens[i][0] in "\\{}":
+-		return 0
+-	    elif self.tabelle[style][self.tokens[i]].link in [2,3]:
+-		continue
+-	    elif self.tokens[i] not in ["~", "!", ",", ".", ";", "?"] :
+-		return 1
+-	    else:
+-		return 0
+-	return 0
++        """returns 1 if next token is a letter"""
++        for i in range(ix+1, self.maxlen):
++            if self.tokens[i][0] in "\\{}":
++                return 0
++            elif self.tabelle[style][self.tokens[i]].link in [2, 3]:
++                continue
++            elif self.tokens[i] not in ["~", "!", ",", ".", ";", "?"]:
++                return 1
++            else:
++                return 0
++        return 0
+ 
+     def before(self, ix, style="serto"):
+-	"""returns 1 if preceding token is a letter"""
+-	for i in range(ix-1, -1, -1):
+-	    if self.tokens[i][0] in "\\{}":
+-		return 0
+-	    elif self.tabelle[style][self.tokens[i]].link == 2:
+-		continue
+-	    elif  self.tokens[i] != "~":
+-		if self.tabelle[style][self.tokens[i]].link == 0:
+-		    return 0
+-		else:
+-		    return 1
+-	    else:
+-		return 0
+-	return 0
+-
+-
+-
+-
++        """returns 1 if preceding token is a letter"""
++        for i in range(ix-1, -1, -1):
++            if self.tokens[i][0] in "\\{}":
++                return 0
++            elif self.tabelle[style][self.tokens[i]].link == 2:
++                continue
++            elif self.tokens[i] != "~":
++                if self.tabelle[style][self.tokens[i]].link == 0:
++                    return 0
++                else:
++                    return 1
++            else:
++                return 0
++        return 0
+ 
+     def convert(self, transcript, style="serto"):
+-	# interface function
+-	# dummy blank
+-	if self.usingUTF8:
+-		line = unicode(transcript, "utf8")
+-		newline = ""
+-		for c in line:
+-			#sys.stderr.write( "eee %d %s\n" % (ord(c), self.UnicodeTable.has_key(ord(c))))
+-			#sys.stderr.write( c.encode("utf8") + "\n")
+-			sertocode = self.UnicodeTable.get(ord(c), c) 
+-			newline += sertocode
+-			#sys.stderr.write( "[%s]\n"  % sertocode)
+-		transcript = newline.encode("utf8")
+-		
+-	transcript = string.replace(transcript, " ", "~")
+-	self.tokenize(transcript, len(transcript), style)
+-	return self.syriacise(style)
+-
++        # interface function
++        # dummy blank
++        if self.usingUTF8:
++            line = str(transcript, "utf8")
++            newline = ""
++            for c in line:
++                        #sys.stderr.write( "eee %d %s\n" % (ord(c), self.UnicodeTable.has_key(ord(c))))
++                        #sys.stderr.write( c.encode("utf8") + "\n")
++                sertocode = self.UnicodeTable.get(ord(c), c)
++                newline += sertocode
++                #sys.stderr.write( "[%s]\n"  % sertocode)
++            transcript = newline.encode("utf8")
++
++        transcript = string.replace(transcript, " ", "~")
++        self.tokenize(transcript, len(transcript), style)
++        return self.syriacise(style)
+ 
+     def texify(self, word, style="serto"):
+-	res = []
+-	for ll in serto.convert(word, style):
+-	    # ll: position of current syriac character in font table
+-	    #sys.stdout.write("LETTER: 0x%x\n" % (ord(ll)))
+-	    #sys.stderr.write("LETTER: %s\n" % ord(ll))
+-
+-	    if ord(ll) < 16:
+-		#print "WWWWWWWWW", len(res), res
+-		if len(res):
+-		    res[-1] = "\\uppersyriac{%d}{%s}" % (ord(ll), res[-1])
+-		else:
+-		    res.append("\\uppersyriac{%d}{A}" % (ord(ll))) # A: Olaf
+-	    elif ord(ll) < 32:
+-		if len(res):
+-		    res[-1] = "\\lowersyriac{%d}{%s}" % (ord(ll), res[-1])
+-		else:
+-		    res.append("\\lowersyriac{%d}{A}" % (ord(ll)))
+-	    elif ord(ll) < 127 and ord(ll) not in [34,35,36,37,38,95]: 
+-		res.append(ll)
+-	    else:
+-		# special (active) TeX-characters, charactes > 127
+-		res.append("\\char%d{}" % ord(ll))
+-	if not self.elatex:
+-	    res.reverse()
+-	return string.join(res, "")
++        res = []
++        for ll in serto.convert(word, style):
++            # ll: position of current syriac character in font table
++            #sys.stdout.write("LETTER: 0x%x\n" % (ord(ll)))
++            #sys.stderr.write("LETTER: %s\n" % ord(ll))
++
++            if ord(ll) < 16:
++                # print "WWWWWWWWW", len(res), res
++                if len(res):
++                    res[-1] = "\\uppersyriac{%d}{%s}" % (ord(ll), res[-1])
++                else:
++                    res.append("\\uppersyriac{%d}{A}" % (ord(ll)))  # A: Olaf
++            elif ord(ll) < 32:
++                if len(res):
++                    res[-1] = "\\lowersyriac{%d}{%s}" % (ord(ll), res[-1])
++                else:
++                    res.append("\\lowersyriac{%d}{A}" % (ord(ll)))
++            elif ord(ll) < 127 and ord(ll) not in [34, 35, 36, 37, 38, 95]:
++                res.append(ll)
++            else:
++                # special (active) TeX-characters, charactes > 127
++                res.append("\\char%d{}" % ord(ll))
++        if not self.elatex:
++            res.reverse()
++        return string.join(res, "")
+ 
+     def inlineserto(self, matchobject):
+-	return "{\\serto\\beginR %s\\endR}" % self.texify(matchobject.group(2))
++        return "{\\serto\\beginR %s\\endR}" % self.texify(matchobject.group(2))
+ 
+     def inlinechaldean(self, matchobject):
+-	return "{\\assyr\\beginR %s\\endR}" \
+-	       % self.texify(matchobject.group(2), "chaldean")
++        return "{\\assyr\\beginR %s\\endR}" \
++               % self.texify(matchobject.group(2), "chaldean")
+ 
+     def inlinetrans(self, matchobject):
+-	return "\\emph{%s}" % self.transliterate(matchobject.group(2))
++        return "\\emph{%s}" % self.transliterate(matchobject.group(2))
+ 
+     def inlinesertotrans(self, matchobject):
+-	return "{\\serto\\beginR %s\\endR} \\emph{%s}" \
+-	       % (self.texify(matchobject.group(2)),
+-		  self.transliterate(matchobject.group(2)))
++        return "{\\serto\\beginR %s\\endR} \\emph{%s}" \
++               % (self.texify(matchobject.group(2)),
++                  self.transliterate(matchobject.group(2)))
++
+     def inlinechaldeantrans(self, matchobject):
+-	return "{\\assyr\\beginR %s\\endR} \\emph{%s}" \
+-	       % (self.texify(matchobject.group(2), "chaldean"),
+-		  self.transliterate(matchobject.group(2), "chaldean"))
++        return "{\\assyr\\beginR %s\\endR} \\emph{%s}" \
++               % (self.texify(matchobject.group(2), "chaldean"),
++                  self.transliterate(matchobject.group(2), "chaldean"))
++
+     def err(self, s):
+-	sys.stderr.write(s + "\n")
++        sys.stderr.write(s + "\n")
++
+ 
+-#-------------------------------------------------------
++# -------------------------------------------------------
+ if __name__ == "__main__":
+     sys.stderr.write("serto - LaTeX - preprocessor\n(c) Johannes Heinecke\n")
+ 
+     if len(sys.argv) < 2:
+-	sys.stderr.write("usage:\n  serto.py [-o] inputfile\n")
+-	sys.stderr.write("    -o: for usage with an older version of LaTeX which cannot typeset right-to-left scripts elatex\n\n")
+-	sys.exit(1)
++        sys.stderr.write("usage:\n  serto.py [-o] inputfile\n")
++        sys.stderr.write(
++            "    -o: for usage with an older version of LaTeX which cannot typeset right-to-left scripts elatex\n\n")
++        sys.exit(1)
+ 
+     else:
+-	sys.stderr.write("\n")
+-	import getopt
++        sys.stderr.write("\n")
++        import getopt
+ 
+-	elatex = 1
+-	optlist,comargs = getopt.getopt(sys.argv[1:], "")
+-
+-	for (o,a) in optlist:
+-	    if o == "-o":
+-		elatex = 0
+-
+-	serto = Serto(elatex=elatex)
+-	fp = open(comargs[0])
+-
+-	#mode = "latin"
+-	mode = ["latin"]
+-	z = fp.readline()
+-	while (z):
+-	    #print "LINE", z,
+-	    if z.find("\usepackage[utf8]{inputenc}") > -1:
+-		serto.usingUTF8 = True
+-	    #print 'QQQ',z, mode
+-	    if z[:-1] == "<SERTO>":
+-		# must be on a single line (will be deleted)
+-		if not elatex:
+-		    sys.stderr.write("using <SERTO> without the -e option (and elatex) may not work!\n")
+-		#mode = "serto"
+-		mode.append("serto")
+-		print '{\\serto\\beginR %'
+-
+-	    elif string.strip(z[:-1]) == "</SERTO>":
+-		#mode = "latin"
+-		del mode[-1]
+-		#print '\\endR}%'  # causes problems in last line
+-		print '}%'
+-
+-	    elif z[:-1] == "<CHALDEAN>":
+-		# must be on a single line (will be deleted)
+-		if not elatex:
+-		    sys.stderr.write("using <CHALDEAN> without the -e option (and elatex) may not work!\n")
+-		#mode = "chaldean"
+-		mode.append("chaldean")
+-		print '{\\assyr\\beginR %'
+-
+-	    elif string.strip(z[:-1]) == "</CHALDEAN>":
+-		#mode = "latin"
+-		del mode[-1]
+-		#print '\\endR}%'  # causes problems in last line
+-		print '}%'
+-
+-
+-	    elif z[:-1] == "<TRANS>":
+-		#mode = "trans"
+-		mode.append("trans")
+-                print '{\\it %'
+-
+-	    elif string.strip(z[:-1]) == "</TRANS>":
+-		#mode = "latin"
+-		del mode[-1]
+-		print '}%'
++        elatex = 1
++        optlist, comargs = getopt.getopt(sys.argv[1:], "")
+ 
++        for (o, a) in optlist:
++            if o == "-o":
++                elatex = 0
++
++        serto = Serto(elatex=elatex)
++        fp = open(comargs[0])
++
++        #mode = "latin"
++        mode = ["latin"]
++        z = fp.readline()
++        while (z):
++            # print "LINE", z,
++            if z.find("\\usepackage[utf8]{inputenc}") > -1:
++                serto.usingUTF8 = True
++            # print 'QQQ',z, mode
++            if z[:-1] == "<SERTO>":
++                # must be on a single line (will be deleted)
++                if not elatex:
++                    sys.stderr.write(
++                        "using <SERTO> without the -e option (and elatex) may not work!\n")
++                #mode = "serto"
++                mode.append("serto")
++                print('{\\serto\\beginR %')
++
++            elif string.strip(z[:-1]) == "</SERTO>":
++                #mode = "latin"
++                del mode[-1]
++                # print '\\endR}%'  # causes problems in last line
++                print('}%')
++
++            elif z[:-1] == "<CHALDEAN>":
++                # must be on a single line (will be deleted)
++                if not elatex:
++                    sys.stderr.write(
++                        "using <CHALDEAN> without the -e option (and elatex) may not work!\n")
++                #mode = "chaldean"
++                mode.append("chaldean")
++                print('{\\assyr\\beginR %')
++
++            elif string.strip(z[:-1]) == "</CHALDEAN>":
++                #mode = "latin"
++                del mode[-1]
++                # print '\\endR}%'  # causes problems in last line
++                print('}%')
++
++            elif z[:-1] == "<TRANS>":
++                #mode = "trans"
++                mode.append("trans")
++                print('{\\it %')
++
++            elif string.strip(z[:-1]) == "</TRANS>":
++                #mode = "latin"
++                del mode[-1]
++                print('}%')
+ 
+ 
+ #	    elif z[:-1] == "<SERTOTRANS>":
+@@ -581,29 +589,26 @@ if __name__ == "__main__":
+ #		mode = "latin"
+ #		print '\\endR}%'
+ 
++            else:
++                # print "mmm", mode, z
++                if mode[-1] == "latin":
++                    #sys.stdout.write(serto.inlineS.sub(serto.inlineserto, z))
++                    a = serto.inlineS.sub(serto.inlineserto, z)
++                    b = serto.inlineT.sub(serto.inlinetrans, a)
++                    c = serto.inlineST.sub(serto.inlinesertotrans, b)
++                    d = serto.inlineC.sub(serto.inlinechaldean, c)
++                    e = serto.inlineCT.sub(serto.inlinechaldeantrans, d)
++                    sys.stdout.write(e)
++                elif mode[-1] == "trans":
++                    print(serto.transliterate(z))
++                else:
++                    if z[:-1] == "":
++                        print("\n\\beginR", end=' ')
++                    else:
++                        print(serto.texify(z, mode[-1]))
+ 
++            # print "rrrrr", mode
++            z = fp.readline()
+ 
+-	    else:
+-		#print "mmm", mode, z
+-		if mode[-1] == "latin":
+-		    #sys.stdout.write(serto.inlineS.sub(serto.inlineserto, z))
+-		    a = serto.inlineS.sub(serto.inlineserto, z)
+-		    b = serto.inlineT.sub(serto.inlinetrans, a)
+-		    c = serto.inlineST.sub(serto.inlinesertotrans, b)
+-		    d = serto.inlineC.sub(serto.inlinechaldean, c)
+-		    e = serto.inlineCT.sub(serto.inlinechaldeantrans, d)
+-		    sys.stdout.write(e)
+-		elif mode[-1] == "trans":
+-		    print serto.transliterate(z)
+-		else:
+-		    if z[:-1] == "": print "\n\\beginR",
+-		    else:
+-			print serto.texify(z, mode[-1])
+-
+-
+-	    #print "rrrrr", mode
+-	    z = fp.readline()
+-
+-
+-	fp.close()
+-	sys.exit(serto.errct)
++        fp.close()
++        sys.exit(serto.errct)
+diff -up ./doc/latex/braille/grade2.py.py3 ./doc/latex/braille/grade2.py
+--- ./doc/latex/braille/grade2.py.py3	2019-08-18 09:14:21.083915571 -0400
++++ ./doc/latex/braille/grade2.py	2019-08-18 09:14:40.917438114 -0400
+@@ -15,7 +15,9 @@ Usage:
+ Usage:
+     python grade2.py < text > tags
+ """
+-import string, re, grade1
++import string
++import re
++import grade1
+ 
+ part_of_word = [
+     'and', 'for', 'of', 'the', 'with',
+@@ -43,7 +45,7 @@ final_letter_contraction = [		# middle o
+     'ation', 'ally',
+ ]
+ initial_letter_contraction = [		# whole or part of word
+-    'these', 'those', 'upon', 'whose', 'word', 
++    'these', 'those', 'upon', 'whose', 'word',
+ 
+     'cannot', 'had', 'many', 'spirit', 'their', 'world',
+ 
+@@ -82,12 +84,15 @@ whole_word = [
+ def begintag(tag, word):
+     return re.sub('^%s(.)' % tag, r'{%s}\1' % tag, word)
+ 
++
+ def middletag(tag, word):
+     return re.sub('(.)%s(.)' % tag, r'\1{%s}\2' % tag, word)
+ 
++
+ def endtag(tag, word):
+     return re.sub('(.)%s$' % tag, r'\1{%s}' % tag, word)
+ 
++
+ def parttag(tag, word):
+     return string.replace(word, tag, '{' + tag + '}')
+ 
+@@ -97,46 +102,56 @@ def parttag(tag, word):
+ #
+ def replace(word):
+     if word in whole_word + initial_letter_contraction:		# whole word
+-	return '{' + word + '}'
+-	
+-    for tag in initial_letter_contraction:	# whole or part of word
+-	word = parttag(tag, word)
+-    for tag in final_letter_contraction:	# middle or end of word
+-	word = middletag(tag, word)
+-	word = endtag(tag, word)
+-    for tag in beginning_of_word: 	word = begintag(tag, word)
+-    for tag in end_of_word:		word = endtag(tag, word)
+-    for tag in middle_of_word: 		word = middletag(tag, word)
+-    for tag in part_of_word:		word = parttag(tag, word)
++        return '{' + word + '}'
++
++    for tag in initial_letter_contraction:  # whole or part of word
++        word = parttag(tag, word)
++    for tag in final_letter_contraction:  # middle or end of word
++        word = middletag(tag, word)
++        word = endtag(tag, word)
++    for tag in beginning_of_word:
++        word = begintag(tag, word)
++    for tag in end_of_word:
++        word = endtag(tag, word)
++    for tag in middle_of_word:
++        word = middletag(tag, word)
++    for tag in part_of_word:
++        word = parttag(tag, word)
+ 
+     s, braces = '', 0
+     for i in word:		# remove nested braces
+-	if i == '{':
+-	    braces = braces + 1
+-	    if braces == 1:  s = s + i
+-	elif i == '}':
+-	    braces = braces - 1
+-	    if braces == 0:  s = s + i
+-	else:
+-	    s = s + i
++        if i == '{':
++            braces = braces + 1
++            if braces == 1:
++                s = s + i
++        elif i == '}':
++            braces = braces - 1
++            if braces == 0:
++                s = s + i
++        else:
++            s = s + i
+     return s
+ 
+ 
+ # Check if word, containing [a-zA-Z] only, is all UPPER case.
+ #
+ def alluppercase(word):		# ^[A-Z]+$
+-    if len(word) == 0:  return 0
++    if len(word) == 0:
++        return 0
+     for i in word:
+-	if i not in string.uppercase:  return 0
++        if i not in string.uppercase:
++            return 0
+     return 1
+ 
+ 
+ # Check if word, containing [a-zA-Z] only, is all lower case.
+ #
+ def alllowercase(word):		# ^[a-z]+$
+-    if len(word) == 0:  return 0
++    if len(word) == 0:
++        return 0
+     for i in word:
+-	if i not in string.lowercase:  return 0
++        if i not in string.lowercase:
++            return 0
+     return 1
+ 
+ 
+@@ -144,29 +159,29 @@ def alllowercase(word):		# ^[a-z]+$
+ #
+ def capitalized(word):		# ^[A-Z][a-z]*$
+     if len(word) == 0:
+-	return 0
++        return 0
+     elif len(word) == 1:
+-	return alluppercase(word[0])
++        return alluppercase(word[0])
+     else:
+-	return alluppercase(word[0]) and alllowercase(word[1:])
++        return alluppercase(word[0]) and alllowercase(word[1:])
+ 
+ 
+ def convert(line):
+     s = ''
+     for word in re.split('([a-zA-Z]+)', line):
+-	if len(word) <= 1 or word[0] not in string.letters:
+-	    s = s + word	# no work if not 2 or more letters
+-	elif alluppercase(word):
+-    	    s = s + '{Upper}' + replace(string.lower(word))
+-	elif capitalized(word):
+-	    w = replace(string.lower(word))
+-	    if w[0] in string.lowercase:
+-		s = s + word[0] + w[1:]	# preserve Capital letter
+-	    else:
+-		s = s + '{Capital}' + w
+-	else:
+-	    s = s + replace(word)
+-    
++        if len(word) <= 1 or word[0] not in string.letters:
++            s = s + word  # no work if not 2 or more letters
++        elif alluppercase(word):
++            s = s + '{Upper}' + replace(string.lower(word))
++        elif capitalized(word):
++            w = replace(string.lower(word))
++            if w[0] in string.lowercase:
++                s = s + word[0] + w[1:]  # preserve Capital letter
++            else:
++                s = s + '{Capital}' + w
++        else:
++            s = s + replace(word)
++
+     # manually handle whole word {o'clock}
+     s = re.sub(r"\bo'clock\b", "{o'clock}", s)
+ 
+@@ -196,5 +211,5 @@ def nopunctuations(tag, newtag, s):
+ 
+ if __name__ == '__main__':
+     import sys
+-    line = sys.stdin.read()	# swallow the whole thing 
+-    print convert(line)		# may produce extra \n
++    line = sys.stdin.read()  # swallow the whole thing
++    print(convert(line))  # may produce extra \n
+diff -up ./doc/latex/cals/test/support/run_tests.py.py3 ./doc/latex/cals/test/support/run_tests.py
+--- ./doc/latex/cals/test/support/run_tests.py.py3	2019-08-18 09:15:15.121614709 -0400
++++ ./doc/latex/cals/test/support/run_tests.py	2019-08-18 09:15:42.391958242 -0400
+@@ -38,7 +38,7 @@ for fname in test_files:
+ # Test function
+ #
+ def generic_test_func(self, modname, testname):
+-  print 'I am a test case with parameters:', self.__class__, modname, testname
++  print('I am a test case with parameters:', self.__class__, modname, testname)
+   self.assertEqual(1, 1)
+ 
+ #
+diff -up ./doc/latex/newcommand/spark.py.py3 ./doc/latex/newcommand/spark.py
+--- ./doc/latex/newcommand/spark.py.py3	2019-08-18 09:23:28.774731080 -0400
++++ ./doc/latex/newcommand/spark.py	2019-08-18 09:23:53.167143894 -0400
+@@ -31,7 +31,7 @@ def _namelist(instance):
+ 		for b in c.__bases__:
+ 			classlist.append(b)
+ 		for name in dir(c):
+-			if not namedict.has_key(name):
++			if name not in namedict:
+ 				namelist.append(name)
+ 				namedict[name] = 1
+ 	return namelist
+@@ -42,7 +42,7 @@ class GenericScanner:
+ 		self.re = re.compile(pattern, re.VERBOSE)
+ 
+ 		self.index2func = {}
+-		for name, number in self.re.groupindex.items():
++		for name, number in list(self.re.groupindex.items()):
+ 			self.index2func[number-1] = getattr(self, 't_' + name)
+ 
+ 	def makeRE(self, name):
+@@ -60,7 +60,7 @@ class GenericScanner:
+ 		return string.join(rv, '|')
+ 
+ 	def error(self, s, pos):
+-		print "Lexical error at position %s" % pos
++		print("Lexical error at position %s" % pos)
+ 		raise SystemExit
+ 
+ 	def tokenize(self, s):
+@@ -73,7 +73,7 @@ class GenericScanner:
+ 
+ 			groups = m.groups()
+ 			for i in range(len(groups)):
+-				if groups[i] and self.index2func.has_key(i):
++				if groups[i] and i in self.index2func:
+ 					self.index2func[i](groups[i])
+ 			pos = m.end()
+ 
+@@ -114,7 +114,7 @@ class GenericParser:
+ 
+ 			rule, fn = self.preprocess(rule, func)
+ 
+-			if self.rules.has_key(lhs):
++			if lhs in self.rules:
+ 				self.rules[lhs].append(rule)
+ 			else:
+ 				self.rules[lhs] = [ rule ]
+@@ -145,9 +145,9 @@ class GenericParser:
+ 		union = {}
+ 		self.first = {}
+ 		
+-		for rulelist in self.rules.values():
++		for rulelist in list(self.rules.values()):
+ 			for lhs, rhs in rulelist:
+-				if not self.first.has_key(lhs):
++				if lhs not in self.first:
+ 					self.first[lhs] = {}
+ 
+ 				if len(rhs) == 0:
+@@ -155,14 +155,14 @@ class GenericParser:
+ 					continue
+ 
+ 				sym = rhs[0]
+-				if not self.rules.has_key(sym):
++				if sym not in self.rules:
+ 					self.first[lhs][sym] = 1
+ 				else:
+ 					union[(sym, lhs)] = 1
+ 		changes = 1
+ 		while changes:
+ 			changes = 0
+-			for src, dest in union.keys():
++			for src, dest in list(union.keys()):
+ 				destlen = len(self.first[dest])
+ 				self.first[dest].update(self.first[src])
+ 				if len(self.first[dest]) != destlen:
+@@ -179,7 +179,7 @@ class GenericParser:
+ 		return None
+ 
+ 	def error(self, token):
+-		print "Syntax error at or near `%s' token" % token
++		print("Syntax error at or near `%s' token" % token)
+ 		raise SystemExit
+ 
+ 	def parse(self, tokens):
+@@ -190,7 +190,7 @@ class GenericParser:
+ 		if self.ruleschanged:
+ 			self.makeFIRST()
+ 
+-		for i in xrange(len(tokens)):
++		for i in range(len(tokens)):
+ 			states[i+1] = []
+ 
+ 			if states[i] == []:
+@@ -245,7 +245,7 @@ class GenericParser:
+ 			#
+ 			#  A -> a . B (predictor)
+ 			#
+-			if self.rules.has_key(nextSym):
++			if nextSym in self.rules:
+ 				#
+ 				#  Work on completer step some more; for rules
+ 				#  with empty RHS, the "parent state" is the
+@@ -253,7 +253,7 @@ class GenericParser:
+ 				#  so the Earley items the completer step needs
+ 				#  may not all be present when it runs.
+ 				#
+-				if needsCompletion.has_key(nextSym):
++				if nextSym in needsCompletion:
+ 					new = (rule, pos+1, parent)
+ 					olditem_i = needsCompletion[nextSym]
+ 					if new not in state:
+@@ -265,7 +265,7 @@ class GenericParser:
+ 				#
+ 				#  Has this been predicted already?
+ 				#
+-				if predicted.has_key(nextSym):
++				if nextSym in predicted:
+ 					continue
+ 				predicted[nextSym] = 1
+ 
+@@ -289,15 +289,15 @@ class GenericParser:
+ 							state.append(new)
+ 							continue
+ 						prhs0 = prhs[0]
+-						if not self.rules.has_key(prhs0):
++						if prhs0 not in self.rules:
+ 							if prhs0 != ttype:
+ 								continue
+ 							else:
+ 								state.append(new)
+ 								continue
+ 						first = self.first[prhs0]
+-						if not first.has_key(None) and \
+-						   not first.has_key(ttype):
++						if None not in first and \
++						   ttype not in first:
+ 							continue
+ 						state.append(new)
+ 					continue
+@@ -310,7 +310,7 @@ class GenericParser:
+ 					#
+ 					prhs = prule[1]
+ 					if len(prhs) > 0 and \
+-					   not self.rules.has_key(prhs[0]) and \
++					   prhs[0] not in self.rules and \
+ 					   token != prhs[0]:
+ 						continue
+ 					state.append((prule, 0, i))
+@@ -332,7 +332,7 @@ class GenericParser:
+ 		
+ 		while pos > 0:
+ 			want = ((rule, pos, parent), state)
+-			if not tree.has_key(want):
++			if want not in tree:
+ 				#
+ 				#  Since pos > 0, it didn't come from closure,
+ 				#  and if it isn't in tree[], then there must
+@@ -388,7 +388,7 @@ class GenericParser:
+ 			sortlist.append((len(rhs), name))
+ 			name2index[name] = i
+ 		sortlist.sort()
+-		list = map(lambda (a,b): b, sortlist)
++		list = [a_b[1] for a_b in sortlist]
+ 		return children[name2index[self.resolve(list)]]
+ 
+ 	def resolve(self, list):
+@@ -553,14 +553,14 @@ class GenericASTMatcher(GenericParser):
+ 
+ def _dump(tokens, states):
+ 	for i in range(len(states)):
+-		print 'state', i
++		print('state', i)
+ 		for (lhs, rhs), pos, parent in states[i]:
+-			print '\t', lhs, '::=',
+-			print string.join(rhs[:pos]),
+-			print '.',
+-			print string.join(rhs[pos:]),
+-			print ',', parent
++			print('\t', lhs, '::=', end=' ')
++			print(string.join(rhs[:pos]), end=' ')
++			print('.', end=' ')
++			print(string.join(rhs[pos:]), end=' ')
++			print(',', parent)
+ 		if i < len(tokens):
+-			print
+-			print 'token', str(tokens[i])
+-			print
++			print()
++			print('token', str(tokens[i]))
++			print()
+diff -up ./doc/latex/scanpages/replicate.py.py3 ./doc/latex/scanpages/replicate.py
+--- ./doc/latex/scanpages/replicate.py.py3	2019-08-18 09:24:16.753576091 -0400
++++ ./doc/latex/scanpages/replicate.py	2019-08-18 09:24:25.654361820 -0400
+@@ -10,7 +10,7 @@ with open(filename,'r') as f:
+ s='\n'.join(tmp)
+ tmp=s.split("%Repetitions=")
+ if len(tmp) != 2:
+-	print "Bailing! The file does not contain exactly one '%Repetitions='"
++	print("Bailing! The file does not contain exactly one '%Repetitions='")
+ 	sys.exit()
+ ss=tmp[1]
+ tmp2=ss.split('\n')
+@@ -18,7 +18,7 @@ numrep=int(tmp2[0])
+ #get variable names
+ tmp=s.split("%Variables=")
+ if len(tmp) != 2:
+-	print "Bailing! The file does not contain exactly one '%Variables='"
++	print("Bailing! The file does not contain exactly one '%Variables='")
+ 	sys.exit()
+ ss=tmp[1]
+ tmp2=ss.split('\n')
+@@ -35,7 +35,7 @@ for j in range(1,n):
+ 	vbles[j]=vbles[j].strip().replace("+",":")
+ 	x=vbles[j].split(":")
+ 	if len(x) != 3:
+-		print "Bad variable descriptor-- " + vbles[j]
++		print("Bad variable descriptor-- " + vbles[j])
+ 		sys.exit
+ 	vlst.append(x[0])
+ 	nnn=0
+diff -up ./tex/generic/pst-geo/data/convert.py.py3 ./tex/generic/pst-geo/data/convert.py
+--- ./tex/generic/pst-geo/data/convert.py.py3	2019-08-18 09:25:03.823442975 -0400
++++ ./tex/generic/pst-geo/data/convert.py	2019-08-18 09:25:09.578304446 -0400
+@@ -1,79 +1,87 @@
+ from string import *
+ 
+-input=open('cities.data','r')
+-output=open('cities.tex','w')
+-nZeile=["% (c) Herbert Voss <voss _at_ perce.de\n"]
++input = open('cities.data', 'r')
++output = open('cities.tex', 'w')
++nZeile = ["% (c) Herbert Voss <voss _at_ perce.de\n"]
++
++
+ def umlaut(instr):
+-    return translate(instr, maketrans('äöü ÄÖÜß', 'aou_AOUs'))
++    return translate(instr, maketrans('Ã¤Ã¶Ã¼ Ã„Ã–ÃœÃŸ', 'aou_AOUs'))
++
++
+ def process(zeile):
+-    stadt=rstrip(zeile[0:23])
+-    Kstadt=umlaut(stadt)
+-    Land=rstrip(zeile[24:56])
+-    if (Land=="Deutschland"):
+-	Land = "Germany"
+-    elif (Land[0:3]=="USA"):
+-	Land ="USA"
+-    elif (find(Land,"Australien")>-1):
+-	Land ="Australia"
+-    elif (find(Land,"Italien")>-1):
+-	Land ="Italy"
+-    elif (find(Land,"Frankreich")>-1):
+-	Land ="France"
+-    elif (find(Land,"nemark")>0):
+-	Land ="Denmark"
+-    elif (find(Land,"britannien")>0):
+-	Land ="GreatBritain"
+-    elif (find(Land,"Elfenbein")>-1):
+-	Land ="IvoryCoast"
+-    elif (find(Land,"Emirate")>-1):
+-	Land ="Emirates"
+-    elif (find(Land,"rkei")>-1):
+-	Land ="Turkey"
+-    elif (find(Land,"thiopien")>-1):
+-	Land ="Ethiopia"
+-    elif (find(Land,"gypten")>-1):
+-	Land ="Egypt"
+-    elif (find(Land,"sterreich")>-1):
+-	Land ="Austria"
+-    elif (find(Land,"dafrika")>-1):
+-	Land ="SouthAfrica"
+-    Grad=zeile[57:59]
+-    Minuten=zeile[61:63]
+-    Breitengrad=float(Grad) + float(Minuten)/60.0
+-    NS=zeile[65]
+-    if (NS=="S"):
+-	Breitengrad = -Breitengrad
+-    Grad=zeile[68:71]
+-    Minuten=zeile[73:75]
+-    Laengengrad=float(Grad) + float(Minuten)/60.0
+-    OW=zeile[77]
+-    if (OW=="W"):
+-	Laengengrad = -Laengengrad
+-    if (Kstadt!=stadt):
+-	Zeile="\\mapput("+str(Laengengrad)+","+str(Breitengrad)+")["+Kstadt+"]{"+stadt+"}["+Land+"]\n"
++    stadt = rstrip(zeile[0:23])
++    Kstadt = umlaut(stadt)
++    Land = rstrip(zeile[24:56])
++    if (Land == "Deutschland"):
++        Land = "Germany"
++    elif (Land[0:3] == "USA"):
++        Land = "USA"
++    elif (find(Land, "Australien") > -1):
++        Land = "Australia"
++    elif (find(Land, "Italien") > -1):
++        Land = "Italy"
++    elif (find(Land, "Frankreich") > -1):
++        Land = "France"
++    elif (find(Land, "nemark") > 0):
++        Land = "Denmark"
++    elif (find(Land, "britannien") > 0):
++        Land = "GreatBritain"
++    elif (find(Land, "Elfenbein") > -1):
++        Land = "IvoryCoast"
++    elif (find(Land, "Emirate") > -1):
++        Land = "Emirates"
++    elif (find(Land, "rkei") > -1):
++        Land = "Turkey"
++    elif (find(Land, "thiopien") > -1):
++        Land = "Ethiopia"
++    elif (find(Land, "gypten") > -1):
++        Land = "Egypt"
++    elif (find(Land, "sterreich") > -1):
++        Land = "Austria"
++    elif (find(Land, "dafrika") > -1):
++        Land = "SouthAfrica"
++    Grad = zeile[57:59]
++    Minuten = zeile[61:63]
++    Breitengrad = float(Grad) + float(Minuten)/60.0
++    NS = zeile[65]
++    if (NS == "S"):
++        Breitengrad = -Breitengrad
++    Grad = zeile[68:71]
++    Minuten = zeile[73:75]
++    Laengengrad = float(Grad) + float(Minuten)/60.0
++    OW = zeile[77]
++    if (OW == "W"):
++        Laengengrad = -Laengengrad
++    if (Kstadt != stadt):
++        Zeile = "\\mapput("+str(Laengengrad)+","+str(Breitengrad) + \
++            ")["+Kstadt+"]{"+stadt+"}["+Land+"]\n"
+ #	Zeile="\\mapput[90]("+str(Laengengrad)+","+str(Breitengrad)+")["+Kstadt+"]{"+stadt+"}["+Land+"]\n"
+     else:
+-	Zeile="\\mapput("+str(Laengengrad)+","+str(Breitengrad)+"){"+stadt+"}["+Land+"]\n"
++        Zeile = "\\mapput("+str(Laengengrad)+"," + \
++            str(Breitengrad)+"){"+stadt+"}["+Land+"]\n"
+ #	Zeile="\\mapput[90]("+str(Laengengrad)+","+str(Breitengrad)+"){"+stadt+"}["+Land+"]\n"
+     return Zeile
++
++
+ for line in input.readlines():
+     Zeile = process(line)
+-    if (find(Zeile,"Italy")>0):	# take Italy from the original file
+-	Zeile = "% "+Zeile
++    if (find(Zeile, "Italy") > 0):  # take Italy from the original file
++        Zeile = "% "+Zeile
+     nZeile.append(Zeile)
+-input=open('villesItalia.tex','r')
++input = open('villesItalia.tex', 'r')
+ nZeile.append("% Italy\n")
+ for line in input.readlines():
+-    if (find(line,"endinput")<0):
+-	Zeile=line[0:len(line)-1]+"[Italy]\n"
+-	nZeile.append(Zeile)
++    if (find(line, "endinput") < 0):
++        Zeile = line[0:len(line)-1]+"[Italy]\n"
++        nZeile.append(Zeile)
+ input.close()
+ nZeile.append("% France\n")
+-input=open('villesFrance.tex','r')
++input = open('villesFrance.tex', 'r')
+ for line in input.readlines():
+-    if (find(line,"endinput")<0):
+-	Zeile=line[0:len(line)-1]+"[France]\n"
+-	nZeile.append(Zeile)
++    if (find(line, "endinput") < 0):
++        Zeile = line[0:len(line)-1]+"[France]\n"
++        nZeile.append(Zeile)
+ output.writelines(nZeile)
+ nZeile.append("\\endinput\n")
+ input.close()
+diff -up ./doc/generic/enctex/unimap.py.py3 ./doc/generic/enctex/unimap.py
+--- ./doc/generic/enctex/unimap.py.py3	2019-08-18 09:40:33.996050750 -0400
++++ ./doc/generic/enctex/unimap.py	2019-08-18 09:41:02.573362799 -0400
+@@ -48,8 +48,6 @@ database = 'unimap.txt'    # Input file
+ output = 'utf8raw.tex'   # Output file
+ 
+ # Compatibility with Pyhton-2.1
+-if not __builtins__.__dict__.has_key('True'):
+-    True = 1; False = 0
+ if not __builtins__.__dict__.has_key('file'):
+     file = open
+ if not __builtins__.__dict__.has_key('dict'):

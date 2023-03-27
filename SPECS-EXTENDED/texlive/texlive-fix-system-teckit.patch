@@ -1,0 +1,16 @@
+diff -up source/m4/kpse-teckit-flags.m4.fix source/m4/kpse-teckit-flags.m4
+--- source/m4/kpse-teckit-flags.m4.fix	2015-07-28 21:46:52.411157717 -0400
++++ source/m4/kpse-teckit-flags.m4	2015-07-28 21:47:03.570090966 -0400
+@@ -20,9 +20,8 @@ _KPSE_LIB_FLAGS([teckit], [TECkit], [],
+ 
+ # KPSE_TECKIT_OPTIONS([WITH-SYSTEM])
+ # ----------------------------------
+-AC_DEFUN([KPSE_TECKIT_OPTIONS], [_KPSE_LIB_OPTIONS([teckit], [$1], [pkg-config])])
++AC_DEFUN([KPSE_TECKIT_OPTIONS], [_KPSE_LIB_OPTIONS([teckit], [$1])])
+ 
+ # KPSE_TECKIT_SYSTEM_FLAGS
+-# -------------------------
+-AC_DEFUN([KPSE_TECKIT_SYSTEM_FLAGS], [dnl
+-_KPSE_PKG_CONFIG_FLAGS([teckit], [teckit])])
++# ------------------------
++AC_DEFUN([KPSE_TECKIT_SYSTEM_FLAGS], [_KPSE_LIB_FLAGS_SYSTEM([teckit], [TECkit])])
