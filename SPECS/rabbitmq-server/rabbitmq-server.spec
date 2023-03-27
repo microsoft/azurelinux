@@ -83,8 +83,26 @@ mv deps/.hex/cache.ets.rmq deps/.hex/cache.ets
 # install rabbitmq-server
 %make_install PREFIX=%{_prefix} RMQ_ROOTDIR=%{_prefix}/lib/rabbitmq
 
+install -p -D -m 0755 ./scripts/rabbitmq-script-wrapper %{_sbindir}/rabbitmqctl
+install -p -D -m 0755 ./scripts/rabbitmq-script-wrapper %{_sbindir}/rabbitmq-server
+install -p -D -m 0755 ./scripts/rabbitmq-script-wrapper %{_sbindir}/rabbitmq-plugins
+install -p -D -m 0755 ./scripts/rabbitmq-script-wrapper %{_sbindir}/rabbitmq-diagnostics
+
+# Make necessary symlinks
+mkdir -p %{_prefix}/lib/rabbitmq/bin
+for app in rabbitmq-defaults rabbitmq-env rabbitmq-plugins rabbitmq-diagnostics rabbitmq-server rabbitmqctl ; do
+	ln -s %{_prefix}/lib/rabbitmq/lib/rabbitmq_server-%{version}/sbin/${app} %{_prefix}/lib/rabbitmq/bin/${app}
+done
+
 %files
-%license LICENSE
+%license LICENSE LICENSE-*
+%{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
+%{_libdir}/rabbitmq/bin/*
+%{_sbindir}/rabbitmqctl
+%{_sbindir}/rabbitmq-server
+%{_sbindir}/rabbitmq-plugins
+%{_sbindir}/rabbitmq-diagnostics
+
 
 
 %changelog
