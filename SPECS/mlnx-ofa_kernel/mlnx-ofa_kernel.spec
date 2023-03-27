@@ -60,8 +60,10 @@
 %{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
 
-%global MLNX_OFED_VERSION 5.6-1.0.3
-%global highest_supported_kernel 5.15.87.1
+# %global MLNX_OFED_VERSION 5.6-1.0.3
+%global MLNX_OFED_VERSION 5.8-1.1.2.1
+
+# %global highest_supported_kernel 5.15.102.1-1
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
