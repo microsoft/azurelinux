@@ -11,12 +11,7 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  ncurses-devel
-%if 0%{?rhel} >= 8
-BuildRequires:  %{_bindir}/pathfix.py
-BuildRequires:  platform-python
-%else
 BuildRequires:  python3
-%endif
 
 %description
 htop is an interactive text-mode process viewer for Linux, similar to
@@ -24,9 +19,6 @@ top(1).
 
 %prep
 %autosetup
-%if 0%{?rhel} >= 8
-pathfix.py -pni "%{_libexecdir}/platform-python" scripts/
-%endif
 
 %build
 autoreconf -vfi
