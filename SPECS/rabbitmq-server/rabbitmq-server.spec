@@ -81,7 +81,7 @@ mv deps/.hex/cache.erl.rmq deps/.hex/cache.erl
 mv deps/.hex/cache.ets.rmq deps/.hex/cache.ets
 
 # install rabbitmq-server
-%make_install
+%make_install PREFIX=%{_prefix} RMQ_ROOTDIR=%{_prefix}/lib/rabbitmq
 
 %files
 %license LICENSE
