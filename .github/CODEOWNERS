@@ -4,6 +4,12 @@
 # Modification to this file require admin approval.
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
 
+# Modifications to the build pipelines require admin approval.
+/pipelines/* @microsoft/cbl-mariner-admins
+
+# Modifications to the CredScan exceptions require admin approval.
+/.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
+
 # Modification to what is considered "core packages" require admin approval.
 /SPECS/core-packages/* @microsoft/cbl-mariner-admins
 

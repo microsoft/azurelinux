@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,7 @@ BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  python3-jinja2
+BuildRequires:  tpm2-tss-devel
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
 Requires:       %{name}-rpm-macros = %{version}-%{release}
@@ -246,6 +247,7 @@ fi
 %{_libdir}/sysctl.d
 %{_libdir}/tmpfiles.d
 /lib/*.so*
+/lib/cryptsetup/libcryptsetup-token-systemd-tpm2.so
 %{_libdir}/modprobe.d/systemd.conf
 %{_libdir}/sysusers.d/*
 %{_bindir}/*
@@ -277,6 +279,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Mar 03 2023 Dan Streetman <ddstreet@microsoft.com> - 250.3-15
+- Build with libtss to enable tpm2 support
+
 * Wed Jan 25 2023 Adit Jha <aditjha@microsoft.com> - 250.3-14
 - Add 99-mariner.preset to disable systemd-oomd by default
 

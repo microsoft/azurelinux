@@ -1,0 +1,43 @@
+From 4d8ca056c900cdb08556bbae2470ebb858369576 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 20 Jan 2023 14:26:50 +0100
+Subject: [PATCH] Adapt to curl-7.87.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+curl-7.87.0 added CURLOPTDEPRECATED and some other helping macros for
+hinting a compiler to produce deprecation warnings. Those are not
+constants for libcurl and clobbered generated curlopt-constants.c
+file:
+
+curlopt-constants.c:19:51: error: 'CURL_DEPRECATED' undeclared (first use in this function)
+   19 |             if (strEQ(name, "DEPRECATED")) return CURL_DEPRECATED;
+      |                                                   ^~~~~~~~~~~~~~~
+
+This patch adjusts curl.h parser in Makefile.PL to skip them.
+
+Backported by @mfrw on 2023-03-17
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+Signed-off-by: Muhammad Falak R Wanni <falakreyaz@gmail.com>
+---
+ Makefile.PL | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index b9e6a46..311b03a 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -127,7 +127,7 @@ if (!defined($curl_h)) {
+     close H;
+ 
+     for my $e (sort @syms) {
+-       if($e =~ /(OBSOLETE|^CURL_EXTERN|^CURL_WIN32\z|^CURLOPT\z|_LAST\z|_LASTENTRY\z)/) {
++       if($e =~ /(OBSOLETE|^CURL_DEPRECATED\z|^CURL_EXTERN|^CURL_IGNORE_DEPRECATION\z|^CURL_STRICTER\z|^CURL_WIN32\z|^CURLOPT\z|^CURLOPTDEPRECATED\z|_LAST\z|_LASTENTRY\z)/) {
+           next;
+        }
+        my ($group) = $e =~ m/^([^_]+_)/;
+-- 
+2.39.1
+

@@ -1,0 +1,30 @@
+From 5e19976cdd9b1a021d96d054ba159cb407c171ac Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Tue, 7 Feb 2023 16:02:01 -0500
+Subject: [PATCH 19/35] iscsi: Read initiatorname.iscsi.
+
+This is normally created by iscsi-init.service.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/iscsi.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+MSFT_TAG: upstreamed
+
+diff --git a/policy/modules/system/iscsi.te b/policy/modules/system/iscsi.te
+index 171bfe85a..cf70f6d3f 100644
+--- a/policy/modules/system/iscsi.te
++++ b/policy/modules/system/iscsi.te
+@@ -90,6 +90,8 @@ dev_rw_userio_dev(iscsid_t)
+ domain_use_interactive_fds(iscsid_t)
+ domain_dontaudit_read_all_domains_state(iscsid_t)
+ 
++files_read_etc_runtime_files(iscsid_t)
++
+ auth_use_nsswitch(iscsid_t)
+ 
+ init_stream_connect_script(iscsid_t)
+-- 
+2.34.1
+
