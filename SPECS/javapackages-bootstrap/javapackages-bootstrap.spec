@@ -25,13 +25,6 @@ Source0:        https://github.com/fedora-java/javapackages-bootstrap/releases/d
 # License breakdown
 Source1:        javapackages-bootstrap-PACKAGE-LICENSING
 
-# To obtain the following sources:
-# tar -xf ${name}-${version}.tar.xz
-# pushd ${name}-${version}
-# ./downstream.sh clone
-# ./downstream.sh prep
-# ./downstream.sh archive
-# The results are in the archive directory
 Source1002:     apache-pom.tar.xz
 Source1001:     ant.tar.xz
 Source1003:     apiguardian.tar.xz
