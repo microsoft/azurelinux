@@ -10,11 +10,11 @@ title: Flowchart key
 ---
 flowchart TD
     %% style definitions
-    classDef io fill:#247BA0,stroke:#247BA0,stroke-width:2px;
-    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
-    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
-    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
-    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
     %% node definitions
     input[/input or output/]:::io
@@ -31,13 +31,13 @@ Mariner is an RPM based distro. A single package (or RPM) is built using a combi
 ```mermaid
 flowchart LR
     %% style definitions
-    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
-    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
-    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
-    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
-    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
-    %% node definitions
+    %% nodes
     spec[/Spec/]:::io
     localSourceTar[/Local Sources if present/]:::io
     sigFile[/Signature file/]:::io
@@ -67,13 +67,13 @@ flowchart LR
 ```mermaid
 flowchart LR
     %% style definitions
-    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
-    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
-    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
-    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
-    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
-    %% node definitions
+    %% nodes
     buildTC[Build toolchain from scratch]:::process
     pullTC[Pull toolchain from remote]:::process
     tcRPMS[/Toolchain RPMs/]:::io
@@ -103,11 +103,11 @@ The tooling consists of a set of `Makefiles`, various go programs, a bootstrappi
 flowchart TD
 
     %% style definitions
-    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
-    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
-    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
-    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
-    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
     %% state nodes
     start(["Start (make toolchain)"]):::goodState
@@ -159,11 +159,11 @@ Package generation is discussed in detail [here](2_local_packages.md) and [here]
 flowchart TD
 
     %% style definitions
-    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
-    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
-    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
-    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
-    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
     %% state nodes
     start(["Start (make build-packages)"]):::goodState
@@ -257,11 +257,11 @@ Image generation is discussed in detail [here](4_image_generation.md). The image
 ```mermaid
 flowchart TD
     %% style definitions
-    classDef io fill:#247BA0,stroke:#333,stroke-width:2px;
-    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px;
-    classDef decision fill:#51344D,stroke:#333,stroke-width:2px;
-    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px;
-    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px;
+    classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
+    classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
+    classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
+    classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
+    classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
     %% state nodes
     start(["Start (make build-packages)"]):::goodState
