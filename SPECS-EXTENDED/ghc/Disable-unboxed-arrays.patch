@@ -1,0 +1,10 @@
+--- ghc-8.8.0.20190721/libraries/containers/containers/include/containers.h~	2019-06-26 20:39:26.000000000 +0000
++++ ghc-8.8.0.20190721/libraries/containers/containers/include/containers.h	2019-07-27 08:55:10.747060247 +0000
+@@ -35,7 +35,6 @@
+ 
+ #ifdef __GLASGOW_HASKELL__
+ # define USE_ST_MONAD 1
+-# define USE_UNBOXED_ARRAYS 1
+ #endif
+ 
+ #endif

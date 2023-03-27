@@ -1,0 +1,22 @@
+Description: Do not emit a warning if the .haddock file is missing
+ As it is quite common on Debian installations to install the -dev package
+ without the -doc package.
+Author: Joachim Breitner <nomeata@debian.org>
+
+Index: ghc-8.0.2/utils/ghc-pkg/Main.hs
+===================================================================
+--- ghc-8.0.2.orig/utils/ghc-pkg/Main.hs
++++ ghc-8.0.2/utils/ghc-pkg/Main.hs
+@@ -1588,8 +1588,10 @@
+   mapM_ (checkDir True  "dynamic-library-dirs") (libraryDynDirs pkg)
+   mapM_ (checkDir True  "include-dirs") (includeDirs pkg)
+   mapM_ (checkDir True  "framework-dirs") (frameworkDirs pkg)
+-  mapM_ (checkFile   True "haddock-interfaces") (haddockInterfaces pkg)
+-  mapM_ (checkDirURL True "haddock-html")       (haddockHTMLs pkg)
++  -- In Debian, it is quite normal that the package is installed without the
++  -- documentation. Do not print a warning there.
++  -- mapM_ (checkFile   True "haddock-interfaces") (haddockInterfaces pkg)
++  -- mapM_ (checkDirURL True "haddock-html")       (haddockHTMLs pkg)
+   checkDuplicateModules pkg
+   checkExposedModules db_stack pkg
+   checkOtherModules pkg

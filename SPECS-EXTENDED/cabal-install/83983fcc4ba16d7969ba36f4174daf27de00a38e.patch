@@ -1,0 +1,49 @@
+From 83983fcc4ba16d7969ba36f4174daf27de00a38e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20S=C3=BAkup?= <mimi.vx@gmail.com>
+Date: Thu, 10 Dec 2020 19:49:23 +0100
+Subject: [PATCH] Allow base16-bytestring 1.0 and newer
+
+---
+ cabal-install/cabal-install.cabal                  | 2 +-
+ cabal-install/src/Distribution/Client/HashValue.hs | 7 ++++++-
+ cabal-install/src/Distribution/Client/HttpUtils.hs | 5 +++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/cabal-install/cabal-install.cabal b/cabal-install/cabal-install.cabal
+index 70e936ffb0e..70bc12458ab 100644
+--- a/cabal-install/cabal-install.cabal
++++ b/cabal-install/cabal-install.cabal
+@@ -267,7 +267,7 @@ executable cabal
+         async      >= 2.0      && < 2.3,
+         array      >= 0.4      && < 0.6,
+         base       >= 4.8      && < 4.15,
+-        base16-bytestring >= 0.1.1 && < 0.2,
++        base16-bytestring >= 0.1.1 && < 1.1.0.0,
+         binary     >= 0.7.3    && < 0.9,
+         bytestring >= 0.10.6.0 && < 0.11,
+         Cabal      == 3.2.*,
+diff --git a/cabal-install/src/Distribution/Client/HashValue.hs b/cabal-install/src/Distribution/Client/HashValue.hs
+index d41c70bf480..abde9c909a9 100644
+--- a/cabal-install/Distribution/Client/HashValue.hs
++++ b/cabal-install/Distribution/Client/HashValue.hs
+@@ -1,3 +1,4 @@
++{-# LANGUAGE CPP                #-}
+ {-# LANGUAGE DeriveDataTypeable #-}
+ {-# LANGUAGE DeriveGeneric      #-}
+ module Distribution.Client.HashValue (
+@@ -71,10 +72,14 @@ hashFromTUF (Sec.Hash hashstr) =
+     --TODO: [code cleanup] either we should get TUF to use raw bytestrings or
+     -- perhaps we should also just use a base16 string as the internal rep.
+     case Base16.decode (BS.pack hashstr) of
++#if MIN_VERSION_base16_bytestring(1,0,0)
++      Right hash -> HashValue hash
++      Left _ -> error "hashFromTUF: cannot decode base16"
++#else
+       (hash, trailing) | not (BS.null hash) && BS.null trailing
+         -> HashValue hash
+       _ -> error "hashFromTUF: cannot decode base16 hash"
+-
++#endif
+ 
+ -- | Truncate a 32 byte SHA256 hash to
+ --

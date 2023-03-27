@@ -1,0 +1,14 @@
+_cabal-rpm()
+{
+    local CMDLINE
+    local IFS=$'\n'
+    CMDLINE=(--bash-completion-index $COMP_CWORD)
+
+    for arg in ${COMP_WORDS[@]}; do
+        CMDLINE=(${CMDLINE[@]} --bash-completion-word $arg)
+    done
+
+    COMPREPLY=( $(cabal-rpm "${CMDLINE[@]}") )
+}
+
+complete -o filenames -F _cabal-rpm cabal-rpm cblrpm

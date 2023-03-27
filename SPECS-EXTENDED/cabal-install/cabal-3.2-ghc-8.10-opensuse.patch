@@ -1,0 +1,344 @@
+diff --git a/cabal-install/Distribution/Client/CmdSdist.hs b/cabal-install/Distribution/Client/CmdSdist.hs
+index 9ce0c8010..a22317004 100644
+--- a/cabal-install/Distribution/Client/CmdSdist.hs
++++ b/cabal-install/Distribution/Client/CmdSdist.hs
+@@ -237,7 +237,10 @@ packageToSdist verbosity projectRootDir format outputFile pkg = do
+         (norm NoExec -> nonexec, norm Exec -> exec) <-
+            listPackageSources verbosity (flattenPackageDescription $ packageDescription pkg) knownSuffixHandlers
+ 
++        print $ map snd exec
++        print $ map snd nonexec
+         let files =  nub . sortOn snd $ nonexec ++ exec
++        print files
+ 
+         case format of
+             SourceList nulSep -> do
+diff --git a/cabal-install/Distribution/Client/FetchUtils.hs b/cabal-install/Distribution/Client/FetchUtils.hs
+index e9a31a91f..4e5e581f9 100644
+--- a/cabal-install/Distribution/Client/FetchUtils.hs
++++ b/cabal-install/Distribution/Client/FetchUtils.hs
+@@ -176,8 +176,8 @@ fetchRepoTarball verbosity' repoCtxt repo pkgid = do
+     verbosity = verboseUnmarkOutput verbosity'
+ 
+     downloadRepoPackage = case repo of
+-      RepoLocal{..} -> return (packageFile repo pkgid)
+-      RepoLocalNoIndex{..} -> return (packageFile repo pkgid)
++      RepoLocal{} -> return (packageFile repo pkgid)
++      RepoLocalNoIndex{} -> return (packageFile repo pkgid)
+ 
+       RepoRemote{..} -> do
+         transport <- repoContextGetTransport repoCtxt
+diff --git a/cabal-install/Distribution/Client/IndexUtils.hs b/cabal-install/Distribution/Client/IndexUtils.hs
+index a76becc05..bf0ff7cf5 100644
+--- a/cabal-install/Distribution/Client/IndexUtils.hs
++++ b/cabal-install/Distribution/Client/IndexUtils.hs
+@@ -634,7 +634,7 @@ withIndexEntries
+     -> ([IndexCacheEntry] -> IO a)
+     -> ([NoIndexCacheEntry] -> IO a)
+     -> IO a
+-withIndexEntries _ (RepoIndex repoCtxt repo@RepoSecure{..}) callback _ =
++withIndexEntries _ (RepoIndex repoCtxt repo@RepoSecure{}) callback _ =
+     repoContextWithSecureRepo repoCtxt repo $ \repoSecure ->
+       Sec.withIndex repoSecure $ \Sec.IndexCallbacks{..} -> do
+         -- Incrementally (lazily) read all the entries in the tar file in order,
+diff --git a/cabal-install/Distribution/Client/Sandbox.hs b/cabal-install/Distribution/Client/Sandbox.hs
+index 66b415d72..14bad3f21 100644
+--- a/cabal-install/Distribution/Client/Sandbox.hs
++++ b/cabal-install/Distribution/Client/Sandbox.hs
+@@ -666,7 +666,7 @@ reinstallAddSourceDeps :: Verbosity
+                           -> FilePath
+                           -> IO WereDepsReinstalled
+ reinstallAddSourceDeps verbosity configFlags' configExFlags
+-                       installFlags globalFlags sandboxDir = topHandler' $ do
++                       installFlags globalFlags sandboxDir = topHandlerWith errorMsg $ do
+   let sandboxDistPref     = sandboxBuildDir sandboxDir
+       configFlags         = configFlags'
+                             { configDistPref  = Flag sandboxDistPref }
+@@ -710,7 +710,8 @@ reinstallAddSourceDeps verbosity configFlags' configExFlags
+         ++ "offending packages or recreating the sandbox."
+       logMsg message rest = debugNoWrap verbosity message >> rest
+ 
+-      topHandler' = topHandlerWith $ \_ -> do
++      errorMsg :: a -> IO WereDepsReinstalled
++      errorMsg _ = do
+         warn verbosity "Couldn't reinstall some add-source dependencies."
+         -- Here we can't know whether any deps have been reinstalled, so we have
+         -- to be conservative.
+diff --git a/cabal-install/Distribution/Client/TargetSelector.hs b/cabal-install/Distribution/Client/TargetSelector.hs
+index 23d92f580..f8f683d98 100644
+--- a/cabal-install/Distribution/Client/TargetSelector.hs
++++ b/cabal-install/Distribution/Client/TargetSelector.hs
+@@ -222,7 +222,7 @@ readTargetSelectorsWith :: (Applicative m, Monad m) => DirActions m
+                         -> Maybe ComponentKindFilter
+                         -> [String]
+                         -> m (Either [TargetSelectorProblem] [TargetSelector])
+-readTargetSelectorsWith dirActions@DirActions{..} pkgs mfilter targetStrs =
++readTargetSelectorsWith dirActions@DirActions{} pkgs mfilter targetStrs =
+     case parseTargetStrings targetStrs of
+       ([], usertargets) -> do
+         usertargets' <- mapM (getTargetStringFileStatus dirActions) usertargets
+diff --git a/cabal-install/Distribution/Client/Update.hs b/cabal-install/Distribution/Client/Update.hs
+index 52bb1f76c..8ded78b9d 100644
+--- a/cabal-install/Distribution/Client/Update.hs
++++ b/cabal-install/Distribution/Client/Update.hs
+@@ -73,8 +73,8 @@ updateRepo :: Verbosity -> UpdateFlags -> RepoContext -> Repo -> IO ()
+ updateRepo verbosity updateFlags repoCtxt repo = do
+   transport <- repoContextGetTransport repoCtxt
+   case repo of
+-    RepoLocal{..} -> return ()
+-    RepoLocalNoIndex{..} -> return ()
++    RepoLocal{} -> return ()
++    RepoLocalNoIndex{} -> return ()
+     RepoRemote{..} -> do
+       downloadResult <- downloadIndex transport verbosity repoRemote repoLocalDir
+       case downloadResult of
+diff --git a/cabal-install/Distribution/Client/Utils/Json.hs b/cabal-install/Distribution/Client/Utils/Json.hs
+index 89a13af87..01d575313 100644
+--- a/cabal-install/Distribution/Client/Utils/Json.hs
++++ b/cabal-install/Distribution/Client/Utils/Json.hs
+@@ -15,12 +15,9 @@ module Distribution.Client.Utils.Json
+     )
+     where
+ 
+-import Data.Char
+-import Data.Int
+-import Data.String
+-import Data.Word
+-import Data.List
+-import Data.Monoid
++import Distribution.Client.Compat.Prelude
++
++import Data.Char (intToDigit)
+ 
+ import Data.ByteString.Builder (Builder)
+ import qualified Data.ByteString.Builder as BB
+@@ -135,13 +132,13 @@ encodeArrayBB :: [Value] -> Builder
+ encodeArrayBB [] = "[]"
+ encodeArrayBB jvs = BB.char8 '[' <> go jvs <> BB.char8 ']'
+   where
+-    go = Data.Monoid.mconcat . intersperse (BB.char8 ',') . map encodeValueBB
++    go = mconcat . intersperse (BB.char8 ',') . map encodeValueBB
+ 
+ encodeObjectBB :: Object -> Builder
+ encodeObjectBB [] = "{}"
+ encodeObjectBB jvs = BB.char8 '{' <> go jvs <> BB.char8 '}'
+   where
+-    go = Data.Monoid.mconcat . intersperse (BB.char8 ',') . map encPair
++    go = mconcat . intersperse (BB.char8 ',') . map encPair
+     encPair (l,x) = encodeStringBB l <> BB.char8 ':' <> encodeValueBB x
+ 
+ encodeStringBB :: String -> Builder
+diff --git a/cabal-install/Distribution/Solver/Modular/Assignment.hs b/cabal-install/Distribution/Solver/Modular/Assignment.hs
+index be5e63bfb..b05a099ec 100644
+--- a/cabal-install/Distribution/Solver/Modular/Assignment.hs
++++ b/cabal-install/Distribution/Solver/Modular/Assignment.hs
+@@ -9,10 +9,11 @@ module Distribution.Solver.Modular.Assignment
+ import Prelude ()
+ import Distribution.Solver.Compat.Prelude hiding (pi)
+ 
+-import Data.Array as A
+-import Data.List as L
+-import Data.Map as M
+-import Data.Maybe
++import qualified Data.Array as A
++import qualified Data.List as L
++import qualified Data.Map as M
++
++import Data.Maybe (fromJust)
+ 
+ import Distribution.PackageDescription (FlagAssignment, mkFlagAssignment) -- from Cabal
+ 
+@@ -79,7 +80,7 @@ toCPs (A pa fa sa) rdm =
+     -- Dependencies per package.
+     depp :: QPN -> [(Component, PI QPN)]
+     depp qpn = let v :: Vertex
+-                   v   = fromJust (cvm qpn)
++                   v   = fromJust (cvm qpn) -- TODO: why this is safe?
+                    dvs :: [(Component, Vertex)]
+                    dvs = tg A.! v
+                in L.map (\ (comp, dv) -> case vm dv of (_, x, _) -> (comp, PI x (pa M.! x))) dvs
+diff --git a/cabal-install/Distribution/Solver/Modular/Builder.hs b/cabal-install/Distribution/Solver/Modular/Builder.hs
+index eb11a36aa..5d196f4fd 100644
+--- a/cabal-install/Distribution/Solver/Modular/Builder.hs
++++ b/cabal-install/Distribution/Solver/Modular/Builder.hs
+@@ -19,10 +19,10 @@ module Distribution.Solver.Modular.Builder (
+ -- flag-guarded dependencies, we cannot introduce them immediately. Instead, we
+ -- store the entire dependency.
+ 
+-import Data.List as L
+-import Data.Map as M
+-import Data.Set as S
+-import Prelude hiding (sequence, mapM)
++import qualified Data.List as L
++import qualified Data.Map as M
++import qualified Data.Set as S
++import Prelude
+ 
+ import qualified Distribution.Solver.Modular.ConflictSet as CS
+ import Distribution.Solver.Modular.Dependency
+@@ -55,7 +55,7 @@ data BuildState = BS {
+ }
+ 
+ -- | Map of available linking targets.
+-type LinkingState = Map (PN, I) [PackagePath]
++type LinkingState = M.Map (PN, I) [PackagePath]
+ 
+ -- | Extend the set of open goals with the new goals listed.
+ --
+diff --git a/cabal-install/Distribution/Solver/Modular/Index.hs b/cabal-install/Distribution/Solver/Modular/Index.hs
+index fdddfc823..ac60fec7d 100644
+--- a/cabal-install/Distribution/Solver/Modular/Index.hs
++++ b/cabal-install/Distribution/Solver/Modular/Index.hs
+@@ -6,10 +6,12 @@ module Distribution.Solver.Modular.Index
+     , mkIndex
+     ) where
+ 
+-import Data.List as L
+-import Data.Map as M
+ import Prelude hiding (pi)
+ 
++import Data.Map (Map)
++import qualified Data.List as L
++import qualified Data.Map as M
++
+ import Distribution.Solver.Modular.Dependency
+ import Distribution.Solver.Modular.Flag
+ import Distribution.Solver.Modular.Package
+diff --git a/cabal-install/Distribution/Solver/Modular/IndexConversion.hs b/cabal-install/Distribution/Solver/Modular/IndexConversion.hs
+index c9565c80d..8e9ef6141 100644
+--- a/cabal-install/Distribution/Solver/Modular/IndexConversion.hs
++++ b/cabal-install/Distribution/Solver/Modular/IndexConversion.hs
+@@ -2,12 +2,12 @@ module Distribution.Solver.Modular.IndexConversion
+     ( convPIs
+     ) where
+ 
+-import Data.List as L
++import qualified Data.List as L
+ import Data.Map.Strict (Map)
+ import qualified Data.Map.Strict as M
+-import Data.Maybe
++import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
+ import Data.Monoid as Mon
+-import Data.Set as S
++import qualified Data.Set as S
+ 
+ import Distribution.Compiler
+ import Distribution.InstalledPackageInfo as IPI
+@@ -330,7 +330,7 @@ flagInfo (StrongFlags strfl) =
+ 
+ -- | Internal package names, which should not be interpreted as true
+ -- dependencies.
+-type IPNs = Set PN
++type IPNs = S.Set PN
+ 
+ -- | Convenience function to delete a 'Dependency' if it's
+ -- for a 'PN' that isn't actually real.
+diff --git a/cabal-install/Distribution/Solver/Modular/Solver.hs b/cabal-install/Distribution/Solver/Modular/Solver.hs
+index 324525505..e6aa1fb43 100644
+--- a/cabal-install/Distribution/Solver/Modular/Solver.hs
++++ b/cabal-install/Distribution/Solver/Modular/Solver.hs
+@@ -9,9 +9,9 @@ module Distribution.Solver.Modular.Solver
+     , PruneAfterFirstSuccess(..)
+     ) where
+ 
+-import Data.Map as M
+-import Data.List as L
+-import Data.Set as S
++import qualified Data.Map as M
++import qualified Data.List as L
++import qualified Data.Set as S
+ import Distribution.Verbosity
+ 
+ import Distribution.Compiler (CompilerInfo)
+@@ -91,8 +91,8 @@ solve :: SolverConfig                         -- ^ solver parameters
+       -> Index                                -- ^ all available packages as an index
+       -> PkgConfigDb                          -- ^ available pkg-config pkgs
+       -> (PN -> PackagePreferences)           -- ^ preferences
+-      -> Map PN [LabeledPackageConstraint]    -- ^ global constraints
+-      -> Set PN                               -- ^ global goals
++      -> M.Map PN [LabeledPackageConstraint]  -- ^ global constraints
++      -> S.Set PN                             -- ^ global goals
+       -> RetryLog Message SolverFailure (Assignment, RevDepMap)
+ solve sc cinfo idx pkgConfigDB userPrefs userConstraints userGoals =
+   explorePhase     $
+@@ -232,7 +232,7 @@ instance GSimpleTree (Tree d c) where
+ 
+       -- Show conflict set
+       goCS :: ConflictSet -> String
+-      goCS cs = "{" ++ (intercalate "," . L.map showVar . CS.toList $ cs) ++ "}"
++      goCS cs = "{" ++ (L.intercalate "," . L.map showVar . CS.toList $ cs) ++ "}"
+ #endif
+ 
+ -- | Replace all goal reasons with a dummy goal reason in the tree
+diff --git a/cabal-install/Distribution/Solver/Modular/Validate.hs b/cabal-install/Distribution/Solver/Modular/Validate.hs
+index 6195d101b..a3dec6e1f 100644
+--- a/cabal-install/Distribution/Solver/Modular/Validate.hs
++++ b/cabal-install/Distribution/Solver/Modular/Validate.hs
+@@ -15,11 +15,12 @@ module Distribution.Solver.Modular.Validate (validateTree) where
+ import Control.Applicative
+ import Control.Monad.Reader hiding (sequence)
+ import Data.Function (on)
+-import Data.List as L
+-import Data.Set as S
+ import Data.Traversable
+ import Prelude hiding (sequence)
+ 
++import qualified Data.List as L
++import qualified Data.Set as S
++
+ import Language.Haskell.Extension (Extension, Language)
+ 
+ import Data.Map.Strict as M
+diff --git a/cabal-install/bootstrap.sh b/cabal-install/bootstrap.sh
+index 077d7f4ef..d51416604 100755
+--- a/cabal-install/bootstrap.sh
++++ b/cabal-install/bootstrap.sh
+@@ -260,9 +260,9 @@ EDIT_DISTANCE_VER="0.2.2.1"; EDIT_DISTANCE_VER_REGEXP="0\.2\.2\.?"
+                        # 0.2.2.*
+ ED25519_VER="0.0.5.0"; ED25519_VER_REGEXP="0\.0\.?"
+                        # 0.0.*
+-HACKAGE_SECURITY_VER="0.6.0.0"; HACKAGE_SECURITY_VER_REGEXP="0\.6\."
+-                       # >= 0.7.0.0 && < 0.7
+-TAR_VER="0.5.1.0";     TAR_VER_REGEXP="0\.5\.([1-9]|1[0-9]|0\.[3-9]|0\.1[0-9])\.?"
++HACKAGE_SECURITY_VER="0.6.0.1"; HACKAGE_SECURITY_VER_REGEXP="0\.6\."
++                       # >= 0.6.0.0 && < 0.7
++TAR_VER="0.5.1.1";     TAR_VER_REGEXP="0\.5\.([1-9]|1[0-9]|0\.[3-9]|0\.1[0-9])\.?"
+                        # >= 0.5.0.3  && < 0.6
+ DIGEST_VER="0.0.1.2"; DIGEST_REGEXP="0\.0\.(1\.[2-9]|[2-9]\.?)"
+                        # >= 0.0.1.2 && < 0.1
+diff --git a/cabal-install/cabal-install.cabal b/cabal-install/cabal-install.cabal
+index 985ea9a5a..c9d713c29 100644
+--- a/cabal-install/cabal-install.cabal
++++ b/cabal-install/cabal-install.cabal
+@@ -316,7 +316,7 @@ executable cabal
+     build-depends:
+         async      >= 2.0      && < 2.3,
+         array      >= 0.4      && < 0.6,
+-        base       >= 4.8      && < 4.14,
++        base       >= 4.8      && < 4.15,
+         base16-bytestring >= 0.1.1 && < 0.2,
+         binary     >= 0.7.3    && < 0.9,
+         bytestring >= 0.10.6.0 && < 0.11,
+@@ -341,7 +341,7 @@ executable cabal
+         time       >= 1.5.0.1  && < 1.10,
+         transformers >= 0.4.2.0 && < 0.6,
+         zlib       >= 0.5.3    && < 0.7,
+-        hackage-security >= 0.6.0.0 && < 0.7,
++        hackage-security >= 0.6.0.1 && < 0.7,
+         text       >= 1.2.3    && < 1.3,
+         parsec     >= 3.1.13.0 && < 3.2
+ 
+diff --git a/cabal-install/tests/IntegrationTests2/targets/complex/q/q.cabal b/cabal-install/tests/IntegrationTests2/targets/complex/q/q.cabal
+index 556fa4a42..7ee22fcb2 100644
+--- a/cabal-install/tests/IntegrationTests2/targets/complex/q/q.cabal
++++ b/cabal-install/tests/IntegrationTests2/targets/complex/q/q.cabal
+@@ -5,7 +5,8 @@ cabal-version: >= 1.2
+ 
+ library
+   exposed-modules: Q
+-  build-depends: base, filepath
++  -- we rely that filepath has filepath-tests component
++  build-depends: base, filepath >=1.4.0.0
+ 
+ executable buildable-false
+   main-is: Main.hs

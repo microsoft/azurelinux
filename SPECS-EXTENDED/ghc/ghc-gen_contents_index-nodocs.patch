@@ -1,0 +1,11 @@
+--- ghc-8.6.5/libraries/gen_contents_index~	2020-02-24 15:02:26.318866694 +0800
++++ ghc-8.6.5/libraries/gen_contents_index	2020-04-09 18:18:40.290722327 +0800
+@@ -47,6 +47,8 @@
+                 HADDOCK_ARGS="$HADDOCK_ARGS $HADDOCK_ARG"
+     done
+ else
++    if ! ls */*.haddock &>/dev/null; then exit 0; fi
++
+     HADDOCK=/usr/bin/haddock
+     # We don't want the GHC API to swamp the index
+     HADDOCK_FILES=`ls -1 */*.haddock | grep -v '/ghc\.haddock' | sort`

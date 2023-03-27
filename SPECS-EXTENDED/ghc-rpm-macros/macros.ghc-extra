@@ -1,0 +1,121 @@
+# RPM Macros for packaging Haskell packages with multiple libs  -*-rpm-spec-*-
+
+# ghc_lib_subpackage [-c cdepslist] [-d] [-l licensetag] [-m] [-x] [name-version]
+# for backward compat also support: ghc_lib_subpackage name version
+%ghc_lib_subpackage(c:dl:mx)\
+%define pkgname %{?2:%{1}}%{!?2:%{lua:\
+local pv = rpm.expand("%1")\
+local _, _, name = string.find(pv, "^([%a%d-]+)-")\
+print(name)\
+}}\
+%define pkgver %{?2}%{!?2:%{lua:\
+local pv = rpm.expand("%1")\
+print(string.sub(pv, string.find(pv, "[%d.]+$")))\
+}}\
+%global ghc_subpackages_list %{?ghc_subpackages_list} %{pkgname}-%{pkgver}\
+%{!-x:%{?1:%global ghc_packages_list %{?ghc_packages_list} %{pkgname}-%{pkgver}}}\
+%define basepkg %{ghc_prefix}-%{pkgname}\
+%if 0%{!-m:1}\
+%package -n %{basepkg}\
+Summary:        Haskell %{pkgname} library\
+%{?1:Version:        %{pkgver}}\
+%{-l:License:        %{-l*}}\
+Url:            https://hackage.haskell.org/package/%{pkgname}\
+%{?ghc_pkg_obsoletes:Obsoletes:      %(echo "%{ghc_pkg_obsoletes}" | sed -e "s/\\(%{ghc_prefix}-[^, ]*\\)-devel/\\1/g")}\
+\
+%description -n %{basepkg}\
+This package provides the Haskell %{pkgname} library.\
+\
+%endif\
+%package -n %{basepkg}-devel\
+Summary:        Haskell %{pkgname} library development files\
+%{?1:Version:        %{pkgver}}\
+%{-l:License:        %{-l*}}\
+Provides:       %{basepkg}-static = %{pkgver}-%{release}\
+Provides:       %{basepkg}-static%{?_isa} = %{pkgver}-%{release}\
+Requires:       %{ghc_prefix}-compiler = %{ghc_version}%{?ghc_version_override:-%{release}}\
+%if 0%{!-m:1}\
+Requires:       %{ghc_prefix}-%{pkgname}%{?_isa} = %{pkgver}-%{release}\
+%endif\
+%{?ghc_pkg_c_deps:Requires:       %{ghc_pkg_c_deps}}\
+%{-c:Requires:       %{-c*}}\
+%{?ghc_pkg_obsoletes:Obsoletes:      %{ghc_pkg_obsoletes}}\
+\
+%description -n %{basepkg}-devel\
+This package provides the Haskell %{pkgname} library development files.\
+\
+%if 0%{!-m:1}\
+%if %{with haddock}\
+%package -n %{basepkg}-doc\
+Summary:        Haskell %{pkgname} library documentation\
+%{?1:Version:        %{pkgver}}\
+%{-l:License:        %{-l*}}\
+BuildArch:      noarch\
+Requires:       %{ghc_prefix}-filesystem\
+Supplements:    (%{basepkg}-devel and %{ghc_prefix}-doc)\
+\
+%description -n %{basepkg}-doc\
+This package provides the Haskell %{pkgname} library documentation.\
+%endif\
+\
+%if %{with ghc_prof}\
+%package -n %{basepkg}-prof\
+Summary:        Haskell %{pkgname} profiling library\
+%{?1:Version:        %{pkgver}}\
+%{-l:License:        %{-l*}}\
+Requires:       %{ghc_prefix}-%{pkgname}-devel%{?_isa} = %{pkgver}-%{release}\
+Supplements:    (%{basepkg}-devel and %{ghc_prefix}-prof)\
+\
+%description -n %{basepkg}-prof\
+This package provides the Haskell %{pkgname} profiling library.\
+%endif\
+\
+%files -n %{basepkg} -f %{!-d:%{pkgname}-%{pkgver}/}%{basepkg}.files\
+\
+%endif\
+%files -n %{basepkg}-devel -f %{!-d:%{pkgname}-%{pkgver}/}%{basepkg}-devel.files\
+%if 0%{!-m:1}\
+\
+%if %{with haddock}\
+%files -n %{basepkg}-doc -f %{!-d:%{pkgname}-%{pkgver}/}%{basepkg}-doc.files\
+%endif\
+\
+%if %{with ghc_prof}\
+%files -n %{basepkg}-prof -f %{!-d:%{pkgname}-%{pkgver}/}%{basepkg}-prof.files\
+%endif\
+%endif\
+%{nil}
+
+# ghc_libs_build [name-version] ...
+%ghc_libs_build()\
+HOME=$PWD\
+%global ghc_subpackaging 1\
+for i in %*; do\
+name=$(echo $i | sed -e "s/\\(.*\\)-.*/\\1/")\
+ver=$(echo $i | sed -e "s/.*-\\(.*\\)/\\1/")\
+cd $name-$ver\
+case $name in\
+haskell-platform)\
+%ghc_lib_build_without_haddock $name $ver\
+;;\
+*)\
+%ghc_lib_build $name $ver\
+./Setup register --inplace\
+;;\
+esac\
+cd ..\
+done\
+%{nil}
+
+# ghc_libs_install [name-version] ...
+%ghc_libs_install()\
+HOME=$PWD\
+args="%*"\
+for i in $args; do\
+cd $i\
+name=$(echo $i | sed -e "s/\\(.*\\)-.*/\\1/")\
+ver=$(echo $i | sed -e "s/.*-\\(.*\\)/\\1/")\
+%ghc_lib_install $name $ver\
+cd ..\
+done\
+%{nil}

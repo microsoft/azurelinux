@@ -1,0 +1,12 @@
+--- ghc-8.4.3/mk/warnings.mk~	2018-02-04 02:30:11.000000000 +0900
++++ ghc-8.4.3/mk/warnings.mk	2018-09-29 14:33:37.607884921 +0900
+@@ -1,6 +1,6 @@
+ # See Note [Order of warning flags].
+-SRC_CC_OPTS     += -Wall $(WERROR)
++#SRC_CC_OPTS     += -Wall $(WERROR)
+ SRC_HC_OPTS     += -Wall
+ # Don't add -Werror to SRC_HC_OPTS_STAGE0 (or SRC_HC_OPTS), because otherwise
+ # validate may unnecessarily fail when booting with an older compiler.
+ # It would be better to only exclude certain warnings from becoming errors
+
+Diff finished.  Sat Sep 29 14:35:43 2018

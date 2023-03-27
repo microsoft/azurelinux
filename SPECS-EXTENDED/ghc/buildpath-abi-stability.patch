@@ -1,0 +1,25 @@
+Forwarded to https://ghc.haskell.org/trac/ghc/ticket/10424
+
+Index: ghc-8.10.1/compiler/iface/MkIface.hs
+===================================================================
+--- ghc-8.10.1.orig/compiler/iface/MkIface.hs
++++ ghc-8.10.1/compiler/iface/MkIface.hs
+@@ -679,7 +679,7 @@
+    iface_hash <- computeFingerprint putNameLiterally
+                       (mod_hash,
+                        ann_fn (mkVarOcc "module"),  -- See mkIfaceAnnCache
+-                       mi_usages iface0,
++                       usages,
+                        sorted_deps,
+                        mi_hpc iface0)
+ 
+@@ -714,6 +714,9 @@
+     (non_orph_rules, orph_rules) = mkOrphMap ifRuleOrph    (mi_rules iface0)
+     (non_orph_fis,   orph_fis)   = mkOrphMap ifFamInstOrph (mi_fam_insts iface0)
+     ann_fn = mkIfaceAnnCache (mi_anns iface0)
++    -- Do not allow filenames to affect the interface
++    usages = [ case u of UsageFile _ fp -> UsageFile "" fp; _ -> u | u <- mi_usages iface0 ]
++
+ 
+ -- | Retrieve the orphan hashes 'mi_orphan_hash' for a list of modules
+ -- (in particular, the orphan modules which are transitively imported by the

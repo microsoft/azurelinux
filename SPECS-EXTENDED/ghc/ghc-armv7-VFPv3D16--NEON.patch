@@ -1,0 +1,11 @@
+--- ghc-7.8.3/aclocal.m4~	2014-07-10 13:27:16.000000000 +0900
++++ ghc-7.8.3/aclocal.m4	2014-11-05 12:19:08.530044128 +0900
+@@ -408,7 +408,7 @@
+                 )],
+                 [changequote(, )dnl
+                  ARM_ISA=ARMv7
+-                 ARM_ISA_EXT="[VFPv3,NEON]"
++                 ARM_ISA_EXT="[VFPv3D16]"
+                  changequote([, ])dnl
+                 ])
+         ])

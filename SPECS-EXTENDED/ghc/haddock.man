@@ -1,0 +1,231 @@
+.TH HADDOCK 1 "July 2010" "Haddock, version 2.6.1" "Haddock documentation generator"
+
+
+.SH NAME
+haddock \- documentation tool for annotated Haskell source code
+
+
+.SH SYNOPSIS
+.B haddock
+.RI [ options ] " file" ...
+
+
+.SH DESCRIPTION
+This manual page documents briefly the
+.B haddock
+command.
+Extensive documentation is available in various other formats including DVI,
+PostScript and HTML; see below.
+
+.PP
+.I file
+is a filename containing a Haskell source module.
+All the modules specified on the command line will be processed together.
+When one module refers to an entity in another module being processed, the
+documentation will link directly to that entity.
+
+Entities that cannot be found, for example because they are in a module that
+is not being processed as part of the current batch, simply will not be
+hyperlinked in the generated documentation.
+.B haddock
+will emit warnings listing all the identifiers it could not resolve.
+
+The modules should not be mutually recursive, as
+.B haddock
+does not like swimming in circles.
+
+
+.SH OPTIONS
+The programs follow the usual GNU command line syntax, with long
+options starting with two dashes (`--').
+A summary of options is included below.
+For a complete description, see the other documentation.
+
+.TP
+\fB\-o \fIDIR\fP, \-\-odir=\fIDIR\fP
+directory in which to put the output files
+
+.TP
+\fB\-i \fIFILE\fP, \-\-read-interface=\fIFILE\fP
+read an interface from 
+.IR FILE .
+
+.TP
+\fB\-D \fIFILE\fP, \-\-dump\-interface=\fIFILE\fP
+dump an interface for these modules in  
+.IR FILE .
+
+.TP
+\fB\-l \fIDIR\fP, \-\-lib=\fIDIR\fP
+location of Haddock's auxiliary files
+
+.TP
+.BR \-h ", " \-\-html
+Generate documentation in HTML format.
+Several files will be generated into the current directory (or the specified
+directory if the 
+.B \-o
+option is given), including the following:
+.RS
+.TP
+.I index.html
+The top level page of the documentation:
+lists the modules available, using indentation to represent the hierarchy if
+the modules are hierarchical.
+.TP
+.I haddock.css
+The stylesheet used by the generated HTML.
+Feel free to modify this to change the colors or layout, or even specify
+your own stylesheet using the
+.B \-\-css
+option.
+.TP
+.I module.html
+An HTML page for each module.
+.TP
+.IR doc-index.html ", " doc-index-XX.html
+The index, split into two (functions/constructors and types/classes, as per
+Haskell namespaces) and further split alphabetically.
+.RE
+
+.TP
+.B \-\-hoogle
+output for Hoogle
+
+.TP
+\fB\-\-html\-help=\fIformat
+produce index and table of contents in mshelp, mshelp2 or devhelp format 
+(with \fI\-h\fP)
+
+.TP
+\fB\-\-source\-base=\fPURL
+Include links to the source files in the generated documentation, where URL
+is the base URL where the source files can be found.
+
+.TP
+\fB\-s \fPURL, \fB\-\-source\-module=\fPURL
+Include links to the source files in the generated documentation, where URL
+is a source code link for each module (using the %{FILE} or %{MODULE} vars).
+
+.TP
+\fB\-\-source\-entity=\fPURL
+Include links to the source files in the generated documentation, where URL
+is a source code link for each entity (using the %{FILE}, %{MODULE} or %{NAME} vars).
+
+.TP
+\fB\-\-comments\-base=\fPURL
+URL for a comments link on the contents and index pages.
+.TP
+\fB\-\-comments\-module=\fPURL
+URL for a comments link for each module (using the %{MODULE} var).
+.TP
+\fB\-\-comments\-entity=\fPURL
+URL for a comments link for each entity (using the %{FILE}, %{MODULE} or %{NAME} vars).
+.TP
+.BI \-\-css= FILE
+Use the CSS
+.I FILE
+instead of the default stylesheet that comes with
+.B haddock 
+for HTML output. It should specify certain classes: see the default stylesheet for details.
+
+.TP
+\fB\-p \fIFILE\fP, \-\-prologue=\fIFILE\fP
+Specify a file containing prologue text.
+
+.TP
+\fB\-t \fITITLE\fP, \-\-title=\fITITLE\fP
+Use \fITITLE\fP as the page heading for each page in the documentation.
+This will normally be the name of the library being documented.
+
+The title should be a plain string (no markup please!).
+
+.TP
+\fB\-k \fINAME\fP, \-\-package=\fINAME\fP
+Specify the package name (optional).
+
+.TP
+.BR \-n ", " \-\-no\-implicit\-prelude  
+do not assume Prelude is imported
+
+.TP
+.BR \-d ", " \-\-debug
+Enable extra debugging output.
+
+.TP
+.BR \-? ", " \-\-help
+Display help.
+
+.TP
+.BR \-V ", " \-\-version
+Display version.
+
+.TP
+.BR \-v ", " \-\-verbose
+Verbose status reporting.
+
+.TP
+\fB\-\-use\-contents=\fPURL
+Use a separately-generated HTML contents page.
+
+.TP
+.B \-\-gen\-contents
+Generate an HTML contents from specified  interfaces.
+
+.TP
+\fB\-\-use\-index=\fPURL
+Use a separately-generated HTML index.
+
+.TP
+.B \-\-gen\-index
+Generate an HTML index from specified interfaces.
+
+.TP
+.B \-\-ignore\-all\-exports   
+Behave as if all modules have the ignore-exports atribute
+
+.TP
+\fB\-\-hide=\fIMODULE
+Behave as if \fIMODULE\fP has the hide attribute.
+
+.TP
+\fB\-\-use\-package=\fIPACKAGE 
+The modules being processed depend on \fIPACKAGE\fP.
+
+.SH FILES
+.I /usr/bin/haddock
+.br
+.I /usr/share/haddock-2.6.1/html/plus.gif
+.br
+.I /usr/share/haddock-2.6.1/html/minus.gif
+.br
+.I /usr/share/haddock-2.6.1/html/haskell_icon.gif
+.br
+.I /usr/share/haddock-2.6.1/html/haddock.js
+.br
+.I /usr/share/haddock-2.6.1/html/haddock.css
+.br
+.I /usr/share/haddock-2.6.1/html/haddock-DEBUG.css
+
+.SH SEE ALSO
+.IR /usr/share/doc/haddock/ ,
+.br
+the Haddock homepage
+.UR http://haskell.org/haddock/
+(http://haskell.org/haddock/)
+.UE
+
+.SH COPYRIGHT
+Haddock version 2.6.1
+
+Copyright 2006-2010  Simon Marlow <simonmar@microsoft.com>, Dawid Waern <david.waern@gmail.com>.
+All rights reserved.
+
+
+.SH AUTHOR
+This manual page was written by Michael Weber <michaelw@debian.org>
+for the Debian GNU/Linux system (but may be used by others).
+
+.\" Local variables:
+.\" mode: nroff
+.\" End:

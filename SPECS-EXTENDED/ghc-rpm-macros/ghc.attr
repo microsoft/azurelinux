@@ -1,0 +1,3 @@
+%__ghc_provides	%{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot} %{ghclibdir} %{?ghc_name:ghc-%{ghc_version}}
+%__ghc_requires	%{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot} %{ghclibdir} %{?ghc_name:ghc-%{ghc_version}}
+%__ghc_path	^(%{ghcliblib}/package.conf.d/.*\.conf|%{ghclibplatform}/.*/libHS.*_p\.a)$

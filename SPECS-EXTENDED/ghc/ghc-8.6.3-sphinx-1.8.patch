@@ -1,0 +1,35 @@
+--- ghc-8.6.3/docs/users_guide/flags.py~	2018-09-21 06:18:23.000000000 +0800
++++ ghc-8.6.3/docs/users_guide/flags.py	2019-03-05 10:20:38.639782096 +0800
+@@ -49,6 +49,8 @@
+ import sphinx
+ from sphinx import addnodes
+ from sphinx.domains.std import GenericObject
++from sphinx.domains import ObjType
++from sphinx.roles import XRefRole
+ from sphinx.errors import SphinxError
+ from distutils.version import LooseVersion
+ from utils import build_table_from_list
+@@ -603,14 +605,21 @@
+     sphinx_version = LooseVersion(sphinx.__version__)
+     override_arg = {'override': True} if sphinx_version >= LooseVersion('1.8') else {}
+ 
++    # Yuck: We can't use app.add_object_type since we need to provide the
++    # Directive instance ourselves.
++    std_object_types = app.registry.domain_object_types.setdefault('std', {})
++ 
+     # Add ghc-flag directive, and override the class with our own
+-    app.add_object_type('ghc-flag', 'ghc-flag')
+     app.add_directive_to_domain('std', 'ghc-flag', Flag, **override_arg)
++    app.add_role_to_domain('std', 'ghc-flag', XRefRole())
++    std_object_types['ghc-flag'] = ObjType('ghc-flag', 'ghc-flag')
+ 
+     # Add extension directive, and override the class with our own
+-    app.add_object_type('extension', 'extension')
+     app.add_directive_to_domain('std', 'extension', LanguageExtension,
+                                 **override_arg)
++    app.add_role_to_domain('std', 'extension', XRefRole())
++    std_object_types['extension'] = ObjType('ghc-flag', 'ghc-flag')
++
+     # NB: language-extension would be misinterpreted by sphinx, and produce
+     # lang="extensions" XML attributes
+ 

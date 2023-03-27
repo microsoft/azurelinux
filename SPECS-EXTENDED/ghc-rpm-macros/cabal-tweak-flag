@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# TODO:
+# support setting flag when no upstream default
+
+set -e +x
+
+function fail {
+    echo "$0: $1" >&2
+    exit 1
+}
+
+USAGE="Usage: $0 FLAG [True|False]"
+
+if [ $# -ne 2 ]; then
+    fail "$USAGE"
+fi
+
+FLAG=$1
+
+NEW=$2
+case $NEW in
+    True) OLD=False ;;
+    False) OLD=True ;;
+    *) echo "Flag value can only be set to True or False" ; exit 1 ;;
+esac
+
+CABALFILE=$(ls *.cabal)
+
+if [ $(echo $CABALFILE | wc -w) -ne 1 ]; then
+   fail "There needs to be one .cabal file in the current dir!"
+fi
+
+if ! grep -q -i "^flag *$FLAG" $CABALFILE; then
+   fail "$CABALFILE does not have flag $FLAG"
+fi
+
+if ! grep -A3 -i "^flag *$FLAG" $CABALFILE | grep -q -i "default:"; then
+   fail "$CABALFILE: $FLAG flag might not have a default"
+fi
+
+if ! grep -A3 -i "^flag *$FLAG" $CABALFILE | grep -q -i "default: *$OLD"; then
+   fail "$CABALFILE: $FLAG flag already defaults to $NEW"
+fi
+
+if [ ! -f $CABALFILE.orig ]; then
+    BACKUP=.orig
+fi
+
+sed -i$BACKUP -e "/[Ff]lag *$FLAG/,/[Dd]efault: *$OLD/ s/\( \+\)\([Dd]efault:[ \t]*\)$OLD/\1\2$NEW\n\1manual: True/" $CABALFILE

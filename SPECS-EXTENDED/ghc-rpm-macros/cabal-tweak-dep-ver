@@ -1,0 +1,36 @@
+#!/bin/sh
+
+set -e +x
+
+function fail {
+    echo "$0: $1" >&2
+    exit 1
+}
+
+USAGE="Usage: $0 dep old new"
+
+if [ $# -ne 3 ]; then
+    fail "$USAGE"
+fi
+
+DEP=$1
+OLD=$(echo $2 | sed -e "s/*/\\\\*/g" -e "s/\./\\\\./g")
+NEW=$3
+
+CABALFILE=$(ls *.cabal)
+
+if [ $(echo $CABALFILE | wc -w) -ne 1 ]; then
+   fail "There needs to be one .cabal file in the current dir!"
+fi
+
+BREAK=[^[:alnum:]-]
+
+if ! grep -q "$BREAK$DEP$BREAK[^,]*$OLD" $CABALFILE; then
+   fail "$CABALFILE does not match: $DEP $OLD"
+fi
+
+if [ ! -f $CABALFILE.orig ]; then
+    BACKUP=.orig
+fi
+
+sed -i$BACKUP -e "s/\($BREAK$DEP$BREAK[^,]*\)$OLD/\1$NEW/g" $CABALFILE

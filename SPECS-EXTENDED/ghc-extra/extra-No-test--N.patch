@@ -1,0 +1,11 @@
+--- extra-1.5.3/extra.cabal~	2017-06-13 06:58:38.000000000 +0900
++++ extra-1.5.3/extra.cabal	2018-01-09 20:24:52.221337034 +0900
+@@ -74,7 +74,7 @@
+     if !os(windows)
+         build-depends: unix
+     hs-source-dirs: test
+-    ghc-options: -main-is Test -threaded "-with-rtsopts=-N4 -K1K"
++    ghc-options: -main-is Test -threaded "-with-rtsopts=-K1K"
+     main-is:        Test.hs
+     other-modules:
+         TestCustom

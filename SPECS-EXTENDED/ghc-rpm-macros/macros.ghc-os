@@ -1,0 +1,13 @@
+# OS specific settings
+
+%_ghcdocdir %{_ghclicensedir}/%{name}
+
+%_ghcdynlibdir %{_libdir}
+
+%ghc_without_dynamic 1
+
+# enable profiling libraries in prof subpkgs
+%with_ghc_prof 1
+
+# enable library documentation in doc subpkgs
+%with_haddock 1

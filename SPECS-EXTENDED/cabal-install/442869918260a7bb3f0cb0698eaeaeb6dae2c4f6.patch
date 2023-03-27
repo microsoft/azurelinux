@@ -1,0 +1,38 @@
+From 442869918260a7bb3f0cb0698eaeaeb6dae2c4f6 Mon Sep 17 00:00:00 2001
+From: Alexis Williams <alexis@typedr.at>
+Date: Sat, 21 Dec 2019 09:50:12 -0800
+Subject: [PATCH] Fix `v2-sdist` permissions
+
+Fixes #5813.
+---
+ cabal-install/Distribution/Client/CmdSdist.hs | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/cabal-install/Distribution/Client/CmdSdist.hs b/cabal-install/Distribution/Client/CmdSdist.hs
+index 55d01ad24a..218da6b720 100644
+--- a/cabal-install/Distribution/Client/CmdSdist.hs
++++ b/cabal-install/Distribution/Client/CmdSdist.hs
+@@ -75,7 +75,8 @@ import Data.List
+ import qualified Data.Set as Set
+ import System.Directory
+     ( getCurrentDirectory, setCurrentDirectory
+-    , createDirectoryIfMissing, makeAbsolute )
++    , createDirectoryIfMissing, makeAbsolute
++    , getPermissions, executable )
+ import System.FilePath
+     ( (</>), (<.>), makeRelative, normalise, takeDirectory )
+ 
+@@ -281,10 +282,11 @@ packageToSdist verbosity projectRootDir format outputFile pkg = do
+                             Right path -> tell [Tar.directoryEntry path]
+ 
+                         for_ files $ \(perm, file) -> do
++                            realPerm <- liftIO $ getPermissions file
+                             let fileDir = takeDirectory (prefix </> file)
+                                 perm' = case perm of
+-                                    Exec -> Tar.executableFilePermissions
+-                                    NoExec -> Tar.ordinaryFilePermissions
++                                    Exec | executable realPerm -> Tar.executableFilePermissions
++                                    _                          -> Tar.ordinaryFilePermissions
+                             needsEntry <- gets (Set.notMember fileDir)
+ 
+                             when needsEntry $ do

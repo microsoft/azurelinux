@@ -1,0 +1,22 @@
+#!/bin/sh
+
+[ $# -lt 1 ] && echo "Usage: `basename $0` %{buildroot}%{ghclibdir} ..." && exit 1
+
+set +x
+
+PKGBASEDIR=$1
+shift
+if [ -d $PKGBASEDIR/lib ];
+then PKGCONFDIR=$PKGBASEDIR/lib/package.conf.d
+else PKGCONFDIR=$PKGBASEDIR/package.conf.d
+fi
+
+# for a ghc build use the new ghc-pkg
+if [ -x "$PKGBASEDIR/bin/ghc-pkg" ]; then
+    GHC_PKG="env LD_LIBRARY_PATH=$(dirname $PKGBASEDIR) $PKGBASEDIR/bin/ghc-pkg --global-package-db=$PKGCONFDIR"
+else
+    GHC_VER=$(basename $PKGBASEDIR | sed -e s/ghc-//)
+    GHC_PKG="/usr/bin/ghc-pkg-${GHC_VER} -f $PKGCONFDIR"
+fi
+
+$GHC_PKG -v0 --simple-output $* | uniq
