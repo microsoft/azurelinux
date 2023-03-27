@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.7.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
+Patch0:    CVE-2023-25165.patch
 BuildRequires:  golang
 BuildRequires:  patch
 Requires:       %{name}-acmesolver
@@ -111,6 +112,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Mon Mar 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-8
+- Add patch for CVE-2023-25165
+
 * Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-7
 - Bump release to rebuild with go 1.19.6
 
