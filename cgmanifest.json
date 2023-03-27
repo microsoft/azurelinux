@@ -1497,8 +1497,8 @@
         "type": "other",
         "other": {
           "name": "ccache",
-          "version": "4.6",
-          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.6/ccache-4.6.tar.gz"
+          "version": "4.8",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.8/ccache-4.8.tar.gz"
         }
       }
     },
@@ -29129,6 +29129,16 @@
           "name": "whois",
           "version": "5.5.15",
           "downloadUrl": "http://ftp.debian.org/debian/pool/main/w/whois/whois_5.5.15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wireguard-tools",
+          "version": "1.0.20210914",
+          "downloadUrl": "https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-1.0.20210914.tar.xz"
         }
       }
     },
