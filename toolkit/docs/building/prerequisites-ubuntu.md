@@ -3,7 +3,7 @@
 
 ## Requirements were validated on `Ubuntu 18.04`
 
-Requirements for building images with a toolkit:
+This page lists host machine requirements for building with the CBL-Mariner toolkit. They cover building the toolchain, packages, and images on an Ubuntu 18.04 host.
 
 ```bash
 # Add a backports repo in order to install the latest version of Go.
@@ -11,15 +11,25 @@ sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
 
 # Install required dependencies.
-sudo apt -y install git make tar wget curl rpm qemu-utils golang-1.17-go genisoimage python-minimal bison gawk parted
-
 # Recommended but not required: `pigz` for faster compression operations.
-sudo apt -y install pigz
+sudo apt -y install \
+    curl \
+    gawk \
+    genisoimage \
+    git \
+    golang-1.17-go \
+    make \
+    parted \
+    pigz \
+    qemu-utils \
+    rpm \
+    tar \
+    wget
 
 # Fix go 1.17 link
 sudo ln -vsf /usr/lib/go-1.17/bin/go /usr/bin/go
 
-# Install Docker.
+# Install and configure Docker.
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER

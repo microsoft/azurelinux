@@ -957,7 +957,7 @@ selinux_relabel()
 check_fence_kdump_config()
 {
 	local hostname=`hostname`
-	local ipaddrs=`hostname -I`
+	local ipaddrs=`hostname -i`
 	local nodes=$(get_option_value "fence_kdump_nodes")
 
 	for node in $nodes; do

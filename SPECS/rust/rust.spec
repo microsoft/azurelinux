@@ -1,25 +1,29 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
+# Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2022-05-19
-%define stage0_version 1.61.0
+%define release_date 2023-02-09
+%define stage0_version 1.67.1
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.62.1
-Release:        4%{?dist}
+Version:        1.68.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
+# Notes: 
+#  - rust source official repo is https://github.com/rust-lang/rust
+#  - cargo source official repo is https://github.com/rust-lang/cargo
+#  - crates.io source official repo is https://github.com/rust-lang/crates.io
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
-Source1:        %{name}-%{version}-src-cargo.tar.gz
+Source1:        rustc-%{version}-src-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
@@ -28,18 +32,29 @@ Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 BuildRequires:  binutils
 BuildRequires:  cmake
+# make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
+# make sure rust relies on libgit2 from CBL-Mariner (instead of using its vendored flavor)
+BuildRequires:  libgit2-devel
+# make sure rust relies on nghttp2 from CBL-Mariner (instead of using its vendored flavor)
+BuildRequires:  nghttp2-devel
 BuildRequires:  ninja-build
+# make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
+BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
+Requires:       curl
 Requires:       gcc
 Requires:       glibc-devel
+Requires:       libgit2
+Requires:       nghttp2
+Requires:       openssl
 Provides:       cargo = %{version}-%{release}
 
 %description
@@ -97,6 +112,9 @@ USER=root SUDO_USER=root %make_build
 
 %check
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+# remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
+rm -v ./tests/rustdoc-ui/issue-98690.*
 %make_build check
 
 %install
@@ -116,6 +134,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
 %{_libexecdir}/cargo-credential-1password
+%{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
 %{_bindir}/cargo
@@ -131,10 +150,12 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
-%{_docdir}/%{name}/html/.stamp
 %{_mandir}/man1/*
 
 %changelog
+* Mon Mar 13 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.68.0-1
+- Updating to version 1.68.0
+
 * Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62.1-4
 - Split out separate 'doc' subpackage to reduce default package size.
 - Updated license information.
