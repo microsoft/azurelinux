@@ -1,7 +1,6 @@
 {
     "Signatures": {
-     "maven-surefire-3.0.0.tar.gz": "3a8ab67869ac4b83cde22ca23b68140b2b46feb7d970db95e42923eb95f9f908",
-     "cpl-v10.html":"dde4c2b665c81a60a6dec39beb54b89836ae071e552d935a04880f9d5a2e58cd",
-     "generate-tarball.sh":"b223db29e37a7bfd28678bc01b63131e28158e97568ca8d3a4d870256d0bddcf"
+     "maven-surefire-3.0.0.tar.gz": "6da606110e640dbee09c91290d5b5396f5f8ad692005a19c85c8fe258f7e4055",
+     "cpl-v10.html":"dde4c2b665c81a60a6dec39beb54b89836ae071e552d935a04880f9d5a2e58cd"
     }
    }

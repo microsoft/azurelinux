@@ -10,8 +10,6 @@ Distribution:   Mariner
 URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
-# Remove bundled binaries which cannot be easily verified for licensing
-Source1:        generate-tarball.sh
 Source2:        cpl-v10.html
 Patch1:         0001-Port-to-TestNG-6.11.patch
 Patch2:         0002-Disable-JUnit-4.8-test-grouping.patch

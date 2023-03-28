@@ -8,8 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/google/guice
 # ./create-tarball.sh %%{version}
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.xz
-Source1:        create-tarball.sh
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
