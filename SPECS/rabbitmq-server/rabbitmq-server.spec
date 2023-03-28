@@ -96,7 +96,7 @@ done
 
 %files
 %license LICENSE LICENSE-*
-%dir %{_libdir}/rabbitmq/lib/
+%{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 
 
