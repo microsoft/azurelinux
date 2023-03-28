@@ -20,8 +20,8 @@
 # Use the erlang.mk from rabbitmq-server, this is overkill for our use case
 # but the defines/macros we are using are so tangled that this is the easiest 
 # short term solution.
-# This file can be obtained by running the following git command:
-#   
+# This file can be obtained by running the following command:
+#   wget https://github.com/rabbitmq/rabbitmq-server/blob/main/erlang.mk
 include erlang.mk
 
 # erlang function used to convert cache.ets to cache.erl
