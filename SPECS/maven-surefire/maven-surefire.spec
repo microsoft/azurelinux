@@ -147,7 +147,7 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %license LICENSE NOTICE cpl-v10.html
 
 %changelog
-* Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
+* Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified
 

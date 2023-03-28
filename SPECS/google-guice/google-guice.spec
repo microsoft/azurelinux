@@ -105,7 +105,7 @@ and above. This package provides Bill of Materials module for Guice.
 %{?javadoc_package}
 
 %prep
-%setup -q
+%setup -q -n guice-%{version}
 
 # We don't have struts2 in Fedora yet.
 %pom_disable_module struts2 extensions
