@@ -4659,6 +4659,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "google-guice",
+          "version": "4.2.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/google-guice-4.2.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "google-noto-cjk-fonts",
           "version": "20190416",
           "downloadUrl": "https://github.com/googlei18n/noto-cjk/archive/be6c059ac1587e556e2412b27f5155c8eb3ddbe6.tar.gz"
@@ -12740,9 +12750,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven-compiler-plugin-bootstrap",
+          "name": "maven-compiler-plugin",
           "version": "3.8.1",
-          "downloadUrl": "http://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
+          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
         }
       }
     },
@@ -12750,9 +12760,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven-jar-plugin-bootstrap",
-          "version": "3.2.0",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.0/maven-jar-plugin-3.2.0-source-release.zip"
+          "name": "maven-jar-plugin",
+          "version": "3.2.2",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.2/maven-jar-plugin-3.2.2-source-release.zip"
         }
       }
     },
@@ -12780,9 +12790,39 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven-resources-plugin-bootstrap",
-          "version": "3.1.0",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.1.0/maven-resources-plugin-3.1.0-source-release.zip"
+          "name": "maven-resolver",
+          "version": "1.7.3",
+          "downloadUrl": "https://archive.apache.org/dist/maven/resolver/maven-resolver-1.7.3-source-release.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven-resources-plugin",
+          "version": "3.2.0",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven-surefire",
+          "version": "3.0.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-surefire-3.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven-wagon",
+          "version": "3.5.1",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.1/wagon-3.5.1-source-release.zip"
         }
       }
     },
@@ -27249,6 +27289,16 @@
           "name": "sip",
           "version": "4.19.21",
           "downloadUrl": "https://www.riverbankcomputing.com/static/Downloads/sip/4.19.21/sip-4.19.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sisu",
+          "version": "0.3.5",
+          "downloadUrl": "https://github.com/eclipse/sisu.inject/archive/refs/tags/releases/0.3.5.tar.gz"
         }
       }
     },

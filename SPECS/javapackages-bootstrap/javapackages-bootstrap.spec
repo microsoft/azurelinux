@@ -16,7 +16,7 @@ Version:        1.5.0
 Release:        2%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
-License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and BSD with advertising and BSD and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
+License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
 URL:            https://github.com/fedora-java/javapackages-bootstrap
 BuildArch:      noarch
 
@@ -25,13 +25,6 @@ Source0:        https://github.com/fedora-java/javapackages-bootstrap/releases/d
 # License breakdown
 Source1:        javapackages-bootstrap-PACKAGE-LICENSING
 
-# To obtain the following sources:
-# tar -xf ${name}-${version}.tar.xz
-# pushd ${name}-${version}
-# ./downstream.sh clone
-# ./downstream.sh prep
-# ./downstream.sh archive
-# The results are in the archive directory
 Source1002:     apache-pom.tar.xz
 Source1001:     ant.tar.xz
 Source1003:     apiguardian.tar.xz
@@ -352,6 +345,7 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %changelog
 * Thu Mar 16 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified
 
 * Mon Jul 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.5.0-1
 - Update to upstream version 1.5.0
