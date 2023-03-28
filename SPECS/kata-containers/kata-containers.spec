@@ -41,7 +41,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.0.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -227,6 +227,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-7
+- Bump release to rebuild with go 1.19.7
+
 * Wed Mar 22 2023 Manuel Huber <mahuber@microsoft.com> - 3.0.0-6
 - Integrate fix to reduce UVM memory consumption
 
