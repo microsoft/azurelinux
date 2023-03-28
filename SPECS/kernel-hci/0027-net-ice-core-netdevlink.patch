@@ -1,0 +1,25 @@
+diff -uNr a/net/core/devlink.c b/net/core/devlink.c
+--- a/net/core/devlink.c	2022-07-19 15:15:26.000000000 -0400
++++ b/net/core/devlink.c	2022-12-16 13:22:59.140597655 -0500
+@@ -4350,6 +4350,21 @@
+ 		.name = DEVLINK_PARAM_GENERIC_ENABLE_VNET_NAME,
+ 		.type = DEVLINK_PARAM_GENERIC_ENABLE_VNET_TYPE,
+ 	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_IO_EQ_SIZE,
++		.name = DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_NAME,
++		.type = DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
++		.name = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME,
++		.type = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE,
++	},
+ };
+ 
+ static int devlink_param_generic_verify(const struct devlink_param *param)

@@ -1,0 +1,27 @@
+diff -uNr a/include/linux/net/intel/iidc.h b/include/linux/net/intel/iidc.h
+--- a/include/linux/net/intel/iidc.h	2022-07-19 15:15:26.000000000 -0400
++++ b/include/linux/net/intel/iidc.h	2022-12-16 13:22:59.136597655 -0500
+@@ -26,7 +26,14 @@
+ 	IIDC_GLOBR,
+ };
+ 
++enum iidc_rdma_protocol {
++	IIDC_RDMA_PROTOCOL_IWARP = BIT(0),
++	IIDC_RDMA_PROTOCOL_ROCEV2 = BIT(1),
++};
++
+ #define IIDC_MAX_USER_PRIORITY		8
++#define IIDC_MAX_DSCP_MAPPING		64
++#define IIDC_DSCP_PFC_MODE		0x1
+ 
+ /* Struct to hold per RDMA Qset info */
+ struct iidc_rdma_qset_params {
+@@ -55,6 +62,8 @@
+ 	u8 vport_relative_bw;
+ 	u8 vport_priority_type;
+ 	u8 num_tc;
++	u8 pfc_mode;
++	u8 dscp_map[IIDC_MAX_DSCP_MAPPING];
+ };
+ 
+ struct iidc_event {

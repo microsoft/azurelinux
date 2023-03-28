@@ -1,0 +1,21 @@
+diff -uNr a/include/net/gtp.h b/include/net/gtp.h
+--- a/include/net/gtp.h	2022-07-19 15:15:26.000000000 -0400
++++ b/include/net/gtp.h	2022-12-16 13:22:59.138597655 -0500
+@@ -27,6 +27,17 @@
+ 	__be32	tid;
+ } __attribute__ ((packed));
+ 
++struct gtp_pdu_session_info {   /* According to 3GPP TS 38.415. */
++        u8      pdu_type;
++        u8      qfi;
++};
++
++static inline bool netif_is_gtp(const struct net_device *dev)
++{
++	return dev->rtnl_link_ops &&
++		!strcmp(dev->rtnl_link_ops->kind, "gtp");
++}
++
+ #define GTP1_F_NPDU	0x01
+ #define GTP1_F_SEQ	0x02
+ #define GTP1_F_EXTHDR	0x04

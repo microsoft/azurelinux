@@ -9,7 +9,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.102.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,11 @@ Patch22:        0023-net-mlx5-Bridge-rename-filter-fg-to-vlan_filter.patch
 Patch23:        0024-net-mlx5-Bridge-extract-VLAN-push-pop-actions-creati.patch
 Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
+Patch26:        0027-net-ice-core-netdevlink.patch
+Patch27:        0028-net-ice-intel-iidc.patch
+Patch28:        0029-net-ice-net-devlink.patch
+Patch29:        0030-net-ice-net-gtp.patch
+Patch30:        0031-net-ice.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -185,6 +190,11 @@ manipulation of eBPF programs and maps.
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
+%patch26 -p1
+%patch27 -p1
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
 
 make mrproper
 
