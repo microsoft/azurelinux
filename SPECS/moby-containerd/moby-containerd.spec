@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
+%define commit_hash 2456e983eb9e37e47538f59ea18f2043c9a73640
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
-Version: 1.6.12
-Release: 5%{?dist}
+Version: 1.6.18
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -86,6 +86,15 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-3
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-2
+- Bump release to rebuild with go 1.19.6
+
+* Mon Mar 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-1
+- Auto-upgrade to 1.6.18 - to fix CVE-2023-25173, CVE-2023-25153
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.12-5
 - Bump release to rebuild with go 1.19.5
 

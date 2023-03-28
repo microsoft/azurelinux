@@ -1,0 +1,71 @@
+From 5a63a38a0f7dc23725903ee9a38efe68efe693c0 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@freedesktop.org>
+Date: Fri, 4 Dec 2020 14:47:13 +0100
+Subject: [PATCH 1/2] Remove any pending task processing handlers when
+ destroying a queue
+
+https://github.com/phako/dleyna-core/pull/2
+---
+ libdleyna/core/task-processor.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/libdleyna/core/task-processor.c b/libdleyna/core/task-processor.c
+index 39529a3dc967..2a126df66f6c 100644
+--- a/libdleyna/core/task-processor.c
++++ b/libdleyna/core/task-processor.c
+@@ -96,6 +96,11 @@ static void prv_free_cb(gpointer data)
+ 
+ 	DLEYNA_LOG_DEBUG("Enter");
+ 
++	if (task_queue->idle_id) {
++		g_source_remove(task_queue->idle_id);
++		task_queue->idle_id = 0;
++	}
++
+ 	g_ptr_array_foreach(task_queue->tasks, prv_task_free_cb, task_queue);
+ 	g_ptr_array_unref(task_queue->tasks);
+ 
+-- 
+2.28.0
+
+
+From 8455170d145e712d03824211efdba44e3960d051 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@freedesktop.org>
+Date: Fri, 4 Dec 2020 20:24:20 +0100
+Subject: [PATCH 2/2] Remove queues only if dleyna_task_processor_t->on_quit_cb
+ is scheduled
+
+See commit 1de3325c201dc0e1 for the original reason why all the queues
+need to be removed before dleyna_task_processor_t->on_quit_cb is run.
+However, if we remove them too early then there might still be tasks
+in flight that need to use them.
+
+https://github.com/phako/dleyna-core/pull/2
+---
+ libdleyna/core/task-processor.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libdleyna/core/task-processor.c b/libdleyna/core/task-processor.c
+index 2a126df66f6c..dc57c086cbd1 100644
+--- a/libdleyna/core/task-processor.c
++++ b/libdleyna/core/task-processor.c
+@@ -257,12 +257,12 @@ void dleyna_task_processor_set_quitting(dleyna_task_processor_t *processor)
+ 	DLEYNA_LOG_DEBUG("Enter");
+ 
+ 	processor->quitting = TRUE;
++	prv_cancel_all_queues(processor);
+ 
+-	if (processor->running_tasks == 0)
++	if (processor->running_tasks == 0) {
+ 		g_idle_add(processor->on_quit_cb, NULL);
+-
+-	prv_cancel_all_queues(processor);
+-	g_hash_table_remove_all(processor->task_queues);
++		g_hash_table_remove_all(processor->task_queues);
++	}
+ 
+ 	DLEYNA_LOG_DEBUG("Exit");
+ }
+-- 
+2.28.0
+

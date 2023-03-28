@@ -13,11 +13,11 @@ ifeq ($(origin CONFIG_FILE), undefined)
 CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
 $(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
 endif
-CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
-PACKAGE_BUILD_LIST     ?=
-PACKAGE_REBUILD_LIST   ?=
-PACKAGE_IGNORE_LIST    ?=
-SRPM_PACK_LIST         ?=
+CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
+PACKAGE_BUILD_LIST      ?=
+PACKAGE_REBUILD_LIST    ?=
+PACKAGE_IGNORE_LIST     ?=
+SRPM_PACK_LIST          ?=
 
 REBUILD_TOOLCHAIN               ?= n
 INCREMENTAL_TOOLCHAIN           ?= n
@@ -52,6 +52,7 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 DELTA_BUILD                     ?= n
 TARGET_ARCH                     ?=
+ALLOW_TOOLCHAIN_REBUILDS        ?= n
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -68,15 +69,16 @@ SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 
 # Sub-folder defines
-LOGS_DIR         ?= $(BUILD_DIR)/logs
-PKGBUILD_DIR     ?= $(BUILD_DIR)/pkg_artifacts
-CACHED_RPMS_DIR  ?= $(BUILD_DIR)/rpm_cache
-BUILD_SRPMS_DIR  ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
-MACRO_DIR        ?= $(BUILD_DIR)/macros
-BUILD_SPECS_DIR  ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
-STATUS_FLAGS_DIR ?= $(BUILD_DIR)/make_status
-CHROOT_DIR       ?= $(BUILD_DIR)/worker/chroot
-IMAGEGEN_DIR     ?= $(BUILD_DIR)/imagegen
+LOGS_DIR           ?= $(BUILD_DIR)/logs
+PKGBUILD_DIR       ?= $(BUILD_DIR)/pkg_artifacts
+CACHED_RPMS_DIR    ?= $(BUILD_DIR)/rpm_cache
+BUILD_SRPMS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
+MACRO_DIR          ?= $(BUILD_DIR)/macros
+BUILD_SPECS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
+STATUS_FLAGS_DIR   ?= $(BUILD_DIR)/make_status
+CHROOT_DIR         ?= $(BUILD_DIR)/worker/chroot
+IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
+TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
@@ -92,13 +94,6 @@ TOOLCHAIN_MANIFESTS_DIR      ?= $(MANIFESTS_DIR)/package
 RPMS_DIR        ?= $(OUT_DIR)/RPMS
 SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
-
-# If toolchain RPMs are being rebuilt locally, they belong with the other RPMs
-ifeq ($(REBUILD_TOOLCHAIN),y)
-   toolchain_rpms_dir := $(RPMS_DIR)
-else
-   toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache
-endif
 
 # External source server
 SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core

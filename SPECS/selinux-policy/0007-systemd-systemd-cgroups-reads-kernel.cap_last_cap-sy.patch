@@ -1,0 +1,30 @@
+From 51ee28660b809ee6220fd70c8730e018eac8f469 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 7 Jul 2022 13:45:12 +0000
+Subject: [PATCH 07/35] systemd: systemd-cgroups reads kernel.cap_last_cap
+ sysctl.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/systemd.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index ef25974ac..3b36837b3 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -396,6 +396,9 @@ fs_register_binary_executable_type(systemd_binfmt_t)
+ allow systemd_cgroups_t self:capability net_admin;
+ 
+ kernel_domtrans_to(systemd_cgroups_t, systemd_cgroups_exec_t)
++# read kernel.cap_last_cap
++kernel_read_kernel_sysctls(systemd_cgroups_t)
++kernel_dontaudit_getattr_proc(systemd_cgroups_t)
+ # for /proc/cmdline
+ kernel_read_system_state(systemd_cgroups_t)
+ 
+-- 
+2.34.1
+

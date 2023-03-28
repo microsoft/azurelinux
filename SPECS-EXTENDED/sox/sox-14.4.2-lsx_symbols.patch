@@ -1,0 +1,12 @@
+diff -Naur sox-14.4.2.orig/src/Makefile.am sox-14.4.2/src/Makefile.am
+--- sox-14.4.2.orig/src/Makefile.am	2014-10-29 22:29:54.000000000 -0500
++++ sox-14.4.2/src/Makefile.am	2015-11-06 09:49:34.466595616 -0600
+@@ -95,7 +95,7 @@
+ 
+ libsox_la_CFLAGS = @WARN_CFLAGS@
+ libsox_la_LDFLAGS = @APP_LDFLAGS@ -version-info @SHLIB_VERSION@ \
+-  -export-symbols-regex '^(sox_.*|lsx_(check_read_params|(close|open)_dllibrary|(debug(_more|_most)?|fail|report|warn)_impl|eof|fail_errno|filelength|find_(enum_(text|value)|file_extension)|getopt(_init)?|lpc10_(create_(de|en)coder_state|(de|en)code)|raw(read|write)|read(_b_buf|buf|chars)|realloc|rewind|seeki|sigfigs3p?|strcasecmp|tell|unreadb|write(b|_b_buf|buf|s)))$$'
++  -export-symbols-regex '^(sox_.*|lsx_(check_read_params|(close|open)_dllibrary|(debug(_more|_most)?|fail|report|warn)_impl|flush|error|eof|fail_errno|filelength|find_(enum_(text|value)|file_extension)|getopt(_init)?|lpc10_(create_(de|en)coder_state|(de|en)code)|raw(read|write)|read(_b_buf|buf|chars)|realloc|rewind|seeki|sigfigs3p?|strcasecmp|tell|unreadb|write(b|_b_buf|buf|s)))$$'
+ 
+ if HAVE_WIN32_LTDL
+   libsox_la_SOURCES += win32-ltdl.c win32-ltdl.h

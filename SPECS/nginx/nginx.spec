@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,7 @@ sh configure \
     --sbin-path=%{_sbindir}/nginx                 \
     --user=%{nginx_user} \
     --with-http_auth_request_module \
+    --with-http_realip_module \
     --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_sub_module \
@@ -109,6 +110,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Mar 27 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.22.1-3
+- Enable building with ngx_http_realip_module
+
 * Wed Nov 30 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.22.1-2
 - Enable http2 support
 
