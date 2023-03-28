@@ -7,7 +7,7 @@ Image configuration consists of two sections - Disks and SystemConfigs - that de
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
 ## TargetDisk
-Required when building unattended ISO installer (`sudo make iso UNATTENDED_INSTALLER=y ...`). This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path. Each `Disk` requires its own `TargetDisk`.
+Required when building unattended ISO installers (`sudo make iso UNATTENDED_INSTALLER=y ...`). This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path. Each `Disk` requires its own `TargetDisk`.
 
 An example can be seen in [core-legacy-unattended-hyperv.json](/toolkit/imageconfigs/core-legacy-unattended-hyperv.json)
 
@@ -17,6 +17,8 @@ An example can be seen in [core-legacy-unattended-hyperv.json](/toolkit/imagecon
     "Value": "/dev/sda"
 }
 ```
+
+For more complex targeting of disks, see [IsKickStartBoot](#iskickstartboot) for using kickstart files and scripts to manually configure the install partitions.
 
 ### Artifacts
 Artifact (non-ISO image building only) defines the name, type and optional compression of the output CBL-Mariner image.
