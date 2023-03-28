@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:          toolbox
 Version:       0.0.18
-Release:       7%{?dist}
+Release:       8%{?dist}
 Summary:       Unprivileged development environment
 
 License:       Apache-2.0
@@ -131,6 +131,9 @@ Dockerfile if the image isn't based on the fedora-toolbox image.
 
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-8
+- Bump release to rebuild with go 1.19.7
+
 * Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-7
 - Bump release to rebuild with go 1.19.6
 
