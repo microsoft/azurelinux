@@ -8,7 +8,7 @@
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.68.0
+Version:        1.68.2
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Tue Mar 28 2023 Muhammad Falak <mwani@microsoft.com> - 1.68.2-1
+- Bump version to 1.68.2 to revoke leaked github keys
+
 * Mon Mar 13 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.68.0-1
 - Updating to version 1.68.0
 
