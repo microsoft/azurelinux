@@ -6,21 +6,20 @@
 
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
-Version:        4.2.0
+Version:        4.0.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://fedora-java.github.io/xmvn/
-Source0:        https://github.com/fedora-java/xmvn/releases/download/%{version}/xmvn-%{version}.tar.xz
+Source0:        https://github.com/fedora-java/xmvn/releases/download/%{version}/xmvn-%{version}.tar.gz
 
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
+BuildRequires:  javapackages-local-bootstrap
 %else
-BuildRequires:  maven-local
 BuildRequires:  mvn(com.beust:jcommander)
-BuildRequires:  mvn(javax.inject:javax.inject)
 BuildRequires:  mvn(org.apache.commons:commons-compress)
 BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-assembly-plugin)
@@ -33,11 +32,14 @@ BuildRequires:  mvn(org.apache.maven:maven-model)
 BuildRequires:  mvn(org.apache.maven:maven-model-builder)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
 BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
+BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-classworlds)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-component-annotations)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-container-default)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
 BuildRequires:  mvn(org.easymock:easymock)
-BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.inject)
-BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.plexus)
-BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
-BuildRequires:  mvn(org.junit.jupiter:junit-jupiter-api)
+BuildRequires:  mvn(org.junit.jupiter:junit-jupiter)
 BuildRequires:  mvn(org.ow2.asm:asm)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
 BuildRequires:  mvn(org.slf4j:slf4j-simple)
@@ -46,10 +48,9 @@ BuildRequires:  mvn(org.xmlunit:xmlunit-assertj3)
 BuildRequires:  maven
 %endif
 
-BuildArch:      noarch
-
 Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       maven >= 3.6.1
+BuildArch:      noarch
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -80,12 +81,16 @@ Requires:       maven >= 3.4.0
 Requires:       maven-jdk-binding
 Suggests:       maven-openjdk11
 
+Obsoletes:      xmvn-connector-aether < 4.0.0
+
 %description    minimal
 This package provides minimal version of XMvn, incapable of using
 remote repositories.
 
 %package        core
 Summary:        XMvn library
+Obsoletes:      xmvn-parent-pom < 4.0.0
+Obsoletes:      xmvn-api < 4.0.0
 
 %description    core
 This package provides XMvn API and XMvn Core modules, which implement
@@ -106,6 +111,11 @@ Summary:        XMvn tools
 # Explicit javapackages-tools requires since scripts use
 # /usr/share/java-utils/java-functions
 Requires:       javapackages-tools
+Obsoletes:      xmvn-tools-pom < 4.0.0
+Obsoletes:      xmvn-bisect < 4.0.0
+Obsoletes:      xmvn-install < 4.0.0
+Obsoletes:      xmvn-resolve < 4.0.0
+Obsoletes:      xmvn-subst < 4.0.0
 
 %description    tools
 This package provides various XMvn tools:
@@ -147,35 +157,28 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
-# Workaround easymock incompatibility with Java 17that should be fixed
-# in easymock 4.4: https://github.com/easymock/easymock/issues/274
-%pom_add_plugin :maven-surefire-plugin xmvn-connector "<configuration>
-    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
-%pom_add_plugin :maven-surefire-plugin xmvn-tools/xmvn-install "<configuration>
-    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
-
 %build
 %mvn_build -j -- -P\\!quality
 
-version=4.*
+version=4.0.0
 tar --delay-directory-restore -xvf target/xmvn-*-bin.tar.gz
-chmod -R +rwX %{name}-${version}
+chmod -R +rwX %{name}-${version}*
 # These are installed as doc
-rm -f %{name}-${version}/{AUTHORS-XMVN,README-XMVN.md,LICENSE,NOTICE,NOTICE-XMVN}
+rm -f %{name}-${version}*/{AUTHORS-XMVN,README-XMVN.md,LICENSE,NOTICE,NOTICE-XMVN}
 # Not needed - we use JPackage launcher scripts
-rm -Rf %{name}-${version}/lib/{installer,resolver,subst}/
+rm -Rf %{name}-${version}*/lib/{installer,resolver,subst}/
 # Irrelevant Maven launcher scripts
-rm -f %{name}-${version}/bin/*
+rm -f %{name}-${version}*/bin/*
 
 
 %install
 %mvn_install
 
-version=4.*
+version=4.0.0
 maven_home=$(realpath $(dirname $(realpath $(%{?jpb_env} which mvn)))/..)
 
 install -d -m 755 %{buildroot}%{_datadir}/%{name}
-cp -r%{?mbi:L} %{name}-${version}/* %{buildroot}%{_datadir}/%{name}/
+cp -r%{?mbi:L} %{name}-${version}*/* %{buildroot}%{_datadir}/%{name}/
 
 for cmd in mvn mvnDebug; do
     cat <<EOF >%{buildroot}%{_datadir}/%{name}/bin/$cmd
@@ -265,49 +268,8 @@ end
 
 %changelog
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
-- Initial import from Fedora to CBL-Mariner
+- Initial import of version 4.0.0 from Fedora to CBL-Mariner
 - License verified
-
-* Mon Mar 20 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.2.0-1
-- Update to upstream version 4.2.0
-
-* Fri Mar 17 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.1.0-1
-- Update to upstream version 4.1.0
-
-* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-12
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Mon Sep 05 2022 Marian Koncek <mkoncek@redhat.com> - 4.0.0-11
-- Mimic maven-javadoc-plugin for -source and --release
-- Add simple implementation of toolchains
-
-* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-10
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Fri Apr 22 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-9
-- Port to Modello 2.0.0
-
-* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 4.0.0-8
-- Rebuilt for java-17-openjdk as system jdk
-
-* Thu Jan 27 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-7
-- Suggest OpenJDK 17 as default Maven binding
-
-* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Fri Jan 14 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-5
-- Rebuild for Maven 3.8.4
-
-* Mon Nov 08 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-4
-- For now keep suggesting OpenJDK 11 Maven binding
-
-* Wed Nov 03 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-3
-- Workaround build issue with OpenJDK 17
-- Suggest OpenJDK 17 as default Maven binding
-
-* Sun Sep 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-2
-- Rebuild to update libjansi.so symlink
 
 * Mon Jul 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-1
 - Update to upstream version 4.0.0
