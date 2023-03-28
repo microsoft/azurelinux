@@ -1,22 +1,30 @@
 # The purpose of this small makescript is to generate a new cache.erl file
-# to insert into the rabbitmq-server/deps/.hex directory prior to install.
+# used to generate a global cache.ets file prior to running make install in rabbitmq.
+#
 # The `generate-hex-cache` target takes an updated cache.ets file and converts
-# it to the cache.erl file format that is expected by rabbitmq-server to create
-# the cache.ets file on-the-fly at time of build and install.
+# it to the cache.erl file format that is expected by the rabbitmq-server Makefile
+# to create the cache.ets file on-the-fly at time of build and install.
 #
 # To run this target, ensure you have the cache.ets file you intend to convert
 # in the current directory. Then run the following:
 #	make generate-hex-cache -f rabbitmqHexCacheMakefile
 #
-# This will generate a cache.erl file ready to be inserted into deps/.hex/
-# to be used by rabbitmq-server.
+# This will generate a cache.erl file, which can be placed in the deps/.hex directory
+# of rabbitmq-server to generate the new cache.ets file without much hassle
+# with the use of their makefile (see the %install section of rabbitmq-server.spec
+# for exactly how we are handling this.
+#
+# The usefulness of the conversion is that we are then not packaging up a random
+# binary file to be consumed and instead ensuring its format.
 
 # Use the erlang.mk from rabbitmq-server, this is overkill for our use case
-# but the defines/macros we are using are so tangled
-# that this is the easiest short term solution.
+# but the defines/macros we are using are so tangled that this is the easiest 
+# short term solution.
+# This file can be obtained by running the following git command:
+#   
 include erlang.mk
 
-# erlang function used to convert 
+# erlang function used to convert cache.ets to cache.erl
 define dump_hex_cache_to_erl_term
   In = "$(1)/cache.ets",
   Out = "$(1)/cache.erl",
@@ -49,7 +57,7 @@ generate-time-file:
 
 generate-hex-cache: generate-time-file
 # Mix Hex component requires a cache file, otherwise it refuses to build
-# offline... That cache is an ETS table with all the applications we
+# offline... That cache is an ETS table with all the applications rabbitmq
 # depend on, plus some versioning informations and checksums. There
 # are two problems with that: the table contains a date (`last_update`
 # field) and `ets:tab2file()` produces a different file each time it's
@@ -60,8 +68,6 @@ generate-hex-cache: generate-time-file
 # table as an Erlang term to a text file.
 #
 # The ETS file must be recreated before compiling RabbitMQ. See the
-# `restore-hex-cache-ets-file` Make target.
-#	$(verbose) echo "$(call dump_hex_cache_to_erl_term,$(call core_native_path,$@),$(call core_native_path,hex-cache-dump-time.txt))" > testCall.txt
+# `restore-hex-cache-ets-file` Make target found in the below Makefile
+#   https://github.com/rabbitmq/rabbitmq-server/blob/main/Makefile
 	$(verbose) $(call erlang,$(call dump_hex_cache_to_erl_term,$(CURDIR),$(CURDIR)/hex-cache-dump-time.txt))
-# Fix file timestamps to have reproducible source archives.
-

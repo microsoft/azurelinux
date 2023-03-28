@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# baseline variables for filename and temporary directory to avoid filenme collisions
 TEMP_TARBALL_DIR="TempRabbitmqTarball"
 VENDOR_TARBALL_NAME="rabbitmq-server-hex-vendor-3.11.11"
 
