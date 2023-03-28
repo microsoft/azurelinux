@@ -26,9 +26,10 @@ var (
 	configFile = exe.InputFlag(app, "Path to the image config file.")
 	outDir     = exe.OutputDirFlag(app, "Directory to download packages into.")
 
-	baseDirPath    = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
-	existingRpmDir = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
-	tmpDir         = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").Required().String()
+	baseDirPath             = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
+	existingRpmDir          = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	existingToolchainRpmDir = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	tmpDir                  = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").Required().String()
 
 	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
@@ -58,7 +59,7 @@ func main() {
 	}
 
 	cloner := rpmrepocloner.New()
-	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
+	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}

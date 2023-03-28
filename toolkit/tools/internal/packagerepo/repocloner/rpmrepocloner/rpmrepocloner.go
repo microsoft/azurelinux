@@ -24,6 +24,7 @@ import (
 const (
 	allRepoIDs             = "*"
 	builtRepoID            = "local-repo"
+	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
@@ -78,24 +79,28 @@ func New() *RpmRepoCloner {
 }
 
 // Initialize initializes rpmrepocloner, enabling Clone() to be called.
-//  - destinationDir is the directory to save RPMs
-//  - tmpDir is the directory to create a chroot
-//  - workerTar is the path to the worker tar used to seed the chroot
-//  - existingRpmsDir is the directory with prebuilt RPMs
-//  - usePreviewRepo if set, the upstream preview repository will be used.
-//  - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
+//   - destinationDir is the directory to save RPMs
+//   - tmpDir is the directory to create a chroot
+//   - workerTar is the path to the worker tar used to seed the chroot
+//   - existingRpmsDir is the directory with prebuilt RPMs
+//   - prebuiltRpmsDir is the directory with toolchain RPMs
+//   - usePreviewRepo if set, the upstream preview repository will be used.
+//   - repoDefinitions is a list of repo files to use when cloning RPMs
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
 		bindFsType = ""
 		bindData   = ""
 
-		chrootLocalRpmsDir = "/localrpms"
+		chrootLocalRpmsDir      = "/localrpms"
+		chrootLocalToolchainDir = "/toolchainrpms"
 
-		overlayWorkDirectory  = "/overlaywork/workdir"
-		overlayUpperDirectory = "/overlaywork/upper"
-		overlaySource         = "overlay"
+		overlaySource                  = "overlay"
+		overlayUpperDirectoryRpms      = "/overlaywork/upper_rpms"
+		overlayWorkDirectoryRpms       = "/overlaywork/workdir_rpms"
+		overlayUpperDirectoryToolchain = "/overlaywork/upper_toolchain"
+		overlayWorkDirectoryToolchain  = "/overlaywork/workdir_toolchain"
 	)
 
 	r.usePreviewRepo = usePreviewRepo
@@ -137,11 +142,16 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	//
 	// 2) Mount the directory to download RPMs into as a bind, allowing the chroot to write
 	// files into it.
-	overlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalRpmsDir, existingRpmsDir, overlayUpperDirectory, overlayWorkDirectory)
+	outRpmsOverlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalRpmsDir, existingRpmsDir, overlayUpperDirectoryRpms, overlayWorkDirectoryRpms)
 	extraMountPoints := []*safechroot.MountPoint{
-		overlayMount,
+		outRpmsOverlayMount,
 		safechroot.NewMountPoint(destinationDir, chrootDownloadDir, bindFsType, safechroot.BindMountPointFlags, bindData),
 	}
+
+	// Include the special toolchain packages directory.
+	toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainRpmsDir, overlayUpperDirectoryToolchain, overlayWorkDirectoryToolchain)
+	extraMountPoints = append(extraMountPoints, toolchainRpmsOverlayMount)
+	overlayExtraDirs = append(overlayExtraDirs, toolchainRpmsOverlayExtraDirs...)
 
 	// Also request that /overlaywork is created before any chroot mounts happen so the overlay can
 	// be created successfully
@@ -154,7 +164,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	// The 'cacheRepoDir' repo is only used during Docker based builds, which don't
 	// use overlay so cache repo must be explicitly initialized.
 	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
-	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir}
+	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir, chrootLocalToolchainDir}
 	for _, repoToInitialize := range reposToInitialize {
 		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
 		err = r.initializeMountedChrootRepo(repoToInitialize)
@@ -289,8 +299,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
-			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+			// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
+			repoOrderList := []string{toolchainRepoId, builtRepoID, cacheRepoID, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -323,8 +333,8 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		releaseverCliArg,
 	}
 
-	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
+	repoOrderList := []string{toolchainRepoId, builtRepoID, fetcherRepoID, cacheRepoID, allRepoIDs}
 	for _, repoID := range repoOrderList {
 		logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
@@ -544,7 +554,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		}
 
 		if err == nil {
-			preBuilt = (repoID == builtRepoID)
+			preBuilt = (repoID == toolchainRepoId || repoID == builtRepoID)
 			break
 		}
 	}
