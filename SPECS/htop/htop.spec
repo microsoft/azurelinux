@@ -1,7 +1,7 @@
 Summary:        Interactive process viewer
 Name:           htop
 Version:        3.0.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_mandir}/man1/htop.1*
 
 %changelog
+* Mon Mar 27 2023 Betty Lakes <bettylakes@microsoft.com> - 3.0.5-4
+- License verified
+- Remove distro specific macros 
+
 * Tue Mar 21 2023 Betty Lakes <bettylakes@microsoft.com> - 3.0.5-3
 - Update python to python3
 

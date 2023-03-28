@@ -2,7 +2,7 @@
 Summary:        An advanced interactive monitor to view the load on system and process level
 Name:           atop
 Version:        2.6.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,6 +93,10 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 %{_sbindir}/atopacctd
 
 %changelog
+* Mon Mar 27 2023 Betty Lakes <bettylakes@microsoft.com> - 2.6.0-8
+- License verified
+- Remove distro specific macros 
+
 * Fri Sep 24 2021 Muhammad Falak <mwani@microsoft.com> - 2.6.0-7
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 
