@@ -63,9 +63,9 @@ type Chroot struct {
 // registerSIGTERMCleanup has been invoked. Use a slice instead of a map
 // to ensure chroots can be cleaned up in LIFO order incase any are interdependent.
 // Note:
-// - Docker based build doesn't need to maintain activeChroots because chroot come from
-//   a pre-existing pool of chroots
-//   (as opposed to regular build which create a new chroot each time a spec is built)
+//   - Docker based build doesn't need to maintain activeChroots because chroot come from
+//     a pre-existing pool of chroots
+//     (as opposed to regular build which create a new chroot each time a spec is built)
 var (
 	inChrootMutex      sync.Mutex
 	activeChrootsMutex sync.Mutex
@@ -146,11 +146,12 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 }
 
 // Initialize initializes a Chroot, creating directories and mount points.
-// - tarPath is an optional path to a tar file that will be extracted at the root of the chroot.
-// - extraDirectories is an optional slice of additional directories that should be created before attempting to
-//   mount inside the chroot.
-// - extraMountPoints is an optional slice of additional mount points that should be created inside the chroot,
-//   they will automatically be unmounted on a Chroot Close.
+//   - tarPath is an optional path to a tar file that will be extracted at the root of the chroot.
+//   - extraDirectories is an optional slice of additional directories that should be created before attempting to
+//     mount inside the chroot.
+//   - extraMountPoints is an optional slice of additional mount points that should be created inside the chroot,
+//     they will automatically be unmounted on a Chroot Close.
+//
 // This call will block until the chroot initializes successfully.
 // Only one Chroot will initialize at a given time.
 func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) (err error) {

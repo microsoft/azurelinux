@@ -50,11 +50,11 @@ type BuildResult struct {
 	UsedCache      bool
 }
 
-//selectNextBuildRequest selects a job based on priority:
-//  1) Bail out if the jobs are cancelled
-//	2) There is something in the priority queue
-//	3) Any job in either normal OR priority queue
-//		OR are the jobs done/cancelled
+// selectNextBuildRequest selects a job based on priority:
+//  1. Bail out if the jobs are cancelled
+//  2. There is something in the priority queue
+//  3. Any job in either normal OR priority queue
+//     OR are the jobs done/cancelled
 func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish bool) {
 	select {
 	case <-channels.Cancel:

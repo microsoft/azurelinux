@@ -252,8 +252,8 @@ func (pkgVer *PackageVer) String() string {
 // PackagesListEntryToPackageVer converts an entry from the packages list JSON into an instance of PackageVer.
 // The entries may contain only the name of the package or also include a single package version constraint.
 // Examples:
-//		- "gcc"
-//		- "gcc=9.1.0"
+//   - "gcc"
+//   - "gcc=9.1.0"
 func PackagesListEntryToPackageVer(packageString string) (pkgVer *PackageVer, err error) {
 	matches := packageWithVersionRegex.FindStringSubmatch(packageString)
 	if len(matches) != packageWithVersionExpectedMatches {
