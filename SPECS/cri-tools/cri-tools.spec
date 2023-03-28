@@ -1,7 +1,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.23.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,12 @@ install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 %{_docdir}/%{name}
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.0-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.0-8
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.0-7
 - Bump release to rebuild with go 1.19.5
 

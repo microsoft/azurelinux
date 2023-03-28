@@ -1,7 +1,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.8.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,12 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-8
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-7
 - Bump release to rebuild with go 1.19.5
 

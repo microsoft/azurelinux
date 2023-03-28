@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.25.0
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -79,6 +79,12 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-7
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-6
+- Bump release to rebuild with go 1.19.6
+
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-5
 - - Set golang <= 1.18.8 build requires
 

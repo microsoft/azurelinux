@@ -1497,8 +1497,8 @@
         "type": "other",
         "other": {
           "name": "ccache",
-          "version": "4.6",
-          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.6/ccache-4.6.tar.gz"
+          "version": "4.8",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.8/ccache-4.8.tar.gz"
         }
       }
     },
@@ -3919,6 +3919,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fstrm",
+          "version": "0.6.1",
+          "downloadUrl": "https://dl.farsightsecurity.com/dist/fstrm/fstrm-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
@@ -4580,8 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.5",
-          "downloadUrl": "https://golang.org/dl/go1.19.5.src.tar.gz"
+          "version": "1.19.7",
+          "downloadUrl": "https://golang.org/dl/go1.19.7.src.tar.gz"
         }
       }
     },
@@ -5300,8 +5310,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.55",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.55.tar.bz2"
+          "version": "2.4.56",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.56.tar.bz2"
         }
       }
     },
@@ -6450,8 +6460,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8021,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8031,8 +8041,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8041,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8051,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -11853,6 +11863,16 @@
           "name": "linuxptp",
           "version": "2.0",
           "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.102.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -24504,8 +24524,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "2.0.3",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.0.3.tar.gz"
+          "version": "2.2.3",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.2.3.tar.gz"
         }
       }
     },
@@ -26666,8 +26686,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.62.1",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.62.1-src.tar.xz"
+          "version": "1.68.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.68.0-src.tar.xz"
         }
       }
     },
@@ -27718,8 +27738,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p2",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
+          "version": "1.9.13p3",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.13p3.tar.gz"
         }
       }
     },
@@ -28868,8 +28888,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1378",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1378.tar.gz"
+          "version": "9.0.1402",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1402.tar.gz"
         }
       }
     },
@@ -29120,6 +29140,16 @@
           "name": "whois",
           "version": "5.5.15",
           "downloadUrl": "http://ftp.debian.org/debian/pool/main/w/whois/whois_5.5.15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wireguard-tools",
+          "version": "1.0.20210914",
+          "downloadUrl": "https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-1.0.20210914.tar.xz"
         }
       }
     },
