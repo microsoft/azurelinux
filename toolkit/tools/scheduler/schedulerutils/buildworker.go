@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
@@ -49,11 +50,11 @@ type BuildResult struct {
 	UsedCache      bool
 }
 
-//selectNextBuildRequest selects a job based on priority:
-//  1) Bail out if the jobs are cancelled
-//	2) There is something in the priority queue
-//	3) Any job in either normal OR priority queue
-//		OR are the jobs done/cancelled
+// selectNextBuildRequest selects a job based on priority:
+//  1. Bail out if the jobs are cancelled
+//  2. There is something in the priority queue
+//  3. Any job in either normal OR priority queue
+//     OR are the jobs done/cancelled
 func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish bool) {
 	select {
 	case <-channels.Cancel:
@@ -191,14 +192,14 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 
 // parseCheckSection reads the package build log file to determine if the %check section passed or not
 func parseCheckSection(logFile string) (err error) {
-	file, err := os.Open(logFile)
+	logFileObject, err := os.Open(logFile)
 	// If we can't open the log file, that's a build error.
 	if err != nil {
 		logger.Log.Errorf("Failed to open log file '%s' while checking package test results. Error: %v", logFile, err)
 		return
 	}
-	defer file.Close()
-	for scanner := bufio.NewScanner(file); scanner.Scan(); {
+	defer logFileObject.Close()
+	for scanner := bufio.NewScanner(logFileObject); scanner.Scan(); {
 		currLine := scanner.Text()
 		// Anything besides 0 is a failed test
 		if strings.Contains(currLine, "CHECK DONE") {
@@ -207,7 +208,7 @@ func parseCheckSection(logFile string) (err error) {
 			}
 			failedLogFile := strings.TrimSuffix(logFile, ".log")
 			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
-			err = os.Rename(logFile, failedLogFile)
+			err = file.Copy(logFile, failedLogFile)
 			if err != nil {
 				logger.Log.Errorf("Log file rename failed. Error: %v", err)
 				return

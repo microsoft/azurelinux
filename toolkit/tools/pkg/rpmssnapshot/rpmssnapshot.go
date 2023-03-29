@@ -26,17 +26,19 @@ const (
 
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
 // Examples:
+//
 //	kernel-5.15.63.1-1.cm2.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
 //	python3-perf-5.15.63.1-1.cm2.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
 //
 // NOTE: regular expression based on following assumptions:
-//	- Package version and release values are not allowed to contain a hyphen character.
-//	- Our tooling prevents the 'Release' tag from having any other form than '[[:digit:]]+%{?dist}'
-//	- The distribution tag is not allowed to contain a period or a hyphen.
-//	- The architecture is not allowed to contain a period or a hyphen.
+//   - Package version and release values are not allowed to contain a hyphen character.
+//   - Our tooling prevents the 'Release' tag from having any other form than '[[:digit:]]+%{?dist}'
+//   - The distribution tag is not allowed to contain a period or a hyphen.
+//   - The architecture is not allowed to contain a period or a hyphen.
 //
 // Regex breakdown:
-// 	^(.*)			<-- [index 1] package name
+//
+//	^(.*)			<-- [index 1] package name
 //	-				<-- second-to-last hyphen separating the package name from its version
 //	([^-]+-\d+)		<-- [index 2] package version and package release number connected by the last hyphen
 //	\.				<-- second-to-last period separating the package release number from the distribution tag
