@@ -16,30 +16,30 @@ import (
 // ReadOnlyVerityRoot controls DM-Verity read-only filesystems which will be mounted at startup
 // It will create a verity disk from the partition mounted at "/". The verity data is stored as
 // part of the image's initramfs.
-// - Enable: Enable dm-verity on the root filesystem and add the root hash to the
+//   - Enable: Enable dm-verity on the root filesystem and add the root hash to the
 //     initramfs
-// - Name: Custom name for the mounted root (default is "verity_root_fs")
-// - ErrorCorrectionEnable: Enable Reed-Solomon forward error correction of read-only data and
+//   - Name: Custom name for the mounted root (default is "verity_root_fs")
+//   - ErrorCorrectionEnable: Enable Reed-Solomon forward error correction of read-only data and
 //     add the FEC data to the initramfs
-// - ErrorCorrectionEncodingRoots: Increase overhead to increase resiliency, default is 2
+//   - ErrorCorrectionEncodingRoots: Increase overhead to increase resiliency, default is 2
 //     encoding bytes per 255 bytes of real data) giving 0.8% overhead ( RS(255,253) )
 //     For a given N (where N = 255 - #Roots), the number of consecutive recoverable blocks is:
-//       ceiling(# of 4k blocks in disk / (N)) * (255-N)
-//       ie for 2GiB disk: ceiling(524288 / 253) * (255-253) = 2073 * 2 = 4146 blocks = ~16MiB
-// - RootHashSignatureEnable: Validate the root hash against a key stored in the kernel's
+//     ceiling(# of 4k blocks in disk / (N)) * (255-N)
+//     ie for 2GiB disk: ceiling(524288 / 253) * (255-253) = 2073 * 2 = 4146 blocks = ~16MiB
+//   - RootHashSignatureEnable: Validate the root hash against a key stored in the kernel's
 //     system keyring. The signature file should be called "<Name>.p7" and must be stored in
 //     the initramfs. This signature WILL NOT BE included automatically in the initramfs. It must
 //     be included via an out of band build step (extract initramfs, create signature from root,
 //     add signature file, recompress).
-// - ValidateOnBoot: Run a validation of the full disk at boot time, normally blocks are validated
+//   - ValidateOnBoot: Run a validation of the full disk at boot time, normally blocks are validated
 //     only as needed. This can take several minutes if the disk is corrupted.
-// - VerityErrorBehavior: System behavior when encountering an unrecoverable verity corruption. One
+//   - VerityErrorBehavior: System behavior when encountering an unrecoverable verity corruption. One
 //     of 'ignore', 'restart', 'panic'
-// - TmpfsOverlays: Mount these paths as writable overlays backed by a tmpfs in memory. They are
+//   - TmpfsOverlays: Mount these paths as writable overlays backed by a tmpfs in memory. They are
 //     discarded on reboot. Overlays should not overlap each other. If a directory is not already
 //     present it will be created automatically. Persistant overlays can be created by mounting
 //     writable partitions as normal.
-// - TmpfsOverlayDebugEnabled: Make the tmpfs overlay mounts easily accessible for debugging
+//   - TmpfsOverlayDebugEnabled: Make the tmpfs overlay mounts easily accessible for debugging
 //     purposes. They can be found in /mnt/verity_overlay_debug_tmpfs
 type ReadOnlyVerityRoot struct {
 	Enable                       bool                `json:"Enable"`
