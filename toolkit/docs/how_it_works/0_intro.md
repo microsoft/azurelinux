@@ -125,6 +125,7 @@ flowchart TD
     pullTC([Local Toolchain Archive available]):::goodState
     hydrateTC[Extract Toolchain RPMs]:::process
     buildRawTC[Build Raw Toolchain]:::process
+    sources[/Sources/]:::io
     localSpecs[/Local SPECS/]:::io
     bsRPMS[/Bootstraped Environment/]:::io
     buildTC[Build Toolchain proper]:::process
@@ -133,6 +134,7 @@ flowchart TD
     %% TC flow
     start --> tcRebuild
     tcRebuild -->|yes| buildRawTC
+    sources-->buildRawTC
     tcManifests --> hydrateTC
     tcManifests --> pullRemote
     tcManifests --> buildTC
@@ -145,6 +147,7 @@ flowchart TD
     hydrateTC --> tcRPMs
     buildRawTC --> bsRPMS
     bsRPMS --> buildTC
+    sources-->buildTC
     localSpecs --> buildTC
     buildTC --> tcArchiveNew
     tcArchiveNew --> pullTC
@@ -184,8 +187,9 @@ flowchart TD
     buildGraph[" Build Graph (grapher) "]:::process
     depGraph[/"Dependency Graph (graph.dot)"/]:::io
     cacheGraph[/"Cached Graph (cached_graph.dot)"/]:::io
+    sources[/Sources/]:::io
     packSRPM[Pack SRPM]:::process
-    pkgFetcher[Package fetcher]:::process
+    pkgFetcher["Package fetcher (graphpkgfetcher)"]:::process
     rpmCache[(RPM cache)]:::io
     remoteRepo[(remote repo)]:::io
     missingDep[/RPMs to fill Missing Dependencies/]:::io
@@ -195,6 +199,7 @@ flowchart TD
     start --> tcPopulated
     tcPopulated --> packSRPM
 
+    sources-->packSRPM
     localSpecs-->packSRPM
     packSRPM-->iSRPMs
     iSRPMs--> parse
@@ -227,9 +232,9 @@ flowchart TD
         trim[Remove unneeded branches from graph]:::process
         doneBuild{{Done building all required nodes?}}:::decision 
         leafNodesAvail{{Leaf nodes available?}}:::decision
-        worker[Schedule a worker to build the srpm]:::process
+        worker[Schedule a worker to build the SRPM]:::process
         builtRPMs[/Built RPMs/]:::io
-        updateDeps[Update Dependencies In Graph]:::process
+        updateDeps[Update dependencies in graph]:::process
         getDeps[Get dependencies]:::process
 
         %% scheduler flow
@@ -261,24 +266,24 @@ flowchart TD
     classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
 
     %% state nodes
-    start(["Start (make build-packages)"]):::goodState
+    start(["Start (make image / make iso)"]):::goodState
     done([Done]):::goodState
     %% error[[Error]]:::badState
 
     %% Image nodes
-    imageConfig[/Image config or json/]:::io
+    imageConfig[/Image config.json/]:::io
     raw[/Raw image or file system/]:::io
     roast["Image format converter (roast)"]:::process
     initrd[/initrd/]:::io
     iso[/"iso (imager tool, pkgs, config files)"/]:::io
     image[/image/]:::io
-    pkgFetcher[Package fetcher]:::process
+    pkgFetcher["Package fetcher (imagepkgfetcher)"]:::process
     rpmCache[(local RPMs)]:::io
     remoteRepo[(remote repo)]:::io
     missingDep[/RPMs to fill Missing Dependencies/]:::io
     imager["Image tool (imager)"]:::process
     isoBuild{{iso installer or offline build?}}:::decision
-    isoBuilder[iso maker]:::process
+    isoBuilder["iso maker (isomaker)"]:::process
 
     %% Image flow
     start-->pkgFetcher
