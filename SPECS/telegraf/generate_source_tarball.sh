@@ -4,31 +4,28 @@
 
 set -e
 
-PKG_VERSION=""
-SRC_TARBALL=""
-OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 get_param() {
     if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         echo "$2"
     else
-        echo "Error: Argument for ($1) is missing." >&2
+        echo "Error: argument for ($1) is missing." >&2
         return 1
     fi
 }
 
+PKG_VERSION=""
+SRC_TARBALL=""
+OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # parameters:
 #
 # --srcTarball  : src tarball file
-#                 this file contains the 'initial' source code of the component
-#                 and should be replaced with the new/modified src code
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
 #
 while (( "$#" )); do
     case "$1" in
         --srcTarball)
-        # get_param
         SRC_TARBALL="$(get_param "$1" "$2")"
         shift 2
         ;;
@@ -40,8 +37,8 @@ while (( "$#" )); do
         PKG_VERSION="$(get_param "$1" "$2")"
         shift 2
         ;;
-        -*) # unsupported flags
-        echo "Error: Unsupported flag $1." >&2
+        -*)
+        echo "Error: unsupported flag $1." >&2
         exit 1
         ;;
   esac
@@ -64,7 +61,7 @@ fi
 SRC_TARBALL="$(realpath "$SRC_TARBALL")"
 OUT_FOLDER="$(realpath "$OUT_FOLDER")"
 
-echo "Creating tempdir."
+echo "Creating a tempdir."
 tmpdir=$(mktemp -d)
 function cleanup {
     echo "Clean-up: removing tempdir ($tmpdir)."
@@ -77,11 +74,11 @@ pushd "$tmpdir" > /dev/null
 NAME_VER="telegraf-$PKG_VERSION"
 VENDOR_TARBALL="$(realpath "$OUT_FOLDER/$NAME_VER-vendor.tar.gz")"
 
-echo "Unpacking source tarball."
+echo "Unpacking the source tarball."
 tar -xf "$SRC_TARBALL"
 
 cd "$NAME_VER"
-echo "Get vendored modules."
+echo "Getting the vendored modules."
 go mod vendor
 
 mkdir -p "$OUT_FOLDER"
