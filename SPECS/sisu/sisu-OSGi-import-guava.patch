@@ -1,0 +1,20 @@
+--- sisu-inject/org.eclipse.sisu.inject/META-INF/MANIFEST.MF~	2014-04-21 16:32:25.000000000 +0200
++++ sisu-inject/org.eclipse.sisu.inject/META-INF/MANIFEST.MF	2014-04-23 10:53:22.538142253 +0200
+@@ -16,6 +16,7 @@
+  com.google.inject.matcher;version="1.3",
+  com.google.inject.name;version="1.3",
+  com.google.inject.spi;version="1.3",
++ com.google.common.base,
+  org.osgi.framework;version="1.5",
+  org.osgi.util.tracker;version="1.4",
+  org.slf4j;resolution:=optional,
+--- sisu-inject/org.eclipse.sisu.inject/build.properties~	2015-02-25 14:46:42.392037463 +0100
++++ sisu-inject/org.eclipse.sisu.inject/build.properties	2015-02-25 14:44:56.626803789 +0100
+@@ -17,5 +17,5 @@
+                .
+ 
+ # build with JSR250 v1.2 and workaround indirect Guava dependency via Guice 4
+-extra.. = platform:/plugin/javax.annotation,platform:/plugin/com.google.guava
+-additional.bundles = javax.annotation,com.google.guava
++extra.. = platform:/plugin/javax.annotation-api,platform:/plugin/com.google.guava
++additional.bundles = javax.annotation-api,com.google.guava

@@ -1497,8 +1497,8 @@
         "type": "other",
         "other": {
           "name": "ccache",
-          "version": "4.6",
-          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.6/ccache-4.6.tar.gz"
+          "version": "4.8",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.8/ccache-4.8.tar.gz"
         }
       }
     },
@@ -1757,8 +1757,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "29.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v29.0.tar.gz"
+          "version": "30.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v30.0.tar.gz"
         }
       }
     },
@@ -3919,6 +3919,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fstrm",
+          "version": "0.6.1",
+          "downloadUrl": "https://dl.farsightsecurity.com/dist/fstrm/fstrm-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
@@ -4580,8 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.5",
-          "downloadUrl": "https://golang.org/dl/go1.19.5.src.tar.gz"
+          "version": "1.19.7",
+          "downloadUrl": "https://golang.org/dl/go1.19.7.src.tar.gz"
         }
       }
     },
@@ -4652,6 +4662,16 @@
           "name": "google-crosextra-carlito-fonts",
           "version": "1.103",
           "downloadUrl": "http://gsdview.appspot.com/chromeos-localmirror/distfiles/crosextrafonts-carlito-20130920.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "google-guice",
+          "version": "4.2.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/google-guice-4.2.3.tar.gz"
         }
       }
     },
@@ -6450,8 +6470,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -7610,6 +7630,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "javapackages-bootstrap",
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages-bootstrap/releases/download/1.5.0/javapackages-bootstrap-1.5.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "javapackages-tools",
           "version": "6.0.0",
           "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
@@ -8021,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8031,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8041,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8051,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.98.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.98.1.tar.gz"
+          "version": "5.15.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -8061,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.92.mshv1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.92.mshv1.tar.gz"
+          "version": "5.15.98.mshv1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.98.mshv1.tar.gz"
         }
       }
     },
@@ -11011,8 +11041,8 @@
         "type": "other",
         "other": {
           "name": "libtiff",
-          "version": "4.4.0",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.4.0/libtiff-v4.4.0.tar.gz"
+          "version": "4.5.0",
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.5.0/libtiff-v4.5.0.tar.gz"
         }
       }
     },
@@ -11853,6 +11883,16 @@
           "name": "linuxptp",
           "version": "2.0",
           "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.102.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -12730,9 +12770,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven-compiler-plugin-bootstrap",
+          "name": "maven-compiler-plugin",
           "version": "3.8.1",
-          "downloadUrl": "http://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
+          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
         }
       }
     },
@@ -12740,9 +12780,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven-jar-plugin-bootstrap",
-          "version": "3.2.0",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.0/maven-jar-plugin-3.2.0-source-release.zip"
+          "name": "maven-jar-plugin",
+          "version": "3.2.2",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.2/maven-jar-plugin-3.2.2-source-release.zip"
         }
       }
     },
@@ -12770,9 +12810,39 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven-resources-plugin-bootstrap",
-          "version": "3.1.0",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.1.0/maven-resources-plugin-3.1.0-source-release.zip"
+          "name": "maven-resolver",
+          "version": "1.7.3",
+          "downloadUrl": "https://archive.apache.org/dist/maven/resolver/maven-resolver-1.7.3-source-release.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven-resources-plugin",
+          "version": "3.2.0",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven-surefire",
+          "version": "3.0.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-surefire-3.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "maven-wagon",
+          "version": "3.5.1",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.1/wagon-3.5.1-source-release.zip"
         }
       }
     },
@@ -13363,8 +13433,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.19.1",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.1-1/go.20220906.5.src.tar.gz"
+          "version": "1.19.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.7-1/go.20230307.2.src.tar.gz"
         }
       }
     },
@@ -24504,8 +24574,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "2.0.3",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.0.3.tar.gz"
+          "version": "2.2.3",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.2.3.tar.gz"
         }
       }
     },
@@ -26655,8 +26725,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.62.1",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.62.1-src.tar.xz"
+          "version": "1.68.2",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz"
         }
       }
     },
@@ -27246,6 +27316,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sisu",
+          "version": "0.3.5",
+          "downloadUrl": "https://github.com/eclipse/sisu.inject/archive/refs/tags/releases/0.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "skkdic",
           "version": "20210217",
           "downloadUrl": "https://github.com/skk-dev/dict/archive/1ca80982c5a32c82bfc5e98e1fe9d8751ab44946/skkdic-20210217.git1ca80982c5a32c82bfc5e98e1fe9d8751ab44946.tar.gz"
@@ -27707,8 +27787,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p2",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
+          "version": "1.9.13p3",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.13p3.tar.gz"
         }
       }
     },
@@ -28067,8 +28147,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.25.2",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.25.2.tar.gz"
+          "version": "1.26.0",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.26.0.tar.gz"
         }
       }
     },
@@ -28857,8 +28937,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1378",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1378.tar.gz"
+          "version": "9.0.1402",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1402.tar.gz"
         }
       }
     },
@@ -29109,6 +29189,16 @@
           "name": "whois",
           "version": "5.5.15",
           "downloadUrl": "http://ftp.debian.org/debian/pool/main/w/whois/whois_5.5.15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wireguard-tools",
+          "version": "1.0.20210914",
+          "downloadUrl": "https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-1.0.20210914.tar.xz"
         }
       }
     },

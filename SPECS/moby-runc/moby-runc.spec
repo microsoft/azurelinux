@@ -5,7 +5,7 @@ Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        1.1.2
-Release:        8%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
@@ -59,6 +59,12 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %{_mandir}/*
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-10
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-9
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 03 2023 Vince Perri <viperri@microsoft.com> - 1.1.2-8
 - Add 0001-cgroups-cpuset-fix-byte-order-while-parsing-cpuset-r.patch
 
