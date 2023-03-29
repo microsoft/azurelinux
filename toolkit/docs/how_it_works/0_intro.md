@@ -196,6 +196,7 @@ flowchart TD
     remoteRepo[(remote repo)]:::io
     missingDep[/RPMs to fill missing dependencies/]:::io
     outRPMS[(RPMs built locally)]:::io
+    buildRPMs[Build RPMs]:::process
 
     %% Rpms flow
     start --> tcPopulated
@@ -217,11 +218,11 @@ flowchart TD
     chroot -...->packSRPM
     chroot -...->parse
     chroot -...->pkgFetcher
-    rpmCache --> getDeps
-    tcRPMs --> getDeps
+    rpmCache --> worker
+    tcRPMs --> worker
     chroot -...-> worker
+    outRPMS --> worker
     builtRPMs --> outRPMS
-    outRPMS --> getDeps
     doneBuild -->|yes| done
     leafNodesAvail -->|no| error
     cacheGraph --> currentGraph
@@ -233,10 +234,9 @@ flowchart TD
         trim[Remove unneeded branches from graph]:::process
         doneBuild{{Done building all required nodes?}}:::decision 
         leafNodesAvail{{Leaf nodes available?}}:::decision
-        worker[Schedule a worker to build the SRPM]:::process
+        worker[Schedule a chroot worker to build the SRPM]:::process
         builtRPMs[/Built RPMs/]:::io
         updateDeps[Update dependencies in graph]:::process
-        getDeps[Get dependencies]:::process
 
         %% scheduler flow
         currentGraph --> trim
@@ -245,8 +245,8 @@ flowchart TD
         leafNodesAvail -->|yes| worker
         builtRPMs --> updateDeps
         updateDeps --> currentGraph
-        getDeps --> worker
-        worker --> builtRPMs
+        worker --> buildRPMs
+        buildRPMs --> builtRPMs
 
         end
     %% end of scheduler
