@@ -25,7 +25,7 @@ flowchart TD
 ```
 <br/>
 
-### High-level RPM Flow
+### High-level RPM flow
 Mariner is an RPM based distro. A single package (or RPM) is built using a combination of sources and a spec file. A signature file is used to verify the sources' hashes. 
 
 ```mermaid
@@ -39,9 +39,9 @@ flowchart LR
 
     %% nodes
     spec[/Spec/]:::io
-    localSourceTar[/Local Sources if present/]:::io
+    localSourceTar[/Local sources if present/]:::io
     sigFile[/Signature file/]:::io
-    remoteSourceTar[/Remote Source/]:::io
+    remoteSourceTar[/Remote source/]:::io
     patches[/Patches/]:::io
     pack[Pack SRPM]:::process
     srpm[/SRPM/]:::io
@@ -54,14 +54,14 @@ flowchart LR
     remoteSourceTar --> pack
     patches --> pack
     sigFile --> pack
-    pack -->srpm 
+    pack --> srpm 
     srpm --> buildRPM
     buildRPM --> rpm
 ```
 </br>
 
-### High-level Build Flow
- The build process can be split into three components: tooling, package generation, and image generation. When building, Makefile options can be used to build Mariner entirely from end to end or to download prebuilt artifacts.
+### High-level build flow
+ The build process can be split into three components: tooling, package generation, and image generation. When building, `make` options can be used to build Mariner from end to end or to download prebuilt artifacts.
 
 
 ```mermaid
@@ -80,7 +80,7 @@ flowchart LR
     buildRPMS[Build RPMs from scratch]:::process
     pullRPMS[Pull RPMs from remote]:::process
     rpms[/RPMs/]:::io
-    buildImage[Build Image from scratch]:::process
+    buildImage[Build image from scratch]:::process
     image[(Image: Container vhd vhdx iso)]:::io
 
     %% node flow
@@ -97,7 +97,7 @@ flowchart LR
 </br>
 
 ### Tools
-The tooling consists of a set of `Makefiles`, various go programs, a bootstrapping environment running in `Docker`, and a `chroot` environment to build in. These are discussed [here](1_initial_prep.md). The toolkit is able to re-build all of the tools from source if desired.
+The tooling consists of a set of makefiles, various Go programs, a bootstrapping environment running in `Docker`, and a `chroot` environment to build in. These are discussed [here](1_initial_prep.md). The toolkit is able to re-build all of the tools from source if desired.
 
 ```mermaid
 flowchart TD
@@ -122,36 +122,36 @@ flowchart TD
     tcRPMs[(Toolchain RPMs)]:::io
     tcArchiveOld[/Old Toolchain archive/]:::io
     tcArchiveNew[/Toolchain archive/]:::io
-    pullTC([Local Toolchain Archive available]):::goodState
+    pullTC([Local toolchain archive available]):::goodState
     hydrateTC[Extract Toolchain RPMs]:::process
-    buildRawTC[Build Raw Toolchain]:::process
+    buildRawTC[Build raw toolchain]:::process
     sources[/Sources/]:::io
     localSpecs[/Local SPECS/]:::io
-    bsRPMS[/Bootstraped Environment/]:::io
-    buildTC[Build Toolchain proper]:::process
+    bsRPMS[/Bootstraped environment/]:::io
+    buildTC[Build toolchain proper]:::process
     pullRemote[Download remote RPMs]:::process
 
     %% TC flow
     start --> tcRebuild
     tcRebuild -->|yes| buildRawTC
-    sources-->buildRawTC
+    sources --> buildRawTC
     tcManifests --> hydrateTC
     tcManifests --> pullRemote
     tcManifests --> buildTC
-    tcRebuild -->|no|toolchainChoice
+    tcRebuild -->|no| toolchainChoice
     toolchainChoice -->|no| pullRemote
     toolchainChoice -->|yes| pullTC 
     pullRemote --> tcRPMs
-    pullTC -->hydrateTC
+    pullTC --> hydrateTC
     tcArchiveOld --> pullTC
     hydrateTC --> tcRPMs
     buildRawTC --> bsRPMS
     bsRPMS --> buildTC
-    sources-->buildTC
+    sources --> buildTC
     localSpecs --> buildTC
     buildTC --> tcArchiveNew
     tcArchiveNew --> pullTC
-    tcRPMs-->tcPopulated
+    tcRPMs --> tcPopulated
     tcPopulated --> done
 ```
 
@@ -179,56 +179,55 @@ flowchart TD
     tcPopulated([Toolchain populated]):::goodState
     localSpecs[/Local SPECS/]:::io
     tcRPMs[(Toolchain RPMs)]:::io
-    createChroot[Create Chroot]:::process
+    createChroot[Create chroot]:::process
     chroot[/chroot/]:::io
     iSRPMs[/Intermediate SRPMs/]:::io
-    parse["Parse Specs (specreader)"]:::process
-    specjson[/"Dependency Data (specs.json)"/]:::io
-    buildGraph[" Build Graph (grapher) "]:::process
-    depGraph[/"Dependency Graph (graph.dot)"/]:::io
-    cacheGraph[/"Cached Graph (cached_graph.dot)"/]:::io
+    parse["Parse specs (specreader)"]:::process
+    specjson[/"Dependency data (specs.json)"/]:::io
+    buildGraph[" Build graph (grapher) "]:::process
+    depGraph[/"Dependency graph (graph.dot)"/]:::io
+    cacheGraph[/"Cached graph (cached_graph.dot)"/]:::io
     sources[/Sources/]:::io
     packSRPM[Pack SRPM]:::process
     pkgFetcher["Package fetcher (graphpkgfetcher)"]:::process
     rpmCache[(RPM cache)]:::io
     remoteRepo[(remote repo)]:::io
-    missingDep[/RPMs to fill Missing Dependencies/]:::io
+    missingDep[/RPMs to fill missing dependencies/]:::io
     outRPMS[(RPMs built locally)]:::io
 
     %% Rpms flow
     start --> tcPopulated
     tcPopulated --> packSRPM
-
-    sources-->packSRPM
-    localSpecs-->packSRPM
-    packSRPM-->iSRPMs
-    iSRPMs--> parse
-    parse--> specjson
+    sources --> packSRPM
+    localSpecs --> packSRPM
+    packSRPM --> iSRPMs
+    iSRPMs --> parse
+    parse --> specjson
     specjson --> buildGraph
-    buildGraph--> depGraph
+    buildGraph --> depGraph
     depGraph --> pkgFetcher
-    remoteRepo-->missingDep
-    missingDep-->pkgFetcher
-    pkgFetcher-->rpmCache
-    pkgFetcher-->cacheGraph
-    createChroot-->chroot
-    tcRPMs-->createChroot
-    chroot-...->packSRPM
-    chroot-...->parse
-    chroot-...->pkgFetcher
-    rpmCache-->getDeps
-    tcRPMs-->getDeps
-    chroot-...->worker
-    builtRPMs-->outRPMS
-    outRPMS-->getDeps
-    doneBuild-->|yes|done
-    leafNodesAvail-->|no|error
-    cacheGraph-->currentGraph
+    remoteRepo --> missingDep
+    missingDep --> pkgFetcher
+    pkgFetcher --> rpmCache
+    pkgFetcher --> cacheGraph
+    createChroot --> chroot
+    tcRPMs --> createChroot
+    chroot -...->packSRPM
+    chroot -...->parse
+    chroot -...->pkgFetcher
+    rpmCache --> getDeps
+    tcRPMs --> getDeps
+    chroot -...-> worker
+    builtRPMs --> outRPMS
+    outRPMS --> getDeps
+    doneBuild -->|yes| done
+    leafNodesAvail -->|no| error
+    cacheGraph --> currentGraph
 
     %% Subgraph for scheduler
         %% scheduler nodes
         subgraph sched ["Scheduler tool (scheduler)"]
-        currentGraph[/Current Graph/]:::io
+        currentGraph[/Current graph/]:::io
         trim[Remove unneeded branches from graph]:::process
         doneBuild{{Done building all required nodes?}}:::decision 
         leafNodesAvail{{Leaf nodes available?}}:::decision
@@ -238,14 +237,14 @@ flowchart TD
         getDeps[Get dependencies]:::process
 
         %% scheduler flow
-        currentGraph-->trim
-        trim-->doneBuild
-        doneBuild-->|no|leafNodesAvail
-        leafNodesAvail-->|yes|worker
-        builtRPMs-->updateDeps
-        updateDeps-->currentGraph
-        getDeps-->worker
-        worker-->builtRPMs
+        currentGraph --> trim
+        trim --> doneBuild
+        doneBuild -->|no| leafNodesAvail
+        leafNodesAvail -->|yes| worker
+        builtRPMs --> updateDeps
+        updateDeps --> currentGraph
+        getDeps --> worker
+        worker --> builtRPMs
 
         end
     %% end of scheduler
@@ -264,43 +263,40 @@ flowchart TD
     classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
     classDef goodState fill:#566E40,stroke:#333,stroke-width:2px,color:#fff;
     classDef badState fill:#BC4B51,stroke:#333,stroke-width:2px,color:#fff;
-
     %% state nodes
-    start(["Start (make image / make iso)"]):::goodState
+    start(["Start (make image / make ISO)"]):::goodState
     done([Done]):::goodState
     %% error[[Error]]:::badState
-
     %% Image nodes
     imageConfig[/Image config.json/]:::io
     raw[/Raw image or file system/]:::io
     roast["Image format converter (roast)"]:::process
     initrd[/initrd/]:::io
-    iso[/"iso (imager tool, pkgs, config files)"/]:::io
+    iso[/"ISO (imager tool, pkgs, config files)"/]:::io
     image[/image/]:::io
     pkgFetcher["Package fetcher (imagepkgfetcher)"]:::process
-    rpmCache[(local RPMs)]:::io
-    remoteRepo[(remote repo)]:::io
+    rpmCache[(Local RPMs)]:::io
+    remoteRepo[(Remote repo)]:::io
     missingDep[/RPMs to fill Missing Dependencies/]:::io
     imager["Image tool (imager)"]:::process
-    isoBuild{{iso installer or offline build?}}:::decision
-    isoBuilder["iso maker (isomaker)"]:::process
-
+    isoBuild{{ISO installer or offline build?}}:::decision
+    isoBuilder["ISO maker (isomaker)"]:::process
     %% Image flow
-    start-->pkgFetcher
-    imageConfig-->pkgFetcher
-    rpmCache-->pkgFetcher
-    remoteRepo-->missingDep
-    missingDep-->pkgFetcher
-    pkgFetcher-->isoBuild
-    isoBuild-->|iso installer|isoBuilder
-    initrd-->isoBuilder
-    isoBuilder-->iso
-    iso-->done
-    isoBuild-->|offline|imager
-    imager-->raw
-    raw-->roast
-    roast-->image
-    image-->done
+    start --> pkgFetcher
+    imageConfig -->pkgFetcher
+    rpmCache --> pkgFetcher
+    remoteRepo --> missingDep
+    missingDep --> pkgFetcher
+    pkgFetcher --> isoBuild
+    isoBuild -->|iso installer| isoBuilder
+    initrd --> isoBuilder
+    isoBuilder --> iso
+    iso --> done
+    isoBuild -->|offline| imager
+    imager --> raw
+    raw --> roast
+    roast --> image
+    image --> done
     
 ```
 
