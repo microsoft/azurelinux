@@ -58,7 +58,10 @@ mkdir -pv %{buildroot}%{_sysconfdir}/%{name}/%{name}.d
 install -m 755 -D %{name} %{buildroot}%{_bindir}/%{name}
 install -m 755 -D scripts/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-install -m 755 -D etc/telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
+
+# Provide empty config file.
+./%{name} config > telegraf.conf
+install -m 755 -D telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
 
 %pre
 getent group telegraf >/dev/null || groupadd -r telegraf
