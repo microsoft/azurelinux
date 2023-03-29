@@ -53,8 +53,10 @@ fi
 echo $PKG_VERSION
 version=$PKG_VERSION
 upstream_version="${version/'~'/'-'}" 
+version_main=$(sed "s/-M[0-9]//" <<< ${upstream_version})
 
-# RETRIEVE
+echo $version_main
+#RETRIEVE
 wget "https://repo1.maven.org/maven2/org/apache/maven/surefire/surefire/${upstream_version}/surefire-${upstream_version}-source-release.zip" -O "${name}-${version}.orig.zip"
 
 rm -rf tarball-tmp
@@ -66,7 +68,7 @@ unzip "../${name}-${version}.orig.zip"
 find -name '*.jar' -delete
 find -name '*.class' -delete
 
-NEW_TARBALL="$OUT_FOLDER/${name}-${version}.tar.gz"
+NEW_TARBALL="$OUT_FOLDER/${name}-${version_main}.tar.gz"
 tar --sort=name --mtime="2021-11-10 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
