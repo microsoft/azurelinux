@@ -73,7 +73,7 @@ Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https:
 
 # Develop for CBL-Mariner
 ## Choose a repo
-The first step in developing with CBL-Mariner is to determine which repo fits your use case. If you are just looking to develop using CBL-Mariner's tools and packages, check out the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. `CBL-MarinerTutorials` is geared towards creating custom CBL-Mariner builds rather than contributing to the tools or common tools. 
+The first step in developing with CBL-Mariner is to determine which repo fits your use case. If you are just looking to develop using CBL-Mariner's tools and packages, check out the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. `CBL-MarinerTutorials` is geared towards creating custom CBL-Mariner builds rather than contributing to the tools or common packages. 
 ```mermaid
 ---
 title: Repo decision tree
