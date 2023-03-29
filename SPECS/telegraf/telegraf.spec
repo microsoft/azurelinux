@@ -1,14 +1,13 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.25.2
-Release:        3%{?dist}
+Version:        1.26.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
-#Source0:       %{url}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
@@ -90,6 +89,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Wed Mar 29 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26.0-1
+- Updating to version 1.26.0 to address CVEs in vendored sources for "containerd".
+
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.2-3
 - Bump release to rebuild with go 1.19.7
 
