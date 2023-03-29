@@ -1,4 +1,14 @@
 #!/bin/bash
+# This script serves to generate the rabbitmq-server-hex-vendor-3.11.11.tar.gz
+# used in rabbitmq-server.spec. to run this script, use the following command:
+#   ./generate-rabbitmq-server-tarball.sh
+#
+# Running the above will execute the script, creating a temp directory for 
+# all the packages, pull all required packages from hex and github (for hex
+# source), then tar everything up into the name specified in 
+# VENDOR_TARBALL_NAME. If the directory name in TEMP_TARBALL_DIR conflits 
+# locally, adjust the variable contents as necessary.
+
 
 # baseline variables for filename and temporary directory to avoid filenme collisions
 TEMP_TARBALL_DIR="TempRabbitmqTarball"
