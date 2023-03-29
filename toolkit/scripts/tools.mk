@@ -81,7 +81,7 @@ $(TOOL_BINS_DIR)/%:
 	touch $@
 else
 # Rebuild the go tools as needed
-$(TOOL_BINS_DIR)/%: $(go_common_files)
+$(TOOL_BINS_DIR)/%: $(go_common_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		CGO_ENABLED=0 go build \
@@ -90,9 +90,24 @@ $(TOOL_BINS_DIR)/%: $(go_common_files)
 endif
 
 # Runs tests for common components
-$(BUILD_DIR)/tools/internal.test_coverage: $(go_internal_files) $(go_imagegen_files)
+$(BUILD_DIR)/tools/internal.test_coverage: $(go_internal_files) $(go_imagegen_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$@ ./...
+
+# Downloads all the go dependencies without using sudo, so we don't break other go use cases for the user.
+# We can check if $SUDO_USER is set (the user who invoked sudo), and if so, use that user to run go get via sudo -u.
+# We allow the command to fail with || true, since we don't want to fail the build if the user has already
+# downloaded the dependencies as root. The go build command will download the dependencies if they are missing (but as root).
+$(STATUS_FLAGS_DIR)/got_go_deps.flag: $(go_common_files)
+	@cd $(TOOLS_DIR)/ && \
+		if [ -z "$$SUDO_USER" ]; then \
+			echo "SUDO_USER is not set, running 'go get' as user '$$USER'"; \
+			go get -d ./... || echo "Failed to run 'go get', falling back to 'go build' to pull modules" ; \
+		else \
+			echo "SUDO_USER is set, running 'go get' as user '$$SUDO_USER'"; \
+			sudo -u $$SUDO_USER go get -d ./... || echo "Failed to run 'go get', falling back to 'go build' to pull modules" ; \
+		fi && \
+		touch $@
 
 # Return a list of all directories inside tools/ which contains a *.go file in
 # the form of "go-fmt-<directory>"
