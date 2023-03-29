@@ -10,6 +10,7 @@ title: Flowchart key
 ---
 flowchart TD
     %% style definitions
+    classDef database fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
     classDef io fill:#247BA0,stroke:#333,stroke-width:2px,color:#fff;
     classDef process fill:#B05E2F,stroke:#333,stroke-width:2px,color:#fff;
     classDef decision fill:#51344D,stroke:#333,stroke-width:2px,color:#fff;
@@ -22,6 +23,7 @@ flowchart TD
     decision{{decision}}:::decision
     goodstate([good state]):::goodState
     badstate[[bad state]]:::badState
+    database[(database)]:::database
 ```
 <br/>
 
