@@ -52,10 +52,9 @@ make %{?_smp_mflags} -k check
 
 %files
 %defattr(-,root,root)
-%license COPYRIGHT
+%license LICENSE.md
 %{_bindir}/*
 %{_libdir}/*.so.*
-%{_mandir}/man1/*
 
 %files devel
 %defattr(-,root,root)
@@ -63,7 +62,6 @@ make %{?_smp_mflags} -k check
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_docdir}/*
-%{_mandir}/man3/*
 
 %changelog
 * Mon Mar 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.5.0-1
