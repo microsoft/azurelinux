@@ -21,8 +21,17 @@ URL:            https://www.rust-lang.org/
 #  - crates.io source official repo is https://github.com/rust-lang/crates.io
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
-# To update the cache run:
-#   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
+# To update the cache, leverage the: generate_source_tarball.sh
+#   
+# An example run for rust 1.68.2:
+# - Download Rust Source (1.68.2):
+#   wget https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz
+# - Create a directory to store the output from the script:
+#   mkdir rustOutputDir
+# - Run the script:
+#   ./generate_source_tarball --srcTarball path/to/rustc-1.68.2-src.tar.xz --outFolder path/to/rustOutputDir --pkgVersion 1.68.2
+#
+
 Source1:        rustc-%{version}-src-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
