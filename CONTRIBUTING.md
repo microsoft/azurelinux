@@ -73,7 +73,7 @@ CBL-Mariner packages live in either [SPECS](SPECS) or [SPECS-EXTENDED](SPECS-EXT
 |SPECS-EXTENDED         |**Yes**    |No       | - Package needs a viable upstream source which actively addresses CVEs <br> - Package must not include project specific code
 |SPECS                  |**Yes**    |**Yes**  | - Package needs a viable upstream source which actively addresses CVEs <br> - Package must not include project specific code <br> - Package needs to offer value for multiple use cases
 
-When looking to graduate a package from `SPECS` to `SPECS-EXTENDED`, consult with a CBL-Mariner dev to highlight the package's value and ensure that the following steps are completed.
+When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, consult with a CBL-Mariner dev to highlight the package's value and ensure that the following steps are completed.
 - Bump the release
 - Add changelog entries "Package promoted from SPECS-EXTENDED to SPECS" and "License verified" 
 - Add a %check section passes if not already present
