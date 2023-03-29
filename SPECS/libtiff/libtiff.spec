@@ -8,19 +8,14 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-# Also fixes CVE-2022-2057 and CVE-2022-2058.
-Patch0:         CVE-2022-2056.patch
-Patch1:         CVE-2022-34526.patch
-# Also fixes CVE-2022-3598
-# Also fixes CVE-2022-3626 and CVE-2022-3627
 Patch7:         CVE-2022-48281.patch
-# Also fixes CVE-2023-0796/0797/0798/0799
-#Also fixes CVE-2023-0801/0802/0803/0804
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libtool
+
 Requires:       libjpeg-turbo
+
 Provides:       %{name}-tools = %{version}-%{release}
 
 %description
@@ -28,6 +23,7 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
+
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
 
