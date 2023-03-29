@@ -24933,6 +24933,17 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rabbitmq-server",
+          "version": "3.11.11",
+          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.11.11/rabbitmq-server-3.11.11.tar.xz"
+        }
+      }
+    },
+    
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "radvd",
           "version": "2.18",
           "downloadUrl": "http://www.litech.org/radvd/dist/radvd-2.18.tar.xz"
