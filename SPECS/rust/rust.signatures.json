@@ -6,7 +6,7 @@
   "rust-std-1.67.1-x86_64-unknown-linux-gnu.tar.gz": "31dfc19ae5821c0542975111574aa8cc7e0b2e1a95204f6cff7572f183524626",
   "rustc-1.67.1-aarch64-unknown-linux-gnu.tar.gz": "accb1afa2674730b69a762f79b4f71bbb5211c4f5b022b115d8e034775dba5ad",
   "rustc-1.67.1-x86_64-unknown-linux-gnu.tar.gz": "11115542833004fff465fdc86994245b6446d988aebd42153203a6f9c3aeccef",
-  "rustc-1.68.0-src-cargo.tar.gz": "8b41ba09a0e998fce6bafa69c93c8c5384b29b38438104db7c98e348b4759979",
-  "rustc-1.68.0-src.tar.xz": "8651245e8708f11d0f65ba9fdb394c4b9300d603d318045664b371729da9eac4"
+  "rustc-1.68.2-src-cargo.tar.gz": "8b41ba09a0e998fce6bafa69c93c8c5384b29b38438104db7c98e348b4759979",
+  "rustc-1.68.2-src.tar.xz": "ce1a115f6aafa912b4622906a92b626354973afa9288e2c7750df4dcf3390fc0"
  }
 }

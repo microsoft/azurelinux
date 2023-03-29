@@ -8,7 +8,7 @@
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.68.0
+Version:        1.68.2
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -21,8 +21,17 @@ URL:            https://www.rust-lang.org/
 #  - crates.io source official repo is https://github.com/rust-lang/crates.io
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
-# To update the cache run:
-#   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
+# To update the cache, leverage the: generate_source_tarball.sh
+#   
+# An example run for rust 1.68.2:
+# - Download Rust Source (1.68.2):
+#   wget https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz
+# - Create a directory to store the output from the script:
+#   mkdir rustOutputDir
+# - Run the script:
+#   ./generate_source_tarball --srcTarball path/to/rustc-1.68.2-src.tar.xz --outFolder path/to/rustOutputDir --pkgVersion 1.68.2
+#
+
 Source1:        rustc-%{version}-src-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
@@ -153,6 +162,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Tue Mar 28 2023 Muhammad Falak <mwani@microsoft.com> - 1.68.2-1
+- Bump version to 1.68.2 to revoke leaked github keys
+
 * Mon Mar 13 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.68.0-1
 - Updating to version 1.68.0
 

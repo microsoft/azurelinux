@@ -10,8 +10,6 @@ Distribution:   Mariner
 URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
-# Remove bundled binaries which cannot be easily verified for licensing
-Source1:        generate-tarball.sh
 Source2:        cpl-v10.html
 Patch1:         0001-Port-to-TestNG-6.11.patch
 Patch2:         0002-Disable-JUnit-4.8-test-grouping.patch
@@ -149,7 +147,7 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %license LICENSE NOTICE cpl-v10.html
 
 %changelog
-* Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
+* Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified
 

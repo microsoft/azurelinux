@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.19.5
+Version:        1.19.7
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -117,6 +117,12 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.7-1
+- Auto-upgrade to 1.19.7 - address CVE-2023-24532
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.6-1
+- Auto-upgrade to 1.19.6 - Address CVE-2022-41722, CVE-2022-41724, CVE-2022-41725, CVE-2022-41723
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.5-1
 - Auto-upgrade to 1.19.5 - upgrade to latest
 
