@@ -1,23 +1,17 @@
+Summary:        Interactive process viewer
+Name:           htop
+Version:        3.0.5
+Release:        4%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name: htop
-Version: 3.0.5
-Release: 2%{?dist}
-Summary: Interactive process viewer
-License: GPLv2+
-URL: http://hisham.hm/htop/
-Source0: https://github.com/htop-dev/htop/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires: desktop-file-utils
-BuildRequires: ncurses-devel
-%if 0%{?rhel} >= 8
-BuildRequires: platform-python
-BuildRequires: /usr/bin/pathfix.py
-%else
-BuildRequires: python
-%endif
-BuildRequires: libtool
-BuildRequires: make
+URL:            http://hisham.hm/htop/
+Source0:        https://github.com/htop-dev/htop/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  desktop-file-utils
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  ncurses-devel
+BuildRequires:  python3
 
 %description
 htop is an interactive text-mode process viewer for Linux, similar to
@@ -25,9 +19,6 @@ top(1).
 
 %prep
 %autosetup
-%if 0%{?rhel} >= 8
-pathfix.py -pni "/usr/libexec/platform-python" scripts/
-%endif
 
 %build
 autoreconf -vfi
@@ -56,6 +47,13 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_mandir}/man1/htop.1*
 
 %changelog
+* Mon Mar 27 2023 Betty Lakes <bettylakes@microsoft.com> - 3.0.5-4
+- License verified
+- Remove distro specific macros 
+
+* Tue Mar 21 2023 Betty Lakes <bettylakes@microsoft.com> - 3.0.5-3
+- Update python to python3
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.5-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

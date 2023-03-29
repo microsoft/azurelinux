@@ -1757,8 +1757,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "29.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v29.0.tar.gz"
+          "version": "30.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v30.0.tar.gz"
         }
       }
     },
@@ -4590,8 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.6",
-          "downloadUrl": "https://golang.org/dl/go1.19.6.src.tar.gz"
+          "version": "1.19.7",
+          "downloadUrl": "https://golang.org/dl/go1.19.7.src.tar.gz"
         }
       }
     },
@@ -8071,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.92.mshv1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.92.mshv1.tar.gz"
+          "version": "5.15.98.mshv1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.98.mshv1.tar.gz"
         }
       }
     },

@@ -138,8 +138,8 @@ worker_chroot_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/$(worker_manifest_name)
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
-# Outputs: $(RPMS_DIR)/<arch>/<name>.<arch>.rpm
-sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
+# Outputs: $(TOOLCHAIN_RPMS_DIR)/<arch>/<name>.<arch>.rpm
+sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(TOOLCHAIN_RPMS_DIR)/\2/\1`p'
 worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chroot_manifest))
 
 # The worker chroot depends on specific toolchain RPMs, the $(toolchain_rpms): target in toolchain.mk knows how
@@ -154,11 +154,11 @@ $(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOO
 else
 $(chroot_worker):
 endif
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(TOOLCHAIN_RPMS_DIR) $(LOGS_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \
-	--rpm-dir="$(toolchain_rpms_dir)" \
+	--rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 	--tmp-dir="$(BUILD_DIR)/validatechroot" \
 	--worker-chroot="$(chroot_worker)" \
 	--worker-manifest="$(worker_chroot_manifest)" \
