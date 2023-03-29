@@ -96,7 +96,7 @@ $(BUILD_DIR)/tools/internal.test_coverage: $(go_internal_files) $(go_imagegen_fi
 
 # Downloads all the go dependencies without using sudo, so we don't break other go use cases for the user.
 # We can check if $SUDO_USER is set (the user who invoked sudo), and if so, use that user to run go get via sudo -u.
-# We allow the command to fail with || true, since we don't want to fail the build if the user has already
+# We allow the command to fail with || echo ..., since we don't want to fail the build if the user has already
 # downloaded the dependencies as root. The go build command will download the dependencies if they are missing (but as root).
 $(STATUS_FLAGS_DIR)/got_go_deps.flag: $(go_common_files)
 	@cd $(TOOLS_DIR)/ && \
