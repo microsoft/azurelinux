@@ -1,15 +1,5 @@
-<!-- Table of Contents does not automatically update -->
 # Contents
-- [Contributing License Agreement](#contributing-license-agreement)
-- [Security Vulnerabilities](#security-vulnerabilities)
-- [Develop for CBL-Mariner](#develop-for-cbl-mariner)
-  - [Packages](#new-packages)
-  - [Toolkit](#toolkit)
-  - [Documentation](#documentation)
-- [Pull Request Guidelines](#pull-request-guidelines)
-  - [PR Titles](#pr-titles)
-  - [PR Checklist](#pr-checklist)
-- [Bugs](#bugs)
+Please use the [auto-generated table of contents](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes#auto-generated-table-of-contents-for-readme-files) GitHub creates. To reveal it, select the three bar menu icon at the top of the page.
 
 # Contributing License Agreement
 
