@@ -21,7 +21,7 @@ flowchart TD
     process[process]:::process
     decision{{decision}}:::decision
     goodstate([good state]):::goodState
-    badstate([bad state]):::badState
+    badstate[[bad state]]:::badState
 ```
 <br/>
 
@@ -112,6 +112,7 @@ flowchart TD
     %% state nodes
     start(["Start (make toolchain)"]):::goodState
     done([Done]):::goodState
+    %% error[[Error]]:::badState
 
     %% TC nodes
     tcManifests[/Local Toolchain Manifests/]:::io
@@ -125,14 +126,16 @@ flowchart TD
     hydrateTC[Extract Toolchain RPMs]:::process
     buildRawTC[Build Raw Toolchain]:::process
     localSpecs[/Local SPECS/]:::io
-    bsRPMS[/Bootstrap Toolchain RPMs/]:::io
+    bsRPMS[/Bootstraped Environment/]:::io
     buildTC[Build Toolchain proper]:::process
     pullRemote[Download remote RPMs]:::process
 
     %% TC flow
     start --> tcRebuild
     tcRebuild -->|yes| buildRawTC
-    tcManifests --> toolchainChoice
+    tcManifests --> hydrateTC
+    tcManifests --> pullRemote
+    tcManifests --> buildTC
     tcRebuild -->|no|toolchainChoice
     toolchainChoice -->|no| pullRemote
     toolchainChoice -->|yes| pullTC 
@@ -140,7 +143,6 @@ flowchart TD
     pullTC -->hydrateTC
     tcArchiveOld --> pullTC
     hydrateTC --> tcRPMs
-    localSpecs --> buildRawTC
     buildRawTC --> bsRPMS
     bsRPMS --> buildTC
     localSpecs --> buildTC
@@ -168,24 +170,21 @@ flowchart TD
     %% state nodes
     start(["Start (make build-packages)"]):::goodState
     done([Done]):::goodState
-    error([error]):::badState
+    error[[Error]]:::badState
 
     %% Rpm nodes
     tcPopulated([Toolchain populated]):::goodState
     localSpecs[/Local SPECS/]:::io
-    buildPackage{{"Make package? (REBUILD_PACKAGES=y/n)"}}:::decision
-    remoteRPM{{Pull remote RPM?}}:::decision
     tcRPMs[(Toolchain RPMs)]:::io
     createChroot[Create Chroot]:::process
     chroot[/chroot/]:::io
     iSRPMs[/Intermediate SRPMs/]:::io
     parse["Parse Specs (specreader)"]:::process
-    specjson[/Spec json/]:::io
+    specjson[/"Dependency Data (specs.json)"/]:::io
     buildGraph[" Build Graph (grapher) "]:::process
     depGraph[/"Dependency Graph (graph.dot)"/]:::io
     cacheGraph[/"Cached Graph (cached_graph.dot)"/]:::io
     packSRPM[Pack SRPM]:::process
-    beginBuild[Begin Build]:::process
     pkgFetcher[Package fetcher]:::process
     rpmCache[(RPM cache)]:::io
     remoteRepo[(remote repo)]:::io
@@ -194,10 +193,8 @@ flowchart TD
 
     %% Rpms flow
     start --> tcPopulated
-    tcPopulated --> buildPackage
-    buildPackage -->|yes|packSRPM
-    remoteRPM -->|no|beginBuild
-    beginBuild --> packSRPM
+    tcPopulated --> packSRPM
+
     localSpecs-->packSRPM
     packSRPM-->iSRPMs
     iSRPMs--> parse
@@ -230,9 +227,9 @@ flowchart TD
         trim[Remove unneeded branches from graph]:::process
         doneBuild{{Done building all required nodes?}}:::decision 
         leafNodesAvail{{Leaf nodes available?}}:::decision
-        worker[Worker to build rpm]:::process
+        worker[Schedule a worker to build the srpm]:::process
         builtRPMs[/Built RPMs/]:::io
-        updateDeps[Update Dependency]:::process
+        updateDeps[Update Dependencies In Graph]:::process
         getDeps[Get dependencies]:::process
 
         %% scheduler flow
@@ -266,12 +263,12 @@ flowchart TD
     %% state nodes
     start(["Start (make build-packages)"]):::goodState
     done([Done]):::goodState
-    %% error([error]):::badState
+    %% error[[Error]]:::badState
 
     %% Image nodes
     imageConfig[/Image config or json/]:::io
     raw[/Raw image or file system/]:::io
-    roast[roast]:::process
+    roast["Image format converter (roast)"]:::process
     initrd[/initrd/]:::io
     iso[/"iso (imager tool, pkgs, config files)"/]:::io
     image[/image/]:::io
