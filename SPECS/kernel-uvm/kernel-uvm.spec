@@ -28,7 +28,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
+URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-mshv-%{version}.tar.gz
 Source1:        config
 Source2:        config
