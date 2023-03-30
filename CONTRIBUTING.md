@@ -78,11 +78,11 @@ CBL-Mariner packages live in either [SPECS](SPECS) or [SPECS-EXTENDED](SPECS-EXT
 
 When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [GitHub issue](https://github.com/microsoft/CBL-Mariner/issues) highlighting the package's value and ensure that the following steps are completed for associated PRs.
 
-1. Bump the release
+1. Increment the spec's `Release` value
 1. Add changelog entries "Package promoted from SPECS-EXTENDED to SPECS" and "License verified"
-1. Add a %check section passes if not already present
+1. Add a `%check` section to the spec if not already present and confirm it passes
 1. Ensure spec is free of references, macros, comments, etc. only applicable to other distros
-1. Complete the PR checklist
+1. Complete the [PR checklist](#pr-checklist)
 1. Pass the GitHub checks
 
 ### Toolkit
