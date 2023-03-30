@@ -4,8 +4,8 @@
 %global short_commit    e88ad165
 Summary:        Open source, general-purpose policy engine
 Name:           opa
-Version:        0.50.2
-Release:        1%{?dist}
+Version:        0.31.0
+Release:        9%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -21,8 +21,8 @@ Patch0:         0001-Make-telemetry-opt-out.patch
 # Skip tests requiring network
 Patch1:         0001-Skip-tests-requiring-network.patch
 # Warn users about WebAssembly missing
+Patch2:         0001-Warn-users-about-WebAssembly-missing.patch
 BuildRequires:  golang
-BuildRequires:  make
  
 %description
 An open source, general-purpose policy engine.
@@ -35,23 +35,39 @@ stack.
 %autosetup -p1
 mv internal/jwx/LICENSE LICENSE-jwx
 
+# Remove code related to wasm, as we have to disable wasm,
+# wasmtime not being packaged in Fedora yet
+rm resolver/wasm/wasm.go version/wasm.go
+rm internal/rego/opa/opa.go internal/wasm/sdk/opa/capabilities/capabilities.go
+rm -rf internal/wasm/sdk/internal/wasm internal/wasm/sdk/opa/opa.go
+
 %build
-make build WASM_ENABLED=0
-mv opa_* opa
+# create vendor folder from the vendor tarball and set vendor mode
+go build -o /bin/generate-man ./build/generate-man
+go build -ldflags "-X %{goipath}/version.Version=%{version} -X %{goipath}/version.Vcs=%{short_commit}" -mod=vendor -v -a -o opa
+mkdir _man
+/bin/generate-man _man
+rm /bin/generate-man
 
 %install
 install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp opa                 %{buildroot}%{_bindir}/
+install -d -p -m 0755                   %{buildroot}%{_mandir}/man1
+install -D -p -m 0644 _man/*         %{buildroot}%{_mandir}/man1/
  
 %files
 %license LICENSE LICENSE-jwx
 %doc docs/content CHANGELOG.md README.md MAINTAINERS.md ADOPTERS.md CODE_OF_CONDUCT.md
 %doc CONTRIBUTING.md GOVERNANCE.md SECURITY.md
+%{_mandir}/man1/opa*.1*
 %{_bindir}/*
 
 %changelog
-* Mon Mar 27 2023 Dallas Delaney <dadelan@microsoft.com> - 0.50.2-1
-- Update to version 0.50.2
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-8
+- Bump release to rebuild with go 1.19.6
 
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-7
 - Bump release to rebuild with go 1.19.5
