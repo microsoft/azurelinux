@@ -215,7 +215,7 @@ flowchart TD
     tcRPMs --> createChroot
     createChroot --> chroot
     chroot -...-> packSRPM & parse & pkgFetcher & worker
-    builtRPMs --> outRPMS
+    builtRPMs ----> outRPMS
     doneBuild -->|yes| done
     leafNodesAvail -->|no| error
     cacheGraph --> currentGraph
