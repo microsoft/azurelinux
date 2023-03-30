@@ -986,8 +986,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.86.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.86.0.tar.gz"
+          "version": "7.88.1",
+          "downloadUrl": "https://curl.haxx.se/download/curl-7.88.1.tar.gz"
         }
       }
     },
@@ -2136,8 +2136,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.55",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.55.tar.bz2"
+          "version": "2.4.56",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.56.tar.bz2"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.172.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.172.1.tar.gz"
+          "version": "5.10.174.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.174.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.172.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.172.1.tar.gz"
+          "version": "5.10.174.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.174.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.172.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.172.1.tar.gz"
+          "version": "5.10.174.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.174.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.172.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.172.1.tar.gz"
+          "version": "5.10.174.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.174.1.tar.gz"
         }
       }
     },
@@ -4406,8 +4406,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.31",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.31.tar.gz"
+          "version": "8.0.32",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.32.tar.gz"
         }
       }
     },
@@ -7036,8 +7036,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.9",
-          "downloadUrl": "http://download.redis.io/releases/redis-6.2.9.tar.gz"
+          "version": "6.2.11",
+          "downloadUrl": "http://download.redis.io/releases/redis-6.2.11.tar.gz"
         }
       }
     },
@@ -8186,8 +8186,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.12p2",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.12p2.tar.gz"
+          "version": "1.9.13p3",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.13p3.tar.gz"
         }
       }
     },
@@ -8636,8 +8636,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1247",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1247.tar.gz"
+          "version": "9.0.1402",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1402.tar.gz"
         }
       }
     },
