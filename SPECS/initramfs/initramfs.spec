@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        11%{?dist}
+Release:        10%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -88,17 +88,15 @@ echo "initramfs (re)generation" %* >&2
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
     echo "(re)generate initramfs for all kernels," %* >&2 \
-    mkinitrd --preload megaraid_sas --preload megaraid -q \
+    mkinitrd -q \
     mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || : \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
         if [[ $k == *mshv* ]]; then \
-            mkinitrd --preload megaraid_sas --preload megaraid -q \
-                /boot/efi/initrd.img-$k $k -k \
+            mkinitrd -q /boot/efi/initrd.img-$k $k -k \
         else \
-            mkinitrd --preload megaraid_sas --preload megaraid -q \
-                /boot/initrd.img-$k $k -k \
+            mkinitrd -q /boot/initrd.img-$k $k -k \
         fi \
     done; \
 fi \
@@ -138,9 +136,6 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
-* Mon Jan 09 2023 Vince Perri <viperri@microsoft.com> - 2.0-11
-- Add megaraid* drivers to the initramfs generated images.
-
 * Thu Mar 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-10
 - Create initrd in /boot/efi for kernel-mshv only if it is a kata image
 
