@@ -22,7 +22,7 @@ Distribution:   Mariner
 %define short_name commons-%{base_name}
 Name:           apache-%{short_name}
 Version:        3.8.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Apache Commons Lang Package
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -101,7 +101,7 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.1-4
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.1-5
 - Moved from extended to core
 - License verified
 

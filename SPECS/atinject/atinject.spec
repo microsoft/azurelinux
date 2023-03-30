@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package atinject
 #
@@ -13,21 +11,20 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 %global base_version 1
 %global git_tag 1f74ea7bd05ce4a3a62ddfe4a2511bf1b4287a61
 %global git_version 20100611git1f74ea7
+Summary:        Dependency injection specification for Java (JSR-330)
 Name:           atinject
 Version:        %{base_version}+%{git_version}
 Release:        3%{?dist}
-Summary:        Dependency injection specification for Java (JSR-330)
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
-URL:            http://javax-inject.github.io/javax-inject/
+URL:            https://javax-inject.github.io/javax-inject/
 # git clone --bare git@github.com:javax-inject/javax-inject
 # git --git-dir=javax-inject.git archive --prefix %{name}-%{base_version}/ --format tar %{git_tag} | xz >%{name}-%{base_version}.tar.xz
 Source0:        %{_mariner_sources_url}/%{name}-%{base_version}.tar.xz
@@ -117,6 +114,9 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1+20100611git1f74ea7-4
+- Moved from extended to core
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-3
 - Updating source URLs.
 - License verified.

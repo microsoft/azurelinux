@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package jsr-305
 #
@@ -13,20 +11,19 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 %global svn_revision 51
 %global svn_date 20130910
+Summary:        Correctness annotations for Java code
 Name:           jsr-305
 Version:        0.1+%{svn_date}
 Release:        7%{?dist}
-Summary:        Correctness annotations for Java code
 # The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
-License:        BSD and CC-BY
+License:        BSD AND CC-BY
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://code.google.com/archive/p/jsr-305
 # There has been no official release yet.  This is a snapshot of the Subversion
@@ -43,7 +40,7 @@ BuildRequires:  ant
 BuildRequires:  dos2unix
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
-Provides:       mvn(com.google.code.findbugs:jsr305)
+Provides:       mvn(com.google.code.findbugs:jsr305) = %{version}-%{release}
 BuildArch:      noarch
 
 %package javadoc
@@ -120,39 +117,53 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 
 * Sat Oct  5 2019 Fridrich Strba <fstrba@suse.com>
 - Remove references to parent from all pom files
+
 * Wed Mar 13 2019 Fridrich Strba <fstrba@suse.com>
 - Fix a broken link
+
 * Wed Feb  6 2019 Fridrich Strba <fstrba@suse.com>
 - Cleanup of spec file
 - Do not distribute sampleUses as documentation
 - Fix javadoc group
+
 * Wed Oct 31 2018 Fridrich Strba <fstrba@suse.com>
 - Package also the parent pom
+
 * Thu Oct 25 2018 Fridrich Strba <fstrba@suse.com>
 - Update to newer snapshot (svn revision 51)
 - Add com.google.code.findbugs:jsr305 alias to the maven provides
+
 * Tue Sep 19 2017 fstrba@suse.com
 - Fix build with jdk9: specify java target and source 1.6
+
 * Fri May 19 2017 dziolkowski@suse.com
 - New build dependency: javapackages-local
 - removed "section free" tag
 - spec cleaned using spec-cleaner
+
 * Wed Mar 18 2015 tchvatal@suse.com
 - Fix build with new javapackages-tools
+
 * Fri Jun 27 2014 tchvatal@suse.com
 - Remove java-javadoc dep as it is not needed to sort out SLE11
+
 * Tue Sep 10 2013 mvyskocil@suse.com
 - use add_maven_depmap from javapackages-tools
 - don't install versioned jars and javadocs
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Thu Jan 26 2012 mvyskocil@suse.cz
 - remove non working url from spec
+
 * Fri Dec  9 2011 coolo@suse.com
 - fix license to be in spdx.org format
+
 * Mon Nov 15 2010 mvyskocil@suse.cz
 - fix bnc#653551 - No license indicators in jsr-305 package
   * add license file with BSD license text
     as written on http://code.google.com/p/jsr-305/
+
 * Wed Jun  3 2009 mvyskocil@suse.cz
 - Initial SUSE packaging based on jpp 5.0

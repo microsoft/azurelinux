@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package guava
 #
@@ -13,16 +11,16 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
+Summary:        Google Core Libraries for Java
 Name:           guava
 Version:        25.0
 Release:        6%{?dist}
-Summary:        Google Core Libraries for Java
 License:        Apache-2.0 AND CC0-1.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -34,7 +32,7 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  jsr-305
 BuildRequires:  junit
 Requires:       mvn(com.google.code.findbugs:jsr305)
-Provides:       mvn(com.google.guava:guava)
+Provides:       mvn(com.google.guava:guava) = %{version}-%{release}
 BuildArch:      noarch
 
 %description
@@ -157,9 +155,11 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
 * Wed Dec  4 2019 Fridrich Strba <fstrba@suse.com>
 - Avoid version-less dependencies that can cause problems with
   some tools
+
 * Fri Nov 22 2019 Fridrich Strba <fstrba@suse.com>
 - Build the package with ant in order to prevent build cycles
   * using a generated and customized ant build system
+
 * Thu Oct 10 2019 Fridrich Strba <fstrba@suse.com>
 - Added patch:
   * guava-25.0-java8compat.patch
@@ -168,5 +168,6 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
     introduced in Java 9
     + This allows us to produce with Java >= 9 binaries that are
     compatible with Java 8
+
 * Fri Apr 12 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of guava 25.0
