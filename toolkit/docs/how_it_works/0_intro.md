@@ -203,32 +203,25 @@ flowchart TD
 
     %% Rpms flow
     start --> tcPopulated
-    tcPopulated --> packSRPM
-    sources --> packSRPM
-    localSpecs --> packSRPM
+    tcPopulated & sources & localSpecs --> packSRPM
     packSRPM --> iSRPMs
     iSRPMs --> parse
     parse --> specjson
     specjson --> buildGraph
     buildGraph --> depGraph
-    depGraph --> pkgFetcher
     remoteRepo --> missingDep
-    missingDep --> pkgFetcher
-    pkgFetcher --> rpmCache
-    pkgFetcher --> cacheGraph
-    createChroot --> chroot
+    depGraph & missingDep --> pkgFetcher
+    pkgFetcher --> rpmCache & cacheGraph
     tcRPMs --> createChroot
-    chroot -...->packSRPM
-    chroot -...->parse
-    chroot -...->pkgFetcher
-    chroot -...-> worker
-    outRPMS --> getDeps
+    createChroot --> chroot
+    chroot -...-> packSRPM & parse & pkgFetcher & worker
     builtRPMs --> outRPMS
     doneBuild -->|yes| done
     leafNodesAvail -->|no| error
     cacheGraph --> currentGraph
-    rpmCache --> getDeps
     tcRPMs --> getDeps
+    rpmCache ----> getDeps
+    outRPMS --> getDeps
 
     %% Subgraph for scheduler
         %% scheduler nodes
@@ -239,7 +232,7 @@ flowchart TD
         leafNodesAvail{{Leaf nodes available?}}:::decision
         worker[Schedule a chroot worker to build the SRPM]:::process
         builtRPMs[/Built RPMs/]:::io
-        updateDeps[Update dependencies in graph]:::process
+        updateDeps[Scan new RPMs and update graph dependencies]:::process
         getDeps[Add dependencies to worker]:::process
 
         %% scheduler flow
@@ -251,9 +244,10 @@ flowchart TD
         worker --> getDeps
         getDeps --> buildRPMs
         buildRPMs --> builtRPMs
-
+        builtRPMs --> updateDeps
         end
     %% end of scheduler
+
 ```
 
 ### Image Generation
