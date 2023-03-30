@@ -11,14 +11,14 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/packagerepo/repocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/packagerepo/repomanager/rpmrepomanager"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/tdnf"
 )
 
 const (

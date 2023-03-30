@@ -15,11 +15,11 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/shell"
 
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"

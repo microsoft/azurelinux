@@ -25,7 +25,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/progressview"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/userview"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 
 	"github.com/bendahl/uinput"
 	"github.com/gdamore/tcell"

@@ -6,9 +6,9 @@ package main
 import (
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/pkggraph"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )

@@ -9,10 +9,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/sliceutils"
 )
 
 const (

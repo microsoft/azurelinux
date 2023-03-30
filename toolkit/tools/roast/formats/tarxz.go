@@ -3,7 +3,7 @@
 
 package formats
 
-import "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+import "github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/shell"
 
 // TarXzType represents the tar.xz format
 const TarXzType = "tar.xz"

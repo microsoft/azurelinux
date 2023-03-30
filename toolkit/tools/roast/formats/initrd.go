@@ -12,7 +12,7 @@ import (
 	"github.com/cavaliercoder/go-cpio"
 	"github.com/klauspost/pgzip"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 // InitrdType represents the format for a compressed initrd file loaded by the Linux kernel at boot

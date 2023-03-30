@@ -14,7 +14,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uiutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/randomization"
 )
 
 // Input validation constants.

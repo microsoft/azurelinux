@@ -9,13 +9,13 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/packagerepo/repocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/packagerepo/repocloner/rpmrepocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/packagerepo/repoutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/pkgjson"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )

@@ -17,15 +17,15 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/tdnf"
 )
 
 const (

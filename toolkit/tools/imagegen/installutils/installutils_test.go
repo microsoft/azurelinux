@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/pkgjson"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 
 	"github.com/stretchr/testify/assert"
 )

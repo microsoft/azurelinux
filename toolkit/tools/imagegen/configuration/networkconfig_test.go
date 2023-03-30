@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/file"
 	"github.com/stretchr/testify/assert"
 )
 

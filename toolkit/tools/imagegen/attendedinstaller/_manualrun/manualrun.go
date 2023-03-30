@@ -10,7 +10,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/logger"
 )
 
 // manualrun is a tool to test the attendedinstaller in the current terminal window.
