@@ -1,6 +1,6 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.55
+Version:        2.4.56
 Release:        1%{?dist}
 License:        Apache-2.0
 URL:            https://httpd.apache.org/
@@ -10,7 +10,7 @@ Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 
 # Patch0 is taken from:
-# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.53-blfs_layout-3.patch
+# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.56-blfs_layout-3.patch
 Patch0:         httpd-2.4.53-blfs_layout-3.patch
 Patch1:         httpd-uncomment-ServerName.patch
 
@@ -207,6 +207,9 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+* Tue Mar 14 2023 Thien Trung Vuong <tvuong@microsoft.com> - 2.4.56-1
+- Upgrade to version 2.4.56 - Fixes CVE-2023-27522, CVE-2023-25690
+
 * Mon Feb 06 2023 Dan Streetman <ddstreet@microsoft.com> - 2.4.55-1
 - Upgrade to version 2.4.55 - Fixes CVE-2022-36760
 
