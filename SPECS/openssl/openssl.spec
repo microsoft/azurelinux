@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,7 @@ Patch29:        CVE-2023-0286.patch
 Patch30:        CVE-2022-4304.patch
 Patch31:        CVE-2022-4450.patch
 Patch32:        CVE-2023-0215.patch
+Patch33:        CVE-2023-0464.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -149,6 +150,7 @@ cp %{SOURCE4} test/
 %patch30 -p1
 %patch31 -p1
 %patch32 -p1
+%patch33 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -328,6 +330,10 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Fri Mar 31 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.1.1k-14
+- Adding patch for CVE-2023-0464
+- 2 of the 3 patches for the CVE were for later versions
+
 * Tue Feb 07 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1k-13
 - Add upstream patches for CVE-2022-4304, CVE-2022-4450, CVE-2023-0215, CVE-2024-0286
 
