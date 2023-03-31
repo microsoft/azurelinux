@@ -2272,6 +2272,7 @@
                 "python-tensorflow-estimator",
                 "python-yamlloader",
                 "R",
+                "rabbitmq-server",
                 "reaper",
                 "rocksdb",
                 "rubygem-addressable",

@@ -190,9 +190,9 @@ libssh2-1.9.0-2.cm2.aarch64.rpm
 libssh2-devel-1.9.0-2.cm2.aarch64.rpm
 krb5-1.19.4-1.cm2.aarch64.rpm
 nghttp2-1.46.0-2.cm2.aarch64.rpm
-curl-7.88.1-1.cm2.aarch64.rpm
-curl-devel-7.88.1-1.cm2.aarch64.rpm
-curl-libs-7.88.1-1.cm2.aarch64.rpm
+curl-8.0.1-1.cm2.aarch64.rpm
+curl-devel-8.0.1-1.cm2.aarch64.rpm
+curl-libs-8.0.1-1.cm2.aarch64.rpm
 tdnf-3.2.2-4.cm2.aarch64.rpm
 tdnf-cli-libs-3.2.2-4.cm2.aarch64.rpm
 tdnf-devel-3.2.2-4.cm2.aarch64.rpm
@@ -228,10 +228,10 @@ libffi-devel-3.4.2-2.cm2.aarch64.rpm
 libtasn1-4.19.0-1.cm2.aarch64.rpm
 p11-kit-0.24.1-1.cm2.aarch64.rpm
 p11-kit-trust-0.24.1-1.cm2.aarch64.rpm
-ca-certificates-shared-2.0.0-11.cm2.noarch.rpm
-ca-certificates-tools-2.0.0-11.cm2.noarch.rpm
-ca-certificates-base-2.0.0-11.cm2.noarch.rpm
-ca-certificates-2.0.0-11.cm2.noarch.rpm
+ca-certificates-shared-2.0.0-12.cm2.noarch.rpm
+ca-certificates-tools-2.0.0-12.cm2.noarch.rpm
+ca-certificates-base-2.0.0-12.cm2.noarch.rpm
+ca-certificates-2.0.0-12.cm2.noarch.rpm
 dwz-0.14-1.cm2.aarch64.rpm
 unzip-6.0-20.cm2.aarch64.rpm
 python3-3.9.14-6.cm2.aarch64.rpm

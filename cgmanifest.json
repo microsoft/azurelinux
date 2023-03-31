@@ -2357,8 +2357,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "7.88.1",
-          "downloadUrl": "https://curl.haxx.se/download/curl-7.88.1.tar.gz"
+          "version": "8.0.1",
+          "downloadUrl": "https://curl.haxx.se/download/curl-8.0.1.tar.gz"
         }
       }
     },
@@ -24933,6 +24933,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rabbitmq-server",
+          "version": "3.11.11",
+          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.11.11/rabbitmq-server-3.11.11.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "radvd",
           "version": "2.18",
           "downloadUrl": "http://www.litech.org/radvd/dist/radvd-2.18.tar.xz"
@@ -28507,8 +28517,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2022g",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022g.tar.gz"
+          "version": "2023c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2023c.tar.gz"
         }
       }
     },
