@@ -73,8 +73,8 @@ CBL-Mariner packages live in either [SPECS](SPECS) or [SPECS-EXTENDED](SPECS-EXT
 
 | Package Support Level | Published | Supported | Comments
 |:----------------------|:----------|:--------|:------------
-|SPECS-EXTENDED         |**Yes**    |No       | - Package needs a viable upstream source which actively addresses CVEs <br> - Package must not include project specific code
-|SPECS                  |**Yes**    |**Yes**  | - Package needs a viable upstream source which actively addresses CVEs <br> - Package must not include project specific code <br> - Package needs to offer value for multiple use cases
+|SPECS-EXTENDED         |**Yes**    |No       | - Package needs a viable upstream source which actively addresses CVEs </br> - Package must not include project specific code
+|SPECS                  |**Yes**    |**Yes**  | - Package needs a viable upstream source which actively addresses CVEs </br> - Package must not include project specific code </br> - Package needs to offer value for multiple use cases
 
 When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [GitHub issue](https://github.com/microsoft/CBL-Mariner/issues) highlighting the package's value and ensure that the following steps are completed for associated PRs.
 
@@ -87,7 +87,7 @@ When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [Git
 
 ### Toolkit
 
-We welcome tooling improvements. When contributing to the toolkit, please adhere to `golang` formatting as described by the [fmt](https://pkg.go.dev/fmt) package. To format using this package, you can run `make go-tidy-all` in your CBL-Mariner toolkit. For guidance building with the toolkit, see our [building instructions](toolkit/docs/building/building.md).
+We welcome tooling improvements. When contributing to the toolkit, please adhere to `golang` formatting as described by the [fmt](https://pkg.go.dev/fmt) package. To format using this package, you can run `make go-tidy-all` in your CBL-Mariner toolkit. For guidance on building with the toolkit, see our [building instructions](toolkit/docs/building/building.md).
 
 ### Documentation
 
@@ -141,7 +141,7 @@ Please avoid titles such as
 
 When creating your PR, please ensure the following:
 
-* The toolchain has been rebuilt successfully (or no changes were made to it). This only applies if you changed any packages in the [toolchain package manifests](toolkit/resources/manifests/package). Specifically, `toolchain_x86_64.txt` and `toolchain_aarch64.txt`. For guidance building the toolchain, see our [building instructions](toolkit/docs/building/building.md).
+* The toolchain has been rebuilt successfully (or no changes were made to it). This only applies if you changed any packages in the [toolchain package manifests](toolkit/resources/manifests/package). Specifically, `toolchain_x86_64.txt` and `toolchain_aarch64.txt`. For guidance on building the toolchain, see our [building instructions](toolkit/docs/building/building.md).
 
 * The [toolchain / worker package manifests](toolkit/resources/manifests/package) are up-to-date (versions match latest package versions in SPEC files). The manifests are the following files:
   * toolchain_x86_64.txt
