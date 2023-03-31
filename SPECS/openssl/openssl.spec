@@ -161,9 +161,9 @@ cp %{SOURCE4} test/
 %patch30 -p1
 %patch31 -p1
 %patch32 -p1
-%patch35 -p1
+# %patch35 -p1
 %patch34 -p1
-%patch33 -p1
+# %patch33 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
