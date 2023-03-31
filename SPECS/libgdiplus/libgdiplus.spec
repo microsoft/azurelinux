@@ -1,7 +1,7 @@
 Summary:        C-based implementation of the GDI+ API
 Name:           libgdiplus
 Version:        6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ find %{buildroot} -type f -name '*.a' -delete -print
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1-2
+- Bumping release to re-build with newer 'libtiff' libraries.
+
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.1-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified
