@@ -1,5 +1,4 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Plexus Common Utilities
 #
 # spec file for package plexus-utils
 #
@@ -13,16 +12,14 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 Name:           plexus-utils
 Version:        3.3.0
-Release:        2%{?dist}
-Summary:        Plexus Common Utilities
-License:        Apache-1.1 AND Apache-2.0 AND xpp AND BSD-3-Clause AND SUSE-Public-Domain
+Release:        3%{?dist}
+License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://codehaus-plexus.github.io/plexus-utils/
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
@@ -57,7 +54,7 @@ cp %{SOURCE2} .
 %pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>" .
 
 %build
-%{ant} jar javadoc
+%ant jar javadoc
 
 %install
 # jar
@@ -80,6 +77,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.0-3
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
@@ -92,11 +93,14 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 - Removed patch:
   * 0001-Follow-symlinks-in-NioFiles.copy.patch
     + not needed with this version
+
 * Tue Apr  9 2019 Fridrich Strba <fstrba@suse.com>
 - Remove reference to the parent pom since we are not building
   using Maven.
+
 * Sun Mar  3 2019 Jan Engelhardt <jengelh@inai.de>
 - Describe package, not project.
+
 * Sat Mar  2 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package for plexus-utils 3.1.1
 - Generate and customize ant build file

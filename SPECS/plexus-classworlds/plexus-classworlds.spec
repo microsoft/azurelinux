@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package plexus
 #
@@ -13,18 +11,17 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 %global short_name classworlds
 %bcond_with tests
+Summary:        Plexus Classworlds Classloader Framework
 Name:           plexus-%{short_name}
 Version:        2.5.2
-Release:        3%{?dist}
-Summary:        Plexus Classworlds Classloader Framework
-License:        Apache-2.0 AND Plexus
+Release:        4%{?dist}
+License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-classworlds
 Source0:        https://github.com/sonatype/%{name}/archive/%{name}-%{version}.tar.gz
@@ -107,6 +104,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.5.2-4
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.2-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
@@ -117,36 +118,45 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 * Tue Apr  9 2019 Fridrich Strba <fstrba@suse.com>
 - Remove reference to the parent pom since we are not building
   using Maven.
+
 * Thu Feb 14 2019 Fridrich Strba <fstrba@suse.com>
 - Rename package to plexus-classworlds
 - Ugrade to version 2.5.2
 - Make building with tests optional as to avoid/shorten build
   cycles
+
 * Wed May 16 2018 fstrba@suse.com
 - Build with source and target 8 to prepare for a possible removal
   of 1.6 compatibility
 - Added patch:
   * classworlds-1.1-deprecated.patch
     + File.toURL() is deprecated
+
 * Mon Sep 18 2017 fstrba@suse.com
 - Specify java source and target level 1.6 in order to allow build
   with jdk9
 - Clean spec file
+
 * Fri May 19 2017 pcervinka@suse.com
 - New build dependency: javapackages-local
 - Fixed requires
 - Removed maven conditions
 - Spec file cleaned
+
 * Wed Mar 18 2015 tchvatal@suse.com
 - Fix build with new javapackages-tools
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Wed Aug 28 2013 mvyskocil@suse.com
 - use add_maven_depmap from javapackages-tools
 - use pom file from repo1.maven.org
+
 * Thu May 10 2012 cfarrell@suse.com
 - license update: BSD-3-Clause
   Open Source is not a recognised license. Use the proper license
   (BSD-3-Clause) in SPDX format
+
 * Wed Jun  3 2009 mvyskocil@suse.cz
 - Initial SUSE packaging from jpackage.org 5.0

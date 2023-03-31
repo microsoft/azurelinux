@@ -1,5 +1,4 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+
 #
 # spec file for package cal10n
 #
@@ -13,19 +12,18 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
+Summary:        Compiler assisted localization library (CAL10N)
 Name:           cal10n
 Version:        0.7.7
-Release:        5%{?dist}
-Summary:        Compiler assisted localization library (CAL10N)
+Release:        6%{?dist}
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
-Url:            http://cal10n.qos.ch
-Source0:        http://cal10n.qos.ch/dist/cal10n-%{version}.tar.gz
+URL:            http://cal10n.qos.ch
+Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        build.xml-0.7.7.tar.xz
 Patch0:         cal10n-0.7.7-sourcetarget.patch
 BuildRequires:  ant
@@ -36,7 +34,6 @@ BuildRequires:  javapackages-tools
 BuildRequires:  junit
 BuildRequires:  xz
 Requires:       java
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
 
 %description
@@ -128,6 +125,10 @@ popd
 %{_javadocdir}/%{name}-%{version}
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
+- Moved from extended to core
+- Updated source URL
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.7-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 - License verified.
@@ -139,17 +140,20 @@ popd
 * Thu Oct 18 2018 Fridrich Strba <fstrba@suse.com>
 - Install the maven pom files in order to generate correctly the
   mvn(...) provides.
+
 * Wed May 16 2018 fstrba@suse.com
 - Modified patch:
   * cal10n-0.7.7-sourcetarget.patch
     + Build with source and target 8 to prepare for a possible
     removal of 1.6 compatibility
 - Run fdupes on documentation
+
 * Thu Sep  7 2017 fstrba@suse.com
 - Added patch:
   * cal10n-0.7.7-sourcetarget.patch
   - Force java source and target levels to 1.6 in order to allow
     building with jdk9
+
 * Thu Dec 25 2014 p.drouand@gmail.com
 - Update to version 0.7.7
   + Correctly read escaped ':', '#', '!', '=' characters. The behavior
@@ -158,18 +162,24 @@ popd
 - Update build.xml.tar.bz2, rename it to build.xml-$VERSION and
   recompress it in xz format
 - Add a requirement to xz
+
 * Mon Jul  7 2014 tchvatal@suse.com
 - Depend on junit not junit4
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Fri May  4 2012 mvyskocil@suse.cz
 - fix bnc#759912 - Manual for cal10n 0.7.4 uses CC-BY-SA-NC-2.5 license
+
 * Fri Apr 27 2012 mvyskocil@suse.cz
 - format spec for Factory
+
 * Mon Dec 12 2011 dmacvicar@suse.de
 - fix build.xml files to build in openSUSE 12.1 and newer.
   MANIFEST contained an absolute path in maven-build.xml
 - Fix group for javadoc subpackage
 - remove id generation for buildroot (used in Fedora)
+
 * Wed Jul 27 2011 dmacvicar@suse.de
 - Un-mavenize. Build with ant

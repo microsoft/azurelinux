@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package glassfish-servlet-api
 #
@@ -13,19 +11,18 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 %global artifactId javax.servlet-api
+Summary:        Java Servlet API
 Name:           glassfish-servlet-api
 Version:        3.1.0
-Release:        3%{?dist}
-Summary:        Java Servlet API
+Release:        4%{?dist}
 License:        (CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
-URL:            http://servlet-spec.java.net
+URL:            https://servlet-spec.java.net
 Source0:        https://github.com/javaee/servlet-spec/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Source2:        glassfish-servlet-api-build.xml
@@ -87,6 +84,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %license src/main/resources/META-INF/LICENSE-2.0.txt
 
 %changelog
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.1.0-4
+- Moved from extended to core
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.0-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
@@ -97,5 +98,6 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 * Mon Apr  8 2019 Fridrich Strba <fstrba@suse.com>
 - Do not depend at all on the parent pom, since we are not building
   with maven.
+
 * Tue Jan 29 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package of javax.servlet-api 3.1.0
