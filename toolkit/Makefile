@@ -23,7 +23,7 @@ SRPM_PACK_LIST          ?=
 
 # Logic to auto configure build options for optimized builds
 # These will set the default values for: REBUILD_TOOLS, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL
-include ./quickbuild_autoconfig.mk
+include ./quickrebuild_autoconfig.mk
 
 # We generally want to use the DELTA_BUILD flag to determine whether to use the incremental toolchain, but to preserve
 # backwards compatibility, we'll still use the INCREMENTAL_TOOLCHAIN flag if it's set.
