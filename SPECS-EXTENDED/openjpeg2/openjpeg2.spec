@@ -355,6 +355,7 @@ chmod +x %{buildroot}%{_bindir}/opj2_jpip_viewer
 %changelog
 * Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.1-12
 - Bumping release to re-build with newer 'libtiff' libraries.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.1-11
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
