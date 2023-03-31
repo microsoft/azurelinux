@@ -119,6 +119,13 @@ cp %{_builddir}/apache-maven-%{version}/LICENSE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/NOTICE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_prefixmvn}/
 
+
+mkdir -p %{buildroot}%{homedir}/bin
+ln -sfv %{_bindirmvn}/mvn %{buildroot}%{homedir}/bin/mvn
+ln -sfv %{_bindirmvn}/mvnDebug %{buildroot}%{homedir}/bin/mvnDebug
+ln -sfv %{_bindirmvn}/mvn.1.gz %{buildroot}%{homedir}/bin/mvn.1.gz
+ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
+
 install -d -m 755 %{buildroot}/etc/java/
 echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openjdk11
 
@@ -132,6 +139,7 @@ echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openj
 %dir %{_datadir}/java/maven
 %{_libdirmvn}/*
 %{_bindirmvn}/*
+%{homedir}/bin/mvn*
 /bin/*
 %{_datadir}/java/maven/*.jar
 %{_prefixmvn}/boot/plexus-classworlds*
@@ -148,6 +156,7 @@ echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openj
 %changelog
 * Thu Mar 23 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
 - Added openjdk11 subpackage
+- Added symlink for binaries requires by xmvn package
 
 * Thu Feb 16 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.7-1
 - Update to version 3.8.7
