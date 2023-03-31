@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package javassist
 #
@@ -14,17 +12,16 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 %define tar_version rel_3_23_1_ga
+Summary:        Java Programming Assistant: bytecode manipulation
 Name:           javassist
 Version:        3.23.1
 Release:        7%{?dist}
-Summary:        Java Programming Assistant: bytecode manipulation
 License:        LGPL-2.1-or-later OR MPL-1.1
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://www.javassist.org/
 Source0:        https://github.com/jboss-javassist/javassist/archive/%{tar_version}.tar.gz
@@ -156,17 +153,22 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
 - Added patch:
   * javassist-osgi.patch
     + Add OSGi manifest to the javassist.jar
+
 * Mon Apr 15 2019 Fridrich Strba <fstrba@suse.com>
 - Added patch:
   * javassist-java8-compat.patch
   - Allow building on systems that do not have java 9 or higher
+
 * Thu Oct 18 2018 Fridrich Strba <fstrba@suse.com>
 - Install and package the maven pom and metadata files
+
 * Mon Oct 15 2018 Fridrich Strba <fstrba@suse.com>
 - BuildRequire at least Java 9. This version uses APIs introduced
   in Java 9
+
 * Sun Oct  7 2018 Jan Engelhardt <jengelh@inai.de>
 - Replace old $RPM_* shell vars by macros.
+
 * Fri Oct  5 2018 pmonrealgonzalez@suse.com
 - Version update to 3.23.1:
   * 3.23.1 Github PR #171
@@ -176,16 +178,19 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
     JIRA JASSIST-261.
 - Dropped patch fixed upstream:
     javassist-rel_3_21_0_ga-javadoc.patch
+
 * Fri Sep  8 2017 fstrba@suse.com
 - Specify java target and source version 1.6 in order to allow
   building with jdk9
 - Added patch:
   * javassist-rel_3_21_0_ga-javadoc.patch
   - fix javadoc errors that are fatal with jdk9
+
 * Fri Jun  9 2017 tchvatal@suse.com
 - Version update to 3.21.0:
   * various compiler settings
   * Require java >= 1.6
+
 * Sat Jan 24 2015 p.drouand@gmail.com
 - Update to version 3.19.0
   * Including a number of bug fixes and Java 8 supports.
@@ -194,18 +199,25 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
 - Build for java API 1.5
 - Remove unzip requirement
 - Update home page and download source Urls
+
 * Wed Sep  3 2014 ro@suse.de
 - fix group entries for subpackages
+
 * Tue Sep  2 2014 ro@suse.de
 - sanitize release line in specfile
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Thu Mar  7 2013 cfarrell@suse.com
 - license update: LGPL-2.1+ or MPL-1.1
   This is a dual license so the operator is ^or^ not ^and^
+
 * Tue Mar  5 2013 coolo@suse.com
 - update license to new format
+
 * Fri Apr 27 2012 mvyskocil@suse.cz
 - format spec file for Factory
+
 * Thu Dec  9 2010 mc@suse.de
 - initial release
