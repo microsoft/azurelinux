@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package apache-commons-lang3
 #
@@ -13,18 +11,17 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 %define base_name lang3
 %define short_name commons-%{base_name}
+Summary:        Apache Commons Lang Package
 Name:           apache-%{short_name}
 Version:        3.8.1
 Release:        5%{?dist}
-Summary:        Apache Commons Lang Package
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-lang
 Source0:        https://archive.apache.org/dist/commons/lang/source/%{short_name}-%{version}-src.tar.gz
@@ -116,8 +113,10 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 * Mon Mar 25 2019 Fridrich Strba <fstrba@suse.com>
 - Remove pom parent, since we don't use it when not building with
   maven
+
 * Mon Feb  4 2019 Fridrich Strba <fstrba@suse.com>
 - Clean-up the spec file and install less jar symlinks
+
 * Mon Oct 22 2018 Fridrich Strba <fstrba@suse.com>
 - Build commons-lang3-3.8.1 using modified build.xml and
   default.properties from 3.4.
@@ -126,19 +125,24 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
   - integrated in the build.xml
 - Use source and target version 1.7, since the code contains
   diamond operator.
+
 * Wed May  2 2018 tchvatal@suse.com
 - Format with spec-cleaner
+
 * Mon Oct  9 2017 fstrba@suse.com
 - Modified patch:
   * commons-lang3-3.4-javadoc.patch
     + Fix build with jdk9
 - Allow building with jdk9 too
 - Run fdupes on javadoc
+
 * Thu Sep 14 2017 fstrba@suse.com
 - Specify java target and source level 1.6
 - Force building with jdk < 1.9, since jdk9's javadoc chocks on one
   class file (internal error)
+
 * Fri May 19 2017 pcervinka@suse.com
 - New build dependency: javapackages-local
+
 * Sun Jan 24 2016 p.drouand@gmail.com
 - Initial release (version 3.4)
