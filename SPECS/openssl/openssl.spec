@@ -350,7 +350,8 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %changelog
 * Thu Mar 30 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.1.1k-22
-- Add triplet of patches for CVE-2023-0464
+- Add CVE-2023-0464
+- CVE-2023-0464 had 3 patches, but 2 were for files created in later versions
 
 * Tue Feb 07 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1k-21
 - Add upstream patches for CVE-2022-4304, CVE-2022-4450, CVE-2023-0215, CVE-2024-0286
