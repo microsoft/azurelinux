@@ -53,9 +53,7 @@ Patch29:        CVE-2023-0286.patch
 Patch30:        CVE-2022-4304.patch
 Patch31:        CVE-2022-4450.patch
 Patch32:        CVE-2023-0215.patch
-Patch33:        CVE-2023-0464-1.patch
-Patch34:        CVE-2023-0464-2.patch
-Patch35:        CVE-2023-0464-3.patch
+Patch33:        CVE-2023-0464.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -161,9 +159,7 @@ cp %{SOURCE4} test/
 %patch30 -p1
 %patch31 -p1
 %patch32 -p1
-# %patch35 -p1
-%patch34 -p1
-# %patch33 -p1
+%patch33 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
