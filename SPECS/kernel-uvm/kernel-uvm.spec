@@ -29,7 +29,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        kernel-mshv-%{version}.tar.gz
+Source0:       %{_mariner_sources_url}/kernel-mshv-%{kernelver}.tar.gz
 Source1:        config
 Source2:        config
 BuildRequires:  audit-devel
