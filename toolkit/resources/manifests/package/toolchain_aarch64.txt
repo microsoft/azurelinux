@@ -575,6 +575,7 @@ util-linux-devel-2.37.4-5.cm2.aarch64.rpm
 util-linux-lang-2.37.4-5.cm2.aarch64.rpm
 which-2.21-8.cm2.aarch64.rpm
 which-debuginfo-2.21-8.cm2.aarch64.rpm
+xfsprogs-5.0.0-3.cm2.x86_64.rpm
 xz-5.2.5-1.cm2.aarch64.rpm
 xz-debuginfo-5.2.5-1.cm2.aarch64.rpm
 xz-devel-5.2.5-1.cm2.aarch64.rpm

@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -136,6 +136,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Fri Apr 07 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.12
+- Added fsck.xfs into initrd
+
 * Fri Mar 31 2023 Vince Perri <viperri@microsoft.com> - 2.0-11
 - Add dracut-megaraid to package watch list, since it will add dracut modules
 
