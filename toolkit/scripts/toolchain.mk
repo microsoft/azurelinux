@@ -152,7 +152,9 @@ $(raw_toolchain): $(toolchain_files)
 		./create_toolchain_in_container.sh \
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
-			$(SOURCE_URL)
+			$(SOURCE_URL) \
+			$(INCREMENTAL_TOOLCHAIN) \
+			$(ARCHIVE_TOOL)
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of

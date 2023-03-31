@@ -8,6 +8,8 @@
 
 ######## DEFINITIONS ########
 
+toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+
 # Build targets
 ifeq ($(origin CONFIG_FILE), undefined)
 CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
@@ -19,8 +21,22 @@ PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
 SRPM_PACK_LIST          ?=
 
-REBUILD_TOOLCHAIN               ?= n
+# Logic to auto configure build options for optimized builds
+# These will set the default values for: REBUILD_TOOLS, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL
+include ./quickbuild_autoconfig.mk
+
+# We generally want to use the DELTA_BUILD flag to determine whether to use the incremental toolchain, but to preserve
+# backwards compatibility, we'll still use the INCREMENTAL_TOOLCHAIN flag if it's set.
+DELTA_BUILD                     ?= n
+ifeq ($(origin DELTA_BUILD), undefined)
+# We didn't set DELTA_BUILD, so use the previous default behavior of INCREMENTAL_TOOLCHAIN for backwards compatibility.
 INCREMENTAL_TOOLCHAIN           ?= n
+else
+# We set DELTA_BUILD, so inherit value for INCREMENTAL_TOOLCHAIN.
+INCREMENTAL_TOOLCHAIN           ?= $(DELTA_BUILD)
+endif
+
+REBUILD_TOOLCHAIN               ?= n
 ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
@@ -50,12 +66,10 @@ CLEANUP_PACKAGE_BUILDS          ?= y
 USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
-DELTA_BUILD                     ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
 
 # Folder defines
-toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
 PREVIEW_REPO     ?= $(toolkit_root)/repos/mariner-official-preview.repo
