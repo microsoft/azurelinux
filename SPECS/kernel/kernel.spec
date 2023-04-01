@@ -129,6 +129,8 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %package -n     python3-perf
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Obsoletes:      python3-perf
+Provides:       python3-perf
 
 %description -n python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
@@ -142,6 +144,8 @@ This package contains common device tree blobs (dtb)
 
 %package -n     bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Obsoletes:      bpftool
+Provides:       bpftool
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
