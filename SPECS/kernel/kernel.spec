@@ -414,6 +414,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Mar 31 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-4
+- Create Obsoletes and Provides for kernel subpackages bpftool, python3-perf
+
 * Wed Mar 29 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-3
 - Enable CONFIG_NET_CLS_FLOWER module
 

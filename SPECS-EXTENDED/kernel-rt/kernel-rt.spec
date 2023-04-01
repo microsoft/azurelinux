@@ -383,7 +383,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Mar 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.55.1-3
+* Fri Mar 31 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.55.1-3
 - Rename bpftool and python3-perf to be kernel specific
 
 * Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.55.1-2
