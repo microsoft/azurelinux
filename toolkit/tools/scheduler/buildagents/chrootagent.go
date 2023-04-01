@@ -81,6 +81,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 		fmt.Sprintf("--worker-tar=%s", config.WorkerTar),
 		fmt.Sprintf("--repo-file=%s", config.RepoFile),
 		fmt.Sprintf("--rpm-dir=%s", config.RpmDir),
+		fmt.Sprintf("--toolchain-rpms-dir=%s", config.ToolchainDir),
 		fmt.Sprintf("--srpm-dir=%s", config.SrpmDir),
 		fmt.Sprintf("--cache-dir=%s", config.CacheDir),
 		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir),

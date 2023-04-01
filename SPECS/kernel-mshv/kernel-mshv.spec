@@ -1,7 +1,7 @@
 
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-hvl1.m2
+%define uname_r %{version}-%{release}
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
@@ -10,16 +10,15 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.92.mshv1
-Release:        1%{?dist}
+Version:        5.15.98.mshv1
+Release:        2%{?dist}
 License:        GPLv2
-URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
+URL:            https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
-Source1:        config
-Source2:        cbl-mariner-ca-20211013.pem
+Source1:        cbl-mariner-ca-20211013.pem
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -77,11 +76,10 @@ This package contains the 'perf' performance analysis tools for MSHV kernel.
 %autosetup -p1
 
 make mrproper
-
-cp %{SOURCE1} .config
+cp arch/x86/configs/mshv_defconfig .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE2} certs/mariner.pem
+cp %{SOURCE1} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
@@ -125,7 +123,7 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz-%{uname_r}
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
 install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
 cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
@@ -237,6 +235,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.98.mshv1-2
+- Consume config from LSG source
+
+* Tue Mar 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.98.mshv1-1
+- Update to v5.15.98.mshv1
+
 * Tue Feb 28 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.92.mshv1-1
 - Update to v5.15.92.mshv2.
 

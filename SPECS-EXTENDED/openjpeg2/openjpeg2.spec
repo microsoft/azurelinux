@@ -10,7 +10,7 @@ Distribution:   Mariner
 
 Name:           openjpeg2
 Version:        2.3.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        C-Library for JPEG 2000
 
 # windirent.h is MIT, the rest is BSD
@@ -353,6 +353,10 @@ chmod +x %{buildroot}%{_bindir}/opj2_jpip_viewer
 
 
 %changelog
+* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.1-12
+- Bumping release to re-build with newer 'libtiff' libraries.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.1-11
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

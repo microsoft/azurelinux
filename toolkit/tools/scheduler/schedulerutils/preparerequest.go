@@ -59,7 +59,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 // canUseCacheForNode checks if the cache can be used for a given node.
 // - It will check if the node corresponds to an entry in packagesToRebuild.
 // - It will check if all dependencies of the node were also cached. Exceptions:
-//		- "TypePreBuilt" nodes must use the cache and have no dependencies to check.
+//   - "TypePreBuilt" nodes must use the cache and have no dependencies to check.
 func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, deltaBuild bool) (canUseCache bool) {
 	// The "TypePreBuilt" nodes always use the cache.
 	if node.Type == pkggraph.TypePreBuilt {
