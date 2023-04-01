@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-sec-dispatcher
-Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/sec-dispatcher-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt 
 # Removed maven-compiler-plugin configuration version in the pom as annotations isn't available in version 1.4.
 Patch0:         %{name}-pom.patch
@@ -53,7 +53,7 @@ cp %{SOURCE1} .
  
 %changelog
 * Mon Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.4-1
-- Initial CBL-Mariner import from Fedora 35
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-34

@@ -57,7 +57,7 @@ Plexus Cipher: encryption/decryption Component
 
 %changelog
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.7-1
-- Initial CBL-Mariner import from Fedora 35
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 
 * Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-24

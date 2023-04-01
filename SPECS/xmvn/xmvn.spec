@@ -13,7 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://fedora-java.github.io/xmvn/
-Source0:        https://github.com/fedora-java/xmvn/releases/download/%{version}/xmvn-%{version}.tar.gz
+Source0:        %{url}archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       maven >= 3.6.1
 BuildArch:      noarch
@@ -264,7 +264,7 @@ end
 
 %changelog
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
-- Initial CBL-Mariner import from Fedora 35
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 
 * Mon Jul 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-1

@@ -20965,7 +20965,7 @@
         "other": {
           "name": "plexus-sec-dispatcher",
           "version": "1.4",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-sec-dispatcher/archive/plexus-sec-dispatcher-1.4/plexus-sec-dispatcher-1.4.tar.gz"
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-sec-dispatcher/archive/refs/tags/sec-dispatcher-1.4.tar.gz"
         }
       }
     },
@@ -29920,7 +29920,7 @@
         "other": {
           "name": "xmvn",
           "version": "4.0.0",
-          "downloadUrl": "https://github.com/fedora-java/xmvn/releases/download/4.0.0/xmvn-4.0.0.tar.gz"
+          "downloadUrl": "https://github.com/fedora-java/xmvn/archive/refs/tags/4.0.0.tar.gz"
         }
       }
     },

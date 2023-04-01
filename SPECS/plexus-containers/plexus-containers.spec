@@ -125,7 +125,7 @@ rm plexus-component-metadata/src/test/java/org/codehaus/plexus/metadata/DefaultC
 
 %changelog
 * Wed Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.1.1-1
-- Initial CBL-Mariner import from Fedora 35
+- Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 
 * Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-3

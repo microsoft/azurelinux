@@ -1550,7 +1550,6 @@
                 "pkcs11-helper",
                 "pkgconf",
                 "plexus-cipher",
-                "plexus-component-api",
                 "plexus-containers",
                 "plexus-sec-dispatcher",
                 "plotutils",
