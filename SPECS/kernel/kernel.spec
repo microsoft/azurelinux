@@ -17,8 +17,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.102.1
-Release:        3%{?dist}
+Version:        5.15.105.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -410,6 +410,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Apr 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.105.1-1
+- Auto-upgrade to 5.15.105.1
+
 * Wed Mar 29 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-3
 - Enable CONFIG_NET_CLS_FLOWER module
 
