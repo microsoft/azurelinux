@@ -8,7 +8,7 @@ Release:        1%{?dist}
 # The following files are under xpp:
 # plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/Driver.java
 # plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/MXParser.java
-License:        Apache-2.0 and and MIT and xpp
+License:        Apache-2.0 AND MIT AND xpp
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/Java
@@ -26,15 +26,15 @@ BuildRequires:  mvn(com.google.guava:guava)
 BuildRequires:  mvn(com.thoughtworks.qdox:qdox)
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
+BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
 BuildRequires:  mvn(org.apache.maven:maven-core)
 BuildRequires:  mvn(org.apache.maven:maven-model)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
-BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
-BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
 BuildRequires:  mvn(org.apache.xbean:xbean-reflect)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-classworlds)
-BuildRequires:  mvn(org.codehaus.plexus:plexus:pom:)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
+BuildRequires:  mvn(org.codehaus.plexus:plexus:pom:)
 BuildRequires:  mvn(org.jdom:jdom2)
 BuildRequires:  mvn(org.ow2.asm:asm)
 %endif
@@ -125,7 +125,7 @@ rm plexus-component-metadata/src/test/java/org/codehaus/plexus/metadata/DefaultC
 
 %changelog
 * Wed Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.1.1-1
-- Initial import from Fedora to CBL-Mariner
+- Initial CBL-Mariner import from Fedora 35
 - License verified
 
 * Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-3

@@ -14,11 +14,15 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://fedora-java.github.io/xmvn/
 Source0:        https://github.com/fedora-java/xmvn/releases/download/%{version}/xmvn-%{version}.tar.gz
-
+Requires:       %{name}-minimal = %{version}-%{release}
+Requires:       maven >= 3.6.1
+BuildArch:      noarch
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 %else
+# Maven home is used as template for XMvn home
+BuildRequires:  maven
 BuildRequires:  mvn(com.beust:jcommander)
 BuildRequires:  mvn(org.apache.commons:commons-compress)
 BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
@@ -44,13 +48,7 @@ BuildRequires:  mvn(org.ow2.asm:asm)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
 BuildRequires:  mvn(org.slf4j:slf4j-simple)
 BuildRequires:  mvn(org.xmlunit:xmlunit-assertj3)
-# Maven home is used as template for XMvn home
-BuildRequires:  maven
 %endif
-
-Requires:       %{name}-minimal = %{version}-%{release}
-Requires:       maven >= 3.6.1
-BuildArch:      noarch
 
 %description
 This package provides extensions for Apache Maven that can be used to
@@ -66,6 +64,8 @@ Requires:       apache-commons-lang3
 Requires:       atinject
 Requires:       google-guice
 Requires:       guava
+Requires:       maven >= 3.4.0
+Requires:       maven-jdk-binding
 Requires:       maven-resolver
 Requires:       maven-wagon
 Requires:       plexus-cipher
@@ -76,11 +76,7 @@ Requires:       plexus-sec-dispatcher
 Requires:       plexus-utils
 Requires:       sisu
 Requires:       slf4j
-
-Requires:       maven >= 3.4.0
-Requires:       maven-jdk-binding
 Suggests:       maven-openjdk11
-
 Obsoletes:      xmvn-connector-aether < 4.0.0
 
 %description    minimal
@@ -220,7 +216,7 @@ rm -rf %{buildroot}%{_datadir}/%{name}/{configuration.xml,config.d/,conf/toolcha
 # Workaround for rpm bug 447156 - rpm fails to change directory to symlink
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement/
 %pretrans -p <lua> minimal
-path = "/usr/share/xmvn/conf/logging"
+path = "%{_datadir}/xmvn/conf/logging"
 st = posix.stat(path)
 if st and st.type == "directory" then
   status = os.rename(path, path .. ".rpmmoved")
@@ -268,7 +264,7 @@ end
 
 %changelog
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
-- Initial import of version 4.0.0 from Fedora to CBL-Mariner
+- Initial CBL-Mariner import from Fedora 35
 - License verified
 
 * Mon Jul 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 4.0.0-1

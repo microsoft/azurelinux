@@ -1,9 +1,9 @@
 %bcond_without bootstrap
- 
+
+Summary:        Plexus Security Dispatcher Component
 Name:           plexus-sec-dispatcher
 Version:        1.4
 Release:        1%{?dist}
-Summary:        Plexus Security Dispatcher Component
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,12 +19,12 @@ BuildArch:      noarch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 %else
+BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
+BuildRequires:  mvn(org.sonatype.plexus:plexus-cipher)
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-container-default)
-BuildRequires:  %{?module_prefix}mvn(org.codehaus.plexus:plexus-utils)
-BuildRequires:  %{?module_prefix}mvn(org.sonatype.plexus:plexus-cipher)
 %endif
  
 %description
@@ -52,8 +52,8 @@ cp %{SOURCE1} .
 %license LICENSE-2.0.txt
  
 %changelog
-* Mon Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0-1
-- Initial import from Fedora to CBL-Mariner
+* Mon Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.4-1
+- Initial CBL-Mariner import from Fedora 35
 - License verified
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-34

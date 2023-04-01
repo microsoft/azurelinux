@@ -1,9 +1,9 @@
 %bcond_without bootstrap
 
+Summary:        Plexus Cipher: encryption/decryption Component
 Name:           plexus-cipher
 Version:        1.7
 Release:        1%{?dist}
-Summary:        Plexus Cipher: encryption/decryption Component
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,8 +12,6 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-cipher
 Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
-
-
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
@@ -58,8 +56,8 @@ Plexus Cipher: encryption/decryption Component
 %license LICENSE.txt NOTICE.txt
 
 %changelog
-* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0-1
-- Moved from extended to core
+* Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.7-1
+- Initial CBL-Mariner import from Fedora 35
 - License verified
 
 * Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-24
