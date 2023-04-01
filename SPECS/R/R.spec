@@ -10,7 +10,7 @@ Group:          System Environment/Daemons
 URL:            https://www.r-project.org
 Source0:        https://cran.r-project.org/src/base/R-4/R-%{version}.tar.gz
 # This change is a best hunch fix as the limitation on curl version 7 was set
-# on 2018. Given curl 8.0.0 is not an actual breaking change, this patch should be fine.
+# in 2018. Given curl 8.0.0 is not an actual breaking change, this patch should be fine.
 # We should drop this when R eventually gets official support for build with curl >= 8.0.0
 Patch0:         0001-configure-fix-compilation-with-curl-8.0.0.patch
 BuildRequires:  build-essential
