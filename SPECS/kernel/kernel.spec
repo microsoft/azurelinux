@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.174.1
+Version:        5.10.176.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -634,6 +634,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Apr 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.176.1-1
+- Auto-upgrade to 5.10.176.1
+
 * Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.10.174.1-1
 - Auto-upgrade to 5.10.174.1
 
