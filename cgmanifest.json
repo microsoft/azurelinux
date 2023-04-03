@@ -28616,6 +28616,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "uchardet",
+          "version": "0.0.6",
+          "downloadUrl": "https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.6.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "uclibc-ng",
           "version": "1.0.41",
           "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.41/uClibc-ng-1.0.41.tar.xz"

@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:          uchardet
 Version:       0.0.6
-Release:       16%{?dist}
+Release:       17%{?dist}
 Summary:       An encoding detector library ported from Mozilla
 
 License:       MPLv1.1 or GPLv2+ or LGPLv2+
@@ -67,6 +67,10 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Apr 03 2023 Bala <balakumaran.kannan@microsoft.com> - 0.0.6-17
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- License verified
+
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.6-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
