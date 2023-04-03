@@ -105,11 +105,10 @@ echo -e 'CERT1\nLINE2\nLINE3\nCERT2\nLINE2\nLINE3' > "${crt_file}"
 conf_file='%{_sysconfdir}/ca-certificates.conf'
 echo -e 'line1\nline2\nline3\ncloud-init-ca-certs.crt\n' > "${conf_file}"
 
-%define test_pkgs pytest-metadata unittest2 mock attrs iniconfig netifaces
+%define test_pkgs pytest-metadata unittest2 mock attrs iniconfig netifaces pyserial
 
 pip3 install --upgrade %{test_pkgs}
 pip3 install -r test-requirements.txt
-pip3 install pyserial
 
 make check %{?_smp_mflags}
 
