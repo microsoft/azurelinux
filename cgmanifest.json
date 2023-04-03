@@ -24754,8 +24754,8 @@
         "type": "other",
         "other": {
           "name": "pytorch",
-          "version": "1.13.1",
-          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.0.0/pytorch-v2.0.0.tar.gz"
         }
       }
     },
