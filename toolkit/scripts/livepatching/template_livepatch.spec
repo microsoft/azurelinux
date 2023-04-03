@@ -137,11 +137,16 @@ do
     [[ "$patch" == *.patch ]] && cat "$patch" >> $all_patches_file
 done
 
-kpatch-build -ddd \
+if ! kpatch-build -ddd \
     --sourcedir . \
     --vmlinux %{_libdir}/debug/lib/modules/%{kernel_version_release}/vmlinux \
     --name %{livepatch_name} \
     $all_patches_file
+then
+    echo "ERROR: failed to build livepatch module. Logs from /root/.kpatch/build.log:" >&2
+    cat /root/.kpatch/build.log >&2
+    exit 1
+fi
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
