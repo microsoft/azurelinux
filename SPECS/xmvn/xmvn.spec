@@ -13,7 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://fedora-java.github.io/xmvn/
-Source0:        %{url}archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/fedora-java/xmvn/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       maven >= 3.6.1
 BuildArch:      noarch
