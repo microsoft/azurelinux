@@ -21,8 +21,8 @@ import (
 // The nodes listed will NOT be found in an actual graph, they are just representative copies which can be used for equality
 // testing and as a source to build real nodes from.
 
-//
 // Full Test Graph:
+//
 //	A(v1):
 //	-> D(v<1)
 //	-> B(v2):
@@ -866,6 +866,7 @@ func TestDeepCopy(t *testing.T) {
 	assert.NotNil(t, gOut)
 
 	gCopy, err := gOut.DeepCopy()
+	assert.NoError(t, err)
 
 	checkTestGraph(t, gCopy)
 }

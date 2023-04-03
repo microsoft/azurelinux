@@ -29,8 +29,9 @@ var (
 	outputGraph = exe.OutputFlag(app, "Updated graph file with unresolved nodes marked as resolved")
 	outDir      = exe.OutputDirFlag(app, "Directory to download packages into.")
 
-	existingRpmDir = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
-	tmpDir         = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
+	existingRpmDir          = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	existingToolchainRpmDir = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	tmpDir                  = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
 
 	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
@@ -62,13 +63,9 @@ func main() {
 		logger.Log.Panicf("Failed to read graph to file. Error: %s", err)
 	}
 
-	var toolchainPackages []string
-	toolchainManifest := *toolchainManifest
-	if len(toolchainManifest) > 0 {
-		toolchainPackages, err = schedulerutils.ReadReservedFilesList(toolchainManifest)
-		if err != nil {
-			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifest, err)
-		}
+	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
+	if err != nil {
+		logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 	}
 
 	if hasUnresolvedNodes(dependencyGraph) {
@@ -101,7 +98,7 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, disableUpstreamRepos, stopOnFailure bool) (err error) {
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
-	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
+	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
 	if err != nil {
 		logger.Log.Errorf("Failed to initialize RPM repo cloner. Error: %s", err)
 		return

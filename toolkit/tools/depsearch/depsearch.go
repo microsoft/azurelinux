@@ -332,7 +332,8 @@ func (t *treeSearch) printProgress() {
 }
 
 // Run a DFS and generate a string representation of the tree. Optionally ignore all branches that only container nodes in
-//  the filter list (ie given the toolchain manifest, only print those branches which container non-toolchain packages)
+//
+//	the filter list (ie given the toolchain manifest, only print those branches which container non-toolchain packages)
 func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, filter bool, filterFile string, verbosity int, generateStrings, printDuplicates bool) (lines []string, hasNonToolchain bool) {
 	t.printProgress()
 	// We only care about run nodes for the purposes of detecting toolchain files

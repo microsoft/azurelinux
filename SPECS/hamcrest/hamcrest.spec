@@ -65,7 +65,7 @@ mocking libraries and UI validation rules.
 %package core
 Summary:        Core API of hamcrest matcher framework.
 Group:          Development/Libraries/Java
-Provides:       mvn(org.hamcrest:hamcrest-core)
+Provides:       mvn(org.hamcrest:hamcrest-core) = %{version}-%{release}
 
 %description core
 The core API of hamcrest matcher framework to be used by third-party framework providers.

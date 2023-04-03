@@ -1,7 +1,7 @@
 Summary:         A library for handling different graphics file formats
 Name:            netpbm
 Version:         10.90.00
-Release:         4%{?dist}
+Release:         5%{?dist}
 # See copyright_summary for details
 License:         BSD and GPLv2 and IJG and MIT and Public Domain
 Vendor:         Microsoft Corporation
@@ -224,6 +224,9 @@ popd
 %doc userguide/*
 
 %changelog
+* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-5
+- Bumping release to re-build with newer 'libtiff' libraries.
+
 * Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-4
 - Updating source URL.
 
@@ -1317,4 +1320,3 @@ popd
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-
