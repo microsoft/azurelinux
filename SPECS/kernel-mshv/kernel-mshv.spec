@@ -13,7 +13,6 @@ Name:           kernel-mshv
 Version:        5.15.98.mshv1
 Release:        3%{?dist}
 License:        GPLv2
-URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
