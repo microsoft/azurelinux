@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        22.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -109,6 +109,7 @@ echo -e 'line1\nline2\nline3\ncloud-init-ca-certs.crt\n' > "${conf_file}"
 
 pip3 install --upgrade %{test_pkgs}
 pip3 install -r test-requirements.txt
+pip3 install pyserial
 
 make check %{?_smp_mflags}
 
@@ -146,7 +147,10 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Wed Feb 15 2022 Minghe Ren <mingheren@microsoft.com> - 22.4-1
+* Mon Apr 03 2023 Minghe Ren <mingheren@microsoft.com> - 22.4-2
+- Install python serial module in check section to aviod test failure
+
+* Wed Feb 15 2023 Minghe Ren <mingheren@microsoft.com> - 22.4-1
 - Upgrade cloud-init to version 22.4
 - Remove add-mariner-distro-support and CVE-2022-2084 pathc as no longer needed in newer version
 
