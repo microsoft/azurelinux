@@ -1,0 +1,3 @@
+pyrpm==0.4
+rpm==0.1.0
+validators==0.20.0
