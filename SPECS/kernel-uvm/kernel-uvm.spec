@@ -29,7 +29,6 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:       %{_mariner_sources_url}/kernel-mshv-%{kernelver}.tar.gz
 Source1:        config
-Source2:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
