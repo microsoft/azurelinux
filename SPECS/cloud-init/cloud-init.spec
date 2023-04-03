@@ -148,7 +148,7 @@ make check %{?_smp_mflags}
 
 %changelog
 * Mon Apr 03 2023 Minghe Ren <mingheren@microsoft.com> - 22.4-2
-- Install python serial module in check section to aviod test failure
+- Install python serial module in check section to avoid test failure
 
 * Wed Feb 15 2023 Minghe Ren <mingheren@microsoft.com> - 22.4-1
 - Upgrade cloud-init to version 22.4
