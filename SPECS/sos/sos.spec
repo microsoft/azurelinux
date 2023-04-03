@@ -69,7 +69,7 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
-* Mon Apr 3 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.4-2
+* Mon Apr 03 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.4-2
 - Fixing missing runtime dep of python3-magic
 
 * Thu Sep 15 2022 Nan Liu <liunan@microsoft.com> - 4.4-1
