@@ -1,21 +1,21 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.25.0
+Version:        1.25.5
 Release:        7%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
-Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s2.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We are also pre-cloning 3 git repositories
 # How to re-build this file:
-# 1. wget https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s1.tar.gz -O %%{name}-%%{version}.tar.gz
+# 1. wget https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s2.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. tar -xf %%{name}-%%{version}.tar.gz
-# 3. cd %%{name}-%%{version}-k3s1
+# 3. cd %%{name}-%%{version}-k3s2
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone --single-branch --branch="v1.6.8-k3s1" --depth=1 https://github.com/k3s-io/containerd
+# 6. git clone --single-branch --branch="v1.5.17" --depth=1 https://github.com/k3s-io/containerd
 # 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
 # 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
@@ -42,7 +42,7 @@ ExclusiveArch:  x86_64
 The certified Kubernetes distribution built for IoT & Edge computing.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-k3s1
+%autosetup -p1 -n %{name}-%{version}-k3s2
 tar -xvf %{SOURCE1}
 
 %build
@@ -79,6 +79,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Tue April 04 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-2
+- Updated k3s to 1.25.5
+
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-7
 - Bump release to rebuild with go 1.19.7
 
