@@ -64,22 +64,22 @@ func main() {
 		logger.Log.Panicf("Failed to read graph to file. Error: %s", err)
 	}
 
-    if _, err := os.Stat(*outputGraph); err == nil {
-        err = pkggraph.ReadDOTGraphFile(oldCachedGraph, *outputGraph)
-        // For Run all nodes in oldCachedGraph if that node is found in dependencyGraph, update its state and type
-        for _, n := range oldCachedGraph.AllNodes() {
+	if _, err := os.Stat(*outputGraph); err == nil {
+		err = pkggraph.ReadDOTGraphFile(oldCachedGraph, *outputGraph)
+		// For Run all nodes in oldCachedGraph if that node is found in dependencyGraph, update its state and type
+		for _, n := range oldCachedGraph.AllNodes() {
 
-            if !(n.Type.String() == "Run" || n.Type.String() == "Remote") {
-                continue
-            }
-            lookupNode, err := dependencyGraph.FindExactPkgNodeFromPkg(n.VersionedPkg)
-            if err == nil && lookupNode != nil {
-                logger.Log.Infof("Updating node %s with state %s and type %s", n.VersionedPkg, n.State, n.Type)
-                lookupNode.RunNode.State = n.State
-                lookupNode.RunNode.Type = n.Type
-            }
-        }
-    }
+			if !(n.Type.String() == "Run" || n.Type.String() == "Remote") {
+				continue
+			}
+			lookupNode, err := dependencyGraph.FindExactPkgNodeFromPkg(n.VersionedPkg)
+			if err == nil && lookupNode != nil {
+				logger.Log.Infof("Updating node %s with state %s and type %s", n.VersionedPkg, n.State, n.Type)
+				lookupNode.RunNode.State = n.State
+				lookupNode.RunNode.Type = n.Type
+			}
+		}
+	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	if err != nil {
