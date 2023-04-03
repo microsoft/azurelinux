@@ -14,8 +14,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       bzip2
 Requires:       python3
-Requires:       python3-magic
 Requires:       python3-libxml2
+Requires:       python3-magic
 Requires:       python3-pexpect
 Requires:       python3-rpm
 Requires:       tar
