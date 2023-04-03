@@ -245,7 +245,7 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_tool
 	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
 	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
+		printf "ERROR: Mismatched packages between:\n\n'%s'\n\t'%s'\n\n" '$(selected_toolchain_archive)' '$(TOOLCHAIN_MANIFEST)' && \
 		echo "$${diff}"; \
 		$(call print_error, $@ failed) ; \
 	fi && \
