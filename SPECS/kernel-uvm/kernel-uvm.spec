@@ -23,7 +23,6 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # uses same source as kernel-mshv
 Source0:       %{_mariner_sources_url}/kernel-mshv-%{version}.tar.gz
 Source1:        config
