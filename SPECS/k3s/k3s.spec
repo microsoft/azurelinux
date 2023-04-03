@@ -15,7 +15,7 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s2
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone --single-branch --branch="v1.5.17" --depth=1 https://github.com/k3s-io/containerd
+# 6. git clone --single-branch --branch="v1.5.18" --depth=1 https://github.com/k3s-io/containerd
 # 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
 # 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
