@@ -15,7 +15,6 @@ QUICKREBUILD_PACKAGES  ?= n
 ifeq ($(QUICKREBUILD),y)
 QUICKREBUILD_TOOLCHAIN = y
 QUICKREBUILD_PACKAGES  = y
-REBUILD_TOOLS=y
 endif
 
 ######## QUICKREBUILD TOOLCHAIN ########
@@ -34,6 +33,7 @@ endif
 REBUILD_TOOLCHAIN             = y
 INCREMENTAL_TOOLCHAIN         = y
 ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y
+REBUILD_TOOLS                 = y
 endif
 
 ######## QUICKREBUILD PACKAGES ########
@@ -43,6 +43,7 @@ ifeq ($(QUICKREBUILD_PACKAGES),y)
 ifneq ($(filter n,$(DELTA_BUILD)),)
 $(error DELTA_BUILD cannot be used with REBUILD_TOOLCHAIN explicitly  set to 'n')
 endif
-DELTA_BUILD = y
-USE_CCACHE ?= y
+DELTA_BUILD   = y
+USE_CCACHE   ?= y
+REBUILD_TOOLS = y
 endif
