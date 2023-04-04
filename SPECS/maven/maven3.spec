@@ -34,10 +34,33 @@ BuildRequires:  msopenjdk-11
 BuildRequires:  wget
 BuildRequires:  which
 Requires:       %{_bindir}/which
-Conflicts:      maven
+Suggests:       %{name}-jdk-binding = %{version}-%{release}
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
+
+%package openjdk11
+Summary:        MSOpenJDK 11 binding for Maven
+RemovePathPostfixes: -openjdk11
+Provides: %{name}-jdk-binding = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
+Requires: msopenjdk-11
+Conflicts: %{name}-jdk-binding
+
+%description openjdk11
+Configures Maven to run with OpenJDK 11.
+
+
+%package openjdk17
+Summary:        MSOpenJDK 17 binding for Maven
+RemovePathPostfixes: -openjdk17
+Provides: %{name}-jdk-binding = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
+Requires: msopenjdk-17
+Conflicts: %{name}-jdk-binding
+ 
+%description openjdk17
+Configures Maven to run with OpenJDK 17.
 
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
@@ -106,6 +129,17 @@ cp %{_builddir}/apache-maven-%{version}/LICENSE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/NOTICE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_prefixmvn}/
 
+
+mkdir -p %{buildroot}%{homedir}/bin
+ln -sfv %{_bindirmvn}/mvn %{buildroot}%{homedir}/bin/mvn
+ln -sfv %{_bindirmvn}/mvnDebug %{buildroot}%{homedir}/bin/mvnDebug
+ln -sfv %{_bindirmvn}/mvn.1.gz %{buildroot}%{homedir}/bin/mvn.1.gz
+ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
+
+install -d -m 755 %{buildroot}/etc/java/
+echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openjdk11
+echo JAVA_HOME=/usr/lib/jvm/msopenjdk-17 >%{buildroot}/etc/java/maven.conf-openjdk17
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -116,6 +150,7 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %dir %{_datadir}/java/maven
 %{_libdirmvn}/*
 %{_bindirmvn}/*
+%{homedir}/bin/mvn*
 /bin/*
 %{_datadir}/java/maven/*.jar
 %{_prefixmvn}/boot/plexus-classworlds*
@@ -126,7 +161,17 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/NOTICE
 %{_prefixmvn}/README.txt
 
+%files openjdk11
+%config /etc/java/maven.conf-openjdk11
+
+%files openjdk17
+%config /etc/java/maven.conf-openjdk17
+
 %changelog
+* Thu Mar 23 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+- Added openjdk11 subpackage
+- Added symlink for binaries requires by xmvn package
+
 * Thu Feb 16 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.7-1
 - Original version for CBL-Mariner (license: MIT)
 - Remove Runtime dependency on any msopenjdk-* version
