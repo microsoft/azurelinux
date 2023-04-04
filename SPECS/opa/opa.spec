@@ -37,15 +37,19 @@ mv internal/jwx/LICENSE LICENSE-jwx
 
 %build
 make build WASM_ENABLED=0
+make man
 
 %install
 install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp opa_linux*          %{buildroot}%{_bindir}/opa
- 
+install -d -p -m 0755                   %{buildroot}%{_mandir}/man1
+install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
+
 %files
 %license LICENSE LICENSE-jwx
 %doc docs/content CHANGELOG.md README.md MAINTAINERS.md ADOPTERS.md CODE_OF_CONDUCT.md
 %doc CONTRIBUTING.md GOVERNANCE.md SECURITY.md
+%{_mandir}/man1/opa*.1*
 %{_bindir}/*
 
 %changelog
