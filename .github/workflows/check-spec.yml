@@ -26,7 +26,7 @@ jobs:
           python-version: 3.9
 
       - name: Get Python dependencies
-        run: python3 -m pip install python-rpm-spec
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
 
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}

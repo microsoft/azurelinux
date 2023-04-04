@@ -27,7 +27,7 @@ jobs:
       - name: Get Python dependencies
         run: |
           sudo apt-get install -y python3-rpm
-          sudo python3 -m pip install rpm pyrpm python-rpm-spec validators
+          sudo python3 -m pip install -r toolkit/scripts/requirements.txt
 
       - name: Check livepatch specs are valid
         run: |
