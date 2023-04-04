@@ -37,11 +37,10 @@ mv internal/jwx/LICENSE LICENSE-jwx
 
 %build
 make build WASM_ENABLED=0
-mv opa_* opa
 
 %install
 install -m 0755 -vd                     %{buildroot}%{_bindir}
-install -m 0755 -vp opa                 %{buildroot}%{_bindir}/
+install -m 0755 -vp opa_linux*          %{buildroot}%{_bindir}/opa
  
 %files
 %license LICENSE LICENSE-jwx
@@ -52,6 +51,12 @@ install -m 0755 -vp opa                 %{buildroot}%{_bindir}/
 %changelog
 * Mon Mar 27 2023 Dallas Delaney <dadelan@microsoft.com> - 0.50.2-1
 - Update to version 0.50.2
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-8
+- Bump release to rebuild with go 1.19.6
 
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-7
 - Bump release to rebuild with go 1.19.5
