@@ -4,15 +4,17 @@
 
 |Task                              | Where to go                                                                   |
 |:---------------------------------|-------------------------------------------------------------------------------|
-|Just build my own packages        | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
+|Just add or build my own packages | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
+|Just add or build my own images   | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
 |Quickly build core packages       | [Dedicated Build Core Packages Guide](./dedicated_guides/build_packages.md)   |
-|Just build my own images          | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
 |Quickly build core images         | [Dedicated Build Core Images Guide](./dedicated_guides/build_images.md)       |
 |Learn how the tools work in depth | [Continue Reading](#overview)                                                 |
 |Add/Update a core Mariner package | [Continue Reading](#overview)                                                 |
 |Improve Mariner tools             | [Continue Reading](#overview)                                                 |
 
 ---
+
+TODO: Update to tell users to use button
 
 - [Overview](#overview)
 - [Building in Stages](#building-in-stages)
@@ -579,7 +581,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `REPO_LIST=...`
 
-> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. CBL-Mariner provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
+> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. **If you are using the pre-packaged CBL-Mariner toolkit** a set of pre-populated RPM repositories are accessible inside the toolkit folder under `toolkit/repos`. If you are **using the core repo** instead of the pre-packaged toolkit they repo files are avaiablae in `SPECS/mariner-repos/`.
 >
 > - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on CBL-Mariner repositories.
 > - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.

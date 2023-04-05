@@ -72,6 +72,10 @@ There are two ways to build packages:
 
 Option `#2` is generally faster, but can lead to accuracy issues. If one of your packages' dependencies has also been changed in your branch but not published the build will use the older published version. This is often fine for quick development work but is not good enough for final testing.
 
+### Signatures
+
+See [Source Hashes](https://github.com/microsoft/CBL-Mariner/blob/2.0/toolkit/docs/building/building.md#source-hashes) and [Create a Signature Meta-data File](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/packages/working_with_packages.md#create-a-signature-meta-data-file) for details on how source signatures work. You will need to update the signature files for a package if you change the sources at all.
+
 ### Dev Loop
 
 ```bash
@@ -88,6 +92,12 @@ pkg_filter=""
 # Modify  your package
 touch ../SPECS/nano/nano.spec
 touch ../SPECS/nano/opessh.spec
+
+# Update signature files, or tell the tools to do it automatically
+sha256sum ../SPECS/nano/my_new_nano_file.txt
+vim ../SPECS/nano/nano.signatures.json
+# --- or ---
+signature_handle="SRPM_FILE_SIGNATURE_HANDLING=update"
 
 # OPTIONAL:
 #   This is the path to the toolchain as described above.
@@ -115,7 +125,8 @@ sudo make clean-expand-specs clean-input-srpms
 #   $pkg_filer              Optionally only package specific .spec files (see above)
 #   $toolchain              Where to get our toolchain (see above)
 #   PACKAGE_REBUILD_LIST    List of packages to ALWAYS rebuild, even if they look unchanged (PACKAGE_BUILD_LIST will build them only if they are missing)
-sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $pkg_filter $toolchain PACKAGE_REBUILD_LIST="$packages"
+#   SRPM_FILE_SIGNATURE_HANDLING Auto update the signature files
+sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $pkg_filter $toolchain PACKAGE_REBUILD_LIST="$packages" $signature_handle
 
 # Repeat as needed
 ```
