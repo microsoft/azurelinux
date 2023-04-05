@@ -118,7 +118,7 @@ fi
 
 %changelog
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.8-1
-- Auto-upgrade to 1.19.8 - address CVEs
+- Auto-upgrade to 1.19.8 - address CVE-2023-24534, CVE-2023-24536, CVE-2023-24537, CVE-2023-24538
 
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.7-1
 - Auto-upgrade to 1.19.7 - address CVE-2023-24532
