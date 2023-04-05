@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-10
+- Bump release to rebuild with go 1.19.8
+
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-9
 - Bump release to rebuild with go 1.19.7
 

@@ -5,7 +5,7 @@
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
 Version:        0.7.10
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -97,6 +97,9 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.10-10
+- Bump release to rebuild with go 1.19.8
+
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.10-9
 - Bump release to rebuild with go 1.19.7
 
