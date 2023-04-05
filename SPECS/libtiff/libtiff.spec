@@ -54,7 +54,7 @@ make %{?_smp_mflags} -k check
 %defattr(-,root,root)
 %license LICENSE.md
 %{_bindir}/*
-%{_libdir}/*.so.*
+%{_libdir}/*.so.6*
 
 %files devel
 %defattr(-,root,root)
