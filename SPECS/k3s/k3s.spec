@@ -31,6 +31,7 @@ Patch0:         vendor_build.patch
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  libseccomp-devel
 BuildRequires:  btrfs-progs-devel
+BuildRequires:  git
 Requires:       apparmor-parser
 # K3s on Mariner is supported on x86_64 only:
 ExclusiveArch:  x86_64

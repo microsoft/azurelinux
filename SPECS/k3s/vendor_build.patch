@@ -47,7 +47,7 @@ diff --git a/scripts/build b/scripts/build
 index fb538350d0..3712ef2abf 100755
 --- a/scripts/build
 +++ b/scripts/build
-@@ -117,15 +117,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
+@@ -111,15 +111,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
      echo Building cni
      TMPDIR=$(mktemp -d)
      trap cleanup EXIT
@@ -70,7 +70,7 @@ index fb538350d0..3712ef2abf 100755
  ln -s k3s ./bin/k3s-agent
  ln -s k3s ./bin/k3s-server
  ln -s k3s ./bin/k3s-token
-@@ -140,16 +142,22 @@ ln -s k3s ./bin/ctr
+@@ -133,16 +135,22 @@ ln -s k3s ./bin/ctr
  export GOPATH=$(pwd)/build
  
  echo Building containerd
