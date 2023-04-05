@@ -21,7 +21,7 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         vendor_build.patch
+Patch0:         vendor_build-1.25.5.patch
 %global debug_package %{nil}
 %define install_path  /usr/local/bin
 %define util_path     %{_datadir}/k3s
