@@ -45,9 +45,9 @@ Maven is a software project management and comprehension tool. Based on the conc
 %package openjdk11
 Summary:        MSOpenJDK 11 binding for Maven
 RemovePathPostfixes: -openjdk11
-Provides: maven-jdk-binding = %{version}-%{release}
-Requires: maven = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Requires: msopenjdk-11
+Provides: %{name}-jdk-binding = %{version}-%{release}
  
 %description openjdk11
 Configures Maven to run with OpenJDK 11.
@@ -126,8 +126,8 @@ ln -sfv %{_bindirmvn}/mvnDebug %{buildroot}%{homedir}/bin/mvnDebug
 ln -sfv %{_bindirmvn}/mvn.1.gz %{buildroot}%{homedir}/bin/mvn.1.gz
 ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
 
-install -d -m 755 %{buildroot}/etc/java/
-echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openjdk11
+install -d -m 755 %{buildroot}%{_sysconfdir}/java/
+echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.conf-openjdk11
 
 %files
 %defattr(-,root,root)
