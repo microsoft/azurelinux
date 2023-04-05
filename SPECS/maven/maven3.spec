@@ -35,7 +35,6 @@ BuildRequires:  msopenjdk-11
 BuildRequires:  wget
 BuildRequires:  which
 Requires:       %{_bindir}/which
-Suggests:       %{name}-jdk-binding = %{version}-%{release}
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
@@ -50,18 +49,6 @@ Conflicts: %{name}-jdk-binding
 
 %description openjdk11
 Configures Maven to run with OpenJDK 11.
-
-
-%package openjdk17
-Summary:        MSOpenJDK 17 binding for Maven
-RemovePathPostfixes: -openjdk17
-Provides: %{name}-jdk-binding = %{version}-%{release}
-Requires: %{name} = %{version}-%{release}
-Requires: msopenjdk-17
-Conflicts: %{name}-jdk-binding
- 
-%description openjdk17
-Configures Maven to run with OpenJDK 17.
 
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
@@ -164,9 +151,6 @@ echo JAVA_HOME=/usr/lib/jvm/msopenjdk-17 >%{buildroot}/etc/java/maven.conf-openj
 
 %files openjdk11
 %config /etc/java/maven.conf-openjdk11
-
-%files openjdk17
-%config /etc/java/maven.conf-openjdk17
 
 %changelog
 * Tue Mar 04 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
