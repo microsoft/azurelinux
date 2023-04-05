@@ -2,6 +2,7 @@
     "Signatures": {
         "javapackages-bootstrap-1.5.0.tar.xz": "37518e10d629f6d7115bd78bed85977c7294f871c2438a57f7857f2c0e065c7c",
         "javapackages-bootstrap-PACKAGE-LICENSING": "3f440662012f41be31be13fb764c1f6a21d51f2efdcabf85ed35e9eb8c3b5714",
+        "ignore.upstream.patch.txt": "441bb5697fc5fb4089b1d43479dd443a8ce4405bec4d6b92c4152d4320ad3a80",
         "apache-pom.tar.xz": "cedc788ca41b99d04a6b058b1689e6eda8f33b9afd642e526a0998d7741f7614",
         "ant.tar.xz": "230ad9d99c5adfffd14abc3e094e8b7331cef0c061282ce0f13245a02458b604",
         "apiguardian.tar.xz": "2637e3d7ba392f36d2bd6faa792385bc33ec195e18215b7efa7f4c580cd3ab8b",
@@ -16,7 +17,7 @@
         "commons-beanutils.tar.xz": "12d84832f49925b06e090dce5f0c07b4fd983dd420746cdc6e102feb3a46601f",
         "commons-cli.tar.xz": "d3df2a5de3bf57d5c53fc4bc199e7c45a3436f10b76481cf88a51cefbbf7be7c",
         "commons-codec.tar.xz": "a9cc38b23b583ab9a277845a57ef2f2b0ef8cb0f41a2c8dc9110f1eeff7ea22c",
-        "commons-collections.tar.xz": "0a28fe4702eb1ae471d47f0219a1b18863c0019673baa08330c4370ece7518f8",
+        "commons-compress-1.21.tar.xz": "c35662f60b14b194f379dbbf6eaffaab1d9dfc568e4a8435aef28db52fda8d11",
         "commons-compress.tar.xz": "e867e6523cd33a10cb6ddfc8a972eed16f322fc03f531bf6b53469b89544ecb1",
         "commons-io.tar.xz": "bc1821e063263ce6aac33f669e49a86dc4681dbe15d3d6d968402b52009132e8",
         "commons-jxpath.tar.xz": "9b25bffed85891c1331d951ce47bcef9db1b3d6a6fbd8decf45e623d406452db",

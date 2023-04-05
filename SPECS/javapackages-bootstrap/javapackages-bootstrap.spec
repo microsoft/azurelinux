@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -24,6 +24,7 @@ Source0:        https://github.com/fedora-java/javapackages-bootstrap/releases/d
 
 # License breakdown
 Source1:        javapackages-bootstrap-PACKAGE-LICENSING
+Source2:        ignore.upstream.patch.txt
 
 Source1002:     apache-pom.tar.xz
 Source1001:     ant.tar.xz
@@ -40,7 +41,7 @@ Source1012:     commons-beanutils.tar.xz
 Source1013:     commons-cli.tar.xz
 Source1014:     commons-codec.tar.xz
 Source1015:     commons-collections.tar.xz
-Source1016:     commons-compress.tar.xz
+Source1016:     commons-compress-1.21.tar.xz
 Source1017:     commons-io.tar.xz
 Source1018:     commons-jxpath.tar.xz
 Source1019:     commons-lang.tar.xz
@@ -135,6 +136,7 @@ Source1107:     xmvn.tar.xz
 Source1108:     xz-java.tar.xz
 
 Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
+Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -151,7 +153,7 @@ Provides:       bundled(apache-commons-beanutils) = 1.9.4
 Provides:       bundled(apache-commons-cli) = 1.4
 Provides:       bundled(apache-commons-codec) = 1.15
 Provides:       bundled(apache-commons-collections) = 3.2.2
-Provides:       bundled(apache-commons-compress) = 1.20
+Provides:       bundled(apache-commons-compress) = 1.21
 Provides:       bundled(apache-commons-io) = 2.8.0
 Provides:       bundled(apache-commons-jxpath) = 1.3
 Provides:       bundled(apache-commons-lang3) = 3.11
@@ -277,7 +279,8 @@ XMvn, allowing JPT to be used before one builds XMvn package.
 
 # leave out the first source as it has already been extracted
 # leave out licensing breakdown file
-other_sources=$(echo %{sources} | cut -d' ' -f3-)
+# leave ignore patch text file
+other_sources=$(echo %{sources} | cut -d' ' -f4-)
 
 for source in ${other_sources}
 do
@@ -285,6 +288,9 @@ do
 done
 
 %patch0 -p1
+pushd "downstream/commons-compress"
+%patch1 -p1 
+popd
 
 for patch_path in patches/*/*
 do
@@ -292,9 +298,19 @@ do
   patch_name="$(echo ${patch_path} | cut -f3 -d/)"
   
   pushd "downstream/${package_name}"
-  patch -p1 < "../../patches/${package_name}/${patch_name}"
+  # not applying some patches provided by javapackages-bootstrap
+  # some upstream patches become not applicable when upgrading any of the sources
+  # only apply the patch if patch is not in the ignore.upstream.patch.txt file
+  if ! grep -Fxq "patches/${package_name}/${patch_name}" %{SOURCE2}
+  then
+    patch -p1 < "../../patches/${package_name}/${patch_name}"
+  fi  
   popd
 done
+
+# removing harmony files from the source as it causes build time error
+sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
+
 
 %build
 export LC_ALL=en_US.UTF-8 
@@ -343,6 +359,9 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
+* Wed Apr 05 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-3
+- Update commons-compress to 1.21 
+
 * Thu Mar 16 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified
