@@ -46,7 +46,6 @@ RemovePathPostfixes: -openjdk11
 Provides: %{name}-jdk-binding = %{version}-%{release}
 Requires: %{name} = %{version}-%{release}
 Requires: msopenjdk-11
-Conflicts: %{name}-jdk-binding
 
 %description openjdk11
 Configures Maven to run with OpenJDK 11.
@@ -127,7 +126,6 @@ ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
 
 install -d -m 755 %{buildroot}/etc/java/
 echo JAVA_HOME=/usr/lib/jvm/msopenjdk-11 >%{buildroot}/etc/java/maven.conf-openjdk11
-echo JAVA_HOME=/usr/lib/jvm/msopenjdk-17 >%{buildroot}/etc/java/maven.conf-openjdk17
 
 %files
 %defattr(-,root,root)
