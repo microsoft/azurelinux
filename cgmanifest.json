@@ -4590,8 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.7",
-          "downloadUrl": "https://golang.org/dl/go1.19.7.src.tar.gz"
+          "version": "1.19.8",
+          "downloadUrl": "https://golang.org/dl/go1.19.8.src.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.98.mshv1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.98.mshv1.tar.gz"
         }
       }
     },
@@ -13443,8 +13443,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.19.7",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.7-1/go.20230307.2.src.tar.gz"
+          "version": "1.19.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.8-1/go.20230404.2.src.tar.gz"
         }
       }
     },
@@ -15014,8 +15014,8 @@
         "type": "other",
         "other": {
           "name": "opa",
-          "version": "0.31.0",
-          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.31.0.tar.gz"
+          "version": "0.50.2",
+          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.50.2.tar.gz"
         }
       }
     },
@@ -20903,6 +20903,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "plexus-cipher",
+          "version": "1.7",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-1.7/plexus-cipher-1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "plexus-classworlds",
           "version": "2.5.2",
           "downloadUrl": "https://github.com/sonatype/plexus-classworlds/archive/plexus-classworlds-2.5.2.tar.gz"
@@ -20916,6 +20926,16 @@
           "name": "plexus-component-api",
           "version": "1.0~alpha15",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0-alpha-15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "plexus-containers",
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-containers/archive/plexus-containers-2.1.1.tar.gz"
         }
       }
     },
@@ -20946,6 +20966,16 @@
           "name": "plexus-pom",
           "version": "5.1",
           "downloadUrl": "https://github.com/codehaus-plexus/plexus-pom/archive/plexus-5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "plexus-sec-dispatcher",
+          "version": "1.4",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-sec-dispatcher/archive/refs/tags/sec-dispatcher-1.4.tar.gz"
         }
       }
     },
@@ -24734,8 +24764,8 @@
         "type": "other",
         "other": {
           "name": "pytorch",
-          "version": "1.13.1",
-          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v1.13.1/pytorch-v1.13.1.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.0.0/pytorch-v2.0.0.tar.gz"
         }
       }
     },
@@ -29891,6 +29921,16 @@
           "name": "xmodmap",
           "version": "1.0.9",
           "downloadUrl": "https://www.x.org/pub/individual/app/xmodmap-1.0.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xmvn",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/fedora-java/xmvn/archive/refs/tags/4.0.0.tar.gz"
         }
       }
     },
