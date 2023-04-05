@@ -28,7 +28,7 @@ Patch0:         vendor_build.patch
 %define install_sh    %{util_path}/setup/install.sh
 %define uninstall_sh  %{util_path}/setup/uninstall.sh
 %define k3s_binary    k3s
-BuildRequires:  golang <= 1.18.8
+BuildRequires:  golang
 BuildRequires:  libseccomp-devel
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  git
