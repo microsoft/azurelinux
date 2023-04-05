@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "5.15.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "version": "5.15.98.mshv1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.98.mshv1.tar.gz"
         }
       }
     },

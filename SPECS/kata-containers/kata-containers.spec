@@ -227,6 +227,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Apr 5 2023 Saul Paredes <saulparedes@microsoft.com> - 3.0.0-9
+- Update kernel uvm image location
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-8
 - Bump release to rebuild with go 1.19.8
 
