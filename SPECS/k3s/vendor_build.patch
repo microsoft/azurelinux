@@ -1,5 +1,5 @@
 diff --git a/package/rpm/install.sh b/package/rpm/install.sh
-index 93b79a1aba..fe6de8b4b3 100755
+index 5acaf70..04ba98e 100755
 --- a/package/rpm/install.sh
 +++ b/package/rpm/install.sh
 @@ -43,12 +43,8 @@ set -e
@@ -44,7 +44,7 @@ index 93b79a1aba..fe6de8b4b3 100755
  
      # --- set related files from system name ---
 diff --git a/scripts/build b/scripts/build
-index fb538350d0..3712ef2abf 100755
+index 8f121aa..f6112a5 100755
 --- a/scripts/build
 +++ b/scripts/build
 @@ -111,15 +111,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
@@ -69,7 +69,7 @@ index fb538350d0..3712ef2abf 100755
 +CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
  ln -s k3s ./bin/k3s-agent
  ln -s k3s ./bin/k3s-server
- ln -s k3s ./bin/k3s-token
+ ln -s k3s ./bin/k3s-etcd-snapshot
 @@ -133,16 +135,22 @@ ln -s k3s ./bin/ctr
  export GOPATH=$(pwd)/build
  
@@ -101,7 +101,7 @@ index fb538350d0..3712ef2abf 100755
 -cp -vf ./build/src/github.com/opencontainers/runc/runc ./bin/
 +cp -vf ./$RUNC_DIR/runc/runc ./bin/
 diff --git a/scripts/package-cli b/scripts/package-cli
-index 2c71e851d1..9cd914b8db 100755
+index 4dc2c80..d813ec8 100755
 --- a/scripts/package-cli
 +++ b/scripts/package-cli
 @@ -60,7 +60,7 @@ LDFLAGS="
