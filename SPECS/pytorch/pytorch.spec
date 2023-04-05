@@ -1,7 +1,7 @@
 %global _empty_manifest_terminate_build 0
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
-Version:        1.13.1
+Version:        2.0.0
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -51,7 +51,7 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%autosetup -a 1
+%autosetup -a 1 -n %{name}-v%{version}
 
 %build
 export USE_CUDA=0
@@ -76,6 +76,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Mon Apr 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-1
+- upgrade to 2.0.0
+
 * Thu Feb 02 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.13.1-1
 - Initial CBL-Mariner import from OpenEuler (license: BSD)
 - License verified
