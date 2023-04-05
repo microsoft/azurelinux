@@ -1,3 +1,4 @@
+%global homedir %{_datadir}/%{name}
 %global debug_package %{nil}
 %global pkg_base_name maven
 %define m2_cache_tarball_name apache-%{pkg_base_name}-%{version}-m2.tar.gz
@@ -11,7 +12,7 @@
 Summary:        Apache Maven alternative package with no jdk bindings
 Name:           maven3
 Version:        3.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -168,7 +169,7 @@ echo JAVA_HOME=/usr/lib/jvm/msopenjdk-17 >%{buildroot}/etc/java/maven.conf-openj
 %config /etc/java/maven.conf-openjdk17
 
 %changelog
-* Thu Mar 23 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+* Tue Mar 04 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
 - Added openjdk11 subpackage
 - Added symlink for binaries requires by xmvn package
 
