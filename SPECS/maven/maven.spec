@@ -12,7 +12,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.8.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -154,6 +154,9 @@ echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.c
 %config /etc/java/maven.conf-openjdk11
 
 %changelog
+* Tue Apr 04 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+- Applied linter changes
+
 * Thu Mar 23 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
 - Added openjdk11 subpackage
 - Added symlink for binaries requires by xmvn package
