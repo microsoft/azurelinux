@@ -137,7 +137,7 @@ ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/
 %endif
 
 %changelog
-* Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1000
+* Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1
 - Consume source and config from dom0
 
 * Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
