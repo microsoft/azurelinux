@@ -1,97 +1,5 @@
-From bf8717d49b3b396d74096322b32186b3a8e6b3d9 Mon Sep 17 00:00:00 2001
-From: Lior Lustgarten <lilustg@microsoft.com>
-Date: Thu, 21 Jul 2022 13:20:43 -0700
-Subject: [PATCH 1/2] enable vendor build
-
----
- scripts/build       | 30 +++++++++++++++++++-----------
- scripts/package-cli |  2 +-
- 2 files changed, 20 insertions(+), 12 deletions(-)
-
-diff --git a/scripts/build b/scripts/build
-index b25156f91e..82bfc46d99 100755
---- a/scripts/build
-+++ b/scripts/build
-@@ -103,15 +103,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
-     echo Building cni
-     TMPDIR=$(mktemp -d)
-     trap cleanup EXIT
--    WORKDIR=$TMPDIR/src/github.com/containernetworking/plugins
--    git clone -b $VERSION_CNIPLUGINS https://github.com/rancher/plugins.git $WORKDIR
--    cd $WORKDIR
-+    WORKDIR=$TMPDIR/src/github.com/containernetworking
-+    mkdir -p $WORKDIR
-+    ls
-+    cp -r vendor/plugins $WORKDIR
-+    cd $WORKDIR/plugins
-     GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
- )
- fi
- 
- echo Building k3s
--CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
-+CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
- ln -s k3s ./bin/k3s-agent
- ln -s k3s ./bin/k3s-server
- ln -s k3s ./bin/k3s-etcd-snapshot
-@@ -125,16 +127,22 @@ ln -s k3s ./bin/ctr
- export GOPATH=$(pwd)/build
- 
- echo Building containerd
--pushd ./build/src/github.com/containerd/containerd
-+CONTAINERD_DIR=build/src/github.com/containerd
-+mkdir -p $CONTAINERD_DIR
-+cp -r vendor/containerd $CONTAINERD_DIR
-+pushd ./$CONTAINERD_DIR/containerd
- TAGS="${TAGS/netcgo/netgo}"
--CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
--CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
-+CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
-+CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
- popd
--cp -vf ./build/src/github.com/containerd/containerd/bin/* ./bin/
-+cp -vf ./$CONTAINERD_DIR/containerd/bin/* ./bin/
- 
- echo Building runc
--pushd ./build/src/github.com/opencontainers/runc
-+RUNC_DIR=build/src/github.com/opencontainers
-+mkdir -p $RUNC_DIR
-+cp -r vendor/runc $RUNC_DIR
-+pushd ./$RUNC_DIR/runc
- rm -f runc
--make EXTRA_LDFLAGS="-w -s" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC
-+make EXTRA_LDFLAGS="-w -s" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC GOMODVENDOR=1
- popd
--cp -vf ./build/src/github.com/opencontainers/runc/runc ./bin/
-+cp -vf ./$RUNC_DIR/runc/runc ./bin/
-diff --git a/scripts/package-cli b/scripts/package-cli
-index 4dc2c80db1..d813ec8959 100755
---- a/scripts/package-cli
-+++ b/scripts/package-cli
-@@ -60,7 +60,7 @@ LDFLAGS="
- "
- TAGS="urfave_cli_no_docs"
- STATIC="-extldflags '-static'"
--CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
-+CGO_ENABLED=0 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
- 
- stat ${CMD_NAME}
- 
--- 
-2.25.1
-
-
-From a4cbc923a6ac449f7be4d2c839598b7fa10706ae Mon Sep 17 00:00:00 2001
-From: Lior Lustgarten <lilustg@microsoft.com>
-Date: Thu, 21 Jul 2022 18:06:07 -0700
-Subject: [PATCH 2/2] Adds install fix for vhdx
-
----
- package/rpm/install.sh | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
-
 diff --git a/package/rpm/install.sh b/package/rpm/install.sh
-index ed0b4fbba6..a3a07cc601 100755
+index 93b79a1aba..fe6de8b4b3 100755
 --- a/package/rpm/install.sh
 +++ b/package/rpm/install.sh
 @@ -43,12 +43,8 @@ set -e
@@ -135,5 +43,234 @@ index ed0b4fbba6..a3a07cc601 100755
      DATA_DIR=/var/lib/rancher/k3s
  
      # --- set related files from system name ---
--- 
-2.25.1
+diff --git a/scripts/build b/scripts/build
+index fb538350d0..3712ef2abf 100755
+--- a/scripts/build
++++ b/scripts/build
+@@ -117,15 +117,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
+     echo Building cni
+     TMPDIR=$(mktemp -d)
+     trap cleanup EXIT
+-    WORKDIR=$TMPDIR/src/github.com/containernetworking/plugins
+-    git clone -b $VERSION_CNIPLUGINS https://github.com/rancher/plugins.git $WORKDIR
+-    cd $WORKDIR
+-    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
++    WORKDIR=$TMPDIR/src/github.com/containernetworking
++    mkdir -p $WORKDIR
++    ls
++    cp -r vendor/plugins $WORKDIR
++    cd $WORKDIR/plugins
++    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
+ )
+ fi
+ 
+ echo Building k3s
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
+ ln -s k3s ./bin/k3s-agent
+ ln -s k3s ./bin/k3s-server
+ ln -s k3s ./bin/k3s-token
+@@ -140,16 +142,22 @@ ln -s k3s ./bin/ctr
+ export GOPATH=$(pwd)/build
+ 
+ echo Building containerd
+-pushd ./build/src/github.com/containerd/containerd
++CONTAINERD_DIR=build/src/github.com/containerd
++mkdir -p $CONTAINERD_DIR
++cp -r vendor/containerd $CONTAINERD_DIR
++pushd ./$CONTAINERD_DIR/containerd
+ TAGS="${TAGS/netcgo/netgo}"
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
+ popd
+-cp -vf ./build/src/github.com/containerd/containerd/bin/* ./bin/
++cp -vf ./$CONTAINERD_DIR/containerd/bin/* ./bin/
+ 
+ echo Building runc
+-pushd ./build/src/github.com/opencontainers/runc
++RUNC_DIR=build/src/github.com/opencontainers
++mkdir -p $RUNC_DIR
++cp -r vendor/runc $RUNC_DIR
++pushd ./$RUNC_DIR/runc
+ rm -f runc
+-make EXTRA_FLAGS="-gcflags=\"all=${GCFLAGS}\"" EXTRA_LDFLAGS="$LDFLAGS" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC
++make EXTRA_LDFLAGS="-w -s" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC GOMODVENDOR=1
+ popd
+-cp -vf ./build/src/github.com/opencontainers/runc/runc ./bin/
++cp -vf ./$RUNC_DIR/runc/runc ./bin/
+diff --git a/scripts/build.orig b/scripts/build.orig
+new file mode 100755
+index 0000000000..fb538350d0
+--- /dev/null
++++ b/scripts/build.orig
+@@ -0,0 +1,155 @@
++#!/bin/bash
++set -e -x
++
++cd $(dirname $0)/..
++
++. ./scripts/version.sh
++
++GO=${GO-go}
++
++PKG="github.com/k3s-io/k3s"
++PKG_CONTAINERD="github.com/containerd/containerd"
++PKG_K3S_CONTAINERD="github.com/k3s-io/containerd"
++PKG_CRICTL="github.com/kubernetes-sigs/cri-tools/pkg"
++PKG_K8S_BASE="k8s.io/component-base"
++PKG_K8S_CLIENT="k8s.io/client-go/pkg"
++PKG_CNI_PLUGINS="github.com/containernetworking/plugins"
++PKG_KUBE_ROUTER="github.com/cloudnativelabs/kube-router"
++PKG_CRI_DOCKERD="github.com/Mirantis/cri-dockerd"
++
++buildDate=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
++
++VERSIONFLAGS="
++    -X ${PKG}/pkg/version.Version=${VERSION}
++    -X ${PKG}/pkg/version.GitCommit=${COMMIT:0:8}
++
++    -X ${PKG_K8S_CLIENT}/version.gitVersion=${VERSION}
++    -X ${PKG_K8S_CLIENT}/version.gitCommit=${COMMIT}
++    -X ${PKG_K8S_CLIENT}/version.gitTreeState=${TREE_STATE}
++    -X ${PKG_K8S_CLIENT}/version.buildDate=${buildDate}
++
++    -X ${PKG_K8S_BASE}/version.gitVersion=${VERSION}
++    -X ${PKG_K8S_BASE}/version.gitCommit=${COMMIT}
++    -X ${PKG_K8S_BASE}/version.gitTreeState=${TREE_STATE}
++    -X ${PKG_K8S_BASE}/version.buildDate=${buildDate}
++
++    -X ${PKG_CRICTL}/version.Version=${VERSION_CRICTL}
++
++    -X ${PKG_CONTAINERD}/version.Version=${VERSION_CONTAINERD}
++    -X ${PKG_CONTAINERD}/version.Package=${PKG_K3S_CONTAINERD}
++
++    -X ${PKG_CNI_PLUGINS}/pkg/utils/buildversion.BuildVersion=${VERSION_CNIPLUGINS}
++    -X ${PKG_CNI_PLUGINS}/plugins/meta/flannel.Program=flannel
++    -X ${PKG_CNI_PLUGINS}/plugins/meta/flannel.Version=${VERSION_FLANNEL}
++    -X ${PKG_CNI_PLUGINS}/plugins/meta/flannel.Commit=HEAD
++    -X ${PKG_CNI_PLUGINS}/plugins/meta/flannel.buildDate=${buildDate}
++
++    -X ${PKG_KUBE_ROUTER}/pkg/version.Version=${VERSION_KUBE_ROUTER}
++    -X ${PKG_KUBE_ROUTER}/pkg/version.BuildDate=${buildDate}
++
++    -X ${PKG_CRI_DOCKERD}/cmd/version.Version=${VERSION_CRI_DOCKERD}
++    -X ${PKG_CRI_DOCKERD}/cmd/version.GitCommit=HEAD
++    -X ${PKG_CRI_DOCKERD}/cmd/version.BuildTime=${buildDate}
++"
++
++if [ -n "${DEBUG}" ]; then
++  GCFLAGS="-N -l"
++else
++  LDFLAGS="-w -s"
++fi
++
++STATIC="
++    -extldflags '-static -lm -ldl -lz -lpthread'
++"
++TAGS="apparmor seccomp netcgo osusergo providerless urfave_cli_no_docs"
++RUNC_TAGS="apparmor seccomp"
++RUNC_STATIC="static"
++
++if [ "$SELINUX" = "true" ]; then
++    TAGS="$TAGS selinux"
++    RUNC_TAGS="$RUNC_TAGS selinux"
++fi
++
++if [ "$STATIC_BUILD" != "true" ]; then
++    STATIC="
++"
++    RUNC_STATIC=""
++else
++    TAGS="static_build libsqlite3 $TAGS"
++fi
++
++mkdir -p bin
++
++if [ ${ARCH} = armv7l ] || [ ${ARCH} = arm ]; then
++    export GOARCH="arm"
++    export GOARM="7"
++fi
++
++if [ ${ARCH} = s390x ]; then
++    export GOARCH="s390x"
++fi
++
++rm -f \
++    bin/k3s-agent \
++    bin/k3s-server \
++    bin/k3s-token \
++    bin/k3s-etcd-snapshot \
++    bin/k3s-secrets-encrypt \
++    bin/k3s-certificate \
++    bin/k3s-completion \
++    bin/kubectl \
++    bin/crictl \
++    bin/ctr \
++    bin/containerd \
++    bin/containerd-shim \
++    bin/containerd-shim-runc-v2 \
++    bin/runc
++
++cleanup() {
++    exit_status=$?
++    rm -rf $TMPDIR
++    exit ${exit_status}
++}
++
++INSTALLBIN=$(pwd)/bin
++if [ ! -x ${INSTALLBIN}/cni ]; then
++(
++    echo Building cni
++    TMPDIR=$(mktemp -d)
++    trap cleanup EXIT
++    WORKDIR=$TMPDIR/src/github.com/containernetworking/plugins
++    git clone -b $VERSION_CNIPLUGINS https://github.com/rancher/plugins.git $WORKDIR
++    cd $WORKDIR
++    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
++)
++fi
++
++echo Building k3s
++CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
++ln -s k3s ./bin/k3s-agent
++ln -s k3s ./bin/k3s-server
++ln -s k3s ./bin/k3s-token
++ln -s k3s ./bin/k3s-etcd-snapshot
++ln -s k3s ./bin/k3s-secrets-encrypt
++ln -s k3s ./bin/k3s-certificate
++ln -s k3s ./bin/k3s-completion
++ln -s k3s ./bin/kubectl
++ln -s k3s ./bin/crictl
++ln -s k3s ./bin/ctr
++
++export GOPATH=$(pwd)/build
++
++echo Building containerd
++pushd ./build/src/github.com/containerd/containerd
++TAGS="${TAGS/netcgo/netgo}"
++CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
++CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
++popd
++cp -vf ./build/src/github.com/containerd/containerd/bin/* ./bin/
++
++echo Building runc
++pushd ./build/src/github.com/opencontainers/runc
++rm -f runc
++make EXTRA_FLAGS="-gcflags=\"all=${GCFLAGS}\"" EXTRA_LDFLAGS="$LDFLAGS" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC
++popd
++cp -vf ./build/src/github.com/opencontainers/runc/runc ./bin/
+diff --git a/scripts/package-cli b/scripts/package-cli
+index 2c71e851d1..9cd914b8db 100755
+--- a/scripts/package-cli
++++ b/scripts/package-cli
+@@ -60,7 +60,7 @@ LDFLAGS="
+ "
+ TAGS="urfave_cli_no_docs"
+ STATIC="-extldflags '-static'"
+-CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
++CGO_ENABLED=0 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
+ 
+ stat ${CMD_NAME}
+ 

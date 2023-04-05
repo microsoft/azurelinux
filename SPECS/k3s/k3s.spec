@@ -1,7 +1,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.25.0
-Release:        7%{?dist}
+Version:        1.26.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -15,7 +15,7 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone --single-branch --branch="v1.6.8-k3s1" --depth=1 https://github.com/k3s-io/containerd
+# 6. git clone --single-branch --branch="v1.5.18" --depth=1 https://github.com/k3s-io/containerd
 # 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
 # 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
@@ -31,6 +31,7 @@ Patch0:         vendor_build.patch
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  libseccomp-devel
 BuildRequires:  btrfs-progs-devel
+BuildRequires:  git
 Requires:       apparmor-parser
 # K3s on Mariner is supported on x86_64 only:
 ExclusiveArch:  x86_64
@@ -79,6 +80,12 @@ exit 0
 %{install_sh}
 
 %changelog
+* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.2-1
+- Updated k3s to 1.26.2
+
+* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-1
+- Updated k3s to 1.25.5
+
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-7
 - Bump release to rebuild with go 1.19.7
 
