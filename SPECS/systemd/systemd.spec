@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        43%{?dist}
+Release:        44%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ Patch24:        CVE-2021-33910.patch
 Patch25:        Backport-fix-dhcp-routes.patch
 Patch26:        Add-ptp_hyperv-udev-rule.patch
 Patch27:        CVE-2022-3821.patch
+Patch28:        CVE-2023-26604.patch
 
 #Portablectl patches for --now --enable and --no-block flags support
 Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
@@ -288,6 +289,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Apr 05 2023 Henry Beberman <henry.beberman@microsoft.com> - 239-44
+- Add patch for CVE-2023-26604
+
 * Mon Nov 21 2022 Andrew Phelps <anphel@microsoft.com> - 239-43
 - Add patch for CVE-2022-3821
 
