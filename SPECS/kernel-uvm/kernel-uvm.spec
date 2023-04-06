@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.98.mshv1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,14 @@ ExclusiveArch:  x86_64
 %description
 The kernel package contains the Linux kernel.
 
+%package devel
+Summary:        Lightweight kernel Devel package
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description devel
+This package contains the kernel UVM devel files
+
 %prep
 tar xf %{SOURCE0} --strip-components=1
 
@@ -105,12 +113,29 @@ KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="
 %endif
 
 %install
+install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
+install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
+
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
 %ifarch x86_64
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
+
+find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+%ifarch x86_64
+# CONFIG_STACK_VALIDATION=y requires objtool to build external modules
+install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+%endif
+
+cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
+ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
+find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %files
 %defattr(-,root,root)
@@ -121,8 +146,16 @@ ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/
 /lib/modules/%{name}/vmlinux
 %endif
 
+%files devel
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/build
+%{_prefix}/src/linux-headers-%{uname_r}
+
 %changelog
-* Fri Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
+* Thu Apr 6 2023 Chris Co <chrco@microsoft.com> - 5.15.98.mshv1-3
+- Generate devel subpackage and enable loadable kernel module support
+
+* Thu Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
 - Remove aarch64 build instructions
 
 * Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1
