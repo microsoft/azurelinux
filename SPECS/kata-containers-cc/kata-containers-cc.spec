@@ -12,7 +12,7 @@ Group:        Virtualization/Libraries
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 URL:          https://github.com/microsoft/kata-containers
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz
 
 Source1:      mariner-coco-build-uvm-image.sh
 Source2:      mariner-coco-build-uvm-image.service
@@ -51,6 +51,8 @@ Requires:  iptables
 Requires:  parted
 Requires:  qemu-img
 Requires:  opa
+Requires:  moby-containerd-cc
+Requires:  kernel-uvm
 
 %description
 Kata Confidential Containers.
@@ -192,6 +194,11 @@ install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE6}
 %{_unitdir}/tardev-snapshotter.service
 %{_unitdir}/mariner-coco-build-uvm-image.service
 %{_unitdir}/pause-image.service
+
+%license LICENSE
+%doc CONTRIBUTING.md
+%doc README.md
+
 
 %changelog
 *   Wed Apr 5 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-10
