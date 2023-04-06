@@ -75,9 +75,9 @@ popd
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/protoc
-%{_libdir}/libprotobuf-lite.so.28*
-%{_libdir}/libprotobuf.so.28*
-%{_libdir}/libprotoc.so.28*
+%{_libdir}/libprotobuf-lite.so.29*
+%{_libdir}/libprotobuf.so.29*
+%{_libdir}/libprotoc.so.29*
 
 %files devel
 %defattr(-,root,root)
