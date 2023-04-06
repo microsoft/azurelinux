@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+KATA_CONF_FILE=/opt/confidential-containers/share/defaults/kata-containers/configuration-clh.toml /opt/confidential-containers/bin/containerd-shim-kata-v2 "$@"

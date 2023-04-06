@@ -1,0 +1,11 @@
+{
+  "Signatures": {
+    "runtime.yaml": "8d3988c4123170b25914be94a9aa92771b91d77c197f02828d28b7dc055e48c7",
+    "kata-containers-cc-0.1.0.tar.gz": "edeadfc3218b257a9c5df3c5599c793d29bebab6ee3b477e2950491b339eb0a6",
+    "mariner-coco-build-uvm-image.sh": "75caf4d8c8e3e006f0ba1c23b7e8d2d800c5aa9aa1f00919a7840e7c8e69011d",
+    "mariner-coco-build-uvm-image.service": "b36ec4812314d8e0f04d7e6c0583d26e317302475d6ba389f890c110ef2decea",
+    "pause-image.service": "a2ff885350c7460e6116e7302919adc83c896044e1eefe3612fdefe2c4bdde67",
+    "pause-image.sh": "597fad7167f73cd7950ea641710eb3713157a4f278b6c158d82e511a2fc65a5a",
+    "containerd-for-cc-override.conf": "923da6c9a367037c7d4231ae560779d17e63347f04509c44eddb70154f64656d"
+  }
+}
