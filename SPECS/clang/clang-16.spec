@@ -29,7 +29,7 @@
     %{_bindir}/nvptx-arch \
     %{_bindir}/scan-build-py
 
-%global clang_srcdir %{name}-project-llvmorg-%{version}
+%global clang_srcdir llvm-project-llvmorg-%{version}
 %global clang_tools_srcdir %{name}-tools-extra-%{version}.src
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
@@ -56,7 +56,6 @@ Requires:       llvm
 Requires:       ncurses
 Requires:       python3
 Requires:       zlib
-Provides:       %{name}-analyzer = %{version}-%{release}
 
 %description
 The goal of the Clang project is to create a new C based language front-end: C, C++, Objective C/C++, OpenCL C and others for the LLVM compiler. You can get and build the source today.
