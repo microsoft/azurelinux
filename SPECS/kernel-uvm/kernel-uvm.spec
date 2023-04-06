@@ -91,8 +91,6 @@ The kernel package contains the Linux kernel.
 Summary:        Lightweight kernel Devel package
 Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
-Requires:       gawk
-Requires:       python3
 
 %description devel
 This package contains the kernel UVM devel files
