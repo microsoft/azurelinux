@@ -12,14 +12,15 @@ Group:        Virtualization/Libraries
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 URL:          https://github.com/microsoft/kata-containers
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 
-Source1:      mariner-coco-build-uvm-image.sh
-Source2:      mariner-coco-build-uvm-image.service
-Source3:      containerd-for-cc-override.conf
-Source4:      runtime.yaml
-Source5:      pause-image.sh
-Source6:      pause-image.service
+Source2:      mariner-coco-build-uvm-image.sh
+Source3:      mariner-coco-build-uvm-image.service
+Source4:      containerd-for-cc-override.conf
+Source5:      runtime.yaml
+Source6:      pause-image.sh
+Source7:      pause-image.service
 
 ExclusiveArch: x86_64
 
@@ -51,7 +52,6 @@ Requires:  iptables
 Requires:  parted
 Requires:  qemu-img
 Requires:  opa
-Requires:  moby-containerd-cc
 Requires:  kernel-uvm
 
 %description
@@ -135,7 +135,7 @@ mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 ln -s /usr/bin/cloud-hypervisor %{buildroot}/%{coco_bin}/cloud-hypervisor
 ln -s /usr/bin/containerd %{buildroot}/%{coco_bin}/containerd
 ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
-install -D -m 0644 %{SOURCE3} %{buildroot}/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
+install -D -m 0644 %{SOURCE4} %{buildroot}/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
 find %{buildroot}/etc
 
@@ -165,12 +165,12 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax              %{buildroot}/%{share_kata}/scripts/nsdax
 install -D -m 0644 %{_builddir}/%{name}-%{version}/tools/osbuilder/mariner-uvm-rootfs.tar.gz        %{buildroot}/opt/mariner/share/uvm/mariner-uvm-rootfs.tar.gz
 
-install -D -m 0755 %{SOURCE1} %{buildroot}/opt/mariner/share/uvm/mariner-coco-build-uvm-image.sh
-install -D -m 0755 %{SOURCE5} %{buildroot}/opt/mariner/share/uvm/pause-image.sh
-install -D -m 0644 %{SOURCE4} %{buildroot}/runtime.yaml
+install -D -m 0755 %{SOURCE2} %{buildroot}/opt/mariner/share/uvm/mariner-coco-build-uvm-image.sh
+install -D -m 0755 %{SOURCE6} %{buildroot}/opt/mariner/share/uvm/pause-image.sh
+install -D -m 0644 %{SOURCE5} %{buildroot}/runtime.yaml
 
-install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE2}
-install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE6}
+install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE3}
+install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE7}
 
 %preun
 %systemd_preun tardev-snapshotter.service
