@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,7 @@ install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 install -d -m755 %{buildroot}%{_localstatedir}/lib/initramfs/kernel
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
-%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips
+%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips, dracut-megaraid
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
 
@@ -136,6 +136,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Fri Mar 31 2023 Vince Perri <viperri@microsoft.com> - 2.0-11
+- Add dracut-megaraid to package watch list, since it will add dracut modules
+
 * Thu Mar 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-10
 - Create initrd in /boot/efi for kernel-mshv only if it is a kata image
 
