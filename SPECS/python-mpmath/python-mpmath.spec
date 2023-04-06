@@ -1,23 +1,3 @@
-Name:           python-mpmath
-Version:        1.3.0
-Release:        3%{?dist}
-Summary:        A pure Python library for multiprecision floating-point arithmetic
-License:        BSD
-URL:            https://mpmath.org
-# Source code
-Source0:        https://github.com/fredrik-johansson/mpmath/archive/%{version}/%{name}-%{version}.tar.gz
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-setuptools_scm
-BuildRequires:  python3-pytest
-BuildRequires:  python3-sphinx
-BuildRequires:  xorg-x11-server-Xvfb
-
-
-BuildArch:      noarch
-
 %global _description %{expand:
 Mpmath is a pure-Python library for multiprecision floating-point
 arithmetic. It provides an extensive set of transcendental functions,
@@ -28,17 +8,34 @@ as well at 10-digit or 1000-digit precision, and in many cases mpmath
 implements asymptotically fast algorithms that scale well for
 extremely high precision work. If available, mpmath will (optionally)
 use gmpy to speed up high precision operations.}
+Summary:        A pure Python library for multiprecision floating-point arithmetic
+Name:           python-mpmath
+Version:        1.3.0
+Release:        3%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://mpmath.org
+# Source code
+Source0:        https://github.com/fredrik-johansson/mpmath/archive/%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-sphinx
+BuildRequires:  xorg-x11-server-Xvfb
+BuildArch:      noarch
 
-%description %_description
+%description %{_description}
 
 %package -n python3-mpmath
-Summary:        A pure Python library for multiprecision floating-point arithmetic
 %{?python_provide:%python_provide python3-mpmath}
+Summary:        A pure Python library for multiprecision floating-point arithmetic
 
-%description -n python3-mpmath %_description
+%description -n python3-mpmath %{_description}
 
 If you require plotting capabilities in mpmath, install python3-matplotlib.
-
 
 %package doc
 Summary:        HTML documentation for %{name}
@@ -46,7 +43,6 @@ Requires:       python3-mpmath = %{version}-%{release}
 
 %description doc
 This package contains the HTML documentation for %{name}.
-
 
 %prep
 %setup -q -n mpmath-%{version}

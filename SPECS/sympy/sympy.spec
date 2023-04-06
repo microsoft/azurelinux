@@ -4,54 +4,49 @@
 
 # We are archful (see below), but there are no ELF objects in the binary RPM.
 %global debug_package %{nil}
-
+%global _description\
+SymPy aims to become a full-featured computer algebra system (CAS)\
+while keeping the code as simple as possible in order to be\
+comprehensible and easily extensible. SymPy is written entirely in\
+Python and does not require any external libraries.
+Summary:        A Python library for symbolic mathematics
 Name:           sympy
 Version:        1.11.1
 Release:        4%{?dist}
-Summary:        A Python library for symbolic mathematics
-
 # The project as a whole is BSD-3-Clause.
 # The files in sympy/parsing/latex are MIT.
 License:        BSD-3-Clause AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://sympy.org/
 Source0:        https://github.com/%{name}/%{name}/archive/%{name}-%{version}.tar.gz
 # Skip tests that require a display
 Patch0:         %{name}-circuitplot.patch
-
+BuildRequires:  %{py3_dist cython}
+BuildRequires:  Python3-mpmath
 # This package used to be noarch, and should still be noarch.  However, because
 # there is no JDK available on i686 anymore, the antlr4 package is also not
 # available on i686.  When we can stop building on i686 altogether, we can bring
 # this back.  In the meantime, we cannot claim to be noarch, because the i686
 # build is different from the other arches in lacking BuildRequires: antlr4.
 # BuildArch:      noarch
-
-%ifarch %{java_arches}
-BuildRequires:  antlr4
-%endif
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  python3-devel
-BuildRequires:  %{py3_dist cython}
 BuildRequires:  python3-numpy-f2py
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildRequires:  Python3-mpmath
 #Test
 BuildRequires:  xorg-x11-server-Xvfb
 
-%global _description\
-SymPy aims to become a full-featured computer algebra system (CAS)\
-while keeping the code as simple as possible in order to be\
-comprehensible and easily extensible. SymPy is written entirely in\
-Python and does not require any external libraries.
-
-%description %_description
+%description %{_description}
 
 %package -n python3-%{name}
 Summary:        A Python3 library for symbolic mathematics
-Recommends:     %{py3_dist cython}
+License:        BSD-3-Clause AND MIT
 Requires:       python-mpmath
+Recommends:     %{py3_dist cython}
 
 %description -n python3-%{name}
 SymPy aims to become a full-featured computer algebra system (CAS)
@@ -60,14 +55,15 @@ comprehensible and easily extensible. SymPy is written entirely in
 Python and does not require any external libraries.
 
 %package examples
-License:        BSD-3-Clause
 Summary:        Sympy examples
+License:        BSD-3-Clause
 Requires:       python3-%{name} = %{version}-%{release}
 
 %description examples
 This package contains example input for sympy.
 
 %package doc
+Summary:        Documentation for sympy
 # This project is BSD-3-Clause.  Other files bundled with the documentation
 # have the following licenses:
 # - searchindex.js: BSD-2-Clause
@@ -90,7 +86,6 @@ This package contains example input for sympy.
 # uses different organization and project names.  I am using the PSF-2.0
 # identifier for now, because there is no valid SPDX choice.  Revisit this.
 License:        BSD-3-Clause AND BSD-2-Clause AND MIT AND PSF-2.0
-Summary:        Documentation for sympy
 Provides:       bundled(js-jquery)
 Provides:       bundled(js-underscore)
 
@@ -118,16 +113,16 @@ for fil in sympy/physics/mechanics/models.py \
   fixtimestamp $fil
 done
 
-%generate_buildrequires
-%pyproject_buildrequires
+%{generate_buildrequires}
+%{pyproject_buildrequires}
 
 %build
 # Build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
-%pyproject_save_files isympy sympy
+%{pyproject_install}
+%{pyproject_save_files} isympy sympy
 
 ## Remove extra files
 rm -f %{buildroot}%{_bindir}/{,doc}test
@@ -152,7 +147,7 @@ find examples/ -name '*.py[co]' -print -delete
 # become too much of a burden.  Only run tests if we happen to build on x86_64.
 # We cannot use %%ifarch here because this is a noarch package.
 if [ "$(uname -m)" = "x86_64" ]; then
-  xvfb-run -d %{python3} bin/test -v 
+  xvfb-run -d %{python3} bin/test -v
 fi
 
 %files -n python3-%{name} -f %{pyproject_files}
@@ -162,7 +157,6 @@ fi
 
 %files examples
 %doc examples/*
-
 
 %changelog
 * Tue Feb 21 2023 Jerry James <loganjerry@gmail.com> - 1.11.1-4

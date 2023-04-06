@@ -23013,6 +23013,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-mpmath",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/fredrik-johansson/mpmath/archive/1.3.0/python-mpmath-1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-msal",
           "version": "1.18.0~b1",
           "downloadUrl": "https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/1.18.0b1/microsoft-authentication-library-for-python-1.18.0b1.tar.gz"
@@ -27919,6 +27929,16 @@
           "name": "symlinks",
           "version": "1.7",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sympy",
+          "version": "1.11.1",
+          "downloadUrl": "https://github.com/sympy/sympy/archive/sympy-1.11.1.tar.gz"
         }
       }
     },
