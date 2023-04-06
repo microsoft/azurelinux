@@ -8,17 +8,10 @@
 %define config_source %{SOURCE1}
 %endif
 
-%ifarch aarch64
-%global __provides_exclude_from %{_libdir}/debug/.build-id/
-%define arch arm64
-%define archdir arm64
-%define config_source %{SOURCE2}
-%endif
-
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.98.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,7 +40,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 # Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
 # to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
@@ -77,11 +70,6 @@ ExclusiveArch:  x86_64 aarch64
 %define kcflags -Wa,-mx86-used-note=no
 %endif
 %define arch x86_64
-%endif
-%ifarch aarch64
-%define image_fname Image
-%define image arch/arm64/boot/%{image_fname}
-%define arch arm64
 %endif
 
 %description
@@ -115,9 +103,6 @@ fi
 %ifarch x86_64
 KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 %endif
-%ifarch aarch64
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-%endif
 
 %install
 D=%{buildroot}%{_datadir}/cloud-hypervisor
@@ -137,6 +122,9 @@ ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/
 %endif
 
 %changelog
+* Fri Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
+- Remove aarch64 build instructions
+
 * Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1
 - Consume source and config from dom0
 
