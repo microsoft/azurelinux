@@ -1,14 +1,26 @@
 # Quick Start Guide
-  - [Install Prerequisites](#install-prerequisites)
-  - [Clone CBL-Mariner](#clone-cbl-mariner)
-  - [Build and Boot an Image](#build-and-boot-an-image)
-    - [VHDX and VHD Images](#vhdx-and-vhd-images)
-    - [ISO Image](#iso-image)
+
+- [Install Prerequisites](#install-prerequisites)
+- [Clone CBL-Mariner](#clone-cbl-mariner)
+- [Build and Boot an Image](#build-and-boot-an-image)
+  - [VHDX and VHD Images](#vhdx-and-vhd-images)
+  - [ISO Image](#iso-image)
+
+## Is this document for you?
+
+|Task                              | Where to go                                                                   |
+|:---------------------------------|-------------------------------------------------------------------------------|
+|Just add or build my own packages | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
+|Just add or build my own images   | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
+|Use the **core repo** to build an image | [Continue Reading](#build-and-boot-an-image)                            |
+|In-depth building guide           | [building.md](../building/building.md)                                        |
 
 ## **Install Prerequisites**
+
 Install prerequisites [here](../building/prerequisites.md).
 
 ## **Clone CBL-Mariner**
+
 From a bash terminal window, clone the CBL-Mariner Repository and check-out a stable build.
 
 ```bash
@@ -21,15 +33,16 @@ git checkout 2.0-stable
 
 ```
 
-## **Build and Boot an Image**
+## Build and Boot an Image
 
-### **VHDX and VHD images**
+### VHDX and VHD images
 
 The following builds a bootable, VHDX or VHD CBL-Mariner image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/2.0/prod/.
 
 No user account is provisioned by default.  To sign-in to these images, the sample meta-user-data.iso image must also be built and installed in your VM's CD drive.  The cloud-init service will detect the iso and provision a user account and password.
 
-**Build a VHD or VHDX Image**
+### Build a VHD or VHDX Image using published packages
+
 ```bash
 # Switch to the toolkit folder
 cd toolkit
@@ -43,18 +56,19 @@ sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/co
 sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/core-legacy.json
 ```
 
-**Build the cloud-init configuration image**
+### Build the cloud-init configuration image
+
 ```Bash
 # Build the cloud-init configuration image
 # The output image is ../out/images/meta-user-data.iso
 sudo make meta-user-data
 ```
 
-**Copy VHD(X) and ISO Images to Your VM Host Machine**
+### Copy VHD(X) and ISO Images to Your VM Host Machine
 
 Copy your binary image(s) to your VM Host Machine using your preferred technique.
 
-**Create VHD(X) Virtual Machine with Hyper-V**
+### Create VHD(X) Virtual Machine with Hyper-V
 
 1. From Hyper-V Select _Action->New->Virtual Machine_.
 1. Provide a name for your VM and press _Next >_.
@@ -64,14 +78,15 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Select _Use an existing virtual hard disk_, then browse and select your VHD(X) file.
 1. Press _Finish_.
 
-**[Gen2/VHDX Only] Fix Boot Options**
+### [Gen2/VHDX Only] Fix Boot Options
+
 1. Right click your virtual machine from Hyper-V Manager
 1. Select _Settings..._.
 1. Select Security and under _Template:_ select _Microsoft UEFI Certificate Authority_.
 1. Select the SCSI Controller from the Hardware panel.
 1. Select DVD Drive and press Add.
 
-**Mount the Meta-User-Data.Iso Image**
+### Mount the Meta-User-Data.Iso Image
 
 1. Right click your virtual machine from Hyper-V Manager
 1. Select _Settings..._.
@@ -80,17 +95,16 @@ choose DVD Drive and press Add.
 1. Select _Image File:_ and browse to the meta-user-data.iso file.
 1. Select _Apply_ to apply all changes.
 
-**Boot and Sign-In to your VHD**
+### Boot and Sign-In to your VHD
 
 1. Right click your VM and select _Connect..._.
 1. Select _Start_.
 1. Wait for CBL-Mariner to boot to the login prompt, then sign in with:
 
-       mariner_user
-       p@ssw0rd
+> mariner_user
+> p@ssw0rd
 
-
-### ISO Image
+## ISO Image
 
 The following builds a bootable ISO image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/2.0/prod/.
 
@@ -101,11 +115,12 @@ cd toolkit
 # Image is placed in ../out/images/full
 sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
 ```
-**Copy ISO Image to Your VM Host Machine**
+
+### Copy ISO Image to Your VM Host Machine
 
 Copy your binary image(s) to your VM Host Machine using your preferred technique.
 
-**Create VHD(X) Virtual Machine with Hyper-V**
+### Create VHD(X) Virtual Machine with Hyper-V
 
 1. From Hyper-V Select _Action->New->Virtual Machine_.
 1. Provide a name for your VM and press _Next >_.
@@ -116,7 +131,7 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Select _Install an operating system from a bootable image file_ and browse to your CBL-Mariner ISO.
 1. Press _Finish_.
 
-**[Gen2/VHDX Only] Fix Boot Options**
+### [Gen2/VHDX Only] Fix Boot Options
 
 1. Right click your virtual machine from Hyper-V Manager
 1. Select _Settings..._
@@ -124,7 +139,8 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Select Firmware and adjust the boot order so DVD is first and Hard Drive is second.
 1. Select _Apply_ to apply all changes.
 
-**Boot ISO**
+### Boot ISO
+
 1. Right click your VM and select _Connect..._.
 1. Select _Start_.
 1. Follow the Installer Prompts to Install your image
