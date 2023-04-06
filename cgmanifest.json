@@ -1746,6 +1746,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "clang-16",
+          "version": "16.0.0",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cldr-emoji-annotation",
           "version": "37.0_13.0_0_1",
           "downloadUrl": "https://github.com/fujiwarat/cldr-emoji-annotation/releases/download/37.0_13.0_0_1/cldr-emoji-annotation-37.0_13.0_0_1.tar.gz"
@@ -12123,6 +12133,16 @@
           "name": "llvm",
           "version": "12.0.1",
           "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "llvm-16",
+          "version": "16.0.0",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }
       }
     },
