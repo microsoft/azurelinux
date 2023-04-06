@@ -5,6 +5,6 @@
   "kata-containers-3.0.0-vendor.tar.gz": "0f31ee3c1bca71650bf3dac3d1f04d2b42322b3c41abb1982a654463a655da42",
   "kata-containers-3.0.0.tar.gz": "e1b3cd7402d99414dc3606364cbb6e71f4354c8be65f31ba5eae89f6c207d05d",
   "kata-osbuilder-generate.service": "4438c39799297efbf88cfc549964432a41506a3c89e13073fa908658a5bd6376",
-  "kata-osbuilder.sh": "b2a0510933f36860c16447400119488a035a7cb579a6f8adc4925fff54f1883b"
+  "kata-osbuilder.sh": "43d82b8c43332a23fa6e8dedf194c786c1d46d35ac901dc4ccb194da63034a9e"
  }
 }
