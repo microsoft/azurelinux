@@ -8,65 +8,16 @@
 |Just add or build my own images   | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
 |Quickly build core packages       | [Dedicated Build Core Packages Guide](./dedicated_guides/build_packages.md)   |
 |Quickly build core images         | [Dedicated Build Core Images Guide](./dedicated_guides/build_images.md)       |
+|Quickly build the go tools        | [Dedicated Go Tooling Guide](./dedicated_guides/build_tools.md)               |
 |Learn how the tools work in depth | [Continue Reading](#overview)                                                 |
 |Add/Update a core Mariner package | [Continue Reading](#overview)                                                 |
 |Improve Mariner tools             | [Continue Reading](#overview)                                                 |
 
 ---
 
-TODO: Update to tell users to use button
+## Table of Contents
 
-- [Overview](#overview)
-- [Building in Stages](#building-in-stages)
-  - [Install Prerequisites](#install-prerequisites)
-  - [Clone and Sync To Stable Commit](#clone-and-sync-to-stable-commit)
-    - [Stable Tags](#stable-tags)
-    - [What About Non-Stable Tags?](#what-about-non-stable-tags)
-  - [Toolchain Stage](#toolchain-stage)
-    - [Populate an Existing Toolchain](#populate-an-existing-toolchain)
-    - [Rebuild the Toolchain](#rebuild-the-toolchain)
-  - [Package Stage](#package-stage)
-    - [Rebuild All Packages](#rebuild-all-packages)
-    - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
-    - [Targeted Package Building](#targeted-package-building)
-  - [Image Stage](#image-stage)
-    - [Virtual Hard Disks and Containers](#virtual-hard-disks-and-containers)
-    - [ISO Images](#iso-images)
-- [Further Reading](#further-reading)
-  - [Packages](#packages)
-  - [Working on Packages](#working-on-packages)
-    - [DOWNLOAD_SRPMS](#download_srpms)
-    - [Force Rebuilds](#force-rebuilds)
-    - [Ignoring Packages](#ignoring-packages)
-    - [Source Hashes](#source-hashes)
-  - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
-    - [CBL-Mariner 1.0](#cbl-mariner-10)
-    - [CBL-Mariner 2.0](#cbl-mariner-20)
-  - [Tools](#tools)
-- [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
-  - [Sources](#sources)
-  - [Authentication](#authentication)
-- [Building Everything From Scratch](#building-everything-from-scratch)
-  - [Bootstrapping the Toolchain and Building Everything from Scratch](#bootstrapping-the-toolchain-and-building-everything-from-scratch)
-  - [Local Build Variables](#local-build-variables)
-    - [Quickrebuild Defaults](#quickrebuild-defaults)
-    - [URLS and Repos](#urls-and-repos)
-    - [Build Enable/Disable Flags](#build-enabledisable-flags)
-- [All Build Targets](#all-build-targets)
-- [Reproducing a Build](#reproducing-a-build)
-  - [Build Summaries](#build-summaries)
-  - [Building From Summaries](#building-from-summaries)
-  - [Reproducing a Package Build](#reproducing-a-package-build)
-  - [Reproducing an Image Build](#reproducing-an-image-build)
-  - [Reproducing an ISO Build](#reproducing-an-iso-build)
-- [All Build Variables](#all-build-variables)
-  - [Targets](#targets)
-  - [Rebuild vs. Download](#rebuild-vs-download)
-  - [Remote Connections](#remote-connections)
-  - [Misc Build](#misc-build)
-  - [Reproducing Builds](#reproducing-builds)
-  - [Directory Customization](#directory-customization)
-  - [Build Details](#build-details)
+Please use the [auto-generated table of contents](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes#auto-generated-table-of-contents-for-readme-files) GitHub creates. To reveal it, select the three bar menu icon at the top of the page.
 
 ## Overview
 
@@ -84,7 +35,7 @@ The CBL-Mariner build system cam consists of several phases and tools, but at a 
 
 - **Image** This stage generatesISO, VHD, VHDX, container, etc. images from the rpm packages built in the package stage. The images are defined by configuration.json files.
 
-It is possible to invkove any stage at any time, the toolings will automatically invoke earlier stages if needed. Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
+It is possible to invoke any stage at any time, the toolings will automatically invoke earlier stages if needed. Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
 
 If you want a detailed breakdown of how the stages interact see [How it works](../how_it_works/0_intro.md) for diagrams and descriptions.
 
@@ -93,14 +44,14 @@ If you want a detailed breakdown of how the stages interact see [How it works](.
 The following sections run through a build one step at a time, briefly explaining the purpose. `Make` will generally automate this flow if given an image target, however building in stages can be useful for debugging and assists in understanding the build process.
 
 If you want to skip to a specific use-case you can jump to **(but read about [Stable Tags](#stable-tags) first)**:
-| Use-case                    | Link                     |
-|:----------------------------|:-------------------------|
-|Build environment setup      | [LINK](prerequisites.md) |
-|Work on a package            | [LINK]                   |
-|Work on images               | [LINK]                   |
-|Work on the toolchain        | [LINK]                   |
-|Work on the tools            | [LINK]                   |
-|Build the world from scratch | [LINK]                   |
+| Use-case                    | Link                                                     |
+|:----------------------------|:---------------------------------------------------------|
+|Build environment setup      | [Prerequisites](prerequisites.md)                        |
+|Work on a package            | [Package Stage](#package-stage)                          |
+|Work on images               | [Image Stage](#image-stage)                              |
+|Work on the toolchain        | [Toolchain Stage](#toolchain-stage)                      |
+|Work on the tools            | [Tools](#tools)                                          |
+|Build the world from scratch | [Build From Scratch](#building-everything-from-scratch)  |
 
 ### Install Prerequisites
 
@@ -127,7 +78,7 @@ git checkout 2.0-stable
 \
 A similar tag, `1.0-stable`, exists for the 1.0 branch. \
 \
-Other branchses are also buildable but not guarnateed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable (ie.  only building using the full bootstrap build from source, rather than hydrating from the package repositories). \
+Other branches are also buildable but not guaranteed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable (ie.  only building using the full bootstrap build from source, rather than hydrating from the package repositories). \
 \
 The `1.0-stable` and `2.0-stable` tags will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke `git fetch --tags` before building.
 
@@ -141,7 +92,7 @@ Most development work can be done based on the stable tags, but sometimes you ne
 
 1) Just rebuild your toolchain every time (set `REBUILD_TOOLCHAIN=y`). The build tools will try to avoid rebuilding this as much as possible.
 1) Save the toolchain aside, and reference it via `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz`)
-1) A hybrid approach, use a stable toolchain via `git checkout 2.0-stable -- ./toolkit/resources/manifests/package/*` on top of a development branch. This will use the last toolchain **However THIS MAY NOT ALWAYS WORK**. There exist dependancy cyles in the packages which are broken by using pre-built toolchain packages. By rolling back the manifests these cycle breaking packages may no longer be available.
+1) A hybrid approach, use a stable toolchain via `git checkout 2.0-stable -- ./toolkit/resources/manifests/package/*` on top of a development branch. This will use the last toolchain **However THIS MAY NOT ALWAYS WORK**. There exist dependency cycles in the packages which are broken by using pre-built toolchain packages. By rolling back the manifests these cycle breaking packages may no longer be available.
 
 | Branch            | Pros                 | Cons
 |:------------------|:---------------------|------
@@ -170,7 +121,7 @@ sudo make toolchain REBUILD_TOOLS=y
 
 Depending on hardware, rebuilding the toolchain can take several hours. A developer should only have to rebuild the toolchain in the following situations:
 
-1) First time building a non-release branch (save the toolchain archiave for reuse later)
+1) First time building a non-release branch (save the toolchain archive for reuse later)
 1) Working on a package found in the [toolchain manifests](../../resources/manifests/package/)
 1) Working on the toolchain build tooling itself
 
@@ -212,7 +163,7 @@ There are several more package build options.  For example it's possible to buil
 
 The following command rebuilds all CBL-Mariner packages.
 
-**A reminder that you can build pacakges outside the core repo (which is often much faster). Refer to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository for examples.**
+**A reminder that you can build packages outside the core repo (which is often much faster). Refer to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository for examples.**
 
 ```bash
 # Build ALL packages on a *stable* branch (i.e. 1.0-stable, 2.0-stable, etc)
@@ -262,7 +213,7 @@ We do this by limiting the packages the toolkit knows about by only packaging th
 |Argument|Use|
 |:-|-|
 | SRPM_PACK_LIST | Only package these `.spec` files for further processing |
-| PACKAGE_BUILD_LIST | Build this package, any any dependecnies we know about |
+| PACKAGE_BUILD_LIST | Build this package, any any dependencies we know about |
 | PACKAGE_REBUILD_LIST | **ALWAYS** build this package, even if we don't think we need to |
 
 ```bash
@@ -304,7 +255,7 @@ sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json QUICKREBUILD=y
 # To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
 sudo make image CONFIG_FILE=./imageconfigs/core-efi.json QUICKREBUILD=y
 
-# To build a core Mariner Contianer (Container Folder: ../out/images/core-container/*.tar.gz
+# To build a core Mariner Container (Container Folder: ../out/images/core-container/*.tar.gz
 sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICKREBUILD=y
 ```
 
@@ -321,7 +272,7 @@ The following builds an ISO with an interactive UI and selectable image configur
 sudo make iso CONFIG_FILE=./imageconfigs/full.json QUICKREBUILD=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig. The image config requires additional information, see [image config fomrat](../formats/imageconfig.md#targetdisk) for more details.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig. The image config requires additional information, see [image config format](../formats/imageconfig.md#targetdisk) for more details.
 
 ```bash
 # Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
@@ -452,7 +403,7 @@ The core of the build system is broken into several parts: A controlling Makefil
 
 ### How it Works
 
-There is an indepth guide on how the build tools hook together in [How it Works](../how_it_works/0_intro.md).
+There is an in-depth guide on how the build tools hook together in [How it Works](../how_it_works/0_intro.md).
 
 ### Building Go Tools
 
@@ -462,11 +413,15 @@ The go tools can be built with the following command:
 sudo make go-tools REBUILD_TOOLS=y
 ```
 
+This will gather the required go modules, compile the shared modules and all tools, and run all unit tests. There is a summary of the go tools here: [Go Tools](../how_it_works/1_initial_prep.md#go-tools-1)
+
 When developing the tools it can be useful to invoke the automatic formatter with:
 
 ```bash
 sudo make go-tidy-all
 ```
+
+Detailed background on the go tool building process can be found in [Go Tools Compiling](../how_it_works/5_misc.md#go-tools-compiling)
 
 ## Building Everything From Scratch
 
@@ -516,7 +471,7 @@ sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y RE
 ```
 
 ```bash
-# Complete rebuild of all tool, package, and image files from source nesessary to build the default image config.
+# Complete rebuild of all tool, package, and image files from source necessary to build the default image config.
 # NOTE: Source files must made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
@@ -581,12 +536,12 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `REPO_LIST=...`
 
-> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. **If you are using the pre-packaged CBL-Mariner toolkit** a set of pre-populated RPM repositories are accessible inside the toolkit folder under `toolkit/repos`. If you are **using the core repo** instead of the pre-packaged toolkit they repo files are avaiablae in `SPECS/mariner-repos/`.
+> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. **If you are using the pre-packaged CBL-Mariner toolkit** a set of pre-populated RPM repositories are accessible inside the toolkit folder under `toolkit/repos`. If you are **using the core repo** instead of the pre-packaged toolkit they repo files are available in `SPECS/mariner-repos/`.
 >
 > - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on CBL-Mariner repositories.
 > - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
 > - `mariner-ui.repo` and `mariner-ui-preview.repo` - CBL-Mariner repository containing packages related to any UI components. The preview version serves the same purpose as the official preview repo.
-> - `mariner-extras.repo` and `mariner-extras-preview.repo` - CBL-Mariner repository containing proprietory RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
+> - `mariner-extras.repo` and `mariner-extras-preview.repo` - CBL-Mariner repository containing proprietary RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
 
 #### Build Enable/Disable Flags
@@ -755,10 +710,10 @@ These are the useful build targets:
 | go-tidy-all                      | Runs `go-fmt-all` and `go-mod-tidy`.
 | go-tools                         | Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 | hydrate-rpms                     | Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
-| image                            | Generate an image (see [Images](#images)).
+| image                            | Generate an image (see [Images](#image-stage)).
 | initrd                           | Create the initrd for the ISO installer.
 | input-srpms                      | Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files.
-| iso                              | Create an installable ISO (see [ISOs](#isos)).
+| iso                              | Create an installable ISO (see [ISOs](#iso-images)).
 | macro-tools                      | Create the directory with expanded rpm macros.
 | make-raw-image                   | Create the raw base image.
 | meta-user-data                   | Create a `meta-user-data.iso` file under `IMAGES_DIR` using `meta-data` and `user-data` from `META_USER_DATA_DIR`.

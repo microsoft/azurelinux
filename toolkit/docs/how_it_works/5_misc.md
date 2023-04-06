@@ -104,7 +104,7 @@ Instead a two part process is used. A target for the folder is used, but a meta 
 
 ### Go Tools Compiling
 
-The various go tools found in `./tools/` (see [Go Tools](#go-tools)) are used to perform various steps in the package and image build process. They are split into two general groups, package build and image build. The tools are built from the `tools.mk` file.
+The various go tools found in `./tools/` (see [Go Tools](./1_initial_prep.md#go-tools)) are used to perform various steps in the package and image build process. They are split into two general groups, package build and image build. The tools are built from the `tools.mk` file.
 
 ##### `$(go_tool_list)`
 This list tracks the available go tools. Any tool listed here should exist in a sub-folder of the same name in `./tools/`.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document details building images in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom images for Mariner. Continue here only if you care about building the `.spec` files present in the core repo, and then converting thoes `.rpm` packages into an image.
+This document details building images in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom images for Mariner. Continue here only if you care about building the `.spec` files present in the core repo, and then converting those `.rpm` packages into an image.
 
 > This guide will follow [Building Packages](./build_packages.md) guide almost exactly since the primary reason to build image in the core repo is to take advantage of bleeding edge, unpublished packages. If you don't need this, consider looking at [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials).
 
@@ -45,7 +45,7 @@ The `hybrid` option minimizes the chance of package conflicts, but runs the risk
 
 ## **3. Get a Toolchain**
 
-If you are using the `stable` or `hybrid` branch strategy, the toolchain will be hanlded automatically. Just invoke the `sudo make image ...` or `sudo make iso ...` commands as needed and the tooling will deal with the rest.
+If you are using the `stable` or `hybrid` branch strategy, the toolchain will be handled automatically. Just invoke the `sudo make image ...` or `sudo make iso ...` commands as needed and the tooling will deal with the rest.
 
 If you are working on a development branch you will need to build a toolchain. Refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for details. **Save your toolchain archive for later!**
 
@@ -56,7 +56,7 @@ See [Image Config Files](https://github.com/microsoft/CBL-MarinerTutorials/blob/
 * Setting up an image config file
 * Adding packages to the image
 
-The image config format is [documented here](../../formats/imageconfig.md). This coveres how to do things like:
+The image config format is [documented here](../../formats/imageconfig.md). This coverers how to do things like:
 
 * Define partition layouts
 * Configure advanced storage
@@ -64,7 +64,7 @@ The image config format is [documented here](../../formats/imageconfig.md). This
 * Add user-defined customizations
 * Configure unattended installer behavior
 
-The core repo behaves slightly differently to a dedicated build envrionment like is described in the Tutorial repo. If you want to use locally build packages to build your images use the following commands. (Otherwise please refer to [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) for simpler methods)
+The core repo behaves slightly differently to a dedicated build environment like is described in the Tutorial repo. If you want to use locally build packages to build your images use the following commands. (Otherwise please refer to [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) for simpler methods)
 
 ## **5. Build and Image**
 
@@ -97,7 +97,7 @@ cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 
 ### Building Packages for the Image
 
-The tools will automatically rebuild any packages that are needed to create the iamge. There is no need to manually build packages, but if desired this can be done via [Build Packages](./build_packages.md#rebuild-minimal-required-packages-for-an-image).
+The tools will automatically rebuild any packages that are needed to create the image. There is no need to manually build packages, but if desired this can be done via [Build Packages](./build_packages.md#rebuild-minimal-required-packages-for-an-image).
 
 ### Dev Loop
 
