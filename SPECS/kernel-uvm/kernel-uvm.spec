@@ -122,9 +122,6 @@ if [ -s config_diff ]; then
 fi
 
 %build
-make KCFLAGS="-Wa,-mx86-used-note=no" VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-
-
 %ifarch x86_64
 KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 %endif
