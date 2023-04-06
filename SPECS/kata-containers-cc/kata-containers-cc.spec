@@ -10,9 +10,7 @@ Version:      0.1.0
 Release:      10%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
-Group:        Virtualization/Libraries
 Vendor:       Microsoft Corporation
-Distribution: Mariner
 URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
