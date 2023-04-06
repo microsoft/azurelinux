@@ -533,6 +533,7 @@
                 "jsoncpp",
                 "Judy",
                 "kata-containers",
+                "kata-containers-cc",
                 "kde-filesystem",
                 "kde-settings",
                 "kdump-anaconda-addon",
