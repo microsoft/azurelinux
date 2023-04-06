@@ -155,7 +155,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 * Thu Apr 6 2023 Chris Co <chrco@microsoft.com> - 5.15.98.mshv1-3
 - Generate devel subpackage and enable loadable kernel module support
 
-* Fri Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
+* Thu Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
 - Remove aarch64 build instructions
 
 * Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1
