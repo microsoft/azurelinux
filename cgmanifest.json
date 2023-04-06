@@ -21254,8 +21254,8 @@
         "type": "other",
         "other": {
           "name": "protobuf",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-all-3.17.3.tar.gz"
+          "version": "3.18.3",
+          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v3.18.3/protobuf-all-3.18.3.tar.gz"
         }
       }
     },

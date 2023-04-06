@@ -1,6 +1,6 @@
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.17.3
+Version:        3.18.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -100,6 +100,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18.3-1
+- Auto-upgrade to 3.18.3 - To address CVE-2022-1941
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1
 - Upgrade to latest upstream version, using upstream release tarball
 - Add soname version to %%file packaging
