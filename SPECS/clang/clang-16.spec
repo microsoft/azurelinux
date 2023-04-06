@@ -11,20 +11,20 @@
     %{_bindir}/clang-cpp \
 
 %global clang_tools_binaries \
+    %{_bindir}/amdgpu-arch \
+    %{_bindir}/analyze-build \
     %{_bindir}/clang-check \
     %{_bindir}/clang-extdef-mapping \
     %{_bindir}/clang-format \
+    %{_bindir}/clang-linker-wrapper \
     %{_bindir}/clang-offload-bundler \
+    %{_bindir}/clang-offload-packager \
     %{_bindir}/clang-refactor \
     %{_bindir}/clang-rename \
+    %{_bindir}/clang-repl \
     %{_bindir}/clang-scan-deps \
     %{_bindir}/diagtool \
     %{_bindir}/hmaptool \
-    %{_bindir}/amdgpu-arch \
-    %{_bindir}/analyze-build \
-    %{_bindir}/clang-linker-wrapper \
-    %{_bindir}/clang-offload-packager \
-    %{_bindir}/clang-repl \
     %{_bindir}/intercept-build \
     %{_bindir}/nvptx-arch \
     %{_bindir}/scan-build-py
@@ -203,24 +203,24 @@ make clang-check
 %{_datadir}/clang/clang-format.py*
 %{_datadir}/clang/clang-format-diff.py*
 %{_datadir}/clang/clang-rename.py*
-/usr/lib/libear/__init__.py
-/usr/lib/libear/config.h.in
-/usr/lib/libear/ear.c
-/usr/lib/libscanbuild/__init__.py
-/usr/lib/libscanbuild/analyze.py
-/usr/lib/libscanbuild/arguments.py
-/usr/lib/libscanbuild/clang.py
-/usr/lib/libscanbuild/compilation.py
-/usr/lib/libscanbuild/intercept.py
-/usr/lib/libscanbuild/report.py
-/usr/lib/libscanbuild/resources/scanview.css
-/usr/lib/libscanbuild/resources/selectable.js
-/usr/lib/libscanbuild/resources/sorttable.js
-/usr/lib/libscanbuild/shell.py
-/usr/libexec/analyze-c++
-/usr/libexec/analyze-cc
-/usr/libexec/intercept-c++
-/usr/libexec/intercept-cc
+%{_libdir}/libear/__init__.py
+%{_libdir}/libear/config.h.in
+%{_libdir}/libear/ear.c
+%{_libdir}/libscanbuild/__init__.py
+%{_libdir}/libscanbuild/analyze.py
+%{_libdir}/libscanbuild/arguments.py
+%{_libdir}/libscanbuild/clang.py
+%{_libdir}/libscanbuild/compilation.py
+%{_libdir}/libscanbuild/intercept.py
+%{_libdir}/libscanbuild/report.py
+%{_libdir}/libscanbuild/resources/scanview.css
+%{_libdir}/libscanbuild/resources/selectable.js
+%{_libdir}/libscanbuild/resources/sorttable.js
+%{_libdir}/libscanbuild/shell.py
+%{_libexecdir}/analyze-c++
+%{_libexecdir}/analyze-cc
+%{_libexecdir}/intercept-c++
+%{_libexecdir}/intercept-cc
 
 
 %changelog
