@@ -4,6 +4,8 @@
 
 %define builds_module %([[ -n "$(echo "%{patches}" | grep -oP "CVE-\\d+-\\d+(?=\\.patch)")" ]] && echo 1 || echo 0)
 
+%define kpatch_logs_file /root/.kpatch/build.log
+
 # Kpatch module names allow only alphanumeric characters and '_'.
 %define livepatch_name %(value="%{name}-%{version}-%{release}"; echo "${value//[^a-zA-Z0-9_]/_}")
 %define livepatch_install_dir %{_libdir}/livepatching/%{kernel_version_release}
@@ -137,11 +139,16 @@ do
     [[ "$patch" == *.patch ]] && cat "$patch" >> $all_patches_file
 done
 
-kpatch-build -ddd \
+if ! kpatch-build -ddd \
     --sourcedir . \
     --vmlinux %{_libdir}/debug/lib/modules/%{kernel_version_release}/vmlinux \
     --name %{livepatch_name} \
     $all_patches_file
+then
+    echo "ERROR: failed to build livepatch module. Logs from '%{kpatch_logs_file}':" >&2
+    cat "%{kpatch_logs_file}" >&2
+    exit 1
+fi
 
 %install
 install -dm 755 %{buildroot}%{livepatch_install_dir}
