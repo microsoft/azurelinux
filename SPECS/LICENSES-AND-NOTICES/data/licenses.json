@@ -1698,6 +1698,7 @@
                 "python-msal",
                 "python-msrestazure",
                 "python-mutagen",
+                "python-networkx",
                 "python-nose2",
                 "python-ntlm-auth",
                 "python-oauth2client",

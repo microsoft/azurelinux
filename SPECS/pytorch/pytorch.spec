@@ -36,7 +36,8 @@ Requires:       python3-numpy
 Requires:       python3-typing-extensions
 Requires:       python3-sympy
 Requires:       python3-jinja2
-Requires:       python3-filelock
+Requires:       python3-opt-einsum
+Requires:       python3-networkx
 
 %description -n python3-pytorch
 PyTorch is a Python package that provides two high-level features:

@@ -1,0 +1,10 @@
+--- doc/conf.py.orig	2021-07-08 10:53:35.000000000 -0600
++++ doc/conf.py	2021-07-13 10:11:17.843998401 -0600
+@@ -50,6 +50,7 @@ sphinx_gallery_conf = {
+     "gallery_dirs": "auto_examples",
+     "backreferences_dir": "modules/generated",
+     "image_scrapers": ("matplotlib",),
++    "expected_failing_examples": ["../examples/geospatial/plot_delaunay.py", "../examples/geospatial/plot_lines.py", "../examples/geospatial/plot_osmnx.py", "../examples/geospatial/plot_points.py", "../examples/graph/plot_football.py"]
+ }
+ # Add pygraphviz png scraper, if available
+ try:
