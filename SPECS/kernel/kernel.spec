@@ -18,7 +18,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.102.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,9 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %package -n     python3-perf
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Conflicts:      python3-perf-azure
+Conflicts:      python3-perf-hci
+Conflicts:      python3-perf-rt
 
 %description -n python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
@@ -142,6 +145,9 @@ This package contains common device tree blobs (dtb)
 
 %package -n     bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Conflicts:      bpftool-azure
+Conflicts:      bpftool-hci
+Conflicts:      bpftool-rt
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
@@ -410,6 +416,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Apr 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-4
+- Add additional conflicts to bpftool and python3-perf subpackages
+
 * Wed Mar 29 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-3
 - Enable CONFIG_NET_CLS_FLOWER module
 

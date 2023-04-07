@@ -122,12 +122,14 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package        python3-perf
+%package -n     python3-perf-azure
 Summary:        Python 3 extension for perf tools
 Requires:       python3
 Conflicts:      python3-perf
+Conflicts:      python3-perf-hci
+Conflicts:      python3-perf-rt
 
-%description    python3-perf
+%description -n python3-perf-azure
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package dtb
@@ -137,11 +139,13 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package        bpftool
+%package -n     bpftool-azure
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 Conflicts:      bpftool
+Conflicts:      bpftool-hci
+Conflicts:      bpftool-rt
 
-%description bpftool
+%description -n bpftool-azure
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -395,7 +399,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files python3-perf
+%files -n python3-perf-azure
 %{python3_sitearch}/*
 
 %ifarch aarch64
@@ -403,7 +407,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
-%files bpftool
+%files -n bpftool-azure
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
