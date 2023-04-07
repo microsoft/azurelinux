@@ -6,7 +6,7 @@ This document details building packages in the core repo. Most people should sta
 
 ## **1. Install Prerequisites**
 
-Prepare your system by [installing the necessary prerequisites here](prerequisites.md).
+Prepare your system by [installing the necessary prerequisites here](../prerequisites.md).
 
 ## **2. Picking a Branch or Tag**
 

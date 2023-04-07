@@ -12,6 +12,8 @@ However, sometimes building quickly in any repo is valuable. The next section wi
 
 Sometimes you just need to build an image quickly, and you don't want to fuss around with additional repos or directories. The following commands use flags that will make the core repo behave in a very similar manner to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials).
 
+Prepare your system by [installing the necessary prerequisites here](../prerequisites.md).
+
 ```bash
 # Clone the CBL-Mariner repo
 git clone https://github.com/microsoft/CBL-Mariner.git
@@ -29,11 +31,15 @@ sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_PACKAGES=n REBUILD_TO
 sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_PACKAGES=n REBUILD_TOOLS=y
 ```
 
-## **1. Install Prerequisites**
+## **I need to Validate Changes with Local Packages**
 
-Prepare your system by [installing the necessary prerequisites here](prerequisites.md).
+The following directions will build both packages and images locally.
 
-## **2. Picking a Branch or Tag**
+### **1. Install Prerequisites**
+
+Prepare your system by [installing the necessary prerequisites here](../prerequisites.md).
+
+### **2. Picking a Branch or Tag**
 
 Please read [Clone and Sync to Stable Commit](../building.md#clone-and-sync-to-stable-commit) for details on picking a branch to develop from.
 
@@ -43,13 +49,13 @@ The `hybrid` option minimizes the chance of package conflicts, but runs the risk
 
 > Unlike when working on package changes, image changes are generally self-contained enough that a build with a `hybrid` or `stable` setup is sufficient for validation.
 
-## **3. Get a Toolchain**
+### **3. Get a Toolchain**
 
 If you are using the `stable` or `hybrid` branch strategy, the toolchain will be handled automatically. Just invoke the `sudo make image ...` or `sudo make iso ...` commands as needed and the tooling will deal with the rest.
 
 If you are working on a development branch, you will need to build a toolchain. Refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for details. **Save your toolchain archive for later!**
 
-## **4. Create a Custom Image Definition**
+### **4. Create a Custom Image Definition**
 
 See [Image Config Files](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/packages/working_with_packages.md#image-config-file) and [Building an Image](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/building/building.md) from the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details on working with custom images. This will cover:
 
@@ -66,11 +72,11 @@ The image config format is [documented here](../../formats/imageconfig.md). This
 
 The core repo behaves slightly different than the dedicated build environment described in [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). If you want to use locally built packages to build your images, use the following commands. (Otherwise please refer to [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) for simpler methods)
 
-## **5. Build and Image**
+### **5. Build and Image**
 
 > These commands very closely mirror those found in [Build Packages](./build_packages.md).
 
-### Setup
+#### Setup
 
 ```bash
 # Clone the CBL-Mariner repo
@@ -83,7 +89,7 @@ cd ./toolkit
 sudo make clean
 ```
 
-### Build a toolchain if using an unstable branch
+#### Build a toolchain if using an unstable branch
 
 ```bash
 # OPTIONAL:
@@ -95,11 +101,11 @@ sudo make toolchain QUICKREBUILD_TOOLCHAIN=y
 cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 ```
 
-### Building Packages for the Image
+#### Building Packages for the Image
 
 The tools will automatically rebuild any packages that are needed to create the image. There is no need to manually build packages, but if desired, this can be done via [Build Packages](./build_packages.md#rebuild-minimal-required-packages-for-an-image).
 
-### Dev Loop
+#### Dev Loop
 
 ```bash
 # Modify your image config

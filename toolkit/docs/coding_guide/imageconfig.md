@@ -46,7 +46,7 @@ func (k *KernelCommandLine) UnmarshalJSON(b []byte) (err error) {
 
 ## Validation
 
-Each type should also implement `IsValid()`, which validates the current types configuration as well as recursively calls each child component's `IsValid()`. This function is used in two places, the JSON unmarshal flow, as well as the image config validator tool which calls the root configuration structure's `IsValid()`.
+Each type should also implement `IsValid()`, which validates the current types configuration as well as recursively calls each child component's `IsValid()`. This function is used in two places, the JSON unmarshal flow, as well as the image [config validator tool](../how_it_works/1_initial_prep.md#imageconfigvalidator) which calls the root configuration structure's `IsValid()`.
 
 ```go
 // GetSedDelimeter returns the delimeter which should be used with sed
