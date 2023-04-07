@@ -22,8 +22,6 @@ URL:            https://sympy.org/
 Source0:        https://github.com/%{name}/%{name}/archive/%{name}-%{version}.tar.gz
 # Skip tests that require a display
 Patch0:         %{name}-circuitplot.patch
-BuildRequires:  %{py3_dist cython}
-BuildRequires:  python3-mpmath
 # This package used to be noarch, and should still be noarch.  However, because
 # there is no JDK available on i686 anymore, the antlr4 package is also not
 # available on i686.  When we can stop building on i686 altogether, we can bring
@@ -33,7 +31,9 @@ BuildRequires:  python3-mpmath
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
+BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
+BuildRequires:  python3-mpmath
 BuildRequires:  python3-numpy-f2py
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
@@ -45,8 +45,8 @@ BuildRequires:  xorg-x11-server-Xvfb
 %package -n python3-%{name}
 Summary:        A Python3 library for symbolic mathematics
 License:        BSD-3-Clause AND MIT
-Requires:       python-mpmath
-Recommends:     %{py3_dist cython}
+Requires:       python3-mpmath
+Requires:       python3-Cython
 
 %description -n python3-%{name}
 SymPy aims to become a full-featured computer algebra system (CAS)
