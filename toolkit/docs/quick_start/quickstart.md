@@ -101,7 +101,7 @@ choose DVD Drive and press Add.
 1. Select _Start_.
 1. Wait for CBL-Mariner to boot to the login prompt, then sign in with:
 
-> mariner_user
+> mariner_user \
 > p@ssw0rd
 
 ## ISO Image

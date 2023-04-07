@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document details building images in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom images for Mariner. Continue here only if you care about building the `.spec` files present in the core repo, and then converting those `.rpm` packages into an image.
+This document details building images in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom images for CBL-Mariner. Continue here only if you care about building the `.spec` files present in the core repo, and then converting those `.rpm` packages into an image.
 
 > This guide will follow [Building Packages](./build_packages.md) guide almost exactly since the primary reason to build image in the core repo is to take advantage of bleeding edge, unpublished packages. If you don't need this, consider looking at [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials).
 

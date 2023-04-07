@@ -65,7 +65,7 @@ Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https:
 
 ## Develop for CBL-Mariner
 
-When starting to develop for CBL-Mariner, use the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. This repository guides developers on using CBL-Mariner's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [CBL-Mariner](https://github.com/microsoft/CBL-Mariner). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within CBL-Mariner. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
+When starting to develop for CBL-Mariner, use the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. This repository guides developers on using CBL-Mariner's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [CBL-Mariner](https://github.com/microsoft/CBL-Mariner). Please see our [building instructions](toolkit/README.md) for a tutorials and build guides. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
 
 ### Packages
 
@@ -78,6 +78,8 @@ CBL-Mariner packages live in either [SPECS](SPECS) or [SPECS-EXTENDED](SPECS-EXT
 
 When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [GitHub issue](https://github.com/microsoft/CBL-Mariner/issues) highlighting the package's value and ensure that the following steps are completed for associated PRs.
 
+See our [building instructions](toolkit/docs/building/dedicated_guides/build_packages.md) for details on how to build packages.
+
 1. Increment the spec's `Release` value
 1. Add changelog entries "Package promoted from SPECS-EXTENDED to SPECS" and "License verified"
 1. Add a `%check` section to the spec if not already present and confirm it passes
@@ -87,7 +89,7 @@ When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [Git
 
 ### Toolkit
 
-We welcome tooling improvements. When contributing to the toolkit, please adhere to `golang` formatting as described by the [fmt](https://pkg.go.dev/fmt) package. To format using this package, you can run `make go-tidy-all` in your CBL-Mariner toolkit. For guidance on building with the toolkit, see our [building instructions](toolkit/docs/building/building.md).
+We welcome tooling improvements. When contributing to the toolkit, please adhere to `golang` formatting as described by the [fmt](https://pkg.go.dev/fmt) package. To format using this package, you can run `make go-tidy-all` in your CBL-Mariner toolkit. For guidance on building with the toolkit, see our [building instructions](toolkit/docs/building/dedicated_guides/build_tools.md).
 
 ### Documentation
 
