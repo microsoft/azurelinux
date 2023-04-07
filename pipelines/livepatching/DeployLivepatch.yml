@@ -1,19 +1,37 @@
 trigger: none
 
 variables:
+# Required by used templates.
+- group: "Mariner Automation"
+
 - name: 'buildArtifactsFolder'
   value: build-artifacts
 
 - name: 'buildLogsFolder'
   value: 'LOGS'
 
+- name: 'pipelinesRepoFolder'
+  value: 'CBL-Mariner-Pipelines'
+
+- name: 'pipelinesRepoRoot'
+  value: '$(Agent.BuildDirectory)/$(pipelinesRepoFolder)'
+
+- name: 'selfRepoFolder'
+  value: 'CBL-Mariner'
+
+- name: 'selfRepoRoot'
+  value: '$(Agent.BuildDirectory)/$(selfRepoFolder)'
+
+- name: 'rpmSigningKeyID'
+  value: '3135ce90'
+
 parameters:
 - name: livepatchKernelVersion
   displayName: 'Version of the kernel, which is used to build the livepatch (example: 5.15.92.1-1.cm2).'
   type: string
 
-- name: useKernelBuildArtifacts
-  displayName: 'Use toolkit and packages from the time the kernel was built.'
+- name: downloadKernelBuildArtifacts
+  displayName: 'Download toolkit and packages from the time the kernel was built.'
   type: boolean
   default: false
 
@@ -22,12 +40,22 @@ parameters:
   type: boolean
   default: false
 
+- name: publishRPMs
+  displayName: 'PRODUCTION RUN. WILL PUBLISH PACKAGES TO PMC.'
+  type: boolean
+  default: false
+
 resources:
   repositories:
   - repository: 1ESPipelineTemplates
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
-    ref: refs/tags/canary
+    ref: refs/tags/release
+
+  - repository: CBL-Mariner-Pipelines
+    type: git
+    name: mariner/CBL-Mariner-Pipelines
+    ref: refs/heads/pawelwi/signing_livepatches
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
@@ -52,22 +80,18 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish build artifacts'
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
-            artifactName: build-artifacts
+            artifactName: $(buildArtifactsFolder)_BUILD
 
           - output: pipelineArtifact
             displayName: 'Publish logs'
             targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
-            artifactName: LOGS
+            artifactName: LOGS_BUILD
 
         steps:
         - bash: |
-            pipelines/common/utilities/Configure-1ES.sh
-          displayName: 'Install 1ES host machine applications'
-
-        - bash: |
             mariner_version="$(make -sC toolkit printvar-RELEASE_MAJOR_ID CONFIG_FILE=)"
             download_tags="$mariner_version-stable"
-            if [[ "${{ parameters.useKernelBuildArtifacts }}" =~ [Tt]rue ]]
+            if [[ "${{ parameters.downloadKernelBuildArtifacts }}" =~ [Tt]rue ]]
             then
               download_tags+=",kernel-${{ parameters.livepatchKernelVersion }}"
             fi
@@ -86,28 +110,155 @@ extends:
             tags: '$(downloadTags)'
             artifact: $(buildArtifactsFolder)
             patterns: |
-              **/toolkit-*.tar.gz
-              **/toolchain_built_rpms_all.tar.gz
               **/rpms.tar.gz
+              **/toolchain_built_rpms_all.tar.gz
+              **/toolkit-*.tar.gz
             path: '$(System.ArtifactsDirectory)'
 
         - task: Bash@3
           displayName: 'Build livepatch'
           inputs:
-            filePath: '$(Build.SourcesDirectory)/pipelines/livepatching/BuildLivepatch.sh'
+            filePath: 'pipelines/livepatching/BuildLivepatch.sh'
             arguments: '-a "$(System.ArtifactsDirectory)"
                         -k "${{ parameters.livepatchKernelVersion }}"
                         -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
-                        -p "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
                         -s "${{ parameters.useRPMsSnapshot }}"'
 
     - stage: Sign
       jobs:
-      - job:
+      - job: Kernel_modules
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: $(buildArtifactsFolder)_KERNEL_MODULES
+
+        pool:
+          # The kernel modules signing task works only on Ubuntu.
+          name: mariner-core-x64-1es-ubuntu2204-gpt-test
+
         steps:
+        - checkout: self
+          path: '$(selfRepoFolder)'
+
+        - checkout: CBL-Mariner-Pipelines
+          path: '$(pipelinesRepoFolder)'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download livepatch RPMs'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)_BUILD'
+            patterns: '**/rpms.tar.gz'
+            path: '$(System.ArtifactsDirectory)'
+
+        - task: Bash@3
+          displayName: 'Extract kernel modules'
+          inputs:
+            filePath: '$(selfRepoRoot)/pipelines/livepatching/ExtractKernelModules.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
+            workingDirectory: '$(selfRepoRoot)'
+
+        - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
+          parameters:
+            artifactsFolder: '$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)'
+            repoRootPath: '$(pipelinesRepoRoot)'
+
+      # Once we enable signing kernel modules on Mariner images, merge this job with the previous one to simplify the pipeline.
+      - job: Kernel_modules_packaging
+        dependsOn: Kernel_modules
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: $(buildArtifactsFolder)_KERNEL_MODULES_PACKAGING
+
+          - output: pipelineArtifact
+            displayName: 'Publish logs'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildLogsFolder)
+            artifactName: LOGS_KERNEL_MODULES_PACKAGING
+
+        steps:
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download RPMs and toolkit archives'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)_BUILD'
+            patterns: |
+              **/*rpms.tar.gz
+              **/toolkit-*.tar.gz
+            path: '$(System.ArtifactsDirectory)'
+
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download signed kernel modules'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)_KERNEL_MODULES'
+            patterns: '**/*.ko'
+            path: '$(System.ArtifactsDirectory)'
+
+        - task: Bash@3
+          displayName: 'Build livepatch-signed RPM'
+          inputs:
+            filePath: 'pipelines/livepatching/BuildLivepatchSigned.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -k "${{ parameters.livepatchKernelVersion }}"
+                        -l "$(Build.ArtifactStagingDirectory)/$(buildLogsFolder)"
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"
+                        -s "${{ parameters.useRPMsSnapshot }}"'
+
+      - job: RPMs
+        dependsOn: Kernel_modules_packaging
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish build artifacts'
+            targetPath: $(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)
+            artifactName: $(buildArtifactsFolder)_RPMS
+
+        steps:
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download RPMs and SRPMs archives'
+          inputs:
+            source: current
+            artifact: '$(buildArtifactsFolder)_KERNEL_MODULES_PACKAGING'
+            patterns: '**/*rpms.tar.gz'
+            path: '$(System.ArtifactsDirectory)'
+
         - bash: |
-            sleep 1
-          displayName: 'Signing placeholder'
+            find "$(System.ArtifactsDirectory)" -name '*rpms.tar.gz' -exec tar -C "$(System.ArtifactsDirectory)" -xf {} \;
+          displayName: 'Expand SRPM/RPM tarballs'
+
+        # JSON config generated from https://portal.esrp.microsoft.com/Onboarding/JSONGenerator
+        - task: EsrpCodeSigning@2
+          displayName: 'Sign RPMs'
+          inputs:
+            ConnectedServiceName: 'ESRP RPM Signing 1ES PTs'
+            FolderPath: '$(System.ArtifactsDirectory)'
+            Pattern: '*.rpm'
+            signConfigType: inlineSignParams
+            inlineOperation: |
+              [
+                {
+                  "KeyCode": "CP-459159-Pgp",
+                  "OperationCode": "LinuxSign",
+                  "Parameters": {},
+                  "ToolName": "sign",
+                  "ToolVersion": "1.0"
+                }
+              ]
+
+        - task: Bash@3
+          displayName: 'Validate and package signed RPMs'
+          inputs:
+            filePath: 'pipelines/common/scripts/PackageSignedRPMs.sh'
+            arguments: '-a "$(System.ArtifactsDirectory)"
+                        -k "$(rpmSigningKeyID)"
+                        -o "$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)"'
 
     - stage: Test
       jobs:
@@ -118,6 +269,7 @@ extends:
           displayName: 'Test placeholder'
 
     - stage: Publish
+      condition: ${{ parameters.publishRPMs }}
       jobs:
       - job:
         steps:

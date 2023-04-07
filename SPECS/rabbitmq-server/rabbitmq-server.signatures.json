@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "rabbitmq-server-3.11.11.tar.xz": "0ff32c1b4a5dd28cc8651af28e4a5e7e577bd58119180949d979492b32a90996",
+  "rabbitmq-server-hex-vendor-3.11.11.tar.gz": "f8176440e667f2cead0221ab139079650adcd916ef37396ff41243536b6b3f70",
+  "mix_task_archive_deps-1.0.0.ez": "e6079c02cbbb41526ea18e8142a14093094c2f1942865f1cb64fbc4eb6212a48",
+  "rabbitmq-server-hex-cache-3.11.11.tar.gz": "d0e45732afb04dfd3941e8a304dc8b6ff9e5aa73f52c16af2a3f78a967f14708"
+ }
+}

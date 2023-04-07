@@ -1,0 +1,98 @@
+From b14ee1ef509d9717eaa29e672282901847f2f735 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 16 Sep 2019 10:48:10 +0200
+Subject: [PATCH] Remove dependency on glassfish-servlet-api
+
+---
+ .../eclipse/sisu/inject/Implementations.java  | 56 +------------------
+ 1 file changed, 1 insertion(+), 55 deletions(-)
+
+diff --git a/sisu-inject/org.eclipse.sisu.inject/src/org/eclipse/sisu/inject/Implementations.java b/sisu-inject/org.eclipse.sisu.inject/src/org/eclipse/sisu/inject/Implementations.java
+index 523c9b2..89db5da 100644
+--- a/sisu-inject/org.eclipse.sisu.inject/src/org/eclipse/sisu/inject/Implementations.java
++++ b/sisu-inject/org.eclipse.sisu.inject/src/org/eclipse/sisu/inject/Implementations.java
+@@ -38,17 +38,6 @@ final class Implementations
+ 
+     static
+     {
+-        boolean hasGuiceServlet;
+-        try
+-        {
+-            hasGuiceServlet = BindingTargetVisitor.class.isInstance( ServletFinder.THIS );
+-        }
+-        catch ( final LinkageError e )
+-        {
+-            hasGuiceServlet = false;
+-        }
+-        HAS_GUICE_SERVLET = hasGuiceServlet;
+-
+         boolean hasJsr250Priority;
+         try
+         {
+@@ -65,8 +54,6 @@ final class Implementations
+     // Constants
+     // ----------------------------------------------------------------------
+ 
+-    private static final boolean HAS_GUICE_SERVLET;
+-
+     private static final boolean HAS_JSR250_PRIORITY;
+ 
+     // ----------------------------------------------------------------------
+@@ -106,7 +93,7 @@ final class Implementations
+ 
+         // peek behind servlet/filter extension bindings when checking priority, so we can order them by rank
+         final Class<?> implementation =
+-            binding.acceptTargetVisitor( HAS_GUICE_SERVLET && isPriority ? ServletFinder.THIS : ClassFinder.THIS );
++            binding.acceptTargetVisitor( ClassFinder.THIS );
+ 
+         T annotation = null;
+         if ( null != implementation )
+@@ -215,45 +202,4 @@ final class Implementations
+             return binding.getPrivateElements().getInjector().getBinding( binding.getKey() ).acceptTargetVisitor( this );
+         }
+     }
+-
+-    /**
+-     * {@link ClassFinder} that can also peek behind servlet/filter bindings.
+-     */
+-    static final class ServletFinder
+-        extends ClassFinder
+-        implements com.google.inject.servlet.ServletModuleTargetVisitor<Object, Class<?>>
+-    {
+-        // ----------------------------------------------------------------------
+-        // Constants
+-        // ----------------------------------------------------------------------
+-
+-        @SuppressWarnings( "hiding" )
+-        static final BindingTargetVisitor<Object, Class<?>> THIS = new ServletFinder();
+-
+-        // ----------------------------------------------------------------------
+-        // Public methods
+-        // ----------------------------------------------------------------------
+-
+-        public Class<?> visit( final com.google.inject.servlet.InstanceFilterBinding binding )
+-        {
+-            return binding.getFilterInstance().getClass();
+-        }
+-
+-        public Class<?> visit( final com.google.inject.servlet.InstanceServletBinding binding )
+-        {
+-            return binding.getServletInstance().getClass();
+-        }
+-
+-        public Class<?> visit( final com.google.inject.servlet.LinkedFilterBinding binding )
+-        {
+-            // this assumes only one level of indirection: api-->impl
+-            return binding.getLinkedKey().getTypeLiteral().getRawType();
+-        }
+-
+-        public Class<?> visit( final com.google.inject.servlet.LinkedServletBinding binding )
+-        {
+-            // this assumes only one level of indirection: api-->impl
+-            return binding.getLinkedKey().getTypeLiteral().getRawType();
+-        }
+-    }
+ }
+-- 
+2.21.0
+

@@ -80,6 +80,8 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
@@ -89,10 +91,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
-ifeq ($(REBUILD_TOOLCHAIN),y)
-$(graph_file): $(toolchain_rpms)
-endif
-$(graph_file): $(specs_file) $(go-grapher)
+$(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms)
 	$(go-grapher) \
 		--input $(specs_file) \
 		$(logging_command) \
@@ -125,12 +124,13 @@ ifeq ($(STOP_ON_FETCH_FAIL),y)
 graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
 		--rpm-dir=$(RPMS_DIR) \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
@@ -177,10 +177,6 @@ clean-compress-srpms:
 	rm -rf $(srpms_archive)
 
 ifeq ($(REBUILD_PACKAGES),y)
-# If we are responsible for building a toolchain, make sure those RPMs are also present in the output directory
-ifeq ($(REBUILD_TOOLCHAIN),y)
-$(RPMS_DIR): $(toolchain_rpms)
-endif
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@touch $@
 	@echo Finished updating $@
@@ -189,7 +185,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -199,6 +195,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--worker-tar="$(chroot_worker)" \
 		--repo-file="$(pkggen_local_repo)" \
 		--rpm-dir="$(RPMS_DIR)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
 		--ccache-dir="$(CCACHE_DIR)" \
@@ -215,7 +212,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		--reserved-file-list-file="$(TOOLCHAIN_MANIFEST)" \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \

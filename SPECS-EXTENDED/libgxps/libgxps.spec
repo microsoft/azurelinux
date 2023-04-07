@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libgxps
 Version:        0.3.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        GObject based library for handling and rendering XPS documents
 
 License:        LGPLv2+
@@ -77,6 +77,9 @@ documents using the %{name} library.
 
 
 %changelog
+* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.1-8
+- Bumping release to re-build with newer 'libtiff' libraries.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.1-7
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
