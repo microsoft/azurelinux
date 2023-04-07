@@ -83,6 +83,10 @@ xvfb-run -a pytest -v
 %{python3_sitelib}/mpmath-%{version}-*.egg-info
 
 %changelog
+* Thur Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.3.0-1
+- Initial CBL-Mariner import from Fedora 38 (license: MIT)
+- License Verified
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

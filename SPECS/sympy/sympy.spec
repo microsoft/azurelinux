@@ -12,7 +12,7 @@ Python and does not require any external libraries.
 Summary:        A Python library for symbolic mathematics
 Name:           sympy
 Version:        1.11.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The project as a whole is BSD-3-Clause.
 # The files in sympy/parsing/latex are MIT.
 License:        BSD-3-Clause AND MIT
@@ -113,9 +113,6 @@ for fil in sympy/physics/mechanics/models.py \
   fixtimestamp $fil
 done
 
-%{generate_buildrequires}
-%{pyproject_buildrequires}
-
 %build
 # Build
 %{pyproject_wheel}
@@ -159,6 +156,10 @@ fi
 %doc examples/*
 
 %changelog
+* Thur Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.11.1-5
+- Initial CBL-Mariner import from Fedora 38 (license: MIT)
+- License Verified
+
 * Tue Feb 21 2023 Jerry James <loganjerry@gmail.com> - 1.11.1-4
 - Fix the antlr4 Recommends (bz 2172030)
 - Dynamically generate BuildRequires (to the extent possible)
