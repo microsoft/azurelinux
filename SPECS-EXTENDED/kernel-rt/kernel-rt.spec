@@ -121,13 +121,12 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf-rt
+%package        python3-perf
 Summary:        Python 3 extension for perf tools
 Requires:       python3
-Obsoletes:      python3-perf
-Provides:       python3-perf
+Conflicts:      python3-perf
 
-%description -n python3-perf-rt
+%description python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package dtb
@@ -137,12 +136,11 @@ Group:          System Environment/Kernel
 %description dtb
 This package contains common device tree blobs (dtb)
 
-%package -n     bpftool-rt
+%package        bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
-Obsoletes:      bpftool
-Provides:       bpftool
+Conflicts:      bpftool
 
-%description -n bpftool-rt
+%description    bpftool
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -375,10 +373,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files -n python3-perf-rt
+%files python3-perf
 %{python3_sitearch}/*
 
-%files -n bpftool-rt
+%files bpftool
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
