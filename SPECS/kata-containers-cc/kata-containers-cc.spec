@@ -83,10 +83,10 @@ popd
 
 # Kernel modules
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
-make KDIR=/usr/src/linux-headers-$KERNEL_VER
-make KDIR=/usr/src/linux-headers-$KERNEL_VER install
+make KDIR=/usr/src/linux-headers-${KERNEL_VER}
+make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
 popd
-%define KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/$KERNEL_MODULE_VER
+%define KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
 # Agent
 pushd %{_builddir}/%{name}-%{version}/src/agent
@@ -104,7 +104,7 @@ sudo -E PATH=$PATH \
 
 rootfs_path="%{_builddir}/%{name}-%{version}/tools/osbuilder/mariner_rootfs"
 
-depmod -a -b ${rootfs_path} $KERNEL_MODULE_VER
+depmod -a -b ${rootfs_path} ${KERNEL_MODULE_VER}
 
 # Install agent service
 pushd %{_builddir}/%{name}-%{version}/src/agent
@@ -123,17 +123,18 @@ tar cf mariner-uvm-rootfs.tar.gz mariner_rootfs
 popd
 
 %install
-%define coco_path opt/confidential-containers
-%define coco_bin %{coco_path}/bin
+%define build_path    /opt/mariner/share/uvm/
+%define coco_path     /opt/confidential-containers
+%define coco_bin      %{coco_path}/bin
 %define defaults_kata %{coco_path}/share/defaults/kata-containers
-%define share_kata %{coco_path}/share/kata-containers
+%define share_kata    %{coco_path}/share/kata-containers
 
 # Symlinks for cc binaries
-mkdir -p %{buildroot}/%{coco_bin}
-mkdir -p %{buildroot}/%{coco_path}/libexec
+mkdir -p %{buildroot}%{coco_bin}
+mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
-ln -s /usr/bin/cloud-hypervisor %{buildroot}/%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/containerd %{buildroot}/%{coco_bin}/containerd
+ln -s /usr/bin/cloud-hypervisor %{buildroot}%{coco_bin}/cloud-hypervisor
+ln -s /usr/bin/containerd %{buildroot}%{coco_bin}/containerd
 ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
 install -D -m 0644 %{SOURCE4} %{buildroot}/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
@@ -142,9 +143,9 @@ find %{buildroot}/etc
 # Runtime
 pushd %{_builddir}/%{name}-%{version}/src/runtime
 install -D -m 0755 containerd-shim-kata-v2 %{buildroot}/usr/local/bin/containerd-shim-kata-cc-v2
-install -D -m 0755 kata-monitor %{buildroot}/%{coco_bin}/kata-monitor
-install -D -m 0755 kata-runtime %{buildroot}/%{coco_bin}/kata-runtime
-install -D -m 0755 data/kata-collect-data.sh %{buildroot}/%{coco_bin}/kata-collect-data.sh
+install -D -m 0755 kata-monitor %{buildroot}%{coco_bin}/kata-monitor
+install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
+install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
 install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
 ln -s configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration.toml
@@ -163,10 +164,10 @@ popd
 install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/scripts/lib.sh                   %{buildroot}/%{share_kata}/scripts/lib.sh
 install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}/%{share_kata}/scripts/image_builder.sh
 install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax              %{buildroot}/%{share_kata}/scripts/nsdax
-install -D -m 0644 %{_builddir}/%{name}-%{version}/tools/osbuilder/mariner-uvm-rootfs.tar.gz        %{buildroot}/opt/mariner/share/uvm/mariner-uvm-rootfs.tar.gz
+install -D -m 0644 %{_builddir}/%{name}-%{version}/tools/osbuilder/mariner-uvm-rootfs.tar.gz        %{buildroot}/%{build_path}/mariner-uvm-rootfs.tar.gz
 
-install -D -m 0755 %{SOURCE2} %{buildroot}/opt/mariner/share/uvm/mariner-coco-build-uvm-image.sh
-install -D -m 0755 %{SOURCE6} %{buildroot}/opt/mariner/share/uvm/pause-image.sh
+install -D -m 0755 %{SOURCE2} %{buildroot}/%{build_path}/mariner-coco-build-uvm-image.sh
+install -D -m 0755 %{SOURCE6} %{buildroot}/%{build_path}/pause-image.sh
 install -D -m 0644 %{SOURCE5} %{buildroot}/runtime.yaml
 
 install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE3}
@@ -185,15 +186,32 @@ install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE7}
 %systemd_post mariner-coco-build-uvm-image.service
 
 %files
-/opt/*
-/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
-/runtime.yaml
-/usr/bin/tardev-snapshotter
-/usr/local/bin/containerd-shim-kata-cc-v2
+%{build_path}/pause-image.sh
+%{build_path}/mariner-uvm-rootfs.tar.gz
+%{build_path}/mariner-coco-build-uvm-image.sh
+
+%{share_kata}/scripts/nsdax
+%{share_kata}/scripts/image_builder.sh
+%{share_kata}/scripts/lib.sh
+
+%{coco_bin}/cloud-hypervisor
+%{coco_bin}/containerd
+%{coco_bin}/kata-collect-data.sh
+%{coco_bin}/kata-monitor
+%{coco_bin}/kata-runtime
+
+%{defaults_kata}/configuration*.toml
+%{coco_path}/libexec/virtiofsd
+
+%{_bindir}/tardev-snapshotter
+%{_prefix}/local/bin/containerd-shim-kata-cc-v2
 
 %{_unitdir}/tardev-snapshotter.service
 %{_unitdir}/mariner-coco-build-uvm-image.service
 %{_unitdir}/pause-image.service
+
+/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
+/runtime.yaml
 
 %license LICENSE
 %doc CONTRIBUTING.md
@@ -202,7 +220,7 @@ install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE7}
 
 %changelog
 *   Wed Apr 5 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-10
--   Add changes from cc-msft-prototypes
+-   Rebase against cc-msft-prototypes branch
 -   License verified.
 -   Original version for CBL-Mariner
 
@@ -210,7 +228,7 @@ install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE7}
 -   Fix configuration paths
 
 *   Wed Mar 1 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-8
--   Build from source
+-   Build from source code
 
 *   Fri Feb 17 2023 Mitch Zhu <mitchzhu@microsoft.com> 0.1.0-7
 -   Port over kata-cc spec update
