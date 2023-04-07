@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ Summary:        Tensors and Dynamic neural networks in Python with strong GPU ac
 Requires:       python3-filelock
 Requires:       python3-numpy
 Requires:       python3-typing-extensions
+Requires:       python3-sympy
+Requires:       python3-jinja2
+Requires:       python3-filelock
 
 %description -n python3-pytorch
 PyTorch is a Python package that provides two high-level features:
@@ -76,6 +79,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
+- Add missing runtine for 2.0.0
+
 * Mon Apr 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-1
 - upgrade to 2.0.0
 
