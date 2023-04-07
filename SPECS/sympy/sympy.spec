@@ -156,7 +156,7 @@ fi
 %doc examples/*
 
 %changelog
-* Thur Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.11.1-5
+* Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.11.1-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified
 

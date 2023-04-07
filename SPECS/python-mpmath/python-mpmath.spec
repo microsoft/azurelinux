@@ -83,7 +83,7 @@ xvfb-run -a pytest -v
 %{python3_sitelib}/mpmath-%{version}-*.egg-info
 
 %changelog
-* Thur Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.3.0-1
+* Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.3.0-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified
 
