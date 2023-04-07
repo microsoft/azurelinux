@@ -23,7 +23,7 @@ Source0:        https://github.com/%{name}/%{name}/archive/%{name}-%{version}.ta
 # Skip tests that require a display
 Patch0:         %{name}-circuitplot.patch
 BuildRequires:  %{py3_dist cython}
-BuildRequires:  Python3-mpmath
+BuildRequires:  python3-mpmath
 # This package used to be noarch, and should still be noarch.  However, because
 # there is no JDK available on i686 anymore, the antlr4 package is also not
 # available on i686.  When we can stop building on i686 altogether, we can bring
