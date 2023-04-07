@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.88.1
+Version:        8.0.1
 Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
@@ -85,6 +85,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Mar 29 2023 Muhammad Falak <mwani@microsoft.com> - 8.0.1-1
+- Bump version to 8.0.1 to address CVE-2023-27533 to CVE-2023-27538
+
 * Thu Mar 09 2023 Nan Liu <liunan@microsoft.com> - 7.88.1-1
 - Upgrade to version 7.88.1 to fix CVE-2023-23914, CVE-2023-23915, CVE-2023-23916
 - Removing old patches that are fixed in version 7.87.0

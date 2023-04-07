@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ BuildRequires:  npth-devel >= 1.2
 BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
-BuildRequires:  libgpg-error-devel >= 1.41
+BuildRequires:  libgpg-error-devel >= 1.46
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
 Requires:       libgpg-error >= 1.46
@@ -89,6 +89,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Tue Mar 21 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.0-2
+- Add correct version for libgpg-error-devel as a BR
+
 * Mon Jan 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-1
 - Auto-upgrade to 2.4.0 - to fix CVE-2022-3515
 - Update libgpg-error dependency to 1.46

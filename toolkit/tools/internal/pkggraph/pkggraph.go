@@ -89,13 +89,13 @@ func (n PkgNode) ID() int64 {
 	return n.nodeID
 }
 
-//PkgGraph implements a simple.DirectedGraph using pkggraph Nodes.
+// PkgGraph implements a simple.DirectedGraph using pkggraph Nodes.
 type PkgGraph struct {
 	*simple.DirectedGraph
 	nodeLookup map[string][]*LookupNode
 }
 
-//LookupNode represents a graph node for a package in the lookup list
+// LookupNode represents a graph node for a package in the lookup list
 type LookupNode struct {
 	RunNode   *PkgNode // The "meta" run node for a package. Tracks the run-time dependencies for the package. Remote packages will only have a RunNode.
 	BuildNode *PkgNode // The build node for a package. Tracks the build requirements for the package. May be nil for remote packages.
@@ -145,7 +145,7 @@ func (n NodeType) String() string {
 	}
 }
 
-//DOTColor returns the graphviz color to set a node to
+// DOTColor returns the graphviz color to set a node to
 func (n *PkgNode) DOTColor() string {
 	switch n.State {
 	case StateMeta:
@@ -1381,17 +1381,12 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	}
 	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 
-	// This is a common error for developers, print this so they can try to fix it themselves.
-	// Circular dependencies in the core repo may be resolved by using toolchain RPMs which won't be rebuilt, BUT
-	// if we aren't doing a full rebuild with REBUILD_TOOLCHAIN=y those RPMs may not be available in ./out/RPMS so
-	// we should prompt the user to pull the full set of toolchain RPMs, and then copy them over to ./out/RPMS.
+	// Hydrating the toolchain RPMs was required to resolve the cycles at one point. This is no longer the case, but
+	// we should leave a message here to avoid confusion.
 	logger.Log.Warn("╔════════════════════════════════════════════════════════════════════════════════════════════════╗")
-	logger.Log.Warn("║ Are you building the core repo (ie github.com/microsoft/CBL-Mariner) ?                         ║")
-	logger.Log.Warn("║ Are you working with a prebuilt or online toolchain (ie REBUILD_TOOLCHAIN != 'y') ?            ║")
-	logger.Log.Warn("║ Some toolchain packages create dependency cycles which can only be resolved by referencing     ║")
-	logger.Log.Warn("║    pre-built .rpm files  in `./out/RPMS`.                                                      ║")
-	logger.Log.Warn("║ Try running `make toolchain` and `make copy-toolchain-rpms` ***with your current arguments***  ║")
-	logger.Log.Warn("║     first! This will copy the toolchain .rpm files from the cache into `./out/RPMS`            ║")
+	logger.Log.Warn("║ 'copy-toolchain-rpms' should no longer be required to resolve cycles even when using online    ║")
+	logger.Log.Warn("║ toolchain rpms. If you see this message, there is likely a legitimate cycle in the dependency  ║")
+	logger.Log.Warn("║ graph.                                                                                         ║")
 	logger.Log.Warn("╚════════════════════════════════════════════════════════════════════════════════════════════════╝")
 
 	return fmt.Errorf("cycles detected in dependency graph")
@@ -1424,6 +1419,7 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 }
 
 // findAllRPMS returns true if all RPMs requested are found on disk.
+//
 //	Also returns a list of all missing files
 func findAllRPMS(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) {
 	for _, rpm := range rpmsToFind {

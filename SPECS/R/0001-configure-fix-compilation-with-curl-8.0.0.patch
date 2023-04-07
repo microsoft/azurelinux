@@ -1,0 +1,26 @@
+From 7749a2feb5287073419dd5294e9d412d28a4bbda Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 31 Mar 2023 10:40:22 +0530
+Subject: [PATCH] configure: fix compilation with curl >= 8.0.0
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ configure | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure b/configure
+index 1227d92..e6b72d3 100755
+--- a/configure
++++ b/configure
+@@ -46052,8 +46052,6 @@ int main()
+ {
+ #ifdef LIBCURL_VERSION_MAJOR
+ #if LIBCURL_VERSION_MAJOR > 7
+-  exit(1);
+-#elif LIBCURL_VERSION_MAJOR == 7 && LIBCURL_VERSION_MINOR >= 28
+   exit(0);
+ #else
+   exit(1);
+-- 
+2.40.0
+

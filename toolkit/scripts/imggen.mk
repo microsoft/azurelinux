@@ -105,6 +105,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		--log-file=$(LOGS_DIR)/imggen/imagepkgfetcher.log \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tdnf-worker=$(chroot_worker) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
@@ -194,7 +195,7 @@ iso: $(initrd_img) $(iso_deps)
 		--iso-repo $(local_and_external_rpm_cache) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/isomaker.log \
-		$(if $(UNATTENDED_INSTALLER),--unattended-install) \
+		$(if $(filter y,$(UNATTENDED_INSTALLER)),--unattended-install) \
 		--output-dir $(artifact_dir) \
 		--image-tag=$(IMAGE_TAG)
 meta-user-data: $(meta_user_data_files)

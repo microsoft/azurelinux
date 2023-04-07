@@ -1,0 +1,152 @@
+From bc4f6405bb6ca0a5c0313edf878c51d5d5af9ffa Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 11 Sep 2020 12:17:15 +0200
+Subject: [PATCH 3/3] Port to maven-shared-utils 3.3.3
+
+---
+ .../DefaultForkConfiguration.java             | 26 ++++++++++++-------
+ .../surefire/report/StatelessXmlReporter.java | 20 +++++++-------
+ 2 files changed, 26 insertions(+), 20 deletions(-)
+
+diff --git a/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/booterclient/DefaultForkConfiguration.java b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/booterclient/DefaultForkConfiguration.java
+index 4ab4435..1ce348b 100644
+--- a/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/booterclient/DefaultForkConfiguration.java
++++ b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/booterclient/DefaultForkConfiguration.java
+@@ -42,6 +42,8 @@ import static org.apache.maven.plugin.surefire.util.Relocator.relocate;
+ import static org.apache.maven.plugin.surefire.SurefireHelper.replaceThreadNumberPlaceholders;
+ import static org.apache.maven.surefire.booter.Classpath.join;
+ 
++import org.apache.maven.shared.utils.cli.CommandLineException;
++
+ /**
+  * Basic framework which constructs CLI.
+  *
+@@ -135,17 +137,21 @@ public abstract class DefaultForkConfiguration
+ 
+         cli.setExecutable( getJdkForTests().getJvmExecutable() );
+ 
+-        String jvmArgLine = newJvmArgLine( forkNumber );
+-        if ( !jvmArgLine.isEmpty() )
+-        {
+-            cli.createArg()
+-                    .setLine( jvmArgLine );
+-        }
++        try {
++            String jvmArgLine = newJvmArgLine( forkNumber );
++            if ( !jvmArgLine.isEmpty() )
++            {
++                cli.createArg()
++                        .setLine( jvmArgLine );
++            }
+ 
+-        if ( getDebugLine() != null && !getDebugLine().isEmpty() )
+-        {
+-            cli.createArg()
+-                    .setLine( getDebugLine() );
++            if ( getDebugLine() != null && !getDebugLine().isEmpty() )
++            {
++                cli.createArg()
++                        .setLine( getDebugLine() );
++            }
++        } catch (CommandLineException ex) {
++            throw new SurefireBooterForkException("", ex);
+         }
+ 
+         resolveClasspath( cli, findStartClass( config ), config, dumpLogDirectory );
+diff --git a/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java
+index fcb066e..bfe894e 100644
+--- a/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java
++++ b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java
+@@ -200,7 +200,7 @@ public class StatelessXmlReporter
+     }
+ 
+     private void serializeTestClass( OutputStream outputStream, OutputStreamWriter fw, XMLWriter ppw,
+-                                     List<WrappedReportEntry> methodEntries )
++                                     List<WrappedReportEntry> methodEntries ) throws IOException
+     {
+         if ( rerunFailingTestsCount > 0 )
+         {
+@@ -215,7 +215,7 @@ public class StatelessXmlReporter
+     }
+ 
+     private void serializeTestClassWithoutRerun( OutputStream outputStream, OutputStreamWriter fw, XMLWriter ppw,
+-                                                 List<WrappedReportEntry> methodEntries )
++                                                 List<WrappedReportEntry> methodEntries ) throws IOException
+     {
+         for ( WrappedReportEntry methodEntry : methodEntries )
+         {
+@@ -231,7 +231,7 @@ public class StatelessXmlReporter
+     }
+ 
+     private void serializeTestClassWithRerun( OutputStream outputStream, OutputStreamWriter fw, XMLWriter ppw,
+-                                              List<WrappedReportEntry> methodEntries )
++                                              List<WrappedReportEntry> methodEntries ) throws IOException
+     {
+         WrappedReportEntry firstMethodEntry = methodEntries.get( 0 );
+         switch ( getTestResultType( methodEntries ) )
+@@ -369,7 +369,7 @@ public class StatelessXmlReporter
+         return new File( reportsDirectory, stripIllegalFilenameChars( customizedReportName + ".xml" ) );
+     }
+ 
+-    private void startTestElement( XMLWriter ppw, WrappedReportEntry report )
++    private void startTestElement( XMLWriter ppw, WrappedReportEntry report ) throws IOException
+     {
+         ppw.startElement( "testcase" );
+         String name = phrasedMethodName ? report.getReportName() : report.getName();
+@@ -390,7 +390,7 @@ public class StatelessXmlReporter
+         ppw.addAttribute( "time", report.elapsedTimeAsString() );
+     }
+ 
+-    private void createTestSuiteElement( XMLWriter ppw, WrappedReportEntry report, TestSetStats testSetStats )
++    private void createTestSuiteElement( XMLWriter ppw, WrappedReportEntry report, TestSetStats testSetStats ) throws IOException
+     {
+         ppw.startElement( "testsuite" );
+ 
+@@ -420,7 +420,7 @@ public class StatelessXmlReporter
+ 
+     private static void getTestProblems( OutputStreamWriter outputStreamWriter, XMLWriter ppw,
+                                          WrappedReportEntry report, boolean trimStackTrace, OutputStream fw,
+-                                         String testErrorType, boolean createOutErrElementsInside )
++                                         String testErrorType, boolean createOutErrElementsInside ) throws IOException
+     {
+         ppw.startElement( testErrorType );
+ 
+@@ -477,7 +477,7 @@ public class StatelessXmlReporter
+ 
+     // Create system-out and system-err elements
+     private static void createOutErrElements( OutputStreamWriter outputStreamWriter, XMLWriter ppw,
+-                                              WrappedReportEntry report, OutputStream fw )
++                                              WrappedReportEntry report, OutputStream fw ) throws IOException
+     {
+         EncodingOutputStream eos = new EncodingOutputStream( fw );
+         addOutputStreamElement( outputStreamWriter, eos, ppw, report.getStdout(), "system-out" );
+@@ -487,7 +487,7 @@ public class StatelessXmlReporter
+     private static void addOutputStreamElement( OutputStreamWriter outputStreamWriter,
+                                          EncodingOutputStream eos, XMLWriter xmlWriter,
+                                          Utf8RecodingDeferredFileOutputStream utf8RecodingDeferredFileOutputStream,
+-                                         String name )
++                                         String name ) throws IOException
+     {
+         if ( utf8RecodingDeferredFileOutputStream != null && utf8RecodingDeferredFileOutputStream.getByteCount() > 0 )
+         {
+@@ -517,7 +517,7 @@ public class StatelessXmlReporter
+      *
+      * @param xmlWriter The test suite to report to
+      */
+-    private static void showProperties( XMLWriter xmlWriter, Map<String, String> systemProperties )
++    private static void showProperties( XMLWriter xmlWriter, Map<String, String> systemProperties ) throws IOException
+     {
+         xmlWriter.startElement( "properties" );
+         for ( final Entry<String, String> entry : systemProperties.entrySet() )
+@@ -559,7 +559,7 @@ public class StatelessXmlReporter
+      * @param message   The string
+      */
+     private static void extraEscapeElementValue( String message, OutputStreamWriter outputStreamWriter,
+-                                                 XMLWriter xmlWriter, OutputStream fw )
++                                                 XMLWriter xmlWriter, OutputStream fw ) throws IOException
+     {
+         // Someday convert to xml 1.1 which handles everything but 0 inside string
+         if ( containsEscapesIllegalXml10( message ) )
+-- 
+2.30.2
+
