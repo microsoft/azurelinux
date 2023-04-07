@@ -42,7 +42,7 @@ sed -i 's/\(numpydoc>=1.\)5/\14/' requirements/doc.txt
 
 %install
 %{pyproject_install}
-%{pyproject_save_files} networkx
+%pyproject_save_files networkx
 mv %{buildroot}%{_docdir}/networkx-%{version} ./installed-docs
 rm -f installed-docs/INSTALL.txt
 

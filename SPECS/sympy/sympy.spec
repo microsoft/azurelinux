@@ -119,7 +119,7 @@ done
 
 %install
 %{pyproject_install}
-%{pyproject_save_files} isympy sympy
+%pyproject_save_files isympy sympy
 
 ## Remove extra files
 rm -f %{buildroot}%{_bindir}/{,doc}test
