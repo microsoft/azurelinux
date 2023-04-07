@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document details building packages in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom packages for Mariner. Continue here only if you care about building the `.spec` files present in the core repo.
+This document details building packages in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom packages for CBL-Mariner. Continue here only if you care about building the `.spec` files present in the core repo.
 
 ## **1. Install Prerequisites**
 
@@ -10,21 +10,21 @@ Prepare your system by [installing the necessary prerequisites here](prerequisit
 
 ## **2. Picking a Branch or Tag**
 
-Please read [Clone and Sync to Stable Commit](../building.md#clone-and-sync-to-stable-commit) for details on picking a brach to develop from.
+Please read [Clone and Sync to Stable Commit](../building.md#clone-and-sync-to-stable-commit) for details on picking a branch to develop from.
 
 For working with packages the `hybrid` approach is often the most powerful, but the `stable` branches are the easiest. **Be aware that the stable branches trail behind the development branches and this can result in merge conflicts when it is time to create a PR.**
 
 The `hybrid` option minimizes the chance of package conflicts, but runs the risk of seeing unresolvable build cycles appearing.
 
-> **Regardless of your choice**, once you are done the initial development work you should rebase and run a build on the development branch corresponding to your stable branch before creating a PR.
+> **Regardless of your choice** once you have done the initial development work, you should rebase and run a build on the development branch corresponding to your stable branch before creating a PR. Please reference the [Contribution Guide](CONTRIBUTING.md) for branch descriptions and further PR instructions.
 
-**If you are working on a package found in the [toolchain manifests](../../resources/manifests/package/)** you should work directly in the development branches. Please refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for instructions on rebuilding the toolchain.
+**If you are working on a package found in the [toolchain manifests](../../resources/manifests/package/)**, you should work directly in the development branches. Please refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for instructions on rebuilding the toolchain.
 
 ## **3. Get a Toolchain**
 
 If you are using the `stable` or `hybrid` branch strategy, the toolchain will be handled automatically. Just invoke the `sudo make build-packages ...` commands as needed and the tooling will deal with the rest.
 
-If you are working on a development branch, or getting ready for a PR you will need to build a toolchain. Refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for details. **Save your toolchain archive for later!**
+If you are working on a development branch or getting ready for a PR, you will need to build a toolchain. Refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for details. **Save your toolchain archive for later!**
 
 ## **4. Add/Modify a Package**
 
@@ -34,7 +34,7 @@ See [Working with Packages](https://github.com/microsoft/CBL-MarinerTutorials/bl
 * Calculating package signatures
 * Writing .spec files
 
-The core repo behaves slightly differently to a dedicated build environment like is described in the Tutorial repo, so use the steps described below to build your package instead.
+The core repo behaves slightly different than the dedicated build environment described in [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) so use the steps described below to build your package instead.
 
 ## **5. Build the Package**
 
@@ -67,10 +67,10 @@ cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 
 There are two ways to build packages:
 
-1) Let the scheduler figure out all of the required packages, and build everything form source with the versions in the current branch.
+1) Let the scheduler figure out all of the required packages and build everything from source with the versions in the current branch.
 2) Only build the very specific packages you care about, get **EVERYTHING ELSE** from the stable releases.
 
-Option `#2` is generally faster, but can lead to accuracy issues. If one of your packages' dependencies has also been changed in your branch but not published the build will use the older published version. This is often fine for quick development work but is not good enough for final testing.
+Option `#2` is generally faster, but can lead to accuracy issues. If one of your packages' dependencies has also been changed in your branch but not published, the build will use the older published version. This is often fine for quick development work but is not good enough for final testing.
 
 ### Signatures
 
@@ -84,7 +84,7 @@ package_list="openssh nano"
 
 # OPTIONAL:
 #   If you want a fast (but possibly less accurate) build, only pack the specific packages we want to build and
-#   use upstream stable packages to fulfil all dependencies.
+#   use upstream stable packages to fulfill all dependencies.
 pkg_filter="SRPM_PACK_LIST='$packages'"
 #   Otherwise, trust the scheduler to optimize the build
 pkg_filter=""
@@ -160,4 +160,4 @@ Any build which requires the ignored packages will still attempt to use them dur
 
 ## Sources
 
-While the build tools will inject sources found inside a package's folder, we prefer to host the sources on a source server (see [building.md](../building.md) for details about `$SOURCE_URL`). For the core repo please file a github issue if you need assistance uploading sources to the Mariner
+While the build tools will inject sources found inside a package's folder, we prefer to host the sources on a source server (see [building.md](../building.md) for details about `$SOURCE_URL`). For the core repo, please file a [GitHub issue](https://github.com/microsoft/CBL-Mariner/issues) if you need assistance uploading sources to the CBL-Mariner.

@@ -2,7 +2,7 @@
 
 ## Structs
 
-Each newly added component of the imageconfig schema should be defined as its own go type, in its own file.
+Each newly added component of the imageconfig schema should be defined in its own file as its own Go type.
 
 From [kernelcommandline.go](../../tools/imagegen/configuration/kernelcommandline.go):
 
@@ -104,7 +104,7 @@ Each test will generally have something along the lines of:
 * Some invalid inputs
 * A valid JSON input (often simplified)
 * An invalid JSON input
-* A config one one sub component that is invalid
+* A config with one sub component that is invalid
 
 From [kernelcommandline_test.go](../../tools/imagegen/configuration/kernelcommandline_test.go):
 
