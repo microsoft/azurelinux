@@ -221,7 +221,7 @@ The following command rebuilds packages for the basic VHD on the **stable** bran
 sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json QUICKREBUILD_PACKAGES=y
 ```
 
-Note that the image config file passed to the `CONFIG_FILE` option _only_ builds the packages included in the image config plus all packages needed to build/run those packages. In other words, rather than the entirety of the CBL-Mariner repo being built, only the packages needed by the image config and the dependencies for those packages will be built.
+Note that the image config file passed to the `CONFIG_FILE` option _only_ builds the packages included in the image config plus all packages needed to build/run those packages. In other words, rather than building the entirety of the CBL-Mariner repo, only the packages needed by the image config and the dependencies for those packages will be built.
 
 #### Targeted Package Building
 
@@ -232,8 +232,8 @@ We do this by limiting the packages the toolkit knows about by only packaging th
 |Argument|Use|
 |:-|-|
 | SRPM_PACK_LIST | Only package these `.spec` files for further processing |
-| PACKAGE_BUILD_LIST | Build this package, and any dependencies we know about **if they have not been built**|
-| PACKAGE_REBUILD_LIST | **ALWAYS** rebuild this package, even if we don't think we need to |
+| PACKAGE_BUILD_LIST | Build this package, and any dependencies we know about **if they are not already built**|
+| PACKAGE_REBUILD_LIST | **ALWAYS** rebuild this package |
 
 ```bash
 # Clear any existing packages that the tools might know about
@@ -249,7 +249,7 @@ Note that this process will download dependencies from [packages.microsoft.com](
 After building a package, you may choose to rebuild it or build additional packages.
 
 ```bash
-# Clean and rebuild targeted packages, but only if they are missing
+# Clean and rebuild targeted packages. Only rebuild the packages if they are not already built.
 sudo make clean-build-packages
 sudo make build-packages -j$(nproc) QUICKREBUILD=y CONFIG_FILE="" SRPM_PACK_LIST="at openssh"
 
@@ -285,7 +285,7 @@ sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICKREBUILD=y
 
 ISOs are bootable images that install CBL-Mariner to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
 
-NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the [toolkit/resources/imagesconfigs](../../../toolkit/resources/imageconfigs/) folder.
+NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the [toolkit/resources/imageconfigs](../../../toolkit/resources/imageconfigs/) folder.
 
 The following builds an ISO with an interactive UI and selectable image configurations:
 
@@ -429,7 +429,11 @@ sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/
 
 ## Tools
 
-The core of the build system is broken into several parts: A controlling Makefile, scripts to build the toolchain, and Go tools to build packages and images.
+The core of the build system is broken into several parts:
+
+- A controlling Makefile
+- Scripts to build the toolchain
+- Go tools to build packages and images.
 
 ### How it Works
 
