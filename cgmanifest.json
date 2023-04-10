@@ -4186,8 +4186,8 @@
         "type": "other",
         "other": {
           "name": "man-db",
-          "version": "2.8.4",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.8.4.tar.xz"
+          "version": "2.8.5",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.8.5.tar.xz"
         }
       }
     },
