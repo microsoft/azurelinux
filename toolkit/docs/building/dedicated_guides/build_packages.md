@@ -2,13 +2,15 @@
 
 ## Overview
 
-This document details building packages in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). This is the correct way to build custom packages for CBL-Mariner. Continue here only if you care about building the `.spec` files present in the core repo.
+This document describes how to build packages in the core repo. Most people should start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials).
+
+The following document shows the correct way to build packages for CBL-Mariner. Follow the instructions if you want to build the `.spec` files present in the core repo.
 
 ## **1. Install Prerequisites**
 
 Prepare your system by [installing the necessary prerequisites here](../prerequisites.md).
 
-## **2. Picking a Branch or Tag**
+## **2. Pick a Branch or Tag**
 
 Please read [Clone and Sync to Stable Commit](../building.md#clone-and-sync-to-stable-commit) for details on picking a branch to develop from.
 
