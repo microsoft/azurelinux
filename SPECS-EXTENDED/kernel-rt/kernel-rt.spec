@@ -60,6 +60,11 @@ ExclusiveArch:  x86_64
 %ifarch x86_64
 BuildRequires:  pciutils-devel
 %endif
+Conflicts:      kernel
+Conflicts:      kernel-azure
+Conflicts:      kernel-hci
+Conflicts:      kernel-mshv
+Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -124,9 +129,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %package -n     python3-perf-rt
 Summary:        Python 3 extension for perf tools
 Requires:       python3
-Conflicts:      python3-perf
-Conflicts:      python3-perf-azure
-Conflicts:      python3-perf-hci
+Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-perf-rt
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
@@ -140,9 +143,7 @@ This package contains common device tree blobs (dtb)
 
 %package -n     bpftool-rt
 Summary:        Inspection and simple manipulation of eBPF programs and maps
-Conflicts:      bpftool
-Conflicts:      bpftool-azure
-Conflicts:      bpftool-hci
+Requires:       %{name} = %{version}-%{release}
 
 %description -n  bpftool-rt
 This package contains the bpftool, which allows inspection and simple

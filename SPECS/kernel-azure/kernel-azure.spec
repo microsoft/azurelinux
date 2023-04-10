@@ -53,6 +53,11 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-hci
+Conflicts:      kernel-rt
+Conflicts:      kernel-mshv
+Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -125,9 +130,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %package -n     python3-perf-azure
 Summary:        Python 3 extension for perf tools
 Requires:       python3
-Conflicts:      python3-perf
-Conflicts:      python3-perf-hci
-Conflicts:      python3-perf-rt
+Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-perf-azure
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
@@ -141,9 +144,7 @@ This package contains common device tree blobs (dtb)
 
 %package -n     bpftool-azure
 Summary:        Inspection and simple manipulation of eBPF programs and maps
-Conflicts:      bpftool
-Conflicts:      bpftool-hci
-Conflicts:      bpftool-rt
+Requires:       %{name} = %{version}-%{release}
 
 %description -n bpftool-azure
 This package contains the bpftool, which allows inspection and simple
