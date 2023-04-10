@@ -21,28 +21,18 @@ PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
 SRPM_PACK_LIST          ?=
 
+######## SET INCREMENTAL BUILD FLAGS ########
+
 # Logic to auto configure build options for optimized builds
-# These will set the default values for: REBUILD_TOOLS, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL
+# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL
 include ./quickrebuild_autoconfig.mk
 
-# We generally want to use the DELTA_BUILD flag to determine whether to use the incremental toolchain, but to preserve
-# backwards compatibility, we'll still use the INCREMENTAL_TOOLCHAIN flag if it's set.
-DELTA_BUILD                     ?= n
-ifeq ($(origin DELTA_BUILD), undefined)
-# We didn't set DELTA_BUILD, so use the previous default behavior of INCREMENTAL_TOOLCHAIN for backwards compatibility.
-INCREMENTAL_TOOLCHAIN           ?= n
-else
-# We set DELTA_BUILD, so inherit value for INCREMENTAL_TOOLCHAIN.
-INCREMENTAL_TOOLCHAIN           ?= $(DELTA_BUILD)
-endif
+######## SET REMAINING FLAGS ########
 
-REBUILD_TOOLCHAIN               ?= n
-ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
 DOWNLOAD_SRPMS                  ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
-REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n

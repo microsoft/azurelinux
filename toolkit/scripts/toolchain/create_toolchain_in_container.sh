@@ -13,10 +13,9 @@ ARCHIVE_TOOL=$5
 
 # Grab an identity for the raw toolchain components so we can avoid rebuilding it if it hasn't changed
 sha_component_tag=$(sha256sum ./container/toolchain-sha256sums ./container/toolchain_build_in_chroot.sh ./create_toolchain_in_container.sh | sha256sum | cut -d' ' -f1 )
-export sha_component_tag
 
 # Check if we already have a committed container with the same sha_component_tag
-if [ "$INCREMENTAL_TOOLCHAIN" == "y" ] && [ -z "$(docker images -q marinertoolchain_populated:${sha_component_tag} 2>/dev/null)" ]; then
+if [ "$INCREMENTAL_TOOLCHAIN" != "y" ] || [ -z "$(docker images -q marinertoolchain_populated:${sha_component_tag} 2>/dev/null)" ]; then
     echo "No existing container with tag ${sha_component_tag}, building..."
 
     ./toolchain_verify.sh $MARINER_BUILD_DIR
