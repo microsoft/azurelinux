@@ -65,7 +65,9 @@ Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https:
 
 ## Develop for CBL-Mariner
 
-When starting to develop for CBL-Mariner, use the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. This repository guides developers on using CBL-Mariner's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [CBL-Mariner](https://github.com/microsoft/CBL-Mariner). Please see our [building instructions](toolkit/README.md) for a tutorials and build guides. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
+Start with [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. This repository guides developers on using CBL-Mariner's tools to customize or add new packages or images.
+
+Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [CBL-Mariner](https://github.com/microsoft/CBL-Mariner). Please see our [building instructions](toolkit/README.md) for tutorials and build guides. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
 
 ### Packages
 

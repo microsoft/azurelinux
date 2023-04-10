@@ -1,8 +1,8 @@
-# Getting Started Using and Building CBL-Mariner
+# Getting Started with CBL-Mariner
 
 ## [Just try the ISO](../README.md#iso)
 
-- Install and try the default ISO installer, no building required
+- Install and try the default ISO installer, no building required.
 
 ## [Get Started with CBL-Mariner](https://github.com/microsoft/CBL-MarinerTutorials)
 
@@ -17,10 +17,10 @@
 
 ## [Core Repo Quick Start Guide](docs/quick_start/quickstart.md)
 
-- **Recommended if you start working with the CBL-Mariner core repo.**
+- **Recommended if you want to start working with the CBL-Mariner core repo.**
 - Quickly build the **Standard CBL-Mariner** image using the core repo, install and use.
 
-## [Custom Image Configuration formats](docs/formats/imageconfig.md)
+## [Image Configuration Schema](docs/formats/imageconfig.md)
 
 - How to define custom mariner images and ISOs
 
