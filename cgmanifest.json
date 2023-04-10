@@ -28017,8 +28017,8 @@
         "type": "other",
         "other": {
           "name": "syslog-ng",
-          "version": "3.33.2",
-          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.33.2/syslog-ng-3.33.2.tar.gz"
+          "version": "3.38.1",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.38.1/syslog-ng-3.38.1.tar.gz"
         }
       }
     },
