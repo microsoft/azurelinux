@@ -20,6 +20,8 @@ def usage():
 
 
 def update_manifest_pkg_version(old_file, new_file):
+    print("Processing " + old_file)
+
     # Remove the toolchain new files if they exist
     if os.path.exists(new_file):
         os.remove(new_file)
@@ -48,8 +50,15 @@ def update_manifest_pkg_version(old_file, new_file):
                 version = os.popen("yum info " + pkgname + " | grep Version | cut -d : -f 2 | head -1").read().strip()
                 release = os.popen("yum info " + pkgname + " | grep Release | cut -d : -f 2 | head -1").read().strip()
                 rpm_name = pkgname + "-" + version + "-" + release + "-" + arch + ".rpm"
-                # print(rpm_name)
+                print(rpm_name)
                 f_new.write(rpm_name + "\n")
+
+    # Copy old file to old file.bak
+    os.rename(old_file, old_file + ".bak")
+    # Copy new file to old file
+    os.rename(new_file, old_file)
+
+    print("Done processing " + old_file)
 
 
 # If number of arguments is not 2, call usage()
