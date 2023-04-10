@@ -1,7 +1,12 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
+<<<<<<< HEAD:SPECS/k3s/k3s-1.25.5.spec
 Version:        1.25.5
 Release:        1%{?dist}
+=======
+Version:        1.25.0
+Release:        8%{?dist}
+>>>>>>> f6d8f7386ef0b64c91b94a8021debc86bef34982:SPECS/k3s/k3s.spec
 License:        ASL 2.0
 Group:          System Environment/Base
 URL:            http://k3s.io
@@ -80,8 +85,13 @@ exit 0
 %{install_sh}
 
 %changelog
+<<<<<<< HEAD:SPECS/k3s/k3s-1.25.5.spec
 * Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-1
 - Updated k3s to 1.25.5
+=======
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-8
+- Bump release to rebuild with go 1.19.8
+>>>>>>> f6d8f7386ef0b64c91b94a8021debc86bef34982:SPECS/k3s/k3s.spec
 
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-7
 - Bump release to rebuild with go 1.19.7
