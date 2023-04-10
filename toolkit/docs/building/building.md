@@ -84,21 +84,23 @@ git checkout 2.0-stable
 \
 A similar tag, `1.0-stable`, exists for the `1.0` branch. \
 \
-Other branches are also buildable but not guaranteed to be stable.  The `1.0` and `2.0` branches are periodically updated with bug fixes, security vulnerability fixes, or occasional feature enhancements.  As those fixes are integrated into the branch the head, of a branch may be temporarily unstable (ie.  only building using the full bootstrap build from source, rather than hydrating from the package servers). \
+Other branches are also buildable but not guaranteed to be stable.  The `1.0` and `2.0` branches are periodically updated with bug fixes, security vulnerability fixes, or occasional feature enhancements.  As those fixes are integrated into the branch, the head of a branch may be temporarily unstable (i.e., only building using the full bootstrap build from source, rather than hydrating from the package servers). \
 \
-The `1.0-stable` and `2.0-stable` tags will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the associated `*-stable` tag is advanced.  To ensure you have the latest tags, invoke `git fetch --tags` before building.
+The `1.0-stable` and `2.0-stable` tags will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the associated `*-stable` tag is advanced. \
+\
+_**IMPORTANT:**_ To ensure you have the latest tags, invoke `git fetch --tags` before building.
 
 It is also possible to build an older version of CBL-Mariner from the stable branches.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in GitHub](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the `*-stable` label above.
 
-Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the `1.0` and `2.0` branches.
+Other branches are not guaranteed to be easily buildable because these builds would require the SRPMs and/or RPMs be available on our public package repository.  At this time, published files are only available for the `1.0` and `2.0` branches.
 
 #### What About Non-Stable Commits?
 
 Most development work can be done based on the stable tags, but sometimes you need to work on the bleeding edge. There are a few options here:
 
 1) Just rebuild your toolchain every time (set `QUICKREBUILD_TOOLCHAIN=y`). The build tools will attempt to avoid rebuilding the toolchain when possible.
-1) Built the toolchain once (see #1), then save a copy of the toolchain you built, and reference it via `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz`)
-1) A hybrid approach, use a stable toolchain via `git checkout 2.0-stable -- ./toolkit/resources/manifests/package/*` on top of a development branch. This will use the latest published toolchain. However, **THIS MAY NOT ALWAYS WORK**. There exist dependency cycles in the packages which are broken by using pre-built toolchain packages. By rolling back the manifests, these cycle breaking packages may no longer be available.
+1) Build the toolchain once (see #1), then save a copy of the toolchain you built, and reference it via `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz`)
+1) A hybrid approach: use a stable toolchain via `git checkout 2.0-stable -- ./toolkit/resources/manifests/package/*` on top of a development branch. This will use the latest published toolchain. However, **THIS MAY NOT ALWAYS WORK**. There exist dependency cycles in the packages which are broken by using pre-built toolchain packages. By rolling back the manifests, these cycle-breaking packages may no longer be available.
 
 #### Overview of Branch/Tag Options
 
@@ -111,17 +113,17 @@ Please also read the [Contribution Guide](../../../CONTRIBUTING.md) if you are i
 |`main`             |- Newest packages </br>- No rebase typically required before pull requests </br>- Early warning of dependency issues | - Need to manage your own toolchain </br>- No easy access to pre-built packages </br>- Longer builds
 |`1.0-dev`          | Same as `main`       | Same as `main`
 |`*-stable`         | - Easy to get pre-built packages </br>- Just download the toolchain | - Need to rebase before pull requests </br>- May mask dependency issues that will occur once rebased onto the development branch
-|`hybrid`           | - Best of both        | - May have hard to resolve issues with dependency cycles </br>- Still a chance that the older toolchain  packages hide dependency issues
+| hybrid approach   | - Best of both        | - May have hard to resolve issues with dependency cycles </br>- Chance that the older toolchain packages hide dependency issues
 
 ### Toolchain Stage
 
 The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _official_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of sources from our source server.  The second uses SRPMS generated from the same sources to build the official RPMs.
 
-For expediency if `REBUILD_TOOLCHAIN=n` is set, the toolchain will be populated from upstream binaries.
+For expediency if `REBUILD_TOOLCHAIN=n` is set, the toolchain will be populated from upstream packages.
 
 #### Populate an Existing Toolchain
 
-A set of bootstrapped toolchain packages (`gcc`, etc.) are used to build CBL-Mariner packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
+A set of bootstrapped toolchain packages (`gcc`, etc.) are used to build CBL-Mariner packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n`, which is the default value unless otherwise specified.
 
 ```bash
 # Populate Toolchain from pre-existing binaries
@@ -133,7 +135,7 @@ sudo make toolchain REBUILD_TOOLS=y
 
 Depending on hardware, rebuilding the toolchain can take several hours. A developer should only have to rebuild the toolchain in the following situations:
 
-1) First time building a non-release branch (save the toolchain archive for reuse later)
+1) First time building a non-release branch (Pro tip: save the toolchain archive for reuse later)
 1) Working on a package found in the [toolchain manifests](../../resources/manifests/package/)
 1) Working on the toolchain build tooling itself
 
@@ -151,7 +153,7 @@ There are several optimizations possible to speed up the building of the toolcha
 sudo make toolchain QUICKREBUILD_TOOLCHAIN=y
 ```
 
-The following commands build **the entire toolchain** from scratch without using any pre-built packages. This step is quite time consuming so make sure to grab a copy of the toolchain if want to skip this step later.
+The following commands build **the entire toolchain** from scratch without using any pre-built packages. This step can be quite time consuming so make sure to grab a copy of the toolchain if want to skip this step later.
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
@@ -165,9 +167,9 @@ cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 
 Package building requires the toolchain to be available. The tools will automatically build or download the toolchain if needed.
 
-The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you to save time, you can choose to build packages for your specific image.
+The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or to save time, you can choose to build packages for your specific image.
 
-The `CONFIG_FILE` argument provides a quick way to declare what image you want to build. To manually build **all** packages, you can clear the configuration with `CONFIG_FILE=` and invoke the package build target `make build-packages ...`.  To build packages needed for a specific image, you must set the `CONFIG_FILE=` parameter to an image configuration file of your choice.  The standard image configuration files are in the [./toolkit/imageconfigs](../../imageconfigs/) folder.
+The `CONFIG_FILE` argument provides the way to declare what image you want to build. To manually build **all** packages, you can clear the configuration with `CONFIG_FILE=` and invoke the package build target `make build-packages CONFIG_FILE="" ...`.  To build packages needed for a specific image, you must set the `CONFIG_FILE=` parameter to an image configuration file of your choice.  The standard image configuration files are in the [./toolkit/imageconfigs](../../imageconfigs/) folder.
 
 Large parts of the package build stage are parallelized. The `Makefile` components may be parallelized by setting the `-j` flag (`-j$(nproc)` works well). The package build scheduler will automatically schedule one build per core, but this can be overwritten using the `CONCURRENT_PACKAGE_BUILDS=` flag.
 
@@ -197,8 +199,8 @@ sudo make build-packages -j$(nproc) CONFIG_FILE="" REBUILD_TOOLS=y
 #   USE_CCACHE   ?= y
 #   REBUILD_TOOLS = y
 
-# QUICKREBUILD_TOOLCHAIN=y builds the toolchain as quickly as possible, see the toolchain
-# section for details
+# QUICKREBUILD_TOOLCHAIN=y builds the toolchain as quickly as possible by using publicly available packages from our public package repo.
+# See the toolchain section for more details.
 
 sudo make build-packages -j$(nproc) CONFIG_FILE="" QUICKREBUILD=y
 #  ---or---
