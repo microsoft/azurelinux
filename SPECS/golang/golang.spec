@@ -12,8 +12,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.18.8
-Release:        2%{?dist}
+Version:        1.19.7
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,7 +22,6 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-Patch1:         CVE-2022-41717.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 
@@ -118,6 +117,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Apr 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.7-1
+- Auto-upgrade to 1.19.7 - to fix CVE-2022-2879, CVE-2022-41723, CVE-2022-2880, CVE-2023-24532, CVE-2022-41724, CVE-2022-41725, CVE-2022-41715, CVE-2022-41722
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.18.8-2
 - Fix for CVE-2022-41717.
 
