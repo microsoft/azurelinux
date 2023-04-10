@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "gpgkey-B23862C415D6565A4E86CBD7579C160D4C9E23E8.gpg": "53f15a7c011ba5a1951839258373076c4ff49bdb35127b3619d2afa28ae9826f",
-  "subunit-1.4.0.tar.gz": "00792096e96cbf1d5f9394dadd0ea73309a4f8b2214822949f1888ce5c2cf1c0",
-  "subunit-1.4.0.tar.gz.asc": "2ead0f86d5712e6655e08cf649cd992efcf38cfa2ca4fb226c77134c28b2f1af"
- }
-}

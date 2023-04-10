@@ -1,0 +1,2 @@
+annotations:
+  io.containerd.cri.runtime-handler: kata-cc

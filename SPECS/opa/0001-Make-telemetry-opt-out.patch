@@ -11,15 +11,12 @@ diff --git a/cmd/run.go b/cmd/run.go
 index 0283937c..12811506 100644
 --- a/cmd/run.go
 +++ b/cmd/run.go
-@@ -184,7 +184,7 @@ To skip bundle verification, use the --skip-verify flag.
- 	addConfigOverrides(runCommand.Flags(), &cmdParams.rt.ConfigOverrides)
+@@ -206,7 +206,7 @@ To skip bundle verification, use the --skip-verify flag.
  	addConfigOverrideFiles(runCommand.Flags(), &cmdParams.rt.ConfigOverrideFiles)
  	addBundleModeFlag(runCommand.Flags(), &cmdParams.rt.BundleMode, false)
--	runCommand.Flags().BoolVar(&cmdParams.skipVersionCheck, "skip-version-check", false, "disables anonymous version reporting (see: https://openpolicyagent.org/docs/latest/privacy)")
-+	runCommand.Flags().BoolVar(&cmdParams.skipVersionCheck, "skip-version-check", true, "disables anonymous version reporting (see: https://openpolicyagent.org/docs/latest/privacy)")
- 	addIgnoreFlag(runCommand.Flags(), &cmdParams.ignore)
  
- 	// bundle verification config
--- 
-2.28.0
-
+-	runCommand.Flags().BoolVar(&cmdParams.skipVersionCheck, "skip-version-check", false, "disables anonymous version reporting (see: https://www.openpolicyagent.org/docs/latest/privacy)")
++	runCommand.Flags().BoolVar(&cmdParams.skipVersionCheck, "skip-version-check", true, "disables anonymous version reporting (see: https://www.openpolicyagent.org/docs/latest/privacy)")
+ 	err := runCommand.Flags().MarkDeprecated("skip-version-check", "\"skip-version-check\" is deprecated. Use \"disable-telemetry\" instead")
+ 	if err != nil {
+ 		fmt.Println("error:", err)
