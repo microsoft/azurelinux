@@ -71,12 +71,11 @@ The image config format is [documented here](../../formats/imageconfig.md). This
 * Add users
 * Add user-defined customizations
 * Configure unattended installer behavior
+* And more...
 
 The core repo behaves slightly different than the dedicated build environment described in [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). If you want to use locally built packages to build your images, use the following commands. Otherwise please refer to [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials). 
 
 ### **5. Build an Image**
-
-> These commands very closely mirror those found in [Build Packages](./build_packages.md).
 
 #### Setup
 

@@ -1,6 +1,6 @@
 # Getting Started with CBL-Mariner
 
-## [Just try the ISO](../README.md#iso)
+## [Start with the CBL-Mariner ISO](../README.md#iso)
 
 - Install and try the default ISO installer, no building required.
 

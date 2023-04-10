@@ -4,8 +4,8 @@
 
 |Task                              | Where to go                                                                   |
 |:---------------------------------|-------------------------------------------------------------------------------|
-|Just add or build my own packages | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
-|Just add or build my own images   | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
+|Add or build my own packages      | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
+|Add or build my own images        | **[CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)** |
 |Quickly build core packages       | [Dedicated Build Core Packages Guide](./dedicated_guides/build_packages.md)   |
 |Quickly build core images         | [Dedicated Build Core Images Guide](./dedicated_guides/build_images.md)       |
 |Quickly build the go tools        | [Dedicated Go Tooling Guide](./dedicated_guides/build_tools.md)               |
@@ -31,9 +31,11 @@ The CBL-Mariner build system consists of several phases and tools, but at a high
 
 - **Toolchain:** This stage gets a set of toolchain RPM packages needed for future steps. It either downloads stable toolchain packages from our package server, or if configured, builds a bootstrap toolchain from scratch and then an official toolchain. Building is highly scripted and serialized in this stage. The official toolchain produced is used in the subsequent package build stage.
 
+The toolchain packages are used to create a `chroot` environment which is free of influences from the host system. This chroot is used for parsing `.spec` files, building packages, and creating offline images.
+
 - **Package:** This stage uses the toolchain packages from the toolchain stage to build more RPM packages.  Packages are built in parallel during this stage.
 
-- **Image:** This stage generates ISO, VHD, VHDX, container, etc. images from the RPM packages built in the package stage. The images are defined by configuration.json files.
+- **Image:** This stage generates ISO, VHD, VHDX, container, etc. images from both the RPM packages built in the package stage, and packages already available in our package repos. The images are defined by configuration.json files.
 
 It is possible to invoke any stage at any time. The tooling will automatically invoke earlier stages if needed. Each stage can be built locally, but in many cases the stage can be seeded from pre-built packages and then partially built.
 
@@ -261,9 +263,34 @@ sudo make build-packages -j$(nproc) QUICKREBUILD=y CONFIG_FILE="" SRPM_PACK_LIST
 
 Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerTutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more _package lists_ to include in the image.
 
-By default, the `make image` and `make iso` commands (discussed below) will build any locally defined packages referenced in the config file before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will instead download all packages from [packages.microsoft.com](packages.microsoft.com). This can accelerate the image build process, especially when performing [Targeted Package Building](#targeted-package-building).
+The [image configuration schema can be found here](../formats/imageconfig.md).
+
+By default, the `make image` and `make iso` commands (discussed below) will build any locally defined packages referenced in the config file before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will instead download all packages from [packages.microsoft.com](packages.microsoft.com). This can accelerate the image build process, especially when performing [Targeted Package Building](#targeted-package-building). The [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo focuses on this type of use-case and is an excellent resource.
 
 All images are generated in the `out/images` folder.
+
+#### Included Image Configuations
+
+| Config | Type |Use-case |
+|:------------------------------------|:--------------|:---------------------------------------------------------------------|
+| core-container.json                 | Container     | Minimal container                                                    |
+| core-efi-aarch64.json               | Offline Image | Minimal offline `aarch64` image for UEFI systems                     |
+| core-efi.json                       | Offline Image | Minimal offline `x86_64` image for UEFI systems                      |
+| core-efi-selinux.json               | Offline Image | Minimal offline `x86_64` image for UEFI systems with SELinux enabled |
+| core-fips.json                      | Offline Image | Minimal offline `x86_64` image for UEFI systems with fips enabled    |
+| core-legacy.json                    | Offline Image | Minimal offline `x86_64` image for BIOS systems                      |
+| core-legacy-unattended-hyperv.json  | ISO           | Minimal ISO that auto-installs on BIOS systems                       |
+| core-ova.json                       | Offline Image | Core-legacy with some extra tools                                    |
+| distroless-base.json                | Container     | Distroless containers                                                |
+| distroless-debug.json               | Container     | Distroless containers                                                |
+| distroless-minimal.json             | Container     | Distroless containers                                                |
+| full-aarch64.json                   | ISO           | Full ISO installer with UI for `aarch64`                             |
+| full.json                           | ISO           | Full ISO installer with UI for `x86_64`                              |
+| marketplace-gen1.json               | Offline Image | Azure Marketplace `x86_64` base image for generation 1 VMs (`.vhd`)  |
+| marketplace-gen2-aarch64.json       | Offline Image | Azure Marketplace `aarch64` base image for generation 2 VMs (`.vhdx`)|
+| marketplace-gen2.json               | Offline Image | Azure Marketplace `x86_64` base image for generation 2 VMs (`.vhdx`) |
+| read-only-root-efi.json             | Offline Image | Offline image with a dm-verity enforced read-only root filesystem    |
+| swuvm.json                          | Offline Image | Offline image that exports a partition artifact suibable for SWUpdate|
 
 #### Virtual Hard Disks and Containers
 
