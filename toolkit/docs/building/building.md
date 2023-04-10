@@ -29,23 +29,23 @@ If you want to experiment with CBL-Mariner, build custom images, or add packages
 
 The CBL-Mariner build system consists of several phases and tools, but at a high-level, it can be viewed simply as 3 distinct build stages:
 
-- **Toolchain:** This stage gets a set of toolchain RPM packages needed for future steps. It either downloads stable toolchain packages from our package server, or if configured, builds a bootstrap toolchain and then an official toolchain. Building is highly scripted and serialized in this stage. The official toolchain produced is used in the subsequent package build stage.
+- **Toolchain:** This stage gets a set of toolchain RPM packages needed for future steps. It either downloads stable toolchain packages from our package server, or if configured, builds a bootstrap toolchain from scratch and then an official toolchain. Building is highly scripted and serialized in this stage. The official toolchain produced is used in the subsequent package build stage.
 
-- **Package:** This stage uses the toolchain packages from the toolchain stage to build all remaining required RPM packages.  Packages are built in parallel during this stage.
+- **Package:** This stage uses the toolchain packages from the toolchain stage to build more RPM packages.  Packages are built in parallel during this stage.
 
 - **Image:** This stage generates ISO, VHD, VHDX, container, etc. images from the RPM packages built in the package stage. The images are defined by configuration.json files.
 
-It is possible to invoke any stage at any time, the tooling will automatically invoke earlier stages if needed. Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
+It is possible to invoke any stage at any time. The tooling will automatically invoke earlier stages if needed. Each stage can be built locally, but in many cases the stage can be seeded from pre-built packages and then partially built.
 
 > i.e., you can run `sudo make image ...` and it will implicitly invoke the toolchain and package stages.
 
-If you want a detailed breakdown of how the stages interact, see [How it works](../how_it_works/0_intro.md) for diagrams and descriptions.
+If you want a detailed breakdown of how the stages interact, see [How it works](../how_it_works/0_intro.md).
 
 ## Building in Stages
 
-The following sections run through a build step-by-step, briefly explaining the purpose of each stage. `Make` will generally automate this flow for any target; however, building in stages can be useful for debugging and assists in understanding the build process.
+The following sections run through a build step-by-step, briefly explaining the purpose of each stage. `make` will generally automate this flow for any target; however, building in stages can be useful for debugging and understanding the build process.
 
-**Once you have read about [Stable Tags](#stable-tags),** you can skip to these sections for guidance on specific use-cases:
+**If you have read about [Stable Tags](#stable-tags),** you can skip to these sections for guidance on specific use-cases:
 | Use-case                    | Link                                                     |
 |:----------------------------|:---------------------------------------------------------|
 |Build environment setup      | [Prerequisites](prerequisites.md)                        |
