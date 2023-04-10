@@ -125,8 +125,8 @@ gmock-devel-1.11.0-1.cm1.aarch64.rpm
 gmp-6.1.2-6.cm1.aarch64.rpm
 gmp-debuginfo-6.1.2-6.cm1.aarch64.rpm
 gmp-devel-6.1.2-6.cm1.aarch64.rpm
-gnupg2-2.2.20-3.cm1.aarch64.rpm
-gnupg2-debuginfo-2.2.20-3.cm1.aarch64.rpm
+gnupg2-2.2.41-1.cm1.aarch64.rpm
+gnupg2-debuginfo-2.2.41-1.cm1.aarch64.rpm
 golang-1.18.8-2.cm1.aarch64.rpm
 gperf-3.1-3.cm1.aarch64.rpm
 gperf-debuginfo-3.1-3.cm1.aarch64.rpm

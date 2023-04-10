@@ -1826,8 +1826,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.2.20",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.2.20.tar.bz2"
+          "version": "2.2.41",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.2.41.tar.bz2"
         }
       }
     },
