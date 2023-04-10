@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.12
+Version:        12.14
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -169,6 +169,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Mon Apr 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 12.14-1
+- Auto-upgrade to 12.14 - to fix CVE-2022-41862
+
 * Thu Oct 06 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 12.12-1
 - Upgrade to 12.12 to fix CVE-2022-1552
 
