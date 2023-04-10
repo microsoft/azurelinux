@@ -1,6 +1,6 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
-Version:        14.21.1
+Version:        14.21.3
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Vendor:         Microsoft Corporation
@@ -79,6 +79,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Mon Apr 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.21.3-1
+- Auto-upgrade to 14.21.3 - to fix CVE-2023-23920, CVE-2023-23919, CVE-2023-23918
+
 * Sun Dec 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.21.1-1
 - Auto-upgrade to 14.21.1 - CVE-2022-3602_CVE-2022-3786_CVE-2022-43548
 
