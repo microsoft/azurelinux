@@ -7981,8 +7981,18 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.25.0",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.0+k3s1.tar.gz"
+          "version": "1.25.5",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.5+k3s2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "k3s",
+          "version": "1.26.2",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.2+k3s1.tar.gz"
         }
       }
     },
@@ -7993,6 +8003,16 @@
           "name": "kata-containers",
           "version": "3.0.0",
           "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kata-containers-cc",
+          "version": "0.1.0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.1.0.tar.gz"
         }
       }
     },
@@ -23033,6 +23053,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-mpmath",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/fredrik-johansson/mpmath/archive/1.3.0/python-mpmath-1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-msal",
           "version": "1.18.0~b1",
           "downloadUrl": "https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/1.18.0b1/microsoft-authentication-library-for-python-1.18.0b1.tar.gz"
@@ -23086,6 +23116,16 @@
           "name": "python-netifaces",
           "version": "0.11.0",
           "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-networkx",
+          "version": "2.8.8",
+          "downloadUrl": "https://github.com/networkx/networkx/archive/networkx-2.8.8.tar.gz"
         }
       }
     },
@@ -27939,6 +27979,16 @@
           "name": "symlinks",
           "version": "1.7",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sympy",
+          "version": "1.11.1",
+          "downloadUrl": "https://github.com/sympy/sympy/archive/sympy-1.11.1.tar.gz"
         }
       }
     },
