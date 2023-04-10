@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "parboiled-1.1.6-build.tar.xz": "c83549bddd26b2e6a7dce072e3745b609649776dfcf92d636e35f39d50229b8a",
-  "parboiled-1.1.6.tar.gz": "793fe27f8aa5ae71e6dc09bcda702835ad9a23329d61cd26de046cfdcb0fbe5d",
-  "parboiled-core-1.1.6.pom": "edddc0695d885056b243346c5f4942c29d9b302ffcfba7d3fa637f8b8f2e8a12",
-  "parboiled-java-1.1.6.pom": "c352dd1c47fd17c11aedd3b7688e893d90877aa46f2a3b1a87418735aaf39b3f",
-  "parboiled-scala_2.10-1.1.6.pom": "e86f61aafb31b5c6aeb324b1a4125ce7a8522bdecb4ee21a6b596b7730840f5c"
- }
-}
