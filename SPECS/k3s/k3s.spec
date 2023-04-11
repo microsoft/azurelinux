@@ -82,10 +82,12 @@ exit 0
 %{install_sh}
 
 %changelog
-* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.2-2
+* Tue Apr 11 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.2-2
+- Addressed CVE for containerd and changed it to the new patched version 1.6.18
+
+* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.2-1
 - Updated k3s to 1.26.2
 - Drop version constraint on golang <= 1.18.8
-- Addressed CVE for containerd and changed it to the new patched version 1.6.18
 
 * Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-1
 - Updated k3s to 1.25.5
