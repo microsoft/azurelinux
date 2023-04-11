@@ -21,19 +21,19 @@ Please use the [auto-generated table of contents](https://docs.github.com/en/rep
 
 ## Overview
 
-The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, package, or image builds. Full builds of CBL-Mariner _**are not**_ generally needed.  All CBL-Mariner packages are built, signed, and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/)
+The following documentation describes how to fully build CBL-Mariner end-to-end, as well as advanced techniques for performing toolchain, package, or image builds. Full builds of CBL-Mariner _**are not**_ generally needed. All CBL-Mariner packages are built, signed, and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/).
 
 If you simply want to test-drive CBL-Mariner, download and install the ISO (see: [readme.md](../../../README.md#iso)).
 
 If you want to experiment with CBL-Mariner, build custom images, or add packages in a more focused environment, refer to the tutorial in the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository.
 
-The CBL-Mariner build system consists of several phases and tools, but at a high-level, it can be viewed simply as 3 distinct build stages:
+The CBL-Mariner build system consists of several phases and tools, but at a high-level, it can be viewed simply as three distinct build stages:
 
-- **Toolchain:** This stage gets a set of toolchain RPM packages needed for future steps. It either downloads stable toolchain packages from our package server, or if configured, builds a bootstrap toolchain from scratch and then an official toolchain. Building is highly scripted and serialized in this stage. The official toolchain produced is used in the subsequent package build stage.
+- **Toolchain:** This stage gets a set of toolchain RPM packages needed for future steps. It either downloads stable toolchain packages from our package server, or, if configured, builds a bootstrap toolchain from scratch and then an official toolchain. Building is highly scripted and serialized in this stage. The official toolchain produced is used in the subsequent package build stage.
 
 The toolchain packages are used to create a `chroot` environment which is free of influences from the host system. This chroot is used for parsing `.spec` files, building packages, and creating offline images.
 
-- **Package:** This stage uses the toolchain packages from the toolchain stage to build more RPM packages.  Packages are built in parallel during this stage.
+- **Package:** This stage uses the toolchain packages from the toolchain stage to build more RPM packages. Packages are built in parallel during this stage.
 
 - **Image:** This stage generates ISO, VHD, VHDX, container, etc. images from both the RPM packages built in the package stage, and packages already available in our package repos. The images are defined by configuration.json files.
 
@@ -86,22 +86,22 @@ git checkout 2.0-stable
 \
 A similar tag, `1.0-stable`, exists for the `1.0` branch. \
 \
-Other branches are also buildable but not guaranteed to be stable.  The `1.0` and `2.0` branches are periodically updated with bug fixes, security vulnerability fixes, or occasional feature enhancements.  As those fixes are integrated into the branch, the head of a branch may be temporarily unstable (i.e., only building using the full bootstrap build from source, rather than hydrating from the package servers). \
+Other branches are also buildable but not guaranteed to be stable. The `1.0` and `2.0` branches are periodically updated with bug fixes, security vulnerability fixes, or occasional feature enhancements. As those fixes are integrated into the branch, the head of a branch may be temporarily unstable (i.e., only building using the full bootstrap build from source, rather than hydrating from the package servers). \
 \
-The `1.0-stable` and `2.0-stable` tags will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the associated `*-stable` tag is advanced. \
+The `1.0-stable` and `2.0-stable` tags will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published. At that point, the associated `*-stable` tag is advanced. \
 \
 _**IMPORTANT:**_ To ensure you have the latest tags, invoke `git fetch --tags` before building.
 
-It is also possible to build an older version of CBL-Mariner from the stable branches.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in GitHub](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the `*-stable` label above.
+It is also possible to build an older version of CBL-Mariner from the stable branches. CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in GitHub](https://github.com/microsoft/CBL-Mariner/releases). These monthly builds are stable and their tags can be substituted for the `*-stable` label above.
 
-Other branches are not guaranteed to be easily buildable because these builds would require the SRPMs and/or RPMs be available on our public package repository.  At this time, published files are only available for the `1.0` and `2.0` branches.
+Other branches are not guaranteed to be easily buildable because these builds would require the SRPMs and/or RPMs be available on our public package repository. At this time, published files are only available for the `1.0` and `2.0` branches.
 
 #### What About Non-Stable Commits?
 
 Most development work can be done based on the stable tags, but sometimes you need to work on the bleeding edge. There are a few options here:
 
 1) Just rebuild your toolchain every time (set `QUICK_REBUILD_TOOLCHAIN=y`). The build tools will attempt to avoid rebuilding the toolchain when possible.
-1) Build the toolchain once (see #1), then save a copy of the toolchain you built, and reference it via `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz`)
+1) Build the toolchain once (see #1), then save a copy of the toolchain you built, and reference it via `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz`.
 1) A hybrid approach: use a stable toolchain via `git checkout 2.0-stable -- ./toolkit/resources/manifests/package/*` on top of a development branch. This will use the latest published toolchain. However, **THIS MAY NOT ALWAYS WORK**. There exist dependency cycles in the packages which are broken by using pre-built toolchain packages. By rolling back the manifests, these cycle-breaking packages may no longer be available.
 
 #### Overview of Branch/Tag Options
@@ -119,13 +119,13 @@ Please also read the [Contribution Guide](../../../CONTRIBUTING.md) if you are i
 
 ### Toolchain Stage
 
-The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _official_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of sources from our source server.  The second uses SRPMS generated from the same sources to build the official RPMs.
+The toolchain builds in two sub-phases. The first phase builds an initial _bootstrap_ toolchain which is then used to build the _official_ toolchain used in package building. In the first phase, the bootstrap toolchain downloads a series of sources from our source server. The second uses SRPMS generated from the same sources to build the official RPMs.
 
-For expediency if `REBUILD_TOOLCHAIN=n` is set, the toolchain will be populated from upstream packages.
+For expediency, if `REBUILD_TOOLCHAIN=n` is set, the toolchain will be populated from upstream packages.
 
 #### Populate an Existing Toolchain
 
-A set of bootstrapped toolchain packages (`gcc`, etc.) are used to build CBL-Mariner packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n`, which is the default value unless otherwise specified.
+A set of bootstrapped toolchain packages (`gcc`, etc.) are used to build CBL-Mariner packages and images. Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine. This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n`, which is the default value unless otherwise specified.
 
 ```bash
 # Populate Toolchain from pre-existing binaries
@@ -155,7 +155,7 @@ There are several optimizations possible to speed up the building of the toolcha
 sudo make toolchain QUICK_REBUILD_TOOLCHAIN=y
 ```
 
-The following commands build **the entire toolchain** from scratch without using any pre-built packages. This step can be quite time consuming so make sure to grab a copy of the toolchain if want to skip this step later.
+The following commands build **the entire toolchain** from scratch, without using any pre-built packages. This step can be quite time-consuming, so make sure to grab a copy of the toolchain if you want to skip this step later.
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
@@ -167,19 +167,19 @@ cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 
 ### Package Stage
 
-Package building requires the toolchain to be available. The tools will automatically build or download the toolchain if needed.
+Package building requires the toolchain to be available. the tools will automatically build or download the toolchain if needed.
 
 The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or to save time, you can choose to build packages for your specific image.
 
-The `CONFIG_FILE` argument provides the way to declare what image you want to build. To manually build **all** packages, you can clear the configuration with `CONFIG_FILE=` and invoke the package build target `make build-packages CONFIG_FILE="" ...`.  To build packages needed for a specific image, you must set the `CONFIG_FILE=` parameter to an image configuration file of your choice.  The standard image configuration files are in the [./toolkit/imageconfigs](../../imageconfigs/) folder.
+The `CONFIG_FILE` argument provides the way to declare what image you want to build. To manually build **all** packages, you can clear the configuration with `CONFIG_FILE=` and invoke the package build target `make build-packages CONFIG_FILE="" ...`. To build packages needed for a specific image, you must set the `CONFIG_FILE=` parameter to an image configuration file of your choice; the standard image configuration files are in the [./toolkit/imageconfigs](../../imageconfigs/) folder.
 
-Large parts of the package build stage are parallelized. The `Makefile` components may be parallelized by setting the `-j` flag (`-j$(nproc)` works well). The package build scheduler will automatically schedule one build per core, but this can be overwritten using the `CONCURRENT_PACKAGE_BUILDS=` flag.
+Large parts of the package build stage are parallelized; the `Makefile` components may be parallelized by setting the `-j` flag (`-j$(nproc)` works well). The package build scheduler will automatically schedule one build per core, but this can be overwritten using the `CONCURRENT_PACKAGE_BUILDS=` flag.
 
-There are several more package build options.  For example, it's possible to build a single package with all of its prerequisites.  For more details on package building options, see [Packages](#packages).
+There are several more package build options; for example, it's possible to build a single package with all of its prerequisites. For more details on package building options, see [Packages](#packages).
 
 #### Rebuild All Packages
 
-The following command rebuilds all CBL-Mariner packages.
+The following command rebuilds all CBL-Mariner packages:
 
 **A reminder that you can build packages outside the core repo (which is often much faster). Refer to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository for examples.**
 
@@ -223,13 +223,13 @@ The following command rebuilds packages for the basic VHD on the **stable** bran
 sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json QUICK_REBUILD_PACKAGES=y
 ```
 
-Note that the image config file passed to the `CONFIG_FILE` option _only_ builds the packages included in the image config plus all packages needed to build/run those packages. In other words, rather than building the entirety of the CBL-Mariner repo, only the packages needed by the image config and the dependencies for those packages will be built.
+Note that the image config file passed to the `CONFIG_FILE` option _only_ builds the packages included in the image config, plus all packages needed to build/run those packages. In other words, rather than building the entirety of the CBL-Mariner repo, only the packages needed by the image config and their dependencies will be built.
 
 #### Targeted Package Building
 
-Beginning with the `CBL-Mariner 2.0`'s 2022 October Release (`2.0.20221007`), it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to CBL-Mariner.
+Beginning with the `CBL-Mariner 2.0`'s 2022 October Release (`2.0.20221007`), it is possible to rapidly build one or more packages "in-tree". This technique can be helpful for modifying an existing SPEC file or adding a new one to CBL-Mariner.
 
-We do this by limiting the packages the toolkit knows about by only packaging the desired SRPMS via `SRPM_PACK_LIST`. Also recall that individual packages can be developed outside the core repo, refer to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details.
+We do this by limiting the packages the toolkit knows about by only packaging the desired SRPMS via `SRPM_PACK_LIST`. Also, recall that individual packages can be developed outside the core repo; refer to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details.
 
 |Argument|Use|
 |:-|-|
@@ -261,11 +261,11 @@ sudo make build-packages -j$(nproc) QUICK_REBUILD=y CONFIG_FILE="" SRPM_PACK_LIS
 
 ### Image Stage
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerTutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more _package lists_ to include in the image.
+Different images and image formats can be produced from the build system. Images are assembled from a combination of _Image Configuration_ files and _Package List_ files. Each [Package List](https://github.com/microsoft/CBL-MarinerTutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image. Each Image Configuration file defines the image output format and selects one or more _package lists_ to include in the image.
 
 The [image configuration schema can be found here](../formats/imageconfig.md).
 
-By default, the `make image` and `make iso` commands (discussed below) will build any locally defined packages referenced in the config file before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will instead download all packages from [packages.microsoft.com](packages.microsoft.com). This can accelerate the image build process, especially when performing [Targeted Package Building](#targeted-package-building). The [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo focuses on this type of use-case and is an excellent resource.
+By default, the `make image` and `make iso` commands (discussed below) will build any locally defined packages referenced in the config file before starting the image build sequence. By adding the `REBUILD_PACKAGES=n` argument, the image build phase will instead download all packages from [packages.microsoft.com](packages.microsoft.com). This can accelerate the image build process, especially when performing [Targeted Package Building](#targeted-package-building). The [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo focuses on this type of use-case and is an excellent resource.
 
 All images are generated in the `out/images` folder.
 
@@ -310,9 +310,9 @@ sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICK_REBUILD=y
 
 #### ISO Images
 
-ISOs are bootable images that install CBL-Mariner to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
+ISOs are bootable images that install CBL-Mariner to either a physical or virtual machine. The installation process can be manually guided through user prompting, or automated through unattended installation.
 
-NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the [toolkit/resources/imageconfigs](../../../toolkit/resources/imageconfigs/) folder.
+NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk). These additional resources are stored in the [toolkit/resources/imageconfigs](../../../toolkit/resources/imageconfigs/) folder.
 
 The following builds an ISO with an interactive UI and selectable image configurations:
 
@@ -324,7 +324,7 @@ The following builds an ISO with an interactive UI and selectable image configur
 sudo make iso CONFIG_FILE=./imageconfigs/full.json QUICK_REBUILD=y
 ```
 
-To create an unattended ISO installer (no interactive UI), use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig. The image config requires additional information, see [image config format](../formats/imageconfig.md#targetdisk) for more details.
+To create an unattended ISO installer (no interactive UI), use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig. The image config requires additional information; see [image config format](../formats/imageconfig.md#targetdisk) for more details.
 
 ```bash
 # Recall that if you are on a stable branch you can omit the toolchain rebuild. If so
@@ -336,11 +336,11 @@ sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyper
 
 ## Further Reading
 
-This section covers additional details about the build system such as build configuration flags and other advanced topics.
+This section covers additional details about the build system, such as build configuration flags and other advanced topics.
 
 ### Packages
 
-The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
+The toolkit can download packages from remote RPM repositories or build them locally. By default, any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) will be built (`core-efi.json` by default). An additional, space-separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
 
 Build all local packages needed for the default `core-efi.json`:
 
@@ -348,7 +348,7 @@ Build all local packages needed for the default `core-efi.json`:
 sudo make build-packages -j$(nproc)
 ```
 
-Build only two packages along with their prerequisites (note `CONFIG_FILE` is explicitly cleared, not specifying it will use the default `core-efi.json` config):
+Build only two packages along with their prerequisites (note `CONFIG_FILE` is explicitly cleared; not specifying it will use the default `core-efi.json` config):
 
 ```bash
 sudo make build-packages PACKAGE_BUILD_LIST="vim nano" CONFIG_FILE= -j$(nproc)
@@ -362,7 +362,7 @@ sudo make build-packages SPECS_DIR="/my/packages/SPECS" -j$(nproc)
 
 ### Working on Packages
 
-The build system will attempt to minimize rebuilds, but sometimes it is useful to force packages to rebuild, or ignore missing packages. Say you want to iterate on the `nano` package, but the `ncurses-devel` package is broken (`ncurses-devel` is a dependency of `nano`)...
+The build system will attempt to minimize rebuilds, but sometimes it is useful to force packages to rebuild, or ignore missing packages. Say, you want to iterate on the `nano` package, but the `ncurses-devel` package is broken (`ncurses-devel` is a dependency of `nano`)...
 
 #### DOWNLOAD_SRPMS
 
@@ -385,7 +385,7 @@ Any build which requires the ignored packages will still attempt to use them dur
 
 #### Source Hashes
 
-The build system also enforces hash checking for sources when packaging SRPMs. For a given `*.spec` file a hash of each source is recorded in `*.signatures.json`. The build system will attempt to find a source which matches the recorded hash. If you change a source the signature file can be updated by setting `SRPM_FILE_SIGNATURE_HANDLING=update`, or invoking the `sha256sum` command and manually editing the signature file.
+The build system also enforces hash checking for sources when packaging SRPMs. For a given `*.spec` file, a hash of each source is recorded in `*.signatures.json`. The build system will attempt to find a source that matches the recorded hash. If you change a source, the signature file can be updated by setting `SRPM_FILE_SIGNATURE_HANDLING=update`, or by invoking the `sha256sum` command and manually editing the signature file.
 
 ```bash
 # Just update the intermediate SRPMs and their source signatures by using the input-srpms target
@@ -445,6 +445,8 @@ REPO_LIST ?=
 The `REPO_LIST` variable supports multiple repo files, and they are prioritized in the order they appear in the list.
 The CBL-Mariner base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
 If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
+
+See [REPO_LIST](#repo_list) for details on adding additional repos to your build.
 
 ### Authentication
 

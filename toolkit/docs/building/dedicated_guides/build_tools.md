@@ -10,17 +10,17 @@ Make sure you have the right version of go by [installing the necessary prerequi
 
 ### Managing root ownership of Go directories
 
-> Since the build tools are run with `sudo`, and the tooling invokes `go build`, there are cases were Go modules are downloaded and owned by the root user. The tools try to avoid this as much as possible however this may occasionally happen. You can run `sudo chown -R $USER:$USER $(go env GOPATH)` to set ownership back to the current user.
+> Since the build tools are run with `sudo`, and the tooling invokes `go build`, there are cases where Go modules are downloaded and owned by the root user. The tools try to avoid this as much as possible; however, this may occasionally happen. You can run `sudo chown -R $USER:$USER $(go env GOPATH)` to set ownership back to the current user.
 
 ### VSCode plugins
 
-The [VSCode Go Extension](https://marketplace.visualstudio.com/items?itemName=golang.Go) is highly recommended for working with the Go files. Enable all the features by pressing `F1`, then running `Go: Instal/Update Tools`. **If this command fails please check [Managing root ownership of Go directories](#managing-root-ownership-of-go-directories).
+The [VSCode Go Extension](https://marketplace.visualstudio.com/items?itemName=golang.Go) is highly recommended for working with the Go files. Enable all the features by pressing `F1`, then running `Go: Install/Update Tools`. **If this command fails, please check [Managing root ownership of Go directories](#managing-root-ownership-of-go-directories).**
 
-With the extension installed you will get automatic formatting, syntax highlighting, linting, step-througy debugging, easy to run unit tests, code coverage and more.
+With the extension installed, you will get automatic formatting, syntax highlighting, linting, step-through debugging, easy-to-run unit tests, code coverage, and more.
 
 ### Building the Tools
 
-The toolkit will try to use pre-compiled binaries by default, but if you are in the core repo you will have to recompile the Go tools. This behavior is controlled via `REBUILD_TOOLS=y`.
+The toolkit will try to use pre-compiled binaries by default, but if you are in the core repo, you will have to recompile the Go tools. This behavior is controlled via `REBUILD_TOOLS=y`.
 
 ```bash
 # Build all the Go tools

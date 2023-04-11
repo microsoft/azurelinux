@@ -14,11 +14,11 @@ Prepare your system by [installing the necessary prerequisites here](../prerequi
 
 Please read [Clone and Sync to Stable Commit](../building.md#clone-and-sync-to-stable-commit) for details on picking a branch to develop from.
 
-For working with packages the `hybrid` approach is often the most powerful, but the `stable` branches are the easiest. **Be aware that the stable branches trail behind the development branches and this can result in merge conflicts when it is time to create a PR.**
+For working with packages, the `hybrid` approach is often the most powerful, but the `stable` branches are the easiest. **Be aware that the stable branches trail behind the development branches and this can result in merge conflicts when it is time to create a PR.**
 
 The `hybrid` option minimizes the chance of package conflicts, but runs the risk of seeing unresolvable build cycles appearing.
 
-> **Regardless of your choice** once you have done the initial development work, you should rebase and run a build on the development branch corresponding to your stable branch before creating a PR. Please reference the [Contribution Guide](CONTRIBUTING.md) for branch descriptions and further PR instructions.
+> **Regardless of your choice**, once you have done the initial development work, you should rebase and run a build on the development branch corresponding to your stable branch before creating a PR. Please reference the [Contribution Guide](CONTRIBUTING.md) for branch descriptions and further PR instructions.
 
 **If you are working on a package found in the [toolchain manifests](../../resources/manifests/package/)**, you should work directly in the development branches. Please refer to [Rebuild the Toolchain](../building.md#rebuild-the-toolchain) for instructions on rebuilding the toolchain.
 
@@ -36,7 +36,7 @@ See [Working with Packages](https://github.com/microsoft/CBL-MarinerTutorials/bl
 * Calculating package signatures
 * Writing .spec files
 
-The core repo behaves slightly different than the dedicated build environment described in [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) so use the steps described below to build your package instead.
+The core repo behaves slightly differently than the dedicated build environment described in [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials), so use the steps described below to build your package instead.
 
 ## **5. Build the Package**
 
@@ -70,9 +70,9 @@ cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 There are two ways to build packages:
 
 1) Let the scheduler figure out all of the required packages and build everything from source with the versions in the current branch.
-2) Only build the very specific packages you care about, get **EVERYTHING ELSE** from the stable releases.
+2) Only build the very specific packages you care about, and get **EVERYTHING ELSE** from the stable releases.
 
-Option `#2` is generally faster, but can lead to accuracy issues. If one of your packages' dependencies has also been changed in your branch but not published, the build will use the older published version. This is often fine for quick development work but is not good enough for final testing.
+Option #2 is generally faster, but can lead to accuracy issues. If one of your packages' dependencies has also been changed in your branch but not published, the build will use the older published version. This is often fine for quick development work, but is not good enough for final testing.
 
 ### Signatures
 
@@ -91,7 +91,7 @@ pkg_filter="SRPM_PACK_LIST='$packages'"
 #   Otherwise, trust the scheduler to optimize the build
 pkg_filter=""
 
-# Modify  your package
+# Modify your package
 touch ../SPECS/nano/nano.spec
 touch ../SPECS/nano/opessh.spec
 
