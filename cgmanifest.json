@@ -13263,8 +13263,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.2.tar.gz"
+          "version": "1.1.5",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.5.tar.gz"
         }
       }
     },
