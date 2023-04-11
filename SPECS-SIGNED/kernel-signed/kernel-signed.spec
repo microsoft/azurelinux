@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.15.60.2
-Release:        1%{?dist}
+Version:        5.15.102.1
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -153,6 +153,111 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Wed Mar 29 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-3
+- Bump release to match kernel
+
+* Wed Mar 22 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.102.1-2
+- Bump release to match kernel
+
+* Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
+- Auto-upgrade to 5.15.102.1
+
+* Mon Mar 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.98.1-1
+- Auto-upgrade to 5.15.98.1
+
+* Sat Feb 25 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.95.1-1
+- Auto-upgrade to 5.15.95.1
+
+* Wed Feb 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.94.1-1
+- Auto-upgrade to 5.15.94.1
+
+* Wed Feb 15 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.92.1-3
+- Bump release to match kernel
+
+* Thu Feb 09 2023 Minghe Ren <mingheren@microsoft.com> - 5.15.92.1-2
+- Disable CONFIG_INIT_ON_FREE_DEFAULT_ON
+
+* Mon Feb 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.92.1-1
+- Auto-upgrade to 5.15.92.1
+
+* Wed Jan 25 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.90.1-1
+- Auto-upgrade to 5.15.90.1
+
+* Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.87.1-1
+- Auto-upgrade to 5.15.87.1
+
+* Sat Jan 07 2023 nick black <niblack@microsoft.com> - 5.15.86.1-2
+- Add several missing BuildRequires (w/ Rachel Menge)
+
+* Tue Jan 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.86.1-1
+- Auto-upgrade to 5.15.86.1
+
+* Fri Dec 23 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.85.1-1
+- Auto-upgrade to 5.15.85.1
+
+* Mon Dec 19 2022 Betty Lakes <bettylakes@microsoft.com> - 5.15.82.1-2
+- Bump release to match kernel
+
+* Tue Dec 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.82.1-1
+- Auto-upgrade to 5.15.82.1
+
+* Wed Dec 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.81.1-1
+- Auto-upgrade to 5.15.81.1
+
+* Mon Dec 05 2022 Betty Lakes <bettylakes@microsoft.com> - 5.15.80.1-2
+- Bump release to match kernel
+
+* Tue Nov 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.80.1-1
+- Auto-upgrade to 5.15.80.1
+
+* Fri Nov 18 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.79.1-1
+- Auto-upgrade to 5.15.79.1
+
+* Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.77.1-1
+- Auto-upgrade to 5.15.77.1
+
+* Wed Oct 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.74.1-3
+- Bump release to match kernel
+
+* Mon Oct 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.74.1-2
+- Bump release to match kernel
+
+* Wed Oct 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.74.1-1
+- Upgrade to 5.15.74.1
+
+* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
+- Upgrade to 5.15.72.1
+
+* Tue Sep 27 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.70.1-1
+- Upgrade to 5.15.70.1
+
+* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.69.1-1
+- Upgrade to 5.15.69.1
+
+* Thu Sep 22 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-4
+- Bump release number to match kernel release
+
+* Tue Sep 20 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-3
+- Bump release number to match kernel release
+
+* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
+- Bump release number to match kernel release
+
+* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
+- Upgrade to 5.15.67.1
+
+* Thu Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
+- Bump release number to match kernel release
+
+* Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
+- Bump release number to match kernel release
+
+* Tue Sep 06 2022 Nikola Bojanic <t-nbojanic@microsoft.com> - 5.15.63.1-2
+- Bump release number to match kernel release
+
+* Mon Aug 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.63.1-1
+- Upgrade to 5.15.63.1
+
 * Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
 - Upgrade to 5.15.60.2 to fix arm64 builds
 
@@ -226,7 +331,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Update source to 5.15.32.1
 
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
-- Bump release number to match kernel release 
+- Bump release number to match kernel release
 
 * Mon Mar 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.26.1-3
 - Bump release number to match kernel release

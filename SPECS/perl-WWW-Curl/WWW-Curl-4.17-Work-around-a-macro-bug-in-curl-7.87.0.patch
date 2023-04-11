@@ -1,0 +1,43 @@
+From 426744bbcbe0842f6d8c0cee08b03179b191738e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 20 Jan 2023 16:35:11 +0100
+Subject: [PATCH] Work around a macro bug in curl-7.87.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Compiling against curl-7.87.0 failed with:
+
+    In file included from /usr/include/curl/curl.h:3195:
+    Curl.xs:688:25: error: void value not ignored as it ought to be
+      688 |                         curl_easy_setopt(clone->curl, 10000 +
+    i, clone->strings[i]);
+	  |                         ^
+
+This was a bug in curl-7.87.0. It will be fixed in next curl release. This
+patch provides a workaround on WWW-Curl side.
+
+<https://github.com/curl/curl/pull/10149>
+CPAN RT#145992
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Curl.xs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Curl.xs b/Curl.xs
+index a4f3afb..87180a9 100644
+--- a/Curl.xs
++++ b/Curl.xs
+@@ -685,7 +685,7 @@ curl_easy_duphandle(self)
+ 	for (i=0;i<=self->strings_index;i++) {
+ 		if (self->strings[i] != NULL) {
+ 			clone->strings[i] = savepv(self->strings[i]);
+-			curl_easy_setopt(clone->curl, 10000 + i, clone->strings[i]);
++			curl_easy_setopt(clone->curl, (10000 + i), clone->strings[i]);
+ 		}
+ 	}
+ 	clone->strings_index = self->strings_index;
+-- 
+2.39.1
+

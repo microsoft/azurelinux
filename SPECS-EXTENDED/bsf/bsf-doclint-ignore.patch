@@ -1,0 +1,12 @@
+diff --git a/build.xml b/build.xml
+--- a/build.xml
++++ b/build.xml
+@@ -305,7 +305,7 @@ Copyright:
+ 	<target name="javadocs" description="Generates the API documentation." depends="compile">
+ 		<mkdir dir="${build.javadocs}" />
+ 		<!-- FIXME: Excluding some packages temporarily -->
+-		<javadoc packagenames="${packages}" failonerror="true" excludepackagenames="org.apache.bsf.engines.java, org.apache.bsf.engines.javaclass" destdir="${build.javadocs}" author="true" version="false" use="true" windowtitle="${project.fullName} API" doctitle="${project.fullName}" source="${source.level}">
++		<javadoc packagenames="${packages}" failonerror="true" excludepackagenames="org.apache.bsf.engines.java, org.apache.bsf.engines.javaclass" destdir="${build.javadocs}" author="true" version="false" use="true" windowtitle="${project.fullName} API" doctitle="${project.fullName}" source="${source.level}" additionalparam="-Xdoclint:none">
+ 			<classpath refid="compile.classpath" />
+ 			<fileset dir="${src.dir}">
+ 				<patternset refid="java.source.files"></patternset>

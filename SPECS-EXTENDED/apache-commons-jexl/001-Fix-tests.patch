@@ -1,0 +1,21 @@
+Description: Fix a test failure with JUnit 4.11 due to the out of order
+ execution of the test methods. This issue is fixed in JEXL 3.
+Author: Emmanuel Bourg
+Forwarded: not-needed
+--- a/src/test/java/org/apache/commons/jexl2/ArithmeticTest.java
++++ b/src/test/java/org/apache/commons/jexl2/ArithmeticTest.java
+@@ -137,6 +137,7 @@
+      * test some simple mathematical calculations
+      */
+     public void testCalculations() throws Exception {
++        JexlThreadedArithmetic.setLenient(Boolean.TRUE);
+ 
+         asserter.setVariable("foo", new Integer(2));
+ 
+@@ -347,4 +348,4 @@
+         }
+         debuggerCheck(jexl);
+     }
+-}
+\ No newline at end of file
++}

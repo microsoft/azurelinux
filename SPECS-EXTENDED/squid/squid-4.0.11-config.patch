@@ -1,0 +1,26 @@
+diff -up squid-4.0.11/src/cf.data.pre.config squid-4.0.11/src/cf.data.pre
+--- squid-4.0.11/src/cf.data.pre.config	2016-06-09 22:32:57.000000000 +0200
++++ squid-4.0.11/src/cf.data.pre	2016-07-11 21:08:35.090976840 +0200
+@@ -4658,7 +4658,7 @@ DOC_END
+ 
+ NAME: logfile_rotate
+ TYPE: int
+-DEFAULT: 10
++DEFAULT: 0
+ LOC: Config.Log.rotateNumber
+ DOC_START
+ 	Specifies the default number of logfile rotations to make when you
+@@ -6444,11 +6444,11 @@ COMMENT_END
+ 
+ NAME: cache_mgr
+ TYPE: string
+-DEFAULT: webmaster
++DEFAULT: root
+ LOC: Config.adminEmail
+ DOC_START
+ 	Email-address of local cache manager who will receive
+-	mail if the cache dies.  The default is "webmaster".
++	mail if the cache dies.  The default is "root".
+ DOC_END
+ 
+ NAME: mail_from

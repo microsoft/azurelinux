@@ -1,0 +1,1246 @@
+diff -upNr WordNet-3.0.orig/doc/man/binsrch.3 WordNet-3.0/doc/man/binsrch.3
+--- WordNet-3.0.orig/doc/man/binsrch.3	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/binsrch.3	2009-01-18 03:31:02.000000000 +0100
+@@ -1,8 +1,8 @@
+ '\" t
+ .\" $Id$
+-.TH BINSRCH 3WN  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
++.TH BINSRCH 3  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
+ .SH NAME
+-bin_search, copyfile, replace_line, insert_line
++bin_search, copyfile, replace_line, insert_line \- general purpose functions for performing a binary search
+ .SH SYNOPSIS
+ .LP
+ \fBchar *bin_search(char *key, FILE *fp);\fP
+@@ -53,11 +53,11 @@ The maximum line length in a file is 25K
+ If there are no additional fields after the search key, the key must
+ be followed by at least one space before the newline character.
+ .SH SEE ALSO
+-.BR wnintro (3WN),
+-.BR morph (3WN),
+-.BR wnsearch (3WN),
+-.BR wnutil (3WN),
+-.BR wnintro (5WN).
++.BR wnintro (3),
++.BR morph (3),
++.BR wnsearch (3),
++.BR wnutil (3),
++.BR wnintro (5).
+ .SH WARNINGS
+ \fBbinsearch(\|)\fP returns a pointer to a static character buffer.
+ The returned string should be copied by the caller if the results need
+diff -upNr WordNet-3.0.orig/doc/man/cntlist.5 WordNet-3.0/doc/man/cntlist.5
+--- WordNet-3.0.orig/doc/man/cntlist.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/cntlist.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH CNTLIST 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH CNTLIST 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+ cntlist \- file listing number of times each tagged sense occurs in a
+ semantic concordance, sorted most to least frequently tagged
+@@ -20,7 +20,7 @@ in the concordance's cntlist file.
+ In the WordNet database, words are assigned sense numbers based on
+ frequency of use in semantically tagged corpora.  The cntlist file used
+ by
+-.BR grind (1WN) 
++.BR grind (1) 
+ to build the WordNet database and assign the sense numbers is a union
+ of the cntlist files from the various semantic concordances that were
+ formerly released by Princeton University.  This
+@@ -87,6 +87,6 @@ User's default browser options.
+ file of combined semantic concordance \fBcntlist\fP files.  Used to
+ assign sense numbers in WordNet database
+ .SH SEE ALSO
+-.BR grind (1WN),
+-.BR wnintro (5WN),
+-.BR senseidx (5WN).
++.BR grind (1),
++.BR wnintro (5),
++.BR senseidx (5).
+diff -upNr WordNet-3.0.orig/doc/man/grind.1 WordNet-3.0/doc/man/grind.1
+--- WordNet-3.0.orig/doc/man/grind.1	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/grind.1	2009-01-18 03:31:02.000000000 +0100
+@@ -24,7 +24,7 @@ Each input lexicographer file consists o
+ (\fIsynsets\fP) for one part of speech.  Although the basic synset
+ syntax is the same for all of the parts of speech, some parts of the
+ syntax only apply to a particular part of speech.  See
+-.BR wninput (5WN) 
++.BR wninput (5) 
+ for a description of the input file format.
+ 
+ Each \fIfilename\fP specified is of the form:
+@@ -42,7 +42,7 @@ where \fIpathname\fP is optional and \fI
+ files, for example \fBnoun.animal\fP and \fBnoun.plant\fP.  One or
+ more input files, in any combination of syntactic categories, may be
+ specified.  See
+-.BR lexnames (5WN)
++.BR lexnames (5)
+ for a list of the lexicographer files used to build the complete
+ WordNet database.
+ .SS Output Files
+@@ -60,7 +60,7 @@ _
+ .TE
+ 
+ See 
+-.BR wndb (5WN) 
++.BR wndb (5) 
+ for a description of the database file formats.
+ 
+ Each time \fBgrind(\|)\fP is run, any existing database files are
+@@ -133,16 +133,16 @@ lexicographer files to use to build data
+ file of combined semantic concordance \fBcntlist\fP files.  Used to
+ assign sense numbers in WordNet database
+ .SH SEE ALSO
+-.BR cntlist (5WN),
+-.BR lexnames (5WN),
+-.BR senseidx (5WN),
+-.BR wndb (5WN),
+-.BR wninput (5WN),
+-.BR uniqbeg (7WN),
+-.BR wngloss (7WN).
++.BR cntlist (5),
++.BR lexnames (5),
++.BR senseidx (5),
++.BR wndb (5),
++.BR wninput (5),
++.BR uniqbeg (7),
++.BR wngloss (7).
+ .SH DIAGNOSTICS
+ Exit status is normally 0.
+-Exit status is -1 if non-specific error occurs.
++Exit status is \-1 if non-specific error occurs.
+ If syntactic or structural errors exist, exit status is number of
+ errors detected.
+ .TP 
+diff -upNr WordNet-3.0.orig/doc/man/lexnames.5 WordNet-3.0/doc/man/lexnames.5
+--- WordNet-3.0.orig/doc/man/lexnames.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/lexnames.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,17 +1,17 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH LEXNAMES 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH LEXNAMES 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+-List of WordNet lexicographer file names and numbers
++lexnames \- List of WordNet lexicographer file names and numbers
+ .SH DESCRIPTION
+ During WordNet development synsets are organized into forty-five
+ lexicographer files based on syntactic category and logical groupings.
+-.BR grind (1WN)
++.BR grind (1)
+ processes these files and produces a database suitable for use with
+ the WordNet library, interface code, and other applications.  The
+ format of the lexicographer files is described in
+-.BR wninput (5WN).
++.BR wninput (5).
+ 
+ A file number corresponds to each lexicographer file.  File numbers
+ are encoded in several parts of the WordNet system as an efficient way
+@@ -117,7 +117,7 @@ Base directory for WordNet.  Default is
+ .B lexnames
+ list of lexicographer file names and numbers
+ .SH SEE ALSO
+-.BR grind (1WN),
+-.BR wnintro (5WN),
+-.BR wndb (5WN),
+-.BR wninput (5WN).
++.BR grind (1),
++.BR wnintro (5),
++.BR wndb (5),
++.BR wninput (5).
+diff -upNr WordNet-3.0.orig/doc/man/Makefile WordNet-3.0/doc/man/Makefile
+--- WordNet-3.0.orig/doc/man/Makefile	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/Makefile	2009-01-18 03:33:59.000000000 +0100
+@@ -134,7 +134,7 @@ sbindir = ${exec_prefix}/sbin
+ sharedstatedir = ${prefix}/com
+ sysconfdir = ${prefix}/etc
+ target_alias = 
+-man_MANS = binsrch.3 cntlist.5 grind.1 lexnames.5 morph.3 morphy.7 senseidx.5 uniqbeg.7 wn.1 wnb.1 wndb.5 wngloss.7 wngroups.7 wninput.5 wnintro.1 wnintro.3 wnintro.5 wnintro.7 wnlicens.7 wnpkgs.7 wnsearch.3 wnstats.7 wnutil.3
++man_MANS = binsrch.3 cntlist.5 grind.1 lexnames.5 morph.3 morphy.7 senseidx.5 uniqbeg.7 wn.1 wnb.1 wndb.5 wngloss.7 wngroups.7 wninput.5 wnintro.1 wnintro.3 wnintro.5 wnintro.7 wnlicens.7 wnpkgs.7 wnsearch.3 wnstats.7 wnutil.3 wishwn.1
+ all: all-am
+ 
+ .SUFFIXES:
+diff -upNr WordNet-3.0.orig/doc/man/morph.3 WordNet-3.0/doc/man/morph.3
+--- WordNet-3.0.orig/doc/man/morph.3	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/morph.3	2009-01-18 03:31:02.000000000 +0100
+@@ -1,8 +1,8 @@
+ '\" t
+ .\" $Id$
+-.TH MORPH 3WN  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
++.TH MORPH 3  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
+ .SH NAME
+-morphinit, re_morphinit, morphstr, morphword
++morphinit, re_morphinit, morphstr, morphword \- WordNet morphological processor functions
+ .SH SYNOPSIS
+ .LP
+ \fB#include "wn.h"\fP
+@@ -67,7 +67,7 @@ is called by 
+ and is not intended to be called directly by an application.
+ Applications wishing to use WordNet and/or the morphological functions
+ must call \fBwninit(\|)\fP at the start of the program.  See
+-.BR wnutil (3WN)
++.BR wnutil (3)
+ for more information.
+ 
+ \fIorigstr\fP may be either a word or a collocation formed by joining
+@@ -93,10 +93,10 @@ If 
+ is passed, it is treated by \fBmorphstr(\|)\fP as
+ .SB ADJECTIVE.
+ .SH SEE ALSO
+-.BR wnintro (3WN),
+-.BR wnsearch (3WN),
+-.BR wndb (5WN),
+-.BR morphy (7WN).
++.BR wnintro (3),
++.BR wnsearch (3),
++.BR wndb (5),
++.BR morphy (7).
+ 
+ .SH WARNINGS
+ Passing an invalid part of speech will result in a core dump.
+diff -upNr WordNet-3.0.orig/doc/man/morphy.7 WordNet-3.0/doc/man/morphy.7
+--- WordNet-3.0.orig/doc/man/morphy.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/morphy.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH MORPHY 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH MORPHY 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ morphy \- discussion of WordNet's morphological processing
+ .SH DESCRIPTION
+@@ -39,7 +39,7 @@ is returned.  A transformation to a vali
+ if the base form of the string is not in WordNet.
+ 
+ The morphological functions are found in the WordNet library.  See
+-.BR morph (3WN)
++.BR morph (3)
+ for information on using these functions.  
+ .SS Rules of Detachment
+ The following table shows the rules of detachment used by Morphy.  If
+@@ -82,7 +82,7 @@ algorithmic manner.  Each line of an exc
+ inflected form of a word or collocation, followed by one or more base
+ forms.  The list is kept in alphabetical order and a binary search is
+ used to find words in these lists.  See
+-.BR wndb (5WN)
++.BR wndb (5)
+ for information on the format of the exception list files.
+ .SS Single Words
+ In general, single words are relatively easy to process.  Morphy first
+@@ -172,9 +172,9 @@ Base directory for WordNet.  Default is
+ .B \fIpos\fP.exc
+ morphology exception lists
+ .SH SEE ALSO
+-.BR wn (1WN),
+-.BR wnb (1WN),
+-.BR binsrch (3WN),
+-.BR morph (3WN),
+-.BR wndb (5WN),
+-.BR wninput (7WN).
++.BR wn (1),
++.BR wnb (1),
++.BR binsrch (3),
++.BR morph (3),
++.BR wndb (5),
++.BR wninput (7).
+diff -upNr WordNet-3.0.orig/doc/man/prologdb.5 WordNet-3.0/doc/man/prologdb.5
+--- WordNet-3.0.orig/doc/man/prologdb.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/prologdb.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,6 +1,6 @@
+ .\" $Id$
+ .tr ~
+-.TH PROLOGDB 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH PROLOGDB 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+ wn_\*.pl \- description of Prolog database files
+ .SH DESCRIPTION
+@@ -14,9 +14,9 @@ WordNet relation giving the user the abi
+ of the database that they are interested.
+ 
+ See \fBFILES\fP, below, for a list of the database files and
+-.BR wndb (5WN)
++.BR wndb (5)
+ and
+-.BR wninput (5WN) 
++.BR wninput (5) 
+ for detailed descriptions of the various WordNet relations (referred to
+ as \fIoperators\fP in this manual page).
+ .SS File Format
+@@ -205,7 +205,7 @@ all words in a synset.  The operator is 
+ A \fIsynset_id\fP is a nine byte field in which the first
+ byte defines the syntactic category of the synset and the remaining
+ eight bytes are a \fIsynset_offset\fP, as defined in 
+-.BR wndb (5WN),
++.BR wndb (5),
+ indicating the byte offset in the \fBdata.\fP\fIpos\fP file that
+ corresponds to the syntactic category.
+ 
+@@ -226,7 +226,7 @@ synset, from left to right, beginning wi
+ lexical WordNet relations \fIw_num\fP may be 0, indicating that the
+ relation holds for all words in the synset indicated by the preceding
+ \fIsynset_id\fP.  See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for a discussion of semantic and lexical relations.
+ 
+ \fIss_type\fP is a one character code indicating the synset type:
+@@ -251,7 +251,7 @@ the lexicographer, with spaces replaced 
+ \fIword\fP is immediately followed by a syntactic marker if one was
+ specified in the lexicographer file.  A syntactic marker is appended,
+ in parentheses, onto \fIword\fP without any intervening spaces.  See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for a list of the syntactic markers for adjectives.
+ 
+ Each synset has a \fIgloss\fP that may contain a definition, one or
+@@ -265,7 +265,7 @@ the synset.  If non-zero, the frame appl
+ synset.
+ 
+ In WordNet, sense numbers are assigned as described in 
+-.BR wndb (5WN).
++.BR wndb (5).
+ \fItag_count\fP is the number of times the sense was tagged in the
+ Semantic Concordances, and \fB0\fP if it was not instantiated.
+ .SH NOTES
+@@ -338,7 +338,7 @@ pertainym pointers
+ .B wn_fr.pl
+ frame pointers
+ .SH SEE ALSO
+-.BR wndb (5WN),
+-.BR wninput (5WN),
+-.BR wngroups (7WN),
+-.BR wnpkgs (7WN).
++.BR wndb (5),
++.BR wninput (5),
++.BR wngroups (7),
++.BR wnpkgs (7).
+diff -upNr WordNet-3.0.orig/doc/man/senseidx.5 WordNet-3.0/doc/man/senseidx.5
+--- WordNet-3.0.orig/doc/man/senseidx.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/senseidx.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH SENSEIDX 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH SENSEIDX 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+ index.sense, sense.idx \- WordNet's sense index
+ .SH DESCRIPTION
+@@ -31,10 +31,10 @@ Using the sense index and a \fIsense_key
+ obtained.  A mapping from noun \fIsense_key\fPs in WordNet 1.6 to
+ corresponding 2.0 \fIsense_key\fPs is provided with version 2.0,
+ and is described in
+-.BR sensemap (5WN).
++.BR sensemap (5).
+ 
+ See
+-.BR wndb (5WN)
++.BR wndb (5)
+ for a thorough discussion of the WordNet database files.
+ .SS File Format
+ The sense index file lists all of the senses in the WordNet database
+@@ -66,7 +66,7 @@ structure containing the parsed synset i
+ \fIsense_number\fP is a decimal integer indicating the sense number of
+ the word, within the part of speech encoded in \fIsense_key\fP, in the
+ WordNet database.  See
+-.BR wndb (5WN)
++.BR wndb (5)
+ for information about how sense numbers are assigned.
+ 
+ \fItag_cnt\fP represents the decimal number of times the sense is
+@@ -98,7 +98,7 @@ below for a listing of the numbers corre
+ \fIlex_filenum\fP is a two digit decimal integer representing the
+ name of the lexicographer file containing the synset for the sense.
+ See
+-.BR lexnames (5WN)
++.BR lexnames (5)
+ for the list of lexicographer file names and their corresponding numbers.
+ 
+ \fIlex_id\fP is a two digit decimal integer that, when appended onto
+@@ -109,7 +109,7 @@ there is no requirement that the numbers
+ \fB00\fP.  Note that a value of \fB00\fP is the default, and therefore
+ is not present in lexicographer files.  Only non-default \fIlex_id\fP
+ values must be explicitly assigned in lexicographer files.  See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for information on the format of lexicographer files.
+ 
+ \fIhead_word\fP is only present if the sense is in an adjective
+@@ -155,10 +155,10 @@ Base directory for WordNet.  Default is
+ .B index.sense
+ sense index
+ .SH SEE ALSO
+-.BR binsrch (3WN),
+-.BR wnsearch (3WN),
+-.BR lexnames (5WN),
+-.BR wnintro (5WN),
+-.BR sensemap (5WN),
+-.BR wndb (5WN),
+-.BR wninput (5WN).
++.BR binsrch (3),
++.BR wnsearch (3),
++.BR lexnames (5),
++.BR wnintro (5),
++.BR sensemap (5),
++.BR wndb (5),
++.BR wninput (5).
+diff -upNr WordNet-3.0.orig/doc/man/uniqbeg.7 WordNet-3.0/doc/man/uniqbeg.7
+--- WordNet-3.0.orig/doc/man/uniqbeg.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/uniqbeg.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,6 +1,6 @@
+ '\" t
+ .\" $Id$
+-.TH UNIQBEG 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH UNIQBEG 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ uniqbeg \- unique beginners for noun hierarchies
+ .SH DESCRIPTION
+@@ -22,7 +22,7 @@ The lexicographer files are not included
+ .B noun.Tops
+ unique beginners for nouns
+ .SH SEE ALSO
+-.BR wndb (5WN),
+-.BR wninput (5WN),
+-.BR wnintro (7WN),
+-.BR wngloss (7WN).
++.BR wndb (5),
++.BR wninput (5),
++.BR wnintro (7),
++.BR wngloss (7).
+diff -upNr WordNet-3.0.orig/doc/man/wn.1 WordNet-3.0/doc/man/wn.1
+--- WordNet-3.0.orig/doc/man/wn.1	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wn.1	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WN 1WN "Dec 2006" "WordNet 3.0" "WordNet\(tm User Commands"
++.TH WN 1 "Dec 2006" "WordNet 3.0" "WordNet\(tm User Commands"
+ .SH NAME
+ wn \- command line interface to WordNet lexical database  
+ .SH SYNOPSIS
+@@ -214,7 +214,7 @@ Verb senses can be grouped by similarity
+ than ordered by frequency of use.  The \fB\-simsv\fP search prints all
+ senses that are close in meaning together, with a line of dashes
+ indicating the end of a group.  See
+-.BR wngroups (7WN)
++.BR wngroups (7)
+ for a discussion of how senses are grouped.
+ 
+ The \fB\-over\fP search displays an overview of all the senses of the
+@@ -326,15 +326,15 @@ files of sentences illustrating the use 
+ .B \fIpos\fP.exc
+ morphology exception lists
+ .SH SEE ALSO
+-.BR wnintro (1WN),
+-.BR wnb (1WN),
+-.BR wnintro (3WN),
+-.BR lexnames (5WN),
+-.BR senseidx (5WN)
+-.BR wndb (5WN), 
+-.BR wninput (5WN),
+-.BR morphy (7WN),
+-.BR wngloss (7WN),
+-.BR wngroups (7WN).
++.BR wnintro (1),
++.BR wnb (1),
++.BR wnintro (3),
++.BR lexnames (5),
++.BR senseidx (5)
++.BR wndb (5), 
++.BR wninput (5),
++.BR morphy (7),
++.BR wngloss (7),
++.BR wngroups (7).
+ .SH BUGS
+ Please report bugs to wordnet@princeton.edu.
+diff -upNr WordNet-3.0.orig/doc/man/wnb.1 WordNet-3.0/doc/man/wnb.1
+--- WordNet-3.0.orig/doc/man/wnb.1	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnb.1	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNB 1WN "Dec 2006" "WordNet 3.0" "WordNet\(tm User Commands"
++.TH WNB 1 "Dec 2006" "WordNet 3.0" "WordNet\(tm User Commands"
+ .SH NAME
+ wnb \- WordNet window-based browser interface 
+ .SH SYNOPSIS
+@@ -271,7 +271,7 @@ these options will be used as the user d
+ Display this manual page.
+ .IP "Help on WordNet terminology"
+ Display the 
+-.BR wngloss (7WN)
++.BR wngloss (7)
+ manual page.
+ .IP "Display the WordNet license"
+ Display the WordNet copyright notice and license agreement.
+@@ -353,7 +353,7 @@ than ordered by frequency of use.  When 
+ similarity"\fP search is selected, senses that are close
+ in meaning are printed together, with a line of dashes indicating the
+ end of a group.  See
+-.BR wngroups (7WN)
++.BR wngroups (7)
+ for a discussion how senses are grouped.
+ 
+ The output of the \fB"Derivationally Related Forms"\fP 
+@@ -447,15 +447,15 @@ files of sentences illustrating the use 
+ .B \fIpos\fP.exc
+ morphology exception lists
+ .SH SEE ALSO
+-.BR wnintro (1WN),
+-.BR wn (1WN),
+-.BR wnintro (3WN),
+-.BR lexnames (5WN),
+-.BR senseidx (5WN),
+-.BR wndb (5WN), 
+-.BR wninput (5WN),
+-.BR morphy (7WN), 
+-.BR wngloss (7WN),
+-.BR wngroups (7WN).
++.BR wnintro (1),
++.BR wn (1),
++.BR wnintro (3),
++.BR lexnames (5),
++.BR senseidx (5),
++.BR wndb (5), 
++.BR wninput (5),
++.BR morphy (7), 
++.BR wngloss (7),
++.BR wngroups (7).
+ .SH BUGS
+ Please reports bugs to wordnet@princeton.edu.
+diff -upNr WordNet-3.0.orig/doc/man/wndb.5 WordNet-3.0/doc/man/wndb.5
+--- WordNet-3.0.orig/doc/man/wndb.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wndb.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNDB 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH WNDB 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+ index.noun, data.noun, index.verb, data.verb, index.adj, data.adj, index.adv, data.adv \- WordNet database files
+ .LP
+@@ -25,7 +25,7 @@ Words in the index file are in lower cas
+ were entered in the lexicographer files.  This folds various
+ orthographic representations of the word into one line enabling
+ database searches to be case insensitive.  See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for a detailed description of the lexicographer files
+ 
+ A data file for a syntactic category contains information
+@@ -51,7 +51,7 @@ newline character.  Fields enclosed in i
+ not be present.
+ 
+ See 
+-.BR wngloss (7WN)
++.BR wngloss (7)
+ for a glossary of WordNet terminology and a discussion of the
+ database's content and logical organization.
+ .SS Index File Format
+@@ -96,7 +96,7 @@ containing it.
+ .I ptr_symbol
+ A space separated list of \fIp_cnt\fP different types of pointers that
+ \fIlemma\fP has in all synsets containing it. See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for a list of \fIpointer_symbol\fPs.  If all senses of \fIlemma\fP
+ have no pointers, this field is omitted and \fIp_cnt\fP is \fB0\fP.
+ .TP 15
+@@ -115,7 +115,7 @@ different sense of \fIlemma\fP in WordNe
+ 8 digit, zero-filled decimal integer that can be used with
+ .BR fseek (3)
+ to read a synset from the data file.  When passed to
+-.BR read_synset (3WN)
++.BR read_synset (3)
+ along with the syntactic category, a data structure containing the
+ parsed synset is returned.
+ .SS Data File Format
+@@ -137,7 +137,7 @@ integer. 
+ .I lex_filenum
+ Two digit decimal integer corresponding to the lexicographer file name
+ containing the synset.  See
+-.BR lexnames (5WN)
++.BR lexnames (5)
+ for the list of filenames and their corresponding numbers.
+ .TP 15
+ .I ss_type
+@@ -166,7 +166,7 @@ lower-case forms.  In \fBdata.adj\fP, a 
+ syntactic marker if one was specified in the lexicographer file.  A
+ syntactic marker is appended, in parentheses, onto \fIword\fP without
+ any intervening spaces.  See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for a list of the syntactic markers for adjectives.
+ .TP 15
+ .I lex_id
+@@ -210,7 +210,7 @@ relation holds.  Word numbers are assign
+ a synset, from left to right, beginning with \fB1\fP.
+ 
+ See 
+-.BR wninput (5WN)
++.BR wninput (5)
+ for a list of \fIpointer_symbol\fPs, and semantic and lexical pointer
+ classifications.
+ .TP 15
+@@ -232,7 +232,7 @@ pointers, if this number is \fB00\fP, \f
+ word indicated.  Word numbers are assigned as described for pointers.
+ Each \fIf_num~~w_num\fP pair is preceded by a \fB+\fP.
+ See
+-.BR wninput (5WN)
++.BR wninput (5)
+ for the text of the generic sentence frames.
+ .TP
+ .I gloss
+@@ -250,11 +250,11 @@ entry in the \fBindex.\fIpos\fR files in
+ in the list have been tagged.
+ 
+ The 
+-.BR cntlist (5WN)
++.BR cntlist (5)
+ file provided with the database lists the number of times each sense
+ is tagged in the semantic concordances.  The data from \fBcntlist\fP
+ is used by
+-.BR grind (1WN)
++.BR grind (1)
+ to order the senses of each word.  When the \fBindex\fP.\fIpos\fP
+ files are generated, the \fIsynset_offset\fPs are output in sense
+ number order, with sense 1 first in the list.  Senses with the same
+@@ -275,7 +275,7 @@ generated from a machine-readable dictio
+ that are not in WordNet.  Also, for many of the inflected forms, base
+ forms could be easily derived using the standard rules of detachment
+ programmed into Morphy (See
+-.BR morph (7WN)).
++.BR morph (7)).
+ These anomalies are allowed to remain in the exception list files,
+ as they do no harm.
+ 
+@@ -290,7 +290,7 @@ the line is the text of a template examp
+ used as a placeholder in the text for the verb.  Both files are sorted
+ alphabetically so that the \fIsense_key\fP and template sentence
+ number can be used as indices, via
+-.BR binsrch (3WN), 
++.BR binsrch (3), 
+ into the appropriate file.
+ 
+ When a request for 
+@@ -306,7 +306,7 @@ represents all of the word senses and sy
+ The \fIword\fP, \fIlex_id\fP, and \fIlex_filenum\fP fields together
+ uniquely identify each word sense in WordNet.  These can be encoded in
+ a \fIsense_key\fP as described in
+-.BR senseidx (5WN).
++.BR senseidx (5).
+ Each synset in the database can be uniquely identified by combining
+ the \fIsynset_offset\fP for the synset with a code for the syntactic
+ category (since it is possible for synsets in different
+@@ -316,7 +316,7 @@ The WordNet system provide both command 
+ interfaces to the database.  Both interfaces utilize a common library
+ of search and morphology code.  The source code for the library and
+ interfaces is included in the WordNet package.  See
+-.BR wnintro (3WN)
++.BR wnintro (3)
+ for an overview of the WordNet source code.
+ .SH ENVIRONMENT VARIABLES (UNIX)
+ .TP 20
+@@ -346,17 +346,17 @@ files of sentences illustrating the use 
+ .B \fIpos\fP.exc
+ morphology exception lists
+ .SH SEE ALSO
+-.BR grind (1WN),
+-.BR wn (1WN),
+-.BR wnb (1WN),
+-.BR wnintro (3WN),
+-.BR binsrch (3WN),
+-.BR wnintro (5WN),
+-.BR cntlist (5WN),
+-.BR lexnames (5WN),
+-.BR senseidx (5WN),
+-.BR wninput (5WN),
+-.BR morphy (7WN),
+-.BR wngloss (7WN),
+-.BR wngroups (7WN),
+-.BR wnstats (7WN).
++.BR grind (1),
++.BR wn (1),
++.BR wnb (1),
++.BR wnintro (3),
++.BR binsrch (3),
++.BR wnintro (5),
++.BR cntlist (5),
++.BR lexnames (5),
++.BR senseidx (5),
++.BR wninput (5),
++.BR morphy (7),
++.BR wngloss (7),
++.BR wngroups (7),
++.BR wnstats (7).
+diff -upNr WordNet-3.0.orig/doc/man/wngloss.7 WordNet-3.0/doc/man/wngloss.7
+--- WordNet-3.0.orig/doc/man/wngloss.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wngloss.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNGLOSS 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH WNGLOSS 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ wngloss \- glossary of terms used in WordNet system
+ .SH DESCRIPTION
+@@ -26,12 +26,12 @@ these files into a database, and search 
+ display information from the database.  The lexicographer files
+ organize nouns, verbs, adjectives and adverbs into groups of synonyms,
+ and describe relations between synonym groups.
+-.BR grind (1WN)
++.BR grind (1)
+ converts the lexicographer files into a database that encodes the
+ relations between the synonym groups.  The different interfaces to the
+ WordNet database utilize a common library of search routines to
+ display these relations.  Note that the lexicographer files and 
+-.BR grind (1WN)
++.BR grind (1)
+ program are not generally distributed.  
+ 
+ .SS Database Organization
+@@ -77,7 +77,7 @@ antonyms; therefore the synset for an ad
+ lexical pointer to the adjective from which it is derived.
+ 
+ See
+-.BR wndb (5WN)
++.BR wndb (5)
+ for a detailed description of the database files and how the data are
+ represented. 
+ .SH GLOSSARY OF TERMS
+@@ -107,7 +107,7 @@ inflections are added.
+ .TP 25
+ .B basic synset
+ Syntactically, same as \fBsynset\fP.  Term is used in 
+-.BR wninput (5WN) 
++.BR wninput (5) 
+ to help explain differences in entering synsets in lexicographer
+ files.
+ .TP 25
+@@ -269,7 +269,7 @@ Information necessary to find a sense in
+ sense key combines a \fBlemma\fP field and codes for the synset type,
+ lexicographer id, lexicographer file number, and information about a
+ satellite's \fBhead synset\fP, if required.  See
+-.BR senseidx (5WN)
++.BR senseidx (5)
+ for a description of the format of a sense key.
+ .TP 25
+ .B subordinate
+diff -upNr WordNet-3.0.orig/doc/man/wngroups.7 WordNet-3.0/doc/man/wngroups.7
+--- WordNet-3.0.orig/doc/man/wngroups.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wngroups.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNGROUPS 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH WNGROUPS 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ wngroups \- discussion of WordNet search code to group similar verb senses
+ .SH DESCRIPTION
+@@ -34,10 +34,10 @@ verb sense keys and sentence frame numbe
+ .B sents.vrb
+ example sentence frames
+ .SH SEE ALSO
+-.BR wn (1WN),
+-.BR wnb (1WN),
+-.BR senseidx (5WN),
+-.BR wnsearch (3WN),
+-.BR wndb (5WN),
+-.BR wnintro (7WN).
++.BR wn (1),
++.BR wnb (1),
++.BR senseidx (5),
++.BR wnsearch (3),
++.BR wndb (5),
++.BR wnintro (7).
+ 
+diff -upNr WordNet-3.0.orig/doc/man/wninput.5 WordNet-3.0/doc/man/wninput.5
+--- WordNet-3.0.orig/doc/man/wninput.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wninput.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,11 +1,11 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNINPUT 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH WNINPUT 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+ noun.\fIsuffix\fP, verb.\fIsuffix\fP, adj.\fIsuffix\fP, adv.\fIsuffix\fP \-
+ WordNet lexicographer files that are input to 
+-.BR grind (1WN)
++.BR grind (1)
+ .SH DESCRIPTION
+ WordNet's source files are written by lexicographers.  They are the
+ product of a detailed relational analysis of lexical semantics: a
+@@ -36,7 +36,7 @@ satellite synsets.  Adverbs generally po
+ which they are derived.
+ 
+ See 
+-.BR wngloss (7WN)
++.BR wngloss (7)
+ for a glossary of WordNet terminology and a discussion of the
+ database's content and logical organization.
+ .SS Lexicographer File Names
+@@ -50,7 +50,7 @@ where \fIpos\fP is either \fBnoun\fP, \f
+ \fBadv\fP.  \fIsuffix\fP may be used to organize groups of synsets
+ into different files, for example \fBnoun.animal\fP and
+ \fBnoun.plant\fP.  See
+-.BR lexnames (5WN)
++.BR lexnames (5)
+ for a list of lexicographer file names that are used in building
+ WordNet.
+ .SS Pointers
+@@ -148,7 +148,7 @@ The \fIpointer_symbol\fPs for adverbs ar
+ Many pointer types are reflexive, meaning that if a synset contains a
+ pointer to another synset, the other synset should contain a
+ corresponding reflexive pointer.  
+-.BR grind (1WN)
++.BR grind (1)
+ automatically inserts missing reflexive pointers for the following
+ pointer types:
+ 
+@@ -178,7 +178,7 @@ synset can be used.  For some verb sense
+ illustrating actual uses of the verb are provided.  (See
+ .SB "Verb Example Sentences"
+ in
+-.BR wndb (5WN).)
++.BR wndb (5).)
+ Whenever there is no example sentence, the generic sentence frames
+ specified by the lexicographer are used.  The generic sentence frames
+ are entered in a synset as a comma-separated list of integer frame
+@@ -247,7 +247,6 @@ relations between all the words in the s
+ 
+ For verbs, the basic synset syntax is defined as follows:
+ 
+-.KS
+ .RS
+ .nf
+ \fB{\fP \fI~~words~~pointers~~frames~~\fP \fB(\fP ~\fIgloss~\fP \fB)~~}\fR
+@@ -268,7 +267,6 @@ form:
+ \fB]\fR
+ .fi
+ .RE
+-.KE
+ 
+ Each adjective cluster is enclosed in square brackets, and may have
+ one or more parts.  Each part consists of a head synset and optional
+@@ -279,7 +277,7 @@ bracket following the last synset.  Head
+ the syntax of basic synsets, however a "Similar to" pointer must be
+ specified in a head synset for each of its satellite synsets.  Most
+ adjective clusters contain two antonymous parts.  See
+-.BR wngloss (7WN)
++.BR wngloss (7)
+ for a discussion of adjective clusters, and
+ .SB "Special Adjective Syntax"
+ for more information on adjective cluster syntax.
+@@ -347,7 +345,7 @@ brackets used to enclose it are treated 
+ define an adjective cluster.  Only one word can be specified in each
+ word/pointer set, and any number of pointers may be included.  A
+ synset can have any number of word/pointer sets.  Each is treated by
+-.BR grind (1WN) 
++.BR grind (1) 
+ essentially as a \fIword\fP, so they all must appear
+ before any synset \fIpointers\fP representing semantic relations.
+ 
+@@ -500,12 +498,12 @@ Sample adverb synsets:
+ .fi
+ .RE
+ .SH SEE ALSO
+-.BR grind (1WN),
+-.BR wnintro (5WN),
+-.BR lexnames (5WN),
+-.BR wndb (5WN),
+-.BR uniqbeg (7WN),
+-.BR wngloss (7WN).
++.BR grind (1),
++.BR wnintro (5),
++.BR lexnames (5),
++.BR wndb (5),
++.BR uniqbeg (7),
++.BR wngloss (7).
+ .LP
+ Fellbaum, C. (1998), ed.
+ \fI"WordNet: An Electronic Lexical Database"\fP.
+diff -upNr WordNet-3.0.orig/doc/man/wnintro.1 WordNet-3.0/doc/man/wnintro.1
+--- WordNet-3.0.orig/doc/man/wnintro.1	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnintro.1	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNINTRO 1WN "Dec 2006" "WordNet 3.0" "WordNet\(tm User Commands"
++.TH WNINTRO 1 "Dec 2006" "WordNet 3.0" "WordNet\(tm User Commands"
+ .SH NAME
+ wnintro \- WordNet user commands
+ .SH SYNOPSIS
+@@ -15,9 +15,9 @@ pages that describe commands available w
+ packages.
+ 
+ The WordNet interfaces 
+-.BR wn (1WN)
++.BR wn (1)
+ and
+-.BR wnb (1WN)
++.BR wnb (1)
+ allow the user to search the WordNet database and display the
+ information textually.  
+ .SH ENVIRONMENT VARIABLES (UNIX)
+@@ -35,12 +35,12 @@ Default is \fBWNHOME/dict\fP.
+ Base directory for WordNet.  Default is
+ \fBC:\eProgram~Files\eWordNet\e3.0\fP.
+ .SH SEE ALSO
+-.BR grind (1WN),
+-.BR wn (1WN),
+-.BR wnb (1WN),
+-.BR wnintro (3WN),
+-.BR wnintro (5WN),
+-.BR wnintro (7WN).
++.BR grind (1),
++.BR wn (1),
++.BR wnb (1),
++.BR wnintro (3),
++.BR wnintro (5),
++.BR wnintro (7).
+ .LP
+ Fellbaum, C. (1998), ed.
+ \fI"WordNet: An Electronic Lexical Database"\fP.
+diff -upNr WordNet-3.0.orig/doc/man/wnintro.3 WordNet-3.0/doc/man/wnintro.3
+--- WordNet-3.0.orig/doc/man/wnintro.3	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnintro.3	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNINTRO 3WN "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
++.TH WNINTRO 3 "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
+ .SH NAME
+ wnintro \- introduction to WordNet library functions
+ .SH DESCRIPTION
+@@ -15,16 +15,16 @@ center box ;
+ l | l | l.
+ \fBCategory\fP	\fBManual Page\fP	\fBObject File\fP
+ _
+-Database Search	wnsearch (3WN)	search.o
+-Morphology	morph (3WN)	morph.o
+-Misc. Utility	wnutil (3WN)	wnutil.o
+-Binary Search	binsrch (3WN)	binsrch.o
++Database Search	wnsearch (3)	search.o
++Morphology	morph (3)	morph.o
++Misc. Utility	wnutil (3)	wnutil.o
++Binary Search	binsrch (3)	binsrch.o
+ .TE
+ 
+ The WordNet library is used by all of the searching interfaces
+ provided with the various WordNet packages.  Additional programs in
+ the system, such as
+-.BR grind (1WN),
++.BR grind (1),
+ also use functions in this library.
+ 
+ The WordNet library is provided in both source and binary forms (on
+@@ -212,11 +212,11 @@ use any WordNet library functions.
+ .SH NOTES
+ All library functions that access the database files expect the files
+ to be open.  The function
+-.BR wninit (3WN)
++.BR wninit (3)
+ must be called before other database access functions such as
+-.BR findtheinfo (3WN)
++.BR findtheinfo (3)
+ or
+-.BR read_synset (3WN).  
++.BR read_synset (3).  
+ 
+ Inclusion of the header file \fBwn.h\fP is necessary.
+ 
+@@ -265,13 +265,13 @@ WordNet library (Windows)
+ .B include
+ header files for use with WordNet library
+ .SH SEE ALSO
+-.BR wnintro (1WN),
+-.BR binsrch (3WN),
+-.BR morph (3WN),
+-.BR wnsearch (3WN),
+-.BR wnutil (3WN),
+-.BR wnintro (5WN),
+-.BR wnintro (7WN).
++.BR wnintro (1),
++.BR binsrch (3),
++.BR morph (3),
++.BR wnsearch (3),
++.BR wnutil (3),
++.BR wnintro (5),
++.BR wnintro (7).
+ 
+ Fellbaum, C. (1998), ed.
+ \fI"WordNet: An Electronic Lexical Database"\fP.
+diff -upNr WordNet-3.0.orig/doc/man/wnintro.5 WordNet-3.0/doc/man/wnintro.5
+--- WordNet-3.0.orig/doc/man/wnintro.5	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnintro.5	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNINTRO 5WN "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
++.TH WNINTRO 5 "Dec 2006" "WordNet 3.0" "WordNet\(tm File Formats"
+ .SH NAME
+ wnintro \- introduction to descriptions of WordNet file formats
+ .SH SYNOPSIS
+@@ -36,17 +36,17 @@ field names are consistently defined.  F
+ files contain one or more \fIsynset_offset\fP fields.  In each case,
+ the definition of \fIsynset_offset\fP is identical.
+ .SH SEE ALSO
+-.BR wnintro (1WN),
+-.BR wnintro (3WN),
+-.BR cntlist (5WN),
+-.BR lexnames (5WN),
+-.BR prologdb (5WN),
+-.BR senseidx (5WN),
+-.BR sensemap (5WN),
+-.BR wndb (5WN),
+-.BR wninput (5WN),
+-.BR wnintro (7WN),
+-.BR wngloss (7WN).
++.BR wnintro (1),
++.BR wnintro (3),
++.BR cntlist (5),
++.BR lexnames (5),
++.BR prologdb (5),
++.BR senseidx (5),
++.BR sensemap (5),
++.BR wndb (5),
++.BR wninput (5),
++.BR wnintro (7),
++.BR wngloss (7).
+ .LP
+ Fellbaum, C. (1998), ed.
+ \fI"WordNet: An Electronic Lexical Database"\fP.
+diff -upNr WordNet-3.0.orig/doc/man/wnintro.7 WordNet-3.0/doc/man/wnintro.7
+--- WordNet-3.0.orig/doc/man/wnintro.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnintro.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNINTRO 7WN "Dec 2006" "WordNet 3.0" "Miscellaneous WordNet\(tm Topics"
++.TH WNINTRO 7 "Dec 2006" "WordNet 3.0" "Miscellaneous WordNet\(tm Topics"
+ .SH NAME
+ wnintro \- introduction to miscellaneous WordNet information
+ .SH SYNOPSIS
+@@ -24,16 +24,16 @@ This section of the \fIWordNet Reference
+ that describe various topics related to WordNet and the semantic
+ concordances, and a glossary of terms.
+ .SH SEE ALSO
+-.BR wnintro (1WN),
+-.BR wnintro (3WN),
+-.BR wnintro (5WN),
+-.BR morphy (7WN),
+-.BR uniqbeg (7WN),
+-.BR wngroups (7WN),
+-.BR wnlicens (7WN),
+-.BR wnpkgs (7WN),
+-.BR wnstats (7WN),
+-.BR wngloss (7WN).
++.BR wnintro (1),
++.BR wnintro (3),
++.BR wnintro (5),
++.BR morphy (7),
++.BR uniqbeg (7),
++.BR wngroups (7),
++.BR wnlicens (7),
++.BR wnpkgs (7),
++.BR wnstats (7),
++.BR wngloss (7).
+ .LP
+ Fellbaum, C. (1998), ed.
+ \fI"WordNet: An Electronic Lexical Database"\fP.
+diff -upNr WordNet-3.0.orig/doc/man/wnlicens.7 WordNet-3.0/doc/man/wnlicens.7
+--- WordNet-3.0.orig/doc/man/wnlicens.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnlicens.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,6 +1,6 @@
+ '\" t
+ .\" $Id$
+-.TH WNLICENS 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH WNLICENS 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ wnlicens \- text of WordNet license
+ .SH DESCRIPTION
+diff -upNr WordNet-3.0.orig/doc/man/wnpkgs.7 WordNet-3.0/doc/man/wnpkgs.7
+--- WordNet-3.0.orig/doc/man/wnpkgs.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnpkgs.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,7 +1,7 @@
+ '\" t
+ .\" $Id$
+ .tr ~
+-.TH WNPKGS 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH WNPKGS 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ wnpkgs \- description of various WordNet system packages
+ .SH DESCRIPTION
+@@ -65,13 +65,13 @@ files.  As with the Prolog database, thi
+ in compressed tar format, but the files are also in ASCII.
+ .SH NOTES
+ The lexicographer files and
+-.BR grind (1WN)
++.BR grind (1)
+ program are not generally distributed.
+ 
+ All of the packages described above may not be available at the time
+ of release of the 3.0 database package.
+ .SH SEE ALSO
+-.BR wnintro (1WN),
+-.BR wnintro (3WN),
+-.BR wnintro (5WN),
+-.BR wnintro (7WN).
++.BR wnintro (1),
++.BR wnintro (3),
++.BR wnintro (5),
++.BR wnintro (7).
+diff -upNr WordNet-3.0.orig/doc/man/wnsearch.3 WordNet-3.0/doc/man/wnsearch.3
+--- WordNet-3.0.orig/doc/man/wnsearch.3	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnsearch.3	2009-01-18 03:31:02.000000000 +0100
+@@ -1,8 +1,8 @@
+ '\" t
+ .\" $Id$
+-.TH WNSEARCH 3WN  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
++.TH WNSEARCH 3  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
+ .SH NAME
+-findtheinfo, findtheinfo_ds, is_defined, in_wn, index_lookup, parse_index, getindex, read_synset, parse_synset, free_syns, free_synset, free_index, traceptrs_ds, do_trace
++findtheinfo, findtheinfo_ds, is_defined, in_wn, index_lookup, parse_index, getindex, read_synset, parse_synset, free_syns, free_synset, free_index, traceptrs_ds, do_trace \- functions for searching the WordNet database
+ .SH SYNOPSIS
+ .LP
+ \fB#include "wn.h"
+@@ -224,7 +224,7 @@ through the \fInextform\fP pointer of th
+ There is no extensive description of what each search type is or the
+ results returned.  Using the WordNet interface, examining the source
+ code, and reading
+-.BR wndb (5WN) 
++.BR wndb (5) 
+ are the best ways to see what types of searches are available and the
+ data returned for each.
+ 
+@@ -277,9 +277,9 @@ OVERVIEW	31	\fIn/a\fP	Show all synsets f
+ CLASSIF_CATEGORY	32	;c	Show domain topic
+ CLASSIF_USAGE	33	;u	Show domain usage
+ CLASSIF_REGIONAL	34	;r	Show domain region
+-CLASS_CATEGORY	35	-c	Show domain terms for topic
+-CLASS_USAGE	36	-u	Show domain terms for usage
+-CLASS_REGIONAL	37	-r	Show domain terms for region
++CLASS_CATEGORY	35	\-c	Show domain terms for topic
++CLASS_USAGE	36	\-u	Show domain terms for usage
++CLASS_REGIONAL	37	\-r	Show domain terms for region
+ INSTANCE	38	@i	Instance of
+ INSTANCES	39	\(api	Show instances
+ .TE
+@@ -301,7 +301,7 @@ OVERVIEW
+ .SH NOTES
+ Applications that use WordNet and/or the morphological functions
+ must call \fBwninit(\|)\fP at the start of the program.  See
+-.BR wnutil (3WN)
++.BR wnutil (3)
+ for more information.
+ 
+ In all function calls, \fIsearchstr\fP may be either a word or a
+@@ -317,14 +317,14 @@ The \fIsearchds\fP field is set by \fBfi
+ The \fIpos\fP passed to \fBtraceptrs_ds(\|)\fP is not used.
+ 
+ .SH SEE ALSO
+-.BR wn (1WN),
+-.BR wnb (1WN),
+-.BR wnintro (3WN),
+-.BR binsrch (3WN),
++.BR wn (1),
++.BR wnb (1),
++.BR wnintro (3),
++.BR binsrch (3),
+ .BR malloc (3),
+-.BR morph (3WN),
+-.BR wnutil (3WN),
+-.BR wnintro (5WN).
++.BR morph (3),
++.BR wnutil (3),
++.BR wnintro (5).
+ .SH WARNINGS
+ \fBparse_synset(\|)\fP must find an exact match between the
+ \fIsearchstr\fP passed and a word in the synset to set
+diff -upNr WordNet-3.0.orig/doc/man/wnstats.7 WordNet-3.0/doc/man/wnstats.7
+--- WordNet-3.0.orig/doc/man/wnstats.7	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnstats.7	2009-01-18 03:31:02.000000000 +0100
+@@ -1,6 +1,6 @@
+ '\" t
+ .\" $Id$
+-.TH WNSTATS 7WN "Dec 2006" "WordNet 3.0" "WordNet\(tm"
++.TH WNSTATS 7 "Dec 2006" "WordNet 3.0" "WordNet\(tm"
+ .SH NAME
+ wnstats \- WordNet 3.0 database statistics
+ .SH DESCRIPTION
+diff -upNr WordNet-3.0.orig/doc/man/wnutil.3 WordNet-3.0/doc/man/wnutil.3
+--- WordNet-3.0.orig/doc/man/wnutil.3	2009-01-18 03:29:55.000000000 +0100
++++ WordNet-3.0/doc/man/wnutil.3	2009-01-18 03:31:02.000000000 +0100
+@@ -1,11 +1,11 @@
+ '\" t
+ .\" $Id$
+-.TH WNUTIL 3WN  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
++.TH WNUTIL 3  "Dec 2006" "WordNet 3.0" "WordNet\(tm Library Functions"
+ .SH NAME
+ wninit, re_wninit, cntwords, strtolower, ToLowerCase, strsubst,
+ getptrtype, getpos, getsstype, StrToPos, GetSynsetForSense,
+ GetDataOffset, GetPolyCount, WNSnsToStr,
+-GetValidIndexPointer, GetWNSense, GetSenseIndex, default_display_message
++GetValidIndexPointer, GetWNSense, GetSenseIndex, default_display_message \- utility functions used by the interface code
+ .SH SYNOPSIS
+ .LP
+ \fB#include "wn.h"\fP
+@@ -28,7 +28,7 @@ GetValidIndexPointer, GetWNSense, GetSen
+ .LP
+ \fBint getsstype(char *ss_type);\fP
+ .LP
+-\fBint StrToPos(char \**pos);\fP
++\fBint StrToPos(char **pos);\fP
+ .LP
+ \fBSynsetPtr GetSynsetForSense(char *sense_key);\fP
+ .LP
+@@ -95,7 +95,7 @@ returns resulting string.
+ .B getptrtype(\|)
+ returns the integer \fIptr_type\fP corresponding to the pointer
+ character passed in \fIptr_symbol\fP.  See
+-.BR wnsearch (3WN)
++.BR wnsearch (3)
+ for a table of pointer symbols and types.
+ 
+ .B getpos(\|)
+@@ -136,7 +136,7 @@ returns sense key encoding for \fIsense_
+ 
+ .B GetValidIndexPointer(\|)
+ returns the Index structure for \fIword\fP in \fIpos\fP.  Calls
+-.BR morphstr (3WN)
++.BR morphstr (3)
+ to find a valid base form if \fIword\fP is inflected.
+ 
+ .B GetWNSense(\|)
+@@ -165,11 +165,11 @@ description of what each search type is 
+ Using the WordNet interface is the best way to see what types of
+ searches are available, and the data returned for each.
+ .SH SEE ALSO
+-.BR wnintro (3WN),
+-.BR wnsearch (3WN),
+-.BR morph (3WN),
+-.BR wnintro (5WN),
+-.BR wnintro (7WN).
++.BR wnintro (3),
++.BR wnsearch (3),
++.BR morph (3),
++.BR wnintro (5),
++.BR wnintro (7).
+ 
+ .SH WARNINGS
+ Error checking on passed arguments is not rigorous.  Passing 

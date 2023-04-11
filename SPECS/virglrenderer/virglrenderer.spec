@@ -1,12 +1,14 @@
 Summary:        Virgl Rendering library.
 Name:           virglrenderer
 Version:        0.9.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.freedesktop.org/virgl/virglrenderer
-Source0:        %{url}/-/archive/%{name}-%{version}/%{name}-%{name}-%{version}.tar.gz
+Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-0135.patch
+Patch1:         CVE-2022-0175.patch
 
 BuildRequires:  libdrm-devel
 BuildRequires:  libepoxy-devel
@@ -38,7 +40,7 @@ that can be used along with the mesa virgl
 driver to test virgl rendering without GL.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}
+%autosetup -p1
 
 %build
 %meson
@@ -64,6 +66,13 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 0.9.1-3
+- Apply CVE-2022-0175 patch from upstream.
+
+* Thu Sep 01 2022 Henry Beberman <henry.beberman@microsoft.com> - 0.9.1-2
+- Apply CVE-2022-0135 patch from upstream.
+- Update "Source0" URL.
+
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.1-1
 - Updating to version 0.9.1.
 - License verified.

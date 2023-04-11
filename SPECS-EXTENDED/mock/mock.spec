@@ -1,4 +1,3 @@
-%bcond_without tests
 # mock group id allocate (Must not overlap with any other gid in Mariner)
 %global mockgid 135
 %global __python %{__python3}
@@ -7,7 +6,7 @@
 Summary:        Builds packages inside chroots
 Name:           mock
 Version:        2.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
@@ -39,12 +38,11 @@ Requires:       usermode
 # hwinfo plugin
 Requires:       util-linux
 BuildArch:      noarch
-%if %{with tests}
+%if %{with_check}
 BuildRequires:  python3-distro
 BuildRequires:  python3-jinja2
+BuildRequires:  python3-pip
 BuildRequires:  python3-pyroute2
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-cov
 BuildRequires:  python3-requests
 BuildRequires:  python3-templated-dictionary
 %endif
@@ -134,9 +132,8 @@ getent group mock > /dev/null || groupadd -f -g %mockgid -r mock
 exit 0
 
 %check
-%if %{with tests}
+%{__python3} -m pip install pytest==7.1.2 pytest-cov==3.0.0
 ./run-tests.sh
-%endif
 
 
 %files
@@ -192,6 +189,9 @@ exit 0
 %dir  %{_datadir}/cheat
 
 %changelog
+* Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 2.16-2
+- Add BR on `python3-pip` & drop un-needed deps to enable ptest
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.16-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update to 2.16 source

@@ -56,13 +56,14 @@ COPY [ "./toolchain-sha256sums", \
 # the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
+# Disable downloading from remote sources by default. The 'toolchain-local-wget-list' generated for the above line will download from $(SOURCE_URL)
+# The 'toolchain-remote-wget-list' is still available and can be used as an alternate to $(SOURCE_URL) if desired.
+#RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz -O kernel-5.15.48.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
-    echo "lfs:lfscblmariner" | chpasswd && \
     usermod -a -G sudo lfs && \
     chown -v lfs $LFS/tools && \
     chown -v lfs $LFS/sources && \

@@ -1,0 +1,27 @@
+From b2f38ad669e99a650850a36576a4d54c57bf9ac0 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 11 Apr 2022 09:27:22 +0200
+Subject: [PATCH] Resolves: #128105 - use "Linux" xterm terminal driver instead
+ of "VT100"
+
+elinks-0.10.1-xterm.patch rebased on 0.15.0
+---
+ src/config/options.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/config/options.c b/src/config/options.c
+index a43fbe0..a363b36 100644
+--- a/src/config/options.c
++++ b/src/config/options.c
+@@ -770,7 +770,7 @@ register_autocreated_options(void)
+ 	get_opt_bool("terminal.linux.m11_hack", NULL) = 1;
+ 	get_opt_int("terminal.vt100.type", NULL) = TERM_VT100;
+ 	get_opt_int("terminal.vt110.type", NULL) = TERM_VT100;
+-	get_opt_int("terminal.xterm.type", NULL) = TERM_VT100;
++	get_opt_int("terminal.xterm.type", NULL) = TERM_LINUX;
+ 	get_opt_bool("terminal.xterm.underline", NULL) = 1;
+ 	get_opt_int("terminal.xterm-color.type", NULL) = TERM_VT100;
+ 	get_opt_int("terminal.xterm-color.colors", NULL) = COLOR_MODE_16;
+-- 
+2.34.1
+

@@ -1,14 +1,13 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        BSD
-URL:            http://infozip.sourceforge.net/UnZip.html
-Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz
-Group:          System Environment/Utilities
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
+Group:          System Environment/Utilities
+URL:            https://infozip.sourceforge.net/UnZip.html
+Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz
 Patch0:         CVE-2014-9636.patch
 Patch1:         CVE-2015-1315.patch
 Patch2:         CVE-2015-7696.patch
@@ -23,10 +22,7 @@ Patch10:        unzip-zipbomb-part2.patch
 Patch11:        unzip-zipbomb-part3.patch
 Patch12:        unzip-zipbomb-manpage.patch
 Patch13:        CVE-2015-7697.patch
-# Fixes CVE-2018-1000035
 Patch14:        CVE-2018-1000035.patch
-# Upstream has fixed CVE-2008-0888 in 6.0
-Patch15:        CVE-2008-0888.nopatch
 
 %description
 The UnZip package contains ZIP extraction utilities. These are useful
@@ -37,23 +33,15 @@ with PKZIP or Info-ZIP utilities, primarily in a DOS environment.
 %autosetup -p1 -n unzip60
 
 %build
-case `uname -m` in
-  i?86)
-    sed -i -e 's/DASM_CRC"/DASM_CRC -DNO_LCHMOD"/' unix/Makefile
-    make -f unix/Makefile linux %{?_smp_mflags}
-    ;;
-  *)
-    sed -i -e 's/CFLAGS="-O -Wall/& -DNO_LCHMOD/' unix/Makefile
-    sed -i 's/CFLAGS="-O -Wall/CFLAGS="-O -g -Wall/' unix/Makefile
-    sed -i 's/LF2 = -s/LF2 =/' unix/Makefile
-    sed -i 's|STRIP = strip|STRIP = /bin/true|' unix/Makefile
-    make -f unix/Makefile linux_noasm %{?_smp_mflags}
-    ;;
-esac
+sed -i -e 's/CFLAGS="-O -Wall/& -DNO_LCHMOD -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT/' unix/Makefile
+sed -i 's/CFLAGS="-O -Wall/CFLAGS="-O -g -Wall/' unix/Makefile
+sed -i 's/LF2 = -s/LF2 =/' unix/Makefile
+sed -i 's|STRIP = strip|STRIP = /bin/true|' unix/Makefile
+%make_build -f unix/Makefile linux_noasm 
 
 %install
 install -v -m755 -d %{buildroot}%{_bindir}
-make DESTDIR=%{buildroot} prefix=%{_prefix} install
+%make_install prefix=%{_prefix}
 cp %{_builddir}/unzip60/funzip %{buildroot}%{_bindir}
 cp %{_builddir}/unzip60/unzip %{buildroot}%{_bindir}
 cp %{_builddir}/unzip60/unzipsfx %{buildroot}%{_bindir}
@@ -61,7 +49,7 @@ cp %{_builddir}/unzip60/unix/zipgrep %{buildroot}%{_bindir}
 ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 
 %check
-make %{?_smp_mflags}  check
+%make_build  check
 
 %files
 %defattr(-,root,root)
@@ -69,6 +57,13 @@ make %{?_smp_mflags}  check
 %{_bindir}/*
 
 %changelog
+* Thu Oct 06 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0-20
+- Compile with large file support, zip64 support
+- Remove i*86 configuration- Mariner doesn't build for those architectures
+- Lint spec
+- Remove nopatch files from spec
+- License verified
+
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 6.0-19
 - Remove contents of nopatch files
 

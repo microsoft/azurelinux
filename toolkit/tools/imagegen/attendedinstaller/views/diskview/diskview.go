@@ -43,7 +43,7 @@ func (dv *DiskView) Initialize(backButtonText string, sysConfig *configuration.S
 		return
 	}
 
-	bootType := diskutils.SystemBootType()
+	bootType := configuration.SystemBootType()
 	logger.Log.Infof("Boot type detected: %s", bootType)
 	dv.autoPartitionWidget = autopartitionwidget.New(dv.systemDevices, bootType)
 	err = dv.autoPartitionWidget.Initialize(backButtonText, sysConfig, cfg, app, dv.switchMode, nextPage, previousPage, quit, refreshTitle)

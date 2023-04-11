@@ -9,6 +9,7 @@ $(call create_folder,$(RPMS_DIR))
 $(call create_folder,$(CACHED_RPMS_DIR))
 $(call create_folder,$(PKGBUILD_DIR))
 $(call create_folder,$(CHROOT_DIR))
+$(call create_folder,$(CCACHE_DIR))
 
 ######## PACKAGE DEPENDENCY CALCULATIONS ########
 
@@ -17,14 +18,15 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-build_specs     = $(shell find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
-pkggen_rpms     = $(shell find $(RPMS_DIR)/*  2>/dev/null )
+pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
 # Pkggen workspace
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
+parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_files        = $(shell find $(CACHED_RPMS_DIR)/)
+rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
@@ -39,11 +41,11 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
-clean: clean-workplan clean-cache
-clean-workplan:
+clean: clean-workplan clean-cache clean-spec-parse
+clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-cache:
@@ -52,6 +54,12 @@ clean-cache:
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
 	rm -rf $(cache_working_dir)
+clean-spec-parse:
+	@echo Verifying no mountpoints present in $(parse_working_dir)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
+	rm -rf $(parse_working_dir)
+clean-ccache:
+	rm -rf $(CCACHE_DIR)
 
 # Optionally generate a summary of any blocked packages after a build.
 analyze-built-graph: $(go-graphanalytics)
@@ -69,22 +77,22 @@ analyze-built-graph: $(go-graphanalytics)
 $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
 	$(go-specreader) \
 		--dir $(BUILD_SPECS_DIR) \
-		--build-dir $(BUILD_DIR)/spec_parsing \
+		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
 		--timestamp-file=$(TIMESTAMP_DIR)/specreader.json \
-		--output $@
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+	  --output $@
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
-ifeq ($(REBUILD_TOOLCHAIN),y)
-$(graph_file): $(toolchain_rpms)
-endif
-$(graph_file): $(specs_file) $(go-grapher)
+$(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms)
 	$(go-grapher) \
 		--input $(specs_file) \
 		$(logging_command) \
@@ -118,12 +126,13 @@ ifeq ($(STOP_ON_FETCH_FAIL),y)
 graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
 		--rpm-dir=$(RPMS_DIR) \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
@@ -171,10 +180,6 @@ clean-compress-srpms:
 	rm -rf $(srpms_archive)
 
 ifeq ($(REBUILD_PACKAGES),y)
-# If we are responsible for building a toolchain, make sure those RPMs are also present in the output directory
-ifeq ($(REBUILD_TOOLCHAIN),y)
-$(RPMS_DIR): $(toolchain_rpms)
-endif
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@touch $@
 	@echo Finished updating $@
@@ -183,7 +188,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -193,45 +198,50 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--worker-tar="$(chroot_worker)" \
 		--repo-file="$(pkggen_local_repo)" \
 		--rpm-dir="$(RPMS_DIR)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(CACHED_RPMS_DIR)/cache" \
+		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
 		--distro-build-number="$(BUILD_NUMBER)" \
 		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
+		--check-attempts="$(CHECK_BUILD_RETRIES)" \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		--reserved-file-list-file="$(TOOLCHAIN_MANIFEST)" \
 		--timestamp-file=$(TIMESTAMP_DIR)/scheduler.json \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
+		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
+		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		$(logging_command) && \
 	touch $@
 
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-rpms:
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
+	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-srpms:
-	tar -I $(ARCHIVE_TOOL) -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
+	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=))
-	@echo Updating missing RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
-	tar -I $(ARCHIVE_TOOL) -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
+	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

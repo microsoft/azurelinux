@@ -1,7 +1,7 @@
 Summary:        Converts markdown into roff (man pages)
 Name:           go-md2man
 Version:        2.0.1
-Release:        9%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,27 @@ cp go-md2man-%{version}/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LIC
 %{_bindir}/go-md2man
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-16
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-15
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-14
+- Bump release to rebuild with go 1.19.6
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-13
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-12
+- Bump release to rebuild with go 1.19.4
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.0.1-11
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.1-10
+- Bump release to rebuild with go 1.18.8
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.1-9
 - Bump release to rebuild against Go 1.18.5
 

@@ -1,0 +1,12 @@
+diff --git a/src/wn.c b/src/wn.c
+index ddb27aa..b160392 100644
+--- a/src/wn.c
++++ b/src/wn.c
+@@ -344,7 +344,7 @@ static int getoptidx(char *searchtype)
+
+ static int error_message(char *msg)
+ {
+-    fprintf(stderr, msg);
++    fprintf(stderr, "%s", msg);
+     return(0);
+ }

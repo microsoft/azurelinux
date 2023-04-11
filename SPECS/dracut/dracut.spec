@@ -1,11 +1,10 @@
-# Copied this spec file from inside of dracut-041.tar.xz and edited later.
-
 %define dracutlibdir %{_libdir}/dracut
 %define _unitdir %{_libdir}/systemd/system
+
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        2%{?dist}
+Release:        4%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -13,9 +12,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://dracut.wiki.kernel.org/
-Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-%{version}.tar.xz
+Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/%{name}-%{version}.tar.xz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source2:        mkinitrd
+Source3:        megaraid.conf
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
 BuildRequires:  asciidoc
@@ -53,6 +53,13 @@ Requires:       nss
 This package requires everything which is needed to build an
 initramfs with dracut, which does an integrity check.
 
+%package megaraid
+Summary:        dracut configuration needed to build an initramfs with MegaRAID driver support
+Requires:       %{name} = %{version}-%{release}
+
+%description megaraid
+This package contains dracut configuration needed to build an initramfs with MegaRAID driver support.
+
 %package tools
 Summary:        dracut tools to build the local initramfs
 Requires:       %{name} = %{version}-%{release}
@@ -65,13 +72,16 @@ This package contains tools to assemble the local initrd and host configuration.
 cp %{SOURCE1} .
 
 %build
-%configure --systemdsystemunitdir=%{_unitdir} --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
-           --libdir=%{_libdir}   --disable-documentation
+%configure \
+    --systemdsystemunitdir=%{_unitdir} \
+    --bashcompletiondir=$(pkg-config --variable=completionsdir bash-completion) \
+    --libdir=%{_libdir} \
+    --disable-documentation
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make %{?_smp_mflags} install \
+%make_install \
      DESTDIR=%{buildroot} \
      libdir=%{_libdir}
 
@@ -92,9 +102,7 @@ rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/98integrity
 mkdir -p %{buildroot}/boot/dracut
 mkdir -p %{buildroot}%{_sharedstatedir}/dracut/overlay
 mkdir -p %{buildroot}%{_localstatedir}/log
-mkdir -p %{buildroot}%{_localstatedir}/opt/dracut/log
-touch %{buildroot}%{_localstatedir}/opt/dracut/log/dracut.log
-ln -sfv %{_localstatedir}/opt/dracut/log/dracut.log %{buildroot}%{_localstatedir}/log/
+touch %{buildroot}%{_localstatedir}/log/dracut.log
 mkdir -p %{buildroot}%{_sharedstatedir}/initramfs
 
 rm -f %{buildroot}%{_mandir}/man?/*suse*
@@ -104,12 +112,14 @@ install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracu
 
 install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
 
+install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
+
 # create compat symlink
 mkdir -p %{buildroot}%{_sbindir}
 ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 
 %check
-make %{?_smp_mflags} -k clean  check
+%make_build -k clean check
 
 %files
 %defattr(-,root,root,0755)
@@ -139,9 +149,7 @@ make %{?_smp_mflags} -k clean  check
 %config(noreplace) %{_sysconfdir}/dracut.conf
 %dir %{_sysconfdir}/dracut.conf.d
 %dir %{dracutlibdir}/dracut.conf.d
-%dir %{_localstatedir}/opt/dracut/log
-%attr(0644,root,root) %ghost %config(missingok,noreplace) %{_localstatedir}/opt/dracut/log/dracut.log
-%{_localstatedir}/log/dracut.log
+%attr(0644,root,root) %ghost %config(missingok,noreplace) %{_localstatedir}/log/dracut.log
 %dir %{_sharedstatedir}/initramfs
 %{_unitdir}/dracut-shutdown.service
 %{_unitdir}/sysinit.target.wants/dracut-shutdown.service
@@ -166,6 +174,10 @@ make %{?_smp_mflags} -k clean  check
 %{_sysconfdir}/dracut.conf.d/40-fips.conf
 %config(missingok) %{_sysconfdir}/system-fips
 
+%files megaraid
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
+
 %files tools
 %defattr(-,root,root,0755)
 
@@ -175,6 +187,12 @@ make %{?_smp_mflags} -k clean  check
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Fri Mar 31 2023 Vince Perri <viperri@microsoft.com> - 055-4
+- Add dracut-megaraid package.
+
+* Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 055-3
+- Fixing default log location.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 055-2
 - Removing the explicit %%clean stage.
 

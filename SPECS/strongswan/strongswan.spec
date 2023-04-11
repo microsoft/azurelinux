@@ -1,6 +1,6 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
-Version:        5.9.5
+Version:        5.9.8
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -20,6 +20,9 @@ strongSwan is a complete IPsec implementation for Linux 2.6, 3.x, and 4.x kernel
 %autosetup -p1
 
 %build
+# Disabling "format-security" warning, not compatible with strongswan custom printf specifiers
+export CCFLAGS="%{optflags}"
+export CFLAGS="$CFLAGS -Wno-format-security"
 %configure
 sed -i '/stdlib.h/a #include <stdint.h>' src/libstrongswan/utils/utils.h &&
 make %{?_smp_mflags}
@@ -48,6 +51,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+* Thu Dec 08 2022 Henry Beberman <henry.beberman@microsoft.com> - 5.9.8-1
+- Updated to version 5.9.8 to fix CVE-2022-40617
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 5.9.5-1
 - Updated to version 5.9.5 to fix CVE-2021-45079.
 

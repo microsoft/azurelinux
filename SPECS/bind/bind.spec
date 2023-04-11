@@ -9,7 +9,7 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.29
+Version:        9.16.33
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
@@ -431,12 +431,16 @@ fi;
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
+%config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
+%{_sysconfdir}/rwtab.d/named
+%{_tmpfilesdir}/named.conf
 %{_sbindir}/named-journalprint
 %{_sbindir}/named-checkconf
 %{_bindir}/named-rrchecker
 %{_bindir}/mdig
 %{_sbindir}/named
+
 %{_sbindir}/rndc*
 %{_libexecdir}/generate-rndc-key.sh
 %{_mandir}/man1/mdig.1*
@@ -469,8 +473,9 @@ fi;
 %ghost %config(noreplace) %{_sysconfdir}/rndc.conf
 # ^- The default rndc.conf which uses rndc.key is in named's default internal config -
 # so rndc.conf is not necessary.
-%defattr(-,named,named,-)
 %dir /run/named
+%config(noreplace) %verify(not link) %{_sysconfdir}/named.conf
+%config(noreplace) %verify(not link) %{_sysconfdir}/named.rfc1912.zones
 
 %files dlz-filesystem
 %{_libdir}/{named,bind}/dlz_filesystem_dynamic.so
@@ -606,10 +611,15 @@ fi;
 %{_mandir}/man8/named-checkzone.8*
 %{_mandir}/man8/named-compilezone.8*
 %{_mandir}/man8/named-nzd2nzf.8*
-%{_sysconfdir}/*
-%{_tmpfilesdir}/named.conf
 
 %changelog
+* Mon Nov 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.33-1
+- Auto-upgrade to 9.16.33 - CVE-2022-2795,CVE-2022-3080
+
+* Mon Sep 12 2022 Olivia Crain <oliviacrain@microsoft.com - 9.16.29-2
+- Move named tmpfiles configuration to base package from utils subpackage
+- Move files under %%{_sysconfdir} in utils subpackage to base package 
+
 * Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.29-1
 - Updating to 9.16.29 to fix CVE-2021-25219.
 

@@ -1,5 +1,5 @@
 {
-    "Signatures": {
-        "gnupg-2.3.7.tar.bz2": "ee163a5fb9ec99ffc1b18e65faef8d086800c5713d15a672ab57d3799da83669"
-    }
+  "Signatures": {
+    "gnupg-2.4.0.tar.bz2": "1d79158dd01d992431dd2e3facb89fdac97127f89784ea2cb610c600fb0c1483"
+  }
 }

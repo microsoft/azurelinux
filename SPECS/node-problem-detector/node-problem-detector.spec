@@ -1,23 +1,21 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.10
-Release:        4%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://github.com/kubernetes/node-problem-detector
 Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         001-remove_arm64_build.patch
-Patch1:         002-remove_windows_build.patch
-Patch2:         003-add_mariner_OSVersion.patch
+Patch0:         001-remove_arch_specific_makefile_logic.patch
+Patch1:         002-add_mariner_OSVersion.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
+Requires:       mariner-release
 %if %{with_check}
 BuildRequires:  mariner-release
 %endif
-Requires:       mariner-release
-ExclusiveArch:  x86_64
 
 %description
 node-problem-detector aims to make various node problems visible to the
@@ -40,9 +38,9 @@ Default configuration files for node-problem-detector
 %install
 mkdir -p %{buildroot}%{_bindir}/
 install -vdm 755 %{buildroot}/%{_bindir}
-install -pm 755 output/linux_amd64/bin/node-problem-detector %{buildroot}%{_bindir}/
-install -pm 755 output/linux_amd64/bin/health-checker %{buildroot}%{_bindir}/
-install -pm 755 output/linux_amd64/bin/log-counter %{buildroot}%{_bindir}/
+install -pm 755 output/linux/bin/node-problem-detector %{buildroot}%{_bindir}/
+install -pm 755 output/linux/bin/health-checker %{buildroot}%{_bindir}/
+install -pm 755 output/linux/bin/log-counter %{buildroot}%{_bindir}/
 
 install -vdm 755 %{buildroot}%{_sysconfdir}/node-problem-detector.d
 cp -R config %{buildroot}%{_sysconfdir}/node-problem-detector.d
@@ -66,6 +64,30 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.10-12
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.10-11
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.10-10
+- Bump release to rebuild with go 1.19.6
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.10-9
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.10-8
+- Bump release to rebuild with go 1.19.4
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 0.8.10-7
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.10-6
+- Bump release to rebuild with go 1.18.8
+
+* Mon Aug 29 2022 Sean Dougherty <sdougherty@microsoft.com> - 0.8.10-5
+- Removed arch-specific logic in Makefile with 001-remove_arch_specific_makefile_logic.patch.
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.10-4
 - Bump release to rebuild against Go 1.18.5
 

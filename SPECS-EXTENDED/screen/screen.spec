@@ -5,8 +5,8 @@ Distribution:   Mariner
 
 Summary:        A screen manager that supports multiple logins on one terminal
 Name:           screen
-Version:        4.8.0
-Release:        4%{?dist}
+Version:        4.9.0
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/screen
 Requires(pre):  /usr/sbin/groupadd
@@ -23,7 +23,7 @@ Patch2:         screen-4.3.1-screenrc.patch
 Patch3:         screen-E3.patch
 Patch4:         screen-4.3.1-suppress_remap.patch
 Patch5:         screen-4.3.1-crypt.patch
-Patch6:         screen-4.8.0-expand-d_xtermosc.patch
+Patch6:         screen-4.9.0-braille.patch
 
 %description
 The screen utility allows you to have multiple logins on just one
@@ -117,6 +117,9 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %endif
 
 %changelog
+* Wed Nov 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.0-1
+- Auto-upgrade to 4.9.0 - CVE-2021-26937
+
 * Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.0-4
 - Using "autoreconf -i" to fix build issues.
 - License verified.

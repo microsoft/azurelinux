@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Jan Alexander Steffens (heftig)" <heftig@archlinux.org>
+Date: Tue, 26 Apr 2022 23:06:51 +0000
+Subject: [PATCH] video-sink: Remove RGBx/BGRx support
+
+The rgb24 renderer uses the wrong pixel stride and the rgb32 renderer
+assumes alpha is meaningful. We can use neither.
+
+Fixes: https://gitlab.gnome.org/GNOME/cheese/-/issues/51
+---
+ clutter-gst/clutter-gst-video-sink.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/clutter-gst/clutter-gst-video-sink.c b/clutter-gst/clutter-gst-video-sink.c
+index 2cbabe6043ca..2c1c10c7810b 100644
+--- a/clutter-gst/clutter-gst-video-sink.c
++++ b/clutter-gst/clutter-gst-video-sink.c
+@@ -98,8 +98,6 @@ GST_DEBUG_CATEGORY_STATIC (clutter_gst_video_sink_debug);
+   "I420,"                                       \
+   "RGBA,"                                       \
+   "BGRA,"                                       \
+-  "RGBx,"                                       \
+-  "BGRx,"                                       \
+   "RGB,"                                        \
+   "BGR,"                                        \
+   "NV12 }"
+@@ -1392,21 +1390,21 @@ static ClutterGstRenderer rgb32_glsl_renderer =
+                      ";"
+ #endif
+                      MAKE_CAPS (GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY,
+-                                "{ RGBA, BGRA, RGBx, BGRx }")),
++                                "{ RGBA, BGRA }")),
+     1, /* n_layers */
+     clutter_gst_rgb32_glsl_setup_pipeline,
+     clutter_gst_rgb32_upload,
+     clutter_gst_rgb32_upload_gl,
+     clutter_gst_dummy_shutdown,
+   };
+ 
+ static ClutterGstRenderer rgb32_renderer =
+   {
+     "RGB 32",
+     CLUTTER_GST_RGB32,
+     0,
+     GST_STATIC_CAPS (MAKE_CAPS (GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY,
+-                                "{ RGBA, BGRA, RGBx, BGRx }")),
++                                "{ RGBA, BGRA }")),
+     2, /* n_layers */
+     clutter_gst_rgb32_setup_pipeline,
+     clutter_gst_rgb32_upload,
+@@ -1907,12 +1905,10 @@ clutter_gst_video_sink_parse_caps (GstCaps *caps,
+       format = CLUTTER_GST_NV12;
+       break;
+     case GST_VIDEO_FORMAT_RGB:
+-    case GST_VIDEO_FORMAT_RGBx:
+       format = CLUTTER_GST_RGB24;
+       bgr = FALSE;
+       break;
+     case GST_VIDEO_FORMAT_BGR:
+-    case GST_VIDEO_FORMAT_BGRx:
+       format = CLUTTER_GST_RGB24;
+       bgr = TRUE;
+       break;

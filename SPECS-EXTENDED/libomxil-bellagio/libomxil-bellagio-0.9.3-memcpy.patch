@@ -1,0 +1,12 @@
+diff -up libomxil-bellagio-0.9.3/src/base/omx_base_component.c.orig libomxil-bellagio-0.9.3/src/base/omx_base_component.c
+--- libomxil-bellagio-0.9.3/src/base/omx_base_component.c.orig	2018-07-20 12:32:03.918664474 +0200
++++ libomxil-bellagio-0.9.3/src/base/omx_base_component.c	2018-07-20 15:11:37.940614285 +0200
+@@ -827,7 +827,7 @@ OSCL_EXPORT_REF OMX_ERRORTYPE omx_base_c
+   uuid[0] = (OMX_U32)omx_component;
+   uuid[1] = getpid();
+   uuid[2] = getuid();
+-  memcpy(*pComponentUUID, uuid, 3*sizeof(uuid));
++  memcpy(*pComponentUUID, uuid, sizeof(uuid));
+ 
+   DEBUG(DEB_LEV_FUNCTION_NAME, "Out of %s for component %p\n", __func__, hComponent);
+   return OMX_ErrorNone;

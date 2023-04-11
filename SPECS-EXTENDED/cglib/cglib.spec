@@ -22,7 +22,7 @@ Distribution:   Mariner
 %global tarball_name RELEASE_3_2_4
 Name:           cglib
 Version:        3.2.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Code Generation Library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -36,7 +36,7 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  objectweb-asm >= 5
 Provides:       %{name}-nohook = %{version}-%{release}
 Obsoletes:      %{name}-nohook < %{version}-%{release}
-Requires:       mvn(org.ow2.asm:asm)
+Requires:       objectweb-asm >= 5
 BuildArch:      noarch
 %if %{with tests}
 BuildConflicts: java-devel >= 9
@@ -123,6 +123,10 @@ cp -r %{name}/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Nov 09 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.2.4-3
+- Fix runtime requirements on objectweb-asm instead of mvn(org.ow2.asm:asm)
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.4-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

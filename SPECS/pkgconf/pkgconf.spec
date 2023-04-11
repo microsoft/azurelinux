@@ -11,7 +11,7 @@
 Summary:        Package compiler and linker metadata toolkit
 Name:           pkgconf
 Version:        1.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,8 @@ URL:            http://pkgconf.org/
 Source0:        https://distfiles.dereferenced.org/%{name}/%{name}-%{version}.tar.xz
 # Simple wrapper script to offer platform versions of pkgconfig
 Source1:        platform-pkg-config.in
+# CVE-2023-24056 is resloved in version 1.9.4
+Patch0:         CVE-2023-24056.patch
 # For regenerating autotools scripts
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -178,6 +180,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Wed Feb 01 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.0-3
+- Add patch for CVE-2023-24056
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.0-2
 - Removing epoch.
 

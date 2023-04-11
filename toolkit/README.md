@@ -3,7 +3,7 @@
 - **Recommended if you want to try CBL-Mariner.**
 - Quickly build the **Standard CBL-Mariner** image, install and use.
 
-## [Tutorial for Building Custom Mariner Based Images](https://github.com/microsoft/CBL-MarinerDemo)
+## [Tutorial for Building Custom Mariner Based Images](https://github.com/microsoft/CBL-MarinerTutorials)
 
 - **Recommended if you are a developer and want to experiment with CBL-Mariner.**
 - Quickly build a **Custom CBL-Mariner** image, install and use.
@@ -18,6 +18,7 @@
 - Build CBL-Mariner end-to-end.
 - Advanced building topics.
 - Build parameters and environment variables.
+- packages.microsoft.com repository structure breakdown.
 
 ## [How the Build System Works](docs/how_it_works/0_intro.md)
 

@@ -10,9 +10,9 @@
 
 Name:           rpmlint
 Version:        1.11
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Tool for checking common errors in RPM packages
-License:        GPLv2
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/rpmlint
@@ -119,6 +119,10 @@ make check PYTHON=%{python} PYTEST=%{pytest} FLAKE8=%{flake8}
 %{_mandir}/man1/rpmlint.1*
 
 %changelog
+* Wed Feb 01 2023 Henry Li <lihl@microsoft.com> - 1.11-8
+- Remove AGPL-related licenses from rpmlint.config
+- License Verified
+
 * Tue Jun 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-7
 - Removing option to build with Python 2.
 - Replacing dependency on 'rpm-python3' with 'python3-rpm'.

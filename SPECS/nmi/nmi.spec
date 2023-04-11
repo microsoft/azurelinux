@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.7
-Release:        3%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,27 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-10
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-8
+- Bump release to rebuild with go 1.19.6
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-7
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-6
+- Bump release to rebuild with go 1.19.4
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.7-5
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.7-4
+- Bump release to rebuild with go 1.18.8
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.7-3
 - Bump release to rebuild against Go 1.18.5
 

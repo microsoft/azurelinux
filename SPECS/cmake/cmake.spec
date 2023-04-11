@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,8 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
+# We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
+Patch1:         CVE-2022-43551.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -79,6 +81,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Mon Feb 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.21.4-3
+- Patch CVE-2022-43551 in bundled curl
+
 * Sun Dec 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-2
 - Adding a workaround for two failing "ParseImplicitLinkInfo" test cases until a fix is available.
 - Adjusted test command to re-run flaky tests.

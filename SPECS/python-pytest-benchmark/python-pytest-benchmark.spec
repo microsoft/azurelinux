@@ -13,7 +13,7 @@ Notable features and goals:\
 Summary:        A py.test fixture for benchmarking code
 Name:           python-%{srcname}
 Version:        3.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,11 +50,13 @@ Requires:       python3-pytest
 %check
 # Skip test_commit_info_error due to possible misalignment with git
 # Similar to https://github.com/ionelmc/pytest-benchmark/issues/143
+# Also skip 'test_basic', 'test_skip', 'test_disable', 'test_only_benchmarks' due to:
+# https://github.com/ionelmc/pytest-benchmark/issues/203
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
+    pytest==7.1.2 \
     pytest-cov>=2.7.1 \
     freezegun \
     elasticsearch \
@@ -65,7 +67,7 @@ pip3 install atomicwrites>=1.3.0 \
     pytest-xdist
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v tests -k "not test_commit_info_error"
+    python%{python3_version} -m pytest -v tests -k 'not (test_commit_info_error or test_basic or test_skip or test_disable or test_only_benchmarks)'
 
 %files -n python3-%{srcname}
 %doc README.rst
@@ -79,6 +81,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/pytest_benchmark-%{version}-py*.egg-info
 
 %changelog
+* Thu Oct 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.1-2
+- Froze 'pytest' version to 7.1.2 to stabilize tests.
+- Disabled test broken upsteam.
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.1-1
 - Updating to 3.4.1.
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
 // nodeState represents the build state of a single node
@@ -90,26 +91,18 @@ func (g *GraphBuildState) BuildFailures() []*BuildResult {
 // ConflictingRPMs will return a list of *.rpm files which should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingRPMs() (rpms []string) {
-	rpms = make([]string, len(g.conflictingRPMs))
-	i := 0
-	for f := range g.conflictingRPMs {
-		rpms[i] = f
-		i++
-	}
+	rpms = sliceutils.StringsSetToSlice(g.conflictingRPMs)
 	sort.Strings(rpms)
+
 	return rpms
 }
 
 // ConflictingSRPMs will return a list of *.src.rpm files which created rpms that should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingSRPMs() (srpms []string) {
-	srpms = make([]string, len(g.conflictingSRPMs))
-	i := 0
-	for f := range g.conflictingSRPMs {
-		srpms[i] = f
-		i++
-	}
+	srpms = sliceutils.StringsSetToSlice(g.conflictingSRPMs)
 	sort.Strings(srpms)
+
 	return srpms
 }
 
@@ -133,7 +126,7 @@ func (g *GraphBuildState) isConflictWithToolchain(fileToCheck string) (hadConfli
 // RecordBuildResult records a build result in the graph build state.
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
-func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {
+func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) {
 
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
@@ -152,7 +145,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {
 		g.nodeToState[node] = state
 	}
 
-	if !res.Skipped && !res.UsedCache {
+	if !allowToolchainRebuilds && !res.Skipped && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
 			if g.isConflictWithToolchain(file) {
 				g.conflictingRPMs[filepath.Base(file)] = true
@@ -160,7 +153,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult) {
 			}
 		}
 	} else {
-		logger.Log.Debugf("skipping checking conflicts since this is not a built node (%v)", res.Node)
+		logger.Log.Debugf("skipping checking conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'", res.Node)
 	}
 
 	return

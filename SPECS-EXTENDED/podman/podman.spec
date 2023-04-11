@@ -29,14 +29,14 @@
 # https://github.com/containers/gvisor-tap-vsock
 %global import_path_gvproxy %%{provider}.%{provider_tld}/%{project}/%{repo_gvproxy}
 %global git_gvproxy https://%{import_path_gvproxy}
-%global commit_gvproxy 4ee84d66bd86668f011733d8873989b5862bcd07
+%global commit_gvproxy aab0ac9367fc5142f5857c36ac2352bcb3c60ab7
 %global shortcommit_gvproxy %(c=%{commit_gvproxy}; echo ${c:0:7})
 
 %global built_tag v4.1.1
 
 Name:           podman
 Version:        4.1.1
-Release:        2%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -50,8 +50,7 @@ BuildRequires:  go-md2man
 BuildRequires:  golang
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-devel
-BuildRequires:  glibc-static
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  git
 BuildRequires:  go-rpm-macros
 BuildRequires:  gpgme-devel
@@ -387,6 +386,27 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-9
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-8
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-7
+- Bump release to rebuild with go 1.19.6
+
+* Fri Feb 17 2023 Muhammad Falak <mwani@microsoft.com> - 4.1.1-6
+- Bump version of gvproxy to enable build with go1.19
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-5
+- Bump release to rebuild with go 1.19.4
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.1.1-4
+- Bump release to rebuild with go 1.18.8
+
+* Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 4.1.1-3
+- Rebuilt for glibc-static 2.35-3
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.1.1-2
 - Bump release to rebuild against Go 1.18.5
 

@@ -1,8 +1,8 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
-Version:        4.2
-Release:        1%{?dist}
+Version:        4.4
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ BuildRequires:  python3-setuptools
 Requires:       bzip2
 Requires:       python3
 Requires:       python3-libxml2
+Requires:       python3-magic
 Requires:       python3-pexpect
 Requires:       python3-rpm
 Requires:       tar
@@ -38,7 +39,7 @@ python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot} --
 
 # Remove doubly-packaged documentation files
 rm -rf %{buildroot}%{_datadir}/licenses/sos
-rm -rf %{buildroot}%{_datadir}/doc/sos
+rm -rf %{buildroot}%{_docdir}/sos
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}
 install -d -m 700 %{buildroot}%{_sysconfdir}/%{name}/cleaner
@@ -68,6 +69,12 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Mon Apr 03 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.4-2
+- Fixing missing runtime dep of python3-magic
+
+* Thu Sep 15 2022 Nan Liu <liunan@microsoft.com> - 4.4-1
+- Update to version 4.4 to fix CVE-2022-2806
+
 * Thu Dec 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2-1
 - Update to version 4.2
 

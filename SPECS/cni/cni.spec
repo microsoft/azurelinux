@@ -24,7 +24,7 @@
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        1.0.1
-Release:        3%{?dist}
+Release:        10%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -113,6 +113,27 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-10
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-8
+- Bump release to rebuild with go 1.19.6
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-7
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-6
+- Bump release to rebuild with go 1.19.4
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.0.1-5
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.1-4
+- Bump release to rebuild with go 1.18.8
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.1-3
 - Bump release to rebuild against Go 1.18.5
 
@@ -189,7 +210,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + Update cnitool documentation for spec v0.4.0
     + Add cni-route-override to CNI plugin list
   * Build and test changes:
-    + Release: bump go to v1.12
+    + Release: 4%{?dist}
 
 * Fri May 17 2019 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.7.0:

@@ -1,6 +1,6 @@
 Summary:        Library implementing the Unicode Bidirectional Algorithm
 Name:           fribidi
-Version:        1.0.10
+Version:        1.0.12
 Release:        1%{?dist}
 License:        LGPLv2+ AND UCD
 Vendor:         Microsoft Corporation
@@ -52,6 +52,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Sep 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.12-1
+- Upgrade to 1.0.12
+
 * Tue Feb 08 2022 Minghe Ren <mingheren@microsoft.com> - 1.0.10-1
 - Update to Version 1.0.10
 

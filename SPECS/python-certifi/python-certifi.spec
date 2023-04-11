@@ -1,7 +1,7 @@
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
-Version:        2021.10.08
-Release:        2%{?dist}
+Version:        2022.12.07
+Release:        1%{?dist}
 License:        MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ pip3 install pytest
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 24 2023 Muhammad Falak <mwani@microsoft.com> - 2022.12.07-1
+- Bump version to 2022.12.07 to address CVE-2022-23491
+
 * Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 2021.10.08-2
 - Add an explict BR on pip
 - Drop un-needed dependencies

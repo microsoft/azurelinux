@@ -12,14 +12,14 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.18.1
+Version:        1.19.8
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v1.18.1-1-fips/go.20220414.3.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.19.8-1/go.20230404.2.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Conflicts:      go
@@ -53,8 +53,6 @@ export GOROOT="`pwd`"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
 rm -f  %{gopath}/src/runtime/*.c
-# Remove the explicit version once `microsoft/go#262` is resolved.
-echo 'go%{version}-1-fips' > VERSION
 pushd src
 ./make.bash --no-clean
 popd
@@ -117,6 +115,18 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Apr 05 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.8-1
+- Bump version to address CVE-2023-24534, CVE-2023-24536, CVE-2023-24537, CVE-2023-24538
+
+* Tue Mar 28 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.7-1
+- Bump version to address CVE-2022-41722, CVE-2022-41724, CVE-2022-41725, CVE-2022-41723, CVE-2023-24532
+
+* Sat Sep 24 2022 Muhammad Falak <mwani@microsoft.com> - 1.19.1-2
+- Drop the explict VERSION in build
+
+* Thu Sep 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
+- Uograde to version to 1.19.1
+
 * Thu May 05 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.1-1
 - Switch to `microsoft/go` for a fips compliant version of go
 

@@ -3,7 +3,7 @@
 Summary:        Thin-wrapper around the mock package for easier use with py.test
 Name:           python-%{pypi_name}
 Version:        3.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,7 +52,7 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
+    pytest==7.1.2 \
     pytest-cov>=2.7.1
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
@@ -67,6 +67,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{file_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-2
+- Freezing 'pytest' test dependency to version 7.1.2.
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
 - Updating to version 3.7.0.
 - Added a patch skipping broken tests.

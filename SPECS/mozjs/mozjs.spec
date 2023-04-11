@@ -3,7 +3,7 @@
 Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -127,6 +127,9 @@ fi
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %changelog
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 78.10.0-3
+- Bump package to rebuild with stable Rust compiler
+
 * Wed Sep 22 2021 Jon Slobodzian <joslobo@microsoft.com> - 78.10.0-2
 - Initial CBL-Mariner import from Photon (license: Apache2)
 - Fixing minor changelog formatting issues.

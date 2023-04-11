@@ -16,7 +16,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 type Network struct {
@@ -78,7 +77,6 @@ func (n *Network) IsValid() (err error) {
 // ConfigureNetwork performs network configuration during the installation process
 func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfig) (err error) {
 	const squashErrors = false
-	var dnsUpdate bool
 
 	for _, networkData := range systemConfig.Networks {
 		deviceName, err := checkNetworkDeviceAvailability(networkData)
@@ -92,24 +90,6 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 		err = createNetworkConfigFile(installChroot, networkData, deviceName)
 		if err != nil {
 			return err
-		}
-
-		hasDNSinConfig := len(networkData.NameServers) > 0
-		if hasDNSinConfig {
-			dnsUpdate = true
-		}
-	}
-
-	err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-networkd")
-	if err != nil {
-		logger.Log.Errorf("Unable to restart systemd-networkd: %s", err)
-		return
-	}
-
-	if dnsUpdate {
-		err = shell.ExecuteLive(squashErrors, "systemctl", "restart", "systemd-resolved")
-		if err != nil {
-			logger.Log.Errorf("Unable to restart systemd-resolved: %s", err)
 		}
 	}
 

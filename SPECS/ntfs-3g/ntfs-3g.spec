@@ -1,6 +1,6 @@
 Summary:        Linux NTFS userspace driver
 Name:           ntfs-3g
-Version:        2022.5.17
+Version:        2022.10.3
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -170,6 +170,9 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Mon Nov 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2022.10.3-1
+- Auto-upgrade to 2022.10.3 - CVE-2022-40284
+
 * Wed Jun 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.5.17-1
 - Updating to 2022.5.17 to fix CVE-2021-46790.
 

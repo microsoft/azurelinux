@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2022.1
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,8 @@ URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
+Patch2:         CVE-2022-31394.patch
+Patch3:         rpm-ostree-drop-lint-which-treats-warning-as-error.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -45,6 +47,7 @@ BuildRequires:  ostree-devel
 BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-pygments
 BuildRequires:  rpm-devel
 BuildRequires:  rust
 BuildRequires:  sqlite-devel
@@ -153,6 +156,16 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Mon Mar 20 2023 Muhammad Falak <mwani@microsoft.com> - 2022.1-4
+- Drop a lint which treats a warning as error to enable build with rust 1.68.0
+
+* Thu Mar 09 2023 Nan Liu <liunan@microsoft.com> - 2022.1-3
+- Apply patch for CVE-2022-31394
+
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2022.1-2
+- Bump package to rebuild with stable Rust compiler
+- Add missing dependency on python3-pygments (needed to build docs)
+
 * Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 2022.1-1
 - Upgrade to version 2022.1
 - Remove patches that no longer apply

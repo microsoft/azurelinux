@@ -1,0 +1,25 @@
+Patch by Robert Scheck <robert@fedoraproject.org> for libunicap >= 0.9.12, which switches
+after the removal of v4l1 from the Linux kernel to the libv4l1compat header of libv4l.
+
+--- libunicap-0.9.12/cpi/v4l/v4l.c			2010-01-17 08:49:29.000000000 +0100
++++ libunicap-0.9.12/cpi/v4l/v4l.c.videodev		2011-10-09 02:50:26.000000000 +0200
+@@ -49,7 +49,7 @@
+ #endif
+ #include <debug.h>
+ 
+-#include <linux/videodev.h>
++#include <libv4l1-videodev.h>
+ #include <linux/videodev2.h> // for v4l2 checks
+ 
+ #include "v4l.h"
+--- libunicap-0.9.12/cpi/v4l2cpi/uvcvideo.h		2010-01-17 08:49:29.000000000 +0100
++++ libunicap-0.9.12/cpi/v4l2cpi/uvcvideo.h.videodev	2011-10-09 02:50:09.000000000 +0200
+@@ -2,7 +2,7 @@
+ #define _USB_VIDEO_H_
+ 
+ #include <linux/kernel.h>
+-#include <linux/videodev.h>
++#include <libv4l1-videodev.h>
+ 
+ #include "uvc_compat.h"
+ 

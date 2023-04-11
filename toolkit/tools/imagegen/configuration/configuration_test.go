@@ -270,6 +270,14 @@ func TestShouldFailPartLabelWithNoName(t *testing.T) {
 	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but it has no [Name]", err.Error())
 }
 
+func TestShouldSucceedReturnPartitionIndexAndObjectForBootPartition(t *testing.T) {
+	actualConfiguration, err := Load("testdata/test_configuration.json")
+	assert.NoError(t, err)
+	bootIndex, bootPartition := actualConfiguration.GetBootPartition()
+	assert.ObjectsAreEqualValues(expectedConfiguration.Disks[0].Partitions[0], bootPartition)
+	assert.Equal(t, 0, bootIndex)
+}
+
 var expectedConfiguration Config = Config{
 	Disks: []Disk{
 		{
@@ -468,6 +476,15 @@ var expectedConfiguration Config = Config{
 				},
 			},
 			PostInstallScripts: []InstallScript{
+				{
+					Path: "arglessScript.sh",
+				},
+				{
+					Path: "thisOneNeedsArguments.sh",
+					Args: "--input abc --output cba",
+				},
+			},
+			FinalizeImageScripts: []InstallScript{
 				{
 					Path: "arglessScript.sh",
 				},

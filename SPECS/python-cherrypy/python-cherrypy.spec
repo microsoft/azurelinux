@@ -7,7 +7,7 @@
 Summary:        A pythonic, object-oriented HTTP framework
 Name:           python-%{pkgname}
 Version:        18.6.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Url:            https://cherrypy.org/
 Vendor:         Microsoft Corporation
@@ -42,6 +42,13 @@ BuildRequires:  python3-pip
 
 %prep
 %setup -q -n %{pypiname}-%{version}
+# suppress depracation warning in the pytest.ini 
+# Feb 2023 setuptools added deprecation warning for pkg_resources.declare_namespace causing all the test to fail for python-cherrypy 
+# https://setuptools.pypa.io/en/latest/history.html#v67-3-0
+# supressing deprecation warning so that test doesn't fail just because of a deprecation warning message.
+# for the future update of this package, cherrypy might stop using pkg_resources.declare_namespace. Might be ok to delete this in the future 
+# when that happens.
+sed -i '/ignore:Use/a \    \ignore::DeprecationWarning' pytest.ini
 
 %build
 python3 setup.py build
@@ -62,6 +69,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/cherryd
 
 %changelog
+* Wed Mar 08 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.6.1-3
+- Suppress pytest deprecation warning 
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 18.6.1-2
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

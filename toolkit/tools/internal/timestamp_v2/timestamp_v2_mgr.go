@@ -39,6 +39,7 @@ import (
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 var (
@@ -82,7 +83,7 @@ func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescripto
 func ensureNoManager() (err error) {
 	if StampMgr != nil {
 		err = fmt.Errorf("already recording timing data for a tool into file (%s)", StampMgr.dataFilePath)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 	}
 	return
 }
@@ -90,7 +91,7 @@ func ensureNoManager() (err error) {
 func ensureExistsManager() (err error) {
 	if StampMgr == nil {
 		err = fmt.Errorf("timestamping not initialized yet, can't record data")
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 	}
 	return
 }
@@ -133,11 +134,11 @@ func (mgr *TimeStampManager) updateFile() {
 	if mgr.shouldWrite {
 		err := jsonutils.WriteJSONDescriptor(mgr.dataFileDescriptor, &(mgr.root))
 		if err != nil {
-			failsafeLoggerWarnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
+			logger.Log.Warnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
 		}
 		mgr.dataFileDescriptor.Sync()
 		if err != nil {
-			failsafeLoggerWarnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
+			logger.Log.Warnf("Failed to store timestamp data into file '%s': %s", mgr.dataFilePath, err)
 		}
 		mgr.lastUpdate = time.Now()
 		mgr.shouldWrite = false
@@ -157,7 +158,7 @@ func BeginTiming(toolName, outputFile string, expectedWeight float64, atomicOper
 	outFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_RDWR, 0664)
 	if err != nil {
 		err = fmt.Errorf("unable to create file %s: %w", outputFile, err)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 	// We will not close the file handle here unless there is an error, we will use it for synchronization going forwards.
@@ -172,7 +173,7 @@ func BeginTiming(toolName, outputFile string, expectedWeight float64, atomicOper
 	root, err := createTimeStamp(toolName, time.Now(), expectedWeight)
 	if err != nil {
 		err = fmt.Errorf("unable to initialize timing root %s: %w", toolName, err)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		// Need to release the lock and file before we fail out
 		unlockFileLock(outFileDescriptor)
 		outFileDescriptor.Close()
@@ -209,7 +210,7 @@ func ResumeTiming(toolName, existingTimingFile string, createIfMissing bool, ato
 	outFileDescriptor, err := os.OpenFile(existingTimingFile, flags, 0664)
 	if err != nil {
 		err = fmt.Errorf("can't read existing timing file (%s): %w", existingTimingFile, err)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 	// We will not close the file handle here unless there is an error, we will use it for synchronization going forwards.
@@ -228,7 +229,7 @@ func ResumeTiming(toolName, existingTimingFile string, createIfMissing bool, ato
 			err = nil
 		} else {
 			err = fmt.Errorf("can't recover existing timing data (%s): %w", existingTimingFile, err)
-			failsafeLoggerWarnf(err.Error())
+			logger.Log.Warnf(err.Error())
 
 			// Need to release the lock and file before we fail out
 			unlockFileLock(outFileDescriptor)
@@ -242,7 +243,7 @@ func ResumeTiming(toolName, existingTimingFile string, createIfMissing bool, ato
 		existingroot, err = createTimeStamp(toolName, time.Now(), 1)
 		if err != nil {
 			err = fmt.Errorf("unable to initialize timing root %s: %w", toolName, err)
-			failsafeLoggerWarnf(err.Error())
+			logger.Log.Warnf(err.Error())
 
 			// Need to release the lock and file before we fail out
 			unlockFileLock(outFileDescriptor)
@@ -274,7 +275,7 @@ func ReadTimingData(existingTimingFile string) (node *TimeStamp, err error) {
 	file, err := os.Open(existingTimingFile)
 	if err != nil {
 		err = fmt.Errorf("can't read existing timing file (%s): %w", existingTimingFile, err)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 	defer file.Close()
@@ -285,14 +286,14 @@ func ReadTimingData(existingTimingFile string) (node *TimeStamp, err error) {
 	}
 	defer func() {
 		if deferErr := unlockFileLock(file); deferErr != nil {
-			failsafeLoggerErrorf("ReadTimingData: %s", deferErr.Error())
+			logger.Log.Errorf("ReadTimingData: %s", deferErr.Error())
 		}
 	}()
 
 	err = jsonutils.ReadJSONDescriptor(file, &existingroot)
 	if err != nil {
 		err = fmt.Errorf("can't recover existing timing data (%s): %w", existingTimingFile, err)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 	existingroot.restoreNode()
@@ -318,7 +319,7 @@ func EndTiming() (err error) {
 	StampMgr.root.completeTimeStamp(time.Now())
 	err = StampMgr.root.FinishAllMeasurements()
 	if err != nil {
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return err
 	}
 
@@ -327,7 +328,7 @@ func EndTiming() (err error) {
 	// Completely releasing the file lock now.
 	err = unlockFileLock(StampMgr.dataFileDescriptor)
 	if err != nil {
-		failsafeLoggerErrorf("EndTiming: %s", err.Error())
+		logger.Log.Errorf("EndTiming: %s", err.Error())
 		return
 	}
 	StampMgr.dataFileDescriptor.Close()
@@ -376,7 +377,7 @@ func StartMeasuringEventWithParent(parent *TimeStamp, name string, expectedWeigh
 
 	if parent == nil {
 		err = fmt.Errorf("invalid timestamp parent, can't add sub-step '%s'", name)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -414,7 +415,7 @@ func StartMeasuringEventByPath(path string, expectedWeight float64) (node *TimeS
 	node = nil
 	if pathComponents[0] != StampMgr.root.Name {
 		err = fmt.Errorf("timestamp root miss-match ('%s', expected '%s')", pathComponents[0], StampMgr.root.Name)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -434,7 +435,7 @@ func StartMeasuringEventByPath(path string, expectedWeight float64) (node *TimeS
 			}
 			next, err = cur.addStep(pathComponent, time.Now(), thisNodeExpectedWeight)
 			if err != nil {
-				failsafeLoggerWarnf(err.Error())
+				logger.Log.Warnf(err.Error())
 				err = fmt.Errorf("failed to create a timestamp object '%s': %w", path, err)
 				return &TimeStamp{}, err
 			}
@@ -462,7 +463,7 @@ func StopMeasurement() (node *TimeStamp, err error) {
 	// We don't want to ever stop measuring the root until we call EndTiming().
 	if StampMgr.activeNode == StampMgr.root {
 		err = fmt.Errorf("can't stop measuring the root timestamp '%s', call EndTiming() instead", StampMgr.root.Name)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return StampMgr.root, err
 	}
 
@@ -490,7 +491,7 @@ func StopMeasurementSpecific(currentNode *TimeStamp) (node *TimeStamp, err error
 	// We don't want to ever stop measuring the root until we call EndTiming().
 	if currentNode == StampMgr.root {
 		err = fmt.Errorf("can't stop measuring the root timestamp '%s', call EndTiming() instead", StampMgr.root.Name)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -547,14 +548,14 @@ func StopMeasurementByPath(path string) (node *TimeStamp, err error) {
 	currentNode := pathSearchInternal(path)
 	if currentNode == nil {
 		err = fmt.Errorf("could not find measurement '%s' by path", path)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 
 	// We don't want to ever stop measuring the root until we call EndTiming().
 	if currentNode == StampMgr.root {
 		err = fmt.Errorf("can't stop measuring the root timestamp '%s', call EndTiming() instead", StampMgr.root.Name)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}
 

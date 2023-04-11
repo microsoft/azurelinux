@@ -2,7 +2,7 @@
 Summary:        Tool Command Language - the language and library.
 Name:           tcl
 Version:        8.6.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        TCL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,8 @@ Group:          System Environment/Libraries
 URL:            http://tcl.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
 BuildRequires:  cmake
+Provides:       tcl(abi) = %{majorver}
+Provides:       tcl-tcldict = %{version}
 
 %description
 Tcl provides a powerful platform for creating integration applications that
@@ -32,14 +34,14 @@ Headers and development libraries for tcl
 
 %build
 cd unix
-./configure \
-       --prefix=%{_prefix}  \
-       --mandir=%{_mandir}  \
-       --enable-threads     \
-       --enable-shared      \
-       --disable-static     \
-       --enable-symbols
-make %{?_smp_mflags}
+autoconf
+%configure \
+    --enable-threads     \
+    --enable-shared      \
+    --disable-static     \
+    --enable-symbols
+
+%make_build
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
@@ -96,6 +98,11 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 8.6.12-2
+- Add provides for tcl(abi)
+- Add provides for tcl-tcldict
+- Replace ./configure and make invocations with macros.
+
 * Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 8.6.12-1
 - Update to 8.6.12
 - Fix lint

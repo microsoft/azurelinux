@@ -1,0 +1,110 @@
+diff -up foomatic-db-20120103/db/source/PPD/Brother/BR8840_2_GPL.ppd.device-ids-20120103 foomatic-db-20120103/db/source/PPD/Brother/BR8840_2_GPL.ppd
+--- foomatic-db-20120103/db/source/PPD/Brother/BR8840_2_GPL.ppd.device-ids-20120103	2012-01-03 00:40:44.000000000 +0000
++++ foomatic-db-20120103/db/source/PPD/Brother/BR8840_2_GPL.ppd	2012-02-24 09:33:37.047452635 +0000
+@@ -32,6 +32,7 @@
+ *ShortNickName: "Brother MFC-8840D BR-Script3"
+ *ModelName: "Brother MFC-8840D BR-Script3"
+ *NickName: "Brother MFC-8840D BR-Script3"
++*1284DeviceID: "MFG:Brother;MDL:MFC-8840D;CMD:HBP,PJL,PCL,PCLXL;"
+ 
+ *%==== Basic Device Capabilities =============
+ *LanguageLevel: "3"
+diff -up foomatic-db-20120103/db/source/PPD/Lexmark/Lexmark_C543.ppd.device-ids-20120103 foomatic-db-20120103/db/source/PPD/Lexmark/Lexmark_C543.ppd
+--- foomatic-db-20120103/db/source/PPD/Lexmark/Lexmark_C543.ppd.device-ids-20120103	2012-01-03 00:40:44.000000000 +0000
++++ foomatic-db-20120103/db/source/PPD/Lexmark/Lexmark_C543.ppd	2012-02-24 09:33:37.049452637 +0000
+@@ -62,7 +62,7 @@
+ *LXCountPIN: "4"
+ *LXlowPINchar: "0"
+ *LXhiPINchar: "9"
+-*1284DeviceID: "MFG: Lexmark;MDL: Lexmark C543"
++*1284DeviceID: "MFG:Lexmark International;MDL:Lexmark C543;"
+ *FreeVM: "252000000"
+ *VMOption 256Meg: "252000000"
+ *VMOption 320Meg: "312000000"
+diff -up foomatic-db-20120103/db/source/printer/Brother-MFC-8840D.xml.device-ids-20120103 foomatic-db-20120103/db/source/printer/Brother-MFC-8840D.xml
+--- foomatic-db-20120103/db/source/printer/Brother-MFC-8840D.xml.device-ids-20120103	2012-02-24 09:33:36.314452298 +0000
++++ foomatic-db-20120103/db/source/printer/Brother-MFC-8840D.xml	2012-02-24 09:33:37.051452638 +0000
+@@ -15,7 +15,7 @@
+   </lang>
+   <autodetect>
+     <general>
+-      <ieee1284>MFG:Brother;MDL:Brother MFC-8840D;</ieee1284>
++      <ieee1284>MFG:Brother;MDL:MFC-8840D;CMD:HBP,PJL,PCL,PCLXL;</ieee1284>
+       <manufacturer>Brother</manufacturer>
+       <model>Brother MFC-8840D</model>
+     </general>
+diff -up foomatic-db-20120103/db/source/printer/HP-DeskJet_720C.xml.device-ids-20120103 foomatic-db-20120103/db/source/printer/HP-DeskJet_720C.xml
+--- foomatic-db-20120103/db/source/printer/HP-DeskJet_720C.xml.device-ids-20120103	2012-02-24 09:33:36.401452339 +0000
++++ foomatic-db-20120103/db/source/printer/HP-DeskJet_720C.xml	2012-02-24 09:33:37.087452655 +0000
+@@ -20,7 +20,7 @@
+       <commandset>SCP,VLINK</commandset>
+       <description>Hewlett-Packard DeskJet 720 Series</description>
+       <manufacturer>HEWLETT-PACKARD</manufacturer>
+-      <model>DESKJET 720</model>
++      <model>DESKJET 720C</model>
+     </parallel>
+   </autodetect>
+   <functionality>A</functionality>
+diff -up foomatic-db-20120103/db/source/printer/HP-LaserJet_M1522nf_MFP.xml.device-ids-20120103 foomatic-db-20120103/db/source/printer/HP-LaserJet_M1522nf_MFP.xml
+--- foomatic-db-20120103/db/source/printer/HP-LaserJet_M1522nf_MFP.xml.device-ids-20120103	2012-02-24 09:33:36.411452343 +0000
++++ foomatic-db-20120103/db/source/printer/HP-LaserJet_M1522nf_MFP.xml	2012-02-24 09:33:37.089452655 +0000
+@@ -13,6 +13,13 @@
+     <postscript level="3" />
+     <pcl level="6" />
+   </lang>
++  <autodetect>
++    <usb>
++      <commandset>PJL,PML,PCLXL,POSTSCRIPT,PCL</commandset>
++      <manufacturer>Hewlett-Packard</manufacturer>
++      <model>HP LaserJet MFP M1522nf MFP</model>
++    </usb>
++  </autodetect>
+   <functionality>D</functionality>
+   <driver>pxlmono</driver>
+   <drivers>
+diff -up foomatic-db-20120103/db/source/printer/Kyocera-FS-1118MFP.xml.device-ids-20120103 foomatic-db-20120103/db/source/printer/Kyocera-FS-1118MFP.xml
+--- foomatic-db-20120103/db/source/printer/Kyocera-FS-1118MFP.xml.device-ids-20120103	2012-02-24 09:34:34.375478948 +0000
++++ foomatic-db-20120103/db/source/printer/Kyocera-FS-1118MFP.xml	2012-02-24 09:41:52.635757050 +0000
+@@ -19,10 +19,10 @@
+   </lang>
+   <autodetect>
+     <general>
+-      <ieee1284>MFG:Kyocera;MODEL:Kyocera FS-1118MFP;COMMAND SET: POSTSCRIPT,PJL,PCL</ieee1284>
+-      <commandset>POSTSCRIPT,PJL,PCL</commandset>
++      <ieee1284>MFG:Kyocera;MODEL:FS-1118MFP;CMD:PCLXL,PostScript Emulation,PCL5E,PJL;</ieee1284>
++      <commandset>CMD:PCLXL,PostScript Emulation,PCL5E,PJL</commandset>
+       <manufacturer>Kyocera</manufacturer>
+-      <model>Kyocera FS-1118MFP</model>
++      <model>FS-1118MFP</model>
+     </general>
+   </autodetect>
+   <functionality>A</functionality>
+diff -up foomatic-db-20120103/db/source/printer/Lexmark-C543.xml.device-ids-20120103 foomatic-db-20120103/db/source/printer/Lexmark-C543.xml
+--- foomatic-db-20120103/db/source/printer/Lexmark-C543.xml.device-ids-20120103	2012-02-24 09:33:36.463452367 +0000
++++ foomatic-db-20120103/db/source/printer/Lexmark-C543.xml	2012-02-24 09:33:37.090452655 +0000
+@@ -15,7 +15,7 @@
+   </lang>
+   <autodetect>
+     <general>
+-      <ieee1284>MFG: Lexmark;MDL: Lexmark C543</ieee1284>
++      <ieee1284>MFG:Lexmark International;MDL:Lexmark C543;</ieee1284>
+       <manufacturer>Lexmark</manufacturer>
+       <model>Lexmark C543</model>
+     </general>
+diff -up foomatic-db-20130911/db/source/printer/Brother-HL-2040.xml.device-ids foomatic-db-20130911/db/source/printer/Brother-HL-2040.xml
+--- foomatic-db-20130911/db/source/printer/Brother-HL-2040.xml.device-ids	2013-09-11 15:55:21.853642637 +0200
++++ foomatic-db-20130911/db/source/printer/Brother-HL-2040.xml	2013-09-11 15:53:30.775176972 +0200
+@@ -15,6 +15,13 @@
+     <pcl level="5e" />
+     <pjl />
+   </lang>
++  <autodetect>
++    <general>
++      <ieee1284>MFG:Brother;MDL:HL-2040 series;CMD:PJL,HBP;</ieee1284>
++      <manufacturer>Brother</manufacturer>
++      <model>Brother HL-2040 series</model>
++    </general>
++  </autodetect>
+   <functionality>B</functionality>
+   <driver>hl1250</driver>
+   <drivers>

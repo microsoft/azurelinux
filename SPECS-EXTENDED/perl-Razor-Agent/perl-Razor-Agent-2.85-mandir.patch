@@ -1,0 +1,14 @@
+Patch by Gregor Herrmann <gregoa@debian.org> for razor-agents <= 2.85 which adjusts
+the regular expression for perl 5.22. See also Debian bug report #807478.
+
+--- razor-agents-2.85/Makefile.PL		2007-05-09 00:47:53.000000000 +0200
++++ razor-agents-2.85/Makefile.PL.mandir	2016-01-11 03:57:13.000000000 +0100
+@@ -142,7 +142,7 @@
+   my $man5 = q{ \\
+ 		$(INST_MAN5DIR) $(INSTALLMAN5DIR)};
+ 
+-  $inherited =~ s/(\$\((?:DEST)?INSTALL\w*MAN1DIR\))/$1$man5/gm;
++  $inherited =~ s/(\$\((?:DEST)?INSTALL\w*MAN1DIR\)"?)/$1$man5/gm;
+ 
+   return $inherited;
+ }

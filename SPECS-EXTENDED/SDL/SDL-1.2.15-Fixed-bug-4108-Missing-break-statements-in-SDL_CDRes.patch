@@ -1,0 +1,41 @@
+From b8dab2d1dae1f6fb0f2b466e2b26645d072b9aaa Mon Sep 17 00:00:00 2001
+From: Sam Lantinga <slouken@libsdl.org>
+Date: Sat, 24 Mar 2018 10:15:42 -0700
+Subject: [PATCH] Fixed bug 4108 - Missing break statements in SDL_CDResume and
+ SDL_CDStop
+
+Ozkan Sezer
+
+Two break statements are missing in SDL_cdrom.c:SDL_CDResume()
+and SDL_CDStop(), which negate the returned code from driver
+and always return 0.  The following patch adds those breaks.
+
+--HG--
+branch : SDL-1.2
+---
+ src/cdrom/SDL_cdrom.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/cdrom/SDL_cdrom.c b/src/cdrom/SDL_cdrom.c
+index 8f91bb1b3..fac2437e5 100644
+--- a/src/cdrom/SDL_cdrom.c
++++ b/src/cdrom/SDL_cdrom.c
+@@ -285,6 +285,7 @@ int SDL_CDResume(SDL_CD *cdrom)
+ 	switch (status) {
+ 		case CD_PAUSED:
+ 			retval = SDL_CDcaps.Resume(cdrom);
++			break;
+ 		default:
+ 			retval = 0;
+ 			break;
+@@ -307,6 +308,7 @@ int SDL_CDStop(SDL_CD *cdrom)
+ 		case CD_PLAYING:
+ 		case CD_PAUSED:
+ 			retval = SDL_CDcaps.Stop(cdrom);
++			break;
+ 		default:
+ 			retval = 0;
+ 			break;
+-- 
+2.17.1
+

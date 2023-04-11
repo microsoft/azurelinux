@@ -26,18 +26,16 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 Url:            https://libreswan.org/
 Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-%if %{with_check}
 Source3:        https://download.libreswan.org/cavs/ikev1_dsa.fax.bz2
 Source4:        https://download.libreswan.org/cavs/ikev1_psk.fax.bz2
 Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
-%endif
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison
@@ -195,6 +193,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Tue Oct 11 2022 Osama Esmail <osamaesmail@microsoft.com> - 4.7-4
+- Removed with_check macro
+
 * Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.7-3
 - Move from SPECS-EXTENDED to SPECS
 

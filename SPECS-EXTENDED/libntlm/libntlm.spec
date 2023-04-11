@@ -1,14 +1,19 @@
+%define version_with_hyphens %(version="%{version}" && echo "${version//./-}")
+
+Summary:        NTLMv1 authentication library
+Name:           libntlm
+Version:        1.6
+Release:        1%{?dist}
+License:        LGPL-2.1-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:           libntlm
-Version:        1.5
-Release:        3%{?dist}
-Summary:        NTLMv1 authentication library
-License:        LGPLv2+
-URL:            http://nongnu.org/libntlm
-Source0:        http://nongnu.org/libntlm/releases/%{name}-%{version}.tar.gz
-BuildRequires:  pkgconfig
+URL:            https://gitlab.com/gsasl/libntlm/
+Source0:        https://gitlab.com/gsasl/libntlm/-/archive/%{name}-%{version_with_hyphens}/%{name}-%{name}-%{version_with_hyphens}.tar.gz
+
+BuildRequires:  autoconf
 BuildRequires:  gcc
+BuildRequires:  pkg-config
+
 Provides:       bundled(gnulib)
 
 %description
@@ -24,7 +29,8 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{name}-%{version_with_hyphens}
+autoreconf -fi
 
 %build
 %configure --disable-static
@@ -33,19 +39,25 @@ sed -i 's|$(install_sh) -c|$(install_sh) -pc|g' Makefile
 
 %install
 make install DESTDIR=%{buildroot}
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
-%doc AUTHORS ChangeLog COPYING README THANKS
-%{_libdir}/%{name}.so.*
+%license COPYING
+%doc AUTHORS ChangeLog README THANKS
+%{_libdir}/%{name}.so.0
+%{_libdir}/%{name}.so.0.*
 
 %files devel
-%doc COPYING 
 %{_includedir}/ntlm.h
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Nov 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6-1
+- Updated to version 1.6 to fix CVE-2019-17455.
+- License verified.
+- Updated URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

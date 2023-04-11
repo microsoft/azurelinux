@@ -2,9 +2,9 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.53
+Version:        2.4.56
 Release:        1%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -21,7 +21,7 @@ Source8:        10-listen443.conf
 Source9:        httpd-init.service
 Source10:       httpd-ssl-gencerts
 
-# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.53-blfs_layout-1.patch
+# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.56-blfs_layout-1.patch
 Patch0:         httpd-2.4.53-blfs_layout-3.patch
 Patch1:         httpd-uncomment-ServerName.patch
 
@@ -342,6 +342,15 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Tue Mar 14 2023 Thien Trung Vuong <tvuong@microsoft.com> - 2.4.56-1
+- Upgrade to version 2.4.56 - Fixes CVE-2023-27522, CVE-2023-25690
+
+* Tue Feb 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.4.55-1
+- Upgrade to version 2.4.55. Fixes CVE-2022-36760
+
+* Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.54-1
+- Auto-upgrade to 2.4.54 - CVE-2022-31813,CVE-2022-28615
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.53-1
 - Update httpd version to 2.4.53 to fix CVE CVE-2022-22720, CVE-2022-22721, CVE-2022-23943.
 

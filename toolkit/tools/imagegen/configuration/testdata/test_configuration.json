@@ -202,6 +202,15 @@
                     "Args": "--input abc --output cba"
                 }
             ],
+            "FinalizeImageScripts":[
+                {
+                    "Path": "arglessScript.sh"
+                },
+                {
+                    "Path": "thisOneNeedsArguments.sh",
+                    "Args": "--input abc --output cba"
+                }
+            ],
             "Networks":[
                 {
                     "BootProto": "dhcp",

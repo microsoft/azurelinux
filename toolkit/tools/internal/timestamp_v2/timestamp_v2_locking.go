@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"golang.org/x/sys/unix"
 )
 
@@ -45,9 +46,9 @@ func waitOnFileLock(flockFile *os.File, blockMillis int64, exclusive bool) (err 
 		err = fmt.Errorf("failed to secure timing data lock after %d milliseconds- %w", blockMillis, err)
 	} else {
 		if exclusive {
-			failsafeLoggerTracef("waitOnFileLock: LOCK EXCLUSIVE\n")
+			logger.Log.Tracef("waitOnFileLock: LOCK EXCLUSIVE\n")
 		} else {
-			failsafeLoggerTracef("waitOnFileLock: LOCK SHARED\n")
+			logger.Log.Tracef("waitOnFileLock: LOCK SHARED\n")
 		}
 	}
 
@@ -58,9 +59,9 @@ func waitOnFileLock(flockFile *os.File, blockMillis int64, exclusive bool) (err 
 func relaxToSharedLock(flockFile *os.File) (err error) {
 	err = unix.Flock(int(flockFile.Fd()), unix.LOCK_SH)
 	if err != nil {
-		failsafeLoggerErrorf("failed to relax timing data lock - %s", err.Error())
+		logger.Log.Errorf("failed to relax timing data lock - %s", err.Error())
 	} else {
-		failsafeLoggerTracef("relaxToSharedLock: RELAX TO SHARED\n")
+		logger.Log.Tracef("relaxToSharedLock: RELAX TO SHARED\n")
 	}
 	return
 }
@@ -72,9 +73,9 @@ func unlockFileLock(flockFile *os.File) (err error) {
 
 	err = unix.Flock(int(flockFile.Fd()), lockMode)
 	if err != nil {
-		failsafeLoggerErrorf("failed to release timing data lock - %s", err.Error())
+		logger.Log.Errorf("failed to release timing data lock - %s", err.Error())
 	} else {
-		failsafeLoggerTracef("unlockFileLock: RELEASE")
+		logger.Log.Tracef("unlockFileLock: RELEASE")
 	}
 	return
 }
@@ -84,7 +85,7 @@ func ensureExclusiveFileLockOnFile(fd *os.File) (err error) {
 	err = waitOnFileLock(fd, blockTimeMilliseconds, true)
 	if err != nil {
 		err = fmt.Errorf("can't lock timestamp file: %w", err)
-		failsafeLoggerWarnf(err.Error())
+		logger.Log.Warnf(err.Error())
 	}
 	return
 }

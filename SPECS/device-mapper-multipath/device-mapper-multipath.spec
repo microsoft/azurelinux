@@ -1,7 +1,7 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
 Version:        0.8.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -9,6 +9,9 @@ Distribution:   Mariner
 URL:            http://christophe.varoqui.free.fr/
 #Source0:       https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz
 Source0:        multipath-tools-%{version}.tar.gz
+# CVE-2022-41973 and CVE-2022-41974 are resolved in 0.9.2
+Patch0:         CVE-2022-41973.patch
+Patch1:         CVE-2022-41974.patch
 BuildRequires:  userspace-rcu-devel
 BuildRequires:  libaio-devel
 BuildRequires:  device-mapper-devel
@@ -46,7 +49,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -qn multipath-tools-%{version}
+%autosetup  -p1 -n multipath-tools-%{version}
 
 %build
 make %{?_smp_mflags} CC="gcc %{optflags} $LDFLAGS -Wno-error=sign-compare"
@@ -57,7 +60,8 @@ make install DESTDIR=%{buildroot} \
    bindir=%{_sbindir} \
    syslibdir=%{_libdir} \
    libdir=%{_libdir}/multipath \
-   pkgconfdir=%{_libdir}/pkgconfig
+   pkgconfdir=%{_libdir}/pkgconfig \
+   tmpfilesdir=%{_tmpfilesdir}
 
 install -vd %{buildroot}%{_sysconfdir}/multipath
 
@@ -82,6 +86,7 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_mandir}/man8/multipath.8.gz
 %{_mandir}/man8/multipathd.8.gz
 %dir %{_sysconfdir}/multipath
+%{_tmpfilesdir}/multipath.conf
 
 %files devel
 %defattr(-,root,root,-)
@@ -96,6 +101,9 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+* Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.6-4
+- Get patches to fix CVE-2022-41973, CVE-2022-41974 from Fedora 36
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.6-3
 - Removing the explicit %%clean stage.
 

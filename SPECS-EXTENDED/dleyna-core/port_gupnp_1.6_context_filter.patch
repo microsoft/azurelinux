@@ -1,0 +1,113 @@
+diff -Naur dleyna-core-0.6.0-orig/libdleyna/core/service-task.c dleyna-core-0.6.0/libdleyna/core/service-task.c
+--- dleyna-core-0.6.0-orig/libdleyna/core/service-task.c	2017-03-04 23:40:11.000000000 +0530
++++ dleyna-core-0.6.0/libdleyna/core/service-task.c	2023-02-01 16:44:47.831113876 +0530
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#include <gio/gio.h>
+ #include "log.h"
+ #include "service-task.h"
+ #include "task-processor.h"
+@@ -102,9 +103,14 @@
+ 	dleyna_service_task_t *task = (dleyna_service_task_t *)atom;
+ 
+ 	if (task->p_action) {
+-		if (task->proxy)
+-			gupnp_service_proxy_cancel_action(task->proxy,
+-							  task->p_action);
++		if (task->proxy) {
++			GError *error = NULL; 
++			GCancellable *cancellable = g_cancellable_new ();
++			gupnp_service_proxy_call_action (task->proxy,
++                                               task->p_action,
++                                               cancellable,
++                                               &error);
++		}
+ 		task->p_action = NULL;
+ 
+ 		dleyna_task_queue_task_completed(task->base.queue_id);
+diff -Naur dleyna-core-0.6.0-orig/libdleyna/core/white-list.c dleyna-core-0.6.0/libdleyna/core/white-list.c
+--- dleyna-core-0.6.0-orig/libdleyna/core/white-list.c	2017-03-04 23:40:11.000000000 +0530
++++ dleyna-core-0.6.0/libdleyna/core/white-list.c	2023-02-01 15:57:11.697278291 +0530
+@@ -26,15 +26,15 @@
+ #include "log.h"
+ 
+ struct dleyna_white_list_t_ {
+-	GUPnPWhiteList *gupnp_wl;
++	GUPnPContextFilter *gupnp_wl;
+ };
+ 
+ #if DLEYNA_LOG_LEVEL & DLEYNA_LOG_LEVEL_DEBUG
+-static void prv_dump_wl_entries(GUPnPWhiteList *wl)
++static void prv_dump_wl_entries(GUPnPContextFilter *wl)
+ {
+ 	GList *l;
+ 
+-	l = gupnp_white_list_get_entries(wl);
++	l = gupnp_context_filter_get_entries(wl);
+ 
+ 	DLEYNA_LOG_DEBUG_NL();
+ 	DLEYNA_LOG_DEBUG("White List entries:");
+@@ -52,7 +52,7 @@
+ }
+ #endif
+ 
+-dleyna_white_list_t *dleyna_white_list_new(GUPnPWhiteList *gupnp_wl)
++dleyna_white_list_t *dleyna_white_list_new(GUPnPContextFilter *gupnp_wl)
+ {
+ 	dleyna_white_list_t *wl;
+ 
+@@ -78,7 +78,7 @@
+ 			      gboolean enabled)
+ {
+ 	if (wl->gupnp_wl != NULL) {
+-		gupnp_white_list_set_enabled(wl->gupnp_wl, enabled);
++		gupnp_context_filter_set_enabled(wl->gupnp_wl, enabled);
+ 
+ 		DLEYNA_LOG_DEBUG("White List enabled: %d", enabled);
+ 	}
+@@ -96,7 +96,7 @@
+ 		(void) g_variant_iter_init(&viter, entries);
+ 
+ 		while (g_variant_iter_next(&viter, "&s", &entry))
+-			(void) gupnp_white_list_add_entry(wl->gupnp_wl, entry);
++			(void) gupnp_context_filter_add_entry(wl->gupnp_wl, entry);
+ 
+ #if DLEYNA_LOG_LEVEL & DLEYNA_LOG_LEVEL_DEBUG
+ 		prv_dump_wl_entries(wl->gupnp_wl);
+@@ -116,7 +116,7 @@
+ 		(void) g_variant_iter_init(&viter, entries);
+ 
+ 		while (g_variant_iter_next(&viter, "&s", &entry))
+-			(void) gupnp_white_list_remove_entry(wl->gupnp_wl,
++			(void) gupnp_context_filter_remove_entry(wl->gupnp_wl,
+ 							     entry);
+ 
+ #if DLEYNA_LOG_LEVEL & DLEYNA_LOG_LEVEL_DEBUG
+@@ -129,7 +129,7 @@
+ {
+ 	if (wl->gupnp_wl != NULL) {
+ 		DLEYNA_LOG_DEBUG("Clear white list");
+-		gupnp_white_list_clear(wl->gupnp_wl);
++		gupnp_context_filter_clear(wl->gupnp_wl);
+ 
+ #if DLEYNA_LOG_LEVEL & DLEYNA_LOG_LEVEL_DEBUG
+ 		prv_dump_wl_entries(wl->gupnp_wl);
+diff -Naur dleyna-core-0.6.0-orig/libdleyna/core/white-list.h dleyna-core-0.6.0/libdleyna/core/white-list.h
+--- dleyna-core-0.6.0-orig/libdleyna/core/white-list.h	2017-03-04 23:40:11.000000000 +0530
++++ dleyna-core-0.6.0/libdleyna/core/white-list.h	2023-02-01 15:53:54.282735424 +0530
+@@ -24,11 +24,11 @@
+ #define DLEYNA_WHITE_LIST_H__
+ 
+ #include <glib.h>
+-#include <libgupnp/gupnp-white-list.h>
++#include <libgupnp/gupnp-context-filter.h>
+ 
+ typedef struct dleyna_white_list_t_ dleyna_white_list_t;
+ 
+-dleyna_white_list_t *dleyna_white_list_new(GUPnPWhiteList *gupnp_wl);
++dleyna_white_list_t *dleyna_white_list_new(GUPnPContextFilter *gupnp_wl);
+ 
+ void dleyna_white_list_delete(dleyna_white_list_t *wl);
+ 

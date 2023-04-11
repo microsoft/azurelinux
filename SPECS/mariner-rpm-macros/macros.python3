@@ -1,8 +1,14 @@
-%python3_sitelib %(%{__python3} -Ic "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-%python3_sitearch %(%{__python3} -Ic "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
-%python3_version %(%{__python3} -Ic "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
-%python3_version_nodots %(%{__python3} -Ic "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
-%python3_platform %(%{__python3} -Ic "import sysconfig; print(sysconfig.get_platform())")
+# nb: $RPM_BUILD_ROOT is not set when the macros are expanded (at spec parse time)
+#     so we set it manually (to empty string), making our Python prefer the correct install scheme location
+# platbase/base is explicitly set to %%{_prefix} to support custom values, such as /app for flatpaks
+%python3_sitelib %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_path('purelib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
+%python3_sitearch %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
+%python3_version %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
+%python3_version_nodots %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
+%python3_platform %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_platform())")
+%python3_platform_triplet %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_config_var('MULTIARCH'))")
+%python3_ext_suffix %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")
+%python3_cache_tag %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; print(sys.implementation.cache_tag)")
 %py3dir %{_builddir}/python3-%{name}-%{version}-%{release}
 
 %py3_shbang_opts -s

@@ -1,0 +1,79 @@
+diff --git a/python2/httplib2/certs.py b/python2/httplib2/certs.py
+index 59d1ffc..a2e7513 100644
+--- a/python2/httplib2/certs.py
++++ b/python2/httplib2/certs.py
+@@ -23,6 +23,7 @@ BUILTIN_CA_CERTS = os.path.join(
+     os.path.dirname(os.path.abspath(__file__)), "cacerts.txt"
+ )
+ 
++FEDORA_CA_CERTS = "/etc/pki/tls/certs/ca-bundle.crt"
+ 
+ def where():
+     env = os.environ.get("HTTPLIB2_CA_CERTS")
+@@ -35,7 +36,7 @@ def where():
+         return custom_ca_locater_where()
+     if certifi_available:
+         return certifi_where()
+-    return BUILTIN_CA_CERTS
++    return FEDORA_CA_CERTS
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/python3/httplib2/certs.py b/python3/httplib2/certs.py
+index 59d1ffc..2708393 100644
+--- a/python3/httplib2/certs.py
++++ b/python3/httplib2/certs.py
+@@ -23,6 +23,8 @@ BUILTIN_CA_CERTS = os.path.join(
+     os.path.dirname(os.path.abspath(__file__)), "cacerts.txt"
+ )
+ 
++FEDORA_CA_CERTS = "/etc/pki/tls/certs/ca-bundle.crt"
++
+ 
+ def where():
+     env = os.environ.get("HTTPLIB2_CA_CERTS")
+@@ -35,7 +37,7 @@ def where():
+         return custom_ca_locater_where()
+     if certifi_available:
+         return certifi_where()
+-    return BUILTIN_CA_CERTS
++    return FEDORA_CA_CERTS
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/tests/test_cacerts_from_env.py b/tests/test_cacerts_from_env.py
+index cb2bd9f..0fed4d5 100644
+--- a/tests/test_cacerts_from_env.py
++++ b/tests/test_cacerts_from_env.py
+@@ -7,6 +7,7 @@ import httplib2
+ 
+ 
+ CA_CERTS_BUILTIN = os.path.join(os.path.dirname(httplib2.__file__), "cacerts.txt")
++FEDORA_CA_CERTS = "/etc/pki/tls/certs/ca-bundle.crt"
+ CERTIFI_CERTS_FILE = "unittest_certifi_file"
+ CUSTOM_CA_CERTS = "unittest_custom_ca_certs"
+ 
+@@ -32,7 +33,7 @@ def ca_certs_tmpfile(clean_env):
+ @mock.patch("httplib2.certs.certifi_available", False)
+ @mock.patch("httplib2.certs.custom_ca_locater_available", False)
+ def test_certs_file_from_builtin(clean_env):
+-    assert httplib2.certs.where() == CA_CERTS_BUILTIN
++    assert httplib2.certs.where() == FEDORA_CA_CERTS
+ 
+ 
+ @mock.patch("httplib2.certs.certifi_available", False)
+@@ -44,7 +45,7 @@ def test_certs_file_from_environment(ca_certs_tmpfile):
+     with pytest.raises(RuntimeError):
+         httplib2.certs.where()
+     os.environ.pop("HTTPLIB2_CA_CERTS")
+-    assert httplib2.certs.where() == CA_CERTS_BUILTIN
++    assert httplib2.certs.where() == FEDORA_CA_CERTS
+ 
+ 
+ @mock.patch("httplib2.certs.certifi_where", mock.MagicMock(return_value=CERTIFI_CERTS_FILE))
+@@ -69,4 +70,4 @@ def test_with_certifi_removed_from_modules(ca_certs_tmpfile):
+     os.environ["HTTPLIB2_CA_CERTS"] = ca_certs_tmpfile
+     assert httplib2.certs.where() == ca_certs_tmpfile
+     os.environ.pop("HTTPLIB2_CA_CERTS")
+-    assert httplib2.certs.where() == CA_CERTS_BUILTIN
++    assert httplib2.certs.where() == FEDORA_CA_CERTS

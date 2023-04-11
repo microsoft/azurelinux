@@ -1,0 +1,26 @@
+diff -up WordNet-3.0/configure.ac.orig WordNet-3.0/configure.ac
+--- WordNet-3.0/configure.ac.orig	2009-05-27 11:57:53.000000000 +0200
++++ WordNet-3.0/configure.ac	2009-05-27 11:58:30.000000000 +0200
+@@ -8,7 +8,8 @@ AC_CONFIG_HEADER([config.h])
+ 
+ # Checks for programs.
+ AC_PROG_CC
+-AC_PROG_RANLIB
++AM_PROG_CC_C_O
++AC_PROG_LIBTOOL
+ AC_PROG_INSTALL
+ 
+ # Checks for header files.
+diff -up WordNet-3.0/lib/Makefile.am.orig WordNet-3.0/lib/Makefile.am
+--- WordNet-3.0/lib/Makefile.am.orig	2009-05-27 11:58:03.000000000 +0200
++++ WordNet-3.0/lib/Makefile.am	2009-05-27 11:59:35.000000000 +0200
+@@ -1,5 +1,6 @@
+-lib_LIBRARIES = libWN.a
+-libWN_a_SOURCES = binsrch.c morph.c search.c wnglobal.c wnhelp.c wnrtl.c wnutil.c
+-libWN_a_CPPFLAGS = $(INCLUDES)
++lib_LTLIBRARIES = libWN.la
++libWN_la_SOURCES = binsrch.c morph.c search.c wnglobal.c wnhelp.c wnrtl.c wnutil.c
++libWN_la_CPPFLAGS = $(INCLUDES)
++libWN_la_LDFLAGS = -version-number 3:0:0
+ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/include
+ SUBDIRS = wnres

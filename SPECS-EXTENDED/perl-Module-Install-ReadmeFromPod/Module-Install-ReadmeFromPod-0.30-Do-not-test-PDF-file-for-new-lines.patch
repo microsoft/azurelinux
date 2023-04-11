@@ -1,0 +1,44 @@
+From 83987c6c69aa34a60eeb0dda95dd40cf6cbcb24d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 29 Jul 2019 09:13:05 +0200
+Subject: [PATCH] Do not test PDF file for new-lines
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A PDF file can contain a stream object that contains "\r\n"byte
+sequence. Therefore it does not make sense to test the PDF file for
+new-lines.
+
+CPAN RT#130221
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ t/05_cleanpdf.t | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/t/05_cleanpdf.t b/t/05_cleanpdf.t
+index bb8f863..59b8ab7 100644
+--- a/t/05_cleanpdf.t
++++ b/t/05_cleanpdf.t
+@@ -14,7 +14,7 @@ unless ( -e 'have_make' ) {
+ eval { require App::pod2pdf; };
+ plan skip_all => 'App::pod2pdf not installed' if $@;
+ 
+-plan tests => 13;
++plan tests => 12;
+ 
+ {
+ my $make = $Config{make};
+@@ -70,7 +70,7 @@ ok( -e 'Foobar.man', 'There is a Foobar.man file' );
+ ok( -e 'Foobar.pdf', 'There is a Foobar.pdf file' );
+ 
+ unlike io->file($_)->all, qr/\r\n/, "$_ contains only unix newlines"
+-  for qw( Foobar.txt Foobar.htm Foobar.man Foobar.pdf );
++  for qw( Foobar.txt Foobar.htm Foobar.man );
+ 
+ my $distclean = capture_merged { system "$make distclean" };
+ diag("$distclean");
+-- 
+2.20.1
+

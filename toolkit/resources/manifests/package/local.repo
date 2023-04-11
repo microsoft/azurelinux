@@ -1,3 +1,11 @@
+[toolchain-repo]
+name=Local Toolchain Repo (build/toolchain_rpms/)
+baseurl=file:///toolchainrpms
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
+sslverify=0
+
 [local-repo]
 name=Local Build Repo (out/RPMS)
 baseurl=file:///localrpms

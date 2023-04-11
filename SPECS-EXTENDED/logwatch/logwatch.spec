@@ -4,7 +4,7 @@ Distribution:   Mariner
 Summary: A log file analysis program
 Name: logwatch
 Version: 7.5.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: MIT
 URL: http://www.logwatch.org/
 Source0: https://sourceforge.net/projects/%{name}/files/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -15,7 +15,7 @@ Requires: grep mailx
 Requires: perl(Date::Manip)
 Requires: perl(Sys::CPU)
 Requires: perl(Sys::MemInfo)
-Requires: crontabs
+Requires: cronie
 BuildArchitectures: noarch
 
 %description
@@ -127,6 +127,9 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_unitdir}/logwatch.timer
 
 %changelog
+* Tue Jan 10 2023 Osama Esmail <osamaesmail@microsoft.com> - 7.5.3-5
+- Replacing crontabs with cronie (removing crontabs rpm because of redundancy)
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-4
 - Updating source URLs.
 - License verified.

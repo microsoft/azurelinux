@@ -54,3 +54,12 @@ endef
 my_out_folder.txt:  $(depend_MY_OUT_FOLDER)
         @echo $(MY_OUT_FOLDER) changed value! > $@
 ```
+When using `$(shell ...)` consider how long the shell command will run for. When tab completing Make will run with `-n|--dry-run` which will parse the makefiles, and generate a list of possible targets. If the shell command is very slow it will freeze the tab completion until complete. Instead we have an alternate function `$(call shell_real_build_only, ...)` which will only run the command during an actual build.
+
+Consider this especially for complex calls to `find` etc.
+```make
+# Consider replacing this:
+local_specs = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
+# With this:
+local_specs = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
+```

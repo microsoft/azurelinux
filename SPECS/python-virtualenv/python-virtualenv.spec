@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.14.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,9 @@ BuildRequires:  python3-pip
 %endif
 
 Requires:       python3
+Requires:       python3-filelock
+Requires:       python3-platformdirs = 2.0.0
+Requires:       python3-distlib < 1
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
@@ -40,7 +43,7 @@ virtualenv is a tool to create isolated Python environment.
 %py3_install
 
 %check
-pip3 install tox
+pip3 install 'tox>=3.27.1,<4.0.0'
 tox -e py
 
 %files -n python3-virtualenv
@@ -50,6 +53,12 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Dec 21 2022 Riken Maharjan <rmaharjan@microsoft.com> - 20.14.0-3
+- Add missing runtime dependencies
+
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 20.14.0-2
+- Update version of tox used for package tests
+
 * Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.14.0-1
 - Upgrade to 20.14.0
 

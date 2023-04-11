@@ -1,0 +1,20 @@
+diff -up Module-Package-Au-2/MANIFEST.no-bundle Module-Package-Au-2/MANIFEST
+--- Module-Package-Au-2/MANIFEST.no-bundle	2014-07-08 15:07:58.736951231 -0400
++++ Module-Package-Au-2/MANIFEST	2014-07-08 15:08:52.625596868 -0400
+@@ -1,16 +1,4 @@
+ Changes
+-inc/Module/Install.pm
+-inc/Module/Install/Base.pm
+-inc/Module/Install/Can.pm
+-inc/Module/Install/Fetch.pm
+-inc/Module/Install/GithubMeta.pm
+-inc/Module/Install/Makefile.pm
+-inc/Module/Install/Metadata.pm
+-inc/Module/Install/Package.pm
+-inc/Module/Install/Win32.pm
+-inc/Module/Install/WriteAll.pm
+-inc/Module/Package.pm
+-inc/Pod/Markdown.pm
+ lib/Module/Package/Au.pm
+ Makefile.PL
+ MANIFEST			This list of files

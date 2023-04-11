@@ -1,0 +1,14 @@
+[Unit]
+Description=Read and set NIS domainname from /etc/sysconfig/network
+Before=ypbind.service yppasswdd.service ypserv.service ypxfrd.service sysinit.target
+DefaultDependencies=no
+Conflicts=shutdown.target
+ConditionPathExists=/etc/sysconfig/network
+
+[Service]
+ExecStart=/usr/libexec/hostname/nis-domainname
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

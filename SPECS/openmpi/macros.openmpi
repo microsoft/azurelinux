@@ -1,0 +1,7 @@
+%_openmpi_load \
+ . /etc/profile.d/modules.sh; \
+ module load mpi/openmpi-%{_arch}; \
+ export OMPI_MCA_rmaps_base_oversubscribe=1
+%_openmpi_unload \
+ . /etc/profile.d/modules.sh; \
+ module unload mpi/openmpi-%{_arch};

@@ -1,0 +1,7 @@
+# GitHub-specific attributes are documented here:
+# https://github.com/github/linguist/blob/master/docs/overrides.md
+*.spec linguist-detectable linguist-language=RPM-Spec
+toolkit/docs/** linguist-documentation
+LICENSES-AND-NOTICES/** linguist-documentation
+SPECS/LICENSES-AND-NOTICES/** linguist-documentation
+SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md linguist-generated

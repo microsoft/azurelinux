@@ -1,0 +1,11 @@
+--- sisu-plexus/org.eclipse.sisu.plexus/src/org/eclipse/sisu/plexus/PlexusBundlePlan.java~	2015-09-13 20:15:37.000000000 +0200
++++ sisu-plexus/org.eclipse.sisu.plexus/src/org/eclipse/sisu/plexus/PlexusBundlePlan.java	2017-01-29 19:56:51.608151337 +0100
+@@ -80,7 +80,7 @@
+ 
+     protected static boolean hasPlexusAnnotations( final Bundle bundle )
+     {
+-        final String imports = bundle.getHeaders().get( Constants.IMPORT_PACKAGE );
++        final String imports = bundle.getHeaders().get( Constants.IMPORT_PACKAGE ).toString();
+         return null != imports && imports.contains( "org.codehaus.plexus.component.annotations" );
+     }
+ 

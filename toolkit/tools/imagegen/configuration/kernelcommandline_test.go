@@ -18,9 +18,10 @@ var (
 		},
 		ExtraCommandLine: "param1=value param2=\"value2 value3\"",
 		SELinux:          "permissive",
+		CGroup:           "version_two",
 	}
 	invalidExtraCommandLine     = "invalid=`delim`"
-	validExtraComandLineJSON    = `{"ImaPolicy": ["tcb"], "ExtraCommandLine": "param1=value param2=\"value2 value3\"", "SELinux": "permissive"}`
+	validExtraComandLineJSON    = `{"ImaPolicy": ["tcb"], "ExtraCommandLine": "param1=value param2=\"value2 value3\"", "SELinux": "permissive", "CGroup": "version_two"}`
 	invalidExtraComandLineJSON1 = `{"ImaPolicy": [ "not-an-ima-policy" ]}`
 	invalidExtraComandLineJSON2 = `{"ExtraCommandLine": "` + invalidExtraCommandLine + `"}`
 )
@@ -75,6 +76,20 @@ func TestShouldFailParsingInvalidSELinux_KernelCommandLine(t *testing.T) {
 	err = remarshalJSON(badSELinux, &checkedCommandline)
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [KernelCommandLine]: failed to parse [SELinux]: invalid value for SELinux (Not a valid SELINUX)", err.Error())
+}
+
+func TestShouldFailParsingInvalidCGroup_KernelCommandLine(t *testing.T) {
+	var checkedCommandline KernelCommandLine
+	badCGroupFlag := validCommandLine
+	badCGroupFlag.CGroup = "Not a valid CGroup"
+
+	err := badCGroupFlag.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid value for CGroup (Not a valid CGroup)", err.Error())
+
+	err = remarshalJSON(badCGroupFlag, &checkedCommandline)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [KernelCommandLine]: failed to parse [CGroup]: invalid value for CGroup (Not a valid CGroup)", err.Error())
 }
 
 func TestShouldFailParsingMixedValidInvalidIma_KernelCommandLine(t *testing.T) {

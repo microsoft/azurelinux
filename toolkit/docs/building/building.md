@@ -9,6 +9,7 @@
    - [Package Stage](#package-stage)
      - [Rebuild All Packages](#rebuild-all-packages)
      - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
+     - [Targeted Package Building](#targeted-package-building)
    - [Image Stage](#image-stage)
      - [Virtual Hard Disks and Containers](#virtual-hard-disks-and-containers)
      - [ISO Images](#iso-images)
@@ -19,6 +20,9 @@
       - [Force Rebuilds](#force-rebuilds)
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
+  - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
+      - [CBL-Mariner 1.0](#cbl-mariner-10)
+      - [CBL-Mariner 2.0](#cbl-mariner-20)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
     - [Authentication](#authentication)
@@ -76,19 +80,20 @@
 
 ## Overview
 
-The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [pacakages.microsoft.com](https://packages.microsoft.com/cbl-mariner/1.0/prod/)
+The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/)
 
-However, to test-drive CBL-Mariner, building an ISO, VHD or VHDX _**is** currently_ required.  There are two approaches.  The fastest way to achieve this is through the [Quick Start Instructions](../quick_start/quickstart.md). This is recommended for anyone that just wants to run CBL-Mariner.  The second, approach is to build a custom CBL-Mariner based image.  This is recommended for developers that want to experiment with CBL-Mariner in a focused environment and is usually faster and easier than working with full CBL-Mariner builds.  To work in a more focused environment, refer to the tutorial in the [CBL-MarinerDemo](https://github.com/microsoft/CBL-MarinerDemo) repository.
+If you simply want to test-drive CBL-Mariner you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with CBL-Mariner and build custom images or add packages in a more focused environment, refer to the tutorial in the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository.
 
 The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
-- **Toolchain** This stage builds several compilers and tools needed in the subsequent package build stage.  Building is serialized in this stage.
+- **Toolchain** This stage builds a bootstrap toolchain and then builds the official toolchain.  The official toolchain is used in the subsequent package build stage.  Building is highly scripted and serialized in this stage.
 
-- **Package** This stage uses outputs from the toolchain stage to build any package not built in toolchain stage.  Packages can be built in parallel during this stage.
+- **Package** This stage uses outputs from the toolchain stage to build any package not built in toolchain stage.  Packages are built in parallel during this stage.
 
 - **Image** This stage generates the resulting ISO, VHD, VHDX, and/or container images from the rpm packages built in the package stage.
 
 Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
+
 
 ## **Building in Stages**
 
@@ -100,22 +105,22 @@ Prepare your system by installing the necessary prerequisites [here](prerequisit
 
 ## **Clone and Sync To Stable Commit**
 
-Clone the 1.0-stable build of CBL-Mariner as shown here.
+Clone the 2.0-stable build of CBL-Mariner as shown here.
 
 ```bash
 # Get the source code
 git clone https://github.com/microsoft/CBL-Mariner.git
 cd CBL-Mariner/toolkit
 
-# Checkout the desired release branch. The 1.0-stable tag tracks the most recent successful release of the 1.0 branch.
-git checkout 1.0-stable
+# Checkout the desired release branch. The 2.0-stable tag tracks the most recent successful release of the 2.0 branch.
+git checkout 2.0-stable
 ```
 
-**IMPORTANT:** The 1.0-stable tag always points to the latest known good build of CBL-Mariner. At this time, only the Mariner 1.0 branch is buildable.  This branch is continually updated with bug fixes, security vulnerability fixes or occassional feature enhancements.  Fixes may be applied to this branch at any time.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 1.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 1.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
+**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of CBL-Mariner of the 2.0 branch. A similar tag, 1.0-stable, exists for the 1.0 branch. Other branchses are also buildable but not guarnateed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 2.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
 
-It is also possible to build an older version of CBL-Mariner from the 1.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 1.0-stable label above.
+It is also possible to build an older version of CBL-Mariner from the 2.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 2.0-stable label above.
 
-Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 1.0 branch.
+Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 2.0 branch.
 
 **NOTE: All subsequent commands are assumed to be executed from inside the toolkit directory.**
 
@@ -160,7 +165,7 @@ The following command rebuilds all CBL-Mariner packages.
 ```bash
 # Build ALL packages
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y
 ```
 
 ### **Rebuild Minimal Required Packages**
@@ -168,19 +173,38 @@ sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y
 The following command rebuilds packages for the basic VHD.
 
 ```bash
-# Build ALL packages FOR AMD64
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8"
-
-# Build ALL packages FOR ARM64
+# Build the subset of packages needed to build the basic VHD
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64"
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 ```
 
-Note that the image build commands in [Build Images](#build-images) will **automatically** build _only_ the packages required by a selected image configuration and then builds the image.
+Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
+
+### **Targeted Package Building**
+Beginning with the CBL-Mariner 2.0's 2022 October Release (2.0.20221007) it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to CBL-Mariner.
+
+```bash
+# Build targeted packages
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh"
+```
+Note that this process will download dependencies from packages.microsoft.com and rebuild just the SPEC files indicated by the SRPM_PACK_LIST
+
+After building a package you may choose to rebuild it or build additional packages.  The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
+
+```bash
+# Clean and rebuild targeted packages
+sudo make clean-build-packages
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at openssh" REFRESH_WORKER_CHROOT=n
+
+# Rebuild single package
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_REBUILD_LIST="at" REFRESH_WORKER_CHROOT=n
+```
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerDemo#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/1.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerTutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+
+By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building)
 
 All images are generated in the `out/images` folder.
 
@@ -193,7 +217,7 @@ sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 # To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
 sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
 
-# To build a Mariner Contianer Image (Container Folder: ../out/images/core-container/*.tar.gz
+# To build a core Mariner Contianer (Container Folder: ../out/images/core-container/*.tar.gz
 sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 
@@ -205,11 +229,11 @@ NOTE: ISOs require additional packaging and build steps (such as the creation of
 
 The following builds an ISO with an interactive UI and selectable image configurations.
 ```bash
-# To build a Mariner ISO Image (ISO folder: ../out/images/full)
+# To build a CBL-Mariner ISO Image (ISO folder: ../out/images/full)
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) that only specifies a _single_ SystemConfig.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig.
 
 ```bash
 # Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
@@ -220,7 +244,7 @@ sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyper
 
 ## Packages
 
-The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
+The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
 
 Build all local packages needed for the default `core-efi.json`:
 
@@ -271,6 +295,33 @@ The build system also enforces hash checking for sources when packaging SRPMs. F
 # Just update the intermediate SRPMs and their source signatures by using the input-srpms target
 sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 ```
+
+### packages.microsoft.com Repository Structure
+
+CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/). The CBL-Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+
+The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
+
+#### CBL-Mariner 1.0
+
+For CBL-Mariner 1.0, the repositories are structured as follows:
+
+- **Base:** Packages released with CBL-Mariner 1.0.
+- **Update:** Base packages added or updated since CBL-Mariner 1.0's release date.
+- **CoreUI:** Targeted UI related packages.
+- **Extras:** CBL-Mariner 1.0 packages that are built by Microsoft and are closed source.
+- **NVIDIA:** Specially licensed NVIDIA packages.
+- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
+
+#### CBL-Mariner 2.0
+
+For CBL-Mariner 2.0, the repositories are structured as follows:
+
+- **Base:** Packages released with CBL-Mariner 2.0 and their updates.
+- **Extras:** CBL-Mariner 2.0 packages that are built by Microsoft and are closed source
+- **Extended:** CBL-Mariner 2.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
+- **NVIDIA:** Specially licensed NVIDIA packages.
+- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
 
 ## Keys, Certs, and Remote Sources
 
@@ -376,15 +427,15 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `PACKAGE_URL_LIST=...`
 
-> Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 
 #### `SRPM_URL_LIST=...`
 
-> Space seperated list of URLs to download packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
+> Space separated list of URLs to download packed SRPM packages from prior to build if `$(DOWNLOAD_SRPMS)` is set to `y`.
 
 #### `REPO_LIST=...`
 
-> List of RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. CBL-Mariner provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
+> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. CBL-Mariner provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
 >
 > - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on CBL-Mariner repositories.
 > - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
@@ -547,7 +598,7 @@ These are the useful build targets:
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
 | compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
-| copy-toolchain-rpms              | Copy all toolchain RPMS from `../build/rpm_cache/cache` to  `../out/RPMS`.
+| copy-toolchain-rpms              | **[DEPRECATED]: This should no longer be needed as a work around in core repo builds. Will be removed in future versions.** Copy all toolchain RPMS from `../build/toolchain_rpms` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
 | fetch-external-image-packages    | Download all external packages required for an image build.
@@ -588,7 +639,7 @@ Since the summary files are regenerated every build, if you wish to reproduce a 
 | Image Build                   | `$(IMAGEGEN_DIR)/{imagename}/image_deps.json`                                                          | Generated every image build. Can be saved and used later with the `IMAGE_CACHE_SUMMARY` variable to reproduce an image build. Contains **all (both external and local)** packages required to build the image.
 | Initrd Build                  | `$(IMAGEGEN_DIR)/iso_initrd/image_deps.json`                                                           | Generated every initrd and ISO build. Can be saved and used later with the `INITRD_CACHE_SUMMARY` variable to reproduce an initrd build. Contains **all (both external and local)** packages required to build the image. However, unless you modified the initrd image packages JSON or have your own version of its PMC packages locally, all the required packages are external.
 
-**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core Mariner's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
+**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core CBL-Mariner's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
 
 ### Building From Summaries
 
@@ -596,7 +647,7 @@ To reproduce a build, there are four constraints:
 
 1. The local SPEC files must be the same. That is, you cannot reproduce a build having modified any of the local SPEC files since when the summary files were generated.
 2. What is being built must be the same. That is, if the summary files were generated from an image build then the reproduced build must be building the exact same image configuration.
-3. The toolkit version must be the same. That is, if the summary files were generated from a `1.0` toolkit, then the reproduced build must be done using the `1.0` toolkit.
+3. The toolkit version must be the same. That is, if the summary files were generated from a `2.0` toolkit, then the reproduced build must be done using the `2.0` toolkit.
 4. The builds must be from clean. Both the build that generated the summary files and the reproduced build must be done from a clean state, otherwise there may be leftover files that affect the summary files. The only exception is the mentioned case of using external packages not present in the PMC repository - in this case you'll need to pre-populate the local cache with these packages after cleaning your repository, but before running the build.
 
 If the above constraints are met then a build can be reproduced from summary files.
@@ -630,8 +681,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | [Image config file](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) to build.
-| CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerDemo#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
+| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | [Image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) to build.
+| CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Additional packages to build. The package will be skipped if the build system thinks it is already up-to-date.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well.
@@ -661,8 +712,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                  | Description
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                                                                                          | URL to request package sources from
-| SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space seperated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`                 | Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+| SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space separated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
+| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`                 | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
@@ -681,13 +732,17 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | ARCHIVE_TOOL                  | $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )                   | Default tool to use in conjunction with `tar` to extract `*.tar.gz` files. Tries to use `pigz` if available, otherwise uses `gzip`
 | INCREMENTAL_TOOLCHAIN         | n                                                                                                      | Only build toolchain RPM packages if they are not already present
 | RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
-| PACKAGE_BUILD_RETRIES         | 1                                                                                                      | Number of build retries for each package
+| ALLOW_TOOLCHAIN_REBUILDS      | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
+|  PACKAGE_BUILD_RETRIES        | 1                                                                                                      | Number of build retries for each package
+| CHECK_BUILD_RETRIES           | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
 | CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 | REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
+| TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
+| USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
 
 ---
 

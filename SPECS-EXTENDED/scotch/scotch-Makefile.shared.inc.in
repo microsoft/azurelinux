@@ -1,0 +1,24 @@
+EXE               =
+LIB               = .so
+OBJ               = .o
+
+MAKE              = make
+AR                = gcc
+CAT               = cat
+CCS               = gcc
+CCP               = mpicc
+CCD               = mpicc
+override CFLAGS  += -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_FILE_COMPRESS_BZ2 -DCOMMON_FILE_COMPRESS_LZMA \
+                    -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME \
+                    -Drestrict=__restrict -DIDXSIZE64
+CLIBFLAGS         = -shared -fPIC
+override LDFLAGS += -lz -lbz2 -llzma -lm -lrt -lpthread
+# LDFLAGS added to AR rule in Makefiles to come after objects to work with -Wl,--as-needed
+ARFLAGS           = -shared -Wl,-soname=$@.$(SOMAJ) -o
+CP                = cp -av
+LEX               = flex
+LN                = ln
+MKDIR             = mkdir -p
+MV                = mv
+RANLIB            = echo
+YACC              = bison -y

@@ -10,30 +10,20 @@ import (
 	"math"
 	"strings"
 	"time"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 type TimeStamp struct {
-	// Name of this step
-	Name string `json:"Name"`
-	// Time we started this step, NIL if step hasn't started
-	StartTime *time.Time `json:"StartTime"`
-	// Time we ended this step, NIL if step hasn't ended
-	EndTime *time.Time `json:"EndTime"`
-	// Calculated once completed, should be -1 if uninitialized. To the nearest 10 milliseconds
-	ElapsedSeconds float64 `json:"ElapsedSeconds"`
-	// Roughly how many sub-steps do we expect this step to take, and how much
-	// weight should they have.
-	// We can use this to estimate the progress bar. If its wrong just use the actual
-	// data we have as we go along. We assume the default weight per step is 1.
-	ExpectedWeight float64 `json:"ExpectedWeight"`
-	// Sub-steps. This timestamp reaches 100% when it has both a start & end time.
-	// Otherwise, progress is calculated by summing each sub steps' Progress() * Weight / ExpectedWeight
-	Steps []*TimeStamp `json:"Steps"`
-	// How much relative weight this step has compared to others. Default is 1.0
-	Weight float64 `json:"Weight"`
-
-	parent   *TimeStamp
-	finished bool
+	Name           string       `json:"Name"`           // Name of this step
+	StartTime      *time.Time   `json:"StartTime"`      // Time we started this step, NIL if step hasn't started
+	EndTime        *time.Time   `json:"EndTime"`        // Time we ended this step, NIL if step hasn't ended
+	ElapsedSeconds float64      `json:"ElapsedSeconds"` // Calculated once completed, should be -1 if uninitialized. To the nearest 10 milliseconds
+	ExpectedWeight float64      `json:"ExpectedWeight"` // How many sub-steps we expected this step to take, and how much weight they should have. Use this information to estimate the progress bar if actual data is not available. Default weight per step is 1.
+	Steps          []*TimeStamp `json:"Steps"`          // Sub-steps. This timestamp reaches 100% when it has both a start & end time. Otherwise, progress is calculated by summing each sub steps' Progress() * Weight / ExpectedWeight
+	Weight         float64      `json:"Weight"`         // How much relative weight this step has compared to others. Default is 1.0
+	parent         *TimeStamp
+	finished       bool
 }
 
 var (
@@ -120,7 +110,7 @@ func (node *TimeStamp) FinishAllMeasurements() (err error) {
 		if node.parent.EndTime == nil {
 			return fmt.Errorf("could not finalize orphaned times for node '%s' since it has no parent with an end time", node.Name)
 		} else {
-			failsafeLoggerWarnf("Found orphaned node '%s' with incomplete timing", node.Path())
+			logger.Log.Warnf("Found orphaned node '%s' with incomplete timing", node.Path())
 			node.completeTimeStamp(*node.parent.EndTime)
 		}
 	}

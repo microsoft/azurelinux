@@ -1,7 +1,7 @@
 Summary:        A tiny but valid init for containers
 Name:           tini
 Version:        0.19.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,7 +12,8 @@ BuildRequires:  cmake
 BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
-BuildRequires:  glibc-devel >= 2.34-3
+BuildRequires:  glibc-devel
+BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
@@ -65,6 +66,9 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
+* Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-8
+- Rebuilt for glibc-static 2.35-3
+
 * Mon Feb 21 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-7
 - Re-enable `tini-static` package
 - Enable binary hardening flag (`-static-pie`)

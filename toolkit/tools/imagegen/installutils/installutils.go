@@ -43,7 +43,7 @@ const (
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
-	bootDirectoryFileMode = 0600
+	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
 	shadowFile            = "/etc/shadow"
 )
@@ -293,7 +293,9 @@ func umount(path string) (err error) {
 // PackageNamesFromSingleSystemConfig goes through the "PackageLists" and "Packages" fields in the "SystemConfig" object, extracting
 // from packageList JSONs and packages listed in config itself to create one comprehensive package list.
 // NOTE: the package list contains the versions restrictions for the packages, if present, in the form "[package][condition][version]".
-//       Example: gcc=9.1.0
+//
+//	Example: gcc=9.1.0
+//
 // - systemConfig is the systemconfig field from the config file
 // Since kernel is not part of the packagelist, it is added separately from KernelOptions.
 func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig) (finalPkgList []string, err error) {
@@ -390,17 +392,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
-
-	if len(config.PackageRepos) > 0 {
-		if config.IsIsoInstall {
-			err = configuration.UpdatePackageRepo(installChroot, config)
-			if err != nil {
-				return
-			}
-		} else {
-			return fmt.Errorf("custom package repos should not be specified unless performing ISO installation")
-		}
-	}
 
 	// Initialize RPM Database so we can install RPMs into the installroot
 	err = initializeRpmDatabase(installRoot, diffDiskBuild)
@@ -505,9 +496,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		generateContainerManifests(installChroot)
 	}
 
-	err = configuration.ConfigureNetwork(installChroot, config)
-	if err != nil {
-		return
+	if len(config.Networks) > 0 {
+		err = configuration.ConfigureNetwork(installChroot, config)
+		if err != nil {
+			return
+		}
 	}
 
 	timestamp_v2.StopMeasurement() // final image configuration
@@ -526,7 +519,9 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
+	// Please contact Qualys before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
+	// Please contact Qualys, AquaSec (trivy) and other supported scanning vendors before changing the following rpm query.
 	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t(none)\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n")
 
 	return
@@ -985,6 +980,22 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
+// InstallGrubEnv installs an empty grubenv f
+func InstallGrubEnv(installRoot string) (err error) {
+	const (
+		assetGrubEnvFile = "/installer/grub2/grubenv"
+		grubEnvFile      = "boot/grub2/grubenv"
+	)
+	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
+	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	if err != nil {
+		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
+		return
+	}
+
+	return
+}
+
 // InstallGrubCfg installs the main grub config to the boot partition
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
@@ -1057,6 +1068,12 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+		return
+	}
+
+	err = setGrubCfgCGroup(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
 		return
 	}
 
@@ -1774,7 +1791,8 @@ func GetPartLabel(device string) (stdout string, err error) {
 }
 
 // FormatMountIdentifier finds the requested identifier type for the given device, and formats it for use
-//  ie "UUID=12345678-abcd..."
+//
+//	ie "UUID=12345678-abcd..."
 func FormatMountIdentifier(identifier configuration.MountIdentifier, device string) (identifierString string, err error) {
 	var id string
 	switch identifier {
@@ -1969,6 +1987,47 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	return
 }
 
+func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	const squashErrors = false
+
+	for _, script := range config.FinalizeImageScripts {
+		// Copy the script from this chroot into the install chroot before running it
+		scriptPath := script.Path
+		fileToCopy := safechroot.FileToCopy{
+			Src:  scriptPath,
+			Dest: scriptPath,
+		}
+
+		installChroot.AddFiles(fileToCopy)
+		if err != nil {
+			return
+		}
+
+		ReportActionf("Running finalize image script: %s", path.Base(script.Path))
+		logger.Log.Infof("Running finalize image script: %s", script.Path)
+		err = installChroot.UnsafeRun(func() error {
+			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", scriptPath, script.Args))
+
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(scriptPath)
+			if err != nil {
+				logger.Log.Errorf("Failed to cleanup finalize image script (%s). Error: %s", scriptPath, err)
+			}
+
+			return err
+		})
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 func setGrubCfgAdditionalCmdLine(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
 		extraPattern = "{{.ExtraCommandLine}}"
@@ -2025,6 +2084,32 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	err = sed(selinuxPattern, selinux, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
+	}
+
+	return
+}
+
+func setGrubCfgCGroup(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		cgroupPattern     = "{{.CGroup}}"
+		cgroupv1FlagValue = "systemd.unified_cgroup_hierarchy=0"
+		cgroupv2FlagValue = "systemd.unified_cgroup_hierarchy=1"
+	)
+	var cgroup string
+
+	switch kernelCommandline.CGroup {
+	case configuration.CGroupV2:
+		cgroup = fmt.Sprintf("%s", cgroupv2FlagValue)
+	case configuration.CGroupV1:
+		cgroup = fmt.Sprintf("%s", cgroupv1FlagValue)
+	case configuration.CGroupDefault:
+		cgroup = ""
+	}
+
+	logger.Log.Debugf("Adding CGroupConfiguration('%s') to '%s'", cgroup, grubPath)
+	err = sed(cgroupPattern, cgroup, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's CGroup setting: %v", err)
 	}
 
 	return
@@ -2317,7 +2402,7 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 	return shell.ExecuteLive(squashErrors, "rdiff", rdiffArgs...)
 }
 
-//KernelPackages returns a list of kernel packages obtained from KernelOptions in the config's SystemConfigs
+// KernelPackages returns a list of kernel packages obtained from KernelOptions in the config's SystemConfigs
 func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 	var packageList []*pkgjson.PackageVer
 	// Add all the provided kernels to the package list

@@ -2,10 +2,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:          toolbox
 Version:       0.0.18
-Release:       3%{?dist}
+Release:       9%{?dist}
 Summary:       Unprivileged development environment
 
-License:       ASL 2.0
+License:       Apache-2.0
 URL:           https://github.com/containers/toolbox
 Source0:       https://github.com/containers/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 
@@ -131,6 +131,25 @@ Dockerfile if the image isn't based on the fedora-toolbox image.
 
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-9
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-8
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-7
+- Bump release to rebuild with go 1.19.6
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-6
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.18-5
+- Bump release to rebuild with go 1.19.4
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.0.18-4
+- Bump release to rebuild with go 1.18.8
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.18-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing 'Requires' for 'podman' as we don't want to provide it with the 'toolbox'.

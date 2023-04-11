@@ -45,8 +45,8 @@ done                                                             \
 ln -s libkcapi.so.%{version}.hmac                            \\\
   "$lib_path"/fipscheck/libkcapi.so.%{vmajor}.hmac               \
 %{nil}
-%global fipscheck_evr     1.5.0-9
-%global hmaccalc_evr      0.9.14-10%{?dist}
+%global fipscheck_next_evr     1.5.0-10%{?dist}
+%global hmaccalc_next_evr      0.9.14-11%{?dist}
 %if %{with_sysctl_tweak}
 # Priority for the sysctl.d preset.
 %global sysctl_prio       50
@@ -58,7 +58,7 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -105,9 +105,9 @@ Header files for applications that use %{name}.
 %package        fipscheck
 Summary:        Drop-in replacements for fipscheck/fipshmac provided by the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:      fipscheck <= %{fipscheck_evr}
-Provides:       fipscheck = %{fipscheck_evr}.1
-Provides:       fipscheck%{?_isa} = %{fipscheck_evr}.1
+Obsoletes:      fipscheck < %{fipscheck_next_evr}
+Provides:       fipscheck = %{fipscheck_next_evr}
+Provides:       fipscheck%{?_isa} = %{fipscheck_next_evr}
 
 %description    fipscheck
 Provides drop-in replacements for fipscheck and fipshmac tools (from
@@ -116,9 +116,9 @@ package fipscheck) using %{name}.
 %package        hmaccalc
 Summary:        Drop-in replacements for hmaccalc provided by the %{name} package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:      hmaccalc <= %{hmaccalc_evr}
-Provides:       hmaccalc = %{hmaccalc_evr}.1
-Provides:       hmaccalc%{?_isa} = %{hmaccalc_evr}.1
+Obsoletes:      hmaccalc < %{hmaccalc_next_evr}
+Provides:       hmaccalc = %{hmaccalc_next_evr}
+Provides:       hmaccalc%{?_isa} = %{hmaccalc_next_evr}
 
 %description    hmaccalc
 Provides drop-in replacements for sha*hmac tools (from package
@@ -256,6 +256,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Thu Jan 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.1-2
+- Fixing 'Obsoletes' and 'Provides' for 'fipscheck' and 'hmaccalc' subpackages.
+
 * Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 1.3.1-1
 - Upgrade to version 1.3.1
 

@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "heimdal-7.7.0.tar.gz": "f02d3314d634cc55eb9cf04a1eae0d96b293e45a1f837de9d894e800161b7d1b",
+  "heimdal-7.7.1.tar.gz": "117cb1ede7848db24cf27311c46f7f735a99f9c836c22e80aec92b91efe56644",
   "heimdal-bashrc": "606045acea4cddb8f0cb7697225382aa89505aa5e0b89c244da333650a372e4f",
   "heimdal-ipropd-master.init": "ecd6d7dd613dcf4e255bc296ad0c6f76ffd0931ee9e8e2b94b0a7edeb92d1264",
   "heimdal-ipropd-master.service": "fc70e57eb6118132d21bad1c01bf16ee5a8572867ee369a09d3f4dbd63adbf7a",

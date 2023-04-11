@@ -4,22 +4,24 @@ Distribution:   Mariner
 
 Name:           python-%{realname}
 Version:        0.4.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        MS-KKDCP (kerberos proxy) WSGI module
 
 License:        MIT
-URL:            https://github.com/npmccallum/%{realname}
-Source0:        https://github.com/npmccallum/%{realname}/archive/%{realname}-%{version}.tar.gz#/python-%{realname}-%{version}.tar.gz
+URL:            https://github.com/latchset/%{realname}
+Source0:        https://github.com/latchset/%{realname}/releases/download/v%{version}/%{realname}-%{version}.tar.gz#/python-%{realname}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  git
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-pytest
-BuildRequires:  python3-coverage
 BuildRequires:  python3-asn1crypto
+BuildRequires:  python3-devel
 BuildRequires:  python3-dns
+%if %{with_check}
+BuildRequires:  python3-coverage
 BuildRequires:  python3-mock
+BuildRequires:  python3-pip
+%endif
 
 
 %description
@@ -49,6 +51,7 @@ minimal configuration.
 %py3_install
 
 %check
+%{__python3} -m pip install pytest==7.1.2
 KDCPROXY_ASN1MOD=asn1crypto %{__python3} -m pytest
 
 %files -n python3-%{realname}
@@ -58,6 +61,10 @@ KDCPROXY_ASN1MOD=asn1crypto %{__python3} -m pytest
 %{python3_sitelib}/%{realname}-%{version}-*.egg-info
 
 %changelog
+* Tue Aug 30 2022 Muhammad Falak <mwani@microsoft.com> - 0.4.2-5
+- Add BR on python-pip and drop BR on pytest to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

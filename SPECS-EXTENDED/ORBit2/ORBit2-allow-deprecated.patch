@@ -1,0 +1,23 @@
+--- ORBit2-2.14.19/linc2/src/Makefile.am.depr	2013-03-15 09:24:45.384143557 -0400
++++ ORBit2-2.14.19/linc2/src/Makefile.am	2013-03-15 09:24:55.172144088 -0400
+@@ -12,8 +12,7 @@
+ 	-I$(top_builddir)/linc2/include  \
+ 	-I$(top_srcdir)/linc2/include    \
+ 	$(LINC_CFLAGS)             \
+-	$(WARN_CFLAGS)             \
+-	-DG_DISABLE_DEPRECATED
++	$(WARN_CFLAGS)
+ 
+ if OS_WIN32
+ else
+--- ORBit2-2.14.19/linc2/src/Makefile.in.depr	2013-03-15 09:24:45.943143588 -0400
++++ ORBit2-2.14.19/linc2/src/Makefile.in	2013-03-15 09:25:08.333144801 -0400
+@@ -244,7 +244,7 @@
+ #	-I$(top_srcdir)/include    
+ INCLUDES = -I$(top_builddir)/linc2/include \
+ 	-I$(top_srcdir)/linc2/include $(LINC_CFLAGS) $(WARN_CFLAGS) \
+-	-DG_DISABLE_DEPRECATED $(am__append_1)
++	$(am__append_1)
+ liblinc_la_SOURCES = \
+ 	linc.c			\
+ 	linc-connection.c	\

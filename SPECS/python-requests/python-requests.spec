@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.27.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,9 @@ perform the simplest of tasks.
 
 %check
 pip3 install tox
+# 2.1.0+ versions of "markupsafe" make test fail.
+# No fix from upstream in version 2.28.1: https://github.com/psf/requests/commit/3ed60078e2376c847ba0b0c9d564af522623c5ba
+sed -i "/wheel/amarkupsafe==2.0.1" requirements-dev.txt
 LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python3-requests
@@ -68,6 +71,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Oct 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.27.1-5
+- Froze dependency "markupsafe==2.0.1" to stabilize tests.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.27.1-4
 - Updating source URL.
 

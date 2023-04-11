@@ -6,7 +6,7 @@ Summary:        Network traffic analyzer
 Name:           wireshark
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:        3.4.14
+Version:        3.4.16
 Release:        1%{?dist}
 License:        BSD and GPLv2
 Url:            https://www.wireshark.org/
@@ -236,6 +236,9 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.16-1
+- Upgrade to 3.4.16
+
 * Fri Jun 10 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.14-1
 - Update to resolves CVEs
 - Disabled Android Dump.

@@ -1,0 +1,69 @@
+From 51c841e510e250b8c32cd695e3f4f0a4b4a66a65 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 9 Feb 2023 14:30:00 +0000
+Subject: [PATCH 23/35] kdump: Fixes from testing kdumpctl.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/kdump.te | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/admin/kdump.te b/policy/modules/admin/kdump.te
+index ec3d2f4d5..77c7e2803 100644
+--- a/policy/modules/admin/kdump.te
++++ b/policy/modules/admin/kdump.te
+@@ -23,6 +23,9 @@ type kdumpctl_exec_t;
+ init_daemon_domain(kdumpctl_t, kdumpctl_exec_t)
+ application_executable_file(kdumpctl_exec_t)
+ 
++type kdumpctl_lock_t;
++files_lock_file(kdumpctl_lock_t)
++
+ type kdumpctl_tmp_t;
+ files_tmp_file(kdumpctl_tmp_t)
+ 
+@@ -61,6 +64,9 @@ allow kdumpctl_t self:unix_stream_socket { accept listen };
+ 
+ allow kdumpctl_t kdump_etc_t:file read_file_perms;
+ 
++allow kdumpctl_t kdumpctl_lock_t:file manage_file_perms;
++files_lock_filetrans(kdumpctl_t, kdumpctl_lock_t, file)
++
+ manage_dirs_pattern(kdumpctl_t, kdumpctl_tmp_t, kdumpctl_tmp_t)
+ manage_files_pattern(kdumpctl_t, kdumpctl_tmp_t, kdumpctl_tmp_t)
+ manage_lnk_files_pattern(kdumpctl_t, kdumpctl_tmp_t, kdumpctl_tmp_t)
+@@ -84,9 +90,12 @@ files_read_etc_runtime_files(kdumpctl_t)
+ files_read_usr_files(kdumpctl_t)
+ files_read_kernel_modules(kdumpctl_t)
+ files_getattr_all_dirs(kdumpctl_t)
++files_list_var(kdumpctl_t)
+ 
+ fs_getattr_all_fs(kdumpctl_t)
+ fs_search_all(kdumpctl_t)
++fs_read_efivarfs_files(kdumpctl_t)
++fs_list_efivars(kdumpctl_t)
+ 
+ init_domtrans_script(kdumpctl_t)
+ init_exec(kdumpctl_t)
+@@ -97,10 +106,16 @@ logging_send_syslog_msg(kdumpctl_t)
+ 
+ miscfiles_read_localization(kdumpctl_t)
+ 
++seutil_domtrans_setfiles(kdumpctl_t)
++
+ optional_policy(`
+ 	gpg_exec(kdumpctl_t)
+ ')
+ 
++optional_policy(`
++	hostname_exec(kdumpctl_t)
++')
++
+ optional_policy(`
+ 	lvm_read_config(kdumpctl_t)
+ ')
+-- 
+2.34.1
+

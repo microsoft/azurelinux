@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.07
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Transformer to dbus-python types
 
 License:        ASL 2.0
@@ -50,7 +50,7 @@ Python 3 version.
 %py3_install
 
 %check
-pip3 install pytest sortedcontainers
+pip3 install pytest==7.1.3 sortedcontainers
 pip3 install .
 pytest -v tests
 
@@ -61,6 +61,9 @@ pytest -v tests
 %{python3_sitelib}/into_dbus_python-*.egg-info/
 
 %changelog
+* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.07-6
+- Freezing "pytest" deps to version 7.1.3 to avoid regressions.
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.07-5
 - Drop BR on pytest & pip install latest deps to enable ptest
 - License verified

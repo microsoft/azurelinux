@@ -1,0 +1,99 @@
+diff -rupN geos-3.11.1/include/geos/geomgraph/Depth.h geos-3.11.1-new/include/geos/geomgraph/Depth.h
+--- geos-3.11.1/include/geos/geomgraph/Depth.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/geomgraph/Depth.h	2023-01-24 07:41:01.310455996 +0100
+@@ -24,6 +24,7 @@
+ #include <geos/geom/Location.h>
+ #include <geos/geom/Position.h>
+ #include <string>
++#include <cstdint>
+ 
+ // Forward declarations
+ namespace geos {
+diff -rupN geos-3.11.1/include/geos/geomgraph/Label.h geos-3.11.1-new/include/geos/geomgraph/Label.h
+--- geos-3.11.1/include/geos/geomgraph/Label.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/geomgraph/Label.h	2023-01-24 07:50:33.250454277 +0100
+@@ -26,6 +26,7 @@
+ 
+ #include <iosfwd> // for operator<<
+ #include <cassert>
++#include <cstdint>
+ 
+ namespace geos {
+ namespace geomgraph { // geos.geomgraph
+diff -rupN geos-3.11.1/include/geos/geomgraph/TopologyLocation.h geos-3.11.1-new/include/geos/geomgraph/TopologyLocation.h
+--- geos-3.11.1/include/geos/geomgraph/TopologyLocation.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/geomgraph/TopologyLocation.h	2023-01-24 07:58:49.033130619 +0100
+@@ -27,6 +27,7 @@
+ #include <array>
+ #include <string>
+ #include <cassert>
++#include <cstdint>
+ 
+ #ifdef _MSC_VER
+ #pragma warning(push)
+diff -rupN geos-3.11.1/include/geos/io/WKTWriter.h geos-3.11.1-new/include/geos/io/WKTWriter.h
+--- geos-3.11.1/include/geos/io/WKTWriter.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/io/WKTWriter.h	2023-01-24 08:09:32.946821997 +0100
+@@ -24,6 +24,7 @@
+ 
+ #include <string>
+ #include <cctype>
++#include <cstdint>
+ 
+ #ifdef _MSC_VER
+ #pragma warning(push)
+diff -rupN geos-3.11.1/include/geos/operation/overlayng/OverlayLabel.h geos-3.11.1-new/include/geos/operation/overlayng/OverlayLabel.h
+--- geos-3.11.1/include/geos/operation/overlayng/OverlayLabel.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/operation/overlayng/OverlayLabel.h	2023-01-24 08:24:50.236120617 +0100
+@@ -17,6 +17,7 @@
+ #include <geos/geom/Location.h>
+ #include <geos/geom/Position.h>
+ #include <geos/export.h>
++#include <cstdint>
+ 
+ using geos::geom::Location;
+ using geos::geom::Position;
+diff -rupN geos-3.11.1/include/geos/shape/fractal/HilbertCode.h geos-3.11.1-new/include/geos/shape/fractal/HilbertCode.h
+--- geos-3.11.1/include/geos/shape/fractal/HilbertCode.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/shape/fractal/HilbertCode.h	2023-01-24 08:34:19.200753980 +0100
+@@ -17,6 +17,7 @@
+ 
+ #include <geos/export.h>
+ #include <string>
++#include <cstdint>
+ 
+ // Forward declarations
+ namespace geos {
+diff -rupN geos-3.11.1/include/geos/shape/fractal/HilbertEncoder.h geos-3.11.1-new/include/geos/shape/fractal/HilbertEncoder.h
+--- geos-3.11.1/include/geos/shape/fractal/HilbertEncoder.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/shape/fractal/HilbertEncoder.h	2023-01-24 08:43:34.124625256 +0100
+@@ -18,6 +18,7 @@
+ #include <geos/export.h>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ // Forward declarations
+ namespace geos {
+diff -rupN geos-3.11.1/include/geos/shape/fractal/MortonCode.h geos-3.11.1-new/include/geos/shape/fractal/MortonCode.h
+--- geos-3.11.1/include/geos/shape/fractal/MortonCode.h	2022-11-13 20:24:40.000000000 +0100
++++ geos-3.11.1-new/include/geos/shape/fractal/MortonCode.h	2023-01-24 09:40:32.202364547 +0100
+@@ -17,6 +17,7 @@
+ 
+ #include <geos/export.h>
+ #include <string>
++#include <cstdint>
+ 
+ // Forward declarations
+ namespace geos {
+diff -rupN geos-3.11.1/tests/unit/capi/GEOSMakeValidTest.cpp geos-3.11.1-new/tests/unit/capi/GEOSMakeValidTest.cpp
+--- geos-3.11.1/tests/unit/capi/GEOSMakeValidTest.cpp	2022-11-13 20:24:41.000000000 +0100
++++ geos-3.11.1-new/tests/unit/capi/GEOSMakeValidTest.cpp	2023-01-24 19:06:06.708755542 +0100
+@@ -9,6 +9,7 @@
+ #include <cstdlib>
+ #include <cmath>
+ #include <cstring>
++#include <cstdint>
+ 
+ #include "capi_test_utils.h"
+ 

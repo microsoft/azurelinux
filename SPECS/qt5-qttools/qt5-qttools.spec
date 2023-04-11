@@ -1,20 +1,21 @@
 Summary:      Qt5 - QtTool components
 Name:         qt5-qttools
 Version:      5.12.5
-Release:      5%{?dist}
+Release:      6%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
 License: LGPLv3 or LGPLv2
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qttools-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qttools-everywhere-src-%{version}.tar.xz
 
 # help lrelease/lupdate use/prefer qmake-qt5
 # https://bugzilla.redhat.com/show_bug.cgi?id=1009893
 Patch0: qttools-opensource-src-5.5.0-qmake-qt5.patch
 
 BuildRequires: coreutils
+
 BuildRequires: qt5-qtbase-private-devel
 # Qt macros
 BuildRequires: qt5-rpm-macros >= %{version}
@@ -390,6 +391,10 @@ fi
 
 
 %changelog
+* Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
+- Update source download path
+- License verified.
+
 * Tue Mar 31 2020 Joe Schmitt <joschmit@microsoft.com> - 5.12.5-5
 - Remove bad buildrequires
 

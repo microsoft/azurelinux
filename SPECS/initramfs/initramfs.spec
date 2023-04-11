@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        8%{?dist}
+Release:        11%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,7 @@ install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 install -d -m755 %{buildroot}%{_localstatedir}/lib/initramfs/kernel
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
-%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips
+%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips, dracut-megaraid
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
 
@@ -82,15 +82,22 @@ echo "initramfs (re)generation" %* >&2
 #
 # So in order to be compatible with kdump, we need to make sure to add the -k
 # option when invoking mkinitrd with an explicit <image> and <kernel version>
+#
+# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
     echo "(re)generate initramfs for all kernels," %* >&2 \
     mkinitrd -q \
+    mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || : \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
-        mkinitrd -q /boot/initrd.img-$k $k -k \
+        if [[ $k == *mshv* ]]; then \
+            mkinitrd -q /boot/efi/initrd.img-$k $k -k \
+        else \
+            mkinitrd -q /boot/initrd.img-$k $k -k \
+        fi \
     done; \
 fi \
 %removal_action
@@ -99,6 +106,8 @@ fi \
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
+# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
+mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
 
 %postun
 echo "initramfs" %{version}-%{release} "postun" >&2
@@ -127,6 +136,16 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Fri Mar 31 2023 Vince Perri <viperri@microsoft.com> - 2.0-11
+- Add dracut-megaraid to package watch list, since it will add dracut modules
+
+* Thu Mar 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-10
+- Create initrd in /boot/efi for kernel-mshv only if it is a kata image
+
+* Mon Dec 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0-9
+- Create initrd in /boot/efi for kernel-mshv.
+- License verified.
+
 * Thu Feb 04 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.0-8
 - Add dracut-fips to package watch list, since it will add a dracut module
 

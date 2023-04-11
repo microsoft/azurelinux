@@ -1,0 +1,12 @@
+diff -urNad wordnet-3.0/src/wnb.orig wordnet-3.0/src/wnb
+--- wordnet-3.0/src/wnb.orig	2005-06-07 21:19:22.000000000 +0200
++++ wordnet-3.0/src/wnb	2006-01-08 13:54:23.537621328 +0100
+@@ -103,7 +103,7 @@
+ 
+ if {$tcl_platform(platform) == "unix"} {
+    if {[lsearch -exact [array names env] WNHOME] == -1} {
+-	set resourcedir "/usr/local/WordNet-3.0/lib/wnres"
++	set resourcedir "/usr/share/wordnet-3.0/lib/wnres"
+    } else {
+ 	set resourcedir "$env(WNHOME)/lib/wnres"
+    }

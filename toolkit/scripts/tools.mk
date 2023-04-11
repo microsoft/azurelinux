@@ -7,6 +7,7 @@
 
 $(call create_folder,$(RPMS_DIR))
 $(call create_folder,$(CACHED_RPMS_DIR)/cache)
+$(call create_folder,$(CCACHE_DIR))
 $(call create_folder,$(TOOL_BINS_DIR))
 $(call create_folder,$(BUILD_DIR)/tools)
 
@@ -29,6 +30,7 @@ go_tool_list = \
 	liveinstaller \
 	pkgworker \
 	roast \
+	rpmssnapshot \
 	scheduler \
 	specreader \
 	srpmpacker \
@@ -54,7 +56,7 @@ define go_util_rule
 go-$(notdir $(tool))=$(tool)
 .PHONY: go-$(notdir $(tool))
 go-$(notdir $(tool)): $(tool)
-$(tool): $(shell find $(TOOLS_DIR)/$(notdir $(tool))/ -type f -name '*.go')
+$(tool): $(call shell_real_build_only, find $(TOOLS_DIR)/$(notdir $(tool))/ -type f -name '*.go')
 endef
 $(foreach tool,$(go_tool_targets),$(eval $(go_util_rule)))
 
@@ -84,7 +86,7 @@ else
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
-		go build \
+		CGO_ENABLED=0 go build \
 			-ldflags="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
 			-o $(TOOL_BINS_DIR)
 endif
@@ -107,7 +109,7 @@ go-fmt-all:
 
 # Formats the test coverage for the tools
 .PHONY: $(BUILD_DIR)/tools/all_tools.coverage
-$(BUILD_DIR)/tools/all_tools.coverage: $(shell find $(TOOLS_DIR)/ -type f -name '*.go')
+$(BUILD_DIR)/tools/all_tools.coverage: $(call shell_real_build_only, find $(TOOLS_DIR)/ -type f -name '*.go')
 	cd $(TOOLS_DIR) && go test -coverpkg=./... -covermode=atomic -coverprofile=$@ ./...
 $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 	cd $(TOOLS_DIR) && go tool cover -html=$(BUILD_DIR)/tools/all_tools.coverage -o $@
@@ -145,8 +147,8 @@ worker_chroot_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/$(worker_manifest_name)
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
-# Outputs: $(RPMS_DIR)/<arch>/<name>.<arch>.rpm
-sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
+# Outputs: $(TOOLCHAIN_RPMS_DIR)/<arch>/<name>.<arch>.rpm
+sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(TOOLCHAIN_RPMS_DIR)/\2/\1`p'
 worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chroot_manifest))
 
 # The worker chroot depends on specific toolchain RPMs, the $(toolchain_rpms): target in toolchain.mk knows how
@@ -158,18 +160,19 @@ worker_chroot_deps := \
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
 $(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE) | $(go-bldtracker)
-endif
+else
 $(chroot_worker):
+endif
 	$(timestamper_download_script) \
 		$(timestamper_tool) \
 		"$(TIMESTAMP_DIR)/download_toolchain.json" \
 		"ending" \
 		"complete" 2>/dev/null && \
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(toolchain_rpms_dir) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(TOOLCHAIN_RPMS_DIR) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \
-	--rpm-dir="$(toolchain_rpms_dir)" \
+	--rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 	--tmp-dir="$(BUILD_DIR)/validatechroot" \
 	--worker-chroot="$(chroot_worker)" \
 	--worker-manifest="$(worker_chroot_manifest)" \

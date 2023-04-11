@@ -1,10 +1,10 @@
 %define upstream_name moby
-%define commit_hash 459d0dfbbb51fb2423a43655e6c62368ec0f36c9
+%define commit_hash 87a90dc786bda134c9eb02adbae2c6a7342fb7f6
 
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
-Version: 20.10.12
-Release: 5%{?dist}
+Version: 20.10.14
+Release: 9%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -19,6 +19,7 @@ Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{vers
 Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_name}-libnetwork-%{version}.tar.gz
 Source3: docker.service
 Source4: docker.socket
+Patch0:  CVE-2023-25153.patch
 
 %{?systemd_requires}
 
@@ -125,6 +126,33 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-9
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-8
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-7
+- Bump release to rebuild with go 1.19.6
+
+* Wed Mar 15 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.14-6
+- Patch CVE-2023-25153
+
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-5
+- Bump release to rebuild with go 1.19.5
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.14-4
+- Bump release to rebuild with go 1.19.4
+
+* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 20.10.14-3
+- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 20.10.14-2
+- Bump release to rebuild with go 1.18.8
+
+* Fri Sep 30 2022 Adit Jha <aditjha@microsoft.com> - 20.10.14-1
+- Upgrade to 20.10.14 to fix CVE-2022-24769
+
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 20.10.12-5
 - Bump release to rebuild against Go 1.18.5
 

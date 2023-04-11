@@ -3,7 +3,7 @@
 Summary:        Fluentd event collector
 Name:           rubygem-%{gem_name}
 Version:        1.14.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Group:          Development/Ruby
 URL:            https://www.fluentd.org/
 Source0:        https://github.com/fluent/fluentd/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0:         file-list.patch
+Patch1:         CVE-2022-39379.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-async-http
@@ -58,6 +59,9 @@ gem install -V --local --force --install-dir %{buildroot}%{gemdir} --bindir %{bu
 %{gemdir}/specifications/fluentd-%{version}.gemspec
 
 %changelog
+* Wed Nov 9 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.14.6-2
+- Add patch to fix CVE-2022-39379
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.14.6-1
 - Update to v1.14.6.
 - Build from .tar.gz source.

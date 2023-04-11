@@ -1,7 +1,7 @@
 Summary:        Library for displaying tabular data in a visually appealing ASCII format
 Name:           python-prettytable
 Version:        3.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,7 +46,7 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 
 %check
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-pip3 install tox
+pip3 install 'tox>=3.27.1,<4.0.0'
 tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-prettytable
@@ -55,6 +55,9 @@ tox -e py%{python3_version_nodots} --sitepackages
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 3.2.0-2
+- Update version of tox used for package tests
+
 * Thu Mar 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.0-1
 - Upgrade to latest upstream version
 - Switch tests to tox runner

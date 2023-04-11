@@ -1,0 +1,13 @@
+diff --git a/libflux/flux/Cargo.toml b/libflux/flux/Cargo.toml
+index b5371672..37aed8dd 100644
+--- a/libflux/flux/Cargo.toml
++++ b/libflux/flux/Cargo.toml
+@@ -6,7 +6,7 @@ edition = "2021"
+ 
+ [lib]
+ name = "flux"
+-crate-type = ["rlib", "staticlib", "cdylib"]
++crate-type = ["rlib", "cdylib"]
+ 
+ [features]
+ default = ["strict", "cffi"]

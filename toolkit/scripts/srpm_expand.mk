@@ -8,7 +8,7 @@ $(call create_folder,$(BUILD_SPECS_DIR))
 
 ######## SRPM EXPANDING ########
 
-srpms = $(shell find $(BUILD_SRPMS_DIR)/ -type f -name '*.src.rpm')
+srpms = $(call shell_real_build_only, find $(BUILD_SRPMS_DIR)/ -type f -name '*.src.rpm')
 srpms_basename = $(foreach srpm,$(srpms),$(notdir $(srpm)))
 srpm_expand_logs_dir = $(LOGS_DIR)/srpm_expand
 srpm_expand_log = $(srpm_expand_logs_dir)/srpm_expand.log

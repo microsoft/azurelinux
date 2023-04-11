@@ -1,0 +1,11 @@
+diff -up libofa-0.9.3/examples/protocol.cpp.me libofa-0.9.3/examples/protocol.cpp
+--- libofa-0.9.3/examples/protocol.cpp.me	2011-12-01 21:56:40.740005441 +0100
++++ libofa-0.9.3/examples/protocol.cpp	2011-12-01 21:56:44.970002991 +0100
+@@ -12,7 +12,6 @@
+ #include <map>
+ #include <expat.h>
+ #include <curl/curl.h>
+-#include <curl/types.h>
+ #include <curl/easy.h>
+ 
+ using namespace std;

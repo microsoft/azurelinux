@@ -1,0 +1,11 @@
+--- liboggz-1.1.1.org/include/oggz/oggz_off_t_generated.h.in	2010-01-30 11:25:59.000000000 +0530
++++ liboggz-1.1.1/include/oggz/oggz_off_t_generated.h.in	2010-05-29 13:06:00.503337547 +0530
+@@ -59,7 +59,7 @@
+ 
+ #include <sys/types.h>
+ 
+-typedef @TYPEOF_OGGZ_OFF_T@ oggz_off_t;
++typedef loff_t oggz_off_t;
+ 
+ #define PRI_OGGZ_OFF_T "@PRI_OGGZ_OFF_T@"
+ 

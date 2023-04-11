@@ -1,39 +1,40 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %define majorver 8.6
 %define vers %{majorver}.10
-
-Summary: The graphical toolkit for the Tcl scripting language
-Name: tk
-Version: %{vers}
-Release: 5%{?dist}
-License: TCL
-URL: http://tcl.sourceforge.net
-Source0: http://download.sourceforge.net/sourceforge/tcl/%{name}%{version}-src.tar.gz
-Requires: tcl = %{vers}
-BuildRequires:  gcc
-BuildRequires: tcl-devel = %{vers}, autoconf
-BuildRequires: libX11-devel
-BuildRequires: libXft-devel
-# panedwindow.n from itcl conflicts
-Conflicts: itcl <= 3.2
-Obsoletes: tile <= 0.8.2
-Provides: tile = 0.8.2
-Patch1: tk-8.6.10-make.patch
-Patch2: tk-8.6.10-conf.patch
-Patch3: tk-8.6.7-no-fonts-fix.patch
+Summary:        The graphical toolkit for the Tcl scripting language
+Name:           tk
+Version:        %{vers}
+Release:        6%{?dist}
+License:        TCL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://tcl.sourceforge.net
+Source0:        https://download.sourceforge.net/sourceforge/tcl/%{name}%{version}-src.tar.gz
+Patch0:         tk-8.6.10-make.patch
+Patch1:         tk-8.6.10-conf.patch
+Patch2:         tk-8.6.7-no-fonts-fix.patch
 # https://core.tcl-lang.org/tk/tktview/dccd82bdc70dc25bb6709a6c14880a92104dda43
-Patch4: tk-8.6.10-font-sizes-fix.patch
+Patch3:         tk-8.6.10-font-sizes-fix.patch
+BuildRequires:  autoconf
+BuildRequires:  gcc
+BuildRequires:  libX11-devel
+BuildRequires:  libXft-devel
+BuildRequires:  tcl-devel >= %{vers}
+Requires:       tcl >= %{vers}
+# panedwindow.n from itcl conflicts
+Conflicts:      itcl <= 3.2
+Obsoletes:      tile <= 0.8.2
+Provides:       tile = 0.8.2
 
 %description
 When paired with the Tcl scripting language, Tk provides a fast and powerful
 way to create cross-platform GUI applications.
 
 %package devel
-Summary: Tk graphical toolkit development files
-Requires: %{name} = %{version}-%{release}
-Requires: tcl-devel = %{vers}
-Requires: libX11-devel libXft-devel
+Summary:        Tk graphical toolkit development files
+Requires:       %{name} = %{version}-%{release}
+Requires:       libX11-devel
+Requires:       libXft-devel
+Requires:       tcl-devel >= %{vers}
 
 %description devel
 When paired with the Tcl scripting language, Tk provides a fast and powerful
@@ -42,12 +43,7 @@ way to create cross-platform GUI applications.
 The package contains the development files and man pages for tk.
 
 %prep
-%setup -n %{name}%{vers} -q
-
-%patch1 -p1 -b .make
-%patch2 -p1 -b .conf
-%patch3 -p1 -b .no-fonts-fix
-%patch4 -p1 -b .font-sizes-fix
+%autosetup -p1 -n %{name}%{vers}
 
 %build
 cd unix
@@ -96,7 +92,8 @@ sed -i -e "s|$PWD/unix|%{_libdir}|; s|$PWD|%{_includedir}/%{name}-private|" %{bu
 %{_libdir}/%{name}%{majorver}
 %{_mandir}/man1/*
 %{_mandir}/mann/*
-%doc README.md changes license.terms
+%license license.terms
+%doc README.md changes
 
 %files devel
 %{_includedir}/*
@@ -108,6 +105,10 @@ sed -i -e "s|$PWD/unix|%{_libdir}|; s|$PWD|%{_includedir}/%{name}-private|" %{bu
 %{_datadir}/%{name}%{majorver}/tkAppInit.c
 
 %changelog
+* Tue Jan 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 8.6.10-6
+- Fix Requires on tcl/tcl-devel with version contraints
+- License verified
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 8.6.10-5
 - Remove epoch
 

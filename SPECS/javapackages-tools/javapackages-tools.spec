@@ -9,7 +9,7 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        6.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,23 @@ Provides:       eclipse-filesystem = %{version}-%{release}
 %description -n javapackages-filesystem
 This package provides some basic directories into which Java packages
 install their content.
+
+%package -n maven-local
+Summary:        Macros and scripts for Maven packaging support
+Requires:       %{name} = %{version}-%{release}
+Requires:       javapackages-local-bootstrap = %{version}-%{release}
+Requires:       xmvn-minimal
+Requires:       xmvn-mojo
+Requires:       xmvn-tools
+# Common Maven plugins required by almost every build. It wouldn't make
+# sense to explicitly require them in every package built with Maven.
+Requires:       maven-compiler-plugin
+Requires:       maven-jar-plugin
+Requires:       maven-resources-plugin
+Requires:       maven-surefire-plugin
+ 
+%description -n maven-local
+This package provides macros and scripts to support packaging Maven artifacts.
 
 %package -n ivy-local-bootstrap
 Summary:        Local mode for Apache Ivy
@@ -130,10 +147,15 @@ pip3 install -r test-requirements.txt
 
 %files -n ivy-local-bootstrap -f files-ivy
 
+%files -n maven-local
+
 %files -n python3-javapackages -f files-python
 %license LICENSE
 
 %changelog
+* Fri Mar 31 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 6.0.0-2
+- Added maven-local subpackage
+
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.0.0-1
 - Update source to v6.0.0
 - Update remove-headless-from-java-requires.patch

@@ -2,7 +2,7 @@
 
 Name:           python-%{srcname}
 Version:        1.5.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Python 3 compatible NTLM library
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
@@ -14,9 +14,12 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
 # For tests
-BuildRequires:  python3dist(pytest)
+%if %{with_check}
 BuildRequires:  python3dist(requests)
 BuildRequires:  python3dist(cryptography)
+BuildRequires:  python3-pip
+%endif
+
 
 %global _description %{expand:
 This package allows Python clients running on any operating system to provide
@@ -42,7 +45,8 @@ Provides:       python3-ntlm3 = %{version}-%{release}
 %py3_install
 
 %check
-%python3 -m pytest -vv
+%{__python3} -m pip install pytest==7.1.2
+%pytest -vv
 
 %files -n python3-%{srcname}
 %doc CHANGES.md README.md
@@ -51,6 +55,9 @@ Provides:       python3-ntlm3 = %{version}-%{release}
 %{python3_sitelib}/ntlm_auth/
 
 %changelog
+* Thu Sep 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.0-6
+- Add BR on `pip` & drop BR on `pytest` to enable ptest
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.5.0-5
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

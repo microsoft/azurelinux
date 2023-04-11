@@ -1,49 +1,56 @@
+%global bundled_slf4j_version 1.7.36
+%global homedir %{_datadir}/%{name}
 %global debug_package %{nil}
-
 %define m2_cache_tarball_name apache-%{name}-%{version}-m2.tar.gz
 %define licenses_tarball_name apache-%{name}-%{version}-licenses.tar.gz
-
 %define offline_build -o
-
 %define _prefixmvn %{_var}/opt/apache-%{name}
 %define _bindirmvn %{_prefixmvn}/bin
 %define _libdirmvn %{_prefixmvn}/lib
-
 # maven 1.0 package version being used. This needs to be updated in case of updates in 1.0.
 %define mvn_1_0_pmc_ver 3.5.4-13
-
 Summary:        Apache Maven
 Name:           maven
-Version:        3.8.4
-Release:        2%{?dist}
+Version:        3.8.7
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://maven.apache.org/
-Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz#/apache-%{name}-%{version}-src.tar.gz
+Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 1.0 maven rpm to provide the mvn binary for the build.
-Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.x86_64.rpm
-Source2: https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.aarch64.rpm
-
-# CBL-Mariner build are without network connection. Hence, we need to generate build caches as tarballs to build
-# rpms in offline mode.
+Source1:        %{_mariner_sources_url}/%{name}-%{mvn_1_0_pmc_ver}.cm1.x86_64.rpm
+Source2:        %{_mariner_sources_url}/%{name}-%{mvn_1_0_pmc_ver}.cm1.aarch64.rpm
+# CBL-Mariner build are without network connection. Hence, we need to generate build caches
+# as tarballs to build rpms in offline mode.
 # In order to generate tarballs, use "maven_build_caches.sh".
 # ./maven_build_caches.sh -v <Maven version string> -a <x86_64 | aarch64>
 # ex: ./maven_build_caches.sh -v 3.8.4 -a x86_64
 Source3:        %{m2_cache_tarball_name}
 Source4:        %{licenses_tarball_name}
-
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  msopenjdk-11
 BuildRequires:  wget
 BuildRequires:  which
 Requires:       %{_bindir}/which
 Requires:       msopenjdk-11
+Requires:       %{name}-jdk-binding = %{version}-%{release}
+Conflicts:      maven3
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
+
+%package openjdk11
+Summary:        MSOpenJDK 11 binding for Maven
+RemovePathPostfixes: -openjdk11
+Requires: %{name} = %{version}-%{release}
+Requires: msopenjdk-11
+Provides: %{name}-jdk-binding = %{version}-%{release}
+ 
+%description openjdk11
+Configures Maven to run with OpenJDK 11.
 
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
@@ -112,6 +119,16 @@ cp %{_builddir}/apache-maven-%{version}/LICENSE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/NOTICE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_prefixmvn}/
 
+
+mkdir -p %{buildroot}%{homedir}/bin
+ln -sfv %{_bindirmvn}/mvn %{buildroot}%{homedir}/bin/mvn
+ln -sfv %{_bindirmvn}/mvnDebug %{buildroot}%{homedir}/bin/mvnDebug
+ln -sfv %{_bindirmvn}/mvn.1.gz %{buildroot}%{homedir}/bin/mvn.1.gz
+ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/java/
+echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.conf-openjdk11
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -122,6 +139,7 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %dir %{_datadir}/java/maven
 %{_libdirmvn}/*
 %{_bindirmvn}/*
+%{homedir}/bin/mvn*
 /bin/*
 %{_datadir}/java/maven/*.jar
 %{_prefixmvn}/boot/plexus-classworlds*
@@ -132,7 +150,23 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/NOTICE
 %{_prefixmvn}/README.txt
 
+%files openjdk11
+%config /etc/java/maven.conf-openjdk11
+
 %changelog
+* Tue Apr 04 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+- Applied linter changes
+
+* Thu Mar 23 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+- Added openjdk11 subpackage
+- Added symlink for binaries requires by xmvn package
+
+* Thu Feb 16 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.7-1
+- Update to version 3.8.7
+
+* Wed Oct 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.4-3
+- Replacing hard-coded source URL with the '_mariner_sources_url' macro.
+
 * Wed Jul 20 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.4-2
 - Adding both x86_64 and aarch64 1.0 maven rpm as sources.
 

@@ -1,0 +1,18 @@
+[Unit]
+Description=Squid caching proxy
+Documentation=man:squid(8)
+After=network.target network-online.target nss-lookup.target
+
+[Service]
+Type=notify
+LimitNOFILE=16384
+PIDFile=/run/squid.pid
+EnvironmentFile=/etc/sysconfig/squid
+ExecStartPre=/usr/libexec/squid/cache_swap.sh
+ExecStart=/usr/sbin/squid --foreground $SQUID_OPTS -f ${SQUID_CONF}
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillMode=mixed
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

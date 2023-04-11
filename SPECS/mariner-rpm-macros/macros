@@ -42,9 +42,14 @@
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
 # are consistently applied this override should be removed.
+#
+# USE_CCACHE: when 'mariner_ccache_enabled' is defined, enable building with ccache
+#
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
 %{set_build_flags}\
+%{?mariner_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
+%{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{nil}
 
 #
@@ -64,15 +69,21 @@
 %_use_internal_dependency_generator 1
 %_build_id_links alldebug
 
-%__os_install_post    \
+%__os_install_post_leave_signatures    \
     %{_rpmconfigdir}/brp-compress \
-    %{_rpmconfigdir}/brp-strip %{__strip} \
-    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
     %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
-    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
     find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
+    %{nil}
+
+%__os_install_post    \
+    %{__os_install_post_leave_signatures} \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
+    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
+    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
+    %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
+    %{?mariner_ccache_enabled:ccache --show-stats} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\

@@ -16,28 +16,29 @@ import (
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	IsDefault          bool               `json:"IsDefault"`
-	IsKickStartBoot    bool               `json:"IsKickStartBoot"`
-	IsIsoInstall       bool               `json:"IsIsoInstall"`
-	BootType           string             `json:"BootType"`
-	Hostname           string             `json:"Hostname"`
-	Name               string             `json:"Name"`
-	PackageLists       []string           `json:"PackageLists"`
-	Packages           []string           `json:"Packages"`
-	KernelOptions      map[string]string  `json:"KernelOptions"`
-	KernelCommandLine  KernelCommandLine  `json:"KernelCommandLine"`
-	AdditionalFiles    map[string]string  `json:"AdditionalFiles"`
-	PartitionSettings  []PartitionSetting `json:"PartitionSettings"`
-	PreInstallScripts  []InstallScript    `json:"PreInstallScripts"`
-	PostInstallScripts []InstallScript    `json:"PostInstallScripts"`
-	Networks           []Network          `json:"Networks"`
-	PackageRepos       []PackageRepo      `json:"PackageRepos"`
-	Groups             []Group            `json:"Groups"`
-	Users              []User             `json:"Users"`
-	Encryption         RootEncryption     `json:"Encryption"`
-	RemoveRpmDb        bool               `json:"RemoveRpmDb"`
-	ReadOnlyVerityRoot ReadOnlyVerityRoot `json:"ReadOnlyVerityRoot"`
-	HidepidDisabled    bool               `json:"HidepidDisabled"`
+	IsDefault            bool               `json:"IsDefault"`
+	IsKickStartBoot      bool               `json:"IsKickStartBoot"`
+	IsIsoInstall         bool               `json:"IsIsoInstall"`
+	BootType             string             `json:"BootType"`
+	Hostname             string             `json:"Hostname"`
+	Name                 string             `json:"Name"`
+	PackageLists         []string           `json:"PackageLists"`
+	Packages             []string           `json:"Packages"`
+	KernelOptions        map[string]string  `json:"KernelOptions"`
+	KernelCommandLine    KernelCommandLine  `json:"KernelCommandLine"`
+	AdditionalFiles      map[string]string  `json:"AdditionalFiles"`
+	PartitionSettings    []PartitionSetting `json:"PartitionSettings"`
+	PreInstallScripts    []InstallScript    `json:"PreInstallScripts"`
+	PostInstallScripts   []InstallScript    `json:"PostInstallScripts"`
+	FinalizeImageScripts []InstallScript    `json:"FinalizeImageScripts"`
+	Networks             []Network          `json:"Networks"`
+	PackageRepos         []PackageRepo      `json:"PackageRepos"`
+	Groups               []Group            `json:"Groups"`
+	Users                []User             `json:"Users"`
+	Encryption           RootEncryption     `json:"Encryption"`
+	RemoveRpmDb          bool               `json:"RemoveRpmDb"`
+	ReadOnlyVerityRoot   ReadOnlyVerityRoot `json:"ReadOnlyVerityRoot"`
+	HidepidDisabled      bool               `json:"HidepidDisabled"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
@@ -68,8 +69,6 @@ func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partiti
 func (s *SystemConfig) IsValid() (err error) {
 	// IsDefault must be validated by a parent struct
 
-	// Validate BootType
-
 	// Validate HostName
 	if (!govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_")) && s.Hostname != "" {
 		return fmt.Errorf("invalid [Hostname]: %s", s.Hostname)
@@ -77,6 +76,11 @@ func (s *SystemConfig) IsValid() (err error) {
 
 	if strings.TrimSpace(s.Name) == "" {
 		return fmt.Errorf("missing [Name] field")
+	}
+
+	// Validate BootType
+	if s.BootType != "efi" && s.BootType != "legacy" && s.BootType != "none" && s.BootType != "" {
+		return fmt.Errorf("invalid [BootType]: %s. Expecting values of either 'efi', 'legacy', 'none' or empty string.", s.BootType)
 	}
 
 	if len(s.PackageLists) == 0 && len(s.Packages) == 0 {

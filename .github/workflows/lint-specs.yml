@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 name: Spec Linting
 
 on:
@@ -24,14 +27,14 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           git fetch origin ${{ github.base_ref }}
-          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
           echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
 
       - name: Get base commit for Pushes
         if: ${{ github.event_name == 'push' }}
         run: |
           git fetch origin ${{ github.event.before }}
-          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
           echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
       - name: Get the changed files
@@ -41,7 +44,7 @@ jobs:
           echo "Files to validate: '${changed_specs}'"
           echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
-      - name: Main branch checkout 
+      - name: Main branch checkout
         uses: actions/checkout@v2
         with:
           ref: 'main'
@@ -61,7 +64,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-        
+
       # We take our version of the linting tool from the master branch to ensure rules
       # are consistent across all branches
       - name: Patch spec-cleaner with Mariner-specific lints
@@ -74,7 +77,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ./spec-cleaner
-      
+
       # Set continue-on-error to true if we're blocking too many PRs here
       # We don't want this tool to have a low signal-to-noise ratio
       - name: Lint changed spec files

@@ -1,0 +1,110 @@
+From 770db497255af1f6c24d9bb701fe6a186f94e98d Mon Sep 17 00:00:00 2001
+From: Vlad Buslov <vladbu@nvidia.com>
+Date: Tue, 7 Sep 2021 18:47:02 +0300
+Subject: [PATCH 14/22] net/mlx5e: Support accept action
+
+Support TC generic 'accept' action in mlx5 by introducing
+MLX5_ESW_ATTR_FLAG_ACCEPT attribute flag. Flag has similar semantics to
+existing MLX5_ESW_ATTR_FLAG_SLOW_PATH flag, however, dedicated flag is
+required because existing 'slow path' flag can be flipped by tunneling
+subsystem when neighbor changes state.
+
+Introduce new helper function mlx5_esw_attr_flags_skip() to check whether
+attribute flags for 'slow path' or 'accept' action are set and use it in
+eswitch code instead of direct bit manipulation.
+
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Paul Blakey <paulb@nvidia.com>
+Reviewed-by: Roi Dayan <roid@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c           | 5 +++++
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.h         | 8 ++++++++
+ .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c    | 6 +++---
+ .../mellanox/mlx5/core/eswitch_offloads_termtbl.c         | 2 +-
+ 4 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 8ca1db84ca21..d7362b3d324c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -3882,6 +3882,11 @@ static int parse_tc_fdb_actions(struct mlx5e_priv *priv,
+ 
+ 	flow_action_for_each(i, act, flow_action) {
+ 		switch (act->id) {
++		case FLOW_ACTION_ACCEPT:
++			action |= MLX5_FLOW_CONTEXT_ACTION_FWD_DEST |
++				MLX5_FLOW_CONTEXT_ACTION_COUNT;
++			attr->flags |= MLX5_ESW_ATTR_FLAG_ACCEPT;
++			break;
+ 		case FLOW_ACTION_DROP:
+ 			action |= MLX5_FLOW_CONTEXT_ACTION_DROP |
+ 				  MLX5_FLOW_CONTEXT_ACTION_COUNT;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index 2c7444101bb9..7461aafb321e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -447,8 +447,16 @@ enum {
+ 	MLX5_ESW_ATTR_FLAG_NO_IN_PORT    = BIT(2),
+ 	MLX5_ESW_ATTR_FLAG_SRC_REWRITE   = BIT(3),
+ 	MLX5_ESW_ATTR_FLAG_SAMPLE        = BIT(4),
++	MLX5_ESW_ATTR_FLAG_ACCEPT        = BIT(5),
+ };
+ 
++/* Returns true if any of the flags that require skipping further TC/NF processing are set. */
++static inline bool
++mlx5_esw_attr_flags_skip(u32 attr_flags)
++{
++	return attr_flags & (MLX5_ESW_ATTR_FLAG_SLOW_PATH | MLX5_ESW_ATTR_FLAG_ACCEPT);
++}
++
+ struct mlx5_esw_flow_attr {
+ 	struct mlx5_eswitch_rep *in_rep;
+ 	struct mlx5_core_dev	*in_mdev;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 3194cdcd2f63..7e192d1a5b2a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -440,7 +440,7 @@ esw_setup_dests(struct mlx5_flow_destination *dest,
+ 	} else if (attr->dest_ft) {
+ 		esw_setup_ft_dest(dest, flow_act, esw, attr, spec, *i);
+ 		(*i)++;
+-	} else if (attr->flags & MLX5_ESW_ATTR_FLAG_SLOW_PATH) {
++	} else if (mlx5_esw_attr_flags_skip(attr->flags)) {
+ 		esw_setup_slow_path_dest(dest, flow_act, chains, *i);
+ 		(*i)++;
+ 	} else if (attr->dest_chain) {
+@@ -467,7 +467,7 @@ esw_cleanup_dests(struct mlx5_eswitch *esw,
+ 
+ 	if (attr->dest_ft) {
+ 		esw_cleanup_decap_indir(esw, attr);
+-	} else if (!(attr->flags & MLX5_ESW_ATTR_FLAG_SLOW_PATH)) {
++	} else if (!mlx5_esw_attr_flags_skip(attr->flags)) {
+ 		if (attr->dest_chain)
+ 			esw_cleanup_chain_dest(chains, attr->dest_chain, 1, 0);
+ 		else if (esw_is_indir_table(esw, attr))
+@@ -678,7 +678,7 @@ __mlx5_eswitch_del_rule(struct mlx5_eswitch *esw,
+ 
+ 	mlx5_del_flow_rules(rule);
+ 
+-	if (!(attr->flags & MLX5_ESW_ATTR_FLAG_SLOW_PATH)) {
++	if (!mlx5_esw_attr_flags_skip(attr->flags)) {
+ 		/* unref the term table */
+ 		for (i = 0; i < MLX5_MAX_FLOW_FWD_VPORTS; i++) {
+ 			if (esw_attr->dests[i].termtbl)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads_termtbl.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads_termtbl.c
+index b45954905845..879d78e46e47 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads_termtbl.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads_termtbl.c
+@@ -219,7 +219,7 @@ mlx5_eswitch_termtbl_required(struct mlx5_eswitch *esw,
+ 
+ 	if (!MLX5_CAP_ESW_FLOWTABLE_FDB(esw->dev, termination_table) ||
+ 	    !MLX5_CAP_ESW_FLOWTABLE_FDB(esw->dev, ignore_flow_level) ||
+-	    attr->flags & MLX5_ESW_ATTR_FLAG_SLOW_PATH ||
++	    mlx5_esw_attr_flags_skip(attr->flags) ||
+ 	    !mlx5_eswitch_offload_is_uplink_port(esw, spec))
+ 		return false;
+ 
+-- 
+2.25.1
+

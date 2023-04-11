@@ -1,8 +1,8 @@
 %{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
 Summary:        DBus for systemd
 Name:           dbus
-Version:        1.14.0
-Release:        1%{?dist}
+Version:        1.15.2
+Release:        2%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,10 @@ Requires:       xz
 # In real-life situations systemd will always be present and thus installed.
 Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
+
+# NOTE: We currently do not build with X11 support.
+# build with X11 support in the future.
+Provides:       %{name}-x11
 
 %description
 The dbus package contains dbus.
@@ -82,6 +86,12 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Fri Oct 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.15.2-2
+- Add an explicit provides `dbus-x11`
+
+* Wed Oct 12 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.15.2-1
+- Upgrade to 1.15.2
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 1.14.0-1
 - Upgrade to version 1.14.0
 - License verified

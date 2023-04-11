@@ -1,13 +1,14 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
+Patch1:         llvm-12.0.1-issue-49955-workaround.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -28,6 +29,7 @@ for developing applications that use llvm.
 
 %prep
 %setup -q -n %{name}-%{version}.src
+%autopatch -p2
 
 %build
 # Disable symbol generation
@@ -86,6 +88,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com> - 12.0.1-5
+- Workaround for llvm issue #49955 with patch
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 12.0.1-4
 - Allow tools to link to libLLVM shared library
 

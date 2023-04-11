@@ -1,21 +1,21 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
-Version:        4.4.0
-Release:        3%{?dist}
+Version:        4.5.0
+Release:        1%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-# Also fixes CVE-2022-2057 and CVE-2022-2058.
-Patch0:         CVE-2022-2056.patch
-Patch1:         CVE-2022-34526.patch
+Patch7:         CVE-2022-48281.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libtool
+
 Requires:       libjpeg-turbo
+
 Provides:       %{name}-tools = %{version}-%{release}
 
 %description
@@ -23,6 +23,7 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
+
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
 
@@ -51,10 +52,9 @@ make %{?_smp_mflags} -k check
 
 %files
 %defattr(-,root,root)
-%license COPYRIGHT
+%license LICENSE.md
 %{_bindir}/*
-%{_libdir}/*.so.*
-%{_mandir}/man1/*
+%{_libdir}/*.so.6*
 
 %files devel
 %defattr(-,root,root)
@@ -62,9 +62,32 @@ make %{?_smp_mflags} -k check
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_docdir}/*
-%{_mandir}/man3/*
 
 %changelog
+* Mon Mar 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.5.0-1
+- Auto-upgrade to 4.5.0 - to fix CVE-2022-4645
+
+* Wed Feb 22 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.0-8
+- Add patch for CVE-2023-0795,CVE-2023-0796,CVE-2023-0797,CVE-2023-0798 & CVE-2023-0799
+- Add fix for: tiffcrop correctly update buffersize after rotateImage(). fix#520
+- Add fix for: TIFFClose() avoid NULL pointer dereferencing. fix#515
+- Add patch for CVE-2023-0800,CVE-2023-0801,CVE-2023-0802,CVE-2023-0803 & CVE-2023-0804
+
+* Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 4.4.0-7
+- Add patch for CVE-2022-48281
+
+* Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 4.4.0-6
+- Add patch for critical CVE-2022-3970
+- Patch CVE-2022-3599
+- Add nopatch for CVE-2022s: 3598, 3626, and 3627
+- Patch CVE-2022-3597
+
+* Mon Oct 24 2022 Sean Dougherty <sdougherty@microsoft.com> - 4.4.0-5
+- Patch CVE-2022-3570
+
+* Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 4.4.0-4
+- Patch CVE-2022-2953
+
 * Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 4.4.0-3
 - Patch CVE-2022-34526
 

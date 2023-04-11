@@ -20,8 +20,19 @@ build_arch := $(shell uname -m)
 #
 # $1 - Folder path
 define create_folder
-$(shell if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
+$(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
 endef
+
+# Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
+# Make will automatically create the MAKEFLAGS variable which contains each of the flags, non-build commmands will include -n
+# which is the short form of --dry-run.
+#
+# $1 - The full command to run, if we are not doing --dry-run
+ifeq (n,$(findstring n,$(firstword $(MAKEFLAGS))))
+shell_real_build_only =
+else # ifeq (n,$(findstring...
+shell_real_build_only = $(shell $1)
+endif # ifeq (n,$(findstring...
 
 # Echos a message to console, then calls "exit 1"
 # Of the form: { echo "MSG" ; exit 1 ; }
@@ -42,9 +53,9 @@ endef
 ######## VARIABLE DEPENDENCY TRACKING ########
 
 # List of variables to watch for changes.
-watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST
+watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR
 # Current list: $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_REPO_LIST) $(depend_CONFIG_FILE) $(depend_STOP_ON_PKG_FAIL)
-#					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST)
+#					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR)
 
 .PHONY: variable_depends_on_phony clean-variable_depends_on_phony
 clean: clean-variable_depends_on_phony

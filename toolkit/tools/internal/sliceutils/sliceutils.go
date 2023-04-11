@@ -41,3 +41,17 @@ func FindMatches(slice []string, isMatch func(string) bool) []string {
 func StringMatch(expected, given interface{}) bool {
 	return expected.(string) == given.(string)
 }
+
+func StringsSetToSlice(inputSet map[string]bool) []string {
+	index := 0
+	outputSlice := make([]string, len(inputSet))
+
+	for element, elementInSet := range inputSet {
+		if elementInSet {
+			outputSlice[index] = element
+			index++
+		}
+	}
+
+	return outputSlice[:index]
+}

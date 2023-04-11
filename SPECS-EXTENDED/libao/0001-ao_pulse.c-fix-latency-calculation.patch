@@ -1,0 +1,26 @@
+From de5547ebc2b0ed37d69889c3c3aec6553d2d84cb Mon Sep 17 00:00:00 2001
+From: Stas Sergeev <stsp@users.sourceforge.net>
+Date: Wed, 18 Feb 2015 00:36:28 +0300
+Subject: [PATCH] ao_pulse.c: fix latency calculation
+
+This fixes periodic underruns with pa plugin.
+---
+ src/plugins/pulse/ao_pulse.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/pulse/ao_pulse.c b/src/plugins/pulse/ao_pulse.c
+index ff5497f..9c0f64a 100644
+--- a/src/plugins/pulse/ao_pulse.c
++++ b/src/plugins/pulse/ao_pulse.c
+@@ -259,7 +259,7 @@ int ao_plugin_open(ao_device *device, ao_sample_format *format) {
+     battr.prebuf = battr.minreq = battr.fragsize = -1;
+ 
+     battr.tlength = (int)(internal->buffer_time * format->rate) / 1000000 *
+-      ((format->bits+7)/8) + device->output_channels;
++      ((format->bits+7)/8) * device->output_channels;
+     battr.minreq = battr.tlength/4;
+     battr.maxlength = battr.tlength+battr.minreq;
+ 
+-- 
+2.1.0
+

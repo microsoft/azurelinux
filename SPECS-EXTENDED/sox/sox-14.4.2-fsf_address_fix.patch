@@ -1,0 +1,47 @@
+From f4853a8119d22096fbe9fd076799a105e3b3abb7 Mon Sep 17 00:00:00 2001
+From: Jiri Kucera <jkucera@redhat.com>
+Date: Tue, 30 Jan 2018 00:29:19 +0100
+Subject: [PATCH] Fixed FSF address
+
+---
+ src/ladspa.h | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/src/ladspa.h b/src/ladspa.h
+index 5c30a8a..299412b 100644
+--- a/src/ladspa.h
++++ b/src/ladspa.h
+@@ -3,21 +3,20 @@
+    Linux Audio Developer's Simple Plugin API Version 1.1[LGPL].
+    Copyright (C) 2000-2002 Richard W.E. Furse, Paul Barton-Davis,
+    Stefan Westerfeld.
+-   
+-   This library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public License
+-   as published by the Free Software Foundation; either version 2.1 of
+-   the License, or (at your option) any later version.
+-   
++
++   This library is free software; you can redistribute it and/or modify it
++   under the terms of the GNU Lesser General Public License as published by
++   the Free Software Foundation; either version 2.1 of the License, or (at
++   your option) any later version.
++
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+-   Lesser General Public License for more details.
+-   
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with this library; if not, write to the Free Software
+-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+-   USA. */
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
++   General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public License
++   along with this library; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
+ 
+ #ifndef LADSPA_INCLUDED
+ #define LADSPA_INCLUDED

@@ -1,6 +1,6 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.105.0
+Version:        0.105.2
 Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
@@ -34,6 +34,8 @@ BuildRequires:  valgrind
 BuildRequires:  zlib-devel
 Requires:       openssl
 Requires:       zlib
+Requires(pre):  shadow-utils
+Requires(postun): shadow-utils
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-lib = %{version}-%{release}
 
@@ -126,6 +128,15 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Fri Feb 17 2023 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.105.2-1
+- Upgrade to 0.105.2 to fix CVE-2023-20032 and CVE-2023-20052
+
+* Wed Sep 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.105.0-3
+- Add pre/postun requirements on shadow-utils
+
+* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.105.0-2
+- Bump package to rebuild with stable Rust compiler
+
 * Mon Jun 13 2022 Andrew Phelps <anphel@microsoft.com> - 0.105.0-1
 - Upgrade to version 0.105.0
 

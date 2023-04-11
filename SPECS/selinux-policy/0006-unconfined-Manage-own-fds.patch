@@ -1,0 +1,31 @@
+From 4e682364ef7879ccf6822114b8e44e170f869197 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 15 Jun 2022 14:43:12 +0000
+Subject: [PATCH 06/35] unconfined: Manage own fds.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/unconfined.if | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index 4393242d5..c4818431c 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -48,8 +48,9 @@ interface(`unconfined_domain_noaudit',`
+ 	# Transition to myself, to make get_ordered_context_list happy.
+ 	allow $1 self:process transition;
+ 
+-	# Write access is for setting attributes under /proc/self/attr.
+-	allow $1 self:file rw_file_perms;
++	# Write access is for setting attributes under /proc/self/attr
++	# and to manipulate fds.
++	manage_files_pattern($1, self, self)
+ 
+ 	# Userland object managers
+ 	allow $1 self:nscd { getpwd getgrp gethost getstat admin shmempwd shmemgrp shmemhost getserv shmemserv };
+-- 
+2.34.1
+

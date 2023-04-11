@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary: A python SOAP client
 Name:  python-suds
 Version: 1.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Source0: https://github.com/suds-community/suds/archive/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 License: LGPLv3+
 BuildArch: noarch
@@ -15,7 +15,7 @@ BuildRequires: python3-devel
 BuildRequires: python3-six
 
 %if %{with_check}
-BuildRequires: python3-pytest
+BuildRequires: python3-pip
 %endif
 
 %global _description %{expand:
@@ -42,6 +42,7 @@ Summary:        %{summary}
 %py3_install
 
 %check
+%{__python3} -m pip install pytest==7.1.2
 %pytest
 
 %files -n python3-%{srcname}
@@ -50,6 +51,9 @@ Summary:        %{summary}
 %license LICENSE.txt
 
 %changelog
+* Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.0-2
+- Add BR on `python3-pip` & drop `python3-pytest` to enable ptest
+
 * Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
 - Updating to version 1.0.0 using Fedora 36 specs (license: MIT) for guidance.
 - License verified.

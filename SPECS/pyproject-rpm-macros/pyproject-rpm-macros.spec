@@ -7,7 +7,7 @@ Name:           pyproject-rpm-macros
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,7 +96,7 @@ install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/marine
 install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/mariner/
 
 %check
-pip3 install more_itertools pytest>=3.9 toml tox
+pip3 install more_itertools pytest>=3.9 toml 'tox>=3.27.1,<4.0.0'
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
 %{python3} -m pytest -vv --doctest-modules
 test_status=$?
@@ -117,6 +117,9 @@ test_status=$?
 %{_rpmconfigdir}/mariner/pyproject_requirements_txt.py
 
 %changelog
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
+- Update version of tox used for package tests
+
 * Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3
 - Adding missing test dependencies.
 

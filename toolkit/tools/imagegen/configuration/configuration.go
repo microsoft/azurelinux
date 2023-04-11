@@ -95,6 +95,17 @@ func (c *Config) GetDiskContainingPartition(partition *Partition) (disk *Disk) {
 	return nil
 }
 
+func (c *Config) GetBootPartition() (partitionIndex int, partition *Partition) {
+	for i, d := range c.Disks {
+		for j, p := range d.Partitions {
+			if p.HasFlag(PartitionFlagBoot) {
+				return j, &c.Disks[i].Partitions[j]
+			}
+		}
+	}
+	return
+}
+
 // GetKernelCmdLineValue returns the output of a specific option setting in /proc/cmdline
 func GetKernelCmdLineValue(option string) (cmdlineValue string, err error) {
 	const cmdlineFile = "/proc/cmdline"
@@ -293,7 +304,7 @@ func Load(configFilePath string) (config Config, err error) {
 		return
 	}
 
-	config.setDefaultConfig()
+	config.SetDefaultConfig()
 
 	return
 }
@@ -332,6 +343,7 @@ func (c *Config) convertToAbsolutePaths(baseDirPath string) {
 		convertPackageListPaths(baseDirPath, systemConfig)
 		convertPreInstallScriptsPaths(baseDirPath, systemConfig)
 		convertPostInstallScriptsPaths(baseDirPath, systemConfig)
+		convertFinalizeImageScriptsPaths(baseDirPath, systemConfig)
 		convertSSHPubKeys(baseDirPath, systemConfig)
 	}
 }
@@ -369,6 +381,12 @@ func convertPostInstallScriptsPaths(baseDirPath string, systemConfig *SystemConf
 	}
 }
 
+func convertFinalizeImageScriptsPaths(baseDirPath string, systemConfig *SystemConfig) {
+	for i, finalizeImageScript := range systemConfig.FinalizeImageScripts {
+		systemConfig.FinalizeImageScripts[i].Path = file.GetAbsPathWithBase(baseDirPath, finalizeImageScript.Path)
+	}
+}
+
 func convertSSHPubKeys(baseDirPath string, systemConfig *SystemConfig) {
 	for _, user := range systemConfig.Users {
 		for i, sshKeyPath := range user.SSHPubKeyPaths {
@@ -387,7 +405,7 @@ func resolveBaseDirPath(baseDirPath, configFilePath string) (absoluteBaseDirPath
 	return filepath.Abs(baseDirPath)
 }
 
-func (c *Config) setDefaultConfig() {
+func (c *Config) SetDefaultConfig() {
 	c.DefaultSystemConfig = &c.SystemConfigs[0]
 	for i, systemConfig := range c.SystemConfigs {
 		if systemConfig.IsDefault {

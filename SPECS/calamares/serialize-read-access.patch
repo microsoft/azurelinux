@@ -1,0 +1,43 @@
+diff -ruN a/src/modules/partition/core/PartitionModel.cpp b/src/modules/partition/core/PartitionModel.cpp
+--- a/src/modules/partition/core/PartitionModel.cpp	2023-01-27 14:12:11.942298970 -0800
++++ b/src/modules/partition/core/PartitionModel.cpp	2023-01-27 14:12:06.786346392 -0800
+@@ -79,6 +79,7 @@
+ int
+ PartitionModel::rowCount( const QModelIndex& parent ) const
+ {
++    QMutexLocker lock(&m_lock);
+     Partition* parentPartition = partitionForIndex( parent );
+     if ( parentPartition )
+         return parentPartition->children().count();
+@@ -89,6 +90,7 @@
+ QModelIndex
+ PartitionModel::index( int row, int column, const QModelIndex& parent ) const
+ {
++    QMutexLocker lock(&m_lock);
+     PartitionNode* parentPartition = parent.isValid()
+                                      ? static_cast< PartitionNode* >( partitionForIndex( parent ) )
+                                      : static_cast< PartitionNode* >( m_device->partitionTable() );
+@@ -106,6 +108,7 @@
+ QModelIndex
+ PartitionModel::parent( const QModelIndex& child ) const
+ {
++    QMutexLocker lock(&m_lock);
+     if ( !child.isValid() )
+         return QModelIndex();
+     Partition* partition = partitionForIndex( child );
+@@ -129,6 +132,7 @@
+ QVariant
+ PartitionModel::data( const QModelIndex& index, int role ) const
+ {
++    QMutexLocker lock(&m_lock);
+     Partition* partition = partitionForIndex( index );
+     if ( !partition )
+         return QVariant();
+@@ -277,7 +281,6 @@
+ Partition*
+ PartitionModel::partitionForIndex( const QModelIndex& index ) const
+ {
+-    QMutexLocker lock(&m_lock);
+     if ( !index.isValid() )
+         return nullptr;
+     return reinterpret_cast< Partition* >( index.internalPointer() );

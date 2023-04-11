@@ -1,15 +1,15 @@
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
 Version:        1.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/cisco/libacvp
-# Source0:      https://github.com/cisco/%%{name}/archive/v%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/cisco/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         openssl.patch
+Patch1:         non-static-configure.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -19,7 +19,7 @@ BuildRequires:  make
 A library that implements the client-side of the ACVP protocol.
 
 %package app
-Summary:        Libacvp application for OpenSSL
+Summary:        LibACVP application for OpenSSL
 Group:          Applications/System
 BuildRequires:  openssl-devel
 Requires:       openssl-libs
@@ -35,7 +35,7 @@ and the library itself.
 ./configure \
     --prefix=%{_prefix} \
     --enable-offline \
-    CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP -DOPENSSL_KDF_SUPPORT -O0 -g -fcommon" \
+    CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP -DOPENSSL_KDF_SUPPORT -O2 -g -fcommon" \
     LIBS="-ldl"
 make clean
 make CC=gcc
@@ -54,6 +54,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/acvp_app
 
 %changelog
+* Wed Oct 05 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.3.0-3
+- Enable building without `glibc-static`
+
 * Wed Nov 17 2021 Andrew Phelps <anphel@microsoft.com> - 1.3.0-2
 - Set -fcommon to compile with gcc11
 

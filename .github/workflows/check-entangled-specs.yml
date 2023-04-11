@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # This action checks that certain groups of specs have matching tags.
 # The main use case is to ensure that signed specs have the same Version and
 #   Release tags as their unsigned counterparts

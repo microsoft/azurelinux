@@ -1,0 +1,16 @@
+libX11-1.5.99.901 has changed prototype of _XData32
+
+<http://bugzilla.libsdl.org/show_bug.cgi?id=1769>
+
+diff -r b6b2829cd7ef src/video/x11/SDL_x11sym.h
+--- a/src/video/x11/SDL_x11sym.h	Wed Feb 27 15:20:31 2013 -0800
++++ b/src/video/x11/SDL_x11sym.h	Wed Mar 27 16:07:23 2013 +0100
+@@ -165,7 +165,7 @@
+  */
+ #ifdef LONG64
+ SDL_X11_MODULE(IO_32BIT)
+-SDL_X11_SYM(int,_XData32,(Display *dpy,register long *data,unsigned len),(dpy,data,len),return)
++SDL_X11_SYM(int,_XData32,(Display *dpy,register _Xconst long *data,unsigned len),(dpy,data,len),return)
+ SDL_X11_SYM(void,_XRead32,(Display *dpy,register long *data,long len),(dpy,data,len),)
+ #endif
+ 

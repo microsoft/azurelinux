@@ -1,0 +1,11 @@
+diff -up libomxil-bellagio-0.9.3/Makefile.am.nodoc libomxil-bellagio-0.9.3/Makefile.am
+--- libomxil-bellagio-0.9.3/Makefile.am.nodoc	2011-01-12 08:53:26.000000000 +0100
++++ libomxil-bellagio-0.9.3/Makefile.am	2012-04-23 13:46:15.410823381 +0200
+@@ -7,7 +7,6 @@ EXTRA_DIST = libomxil-bellagio.spec
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libomxil-bellagio.pc
+ 
+-docdir = $(DESTDIR)$(prefix)/share/doc/@PACKAGE@
+ doc_DATA = README \
+ 	   ChangeLog \
+ 	   TODO

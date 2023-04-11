@@ -1,0 +1,67 @@
+From a976b037b63d8de9ed0eb920238ac4211b649408 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Mon, 29 Apr 2019 15:50:39 +0200
+Subject: [PATCH] fix small errors detected by coverity
+
+---
+ src/video/SDL_surface.c        | 2 +-
+ src/video/fbcon/SDL_fbevents.c | 2 +-
+ src/video/fbcon/SDL_fbmatrox.c | 2 ++
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/video/SDL_surface.c b/src/video/SDL_surface.c
+index 0f3ad12c4..0386cb3fb 100644
+--- a/src/video/SDL_surface.c
++++ b/src/video/SDL_surface.c
+@@ -116,6 +116,7 @@ SDL_Surface * SDL_CreateRGBSurface (Uint32 flags,
+ 	surface->locked = 0;
+ 	surface->map = NULL;
+ 	surface->unused1 = 0;
++	surface->refcount = 1;
+ 	SDL_SetClipRect(surface, NULL);
+ 	SDL_FormatChanged(surface);
+ 
+@@ -142,7 +143,6 @@ SDL_Surface * SDL_CreateRGBSurface (Uint32 flags,
+ 	}
+ 
+ 	/* The surface is ready to go */
+-	surface->refcount = 1;
+ #ifdef CHECK_LEAKS
+ 	++surfaces_allocated;
+ #endif
+diff --git a/src/video/fbcon/SDL_fbevents.c b/src/video/fbcon/SDL_fbevents.c
+index 5e369a4a8..dd7413df9 100644
+--- a/src/video/fbcon/SDL_fbevents.c
++++ b/src/video/fbcon/SDL_fbevents.c
+@@ -575,7 +575,7 @@ int FB_OpenMouse(_THIS)
+ 
+ 	/* ELO TOUCHSCREEN SUPPORT */
+ 
+-	if ( mousedrv && (SDL_strcmp(mousedrv, "ELO") == 0) ) {
++	if ( mousedrv && (SDL_strcmp(mousedrv, "ELO") == 0) && mousedev ) {
+ 		mouse_fd = open(mousedev, O_RDWR);
+ 		if ( mouse_fd >= 0 ) {
+ 			if(eloInitController(mouse_fd)) {
+diff --git a/src/video/fbcon/SDL_fbmatrox.c b/src/video/fbcon/SDL_fbmatrox.c
+index 04b90b05d..4e3da4f84 100644
+--- a/src/video/fbcon/SDL_fbmatrox.c
++++ b/src/video/fbcon/SDL_fbmatrox.c
+@@ -80,6 +80,7 @@ static int FillHWRect(_THIS, SDL_Surface *dst, SDL_Rect *rect, Uint32 color)
+ 	switch (dst->format->BytesPerPixel) {
+ 	    case 1:
+ 		color |= (color<<8);
++		/* fallthrough */
+ 	    case 2:
+ 		color |= (color<<16);
+ 		break;
+@@ -191,6 +192,7 @@ static int HWAccelBlit(SDL_Surface *src, SDL_Rect *srcrect,
+ 		switch (dst->format->BytesPerPixel) {
+ 		    case 1:
+ 			colorkey |= (colorkey<<8);
++			/* fallthrough */
+ 		    case 2:
+ 			colorkey |= (colorkey<<16);
+ 			break;
+-- 
+2.20.1
+
