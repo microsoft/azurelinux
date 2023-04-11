@@ -59,7 +59,7 @@ If you are working on a development branch, you will need to build a toolchain. 
 
 ### **4. Create a Custom Image Definition**
 
-See [Image Config Files](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/packages/working_with_packages.md#image-config-file) and [Building an Image](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/building/building.md) from the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details on working with custom images. This will cover:
+See [Image Config Files](https://github.com/microsoft/CBL-MarinerTutorials/blob/-/docs/packages/working_with_packages.md#image-config-file) and [Building an Image](https://github.com/microsoft/CBL-MarinerTutorials/blob/-/docs/building/building.md) from the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details on working with custom images. This will cover:
 
 * Setting up an image config file
 * Adding packages to the image

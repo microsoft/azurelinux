@@ -30,7 +30,7 @@ If you are working on a development branch or getting ready for a PR, you will n
 
 ## **4. Add/Modify a Package**
 
-See [Working with Packages](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/packages/working_with_packages.md#tutorial-customize-your-image-with-unsupported-packages) from the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details on working with RPM packages. This will cover:
+See [Working with Packages](https://github.com/microsoft/CBL-MarinerTutorials/blob/-/docs/packages/working_with_packages.md#tutorial-customize-your-image-with-unsupported-packages) from the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo for details on working with RPM packages. This will cover:
 
 * Working with source files
 * Calculating package signatures
@@ -76,7 +76,7 @@ Option `#2` is generally faster, but can lead to accuracy issues. If one of your
 
 ### Signatures
 
-See [Source Hashes](https://github.com/microsoft/CBL-Mariner/blob/2.0/toolkit/docs/building/building.md#source-hashes) and [Create a Signature Meta-data File](https://github.com/microsoft/CBL-MarinerTutorials/blob/main/docs/packages/working_with_packages.md#create-a-signature-meta-data-file) for details on how source signatures work. You will need to update the signature files for a package if you change the sources at all.
+See [Source Hashes](/toolkit/docs/building/building.md#source-hashes) and [Create a Signature Meta-data File](https://github.com/microsoft/CBL-MarinerTutorials/blob/-/docs/packages/working_with_packages.md#create-a-signature-meta-data-file) for details on how source signatures work. You will need to update the signature files for a package if you change the sources at all.
 
 ### Dev Loop
 
