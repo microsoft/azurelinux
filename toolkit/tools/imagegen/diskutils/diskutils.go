@@ -574,7 +574,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	// This is due to a possible race condition in Linux/parted where the partition may not actually be ready after being newly created.
 	// To handle such cases, we can retry the command.
 	switch fsType {
-	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4":
+	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4", "xfs":
 		if fsType == "fat32" || fsType == "fat16" {
 			fsType = "vfat"
 		}
