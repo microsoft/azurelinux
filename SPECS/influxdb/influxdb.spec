@@ -55,19 +55,19 @@ Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
+BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
+BuildRequires:  kernel-headers
+BuildRequires:  protobuf-devel
+BuildRequires:  rust >= 1.60.0
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  tzdata
 # IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
 BuildRequires:  pkgconfig(flux) >= 0.191.0
-BuildRequires:  protobuf-devel
-BuildRequires:  kernel-headers
-BuildRequires:  rust >= 1.60.0
-BuildRequires:  clang
-BuildRequires:  tzdata
-BuildRequires:  systemd-rpm-macros
 Requires:       tzdata
+Requires(post): systemd
 Conflicts:      influxdb
 %{?systemd_requires}
-Requires(post): systemd
 
 %description
 InfluxDB is an distributed time series database with no external dependencies.
