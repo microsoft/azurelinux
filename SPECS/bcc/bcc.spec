@@ -2,7 +2,7 @@
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
 Version:        0.24.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,7 +17,7 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libstdc++
-BuildRequires:  llvm-devel
+BuildRequires:  llvm-devel < 16.0.0
 BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  pkg-config
@@ -121,6 +121,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Tue Apr 11 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.24.0-2
+- Add an explicit constraint on llvm-devel < 16.0.0
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.24.0-1
 - Update to 0.24.0
 
