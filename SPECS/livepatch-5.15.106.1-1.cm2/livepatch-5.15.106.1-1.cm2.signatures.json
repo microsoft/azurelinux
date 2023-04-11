@@ -1,0 +1,7 @@
+{
+  "Signatures": {
+    "config-5.15.106.1-1.cm2": "290c87fc3e566cd069be96afeb08f03def96065af53b426c36960d6a843d07c4",
+    "kernel-5.15.106.1.tar.gz": "de7bcb9bbbe487683ecd2e07e536170be7424895694865a642b89d604083a540",
+    "mariner-5.15.106.1-1.cm2.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0"
+  }
+}
