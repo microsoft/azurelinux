@@ -121,14 +121,14 @@ go test ./...
 %sysusers_create_package %{name} %{SOURCE6}
 
 %preun
-%service_del_preun influxdb.service
+%systemd_preun influxdb.service
 
 %post
 %tmpfiles_create %{_tmpfilesdir}/influxdb.conf
-%service_add_post influxdb.service
+%systemd_post influxdb.service
 
 %postun
-%service_del_postun influxdb.service
+%systemd_postun_with_restart influxdb.service
 
 %files
 %license LICENSE
