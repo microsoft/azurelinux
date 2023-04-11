@@ -7,7 +7,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.26.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 # Note: k3s is not exclusive with coredns, etcd, containerd, runc and other CBL-Mariner packages which it embeds.
 # This means there may be multiple versions of these packages. At this time exclusivity is not being enforced to
@@ -82,9 +82,10 @@ exit 0
 %{install_sh}
 
 %changelog
-* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.2-1
+* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.2-2
 - Updated k3s to 1.26.2
 - Drop version constraint on golang <= 1.18.8
+- Addressed CVE for containerd and changed it to the new patched version 1.6.18
 
 * Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-1
 - Updated k3s to 1.25.5
