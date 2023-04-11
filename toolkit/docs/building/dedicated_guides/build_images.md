@@ -96,9 +96,9 @@ sudo make clean
 # OPTIONAL:
 #   Build the latest toolchain **if you are NOT working on a stable branch**
 git checkout main
-sudo make toolchain QUICKREBUILD_TOOLCHAIN=y
+sudo make toolchain QUICK_REBUILD_TOOLCHAIN=y
 
-# Copy it somewhere safe if you want (you can also just leave QUICKREBUILD_TOOLCHAIN=y set)
+# Copy it somewhere safe if you want (you can also just leave QUICK_REBUILD_TOOLCHAIN=y set)
 cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 ```
 
@@ -120,21 +120,21 @@ touch ./imageconfigs/core-efi.json
 #       3) Use a stable branch and don't worry about it
 toolchain="TOOLCHAIN_ARCHIVE='~/mariner_toolchain.tar.gz'"
 # --- or ---
-toolchain="QUICKREBUILD_TOOLCHAIN=y"
+toolchain="QUICK_REBUILD_TOOLCHAIN=y"
 # --- or ---
 toolchain=""
 
 # Build the desired image config. It will end up in ../out/images/<name>
 #   -j$(nproc)              Number of parallel threads to use in the Makefile. The pkg scheduler will
 #                               make its own choices
-#   QUICKREBUILD_PACKAGES=y Try to avoid building packages as much as possible (ie download what we can
+#   QUICK_REBUILD_PACKAGES=y Try to avoid building packages as much as possible (ie download what we can
 #                               from the package repo)
 #   CONFIG_FILE="./imageconfigs/core-efi.json"  Build this image config
 #   REBUILD_TOOLS=y         Rebuild the go tools if needed
 #   $pkg_filer              Optionally only package specific .spec files (see above)
 #   $toolchain              Where to get our toolchain (see above)
-sudo make image -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="./imageconfigs/core-efi.json" REBUILD_TOOLS=y $toolchain
+sudo make image -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE="./imageconfigs/core-efi.json" REBUILD_TOOLS=y $toolchain
 # --- or ---
-sudo make iso -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="./imageconfigs/full.json" REBUILD_TOOLS=y $toolchain
+sudo make iso -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE="./imageconfigs/full.json" REBUILD_TOOLS=y $toolchain
 # Repeat as needed
 ```

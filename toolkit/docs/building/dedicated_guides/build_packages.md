@@ -59,9 +59,9 @@ sudo make clean
 # OPTIONAL:
 #   Build the latest toolchain **if you are NOT working on a stable branch**
 git checkout main
-sudo make toolchain QUICKREBUILD_TOOLCHAIN=y
+sudo make toolchain QUICK_REBUILD_TOOLCHAIN=y
 
-# Copy it somewhere safe if  you want (you can also just leave QUICKREBUILD_TOOLCHAIN=y set)
+# Copy it somewhere safe if  you want (you can also just leave QUICK_REBUILD_TOOLCHAIN=y set)
 cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 ```
 
@@ -109,7 +109,7 @@ signature_handle="SRPM_FILE_SIGNATURE_HANDLING=update"
 #       3) Use a stable branch and don't worry about it
 toolchain="TOOLCHAIN_ARCHIVE='~/mariner_toolchain.tar.gz'"
 # --- or ---
-toolchain="QUICKREBUILD_TOOLCHAIN=y"
+toolchain="QUICK_REBUILD_TOOLCHAIN=y"
 # --- or ---
 toolchain=""
 
@@ -121,14 +121,14 @@ sudo make clean-expand-specs clean-input-srpms
 
 # Build the packages listed, they will end up in ../out/RPMS
 #   -j$(nproc)              Number of parallel threads to use in the Makefile. The pkg scheduler will make its own choices
-#   QUICKREBUILD_PACKAGES=y Try to avoid building packages as much as possible (ie download what we can from the package repo)
+#   QUICK_REBUILD_PACKAGES=y Try to avoid building packages as much as possible (ie download what we can from the package repo)
 #   CONFIG_FILE=""          Do not base package selection on an image config
 #   REBUILD_TOOLS=y         Rebuild the go tools if needed
 #   $pkg_filer              Optionally only package specific .spec files (see above)
 #   $toolchain              Where to get our toolchain (see above)
 #   PACKAGE_REBUILD_LIST    List of packages to ALWAYS rebuild, even if they look unchanged (PACKAGE_BUILD_LIST will build them only if they are missing)
 #   SRPM_FILE_SIGNATURE_HANDLING Auto update the signature files
-sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $pkg_filter $toolchain PACKAGE_REBUILD_LIST="$packages" $signature_handle
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $pkg_filter $toolchain PACKAGE_REBUILD_LIST="$packages" $signature_handle
 
 # Repeat as needed
 ```
@@ -138,7 +138,7 @@ sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="" REBUI
 The following command rebuilds all CBL-Mariner packages in the repo.
 
 ```bash
-sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $toolchain
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $toolchain
 ```
 
 ### Rebuild Minimal Required Packages for an Image
@@ -146,7 +146,7 @@ sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE="" REBUI
 The following command rebuilds packages for the basic VHD on the **stable** branch.
 
 ```bash
-sudo make build-packages -j$(nproc) QUICKREBUILD_PACKAGES=y CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y $toolchain
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y $toolchain
 ```
 
 ### Ignoring Packages

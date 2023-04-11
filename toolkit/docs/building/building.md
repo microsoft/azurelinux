@@ -100,7 +100,7 @@ Other branches are not guaranteed to be easily buildable because these builds wo
 
 Most development work can be done based on the stable tags, but sometimes you need to work on the bleeding edge. There are a few options here:
 
-1) Just rebuild your toolchain every time (set `QUICKREBUILD_TOOLCHAIN=y`). The build tools will attempt to avoid rebuilding the toolchain when possible.
+1) Just rebuild your toolchain every time (set `QUICK_REBUILD_TOOLCHAIN=y`). The build tools will attempt to avoid rebuilding the toolchain when possible.
 1) Build the toolchain once (see #1), then save a copy of the toolchain you built, and reference it via `TOOLCHAIN_ARCHIVE=my_toolchain.tar.gz`)
 1) A hybrid approach: use a stable toolchain via `git checkout 2.0-stable -- ./toolkit/resources/manifests/package/*` on top of a development branch. This will use the latest published toolchain. However, **THIS MAY NOT ALWAYS WORK**. There exist dependency cycles in the packages which are broken by using pre-built toolchain packages. By rolling back the manifests, these cycle-breaking packages may no longer be available.
 
@@ -146,13 +146,13 @@ There are several optimizations possible to speed up the building of the toolcha
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used.
 
-# QUICKREBUILD_TOOLCHAIN=y is a fast way to set all relevant optimization flags.
+# QUICK_REBUILD_TOOLCHAIN=y is a fast way to set all relevant optimization flags.
 # It implies the following:
 #   REBUILD_TOOLCHAIN             = y
 #   INCREMENTAL_TOOLCHAIN         = y
 #   ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y
 #   REBUILD_TOOLS                 = y
-sudo make toolchain QUICKREBUILD_TOOLCHAIN=y
+sudo make toolchain QUICK_REBUILD_TOOLCHAIN=y
 ```
 
 The following commands build **the entire toolchain** from scratch without using any pre-built packages. This step can be quite time consuming so make sure to grab a copy of the toolchain if want to skip this step later.
@@ -194,19 +194,19 @@ sudo make build-packages -j$(nproc) CONFIG_FILE="" REBUILD_TOOLS=y
 # Build ALL packages on an *unstable* branch
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
 
-# QUICKREBUILD=y sets both QUICKREBUILD_PACKAGES=y and QUICKREBUILD_TOOLCHAIN=y
+# QUICK_REBUILD=y sets both QUICK_REBUILD_PACKAGES=y and QUICK_REBUILD_TOOLCHAIN=y
 
-# QUICKREBUILD_PACKAGES=y implies the following flags:
+# QUICK_REBUILD_PACKAGES=y implies the following flags:
 #   DELTA_BUILD   = y
 #   USE_CCACHE   ?= y
 #   REBUILD_TOOLS = y
 
-# QUICKREBUILD_TOOLCHAIN=y builds the toolchain as quickly as possible by using publicly available packages from our public package repo.
+# QUICK_REBUILD_TOOLCHAIN=y builds the toolchain as quickly as possible by using publicly available packages from our public package repo.
 # See the toolchain section for more details.
 
-sudo make build-packages -j$(nproc) CONFIG_FILE="" QUICKREBUILD=y
+sudo make build-packages -j$(nproc) CONFIG_FILE="" QUICK_REBUILD=y
 #  ---or---
-sudo make build-packages -j$(nproc) CONFIG_FILE="" QUICKREBUILD_PACKAGES=y TOOLCHAIN_ARCHIVE=~/mariner_toolchain.tar.gz
+sudo make build-packages -j$(nproc) CONFIG_FILE="" QUICK_REBUILD_PACKAGES=y TOOLCHAIN_ARCHIVE=~/mariner_toolchain.tar.gz
 ```
 
 #### Rebuild Minimal Required Packages
@@ -217,10 +217,10 @@ The following command rebuilds packages for the basic VHD on the **stable** bran
 # Build the subset of packages needed to build the basic VHD on a *stable* branch (i.e. 1.0-stable, 2.0-stable, etc)
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
 
-# We do not use QUICKREBUILD or QUICKREBUILD_TOOLCHAIN since this is a stable branch and we
+# We do not use QUICK_REBUILD or QUICK_REBUILD_TOOLCHAIN since this is a stable branch and we
 # want to just download the toolchain
 
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json QUICKREBUILD_PACKAGES=y
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json QUICK_REBUILD_PACKAGES=y
 ```
 
 Note that the image config file passed to the `CONFIG_FILE` option _only_ builds the packages included in the image config plus all packages needed to build/run those packages. In other words, rather than building the entirety of the CBL-Mariner repo, only the packages needed by the image config and the dependencies for those packages will be built.
@@ -243,7 +243,7 @@ sudo make clean-input-srpms clean-expand-specs
 
 # Build targeted packages
 packages="openssh at"
-sudo make build-packages -j$(nproc) QUICKREBUILD=y SRPM_PACK_LIST="$packages"
+sudo make build-packages -j$(nproc) QUICK_REBUILD=y SRPM_PACK_LIST="$packages"
 ```
 
 Note that this process will download dependencies from [packages.microsoft.com](packages.microsoft.com) and rebuild just the `.spec` files indicated by the `SRPM_PACK_LIST`
@@ -253,10 +253,10 @@ After building a package, you may choose to rebuild it or build additional packa
 ```bash
 # Clean and rebuild targeted packages. Only rebuild the packages if they are not already built.
 sudo make clean-build-packages
-sudo make build-packages -j$(nproc) QUICKREBUILD=y CONFIG_FILE="" SRPM_PACK_LIST="at openssh"
+sudo make build-packages -j$(nproc) QUICK_REBUILD=y CONFIG_FILE="" SRPM_PACK_LIST="at openssh"
 
 # Force the 'at' package to rebuild no matter what, and build openssh if it is missing
-sudo make build-packages -j$(nproc) QUICKREBUILD=y CONFIG_FILE="" SRPM_PACK_LIST="at openssh" PACKAGE_REBUILD_LIST="at" PACKAGE_BUILD_LIST="openssh"
+sudo make build-packages -j$(nproc) QUICK_REBUILD=y CONFIG_FILE="" SRPM_PACK_LIST="at openssh" PACKAGE_REBUILD_LIST="at" PACKAGE_BUILD_LIST="openssh"
 ```
 
 ### Image Stage
@@ -296,16 +296,16 @@ All images are generated in the `out/images` folder.
 
 ```bash
 # Recall that if you are on a stable branch you can omit the toolchain rebuild. If so
-# use QUICKREBUILD_PACKAGES=y instead of QUICKREBUILD=y.
+# use QUICK_REBUILD_PACKAGES=y instead of QUICK_REBUILD=y.
 
 # To build a CBL-Mariner VHD Image (VHD folder: ../out/images/core-legacy)
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json QUICKREBUILD=y
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json QUICK_REBUILD=y
 
 # To build a CBL-Mariner VHDX Image (VHDX folder ../out/images/core-efi)
-sudo make image CONFIG_FILE=./imageconfigs/core-efi.json QUICKREBUILD=y
+sudo make image CONFIG_FILE=./imageconfigs/core-efi.json QUICK_REBUILD=y
 
 # To build a core CBL-Mariner Container (Container Folder: ../out/images/core-container/*.tar.gz)
-sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICKREBUILD=y
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICK_REBUILD=y
 ```
 
 #### ISO Images
@@ -318,20 +318,20 @@ The following builds an ISO with an interactive UI and selectable image configur
 
 ```bash
 # Recall that if you are on a stable branch you can omit the toolchain rebuild. If so
-# use QUICKREBUILD_PACKAGES=y instead of QUICKREBUILD=y.
+# use QUICK_REBUILD_PACKAGES=y instead of QUICK_REBUILD=y.
 
 # To build a CBL-Mariner ISO Image (ISO folder: ../out/images/full)
-sudo make iso CONFIG_FILE=./imageconfigs/full.json QUICKREBUILD=y
+sudo make iso CONFIG_FILE=./imageconfigs/full.json QUICK_REBUILD=y
 ```
 
 To create an unattended ISO installer (no interactive UI), use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig. The image config requires additional information, see [image config format](../formats/imageconfig.md#targetdisk) for more details.
 
 ```bash
 # Recall that if you are on a stable branch you can omit the toolchain rebuild. If so
-# use QUICKREBUILD_PACKAGES=y instead of QUICKREBUILD=y.
+# use QUICK_REBUILD_PACKAGES=y instead of QUICK_REBUILD=y.
 
 # Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
-sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json QUICKREBUILD=y UNATTENDED_INSTALLER=y
+sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json QUICK_REBUILD=y UNATTENDED_INSTALLER=y
 ```
 
 ## Further Reading
@@ -544,40 +544,6 @@ sudo make image PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUIL
 ```
 
 ### Local Build Variables
-
-#### Quickrebuild Defaults
-
-Quickrebuild flags will set some flags to try and optimize builds for speed. This involves using as many packages as possible from the upstream repos for both package building and for toolchain creation. These flags are meant to work on any branch.
-
-#### `QUICKREBUILD=...`
-
-##### `QUICKREBUILD=`**`n`** _(default)_
-
-> Do not set any additional quickbuild flags
-
-##### `QUICKREBUILD=`**`y`**
-
-> If they are not set, set `QUICKREBUILD_TOOLCHAIN=y` and `QUICKREBUILD_PACKAGES=y`.
-
-#### `QUICKREBUILD_TOOLCHAIN=...`
-
-##### `QUICKREBUILD_TOOLCHAIN=`**`n`** _(default)_
-
-> Do not set toolchain specific quick rebuild flags
-
-##### `QUICKREBUILD_TOOLCHAIN=`**`y`**
-
-> Set `REBUILD_TOOLCHAIN = y`, `INCREMENTAL_TOOLCHAIN = y`, `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y`, `REBUILD_TOOLS ?= y`.
-
-#### `QUICKREBUILD_PACKAGES=...`
-
-##### `QUICKREBUILD_PACKAGES=`**`n`** _(default)_
-
-> Do not set toolchain specific quick rebuild flags
-
-##### `QUICKREBUILD_PACKAGES=`**`y`**
-
-> Set `DELTA_BUILD = y`, `REBUILD_TOOLS ?= y`, `REBUILD_TOOLS ?= y`.
 
 #### URLS and Repos
 
@@ -860,9 +826,9 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| QUICKREBUILD                  | n                                                                                                      | Set good defaults for fast rebuilds of both toolchain and packages on any branch
-| QUICKREBUILD_TOOLCHAIN        | n                                                                                                      | Set good defaults for fast rebuilds  _just the toolchain_ on any branch
-| QUICKREBUILD_PACKAGES         | n                                                                                                      | Set good defaults for fast rebuilds  _just the packages_ on any branch
+| QUICK_REBUILD                  | n                                                                                                      | Set good defaults for fast rebuilds of both toolchain and packages on any branch
+| QUICK_REBUILD_TOOLCHAIN        | n                                                                                                      | Set good defaults for fast rebuilds  _just the toolchain_ on any branch
+| QUICK_REBUILD_PACKAGES         | n                                                                                                      | Set good defaults for fast rebuilds  _just the packages_ on any branch
 | REBUILD_TOOLCHAIN             | n                                                                                                      | Bootstrap the toolchain packages locally or download them?
 | ALLOW_TOOLCHAIN_DOWNLOAD_FAIL | n                                                                                                      | Allow for partial rehydration of the toolchain from `$(PACKAGE_URL_LIST)`? Only applicable if `REBUILD_TOOLCHAIN=y` and `INCREMENTAL_TOOLCHAIN=y`.
 | REBUILD_PACKAGES              | y                                                                                                      | Build packages locally or download them? Only packages with a local spec file will be built.
