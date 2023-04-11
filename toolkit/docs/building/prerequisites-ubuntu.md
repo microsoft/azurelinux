@@ -24,7 +24,8 @@ sudo apt -y install \
     qemu-utils \
     rpm \
     tar \
-    wget
+    wget \
+    xfsprogs
 
 # Fix go 1.17 link
 sudo ln -vsf /usr/lib/go-1.17/bin/go /usr/bin/go

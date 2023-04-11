@@ -1,0 +1,13 @@
+--- sympy-sympy-1.8/sympy/physics/quantum/tests/test_circuitplot.py.orig	2021-04-09 16:29:50.000000000 -0600
++++ sympy-sympy-1.8/sympy/physics/quantum/tests/test_circuitplot.py	2021-04-12 13:27:55.241417177 -0600
+@@ -4,7 +4,9 @@ from sympy.physics.quantum.gate import C
+ from sympy.external import import_module
+ from sympy.testing.pytest import skip
+ 
+-mpl = import_module('matplotlib')
++mpl = import_module(
++    'matplotlib', import_kwargs={'fromlist': ['pyplot']},
++    catch=(RuntimeError,))  # This is raised in environments that have no display.
+ 
+ def test_render_label():
+     assert render_label('q0') == r'$\left|q0\right\rangle$'
