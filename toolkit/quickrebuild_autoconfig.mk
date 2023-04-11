@@ -24,16 +24,16 @@ ifeq ($(QUICK_REBUILD_TOOLCHAIN),y)
 # to enable these. Both INCREMENTAL_TOOLCHAIN and DELTA_BUILD are checked because DELTA_BUILD implies
 # the depcrecated INCREMENTAL_TOOLCHAIN.
 ifneq ($(filter n,$(REBUILD_TOOLCHAIN)),)
-$(error REBUILD_TOOLCHAIN cannot be used with REBUILD_TOOLCHAIN explicitly set to 'n')
+$(error QUICK_REBUILD_TOOLCHAIN cannot be used with REBUILD_TOOLCHAIN explicitly set to 'n')
 endif
 ifneq ($(filter n,$(INCREMENTAL_TOOLCHAIN)),)
-$(error REBUILD_TOOLCHAIN cannot be used with INCREMENTAL_TOOLCHAIN explicitly set to 'n')
+$(error QUICK_REBUILD_TOOLCHAIN cannot be used with INCREMENTAL_TOOLCHAIN explicitly set to 'n')
 endif
 ifneq ($(filter n,$(DELTA_BUILD)),)
-$(error REBUILD_TOOLCHAIN cannot be used with DELTA_BUILD explicitly  set to 'n')
+$(error QUICK_REBUILD_TOOLCHAIN cannot be used with DELTA_BUILD explicitly  set to 'n')
 endif
 ifneq ($(filter n,$(ALLOW_TOOLCHAIN_DOWNLOAD_FAIL)),)
-$(error REBUILD_TOOLCHAIN cannot be used with ALLOW_TOOLCHAIN_DOWNLOAD_FAIL explicitly set to 'n')
+$(error QUICK_REBUILD_TOOLCHAIN cannot be used with ALLOW_TOOLCHAIN_DOWNLOAD_FAIL explicitly set to 'n')
 endif
 
 DELTA_BUILD                   = y
