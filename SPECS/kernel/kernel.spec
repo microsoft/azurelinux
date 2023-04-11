@@ -18,7 +18,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.102.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -410,6 +410,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 11 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-5
+- Enable CONFIG_HIST_TRIGGERS
+
 * Wed Mar 29 2023 Kanika Nema <kanikanema@microsoft.com> - 5.15.102.1-4
 - Enable nvme-tcp and nvme-rdma modules
 
