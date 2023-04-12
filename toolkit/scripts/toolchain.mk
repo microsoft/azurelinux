@@ -72,6 +72,15 @@ clean-toolchain:
 	rm -f $(SCRIPTS_DIR)/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/.bashrc
 
+# Clean the containers we use during toolchain build
+ifeq ($(CLEAN_TOOLCHAIN_CONTAINERS),y)
+clean:  clean-toolchain-containers
+endif
+
+# Optionally remove all toolchain docker containers
+clean-toolchain-containers:
+	$(SCRIPTS_DIR)/toolchain/toolchain_clean.sh $(BUILD_DIR)
+
 clean-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
 	for f in $(toolchain_rpms_noarch); do rm -vf $(RPMS_DIR)/noarch/$$f; done

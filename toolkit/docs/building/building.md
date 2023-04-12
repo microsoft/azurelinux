@@ -499,6 +499,16 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Do not clear out the toolchain build chroot before performing a build of the final toolchain packages. RPMs within the toolchain build chroot will be used as a cache to avoid rebuilding already-built SRPMs. These RPMs can be seeded by (a) previous failed builds or (b) upstream package repos.
 
+#### `CLEAN_TOOLCHAIN_CONTAINERS=...`
+
+##### `CLEAN_TOOLCHAIN_CONTAINERS=n`
+
+> Leave the raw toolchain containers in docker when running `make clean`. If they match the configuration of the current build they will be re-used.
+
+##### `CLEAN_TOOLCHAIN_CONTAINERS=`**`y`** *(default)*
+
+> Delete all `marinertoolchain*` containers and images associated with this working directory when running `make clean`.
+
 #### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
 
 ##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`n`** *(default)*

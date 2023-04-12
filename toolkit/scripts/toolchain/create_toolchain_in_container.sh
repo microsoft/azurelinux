@@ -52,7 +52,7 @@ EOF
 
     echo Building temp toolchain in container
     export tag=$(date +'%y%m%d.%H%M')
-    docker build --tag marinertoolchain:${tag} ./container
+    docker build --tag marinertoolchain:${tag} --build-arg MARINER_BUILD_DIR="${MARINER_BUILD_DIR}" ./container
     docker tag marinertoolchain:${tag} marinertoolchain:latest
 
     # Now build final raw toolchain as root, which requires --privileged for the chroot

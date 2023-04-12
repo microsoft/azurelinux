@@ -8,6 +8,7 @@
 
 # The QUICK_REBUILD* flags are special flags that will try to build the toolchain and packages as quickly as possible. They will
 # automatically set REBUILD_TOOLS, USE_CCACHE, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL to 'y'.
+# It will also set CLEAN_TOOLCHAIN_CONTAINERS to 'n'
 QUICK_REBUILD           ?= n
 QUICK_REBUILD_TOOLCHAIN ?= n
 QUICK_REBUILD_PACKAGES  ?= n
@@ -40,9 +41,10 @@ DELTA_BUILD                   = y
 REBUILD_TOOLCHAIN             = y
 ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y
 
-# Don't care if REBUILD_TOOLS is set or not, doesn't matter to the quickbuild. Just turn this
+# Don't care if REBUILD_TOOLS or CLEAN_TOOLCHAIN_CONTAINERS is set or not, doesn't matter to the quickbuild. Just turn this
 # on to be friendly to the user unless they  have explicitly set it to off.
-REBUILD_TOOLS                 ?= y
+REBUILD_TOOLS                ?= y
+CLEAN_TOOLCHAIN_CONTAINERS   ?= n
 endif
 
 ######## QUICK_REBUILD PACKAGES ########
@@ -68,6 +70,7 @@ ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
 REBUILD_TOOLS                   ?= n
 USE_CCACHE                      ?= n
 DELTA_BUILD                     ?= n
+CLEAN_TOOLCHAIN_CONTAINERS      ?= y
 
 ######## HANDLE INCREMENTAL_TOOLCHAIN DEPRECATION ########
 
