@@ -2,6 +2,12 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 
+# Edit default debuginfo settings
+%undefine _unique_build_ids
+%undefine _unique_debug_names
+%global _missing_build_ids_terminate_build 1
+%global _no_recompute_build_ids 1
+
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
@@ -18,7 +24,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.107.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -410,6 +416,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
+- Disable rpm's debuginfo defaults which generate build-ids
+
 * Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
 - Auto-upgrade to 5.15.107.1
 
