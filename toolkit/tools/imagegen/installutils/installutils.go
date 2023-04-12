@@ -630,7 +630,7 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 		return
 	}
 
-	err = shell.ExecuteLive(squashErrors, "tdnf", "download", releaseverCliArg, "--alldeps", "--destdir", installRoot, releasePackage)
+	err = shell.ExecuteLive(squashErrors, "tdnf", "install", "--downloadonly", releaseverCliArg, "--alldeps", "--downloaddir", installRoot, releasePackage)
 	if err != nil {
 		logger.Log.Errorf("Failed to prepare the RPM database on downloading the 'mariner-release' package: %v", err)
 		return

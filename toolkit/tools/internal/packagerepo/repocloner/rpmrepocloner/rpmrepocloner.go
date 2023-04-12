@@ -328,15 +328,15 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
-			"--destdir",
+			"--downloaddir",
 			downloadDir,
 			pkgName,
 		}
 
 		if cloneDeps {
-			args = append([]string{"download", "--alldeps"}, args...)
+			args = append([]string{"install", "--downloadonly", "--alldeps"}, args...)
 		} else {
-			args = append([]string{"download-nodeps"}, args...)
+			args = append([]string{"install", "--downloadonly", "--nodeps"}, args...)
 		}
 
 		err = r.chroot.Run(func() (err error) {

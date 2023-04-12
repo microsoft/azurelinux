@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.44.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -755,9 +755,9 @@ cp %{SOURCE9} %{_sysconfdir}/yum.repos.d/allrepos.repo
 # Must keep in sync with BRs under "Build requirements for the appliance"
 # Download to
 mkdir -pv %{_var}/cache/tdnf
-tdnf download -y --disablerepo=* \
+tdnf isntall --downloadonly -y --disablerepo=* \
   --enablerepo=local-repo --enablerepo=upstream-cache-repo \
-  --alldeps --destdir %{_var}/cache/tdnf \
+  --alldeps --downloaddir %{_var}/cache/tdnf \
     acl \
     attr \
     augeas-libs \
@@ -1234,6 +1234,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Wed Apr 12 2023 Sam Meluch <sammeluch@microsoft.com> - 1.44.0-12
+- Update tdnf download to tdnf install --downloadonly
+
 * Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.44.0-11
 - Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
 

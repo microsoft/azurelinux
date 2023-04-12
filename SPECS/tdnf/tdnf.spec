@@ -1,7 +1,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
-Version:        3.2.2
-Release:        4%{?dist}
+Version:        3.5.2
+Release:        1%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,6 @@ Source4:        tdnfrepogpgcheck.conf
 Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
-Patch3:         tdnf-add-download-command.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -33,6 +32,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
+BuildRequires:  sqlite-devel
 Requires:       curl
 Requires:       libmetalink
 Requires:       libsolv
@@ -178,6 +178,10 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tdnf-automatic
 
 %changelog
+* Wed Apr 12 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-1
+- Update tdnf to version 3.5.2
+- Remove tdnf download patch in favor of upstream --downloadonly functionality
+
 * Tue May 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
 - Reverting usage of "rpm" in RPM scripts since "/var/lib/rpm/.rpm.lock" is always taken.
 
