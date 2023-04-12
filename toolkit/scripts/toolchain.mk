@@ -60,6 +60,7 @@ endif
 clean: clean-toolchain
 
 clean-toolchain:
+	$(SCRIPTS_DIR)/safeunmount.sh "$(toolchain_build_dir)"
 	rm -rf $(toolchain_build_dir)
 	rm -rf $(toolchain_local_temp)
 	rm -rf $(toolchain_logs_dir)
