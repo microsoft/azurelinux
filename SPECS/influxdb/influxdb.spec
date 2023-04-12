@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,19 +55,19 @@ Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
+BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
+BuildRequires:  kernel-headers
+BuildRequires:  protobuf-devel
+BuildRequires:  rust >= 1.60.0
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  tzdata
 # IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
 BuildRequires:  pkgconfig(flux) >= 0.191.0
-BuildRequires:  protobuf-devel
-BuildRequires:  kernel-headers
-BuildRequires:  rust >= 1.60.0
-BuildRequires:  clang
-BuildRequires:  tzdata
-BuildRequires:  systemd-rpm-macros
 Requires:       tzdata
+Requires(post): systemd
 Conflicts:      influxdb
 %{?systemd_requires}
-Requires(post): systemd
 
 %description
 InfluxDB is an distributed time series database with no external dependencies.
@@ -121,14 +121,14 @@ go test ./...
 %sysusers_create_package %{name} %{SOURCE6}
 
 %preun
-%service_del_preun influxdb.service
+%systemd_preun influxdb.service
 
 %post
 %tmpfiles_create %{_tmpfilesdir}/influxdb.conf
-%service_add_post influxdb.service
+%systemd_post influxdb.service
 
 %postun
-%service_del_postun influxdb.service
+%systemd_postun_with_restart influxdb.service
 
 %files
 %license LICENSE
@@ -144,6 +144,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Tue Apr 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-6
+- Fixed uninstallation step not working
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-5
 - Bump release to rebuild with go 1.19.8
 
