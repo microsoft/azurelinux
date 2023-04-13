@@ -14183,8 +14183,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.19.1",
-          "downloadUrl": "https://nodejs.org/download/release/v16.19.1/node-v16.19.1.tar.xz"
+          "version": "18.9.0",
+          "downloadUrl": "https://nodejs.org/download/release/v18.9.0/node-v18.9.0.tar.xz"
         }
       }
     },
