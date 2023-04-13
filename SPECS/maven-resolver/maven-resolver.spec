@@ -3,7 +3,6 @@ Summary:        Apache Maven Artifact Resolver library
 Name:           maven-resolver
 Version:        1.7.3
 Release:        7%{?dist}
-Epoch:          1
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
