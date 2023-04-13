@@ -5,7 +5,7 @@
   "golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz": "b7e8935189ea46c67eedafe6a97aefbdc2bf71dd9097fb7ee8a2a8ebc7556e7e",
   "golang-sys-b0526f3d87448f0401ea3f7f3a81aa9e6ab4804d.tar.gz": "23703a84893a1cb53d3efbb46143451431b95b78d29ef1e02132cd580bb3a445",
   "logrus-v1.8.1.tar.gz": "e9492c08ac8f202b438ccfb992bf81b7860739cf8f2266958e0c574c7abfdd74",
-  "runc-v1.1.2.tar.gz": "1a14bb492b562a6f7a27248e65a699790a6964923de64612e9bafc06124a30a2",
+  "runc-v1.1.5.tar.gz": "4bbc7703f4a5273e4b3d2c0ef233c784d116e92722e05fa11aa93ccf51aed4b9",
   "runtime-spec-v1.0.2.tar.gz": "0933a1ba6e418fe020993e80426107da8de3572f3f20b4cd1ef296de6e62bb61",
   "urfave-cli-v2.3.0.tar.gz": "b17376246f1477157daab86d4a1562d6b004f5be0d15dfc61ebd8bb129384e6b"
  }
