@@ -71,13 +71,13 @@ func New() *RpmRepoCloner {
 }
 
 // Initialize initializes rpmrepocloner, enabling Clone() to be called.
-//  - destinationDir is the directory to save RPMs
-//  - tmpDir is the directory to create a chroot
-//  - workerTar is the path to the worker tar used to seed the chroot
-//  - existingRpmsDir is the directory with prebuilt RPMs
-//  - useUpdateRepo if set, the upstream update repository will be used.
-//  - usePreviewRepo if set, the upstream preview repository will be used.
-//  - repoDefinitions is a list of repo files to use when cloning RPMs
+//   - destinationDir is the directory to save RPMs
+//   - tmpDir is the directory to create a chroot
+//   - workerTar is the path to the worker tar used to seed the chroot
+//   - existingRpmsDir is the directory with prebuilt RPMs
+//   - useUpdateRepo if set, the upstream update repository will be used.
+//   - usePreviewRepo if set, the upstream preview repository will be used.
+//   - repoDefinitions is a list of repo files to use when cloning RPMs
 func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, useUpdateRepo, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false

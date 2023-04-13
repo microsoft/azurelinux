@@ -81,13 +81,13 @@ func (n PkgNode) ID() int64 {
 	return n.nodeID
 }
 
-//PkgGraph implements a simple.DirectedGraph using pkggraph Nodes.
+// PkgGraph implements a simple.DirectedGraph using pkggraph Nodes.
 type PkgGraph struct {
 	*simple.DirectedGraph
 	nodeLookup map[string][]*LookupNode
 }
 
-//LookupNode represents a graph node for a package in the lookup list
+// LookupNode represents a graph node for a package in the lookup list
 type LookupNode struct {
 	RunNode   *PkgNode // The "meta" run node for a package. Tracks the run-time dependencies for the package. Remote packages will only have a RunNode.
 	BuildNode *PkgNode // The build node for a package. Tracks the build requirements for the package. May be nil for remote packages.
@@ -133,7 +133,7 @@ func (n NodeType) String() string {
 	}
 }
 
-//DOTColor returns the graphviz color to set a node to
+// DOTColor returns the graphviz color to set a node to
 func (n *PkgNode) DOTColor() string {
 	switch n.State {
 	case StateMeta:

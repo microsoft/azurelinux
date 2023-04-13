@@ -291,7 +291,9 @@ func umount(path string) (err error) {
 // PackageNamesFromSingleSystemConfig goes through the packageslist field in the systemconfig and extracts the list of packages
 // from each of the packagelists.
 // NOTE: the package list contains the versions restrictions for the packages, if present, in the form "[package][condition][version]".
-//       Example: gcc=9.1.0
+//
+//	Example: gcc=9.1.0
+//
 // - systemConfig is the systemconfig field from the config file
 // Since kernel is not part of the packagelist, it is added separately from KernelOptions.
 func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig) (finalPkgList []string, err error) {
@@ -2204,7 +2206,7 @@ func isRunningInHyperV() (isHyperV bool, err error) {
 	return
 }
 
-//KernelPackages returns a list of kernel packages obtained from KernelOptions in the config's SystemConfigs
+// KernelPackages returns a list of kernel packages obtained from KernelOptions in the config's SystemConfigs
 func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 	var packageList []*pkgjson.PackageVer
 	// Add all the provided kernels to the package list
