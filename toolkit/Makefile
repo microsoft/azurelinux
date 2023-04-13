@@ -9,6 +9,7 @@
 ######## DEFINITIONS ########
 
 toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
 ifeq ($(origin CONFIG_FILE), undefined)
@@ -25,7 +26,7 @@ SRPM_PACK_LIST          ?=
 
 # Logic to auto configure build options for optimized builds
 # These will set the default values for: REBUILD_TOOLS, USE_CCACHE, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
-include ./quickrebuild_autoconfig.mk
+include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
 
@@ -63,7 +64,6 @@ TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
 PREVIEW_REPO     ?= $(toolkit_root)/repos/mariner-official-preview.repo
 RESOURCES_DIR    ?= $(toolkit_root)/resources
-SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
 PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
