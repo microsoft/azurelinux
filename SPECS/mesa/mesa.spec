@@ -52,7 +52,7 @@
 Summary:        Mesa graphics libraries
 Name:           mesa
 Version:        21.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,7 +73,7 @@ BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gettext
-BuildRequires:  llvm-devel >= 7.0.0
+BuildRequires:  llvm-devel < 16.0.0
 BuildRequires:  meson >= 0.45
 BuildRequires:  pkgconfig(dri2proto) >= 2.8
 BuildRequires:  pkgconfig(expat)
@@ -588,6 +588,9 @@ popd
 %endif
 
 %changelog
+* Tue Apr 11 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 21.0.0-4
+- Add an explicit constraint on llvm-devel < 16.0.0
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 21.0.0-3
 - Remove epoch
 

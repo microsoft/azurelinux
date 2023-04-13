@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "LICENSE": "386eaf71633bf096e6c17471f50e867dabdf14d38a157ca27a0425dc583eb9fe",
-  "copy_jdk_configs.lua": "6affc066935f57bc54f3a9a1f0b6cfcbbe9e3914a05d847f6fa331bdb55a6398",
-  "copy_jdk_configs_fixFiles.sh": "085523323d639dacc45ee2e8b8dfc225e0609786a8b78b71067d965b62298a8e"
- }
-}

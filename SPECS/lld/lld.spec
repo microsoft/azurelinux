@@ -1,7 +1,7 @@
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
 Version:        12.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%
 BuildRequires:  build-essential
 BuildRequires:  cmake
 BuildRequires:  file
-BuildRequires:  llvm-devel
+BuildRequires:  llvm-devel < 16.0.0
 BuildRequires:  ninja-build
 BuildRequires:  python3
 Requires:       %{name}-libs = %{version}-%{release}
@@ -71,6 +71,9 @@ cd build
 %{_libdir}/*.so.12*
 
 %changelog
+*   Tue Apr 11 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 12.0.1-2
+-   Add an explicit constraint on llvm-devel < 16.0.0
+
 *   Thu Aug 12 2021 Andy Caldwell <andycaldwell@microsoft.com>  12.0.1-1
 -   Original version for CBL-Mariner.
 -   License verified
