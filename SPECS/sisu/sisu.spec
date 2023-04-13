@@ -19,8 +19,8 @@ Patch3:         sisu-osgi-api.patch
 Patch4:         0001-Remove-dependency-on-glassfish-servlet-api.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-Provides:       %{name}-inject = %{epoch}:%{version}-%{release}
-Provides:       %{name}-plexus = %{epoch}:%{version}-%{release}
+Provides:       %{name}-inject = %{version}-%{release}
+Provides:       %{name}-plexus = %{version}-%{release}
 Provides:       bundled(objectweb-asm)
 BuildArch:      noarch
 

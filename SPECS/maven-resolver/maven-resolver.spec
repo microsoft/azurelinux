@@ -11,15 +11,15 @@ Source0:        https://archive.apache.org/dist/maven/resolver/%{name}-%{version
 Patch0:         0001-Remove-use-of-deprecated-SHA-1-and-MD5-algorithms.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-Provides:       maven-resolver-api = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-spi = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-impl = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-util = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-connector-basic = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-transport-wagon = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-transport-http = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-transport-file = %{epoch}:%{version}-%{release}
-Provides:       maven-resolver-transport-classpath = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-api = %{version}-%{release}
+Provides:       maven-resolver-spi = %{version}-%{release}
+Provides:       maven-resolver-impl = %{version}-%{release}
+Provides:       maven-resolver-util = %{version}-%{release}
+Provides:       maven-resolver-connector-basic = %{version}-%{release}
+Provides:       maven-resolver-transport-wagon = %{version}-%{release}
+Provides:       maven-resolver-transport-http = %{version}-%{release}
+Provides:       maven-resolver-transport-file = %{version}-%{release}
+Provides:       maven-resolver-transport-classpath = %{version}-%{release}
 BuildArch:      noarch
 
 %description
