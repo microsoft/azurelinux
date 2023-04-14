@@ -1,15 +1,15 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
-Version:        1.1.2+azure
-Release:        4%{?dist}
+Version:        1.1.5+azure
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Virtualization/Libraries
 URL:            https://runc.io/
 # See generate-sources.sh for creating runc source tarball
-#Source0:       https://github.com/opencontainers/runc/archive/refs/tags/v1.1.2.tar.gz
-Source0:        runc-v1.1.2.tar.gz
+#Source0:       https://github.com/opencontainers/runc/archive/refs/tags/v1.1.5.tar.gz
+Source0:        runc-v1.1.5.tar.gz
 #Source1:       https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz
 Source1:        logrus-v1.8.1.tar.gz
 #Source2:       https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz
@@ -108,6 +108,9 @@ cp %{SOURCE7} %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Thu Apr 13 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.1.5+azure-1
+- Bump release to fix CVE-2023-28642, CVE-2023-27561, CVE-2023-25809
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.2+azure-4
 - Bump release to rebuild with go 1.18.8-2
 
