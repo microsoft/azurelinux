@@ -141,7 +141,8 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		$(logging_command) \
 		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \
-		--output=$(cached_file) && \
+		--output=$(cached_file) \
+		--unresolved-pkg-file=$(PKGBUILD_DIR)/unresolved_packages.txt && \
 	touch $@
 
 $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)

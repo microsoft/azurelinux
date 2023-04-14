@@ -46,6 +46,7 @@ var (
 
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
+	unresolvedPkgFile = app.Flag("unresolved-pkg-file", "Path to save the list of unresolved packages").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -96,6 +97,14 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, disableUpstreamRepos, stopOnFailure bool) (err error) {
+	// If unresolvedPkgFile file present in the machine, delete it.
+	if _, err := os.Stat(*unresolvedPkgFile); err == nil {
+		err = os.Remove(*unresolvedPkgFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to delete file %s. Old values may cause confusion! Error: %s", *unresolvedPkgFile, err)
+		}
+	}
+
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
 	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
@@ -173,6 +182,17 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	resolvedPackages, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
 		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
+		// Store node.VersionedPkg.Name into a unresolvedPkgFile
+		file, ferr := os.OpenFile(*unresolvedPkgFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if ferr != nil {
+			logger.Log.Warnf("Failed to open file %s. Error: %s", *unresolvedPkgFile, ferr)
+		} else {
+			defer file.Close()
+			if _, ferr := file.WriteString(node.VersionedPkg.Name + "\n"); ferr != nil {
+				logger.Log.Warnf("Failed to write to file %s. Error: %s", *unresolvedPkgFile, err)
+			}
+		}
+
 		// It is not an error if an implicit node could not be resolved as it may become available later in the build.
 		// If it does not become available scheduler will print an error at the end of the build.
 		if node.Implicit {
@@ -184,6 +204,17 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	}
 
 	if len(resolvedPackages) == 0 {
+		// Store node.VersionedPkg.Name into a unresolvedPkgFile
+		file, err := os.OpenFile(*unresolvedPkgFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			logger.Log.Warnf("Failed to open file %s. Error: %s", *unresolvedPkgFile, err)
+		} else {
+			defer file.Close()
+			if _, err := file.WriteString(node.VersionedPkg.Name + "\n"); err != nil {
+				logger.Log.Warnf("Failed to write to file %s. Error: %s", *unresolvedPkgFile, err)
+			}
+		}
+
 		return fmt.Errorf("failed to find any packages providing '%v'", node.VersionedPkg)
 	}
 
