@@ -1,7 +1,7 @@
 Summary:       xinetd -- A better inetd.
 Name:          xinetd
 Version:       2.3.15
-Release:       12%{?dist}
+Release:       13%{?dist}
 License:       BSD
 Group:         System Environment/Daemons
 Vendor:        Microsoft Corporation
@@ -10,6 +10,7 @@ URL:           https://github.com/xinetd-org/xinetd
 #Source0:      https://github.com/xinetd-org/xinetd/archive/%{name}-2-3-15.tar.gz
 Source0:       %{name}-%{version}.tar.gz
 Source1:       xinetd.service
+Patch0:        CVE-2013-4342.patch
 BuildRequires: systemd
 BuildRequires: libtirpc-devel
 Requires:      systemd
@@ -23,7 +24,7 @@ of servers that can be started, and has a configurable defence
 mechanism to protect against port scanners, among other things.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -71,6 +72,9 @@ rm -rf %{buildroot}
 %{_libdir}/systemd/system-preset/50-xinetd.preset
 
 %changelog
+* Wed Apr 05 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.3.15-13
+- Patch CVE-2013-4342
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.15-12
 - Added %%license line automatically
 
