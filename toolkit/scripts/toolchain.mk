@@ -226,7 +226,8 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
-			$(toolchain_from_repos) && \
+			$(toolchain_from_repos) \
+			$(TOOLCHAIN_MANIFEST) && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
