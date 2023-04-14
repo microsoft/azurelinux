@@ -1746,7 +1746,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "clang",
+          "name": "clang16",
           "version": "16.0.0",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }
@@ -12150,7 +12150,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "llvm",
+          "name": "llvm16",
           "version": "16.0.0",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }

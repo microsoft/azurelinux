@@ -30,10 +30,10 @@
     %{_bindir}/scan-build-py
 
 %global clang_srcdir llvm-project-llvmorg-%{version}
-%global clang_tools_srcdir %{name}-tools-extra-%{version}.src
+%global clang_tools_srcdir clang-tools-extra-%{version}.src
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
-Name:           clang
+Name:           clang16
 Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
 Release:        1%{?dist}
 License:        NCSA
@@ -45,14 +45,14 @@ Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%
 Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{clang_tools_srcdir}.tar.xz
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
-BuildRequires:  llvm-devel = %{version}
+BuildRequires:  llvm16-devel = %{version}
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       libstdc++-devel
 Requires:       libxml2
-Requires:       llvm
+Requires:       llvm16
 Requires:       ncurses
 Requires:       python3
 Requires:       zlib
@@ -225,7 +225,7 @@ make clang-check
 
 %changelog
 * Wed Apr 05 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-1
-- Add spec for clang-16
+- Add spec for clang16
 
 * Fri Oct 07 2022 Andy Caldwell <andycaldwell@microsoft.com> - 12.0.1-4
 - Enable `-pie` executables by default
