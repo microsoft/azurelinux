@@ -162,6 +162,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--log-file=$(LOGS_DIR)/imggen/externalimagepkgfetcher.log \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tdnf-worker=$(chroot_worker) \
 		--external-only \
 		--package-graph=$(graph_file) \
