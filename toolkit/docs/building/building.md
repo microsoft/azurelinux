@@ -165,6 +165,10 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 cp ../build/toolchain/toolchain_built_rpms_all.tar.gz ~/mariner_toolchain.tar.gz
 ```
 
+#### Preserve Toolchain State
+
+Running `make clean` will tidy up early toolchain components that use docker containers to build. You can preserve these containers by passing `CLEAN_TOOLCHAIN_CONTAINERS=n` when cleaning. The `QUICK_REBUILD_TOOLCHAIN=y` flag will also set this flag.
+
 ### Package Stage
 
 Package building requires the toolchain to be available. the tools will automatically build or download the toolchain if needed.

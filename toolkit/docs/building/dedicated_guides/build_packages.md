@@ -50,7 +50,7 @@ cd CBL-Mariner
 # Sync to the latest stable build
 git checkout 2.0-stable
 cd ./toolkit
-sudo make clean
+sudo make clean QUICK_REBUILD=y
 ```
 
 ### Build a toolchain if using an unstable branch
