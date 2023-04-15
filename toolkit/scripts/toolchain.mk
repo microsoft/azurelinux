@@ -49,7 +49,7 @@ $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
 
-.PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
+.PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
 ifeq ($(REBUILD_TOOLCHAIN),y)
