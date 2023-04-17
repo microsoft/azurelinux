@@ -1,6 +1,6 @@
 Summary:        Define and run multi-container applications with Docker
-Name:           docker-compose
-Version:        2.16.0
+Name:           moby-compose
+Version:        2.17.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -40,17 +40,17 @@ go build \
 	   -trimpath \
 	   -tags e2e \
 	   -ldflags "-w -X github.com/docker/compose/v2/internal.Version=%{version}" \
-	   -o ./bin/build/%{name} ./cmd
+	   -o ./bin/build/docker-compose ./cmd
 
 %install
-mkdir -p %{buildroot}%{_bindir}
-install -D -m0755 bin/build/docker-compose %{buildroot}%{_bindir}/
+mkdir -p "%{buildroot}/%{_libexecdir}/docker/cli-plugins"
+install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cli-plugins
 
 %files
 %license LICENSE
-%{_bindir}/docker-compose
+%{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
-* Tue Mar 14 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 2.16.0-1
+* Tue Mar 14 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 2.17.2-1
 - Original version for CBL-Mariner
 - License Verified
