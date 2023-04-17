@@ -2847,9 +2847,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "docker-compose",
-          "version": "2.16.0",
-          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.16.0.tar.gz"
+          "name": "moby-compose",
+          "version": "2.17.2",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
         }
       }
     },
