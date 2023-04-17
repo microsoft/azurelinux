@@ -1,23 +1,28 @@
-
-%global  nginx_user          nginx
+%global nginx_user nginx
+%global njs_version 0.7.12
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        4%{?dist}
-License:        BSD 2-Clause
+Release:        5%{?dist}
+License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
-Source2:        nginx-njs-0.2.1.tar.gz
+Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+BuildRequires:  libxml2-devel
+BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
+BuildRequires:  readline-devel
 BuildRequires:  which
+BuildRequires:  zlib-devel
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-mimetypes
 
@@ -43,7 +48,7 @@ popd
 
 %build
 sh configure \
-    --add-module=../nginx-njs/njs-0.2.1/nginx   \
+    --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
     --group=%{nginx_user} \
@@ -64,10 +69,10 @@ sh configure \
     --with-pcre \
     --with-stream
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 install -vdm755 %{buildroot}%{_libdir}/systemd/system
 install -vdm755 %{buildroot}%{_var}/log
 install -vdm755 %{buildroot}%{_var}/opt/nginx/log
@@ -111,6 +116,10 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Apr 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.22.1-5
+- Upgrade bundled njs version to 0.7.12 to fix CVE-2020-19692, CVE-2020-19695
+- Use SPDX expression in license tag
+
 * Tue Apr 04 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.22.1-4
 - Enable building with ngx_http_gzip_static_module
 
