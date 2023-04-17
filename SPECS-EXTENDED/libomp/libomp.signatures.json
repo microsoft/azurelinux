@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "hans-gpg-key.asc": "8832cdaa241a735a21c630408814ec3168f6daae4a6e227a54d8414675a1d30c",
-  "lit.fedora.cfg.py": "98300a30102663d10528fe2513e390dc3436cdf2d74aeaf9eb15d868135477eb",
-  "openmp-10.0.1.src.tar.xz": "d19f728c8e04fb1e94566c8d76aef50ec926cd2f95ef3bf1e0a5de4909b28b44",
-  "openmp-10.0.1.src.tar.xz.sig": "5d96de0e0cf5fa2c4e8cc5e2f6eacd5d87d76856e8b6aa012190ab011585c449",
-  "run-lit-tests": "01686dcc50bb64cad6f7ee188ad5e3460a93b74cbd8d94a7337250dc1b87d267"
- }
-}

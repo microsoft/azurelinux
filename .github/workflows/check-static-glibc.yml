@@ -27,7 +27,7 @@ jobs:
           python-version: 3.9
 
       - name: Get Python dependencies
-        run: python3 -m pip install python-rpm-spec
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
 
       - name: Verify .spec files
         run: python3 toolkit/scripts/check_static_glibc.py SPECS/**/*.spec SPECS-EXTENDED/**/*.spec SPECS-SIGNED/**/*.spec

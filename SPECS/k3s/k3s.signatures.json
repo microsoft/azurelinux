@@ -1,6 +1,7 @@
-{
-    "Signatures": {
-     "k3s-1.25.0-vendor.tar.gz": "6d6c58fb43e92dcb7d2f074767d415b81f870eecad3f0e2d4eac2fd55f58dc1f",
-     "k3s-1.25.0.tar.gz": "3078bfad9fa4402be143e8ba706dd7773e435cf64b67e58c936c26a1ad284e2f"
-    }
+{ 
+ "Signatures": {
+  "k3s-1.26.2-vendor.tar.gz": "2bab1d84c5c2c681a9e915760468ec7a58940e2c2677498e3d2e8bc0d64f4b16",
+  "k3s-1.26.2.tar.gz": "c21558b661a3e5e1b142a429eb8cce58f0033936b1c5200cf63c07c13841e643"
+ }
 }
+

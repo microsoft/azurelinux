@@ -8,25 +8,24 @@ Subject: [PATCH] Skip tests requiring network
  1 file changed, 2 insertions(+)
 
 diff --git a/ast/schema_test.go b/ast/schema_test.go
-index 1e017db4..729cc582 100644
+index 2882829b2..879fe672e 100644
 --- a/ast/schema_test.go
 +++ b/ast/schema_test.go
-@@ -42,6 +42,7 @@ func TestParseSchemaObject(t *testing.T) {
+@@ -56,6 +56,7 @@ func TestParseSchemaObject(t *testing.T) {
  }
  
  func TestSetTypesWithSchemaRef(t *testing.T) {
 +	t.Skip()
  	var sch interface{}
- 	err := util.Unmarshal([]byte(refSchema), &sch)
- 	if err != nil {
-@@ -60,6 +61,7 @@ func TestSetTypesWithSchemaRef(t *testing.T) {
+ 
+ 	ts := kubeSchemaServer(t)
+@@ -116,6 +117,7 @@ func TestSetTypesWithSchemaRef(t *testing.T) {
  }
  
  func TestSetTypesWithPodSchema(t *testing.T) {
 +	t.Skip()
  	var sch interface{}
- 	err := util.Unmarshal([]byte(podSchema), &sch)
- 	if err != nil {
+ 
+ 	ts := kubeSchemaServer(t)
 -- 
 2.31.1
-
