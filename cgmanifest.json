@@ -7981,8 +7981,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.5+k3s2.tar.gz"
+          "version": "1.25.8",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.8+k3s1.tar.gz"
         }
       }
     },
@@ -7991,8 +7991,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.26.2",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.2+k3s1.tar.gz"
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.3+k3s1.tar.gz"
         }
       }
     },
@@ -9901,8 +9901,8 @@
         "type": "other",
         "other": {
           "name": "libmbim",
-          "version": "1.26.2",
-          "downloadUrl": "https://www.freedesktop.org/software/libmbim/libmbim-1.26.2.tar.xz"
+          "version": "1.26.3",
+          "downloadUrl": "https://www.freedesktop.org/software/libmbim/libmbim-1.26.3.tar.xz"
         }
       }
     },
