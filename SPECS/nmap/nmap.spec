@@ -1,6 +1,6 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
-Version:        7.92
+Version:        7.93
 Release:        1%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
@@ -58,6 +58,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Mon Apr 17 2023 Saul Paredes <saulparedes@microsoft.com> - 7.93-1
+- Upgrading to latest version to fix CVE-2018-25032
+
 * Wed Feb 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 7.92-1
 - Upgrading to latest version.
 
