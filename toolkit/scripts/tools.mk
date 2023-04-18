@@ -38,9 +38,9 @@ go_tool_list = \
 go_tool_targets = $(foreach target,$(go_tool_list),$(TOOL_BINS_DIR)/$(target))
 # Common files to monitor for all go targets
 go_module_files = $(TOOLS_DIR)/go.mod $(TOOLS_DIR)/go.sum
-go_internal_files = $(shell find $(TOOLS_DIR)/internal/ -type f -name '*.go')
+go_pkg_files = $(shell find $(TOOLS_DIR)/pkg/ -type f -name '*.go')
 go_imagegen_files = $(shell find $(TOOLS_DIR)/imagegen/ -type f -name '*.go')
-go_common_files = $(go_module_files) $(go_internal_files) $(go_imagegen_files) $(BUILD_DIR)/tools/internal.test_coverage
+go_common_files = $(go_module_files) $(go_pkg_files) $(go_imagegen_files) $(BUILD_DIR)/tools/pkg.test_coverage
 # A report on test coverage for all the go tools
 test_coverage_report=$(TOOL_BINS_DIR)/test_coverage_report.html
 
@@ -85,12 +85,12 @@ $(TOOL_BINS_DIR)/%: $(go_common_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		CGO_ENABLED=0 go build \
-			-ldflags="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
+			-ldflags="-X github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/exe.ToolkitVersion=$(RELEASE_VERSION)" \
 			-o $(TOOL_BINS_DIR)
 endif
 
 # Runs tests for common components
-$(BUILD_DIR)/tools/internal.test_coverage: $(go_internal_files) $(go_imagegen_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
+$(BUILD_DIR)/tools/pkg.test_coverage: $(go_pkg_files) $(go_imagegen_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$@ ./...
 
