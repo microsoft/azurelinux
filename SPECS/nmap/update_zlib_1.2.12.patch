@@ -1,138 +1,5 @@
-From ea9344ef3db8a55f77e9d2c90a11fe5ccb7c4274 Mon Sep 17 00:00:00 2001
-From: dmiller <dmiller@e0a8ed71-7df4-0310-8962-fdc924857419>
-Date: Wed, 31 Aug 2022 15:24:02 +0000
-Subject: [PATCH] Update zlib to 1.2.12
-
----
- libz/CMakeLists.txt                           |    2 +-
- libz/ChangeLog                                |  161 +-
- libz/Makefile.in                              |   18 +-
- libz/NMAP_MODIFICATIONS                       |    4 +-
- libz/README                                   |   11 +-
- libz/configure                                |   48 +-
- libz/contrib/README.contrib                   |   21 -
- libz/contrib/amd64/amd64-match.S              |  452 -
- libz/contrib/asm686/README.686                |   51 -
- libz/contrib/asm686/match.S                   |  357 -
- libz/contrib/blast/blast.h                    |    2 +-
- libz/contrib/delphi/ZLib.pas                  |    2 +-
- libz/contrib/dotzlib/DotZLib.build            |   33 -
- libz/contrib/dotzlib/DotZLib.sln              |   21 -
- libz/contrib/dotzlib/DotZLib/AssemblyInfo.cs  |   58 -
- libz/contrib/dotzlib/DotZLib/ChecksumImpl.cs  |  202 -
- .../contrib/dotzlib/DotZLib/CircularBuffer.cs |   83 -
- libz/contrib/dotzlib/DotZLib/CodecBase.cs     |  198 -
- libz/contrib/dotzlib/DotZLib/Deflater.cs      |  106 -
- libz/contrib/dotzlib/DotZLib/DotZLib.cs       |  288 -
- libz/contrib/dotzlib/DotZLib/DotZLib.csproj   |  141 -
- libz/contrib/dotzlib/DotZLib/GZipStream.cs    |  301 -
- libz/contrib/dotzlib/DotZLib/Inflater.cs      |  105 -
- libz/contrib/dotzlib/DotZLib/UnitTests.cs     |  274 -
- libz/contrib/dotzlib/LICENSE_1_0.txt          |   23 -
- libz/contrib/dotzlib/readme.txt               |   58 -
- libz/contrib/infback9/inftree9.c              |    6 +-
- libz/contrib/inflate86/inffas86.c             | 1157 --
- libz/contrib/inflate86/inffast.S              | 1368 ---
- libz/contrib/masmx64/bld_ml64.bat             |    2 -
- libz/contrib/masmx64/gvmat64.asm              |  553 -
- libz/contrib/masmx64/inffas8664.c             |  186 -
- libz/contrib/masmx64/inffasx64.asm            |  396 -
- libz/contrib/masmx64/readme.txt               |   31 -
- libz/contrib/masmx86/bld_ml32.bat             |    2 -
- libz/contrib/masmx86/inffas32.asm             | 1080 --
- libz/contrib/masmx86/inffas32.lst             | 1224 --
- libz/contrib/masmx86/match686.asm             |  479 -
- libz/contrib/masmx86/match686.lst             |  624 --
- libz/contrib/masmx86/readme.txt               |   27 -
- libz/contrib/minizip/configure.ac             |    2 +-
- libz/contrib/minizip/crypt.h                  |   19 +-
- libz/contrib/minizip/ioapi.c                  |   18 +-
- libz/contrib/minizip/ioapi.h                  |    8 +-
- libz/contrib/minizip/miniunz.c                |   35 +-
- libz/contrib/minizip/minizip.c                |   41 +-
- libz/contrib/minizip/unzip.c                  |   31 +-
- libz/contrib/minizip/unzip.h                  |   12 +-
- libz/contrib/minizip/zip.c                    |   36 +-
- libz/contrib/minizip/zip.h                    |   17 +-
- libz/contrib/pascal/zlibpas.pas               |    2 +-
- libz/contrib/vstudio/readme.txt               |    2 +-
- libz/contrib/vstudio/vc10/zlib.rc             |    8 +-
- libz/contrib/vstudio/vc10/zlibvc.def          |    5 +
- libz/contrib/vstudio/vc11/zlib.rc             |    8 +-
- libz/contrib/vstudio/vc11/zlibvc.def          |    5 +
- libz/contrib/vstudio/vc12/zlib.rc             |    8 +-
- libz/contrib/vstudio/vc12/zlibstat.vcxproj    |  933 +-
- libz/contrib/vstudio/vc12/zlibvc.def          |    5 +
- libz/contrib/vstudio/vc12/zlibvc.vcxproj      | 1566 ++-
- libz/contrib/vstudio/vc14/zlib.rc             |    8 +-
- libz/contrib/vstudio/vc14/zlibvc.def          |    5 +
- libz/contrib/vstudio/vc9/zlib.rc              |    8 +-
- libz/contrib/vstudio/vc9/zlibvc.def           |    5 +
- libz/crc32.c                                  | 1258 ++-
- libz/crc32.h                                  | 9877 ++++++++++++++++-
- libz/deflate.c                                |  108 +-
- libz/deflate.h                                |   27 +-
- libz/gzguts.h                                 |    5 +-
- libz/gzlib.c                                  |    8 +-
- libz/gzread.c                                 |   12 +-
- libz/gzwrite.c                                |   38 +-
- libz/infback.c                                |    3 +-
- libz/inffast.c                                |   28 +-
- libz/inflate.c                                |   47 +-
- libz/inflate.h                                |    5 +-
- libz/inftrees.c                               |    6 +-
- libz/os400/README400                          |    2 +-
- libz/qnx/package.qpg                          |   10 +-
- libz/test/example.c                           |    5 +-
- libz/treebuild.xml                            |    4 +-
- libz/trees.c                                  |   75 +-
- libz/win32/Makefile.bor                       |    1 -
- libz/win32/Makefile.gcc                       |    5 -
- libz/win32/Makefile.msc                       |    4 -
- libz/win32/README-WIN32.txt                   |    4 +-
- libz/win32/zlib.def                           |    3 +
- libz/zlib.3                                   |    6 +-
- libz/zlib.h                                   |  223 +-
- libz/zlib.map                                 |    6 +
- libz/zlib2ansi                                |    0
- libz/zutil.c                                  |    4 +-
- libz/zutil.h                                  |   21 +-
- 93 files changed, 12266 insertions(+), 12471 deletions(-)
- mode change 100644 => 100755 libz/configure
- delete mode 100644 libz/contrib/amd64/amd64-match.S
- delete mode 100644 libz/contrib/asm686/README.686
- delete mode 100644 libz/contrib/asm686/match.S
- delete mode 100644 libz/contrib/dotzlib/DotZLib.build
- delete mode 100644 libz/contrib/dotzlib/DotZLib.sln
- delete mode 100644 libz/contrib/dotzlib/DotZLib/AssemblyInfo.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/ChecksumImpl.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/CircularBuffer.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/CodecBase.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/Deflater.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/DotZLib.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/DotZLib.csproj
- delete mode 100644 libz/contrib/dotzlib/DotZLib/GZipStream.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/Inflater.cs
- delete mode 100644 libz/contrib/dotzlib/DotZLib/UnitTests.cs
- delete mode 100644 libz/contrib/dotzlib/LICENSE_1_0.txt
- delete mode 100644 libz/contrib/dotzlib/readme.txt
- delete mode 100644 libz/contrib/inflate86/inffas86.c
- delete mode 100644 libz/contrib/inflate86/inffast.S
- delete mode 100644 libz/contrib/masmx64/bld_ml64.bat
- delete mode 100644 libz/contrib/masmx64/gvmat64.asm
- delete mode 100644 libz/contrib/masmx64/inffas8664.c
- delete mode 100644 libz/contrib/masmx64/inffasx64.asm
- delete mode 100644 libz/contrib/masmx64/readme.txt
- delete mode 100644 libz/contrib/masmx86/bld_ml32.bat
- delete mode 100644 libz/contrib/masmx86/inffas32.asm
- delete mode 100644 libz/contrib/masmx86/inffas32.lst
- delete mode 100644 libz/contrib/masmx86/match686.asm
- delete mode 100644 libz/contrib/masmx86/match686.lst
- delete mode 100644 libz/contrib/masmx86/readme.txt
- mode change 100644 => 100755 libz/zlib2ansi
-
 diff --git a/libz/CMakeLists.txt b/libz/CMakeLists.txt
-index 0fe939df68..e6fbb37d10 100644
+index 0fe939d..e6fbb37 100644
 --- a/libz/CMakeLists.txt
 +++ b/libz/CMakeLists.txt
 @@ -3,7 +3,7 @@ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
@@ -145,7 +12,7 @@ index 0fe939df68..e6fbb37d10 100644
  option(ASM686 "Enable building i686 assembly implementation")
  option(AMD64 "Enable building amd64 assembly implementation")
 diff --git a/libz/ChangeLog b/libz/ChangeLog
-index 30199a65a0..f0b0e61809 100644
+index 30199a6..f0b0e61 100644
 --- a/libz/ChangeLog
 +++ b/libz/ChangeLog
 @@ -1,6 +1,69 @@
@@ -528,7 +395,7 @@ index 30199a65a0..f0b0e61809 100644
  - added Z_HUFFMAN_ONLY
  - added gzerror()
 diff --git a/libz/Makefile.in b/libz/Makefile.in
-index 5a77949ff0..3d858aa3a2 100644
+index 5a77949..3d858aa 100644
 --- a/libz/Makefile.in
 +++ b/libz/Makefile.in
 @@ -32,7 +32,7 @@ CPP=$(CC) -E
@@ -591,7 +458,7 @@ index 5a77949ff0..3d858aa3a2 100644
  tags:
  	etags $(SRCDIR)*.[ch]
 diff --git a/libz/NMAP_MODIFICATIONS b/libz/NMAP_MODIFICATIONS
-index a5a97e6a16..abb5f1ba85 100644
+index a5a97e6..abb5f1b 100644
 --- a/libz/NMAP_MODIFICATIONS
 +++ b/libz/NMAP_MODIFICATIONS
 @@ -2,7 +2,7 @@ diff --git a/libz/configure b/libz/configure
@@ -611,7 +478,7 @@ index a5a97e6a16..abb5f1ba85 100644
 \ No newline at end of file
 + done
 diff --git a/libz/README b/libz/README
-index 51106de475..024b79d3d8 100644
+index 51106de..024b79d 100644
 --- a/libz/README
 +++ b/libz/README
 @@ -1,6 +1,6 @@
@@ -655,7 +522,7 @@ index 51106de475..024b79d3d8 100644
 diff --git a/libz/configure b/libz/configure
 old mode 100644
 new mode 100755
-index f7a3048ad3..c55f525dc9
+index f7a3048..c55f525
 --- a/libz/configure
 +++ b/libz/configure
 @@ -87,6 +87,7 @@ build64=0
@@ -778,7 +645,7 @@ index f7a3048ad3..c55f525dc9
  echo exec_prefix = $exec_prefix >> configure.log
  echo includedir = $includedir >> configure.log
 diff --git a/libz/contrib/README.contrib b/libz/contrib/README.contrib
-index a411d5c396..335e43508b 100644
+index a411d5c..335e435 100644
 --- a/libz/contrib/README.contrib
 +++ b/libz/contrib/README.contrib
 @@ -8,14 +8,6 @@ ada/        by Dmitriy Anisimkov <anisimkov@yahoo.com>
@@ -825,7 +692,7 @@ index a411d5c396..335e43508b 100644
          Includes Zip64 support by Mathias Svensson <mathias@result42.com>
 diff --git a/libz/contrib/amd64/amd64-match.S b/libz/contrib/amd64/amd64-match.S
 deleted file mode 100644
-index 81d4a1c949..0000000000
+index 81d4a1c..0000000
 --- a/libz/contrib/amd64/amd64-match.S
 +++ /dev/null
 @@ -1,452 +0,0 @@
@@ -1283,7 +1150,7 @@ index 81d4a1c949..0000000000
 -match_init:	ret
 diff --git a/libz/contrib/asm686/README.686 b/libz/contrib/asm686/README.686
 deleted file mode 100644
-index a0bf3bea4a..0000000000
+index a0bf3be..0000000
 --- a/libz/contrib/asm686/README.686
 +++ /dev/null
 @@ -1,51 +0,0 @@
@@ -1340,7 +1207,7 @@ index a0bf3bea4a..0000000000
 -April, 2007
 diff --git a/libz/contrib/asm686/match.S b/libz/contrib/asm686/match.S
 deleted file mode 100644
-index fa42109278..0000000000
+index fa42109..0000000
 --- a/libz/contrib/asm686/match.S
 +++ /dev/null
 @@ -1,357 +0,0 @@
@@ -1702,7 +1569,7 @@ index fa42109278..0000000000
 -.cfi_endproc
 -match_init:	ret
 diff --git a/libz/contrib/blast/blast.h b/libz/contrib/blast/blast.h
-index 6cf65eda16..ef8544c53b 100644
+index 6cf65ed..ef8544c 100644
 --- a/libz/contrib/blast/blast.h
 +++ b/libz/contrib/blast/blast.h
 @@ -57,7 +57,7 @@ int blast(blast_in infun, void *inhow, blast_out outfun, void *outhow,
@@ -1715,7 +1582,7 @@ index 6cf65eda16..ef8544c53b 100644
   * The output function is invoked: err = outfun(how, buf, len), where the bytes
   * to be written are buf[0..len-1].  If err is not zero, then blast() returns
 diff --git a/libz/contrib/delphi/ZLib.pas b/libz/contrib/delphi/ZLib.pas
-index 060e199118..d40dad8a11 100644
+index 060e199..d40dad8 100644
 --- a/libz/contrib/delphi/ZLib.pas
 +++ b/libz/contrib/delphi/ZLib.pas
 @@ -152,7 +152,7 @@ procedure DecompressToUserBuf(const InBuf: Pointer; InBytes: Integer;
@@ -1729,7 +1596,7 @@ index 060e199118..d40dad8a11 100644
    EZlibError = class(Exception);
 diff --git a/libz/contrib/dotzlib/DotZLib.build b/libz/contrib/dotzlib/DotZLib.build
 deleted file mode 100644
-index 7f90d6bc7c..0000000000
+index 7f90d6b..0000000
 --- a/libz/contrib/dotzlib/DotZLib.build
 +++ /dev/null
 @@ -1,33 +0,0 @@
@@ -1769,7 +1636,7 @@ index 7f90d6bc7c..0000000000
 \ No newline at end of file
 diff --git a/libz/contrib/dotzlib/DotZLib.sln b/libz/contrib/dotzlib/DotZLib.sln
 deleted file mode 100644
-index ac45ca048b..0000000000
+index ac45ca0..0000000
 --- a/libz/contrib/dotzlib/DotZLib.sln
 +++ /dev/null
 @@ -1,21 +0,0 @@
@@ -1796,7 +1663,7 @@ index ac45ca048b..0000000000
 -EndGlobal
 diff --git a/libz/contrib/dotzlib/DotZLib/AssemblyInfo.cs b/libz/contrib/dotzlib/DotZLib/AssemblyInfo.cs
 deleted file mode 100644
-index 0491bfc2b0..0000000000
+index 0491bfc..0000000
 --- a/libz/contrib/dotzlib/DotZLib/AssemblyInfo.cs
 +++ /dev/null
 @@ -1,58 +0,0 @@
@@ -1860,7 +1727,7 @@ index 0491bfc2b0..0000000000
 -[assembly: AssemblyKeyName("")]
 diff --git a/libz/contrib/dotzlib/DotZLib/ChecksumImpl.cs b/libz/contrib/dotzlib/DotZLib/ChecksumImpl.cs
 deleted file mode 100644
-index 788b2fcece..0000000000
+index 788b2fc..0000000
 --- a/libz/contrib/dotzlib/DotZLib/ChecksumImpl.cs
 +++ /dev/null
 @@ -1,202 +0,0 @@
@@ -2069,7 +1936,7 @@ index 788b2fcece..0000000000
 \ No newline at end of file
 diff --git a/libz/contrib/dotzlib/DotZLib/CircularBuffer.cs b/libz/contrib/dotzlib/DotZLib/CircularBuffer.cs
 deleted file mode 100644
-index c1cab3a02c..0000000000
+index c1cab3a..0000000
 --- a/libz/contrib/dotzlib/DotZLib/CircularBuffer.cs
 +++ /dev/null
 @@ -1,83 +0,0 @@
@@ -2158,7 +2025,7 @@ index c1cab3a02c..0000000000
 -}
 diff --git a/libz/contrib/dotzlib/DotZLib/CodecBase.cs b/libz/contrib/dotzlib/DotZLib/CodecBase.cs
 deleted file mode 100644
-index 42e6da3a56..0000000000
+index 42e6da3..0000000
 --- a/libz/contrib/dotzlib/DotZLib/CodecBase.cs
 +++ /dev/null
 @@ -1,198 +0,0 @@
@@ -2362,7 +2229,7 @@ index 42e6da3a56..0000000000
 -}
 diff --git a/libz/contrib/dotzlib/DotZLib/Deflater.cs b/libz/contrib/dotzlib/DotZLib/Deflater.cs
 deleted file mode 100644
-index c2477925b6..0000000000
+index c247792..0000000
 --- a/libz/contrib/dotzlib/DotZLib/Deflater.cs
 +++ /dev/null
 @@ -1,106 +0,0 @@
@@ -2474,7 +2341,7 @@ index c2477925b6..0000000000
 -}
 diff --git a/libz/contrib/dotzlib/DotZLib/DotZLib.cs b/libz/contrib/dotzlib/DotZLib/DotZLib.cs
 deleted file mode 100644
-index be184b4c71..0000000000
+index be184b4..0000000
 --- a/libz/contrib/dotzlib/DotZLib/DotZLib.cs
 +++ /dev/null
 @@ -1,288 +0,0 @@
@@ -2768,7 +2635,7 @@ index be184b4c71..0000000000
 -}
 diff --git a/libz/contrib/dotzlib/DotZLib/DotZLib.csproj b/libz/contrib/dotzlib/DotZLib/DotZLib.csproj
 deleted file mode 100644
-index 71eeb8590a..0000000000
+index 71eeb85..0000000
 --- a/libz/contrib/dotzlib/DotZLib/DotZLib.csproj
 +++ /dev/null
 @@ -1,141 +0,0 @@
@@ -2915,7 +2782,7 @@ index 71eeb8590a..0000000000
 -
 diff --git a/libz/contrib/dotzlib/DotZLib/GZipStream.cs b/libz/contrib/dotzlib/DotZLib/GZipStream.cs
 deleted file mode 100644
-index b161300b18..0000000000
+index b161300..0000000
 --- a/libz/contrib/dotzlib/DotZLib/GZipStream.cs
 +++ /dev/null
 @@ -1,301 +0,0 @@
@@ -3222,7 +3089,7 @@ index b161300b18..0000000000
 -}
 diff --git a/libz/contrib/dotzlib/DotZLib/Inflater.cs b/libz/contrib/dotzlib/DotZLib/Inflater.cs
 deleted file mode 100644
-index 8ed5451d66..0000000000
+index 8ed5451..0000000
 --- a/libz/contrib/dotzlib/DotZLib/Inflater.cs
 +++ /dev/null
 @@ -1,105 +0,0 @@
@@ -3333,7 +3200,7 @@ index 8ed5451d66..0000000000
 -}
 diff --git a/libz/contrib/dotzlib/DotZLib/UnitTests.cs b/libz/contrib/dotzlib/DotZLib/UnitTests.cs
 deleted file mode 100644
-index 44f76332ba..0000000000
+index 44f7633..0000000
 --- a/libz/contrib/dotzlib/DotZLib/UnitTests.cs
 +++ /dev/null
 @@ -1,274 +0,0 @@
@@ -3613,7 +3480,7 @@ index 44f76332ba..0000000000
 -#endif
 diff --git a/libz/contrib/dotzlib/LICENSE_1_0.txt b/libz/contrib/dotzlib/LICENSE_1_0.txt
 deleted file mode 100644
-index 30aac2cf47..0000000000
+index 30aac2c..0000000
 --- a/libz/contrib/dotzlib/LICENSE_1_0.txt
 +++ /dev/null
 @@ -1,23 +0,0 @@
@@ -3643,7 +3510,7 @@ index 30aac2cf47..0000000000
 \ No newline at end of file
 diff --git a/libz/contrib/dotzlib/readme.txt b/libz/contrib/dotzlib/readme.txt
 deleted file mode 100644
-index b2395720d4..0000000000
+index b239572..0000000
 --- a/libz/contrib/dotzlib/readme.txt
 +++ /dev/null
 @@ -1,58 +0,0 @@
@@ -3706,7 +3573,7 @@ index b2395720d4..0000000000
 -Use, modification and distribution are subject to the Boost Software License, Version 1.0.
 -(See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 diff --git a/libz/contrib/infback9/inftree9.c b/libz/contrib/infback9/inftree9.c
-index 5f4a76798d..05506066ce 100644
+index 5f4a767..0550606 100644
 --- a/libz/contrib/infback9/inftree9.c
 +++ b/libz/contrib/infback9/inftree9.c
 @@ -1,5 +1,5 @@
@@ -3736,7 +3603,7 @@ index 5f4a76798d..05506066ce 100644
          65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073,
 diff --git a/libz/contrib/inflate86/inffas86.c b/libz/contrib/inflate86/inffas86.c
 deleted file mode 100644
-index 7292f67b75..0000000000
+index 7292f67..0000000
 --- a/libz/contrib/inflate86/inffas86.c
 +++ /dev/null
 @@ -1,1157 +0,0 @@
@@ -4899,7 +4766,7 @@ index 7292f67b75..0000000000
 -
 diff --git a/libz/contrib/inflate86/inffast.S b/libz/contrib/inflate86/inffast.S
 deleted file mode 100644
-index 2245a2905b..0000000000
+index 2245a29..0000000
 --- a/libz/contrib/inflate86/inffast.S
 +++ /dev/null
 @@ -1,1368 +0,0 @@
@@ -6273,7 +6140,7 @@ index 2245a2905b..0000000000
 -#endif
 diff --git a/libz/contrib/masmx64/bld_ml64.bat b/libz/contrib/masmx64/bld_ml64.bat
 deleted file mode 100644
-index 8f9343d0af..0000000000
+index 8f9343d..0000000
 --- a/libz/contrib/masmx64/bld_ml64.bat
 +++ /dev/null
 @@ -1,2 +0,0 @@
@@ -6281,7 +6148,7 @@ index 8f9343d0af..0000000000
 -ml64.exe /Flgvmat64   /c /Zi gvmat64.asm
 diff --git a/libz/contrib/masmx64/gvmat64.asm b/libz/contrib/masmx64/gvmat64.asm
 deleted file mode 100644
-index 9879c28b90..0000000000
+index 9879c28..0000000
 --- a/libz/contrib/masmx64/gvmat64.asm
 +++ /dev/null
 @@ -1,553 +0,0 @@
@@ -6840,7 +6707,7 @@ index 9879c28b90..0000000000
 -END
 diff --git a/libz/contrib/masmx64/inffas8664.c b/libz/contrib/masmx64/inffas8664.c
 deleted file mode 100644
-index e8af06fa02..0000000000
+index e8af06f..0000000
 --- a/libz/contrib/masmx64/inffas8664.c
 +++ /dev/null
 @@ -1,186 +0,0 @@
@@ -7032,7 +6899,7 @@ index e8af06fa02..0000000000
 -#endif
 diff --git a/libz/contrib/masmx64/inffasx64.asm b/libz/contrib/masmx64/inffasx64.asm
 deleted file mode 100644
-index 60a8d89b71..0000000000
+index 60a8d89..0000000
 --- a/libz/contrib/masmx64/inffasx64.asm
 +++ /dev/null
 @@ -1,396 +0,0 @@
@@ -7434,7 +7301,7 @@ index 60a8d89b71..0000000000
 -END
 diff --git a/libz/contrib/masmx64/readme.txt b/libz/contrib/masmx64/readme.txt
 deleted file mode 100644
-index 2da6733412..0000000000
+index 2da6733..0000000
 --- a/libz/contrib/masmx64/readme.txt
 +++ /dev/null
 @@ -1,31 +0,0 @@
@@ -7471,7 +7338,7 @@ index 2da6733412..0000000000
 -  http://www.microsoft.com/whdc/devtools/ddk/default.mspx for low price)
 diff --git a/libz/contrib/masmx86/bld_ml32.bat b/libz/contrib/masmx86/bld_ml32.bat
 deleted file mode 100644
-index e1b86bf68a..0000000000
+index e1b86bf..0000000
 --- a/libz/contrib/masmx86/bld_ml32.bat
 +++ /dev/null
 @@ -1,2 +0,0 @@
@@ -7479,7 +7346,7 @@ index e1b86bf68a..0000000000
 -ml /coff /Zi /c /Flinffas32.lst inffas32.asm
 diff --git a/libz/contrib/masmx86/inffas32.asm b/libz/contrib/masmx86/inffas32.asm
 deleted file mode 100644
-index 03d20f838b..0000000000
+index 03d20f8..0000000
 --- a/libz/contrib/masmx86/inffas32.asm
 +++ /dev/null
 @@ -1,1080 +0,0 @@
@@ -8565,7 +8432,7 @@ index 03d20f838b..0000000000
 -end
 diff --git a/libz/contrib/masmx86/inffas32.lst b/libz/contrib/masmx86/inffas32.lst
 deleted file mode 100644
-index 9c6137479c..0000000000
+index 9c61374..0000000
 --- a/libz/contrib/masmx86/inffas32.lst
 +++ /dev/null
 @@ -1,1224 +0,0 @@
@@ -9795,7 +9662,7 @@ index 9c6137479c..0000000000
 -	   0 Errors
 diff --git a/libz/contrib/masmx86/match686.asm b/libz/contrib/masmx86/match686.asm
 deleted file mode 100644
-index 3b09212f8a..0000000000
+index 3b09212..0000000
 --- a/libz/contrib/masmx86/match686.asm
 +++ /dev/null
 @@ -1,479 +0,0 @@
@@ -10280,7 +10147,7 @@ index 3b09212f8a..0000000000
 -end
 diff --git a/libz/contrib/masmx86/match686.lst b/libz/contrib/masmx86/match686.lst
 deleted file mode 100644
-index bc96b0ccef..0000000000
+index bc96b0c..0000000
 --- a/libz/contrib/masmx86/match686.lst
 +++ /dev/null
 @@ -1,624 +0,0 @@
@@ -10910,7 +10777,7 @@ index bc96b0ccef..0000000000
 -	   0 Errors
 diff --git a/libz/contrib/masmx86/readme.txt b/libz/contrib/masmx86/readme.txt
 deleted file mode 100644
-index 3271f720a1..0000000000
+index 3271f72..0000000
 --- a/libz/contrib/masmx86/readme.txt
 +++ /dev/null
 @@ -1,27 +0,0 @@
@@ -10942,7 +10809,7 @@ index 3271f720a1..0000000000
 -make -f win32/Makefile.bor LOCAL_ZLIB="-DASMV -DASMINF" OBJA="match686.obj inffas32.obj" OBJPA="+match686c.obj+match686.obj+inffas32.obj"
 -
 diff --git a/libz/contrib/minizip/configure.ac b/libz/contrib/minizip/configure.ac
-index 5b11970977..6409abc893 100644
+index 5b11970..6409abc 100644
 --- a/libz/contrib/minizip/configure.ac
 +++ b/libz/contrib/minizip/configure.ac
 @@ -1,7 +1,7 @@
@@ -10955,7 +10822,7 @@ index 5b11970977..6409abc893 100644
  AM_INIT_AUTOMAKE([foreign])
  LT_INIT
 diff --git a/libz/contrib/minizip/crypt.h b/libz/contrib/minizip/crypt.h
-index 1e9e8200b2..9da15373d8 100644
+index 1e9e820..9da1537 100644
 --- a/libz/contrib/minizip/crypt.h
 +++ b/libz/contrib/minizip/crypt.h
 @@ -38,6 +38,7 @@ static int decrypt_byte(unsigned long* pkeys, const z_crc_t* pcrc_32_tab)
@@ -11001,7 +10868,7 @@ index 1e9e8200b2..9da15373d8 100644
      int c;                       /* random byte */
      unsigned char header[RAND_HEAD_LEN-2]; /* random header */
 diff --git a/libz/contrib/minizip/ioapi.c b/libz/contrib/minizip/ioapi.c
-index 7f5c191b2a..d666e5a228 100644
+index 7f5c191..d666e5a 100644
 --- a/libz/contrib/minizip/ioapi.c
 +++ b/libz/contrib/minizip/ioapi.c
 @@ -58,7 +58,7 @@ ZPOS64_T call_ztell64 (const zlib_filefunc64_32_def* pfilefunc,voidpf filestream
@@ -11112,7 +10979,7 @@ index 7f5c191b2a..d666e5a228 100644
      ret = ferror((FILE *)stream);
      return ret;
 diff --git a/libz/contrib/minizip/ioapi.h b/libz/contrib/minizip/ioapi.h
-index 8dcbdb06e3..114bfab762 100644
+index 8dcbdb0..114bfab 100644
 --- a/libz/contrib/minizip/ioapi.h
 +++ b/libz/contrib/minizip/ioapi.h
 @@ -91,8 +91,7 @@ typedef  64BIT_INT_CUSTOM_TYPE ZPOS64_T;
@@ -11138,7 +11005,7 @@ index 8dcbdb06e3..114bfab762 100644
  #ifdef __cplusplus
  extern "C" {
 diff --git a/libz/contrib/minizip/miniunz.c b/libz/contrib/minizip/miniunz.c
-index 3d65401be5..f103815efb 100644
+index 3d65401..f103815 100644
 --- a/libz/contrib/minizip/miniunz.c
 +++ b/libz/contrib/minizip/miniunz.c
 @@ -45,6 +45,7 @@
@@ -11290,7 +11157,7 @@ index 3d65401be5..f103815efb 100644
      {
          printf("file %s not found in the zipfile\n",filename);
 diff --git a/libz/contrib/minizip/minizip.c b/libz/contrib/minizip/minizip.c
-index 4288962ece..7f937aa5b2 100644
+index 4288962..7f937aa 100644
 --- a/libz/contrib/minizip/minizip.c
 +++ b/libz/contrib/minizip/minizip.c
 @@ -71,8 +71,8 @@
@@ -11448,7 +11315,7 @@ index 4288962ece..7f937aa5b2 100644
                              {
                                  printf("error in writing %s in the zipfile\n",
 diff --git a/libz/contrib/minizip/unzip.c b/libz/contrib/minizip/unzip.c
-index bcfb9416ec..5e12e47474 100644
+index bcfb941..5e12e47 100644
 --- a/libz/contrib/minizip/unzip.c
 +++ b/libz/contrib/minizip/unzip.c
 @@ -455,7 +455,7 @@ local ZPOS64_T unz64local_SearchCentralDir(const zlib_filefunc64_32_def* pzlib_f
@@ -11553,7 +11420,7 @@ index bcfb9416ec..5e12e47474 100644
  }
  
 diff --git a/libz/contrib/minizip/unzip.h b/libz/contrib/minizip/unzip.h
-index 2104e39150..6f95e94d75 100644
+index 2104e39..6f95e94 100644
 --- a/libz/contrib/minizip/unzip.h
 +++ b/libz/contrib/minizip/unzip.h
 @@ -83,12 +83,12 @@ typedef voidp unzFile;
@@ -11576,7 +11443,7 @@ index 2104e39150..6f95e94d75 100644
  
  /* unz_global_info structure contain global data about the ZIPfile
 diff --git a/libz/contrib/minizip/zip.c b/libz/contrib/minizip/zip.c
-index 44e88a9cb9..4e611e1163 100644
+index 44e88a9..4e611e1 100644
 --- a/libz/contrib/minizip/zip.c
 +++ b/libz/contrib/minizip/zip.c
 @@ -158,7 +158,7 @@ typedef struct
@@ -11717,7 +11584,7 @@ index 44e88a9cb9..4e611e1163 100644
  
    while(p < (pData + *dataLen))
 diff --git a/libz/contrib/minizip/zip.h b/libz/contrib/minizip/zip.h
-index 8aaebb6234..7e4509d77b 100644
+index 8aaebb6..7e4509d 100644
 --- a/libz/contrib/minizip/zip.h
 +++ b/libz/contrib/minizip/zip.h
 @@ -88,12 +88,12 @@ typedef voidp zipFile;
@@ -11752,10 +11619,10 @@ index 8aaebb6234..7e4509d77b 100644
                         const char* filename,
                         const zip_fileinfo* zipfi,
 diff --git a/libz/contrib/pascal/zlibpas.pas b/libz/contrib/pascal/zlibpas.pas
-index a0dff11b50..adb5cd60b0 100644
+index a0dff11..adb5cd6 100644
 --- a/libz/contrib/pascal/zlibpas.pas
 +++ b/libz/contrib/pascal/zlibpas.pas
-@@ -10,7 +10,7 @@
+@@ -10,7 +10,7 @@ unit zlibpas;
  interface
  
  const
@@ -11765,7 +11632,7 @@ index a0dff11b50..adb5cd60b0 100644
  
  type
 diff --git a/libz/contrib/vstudio/readme.txt b/libz/contrib/vstudio/readme.txt
-index f67eae8678..d396d4309f 100644
+index f67eae8..d396d43 100644
 --- a/libz/contrib/vstudio/readme.txt
 +++ b/libz/contrib/vstudio/readme.txt
 @@ -1,4 +1,4 @@
@@ -11775,7 +11642,7 @@ index f67eae8678..d396d4309f 100644
  
  This directory contains projects that build zlib and minizip using
 diff --git a/libz/contrib/vstudio/vc10/zlib.rc b/libz/contrib/vstudio/vc10/zlib.rc
-index fee177a71c..8ad25f1031 100644
+index fee177a..8ad25f1 100644
 --- a/libz/contrib/vstudio/vc10/zlib.rc
 +++ b/libz/contrib/vstudio/vc10/zlib.rc
 @@ -2,8 +2,8 @@
@@ -11805,7 +11672,7 @@ index fee177a71c..8ad25f1031 100644
    END
    BLOCK "VarFileInfo"
 diff --git a/libz/contrib/vstudio/vc10/zlibvc.def b/libz/contrib/vstudio/vc10/zlibvc.def
-index 54e683d99c..ba09bc1b98 100644
+index 54e683d..ba09bc1 100644
 --- a/libz/contrib/vstudio/vc10/zlibvc.def
 +++ b/libz/contrib/vstudio/vc10/zlibvc.def
 @@ -151,3 +151,8 @@ EXPORTS
@@ -11818,7 +11685,7 @@ index 54e683d99c..ba09bc1b98 100644
 +		crc32_combine_gen64						@177
 +		crc32_combine_op						@178
 diff --git a/libz/contrib/vstudio/vc11/zlib.rc b/libz/contrib/vstudio/vc11/zlib.rc
-index fee177a71c..8ad25f1031 100644
+index fee177a..8ad25f1 100644
 --- a/libz/contrib/vstudio/vc11/zlib.rc
 +++ b/libz/contrib/vstudio/vc11/zlib.rc
 @@ -2,8 +2,8 @@
@@ -11848,7 +11715,7 @@ index fee177a71c..8ad25f1031 100644
    END
    BLOCK "VarFileInfo"
 diff --git a/libz/contrib/vstudio/vc11/zlibvc.def b/libz/contrib/vstudio/vc11/zlibvc.def
-index 54e683d99c..ba09bc1b98 100644
+index 54e683d..ba09bc1 100644
 --- a/libz/contrib/vstudio/vc11/zlibvc.def
 +++ b/libz/contrib/vstudio/vc11/zlibvc.def
 @@ -151,3 +151,8 @@ EXPORTS
@@ -11861,7 +11728,7 @@ index 54e683d99c..ba09bc1b98 100644
 +		crc32_combine_gen64						@177
 +		crc32_combine_op						@178
 diff --git a/libz/contrib/vstudio/vc12/zlib.rc b/libz/contrib/vstudio/vc12/zlib.rc
-index c4e4b016e9..9475873506 100644
+index c4e4b01..9475873 100644
 --- a/libz/contrib/vstudio/vc12/zlib.rc
 +++ b/libz/contrib/vstudio/vc12/zlib.rc
 @@ -2,8 +2,8 @@
@@ -11890,948 +11757,8 @@ index c4e4b016e9..9475873506 100644
      END
    END
    BLOCK "VarFileInfo"
-diff --git a/libz/contrib/vstudio/vc12/zlibstat.vcxproj b/libz/contrib/vstudio/vc12/zlibstat.vcxproj
-index 205c36390b..3fdee7c507 100644
---- a/libz/contrib/vstudio/vc12/zlibstat.vcxproj
-+++ b/libz/contrib/vstudio/vc12/zlibstat.vcxproj
-@@ -1,468 +1,467 @@
--﻿<?xml version="1.0" encoding="utf-8"?>
--<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
--  <ItemGroup Label="ProjectConfigurations">
--    <ProjectConfiguration Include="Debug|Itanium">
--      <Configuration>Debug</Configuration>
--      <Platform>Itanium</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Debug|Win32">
--      <Configuration>Debug</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Debug|x64">
--      <Configuration>Debug</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="ReleaseWithoutAsm|Itanium">
--      <Configuration>ReleaseWithoutAsm</Configuration>
--      <Platform>Itanium</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="ReleaseWithoutAsm|Win32">
--      <Configuration>ReleaseWithoutAsm</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="ReleaseWithoutAsm|x64">
--      <Configuration>ReleaseWithoutAsm</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Release|Itanium">
--      <Configuration>Release</Configuration>
--      <Platform>Itanium</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Release|Win32">
--      <Configuration>Release</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Release|x64">
--      <Configuration>Release</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--  </ItemGroup>
--  <PropertyGroup Label="Globals">
--    <ProjectGuid>{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}</ProjectGuid>
--  </PropertyGroup>
--  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--    <CharacterSet>Unicode</CharacterSet>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
--    <ConfigurationType>StaticLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
--  <ImportGroup Label="ExtensionSettings">
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <PropertyGroup Label="UserMacros" />
--  <PropertyGroup>
--    <_ProjectFileVersion>10.0.30128.1</_ProjectFileVersion>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibStat$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibStat$(Configuration)\Tmp\</IntDir>
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
--  </PropertyGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>OldStyle</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:X86 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ASMV;ASMINF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:X86 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <AdditionalDependencies>..\..\masmx86\match686.obj;..\..\masmx86\inffas32.obj;%(AdditionalDependencies)</AdditionalDependencies>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:X86 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
--    <Midl>
--      <TargetEnvironment>X64</TargetEnvironment>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>OldStyle</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:AMD64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
--    <Midl>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>OldStyle</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:IA64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
--    <Midl>
--      <TargetEnvironment>X64</TargetEnvironment>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:AMD64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <AdditionalDependencies>..\..\masmx64\gvmat64.obj;..\..\masmx64\inffasx64.obj;%(AdditionalDependencies)</AdditionalDependencies>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
--    <Midl>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:IA64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">
--    <Midl>
--      <TargetEnvironment>X64</TargetEnvironment>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:AMD64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">
--    <Midl>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Lib>
--      <AdditionalOptions>/MACHINE:IA64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </Lib>
--  </ItemDefinitionGroup>
--  <ItemGroup>
--    <ClCompile Include="..\..\..\adler32.c" />
--    <ClCompile Include="..\..\..\compress.c" />
--    <ClCompile Include="..\..\..\crc32.c" />
--    <ClCompile Include="..\..\..\deflate.c" />
--    <ClCompile Include="..\..\..\gzclose.c" />
--    <ClCompile Include="..\..\..\gzlib.c" />
--    <ClCompile Include="..\..\..\gzread.c" />
--    <ClCompile Include="..\..\..\gzwrite.c" />
--    <ClCompile Include="..\..\..\infback.c" />
--    <ClCompile Include="..\..\masmx64\inffas8664.c">
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
--    </ClCompile>
--    <ClCompile Include="..\..\..\inffast.c" />
--    <ClCompile Include="..\..\..\inflate.c" />
--    <ClCompile Include="..\..\..\inftrees.c" />
--    <ClCompile Include="..\..\minizip\ioapi.c" />
--    <ClCompile Include="..\..\..\trees.c" />
--    <ClCompile Include="..\..\..\uncompr.c" />
--    <ClCompile Include="..\..\minizip\unzip.c" />
--    <ClCompile Include="..\..\minizip\zip.c" />
--    <ClCompile Include="..\..\..\zutil.c" />
--  </ItemGroup>
--  <ItemGroup>
--    <ResourceCompile Include="zlib.rc" />
--  </ItemGroup>
--  <ItemGroup>
--    <None Include="zlibvc.def" />
--  </ItemGroup>
--  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
--  <ImportGroup Label="ExtensionTargets">
--  </ImportGroup>
-+﻿<?xml version="1.0" encoding="utf-8"?>
-+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-+  <ItemGroup Label="ProjectConfigurations">
-+    <ProjectConfiguration Include="Debug|Itanium">
-+      <Configuration>Debug</Configuration>
-+      <Platform>Itanium</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Debug|Win32">
-+      <Configuration>Debug</Configuration>
-+      <Platform>Win32</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Debug|x64">
-+      <Configuration>Debug</Configuration>
-+      <Platform>x64</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="ReleaseWithoutAsm|Itanium">
-+      <Configuration>ReleaseWithoutAsm</Configuration>
-+      <Platform>Itanium</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="ReleaseWithoutAsm|Win32">
-+      <Configuration>ReleaseWithoutAsm</Configuration>
-+      <Platform>Win32</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="ReleaseWithoutAsm|x64">
-+      <Configuration>ReleaseWithoutAsm</Configuration>
-+      <Platform>x64</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Release|Itanium">
-+      <Configuration>Release</Configuration>
-+      <Platform>Itanium</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Release|Win32">
-+      <Configuration>Release</Configuration>
-+      <Platform>Win32</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Release|x64">
-+      <Configuration>Release</Configuration>
-+      <Platform>x64</Platform>
-+    </ProjectConfiguration>
-+  </ItemGroup>
-+  <PropertyGroup Label="Globals">
-+    <ProjectGuid>{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}</ProjectGuid>
-+  </PropertyGroup>
-+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+    <CharacterSet>Unicode</CharacterSet>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-+    <ConfigurationType>StaticLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-+  <ImportGroup Label="ExtensionSettings">
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <PropertyGroup Label="UserMacros" />
-+  <PropertyGroup>
-+    <_ProjectFileVersion>10.0.30128.1</_ProjectFileVersion>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibStat$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibStat$(Configuration)\Tmp\</IntDir>
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-+  </PropertyGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-+    <ClCompile>
-+      <Optimization>Disabled</Optimization>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:X86 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ASMV;ASMINF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:X86 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <AdditionalDependencies>..\..\masmx86\match686.obj;..\..\masmx86\inffas32.obj;%(AdditionalDependencies)</AdditionalDependencies>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:X86 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-+    <Midl>
-+      <TargetEnvironment>X64</TargetEnvironment>
-+    </Midl>
-+    <ClCompile>
-+      <Optimization>Disabled</Optimization>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:AMD64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
-+    <Midl>
-+      <TargetEnvironment>Itanium</TargetEnvironment>
-+    </Midl>
-+    <ClCompile>
-+      <Optimization>Disabled</Optimization>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:IA64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-+    <Midl>
-+      <TargetEnvironment>X64</TargetEnvironment>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:AMD64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <AdditionalDependencies>..\..\masmx64\gvmat64.obj;..\..\masmx64\inffasx64.obj;%(AdditionalDependencies)</AdditionalDependencies>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
-+    <Midl>
-+      <TargetEnvironment>Itanium</TargetEnvironment>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:IA64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">
-+    <Midl>
-+      <TargetEnvironment>X64</TargetEnvironment>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:AMD64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">
-+    <Midl>
-+      <TargetEnvironment>Itanium</TargetEnvironment>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>ZLIB_WINAPI;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibstat.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Lib>
-+      <AdditionalOptions>/MACHINE:IA64 /NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibstat.lib</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </Lib>
-+  </ItemDefinitionGroup>
-+  <ItemGroup>
-+    <ClCompile Include="..\..\..\adler32.c" />
-+    <ClCompile Include="..\..\..\compress.c" />
-+    <ClCompile Include="..\..\..\crc32.c" />
-+    <ClCompile Include="..\..\..\deflate.c" />
-+    <ClCompile Include="..\..\..\gzclose.c" />
-+    <ClCompile Include="..\..\..\gzlib.c" />
-+    <ClCompile Include="..\..\..\gzread.c" />
-+    <ClCompile Include="..\..\..\gzwrite.c" />
-+    <ClCompile Include="..\..\..\infback.c" />
-+    <ClCompile Include="..\..\masmx64\inffas8664.c">
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-+    </ClCompile>
-+    <ClCompile Include="..\..\..\inffast.c" />
-+    <ClCompile Include="..\..\..\inflate.c" />
-+    <ClCompile Include="..\..\..\inftrees.c" />
-+    <ClCompile Include="..\..\minizip\ioapi.c" />
-+    <ClCompile Include="..\..\..\trees.c" />
-+    <ClCompile Include="..\..\..\uncompr.c" />
-+    <ClCompile Include="..\..\minizip\unzip.c" />
-+    <ClCompile Include="..\..\minizip\zip.c" />
-+    <ClCompile Include="..\..\..\zutil.c" />
-+  </ItemGroup>
-+  <ItemGroup>
-+    <ResourceCompile Include="zlib.rc" />
-+  </ItemGroup>
-+  <ItemGroup>
-+    <None Include="zlibvc.def" />
-+  </ItemGroup>
-+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-+  <ImportGroup Label="ExtensionTargets">
-+  </ImportGroup>
- </Project>
-\ No newline at end of file
 diff --git a/libz/contrib/vstudio/vc12/zlibvc.def b/libz/contrib/vstudio/vc12/zlibvc.def
-index 54e683d99c..ba09bc1b98 100644
+index 54e683d..ba09bc1 100644
 --- a/libz/contrib/vstudio/vc12/zlibvc.def
 +++ b/libz/contrib/vstudio/vc12/zlibvc.def
 @@ -151,3 +151,8 @@ EXPORTS
@@ -12843,1585 +11770,8 @@ index 54e683d99c..ba09bc1b98 100644
 +		crc32_combine_gen						@176
 +		crc32_combine_gen64						@177
 +		crc32_combine_op						@178
-diff --git a/libz/contrib/vstudio/vc12/zlibvc.vcxproj b/libz/contrib/vstudio/vc12/zlibvc.vcxproj
-index 54da3e17c3..ab2b6c3603 100644
---- a/libz/contrib/vstudio/vc12/zlibvc.vcxproj
-+++ b/libz/contrib/vstudio/vc12/zlibvc.vcxproj
-@@ -1,884 +1,692 @@
--﻿<?xml version="1.0" encoding="utf-8"?>
--<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
--  <ItemGroup Label="ProjectConfigurations">
--    <ProjectConfiguration Include="DebugWithoutAsm|Win32">
--      <Configuration>DebugWithoutAsm</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="DebugWithoutAsm|x64">
--      <Configuration>DebugWithoutAsm</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Debug|Itanium">
--      <Configuration>Debug</Configuration>
--      <Platform>Itanium</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Debug|Win32">
--      <Configuration>Debug</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Debug|x64">
--      <Configuration>Debug</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="ReleaseWithoutAsm|Itanium">
--      <Configuration>ReleaseWithoutAsm</Configuration>
--      <Platform>Itanium</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="ReleaseWithoutAsm|Win32">
--      <Configuration>ReleaseWithoutAsm</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="ReleaseWithoutAsm|x64">
--      <Configuration>ReleaseWithoutAsm</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Release|Itanium">
--      <Configuration>Release</Configuration>
--      <Platform>Itanium</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Release|Win32">
--      <Configuration>Release</Configuration>
--      <Platform>Win32</Platform>
--    </ProjectConfiguration>
--    <ProjectConfiguration Include="Release|x64">
--      <Configuration>Release</Configuration>
--      <Platform>x64</Platform>
--    </ProjectConfiguration>
--  </ItemGroup>
--  <PropertyGroup Label="Globals">
--    <ProjectGuid>{8FD826F8-3739-44E6-8CC8-997122E53B8D}</ProjectGuid>
--  </PropertyGroup>
--  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <WholeProgramOptimization>true</WholeProgramOptimization>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <WholeProgramOptimization>true</WholeProgramOptimization>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--    <CharacterSet>Unicode</CharacterSet>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--    <CharacterSet>Unicode</CharacterSet>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <WholeProgramOptimization>true</WholeProgramOptimization>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <WholeProgramOptimization>true</WholeProgramOptimization>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v120</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <WholeProgramOptimization>true</WholeProgramOptimization>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <WholeProgramOptimization>true</WholeProgramOptimization>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'" Label="Configuration">
--    <ConfigurationType>DynamicLibrary</ConfigurationType>
--    <UseOfMfc>false</UseOfMfc>
--    <PlatformToolset>v142</PlatformToolset>
--  </PropertyGroup>
--  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
--  <ImportGroup Label="ExtensionSettings">
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'" Label="PropertySheets">
--    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
--  </ImportGroup>
--  <PropertyGroup Label="UserMacros" />
--  <PropertyGroup>
--    <_ProjectFileVersion>10.0.30128.1</_ProjectFileVersion>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">true</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">false</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibDll$(Configuration)\</OutDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">x64\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">true</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateManifest>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</LinkIncremental>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">true</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">false</GenerateManifest>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">false</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">false</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateManifest>
--    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
--    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
--    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">false</LinkIncremental>
--    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">false</GenerateManifest>
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
--    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
--    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
--    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">zlibwapi</TargetName>
--    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">zlibwapi</TargetName>
--  </PropertyGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
--    <Midl>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Win32</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
--      <AdditionalDependencies>..\..\masmx86\match686.obj;..\..\masmx86\inffas32.obj;%(AdditionalDependencies)</AdditionalDependencies>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <GenerateDebugInformation>true</GenerateDebugInformation>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <RandomizedBaseAddress>false</RandomizedBaseAddress>
--      <DataExecutionPrevention>
--      </DataExecutionPrevention>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--    </Link>
--    <PreBuildEvent>
-+﻿<?xml version="1.0" encoding="utf-8"?>
-+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-+  <ItemGroup Label="ProjectConfigurations">
-+    <ProjectConfiguration Include="Debug|Itanium">
-+      <Configuration>Debug</Configuration>
-+      <Platform>Itanium</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Debug|Win32">
-+      <Configuration>Debug</Configuration>
-+      <Platform>Win32</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Debug|x64">
-+      <Configuration>Debug</Configuration>
-+      <Platform>x64</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="ReleaseWithoutAsm|Itanium">
-+      <Configuration>ReleaseWithoutAsm</Configuration>
-+      <Platform>Itanium</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="ReleaseWithoutAsm|Win32">
-+      <Configuration>ReleaseWithoutAsm</Configuration>
-+      <Platform>Win32</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="ReleaseWithoutAsm|x64">
-+      <Configuration>ReleaseWithoutAsm</Configuration>
-+      <Platform>x64</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Release|Itanium">
-+      <Configuration>Release</Configuration>
-+      <Platform>Itanium</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Release|Win32">
-+      <Configuration>Release</Configuration>
-+      <Platform>Win32</Platform>
-+    </ProjectConfiguration>
-+    <ProjectConfiguration Include="Release|x64">
-+      <Configuration>Release</Configuration>
-+      <Platform>x64</Platform>
-+    </ProjectConfiguration>
-+  </ItemGroup>
-+  <PropertyGroup Label="Globals">
-+    <ProjectGuid>{8FD826F8-3739-44E6-8CC8-997122E53B8D}</ProjectGuid>
-+  </PropertyGroup>
-+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <WholeProgramOptimization>true</WholeProgramOptimization>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <WholeProgramOptimization>true</WholeProgramOptimization>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+    <CharacterSet>Unicode</CharacterSet>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <WholeProgramOptimization>true</WholeProgramOptimization>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <WholeProgramOptimization>true</WholeProgramOptimization>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <WholeProgramOptimization>true</WholeProgramOptimization>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <WholeProgramOptimization>true</WholeProgramOptimization>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-+    <ConfigurationType>DynamicLibrary</ConfigurationType>
-+    <UseOfMfc>false</UseOfMfc>
-+    <PlatformToolset>v120</PlatformToolset>
-+  </PropertyGroup>
-+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-+  <ImportGroup Label="ExtensionSettings">
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-+  </ImportGroup>
-+  <PropertyGroup Label="UserMacros" />
-+  <PropertyGroup>
-+    <_ProjectFileVersion>10.0.30128.1</_ProjectFileVersion>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">false</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">x86\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">false</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">false</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">x64\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateManifest>
-+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibDll$(Configuration)\</OutDir>
-+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ia64\ZlibDll$(Configuration)\Tmp\</IntDir>
-+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">false</LinkIncremental>
-+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">false</GenerateManifest>
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">zlibwapi</TargetName>
-+    <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">zlibwapi</TargetName>
-+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">zlibwapi</TargetName>
-+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">zlibwapi</TargetName>
-+    <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">zlibwapi</TargetName>
-+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">zlibwapi</TargetName>
-+  </PropertyGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-+    <Midl>
-+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>Win32</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <Optimization>Disabled</Optimization>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-+      <AdditionalDependencies>..\..\masmx86\match686.obj;..\..\masmx86\inffas32.obj;%(AdditionalDependencies)</AdditionalDependencies>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <GenerateDebugInformation>true</GenerateDebugInformation>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-+      <DataExecutionPrevention>
-+      </DataExecutionPrevention>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+    </Link>
-+    <PreBuildEvent>
-       <Command>cd ..\..\masmx86
--bld_ml32.bat</Command>
--    </PreBuildEvent>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">
--    <Midl>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Win32</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <GenerateDebugInformation>true</GenerateDebugInformation>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <RandomizedBaseAddress>false</RandomizedBaseAddress>
--      <DataExecutionPrevention>
--      </DataExecutionPrevention>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">
--    <Midl>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Win32</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerOutput>All</AssemblerOutput>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <RandomizedBaseAddress>false</RandomizedBaseAddress>
--      <DataExecutionPrevention>
--      </DataExecutionPrevention>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <OptimizeReferences>true</OptimizeReferences>
--      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
--    <Midl>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Win32</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerOutput>All</AssemblerOutput>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
--      <AdditionalDependencies>..\..\masmx86\match686.obj;..\..\masmx86\inffas32.obj;%(AdditionalDependencies)</AdditionalDependencies>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <RandomizedBaseAddress>false</RandomizedBaseAddress>
--      <DataExecutionPrevention>
--      </DataExecutionPrevention>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
--    </Link>
--    <PreBuildEvent>
-+bld_ml32.bat</Command>
-+    </PreBuildEvent>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">
-+    <Midl>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>Win32</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerOutput>All</AssemblerOutput>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-+      <DataExecutionPrevention>
-+      </DataExecutionPrevention>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+    </Link>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-+    <Midl>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>Win32</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerOutput>All</AssemblerOutput>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-+      <AdditionalDependencies>..\..\masmx86\match686.obj;..\..\masmx86\inffas32.obj;%(AdditionalDependencies)</AdditionalDependencies>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-+      <DataExecutionPrevention>
-+      </DataExecutionPrevention>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-+    </Link>
-+    <PreBuildEvent>
-       <Command>cd ..\..\masmx86
--bld_ml32.bat</Command>
--    </PreBuildEvent>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
--    <Midl>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>X64</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <AdditionalDependencies>..\..\masmx64\gvmat64.obj;..\..\masmx64\inffasx64.obj;%(AdditionalDependencies)</AdditionalDependencies>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <GenerateDebugInformation>true</GenerateDebugInformation>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineX64</TargetMachine>
--    </Link>
--    <PreBuildEvent>
-+bld_ml32.bat</Command>
-+    </PreBuildEvent>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-+    <Midl>
-+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>X64</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <Optimization>Disabled</Optimization>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <AdditionalDependencies>..\..\masmx64\gvmat64.obj;..\..\masmx64\inffasx64.obj;%(AdditionalDependencies)</AdditionalDependencies>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <GenerateDebugInformation>true</GenerateDebugInformation>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <TargetMachine>MachineX64</TargetMachine>
-+    </Link>
-+    <PreBuildEvent>
-       <Command>cd ..\..\contrib\masmx64
--bld_ml64.bat</Command>
--    </PreBuildEvent>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|x64'">
--    <Midl>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>X64</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <GenerateDebugInformation>true</GenerateDebugInformation>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineX64</TargetMachine>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
--    <Midl>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <GenerateDebugInformation>true</GenerateDebugInformation>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineIA64</TargetMachine>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">
--    <Midl>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <Optimization>Disabled</Optimization>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <GenerateDebugInformation>true</GenerateDebugInformation>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineIA64</TargetMachine>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">
--    <Midl>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>X64</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerOutput>All</AssemblerOutput>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineX64</TargetMachine>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">
--    <Midl>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerOutput>All</AssemblerOutput>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineIA64</TargetMachine>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
--    <Midl>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>X64</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerOutput>All</AssemblerOutput>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <AdditionalDependencies>..\..\masmx64\gvmat64.obj;..\..\masmx64\inffasx64.obj;%(AdditionalDependencies)</AdditionalDependencies>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineX64</TargetMachine>
--    </Link>
--    <PreBuildEvent>
-+bld_ml64.bat</Command>
-+    </PreBuildEvent>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
-+    <Midl>
-+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>Itanium</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <Optimization>Disabled</Optimization>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <GenerateDebugInformation>true</GenerateDebugInformation>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <TargetMachine>MachineIA64</TargetMachine>
-+    </Link>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|x64'">
-+    <Midl>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>X64</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerOutput>All</AssemblerOutput>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <TargetMachine>MachineX64</TargetMachine>
-+    </Link>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">
-+    <Midl>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>Itanium</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerOutput>All</AssemblerOutput>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <TargetMachine>MachineIA64</TargetMachine>
-+    </Link>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-+    <Midl>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>X64</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;ASMV;ASMINF;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerOutput>All</AssemblerOutput>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <AdditionalDependencies>..\..\masmx64\gvmat64.obj;..\..\masmx64\inffasx64.obj;%(AdditionalDependencies)</AdditionalDependencies>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <TargetMachine>MachineX64</TargetMachine>
-+    </Link>
-+    <PreBuildEvent>
-       <Command>cd ..\..\masmx64
--bld_ml64.bat</Command>
--    </PreBuildEvent>
--  </ItemDefinitionGroup>
--  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
--    <Midl>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <MkTypLibCompatible>true</MkTypLibCompatible>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <TargetEnvironment>Itanium</TargetEnvironment>
--      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
--    </Midl>
--    <ClCompile>
--      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
--      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <StringPooling>true</StringPooling>
--      <ExceptionHandling>
--      </ExceptionHandling>
--      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
--      <BufferSecurityCheck>false</BufferSecurityCheck>
--      <FunctionLevelLinking>true</FunctionLevelLinking>
--      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
--      <AssemblerOutput>All</AssemblerOutput>
--      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
--      <ObjectFileName>$(IntDir)</ObjectFileName>
--      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
--      <BrowseInformation>
--      </BrowseInformation>
--      <WarningLevel>Level3</WarningLevel>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--    </ClCompile>
--    <ResourceCompile>
--      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <Culture>0x040c</Culture>
--    </ResourceCompile>
--    <Link>
--      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
--      <SuppressStartupBanner>true</SuppressStartupBanner>
--      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
--      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
--      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
--      <GenerateMapFile>true</GenerateMapFile>
--      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
--      <SubSystem>Windows</SubSystem>
--      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
--      <TargetMachine>MachineIA64</TargetMachine>
--    </Link>
--  </ItemDefinitionGroup>
--  <ItemGroup>
--    <ClCompile Include="..\..\..\adler32.c" />
--    <ClCompile Include="..\..\..\compress.c" />
--    <ClCompile Include="..\..\..\crc32.c" />
--    <ClCompile Include="..\..\..\deflate.c" />
--    <ClCompile Include="..\..\..\gzclose.c" />
--    <ClCompile Include="..\..\..\gzlib.c" />
--    <ClCompile Include="..\..\..\gzread.c" />
--    <ClCompile Include="..\..\..\gzwrite.c" />
--    <ClCompile Include="..\..\..\infback.c" />
--    <ClCompile Include="..\..\masmx64\inffas8664.c">
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugWithoutAsm|Win32'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
--      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
--    </ClCompile>
--    <ClCompile Include="..\..\..\inffast.c" />
--    <ClCompile Include="..\..\..\inflate.c" />
--    <ClCompile Include="..\..\..\inftrees.c" />
--    <ClCompile Include="..\..\minizip\ioapi.c" />
--    <ClCompile Include="..\..\minizip\iowin32.c" />
--    <ClCompile Include="..\..\..\trees.c" />
--    <ClCompile Include="..\..\..\uncompr.c" />
--    <ClCompile Include="..\..\minizip\unzip.c">
--      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--    </ClCompile>
--    <ClCompile Include="..\..\minizip\zip.c">
--      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
--    </ClCompile>
--    <ClCompile Include="..\..\..\zutil.c" />
--  </ItemGroup>
--  <ItemGroup>
--    <ResourceCompile Include="zlib.rc" />
--  </ItemGroup>
--  <ItemGroup>
--    <None Include="zlibvc.def" />
--  </ItemGroup>
--  <ItemGroup>
--    <ClInclude Include="..\..\..\deflate.h" />
--    <ClInclude Include="..\..\..\infblock.h" />
--    <ClInclude Include="..\..\..\infcodes.h" />
--    <ClInclude Include="..\..\..\inffast.h" />
--    <ClInclude Include="..\..\..\inftrees.h" />
--    <ClInclude Include="..\..\..\infutil.h" />
--    <ClInclude Include="..\..\..\zconf.h" />
--    <ClInclude Include="..\..\..\zlib.h" />
--    <ClInclude Include="..\..\..\zutil.h" />
--  </ItemGroup>
--  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
--  <ImportGroup Label="ExtensionTargets">
--  </ImportGroup>
-+bld_ml64.bat</Command>
-+    </PreBuildEvent>
-+  </ItemDefinitionGroup>
-+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
-+    <Midl>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <MkTypLibCompatible>true</MkTypLibCompatible>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <TargetEnvironment>Itanium</TargetEnvironment>
-+      <TypeLibraryName>$(OutDir)zlibvc.tlb</TypeLibraryName>
-+    </Midl>
-+    <ClCompile>
-+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-+      <AdditionalIncludeDirectories>..\..\..;..\..\masmx86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;ZLIB_WINAPI;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <StringPooling>true</StringPooling>
-+      <ExceptionHandling>
-+      </ExceptionHandling>
-+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-+      <BufferSecurityCheck>false</BufferSecurityCheck>
-+      <FunctionLevelLinking>true</FunctionLevelLinking>
-+      <PrecompiledHeaderOutputFile>$(IntDir)zlibvc.pch</PrecompiledHeaderOutputFile>
-+      <AssemblerOutput>All</AssemblerOutput>
-+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-+      <ObjectFileName>$(IntDir)</ObjectFileName>
-+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
-+      <BrowseInformation>
-+      </BrowseInformation>
-+      <WarningLevel>Level3</WarningLevel>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+    </ClCompile>
-+    <ResourceCompile>
-+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <Culture>0x040c</Culture>
-+    </ResourceCompile>
-+    <Link>
-+      <OutputFile>$(OutDir)zlibwapi.dll</OutputFile>
-+      <SuppressStartupBanner>true</SuppressStartupBanner>
-+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-+      <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
-+      <ProgramDatabaseFile>$(OutDir)zlibwapi.pdb</ProgramDatabaseFile>
-+      <GenerateMapFile>true</GenerateMapFile>
-+      <MapFileName>$(OutDir)zlibwapi.map</MapFileName>
-+      <SubSystem>Windows</SubSystem>
-+      <ImportLibrary>$(OutDir)zlibwapi.lib</ImportLibrary>
-+      <TargetMachine>MachineIA64</TargetMachine>
-+    </Link>
-+  </ItemDefinitionGroup>
-+  <ItemGroup>
-+    <ClCompile Include="..\..\..\adler32.c" />
-+    <ClCompile Include="..\..\..\compress.c" />
-+    <ClCompile Include="..\..\..\crc32.c" />
-+    <ClCompile Include="..\..\..\deflate.c" />
-+    <ClCompile Include="..\..\..\gzclose.c" />
-+    <ClCompile Include="..\..\..\gzlib.c" />
-+    <ClCompile Include="..\..\..\gzread.c" />
-+    <ClCompile Include="..\..\..\gzwrite.c" />
-+    <ClCompile Include="..\..\..\infback.c" />
-+    <ClCompile Include="..\..\masmx64\inffas8664.c">
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Itanium'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseWithoutAsm|Win32'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
-+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-+    </ClCompile>
-+    <ClCompile Include="..\..\..\inffast.c" />
-+    <ClCompile Include="..\..\..\inflate.c" />
-+    <ClCompile Include="..\..\..\inftrees.c" />
-+    <ClCompile Include="..\..\minizip\ioapi.c" />
-+    <ClCompile Include="..\..\minizip\iowin32.c" />
-+    <ClCompile Include="..\..\..\trees.c" />
-+    <ClCompile Include="..\..\..\uncompr.c" />
-+    <ClCompile Include="..\..\minizip\unzip.c">
-+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+    </ClCompile>
-+    <ClCompile Include="..\..\minizip\zip.c">
-+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ZLIB_INTERNAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-+    </ClCompile>
-+    <ClCompile Include="..\..\..\zutil.c" />
-+  </ItemGroup>
-+  <ItemGroup>
-+    <ResourceCompile Include="zlib.rc" />
-+  </ItemGroup>
-+  <ItemGroup>
-+    <None Include="zlibvc.def" />
-+  </ItemGroup>
-+  <ItemGroup>
-+    <ClInclude Include="..\..\..\deflate.h" />
-+    <ClInclude Include="..\..\..\infblock.h" />
-+    <ClInclude Include="..\..\..\infcodes.h" />
-+    <ClInclude Include="..\..\..\inffast.h" />
-+    <ClInclude Include="..\..\..\inftrees.h" />
-+    <ClInclude Include="..\..\..\infutil.h" />
-+    <ClInclude Include="..\..\..\zconf.h" />
-+    <ClInclude Include="..\..\..\zlib.h" />
-+    <ClInclude Include="..\..\..\zutil.h" />
-+  </ItemGroup>
-+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-+  <ImportGroup Label="ExtensionTargets">
-+  </ImportGroup>
- </Project>
-\ No newline at end of file
 diff --git a/libz/contrib/vstudio/vc14/zlib.rc b/libz/contrib/vstudio/vc14/zlib.rc
-index c4e4b016e9..9475873506 100644
+index c4e4b01..9475873 100644
 --- a/libz/contrib/vstudio/vc14/zlib.rc
 +++ b/libz/contrib/vstudio/vc14/zlib.rc
 @@ -2,8 +2,8 @@
@@ -14451,7 +11801,7 @@ index c4e4b016e9..9475873506 100644
    END
    BLOCK "VarFileInfo"
 diff --git a/libz/contrib/vstudio/vc14/zlibvc.def b/libz/contrib/vstudio/vc14/zlibvc.def
-index 54e683d99c..ba09bc1b98 100644
+index 54e683d..ba09bc1 100644
 --- a/libz/contrib/vstudio/vc14/zlibvc.def
 +++ b/libz/contrib/vstudio/vc14/zlibvc.def
 @@ -151,3 +151,8 @@ EXPORTS
@@ -14464,7 +11814,7 @@ index 54e683d99c..ba09bc1b98 100644
 +		crc32_combine_gen64						@177
 +		crc32_combine_op						@178
 diff --git a/libz/contrib/vstudio/vc9/zlib.rc b/libz/contrib/vstudio/vc9/zlib.rc
-index fee177a71c..8ad25f1031 100644
+index fee177a..8ad25f1 100644
 --- a/libz/contrib/vstudio/vc9/zlib.rc
 +++ b/libz/contrib/vstudio/vc9/zlib.rc
 @@ -2,8 +2,8 @@
@@ -14494,7 +11844,7 @@ index fee177a71c..8ad25f1031 100644
    END
    BLOCK "VarFileInfo"
 diff --git a/libz/contrib/vstudio/vc9/zlibvc.def b/libz/contrib/vstudio/vc9/zlibvc.def
-index 54e683d99c..ba09bc1b98 100644
+index 54e683d..ba09bc1 100644
 --- a/libz/contrib/vstudio/vc9/zlibvc.def
 +++ b/libz/contrib/vstudio/vc9/zlibvc.def
 @@ -151,3 +151,8 @@ EXPORTS
@@ -14507,7 +11857,7 @@ index 54e683d99c..ba09bc1b98 100644
 +		crc32_combine_gen64						@177
 +		crc32_combine_op						@178
 diff --git a/libz/crc32.c b/libz/crc32.c
-index 9580440c0e..a1bdce5c23 100644
+index 9580440..a1bdce5 100644
 --- a/libz/crc32.c
 +++ b/libz/crc32.c
 @@ -1,12 +1,10 @@
@@ -15918,7 +13268,7 @@ index 9580440c0e..a1bdce5c23 100644
 +    return multmodp(op, crc1) ^ crc2;
  }
 diff --git a/libz/crc32.h b/libz/crc32.h
-index 9e0c778102..137df68d61 100644
+index 9e0c778..137df68 100644
 --- a/libz/crc32.h
 +++ b/libz/crc32.h
 @@ -2,440 +2,9445 @@
@@ -25804,7 +23154,7 @@ index 9e0c778102..137df68d61 100644
 +    0x2e4e5eef, 0x4eaba214, 0xa8a472c0, 0x429a969e, 0x148d302a,
 +    0xc40ba6d0, 0xc4e22c3c};
 diff --git a/libz/deflate.c b/libz/deflate.c
-index 1ec761448d..799fb93cc0 100644
+index 1ec7614..799fb93 100644
 --- a/libz/deflate.c
 +++ b/libz/deflate.c
 @@ -1,5 +1,5 @@
@@ -26088,7 +23438,7 @@ index 1ec761448d..799fb93cc0 100644
      return block_done;
  }
 diff --git a/libz/deflate.h b/libz/deflate.h
-index 23ecdd312b..17c226113b 100644
+index 23ecdd3..17c2261 100644
 --- a/libz/deflate.h
 +++ b/libz/deflate.h
 @@ -1,5 +1,5 @@
@@ -26153,7 +23503,7 @@ index 23ecdd312b..17c226113b 100644
  #else
  # define _tr_tally_lit(s, c, flush) flush = _tr_tally(s, 0, c)
 diff --git a/libz/gzguts.h b/libz/gzguts.h
-index 990a4d2514..57faf37165 100644
+index 990a4d2..57faf37 100644
 --- a/libz/gzguts.h
 +++ b/libz/gzguts.h
 @@ -1,5 +1,5 @@
@@ -26181,7 +23531,7 @@ index 990a4d2514..57faf37165 100644
      z_off64_t skip;         /* amount to skip (already rewound if backwards) */
      int seek;               /* true if seek request pending */
 diff --git a/libz/gzlib.c b/libz/gzlib.c
-index 4105e6aff9..dddaf26873 100644
+index 4105e6a..dddaf26 100644
 --- a/libz/gzlib.c
 +++ b/libz/gzlib.c
 @@ -1,11 +1,11 @@
@@ -26217,7 +23567,7 @@ index 4105e6aff9..dddaf26873 100644
              return -1;
          state->x.have = 0;
 diff --git a/libz/gzread.c b/libz/gzread.c
-index 956b91ea7d..884c9bfe4c 100644
+index 956b91e..884c9bf 100644
 --- a/libz/gzread.c
 +++ b/libz/gzread.c
 @@ -1,5 +1,5 @@
@@ -26267,7 +23617,7 @@ index 956b91ea7d..884c9bfe4c 100644
  
  int ZEXPORT gzgetc_(file)
 diff --git a/libz/gzwrite.c b/libz/gzwrite.c
-index c7b5651d70..a8ffc8f53d 100644
+index c7b5651..a8ffc8f 100644
 --- a/libz/gzwrite.c
 +++ b/libz/gzwrite.c
 @@ -1,5 +1,5 @@
@@ -26372,7 +23722,7 @@ index c7b5651d70..a8ffc8f53d 100644
          strm->avail_in = left;
      }
 diff --git a/libz/infback.c b/libz/infback.c
-index 59679ecbfc..a390c58e81 100644
+index 59679ec..a390c58 100644
 --- a/libz/infback.c
 +++ b/libz/infback.c
 @@ -1,5 +1,5 @@
@@ -26391,7 +23741,7 @@ index 59679ecbfc..a390c58e81 100644
          case LEN:
              /* use inflate_fast() if we have enough input and output */
 diff --git a/libz/inffast.c b/libz/inffast.c
-index 0dbd1dbc09..1fec7f363f 100644
+index 0dbd1db..1fec7f3 100644
 --- a/libz/inffast.c
 +++ b/libz/inffast.c
 @@ -70,7 +70,7 @@ unsigned start;         /* inflate()'s starting value for strm->avail_out */
@@ -26469,7 +23819,7 @@ index 0dbd1dbc09..1fec7f363f 100644
          }
          else if (op & 32) {                     /* end-of-block */
 diff --git a/libz/inflate.c b/libz/inflate.c
-index ac333e8c2e..7be8c63662 100644
+index ac333e8..7be8c63 100644
 --- a/libz/inflate.c
 +++ b/libz/inflate.c
 @@ -1,5 +1,5 @@
@@ -26742,7 +24092,7 @@ index ac333e8c2e..7be8c63662 100644
      else
          state->wrap &= ~4;
 diff --git a/libz/inflate.h b/libz/inflate.h
-index a46cce6b6d..f127b6b1fa 100644
+index a46cce6..f127b6b 100644
 --- a/libz/inflate.h
 +++ b/libz/inflate.h
 @@ -1,5 +1,5 @@
@@ -26763,7 +24113,7 @@ index a46cce6b6d..f127b6b1fa 100644
      unsigned long check;        /* protected copy of check value */
      unsigned long total;        /* protected copy of output count */
 diff --git a/libz/inftrees.c b/libz/inftrees.c
-index 2ea08fc13e..09462a740b 100644
+index 2ea08fc..09462a7 100644
 --- a/libz/inftrees.c
 +++ b/libz/inftrees.c
 @@ -1,5 +1,5 @@
@@ -26792,7 +24142,7 @@ index 2ea08fc13e..09462a740b 100644
          1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193,
          257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145,
 diff --git a/libz/os400/README400 b/libz/os400/README400
-index 4f98334f5a..10f6c9d401 100644
+index 4f98334..10f6c9d 100644
 --- a/libz/os400/README400
 +++ b/libz/os400/README400
 @@ -1,4 +1,4 @@
@@ -26802,7 +24152,7 @@ index 4f98334f5a..10f6c9d401 100644
  1) Download and unpack the zlib tarball to some IFS directory.
     (i.e.: /path/to/the/zlib/ifs/source/directory)
 diff --git a/libz/qnx/package.qpg b/libz/qnx/package.qpg
-index 31e8e90db4..badd1d5a0a 100644
+index 31e8e90..badd1d5 100644
 --- a/libz/qnx/package.qpg
 +++ b/libz/qnx/package.qpg
 @@ -25,10 +25,10 @@
@@ -26830,7 +24180,7 @@ index 31e8e90db4..badd1d5a0a 100644
                 <QPM:ReleaseStability>Stable</QPM:ReleaseStability>
                 <QPM:ReleaseNoteMinor></QPM:ReleaseNoteMinor>
 diff --git a/libz/test/example.c b/libz/test/example.c
-index eee17ce7c1..949f4f6256 100644
+index eee17ce..949f4f6 100644
 --- a/libz/test/example.c
 +++ b/libz/test/example.c
 @@ -440,9 +440,8 @@ void test_sync(compr, comprLen, uncompr, uncomprLen)
@@ -26846,7 +24196,7 @@ index eee17ce7c1..949f4f6256 100644
      }
      err = inflateEnd(&d_stream);
 diff --git a/libz/treebuild.xml b/libz/treebuild.xml
-index fd75525f99..781b4c98cc 100644
+index fd75525..781b4c9 100644
 --- a/libz/treebuild.xml
 +++ b/libz/treebuild.xml
 @@ -1,6 +1,6 @@
@@ -26859,7 +24209,7 @@ index fd75525f99..781b4c98cc 100644
  	<property name="include-target-dir" value="$(@PACKAGE/install-includedir)" />
  
 diff --git a/libz/trees.c b/libz/trees.c
-index 50cf4b4571..f73fd99c37 100644
+index 50cf4b4..f73fd99 100644
 --- a/libz/trees.c
 +++ b/libz/trees.c
 @@ -1,5 +1,5 @@
@@ -27032,7 +24382,7 @@ index 50cf4b4571..f73fd99c37 100644
       */
      return Z_BINARY;
 diff --git a/libz/win32/Makefile.bor b/libz/win32/Makefile.bor
-index d152bbb7ff..4495353f3f 100644
+index d152bbb..4495353 100644
 --- a/libz/win32/Makefile.bor
 +++ b/libz/win32/Makefile.bor
 @@ -3,7 +3,6 @@
@@ -27044,7 +24394,7 @@ index d152bbb7ff..4495353f3f 100644
  # ------------ Borland C++ ------------
  
 diff --git a/libz/win32/Makefile.gcc b/libz/win32/Makefile.gcc
-index 305be50afe..081e391eb2 100644
+index 305be50..081e391 100644
 --- a/libz/win32/Makefile.gcc
 +++ b/libz/win32/Makefile.gcc
 @@ -11,10 +11,6 @@
@@ -27067,7 +24417,7 @@ index 305be50afe..081e391eb2 100644
  
  PREFIX =
 diff --git a/libz/win32/Makefile.msc b/libz/win32/Makefile.msc
-index 6831882de4..9c6515360e 100644
+index 6831882..9c65153 100644
 --- a/libz/win32/Makefile.msc
 +++ b/libz/win32/Makefile.msc
 @@ -4,10 +4,6 @@
@@ -27082,7 +24432,7 @@ index 6831882de4..9c6515360e 100644
  # The toplevel directory of the source tree.
  #
 diff --git a/libz/win32/README-WIN32.txt b/libz/win32/README-WIN32.txt
-index df7ab7f4b3..536cfec6f6 100644
+index df7ab7f..536cfec 100644
 --- a/libz/win32/README-WIN32.txt
 +++ b/libz/win32/README-WIN32.txt
 @@ -1,6 +1,6 @@
@@ -27103,7 +24453,7 @@ index df7ab7f4b3..536cfec6f6 100644
    README-WIN32.txt This document
    ChangeLog        Changes since previous zlib packages
 diff --git a/libz/win32/zlib.def b/libz/win32/zlib.def
-index 784b138691..53c80115fc 100644
+index 784b138..53c8011 100644
 --- a/libz/win32/zlib.def
 +++ b/libz/win32/zlib.def
 @@ -69,6 +69,7 @@ EXPORTS
@@ -27124,7 +24474,7 @@ index 784b138691..53c80115fc 100644
      deflateInit_
      deflateInit2_
 diff --git a/libz/zlib.3 b/libz/zlib.3
-index bda4eb0737..bcaebd9f02 100644
+index bda4eb0..bcaebd9 100644
 --- a/libz/zlib.3
 +++ b/libz/zlib.3
 @@ -1,4 +1,4 @@
@@ -27146,7 +24496,7 @@ index bda4eb0737..bcaebd9f02 100644
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
 diff --git a/libz/zlib.h b/libz/zlib.h
-index f09cdaf1e0..4a98e38bf3 100644
+index f09cdaf..4a98e38 100644
 --- a/libz/zlib.h
 +++ b/libz/zlib.h
 @@ -1,7 +1,7 @@
@@ -27653,7 +25003,7 @@ index f09cdaf1e0..4a98e38bf3 100644
                                              const char *mode));
  #endif
 diff --git a/libz/zlib.map b/libz/zlib.map
-index 40fa9db2bc..b330b606fe 100644
+index 40fa9db..b330b60 100644
 --- a/libz/zlib.map
 +++ b/libz/zlib.map
 @@ -92,3 +92,9 @@ ZLIB_1.2.9 {
@@ -27670,7 +25020,7 @@ diff --git a/libz/zlib2ansi b/libz/zlib2ansi
 old mode 100644
 new mode 100755
 diff --git a/libz/zutil.c b/libz/zutil.c
-index a76c6b0c7e..dcab28a0d5 100644
+index a76c6b0..dcab28a 100644
 --- a/libz/zutil.c
 +++ b/libz/zutil.c
 @@ -136,8 +136,8 @@ const char * ZEXPORT zError(err)
@@ -27685,7 +25035,7 @@ index a76c6b0c7e..dcab28a0d5 100644
       * Its value is always 0 and should not be used.
       */
 diff --git a/libz/zutil.h b/libz/zutil.h
-index b079ea6a80..d9a20ae1bf 100644
+index b079ea6..d9a20ae 100644
 --- a/libz/zutil.h
 +++ b/libz/zutil.h
 @@ -1,5 +1,5 @@
