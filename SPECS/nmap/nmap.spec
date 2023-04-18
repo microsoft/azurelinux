@@ -35,6 +35,7 @@ Nmap implementation of the ncat tool
 rm -rf libpcap macosx mswin32 libssh2 libz
 
 %build
+%configure
 %make_build
 
 %install
