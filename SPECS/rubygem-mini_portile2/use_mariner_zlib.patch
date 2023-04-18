@@ -1,0 +1,20 @@
+diff --git a/examples/Rakefile b/examples/Rakefile
+index f68ca38..615a9cf 100644
+--- a/examples/Rakefile
++++ b/examples/Rakefile
+@@ -109,11 +109,12 @@ class ZlibRecipe < MiniPortile
+   end
+ end
+ 
+-zlib = ZlibRecipe.new "zlib", "1.2.8"
++zlib = ZlibRecipe.new "zlib", "1.2.12"
+ zlib.files << {
+   # url: "http://zlib.net/#{zlib.name}-#{zlib.version}.tar.gz",
+-  url: "file://#{File.dirname(__FILE__)}/#{zlib.name}-#{zlib.version}.tar.gz",
+-  md5: "44d667c142d7cda120332623eab69f40",
++  # url: "file://#{File.dirname(__FILE__)}/#{zlib.name}-#{zlib.version}.tar.gz",
++  url: "https://cblmarinerstorage.blob.core.windows.net/sources/core/zlib-1.2.12.tar.xz",
++  md5: "28687d676c04e7103bb6ff2b9694c471",
+ }
+ 
+ recipes.push zlib

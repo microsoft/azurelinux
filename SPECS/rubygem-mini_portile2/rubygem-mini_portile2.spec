@@ -3,7 +3,7 @@
 Summary:        Simplistic port-like solution for developers
 Name:           rubygem-mini_portile2
 Version:        2.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/flavorjones/mini_portile
 Source0:        https://github.com/flavorjones/mini_portile/archive/refs/tags/v%{version}.tar.gz#/mini_portile-%{version}.tar.gz
 Patch0:         fix-file_list.patch
+Patch1:         use_mariner_zlib.patch
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
@@ -32,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Apr 18 2023 Saul Paredes <saulparedes@microsoft.com> - 2.8.0-2
+- Update zlib to come from Mariner storage
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.8.0-1
 - Update to v2.8.0.
 - Build from .tar.gz source.
