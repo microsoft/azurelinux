@@ -8,8 +8,8 @@
 
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.102.1
-Release:        2%{?dist}
+Version:        5.15.107.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -418,6 +418,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
+- Auto-upgrade to 5.15.107.1
+
 * Tue Apr 11 2023 Kanika Nema <kanikanema@microsoft.com> - 5.15.102.1-2
 - Enable nvme-tcp and nvme-rdma modules
 
