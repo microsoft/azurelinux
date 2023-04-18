@@ -35,8 +35,6 @@ Nmap implementation of the ncat tool
 rm -rf libpcap macosx mswin32 libssh2 libz
 
 %build
-# Zenmap and Ndiff are python2 only: https://github.com/nmap/nmap/issues/1176
-%configure --without-zenmap --without-ndiff
 %make_build
 
 %install
