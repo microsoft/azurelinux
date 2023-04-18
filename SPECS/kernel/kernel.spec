@@ -57,11 +57,6 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-Conflicts:      kernel-azure
-Conflicts:      kernel-hci
-Conflicts:      kernel-mshv
-Conflicts:      kernel-rt
-Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -134,8 +129,6 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %package -n     python3-perf
 Summary:        Python 3 extension for perf tools
 Requires:       python3
-Requires:       %{name} = %{version}-%{release}
-Provides:       python3-perf
 
 %description -n python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
@@ -149,8 +142,6 @@ This package contains common device tree blobs (dtb)
 
 %package -n     bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
-Requires:       %{name} = %{version}-%{release}
-Provides:       bpftool
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
@@ -421,7 +412,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
 - Add new requires for bpftool and python3-perf for specfic kernel
-- Add kernel conflicts
 
 * Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
 - Auto-upgrade to 5.15.107.1

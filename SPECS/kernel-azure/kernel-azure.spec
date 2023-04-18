@@ -53,11 +53,6 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-Conflicts:      kernel
-Conflicts:      kernel-hci
-Conflicts:      kernel-rt
-Conflicts:      kernel-mshv
-Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -127,30 +122,12 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf-azure
-Summary:        Python 3 extension for perf tools
-Requires:       python3
-Requires:       %{name} = %{version}-%{release}
-Provides:       python3-perf
-
-%description -n python3-perf-azure
-This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
-
 %package dtb
 Summary:        This package contains common device tree blobs (dtb)
 Group:          System Environment/Kernel
 
 %description dtb
 This package contains common device tree blobs (dtb)
-
-%package -n     bpftool-azure
-Summary:        Inspection and simple manipulation of eBPF programs and maps
-Requires:       %{name} = %{version}-%{release}
-Provides:       bpftool
-
-%description -n bpftool-azure
-This package contains the bpftool, which allows inspection and simple
-manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
@@ -185,15 +162,9 @@ fi
 %build
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
-# Compile perf, python3-perf
-make -C tools/perf PYTHON=%{python3} all
-
 %ifarch x86_64
 make -C tools turbostat cpupower
 %endif
-
-#Compile bpftool
-make -C tools/bpf/bpftool
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
@@ -284,12 +255,6 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
 # Linux version that was affected is 4.4.26
 make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
-
-# Install python3-perf
-make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
-
-# Install bpftool
-make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
 %ifarch x86_64
 # Install turbostat cpupower
@@ -402,23 +367,14 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
-%files -n python3-perf-azure
-%{python3_sitearch}/*
-
 %ifarch aarch64
 %files dtb
 /boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
-%files -n bpftool-azure
-%{_sbindir}/bpftool
-%{_sysconfdir}/bash_completion.d/bpftool
-
 %changelog
 * Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
-- Rename bpftool and python3-perf to be kernel specific
-- Add new requires for bpftool and python3-perf for specfic kernel
-- Add kernel conflicts
+- Remove bpftool and python3-perf to kernel
 
 * Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
 - Auto-upgrade to 5.15.107.1
