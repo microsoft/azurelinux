@@ -2,8 +2,8 @@
 
 Summary:        Boost
 Name:           boost
-Version:        1.76.0
-Release:        2%{?dist}
+Version:        1.82.0
+Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,10 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %{_libdir}/libboost_*.a
 
 %changelog
+* Tue Apr 18 2023 Sam Meluch <sammeluch@microsoft.com> - 1.82.0-1
+- Upgrade boost to version 1.82.0
+- Fix CVE-2018-25032
+
 * Wed Dec 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.76.0-2
 - Making Boost build its static libbost_stacktrace_backtrace.a lib.
 
