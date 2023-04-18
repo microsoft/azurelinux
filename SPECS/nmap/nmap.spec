@@ -18,6 +18,8 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
+Patch1:         remove_openssl_macro.patch
+
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
 

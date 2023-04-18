@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "nmap-7.93.tar.bz2": "55bcfe4793e25acc96ba4274d8c4228db550b8e8efd72004b38ec55a2dd16651"
+  "nmap-7.93.tar.bz2": "55bcfe4793e25acc96ba4274d8c4228db550b8e8efd72004b38ec55a2dd16651",
+  "remove_openssl_macro.patch": "67a713b2597c1d44bf18d72f3165be54d7f840637d6a15e1c8f54121b27d1f29"
  }
 }
