@@ -18,8 +18,8 @@ compilations and detecting when the same compilation is being done again.
 %prep
 %setup -q
 
-pwd
-ls
+# Remove zlib directory (to be sure using system version)
+rm -rf src/zlib
 
 %build
 %configure --without-bundled-zlib
@@ -35,10 +35,12 @@ make install DESTDIR=%{buildroot}
 %{_bindir}/ccache
 
 %changelog
-*   Wed Apr 19 2023 Saul Paredes <saulparedes@microsoft.com> 3.6-3
--   Build without bundled zlib
+* Wed Apr 19 2023 Saul Paredes <saulparedes@microsoft.com> - 3.6-3
+- Build without bundled zlib
+
 *   Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6-2
 -   License verified.
 -   Added 'Vendor' and 'Distribution' tags.
+
 *   Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 3.6-1
 -   Original version for CBL-Mariner.
