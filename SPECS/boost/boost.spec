@@ -33,7 +33,7 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%setup -q -n boost_1_66_0
+%autosetup -n %{name}_%{underscore_version}
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
