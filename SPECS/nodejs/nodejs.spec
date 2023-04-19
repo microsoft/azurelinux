@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.19.1
+%define npm_version 9.5.1
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        18.9.0
+Version:        18.16.0
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
@@ -114,7 +114,7 @@ make cctest
 
 %changelog
 * Wed Apr 12 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.9.0-1
-- Upgrade to 18.9.0
+- Upgrade to 18.16.0
 
 * Wed Mar 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.19.1-1
 - Auto-upgrade to 16.19.1 - to fix CVE-2023-23936
