@@ -1,3 +1,5 @@
+%global _default_patch_fuzz 1
+
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.4

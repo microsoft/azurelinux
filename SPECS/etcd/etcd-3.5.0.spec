@@ -1,3 +1,5 @@
+%global _default_patch_fuzz 1
+
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.0
@@ -54,7 +56,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%autosetup -p1
+%/autosetup -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
