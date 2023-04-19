@@ -10,7 +10,6 @@ Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        http://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
 BuildRequires:  bzip2-devel
-BuildRequires:  libbacktrace-static
 
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
