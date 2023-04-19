@@ -180,7 +180,7 @@ fi
 
 %changelog
 * Wed Apr 19 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-3
-* Patch CVE-2022-37601 for loader-utils npm module
+* Patch CVE-2022-37601 for webpack/loader-utils npm module
 
 * Tue Sep 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-2
 - Adding Runtime requirement on msopenjdk.
