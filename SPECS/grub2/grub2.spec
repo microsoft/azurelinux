@@ -284,7 +284,7 @@ GRUB_TIMEOUT=$(grep -w 'set timeout' /boot/grub2/grub.cfg | awk -F'=' 'NR==1{pri
 GRUB_DISABLE_SUBMENU=true
 GRUB_TERMINAL="serial console"
 GRUB_SERIAL_COMMAND="serial"
-GRUB_CMDLINE_LINUX="rd.auto=1 $(grep mariner_cmdline /boot/mariner.cfg | cut -d= -f2-) lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 console=ttyS0 $(grep systemd_cmdline /boot/systemd.cfg| cut -d= -f2-)"
+GRUB_CMDLINE_LINUX="rd.auto=1 $(grep mariner_cmdline /boot/mariner.cfg | cut -d= -f2-) lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 $(grep -o "console=[^[:space:]]*" /proc/cmdline |tr '\n' ' ') $(grep systemd_cmdline /boot/systemd.cfg| cut -d= -f2-)"
 GRUB_DISABLE_RECOVERY="true"
 GRUB_DEFAULT="saved"
 GRUB_DISTRIBUTOR="CBL-Mariner"
