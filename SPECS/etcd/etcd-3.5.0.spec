@@ -56,7 +56,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%/autosetup -p1
+%autosetup -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
