@@ -82,8 +82,8 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
--* Tue Apr 18 2023 Andrew Phelps anphel@microsoft.com - 2.0.0-3
--- Disable debuginfo package
+* Tue Apr 18 2023 Andrew Phelps anphel@microsoft.com - 2.0.0-3
+- Disable debuginfo package
 
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Add missing runtine for 2.0.0
