@@ -111,6 +111,7 @@ make cctest
 %defattr(-,root,root)
 %{_includedir}/*
 %{_docdir}/*
+%{_datadir}/systemtap/tapset/node.stp
 
 %changelog
 * Wed Apr 12 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.9.0-1
