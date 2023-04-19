@@ -12,7 +12,7 @@ URL:            https://www.ntop.org/
 Source0:        %{name}-%{version}.tar.gz
 #Source1:       https://github.com/ntop/nDPI/archive/%{nDPIver}.tar.gz
 Source1:        nDPI-%{nDPIver}.tar.gz
-Patch1:			CVE-2021-45985.patch
+Patch1:         CVE-2021-45985.patch
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel

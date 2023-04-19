@@ -15,7 +15,7 @@ URL:            https://www.memcached.org/
 Source0:        https://www.memcached.org/files/%{name}-%{version}.tar.gz
 Source1:        memcached.sysconfig
 Patch0:         memcached-unit.patch
-Patch1:			CVE-2021-45985.patch
+Patch1:         CVE-2021-45985.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
