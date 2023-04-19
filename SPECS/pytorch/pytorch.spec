@@ -1,8 +1,10 @@
 %global _empty_manifest_terminate_build 0
+# The pytorch-debuginfo package is nearly 2GB. Disable it unless we have a specific need for this package.
+%global debug_package %{nil}
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,6 +82,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+-* Tue Apr 18 2023 Andrew Phelps anphel@microsoft.com - 2.0.0-3
+-- Disable debuginfo package
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Add missing runtine for 2.0.0
 
