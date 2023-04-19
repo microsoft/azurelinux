@@ -37,6 +37,7 @@ Source1:        etcd.service
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source2:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2021-28235.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -53,7 +54,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%setup -q
+%autosetup -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build

@@ -42,6 +42,7 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2021-28235.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -58,7 +59,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%setup -q
+%autosetup -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
