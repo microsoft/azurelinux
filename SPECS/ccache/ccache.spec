@@ -38,9 +38,9 @@ make install DESTDIR=%{buildroot}
 * Wed Apr 19 2023 Saul Paredes <saulparedes@microsoft.com> - 3.6-3
 - Build without bundled zlib
 
-*   Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6-2
--   License verified.
--   Added 'Vendor' and 'Distribution' tags.
+* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-2
+- License verified.
+- Added 'Vendor' and 'Distribution' tags.
 
-*   Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 3.6-1
--   Original version for CBL-Mariner.
+* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 3.6-1
+- Original version for CBL-Mariner.
