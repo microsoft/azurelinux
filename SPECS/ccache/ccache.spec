@@ -18,6 +18,9 @@ compilations and detecting when the same compilation is being done again.
 %prep
 %setup -q
 
+pwd
+ls
+
 %build
 %configure --without-bundled-zlib
 make %{?_smp_mflags}
