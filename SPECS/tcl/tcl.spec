@@ -1,8 +1,8 @@
 Summary:        Tool Command Language - the language and library.
 Name:           tcl
-Version:        8.6.8
+Version:        8.6.13
 %define majorver 8.6
-Release:        3%{?dist}
+Release:        1%{?dist}
 URL:            http://tcl.sourceforge.net/
 License:        LGPLv2+
 Group:          System Environment/Libraries
@@ -99,6 +99,9 @@ make test
 
 
 %changelog
+* Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.6.13-1
+- Auto-upgrade to 8.6.13 - Fix CVE-2018-25032
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.8-3
 - Added %%license line automatically
 

@@ -8296,8 +8296,8 @@
         "type": "other",
         "other": {
           "name": "tcl",
-          "version": "8.6.8",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.8-src.tar.gz"
+          "version": "8.6.13",
+          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.13-src.tar.gz"
         }
       }
     },
