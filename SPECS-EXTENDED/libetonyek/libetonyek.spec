@@ -4,14 +4,14 @@ Distribution:   Mariner
 
 Name: libetonyek
 Version: 0.1.9
-Release: 8%{?dist}
+Release: 7%{?dist}
 Summary: A library for import of Apple iWork documents
 
 License: MPLv2.0
 URL: http://wiki.documentfoundation.org/DLP/Libraries/libetonyek
 Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
-BuildRequires: boost-devel <= 1.78.0
+BuildRequires: boost-devel
 BuildRequires: doxygen
 BuildRequires: gcc-c++
 BuildRequires: glm-devel
@@ -125,9 +125,6 @@ fi
 %{_mandir}/man1/pages2text.1*
 
 %changelog
-* Wed Apr 19 2023 Sam Meluch <sammeluch@microsoft.com> - 0.1.9-8
-- limit boost version after update to 1.82.0
-
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.9-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

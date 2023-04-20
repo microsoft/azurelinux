@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 9%{?dist}
+Release: 8%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://www.dyninst.org
@@ -23,7 +23,7 @@ Patch5: gcc-11-fix.patch
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
-BuildRequires: boost-devel <= 1.76.0
+BuildRequires: boost-devel
 BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
@@ -58,7 +58,7 @@ dyninst-doc contains API documentation for the Dyninst libraries.
 %package devel
 Summary: Header files for compiling programs with Dyninst
 Requires: dyninst = %{version}-%{release}
-Requires: boost-devel <= 1.76.0
+Requires: boost-devel
 Requires: tbb-devel
 
 %description devel
@@ -194,9 +194,6 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
-* Web Apr 19 2023 Sam Meluch <sammeluch@microsoft.com> - 10.1.0-9
-- limit boost version for update to 1.82.0
-
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 10.1.0-8
 - Rebuilt for glibc-static 2.35-3
 
