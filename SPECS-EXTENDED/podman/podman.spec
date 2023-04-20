@@ -36,7 +36,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -45,6 +45,7 @@ URL:            https://%{name}.io/
 Source0:        %{git0}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-%{shortcommit_plugins}.tar.gz
 Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-%{shortcommit_gvproxy}.tar.gz
+Patch0:         CVE-2022-2989.patch
 Provides:       %{name}-manpages = %{version}-%{release}
 BuildRequires:  go-md2man
 BuildRequires:  golang
@@ -225,7 +226,7 @@ gvisor-tap-vsock brings a configurable DNS server and
 dynamic port forwarding.
 
 %prep
-%autosetup -Sgit
+%autosetup -Sgit -p1
 sed -i 's;@@PODMAN@@\;$(BINDIR);@@PODMAN@@\;%{_bindir};' Makefile
 
 # untar dnsname
@@ -386,6 +387,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Thu Apr 20 2023 Amrita Kohli <amritakohli@microsoft.com> - 4.1.1-10
+- Patch CVE-2022-2989
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-9
 - Bump release to rebuild with go 1.19.8
 
