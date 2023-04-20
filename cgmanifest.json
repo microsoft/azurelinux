@@ -1746,7 +1746,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "clang",
+          "name": "clang16",
           "version": "16.0.0",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }
@@ -6480,8 +6480,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -7981,8 +7981,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.5+k3s2.tar.gz"
+          "version": "1.25.8",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.8+k3s1.tar.gz"
         }
       }
     },
@@ -7991,8 +7991,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.26.2",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.2+k3s1.tar.gz"
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.3+k3s1.tar.gz"
         }
       }
     },
@@ -8003,16 +8003,6 @@
           "name": "kata-containers",
           "version": "3.0.0",
           "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kata-containers-cc",
-          "version": "0.1.0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.1.0.tar.gz"
         }
       }
     },
@@ -8081,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -8091,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -11930,6 +11920,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.107.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "livepatch-5.15.48.1-4.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
@@ -12160,7 +12160,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "llvm",
+          "name": "llvm16",
           "version": "16.0.0",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }
@@ -14153,8 +14153,8 @@
         "type": "other",
         "other": {
           "name": "nmap",
-          "version": "7.92",
-          "downloadUrl": "https://nmap.org/dist/nmap-7.92.tar.bz2"
+          "version": "7.93",
+          "downloadUrl": "https://nmap.org/dist/nmap-7.93.tar.bz2"
         }
       }
     },
@@ -28187,8 +28187,8 @@
         "type": "other",
         "other": {
           "name": "tcl",
-          "version": "8.6.12",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.12-src.tar.gz"
+          "version": "8.6.13",
+          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.13-src.tar.gz"
         }
       }
     },
@@ -28629,6 +28629,16 @@
           "name": "tzdata",
           "version": "2023c",
           "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2023c.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uchardet",
+          "version": "0.0.6",
+          "downloadUrl": "https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.6.tar.xz"
         }
       }
     },

@@ -1,5 +1,5 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
-Name:           llvm
+Name:           llvm16
 Version:        16.0.0
 Release:        1%{?dist}
 License:        NCSA
@@ -15,7 +15,7 @@ BuildRequires:  ninja-build
 BuildRequires:  python3-devel
 Requires:       libxml2
 Provides:       %{name} = %{version}
-Provides:       llvm = %{version}-%{release}
+Provides:       %{name} = %{version}-%{release}
 
 %description
 The LLVM Project is a collection of modular and reusable compiler and toolchain technologies. Despite its name, LLVM has little to do with traditional virtual machines, though it does provide helpful libraries that can be used to build them. The name "LLVM" itself is not an acronym; it is the full name of the project.
@@ -29,7 +29,7 @@ The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
 %prep
-%setup -q -n %{name}-project-llvmorg-%{version}
+%setup -q -n llvm-project-llvmorg-%{version}
 
 %build
 # Disable symbol generation
@@ -89,7 +89,7 @@ ninja check-all
 
 %changelog
 * Wed Apr 05 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-1
-- Add spec for llvm-16
+- Add spec for llvm16
 
 * Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com> - 12.0.1-5
 - Workaround for llvm issue #49955 with patch

@@ -1976,6 +1976,7 @@
                 "ttmkfdir",
                 "tuna",
                 "twolame",
+                "uchardet",
                 "uclibc-ng",
                 "ucpp",
                 "ucs-miscfixed-fonts",
@@ -2151,11 +2152,11 @@
                 "ivykis",
                 "jsonbuilder",
                 "jx",
-                "kata-containers-cc",
                 "keda",
                 "keras",
                 "kernel-azure-signed",
                 "kernel-hci-signed",
+                "kernel-mstflint-signed",
                 "kernel-signed",
                 "KeysInUse-OpenSSL",
                 "kpatch",
@@ -2176,6 +2177,7 @@
                 "libuv",
                 "libxml++",
                 "livepatch-5.15.102.1-1.cm2",
+                "livepatch-5.15.107.1-1.cm2",
                 "livepatch-5.15.48.1-4.cm2",
                 "livepatch-5.15.48.1-4.cm2-signed",
                 "livepatch-5.15.72.1-1.cm2",
@@ -2590,7 +2592,7 @@
                 "chrpath",
                 "cifs-utils",
                 "clang",
-                "clang-16",
+                "clang16",
                 "cloud-init",
                 "cloud-utils-growpart",
                 "cmake",
@@ -2792,7 +2794,7 @@
                 "lldb",
                 "lldpad",
                 "llvm",
-                "llvm-16",
+                "llvm16",
                 "lm-sensors",
                 "lmdb",
                 "log4cpp",
@@ -3056,7 +3058,7 @@
             "specs": [
                 "k3s",
                 "k3s-1.24.6",
-                "k3s-1.25.5"
+                "k3s-1.25.8"
             ]
         },
         "Sysbench source": {

@@ -6,8 +6,8 @@
 %define k3s_binary    k3s
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.25.5
-Release:        2%{?dist}
+Version:        1.25.8
+Release:        1%{?dist}
 License:        ASL 2.0
 # Note: k3s is not exclusive with coredns, etcd, containerd, runc and other CBL-Mariner packages which it embeds.
 # This means there may be multiple versions of these packages. At this time exclusivity is not being enforced to
@@ -16,14 +16,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://k3s.io
-Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s2.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We are also pre-cloning 3 git repositories
 # How to re-build this file:
-# 1. wget https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s2.tar.gz -O %%{name}-%%{version}.tar.gz
+# 1. wget https://github.com/k3s-io/%%{name}/archive/refs/tags/v%%{version}+k3s1.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. tar -xf %%{name}-%%{version}.tar.gz
-# 3. cd %%{name}-%%{version}-k3s2
+# 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
 # 6. git clone --single-branch --branch="v1.6.18" --depth=1 https://github.com/k3s-io/containerd
@@ -32,7 +32,7 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         vendor_build-1.25.5.patch
+Patch0:         vendor_build-1.25.8.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  git
 BuildRequires:  golang <= 1.18.8
@@ -45,7 +45,7 @@ ExclusiveArch:  x86_64
 The certified Kubernetes distribution built for IoT & Edge computing.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-k3s2
+%autosetup -p1 -n %{name}-%{version}-k3s1
 tar -xvf %{SOURCE1}
 
 %build
@@ -82,11 +82,8 @@ exit 0
 %{install_sh}
 
 %changelog
-* Tue Apr 11 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-2
-- Addressed CVE for containerd and changed it to the new patched version 1.6.18
-
-* Wed Apr 05 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.5-1
-- Updated k3s to 1.25.5
+* Mon Apr 17 2023 Anuj Garg <anujgarg@microsoft.com> - 1.25.8-1
+- Updated k3s to 1.25.8
 
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-7
 - Bump release to rebuild with go 1.19.7
