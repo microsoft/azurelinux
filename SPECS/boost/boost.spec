@@ -2,13 +2,14 @@
 Summary:        Boost
 Name:           boost
 Version:        1.76.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
+Patch0:         upgrade-zlib-1.2.12.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
 
@@ -35,7 +36,7 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%autosetup -n %{name}_%{underscore_version}
+%autosetup -n %{name}_%{underscore_version} -p1
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
@@ -62,6 +63,10 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %{_libdir}/libboost_*.a
 
 %changelog
+* Thu Apr 20 2023 Sam Meluch <sammeluch@microsoft.com> - 1.76.0-3
+- Add patch for zlib
+- run spec linter
+
 * Wed Dec 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.76.0-2
 - Making Boost build its static libbost_stacktrace_backtrace.a lib.
 
