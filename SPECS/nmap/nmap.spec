@@ -1,7 +1,7 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.90
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://nmap.org/
 Source0:        https://nmap.org/dist/%{name}-%{version}.tar.bz2
 ## https://github.com/nmap/nmap/commit/f6b40614e4a8131394792d590965f8af3c635323.patch
 Patch0:         nmap-unix_crash.patch
+Patch1:         update_zlib_1.2.12.patch
 BuildRequires:  binutils
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
@@ -59,6 +60,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Tue Apr 18 2023 Saul Paredes <saulparedes@microsoft.com> 7.90-3
+- patch to update zlib to 1.2.12
+
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 7.90-2
 - nmap-unix_crash.patch fix for crash with unix sockets.
 
