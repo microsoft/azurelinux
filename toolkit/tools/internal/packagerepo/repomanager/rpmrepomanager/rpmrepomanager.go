@@ -46,6 +46,23 @@ func CreateRepo(repoDir string) (err error) {
 	return
 }
 
+// sanitizeOutput will take the raw output from an RPM command and split by new line,
+// trimming whitespace and removing blank lines.
+func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
+       rawSplitOutput := strings.Split(rawResults, "\n")
+
+       for _, line := range rawSplitOutput {
+               trimmedLine := strings.TrimSpace(line)
+               if trimmedLine == "" {
+                       continue
+               }
+
+               sanitizedOutput = append(sanitizedOutput, trimmedLine)
+       }
+
+       return
+}
+
 // OrganizePackagesByArch will recursively move RPMs from srcDir into architecture folders under repoDir
 func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 	const noArch = "noarch"
@@ -77,7 +94,27 @@ func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 		}
 
 		for _, rpmFile := range rpmFiles {
-			dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
+			//dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
+			// rpmFile is the real RPM filename. It might not match the filename generated from RPM metadata inside of it (%{nvra}.rpm)
+			commandArgs := []string{"-qp"}
+			commandArgs = append(commandArgs, "-qf")
+			commandArgs = append(commandArgs, "'%{nvra}.rpm'")
+			commandArgs = append(commandArgs, rpmFile)
+			stdout, stderr, err = shell.Execute("rpm", commandArgs...)
+			if err != nil {
+					logger.Log.Warn(stderr)
+			}
+			queryRpmPath := sanitizeOutput(stdout)
+			calculatedRpmFilename := fmt.Sprintf("%s.rpm", queryRpmPath[0])
+			logger.Log.Tracef("calculatedRpmFilename == '%s' rpmFile == '%s'", calculatedRpmFilename, filepath.Base(rpmFile))
+			if calculatedRpmFilename != filepath.Base(rpmFile) {
+				// "!!!!! Detected mismatch filename !!!!!!
+				// 		calulated == 'msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64.rpm'
+				//		actual    == 'msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm'
+				logger.Log.Warnf("!!!!! Detected mismatch filename !!!!!! calulated == '%s' actual == '%s'", calculatedRpmFilename, filepath.Base(rpmFile))
+			}
+			// cat ../build/logs/pkggen/workplan/cached_graph.dot.log | grep msopenjdk
+			dstFile := filepath.Join(repoDir, arch, filepath.Base(calculatedRpmFilename))
 			err = file.Move(rpmFile, dstFile)
 			if err != nil {
 				logger.Log.Warnf("Unable to move (%s) to (%s)", rpmFile, dstFile)
