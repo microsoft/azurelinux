@@ -1,0 +1,19 @@
+diff --git a/ncat/http_digest.c b/ncat/http_digest.c
+index b5f80a9..7877887 100644
+--- a/ncat/http_digest.c
++++ b/ncat/http_digest.c
+@@ -133,10 +133,10 @@ int http_digest_init_secret(void)
+     return 0;
+ }
+ 
+-#if OPENSSL_API_LEVEL < 10100
+-#define EVP_MD_CTX_new EVP_MD_CTX_create
+-#define EVP_MD_CTX_free EVP_MD_CTX_destroy
+-#endif
++// #if OPENSSL_API_LEVEL < 10100
++// #define EVP_MD_CTX_new EVP_MD_CTX_create
++// #define EVP_MD_CTX_free EVP_MD_CTX_destroy
++// #endif
+ static char *make_nonce(const struct timeval *tv)
+ {
+     char *buf = NULL;
