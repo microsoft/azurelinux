@@ -94,27 +94,22 @@ func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 		}
 
 		for _, rpmFile := range rpmFiles {
-			//dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
-			// rpmFile is the real RPM filename. It might not match the filename generated from RPM metadata inside of it (%{nvra}.rpm)
+			// rpmFile is the real RPM filename.
+			// use rpm to check the "%{nvra}.rpm" filename based on metadata
+			// Print a warning if they do not match
 			commandArgs := []string{"-qp"}
-			commandArgs = append(commandArgs, "-qf")
-			commandArgs = append(commandArgs, "'%{nvra}.rpm'")
-			commandArgs = append(commandArgs, rpmFile)
+			commandArgs = append(commandArgs, "-qf", "'%{nvra}.rpm'", rpmFile)
 			stdout, stderr, err = shell.Execute("rpm", commandArgs...)
-			if err != nil {
-					logger.Log.Warn(stderr)
+			if err == nil {
+				queryRpmPath := strings.Split(stdout, "\n")
+				calculatedRpmFilename := fmt.Sprintf("%s.rpm", queryRpmPath[0])
+				if calculatedRpmFilename != filepath.Base(rpmFile) {
+					logger.Log.Warnf("!!!!! Detected mismatch filename !!!!!!")
+					logger.Log.Warnf("---- calulated == '%s'", calculatedRpmFilename)
+					logger.Log.Warnf("---- actual    == '%s'", filepath.Base(rpmFile))
+				}
 			}
-			queryRpmPath := sanitizeOutput(stdout)
-			calculatedRpmFilename := fmt.Sprintf("%s.rpm", queryRpmPath[0])
-			logger.Log.Tracef("calculatedRpmFilename == '%s' rpmFile == '%s'", calculatedRpmFilename, filepath.Base(rpmFile))
-			if calculatedRpmFilename != filepath.Base(rpmFile) {
-				// "!!!!! Detected mismatch filename !!!!!!
-				// 		calulated == 'msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64.rpm'
-				//		actual    == 'msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm'
-				logger.Log.Warnf("!!!!! Detected mismatch filename !!!!!! calulated == '%s' actual == '%s'", calculatedRpmFilename, filepath.Base(rpmFile))
-			}
-			// cat ../build/logs/pkggen/workplan/cached_graph.dot.log | grep msopenjdk
-			dstFile := filepath.Join(repoDir, arch, filepath.Base(calculatedRpmFilename))
+			dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
 			err = file.Move(rpmFile, dstFile)
 			if err != nil {
 				logger.Log.Warnf("Unable to move (%s) to (%s)", rpmFile, dstFile)
