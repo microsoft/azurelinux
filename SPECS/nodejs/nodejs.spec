@@ -114,7 +114,7 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Wed Apr 12 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.9.0-1
+* Wed Apr 12 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.16.0-1
 - Upgrade to 18.16.0
 
 * Wed Mar 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.19.1-1
