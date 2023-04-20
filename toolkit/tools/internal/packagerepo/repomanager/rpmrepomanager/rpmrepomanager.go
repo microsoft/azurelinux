@@ -37,12 +37,77 @@ func CreateRepo(repoDir string) (err error) {
 		return
 	}
 
+/*
+	logger.Log.Info("executing ls -lR ", repoDir)
+	rstdout, rstderr, rerr := shell.Execute("ls", "-lR", repoDir)
+	if rerr != nil {
+		logger.Log.Warn(rstderr)
+	}
+	logger.Log.Info("repoDir contents",repoDir)
+	logger.Log.Info(rstdout)
+*/
 	// Create a new repodata
 	_, stderr, err := shell.Execute("createrepo", repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
 	}
 
+//	logger.Log.Info("executing ls -lR ", "/etc/yum.repos.d")
+//	rstdout, rstderr, rerr = shell.Execute("ls", "-lR", "/etc/yum.repos.d")
+//	if rerr != nil {
+//		logger.Log.Warn(rstderr)
+//	}
+//	logger.Log.Info("/etc/yum.repos.d contents")
+//	logger.Log.Info(rstdout)
+//	logger.Log.Infof("/etc/yum.repos.d contents Infof")
+//	logger.Log.Infof(rstdout)
+
+/*
+	logger.Log.Info("executing tdnf repolist in chroot")
+	rstdout, rstderr, rerr = shell.Execute("tdnf", "repolist")
+	if rerr != nil {
+		logger.Log.Warn(rstderr)
+		logger.Log.Warn(rerr)
+	}
+	logger.Log.Info("actual tdnf repolist")
+	logger.Log.Info(rstdout)
+	rstdout, rstderr, rerr = shell.Execute("cat","/etc/tdnf/tdnf.conf")
+	if rerr != nil {
+		logger.Log.Warn(rstderr)
+		logger.Log.Warn(rerr)
+	}
+	logger.Log.Info("/etc/tdnf/tdnf.conf")
+	logger.Log.Info(rstdout)
+
+	logger.Log.Info("executing tdnf repolist in chroot")
+	rstdout, rstderr, rerr = shell.Execute("tdnf", "repolist", "--releasever", "2.0")
+	if rerr != nil {
+		logger.Log.Warn(rstderr)
+		logger.Log.Warn(rerr)
+	}
+	logger.Log.Info("actual tdnf repolist --releasever 2.0")
+	logger.Log.Infof(rstdout)
+
+	logger.Log.Info("executing sudo tdnf list all --releasever 2.0")
+	rstdout, rstderr, rerr = shell.Execute("tdnf", "list", "all", "--releasever", "2.0")
+	if rerr != nil {
+		logger.Log.Warn(rstderr)
+		logger.Log.Warn(rerr)
+	}
+	logger.Log.Info("actual tdnf list all --releasever 2.0")
+	logger.Log.Infof(rstdout)
+
+
+	logger.Log.Info("executing sudo tdnf list all")
+	rstdout, rstderr, rerr = shell.Execute("tdnf", "list", "all")
+	if rerr != nil {
+		logger.Log.Warn(rstderr)
+		logger.Log.Warn(rerr)
+	}
+	logger.Log.Info("actual tdnf list all")
+	logger.Log.Info(rstdout)
+//"sudo tdnf list all"
+*/
 	return
 }
 

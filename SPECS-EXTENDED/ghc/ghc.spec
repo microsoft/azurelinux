@@ -5,7 +5,7 @@ Distribution:   Mariner
 %bcond_with quickbuild
 
 # make sure ghc libraries' ABI hashes unchanged
-%bcond_without abicheck
+%bcond_with abicheck
 
 %global ghc_major 8.10
 
@@ -121,6 +121,7 @@ BuildRequires: gmp-devel
 BuildRequires: hscolour
 BuildRequires: libffi-devel
 BuildRequires: make
+BuildRequires: glibc-static >= 2.35-3%{?dist}
 # for terminfo
 BuildRequires: ncurses-devel
 BuildRequires: perl-interpreter

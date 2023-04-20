@@ -1,0 +1,37 @@
+[fedora]
+name=Fedora 37 - $basearch
+#baseurl=http://download.example/pub/fedora/linux/releases/37/Everything/$basearch/os/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-37&arch=$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-37-x86_64
+#$basearch
+skip_if_unavailable=False
+
+[fedora-debuginfo]
+name=Fedora 37 - $basearch - Debug
+#baseurl=http://download.example/pub/fedora/linux/releases/37/Everything/$basearch/debug/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-debug-37&arch=$basearch
+enabled=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-37-$basearch
+skip_if_unavailable=False
+
+[fedora-source]
+name=Fedora 37 - Source
+#baseurl=http://download.example/pub/fedora/linux/releases/37/Everything/source/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-source-37&arch=$basearch
+enabled=0
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-37-$basearch
+skip_if_unavailable=False

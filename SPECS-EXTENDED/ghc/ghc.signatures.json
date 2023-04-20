@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "ghc-8.10.7-src.tar.xz": "e3eef6229ce9908dfe1ea41436befb0455fefb1932559e860ad4c606b0d03c9d",
+  "ghc-8.10.7-src.tar.xz.sig": "2a37a070839ada54ab7b9d7d1f062ad1fe3e24d97e58fbd510a304492d0b2ce6",
+  "ghc-pkg.man": "66bf0e6129fd3555b5ed096c1891768dbdf10a5e61e2754b00d456f1226f69f8",
+  "haddock.man": "866b1c30382debb6f876ff7d1ea9440147f53a005a28b335113850692c68f9a0",
+  "runghc.man": "e8f26651af5c2316b40b91b200e00cc475461ea6276ade072f44d93ca29bb8de"
+ }
+}

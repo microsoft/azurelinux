@@ -328,6 +328,11 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			}
 		}
 
+                logger.Log.Info("Evaluating macro")
+                queryResults,err = rpm.EvalMacro();
+                logger.Log.Info("Evaluated macro", queryResults, err)
+                logger.Log.Info("=====================")
+
 		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
 		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
 		if err == nil && len(queryResults) != 0 {

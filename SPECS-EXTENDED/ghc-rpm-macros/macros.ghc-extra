@@ -33,7 +33,7 @@ Summary:        Haskell %{pkgname} library development files\
 %{-l:License:        %{-l*}}\
 Provides:       %{basepkg}-static = %{pkgver}-%{release}\
 Provides:       %{basepkg}-static%{?_isa} = %{pkgver}-%{release}\
-Requires:       %{ghc_prefix}-compiler = %{ghc_version}%{?ghc_version_override:-%{release}}\
+#Requires:       %{ghc_prefix}-compiler = %{ghc_version}%{?ghc_version_override:-%{release}}\
 %if 0%{!-m:1}\
 Requires:       %{ghc_prefix}-%{pkgname}%{?_isa} = %{pkgver}-%{release}\
 %endif\

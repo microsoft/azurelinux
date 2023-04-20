@@ -1,0 +1,89 @@
+fedora-7-primary: i386 x86_64 ppc ppc64
+
+fedora-8-primary: i386 x86_64 ppc ppc64
+fedora-8-primary-original:
+
+fedora-9-primary: i386 x86_64 ppc ppc64
+fedora-9-primary-original:
+fedora-9-secondary: ia64
+
+fedora-10-primary: i386 x86_64 ppc ppc64
+
+fedora-11-primary: i386 x86_64 ppc ppc64
+fedora-11-secondary: mips s390x sparc sparc64
+
+fedora-12-primary: i386 x86_64 ppc ppc64
+fedora-12-secondary: mips s390x sparc sparc64
+
+fedora-13-primary: i386 x86_64 armhfp
+fedora-13-secondary: arm mips
+
+fedora-14-primary: i386 x86_64
+fedora-14-secondary: arm
+
+fedora-15-primary: i386 x86_64
+fedora-15-secondary: arm armhfp ppc ppc64 s390 s390x
+
+fedora-16-primary: i386 x86_64
+fedora-16-secondary: arm armhfp ppc ppc64 s390 s390x
+
+fedora-17-primary: i386 x86_64
+fedora-17-secondary: arm armhfp ppc ppc64 s390 s390x
+
+fedora-18-primary: i386 x86_64
+fedora-18-secondary: arm armhfp ppc ppc64 s390 s390x
+
+fedora-19-primary: i386 x86_64
+fedora-19-secondary: armhfp ppc ppc64 s390 s390x
+
+fedora-20-primary: i386 x86_64 armhfp
+fedora-20-secondary: ppc ppc64 s390 s390x
+
+fedora-21-primary: i386 x86_64 armhfp
+fedora-21-secondary: aarch64 ppc64 ppc64le s390 s390x
+
+fedora-22-primary: i386 x86_64 armhfp
+fedora-22-secondary: aarch64 ppc64 ppc64le s390 s390x
+
+fedora-23-primary: i386 x86_64 armhfp
+fedora-23-secondary: aarch64 ppc64 ppc64le s390 s390x
+
+fedora-24-primary: i386 x86_64 armhfp
+fedora-24-secondary: aarch64 ppc64 ppc64le s390x
+
+fedora-25-primary: i386 x86_64 armhfp
+fedora-25-secondary: aarch64 ppc64 ppc64le s390x
+
+fedora-26-primary: i386 x86_64 armhfp aarch64 ppc64 ppc64le
+fedora-26-secondary: s390x
+
+fedora-27-primary: i386 x86_64 armhfp aarch64 ppc64 ppc64le s390x
+
+fedora-28-primary: i386 x86_64 armhfp aarch64 ppc64 ppc64le s390x
+
+fedora-29-primary: i386 x86_64 armhfp aarch64 ppc64 ppc64le s390x
+fedora-modularity:
+
+fedora-30-primary: i386 x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-iot-2019: i386 x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-31-primary: i386 x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-32-primary: i386 x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-33-primary: i386 x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-34-primary: i386 x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-35-primary: x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-36-primary: x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-37-primary: x86_64 armhfp aarch64 ppc64le s390x
+
+fedora-38-primary: x86_64 aarch64 ppc64le s390x
+
+fedora-39-primary: x86_64 aarch64 ppc64le s390x
+
+fedora-40-primary: x86_64 aarch64 ppc64le s390x

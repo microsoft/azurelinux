@@ -1,0 +1,22 @@
+# This is a repo that contains all the old update packages from the
+# Fedora updates yum repository (i.e. the packages that have made it
+# to "stable"). This repo is needed for OSTree based systems where users
+# may be trying to layer packages on top of a base layer that doesn't
+# have the latest stable content. Since base layer content is locked
+# the package layering operation will fail unless there are older versions
+# of packages available.
+#
+# This repo is given a high cost in order to prefer the normal Fedora
+# yum repositories, which means only packages that can't be found
+# elsewhere will be downloaded from here.
+[updates-archive]
+name=Fedora $releasever - $basearch - Updates Archive
+baseurl=https://fedoraproject-updates-archive.fedoraproject.org/fedora/$releasever/$basearch/
+enabled=AUTO_VALUE
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+skip_if_unavailable=True
+cost=10000 # default is 1000

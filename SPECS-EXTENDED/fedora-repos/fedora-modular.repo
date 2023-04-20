@@ -1,0 +1,36 @@
+[fedora-modular]
+name=Fedora Modular $releasever - $basearch
+#baseurl=http://download.example/pub/fedora/linux/releases/$releasever/Modular/$basearch/os/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-modular-$releasever&arch=$basearch
+enabled=AUTO_VALUE
+countme=1
+metadata_expire=AUTO_VALUE
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+skip_if_unavailable=False
+
+[fedora-modular-debuginfo]
+name=Fedora Modular $releasever - $basearch - Debug
+#baseurl=http://download.example/pub/fedora/linux/releases/$releasever/Modular/$basearch/debug/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-modular-debug-$releasever&arch=$basearch
+enabled=0
+metadata_expire=AUTO_VALUE
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+skip_if_unavailable=False
+
+[fedora-modular-source]
+name=Fedora Modular $releasever - Source
+#baseurl=http://download.example/pub/fedora/linux/releases/$releasever/Modular/source/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-modular-source-$releasever&arch=$basearch
+enabled=0
+metadata_expire=AUTO_VALUE
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+skip_if_unavailable=False

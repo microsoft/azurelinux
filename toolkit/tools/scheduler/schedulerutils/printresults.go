@@ -6,6 +6,7 @@ package schedulerutils
 import (
 	"encoding/csv"
 	"os"
+	"strings"
 	"path/filepath"
 	"sync"
 
@@ -136,6 +137,122 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	err = csvWriter.WriteAll(csvBlob)
 	if err != nil {
 		logger.Log.Warnf("Failed to write to CSV file '%s'. Error: %s", outputPath, err)
+	}
+}
+
+func ResolveUnresolvedNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
+	failedSRPMs := make(map[string]bool)
+	failures := buildState.BuildFailures()
+	for _, failure := range failures {
+		failedSRPMs[failure.Node.SrpmPath] = true
+	}
+
+	prebuiltSRPMs := make(map[string]bool)
+	builtSRPMs := make(map[string]bool)
+	unbuiltSRPMs := make(map[string]bool)
+	unresolvedDependencies := make(map[string]bool)
+//	unresolvedPkgs := make(map[string]bool)
+	rpmConflicts := buildState.ConflictingRPMs()
+	srpmConflicts := buildState.ConflictingSRPMs()
+
+	conflictsLogger := logger.Log.Errorf
+	if allowToolchainRebuilds || (len(rpmConflicts) == 0 && len(srpmConflicts) == 0) {
+		conflictsLogger = logger.Log.Infof
+	}
+
+	buildNodes := pkgGraph.AllBuildNodes()
+	for _, node := range buildNodes {
+		if buildState.IsNodeCached(node) {
+			prebuiltSRPMs[node.SrpmPath] = true
+			continue
+		} else if buildState.IsNodeAvailable(node) {
+			builtSRPMs[node.SrpmPath] = true
+			continue
+		}
+
+		_, found := failedSRPMs[node.SrpmPath]
+		if !found {
+			unbuiltSRPMs[node.SrpmPath] = true
+		}
+	}
+
+	for _, node := range pkgGraph.AllRunNodes() {
+		if node.State == pkggraph.StateUnresolved {
+			unresolvedpkgname := node.VersionedPkg.String() 
+                        idx := strings.Index(unresolvedpkgname, ":")
+//                        if idx == -1 {
+//				unresolvedpkgname = node.VersionedPkg.String()
+//                        }
+                        unresolvedpkgname = unresolvedpkgname[:idx+1]
+			unresolvedDependencies[node.VersionedPkg.String()] = true
+		}
+	}
+
+	logger.Log.Info("---------------------------")
+	logger.Log.Info("--------- Unresolved Summary ---------")
+	logger.Log.Info("---------------------------")
+
+	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
+
+	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
+		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
+	}
+
+	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
+		conflictsLogger("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
+		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
+	}
+
+	if len(builtSRPMs) != 0 {
+		logger.Log.Info("Built SRPMs:")
+		for srpm := range builtSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(prebuiltSRPMs) != 0 {
+		logger.Log.Info("Prebuilt SRPMs:")
+		for srpm := range prebuiltSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(failures) != 0 {
+		logger.Log.Info("Failed SRPMs:")
+		for _, failure := range failures {
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		}
+	}
+
+	if len(unbuiltSRPMs) != 0 {
+		logger.Log.Info("Blocked SRPMs:")
+		for srpm := range unbuiltSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(unresolvedDependencies) != 0 {
+		logger.Log.Info("Unresolved dependencies:")
+		for dependency := range unresolvedDependencies {
+			logger.Log.Infof("--> %s", dependency)
+		}
+	}
+
+	if len(rpmConflicts) != 0 {
+		conflictsLogger("RPM conflicts with toolchain: ")
+		for _, conflict := range rpmConflicts {
+			conflictsLogger("--> %s", conflict)
+		}
+	}
+
+	if len(srpmConflicts) != 0 {
+		conflictsLogger("SRPM conflicts with toolchain: ")
+		for _, conflict := range srpmConflicts {
+			conflictsLogger("--> %s", conflict)
+		}
 	}
 }
 

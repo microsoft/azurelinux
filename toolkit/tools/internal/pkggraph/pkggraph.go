@@ -11,16 +11,22 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+//	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+//	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/getRPM"
+//	"github.com/microsoft/CBL-Mariner/toolkit/tools/graphpkgfetcher"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/versioncompare"
+//        "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/encoding"
@@ -124,6 +130,96 @@ func (n NodeState) String() string {
 		return "error"
 	}
 }
+
+func downloadRPMs(unique_strings map[string]bool)(){
+	if len(unique_strings) == 0 {
+		logger.Log.Infof("No packages to download")
+		return
+	}
+	pkgList := "packagelist.txt"
+	outDir  := "/home/sindhu/CBL-Mariner-pandoc/CBL-Mariner-pandoc/out/RPMS/"
+	pkgFile := outDir+pkgList
+	logger.Log.Infof("Preparing packageList file %s ", pkgFile)
+	file, err := os.Create(pkgFile)
+	if err != nil {
+		if os.IsExist(err) {
+			file, err = os.OpenFile(pkgFile, os.O_WRONLY, 0644)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+			fmt.Println("Opened existing file for writing.")
+		}
+		 panic(err)
+	}
+	for unique_string, _ := range (unique_strings){
+	  	logger.Log.Infof("writing unique strings %s to file %s", unique_string, pkgFile)
+		pathParts := strings.Split(unique_string, "/")
+	        pathLen := len(pathParts)
+	        if pathLen >= 2 {
+	            fmt.Printf("Last two words: %s, %s\n", pathParts[pathLen-2], pathParts[pathLen-1])
+	              arch := pathParts[pathLen-2]
+	            pkgname := pathParts[pathLen-1]
+	       	    for i, c := range pkgname {
+	            if unicode.IsDigit(c) {
+	                substr := pkgname[:i-1]
+		        fmt.Printf("Package name is %s arch is %s\n", substr, arch)
+		        fmt.Printf("pkgname %s\n", substr)
+			substr = substr + "\n"
+			_, err = file.WriteString(substr)
+			if err != nil {
+				panic(err)
+			}
+	
+	                break
+	            }
+	            }
+	        } else {
+	            fmt.Println("Invalid path")
+	        }
+	}
+	// flush the output buffer to ensure all data is written to the file
+	err = file.Sync()
+	if err != nil {
+		panic(err)
+	}
+	logger.Log.Info("Invoke script to download RPMs")
+        rstdout, rstderr, rerr := shell.Execute("/home/sindhu/tools/tools/import_specs/import-RPMs.sh", "fedora")
+        logger.Log.Infof("invoked script stdout %s stderr %s rerr %s", rstdout, rstderr, rerr)
+	return
+}
+/*
+func getRPM(node *PkgNode){
+        // Create the worker environment
+        cloner := rpmrepocloner.New()
+        outDir := "/home/sindhu/CBL-Mariner-pandoc/CBL-Mariner-pandoc/out/RPMS"
+        tmpDir := "/home/sindhu/CBL-Mariner-pandoc/CBL-Mariner-pandoc/build/pkg_artifacts/tdnf_cache_worker"
+        workertar := "/home/sindhu/CBL-Mariner-pandoc/CBL-Mariner-pandoc/build/worker/worker_chroot.tar.gz"
+        existingRpmDir := "/home/sindhu/CBL-Mariner-pandoc/CBL-Mariner-pandoc/out/RPMS"
+        usePreviewRepo := true
+        repoFiles := []string{"../SPECS/mariner-repos/fedora.repo"}
+        var err error
+        err = cloner.Initialize(outDir, tmpDir, workertar, existingRpmDir, usePreviewRepo, repoFiles)
+        if err != nil {
+                logger.Log.Errorf("Failed to initialize RPM repo cloner. Error: %s", err)
+                return
+        }
+        defer cloner.Close()
+        fetchedPackages := make(map[string]bool)
+        prebuiltPackages := make(map[string]bool)
+        var toolchainPackages []string
+
+        resolveErr := resolveSingleNode(cloner, node, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
+        // Failing to clone a dependency should not halt a build.
+        // The build should continue and attempt best effort to build as many packages as possible.
+        if resolveErr != nil {
+                errorMessage := strings.Builder{}
+                errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", node))
+         }
+
+
+}
+*/
 
 func (n NodeType) String() string {
 	switch n {
@@ -1120,13 +1216,39 @@ func (g *PkgGraph) CreateSubGraph(rootNode *PkgNode) (subGraph *PkgGraph, err er
 	return
 }
 
+func IsSRPMPrebuilt_check(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex, unique_strings *map[string]bool) (isPrebuilt bool, expectedFiles, missingFiles []string) {
+	expectedFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
+	isPrebuilt, missingFiles = findAllRPMS(expectedFiles)
+
+        for _, missingrpm := range missingFiles {
+                (*unique_strings)[missingrpm] = true 
+        }
+
+//        for key, _ := range (*unique_strings){
+//        	logger.Log.Infof("unique Missing RPMs %s", key)
+//        }
+
+/*
+	isPrebuilt, missingFiles = findAllRPMS_fedora(expectedFiles)
+	if len(missingFiles) != 0 {
+		downloadRPMs(*unique_strings)
+		isPrebuilt, missingFiles = findAllRPMS_fedora(expectedFiles)
+		if len(missingFiles) == 0 {
+			srpmPath =  strings.ReplaceAll(srpmPath, "cm2", "fc37")
+			logger.Log.Infof("Got all missing RPMS from fedora. modified SRPM path to %s", srpmPath)
+		}
+	}
+*/
+	return
+}
+
 // IsSRPMPrebuilt checks if an SRPM is prebuilt, returning true if so along with a slice of corresponding prebuilt RPMs.
 // The function will lock 'graphMutex' before performing the check if the mutex is not nil.
 func IsSRPMPrebuilt(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, expectedFiles, missingFiles []string) {
 	expectedFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
-	logger.Log.Tracef("Expected RPMs from %s: %v", srpmPath, expectedFiles)
+//	logger.Log.Tracef("Expected RPMs from %s: %v", srpmPath, expectedFiles)
 	isPrebuilt, missingFiles = findAllRPMS(expectedFiles)
-	logger.Log.Tracef("Missing RPMs from %s: %v", srpmPath, missingFiles)
+//	logger.Log.Tracef("Missing RPMs from %s: %v", srpmPath, missingFiles)
 	return
 }
 
@@ -1235,7 +1357,18 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 // - all nodes are from the same spec file or
 // - at least one of the nodes of the cycle represents a pre-built SRPM.
 func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
-	logger.Log.Debugf("Found cycle: %v", cycle)
+        unique_rpms := map[string]bool{}
+        for _, node := range cycle {
+		logger.Log.Infof("Found cycle rpm: %s", node.RpmPath)
+		logger.Log.Infof("Found cycle rpm NodeState: %s", node.State)
+		logger.Log.Infof("Found cycle rpm NodeType: %s", node.Type)
+                unique_rpms[node.RpmPath] = true
+		logger.Log.Infof("Found cycle rpm arch: %s", node.Architecture)
+        }
+        for key, _ := range (unique_rpms){
+        	logger.Log.Infof("unique RPMs %s", key)
+        } 
+	logger.Log.Infof("Found cycle: %v", cycle)
 
 	// Omit the first element of the cycle, since it is repeated as the last element
 	trimmedCycle := cycle[1:]
@@ -1245,7 +1378,16 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
 		return
 	}
 
-	return g.fixPrebuiltSRPMsCycle(trimmedCycle)
+	logger.Log.Infof("Trying to fix SRPMsCycle phase1 with existing RPMs")
+	err = g.fixPrebuiltSRPMsCycle(trimmedCycle, false)
+	if err == nil {
+		return
+	}
+//        g.tryfixPrebuiltSRPMsCycle(trimmedCycle)
+	logger.Log.Infof("Trying to fix SRPMsCycle phase2 download RPMs")
+	g.fixPrebuiltSRPMsCycle(trimmedCycle, true)
+	logger.Log.Infof("Trying to fix SRPMsCycle phase3 use downloaded RPMs")
+	return g.fixPrebuiltSRPMsCycle(trimmedCycle, false)
 }
 
 // fixIntraSpecCycle attempts to fix a cycle if none of the cycle nodes are build nodes.
@@ -1313,12 +1455,22 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 	return
 }
 
+/*
+func (g *PkgGraph) tryfixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) () {
+     for _, node := range trimmedCycle {
+        logger.Log.Info("Trying to get RPM for ", node.SrpmPath)
+        getRPM(node)
+     }
+}
+*/
 // fixPrebuiltSRPMsCycle attempts to fix a cycle if at least one node is a pre-built SRPM.
 // If a cycle can be fixed, edges representing the build dependencies of the pre-built SRPM will be removed.
-func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
+func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode, getRPM bool) (err error) {
 	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
 
+        unique_strings := map[string]bool{}
 	currentNode := trimmedCycle[len(trimmedCycle)-1]
+        logger.Log.Info("SRPM in cycle", currentNode.SrpmPath)
 	for _, previousNode := range trimmedCycle {
 		// Why we're targetting only "build node -> run node" edges:
 		// 1. Explicit package rebuilds create an edge between the goal node and an SRPM's run nodes.
@@ -1326,7 +1478,21 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 		// 2. Every build cycle must contain at least one edge between a build node and a run node from different SRPMs.
 		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
 		buildToRunEdge := previousNode.Type == TypeBuild && currentNode.Type == TypeRun
-		if isPrebuilt, _, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
+//                currentNode.SrpmPath
+//                currentNode.Architecture
+                 
+                logger.Log.Info("SRPM in cycle ", currentNode.SrpmPath)
+		isPrebuilt:= false
+		if getRPM {
+			isPrebuilt, _, _ = IsSRPMPrebuilt_check(currentNode.SrpmPath, g, nil, &unique_strings)
+/*			currentNode.SrpmPath =  strings.ReplaceAll(currentNode.SrpmPath, "cm2", "fc37")
+                	logger.Log.Infof("getRPM SRPM path modified/not- %s, isPrebuilt:%t", currentNode.SrpmPath, isPrebuilt)
+*/
+		} else {
+			isPrebuilt, _, _ = IsSRPMPrebuilt(currentNode.SrpmPath, g, nil)
+		}
+		if buildToRunEdge && isPrebuilt {
+//		if isPrebuilt, _, _ := IsSRPMPrebuilt_check(currentNode.SrpmPath, g, nil, &unique_strings); buildToRunEdge && isPrebuilt {
 			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
 				currentNode.SrpmPath, previousNode.SrpmPath)
 
@@ -1356,6 +1522,8 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 		currentNode = previousNode
 	}
 
+        logger.Log.Infof("Invoking script to downloadRPMs")
+	downloadRPMs(unique_strings)
 	return fmt.Errorf("cycle contains no pre-build SRPMs, unresolvable")
 }
 
@@ -1379,6 +1547,9 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	for _, node := range cycle[1:] {
 		fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 	}
+	for _, node := range cycle[0:] {
+		fmt.Fprintf(&cycleStringBuilder, "Pkgname %s\n", node.VersionedPkg.Name)
+        }
 	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 
 	// This is a common error for developers, print this so they can try to fix it themselves.
@@ -1425,13 +1596,33 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 
 // findAllRPMS returns true if all RPMs requested are found on disk.
 //	Also returns a list of all missing files
+func findAllRPMS_fedora(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) {
+	for _, rpm := range rpmsToFind {
+		new_file := strings.ReplaceAll(rpm, "cm2", "fc37")
+		isFile, _ := file.IsFile(new_file)
+		if !isFile {
+			logger.Log.Debugf("Did not find (%s)",  new_file)
+			missingRpms = append(missingRpms, new_file)
+		}
+	}
+	foundAllRpms = len(missingRpms) == 0
+
+	return
+}
+// findAllRPMS returns true if all RPMs requested are found on disk.
+//	Also returns a list of all missing files
 func findAllRPMS(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) {
 	for _, rpm := range rpmsToFind {
 		isFile, _ := file.IsFile(rpm)
 
 		if !isFile {
-			logger.Log.Debugf("Did not find (%s)", rpm)
-			missingRpms = append(missingRpms, rpm)
+			new_file := strings.ReplaceAll(rpm, "cm2", "fc37")
+			isFile, _ := file.IsFile(new_file)
+			if !isFile {
+				missingRpms = append(missingRpms, rpm)
+				//logger.Log.Debugf("Did not find (%s)", rpm)
+				logger.Log.Debugf("Did not find (%s) (%s)", rpm, new_file)
+			}
 		}
 	}
 	foundAllRpms = len(missingRpms) == 0

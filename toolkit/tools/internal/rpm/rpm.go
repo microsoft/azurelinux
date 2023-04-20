@@ -146,6 +146,7 @@ func formatCommandArgs(extraArgs []string, file, queryFormat string, defines map
 // by new line and whitespace trimmed.
 func executeRpmCommand(program string, args ...string) (results []string, err error) {
 	stdout, stderr, err := shell.Execute(program, args...)
+        logger.Log.Info(stdout, stderr)
 	if err != nil {
 		// When dealing with a SPEC/package intended for a different architecture, explicitly set the error message
 		// to a known value so the invoker can check for it.
@@ -185,6 +186,19 @@ func GetInstalledPackages() (result []string, err error) {
 	const queryArg = "-qa"
 
 	return executeRpmCommand(rpmProgram, queryArg)
+}
+
+func EvalMacro() (result []string, err error) {
+	const queryArg2 = "--eval"
+	const queryArg3 = "%{_arch}"
+	const queryArg4 = "%{ghc_lib_subpackage}"
+	const queryArg5 = "%{ghc_set_gcc_flags}"
+
+  	executeRpmCommand(rpmProgram, queryArg2, queryArg3)
+
+        logger.Log.Info("Evaluating ", queryArg5)
+	return executeRpmCommand(rpmProgram, queryArg2, queryArg5)
+
 }
 
 // QuerySPEC queries a SPEC file with queryFormat. Returns the output split by line and trimmed.

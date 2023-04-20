@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"unicode"
 	"strings"
 	"time"
 
@@ -278,6 +279,18 @@ func tdnfInstall(packages []string) (err error) {
 	// - Strip any filepath from packages.
 	for i := range packages {
 		packages[i] = filepath.Base(strings.TrimSuffix(packages[i], ".rpm"))
+		if strings.Contains(packages[i], "fc37") || strings.Contains(packages[i], "ghc") {
+			for j, c := range packages[i] {
+			        if unicode.IsDigit(c) {
+					old_pkg := packages[i]
+					if (packages[i][j-1] == '-') {
+			        		packages[i] =  packages[i][:j-1]
+					}
+					logger.Log.Infof("Modified packagenames %s to remove release and version info %s\n", old_pkg, packages[i])
+					break
+			    	}
+			}
+		}
 	}
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()

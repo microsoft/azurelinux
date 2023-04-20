@@ -253,6 +253,7 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	// NOTE: range iterates by value, not reference. Manually access slice
 	for idx := range packages {
 		pkg := packages[idx]
+		/*adds run node, build node, run->build edge*/
 		err = addLocalPackage(graph, pkg)
 		if err != nil {
 			logger.Log.Errorf("Failed to add local package %+v", pkg)

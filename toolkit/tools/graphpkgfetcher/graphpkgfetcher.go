@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 package main
+//package graphpkgfetcher
 
 import (
 	"fmt"
@@ -16,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+//	"github.com/microsoft/CBL-Mariner/toolkit/tools/rs"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"gonum.org/v1/gonum/graph"

@@ -1,0 +1,57 @@
+# These packages are untested and still under development. This
+# repository is used for development of new releases.
+#
+# This repository can see significant daily turnover and major
+# functionality changes which cause unexpected problems with other
+# development packages. Please use these packages if you want to work
+# with the Fedora developers by testing these new development packages.
+#
+# # https://admin.fedoraproject.org/mailman/listinfo/test (Subscription
+# Required) is available as a discussion forum for
+# testing and troubleshooting for development packages in conjunction
+# with new test releases.
+#
+# More information is available at http://fedoraproject.org/wiki/Testing
+#
+# Reproducible and reportable issues should be filed at
+# http://bugzilla.redhat.com/.
+#
+# Product: Fedora
+# Version: rawhide-modular
+
+[rawhide-modular]
+name=Fedora - Modular Rawhide - Developmental packages for the next Fedora release
+#baseurl=http://download.example/pub/fedora/linux/development/rawhide/Modular/$basearch/os/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=rawhide-modular&arch=$basearch
+enabled=AUTO_VALUE
+countme=1
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-$basearch AUTO_VALUE
+skip_if_unavailable=False
+
+[rawhide-modular-debuginfo]
+name=Fedora - Modular Rawhide - Debug
+#baseurl=http://download.example/pub/fedora/linux/development/rawhide/Modular/$basearch/debug/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=rawhide-modular-debug&arch=$basearch
+enabled=0
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-$basearch AUTO_VALUE
+skip_if_unavailable=False
+
+[rawhide-modular-source]
+name=Fedora - Modular Rawhide - Source
+#baseurl=http://download.example/pub/fedora/linux/development/rawhide/Modular/source/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=rawhide-modular-source&arch=$basearch
+enabled=0
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-$basearch AUTO_VALUE
+skip_if_unavailable=False

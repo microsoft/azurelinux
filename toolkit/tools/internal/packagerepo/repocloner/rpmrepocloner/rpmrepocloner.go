@@ -25,6 +25,7 @@ const (
 	allRepoIDs             = "*"
 	builtRepoID            = "local-repo"
 	cacheRepoID            = "upstream-cache-repo"
+	fedoraRepoID           = "fedora"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
@@ -224,6 +225,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Assume the order of repoDefinitions indicates their relative priority.
 	for _, repoFilePath := range repoDefinitions {
 		err = appendRepoFile(repoFilePath, dstFile)
+		logger.Log.Infof("Appending existing repo file %s", repoFilePath)
 		if err != nil {
 			return
 		}
@@ -274,7 +276,12 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 			downloadDir = cacheRepoDir
 		}
 
+		fedorapkg := false
 		logger.Log.Debugf("Cloning: %s", pkgName)
+		if strings.Contains(pkgName, "fc37") {
+			fedorapkg = true
+		}
+		logger.Log.Debugf(" IsFedorapkg %t", fedorapkg)
 		args := []string{
 			"--destdir",
 			downloadDir,
@@ -290,7 +297,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+			repoOrderList := []string{builtRepoID, cacheRepoID, fedoraRepoID, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -313,7 +320,6 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 	if err != nil {
 		return
 	}
-
 	provideQuery := convertPackageVersionToTdnfArg(pkgVer)
 
 	baseArgs := []string{
@@ -335,8 +341,13 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
 			}
 
+//			rstdout, rstderr, rerr := shell.Execute("cat", "/etc/yum.repos.d/allrepos.repo")
+//			logger.Log.Infof("tdnf repolist:\n%s\n\n%s\n\n%s", rstdout, rstderr, rerr)
+//
+//			rstdout, rstderr, rerr = shell.Execute("tdnf", "repolist")
+//			logger.Log.Infof("tdnf repolist:\n%s\n\n%s\n\n%s", rstdout, rstderr, rerr)
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
-			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
+//			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
 
 			if err != nil {
 				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
@@ -350,6 +361,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				packageName := matches[packageNameIndex]
 				packageNames = append(packageNames, packageName)
 				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
+				break
 			}
 
 			return
@@ -514,8 +526,8 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		)
 		stdout, stderr, err = shell.Execute("tdnf", args...)
 
-		logger.Log.Debugf("stdout: %s", stdout)
-		logger.Log.Debugf("stderr: %s", stderr)
+//		logger.Log.Debugf("stdout: %s", stdout)
+//		logger.Log.Debugf("stderr: %s", stderr)
 
 		if err != nil {
 			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
@@ -545,6 +557,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 
 		if err == nil {
 			preBuilt = (repoID == builtRepoID)
+			logger.Log.Info("Got the package")
 			break
 		}
 	}

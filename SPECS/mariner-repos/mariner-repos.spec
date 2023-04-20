@@ -21,6 +21,7 @@ Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 Source12:       mariner-extended-debuginfo.repo
 Source13:       mariner-extended-debuginfo-preview.repo
+Source14:       fedora.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -128,6 +129,14 @@ Requires(preun): gpgme
 %description shared
 %{summary}
 
+%package -n fedora
+Summary:        Fedora repo file.
+Group:          System Environment/Base
+#Requires:       %{name}-shared = %{version}-%{release}
+
+%description -n fedora
+%{summary}
+
 %install
 export REPO_DIRECTORY="%{buildroot}%{_sysconfdir}/yum.repos.d"
 install -d -m 755 $REPO_DIRECTORY
@@ -143,6 +152,7 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
+install -m 644 %{SOURCE14} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -203,6 +213,10 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %files microsoft-preview
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-microsoft-preview.repo
+
+%files -n fedora
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/fedora.repo
 
 %files preview
 %defattr(-,root,root,-)
