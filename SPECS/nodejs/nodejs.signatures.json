@@ -1,5 +1,5 @@
 {
-  "Signatures": {
-    "node-v18.16.0.tar.xz": "33d81a233e235a509adda4a4f2209008d04591979de6b3f0f67c1c906093f118"
+    "Signatures": {
+      "node-v16.19.1.tar.xz": "6cea9e7c99e79864fb7c5140c2830225e15b62e836c8d57e217992431b63d2cc"
+    }
   }
-}
