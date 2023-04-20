@@ -426,8 +426,8 @@
         "type": "other",
         "other": {
           "name": "boost",
-          "version": "1.82.0",
-          "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_82_0.tar.bz2"
+          "version": "1.66.0",
+          "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
         }
       }
     },
