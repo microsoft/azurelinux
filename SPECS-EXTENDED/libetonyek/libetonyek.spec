@@ -127,6 +127,7 @@ fi
 %changelog
 * Wed Apr 19 2023 Sam Meluch <sammeluch@microsoft.com> - 0.1.9-8
 - limit boost version after update to 1.82.0
+- Verified license
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.9-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
