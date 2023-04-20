@@ -2838,6 +2838,7 @@
                 "nginx",
                 "ninja-build",
                 "nodejs",
+                "nodejs18",
                 "npth",
                 "nspr",
                 "nss",
