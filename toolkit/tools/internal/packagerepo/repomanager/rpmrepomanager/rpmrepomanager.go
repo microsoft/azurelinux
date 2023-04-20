@@ -46,23 +46,6 @@ func CreateRepo(repoDir string) (err error) {
 	return
 }
 
-// sanitizeOutput will take the raw output from an RPM command and split by new line,
-// trimming whitespace and removing blank lines.
-func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
-       rawSplitOutput := strings.Split(rawResults, "\n")
-
-       for _, line := range rawSplitOutput {
-               trimmedLine := strings.TrimSpace(line)
-               if trimmedLine == "" {
-                       continue
-               }
-
-               sanitizedOutput = append(sanitizedOutput, trimmedLine)
-       }
-
-       return
-}
-
 // OrganizePackagesByArch will recursively move RPMs from srcDir into architecture folders under repoDir
 func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 	const noArch = "noarch"
@@ -94,19 +77,17 @@ func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 		}
 
 		for _, rpmFile := range rpmFiles {
-			// rpmFile is the real RPM filename.
-			// use rpm to check the "%{nvra}.rpm" filename based on metadata
-			// Print a warning if they do not match
-			commandArgs := []string{"-qp"}
-			commandArgs = append(commandArgs, "-qf", "'%{nvra}.rpm'", rpmFile)
-			stdout, stderr, err = shell.Execute("rpm", commandArgs...)
+			// rpmFile is the real RPM filename on disk.
+			// use rpm cli to check the rpmFile's reported package name
+			// print a warning if the filename does not match the package name
+			stdout, stderr, err = shell.Execute("rpm", "-qp", rpmFile)
 			if err == nil {
-				queryRpmPath := strings.Split(stdout, "\n")
-				calculatedRpmFilename := fmt.Sprintf("%s.rpm", queryRpmPath[0])
+				calculatedRpmName := strings.Split(stdout, "\n")
+				calculatedRpmFilename := fmt.Sprintf("%s.rpm", calculatedRpmName[0])
 				if calculatedRpmFilename != filepath.Base(rpmFile) {
-					logger.Log.Warnf("!!!!! Detected mismatch filename !!!!!!")
-					logger.Log.Warnf("---- calulated == '%s'", calculatedRpmFilename)
-					logger.Log.Warnf("---- actual    == '%s'", filepath.Base(rpmFile))
+					logger.Log.Warnf("!!!!! Detected mismatched filename !!!!!!")
+					logger.Log.Warnf("---- filename   == '%s'", filepath.Base(rpmFile))
+					logger.Log.Warnf("---- calculated == '%s'", calculatedRpmFilename)
 				}
 			}
 			dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
