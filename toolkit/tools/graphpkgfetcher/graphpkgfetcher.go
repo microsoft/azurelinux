@@ -168,6 +168,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	const cloneDeps = true
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
+	// Searching for a package which supplies: msopenjdk-11
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
 	// Resolve nodes to exact package names so they can be referenced in the graph.
 	resolvedPackages, err := cloner.WhatProvides(node.VersionedPkg)
@@ -231,6 +232,10 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []string) (err error) {
 	rpmPaths := []string{}
 	for _, resolvedPackage := range resolvedPackages {
+		logger.Log.Warnf("assignRPMPath: resolvedPackage == '%s'", resolvedPackage)
+		// /tmp/mariner/build/rpm_cache/cache/msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64.rpm
+		// should be:
+		// /tmp/mariner/build/rpm_cache/cache/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm
 		rpmPaths = append(rpmPaths, rpmPackageToRPMPath(resolvedPackage, outDir))
 	}
 
@@ -261,10 +266,14 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 	return
 }
 
+// input: rpmPackage	msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64
+// output:              /tmp/CBL-Mariner/build/rpm_cache/cache/msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64.rpm
 func rpmPackageToRPMPath(rpmPackage, outDir string) string {
 	// Construct the rpm path of the cloned package.
 	rpmName := fmt.Sprintf("%s.rpm", rpmPackage)
-	return filepath.Join(outDir, rpmName)
+	returnString := filepath.Join(outDir, rpmName)
+	logger.Log.Warnf("rpmPackageToRPMPath: input == '%s' output == '%s'", rpmPackage, returnString)
+	return returnString
 }
 
 func isToolchainPackage(rpmPath string, toolchainRPMs []string) bool {

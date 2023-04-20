@@ -318,6 +318,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		}
 
 		if cloneDeps {
+			// +                       // Executing: [tdnf download --alldeps --destdir /outputrpms msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64 --disablerepo=* --releasever=2.0 --enablerepo=toolchain-repo]"
 			args = append([]string{"download", "--alldeps"}, args...)
 		} else {
 			args = append([]string{"download-nodeps"}, args...)
@@ -375,6 +376,8 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
 			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
+			// tdnf returns "msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64", but the filename is different: 
+			//              "msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64"
 
 			if err != nil {
 				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
@@ -387,6 +390,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			for _, matches := range packageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
 				packageName := matches[packageNameIndex]
 				packageNames = append(packageNames, packageName)
+				// 'msopenjdk-11' is available from package 'msopenjdk-11-11.0.14.1+1_LTS-31207.x86_64'
 				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 			}
 
