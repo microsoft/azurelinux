@@ -49,6 +49,7 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %clean
 rm -rf %{buildroot}/*
 
+
 %files
 %defattr(-,root,root)
 %license LICENSE_1_0.txt
