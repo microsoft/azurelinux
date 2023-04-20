@@ -1,5 +1,4 @@
 %define underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
-
 Summary:        Boost
 Name:           boost
 Version:        1.76.0
@@ -10,7 +9,6 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
-
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
 
