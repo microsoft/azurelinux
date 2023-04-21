@@ -261,8 +261,8 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
-* Thu Apr 20 2023 Saul Paredes <saulparedes@microsoft.com> - 2.7.18-12
-- Remove vendored zlib to address CVE-2018-25032
+* Thu Apr 20 2023 Saul Paredes <saulparedes@microsoft.com> - 2.7.18-13
+- Remove vendored zlib and use system one to address CVE-2018-25032
 
 * Mon Mar 06 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.7.18-12
 - Patch CVE-2023-24329.
