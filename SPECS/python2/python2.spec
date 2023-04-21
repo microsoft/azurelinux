@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -54,6 +54,7 @@ BuildRequires:  libffi-devel >= 3.0.13
 BuildRequires:  sqlite-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  readline-devel
+BuildRequires:  zlib
 Requires:       openssl
 Requires:       python2-libs = %{version}-%{release}
 Provides:       python-sqlite = %{version}-%{release}
@@ -141,6 +142,7 @@ The test package contains all regression tests for Python as well as the modules
 
 %prep
 %autosetup -p1 -n Python-%{version}
+rm -rf Modules/zlib
 
 %build
 export OPT="${CFLAGS} %{openssl_flags}"
@@ -149,6 +151,7 @@ export OPT="${CFLAGS} %{openssl_flags}"
     CXXFLAGS="%{optflags} %{openssl_flags}" \
     --enable-shared \
     --with-ssl \
+    --with-system-zlib \
     --with-system-expat \
     --with-system-ffi \
     --enable-unicode=ucs4 \
@@ -258,6 +261,9 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Thu Apr 20 2023 Saul Paredes <saulparedes@microsoft.com> - 2.7.18-13
+- Remove vendored zlib and use system one to address CVE-2018-25032
+
 * Mon Mar 06 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.7.18-12
 - Patch CVE-2023-24329.
 
