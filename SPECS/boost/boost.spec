@@ -37,7 +37,7 @@ The boost-static package contains boost static libraries.
 
 %prep
 %autosetup -N -n %{name}_%{underscore_version}
-pushd %{name}_%{underscore_version}/lib/beast
+pushd libs/beast
 patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f < {PATCH0}
 popd
 
