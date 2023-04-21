@@ -36,7 +36,10 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%autosetup -n %{name}_%{underscore_version} -p1
+%autosetup -n %{name}_%{underscore_version}
+pushd lib/beast
+patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f < {PATCH0}
+popd
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
