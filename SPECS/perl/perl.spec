@@ -9,7 +9,7 @@
 Summary:        Practical Extraction and Report Language
 Name:           perl
 Version:        5.30.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 URL:            https://www.perl.org/
 Group:          Development/Languages
@@ -35,6 +35,7 @@ Report Language.
 %prep
 %setup -q
 sed -i 's/-fstack-protector/&-all/' Configure
+rm -rf cpan/Compress-Raw-Zlib
 
 %build
 export BUILD_ZLIB=False
@@ -73,6 +74,8 @@ make test TEST_SKIP_VERSION_CHECK=1
 %{_mandir}/*/*
 
 %changelog
+*   Thu Apr 20 2023 Saul Paredes <saulparedes@microsoft.com> 5.30.3-2
+-   Remove vendored zlib to address CVE-2018-25032
 *   Tue Jun 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.30.3-1
 -   Updating to newer version to fix CVE-2020-10878 and CVE-2020-12723.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.28.1-4
