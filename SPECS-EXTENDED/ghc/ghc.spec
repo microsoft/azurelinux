@@ -414,6 +414,7 @@ export CC=%{_bindir}/gcc
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   --docdir=%{_docdir}/%{name} \
   --with-system-libffi \
+  --disable-shared
 %ifarch %{ghc_unregisterized_arches}
   --enable-unregisterised \
 %endif
