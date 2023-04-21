@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -269,6 +269,7 @@ Patch1010:      CVE-2022-3872.patch
 Patch1011:      CVE-2021-3929.patch
 # CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
 Patch1012:      CVE-2021-4207.patch
+Patch1013:      CVE-2022-3165.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2303,6 +2304,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Fri Apr 21 2023 Amrita Kohli <amritakohli@microsoft.com> - 6.2.0-15
+- Patch for CVE-2022-3165
+
 * Wed Feb 15 2023 Vince Perri <viperri@microsoft.com> - 6.2.0-14
 - Move PXE and EFI ROM images from system-x86-core to new ipxe subpackage
 - Require ipxe for both system-x86-core and system-aarch64-core packages
