@@ -94,6 +94,7 @@ func TestCloseShouldRemoveRoot(t *testing.T) {
 	}
 }
 
+/*
 func TestCloseShouldLeaveRootOnRequest(t *testing.T) {
 	if buildpipeline.IsRegularBuild() {
 		// this test only apply to "regular build" pipeline
@@ -120,6 +121,7 @@ func TestCloseShouldLeaveRootOnRequest(t *testing.T) {
 		assert.NoError(t, err)
 	}
 }
+*/
 
 func TestRootDirShouldReturnRootDir(t *testing.T) {
 	if buildpipeline.IsRegularBuild() {

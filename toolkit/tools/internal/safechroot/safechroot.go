@@ -439,6 +439,37 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk bool) (err error) {
 		unmountFlags  = 0
 	)
 
+
+	if leaveOnDisk {
+		mountpoints_file := filepath.Join(c.rootDir, "mountpoints_list")
+		f, ferr := os.OpenFile(mountpoints_file, os.O_CREATE|os.O_WRONLY, 0644)
+		if ferr != nil {
+			logger.Log.Warnf("Failed to create file (%s). Error: %s", mountpoints_file, ferr)
+		} else {
+			defer f.Close()
+			for i, mountPoint := range c.mountPoints {
+				// Skip mount points if they were not successfully created
+				if !mountPoint.isMounted {
+					continue
+				}
+
+				fullPath := filepath.Join(c.rootDir, mountPoint.target)
+
+				logger.Log.Debugf("Writing to file (%s)", fullPath)
+
+				if _, ferr = f.WriteString(fullPath); ferr != nil {
+					logger.Log.Warnf("Failed to write to file (%s). Error: %s", fullPath, ferr)
+				}
+                                if i != len(c.mountPoints)-1 {
+                                    _, ferr = f.WriteString("\n")
+                                    if ferr != nil {
+					logger.Log.Warnf("Failed to write to file (newline). Error: %s",  ferr)
+                                    }
+                                }
+			}
+			return
+		}
+	}
 	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
 
