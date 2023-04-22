@@ -12,6 +12,7 @@ Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_ver
 Patch0:         upgrade-zlib-1.2.12.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
+BuildRequires:  git
 
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
