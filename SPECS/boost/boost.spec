@@ -39,6 +39,8 @@ The boost-static package contains boost static libraries.
 %prep
 %setup -q -n %{name}_%{underscore_version}
 git init
+git config user.email "%{name}@%{name}.com"
+git config user.name "%{name}"
 git add .
 git commit -m "iniial commit"
 git am --directory=libs/beast %{_sourcedir}/upgrade-zlib-1.2.12.patch
