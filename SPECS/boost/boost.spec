@@ -37,7 +37,10 @@ The boost-static package contains boost static libraries.
 
 %prep
 %setup -q -n %{name}_%{underscore_version}
-git_am --directory=libs/beast %{_sourcedir}/upgrade-zlib-1.2.12.patch
+git init
+git add .
+git commit -m "iniial commit"
+git am --directory=libs/beast %{_sourcedir}/upgrade-zlib-1.2.12.patch
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
