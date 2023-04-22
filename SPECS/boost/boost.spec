@@ -38,6 +38,10 @@ The boost-static package contains boost static libraries.
 
 %prep
 %setup -q -n %{name}_%{underscore_version}
+# setup git to use git am to apply the patch
+# since the patch contains binary git diff, the use of /bin/patch is not sufficient
+# as they are not compatable.
+# when this patch is no longer required, these git commands can be removed
 git init
 git config user.email "%{name}@%{name}.com"
 git config user.name "%{name}"
