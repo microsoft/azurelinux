@@ -37,9 +37,7 @@ The boost-static package contains boost static libraries.
 
 %prep
 %autosetup -N -n %{name}_%{underscore_version}
-pushd libs/beast
-%patch0 -p1
-popd
+%patch0 -Sgit_am --directory=libs/beast
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}

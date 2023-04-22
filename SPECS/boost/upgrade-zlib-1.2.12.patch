@@ -40,7 +40,6 @@ https://access.redhat.com/security/cve/CVE-2018-25032
  test/extern/zlib-1.2.11/crc32.h               |  441 -
  test/extern/zlib-1.2.11/examples/enough.c     |  572 -
  test/extern/zlib-1.2.11/zlib.3.pdf            |  Bin 19318 -> 0 bytes
- .../{zlib-1.2.11 => zlib-1.2.12}/.gitignore   |    0
  .../CMakeLists.txt                            |    2 +-
  .../{zlib-1.2.11 => zlib-1.2.12}/ChangeLog    |  161 +-
  test/extern/{zlib-1.2.11 => zlib-1.2.12}/FAQ  |    0
@@ -304,7 +303,6 @@ https://access.redhat.com/security/cve/CVE-2018-25032
  delete mode 100644 test/extern/zlib-1.2.11/crc32.h
  delete mode 100644 test/extern/zlib-1.2.11/examples/enough.c
  delete mode 100644 test/extern/zlib-1.2.11/zlib.3.pdf
- rename test/extern/{zlib-1.2.11 => zlib-1.2.12}/.gitignore (100%)
  rename test/extern/{zlib-1.2.11 => zlib-1.2.12}/CMakeLists.txt (99%)
  rename test/extern/{zlib-1.2.11 => zlib-1.2.12}/ChangeLog (93%)
  rename test/extern/{zlib-1.2.11 => zlib-1.2.12}/FAQ (100%)
@@ -554,7 +552,7 @@ diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
 index 3f2fb3ca35..437b1cc340 100644
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -21,33 +21,39 @@ if (OPENSSL_FOUND)
+@@ -21,26 +21,32 @@ if (OPENSSL_FOUND)
  endif()
  
  set (ZLIB_SOURCES
@@ -606,15 +604,15 @@ index 3f2fb3ca35..437b1cc340 100644
 +    ${CMAKE_CURRENT_LIST_DIR}/extern/zlib-1.2.12/zutil.c
  )
  
- add_library (
-         lib-zlib
-         ${ZLIB_SOURCES}
- )
--target_include_directories(lib-zlib PUBLIC "${CMAKE_CURRENT_LIST_DIR}/extern/zlib-1.2.11")
-+target_include_directories(lib-zlib PUBLIC "${CMAKE_CURRENT_LIST_DIR}/extern/zlib-1.2.12")
- set_property(TARGET lib-zlib PROPERTY FOLDER "static-libs")
- 
  set (TEST_MAIN ${PROJECT_SOURCE_DIR}/test/lib_beast.cpp)
+@@ -52,6 +58,7 @@ add_library (
+     ${CMAKE_CURRENT_LIST_DIR}/lib_test.cpp
+ )
+ 
++target_include_directories(lib-zlib PUBLIC "${CMAKE_CURRENT_LIST_DIR}/extern/zlib-1.2.12")
+ set_property(TARGET lib-test PROPERTY FOLDER "static-libs")
+ 
+ add_subdirectory (beast)
 diff --git a/test/Jamfile b/test/Jamfile
 index 02c8a7d04b..aabee815a8 100644
 --- a/test/Jamfile
@@ -8966,10 +8964,6 @@ z1^ZpT5GP}3?yM8^Z><18HA_!0R5t+7M~Cd85BxxrVpIV@Svxa(z+I{cG&w~QperaT
 zF3!y-CM7N<#v#Sa&IK(<Ku4C~li*<!=aiHX7yjRS=-)n1;|wu&g4`)2h?koa`Zrs&
 JQcBWj{|}C3j9UNz
 
-diff --git a/test/extern/zlib-1.2.11/.gitignore b/test/extern/zlib-1.2.12/.gitignore
-similarity index 100%
-rename from test/extern/zlib-1.2.11/.gitignore
-rename to test/extern/zlib-1.2.12/.gitignore
 diff --git a/test/extern/zlib-1.2.11/CMakeLists.txt b/test/extern/zlib-1.2.12/CMakeLists.txt
 similarity index 99%
 rename from test/extern/zlib-1.2.11/CMakeLists.txt
