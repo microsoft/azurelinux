@@ -415,6 +415,40 @@ sudo make image PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUIL
 
 ### Local Build Variables
 
+#### Quickrebuild Defaults
+
+Quickrebuild flags will set some flags to try and optimize builds for speed. This involves using as many packages as possible from the upstream repos for both package building and for toolchain creation. These flags are meant to work on any branch.
+
+#### `QUICK_REBUILD=...`
+
+##### `QUICK_REBUILD=`**`n`** _(default)_
+
+> Do not set any additional quickbuild flags
+
+##### `QUICK_REBUILD=`**`y`**
+
+> If they are not set, set `QUICK_REBUILD_TOOLCHAIN=y` and `QUICK_REBUILD_PACKAGES=y`.
+
+#### `QUICK_REBUILD_TOOLCHAIN=...`
+
+##### `QUICK_REBUILD_TOOLCHAIN=`**`n`** _(default)_
+
+> Do not set toolchain specific quick rebuild flags
+
+##### `QUICK_REBUILD_TOOLCHAIN=`**`y`**
+
+> Set `REBUILD_TOOLCHAIN = y`, `INCREMENTAL_TOOLCHAIN = y`, `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y`, `REBUILD_TOOLS ?= y`.
+
+#### `QUICK_REBUILD_PACKAGES=...`
+
+##### `QUICK_REBUILD_PACKAGES=`**`n`** _(default)_
+
+> Do not set toolchain specific quick rebuild flags
+
+##### `QUICK_REBUILD_PACKAGES=`**`y`**
+
+> Set `DELTA_BUILD = y`, `REBUILD_TOOLS ?= y`, `REBUILD_TOOLS ?= y`.
+
 #### URLS and Repos
 
 The build can be configured to prioritize local builds but still use the remote sources if needed. For example: If a locally defined `*.spec` file has build dependencies which are not satisfied locally.
@@ -464,6 +498,16 @@ If that is not desired all remote sources can be disabled by clearing the follow
 ##### `INCREMENTAL_TOOLCHAIN=`**`y`**
 
 > Do not clear out the toolchain build chroot before performing a build of the final toolchain packages. RPMs within the toolchain build chroot will be used as a cache to avoid rebuilding already-built SRPMs. These RPMs can be seeded by (a) previous failed builds or (b) upstream package repos.
+
+#### `CLEAN_TOOLCHAIN_CONTAINERS=...`
+
+##### `CLEAN_TOOLCHAIN_CONTAINERS=n`
+
+> Leave the raw toolchain containers in docker when running `make clean`. If they match the configuration of the current build they will be re-used.
+
+##### `CLEAN_TOOLCHAIN_CONTAINERS=`**`y`** *(default)*
+
+> Delete all `marinertoolchain*` containers and images associated with this working directory when running `make clean`.
 
 #### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
 
