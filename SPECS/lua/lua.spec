@@ -14,7 +14,7 @@
 Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ Patch20:        CVE-2021-43519.patch
 Patch21:        CVE-2022-28805.patch
 Patch22:        CVE-2021-44647.patch
 Patch23:        CVE-2022-33099.patch
+Patch24:        CVE-2021-45985.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -106,6 +107,9 @@ sed -i 's|5.3.0|%{version}|g' configure.ac
 %patch19 -p1 -b .bug3
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
 autoreconf -ifv
 
 %if 0%{?bootstrap}
@@ -220,6 +224,10 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Mon Apr 14 2023 Bala <balakumaran.kannan@microsoft.com> - 5.4.3-5
+- Patching CVE-2021-45985
+- Add patch command to apply unapplied patches
+
 * Wed Jul 13 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 5.4.3-4
 - Patching CVE-2022-33099.
 

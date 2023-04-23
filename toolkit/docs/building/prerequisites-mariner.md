@@ -29,7 +29,8 @@ sudo tdnf -y install \
     rpm-build \
     sudo \
     tar \
-    wget
+    wget \
+    xfsprogs
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service

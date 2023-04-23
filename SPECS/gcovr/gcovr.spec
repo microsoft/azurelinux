@@ -2,8 +2,8 @@
 Summary:        A code coverage report generator using GNU gcov
 Name:           gcovr
 Version:        5.0
-Release:        1%{?dist}
-License:        BSD
+Release:        2%{?dist}
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gcovr.com/
@@ -11,11 +11,12 @@ Source0:        https://github.com/gcovr/%{name}/archive/%{version}/%{name}-%{ve
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-Requires:       %{py3_dist Jinja2}
+Requires:       python3-jinja2
+Requires:       python3-pygments
+Requires:       python3-lxml
 # for gcov
 Requires:       gcc
 BuildArch:      noarch
-%{?python_enable_dependency_generator}
 %if %{with docs}
 BuildRequires:  %{py3_dist Jinja2}
 BuildRequires:  %{py3_dist Sphinx}
@@ -78,7 +79,6 @@ rm build/html/.buildinfo
 popd
 %endif
 
-
 %files
 %license LICENSE.txt
 %doc README.rst CHANGELOG.rst
@@ -93,8 +93,11 @@ popd
 %doc doc/build/html/*
 %endif
 
-
 %changelog
+* Mon Apr 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.0-2
+- Add runtime requirements to main package
+- Use SPDX expression in license tag
+
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0-1
 - Update to v5.0
 
