@@ -31,7 +31,7 @@ BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  git
 BuildRequires:  sudo
-BuildRequires:  openssl-devel = 1.1.1k-21.cm2
+BuildRequires:  openssl-devel
 BuildRequires:  iptables-devel
 BuildRequires:  wget
 BuildRequires:  perl-FindBin
@@ -50,6 +50,14 @@ Requires:  kernel-uvm
 
 %description
 Kata Confidential Containers.
+
+%package tools
+Summary:        Kata CC Tools package
+Requires:       %{name} = %{version}-%{release}
+Requires:       cargo
+
+%description tools
+This package contains the UVM osbuilder files
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -200,6 +208,12 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 /etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
+%license LICENSE
+%doc CONTRIBUTING.md
+%doc README.md
+
+
+%files tools
 %dir %{osbuilder}/src/agent/samples/policy/all-allowed
 %{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed-data.json
 %{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed.rego
@@ -220,11 +234,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %dir %{osbuilder}/tools
 %{osbuilder}/modules/*
 %{osbuilder}/tools/*
-
-
-%license LICENSE
-%doc CONTRIBUTING.md
-%doc README.md
 
 # Remove some scripts we don't use
 # %exclude %{osbuilder}/tools/packaging
