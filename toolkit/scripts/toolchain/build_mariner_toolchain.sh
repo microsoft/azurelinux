@@ -20,6 +20,7 @@ INCREMENTAL_TOOLCHAIN=${9:-n}
 MARINER_INPUT_SRPMS_DIR=${10}
 MARINER_OUTPUT_SRPMS_DIR=${11}
 MARINER_REHYDRATED_RPMS_DIR=${12}
+MARINER_TOOLCHAIN_MANIFESTS_FILE=${13}
 
 # Create toolchain subdirectory in out folder
 mkdir -pv $MARINER_BUILD_DIR/toolchain
@@ -37,7 +38,9 @@ mkdir -pv $MARINER_RPM_DIR/$(uname -m)
     "$INCREMENTAL_TOOLCHAIN" \
     "$MARINER_INPUT_SRPMS_DIR" \
     "$MARINER_OUTPUT_SRPMS_DIR" \
-    "$MARINER_REHYDRATED_RPMS_DIR"
+    "$MARINER_REHYDRATED_RPMS_DIR" \
+    "$MARINER_TOOLCHAIN_MANIFESTS_FILE"
+
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz

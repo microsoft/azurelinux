@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Mon Apr 03 2023 Bala <balakumaran.kannan@microsoft.com> - 3.21.4.4
+- Add build directory to %cmake macro to align with %cmake_build
+
 * Mon Feb 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.21.4-3
 - Patch CVE-2022-43551 in bundled curl
 

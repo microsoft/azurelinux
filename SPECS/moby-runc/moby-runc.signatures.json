@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "moby-runc-1.1.2.tar.gz": "0ccce82b1d9c058d8fd7443d261c96fd7a803f2775bcb1fec2bdb725bc7640f6"
- }
+  "Signatures": {
+    "moby-runc-1.1.5.tar.gz": "76cbf30637cbb828794d72d32fb3fd6ff3139cd9743b8b44790fd110f43d96b2"
+  }
 }
