@@ -1,0 +1,58 @@
+From 289f5c18b195aa43d46a619d1188709abbfa9c82 Mon Sep 17 00:00:00 2001
+From: 10054172 <hui.zhang@thalesgroup.com>
+Date: Fri, 18 Mar 2022 12:42:57 -0400
+Subject: [PATCH 1/2] Fix issue #499: unsigned integer overflow
+
+Signed-off-by: 10054172 <hui.zhang@thalesgroup.com>
+---
+ protobuf-c/protobuf-c.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/protobuf-c/protobuf-c.c b/protobuf-c/protobuf-c.c
+index 98052cdb..ec2d40a1 100644
+--- a/protobuf-c/protobuf-c.c
++++ b/protobuf-c/protobuf-c.c
+@@ -2603,10 +2603,13 @@ parse_required_member(ScannedMember *scanned_member,
+ 			return FALSE;
+ 
+ 		def_mess = scanned_member->field->default_value;
+-		subm = protobuf_c_message_unpack(scanned_member->field->descriptor,
+-						 allocator,
+-						 len - pref_len,
+-						 data + pref_len);
++		if (len > pref_len)
++			subm = protobuf_c_message_unpack(scanned_member->field->descriptor,
++							 allocator,
++							 len - pref_len,
++							 data + pref_len);
++		else
++			subm = NULL;
+ 
+ 		if (maybe_clear &&
+ 		    *pmessage != NULL &&
+
+From 0d1fd124a4e0a07b524989f6e64410ff648fba61 Mon Sep 17 00:00:00 2001
+From: "Todd C. Miller" <Todd.Miller@sudo.ws>
+Date: Thu, 9 Jun 2022 07:34:55 -0600
+Subject: [PATCH 2/2] Fix regression with zero-length messages introduced in
+ protobuf-c PR 500.
+
+[edmonds: Import bugfix from
+https://github.com/sudo-project/sudo/commit/b6a6451482a3ff5e30f43ef888159d4b0d39143b.patch.]
+---
+ protobuf-c/protobuf-c.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/protobuf-c/protobuf-c.c b/protobuf-c/protobuf-c.c
+index ec2d40a1..448f3e81 100644
+--- a/protobuf-c/protobuf-c.c
++++ b/protobuf-c/protobuf-c.c
+@@ -2603,7 +2603,7 @@ parse_required_member(ScannedMember *scanned_member,
+ 			return FALSE;
+ 
+ 		def_mess = scanned_member->field->default_value;
+-		if (len > pref_len)
++		if (len >= pref_len)
+ 			subm = protobuf_c_message_unpack(scanned_member->field->descriptor,
+ 							 allocator,
+ 							 len - pref_len,
