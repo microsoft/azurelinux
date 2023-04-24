@@ -10,7 +10,7 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}_%{underscore_version}.tar.bz2
-Patch0:         upgrade-zlib-1.2.12.patch
+Patch0:         CVE-2018-25032.patch
 BuildRequires:  bzip2-devel
 
 %description
@@ -36,7 +36,7 @@ The boost-static package contains boost static libraries.
 
 %prep
 %autosetup -N -n %{name}_%{underscore_version}
-pushd libs/beast
+pushd libs/beast/test/extern/zlib-1.2.11
 %patch0 -p1
 popd
 
