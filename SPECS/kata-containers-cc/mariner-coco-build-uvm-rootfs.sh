@@ -6,7 +6,6 @@ set -o errexit
 
 [ -n "${DEBUG:-}" ] && set -o xtrace
 
-readonly SCRIPT_NAME="$0"
 readonly SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/rootfs-builder/rootfs-cbl-mariner
 readonly ROOTFS_TARGET=/opt/mariner/share/uvm
