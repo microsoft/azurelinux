@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/protobuf-c/protobuf-c
 Source0:        https://github.com/protobuf-c/protobuf-c/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch0:    CVE-2022-48468-1.patch
 Patch0:    CVE-2022-48468.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -43,7 +42,6 @@ The protobuf-c-static package contains static protobuf-c libraries.
 
 %prep
 %setup -q
-%patch0 -p1
 %patch0 -p1
 autoreconf -iv
 
