@@ -236,7 +236,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{osbuilder}/tools/*
 
 # Remove some scripts we don't use
-# %exclude %{osbuilder}/tools/packaging
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/alpine
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/centos
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/clearlinux
@@ -246,11 +245,11 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
-*   Thu Apr 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-11
--   Add vendored code and move rootfs building out of package
+*   Thu Apr 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
+-   Add vendored code and move UVM building out of base package
 
 *   Wed Apr 5 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-10
--   Rebase against cc-msft-prototypes branch
+-   Rebase against 0.4.0 upstream tag
 -   License verified.
 -   Original version for CBL-Mariner
 
