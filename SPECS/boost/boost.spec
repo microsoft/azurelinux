@@ -9,10 +9,9 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
-Patch0:         upgrade-zlib-1.2.12.patch
+Patch0:         CVE-2018-25032.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
-BuildRequires:  git
 
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
@@ -38,16 +37,9 @@ The boost-static package contains boost static libraries.
 
 %prep
 %setup -q -n %{name}_%{underscore_version}
-# setup git to use git am to apply the patch
-# since the patch contains binary git diff, the use of /bin/patch is not sufficient
-# as they are not compatable.
-# when this patch is no longer required, these git commands can be removed
-git init
-git config user.email "%{name}@%{name}.com"
-git config user.name "%{name}"
-git add .
-git commit -m "iniial commit"
-git am --directory=libs/beast %{_sourcedir}/upgrade-zlib-1.2.12.patch
+pushd libs/beast/test/extern/zlib-1.2.11
+%patch0 -p1
+popd
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
