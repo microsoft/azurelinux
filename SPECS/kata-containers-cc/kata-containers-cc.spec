@@ -14,7 +14,6 @@ Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
-
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      containerd-for-cc-override.conf
 Source4:      mariner-coco-build-uvm-image.sh
@@ -24,28 +23,19 @@ ExclusiveArch: x86_64
 
 BuildRequires:  golang
 BuildRequires:  make
-BuildRequires:  gcc
 BuildRequires:  protobuf-compiler
-BuildRequires:  dracut
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  git
-BuildRequires:  sudo
 BuildRequires:  openssl-devel
-BuildRequires:  iptables-devel
-BuildRequires:  wget
 BuildRequires:  perl-FindBin
 BuildRequires:  perl-lib
 BuildRequires:  libseccomp-devel
 BuildRequires:  kernel-uvm-devel
-BuildRequires:  parted
 BuildRequires:  opa >= 0.50.2
 
 Requires:  systemd
 Requires:  iptables
-Requires:  parted
-Requires:  qemu-img
-Requires:  opa >= 0.50.2
 Requires:  kernel-uvm
 
 %description
@@ -55,6 +45,9 @@ Kata Confidential Containers.
 Summary:        Kata CC Tools package
 Requires:       %{name} = %{version}-%{release}
 Requires:       cargo
+Requires:       qemu-img
+Requires:       parted
+Requires:       curl
 
 %description tools
 This package contains the UVM osbuilder files
@@ -245,7 +238,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
-*   Thu Apr 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
+*   Mon Apr 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
 -   Add vendored code and move UVM building out of base package
 
 *   Wed Apr 5 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-10
