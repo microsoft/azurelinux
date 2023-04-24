@@ -56,10 +56,6 @@ Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
 Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
 Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
 Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
-Patch5:         runtime-Support-for-AMD-SEV-SNP-VMs.patch
-Patch6:         runtime-clh-Use-the-new-API-to-boot-with-TDX-firmware-td-shim.patch
-Patch7:         versions-Update-Cloud-Hypervisor.patch
-Patch8:         runtime-Re-generate-the-client-code.patch
 Patch9:         runtime-reduce-uvm-high-mem-footprint.patch
 
 BuildRequires:  golang
