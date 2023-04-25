@@ -24,18 +24,16 @@ ExclusiveArch: x86_64
 BuildRequires:  golang
 BuildRequires:  make
 BuildRequires:  protobuf-compiler
+BuildRequires:  dracut
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  git
-BuildRequires:  openssl-devel
+BuildRequires:  sudo
 BuildRequires:  perl-FindBin
 BuildRequires:  perl-lib
 BuildRequires:  libseccomp-devel
 BuildRequires:  kernel-uvm-devel
-BuildRequires:  opa >= 0.50.2
 
-Requires:  systemd
-Requires:  iptables
 Requires:  kernel-uvm
 
 %description
@@ -48,6 +46,7 @@ Requires:       cargo
 Requires:       qemu-img
 Requires:       parted
 Requires:       curl
+Requires:       opa >= 0.50.2
 
 %description tools
 This package contains the UVM osbuilder files
@@ -168,7 +167,6 @@ install -m 0644 -D -t %{buildroot}%{_unitdir} tardev-snapshotter.service
 install -D -m 0755 target/release/tardev-snapshotter  %{buildroot}/usr/bin/tardev-snapshotter
 popd
 
-# The UVM rootfs will be used to build an img file at the first host boot.
 install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
 install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax.gpl.c        %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/nsdax.gpl.c
 
@@ -195,9 +193,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{coco_path}/libexec/virtiofsd
 
 %{_bindir}/tardev-snapshotter
+%{_unitdir}/tardev-snapshotter.service
 %{_prefix}/local/bin/containerd-shim-kata-cc-v2
 
-%{_unitdir}/tardev-snapshotter.service
 
 /etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
