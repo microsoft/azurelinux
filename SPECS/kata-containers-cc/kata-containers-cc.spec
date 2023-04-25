@@ -156,7 +156,6 @@ install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
 install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
 install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
-ln -s configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration.toml
 sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
 popd
 
