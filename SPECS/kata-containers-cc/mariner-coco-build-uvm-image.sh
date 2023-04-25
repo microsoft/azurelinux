@@ -18,7 +18,7 @@ generate_image()
       -o ${IMAGE_BUILD_ROOT}/nsdax
 
     # build image
-    sudo DEBUG=1 \
+    sudo \
       NSDAX_BIN=${IMAGE_BUILD_ROOT}/nsdax \
       ${ROOT_FOLDER}/opt/mariner/share/uvm/tools/osbuilder/image-builder/image_builder.sh \
       ${ROOT_FOLDER}/rootfs-cbl-mariner

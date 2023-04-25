@@ -3,7 +3,7 @@
     "kata-containers-cc-0.4.0.tar.gz": "7685522c0bc20df73b68222be3018b718ab7b575c78ebfdf3f5030c56ea6a811",
     "kata-containers-cc-0.4.0-cargo.tar.gz": "3302b970d33d2e81bfc80eb9c5436e78e02e9e6c0195108cb0a839330da81d31",
     "mariner-coco-build-uvm-rootfs.sh" :"3968664bc3655ec77b846bcd233307fdb45b8281341e208d1d88fa5b88e28076",
-    "mariner-coco-build-uvm-image.sh": "e5893f11fdcf11ca5eafbe0449b918ae30e3388d03eef370c68290212aefff39",
+    "mariner-coco-build-uvm-image.sh": "3672dd7f8c90e3d9e754b5b5ecffa9816339a30fd4770a4cd96c66af945cd9ef",
     "containerd-for-cc-override.conf": "923da6c9a367037c7d4231ae560779d17e63347f04509c44eddb70154f64656d"
   }
 }
