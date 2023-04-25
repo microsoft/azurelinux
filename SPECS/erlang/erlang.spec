@@ -9,6 +9,7 @@ Distribution:   Mariner
 License:      ASL 2.0
 URL:          https://erlang.org
 Source0:      https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
+Patch0:       CVE-2018-25032.patch
 
 BuildRequires: unzip
 %description
@@ -16,6 +17,7 @@ erlang programming language
 
 %prep
 %setup -q -n otp-OTP-%{version}
+autosetup -p1
 
 %build
 export ERL_TOP=`pwd`
