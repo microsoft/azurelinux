@@ -67,7 +67,10 @@ func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 
 		err = os.MkdirAll(filepath.Join(repoDir, arch), os.ModePerm)
 		if err != nil {
-			return
+			logger.Log.Warnf("Unable to create directory: '%s' '%s'", filepath.Join(repoDir, arch), err)
+			// consider this a non-fatal error and continue
+			err = nil
+			continue
 		}
 
 		rpmSearch := filepath.Join(srcDir, fmt.Sprintf("*.%s.rpm", arch))
