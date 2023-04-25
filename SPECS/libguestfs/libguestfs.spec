@@ -755,7 +755,7 @@ cp %{SOURCE9} %{_sysconfdir}/yum.repos.d/allrepos.repo
 # Must keep in sync with BRs under "Build requirements for the appliance"
 # Download to
 mkdir -pv %{_var}/cache/tdnf
-tdnf isntall --downloadonly -y --disablerepo=* \
+tdnf install --downloadonly -y --disablerepo=* \
   --enablerepo=local-repo --enablerepo=upstream-cache-repo \
   --alldeps --downloaddir %{_var}/cache/tdnf \
     acl \
