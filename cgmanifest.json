@@ -13282,6 +13282,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "moby-containerd-cc",
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "moby-engine",
           "version": "20.10.14",
           "downloadUrl": "https://github.com/moby/moby/archive/v20.10.14.tar.gz"
