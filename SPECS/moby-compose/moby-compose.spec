@@ -8,21 +8,14 @@ Distribution:   Mariner
 Group:          Tools/Container
 URL:            https://github.com/docker/compose
 Source0:        https://github.com/docker/compose/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
-#   1. wget https://github.com/docker/compose/archive/refs/tags/v%{version}.tar.gz -o %{name}-%{version}.tar.gz
-#   2. tar -xf %{name}-%{version}.tar.gz
-#   3. cd %{name}-%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2023-03-17 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %{name}-%{version}-govendor-vX.tar.gz vendor
+
+# Leverage the `generate_source_tarball.sh` to create the vendor sources
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
 # After fixing any possible CVE for the vendored source, we must bump v1 -> v2
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
 BuildRequires:  golang
+Requires:       moby-cli
+
 
 %description
 Compose is a tool for defining and running multi-container Docker applications.
