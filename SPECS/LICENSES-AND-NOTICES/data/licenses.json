@@ -2213,6 +2213,7 @@
                 "mm-common",
                 "moby-buildx",
                 "moby-cli",
+                "moby-compose",
                 "moby-containerd",
                 "moby-engine",
                 "moby-runc",

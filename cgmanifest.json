@@ -2847,6 +2847,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "moby-compose",
+          "version": "2.17.2",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dogtail",
           "version": "0.9.11",
           "downloadUrl": "https://gitlab.com/dogtail/dogtail/raw/released/dogtail-0.9.11.tar.gz"
