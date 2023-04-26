@@ -17,7 +17,7 @@ erlang programming language
 
 %prep
 %setup -q -n otp-OTP-%{version}
-%patch -p1
+%patch0 -p1
 
 %build
 export ERL_TOP=`pwd`
