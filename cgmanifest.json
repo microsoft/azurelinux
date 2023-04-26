@@ -2847,6 +2847,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "moby-compose",
+          "version": "2.17.2",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dogtail",
           "version": "0.9.11",
           "downloadUrl": "https://gitlab.com/dogtail/dogtail/raw/released/dogtail-0.9.11.tar.gz"
@@ -7973,6 +7983,16 @@
           "name": "k3s",
           "version": "1.24.6",
           "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.6+k3s1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "k3s",
+          "version": "1.24.12",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.12+k3s1.tar.gz"
         }
       }
     },
@@ -13503,8 +13523,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.14.1+1-LTS-31207.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm"
+          "version": "11.0.18-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm"
         }
       }
     },
@@ -13513,8 +13533,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.14.1+1-LTS-31207.x86_64.rpm",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm"
+          "version": "11.0.18-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm"
         }
       }
     },
@@ -13623,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.32",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.32.tar.gz"
+          "version": "8.0.33",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.33.tar.gz"
         }
       }
     },
@@ -21324,8 +21344,8 @@
         "type": "other",
         "other": {
           "name": "protobuf-c",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.0/protobuf-c-1.4.0.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.1/protobuf-c-1.4.1.tar.gz"
         }
       }
     },
