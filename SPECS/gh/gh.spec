@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,8 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+# Available upstream in 2.16.0
+Patch0:         fix-relative-time-search-tests.patch
 
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  git
@@ -38,7 +40,7 @@ Requires:       git
 GitHub official command line tool.
 
 %prep
-%setup -q -n cli-%{version}
+%autosetup -p1 -n cli-%{version}
 
 %build
 tar --no-same-owner -xf %{SOURCE1}
@@ -70,6 +72,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Apr 26 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.13.0-11
+- Add upstream patch to fix search tests involving relative time
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-10
 - Bump release to rebuild with go 1.19.8
 
