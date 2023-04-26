@@ -28,15 +28,14 @@ BuildRequires: systemd-rpm-macros
 
 Requires: moby-runc >= 1.1.0
 
-Conflicts: containerd
-Conflicts: containerd-io
+Conflicts: moby-containerd
 Conflicts: moby-engine <= 3.0.10
 
 Obsoletes: containerd
 Obsoletes: containerd-io
 
 %description
-This is the contianerd runtime meant for use with confidential containers
+This is the containerd runtime meant for use with confidential containers
 
 %prep
 %autosetup -p1 -n %{upstream_repo}-%{version}
