@@ -14,6 +14,8 @@ Patch2:         CVE-2021-41990.patch
 Patch3:         CVE-2021-41991.patch
 Patch4:         CVE-2021-45079.patch
 Patch5:         CVE-2022-40617.patch
+# Vulnerability applies to 5.9.8 and 5.9.9
+Patch6:         CVE-2023-26463.nopatch
 BuildRequires:  autoconf
 BuildRequires:  gmp-devel
 
@@ -51,6 +53,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_datadir}/strongswan/*
 
 %changelog
+* Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.7.2-6
+- No patch for CVE-2023-26463 effects only 5.9.8 and 5.9.9
+
 * Fri Feb 10 2023 Dan Streetman <ddstreet@microsoft.com> - 5.7.2-6
 - CVE-2022-40617
 
