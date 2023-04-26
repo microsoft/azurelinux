@@ -2,7 +2,7 @@
 Name:         erlang
 Summary:      erlang
 Version:      24.2
-Release:      1%{?dist}
+Release:      2%{?dist}
 Group:        Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,9 @@ make install DESTDIR=%{buildroot}
 %exclude %{_libdir}/debug
 
 %changelog
+* Wed Apr 26 2023 Sindhu Karri <lakarri@microsoft.com> - 24.2-2
+- Add patch for zlib CVE-2018-25032
+
 * Wed Jan 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 24.2-1
 - Update source to 24.2
 
