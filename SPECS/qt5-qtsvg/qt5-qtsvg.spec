@@ -3,7 +3,7 @@
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License:        LGPLv2 WITH exceptions OR GPLv3 WITH exceptions
 Vendor:         Microsoft Corporation
@@ -15,6 +15,7 @@ Patch100:       CVE-2021-38593.nopatch
 Patch101:       CVE-2018-21035.nopatch
 # Vulnerability is limited to the Windows OS.
 Patch102:       CVE-2022-25634.nopatch
+Patch103:    CVE-2023-24607.patch
 
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
@@ -85,6 +86,9 @@ popd
 %{_qt5_examplesdir}/
 
 %changelog
+* Wed Apr 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.12.11-4
+- Add patch for CVE-2023-24607
+
 * Fri Mar 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Adding a nopatch for CVE-2022-25634 - vulnerability limited to the Windows OS.
 
