@@ -421,7 +421,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Thu May 04 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-3
-- Enable HWMON support
+- Enable HWMON support, RAS_CEC, and BLK_DEV_IO_TRACE
 
 * Wed May 03 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-2
 - Enable CONFIG_NVME_MULTIPATH
