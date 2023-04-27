@@ -428,6 +428,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Mar 30 2023 Timothy Miskell <timothy.miskell@intel.com> - 5.15.102.1-2
+- Add net/ice patches
+- Set CONFIG_ICE=m
+
 * Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
 - Auto-upgrade to 5.15.102.1
 
