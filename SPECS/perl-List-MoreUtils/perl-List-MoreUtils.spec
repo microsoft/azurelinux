@@ -2,7 +2,7 @@
 Summary:        Provide the stuff missing in List::Util
 Name:           perl-List-MoreUtils
 Version:        0.428
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
