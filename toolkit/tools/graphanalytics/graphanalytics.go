@@ -344,6 +344,7 @@ func finalPathNodeSRPMMatch(expected, given interface{}) bool {
 }
 
 // convertNodePathToStringPath converts the graph node slice into a string in the following format:
+//
 //	<last_node>: <first_node> [<optional_node_SRPM_name>] -> <second_node> [<optional_node_SRPM_name>] -> (...) -> <last_node> [<optional_node_SRPM_name>]
 func convertNodePathToStringPath(nodePath []graph.Node) string {
 	var pathStrings []string

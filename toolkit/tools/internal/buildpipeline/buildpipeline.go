@@ -32,8 +32,8 @@ func IsRegularBuild() bool {
 }
 
 // GetChrootDir returns the chroot folder
-// - proposeDir is suggested folder name
-//   in case of Docker based build a chroot dir is selected from the chroot pool and proposeDir is ignored
+//   - proposeDir is suggested folder name
+//     in case of Docker based build a chroot dir is selected from the chroot pool and proposeDir is ignored
 func GetChrootDir(proposedDir string) (chrootDir string, err error) {
 	if IsRegularBuild() {
 		// don't change proposed dir in case of regular build
@@ -180,11 +180,11 @@ func GetRpmsDir(chrootDir string, proposedDir string) string {
 }
 
 // CleanupDockerChroot: Docker based only, clean chroot =>
-// 1) delete everything but the folders listed
-//    these folders are the ones mounted in docker run command (-v option)
-// 2) create empty folders
-//    these folders are required by chroot (e.g.: /run) and needs to be created empty
-//    to not inherit anything from previous build
+//  1. delete everything but the folders listed
+//     these folders are the ones mounted in docker run command (-v option)
+//  2. create empty folders
+//     these folders are required by chroot (e.g.: /run) and needs to be created empty
+//     to not inherit anything from previous build
 func CleanupDockerChroot(chroot string) (err error) {
 	var folderToKeep = []string{
 		"dev",

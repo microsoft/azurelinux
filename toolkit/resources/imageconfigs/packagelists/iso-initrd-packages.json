@@ -61,6 +61,7 @@
         "util-linux",
         "veritysetup",
         "words",
+        "xfsprogs",
         "xz",
         "zlib"
     ]

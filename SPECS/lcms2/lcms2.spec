@@ -1,7 +1,7 @@
 Summary:        Color Management Engine
 Name:           lcms2
 Version:        2.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/lcms2.pc
 
 %changelog
+* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13.1-2
+- Bumping release to re-build with newer 'libtiff' libraries.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13.1-1
 - Updating to 2.13.1.
 - Fixing source URL.

@@ -9,13 +9,14 @@ import "fmt"
 type BuildAgentConfig struct {
 	Program string
 
-	WorkDir   string
-	WorkerTar string
-	RepoFile  string
-	RpmDir    string
-	SrpmDir   string
-	CacheDir  string
-	CCacheDir string
+	WorkDir      string
+	WorkerTar    string
+	RepoFile     string
+	RpmDir       string
+	ToolchainDir string
+	SrpmDir      string
+	CacheDir     string
+	CCacheDir    string
 
 	DistTag              string
 	DistroReleaseVersion string

@@ -77,6 +77,19 @@ func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
 		}
 
 		for _, rpmFile := range rpmFiles {
+			// rpmFile is the real RPM filename on disk.
+			// use rpm cli to check the rpmFile's reported package name
+			// print a warning if the filename does not match the package name
+			stdout, stderr, err = shell.Execute("rpm", "-qp", rpmFile)
+			if err == nil {
+				calculatedRpmName := strings.Split(stdout, "\n")
+				calculatedRpmFilename := fmt.Sprintf("%s.rpm", calculatedRpmName[0])
+				if calculatedRpmFilename != filepath.Base(rpmFile) {
+					logger.Log.Warnf("!!!!! Detected mismatched filename !!!!!!")
+					logger.Log.Warnf("---- filename   == '%s'", filepath.Base(rpmFile))
+					logger.Log.Warnf("---- calculated == '%s'", calculatedRpmFilename)
+				}
+			}
 			dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
 			err = file.Move(rpmFile, dstFile)
 			if err != nil {

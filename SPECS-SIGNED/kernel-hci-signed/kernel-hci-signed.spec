@@ -4,8 +4,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for HCI
 Name:           kernel-hci-signed-%{buildarch}
-Version:        5.15.102.1
-Release:        2%{?dist}
+Version:        5.15.107.1
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -149,8 +149,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Wed Apr 26 2023 Timothy Miskell <timothy.miskell@intel.com> - 5.15.102.1-1
+* Wed Apr 26 2023 Timothy Miskell <timothy.miskell@intel.com> - 5.15.107.1-3
 - Bump release to match kernel-hci
+
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
+- Bump release to match kernel-hci
+
+* Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
+- Auto-upgrade to 5.15.107.1
+
+* Tue Apr 11 2023 Kanika Nema <kanikanema@microsoft.com> - 5.15.102.1-2
+- Bump release number to match kernel release.
 
 * Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
 - Auto-upgrade to 5.15.102.1

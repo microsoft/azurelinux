@@ -13,7 +13,7 @@ import (
 // MountIdentifier indicates how a partition should be identified in the fstab file
 type MountIdentifier string
 
-//label
+// label
 const (
 	// MountIdentifierUuid mounts this partition via the filesystem UUID
 	MountIdentifierUuid MountIdentifier = "uuid"
