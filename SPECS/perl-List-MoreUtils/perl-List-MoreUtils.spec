@@ -47,9 +47,12 @@ make test
 %{perl_vendorlib}/List/
 %{_mandir}/man3/List::MoreUtils.3*
 %{_mandir}/man3/List::MoreUtils::PP.3*
-%{_mandir}/man3/List::MoreUtils::Contributing.3.gz
+%{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Wed Apr 26 2023 Sam Meluch <sammeluch@microsoft.com> - 0.428-6
+- update man3 file extension
+
 * Fri Nov 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.428-5
 - Adding 'local::lib' perl5 library to fix test dependencies.
 - Removed %%sha1 macro.
