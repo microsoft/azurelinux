@@ -60,6 +60,7 @@ make test
 
 %changelog
 * Wed Apr 26 2023 Sam Meluch <sammeluch@micrsoft.com> 1.004-4
+- update man3 files with correct extension
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically

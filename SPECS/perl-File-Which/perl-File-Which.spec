@@ -54,6 +54,7 @@ make test
 
 %changelog
 * Wed Apr 26 2023 Sam Meluch <sammeluch@microsoft.com> - 1.22-4
+- update man3 files with correct extension
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.22-3
 - Added %%license line automatically
