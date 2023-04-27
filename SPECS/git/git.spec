@@ -1,6 +1,6 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.33.7
+Version:        2.33.8
 Release:        1%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
@@ -88,6 +88,9 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+* Thu Apr 27 2023 Sean Dougherty <sdougherty@microsoft.com> - 2.33.8-1
+- Upgrade git to 2.33.8 to address CVE-2023-25652 and CVE-2023-29007
+
 * Tue Feb 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.33.7-1
 - Auto-upgrade to 2.33.7 - fix CVE-2023-22490, CVE-2023-23946
 
