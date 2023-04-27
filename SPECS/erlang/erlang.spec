@@ -2,13 +2,14 @@
 Name:         erlang
 Summary:      erlang
 Version:      24.2
-Release:      1%{?dist}
+Release:      2%{?dist}
 Group:        Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:      ASL 2.0
 URL:          https://erlang.org
 Source0:      https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
+Patch0:       CVE-2018-25032.patch
 
 BuildRequires: unzip
 %description
@@ -16,6 +17,7 @@ erlang programming language
 
 %prep
 %setup -q -n otp-OTP-%{version}
+%patch0 -p1
 
 %build
 export ERL_TOP=`pwd`
@@ -39,6 +41,9 @@ make install DESTDIR=%{buildroot}
 %exclude %{_libdir}/debug
 
 %changelog
+* Wed Apr 26 2023 Sindhu Karri <lakarri@microsoft.com> - 24.2-2
+- Add patch for zlib CVE-2018-25032
+
 * Wed Jan 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 24.2-1
 - Update source to 24.2
 
