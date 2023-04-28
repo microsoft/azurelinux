@@ -10,11 +10,11 @@
 timestamper_tool = $(TOOL_BINS_DIR)/bldtracker
 
 # At the beginning of the build, create an empty directory
-# at build/timestamp, and create an "init" file. 
+# at build/timestamp, and create an "init" file.
 
 $(call create_folder,$(TIMESTAMP_DIR))
 # We want to make sure that we don't reset our timing data if we run a sub-make
-ifeq ($(MAKELEVEL),0)
-$(shell rm -rf $(TIMESTAMP_DIR)/*)
-$(shell touch $(TIMESTAMP_DIR)/init)
-endif
+# ifeq ($(MAKELEVEL),0)
+# $(shell rm -rf $(TIMESTAMP_DIR)/*)
+# $(shell touch $(TIMESTAMP_DIR)/init)
+# endif

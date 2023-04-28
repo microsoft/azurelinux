@@ -15,9 +15,7 @@ $(call create_folder,$(BUILD_DIR)/tools)
 
 # List of go utilities in tools/ directory
 go_tool_list = \
-	bldtracker \
 	boilerplate \
-	dashboard \
 	depsearch \
 	grapher \
 	graphpkgfetcher \
@@ -131,13 +129,6 @@ $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 go-test-coverage: $(test_coverage_report)
 	@echo Coverage report available at: $(test_coverage_report)
 
-.PHONY: dashboard dashboard_v2
-dashboard: $(go-dashboard)
-	$(go-dashboard) --build-dir="$(BUILD_DIR)" || true
-
-dashboard_v2: $(go-dashboard_v2)
-	$(go-dashboard_v2) --build-dir="$(BUILD_DIR)" || true
-
 ######## CHROOT TOOLS ########
 
 chroot_worker = $(BUILD_DIR)/worker/worker_chroot.tar.gz
@@ -171,19 +162,14 @@ worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chr
 worker_chroot_deps := \
 	$(worker_chroot_manifest) \
 	$(worker_chroot_rpm_paths) \
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh \
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
-$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE) | $(go-bldtracker)
+$(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 else
 $(chroot_worker):
 endif
-	$(timestamper_download_script) \
-		$(timestamper_tool) \
-		"$(TIMESTAMP_DIR)/download_toolchain.json" \
-		"ending" \
-		"complete" 2>/dev/null && \
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(TOOLCHAIN_RPMS_DIR) $(LOGS_DIR) $(go-bldtracker) $(TIMESTAMP_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(TOOLCHAIN_RPMS_DIR) $(LOGS_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \

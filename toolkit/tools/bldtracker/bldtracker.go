@@ -75,12 +75,14 @@ func setupLogger(logLevelStr string) {
 	logger.SetStderrLogLevel(logLevelStr)
 }
 
-// Creates a CSV specifically for the shell script mentioned in "scriptName".
+// Creates a JSON specifically for the shell script mentioned in "scriptName".
 func initialize(completePath, toolName string, expectedWeight float64) {
 	timestamp_v2.BeginTiming(toolName, completePath, expectedWeight, true)
+	// timestamp.BeginTiming(toolName, completePath+"l")
+	// timestamp.FlushAndCleanUpResources()
 }
 
-// Records a new timestamp to the specific CSV for the specified shell script.
+// Records a new timestamp to the specific JSON for the specified shell script.
 func record(completePath, toolName, path string, expectedWeight float64, weight float64, createIfMIssing bool, createIfMissingExpected float64) {
 	logger.Log.Tracef("Try to start measure %s...\n", path)
 	root, err := timestamp_v2.ResumeTiming(toolName, completePath, createIfMIssing, true)
@@ -103,6 +105,10 @@ func record(completePath, toolName, path string, expectedWeight float64, weight 
 		logger.Log.Errorf("Failed to record timestamp: %s", err)
 	}
 	logger.Log.Tracef("... done start %s\n", path)
+
+	// timestamp.ResumeTiming(toolName, completePath+"l")
+	// defer timestamp.FlushAndCleanUpResources()
+	// timestamp.StartEventByPath(fullPath)
 }
 
 func stop(completePath, toolName, path string) {
@@ -119,6 +125,10 @@ func stop(completePath, toolName, path string) {
 		logger.Log.Errorf("Failed to record timestamp: %s", err)
 	}
 	logger.Log.Tracef("... done stop %s\n", path)
+
+	// timestamp.ResumeTiming(toolName, completePath+"l")
+	// defer timestamp.FlushAndCleanUpResources()
+	// timestamp.StopEventByPath(fullPath)
 }
 
 func finish(completePath, toolName string) {
@@ -128,6 +138,9 @@ func finish(completePath, toolName string) {
 	}
 
 	timestamp_v2.EndTiming()
+
+	// timestamp.ResumeTiming(toolName, completePath+"l")
+	// timestamp.CompleteTiming()
 }
 
 func watch(completePath string) {

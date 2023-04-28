@@ -43,7 +43,7 @@ import (
 )
 
 var (
-	StampMgr *TimeStampManager = nil // A shared TimeInfo object that is by default nil. Library will log an warning if the empty object is called.
+	StampMgr *TimeStampManager = nil // A shared TimeInfo object that is by default nil. Library will log a warning if the empty object is called.
 )
 
 const (
@@ -72,11 +72,11 @@ func newStampMgr(rootNode *TimeStamp, outputFilePath string, outputFileDescripto
 		dataFilePath:       outputFilePath,
 		dataFileDescriptor: outputFileDescriptor,
 		root:               rootNode,
+		activeNode:         rootNode,
 		isAtomic:           atomicMode,
 		shouldWrite:        true,
 		lastUpdate:         time.Now(),
 	}
-	newMgr.activeNode = newMgr.root
 	return
 }
 
@@ -309,7 +309,7 @@ func EndTiming() (err error) {
 		return err
 	}
 
-	// We are tearing down, flus any data now
+	// We are tearing down, flush any data now
 	StampMgr.shouldWrite = true
 
 	// Will manually tear down locks at the end of this function
@@ -414,7 +414,7 @@ func StartMeasuringEventByPath(path string, expectedWeight float64) (node *TimeS
 	// Check the root first
 	node = nil
 	if pathComponents[0] != StampMgr.root.Name {
-		err = fmt.Errorf("timestamp root miss-match ('%s', expected '%s')", pathComponents[0], StampMgr.root.Name)
+		err = fmt.Errorf("timestamp root mismatch ('%s', expected '%s')", pathComponents[0], StampMgr.root.Name)
 		logger.Log.Warnf(err.Error())
 		return &TimeStamp{}, err
 	}

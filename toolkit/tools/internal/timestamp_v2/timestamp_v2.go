@@ -26,7 +26,7 @@ type TimeStamp struct {
 	finished       bool
 }
 
-var (
+const (
 	pathSeparator string = "/"
 )
 

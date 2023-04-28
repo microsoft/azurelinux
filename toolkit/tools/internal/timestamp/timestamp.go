@@ -1,129 +1,92 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// Records the run time for different parts of a go program
-// and its nested calls to other go programs.
+// Timestamp data structure and utilities
 
 package timestamp
 
 import (
-	"encoding/csv"
-	"os"
-	"path/filepath"
+	"fmt"
+	"strings"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/uidutils"
 )
 
-var (
-	Stamp = &TimeInfo{} // A shared TimeInfo object that is by default empty; will log an warning if the empty object is called.
+type TimeStamp struct {
+	ID              int64      `json:"ID"`
+	Name            string     `json:"Name"`
+	StartTime       *time.Time `json:"StartTime"`
+	EndTime         *time.Time `json:"EndTime"`
+	ElapsedSeconds  float64    `json:"ElapsedSeconds"`
+	ParentID        int64      `json:"ParentID"`
+	parentTimestamp *TimeStamp
+	subSteps        map[string]*TimeStamp
+}
+
+const (
+	pathSeparator string = "/"
 )
 
-// TimeInfo holds information needed for timestamping a go program.
-type TimeInfo struct {
-	filePath   string        // Path to store all timestamps
-	toolName   string        // Name of the tool (consistent for all timestamps related to this object)
-	stepName   string        // Name of the step
-	actionName string        // Subaction within current step
-	duration   time.Duration // Time to complete the step (ms)
-	startTime  time.Time     // Start time of the step
-	endTime    time.Time     // End time for the step
-	timeRange  bool          // Whether to record start and end time
-}
-
-// Create a new instance of timeInfo struct.
-func New(toolName string) *TimeInfo {
-	return &TimeInfo{
-		toolName:  toolName,
-		timeRange: true,
-		startTime: time.Now(),
+func (ts *TimeStamp) ElapsedTime() time.Duration {
+	if ts.EndTime == nil {
+		return time.Duration(-1)
 	}
+	return ts.EndTime.Sub(*ts.StartTime)
 }
 
-func NewBldTracker(scriptName string, stepName string, actionName string, startTime time.Time) *TimeInfo {
-	return &TimeInfo{
-		toolName:   scriptName,
-		stepName:   stepName,
-		actionName: actionName,
-		startTime:  startTime,
-		timeRange:  true,
+func (ts *TimeStamp) DisplayName() string {
+	if ts == nil {
+		return ""
 	}
+	return ts.parentTimestamp.DisplayName() + pathSeparator + ts.Name
 }
 
-// Creates the file that every subsequent timestamp in this go program will write to.
-func InitCSV(completePath string) {
-	// Update the global object "Stamp".
-	// Assume the base directory of completePath ends with .csv for now (possible to be .json later).
-	fileName := filepath.Base(completePath)
-	Stamp = New(fileName)
-
-	file, err := os.Create(completePath)
-	if err != nil {
-		logger.Log.Warnf("Unable to create file %s: %s \n", completePath, err)
-	}
-
-	// Store file path information.
-	Stamp.filePath = completePath
-	file.Close()
-}
-
-// Start recording time for a new operation.
-func (info *TimeInfo) Start() {
-	// If we have not set up TimeInfo, log a warning and do nothing.
-	if *info == (TimeInfo{}) {
-		logger.Log.Warnf("Unable to record timestamp; 'timestamp.Stamp' has not been set up for this file.")
+func newTimeStamp(name string, startTime time.Time, parent *TimeStamp) (ts *TimeStamp, err error) {
+	if strings.Contains(name, pathSeparator) {
+		err = fmt.Errorf("Can't create a timestamp object with a path containing %s", pathSeparator)
 		return
 	}
-	info.startTime = time.Now()
+
+	ts = &TimeStamp{ID: uidutils.NextUID(), Name: name, StartTime: &startTime, EndTime: nil, subSteps: make(map[string]*TimeStamp), ParentID: -1}
+	if parent != nil {
+		parent.addSubStep(ts)
+	}
+	return
 }
 
-// An internal function that helps record the timestamp.
-func (info *TimeInfo) track() {
-	info.endTime = time.Now()
-	info.duration = info.endTime.Sub(info.startTime)
-}
-
-// Records a new timestamp and writes it to the corresponding CSV file.
-func (info *TimeInfo) RecordToCSV(stepName string, actionName string) {
-	// If we have not set up TimeInfo, log a warning and do nothing.
-	if *info == (TimeInfo{}) {
-		logger.Log.Warnf("Unable to record timestamp; 'timestamp.Stamp' has not been set up for this file.")
+func newTimeStampByPath(root *TimeStamp, path string, startTime time.Time) (ts *TimeStamp, err error) {
+	components := strings.Split(path, pathSeparator)
+	if components[0] != root.Name {
+		err = fmt.Errorf("Timestamp root mismatch ('%s', expected '%s')", components[0], root.Name)
 		return
 	}
-	// Create a new CSV file.
-	file, err := os.OpenFile(info.filePath, os.O_APPEND|os.O_WRONLY, 0644)
+	parent, err := getTimeStampFromPath(root, components[:len(components)-1], 1)
 	if err != nil {
-		logger.Log.Warnf("Failed to open the CSV file. %s\n", err)
-		return
+		return &TimeStamp{}, err
 	}
-	defer file.Close()
-
-	// Writes the timestamp.
-	info.stepName = stepName
-	info.actionName = actionName
-
-	WriteStamp(file, info)
-
-	// In case .start() is not called.
-	info.startTime = info.endTime
+	ts, err = newTimeStamp(components[len(components)-1], startTime, parent)
+	return
 }
 
-// A function that generates a new timestamp and writes it to the CSV file.
-// Also used by bldtracker.go.
-func WriteStamp(file *os.File, info *TimeInfo) {
-	var err error
-	info.track()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	if info.timeRange {
-		err = writer.Write([]string{info.toolName, info.stepName, info.actionName, info.duration.String(),
-			info.startTime.Format(time.UnixDate), info.endTime.Format(time.UnixDate)})
-	} else {
-		err = writer.Write([]string{info.toolName, info.stepName, info.actionName, info.duration.String()})
+func getTimeStampFromPath(root *TimeStamp, path []string, nextIndex int) (ts *TimeStamp, err error) {
+	if nextIndex == len(path) {
+		return root, nil
 	}
-	if err != nil {
-		logger.Log.Warnf("Fail to write to file. %s\n", err)
+	nextNode, present := root.subSteps[path[nextIndex]]
+	if !present {
+		err = fmt.Errorf("Node at index %d does not exist in the path from root: %v", nextIndex, path)
 	}
+	return getTimeStampFromPath(nextNode, path, nextIndex+1)
+}
+
+func (ts *TimeStamp) addSubStep(subStep *TimeStamp) {
+	ts.subSteps[subStep.Name] = subStep
+	subStep.parentTimestamp = ts
+	subStep.ParentID = ts.ID
+}
+
+func (ts *TimeStamp) complete(endTime time.Time) {
+	ts.EndTime = &endTime
+	ts.ElapsedSeconds = ts.ElapsedTime().Seconds()
 }

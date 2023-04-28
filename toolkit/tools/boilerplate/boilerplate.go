@@ -11,6 +11,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/boilerplate/hello"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -32,6 +33,9 @@ func main() {
 	logger.InitBestEffort(*logFile, *logLevel)
 	timestamp_v2.BeginTiming("boilerplate", *timestampFile, 1, false)
 	defer timestamp_v2.EndTiming()
+
+	timestamp.BeginTiming("boilerplate", *timestampFile+"l")
+	defer timestamp.CompleteTiming()
 
 	logger.Log.Info(hello.World())
 }
