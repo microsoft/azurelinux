@@ -54,10 +54,8 @@ BuildRequires:  readline-devel
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  texinfo
-%if %{with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-%endif
 Requires:       ncurses
 Requires:       net-snmp
 Requires(post): hostname
@@ -95,7 +93,12 @@ SELinux policy modules for FRR package
 %endif
 
 %prep
-%autosetup -p1 -n %{name}-%{name}-%{version}
+%setup -n %{name}-%{name}-%{version}
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
 #Selinux
 mkdir selinux
 cp -p %{SOURCE3} %{SOURCE4} %{SOURCE5} selinux
@@ -179,7 +182,7 @@ rm %{buildroot}%{_libdir}/frr/*.so
 rm -r %{buildroot}%{_includedir}/frr/
 
 %pre
-%sysusers_create_compat %{SOURCE2}
+%sysusers_create_package %{name} %{SOURCE2}
 
 %post
 %systemd_post frr.service
