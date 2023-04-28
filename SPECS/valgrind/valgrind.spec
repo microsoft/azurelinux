@@ -49,7 +49,7 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
-* Wed Apr 6 2023 Olivia Crain <oliviacrain@microsoft.com> - 3.18.1-2
+* Wed Apr 26 2023 Olivia Crain <oliviacrain@microsoft.com> - 3.18.1-2
 - Fix flaky doctests by installing XML DTD files package during check builds
 - Use SPDX license expression in license tag
 
