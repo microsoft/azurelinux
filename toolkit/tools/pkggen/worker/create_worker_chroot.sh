@@ -10,36 +10,22 @@ set -o pipefail
 # $3 path to find RPMs. May be in PATH/<arch>/*.rpm
 # $4 path to log directory
 
-[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ] && [ -n "$6" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir> <./bldtracker> <./timestamp_output_directory>"; exit; }
+[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir>"; exit; }
 
 chroot_base=$1
 packages=$2
 rpm_path=$3
 log_path=$4
-bldtracker=$5
-timestamp_dir=$6
 
 chroot_name="worker_chroot"
-timestamp_script="$(realpath "$(dirname $0)/../../../scripts/timestamp.sh")"
 chroot_builder_folder=$chroot_base/$chroot_name
 chroot_archive=$chroot_base/$chroot_name.tar.gz
 chroot_log="$log_path"/$chroot_name.log
-chroot_timing_log="$log_path"/${chroot_name}_timestamp.log
-
-#set -x
-#set -e
-TIMESTAMP_FILE_PATH=$timestamp_dir/chroot.json
-BLDTRACKER=$bldtracker
-source $timestamp_script
-
-begin_timestamp 2
 
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
 
     echo "Adding RPM to worker chroot: $1." | tee -a "$chroot_log"
-
-    start_record_timestamp "install packages/install rpm files/$1" 0
 
     full_rpm_path=$(find "$rpm_path" -name "$1" -type f 2>>"$chroot_log")
     if [ ! $? -eq 0 ] || [ -z "$full_rpm_path" ]
@@ -56,10 +42,7 @@ install_one_toolchain_rpm () {
         echo "Elevated install failed for package $1, aborting. $error_msg_tail" | tee -a "$chroot_log"
         exit 1
     fi
-
-    stop_record_timestamp "install packages/install rpm files/$1"
 }
-
 
 rm -rf "$chroot_builder_folder"
 rm -f "$chroot_archive"
@@ -77,14 +60,9 @@ mknod -m 600 $chroot_builder_folder/dev/console c 5 1
 mknod -m 666 $chroot_builder_folder/dev/null c 1 3
 mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
 
-start_record_timestamp "install packages" 4 10.0
-start_record_timestamp "install packages/install rpm files" $(cat "$packages" | wc -l) $(cat "$packages" | wc -l) # Set weight to # of packages to install
-
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
-
-stop_record_timestamp "install packages/install rpm files"
 
 # If the host machine rpm version is >= 4.16 (such as Mariner 2.0), it will create an "sqlite" rpm database backend incompatible with Mariner 1.0 (which uses "bdb")
 # To resolve this, enter the 1.0 chroot after the packages are installed, and use the older rpm tool in the chroot to re-create the database in "bdb" format.
@@ -97,8 +75,6 @@ echo "Current host '$HOST_RPM_VERSION' with rpm db '$HOST_RPM_DB_BACKEND', guest
 if [[ "$HOST_RPM_DB_BACKEND" == "$GUEST_RPM_DB_BACKEND" ]]; then
     echo "The host rpm db '$HOST_RPM_DB_BACKEND' matches the guest. Not rebuilding the database." | tee -a "$chroot_log"
 else
-    start_record_timestamp "install packages/adding RPM DB entries"
-
     echo "The host rpm db ('$HOST_RPM_DB_BACKEND') differs from the guest ('$GUEST_RPM_DB_BACKEND'). Rebuilding database for compatibility" | tee -a "$chroot_log"
     TEMP_DB_PATH="/temp_db"
     chroot "$chroot_builder_folder" mkdir -p "$TEMP_DB_PATH"
@@ -112,17 +88,9 @@ else
         chroot "$chroot_builder_folder" rm $package
     done < "$packages"
     echo "Overwriting old RPM database with the results of the conversion." | tee -a "$chroot_log"
-
-    stop_record_timestamp "install packages/adding RPM DB entries"
-    start_record_timestamp "install packages/overwriting old RPM database"
-
     chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
     chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
-
-    stop_record_timestamp "install packages/overwriting old RPM database"
 fi
-
-start_record_timestamp "install packages/importing GPG keys"
 
 echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
 for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
@@ -130,8 +98,6 @@ do
     echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
     chroot "$chroot_builder_folder" rpm --import "$gpg_key"
 done
-
-stop_record_timestamp "install packages/importing GPG keys"
 
 HOME=$ORIGINAL_HOME
 
@@ -146,18 +112,9 @@ if [[ -f "$DOCKERCONTAINERONLY" ]]; then
 fi
 
 echo "Done installing all packages, creating $chroot_archive." | tee -a "$chroot_log"
-
-stop_record_timestamp "install packages"
-
-start_record_timestamp "packing the chroot"
-
 if command -v pigz &>/dev/null ; then
     tar -I pigz -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 else
     tar -I gzip -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 fi
 echo "Done creating $chroot_archive." | tee -a "$chroot_log"
-
-stop_record_timestamp "packing the chroot"
-
-finish_timestamp

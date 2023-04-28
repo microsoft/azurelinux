@@ -44,12 +44,9 @@ mkdir -pv $MARINER_RPM_DIR/$(uname -m)
     "$MARINER_INPUT_SRPMS_DIR" \
     "$MARINER_OUTPUT_SRPMS_DIR" \
     "$MARINER_REHYDRATED_RPMS_DIR" \
-<<<<<<< HEAD
+    "$MARINER_TOOLCHAIN_MANIFESTS_FILE" \
     "$BLDTRACKER" \
     "$TIMESTAMP_FILE_PATH"
-=======
-    "$MARINER_TOOLCHAIN_MANIFESTS_FILE"
->>>>>>> de746e34ae3cd53771507f5c583285a7cdc8703d
 
 # Output:
 # out/toolchain/built_rpms
