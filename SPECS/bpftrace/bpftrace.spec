@@ -1,7 +1,7 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.16.0
-Release:        2%{?dist}
+Version:        0.19.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,8 +51,9 @@ mkdir build
 cd build
 
 %cmake \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DBUILD_SHARED_LIBS:BOOL=OFF \
+    -DUSE_SYSTEM_BPF_BCC:BOOL=ON \
 %if !%{with_check}
     -DBUILD_TESTING=0 \
 %endif
