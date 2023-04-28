@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-azure
-Version:        5.15.107.1
-Release:        2%{?dist}
+Version:        5.15.108.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -416,6 +416,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Apr 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.108.1-1
+- Auto-upgrade to 5.15.108.1
+
 * Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
 - Disable rpm's debuginfo defaults which regenerate build-ids
 
