@@ -30400,8 +30400,8 @@
         "type": "other",
         "other": {
           "name": "zlib",
-          "version": "1.2.12",
-          "downloadUrl": "https://www.zlib.net/zlib-1.2.12.tar.xz"
+          "version": "1.2.13",
+          "downloadUrl": "https://www.zlib.net/zlib-1.2.13.tar.xz"
         }
       }
     },
