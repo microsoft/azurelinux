@@ -2847,16 +2847,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "moby-compose",
-          "version": "2.17.2",
-          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dogtail",
           "version": "0.9.11",
           "downloadUrl": "https://gitlab.com/dogtail/dogtail/raw/released/dogtail-0.9.11.tar.gz"
@@ -13142,6 +13132,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "moby-compose",
+          "version": "2.17.2",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "moby-containerd",
           "version": "1.6.18",
           "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.18.tar.gz"
@@ -14092,16 +14092,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nodejs18",
-          "version": "18.16.0",
-          "downloadUrl": "https://nodejs.org/download/release/v18.16.0/node-v18.16.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nodejs-nodemon",
           "version": "2.0.3",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
@@ -14115,6 +14105,16 @@
           "name": "nodejs-packaging",
           "version": "25",
           "downloadUrl": "https://releases.pagure.org/nodejs-packaging/nodejs-packaging-fedora-25.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nodejs18",
+          "version": "18.16.0",
+          "downloadUrl": "https://nodejs.org/download/release/v18.16.0/node-v18.16.0.tar.xz"
         }
       }
     },
