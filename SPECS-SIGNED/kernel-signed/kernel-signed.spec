@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.15.102.1
+Version:        5.15.107.1
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -153,6 +153,21 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Wed Apr 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-3
+- Bump release to match kernel
+
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
+- Bump release to match kernel
+
+* Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
+- Auto-upgrade to 5.15.107.1
+
+* Tue Apr 11 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-5
+- Bump release to match kernel
+
+* Tue Apr 11 2023 Kanika Nema <kanikanema@microsoft.com> - 5.15.102.1-4
+- Bump release number to match kernel release.
+
 * Wed Mar 29 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-3
 - Bump release to match kernel
 

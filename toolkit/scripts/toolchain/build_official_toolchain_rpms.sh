@@ -17,15 +17,17 @@ INCREMENTAL_TOOLCHAIN=${8:-n}
 MARINER_INPUT_SRPMS_DIR=$9
 MARINER_OUTPUT_SRPMS_DIR=${10}
 MARINER_REHYDRATED_RPMS_DIR=${11}
+MARINER_TOOLCHAIN_MANIFESTS_FILE=${12}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${12}
-TIMESTAMP_FILE_PATH=${13}
+BLDTRACKER=${13}
+TIMESTAMP_FILE_PATH=${14}
 source $(dirname  $0)/../timestamp.sh
 # =====================================================
 
 begin_timestamp 10
 start_record_timestamp "prep_files"
+
 
 MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
@@ -87,8 +89,24 @@ start_record_timestamp "hydrate"
 # If we're incrementally building and there are RPMs available to rehydrate from the repo, copy to the proper chroot RPM folder.
 # Empty files are indicative of a failure to download or a disabling of repo rehydration, so filter out empty RPMs.
 if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
-find $MARINER_REHYDRATED_RPMS_DIR -name "*.$(uname -m).rpm" -size +0 -exec cp {} $CHROOT_RPMS_DIR_ARCH ';'
-find $MARINER_REHYDRATED_RPMS_DIR -name "*.noarch.rpm" -size +0 -exec cp {} $CHROOT_RPMS_DIR_NOARCH ';'
+    # Lines with 'noarch' in them are noarch RPMs, otherwise they're arch-specific RPMs.
+    ARCH_RPMS=$(grep -v 'noarch' "$MARINER_TOOLCHAIN_MANIFESTS_FILE")
+    NOARCH_RPMS=$(grep 'noarch' "$MARINER_TOOLCHAIN_MANIFESTS_FILE")
+
+    for rpm in $ARCH_RPMS; do
+        # If the file exists and is not empty (test -s), copy it to the chroot RPM folder.
+        if [ -s "$MARINER_REHYDRATED_RPMS_DIR/$rpm" ]; then
+            echo "Copying $MARINER_REHYDRATED_RPMS_DIR/$rpm to $CHROOT_RPMS_DIR_ARCH"
+            cp "$MARINER_REHYDRATED_RPMS_DIR/$rpm" "$CHROOT_RPMS_DIR_ARCH"
+        fi
+    done
+    for rpm in $NOARCH_RPMS; do
+        # If the file exists and is not empty (test -s), copy it to the chroot RPM folder.
+        if [ -s "$MARINER_REHYDRATED_RPMS_DIR/$rpm" ]; then
+            echo "Copying $MARINER_REHYDRATED_RPMS_DIR/$rpm to $CHROOT_RPMS_DIR_NOARCH"
+            cp "$MARINER_REHYDRATED_RPMS_DIR/$rpm" "$CHROOT_RPMS_DIR_NOARCH"
+        fi
+    done
 fi
 
 stop_record_timestamp "hydrate"
@@ -158,7 +176,7 @@ chroot_and_install_rpms () {
     fi
 
     chroot_mount
-    
+
     echo "RPM files to be installed..."
     chroot "$LFS" ls -la $CHROOT_INSTALL_RPM_DIR_IN_CHROOT
     echo "Installing the rpms..."
@@ -384,10 +402,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 

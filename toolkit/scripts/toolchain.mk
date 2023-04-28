@@ -26,7 +26,6 @@ toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
-timestamper_download_script = $(SCRIPTS_DIR)/toolchain_download_timestamp.sh
 toolchain_files = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain -name *.sh) \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
@@ -50,7 +49,7 @@ $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
 
-.PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
+.PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
 ifeq ($(REBUILD_TOOLCHAIN),y)
@@ -72,6 +71,15 @@ clean-toolchain:
 	rm -f $(SCRIPTS_DIR)/toolchain/container/check-system-ca-certs.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/.bashrc
+
+# Clean the containers we use during toolchain build
+ifeq ($(CLEAN_TOOLCHAIN_CONTAINERS),y)
+clean:  clean-toolchain-containers
+endif
+
+# Optionally remove all toolchain docker containers
+clean-toolchain-containers:
+	$(SCRIPTS_DIR)/toolchain/toolchain_clean.sh $(BUILD_DIR)
 
 clean-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
@@ -147,15 +155,15 @@ hydrate-toolchain:
 
 # Output:
 # out/toolchain/toolchain_from_container.tar.gz
-$(raw_toolchain): $(toolchain_files) | $(timestamper_tool)
+$(raw_toolchain): $(toolchain_files)
 	@echo "Building raw toolchain"
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./create_toolchain_in_container.sh \
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
 			$(SOURCE_URL) \
-			$(timestamper_tool) \
-			$(TIMESTAMP_DIR)/create_toolchain_in_container.json
+			$(INCREMENTAL_TOOLCHAIN) \
+			$(ARCHIVE_TOOL)
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -194,14 +202,14 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 		touch $@; \
 	}
 else
-$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) 
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 	@touch $@
 endif
 
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
-$(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag | $(go-bldtracker)
+$(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo "Building base packages"
 	# Clean the existing chroot if not doing an incremental build
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
@@ -219,8 +227,7 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
 			$(toolchain_from_repos) \
-			$(go-bldtracker) \
-			$(TIMESTAMP_DIR)/build_mariner_toolchain.json && \
+			$(TOOLCHAIN_MANIFEST) && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
@@ -248,7 +255,7 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_tool
 	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
 	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
+		printf "ERROR: Mismatched packages between:\n\n'%s'\n\t'%s'\n\n" '$(selected_toolchain_archive)' '$(TOOLCHAIN_MANIFEST)' && \
 		echo "$${diff}"; \
 		$(call print_error, $@ failed) ; \
 	fi && \
@@ -262,7 +269,7 @@ $(toolchain_local_temp)%: ;
 
 # If $(depend_TOOLCHAIN_ARCHIVE) and $(depend_REBUILD_TOOLCHAIN) argument trackers change it is important to check
 #	that all of the toolchain .rpms are correct. The different toolchain sources may have identical files but with
-#	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take 
+#	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take
 #	responsibility for updating the .rpms in the final destination if needed.
 $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(call shell_real_build_only, find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $(toolchain_local_temp) && \
@@ -290,17 +297,10 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN) | $(timestamper_tool)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	$(timestamper_download_script) \
-		$(timestamper_tool) \
-		"$(TIMESTAMP_DIR)/download_toolchain.json" \
-		$$rpm_filename \
-		"record" \
-		$$(wc -w < $(TOOLCHAIN_MANIFEST)) && \
 	echo "Downloading toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
@@ -317,22 +317,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN) | $(timesta
 		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
 		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
 		$(call print_error,\nToolchain download failed. See above errors for more details.) \
-	} && \
-	$(timestamper_download_script) \
-		$(timestamper_tool) \
-		"$(TIMESTAMP_DIR)/download_toolchain.json" \
-		$$rpm_filename \
-		"stop" || \
-	true
-
-
-toolchain: | $(timestamper_tool)
-	$(timestamper_download_script) \
-		$(timestamper_tool) \
-		"$(TIMESTAMP_DIR)/download_toolchain.json" \
-		"ending" \
-		"complete" || \
-	true
+	}
 endif
 
 # ./out/RPMS is reserved for RPMs generated by the tooling, all other RPMs are cached in the ./build folder. If REBUILD_TOOLCHAIN=y is set
@@ -343,7 +328,7 @@ $(RPMS_DIR): $(toolchain_out_rpms)
 
 # For each toolchain RPM in ./out/RPMS, add a dependency on the counterparts in the normal toolchain directory:
 # Each path in $(toolchain_out_rpms) corresponds to a .rpm file we expect to have been built by the toolchain target and made available in ./out/RPMS.
-# Those RPMs however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS 
+# Those RPMs however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS
 # we will need to copy it over. We can filter the list of toolchain rpms $(toolchain_rpms) to find the source that matches the target ($@),
 # then copy it over.
 $(toolchain_out_rpms): $(toolchain_rpms)

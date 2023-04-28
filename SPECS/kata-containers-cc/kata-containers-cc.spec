@@ -6,59 +6,56 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.1.0
-Release:      10%{?dist}
+Version:      0.4.0
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
-
-Source2:      mariner-coco-build-uvm-image.sh
-Source3:      mariner-coco-build-uvm-image.service
-Source4:      containerd-for-cc-override.conf
-Source5:      runtime.yaml
-Source6:      pause-image.sh
-Source7:      pause-image.service
+Source2:      %{name}-%{version}-cargo.tar.gz
+Source3:      containerd-for-cc-override.conf
+Source4:      mariner-coco-build-uvm-image.sh
+Source5:      mariner-coco-build-uvm-rootfs.sh
 
 ExclusiveArch: x86_64
 
 BuildRequires:  golang
 BuildRequires:  make
-BuildRequires:  systemd
-BuildRequires:  gcc
 BuildRequires:  protobuf-compiler
-BuildRequires:  mariner-release
 BuildRequires:  dracut
-BuildRequires:  busybox
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  git
 BuildRequires:  sudo
-BuildRequires:  curl
-BuildRequires:  openssl-devel
-BuildRequires:  iptables-devel
-BuildRequires:  wget
 BuildRequires:  perl-FindBin
 BuildRequires:  perl-lib
 BuildRequires:  libseccomp-devel
 BuildRequires:  kernel-uvm-devel
-BuildRequires:  parted
-BuildRequires:  opa >= 0.50.2
 
-Requires:  systemd
-Requires:  iptables
-Requires:  parted
-Requires:  qemu-img
-Requires:  opa
 Requires:  kernel-uvm
 
 %description
 Kata Confidential Containers.
 
+%package tools
+Summary:        Kata CC Tools package
+Requires:       %{name} = %{version}-%{release}
+Requires:       cargo
+Requires:       qemu-img
+Requires:       parted
+Requires:       curl
+Requires:       opa >= 0.50.2
+
+%description tools
+This package contains the UVM osbuilder files
+
 %prep
 %autosetup -p1 -n %{name}-%{version}
+pushd %{_builddir}/%{name}-%{version}
+tar -xf %{SOURCE2}
+popd
 
 %build
 export PATH=$PATH:"$(pwd)/go/bin"
@@ -86,59 +83,70 @@ pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
 make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
 popd
-%define KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
+%global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
 # Agent
 pushd %{_builddir}/%{name}-%{version}/src/agent
 %make_build %{agent_make_vars}
 popd
 
-# UVM rootfs
-pushd %{_builddir}/%{name}-%{version}/tools/osbuilder
-gcc -O2 ./image-builder/nsdax.gpl.c -o ./image-builder/nsdax
-
-sudo -E PATH=$PATH \
- GOPATH="$(sudo readlink -f %{_builddir}/%{name}-%{version}/src/runtime/go)" \
- AGENT_SOURCE_BIN="$(sudo readlink -f %{_builddir}/%{name}-%{version}/src/agent/target/x86_64-unknown-linux-gnu/debug/kata-agent)" \
- make DISTRO=mariner KERNEL_MODULES_DIR=%{KERNEL_MODULES_DIR} rootfs
-
-rootfs_path="%{_builddir}/%{name}-%{version}/tools/osbuilder/mariner_rootfs"
-
-depmod -a -b ${rootfs_path} ${KERNEL_MODULE_VER}
-
-# Install agent service
-pushd %{_builddir}/%{name}-%{version}/src/agent
-sudo -E PATH=$PATH make install-services DESTDIR="${rootfs_path}"
-popd
-
-# The previous command doesn't include kata-agent.service and
-# kata-containers.target in the rootfs, for an unknown reason.
-sudo cp %{_builddir}/%{name}-%{version}/src/agent/kata-containers.target  mariner_rootfs/usr/lib/systemd/system/
-sudo cp %{_builddir}/%{name}-%{version}/src/agent/kata-agent.service.in   mariner_rootfs/usr/lib/systemd/system/kata-agent.service
-sudo sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g' mariner_rootfs/usr/lib/systemd/system/kata-agent.service
-
-# The UVM rootfs will be used to build an img file at the first Host boot.
-tar cf mariner-uvm-rootfs.tar.gz mariner_rootfs
-
-popd
-
 %install
-%define build_path    /opt/mariner/share/uvm/
 %define coco_path     /opt/confidential-containers
 %define coco_bin      %{coco_path}/bin
 %define defaults_kata %{coco_path}/share/defaults/kata-containers
 %define share_kata    %{coco_path}/share/kata-containers
+%define osbuilder     /opt/mariner/share/uvm
+
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/scripts
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/image-builder
+mkdir -p %{buildroot}%{osbuilder}/ci
+
+# Kernel modules
+cp -aR %{KERNEL_MODULES_DIR} %{buildroot}%{osbuilder}
+
+# osbuilder
+pushd %{_builddir}/%{name}-%{version}
+rm tools/osbuilder/.gitignore
+rm tools/osbuilder/rootfs-builder/.gitignore
+
+install -D -m 0755 %{SOURCE4}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-image.sh
+install -D -m 0755 %{SOURCE5}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-rootfs.sh
+install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
+install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
+install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
+cp -aR tools/osbuilder/rootfs-builder   %{buildroot}%{osbuilder}/tools/osbuilder
+cp -aR tools/osbuilder/initrd-builder   %{buildroot}%{osbuilder}/tools/osbuilder
+cp -aR tools/osbuilder/scripts          %{buildroot}%{osbuilder}/tools/osbuilder
+popd
 
 # Symlinks for cc binaries
 mkdir -p %{buildroot}%{coco_bin}
+mkdir -p %{buildroot}%{share_kata}
 mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
-ln -s /usr/bin/cloud-hypervisor %{buildroot}%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/containerd %{buildroot}%{coco_bin}/containerd
+ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
+ln -s /usr/bin/containerd                     %{buildroot}%{coco_bin}/containerd
+ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
+
 ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
-install -D -m 0644 %{SOURCE4} %{buildroot}/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
+install -D -m 0644 %{SOURCE3} %{buildroot}/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
 find %{buildroot}/etc
+
+# Agent
+pushd %{_builddir}/%{name}-%{version}/src/agent
+
+mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
+cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
+install -D -m 0755 mount_tar.sh           %{buildroot}%{osbuilder}/src/agent/mount_tar.sh
+install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
+install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
+install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
+install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
+
+popd 
 
 # Runtime
 pushd %{_builddir}/%{name}-%{version}/src/runtime
@@ -148,7 +156,6 @@ install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
 install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
 install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
-ln -s configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration.toml
 sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
 popd
 
@@ -157,42 +164,23 @@ pushd %{_builddir}/%{name}-%{version}/src/tardev-snapshotter/
 sed -i -e 's/containerd.service/kubelet.service/g' tardev-snapshotter.service
 install -m 0644 -D -t %{buildroot}%{_unitdir} tardev-snapshotter.service
 install -D -m 0755 target/release/tardev-snapshotter  %{buildroot}/usr/bin/tardev-snapshotter
-
 popd
 
-# The UVM rootfs will be used to build an img file at the first host boot.
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/scripts/lib.sh                   %{buildroot}/%{share_kata}/scripts/lib.sh
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}/%{share_kata}/scripts/image_builder.sh
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax              %{buildroot}/%{share_kata}/scripts/nsdax
-install -D -m 0644 %{_builddir}/%{name}-%{version}/tools/osbuilder/mariner-uvm-rootfs.tar.gz        %{buildroot}/%{build_path}/mariner-uvm-rootfs.tar.gz
+install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
+install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax.gpl.c        %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/nsdax.gpl.c
 
-install -D -m 0755 %{SOURCE2} %{buildroot}/%{build_path}/mariner-coco-build-uvm-image.sh
-install -D -m 0755 %{SOURCE6} %{buildroot}/%{build_path}/pause-image.sh
-install -D -m 0644 %{SOURCE5} %{buildroot}/runtime.yaml
-
-install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE3}
-install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE7}
 
 %preun
 %systemd_preun tardev-snapshotter.service
-%systemd_preun mariner-coco-build-uvm-image.service
 
 %postun
 %systemd_postun tardev-snapshotter.service
-%systemd_postun mariner-coco-build-uvm-image.service
 
 %post
 %systemd_post tardev-snapshotter.service
-%systemd_post mariner-coco-build-uvm-image.service
 
 %files
-%{build_path}/pause-image.sh
-%{build_path}/mariner-uvm-rootfs.tar.gz
-%{build_path}/mariner-coco-build-uvm-image.sh
-
-%{share_kata}/scripts/nsdax
-%{share_kata}/scripts/image_builder.sh
-%{share_kata}/scripts/lib.sh
+%{share_kata}/vmlinux.container
 
 %{coco_bin}/cloud-hypervisor
 %{coco_bin}/containerd
@@ -204,23 +192,54 @@ install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE7}
 %{coco_path}/libexec/virtiofsd
 
 %{_bindir}/tardev-snapshotter
+%{_unitdir}/tardev-snapshotter.service
 %{_prefix}/local/bin/containerd-shim-kata-cc-v2
 
-%{_unitdir}/tardev-snapshotter.service
-%{_unitdir}/mariner-coco-build-uvm-image.service
-%{_unitdir}/pause-image.service
 
 /etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
-/runtime.yaml
 
 %license LICENSE
 %doc CONTRIBUTING.md
 %doc README.md
 
 
+%files tools
+%dir %{osbuilder}/src/agent/samples/policy/all-allowed
+%{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed-data.json
+%{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed.rego
+%{osbuilder}/src/agent/mount_tar.sh
+
+%{osbuilder}/mariner-coco-build-uvm-image.sh
+%{osbuilder}/mariner-coco-build-uvm-rootfs.sh
+%{osbuilder}/kata-containers.target
+%{osbuilder}/kata-agent.service.in
+%{osbuilder}/coco-opa.service
+%{osbuilder}/kata-agent
+%{osbuilder}/ci/install_yq.sh
+
+%{osbuilder}/VERSION
+%{osbuilder}/versions.yaml
+
+%dir %{osbuilder}/modules
+%dir %{osbuilder}/tools
+%{osbuilder}/modules/*
+%{osbuilder}/tools/*
+
+# Remove some scripts we don't use
+%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/alpine
+%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/centos
+%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/clearlinux
+%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/debian
+%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/template
+%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
+
+
 %changelog
+*   Mon Apr 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
+-   Add vendored code and move UVM building out of base package
+
 *   Wed Apr 5 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-10
--   Rebase against cc-msft-prototypes branch
+-   Rebase against 0.4.0 upstream tag
 -   License verified.
 -   Original version for CBL-Mariner
 

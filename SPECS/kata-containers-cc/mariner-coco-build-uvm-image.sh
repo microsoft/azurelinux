@@ -2,91 +2,51 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+set -e
 set -o errexit
 
 [ -n "${DEBUG:-}" ] && set -o xtrace
 
-readonly SCRIPT_NAME="$0"
 readonly SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 readonly IMAGE_BUILD_ROOT=`mktemp --directory -t mariner-coco-build-uvm-image-XXXXXX`
-readonly IMAGE_LINK="/opt/confidential-containers/share/kata-containers/kata-containers.img"
-readonly IMAGE_LINK_TARGET="/var/cache/mariner/uvm/kata-containers.img"
-readonly KERNEL_LINK="/opt/confidential-containers/share/kata-containers/vmlinux.container"
-readonly KERNEL_LINK_TARGET="/usr/share/cloud-hypervisor/vmlinux.bin"
 
-COMMAND=""
-
-usage()
+generate_image()
 {
-    cat << EOF
+    pushd "${IMAGE_BUILD_ROOT}"
 
-Usage: ${SCRIPT_NAME} [options]
+    gcc -O2 ${ROOT_FOLDER}/opt/mariner/share/uvm/tools/osbuilder/image-builder/nsdax.gpl.c \
+      -o ${IMAGE_BUILD_ROOT}/nsdax
 
-This script builds the kata UVM image for Mariner.
+    # build image
+    sudo \
+      NSDAX_BIN=${IMAGE_BUILD_ROOT}/nsdax \
+      ${ROOT_FOLDER}/opt/mariner/share/uvm/tools/osbuilder/image-builder/image_builder.sh \
+      ${ROOT_FOLDER}/rootfs-cbl-mariner
 
-This script is called at via mariner-coco-build-uvm-image.service.
+    sudo cp kata-containers.img $OUT_DIR
 
-Options:
-  -h            Show this help message
-
-  -c            Check if an image is already generated for the current
-                kernel, and if so, simply exit
-EOF
-
-    exit $1
+    popd
+    sudo rm -rf "${IMAGE_BUILD_ROOT}"
 }
 
-parse_args()
-{
-    while getopts "ch:" opt
-    do
-        case $opt in
-            c) COMMAND="check" ;;
-            h) usage 0 ;;
-            *) usage 1 ;;
-        esac
-    done
-    shift $(($OPTIND - 1))
 
-    if [ -n "$*" ]; then
-        error "Unhandled options: '$*'"
-        usage 1
-    fi
-}
+while getopts ":r:o:" OPTIONS; do
+  case "${OPTIONS}" in
+    r ) ROOT_FOLDER=$OPTARG ;;
+    o ) OUT_DIR=$OPTARG ;;
 
-main()
-{
-    parse_args $*
+    \? )
+        echo "Error - Invalid Option: -$OPTARG" 1>&2
+        exit 1
+        ;;
+    : )
+        echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+  esac
+done
 
-    if [ "$COMMAND" = "check" ]; then
-        local linked_image=$(readlink -n "${IMAGE_LINK}" || :)
-        if [ "${IMAGE_LINK_TARGET}" = "${linked_image}" ] ; then
-            if [ -f "${linked_image}" ] ; then
-                echo "symlink=${IMAGE_LINK} already points to UVM kernel=${IMAGE_LINK_TARGET}"
-                echo "Nothing to generate. Exiting."
-                rm -rf "${IMAGE_BUILD_ROOT}"
-                exit 0
-            fi
-        fi
-    fi
-    
-    cd "${IMAGE_BUILD_ROOT}"
-    sudo tar --same-owner -xvf "${SCRIPT_DIR}/mariner-uvm-rootfs.tar.gz"
+echo "-- ROOT_FOLDER: $ROOT_FOLDER"
+echo "-- OUT_DIR: $OUT_DIR"
 
-    DEBUG=1 \
-    NSDAX_BIN=/opt/confidential-containers/share/kata-containers/scripts/nsdax \
-    /opt/confidential-containers/share/kata-containers/scripts/image_builder.sh ./mariner_rootfs
-
-    install -D -m 0644 kata-containers.img "$IMAGE_LINK_TARGET"
-    ln -sf "${IMAGE_LINK_TARGET}" "${IMAGE_LINK}"
-    ln -sf "${KERNEL_LINK_TARGET}" "${KERNEL_LINK}"
-
-    # TODO: don't leak these files when exiting due to an error.
-    rm -rf "${IMAGE_BUILD_ROOT}"
-
-    sed -i -e "s|kernel = .*$|kernel = \"$KERNEL_LINK_TARGET\"|" /opt/confidential-containers/share/defaults/kata-containers/configuration-clh.toml
-    sed -i -e "s|image = .*$|image = \"$IMAGE_LINK_TARGET\"|" /opt/confidential-containers/share/defaults/kata-containers/configuration-clh.toml
-}
-
-echo "$0 args: $*"
-main $*
+generate_image $*

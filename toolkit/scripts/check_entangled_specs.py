@@ -41,6 +41,10 @@ version_release_matching_groups = [
     frozenset([
         "SPECS/cyrus-sasl/cyrus-sasl.spec",
         "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/kernel-mstflint-signed/kernel-mstflint-signed.spec",
+        "SPECS/mstflint/mstflint.spec"
     ])
 ]
 

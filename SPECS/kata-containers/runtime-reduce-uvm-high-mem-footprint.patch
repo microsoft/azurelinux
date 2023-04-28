@@ -19,20 +19,20 @@ current mechanism of requesting resources through pod Limit annotations:
 Testing: Manual testing, creating pods with Limits and without limits, and with two containers where each container has a limit, tested with integration in a SPEC file where the config variables were set via environment variables via the make command
 ---
  src/runtime/Makefile                          |  8 ++++-
- src/runtime/config/configuration-clh.toml.in  | 17 ++++++----
+ src/runtime/config/configuration-clh.toml.in  | 17 +++++----
  src/runtime/config/configuration-fc.toml.in   |  5 +++
  src/runtime/config/configuration-qemu.toml.in |  7 +++-
- src/runtime/pkg/katautils/config.go           | 32 ++++++++++---------
- src/runtime/pkg/oci/utils.go                  | 11 +++++++
+ src/runtime/pkg/katautils/config.go           | 36 ++++++++++---------
+ src/runtime/pkg/oci/utils.go                  | 11 ++++++
  src/runtime/virtcontainers/hypervisor.go      |  2 +-
  src/runtime/virtcontainers/sandbox.go         |  3 ++
- 8 files changed, 61 insertions(+), 24 deletions(-)
+ 8 files changed, 63 insertions(+), 26 deletions(-)
 
 diff --git a/src/runtime/Makefile b/src/runtime/Makefile
-index b05106318..604e0ddae 100644
+index 99dde7e..1fbac61 100644
 --- a/src/runtime/Makefile
 +++ b/src/runtime/Makefile
-@@ -150,7 +150,7 @@ DEFVCPUS := 1
+@@ -158,7 +158,7 @@ DEFVCPUS := 1
  # Default maximum number of vCPUs
  DEFMAXVCPUS := 0
  # Default memory size in MiB
@@ -41,7 +41,7 @@ index b05106318..604e0ddae 100644
  # Default memory slots
  # Cases to consider :
  # - nvdimm rootfs image
-@@ -211,6 +211,9 @@ DEFSANDBOXCGROUPONLY ?= false
+@@ -225,6 +225,9 @@ DEFSANDBOXCGROUPONLY ?= false
  
  DEFSTATICRESOURCEMGMT ?= false
  
@@ -51,7 +51,7 @@ index b05106318..604e0ddae 100644
  DEFBINDMOUNTS := []
  
  SED = sed
-@@ -278,6 +281,7 @@ ifneq (,$(CLHCMD))
+@@ -292,6 +295,7 @@ ifneq (,$(CLHCMD))
      # CLH-specific options (all should be suffixed by "_CLH")
      # currently, huge pages are required for virtiofsd support
      DEFNETWORKMODEL_CLH := tcfilter
@@ -59,7 +59,7 @@ index b05106318..604e0ddae 100644
      KERNELTYPE_CLH = uncompressed
      KERNEL_NAME_CLH = $(call MAKE_KERNEL_NAME,$(KERNELTYPE_CLH))
      KERNELPATH_CLH = $(KERNELDIR)/$(KERNEL_NAME_CLH)
-@@ -480,7 +484,9 @@ USER_VARS += DEFENTROPYSOURCE
+@@ -501,7 +505,9 @@ USER_VARS += DEFENTROPYSOURCE
  USER_VARS += DEFVALIDENTROPYSOURCES
  USER_VARS += DEFSANDBOXCGROUPONLY
  USER_VARS += DEFSTATICRESOURCEMGMT
@@ -70,10 +70,10 @@ index b05106318..604e0ddae 100644
  USER_VARS += DEFVFIOMODE
  USER_VARS += BUILDFLAGS
 diff --git a/src/runtime/config/configuration-clh.toml.in b/src/runtime/config/configuration-clh.toml.in
-index 59ddf43e1..4f05115b8 100644
+index df7cc7a..d9e4864 100644
 --- a/src/runtime/config/configuration-clh.toml.in
 +++ b/src/runtime/config/configuration-clh.toml.in
-@@ -25,7 +25,7 @@ image = "@IMAGEPATH@"
+@@ -31,7 +31,7 @@ rootfs_type=@DEFROOTFSTYPE@
  #
  # Known limitations:
  # * Does not work by design:
@@ -82,7 +82,7 @@ index 59ddf43e1..4f05115b8 100644
  #   - Memory Hotplug
  #   - NVDIMM devices
  #
-@@ -190,9 +190,9 @@ block_device_driver = "virtio-blk"
+@@ -206,9 +206,9 @@ block_device_driver = "virtio-blk"
  # and we strongly advise users to refer the Cloud Hypervisor official
  # documentation for a better understanding of its internals:
  # https://github.com/cloud-hypervisor/cloud-hypervisor/blob/main/docs/io_throttling.md
@@ -94,7 +94,7 @@ index 59ddf43e1..4f05115b8 100644
  # net_rate_limiter_bw_max_rate controls network I/O bandwidth (size in bits/sec
  # for SB/VM).
  # The same value is used for inbound and outbound bandwidth.
-@@ -226,9 +226,9 @@ block_device_driver = "virtio-blk"
+@@ -242,9 +242,9 @@ block_device_driver = "virtio-blk"
  # and we strongly advise users to refer the Cloud Hypervisor official
  # documentation for a better understanding of its internals:
  # https://github.com/cloud-hypervisor/cloud-hypervisor/blob/main/docs/io_throttling.md
@@ -106,7 +106,7 @@ index 59ddf43e1..4f05115b8 100644
  # disk_rate_limiter_bw_max_rate controls disk I/O bandwidth (size in bits/sec
  # for SB/VM).
  # The same value is used for inbound and outbound bandwidth.
-@@ -356,7 +356,12 @@ sandbox_cgroup_only=@DEFSANDBOXCGROUPONLY@
+@@ -380,7 +380,12 @@ sandbox_cgroup_only=@DEFSANDBOXCGROUPONLY@
  # - When running with pods, sandbox sizing information will only be available if using Kubernetes >= 1.23 and containerd >= 1.6. CRI-O
  #   does not yet support sandbox sizing annotations.
  # - When running single containers using a tool like ctr, container sizing information will be available.
@@ -121,10 +121,10 @@ index 59ddf43e1..4f05115b8 100644
  # If specified, sandbox_bind_mounts identifieds host paths to be mounted (ro) into the sandboxes shared path.
  # This is only valid if filesystem sharing is utilized. The provided path(s) will be bindmounted into the shared fs directory.
 diff --git a/src/runtime/config/configuration-fc.toml.in b/src/runtime/config/configuration-fc.toml.in
-index b7f349c0d..e1a87762a 100644
+index 10dc177..6dfe5ce 100644
 --- a/src/runtime/config/configuration-fc.toml.in
 +++ b/src/runtime/config/configuration-fc.toml.in
-@@ -352,6 +352,11 @@ sandbox_cgroup_only=@DEFSANDBOXCGROUPONLY@
+@@ -358,6 +358,11 @@ sandbox_cgroup_only=@DEFSANDBOXCGROUPONLY@
  # - When running single containers using a tool like ctr, container sizing information will be available.
  static_sandbox_resource_mgmt=@DEFSTATICRESOURCEMGMT_FC@
  
@@ -137,10 +137,10 @@ index b7f349c0d..e1a87762a 100644
  # be created on the host and shared via virtio-fs. This is potentially slower, but allows sharing of files from host to guest.
  disable_guest_empty_dir=@DEFDISABLEGUESTEMPTYDIR@
 diff --git a/src/runtime/config/configuration-qemu.toml.in b/src/runtime/config/configuration-qemu.toml.in
-index d0a711dcf..7a5137247 100644
+index 4fb5a8b..cb29ca5 100644
 --- a/src/runtime/config/configuration-qemu.toml.in
 +++ b/src/runtime/config/configuration-qemu.toml.in
-@@ -26,7 +26,7 @@ machine_type = "@MACHINETYPE@"
+@@ -33,7 +33,7 @@ rootfs_type=@DEFROOTFSTYPE@
  #
  # Known limitations:
  # * Does not work by design:
@@ -149,7 +149,7 @@ index d0a711dcf..7a5137247 100644
  #   - Memory Hotplug
  #   - NVDIMM devices
  #
-@@ -580,6 +580,11 @@ sandbox_cgroup_only=@DEFSANDBOXCGROUPONLY@
+@@ -622,6 +622,11 @@ sandbox_cgroup_only=@DEFSANDBOXCGROUPONLY@
  # - When running single containers using a tool like ctr, container sizing information will be available.
  static_sandbox_resource_mgmt=@DEFSTATICRESOURCEMGMT@
  
@@ -162,10 +162,10 @@ index d0a711dcf..7a5137247 100644
  # This is only valid if filesystem sharing is utilized. The provided path(s) will be bindmounted into the shared fs directory.
  # If defaults are utilized, these mounts should be available in the guest at `/run/kata-containers/shared/containers/sandbox-mounts`
 diff --git a/src/runtime/pkg/katautils/config.go b/src/runtime/pkg/katautils/config.go
-index f3bc06bdf..b6220a44d 100644
+index 997d073..866db0b 100644
 --- a/src/runtime/pkg/katautils/config.go
 +++ b/src/runtime/pkg/katautils/config.go
-@@ -157,21 +157,22 @@ type hypervisor struct {
+@@ -161,23 +161,24 @@ type hypervisor struct {
  }
  
  type runtime struct {
@@ -174,12 +174,14 @@ index f3bc06bdf..b6220a44d 100644
 -	JaegerUser                string   `toml:"jaeger_user"`
 -	JaegerPassword            string   `toml:"jaeger_password"`
 -	VfioMode                  string   `toml:"vfio_mode"`
+-	GuestSeLinuxLabel         string   `toml:"guest_selinux_label"`
 -	SandboxBindMounts         []string `toml:"sandbox_bind_mounts"`
 -	Experimental              []string `toml:"experimental"`
--	Debug                     bool     `toml:"enable_debug"`
 -	Tracing                   bool     `toml:"enable_tracing"`
 -	DisableNewNetNs           bool     `toml:"disable_new_netns"`
 -	DisableGuestSeccomp       bool     `toml:"disable_guest_seccomp"`
+-	EnableVCPUsPinning        bool     `toml:"enable_vcpus_pinning"`
+-	Debug                     bool     `toml:"enable_debug"`
 -	SandboxCgroupOnly         bool     `toml:"sandbox_cgroup_only"`
 -	StaticSandboxResourceMgmt bool     `toml:"static_sandbox_resource_mgmt"`
 -	EnablePprof               bool     `toml:"enable_pprof"`
@@ -189,33 +191,35 @@ index f3bc06bdf..b6220a44d 100644
 +	JaegerUser                      string   `toml:"jaeger_user"`
 +	JaegerPassword                  string   `toml:"jaeger_password"`
 +	VfioMode                        string   `toml:"vfio_mode"`
++	GuestSeLinuxLabel               string   `toml:"guest_selinux_label"`
 +	SandboxBindMounts               []string `toml:"sandbox_bind_mounts"`
 +	Experimental                    []string `toml:"experimental"`
-+	Debug                           bool     `toml:"enable_debug"`
 +	Tracing                         bool     `toml:"enable_tracing"`
 +	DisableNewNetNs                 bool     `toml:"disable_new_netns"`
 +	DisableGuestSeccomp             bool     `toml:"disable_guest_seccomp"`
++	EnableVCPUsPinning              bool     `toml:"enable_vcpus_pinning"`
++	Debug                           bool     `toml:"enable_debug"`
 +	SandboxCgroupOnly               bool     `toml:"sandbox_cgroup_only"`
 +	StaticSandboxResourceMgmt       bool     `toml:"static_sandbox_resource_mgmt"`
-+	StaticSandboxWorkloadDefaultMem uint32   `toml:"static_sandbox_default_workload_mem"`
 +	EnablePprof                     bool     `toml:"enable_pprof"`
 +	DisableGuestEmptyDir            bool     `toml:"disable_guest_empty_dir"`
++	StaticSandboxWorkloadDefaultMem uint32   `toml:"static_sandbox_default_workload_mem"`
  }
  
  type agent struct {
-@@ -1313,6 +1314,7 @@ func LoadConfiguration(configPath string, ignoreLogging bool) (resolvedConfigPat
- 	config.DisableGuestSeccomp = tomlConf.Runtime.DisableGuestSeccomp
- 
+@@ -1372,6 +1373,7 @@ func LoadConfiguration(configPath string, ignoreLogging bool) (resolvedConfigPat
+ 	config.EnableVCPUsPinning = tomlConf.Runtime.EnableVCPUsPinning
+ 	config.GuestSeLinuxLabel = tomlConf.Runtime.GuestSeLinuxLabel
  	config.StaticSandboxResourceMgmt = tomlConf.Runtime.StaticSandboxResourceMgmt
 +	config.StaticSandboxWorkloadDefaultMem = tomlConf.Runtime.StaticSandboxWorkloadDefaultMem
  	config.SandboxCgroupOnly = tomlConf.Runtime.SandboxCgroupOnly
  	config.DisableNewNetNs = tomlConf.Runtime.DisableNewNetNs
  	config.EnablePprof = tomlConf.Runtime.EnablePprof
 diff --git a/src/runtime/pkg/oci/utils.go b/src/runtime/pkg/oci/utils.go
-index 95bfe2a33..59e55c47d 100644
+index d2d713f..436a0d2 100644
 --- a/src/runtime/pkg/oci/utils.go
 +++ b/src/runtime/pkg/oci/utils.go
-@@ -137,6 +137,9 @@ type RuntimeConfig struct {
+@@ -143,6 +143,9 @@ type RuntimeConfig struct {
  	// any later resource updates.
  	StaticSandboxResourceMgmt bool
  
@@ -225,7 +229,7 @@ index 95bfe2a33..59e55c47d 100644
  	// Determines if create a netns for hypervisor process
  	DisableNewNetNs bool
  
-@@ -928,6 +931,8 @@ func SandboxConfig(ocispec specs.Spec, runtime RuntimeConfig, bundlePath, cid st
+@@ -952,6 +955,8 @@ func SandboxConfig(ocispec specs.Spec, runtime RuntimeConfig, bundlePath, cid st
  
  		StaticResourceMgmt: runtime.StaticSandboxResourceMgmt,
  
@@ -234,7 +238,7 @@ index 95bfe2a33..59e55c47d 100644
  		ShmSize: shmSize,
  
  		VfioMode: runtime.VfioMode,
-@@ -950,6 +955,12 @@ func SandboxConfig(ocispec specs.Spec, runtime RuntimeConfig, bundlePath, cid st
+@@ -976,6 +981,12 @@ func SandboxConfig(ocispec specs.Spec, runtime RuntimeConfig, bundlePath, cid st
  	// with the base number of CPU/memory (which is equal to the default CPU/memory specified for the runtime
  	// configuration or annotations) as well as any specified workload resources.
  	if sandboxConfig.StaticResourceMgmt {
@@ -248,10 +252,10 @@ index 95bfe2a33..59e55c47d 100644
  		sandboxConfig.SandboxResources.BaseMemMB = sandboxConfig.HypervisorConfig.MemorySize
  
 diff --git a/src/runtime/virtcontainers/hypervisor.go b/src/runtime/virtcontainers/hypervisor.go
-index c44c0bae7..60e2b99b3 100644
+index dee5fec..0d86807 100644
 --- a/src/runtime/virtcontainers/hypervisor.go
 +++ b/src/runtime/virtcontainers/hypervisor.go
-@@ -71,7 +71,7 @@ const (
+@@ -74,7 +74,7 @@ const (
  	vSockLogsPort = 1025
  
  	// MinHypervisorMemory is the minimum memory required for a VM.
@@ -259,21 +263,21 @@ index c44c0bae7..60e2b99b3 100644
 +	MinHypervisorMemory = 64
  
  	defaultMsize9p = 8192
- )
+ 
 diff --git a/src/runtime/virtcontainers/sandbox.go b/src/runtime/virtcontainers/sandbox.go
-index e4a16983e..24992111a 100644
+index 523c072..bb36af0 100644
 --- a/src/runtime/virtcontainers/sandbox.go
 +++ b/src/runtime/virtcontainers/sandbox.go
-@@ -161,6 +161,9 @@ type SandboxConfig struct {
- 	// StaticResourceMgmt indicates if the shim should rely on statically sizing the sandbox (VM)
- 	StaticResourceMgmt bool
+@@ -160,6 +160,9 @@ type SandboxConfig struct {
  
-+	// Memory to allocate for workloads within the sandbox when workload memory is unspecified
+ 	HypervisorConfig HypervisorConfig
+ 
 +	StaticWorkloadDefaultMem uint32
 +
++	// Memory to allocate for workloads within the sandbox when workload memory is unspecified
  	ShmSize uint64
  
- 	VfioMode config.VFIOModeType
+ 	SandboxResources SandboxResourceSizing
 -- 
-2.33.6
+2.25.1
 

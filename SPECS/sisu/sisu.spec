@@ -3,7 +3,6 @@ Summary:        Eclipse dependency injection framework
 Name:           sisu
 Version:        0.3.5
 Release:        4%{?dist}
-Epoch:          1
 # sisu is EPL-1.0, the bundled asm is BSD
 License:        EPL-1.0 AND BSD
 Vendor:         Microsoft Corporation
@@ -20,8 +19,8 @@ Patch3:         sisu-osgi-api.patch
 Patch4:         0001-Remove-dependency-on-glassfish-servlet-api.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-Provides:       %{name}-inject = %{epoch}:%{version}-%{release}
-Provides:       %{name}-plexus = %{epoch}:%{version}-%{release}
+Provides:       %{name}-inject = %{version}-%{release}
+Provides:       %{name}-plexus = %{version}-%{release}
 Provides:       bundled(objectweb-asm)
 BuildArch:      noarch
 

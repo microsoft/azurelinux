@@ -8,6 +8,9 @@
 
 ######## DEFINITIONS ########
 
+toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+SCRIPTS_DIR  ?= $(toolkit_root)/scripts
+
 # Build targets
 ifeq ($(origin CONFIG_FILE), undefined)
 CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
@@ -19,16 +22,19 @@ PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
 SRPM_PACK_LIST          ?=
 
-REBUILD_TOOLCHAIN               ?= n
-INCREMENTAL_TOOLCHAIN           ?= n
-ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
+######## SET INCREMENTAL BUILD FLAGS ########
+
+# Logic to auto configure build options for optimized builds
+# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
+include $(SCRIPTS_DIR)/incremental_building.mk
+
+######## SET REMAINING FLAGS ########
+
 UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
 DOWNLOAD_SRPMS                  ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
-REBUILD_TOOLS                   ?= n
 RUN_CHECK                       ?= n
-USE_CCACHE                      ?= n
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
@@ -50,17 +56,14 @@ CLEANUP_PACKAGE_BUILDS          ?= y
 USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
-DELTA_BUILD                     ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
 
 # Folder defines
-toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
 PREVIEW_REPO     ?= $(toolkit_root)/repos/mariner-official-preview.repo
 RESOURCES_DIR    ?= $(toolkit_root)/resources
-SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
 PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build

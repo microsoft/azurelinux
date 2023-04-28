@@ -1746,7 +1746,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "clang",
+          "name": "clang16",
           "version": "16.0.0",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }
@@ -4270,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.6",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.6.tar.xz"
+          "version": "2.33.8",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.8.tar.xz"
         }
       }
     },
@@ -6480,8 +6480,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -7981,8 +7981,8 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.5+k3s2.tar.gz"
+          "version": "1.24.12",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.12+k3s1.tar.gz"
         }
       }
     },
@@ -7991,8 +7991,18 @@
         "type": "other",
         "other": {
           "name": "k3s",
-          "version": "1.26.2",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.2+k3s1.tar.gz"
+          "version": "1.25.8",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.8+k3s1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "k3s",
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.3+k3s1.tar.gz"
         }
       }
     },
@@ -8001,8 +8011,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.0.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
+          "version": "3.1.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.0.tar.gz"
         }
       }
     },
@@ -8011,8 +8021,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.1.0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.1.0.tar.gz"
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.0.tar.gz"
         }
       }
     },
@@ -8081,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -8091,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.102.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
+          "version": "5.15.107.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -11930,9 +11940,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "livepatch-5.15.48.1-4.cm2",
+          "name": "livepatch-5.15.102.1-3.cm2",
           "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.102.1.tar.gz"
         }
       }
     },
@@ -11940,129 +11950,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "livepatch-5.15.72.1-1.cm2",
+          "name": "livepatch-5.15.107.1-1.cm2",
           "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.72.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.74.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.77.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.79.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.80.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.81.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.82.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.82.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.85.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.86.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.87.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.90.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.92.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.92.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.92.1-2.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.92.1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.107.1.tar.gz"
         }
       }
     },
@@ -12160,7 +12050,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "llvm",
+          "name": "llvm16",
           "version": "16.0.0",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
         }
@@ -13233,8 +13123,18 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "20.10.12",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.12.tar.gz"
+          "version": "20.10.24",
+          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "moby-compose",
+          "version": "2.17.2",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
         }
       }
     },
@@ -13493,8 +13393,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.14.1+1-LTS-31207.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm"
+          "version": "11.0.18-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm"
         }
       }
     },
@@ -13503,8 +13403,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.14.1+1-LTS-31207.x86_64.rpm",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm"
+          "version": "11.0.18-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm"
         }
       }
     },
@@ -13613,8 +13513,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.32",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.32.tar.gz"
+          "version": "8.0.33",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.33.tar.gz"
         }
       }
     },
@@ -14153,8 +14053,8 @@
         "type": "other",
         "other": {
           "name": "nmap",
-          "version": "7.92",
-          "downloadUrl": "https://nmap.org/dist/nmap-7.92.tar.bz2"
+          "version": "7.93",
+          "downloadUrl": "https://nmap.org/dist/nmap-7.93.tar.bz2"
         }
       }
     },
@@ -14205,6 +14105,16 @@
           "name": "nodejs-packaging",
           "version": "25",
           "downloadUrl": "https://releases.pagure.org/nodejs-packaging/nodejs-packaging-fedora-25.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nodejs18",
+          "version": "18.16.0",
+          "downloadUrl": "https://nodejs.org/download/release/v18.16.0/node-v18.16.0.tar.xz"
         }
       }
     },
@@ -21304,8 +21214,8 @@
         "type": "other",
         "other": {
           "name": "protobuf-c",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.0/protobuf-c-1.4.0.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.1/protobuf-c-1.4.1.tar.gz"
         }
       }
     },
@@ -27837,8 +27747,8 @@
         "type": "other",
         "other": {
           "name": "strongswan",
-          "version": "5.9.8",
-          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.8.tar.bz2"
+          "version": "5.9.10",
+          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.10.tar.bz2"
         }
       }
     },
@@ -28177,8 +28087,8 @@
         "type": "other",
         "other": {
           "name": "tcl",
-          "version": "8.6.12",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.12-src.tar.gz"
+          "version": "8.6.13",
+          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.13-src.tar.gz"
         }
       }
     },
@@ -28619,6 +28529,16 @@
           "name": "tzdata",
           "version": "2023c",
           "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2023c.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "uchardet",
+          "version": "0.0.6",
+          "downloadUrl": "https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.6.tar.xz"
         }
       }
     },
@@ -30480,8 +30400,8 @@
         "type": "other",
         "other": {
           "name": "zlib",
-          "version": "1.2.12",
-          "downloadUrl": "https://www.zlib.net/zlib-1.2.12.tar.xz"
+          "version": "1.2.13",
+          "downloadUrl": "https://www.zlib.net/zlib-1.2.13.tar.xz"
         }
       }
     },
