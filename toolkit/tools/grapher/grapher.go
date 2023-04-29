@@ -12,7 +12,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -40,10 +39,7 @@ func main() {
 	var err error
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	timestamp_v2.BeginTiming("grapher", *timestampFile, 3, false)
-	defer timestamp_v2.EndTiming()
-
-	timestamp.BeginTiming("grapher", *timestampFile+"l")
+	timestamp.BeginTiming("grapher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
 	localPackages := pkgjson.PackageRepo{}
@@ -255,16 +251,12 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 // populateGraph adds all the data contained in the PackageRepo structure into
 // the graph.
 func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) {
-	timestamp_v2.StartMeasuringEvent("popluating graph", 2)
-	defer timestamp_v2.StopMeasurement()
-
-	ts, _ := timestamp.StartEvent("populating graph", nil)
-	defer timestamp.StopEvent(ts)
+	timestamp.StartEvent("populating graph", nil)
+	defer timestamp.StopEvent(nil)
 
 	packages := repo.Repo
 
-	timestamp_v2.StartMeasuringEvent("add package nodes", 0)
-	ts, _ = timestamp.StartEvent("add package node", nil)
+	timestamp.StartEvent("add package node", nil)
 
 	// Scan and add each package we know about
 	logger.Log.Infof("Adding all packages from %s", *input)
@@ -279,9 +271,8 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	}
 	logger.Log.Infof("\tAdded %d packages", len(packages))
 
-	timestamp.StopEvent(ts)
-	timestamp_v2.StopMeasurement() // add package nodes
-	timestamp_v2.StartMeasuringEvent("add dependencies", 0)
+	timestamp.StopEvent(nil) // add package nodes
+	timestamp.StartEvent("add dependencies", nil)
 
 	// Rescan and add all the dependencies
 	logger.Log.Infof("Adding all dependencies from %s", *input)
@@ -297,7 +288,7 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	}
 	logger.Log.Infof("\tAdded %d dependencies", dependenciesAdded)
 
-	timestamp_v2.StopMeasurement() // add dependencies
+	timestamp.StopEvent(nil) // add dependencies
 
 	return err
 }

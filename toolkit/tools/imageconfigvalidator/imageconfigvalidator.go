@@ -15,7 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -38,8 +38,8 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.BeginTiming("config_validator", *timestampFile, 1, false)
-	defer timestamp_v2.EndTiming()
+	timestamp.BeginTiming("config validator", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	inPath, err := filepath.Abs(*input)
 	logger.PanicOnError(err, "Error when calculating input path")
@@ -64,8 +64,8 @@ func main() {
 
 // ValidateConfiguration will run sanity checks on a configuration structure
 func ValidateConfiguration(config configuration.Config) (err error) {
-	timestamp_v2.StartMeasuringEvent("validating config", 2)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("validating config", nil)
+	defer timestamp.StopEvent(nil)
 
 	err = config.IsValid()
 	if err != nil {
@@ -82,8 +82,8 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 }
 
 func validateKickStartInstall(config configuration.Config) (err error) {
-	timestamp_v2.StartMeasuringEvent("validate kickstart", 0)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("validate kickstart", nil)
+	defer timestamp.StopEvent(nil)
 
 	// If doing a kickstart-style installation, then the image config file
 	// must not have any partitioning info because that will be provided
@@ -101,8 +101,8 @@ func validateKickStartInstall(config configuration.Config) (err error) {
 }
 
 func validatePackages(config configuration.Config) (err error) {
-	timestamp_v2.StartMeasuringEvent("validate packages", 0)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("validate packages", nil)
+	defer timestamp.StopEvent(nil)
 
 	const (
 		selinuxPkgName     = "selinux-policy"

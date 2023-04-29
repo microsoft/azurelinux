@@ -33,7 +33,8 @@ var (
 
 type TimeStampRecord struct {
 	EventType EventType `json:"EventType"`
-	TimeStamp
+	*TimeStamp
+	time time.Time
 }
 
 // The write manager is responsible for holding a write buffer and flushing it to file
@@ -42,7 +43,7 @@ type TimeStampRecord struct {
 type TimeStampWriteManager struct {
 	filePath       string
 	fileDescriptor *os.File
-	writeBuffer    []*TimeStampRecord
+	writeBuffer    [][]byte
 	lastWrite      time.Time
 }
 
@@ -59,6 +60,7 @@ type TimeStampReadManager struct {
 type TimeStampManager struct {
 	EventQueue             chan *TimeStampRecord
 	eventProcessorFinished chan bool
+	lock                   sync.Mutex
 	TimeStampWriteManager
 	TimeStampReadManager
 }
@@ -162,7 +164,10 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 		return &TimeStamp{}, err
 	}
 
-	ts, err = newTimeStamp(name, time.Now(), parentTS)
+	timestampMgr.lock.Lock()
+	defer timestampMgr.lock.Unlock()
+
+	ts, err = newTimeStamp(name, parentTS)
 	if err != nil {
 		err = fmt.Errorf("Failed to create a timestamp object %s: %v", name, err)
 		return &TimeStamp{}, err
@@ -176,7 +181,10 @@ func StartEventByPath(path string) (ts *TimeStamp, err error) {
 		return &TimeStamp{}, err
 	}
 
-	ts, err = newTimeStampByPath(timestampMgr.root, path, time.Now())
+	timestampMgr.lock.Lock()
+	defer timestampMgr.lock.Unlock()
+
+	ts, err = newTimeStampByPath(timestampMgr.root, path)
 	if err != nil {
 		err = fmt.Errorf("Failed to create a timestamp object %s: %v", path, err)
 		return &TimeStamp{}, err
@@ -190,7 +198,6 @@ func StopEvent(ts *TimeStamp) (*TimeStamp, error) {
 		return &TimeStamp{}, err
 	}
 
-	ts.complete(time.Now())
 	timestampMgr.submitEvent(EventStop, ts)
 	return ts, nil
 }
@@ -210,29 +217,29 @@ func StopEventByPath(path string) (ts *TimeStamp, err error) {
 		return &TimeStamp{}, err
 	}
 
-	ts.complete(time.Now())
 	timestampMgr.submitEvent(EventStop, ts)
 	return
 }
 
 func (mgr *TimeStampManager) submitEvent(eventType EventType, ts *TimeStamp) {
-	mgr.EventQueue <- &TimeStampRecord{EventType: eventType, TimeStamp: *ts}
+	mgr.EventQueue <- &TimeStampRecord{EventType: eventType, TimeStamp: ts, time: time.Now()}
 }
 
-// Process the events in queue by adding a timestamp record to the write buffer, and update
-// the current timestamp tree.
-// The order of operation is write -> update in-memory data structure, so there might be a small
-// delay in read update, but the data is always consistent.
 func (mgr *TimeStampManager) processEventsInQueue() {
 	for event := range mgr.EventQueue {
-		mgr.writeToFile(event)
 		mgr.updateRead(event)
+		mgr.writeToFile(event)
 	}
 	mgr.eventProcessorFinished <- true
 }
 
 func (writeMgr *TimeStampWriteManager) writeToFile(record *TimeStampRecord) {
-	writeMgr.writeBuffer = append(writeMgr.writeBuffer, record)
+	outputBytes, err := json.Marshal(record)
+	if err != nil {
+		logger.Log.Warnf("Failed to marshal timestamp record: %v", err)
+		return
+	}
+	writeMgr.writeBuffer = append(writeMgr.writeBuffer, outputBytes)
 
 	cooldownDuration := time.Duration(writeCooldownMilliseconds) * time.Millisecond
 	if writeMgr.lastWrite.Add(cooldownDuration).After(time.Now()) {
@@ -244,14 +251,8 @@ func (writeMgr *TimeStampWriteManager) writeToFile(record *TimeStampRecord) {
 }
 
 func (writeMgr *TimeStampWriteManager) flush() {
-	for _, record := range writeMgr.writeBuffer {
-		outputBytes, err := json.Marshal(record)
-		logger.Log.Infof("%v -> %v", record, outputBytes)
-		if err != nil {
-			logger.Log.Warnf("Failed to marshal timestamp record: %v", err)
-			continue
-		}
-		_, err = writeMgr.fileDescriptor.WriteString(string(outputBytes) + "\n")
+	for _, outputBytes := range writeMgr.writeBuffer {
+		_, err := writeMgr.fileDescriptor.WriteString(string(outputBytes) + "\n")
 		if err != nil {
 			logger.Log.Warnf("Failed to write timestamp record to file %s: %v", writeMgr.filePath, err)
 			continue
@@ -265,28 +266,37 @@ func (writeMgr *TimeStampWriteManager) flush() {
 	writeMgr.writeBuffer = nil
 }
 
-func (readMgr *TimeStampReadManager) updateRead(record *TimeStampRecord) {
-	if record.EventType == EventStart {
-		ts := &record.TimeStamp
-		readMgr.nodes[ts.ID] = ts
+func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
+	mgr.lock.Lock()
+	defer mgr.lock.Unlock()
+
+	if record.TimeStamp == nil {
+		record.TimeStamp = mgr.lastVisited
+	}
+
+	switch record.EventType {
+	case EventStart:
+		ts := record.TimeStamp
+		ts.StartTime = &record.time
+		mgr.nodes[ts.ID] = ts
 		if record.parentTimestamp == nil {
-			if readMgr.lastVisited == nil {
-				readMgr.root = ts
+			if mgr.lastVisited == nil {
+				mgr.root = ts
 			} else {
-				readMgr.lastVisited.addSubStep(ts)
+				mgr.lastVisited.addSubStep(ts)
 			}
-			readMgr.lastVisited = ts
+			mgr.lastVisited = ts
 		} else {
-			readMgr.nodes[ts.ParentID].addSubStep(ts)
-			if readMgr.lastVisited.ID == ts.ParentID {
-				readMgr.lastVisited = ts
+			mgr.nodes[ts.ParentID].addSubStep(ts)
+			if mgr.lastVisited.ID == ts.ParentID {
+				mgr.lastVisited = ts
 			}
 		}
-	} else {
-		ts := readMgr.nodes[record.ID]
-		ts.EndTime = record.EndTime
-		if record.EventType == EventStop && ts.ID == readMgr.lastVisited.ID {
-			readMgr.lastVisited = ts.parentTimestamp
+	case EventStop:
+		ts := mgr.nodes[record.ID]
+		ts.complete(record.time)
+		if record.EventType == EventStop && ts.ID == mgr.lastVisited.ID {
+			mgr.lastVisited = ts.parentTimestamp
 		}
 	}
 	return

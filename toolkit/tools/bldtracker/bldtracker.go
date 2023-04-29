@@ -7,12 +7,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -77,77 +76,29 @@ func setupLogger(logLevelStr string) {
 
 // Creates a JSON specifically for the shell script mentioned in "scriptName".
 func initialize(completePath, toolName string, expectedWeight float64) {
-	timestamp_v2.BeginTiming(toolName, completePath, expectedWeight, true)
-	// timestamp.BeginTiming(toolName, completePath+"l")
-	// timestamp.FlushAndCleanUpResources()
+	timestamp.BeginTiming(toolName, completePath)
+	timestamp.FlushAndCleanUpResources()
 }
 
 // Records a new timestamp to the specific JSON for the specified shell script.
 func record(completePath, toolName, path string, expectedWeight float64, weight float64, createIfMIssing bool, createIfMissingExpected float64) {
-	logger.Log.Tracef("Try to start measure %s...\n", path)
-	root, err := timestamp_v2.ResumeTiming(toolName, completePath, createIfMIssing, true)
-	if createIfMIssing {
-		root.ExpectedWeight = createIfMissingExpected
-	}
-	logger.Log.Tracef("... start %s...\n", path)
-	if err != nil {
-		logger.Log.Errorf("Failed to resume timestamp: %s", err)
-		return
-	}
-
 	fullPath := toolName + "/" + path
-	ts, err := timestamp_v2.StartMeasuringEventByPath(fullPath, expectedWeight)
-	if weight != ts.Weight {
-		ts.SetWeight(weight)
-		timestamp_v2.FlushData()
-	}
-	if err != nil {
-		logger.Log.Errorf("Failed to record timestamp: %s", err)
-	}
-	logger.Log.Tracef("... done start %s\n", path)
-
-	// timestamp.ResumeTiming(toolName, completePath+"l")
-	// defer timestamp.FlushAndCleanUpResources()
-	// timestamp.StartEventByPath(fullPath)
+	timestamp.ResumeTiming(toolName, completePath)
+	defer timestamp.FlushAndCleanUpResources()
+	timestamp.StartEventByPath(fullPath)
 }
 
 func stop(completePath, toolName, path string) {
-	logger.Log.Tracef("Try to stop measure %s...\n", path)
-	_, err := timestamp_v2.ResumeTiming(toolName, completePath, false, true)
-	logger.Log.Tracef("... stop %s...\n", path)
-	if err != nil {
-		logger.Log.Errorf("Failed to record timestamp: %s", err)
-	}
-
 	fullPath := toolName + "/" + path
-	_, err = timestamp_v2.StopMeasurementByPath(fullPath)
-	if err != nil {
-		logger.Log.Errorf("Failed to record timestamp: %s", err)
-	}
-	logger.Log.Tracef("... done stop %s\n", path)
-
-	// timestamp.ResumeTiming(toolName, completePath+"l")
-	// defer timestamp.FlushAndCleanUpResources()
-	// timestamp.StopEventByPath(fullPath)
+	timestamp.ResumeTiming(toolName, completePath)
+	defer timestamp.FlushAndCleanUpResources()
+	timestamp.StopEventByPath(fullPath)
 }
 
 func finish(completePath, toolName string) {
-	_, err := timestamp_v2.ResumeTiming(toolName, completePath, false, true)
-	if err != nil {
-		logger.Log.Errorf("Failed to record timestamp: %s", err)
-	}
-
-	timestamp_v2.EndTiming()
-
-	// timestamp.ResumeTiming(toolName, completePath+"l")
-	// timestamp.CompleteTiming()
+	timestamp.ResumeTiming(toolName, completePath)
+	timestamp.CompleteTiming()
 }
 
 func watch(completePath string) {
-	ts, err := timestamp_v2.ReadTimingData(completePath)
-	if err != nil {
-		logger.Log.Errorf("Failed to record timestamp: %s", err)
-	} else {
-		fmt.Printf("%d", int(ts.Progress()*100))
-	}
 }

@@ -17,7 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -68,8 +68,8 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.BeginTiming("imager", *timestampFile, 3, false)
-	defer timestamp_v2.EndTiming()
+	timestamp.BeginTiming("imager", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	if *emitProgress {
 		installutils.EnableEmittingProgress()
@@ -83,7 +83,7 @@ func main() {
 
 	// Execute preinstall scripts and parse partitioning when performing kickstart installation
 	if systemConfig.IsKickStartBoot {
-		timestamp_v2.StartMeasuringEvent("applying kickstart", 0)
+		timestamp.StartEvent("applying kickstart", nil)
 		err = installutils.RunPreInstallScripts(systemConfig)
 		logger.PanicOnError(err, "Failed to preinstall scripts")
 
@@ -97,7 +97,7 @@ func main() {
 		if err != nil {
 			logger.PanicOnError(err, "Invalid image configuration: %s", err)
 		}
-		timestamp_v2.StopMeasurement() // applying kickstart
+		timestamp.StopEvent(nil) // applying kickstart
 	}
 
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
@@ -106,8 +106,8 @@ func main() {
 
 func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configuration.Disk, outputDir, buildDir string) (err error) {
 	logger.Log.Infof("Building system configuration (%s)", systemConfig.Name)
-	timestamp_v2.StartMeasuringEvent("building system config", 1)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("building system config", nil)
+	defer timestamp.StopEvent(nil)
 
 	const (
 		assetsMountPoint    = "/installer"
@@ -147,8 +147,8 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	isRootFS = len(systemConfig.PartitionSettings) == 0
 	if isRootFS {
 		logger.Log.Infof("Creating rootfs")
-		timestamp_v2.StartMeasuringEvent("creating rootfs", 1)
-		defer timestamp_v2.StopMeasurement()
+		timestamp.StartEvent("creating rootfs", nil)
+		defer timestamp.StopEvent(nil)
 		additionalExtraMountPoints, additionalExtraDirectories, err := setupRootFS(outputDir, installRoot)
 		if err != nil {
 			return err
@@ -168,7 +168,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 		}
 	} else {
-		timestamp_v2.StartMeasuringEvent("creating raw disk", 1)
+		timestamp.StartEvent("creating raw disk", nil)
 
 		diskConfig := disks[defaultDiskIndex]
 		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisk(buildDir, defaultTempDiskName, *liveInstallFlag, diskConfig, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
@@ -201,7 +201,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 
 		logger.Log.Infof("Selected (%s) for the kernel", kernelPkg)
 		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
-		timestamp_v2.StopMeasurement() // creating raw disk
+		timestamp.StopEvent(nil) // creating raw disk
 	}
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
@@ -209,7 +209,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	// Create Parition to Mountpoint map
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
 	if diffDiskBuild {
-		timestamp_v2.StartMeasuringEvent("creating delta disks", 0)
+		timestamp.StartEvent("creating delta disk", nil)
 		mountPointToOverlayMap, err = installutils.UpdatePartitionMapWithOverlays(partIDToDevPathMap, partIDToFsTypeMap, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, systemConfig)
 		// Schedule unmount of overlays after the upper layers are unmounted.
 		defer installutils.OverlayUnmount(mountPointToOverlayMap)
@@ -217,11 +217,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			logger.Log.Error("Failed to create the partition map")
 			return
 		}
-		timestamp_v2.StopMeasurement() // creating delta disks
+		timestamp.StopEvent(nil) // creating delta disk
 	}
 
 	if isOfflineInstall {
-		timestamp_v2.StartMeasuringEvent("create offline install env", 0)
+		timestamp.StartEvent("create offline install env", nil)
 		// Create setup chroot
 		additionalExtraMountPoints := []*safechroot.MountPoint{
 			safechroot.NewMountPoint(*assets, assetsMountPoint, "", safechroot.BindMountPointFlags, ""),
@@ -246,7 +246,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			return
 		}
 
-		timestamp_v2.StopMeasurement() // create offline install env
+		timestamp.StopEvent(nil) // create offline install env
 
 		err = setupChroot.Run(func() error {
 			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
@@ -505,8 +505,8 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	return
 }
 func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
-	timestamp_v2.StartMeasuringEvent("building image", 3)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("building image", nil)
+	defer timestamp.StopEvent(nil)
 	const (
 		installRoot       = "/installroot"
 		verityWorkingDir  = "verityworkingdir"
@@ -569,7 +569,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		}
 	}
 
-	timestamp_v2.StartMeasuringEvent("install chroot packages", float64(len(setupChrootPackages)))
+	timestamp.StartEvent("install chroot packages", nil)
 	for _, setupChrootPackage := range setupChrootPackages {
 		_, err = installutils.TdnfInstall(setupChrootPackage, rootDir)
 		if err != nil {
@@ -577,7 +577,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 			return
 		}
 	}
-	timestamp_v2.StopMeasurement() // install chroot packages
+	timestamp.StopEvent(nil) // install chroot packages
 
 	// Populate image contents
 	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
@@ -605,7 +605,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 
 		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
 		if systemConfig.ReadOnlyVerityRoot.Enable {
-			timestamp_v2.StartMeasuringEvent("configure DM Verity", 0)
+			timestamp.StartEvent("configure DM Verity", nil)
 			var initramfsPathList []string
 			err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
 			if err != nil {
@@ -622,7 +622,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 				err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
 				return
 			}
-			timestamp_v2.StopMeasurement() // configure DM Verity
+			timestamp.StopEvent(nil) // configure DM Verity
 		}
 	}
 
@@ -637,8 +637,8 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 }
 
 func configureDiskBootloader(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice) (err error) {
-	timestamp_v2.StartMeasuringEvent("configuring bootloader", 0)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("configuring bootloader", nil)
+	timestamp.StopEvent(nil)
 
 	const rootMountPoint = "/"
 	const bootMountPoint = "/boot"

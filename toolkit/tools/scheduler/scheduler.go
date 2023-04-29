@@ -16,7 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
@@ -98,10 +98,10 @@ func main() {
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.BeginTiming("pkg build", *timestampFile, 101, false)
-	defer timestamp_v2.EndTiming()
+	timestamp.BeginTiming("pkg build", *timestampFile)
+	defer timestamp.CompleteTiming()
 
-	timestamp_v2.StartMeasuringEvent("prepare to build", 0)
+	timestamp.StartEvent("prepare to build", nil)
 
 	if *workers <= 0 {
 		*workers = runtime.NumCPU()
@@ -177,7 +177,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	timestamp_v2.StopMeasurement() // prepare to build
+	timestamp.StopEvent(nil) // prepare to build
 
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, toolchainPackages, *deltaBuild, *allowToolchainRebuilds)
 	if err != nil {
@@ -217,9 +217,8 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	}
 
 	// Approximately 1 management + 1 idle node per package build, so take size of graph x3 for expected weight
-	rootTS, _ := timestamp_v2.StartMeasuringEvent("build graph", float64(pkgGraph.Nodes().Len()*3))
-	rootTS.SetWeight(100.0)
-	defer timestamp_v2.StopMeasurementSpecific(rootTS)
+	rootTS, _ := timestamp.StartEvent("build graph", nil)
+	defer timestamp.StopEvent(rootTS)
 
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
@@ -245,7 +244,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 // startWorkerPool starts the worker pool and returns the communication channels between the workers and the scheduler.
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
-func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string, tsRoot *timestamp_v2.TimeStamp) (channels *schedulerChannels) {
+func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string, tsRoot *timestamp.TimeStamp) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
 		Requests:         make(chan *schedulerutils.BuildRequest, channelBufferSize),
 		PriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
@@ -298,7 +297,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
-		timestamp_v2.StartMeasuringEvent("management", 0)
+		timestamp.StartEvent("management", nil)
 
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
@@ -345,12 +344,12 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			}
 		}
 
-		timestamp_v2.StopMeasurement() // management
+		timestamp.StopEvent(nil) // management
 
 		// Process the the next build result
 		res := <-channels.Results
 
-		timestamp_v2.StartMeasuringEvent("process results", 0)
+		timestamp.StartEvent("process results", nil)
 
 		schedulerutils.PrintBuildResult(res)
 		buildState.RecordBuildResult(res, allowToolchainRebuilds)
@@ -410,7 +409,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
 		}
 
-		timestamp_v2.StopMeasurement() // process results
+		timestamp.StopEvent(nil) // process results
 	}
 
 	// Let the workers know they are done

@@ -16,7 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"gonum.org/v1/gonum/graph"
@@ -57,8 +57,8 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.BeginTiming("graphpkgfetcher", *timestampFile, 101, false)
-	defer timestamp_v2.EndTiming()
+	timestamp.BeginTiming("graphpkgfetcher", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	dependencyGraph := pkggraph.NewPkgGraph()
 
@@ -109,7 +109,7 @@ func findUnresolvedNodes(runNodes []*pkggraph.PkgNode) (unreslovedNodes []*pkggr
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, disableUpstreamRepos, stopOnFailure bool) (err error) {
-	timestamp_v2.StartMeasuringEvent("initialize and configure cloner", 0)
+	timestamp.StartEvent("initialize and configure cloner", nil)
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
 	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
@@ -127,10 +127,9 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		}
 	}
 
-	timestamp_v2.StopMeasurement() // initialize and configure cloner
-	ts, _ := timestamp_v2.StartMeasuringEvent("Clone packages", 1)
-	ts.SetWeight(100)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StopEvent(nil) // initialize and configure cloner
+	timestamp.StartEvent("Clone packages", nil)
+	defer timestamp.StopEvent(nil)
 
 	cachingSucceeded := true
 	if strings.TrimSpace(inputSummaryFile) == "" {
@@ -139,7 +138,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		prebuiltPackages := make(map[string]bool)
 		unresolvedNodes := findUnresolvedNodes(dependencyGraph.AllRunNodes())
 
-		timestamp_v2.StartMeasuringEvent("clone graph", float64(len(unresolvedNodes)))
+		timestamp.StartEvent("clone graph", nil)
 
 		for _, n := range unresolvedNodes {
 			resolveErr := resolveSingleNode(cloner, n, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
@@ -156,15 +155,15 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 				logger.Log.Debugf(errorMessage.String())
 			}
 		}
-		timestamp_v2.StopMeasurement() // clone graph
+		timestamp.StopEvent(nil) // clone graph
 	} else {
-		timestamp_v2.StartMeasuringEvent("restore packages", 0)
+		timestamp.StartEvent("restore packages", nil)
 
 		// If an input summary file was provided, simply restore the cache using the file.
 		err = repoutils.RestoreClonedRepoContents(cloner, inputSummaryFile)
 		cachingSucceeded = err == nil
 
-		timestamp_v2.StopMeasurement() // restore packages
+		timestamp.StopEvent(nil) // restore packages
 	}
 	if stopOnFailure && !cachingSucceeded {
 		return fmt.Errorf("failed to cache unresolved nodes")

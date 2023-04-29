@@ -28,7 +28,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp_v2"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -129,10 +129,10 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	timestamp_v2.BeginTiming("srpmpacker", *timestampFile, 25, false)
-	defer timestamp_v2.EndTiming()
+	timestamp.BeginTiming("srpmpacker", *timestampFile)
+	defer timestamp.CompleteTiming()
 
-	timestamp_v2.StartMeasuringEvent("configuring packer", 0)
+	timestamp.StartEvent("configuring packer", nil)
 
 	if *workers <= 0 {
 		logger.Log.Fatalf("Value in --workers must be greater than zero. Found %d", *workers)
@@ -177,7 +177,7 @@ func main() {
 		templateSrcConfig.tlsCerts = append(templateSrcConfig.tlsCerts, cert)
 	}
 
-	timestamp_v2.StopMeasurement()
+	timestamp.StopEvent(nil)
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
@@ -209,8 +209,8 @@ func removeDuplicateStrings(packList []string) (deduplicatedPackList []string) {
 // parsePackListFile will parse a list of packages to pack if one is specified.
 // Duplicate list entries in the file will be removed.
 func parsePackListFile(packListFile string) (packList []string, err error) {
-	timestamp_v2.StartMeasuringEvent("parse list", 0)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("parse list", nil)
+	defer timestamp.StopEvent(nil)
 
 	if packListFile == "" {
 		return
@@ -282,11 +282,10 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
 func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
-	ts, _ := timestamp_v2.StartMeasuringEvent("packing SRPMS", 2)
-	defer timestamp_v2.StopMeasurement()
-	ts.SetWeight(20)
+	timestamp.StartEvent("packing SRPMS", nil)
+	defer timestamp.StopEvent(nil)
 
-	timestamp_v2.StartMeasuringEvent("determining specs to pack", 0)
+	timestamp.StartEvent("determining specs to pack", nil)
 	specFiles, err := findSPECFiles(specsDir, packList)
 	if err != nil {
 		return
@@ -296,7 +295,7 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 	if err != nil {
 		return
 	}
-	timestamp_v2.StopMeasurement()
+	timestamp.StopEvent(nil)
 
 	err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
 	return
@@ -347,8 +346,8 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 		specsMountPoint  = "/specs"
 		buildDirInChroot = "/build"
 	)
-	timestamp_v2.StartMeasuringEvent("create chroot", 0)
-	defer timestamp_v2.StopMeasurement()
+	timestamp.StartEvent("create chroot", nil)
+	defer timestamp.StopEvent(nil)
 
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(outDir, outMountPoint, "", safechroot.BindMountPointFlags, ""),
@@ -585,8 +584,8 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 
 // packSRPMs will pack any SPEC files that have been marked as `toPack`.
 func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers int) (err error) {
-	tsRoot, _ := timestamp_v2.StartMeasuringEvent("packing SRPMs", float64(len(specStates)))
-	defer timestamp_v2.StopMeasurement()
+	tsRoot, _ := timestamp.StartEvent("packing SRPMs", nil)
+	defer timestamp.StopEvent(nil)
 	var wg sync.WaitGroup
 
 	allSpecStates := make(chan *specState, len(specStates))
@@ -631,7 +630,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 }
 
 // packSRPMWorker will process a channel of SPECs and pack any that are marked as toPack.
-func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp_v2.TimeStamp) {
+func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
 	defer wg.Done()
 
 	for specState := range allSpecStates {
@@ -642,7 +641,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 		default:
 		}
 
-		ts, _ := timestamp_v2.StartMeasuringEventWithParent(tsRoot, filepath.Base(specState.specFile), 0)
+		ts, _ := timestamp.StartEvent(filepath.Base(specState.specFile), tsRoot)
 
 		result := &packResult{
 			specFile: specState.specFile,
@@ -651,7 +650,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 		// Its a no-op if the SPEC does not need to be packed
 		if !specState.toPack {
 			results <- result
-			timestamp_v2.StopMeasurementSpecific(ts)
+			timestamp.StopEvent(ts)
 			continue
 		}
 
@@ -682,7 +681,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 		result.srpmFile = outputPath
 
 		results <- result
-		timestamp_v2.StopMeasurementSpecific(ts)
+		timestamp.StopEvent(ts)
 	}
 }
 

@@ -42,20 +42,20 @@ func (ts *TimeStamp) DisplayName() string {
 	return ts.parentTimestamp.DisplayName() + pathSeparator + ts.Name
 }
 
-func newTimeStamp(name string, startTime time.Time, parent *TimeStamp) (ts *TimeStamp, err error) {
+func newTimeStamp(name string, parent *TimeStamp) (ts *TimeStamp, err error) {
 	if strings.Contains(name, pathSeparator) {
 		err = fmt.Errorf("Can't create a timestamp object with a path containing %s", pathSeparator)
 		return
 	}
 
-	ts = &TimeStamp{ID: uidutils.NextUID(), Name: name, StartTime: &startTime, EndTime: nil, subSteps: make(map[string]*TimeStamp), ParentID: -1}
+	ts = &TimeStamp{ID: uidutils.NextUID(), Name: name, StartTime: nil, EndTime: nil, subSteps: make(map[string]*TimeStamp), ParentID: -1}
 	if parent != nil {
 		parent.addSubStep(ts)
 	}
 	return
 }
 
-func newTimeStampByPath(root *TimeStamp, path string, startTime time.Time) (ts *TimeStamp, err error) {
+func newTimeStampByPath(root *TimeStamp, path string) (ts *TimeStamp, err error) {
 	components := strings.Split(path, pathSeparator)
 	if components[0] != root.Name {
 		err = fmt.Errorf("Timestamp root mismatch ('%s', expected '%s')", components[0], root.Name)
@@ -65,7 +65,7 @@ func newTimeStampByPath(root *TimeStamp, path string, startTime time.Time) (ts *
 	if err != nil {
 		return &TimeStamp{}, err
 	}
-	ts, err = newTimeStamp(components[len(components)-1], startTime, parent)
+	ts, err = newTimeStamp(components[len(components)-1], parent)
 	return
 }
 
