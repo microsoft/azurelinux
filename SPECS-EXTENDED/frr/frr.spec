@@ -6,7 +6,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -179,7 +179,7 @@ rm %{buildroot}%{_libdir}/frr/*.so
 rm -r %{buildroot}%{_includedir}/frr/
 
 %pre
-%sysusers_create_compat %{SOURCE2}
+%sysusers_create_package %{name} %{SOURCE2}
 
 %post
 %systemd_post frr.service
