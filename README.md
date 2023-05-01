@@ -20,11 +20,11 @@ When security vulnerabilities arise, CBL-Mariner supports both a package-based u
 
 ### Get Started with CBL-Mariner
 
-Instructions for running, customizing, and building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md).
+See the following sections for several ways to get started using CBL-Mariner:
 
-### [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)
-
-The [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo includes several guides for starting with CBL-Mariner images. The full documentation above also links to it where relaxant.
+- Installing and running a pre-built ISO
+- Using the CBL-Mariner toolkit to build custom images and installers via our [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo
+- Learning how to use the toolkit to work with the core repo and other advanced topics
 
 ### ISO
 
@@ -38,6 +38,14 @@ Before using a downloaded ISO, [verify the checksum and signature of the image](
 After downloading the ISO, use [the quickstart instructions](toolkit/docs/quick_start/quickstart.md) to install and use the image in a Hyper-V VM.
 
 Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/CBL-Mariner/issues) or create a new feature request by clicking [here](https://github.com/microsoft/CBL-Mariner/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/CBL-Mariner/blob/-/SUPPORT.md) file.
+
+### [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials)
+
+The [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo includes several guides for starting with CBL-Mariner images. The full documentation above also links to it where relaxant.
+
+### Developing for Mariner
+
+Instructions for running, customizing, and building CBL-Mariner may be found here: [Toolkit Documentation](./toolkit/README.md).
 
 ## Trademarks
 
