@@ -7,7 +7,7 @@
 
 Name:         kata-containers-cc
 Version:      0.4.0
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -15,9 +15,8 @@ URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
-Source3:      containerd-for-cc-override.conf
-Source4:      mariner-coco-build-uvm-image.sh
-Source5:      mariner-coco-build-uvm-rootfs.sh
+Source3:      mariner-coco-build-uvm-image.sh
+Source4:      mariner-coco-build-uvm-rootfs.sh
 
 ExclusiveArch: x86_64
 
@@ -35,6 +34,7 @@ BuildRequires:  libseccomp-devel
 BuildRequires:  kernel-uvm-devel
 
 Requires:  kernel-uvm
+Requires:  moby-containerd-cc
 
 %description
 Kata Confidential Containers.
@@ -111,8 +111,8 @@ pushd %{_builddir}/%{name}-%{version}
 rm tools/osbuilder/.gitignore
 rm tools/osbuilder/rootfs-builder/.gitignore
 
-install -D -m 0755 %{SOURCE4}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-image.sh
-install -D -m 0755 %{SOURCE5}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-rootfs.sh
+install -D -m 0755 %{SOURCE3}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-image.sh
+install -D -m 0755 %{SOURCE4}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-rootfs.sh
 install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
 install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
 install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
@@ -127,11 +127,9 @@ mkdir -p %{buildroot}%{share_kata}
 mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/containerd                     %{buildroot}%{coco_bin}/containerd
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
 
 ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
-install -D -m 0644 %{SOURCE3} %{buildroot}/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
 find %{buildroot}/etc
 
@@ -183,7 +181,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{share_kata}/vmlinux.container
 
 %{coco_bin}/cloud-hypervisor
-%{coco_bin}/containerd
 %{coco_bin}/kata-collect-data.sh
 %{coco_bin}/kata-monitor
 %{coco_bin}/kata-runtime
@@ -194,9 +191,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{_bindir}/tardev-snapshotter
 %{_unitdir}/tardev-snapshotter.service
 %{_prefix}/local/bin/containerd-shim-kata-cc-v2
-
-
-/etc/systemd/system/containerd.service.d/containerd-for-cc-override.conf
 
 %license LICENSE
 %doc CONTRIBUTING.md
@@ -235,6 +229,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
+*   Wed Apr 26 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
+-   Remove containerd override and add dependency on moby-containerd-cc
+
 *   Mon Apr 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
 -   Add vendored code and move UVM building out of base package
 

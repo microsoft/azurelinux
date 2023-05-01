@@ -2199,6 +2199,7 @@
                 "moby-cli",
                 "moby-compose",
                 "moby-containerd",
+                "moby-containerd-cc",
                 "moby-engine",
                 "moby-runc",
                 "msgpack",
