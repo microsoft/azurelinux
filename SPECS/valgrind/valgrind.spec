@@ -2,14 +2,17 @@
 Summary:        Memory Management Debugger.
 Name:           valgrind
 Version:        3.18.1
-Release:        1%{?dist}
-License:        GPLv2+
+Release:        2%{?dist}
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Debuggers
 URL:            https://valgrind.org
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.bz2
 BuildRequires:  pkg-config
+%if %{with_check}
+BuildRequires:  docbook-dtd-xml
+%endif
 Provides:       %{name}-devel = %{version}-%{release}
 
 %description
@@ -46,6 +49,10 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
+* Wed Apr 26 2023 Olivia Crain <oliviacrain@microsoft.com> - 3.18.1-2
+- Fix flaky doctests by installing XML DTD files package during check builds
+- Use SPDX license expression in license tag
+
 * Fri Nov 13 2021 Andrew Phelps <anphel@microsoft.com> - 3.18.1-1
 - Update to version 3.18.1
 

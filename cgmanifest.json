@@ -2847,16 +2847,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "moby-compose",
-          "version": "2.17.2",
-          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dogtail",
           "version": "0.9.11",
           "downloadUrl": "https://gitlab.com/dogtail/dogtail/raw/released/dogtail-0.9.11.tar.gz"
@@ -4280,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.6",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.6.tar.xz"
+          "version": "2.33.8",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.8.tar.xz"
         }
       }
     },
@@ -8021,8 +8011,18 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.0.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.0.0.tar.gz"
+          "version": "3.1.0",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kata-containers-cc",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.0.tar.gz"
         }
       }
     },
@@ -11960,146 +11960,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "livepatch-5.15.48.1-4.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.72.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.72.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.74.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.74.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.77.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.77.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.79.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.79.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.80.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.80.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.81.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.81.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.82.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.82.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.85.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.85.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.86.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.86.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.87.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.87.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.90.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.90.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.92.1-1.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.92.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "livepatch-5.15.92.1-2.cm2",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.92.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "livepatch-5.15.94.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.94.1.tar.gz"
@@ -13272,6 +13132,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "moby-compose",
+          "version": "2.17.2",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "moby-containerd",
           "version": "1.6.18",
           "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.18.tar.gz"
@@ -14222,16 +14092,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nodejs18",
-          "version": "18.16.0",
-          "downloadUrl": "https://nodejs.org/download/release/v18.16.0/node-v18.16.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nodejs-nodemon",
           "version": "2.0.3",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
@@ -14245,6 +14105,16 @@
           "name": "nodejs-packaging",
           "version": "25",
           "downloadUrl": "https://releases.pagure.org/nodejs-packaging/nodejs-packaging-fedora-25.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nodejs18",
+          "version": "18.16.0",
+          "downloadUrl": "https://nodejs.org/download/release/v18.16.0/node-v18.16.0.tar.xz"
         }
       }
     },
@@ -27877,8 +27747,8 @@
         "type": "other",
         "other": {
           "name": "strongswan",
-          "version": "5.9.8",
-          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.8.tar.bz2"
+          "version": "5.9.10",
+          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.10.tar.bz2"
         }
       }
     },
@@ -30530,8 +30400,8 @@
         "type": "other",
         "other": {
           "name": "zlib",
-          "version": "1.2.12",
-          "downloadUrl": "https://www.zlib.net/zlib-1.2.12.tar.xz"
+          "version": "1.2.13",
+          "downloadUrl": "https://www.zlib.net/zlib-1.2.13.tar.xz"
         }
       }
     },

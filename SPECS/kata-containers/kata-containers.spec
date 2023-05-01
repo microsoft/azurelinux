@@ -40,8 +40,8 @@
 
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
-Version:        3.0.0
-Release:        8%{?dist}
+Version:        3.1.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -56,10 +56,6 @@ Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
 Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
 Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
 Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
-Patch5:         runtime-Support-for-AMD-SEV-SNP-VMs.patch
-Patch6:         runtime-clh-Use-the-new-API-to-boot-with-TDX-firmware-td-shim.patch
-Patch7:         versions-Update-Cloud-Hypervisor.patch
-Patch8:         runtime-Re-generate-the-client-code.patch
 Patch9:         runtime-reduce-uvm-high-mem-footprint.patch
 
 BuildRequires:  golang
@@ -227,6 +223,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Apr 12 2023 Saul Paredes <saulparedes@microsoft.com> - 3.1.0-1
+- Update to version 3.1.0
+
 * Wed Apr 5 2023 Saul Paredes <saulparedes@microsoft.com> - 3.0.0-9
 - Update kernel uvm image location
 
