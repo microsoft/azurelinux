@@ -18,7 +18,7 @@ Source2:        mkinitrd
 Source3:        megaraid.conf
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
-Patch2:         fix-grep-selinux-execmem.patch
+Patch2:         fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 BuildRequires:  asciidoc
 BuildRequires:  bash
 BuildRequires:  git
