@@ -25,15 +25,30 @@ import (
 // repository configuration will be saved in the installed system if specified, and only
 // available during the installation process if not
 type PackageRepo struct {
-	Name    string `json:"Name"`
-	BaseUrl string `json:"BaseUrl"`
-	Install bool   `json:"Install"`
+	Name     string `json:"Name"`
+	BaseUrl  string `json:"BaseUrl"`
+	Install  bool   `json:"Install"`
+	GPGCheck bool   `json:"GPGCheck"` // Default value is true
+	GPGKeys  string `json:"GPGKeys"`  // Default value is "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
+}
+
+func getDefaultGPGCheck() bool {
+	return true
+}
+
+func getDefaultGPGKeys() string {
+	return "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
 }
 
 // UnmarshalJSON Unmarshals a PackageRepo entry
 func (p *PackageRepo) UnmarshalJSON(b []byte) (err error) {
 	// Use an intermediate type which will use the default JSON unmarshal implementation
 	type IntermediateTypePackageRepo PackageRepo
+
+	// Set default values
+	p.GPGCheck = getDefaultGPGCheck()
+	p.GPGKeys = getDefaultGPGKeys()
+
 	err = json.Unmarshal(b, (*IntermediateTypePackageRepo)(p))
 	if err != nil {
 		return fmt.Errorf("failed to parse [PackageRepo]: %w", err)
@@ -57,6 +72,17 @@ func (p *PackageRepo) IsValid() (err error) {
 	err = p.repoUrlIsValid()
 	if err != nil {
 		return
+	}
+
+	// Repos for ISO use only (install = false) cannot support custom GPG keys if GPGCheck is enabled. Warn the user even
+	// if we are installing the repo file, as the repo file will not be usable in the installer.
+	if p.GPGCheck && p.GPGKeys != getDefaultGPGKeys() {
+		if !p.Install {
+			err = fmt.Errorf("invalid value for package repo '%s' [GPGKeys] (%s), custom GPG keys are only supported for repos that are installed", p.Name, p.GPGKeys)
+			return
+		} else {
+			logger.Log.Warnf("Warning: Custom GPG keys are only supported for repos that are installed. The repo file for '%s' will not be usable in the installer.", p.Name)
+		}
 	}
 
 	return
@@ -119,7 +145,7 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 // nameIsValid returns an error if the package repo name is empty
 func (p *PackageRepo) nameIsValid() (err error) {
 	if strings.TrimSpace(p.Name) == "" {
-		return fmt.Errorf("invalid value for package repo name (%s), name cannot be empty", p.Name)
+		return fmt.Errorf("invalid value for package repo [Name] (%s), name cannot be empty", p.Name)
 	}
 	return
 }
@@ -127,7 +153,7 @@ func (p *PackageRepo) nameIsValid() (err error) {
 // repoUrlIsValid returns an error if the package url is invalid
 func (p *PackageRepo) repoUrlIsValid() (err error) {
 	if strings.TrimSpace(p.BaseUrl) == "" {
-		return fmt.Errorf("invalid value for package repo URL (%s), URL cannot be empty", p.BaseUrl)
+		return fmt.Errorf("invalid value for package repo [BaseUrl] (%s), URL cannot be empty", p.BaseUrl)
 	}
 
 	_, err = url.ParseRequestURI(p.BaseUrl)
@@ -139,15 +165,13 @@ func (p *PackageRepo) repoUrlIsValid() (err error) {
 
 func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	const (
-		gpgKey       = "gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY\n"
 		enable       = "enabled=1\n"
-		gpgCheck     = "gpgcheck=1\n"
 		repogpgCheck = "repo_gpgcheck=1\n"
 		skip         = "skip_if_unavailable=True\n"
 		sslVerify    = "sslverify=1\n"
 	)
 
-	additionalFields := []string{gpgKey, enable, gpgCheck, repogpgCheck, skip, sslVerify}
+	additionalFields := []string{enable, repogpgCheck, skip, sslVerify}
 
 	for _, additionalField := range additionalFields {
 		_, err = stringBuilder.WriteString(additionalField)
@@ -200,6 +224,28 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	_, err = stringBuilder.WriteString(repoUrl)
 	if err != nil {
 		logger.Log.Errorf("Error writing repo URL: %s. Error: %s", repoUrl, err)
+		return
+	}
+
+	// Write the GPGKey field
+	gpgKey := fmt.Sprintf("gpgkey=%s\n", packageRepo.GPGKeys)
+	_, err = stringBuilder.WriteString(gpgKey)
+	if err != nil {
+		logger.Log.Errorf("Error writing repo GPGKey: %s. Error: %s", gpgKey, err)
+		return
+	}
+
+	// Write the repo GPGCheck field
+	var gpgVal string
+	if packageRepo.GPGCheck {
+		gpgVal = "1"
+	} else {
+		gpgVal = "0"
+	}
+	repoGpgCheck := fmt.Sprintf("gpgcheck=%s\n", gpgVal)
+	_, err = stringBuilder.WriteString(repoGpgCheck)
+	if err != nil {
+		logger.Log.Errorf("Error writing repo GPGCheck: %s. Error: %s", repoGpgCheck, err)
 		return
 	}
 
