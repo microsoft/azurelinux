@@ -1,6 +1,6 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.33.6
+Version:        2.33.8
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -168,6 +168,9 @@ fi
 %endif
 
 %changelog
+* Thu Apr 27 Sean Dougherty <sdougherty@microsoft.com> - 2.33.8-1
+- Upgrade to 2.33.8 to address CVE-2023-25652 and CVE-2023-29007
+
 * Mon Jan 23 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.33.6-1
 - Upgrade to 2.33.6 to address CVE-2022-23521 and CVE-2022-41903
 
