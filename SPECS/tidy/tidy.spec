@@ -94,7 +94,7 @@ rm -fv %{buildroot}%{_libdir}/libtidy.a
 
 %changelog
 * Mon May 01 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.8.0-6
-- Added bespoke backport patch to fix CVE-2021-33391
+- Backported patch to fix CVE-2021-33391
 
 * Tue Oct 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 5.8.0-5
 - Upgraded from 5.7.28 to 5.8.0
