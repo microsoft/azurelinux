@@ -123,7 +123,7 @@ systemd services for periodic automatic update
 
 %cmake_build
 
-cd %{__cmake_builddir}
+cd %{_vpath_builddir}
 %make_build python
 
 %check
@@ -144,7 +144,7 @@ install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/td
 rm -f %{buildroot}%{_bindir}/jsondumptest
 rm -rf %{buildroot}%{_datadir}/tdnf
 
-pushd %{__cmake_builddir}/python
+pushd %{_vpath_builddir}/python
 %py3_install
 popd
 find %{buildroot} -name '*.pyc' -delete
