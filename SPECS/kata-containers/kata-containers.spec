@@ -35,8 +35,9 @@
                                 DEFENABLEANNOTATIONS=['\\\".*\\\"'] \\\
                                 DEFAULT_HYPERVISOR=cloud-hypervisor
 
-%global agent_make_vars         LIBC=gnu \\\
+%global agent_make_vars         LIBC=gnu \\\ #todo: experiment with 
                                 DESTDIR=%{buildroot}%{kataagentdir}
+                                # todo: double check -ldflags="-s -w" is inherited as expected
 
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
@@ -114,7 +115,7 @@ pushd src/runtime
 popd
 
 pushd src/agent
-%make_build %{agent_make_vars}
+make optimize %{agent_make_vars}
 touch kata-agent
 popd
 
