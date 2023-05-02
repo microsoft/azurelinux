@@ -6,27 +6,27 @@
 //
 // Basic automatic stack based:
 //
-//	timestamp.BeginTiming("tool", "/path/to/output/file.jsonl")
-//	timestamp.StartEvent("step-A", nil)									// starts recording step-A
-//  	...
-//		timestamp.StartEvent("sub-step-of-step-A", nil)		// starts recording sub-step-of-step-A
-//		timestamp.StopEvent(nil)													// stops recording sub-step-of-step-A
-//		...
-//  timestamp.StopEvent(nil)														// stops recording step-A
+//  timestamp.BeginTiming("tool", "/path/to/output/file.jsonl")
+//  timestamp.StartEvent("step-A", nil)                 // starts recording step-A
+//    ...
+//    timestamp.StartEvent("sub-step-of-step-A", nil)   // starts recording sub-step-of-step-A
+//    timestamp.StopEvent(nil)                          // stops recording sub-step-of-step-A
+//    ...
+//  timestamp.StopEvent(nil)                            // stops recording step-A
 //  timestamp.CompleteTiming()
 //
 // Advanced handling for workers:
 //
-// 	func worker(parent *TimeStamp, task string) {
-//		ts, _ := timestamp.StartEvent(task, parent)							// starts recording "tool/scheduler/<task>"
-//		defer timestamp.StopEvent(ts)
-//	}
+//  func worker(parent *TimeStamp, task string) {
+//    ts, _ := timestamp.StartEvent(task, parent)             // starts recording "tool/scheduler/<task>"
+//    defer timestamp.StopEvent(ts)
+//  }
 //
-//	schedulerTS, _ := timestamp.StartEvent("scheduler", nil)	// starts recording "tool/scheduler"
-// 	defer timestamp.StopEvent(schedulerTS)										// stops recording "tool/scheduler" later
-//	for task := range allTasks {
-//		go worker(schedulerTS, task)														// each worker will add a substep under "tool/scheduler"
-//	}
+//  schedulerTS, _ := timestamp.StartEvent("scheduler", nil   // starts recording "tool/scheduler"
+//  defer timestamp.StopEvent(schedulerTS)                    // stops recording "tool/scheduler" later
+//  for task := range allTasks {
+//    go worker(schedulerTS, task)                            // each worker will add a substep under "tool/scheduler"
+//  }
 
 package timestamp
 
