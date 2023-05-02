@@ -1,13 +1,14 @@
 Summary:        software font engine.
 Name:           freetype
 Version:        2.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD WITH advertising OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
+Patch0:    CVE-2023-2004.patch
 BuildRequires:  libtool
 BuildRequires:  zlib-devel
 
@@ -54,6 +55,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue May 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.12.1-3
+- Add patch for CVE-2023-2004
+
 * Tue Feb 28 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.12.1-2
 - Bump release number due to harfbuzz upgrade to fix CVE-2023-25193.
 
