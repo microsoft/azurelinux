@@ -50,7 +50,8 @@ func newTimeStamp(name string, parent *TimeStamp) (ts *TimeStamp, err error) {
 
 	ts = &TimeStamp{ID: uidutils.NextUID(), Name: name, StartTime: nil, EndTime: nil, subSteps: make(map[string]*TimeStamp), ParentID: -1}
 	if parent != nil {
-		parent.addSubStep(ts)
+		ts.parentTimestamp = parent
+		ts.ParentID = parent.ID
 	}
 	return
 }

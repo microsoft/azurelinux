@@ -60,7 +60,6 @@ type TimeStampReadManager struct {
 type TimeStampManager struct {
 	EventQueue             chan *TimeStampRecord
 	eventProcessorFinished chan bool
-	lock                   sync.Mutex
 	TimeStampWriteManager
 	TimeStampReadManager
 }
@@ -81,7 +80,7 @@ func newTimeStampReadManager() *TimeStampReadManager {
 
 func newTimeStampManager() *TimeStampManager {
 	return &TimeStampManager{
-		EventQueue:             make(chan *TimeStampRecord, 100),
+		EventQueue:             make(chan *TimeStampRecord, 256),
 		eventProcessorFinished: make(chan bool, 1),
 		TimeStampWriteManager:  *newTimeStampWriteManager(),
 		TimeStampReadManager:   *newTimeStampReadManager(),
@@ -164,9 +163,6 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 		return &TimeStamp{}, err
 	}
 
-	timestampMgr.lock.Lock()
-	defer timestampMgr.lock.Unlock()
-
 	ts, err = newTimeStamp(name, parentTS)
 	if err != nil {
 		err = fmt.Errorf("Failed to create a timestamp object %s: %v", name, err)
@@ -180,9 +176,6 @@ func StartEventByPath(path string) (ts *TimeStamp, err error) {
 	if err = ensureManagerExists(); err != nil {
 		return &TimeStamp{}, err
 	}
-
-	timestampMgr.lock.Lock()
-	defer timestampMgr.lock.Unlock()
 
 	ts, err = newTimeStampByPath(timestampMgr.root, path)
 	if err != nil {
@@ -267,9 +260,6 @@ func (writeMgr *TimeStampWriteManager) flush() {
 }
 
 func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
-	mgr.lock.Lock()
-	defer mgr.lock.Unlock()
-
 	if record.TimeStamp == nil {
 		record.TimeStamp = mgr.lastVisited
 	}
