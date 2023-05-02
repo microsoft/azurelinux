@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.98.mshv1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -137,6 +137,9 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
+mkdir -p %{buildroot}/boot/kernel-uvm/
+install -vm 600 arch/%{arch}/boot/bzImage %{buildroot}/boot/kernel-uvm/bzImage
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -145,6 +148,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
 %endif
+/boot/kernel-uvm/bzImage
 
 %files devel
 %defattr(-,root,root)
@@ -152,6 +156,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Mon May 1 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.98.mshv1-4
+- Install the bzImage
+
 * Thu Apr 6 2023 Chris Co <chrco@microsoft.com> - 5.15.98.mshv1-3
 - Generate devel subpackage and enable loadable kernel module support
 
