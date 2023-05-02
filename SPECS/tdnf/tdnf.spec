@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -203,6 +203,9 @@ find %{buildroot} -name '*.pyc' -delete
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 05 2023 Sam Meluch <sammeluch@microsoft.com> - 2.1.0-8
+- Add patch for increased curl timeout and retry logic
+
 * Tue Dec 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-7
 - Adding a dependency on "mariner-repos-shared" to guarantee existence of the YUM repos directory.
 
