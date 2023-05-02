@@ -27,6 +27,7 @@ Patch5:         tdnf-support-multiple-gpgkeys.patch
 Patch6:         tdnf-add-download-no-deps-command.patch
 Patch7:         tdnf-use-custom-keyring-for-gpg-checks.patch
 Patch8:         tdnf-mandatory-space-list-output.patch
+Patch9:         tdnf-increase-timeout.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
