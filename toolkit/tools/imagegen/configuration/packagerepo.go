@@ -236,16 +236,13 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	}
 
 	// Write the repo GPGCheck field
-	var gpgVal string
 	if packageRepo.GPGCheck {
-		gpgVal = "1"
+			_, err = stringBuilder.WriteString("gpgcheck=1\n")
 	} else {
-		gpgVal = "0"
+			_, err = stringBuilder.WriteString("gpgcheck=0\n")
 	}
-	repoGpgCheck := fmt.Sprintf("gpgcheck=%s\n", gpgVal)
-	_, err = stringBuilder.WriteString(repoGpgCheck)
 	if err != nil {
-		logger.Log.Errorf("Error writing repo GPGCheck: %s. Error: %s", repoGpgCheck, err)
+		logger.Log.Errorf("Error writing repo GPGCheck. Error: %s", err)
 		return
 	}
 
