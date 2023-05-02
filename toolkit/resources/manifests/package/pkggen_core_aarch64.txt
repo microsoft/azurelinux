@@ -28,11 +28,11 @@ libgomp-9.1.0-7.cm1.aarch64.rpm
 libgomp-devel-9.1.0-7.cm1.aarch64.rpm
 gcc-9.1.0-7.cm1.aarch64.rpm
 pkg-config-0.29.2-4.cm1.aarch64.rpm
-ncurses-6.3-2.cm1.aarch64.rpm
-ncurses-compat-6.3-2.cm1.aarch64.rpm
-ncurses-devel-6.3-2.cm1.aarch64.rpm
-ncurses-libs-6.3-2.cm1.aarch64.rpm
-ncurses-term-6.3-2.cm1.aarch64.rpm
+ncurses-6.4-1.cm1.aarch64.rpm
+ncurses-compat-6.4-1.cm1.aarch64.rpm
+ncurses-devel-6.4-1.cm1.aarch64.rpm
+ncurses-libs-6.4-1.cm1.aarch64.rpm
+ncurses-term-6.4-1.cm1.aarch64.rpm
 readline-7.0-4.cm1.aarch64.rpm
 readline-devel-7.0-4.cm1.aarch64.rpm
 coreutils-8.30-12.cm1.aarch64.rpm
