@@ -3,13 +3,15 @@
 Name:           fluent-bit
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Version:        1.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
 #Source0:       https://github.com/fluent/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         CVE-2021-46878.patch
+Patch1:         CVE-2021-46879.patch
 
 BuildRequires:  cmake
 BuildRequires:  systemd-devel
@@ -26,7 +28,7 @@ Requires:       %{name} = %{version}
 Development files for %{name}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 cd build
@@ -50,6 +52,9 @@ make install DESTDIR=%{buildroot}
 /usr/lib64/fluent-bit/*.so
 
 %changelog
+* Tue May 02 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.5.2-3
+- Add patch for CVE-2021-46879 & CVE-2021-46878.
+
 * Fri Sep 10 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.5.2-2
 - Enable plug-in for systemd support
 
