@@ -118,6 +118,7 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
+install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %ifarch x86_64
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
@@ -137,18 +138,15 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
-mkdir -p %{buildroot}/boot/kernel-uvm/
-install -vm 600 arch/%{arch}/boot/bzImage %{buildroot}/boot/kernel-uvm/bzImage
-
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
+%{_datadir}/cloud-hypervisor/bzImage
 %dir %{_datadir}/cloud-hypervisor
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
 %endif
-/boot/kernel-uvm/bzImage
 
 %files devel
 %defattr(-,root,root)
