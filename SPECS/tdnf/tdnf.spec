@@ -28,18 +28,22 @@ BuildRequires:  glibc-devel
 BuildRequires:  gpgme-devel
 BuildRequires:  libmetalink-devel
 BuildRequires:  libsolv-devel
+BuildRequires:  libxml2-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  rpm-devel
 BuildRequires:  sqlite-devel
-Requires:       curl
+BuildRequires:  zlib-devel
+Requires:       curl-libs
 Requires:       libmetalink
 Requires:       libsolv
 Requires:       openssl-libs
 Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
+Requires:       zlib
 Obsoletes:      yum
 Provides:       yum
 %if %{with_check}
@@ -48,7 +52,6 @@ BuildRequires:  glib
 BuildRequires:  libxml2
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
-BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %endif
 
@@ -56,6 +59,7 @@ BuildRequires:  python3-xml
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
 
 %define _tdnfpluginsdir %{_libdir}/tdnf-plugins
+%define _tdnf_history_db_dir %{libdir}/sysimage/tdnf
 
 %package    devel
 Summary:        A Library providing C API for tdnf
@@ -73,9 +77,19 @@ Group:          Development/Libraries
 %description cli-libs
 Library providing cli libs for tdnf like clients.
 
+%package plugin-metalink
+Summary:        tdnf plugin providing metalink functionality for repo configurations
+Group:          Applications/RPM
+Requires:       tdnf = %{version}-%{release}
+Requires:       libxml2
+
+%description plugin-metalink
+tdnf plugin providing metalink functionality for repo configurations
+
 %package        plugin-repogpgcheck
 Summary:        tdnf plugin providing gpg verification for repository metadata
 Group:          Development/Libraries
+Requires:       tdnf = %{version}-%{release}
 Requires:       gpgme
 
 %description plugin-repogpgcheck
@@ -91,6 +105,7 @@ python bindings for tdnf
 
 %package        autoupdate
 Summary:        systemd services for periodic automatic update
+Group:          Applciations/RPM
 Requires:       %{name} = %{version}-%{release}
 
 %description autoupdate
@@ -100,36 +115,37 @@ systemd services for periodic automatic update
 %autosetup -p1
 
 %build
-mkdir build && cd build
-cmake \
--DCMAKE_BUILD_TYPE=Debug \
--DCMAKE_INSTALL_PREFIX=%{_prefix} \
--DCMAKE_INSTALL_LIBDIR:PATH=lib \
-..
-make %{?_smp_mflags} && make python
+%cmake \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir}
+
+%cmake_build
+
+cd %{__cmake_builddir}
+%make_build python
 
 %check
 pip3 install pytest requests pyOpenSSL
 cd build && make %{?_smp_mflags} check
 
 %install
-cd build && %make_install
+%cmake_install
 find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum
+ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tdnfj
 install -v -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/tdnf-cache-updateinfo
 install -v -D -m 0644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.service
 install -v -D -m 0644 %{SOURCE3} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
 install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-mv %{buildroot}%{_libdir}/pkgconfig/tdnfcli.pc %{buildroot}%{_libdir}/pkgconfig/tdnf-cli-libs.pc
-mkdir -p %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck
-mv %{buildroot}/%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
+rm -f %{buildroot}%{_bindir}/jsondumptest
+rm -rf %{buildroot}%{_datadir}/tdnf
 
-pushd python
-python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
+pushd %{__cmake_builddir}/python
+%py3_install
 popd
-
 find %{buildroot} -name '*.pyc' -delete
 
 %ldconfig_scriptlets
@@ -140,6 +156,8 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tdnf
 %{_bindir}/tyum
 %{_bindir}/yum
+%{_bindir}/tdnfj
+%{_bindir}/tndf-config
 %{_bindir}/tdnf-cache-updateinfo
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
@@ -161,11 +179,17 @@ find %{buildroot} -name '*.pyc' -delete
 %{_libdir}/libtdnfcli.so.3
 %{_libdir}/libtdnfcli.so.3.*
 
+%files plugin-metalink
+%defattr(-,root,root)
+%dir %{_sysconfdir}/tdnf/pluginconf.d
+%config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfmetalink.conf
+%{_tdnfpluginsdir}/libtdnfmetalink.so
+
 %files plugin-repogpgcheck
 %defattr(-,root,root)
 %dir %{_sysconfdir}/tdnf/pluginconf.d
 %config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
+%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so
 
 %files python
 %defattr(-,root,root)
