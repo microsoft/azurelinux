@@ -22,7 +22,7 @@ Source12:       useradd-default
 Source13:       login-defs
 Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
-Patch2:    CVE-2023-29383.patch
+Patch2:         CVE-2023-29383.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
