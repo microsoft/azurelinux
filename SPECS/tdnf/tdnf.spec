@@ -1,3 +1,5 @@
+%undefine __cmake_in_source_build
+
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.5.2
@@ -123,7 +125,7 @@ systemd services for periodic automatic update
 
 %cmake_build
 
-cd %{_builddir}/build
+cd %{__cmake_builddir}
 %make_build python
 
 %check
@@ -144,7 +146,7 @@ install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/td
 rm -f %{buildroot}%{_bindir}/jsondumptest
 rm -rf %{buildroot}%{_datadir}/tdnf
 
-pushd %{_builddir}/build/python
+pushd %{__cmake_builddir}/python
 %py3_install
 popd
 find %{buildroot} -name '*.pyc' -delete
