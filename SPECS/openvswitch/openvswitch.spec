@@ -50,7 +50,7 @@ Requires(post):    /bin/sed
 Requires(post):    systemd-units
 Requires(preun):   systemd-units
 Requires(postun):  systemd-units
-Patch0:            CVE-2023-1688.patch
+Patch0:            CVE-2023-1668.patch
 
 
 %description
