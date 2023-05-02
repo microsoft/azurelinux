@@ -1,6 +1,33 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// Manages reading and writing of timing data for active tools
+// General flow should be as folllows:
+//
+// Basic automatic stack based:
+//
+//	timestamp.BeginTiming("tool", "/path/to/output/file.jsonl")
+//	timestamp.StartEvent("step-A", nil)									// starts recording step-A
+//  	...
+//		timestamp.StartEvent("sub-step-of-step-A", nil)		// starts recording sub-step-of-step-A
+//		timestamp.StopEvent(nil)													// stops recording sub-step-of-step-A
+//		...
+//  timestamp.StopEvent(nil)														// stops recording step-A
+//  timestamp.CompleteTiming()
+//
+// Advanced handling for workers:
+//
+// 	func worker(parent *TimeStamp, task string) {
+//		ts, _ := timestamp.StartEvent(task, parent)							// starts recording "tool/scheduler/<task>"
+//		defer timestamp.StopEvent(ts)
+//	}
+//
+//	schedulerTS, _ := timestamp.StartEvent("scheduler", nil)	// starts recording "tool/scheduler"
+// 	defer timestamp.StopEvent(schedulerTS)										// stops recording "tool/scheduler" later
+//	for task := range allTasks {
+//		go worker(schedulerTS, task)														// each worker will add a substep under "tool/scheduler"
+//	}
+
 package timestamp
 
 import (
@@ -17,9 +44,12 @@ import (
 
 type EventType int
 
+// Types of event for a timestamped step. E.g start, stop
 const (
 	EventStart EventType = iota
 	EventStop
+	// EventPause
+	// EventResume
 )
 
 const (
@@ -31,45 +61,46 @@ var (
 	initOnce     sync.Once
 )
 
+// Represents an event during recording of a timestamped step
 type TimeStampRecord struct {
 	EventType EventType `json:"EventType"`
 	*TimeStamp
 	time time.Time
 }
 
-// The write manager is responsible for holding a write buffer and flushing it to file
-// periodically. It is supposed to be running in a separate goroutine so the main build
-// process performance is not affected.
+// The write manager is responsible for holding a write buffer and flushing it to file periodically. It is supposed
+// to be running in a separate goroutine so the main build process performance is not affected.
 type TimeStampWriteManager struct {
-	filePath       string
-	fileDescriptor *os.File
-	writeBuffer    [][]byte
-	lastWrite      time.Time
+	filePath       string    // absolute path to the file recording timestamp events
+	fileDescriptor *os.File  // file descriptor of the file to write to
+	writeBuffer    [][]byte  // write buffer, each element in the buffer represents a single line
+	lastWrite      time.Time // last time the buffer is flushed to disk
 }
 
-// The read manager is responsible for holding an in-memory data structure for the timestamps,
-// starting from the root node. Read manager provides interface for querying the current state
-// of the timestamps
+// The read manager is responsible for holding an in-memory data structure for the timestamps, starting from the root
+// node. Read manager provides interface for querying the current state of the timestamps.
 type TimeStampReadManager struct {
-	root        *TimeStamp
-	nodes       map[int64]*TimeStamp
-	lastVisited *TimeStamp
+	root        *TimeStamp           // root timestamp, usually represents the tool being tracked
+	nodes       map[int64]*TimeStamp // map of timestamp ID -> timestamp object for fast access
+	lastVisited *TimeStamp           // helper pointer, useful for providing easy-to-use interface
 }
 
 // The TimeStampManager provides the main interface for actions taken on timestamp objects.
 type TimeStampManager struct {
-	EventQueue             chan *TimeStampRecord
-	eventProcessorFinished chan bool
-	TimeStampWriteManager
-	TimeStampReadManager
+	EventQueue             chan *TimeStampRecord // events to be processed and recorded to file
+	eventProcessorFinished chan bool             // signal to terminate the processor when no more events will be added to queue
+	TimeStampWriteManager                        // interface to handle all file writing
+	TimeStampReadManager                         // interface to handle all in-memory structures
 }
 
+// Initializes a new write manager object
 func newTimeStampWriteManager() *TimeStampWriteManager {
 	return &TimeStampWriteManager{
 		lastWrite: time.Now(),
 	}
 }
 
+// Initializes a new read manager object
 func newTimeStampReadManager() *TimeStampReadManager {
 	return &TimeStampReadManager{
 		root:        nil,
@@ -78,6 +109,7 @@ func newTimeStampReadManager() *TimeStampReadManager {
 	}
 }
 
+// Initializes a new manager object
 func newTimeStampManager() *TimeStampManager {
 	return &TimeStampManager{
 		EventQueue:             make(chan *TimeStampRecord, 256),
@@ -87,6 +119,7 @@ func newTimeStampManager() *TimeStampManager {
 	}
 }
 
+// Initializes the global timestamp manager of the module
 func initTimeStampManager() {
 	timestampMgr = newTimeStampManager()
 }
@@ -98,6 +131,7 @@ func ensureManagerExists() error {
 	return nil
 }
 
+// Begins collecting timing data for a high level component 'toolName' into the file at 'outputFile'
 func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 	initOnce.Do(initTimeStampManager)
 
@@ -122,6 +156,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 	return timestampMgr.root, err
 }
 
+// Begins appending timing data for a high level component 'toolName' into the file at 'outputFile'
 func ResumeTiming(toolName, outputFile string) error {
 	initOnce.Do(initTimeStampManager)
 
@@ -141,6 +176,7 @@ func ResumeTiming(toolName, outputFile string) error {
 	return nil
 }
 
+// Marks the end of collecting timing data. Perform any cleanup needed by the timestamp manager object
 func CompleteTiming() (err error) {
 	if err = ensureManagerExists(); err != nil {
 		return
@@ -151,6 +187,7 @@ func CompleteTiming() (err error) {
 	return
 }
 
+// Close the event queue, wait for the processor to finish and flush the remaining buffered data to disk
 func FlushAndCleanUpResources() {
 	close(timestampMgr.EventQueue)
 	<-timestampMgr.eventProcessorFinished
@@ -158,6 +195,7 @@ func FlushAndCleanUpResources() {
 	timestampMgr.fileDescriptor.Close()
 }
 
+// Add an event that marks the start of a timestamped step, if parentTS is nil, use lastVisited as parentTS
 func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 	if err = ensureManagerExists(); err != nil {
 		return &TimeStamp{}, err
@@ -172,6 +210,7 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 	return
 }
 
+// Add an avent that marks the start of a timestamped step using full name
 func StartEventByPath(path string) (ts *TimeStamp, err error) {
 	if err = ensureManagerExists(); err != nil {
 		return &TimeStamp{}, err
@@ -186,6 +225,7 @@ func StartEventByPath(path string) (ts *TimeStamp, err error) {
 	return
 }
 
+// Add an event that marks the end of a timestamped step, if ts is nil, use lastVisited as ts
 func StopEvent(ts *TimeStamp) (*TimeStamp, error) {
 	if err := ensureManagerExists(); err != nil {
 		return &TimeStamp{}, err
@@ -195,6 +235,7 @@ func StopEvent(ts *TimeStamp) (*TimeStamp, error) {
 	return ts, nil
 }
 
+// Add an event that marks the end of a timestamped step using full name
 func StopEventByPath(path string) (ts *TimeStamp, err error) {
 	if err = ensureManagerExists(); err != nil {
 		return &TimeStamp{}, err
@@ -214,10 +255,12 @@ func StopEventByPath(path string) (ts *TimeStamp, err error) {
 	return
 }
 
+// Submit a recorded event to event queue to be processed
 func (mgr *TimeStampManager) submitEvent(eventType EventType, ts *TimeStamp) {
 	mgr.EventQueue <- &TimeStampRecord{EventType: eventType, TimeStamp: ts, time: time.Now()}
 }
 
+// Process each event submitted to the queue by updating in-memory data structure and recording to file
 func (mgr *TimeStampManager) processEventsInQueue() {
 	for event := range mgr.EventQueue {
 		mgr.updateRead(event)
@@ -226,6 +269,7 @@ func (mgr *TimeStampManager) processEventsInQueue() {
 	mgr.eventProcessorFinished <- true
 }
 
+// Append a timestamp record to file, and periodically flush to disk
 func (writeMgr *TimeStampWriteManager) writeToFile(record *TimeStampRecord) {
 	outputBytes, err := json.Marshal(record)
 	if err != nil {
@@ -243,6 +287,7 @@ func (writeMgr *TimeStampWriteManager) writeToFile(record *TimeStampRecord) {
 	writeMgr.lastWrite = time.Now()
 }
 
+// Flush write buffer to disk
 func (writeMgr *TimeStampWriteManager) flush() {
 	for _, outputBytes := range writeMgr.writeBuffer {
 		_, err := writeMgr.fileDescriptor.WriteString(string(outputBytes) + "\n")
@@ -259,6 +304,7 @@ func (writeMgr *TimeStampWriteManager) flush() {
 	writeMgr.writeBuffer = nil
 }
 
+// Update the timestamp tree for each event submitted to the event queue
 func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
 	if record.TimeStamp == nil {
 		record.TimeStamp = mgr.lastVisited
@@ -292,6 +338,8 @@ func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
 	return
 }
 
+// Read records written to a file and build a (partially) finished timestamp tree. This is useful for resuming
+// partial recording progress
 func (readMgr *TimeStampReadManager) buildTreeFromFile(fd *os.File) (err error) {
 	fd.Seek(0, 0)
 	scanner := bufio.NewScanner(fd)

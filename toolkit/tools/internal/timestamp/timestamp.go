@@ -14,20 +14,21 @@ import (
 )
 
 type TimeStamp struct {
-	ID              int64      `json:"ID"`
-	Name            string     `json:"Name"`
-	StartTime       *time.Time `json:"StartTime"`
-	EndTime         *time.Time `json:"EndTime"`
-	ElapsedSeconds  float64    `json:"ElapsedSeconds"`
-	ParentID        int64      `json:"ParentID"`
-	parentTimestamp *TimeStamp
-	subSteps        map[string]*TimeStamp
+	ID              int64                 `json:"ID"`             // Unique ID for timestamp object
+	Name            string                `json:"Name"`           // Name of the step
+	StartTime       *time.Time            `json:"StartTime"`      // Start time of the step
+	EndTime         *time.Time            `json:"EndTime"`        // End time of the step
+	ElapsedSeconds  float64               `json:"ElapsedSeconds"` // Total elapsed time in seconds
+	ParentID        int64                 `json:"ParentID"`       // ID of the parent step
+	parentTimestamp *TimeStamp            // Pointer to parent step
+	subSteps        map[string]*TimeStamp // Map of step name -> timestamp of substep
 }
 
 const (
 	pathSeparator string = "/"
 )
 
+// Calculates the elapsed time of a step, returns -1 if the end time is not yet available
 func (ts *TimeStamp) ElapsedTime() time.Duration {
 	if ts.EndTime == nil {
 		return time.Duration(-1)
@@ -35,6 +36,7 @@ func (ts *TimeStamp) ElapsedTime() time.Duration {
 	return ts.EndTime.Sub(*ts.StartTime)
 }
 
+// Returns full name of the step starting from the root, i.e A/B/C
 func (ts *TimeStamp) DisplayName() string {
 	if ts == nil {
 		return ""
@@ -42,6 +44,7 @@ func (ts *TimeStamp) DisplayName() string {
 	return ts.parentTimestamp.DisplayName() + pathSeparator + ts.Name
 }
 
+// Creates a new timestamp object with optional parent ID
 func newTimeStamp(name string, parent *TimeStamp) (ts *TimeStamp, err error) {
 	if strings.Contains(name, pathSeparator) {
 		err = fmt.Errorf("Can't create a timestamp object with a path containing %s", pathSeparator)
@@ -56,6 +59,7 @@ func newTimeStamp(name string, parent *TimeStamp) (ts *TimeStamp, err error) {
 	return
 }
 
+// Creates a new timestamp object in the timestamp tree using full path name
 func newTimeStampByPath(root *TimeStamp, path string) (ts *TimeStamp, err error) {
 	components := strings.Split(path, pathSeparator)
 	if components[0] != root.Name {
@@ -70,6 +74,7 @@ func newTimeStampByPath(root *TimeStamp, path string) (ts *TimeStamp, err error)
 	return
 }
 
+// Returns timestamp node starting from the root using full path name
 func getTimeStampFromPath(root *TimeStamp, path []string, nextIndex int) (ts *TimeStamp, err error) {
 	if nextIndex == len(path) {
 		return root, nil
@@ -81,12 +86,14 @@ func getTimeStampFromPath(root *TimeStamp, path []string, nextIndex int) (ts *Ti
 	return getTimeStampFromPath(nextNode, path, nextIndex+1)
 }
 
+// Adds a substep to the current timestamp node
 func (ts *TimeStamp) addSubStep(subStep *TimeStamp) {
 	ts.subSteps[subStep.Name] = subStep
 	subStep.parentTimestamp = ts
 	subStep.ParentID = ts.ID
 }
 
+// Marks the end of a timestamped step with endTime
 func (ts *TimeStamp) complete(endTime time.Time) {
 	ts.EndTime = &endTime
 	ts.ElapsedSeconds = ts.ElapsedTime().Seconds()
