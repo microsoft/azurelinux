@@ -85,7 +85,8 @@ func main() {
 	defines[rpm.DistTagDefine] = *distTag
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
-	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
+//	defines[rpm.MarinerModuleLdflagsDefine] = ""
+//	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 	if *useCcache {
 		defines[rpm.MarinerCCacheDefine] = "true"
 	}
