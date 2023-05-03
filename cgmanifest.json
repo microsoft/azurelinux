@@ -6449,6 +6449,17 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hvloader",
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/microsoft/HvLoader/archive/refs/tags/v1.0.1.tar.gz"
+        }
+      }
+    },
+
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hwdata",
           "version": "0.356",
           "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.356.tar.gz"

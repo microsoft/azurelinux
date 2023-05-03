@@ -1,7 +1,7 @@
 Summary: A collection of programs for manipulating patch files
 Name: patchutils
 Version: 0.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,10 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/*/*
 
 %changelog
+* Tue May 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 0.4.2-3
+- Moved to SPECS
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
