@@ -266,7 +266,7 @@ rm tests/lib/*grpc*
 %endif
 
 %changelog
-* Wed May 3 2023 Samuel Mueller <samuelle@microsoft.com> - 8.4.2-2
+* Wed May 3 2023 Samuel Mueller <samuelle@microsoft.com> - 8.4.2-3
 - Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
 
 * Mon Jan 30 2023 Sumedh Sharma <sumsharma@microsoft.com> - 8.4.2-2
