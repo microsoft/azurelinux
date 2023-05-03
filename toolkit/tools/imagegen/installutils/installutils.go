@@ -1604,7 +1604,7 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	//     only supports the below cases:
 	for mount, fsType := range mountPointToFsTypeMap {
 		switch fsType {
-		case "ext2", "ext3", "ext4":
+		case "ext2", "ext3", "ext4", "xfs":
 			listOfMountsToLabel = append(listOfMountsToLabel, mount)
 		case "fat32", "fat16", "vfat":
 			logger.Log.Debugf("SELinux will not label mount at (%s) of type (%s), skipping", mount, fsType)
