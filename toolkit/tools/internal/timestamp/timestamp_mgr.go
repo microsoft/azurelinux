@@ -184,6 +184,7 @@ func CompleteTiming() (err error) {
 
 	StopEvent(timestampMgr.root)
 	FlushAndCleanUpResources()
+	timestampMgr = nil
 	return
 }
 
