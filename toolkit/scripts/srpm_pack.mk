@@ -97,8 +97,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
-		--log-level=$(LOG_LEVEL) \
-		--timestamp-file=$(TIMESTAMP_DIR)/srpm_packer.jsonl && \
+		--log-level=$(LOG_LEVEL) && \
 	touch $@
 
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
@@ -115,7 +114,6 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--pack-list=$(toolchain_spec_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
-		--log-level=$(LOG_LEVEL) \
-		--timestamp-file=$(TIMESTAMP_DIR)/srpm_toolchain_packer.jsonl && \
+		--log-level=$(LOG_LEVEL) && \
 	touch $@
 endif

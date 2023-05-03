@@ -19,7 +19,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 const (
@@ -302,11 +301,7 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 // The cloner will mark any package that locally built by setting preBuilt = true
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
-	timestamp.StartEvent("cloning packages", nil)
-	defer timestamp.StopEvent(nil)
 	for _, pkg := range packagesToClone {
-		timestamp.StartEvent(pkg.Name, nil)
-
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
 		effectiveCacheRepo := selectCorrectCacheRepoID()
@@ -339,8 +334,6 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		if err != nil {
 			return
 		}
-
-		timestamp.StopEvent(nil) // pkg.Name
 	}
 
 	return

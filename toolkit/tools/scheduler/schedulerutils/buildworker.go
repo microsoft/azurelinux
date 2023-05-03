@@ -17,7 +17,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
@@ -92,12 +91,8 @@ func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish 
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages []string, tsRoot *timestamp.TimeStamp) {
-	// Track the time a worker spends waiting on a task. We will add a timing node each time we finish processing a request, and stop
-	// it when we pick up the next request
-	idleTimestamp, _ := timestamp.StartEvent("worker idle", tsRoot)
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages []string) {
 	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
-		timestamp.StopEvent(idleTimestamp) // worker idle
 
 		res := &BuildResult{
 			Node:           req.Node,
@@ -106,14 +101,12 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeBuild:
-			ts, _ := timestamp.StartEvent(req.Node.FriendlyName(), tsRoot)
 			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
 			}
-			timestamp.StopEvent(ts) // req.Node.FriendlyName()
 
 		case pkggraph.TypeRun, pkggraph.TypeGoal, pkggraph.TypeRemote, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
 			res.UsedCache = req.CanUseCache
@@ -126,8 +119,6 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		}
 
 		channels.Results <- res
-		// Track the time a worker spends waiting on a task
-		idleTimestamp, _ = timestamp.StartEvent("worker idle", tsRoot)
 	}
 
 	logger.Log.Debug("Worker done")

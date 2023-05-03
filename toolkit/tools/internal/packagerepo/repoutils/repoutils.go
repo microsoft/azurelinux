@@ -12,7 +12,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 // RestoreClonedRepoContents restores a cloner's repo contents using a JSON file at `srcFile`.
@@ -22,9 +21,6 @@ import (
 // cache (with exception of the toolchain packages) then this routine will return an error.
 // This is done to ensure the cache only contains the desired packages.
 func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (err error) {
-	timestamp.StartEvent("restoring cloned repo", nil)
-	defer timestamp.StopEvent(nil)
-
 	const (
 		cloneDeps        = false
 		packageCondition = "="
@@ -96,8 +92,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 
 // SaveClonedRepoContents saves a cloner's repo contents to a JSON file at `dstFile`.
 func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string) (err error) {
-	timestamp.StartEvent("saving cloned repo contents", nil)
-	defer timestamp.StopEvent(nil)
+	logger.Log.Infof("Saving cloned repository contents to (%s)", dstFile)
 
 	repo, err := cloner.ClonedRepoContents()
 	if err != nil {
