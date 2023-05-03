@@ -187,6 +187,7 @@ func main() {
 
 // cancelOutstandingBuilds stops any builds that are currently running.
 func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
+	timestamp.CompleteTiming()
 	err := agent.Close()
 	if err != nil {
 		logger.Log.Errorf("Unable to close build agent, error: %s", err)
