@@ -36,6 +36,7 @@
 
 /SPECS/dracut/* @microsoft/cbl-mariner-dracut
 /SPECS/initramfs/* @microsoft/cbl-mariner-dracut
+/SPECS/verity-read-only-root/* @microsoft/cbl-mariner-dracut
 
 /SPECS/systemd/* @microsoft/cbl-mariner-systemd
 
