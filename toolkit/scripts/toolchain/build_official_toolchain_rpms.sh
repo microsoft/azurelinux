@@ -25,7 +25,7 @@ TIMESTAMP_FILE_PATH=${14}
 source $(dirname  $0)/../timestamp.sh
 # =====================================================
 
-begin_timestamp 10
+begin_timestamp
 start_record_timestamp "prep_files"
 
 
@@ -282,12 +282,9 @@ cp /etc/resolv.conf $LFS/etc/
 chroot_and_print_installed_rpms
 
 stop_record_timestamp "build prep"
-num_build_steps=$(grep -P "build_rpm_in_chroot_no_install" $0)
-num_install_steps=$(grep -P "chroot_and_install_rpms" $0)
-# -1 for func definitions, -1 for the grep expressions
-start_record_timestamp "build packages" 2 100
-start_record_timestamp "build packages/build" $num_build_steps
-start_record_timestamp "build packages/install" $num_install_steps
+start_record_timestamp "build packages"
+start_record_timestamp "build packages/build"
+start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
