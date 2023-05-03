@@ -264,9 +264,9 @@ A sample Networks entry pointing to one network configuration:
 
 ### PackageRepos
 
-The `PackageRepos` list defines custom package repos to use with **ISO installers**. Each repo must set `Name` and `BaseUrl`. Each repo may also set `GPGCheck` (`GPGCheck` defaults to `true`) and `GPGKeys` (a string of the form `file:///path/to/key1 file:///path/to/key2 ...`. `GPGKeys` defaults to the Microsoft RPM signing keys if left unset), and `Install` to also include the repo in the final installed image.
+The `PackageRepos` list defines custom package repos to use with **ISO installers**. Each repo must set `Name` and `BaseUrl`. Each repo may also set `GPGCheck`/`RepoGPGCheck` (both default to `true`), `GPGKeys` (a string of the form `file:///path/to/key1 file:///path/to/key2 ...`. `GPGKeys` defaults to the Microsoft RPM signing keys if left unset), and `Install` which causes the repo file to be installed into the final image.
 
-If a custom repo entry is present, the default repo entires **will not be used during install**. If you want to also use them you will need to add an entry for [local.repo](toolkit/resources/manifests/image/local.repo) into the repo list.
+If a custom repo entry is present, the default local file repo entires **will not be used during install**. If you want to also use them you will need to add an entry for [local.repo](toolkit/resources/manifests/image/local.repo) into the repo list. The default behavior is to pre-download the required packages into the ISO installer from repos defined in `REPO_LIST`.
 
 By default the repo will only be used during ISO install, it may also be made available to the installed image by setting `Install` to `true`.
 
@@ -284,6 +284,7 @@ By default the repo will only be used during ISO install, it may also be made av
         "BaseUrl":  "https://contoso.com/cbl-mariner-custom-packages/$releasever/prod/base/$basearch",
         "Install":  true,
         "GPGCheck": true,
+        "RepoGPGCheck": false,
         "GPGKeys": "file:///etc/pki/rpm-gpg/my-custom-key"
     }
 ]

@@ -25,20 +25,19 @@ import (
 // repository configuration will be saved in the installed system if specified, and only
 // available during the installation process if not
 type PackageRepo struct {
-	Name     string `json:"Name"`
-	BaseUrl  string `json:"BaseUrl"`
-	Install  bool   `json:"Install"`
-	GPGCheck bool   `json:"GPGCheck"` // Default value is true
-	GPGKeys  string `json:"GPGKeys"`  // Default value is "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
+	Name         string `json:"Name"`
+	BaseUrl      string `json:"BaseUrl"`
+	Install      bool   `json:"Install"`
+	GPGCheck     bool   `json:"GPGCheck"`     // Default value is true
+	RepoGPGCheck bool   `json:"RepoGPGCheck"` // Default value is true
+	GPGKeys      string `json:"GPGKeys"`      // Default value is "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
 }
 
-func getDefaultGPGCheck() bool {
-	return true
-}
-
-func getDefaultGPGKeys() string {
-	return "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
-}
+const (
+	packageRepoDefaultGPGCheck     = true
+	packageRepoDefaultRepoGPGCheck = true
+	packageRepoDefaultGPGKeys      = "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
+)
 
 // UnmarshalJSON Unmarshals a PackageRepo entry
 func (p *PackageRepo) UnmarshalJSON(b []byte) (err error) {
@@ -46,8 +45,9 @@ func (p *PackageRepo) UnmarshalJSON(b []byte) (err error) {
 	type IntermediateTypePackageRepo PackageRepo
 
 	// Set default values
-	p.GPGCheck = getDefaultGPGCheck()
-	p.GPGKeys = getDefaultGPGKeys()
+	p.GPGCheck = packageRepoDefaultGPGCheck
+	p.RepoGPGCheck = packageRepoDefaultRepoGPGCheck
+	p.GPGKeys = packageRepoDefaultGPGKeys
 
 	err = json.Unmarshal(b, (*IntermediateTypePackageRepo)(p))
 	if err != nil {
@@ -74,14 +74,14 @@ func (p *PackageRepo) IsValid() (err error) {
 		return
 	}
 
-	// Repos for ISO use only (install = false) cannot support custom GPG keys if GPGCheck is enabled. Warn the user even
+	// Repos for ISO use only (install = false) cannot support custom GPG keys if GPGCheck/RepoGPGCheck is enabled. Warn the user even
 	// if we are installing the repo file, as the repo file will not be usable in the installer.
-	if p.GPGCheck && p.GPGKeys != getDefaultGPGKeys() {
+	if (p.GPGCheck || p.RepoGPGCheck) && p.GPGKeys != packageRepoDefaultGPGKeys {
 		if !p.Install {
-			err = fmt.Errorf("invalid value for package repo '%s' [GPGKeys] (%s), custom GPG keys are only supported for repos that are installed", p.Name, p.GPGKeys)
+			err = fmt.Errorf("invalid value for package repo '%s' [GPGKeys] (%s), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", p.Name, p.GPGKeys)
 			return
 		} else {
-			logger.Log.Warnf("Warning: Custom GPG keys are only supported for repos that are installed. The repo file for '%s' will not be usable in the installer.", p.Name)
+			logger.Log.Warnf("Warning: Custom GPG keys are only supported for repos that are installed into the final image after the ISO runs. The repo file for '%s' will not be usable during the installation process.", p.Name)
 		}
 	}
 
@@ -165,13 +165,12 @@ func (p *PackageRepo) repoUrlIsValid() (err error) {
 
 func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	const (
-		enable       = "enabled=1\n"
-		repogpgCheck = "repo_gpgcheck=1\n"
-		skip         = "skip_if_unavailable=True\n"
-		sslVerify    = "sslverify=1\n"
+		enable    = "enabled=1\n"
+		skip      = "skip_if_unavailable=True\n"
+		sslVerify = "sslverify=1\n"
 	)
 
-	additionalFields := []string{enable, repogpgCheck, skip, sslVerify}
+	additionalFields := []string{enable, skip, sslVerify}
 
 	for _, additionalField := range additionalFields {
 		_, err = stringBuilder.WriteString(additionalField)
@@ -182,6 +181,16 @@ func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	}
 
 	return
+}
+
+// convertBoolToRepoFlag converts a boolean value to a string that can be used in a repo file. It will be of the
+// form "key=1" or "key=0".
+func convertBoolToRepoFlag(key string, value bool) string {
+	if value {
+		return fmt.Sprintf("%s=1\n", key)
+	} else {
+		return fmt.Sprintf("%s=0\n", key)
+	}
 }
 
 func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) {
@@ -235,14 +244,17 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 		return
 	}
 
-	// Write the repo GPGCheck field
-	if packageRepo.GPGCheck {
-			_, err = stringBuilder.WriteString("gpgcheck=1\n")
-	} else {
-			_, err = stringBuilder.WriteString("gpgcheck=0\n")
-	}
+	// Write the  GPGCheck field
+	_, err = stringBuilder.WriteString(convertBoolToRepoFlag("gpgcheck", packageRepo.GPGCheck))
 	if err != nil {
-		logger.Log.Errorf("Error writing repo GPGCheck. Error: %s", err)
+		logger.Log.Errorf("Error writing GPGCheck. Error: %s", err)
+		return
+	}
+
+	// Write the repo GPGCheck field
+	_, err = stringBuilder.WriteString(convertBoolToRepoFlag("repo_gpgcheck", packageRepo.RepoGPGCheck))
+	if err != nil {
+		logger.Log.Errorf("Error writing repo RepoGPGCheck. Error: %s", err)
 		return
 	}
 

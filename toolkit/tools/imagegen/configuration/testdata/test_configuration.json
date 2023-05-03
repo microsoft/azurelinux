@@ -183,7 +183,8 @@
                     "Name": "repo2",
                     "BaseUrl": "https://repo2.com",
                     "Install": false,
-                    "GPGCheck": false
+                    "GPGCheck": false,
+                    "RepoGPGCheck": false
                 }
             ],
             "PreInstallScripts":[

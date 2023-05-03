@@ -17,18 +17,20 @@ import (
 var (
 	validPackageRepos = []PackageRepo{
 		{
-			Name:     "mariner-official-base",
-			BaseUrl:  "https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch",
-			Install:  false,
-			GPGCheck: true,
-			GPGKeys:  "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
+			Name:         "mariner-official-base",
+			BaseUrl:      "https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch",
+			Install:      false,
+			GPGCheck:     true,
+			RepoGPGCheck: true,
+			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 		},
 		{
-			Name:     "mariner-official-preview",
-			BaseUrl:  "https://packages.microsoft.com/cbl-mariner/$releasever/preview/base/$basearch",
-			Install:  true,
-			GPGCheck: true,
-			GPGKeys:  "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
+			Name:         "mariner-official-preview",
+			BaseUrl:      "https://packages.microsoft.com/cbl-mariner/$releasever/preview/base/$basearch",
+			Install:      true,
+			GPGCheck:     true,
+			RepoGPGCheck: true,
+			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 		},
 	}
 
@@ -38,15 +40,16 @@ var (
 		"baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch",
 		"gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 		"gpgcheck=1",
-		"enabled=1",
 		"repo_gpgcheck=1",
+		"enabled=1",
 		"skip_if_unavailable=True",
 		"sslverify=1",
 	}
 
-	validRepoJson      = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false}`
-	validRepoNoGPGJson = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false,"gpgcheck":false}`
-	validRepoCustomKey = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":true,"gpgkeys":"file:///etc/pki/rpm-gpg/my-custom-key"}`
+	validRepoJson          = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false}`
+	validRepoNoGPGJson     = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false,"gpgcheck":false}`
+	validRepoNoRepoGPGJson = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false,"RepoGPGCheck":false}`
+	validRepoCustomKey     = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":true,"gpgkeys":"file:///etc/pki/rpm-gpg/my-custom-key"}`
 )
 
 func TestShouldPassParsingValidPackageRepos_PackageRepo(t *testing.T) {
@@ -146,6 +149,17 @@ func TestShouldDisableGPG_PackageRepo(t *testing.T) {
 	assert.Equal(t, noGPGRepo, checkedPackageRepo)
 }
 
+func TestShouldDisableRepoGPG_PackageRepo(t *testing.T) {
+	var checkedPackageRepo PackageRepo
+	err := marshalJSONString(validRepoNoRepoGPGJson, &checkedPackageRepo)
+
+	noGPGRepo := validPackageRepos[0]
+	noGPGRepo.RepoGPGCheck = false
+
+	assert.NoError(t, err)
+	assert.Equal(t, noGPGRepo, checkedPackageRepo)
+}
+
 func TestShouldSetCustomKeys_PackageRepo(t *testing.T) {
 	var checkedPackageRepo PackageRepo
 	validRepoContentCustomKey := append([]string{}, validRepoContent...)
@@ -177,11 +191,25 @@ func TestShouldFailNonInstalledCustomKeys_PackageRepo(t *testing.T) {
 	assert.Equal(t, "failed to parse [PackageRepo]: invalid value for package repo 'mariner-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed", err.Error())
 }
 
+func TestShouldSucceedlInstalledCustomKeys_PackageRepo(t *testing.T) {
+	var checkedPackageRepo PackageRepo
+	testPackageRepo := validPackageRepos[0]
+	testPackageRepo.Install = true
+	testPackageRepo.GPGKeys = "file:///etc/pki/rpm-gpg/my-custom-key"
+
+	err := testPackageRepo.IsValid()
+	assert.NoError(t, err)
+
+	err = remarshalJSON(testPackageRepo, &checkedPackageRepo)
+	assert.NoError(t, err)
+}
+
 func TestShouldSucceedSettingDefaults_PackageRepo(t *testing.T) {
 	var checkedPackageRepo PackageRepo
 	err := marshalJSONString(`{"name": "test", "BaseUrl":"https://www.contoso.com"}`, &checkedPackageRepo)
 
 	assert.NoError(t, err)
 	assert.True(t, checkedPackageRepo.GPGCheck)
+	assert.True(t, checkedPackageRepo.RepoGPGCheck)
 	assert.Equal(t, "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY", checkedPackageRepo.GPGKeys)
 }
