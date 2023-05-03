@@ -164,6 +164,7 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tdnf-cache-updateinfo
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
+%{_libdir}/tdnf/tdnf-history-util
 %config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
 %dir %{_var}/cache/tdnf
 %{_datadir}/bash-completion/completions/tdnf
