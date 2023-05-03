@@ -49,7 +49,7 @@ $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
 
-.PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
+.PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
 ifeq ($(REBUILD_TOOLCHAIN),y)
@@ -72,6 +72,15 @@ clean-toolchain:
 	rm -f $(SCRIPTS_DIR)/toolchain/container/check-system-ca-certs.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/.bashrc
+
+# Clean the containers we use during toolchain build
+ifeq ($(CLEAN_TOOLCHAIN_CONTAINERS),y)
+clean:  clean-toolchain-containers
+endif
+
+# Optionally remove all toolchain docker containers
+clean-toolchain-containers:
+	$(SCRIPTS_DIR)/toolchain/toolchain_clean.sh $(BUILD_DIR)
 
 clean-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
@@ -153,7 +162,9 @@ $(raw_toolchain): $(toolchain_files)
 		./create_toolchain_in_container.sh \
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
-			$(SOURCE_URL)
+			$(SOURCE_URL) \
+			$(INCREMENTAL_TOOLCHAIN) \
+			$(ARCHIVE_TOOL)
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -217,7 +228,8 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
-			$(toolchain_from_repos) && \
+			$(toolchain_from_repos) \
+			$(TOOLCHAIN_MANIFEST) && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
@@ -245,7 +257,7 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_tool
 	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
 	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
+		printf "ERROR: Mismatched packages between:\n\n'%s'\n\t'%s'\n\n" '$(selected_toolchain_archive)' '$(TOOLCHAIN_MANIFEST)' && \
 		echo "$${diff}"; \
 		$(call print_error, $@ failed) ; \
 	fi && \
