@@ -127,7 +127,7 @@ install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 # Symlink for mshv-linuxloader conf
-ln -s bzImage %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
+ln -s bzImage vmlinux-%{uname_r}
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
