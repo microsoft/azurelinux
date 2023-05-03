@@ -121,7 +121,7 @@ systemd services for periodic automatic update
 %cmake \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir}
+    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} 
 
 %cmake_build
 
@@ -160,7 +160,7 @@ find %{buildroot} -name '*.pyc' -delete
 %{_bindir}/tyum
 %{_bindir}/yum
 %{_bindir}/tdnfj
-%{_bindir}/tndf-config
+%{_bindir}/tdnf-config
 %{_bindir}/tdnf-cache-updateinfo
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
