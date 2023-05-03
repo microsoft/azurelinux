@@ -20,21 +20,16 @@ const (
 	recordMode     = "record"
 	stopMode       = "stop"
 	finishMode     = "finish"
-	watchMode      = "watch"
 )
 
 var (
-	app                     = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
-	scriptName              = app.Flag("script-name", "The name of the current tool.").Required().String()
-	stepPath                = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
-	expectedWeight          = app.Flag("expected-weight", "Expected number of substeps/weight for this new step").Default("0").Float64()
-	weight                  = app.Flag("weight", "How much weight will this step have relative to others, defaults to 1.0").Default("1.0").Float64()
-	outPath                 = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute
-	logLevel                = exe.LogLevelFlag(app)
-	validModes              = []string{initializeMode, recordMode, stopMode, finishMode, watchMode}
-	mode                    = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
-	createIfMIssing         = app.Flag("create-if-missing", "Regardless of mode, create a file if its missing").Bool()
-	createIfMissingExpected = app.Flag("create-if-missing-expected", "How much weight should the missing root expect").Default("0").Float64()
+	app        = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
+	scriptName = app.Flag("script-name", "The name of the current tool.").Required().String()
+	stepPath   = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
+	outPath    = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute
+	logLevel   = exe.LogLevelFlag(app)
+	validModes = []string{initializeMode, recordMode, stopMode, finishMode}
+	mode       = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
 )
 
 func main() {
@@ -47,19 +42,13 @@ func main() {
 	// Perform different actions based on the input "mode".
 	switch *mode {
 	case initializeMode:
-		initialize(*outPath, *scriptName, *expectedWeight)
-
+		initialize(*outPath, *scriptName)
 	case recordMode:
-		record(*outPath, *scriptName, *stepPath, *expectedWeight, *weight, *createIfMIssing, *createIfMissingExpected)
-
+		record(*outPath, *scriptName, *stepPath)
 	case stopMode:
 		stop(*outPath, *scriptName, *stepPath)
-
 	case finishMode:
 		finish(*outPath, *scriptName)
-
-	case watchMode:
-		watch(*outPath)
 
 	default:
 		logger.Log.Warnf("Invalid call. Mode must be 'n' for initialize or 'r' for record. ")
@@ -75,13 +64,13 @@ func setupLogger(logLevelStr string) {
 }
 
 // Creates a JSON specifically for the shell script mentioned in "scriptName".
-func initialize(completePath, toolName string, expectedWeight float64) {
+func initialize(completePath, toolName string) {
 	timestamp.BeginTiming(toolName, completePath)
 	timestamp.FlushAndCleanUpResources()
 }
 
 // Records a new timestamp to the specific JSON for the specified shell script.
-func record(completePath, toolName, path string, expectedWeight float64, weight float64, createIfMIssing bool, createIfMissingExpected float64) {
+func record(completePath, toolName, path string) {
 	fullPath := toolName + "/" + path
 	timestamp.ResumeTiming(toolName, completePath)
 	defer timestamp.FlushAndCleanUpResources()
@@ -98,7 +87,4 @@ func stop(completePath, toolName, path string) {
 func finish(completePath, toolName string) {
 	timestamp.ResumeTiming(toolName, completePath)
 	timestamp.CompleteTiming()
-}
-
-func watch(completePath string) {
 }
