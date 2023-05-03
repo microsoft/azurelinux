@@ -26,6 +26,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 const (
@@ -362,6 +363,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 
 		packageList = append(packageList, packages...)
 	}
+
 	return
 }
 
@@ -379,6 +381,9 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
 // - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
 func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
+	timestamp.StartEvent("populating install root", nil)
+	defer timestamp.StopEvent(nil)
+
 	const (
 		filesystemPkg = "filesystem"
 	)
@@ -418,6 +423,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
 
+	timestamp.StartEvent("installing packages", nil)
 	// Install filesystem package first
 	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
 	if err != nil {
@@ -441,6 +447,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 			return
 		}
 	}
+
+	timestamp.StopEvent(nil) // installing packages
+	timestamp.StartEvent("final image configuration", nil)
 
 	// Copy additional files
 	err = copyAdditionalFiles(installChroot, config)
@@ -495,6 +504,8 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}
 	}
 
+	timestamp.StopEvent(nil) // final image configuration
+
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
 	return
@@ -544,6 +555,8 @@ func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err er
 
 // TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
 func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesInstalled, totalPackages int, reportProgress bool) (packagesInstalled int, err error) {
+	timestamp.StartEvent("installing"+packageName, nil)
+	defer timestamp.StopEvent(nil)
 	var (
 		releaseverCliArg string
 	)
@@ -1556,6 +1569,8 @@ func updateUserPassword(installRoot, username, password string) (err error) {
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
 func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {
+	timestamp.StartEvent("SELinux", nil)
+	defer timestamp.StopEvent(nil)
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", systemConfig.KernelCommandLine.SELinux)
 
 	err = selinuxUpdateConfig(systemConfig, installChroot)
@@ -1882,6 +1897,8 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 
 func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
 	ReportAction("Copying additional files")
+	timestamp.StartEvent("Copying additional files", nil)
+	defer timestamp.StopEvent(nil)
 
 	for srcFile, dstFile := range config.AdditionalFiles {
 		fileToCopy := safechroot.FileToCopy{
@@ -1929,6 +1946,8 @@ func RunPreInstallScripts(config configuration.SystemConfig) (err error) {
 }
 
 func runPostInstallScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	timestamp.StartEvent("post install scripts", nil)
+	defer timestamp.StopEvent(nil)
 	const squashErrors = false
 
 	for _, script := range config.PostInstallScripts {
@@ -2266,6 +2285,9 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 // - partIDToDevPathMap is a map of partition IDs to partition device paths
 // - mountPointToOverlayMap is a map of mountpoints to the overlay details for this mount if any
 func ExtractPartitionArtifacts(setupChrootDirPath, workDirPath string, diskIndex int, disk configuration.Disk, systemConfig configuration.SystemConfig, partIDToDevPathMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
+	timestamp.StartEvent("create partition artifacts", nil)
+	defer timestamp.StopEvent(nil)
+
 	const (
 		ext4ArtifactType  = "ext4"
 		diffArtifactType  = "diff"

@@ -203,7 +203,7 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 		touch $@; \
 	}
 else
-$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) 
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 	@touch $@
 endif
 
@@ -271,7 +271,7 @@ $(toolchain_local_temp)%: ;
 
 # If $(depend_TOOLCHAIN_ARCHIVE) and $(depend_REBUILD_TOOLCHAIN) argument trackers change it is important to check
 #	that all of the toolchain .rpms are correct. The different toolchain sources may have identical files but with
-#	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take 
+#	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take
 #	responsibility for updating the .rpms in the final destination if needed.
 $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(call shell_real_build_only, find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $(toolchain_local_temp) && \
@@ -330,7 +330,7 @@ $(RPMS_DIR): $(toolchain_out_rpms)
 
 # For each toolchain RPM in ./out/RPMS, add a dependency on the counterparts in the normal toolchain directory:
 # Each path in $(toolchain_out_rpms) corresponds to a .rpm file we expect to have been built by the toolchain target and made available in ./out/RPMS.
-# Those RPMs however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS 
+# Those RPMs however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS
 # we will need to copy it over. We can filter the list of toolchain rpms $(toolchain_rpms) to find the source that matches the target ($@),
 # then copy it over.
 $(toolchain_out_rpms): $(toolchain_rpms)
