@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.98.mshv1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -126,6 +126,8 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
+# Symlink for mshv-linuxloader conf
+ln -s bzImage %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
@@ -235,6 +237,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Wed May 3 2023 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.98.mshv1-4
+- Add vmlinux symlink for mshv-linuxloader
+
 * Thu Mar 30 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.98.mshv1-3
 - Add back config
 
