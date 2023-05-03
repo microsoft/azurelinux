@@ -562,7 +562,7 @@ tdnf-autoupdate-3.5.2-1.cm2.aarch64.rpm
 tdnf-cli-libs-3.5.2-1.cm2.aarch64.rpm
 tdnf-debuginfo-3.5.2-1.cm2.aarch64.rpm
 tdnf-devel-3.5.2-1.cm2.aarch64.rpm
-tdnf-metalink-3.5.2-1.cm2.aarch64.rpm
+tdnf-plugin-metalink-3.5.2-1.cm2.aarch64.rpm
 tdnf-plugin-repogpgcheck-3.2.2-1.cm2.aarch64.rpm
 tdnf-python-3.5.2-1.cm2.aarch64.rpm
 texinfo-6.8-1.cm2.aarch64.rpm
