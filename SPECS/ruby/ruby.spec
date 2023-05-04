@@ -71,7 +71,7 @@
 %global tmpdir_version          0.1.2
 %global tsort_version           0.1.0
 %global un_version              0.2.0
-%global uri_version             0.11.1
+%global uri_version             0.12.1
 %global weakref_version         0.1.1
 %global win32ole_version        1.8.8
 %global yaml_version            0.2.0
@@ -82,8 +82,8 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.1.3
-Release:        2%{?dist}
+Version:        3.1.4
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
