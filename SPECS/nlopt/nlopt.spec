@@ -1,8 +1,5 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Prevent accidental soname bumps.
 %global sover        0
-
 # Conditionals controlling the build.
 %global with_guile   0
 %global with_octave  0
@@ -14,14 +11,12 @@ Distribution:   Mariner
 %endif
 %global guile_pkg    %(echo guile%{?guile_ver} | sed -e 's!\\\.!!g')
 
-
+Summary:           Open-Source library for nonlinear optimization
 Name:              nlopt
 Version:           2.7.1
-Release:           12%{?dist}
-Summary:           Open-Source library for nonlinear optimization
-
-# Get a lowercase name for virtual provides.
-%global lc_name    %{lua:print(string.lower(rpm.expand("%{name}")))}
+Release:           13%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 # The detailed license-breakdown of the sources is:
 #
@@ -52,8 +47,8 @@ Summary:           Open-Source library for nonlinear optimization
 # praxis/*  subplex/*
 #
 License:           BSD and LGPLv2+ and MIT and Public Domain
-URL:               http://ab-initio.mit.edu/%{lc_name}
-Source0:           https://github.com/stevengj/%{lc_name}/archive/v%{version}/%{lc_name}-%{version}.tar.gz
+URL:               http://ab-initio.mit.edu/%{name}
+Source0:           https://github.com/stevengj/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Kill RPATH.
 Patch0:            nlopt-2.6.2-kill_rpath.patch
@@ -71,8 +66,8 @@ BuildRequires:     ncurses-devel
 # The "gnulib" is a copylib and has a wildcard-permission from FPC.
 # See: https://fedorahosted.org/fpc/ticket/174
 Provides:          bundled(gnulib)
-Provides:          %{lc_name}                                      =  %{version}-%{release}
-Provides:          %{lc_name}%{?_isa}                              =  %{version}-%{release}
+Provides:          %{name}                                      =  %{version}-%{release}
+Provides:          %{name}%{?_isa}                              =  %{version}-%{release}
 
 %description
 NLopt is a library for nonlinear local and global optimization, for
@@ -88,8 +83,8 @@ been made with C++-support enabled.
 Summary:           Development files for %{name}
 
 Requires:          %{name}%{?_isa}                                 =  %{version}-%{release}
-Provides:          %{lc_name}-devel                                =  %{version}-%{release}
-Provides:          %{lc_name}-devel%{?_isa}                        =  %{version}-%{release}
+Provides:          %{name}-devel                                =  %{version}-%{release}
+Provides:          %{name}-devel%{?_isa}                        =  %{version}-%{release}
 
 %description devel
 This package contains development files for %{name}.
@@ -98,7 +93,7 @@ This package contains development files for %{name}.
 %package doc
 Summary:           Documentation files for %{name}
 BuildArch:         noarch
-Provides:          %{lc_name}-doc                                  =  %{version}-%{release}
+Provides:          %{name}-doc                                  =  %{version}-%{release}
 
 %description doc
 This package contains documentation files for %{name}.
@@ -119,8 +114,8 @@ BuildRequires:     swig
 Requires:          %{guile_pkg}%{?_isa}
 Requires:          %{name}%{?_isa}                                 =  %{version}-%{release}
 
-Provides:          guile-%{lc_name}                                =  %{version}-%{release}
-Provides:          guile-%{lc_name}%{?_isa}                        =  %{version}-%{release}
+Provides:          guile-%{name}                                =  %{version}-%{release}
+Provides:          guile-%{name}%{?_isa}                        =  %{version}-%{release}
 
 %description -n guile-%{name}
 This package contains Guile bindings for %{name}.
@@ -139,8 +134,8 @@ Requires:          octave(api)                                     =  %{octave_a
 Requires(post):    octave
 Requires(postun):  octave
 
-Provides:          octave-%{lc_name}                               =  %{version}-%{release}
-Provides:          octave-%{lc_name}%{?_isa}                       =  %{version}-%{release}
+Provides:          octave-%{name}                               =  %{version}-%{release}
+Provides:          octave-%{name}%{?_isa}                       =  %{version}-%{release}
 
 %description -n octave-%{name}
 This package contains the Octave bindings for %{name}.
@@ -156,8 +151,8 @@ BuildRequires:     python%{python3_pkgversion}-numpy
 
 Requires:          %{name}%{?_isa}                                 =  %{version}-%{release}
 
-Provides:          python%{python3_pkgversion}-%{lc_name}          =  %{version}-%{release}
-Provides:          python%{python3_pkgversion}-%{lc_name}%{?_isa}  =  %{version}-%{release}
+Provides:          python%{python3_pkgversion}-%{name}          =  %{version}-%{release}
+Provides:          python%{python3_pkgversion}-%{name}%{?_isa}  =  %{version}-%{release}
 
 %description -n python%{python3_pkgversion}-%{name}
 This package contains Python3 bindings for %{name}.
@@ -165,7 +160,7 @@ This package contains Python3 bindings for %{name}.
 
 
 %prep
-%autosetup -p 1 -n %{lc_name}-%{version}
+%autosetup -p 1 -n %{name}-%{version}
 
 # Move all %%doc to topdir and append their belonging.
 [[ -f README.md ]] &&  \
@@ -261,15 +256,15 @@ EOF
 %files
 %doc ChangeLog NEWS.md
 %license COPY*
-%{_libdir}/lib%{lc_name}.so.%{sover}*
+%{_libdir}/lib%{name}.so.%{sover}*
 
 
 %files devel
 %doc %{_mandir}/man3/*
 %{_includedir}/*
 %{_libdir}/cmake/nlopt/
-%{_libdir}/lib%{lc_name}.so
-%{_libdir}/pkgconfig/%{lc_name}.pc
+%{_libdir}/lib%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 
 %files doc
@@ -300,6 +295,9 @@ EOF
 
 
 %changelog
+* Thu May 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 2.7.1-13
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+
 * Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
