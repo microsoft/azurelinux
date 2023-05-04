@@ -146,6 +146,8 @@ install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/td
 rm -f %{buildroot}%{_bindir}/jsondumptest
 rm -rf %{buildroot}%{_datadir}/tdnf
 
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/protected.d
+
 pushd %{__cmake_builddir}/python
 %py3_install
 popd
