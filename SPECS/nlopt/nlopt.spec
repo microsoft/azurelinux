@@ -6,17 +6,14 @@
 %global with_py3     0
 
 # Guile version
-%if 0%{?fedora}
 %global guile_ver    2.2
-%endif
-%global guile_pkg    %(echo guile%{?guile_ver} | sed -e 's!\\\.!!g')
 
 Summary:           Open-Source library for nonlinear optimization
 Name:              nlopt
 Version:           2.7.1
 Release:           13%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Vendor:            Microsoft Corporation
+Distribution:      Mariner
 
 # The detailed license-breakdown of the sources is:
 #
@@ -107,11 +104,11 @@ This package contains documentation files for %{name}.
 
 Summary:           Guile bindings for %{name}
 
-BuildRequires:     %{guile_pkg}-devel
+BuildRequires:     guile-devel
 BuildRequires:     pkgconfig
 BuildRequires:     swig
 
-Requires:          %{guile_pkg}%{?_isa}
+Requires:          guile
 Requires:          %{name}%{?_isa}                                 =  %{version}-%{release}
 
 Provides:          guile-%{name}                                =  %{version}-%{release}
@@ -185,10 +182,18 @@ done
 %cmake3                                     \
   -DNLOPT_CXX=ON                            \
   -DNLOPT_FORTRAN=ON                        \
+%if 0%{?with_py3}
+  -DNLOPT_PYTHON=ON                         \
+%else
   -DNLOPT_PYTHON=OFF                        \
+%endif
   -DNLOPT_OCTAVE=OFF                        \
   -DNLOPT_MATLAB=OFF                        \
+%if 0%{?with_guile}
+  -DNLOPT_GUILE=ON                          \
+%else
   -DNLOPT_GUILE=OFF                         \
+%endif
   -DNLOPT_SWIG=ON                           \
   -DNLOPT_TESTS=ON                          \
   -DBUILD_SHARED_LIBS=ON                    \
