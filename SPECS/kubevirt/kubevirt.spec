@@ -19,8 +19,8 @@
 %global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        0.58.0
-Release:        7%{?dist}
+Version:        0.59.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -143,7 +143,7 @@ install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}
 # virt-launcher configurations
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
 install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
-install -p -m 0644 cmd/virt-launcher/libvirtd.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
+install -p -m 0644 cmd/virt-launcher/virtqemud.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
 install -p -m 0644 cmd/virt-launcher/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
 
 
@@ -211,6 +211,10 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
+* Wed May 03 2023 Aditya Dubey <adityadubey@microsoft.com> - 0.58.0-7
+- Upgrade to 0.58.0
+- switching to use virtqemud daemon instead of libvirtd
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58.0-7
 - Bump release to rebuild with go 1.19.8
 
