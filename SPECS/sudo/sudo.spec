@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.13p3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -15,6 +15,7 @@ BuildRequires:  openssl-libs
 BuildRequires:  pam-devel
 BuildRequires:  sed
 BuildRequires:  zlib-devel
+BuildRequires:  openldap
 Requires:       audit-libs
 Requires:       openssl-libs
 Requires:       pam
@@ -36,6 +37,8 @@ the ability to run some (or all) commands as root or another user while logging 
     --docdir=%{_docdir}/%{name}-%{version} \
     --with-env-editor \
     --with-pam \
+    --with-ldap \
+    --with-ldap-conf-file=/etc/sudo-ldap.conf \
     --with-linux-audit \
     --enable-zlib=system \
     --with-passprompt="[sudo] password for %p: "
@@ -97,6 +100,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Thu May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
+- Add config option to sudo build to allow configuration of sudo via LDAP.
+
 * Thu Mar 16 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.9.13p3-1
 - Upgrade to 1.9.13p3 to fix CVE-2023-27320
 
