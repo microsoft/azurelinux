@@ -6,7 +6,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -179,7 +179,7 @@ rm %{buildroot}%{_libdir}/frr/*.so
 rm -r %{buildroot}%{_includedir}/frr/
 
 %pre
-%sysusers_create_compat %{SOURCE2}
+%sysusers_create_package %{name} %{SOURCE2}
 
 %post
 %systemd_post frr.service
@@ -266,6 +266,9 @@ rm tests/lib/*grpc*
 %endif
 
 %changelog
+* Wed May 3 2023 Samuel Mueller <samuelle@microsoft.com> - 8.4.2-3
+- Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
+
 * Mon Jan 30 2023 Sumedh Sharma <sumsharma@microsoft.com> - 8.4.2-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Disable sub-package selinux for selinux type targeted

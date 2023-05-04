@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Source12:       useradd-default
 Source13:       login-defs
 Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
+Patch2:         CVE-2023-29383.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
@@ -70,6 +71,7 @@ Libraries and headers for libsubid
 %setup -q -n shadow-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 autoreconf -fiv
 
@@ -176,6 +178,9 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Tue May 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9-12
+- Add patch for CVE-2023-29383
+
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-11
 - Update login-defs, system-auth, passwd to improve security 
 

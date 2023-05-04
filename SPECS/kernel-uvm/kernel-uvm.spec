@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        5.15.98.mshv1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -118,6 +118,7 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
+install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %ifarch x86_64
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
@@ -141,6 +142,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
+%{_datadir}/cloud-hypervisor/bzImage
 %dir %{_datadir}/cloud-hypervisor
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
@@ -152,6 +154,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Mon May 1 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.98.mshv1-4
+- Install the bzImage
+
 * Thu Apr 6 2023 Chris Co <chrco@microsoft.com> - 5.15.98.mshv1-3
 - Generate devel subpackage and enable loadable kernel module support
 
