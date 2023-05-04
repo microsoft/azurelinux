@@ -6455,7 +6455,6 @@
         }
       }
     },
-
     {
       "component": {
         "type": "other",
@@ -25155,8 +25154,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.11",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.11.tar.gz"
+          "version": "6.2.12",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.12.tar.gz"
         }
       }
     },
