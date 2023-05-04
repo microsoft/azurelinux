@@ -1,43 +1,35 @@
 %global frr_libdir %{_libexecdir}/frr
-%global _hardened_build 1
-%global selinuxtype targeted
-%define _legacy_common_support 1
-%bcond_with selinux
+
 Summary:        Routing daemon
 Name:           frr
-Version:        8.4.2
-Release:        3%{?dist}
-License:        GPLv2+
+Version:        8.5.1
+Release:        1%{?dist}
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.frrouting.org
 Source0:        https://github.com/FRRouting/frr/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        %{name}-tmpfiles.conf
 Source2:        %{name}-sysusers.conf
-#Decentralized SELinux policy
-Source3:        frr.fc
-Source4:        frr.te
-Source5:        frr.if
 Patch0:         0000-remove-babeld-and-ldpd.patch
-Patch1:         0002-enable-openssl.patch
-Patch2:         0003-disable-eigrp-crypto.patch
-Patch3:         0004-fips-mode.patch
-Patch4:         0005-remove-grpc-test.patch
+Patch1:         0001-enable-openssl.patch
+Patch2:         0002-disable-eigrp-crypto.patch
+Patch3:         0003-fips-mode.patch
+Patch4:         0004-remove-grpc-test.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  bison >= 2.7
+BuildRequires:  bison
 BuildRequires:  c-ares-devel
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  git-core
 BuildRequires:  groff
 BuildRequires:  grpc-devel
 BuildRequires:  grpc-plugins
 BuildRequires:  json-c-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
-BuildRequires:  libyang-devel >= 2.0.0
+BuildRequires:  libyang-devel
 BuildRequires:  make
 BuildRequires:  ncurses
 BuildRequires:  ncurses-devel
@@ -47,14 +39,13 @@ BuildRequires:  patch
 BuildRequires:  perl-XML-LibXML
 BuildRequires:  perl-generators
 BuildRequires:  python3-devel
-BuildRequires:  python3-pytest
 BuildRequires:  python3-sphinx
 BuildRequires:  re2-devel
 BuildRequires:  readline-devel
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  texinfo
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif
@@ -64,11 +55,7 @@ Requires(post): hostname
 %{?sysusers_requires_compat}
 Requires(post): systemd
 Requires(postun): systemd
-Requires(preun):systemd
-%if 0%{?with_selinux}
-Requires: (%{name}-selinux = %{version}-%{release} if selinux-policy-%{selinuxtype})
-%endif
-Obsoletes:      quagga < 1.2.4-17
+Requires(preun): systemd
 Provides:       routingdaemon = %{version}-%{release}
 
 %description
@@ -80,25 +67,8 @@ FRRouting supports BGP4, OSPFv2, OSPFv3, ISIS, RIP, RIPng, PIM, NHRP, PBR, EIGRP
 
 FRRouting is a fork of Quagga.
 
-%if 0%{?with_selinux}
-%package selinux
-Summary:        Selinux policy for FRR
-BuildRequires:  selinux-policy-devel
-Requires:       selinux-policy-%{selinuxtype}
-Requires(post): selinux-policy-%{selinuxtype}
-BuildArch:      noarch
-%{?selinux_requires}
-
-%description selinux
-SELinux policy modules for FRR package
-
-%endif
-
 %prep
 %autosetup -p1 -n %{name}-%{name}-%{version}
-#Selinux
-mkdir selinux
-cp -p %{SOURCE3} %{SOURCE4} %{SOURCE5} selinux
 
 %build
 autoreconf -ivf
@@ -133,25 +103,21 @@ autoreconf -ivf
 # Build info documentation
 %make_build -C doc info
 
-#SELinux policy
-%if 0%{?with_selinux}
-make -C selinux -f %{_datadir}/selinux/devel/Makefile %{name}.pp
-bzip2 -9 selinux/%{name}.pp
-%endif
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/{frr,rc.d/init.d,sysconfig,logrotate.d,pam.d,default} \
-         %{buildroot}%{_rundir}/frr/log/frr %{buildroot}%{_infodir} \
-         %{buildroot}%{_unitdir}
+         %{buildroot}%{_rundir}/frr/log/frr \
+         %{buildroot}%{_infodir} \
+         %{buildroot}%{_unitdir} \
+         %{buildroot}%{_tmpfilesdir} \
+         %{buildroot}%{_sysusersdir} \
+         %{buildroot}%{frr_libdir}
 
 mkdir -p -m 0755 %{buildroot}%{_libdir}/frr
-mkdir -p %{buildroot}%{_tmpfilesdir}
-mkdir -p %{buildroot}%{_sysusersdir}
-mkdir -p %{buildroot}%{frr_libdir}
 
 %make_install
 
-# Remove this file, as it is uninstalled and causes errors when building on RH9
+# Remove this file, this package should not own the top-level info dir file for the whole system
 rm -rf %{buildroot}%{_infodir}/dir
 
 install -p -m 644 %{SOURCE1} %{buildroot}%{_tmpfilesdir}/%{name}.conf
@@ -165,16 +131,10 @@ install -p -m 644 redhat/frr.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/fr
 install -p -m 644 redhat/frr.pam %{buildroot}%{_sysconfdir}/pam.d/frr
 install -d -m 775 %{buildroot}/run/frr
 
-%if 0%{?with_selinux}
-install -D -m 644 selinux/%{name}.pp.bz2 \
-	%{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-install -D -m 644 selinux/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/distributed/%{name}.if
-%endif
-
 # Delete libtool archives
 find %{buildroot} -type f -name "*.la" -delete -print
 
-#Upstream does not maintain a stable API, these headers from -devel subpackage are no longer needed
+# Upstream does not maintain a stable API, these files from -devel subpackage are no longer needed
 rm %{buildroot}%{_libdir}/frr/*.so
 rm -r %{buildroot}%{_includedir}/frr/
 
@@ -201,28 +161,6 @@ fi
 
 %preun
 %systemd_preun frr.service
-
-#SELinux
-%if 0%{?with_selinux}
-%pre selinux
-%selinux_relabel_pre -s %{selinuxtype}
-
-%post selinux
-%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-%selinux_relabel_post -s %{selinuxtype}
-#/var/tmp and /var/run need to be relabeled as well if FRR is running before upgrade
-if [ $1 == 2 ]; then
-    %{_sbindir}/restorecon -R %{_var}/tmp/frr &> /dev/null
-    %{_sbindir}/restorecon -R %{_var}/run/frr &> /dev/null
-fi
-
-%postun selinux
-if [ $1 -eq 0 ]; then
-    %selinux_modules_uninstall -s %{selinuxtype} %{name}
-    %selinux_relabel_post -s %{selinuxtype}
-fi
-
-%endif
 
 %check
 %{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
@@ -258,14 +196,13 @@ rm tests/lib/*grpc*
 %{_tmpfilesdir}/%{name}.conf
 %{_sysusersdir}/%{name}.conf
 
-%if 0%{?with_selinux}
-%files selinux
-%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.*
-%{_datadir}/selinux/devel/include/distributed/%{name}.if
-%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
-%endif
-
 %changelog
+* Thu May 04 2023 Olivia Crain <oliviacrain@microsoft.com> - 8.5.1-1
+- Clean up spec and promote to core specs
+- Renumber patches
+- Remove unused selinux subpackage
+- Use SPDX license expression in license tag
+
 * Wed May 3 2023 Samuel Mueller <samuelle@microsoft.com> - 8.4.2-3
 - Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
 
