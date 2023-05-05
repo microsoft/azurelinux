@@ -71,7 +71,7 @@
 %global tmpdir_version          0.1.2
 %global tsort_version           0.1.0
 %global un_version              0.2.0
-%global uri_version             0.12.1
+%global uri_version             0.11.1
 %global weakref_version         0.1.1
 %global win32ole_version        1.8.8
 %global yaml_version            0.2.0
@@ -82,8 +82,8 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.1.4
-Release:        1%{?dist}
+Version:        3.1.3
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -399,8 +399,7 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.4-1
-- Bump version to 3.1.4
+* Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.3-2
 - Update time_version to v0.2.2 to resolve CVE-2023-28756
 - Update uri_version to v0.11.1 to resolve CVE-2023-28755
 
