@@ -1,0 +1,44 @@
+From 31bc237e9b382af9474d32cbcf1ad61c8b665b4c Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Fri, 5 May 2023 11:15:08 -0700
+Subject: [PATCH] Print info for debugging remote host issue
+
+---
+ client/remoterepo.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/client/remoterepo.c b/client/remoterepo.c
+index 60adbb0..7e02cb0 100644
+--- a/client/remoterepo.c
++++ b/client/remoterepo.c
+@@ -126,6 +126,8 @@ TDNFDownloadFileFromRepo(
+             dwError = TDNFJoinPath(&pszUrl, pRepo->ppszBaseUrls[i], pszLocation, NULL);
+             BAIL_ON_TDNF_ERROR(dwError);
+ 
++            pr_info("TDNF File Download Information:\nRepo Name: '%s'\nFull URL: '%s'\nBase URL: '%s'\nFile Location: '%s'\nDownload Location: '%s'\n\n", pRepo->pszName, pszUrl, pRepo->ppszBaseUrls[i], pszLocation, pszFile);
++
+             dwError = TDNFDownloadFile(pTdnf, pRepo, pszUrl, pszFile, pszProgressData);
+             if (dwError == 0) {
+                 break;
+@@ -135,6 +137,7 @@ TDNFDownloadFileFromRepo(
+     } else {
+         /* If there is no base url, pszLocation should contain the whole URL.
+            This is the case for packages from the command line. */
++        pr_info("TDNF File Download Information:\nRepo Name: '%s'\nFull URL: '%s'\nBase URL: '%s'\nFile Location: '%s'\nDownload Location: '%s'\n\n", pRepo->pszName, "", pszLocation, pszLocation, pszFile);
+         dwError = TDNFDownloadFile(pTdnf, pRepo, pszLocation, pszFile, pszProgressData);
+     }
+     BAIL_ON_TDNF_ERROR(dwError);
+@@ -238,7 +241,10 @@ TDNFDownloadFile(
+         if (i > 0)
+         {
+             pr_info("retrying %d/%d\n", i, pRepo->nRetries);
++        } else {
++            pr_info("CURLOPT_URL: '%s'\n", pszFileUrl);
+         }
++
+         dwError = curl_easy_perform(pCurl);
+         if (dwError == CURLE_OK)
+         {
+-- 
+2.25.1
+
