@@ -1,57 +1,40 @@
-From 5c2786d2968f150ce8725e2bac60b6b1e0e0a488 Mon Sep 17 00:00:00 2001
-From: Matt Jeanneret <mjeanneret@microsoft.com>
-Date: Thu, 9 Feb 2023 16:37:09 +0000
-Subject: [PATCH] Merged PR 28216: Cleanup housekeeping cgroup on vm delete
+From 16c98473d5b3e80b65eda99b0d135669c2d7635e Mon Sep 17 00:00:00 2001
+From: Kanika Nema <kanikanema@microsoft.com>
+Date: Fri, 5 May 2023 18:19:59 +0000
+Subject: [PATCH] Cleanup housekeeping cgroup on vm delete
 
 Move cgroup.threads back to parent cgroup and rmdir the
 housekeeping cgroup before the vm is deleted.
 
 This prevents a bug in runc where it cannot read housekeeping/cgroup.procs
 stopping vm from being deleted
-
-Related work items: #502971
 ---
- Makefile                                     | 15 ++++++-
- pkg/virt-handler/cgroup/cgroup.go            |  6 +++
- pkg/virt-handler/cgroup/cgroup_v1_manager.go | 19 +++++++++
- pkg/virt-handler/cgroup/cgroup_v2_manager.go | 19 +++++++++
- pkg/virt-handler/cgroup/util.go              | 33 +++++++++++++++
- pkg/virt-handler/vm.go                       | 44 ++++++++++++++++++++
- 6 files changed, 135 insertions(+), 1 deletion(-)
+ .../services/renderresources.go               |  6 ++-
+ pkg/virt-handler/cgroup/cgroup.go             |  6 +++
+ pkg/virt-handler/cgroup/cgroup_v1_manager.go  | 19 ++++++++
+ pkg/virt-handler/cgroup/cgroup_v2_manager.go  | 19 ++++++++
+ pkg/virt-handler/cgroup/util.go               | 33 ++++++++++++++
+ pkg/virt-handler/vm.go                        | 44 +++++++++++++++++++
+ 6 files changed, 125 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 3d1a722f9..51ea5ae4c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -248,7 +248,6 @@ lint:
+diff --git a/pkg/virt-controller/services/renderresources.go b/pkg/virt-controller/services/renderresources.go
+index 46b242932..d75354bc5 100644
+--- a/pkg/virt-controller/services/renderresources.go
++++ b/pkg/virt-controller/services/renderresources.go
+@@ -194,9 +194,11 @@ func WithCPUPinning(cpu *v1.CPU) ResourceRendererOption {
+ 			}
+ 		}
  
- # The above is forked from upstream, the below is more traditional NetworkCloud Makefile
- 
--.DEFAULT_GOAL := help
- PROJ_DIR := $(shell pwd)
- 
- help: ## Display this help.
-@@ -261,6 +260,20 @@ help: ## Display this help.
- SHELL = /usr/bin/env bash -o pipefail
- .SHELLFLAGS = -ec
- 
-+afo-images: ; $(info Building AFO Docker images...)
-+	DOCKER_BUILDKIT=1 docker build -t $(DOCKER_PREFIX)/builder:$(DOCKER_TAG) \
-+                        -f afo-dockerfiles/Dockerfile-kubevirt-builder .
-+	DOCKER_BUILDKIT=1 docker build -t $(DOCKER_PREFIX)/virt-operator:$(DOCKER_TAG) --build-arg BUILDER_IMAGE=$(DOCKER_PREFIX)/builder:$(DOCKER_TAG) \
-+                        -f afo-dockerfiles/Dockerfile-kubevirt-virt-operator .
-+	DOCKER_BUILDKIT=1 docker build -t $(DOCKER_PREFIX)/virt-api:$(DOCKER_TAG) --build-arg BUILDER_IMAGE=$(DOCKER_PREFIX)/builder:$(DOCKER_TAG) \
-+                        -f afo-dockerfiles/Dockerfile-kubevirt-virt-api .
-+	DOCKER_BUILDKIT=1 docker build -t $(DOCKER_PREFIX)/virt-controller:$(DOCKER_TAG) --build-arg BUILDER_IMAGE=$(DOCKER_PREFIX)/builder:$(DOCKER_TAG) \
-+                        -f afo-dockerfiles/Dockerfile-kubevirt-virt-controller .
-+	DOCKER_BUILDKIT=1 docker build -t $(DOCKER_PREFIX)/virt-handler:$(DOCKER_TAG) --build-arg BUILDER_IMAGE=$(DOCKER_PREFIX)/builder:$(DOCKER_TAG) \
-+                        -f afo-dockerfiles/Dockerfile-kubevirt-virt-handler .
-+	DOCKER_BUILDKIT=1 docker build -t $(DOCKER_PREFIX)/virt-launcher:$(DOCKER_TAG) --build-arg BUILDER_IMAGE=$(DOCKER_PREFIX)/builder:$(DOCKER_TAG) \
-+                        -f afo-dockerfiles/Dockerfile-kubevirt-virt-launcher .
-+
- ##@ Release
- 
- generate-release-manifest: ## Generates the Release Manifest for this repository
+-		// allocate 1 more pcpu if IsolateEmulatorThread request
++		// allocate 2 more pcpu if IsolateEmulatorThread request
++		// the extra cpu ensures hyperthread SMT cpu alignment when cpu-manager
++		// policy full-pcpus-only is used.
+ 		if cpu.IsolateEmulatorThread {
+-			emulatorThreadCPU := resource.NewQuantity(1, resource.BinarySI)
++			emulatorThreadCPU := resource.NewQuantity(2, resource.BinarySI)
+ 			limits := renderer.calculatedLimits[k8sv1.ResourceCPU]
+ 			limits.Add(*emulatorThreadCPU)
+ 			renderer.vmLimits[k8sv1.ResourceCPU] = limits
 diff --git a/pkg/virt-handler/cgroup/cgroup.go b/pkg/virt-handler/cgroup/cgroup.go
 index b0b28a046..052b5aa96 100644
 --- a/pkg/virt-handler/cgroup/cgroup.go
@@ -193,7 +176,7 @@ index f088dc4ce..820671f8f 100644
  // the pods control group (if subcgroup != nil).
  func setCpuSetHelper(manager Manager, subCgroup string, cpusList []int) error {
 diff --git a/pkg/virt-handler/vm.go b/pkg/virt-handler/vm.go
-index dbe1cca19..2513a213b 100644
+index 698133860..d0b0051d2 100644
 --- a/pkg/virt-handler/vm.go
 +++ b/pkg/virt-handler/vm.go
 @@ -2135,6 +2135,13 @@ func (d *VirtualMachineController) processVmShutdown(vmi *v1.VirtualMachineInsta
@@ -224,7 +207,7 @@ index dbe1cca19..2513a213b 100644
  		err = client.DeleteDomain(vmi)
  		if err != nil && !cmdclient.IsDisconnected(err) {
  			// Only report err if it wasn't the result of a disconnect.
-@@ -2690,6 +2704,36 @@ func (d *VirtualMachineController) configureHousekeepingCgroup(vmi *v1.VirtualMa
+@@ -2688,6 +2702,36 @@ func (d *VirtualMachineController) configureHousekeepingCgroup(vmi *v1.VirtualMa
  	return nil
  }
  
