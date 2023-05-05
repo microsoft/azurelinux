@@ -180,27 +180,9 @@ func main() {
 	logger.PanicOnError(err)
 }
 
-// removeDuplicateStrings will remove duplicate entries from a string slice
-func removeDuplicateStrings(packList []string) (deduplicatedPackList []string) {
-	var (
-		packListSet = make(map[string]struct{})
-		exists      = struct{}{}
-	)
-
-	for _, entry := range packList {
-		packListSet[entry] = exists
-	}
-
-	for entry := range packListSet {
-		deduplicatedPackList = append(deduplicatedPackList, entry)
-	}
-
-	return
-}
-
 // parsePackListFile will parse a list of packages to pack if one is specified.
 // Duplicate list entries in the file will be removed.
-func parsePackListFile(packListFile string) (packList []string, err error) {
+func parsePackListFile(packListFile string) (packList map[string]bool, err error) {
 	if packListFile == "" {
 		return
 	}
@@ -215,7 +197,7 @@ func parsePackListFile(packListFile string) (packList []string, err error) {
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if line != "" {
-			packList = append(packList, line)
+			packList[line] = true
 		}
 	}
 
@@ -223,14 +205,12 @@ func parsePackListFile(packListFile string) (packList []string, err error) {
 		err = fmt.Errorf("cannot have empty pack list (%s)", packListFile)
 	}
 
-	packList = removeDuplicateStrings(packList)
-
 	return
 }
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
@@ -269,7 +249,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 }
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
-func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList []string, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 
 	specFiles, err := findSPECFiles(specsDir, packList)
@@ -288,12 +268,12 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 
 // findSPECFiles finds all SPEC files that should be considered for packing.
 // Takes into consideration a packList if provided.
-func findSPECFiles(specsDir string, packList []string) (specFiles []string, err error) {
+func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []string, err error) {
 	if len(packList) == 0 {
 		specSearch := filepath.Join(specsDir, "**/*.spec")
 		specFiles, err = filepath.Glob(specSearch)
 	} else {
-		for _, specName := range packList {
+		for specName := range packList {
 			var specFile []string
 
 			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
@@ -304,13 +284,8 @@ func findSPECFiles(specsDir string, packList []string) (specFiles []string, err 
 				return
 			}
 			if len(specFile) != 1 {
-				if strings.HasPrefix(specName, "msopenjdk-11") {
-					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
-					continue
-				} else {
-					err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
-					return
-				}
+				err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
+				return
 			}
 
 			specFiles = append(specFiles, specFile[0])
