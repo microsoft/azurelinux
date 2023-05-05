@@ -18,7 +18,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.116.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -137,35 +137,12 @@ Requires:       python3
 %description docs
 This package contains the Linux kernel doc files
 
-%package tools
-Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
-Group:          System/Tools
-Requires:       %{name} = %{version}-%{release}
-Requires:       audit
-
-%description tools
-This package contains the 'perf' performance analysis tools for Linux kernel.
-
-%package -n     python3-perf
-Summary:        Python 3 extension for perf tools
-Requires:       python3
-
-%description -n python3-perf
-This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
-
 %package dtb
 Summary:        This package contains common device tree blobs (dtb)
 Group:          System Environment/Kernel
 
 %description dtb
 This package contains common device tree blobs (dtb)
-
-%package -n     bpftool
-Summary:        Inspection and simple manipulation of eBPF programs and maps
-
-%description -n bpftool
-This package contains the bpftool, which allows inspection and simple
-manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
@@ -226,14 +203,6 @@ fi
 
 %build
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-
-# Compile perf, python3-perf
-make -C tools/perf PYTHON=%{python3} all
-
-make -C tools turbostat cpupower
-
-#Compile bpftool
-make -C tools/bpf/bpftool
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
@@ -306,23 +275,6 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
-
-# disable (JOBS=1) parallel build to fix this issue:
-# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
-# Linux version that was affected is 4.4.26
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
-
-# Install python3-perf
-make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
-
-# Install bpftool
-make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
-
-# Install turbostat cpupower
-make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
-
-# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
-rm -vf %{buildroot}%{_bindir}/trace
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
@@ -397,38 +349,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
 
-%files tools
-%defattr(-,root,root)
-%{_libexecdir}
-%exclude %dir %{_libdir}/debug
-%{_sbindir}/cpufreq-bench
-%{_lib64dir}/traceevent
-%{_lib64dir}/libperf-jvmti.so
-%{_lib64dir}/libcpupower.so*
-%{_sysconfdir}/cpufreq-bench.conf
-%{_includedir}/cpuidle.h
-%{_includedir}/cpufreq.h
-%{_mandir}/man1/cpupower*.gz
-%{_mandir}/man8/turbostat*.gz
-%{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
-%{_datadir}/bash-completion/completions/cpupower
-%{_bindir}
-%{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
-%{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
-%{_includedir}/perf/perf_dlfilter.h
-
-%files -n python3-perf
-%{python3_sitearch}/*
-
-%files -n bpftool
-%{_sbindir}/bpftool
-%{_sysconfdir}/bash_completion.d/bpftool
-
 %changelog
+* Wed Jul 05 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.116.1-2
+- Use tools, bpftool, and python3-perf subpackages from kernel.spec
+
 * Tue Jun 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.116.1-1
 - Auto-upgrade to 5.15.116.1
 
