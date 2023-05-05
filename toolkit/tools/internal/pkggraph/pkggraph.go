@@ -1079,8 +1079,9 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 		} else {
 			logger.Log.Warnf("Could not goal package %+v", pkg)
 			if strict {
-				logger.Log.Warnf("Missing %+v", pkg)
+				logger.Log.Errorf("Missing %+v", pkg)
 				err = fmt.Errorf("could not find all goal nodes with strict=true")
+				return
 			}
 		}
 	}
