@@ -122,7 +122,8 @@ systemd services for periodic automatic update
 %cmake \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} 
+    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
+    -DHISTORY_DB_DIR=%{_tdnf_history_db_dir}
 
 %cmake_build
 
@@ -137,6 +138,7 @@ cd build && make %{?_smp_mflags} check
 %cmake_install
 find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
+mkdir -p %{buildroot}%{_tdnf_history_db_dir}
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tdnfj
@@ -170,6 +172,7 @@ find %{buildroot} -name '*.pyc' -delete
 %{_libdir}/tdnf/tdnf-history-util
 %config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
 %dir %{_var}/cache/tdnf
+%dir %{_tdnf_history_db_dir}
 %{_datadir}/bash-completion/completions/tdnf
 
 %files devel
