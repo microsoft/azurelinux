@@ -399,7 +399,8 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.3-2
+* Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.4-1
+- Bump version to 3.1.4
 - Update time_version to v0.2.2 to resolve CVE-2023-28756
 - Update uri_version to v0.11.1 to resolve CVE-2023-28755
 
