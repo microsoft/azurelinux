@@ -63,7 +63,7 @@ BuildRequires:  python3-xml
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
 
 %define _tdnfpluginsdir %{_libdir}/tdnf-plugins
-%define _tdnf_history_db_dir %{libdir}/sysimage/tdnf
+%define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
 
 %package    devel
 Summary:        A Library providing C API for tdnf
