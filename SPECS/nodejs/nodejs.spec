@@ -80,8 +80,8 @@ python3 configure.py \
   --without-dtrace \
   --openssl-use-def-ca-store
 
-# ninja build scripts expect a "python" executable - create symlink to python3
-ln -v /usr/bin/python3 /usr/bin/python
+# Some build scripts expect a "python" executable - create symlink to python3
+ln -sv /usr/bin/python3 /usr/bin/python
 
 %ninja_build -C out/Release
 
@@ -118,7 +118,7 @@ make cctest
 
 %changelog
 * Thu May 04 2023 Andrew Phelps <anphel@microsoft.com> - 16.19.1-2
-- Use ninja build system
+- Speed up compilation by using ninja build system
 
 * Wed Mar 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.19.1-1
 - Auto-upgrade to 16.19.1 - to fix CVE-2023-23936
