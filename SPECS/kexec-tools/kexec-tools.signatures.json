@@ -19,6 +19,7 @@
   "kdump-lib-initramfs.sh": "ff4b63f99470ee796fd7e4a532dde241c4da02909306926a08a172457775a92a",
   "kdump-lib.sh": "3d50507626d4a92b8448c7d6604923f6f460c4cb5c8b18977381a7d5e516dfba",
   "kdump-udev-throttler": "125d538a59172f779b40ea32fea1e4eb50d849f25eb2537a48328d4401136679",
+  "kdump.cfg": "0c3daae6742ea4775714c16b30ee6843a07e2c4a75452e8ebe434a04bf86a190",
   "kdump.conf": "79800851142001c87d900a5afba163e73f1b961ce1cadafffb9306904bef73c9",
   "kdump.conf.5": "bab6c7b171f76e8c6df91bb7db852815caacbc3cd3d4309a1dc58d36950440e4",
   "kdump.service": "ed8d22fafa6cfafaddcfd9fec82e3fa7fa42aa0366f69676fafa97e200b0506a",

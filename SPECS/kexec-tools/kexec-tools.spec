@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.23
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,7 @@ Source26: live-image-kdump-howto.txt
 Source27: early-kdump-howto.txt
 Source28: kdump-udev-throttler
 Source29: kdump.sysconfig.aarch64
+Source30: kdump.cfg
 
 #######################################
 # These are sources for mkdumpramfs
@@ -184,6 +185,9 @@ install -m 644 %{SOURCE15} $RPM_BUILD_ROOT%{_mandir}/man5/kdump.conf.5
 install -m 644 %{SOURCE16} $RPM_BUILD_ROOT%{_unitdir}/kdump.service
 install -m 755 -D %{SOURCE22} $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system-generators/kdump-dep-generator.sh
 
+install -dm 0700 $RPM_BUILD_ROOT/boot/
+install -m 0600 %{SOURCE30} $RPM_BUILD_ROOT/boot/
+
 %ifarch %{ix86} x86_64 aarch64
 install -m 755 makedumpfile-%{mkdf_ver}/makedumpfile $RPM_BUILD_ROOT/usr/sbin/makedumpfile
 install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.8.gz $RPM_BUILD_ROOT/%{_mandir}/man8/makedumpfile.8.gz
@@ -298,6 +302,7 @@ done
 %{_datadir}/kdump
 %{_prefix}/lib/kdump
 %{_sysconfdir}/makedumpfile.conf.sample
+%config(noreplace) /boot/kdump.cfg
 %config(noreplace,missingok) %{_sysconfdir}/sysconfig/kdump
 %config(noreplace,missingok) %verify(not mtime) %{_sysconfdir}/kdump.conf
 %config %{_udevrulesdir}
@@ -324,6 +329,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Fri May 05 2023 Dan Streetman <ddstreet@ieee.org> - 2.0.23-3
+- Add crashkernel= boot param to (new) hardcoded grub config
+- kdumpctl support for the version of hostname being shipped with Mariner
 * Fri Mar 17 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.23-2
 - Required binary grep missing from squashfs
 - kdumpctl support for the version of hostname being shipped with Mariner
