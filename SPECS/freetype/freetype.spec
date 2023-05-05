@@ -1,6 +1,6 @@
 Summary:        software font engine.
 Name:           freetype
-Version:        2.13.0
+Version:        2.12.1
 Release:        1%{?dist}
 License:        BSD/GPLv2
 Vendor:         Microsoft Corporation
@@ -80,9 +80,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/freetype-config
 
 %changelog
-* Thu May 04 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.13.0-1
-- Bump version to 2.13.0 to address CVE-2023-2004
-
 * Wed Aug 10 2022 Muhammad Falak <mwani@microsoft.com> - 2.12.1-1
 - Bump verison to address CVE-2022-27405
 
