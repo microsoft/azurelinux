@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -80,7 +80,10 @@ python3 configure.py \
   --without-dtrace \
   --openssl-use-def-ca-store
 
-JOBS=4 make %{?_smp_mflags} V=0
+# Some build scripts expect a "python" executable - create symlink to python3
+ln -sv /usr/bin/python3 /usr/bin/python
+
+%ninja_build -C out/Release
 
 %install
 
@@ -114,6 +117,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Thu May 04 2023 Andrew Phelps <anphel@microsoft.com> - 18.16.0-2
+- Speed up compilation by using ninja build system
+
 * Wed Apr 12 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.16.0-1
 - Upgrade to 18.16.0
 
