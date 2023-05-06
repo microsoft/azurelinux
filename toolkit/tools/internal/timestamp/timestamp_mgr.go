@@ -34,9 +34,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -48,17 +48,17 @@ type EventType int
 const (
 	EventStart EventType = iota
 	EventStop
-	// EventPause
-	// EventResume
+	EventPause
+	EventResume
 )
 
 const (
-	writeCooldownMilliseconds = 1000 // How often to write data back to file
+	writeCooldownMilliseconds = 1000          // How often to write data back to file
+	maxID                     = math.MaxInt64 // max value to use for timestamp ID
 )
 
 var (
 	timestampMgr *TimeStampManager = nil
-	initOnce     sync.Once
 )
 
 // Represents an event during recording of a timestamped step
@@ -89,8 +89,10 @@ type TimeStampReadManager struct {
 type TimeStampManager struct {
 	EventQueue             chan *TimeStampRecord // events to be processed and recorded to file
 	eventProcessorFinished chan bool             // signal to terminate the processor when no more events will be added to queue
-	TimeStampWriteManager                        // interface to handle all file writing
-	TimeStampReadManager                         // interface to handle all in-memory structures
+	currentMaxID           int64
+
+	TimeStampWriteManager // interface to handle all file writing
+	TimeStampReadManager  // interface to handle all in-memory structures
 }
 
 // Initializes a new write manager object
@@ -133,7 +135,7 @@ func ensureManagerExists() error {
 
 // Begins collecting timing data for a high level component 'toolName' into the file at 'outputFile'
 func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
-	initOnce.Do(initTimeStampManager)
+	initTimeStampManager()
 
 	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY, 0664)
 	if err != nil {
@@ -158,7 +160,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 
 // Begins appending timing data for a high level component 'toolName' into the file at 'outputFile'
 func ResumeTiming(toolName, outputFile string) error {
-	initOnce.Do(initTimeStampManager)
+	initTimeStampManager()
 
 	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_RDWR, 0664)
 	if err != nil {
@@ -169,7 +171,7 @@ func ResumeTiming(toolName, outputFile string) error {
 
 	timestampMgr.filePath = outputFile
 	timestampMgr.fileDescriptor = outputFileDescriptor
-	timestampMgr.buildTreeFromFile(timestampMgr.fileDescriptor)
+	timestampMgr.buildTreeFromFile()
 	timestampMgr.fileDescriptor.Seek(0, 2)
 
 	go timestampMgr.processEventsInQueue()
@@ -203,6 +205,7 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 	}
 
 	ts, err = newTimeStamp(name, parentTS)
+	ts.ID = timestampMgr.nextID()
 	if err != nil {
 		err = fmt.Errorf("Failed to create a timestamp object %s: %v", name, err)
 		return &TimeStamp{}, err
@@ -211,13 +214,14 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 	return
 }
 
-// Add an avent that marks the start of a timestamped step using full name
+// Add an event that marks the start of a timestamped step using full name
 func StartEventByPath(path string) (ts *TimeStamp, err error) {
 	if err = ensureManagerExists(); err != nil {
 		return &TimeStamp{}, err
 	}
 
 	ts, err = newTimeStampByPath(timestampMgr.root, path)
+	ts.ID = timestampMgr.nextID()
 	if err != nil {
 		err = fmt.Errorf("Failed to create a timestamp object %s: %v", path, err)
 		return &TimeStamp{}, err
@@ -254,6 +258,39 @@ func StopEventByPath(path string) (ts *TimeStamp, err error) {
 
 	timestampMgr.submitEvent(EventStop, ts)
 	return
+}
+
+// Pause a step
+func PauseEvent(ts *TimeStamp) (*TimeStamp, error) {
+	if err := ensureManagerExists(); err != nil {
+		return &TimeStamp{}, err
+	}
+
+	timestampMgr.submitEvent(EventPause, ts)
+	return ts, nil
+}
+
+// Resume a step
+func ResumeEvent(ts *TimeStamp) (*TimeStamp, error) {
+	if err := ensureManagerExists(); err != nil {
+		return &TimeStamp{}, err
+	}
+
+	timestampMgr.submitEvent(EventResume, ts)
+	return ts, nil
+}
+
+func (mgr *TimeStampManager) nextID() (id int64) {
+	if mgr.currentMaxID < maxID {
+		id = mgr.currentMaxID
+		mgr.currentMaxID++
+		return
+	}
+	panic("Ran out of int64 to assign new ID")
+}
+
+func (mgr *TimeStampManager) setMaxID(maxID int64) {
+	mgr.currentMaxID = maxID
 }
 
 // Submit a recorded event to event queue to be processed
@@ -325,15 +362,22 @@ func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
 			mgr.lastVisited = ts
 		} else {
 			mgr.nodes[ts.ParentID].addSubStep(ts)
-			if mgr.lastVisited.ID == ts.ParentID {
+			if mgr.lastVisited != nil && mgr.lastVisited.ID == ts.ParentID {
 				mgr.lastVisited = ts
 			}
 		}
-	case EventStop:
+	case EventStop, EventPause:
 		ts := mgr.nodes[record.ID]
 		ts.complete(record.time)
-		if record.EventType == EventStop && ts.ID == mgr.lastVisited.ID {
+		if mgr.lastVisited != nil && ts.ID == mgr.lastVisited.ID {
 			mgr.lastVisited = ts.parentTimestamp
+		}
+	case EventResume:
+		ts := mgr.nodes[record.ID]
+		ts.StartTime = &record.time
+		ts.EndTime = nil
+		if mgr.lastVisited != nil && mgr.lastVisited.ID == ts.ParentID {
+			mgr.lastVisited = ts
 		}
 	}
 	return
@@ -341,9 +385,9 @@ func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
 
 // Read records written to a file and build a (partially) finished timestamp tree. This is useful for resuming
 // partial recording progress
-func (readMgr *TimeStampReadManager) buildTreeFromFile(fd *os.File) (err error) {
-	fd.Seek(0, 0)
-	scanner := bufio.NewScanner(fd)
+func (mgr *TimeStampManager) buildTreeFromFile() (err error) {
+	mgr.fileDescriptor.Seek(0, 0)
+	scanner := bufio.NewScanner(mgr.fileDescriptor)
 	for scanner.Scan() {
 		var ts TimeStamp
 		err = json.Unmarshal(scanner.Bytes(), &ts)
@@ -351,11 +395,15 @@ func (readMgr *TimeStampReadManager) buildTreeFromFile(fd *os.File) (err error) 
 			logger.Log.Warnf("Error reading timestamp object from file %v", err)
 			continue
 		}
-		readMgr.nodes[ts.ID] = &ts
-		if readMgr.root == nil {
-			readMgr.root = &ts
+		ts.subSteps = make(map[string]*TimeStamp)
+		if ts.ID >= mgr.currentMaxID {
+			mgr.setMaxID(ts.ID + 1)
+		}
+		mgr.nodes[ts.ID] = &ts
+		if mgr.root == nil {
+			mgr.root = &ts
 		} else {
-			readMgr.nodes[ts.ParentID].addSubStep(&ts)
+			mgr.nodes[ts.ParentID].addSubStep(&ts)
 		}
 	}
 	if err = scanner.Err(); err != nil {
