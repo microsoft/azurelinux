@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/uidutils"
 )
 
 type TimeStamp struct {
@@ -41,6 +39,9 @@ func (ts *TimeStamp) DisplayName() string {
 	if ts == nil {
 		return ""
 	}
+	if ts.parentTimestamp == nil {
+		return ts.Name
+	}
 	return ts.parentTimestamp.DisplayName() + pathSeparator + ts.Name
 }
 
@@ -51,7 +52,7 @@ func newTimeStamp(name string, parent *TimeStamp) (ts *TimeStamp, err error) {
 		return
 	}
 
-	ts = &TimeStamp{ID: uidutils.NextUID(), Name: name, StartTime: nil, EndTime: nil, subSteps: make(map[string]*TimeStamp), ParentID: -1}
+	ts = &TimeStamp{Name: name, StartTime: nil, EndTime: nil, subSteps: make(map[string]*TimeStamp), ParentID: -1}
 	if parent != nil {
 		ts.parentTimestamp = parent
 		ts.ParentID = parent.ID
@@ -82,6 +83,7 @@ func getTimeStampFromPath(root *TimeStamp, path []string, nextIndex int) (ts *Ti
 	nextNode, present := root.subSteps[path[nextIndex]]
 	if !present {
 		err = fmt.Errorf("Node at index %d does not exist in the path from root: %v", nextIndex, path)
+		return &TimeStamp{}, err
 	}
 	return getTimeStampFromPath(nextNode, path, nextIndex+1)
 }
