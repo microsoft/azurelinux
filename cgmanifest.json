@@ -14082,6 +14082,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nlopt",
+          "version": "2.7.1",
+          "downloadUrl": "https://github.com/stevengj/nlopt/archive/v2.7.1/nlopt-2.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nmap",
           "version": "7.93",
           "downloadUrl": "https://nmap.org/dist/nmap-7.93.tar.bz2"
