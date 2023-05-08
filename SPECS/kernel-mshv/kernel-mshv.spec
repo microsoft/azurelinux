@@ -126,8 +126,6 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
-# Symlink for mshv-linuxloader conf
-ln -s bzImage vmlinux-%{uname_r}
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
@@ -145,7 +143,7 @@ EOF
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 mkdir -p %{buildroot}/lib/modules/%{uname_r}
-ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
+ln -s bzImageMSHV %{buildroot}/lib/modules/%{uname_r}/vmlinuz
 
 #    Cleanup dangling symlinks
 rm -rf %{buildroot}/lib/modules/%{uname_r}/source
