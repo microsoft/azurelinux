@@ -116,7 +116,7 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 mkdir -p %{buildroot}/boot/efi
-install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz-%{uname_r}
+install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz
 %endif
 
 # Restrict the permission on System.map-X file
@@ -144,7 +144,6 @@ EOF
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 mkdir -p %{buildroot}/lib/modules/%{uname_r}
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
-ln -s /boot/vmlinuz-%{uname_r} /boot/efi/bzImageMSHV
 
 #    Cleanup dangling symlinks
 rm -rf %{buildroot}/lib/modules/%{uname_r}/source
@@ -204,8 +203,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
-/boot/efi/vmlinuz-%{uname_r}
-/boot/efi/bzImageMSHV
+/boot/efi/vmlinuz
 %config(noreplace) /boot/linux-%{uname_r}.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
