@@ -17,14 +17,14 @@
 
 # Used for comparing with latest upstream tag
 # to decide whether to autobuild (non-rawhide only)
-%define built_tag v1.2.0
+%define built_tag v1.1.1
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %global gen_version %(b=%{built_tag_strip}; echo ${b/-/"~"})
 %define download_url %{git0}/archive/%{built_tag}.tar.gz
 
 Name:          %{project}-%{repo}
-Version:       1.2.0
-Release:       1%{?dist}
+Version:       1.1.1
+Release:       8%{?dist}
 Summary:       Libraries for writing CNI plugin
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -129,9 +129,6 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %{_unitdir}/cni-dhcp.socket
 
 %changelog
-* Wed May 08 2023 Betty Lakes <bettylakes@microsoft.com> - 1.2.0-1
-- Update to the new version 1.2.0
-
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-8
 - Bump release to rebuild with go 1.19.8
 
