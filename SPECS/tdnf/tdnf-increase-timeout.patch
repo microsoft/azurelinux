@@ -1,48 +1,92 @@
-From 3d6d821d07ff4ff5d4390b5f0754d5c1cf3139ee Mon Sep 17 00:00:00 2001
+From 24163dbd2edb027112ad57ba2ffe75365dc06a1d Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
-Date: Mon, 1 May 2023 19:22:25 -0700
-Subject: [PATCH] Initial timeout patch
+Date: Mon, 8 May 2023 14:57:38 -0700
+Subject: [PATCH] Add retry logic for connection failure
 
 ---
- client/remoterepo.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ client/remoterepo.c | 64 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 43 insertions(+), 21 deletions(-)
 
 diff --git a/client/remoterepo.c b/client/remoterepo.c
-index de0e04c..333647e 100644
+index de0e04c..88e3f92 100644
 --- a/client/remoterepo.c
 +++ b/client/remoterepo.c
-@@ -142,6 +142,9 @@ TDNFDownloadFile(
-     dwError = _handle_curl_cb(pTdnf, pCurl, pszFileUrl);
-     BAIL_ON_TDNF_ERROR(dwError);
- 
-+    /* set curlRetry for and add tag to re-set all curl opts, per documenation */
-+    int curlRetry = 0;
-+curlCall:
-     dwError = TDNFRepoGetUserPass(pTdnf, pszRepo, &pszUserPass);
-     BAIL_ON_TDNF_ERROR(dwError);
- 
-@@ -180,10 +183,21 @@ TDNFDownloadFile(
-         BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
+@@ -173,32 +173,54 @@ TDNFDownloadFile(
+         }
      }
  
-+    /* double the timeout on curl connect requests */
+-    fp = fopen(pszFile, "wb");
+-    if(!fp)
++    /* Double the connection timeout */
 +    dwError = curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT, 600);
 +    BAIL_ON_TDNF_CURL_ERROR(dwError);
 +
-     dwError = curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, fp);
-     BAIL_ON_TDNF_CURL_ERROR(dwError);
++    /* Add retry logic for connection failure*/
++    int retries = 2;
++    for( int i = 0; i < retries; i++)
+     {
+-        dwError = errno;
+-        BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
+-    }
++        if (i > 0)
++        {
++            printf("Retrying from connection timeout failure\n");
++        }
++        fp = fopen(pszFile, "wb");
++        if(!fp)
++        {
++            dwError = errno;
++            BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
++        }
  
-     dwError = curl_easy_perform(pCurl);
-+    /* give one retry on connection failure */
-+    if (!curlRetry && dwError == 28) 
-+    {
-+        curlRetry = 1;
-+        goto curlCall;
-+    }
+-    dwError = curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, fp);
+-    BAIL_ON_TDNF_CURL_ERROR(dwError);
++        dwError = curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, fp);
++        BAIL_ON_TDNF_CURL_ERROR(dwError);
+ 
+-    dwError = curl_easy_perform(pCurl);
+-    BAIL_ON_TDNF_CURL_ERROR(dwError);
++        dwError = curl_easy_perform(pCurl);
++        if (i < (retries - 1) && dwError == 22)
++        {
++            /* Retry on Connection timeout failure */
++            fclose(fp);
++            fp = NULL;
++            continue;
++        } 
+ 
+-    dwError = curl_easy_getinfo(pCurl,
+-                                CURLINFO_RESPONSE_CODE,
+-                                &lStatus);
+-    BAIL_ON_TDNF_CURL_ERROR(dwError);
++        BAIL_ON_TDNF_CURL_ERROR(dwError);
+ 
+-    if(lStatus >= 400)
+-    {
+-        fprintf(stderr,
+-                "Error: %ld when downloading %s\n. Please check repo url.\n",
+-                lStatus,
+-                pszFileUrl);
+-        dwError = ERROR_TDNF_INVALID_PARAMETER;
+-        BAIL_ON_TDNF_ERROR(dwError);
++        dwError = curl_easy_getinfo(pCurl,
++                                    CURLINFO_RESPONSE_CODE,
++                                    &lStatus);
++        BAIL_ON_TDNF_CURL_ERROR(dwError);
 +
-     BAIL_ON_TDNF_CURL_ERROR(dwError);
- 
-     dwError = curl_easy_getinfo(pCurl,
++        if(lStatus >= 400)
++        {
++            fprintf(stderr,
++                    "Error: %ld when downloading %s\n. Please check repo url.\n",
++                    lStatus,
++                    pszFileUrl);
++            dwError = ERROR_TDNF_INVALID_PARAMETER;
++            BAIL_ON_TDNF_ERROR(dwError);
++        }
++        break;
+     }
+ cleanup:
+     TDNF_SAFE_FREE_MEMORY(pszUserPass);
 -- 
 2.25.1
 
