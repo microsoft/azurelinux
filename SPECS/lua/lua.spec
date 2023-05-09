@@ -1,6 +1,6 @@
 %global major_version 5.4
 # Normally, this is the same as version, but... not always.
-%global test_version 5.4.3
+%global test_version 5.4.4
 # If you are incrementing major_version, enable bootstrapping and adjust accordingly.
 # Version should be the latest prior build. If you don't do this, RPM will break and
 # everything will grind to a halt.
