@@ -1,0 +1,25 @@
+From dbe36f50a59c125c91093c083ebd0f490f457214 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Mon, 8 May 2023 19:32:31 -0700
+Subject: [PATCH] change goal.c to not require history file
+
+---
+ client/goal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/goal.c b/client/goal.c
+index f1fb244..fd590b2 100644
+--- a/client/goal.c
++++ b/client/goal.c
+@@ -273,7 +273,7 @@ TDNFAddUserInstalledToJobs(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
+-    dwError = TDNFGetHistoryCtx(pTdnf, &pHistoryCtx, 1);
++    dwError = TDNFGetHistoryCtx(pTdnf, &pHistoryCtx, 0);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+     dwError = SolvAddUserInstalledToJobs(pQueueJobs,
+-- 
+2.25.1
+

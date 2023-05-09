@@ -20,7 +20,7 @@ Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 Patch3:         tdnf-printf-fix.patch
 Patch4:         tdnf-sqlite-library.patch
-#Patch5:         tdnf-added-logging.patch
+Patch5:         tdnf-goal-history.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
