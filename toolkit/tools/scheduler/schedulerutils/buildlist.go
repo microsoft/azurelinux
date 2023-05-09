@@ -51,14 +51,10 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 // Note: since "SRPM_PACK_LIST" can work only with spec names, spec names take priority over package names
 // so that passing "X" to "SRPM_PACK_LIST", "PACKAGE_IGNORE_LIST", and "*_BUILD_LIST" arguments targets the same set of packages.
 func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *pkggraph.PkgGraph) (packageVers []*pkgjson.PackageVer, err error) {
-	var (
-		foundNode          *pkggraph.LookupNode
-		specToPackageNodes map[string]map[*pkggraph.PkgNode]bool
-	)
-
 	logger.Log.Debugf("Converting package/spec names to build nodes' PackageVers: %v", packageOrSpecNames)
 
 	packageVersMap := make(map[*pkgjson.PackageVer]bool)
+	specToPackageNodes := make(map[string]map[*pkggraph.PkgNode]bool)
 
 	for _, node := range dependencyGraph.AllBuildNodes() {
 		specToPackageNodes[node.SpecName()][node] = true
@@ -71,15 +67,15 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 				packageVersMap[pkg.VersionedPkg] = true
 			}
 		} else {
-			foundNode, err = dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
+			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
 				logger.Log.Errorf("Name '%s' matches neither a spec nor a package name.", packageOrSpecName)
-				return
+				return nil, err
 			}
 			if foundNode.BuildNode == nil {
 				logger.Log.Errorf("Found package '%s' but it is not a locally-built package.", packageOrSpecName)
 				err = fmt.Errorf("found package '%s' but it is not a locally-built package", packageOrSpecName)
-				return
+				return nil, err
 			}
 
 			logger.Log.Debugf("Name '%s' matched a package name. Adding it to the list.", packageOrSpecName)
