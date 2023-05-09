@@ -175,7 +175,7 @@ fi
 * Tue Oct 18 2016 Alexey Makhalov <amakhalov@vmware.com> 1.8.18p1-1
 - Update to 1.8.18p1
 
-* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 1.8.15-4
+* Tue Oct 04 2016 ChangLee <changlee@vmware.com> 1.8.15-4
 - Modified %check
 
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.15-3
