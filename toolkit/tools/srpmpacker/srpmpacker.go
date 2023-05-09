@@ -187,6 +187,8 @@ func parsePackListFile(packListFile string) (packList map[string]bool, err error
 		return
 	}
 
+	packList = make(map[string]bool)
+
 	file, err := os.Open(packListFile)
 	if err != nil {
 		return
