@@ -54,16 +54,16 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 	logger.Log.Debugf("Converting package/spec names to build nodes' PackageVers: %v", packageOrSpecNames)
 
 	packageVersMap := make(map[*pkgjson.PackageVer]bool)
-	specToPackageNodes := make(map[string]map[*pkggraph.PkgNode]bool)
+	specToPackageNodes := make(map[string][]*pkggraph.PkgNode)
 
 	for _, node := range dependencyGraph.AllBuildNodes() {
-		specToPackageNodes[node.SpecName()][node] = true
+		specToPackageNodes[node.SpecName()] = append(specToPackageNodes[node.SpecName()], node)
 	}
 
 	for _, packageOrSpecName := range packageOrSpecNames {
 		if nodes, ok := specToPackageNodes[packageOrSpecName]; ok {
 			logger.Log.Debugf("Name '%s' matched a spec name. Adding all packages built from this spec to the list.", packageOrSpecName)
-			for pkg := range nodes {
+			for _, pkg := range nodes {
 				packageVersMap[pkg.VersionedPkg] = true
 			}
 		} else {
