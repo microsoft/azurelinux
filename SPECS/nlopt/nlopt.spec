@@ -302,6 +302,7 @@ EOF
 %changelog
 * Thu May 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 2.7.1-13
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License verified
 
 * Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
