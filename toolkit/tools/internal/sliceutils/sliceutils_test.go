@@ -41,7 +41,7 @@ func TestPackageVersSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testi
 	outputSlice := PackageVersSetToSlice(inputSet)
 
 	assert.NotNil(t, outputSlice)
-	assert.Len(t, outputSlice, 2)
+	assert.Len(t, outputSlice, 1)
 	assert.Contains(t, outputSlice, existingPackageVer)
 	assert.NotContains(t, outputSlice, missingPackageVer)
 }

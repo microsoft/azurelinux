@@ -43,11 +43,27 @@ func FindMatches(slice []string, isMatch func(string) bool) []string {
 
 // StringMatch is intended to be used with "Contains" and "Find" for slices of strings.
 func StringMatch(expected, given interface{}) bool {
+	if expected == nil && given == nil {
+		return true
+	}
+
+	if expected == nil || given == nil {
+		return false
+	}
+
 	return expected.(string) == given.(string)
 }
 
 // PackageVerMatch is intended to be used with "Contains" and "Find" for slices of *pkgjson.PackageVers.
 func PackageVerMatch(expected, given interface{}) bool {
+	if expected == nil && given == nil {
+		return true
+	}
+
+	if expected == nil || given == nil {
+		return false
+	}
+
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
 }
 
