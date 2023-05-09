@@ -5,6 +5,7 @@ package schedulerutils
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
 // CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
@@ -21,83 +23,71 @@ import (
 //   - packagesNamesToRebuild,
 //   - local packages listed in the image config, and
 //   - kernels in the image config (if built locally).
-func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []string, inputGraphFile, imageConfig, baseDirPath string) (packageVersToBuild []*pkgjson.PackageVer, err error) {
-	packageVersToBuild = convertPackageNamesIntoPackageVers(packagesNamesToBuild)
-	packageVersToBuild = append(packageVersToBuild, convertPackageNamesIntoPackageVers(packagesNamesToRebuild)...)
-
-	if imageConfig == "" {
-		return
-	}
+func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph) (packageVersToBuild []*pkgjson.PackageVer, err error) {
+	packageVersToBuild = append(packagesNamesToBuild, packagesNamesToRebuild...)
 
 	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
 	if err != nil {
 		return
 	}
 
-	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, inputGraphFile)
+	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
 	if err != nil {
 		return
 	}
 
 	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	return
-}
-
-// convertPackageNamesIntoPackageVers converts a slice of package names into PackageVer structures that
-// are understood by the graph.
-func convertPackageNamesIntoPackageVers(packageNames []string) (packageVers []*pkgjson.PackageVer) {
-	packageVers = make([]*pkgjson.PackageVer, len(packageNames))
-	for i, pkg := range packageNames {
-		packageVers[i] = &pkgjson.PackageVer{
-			Name: pkg,
-		}
-	}
+	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
 
 	return
 }
 
-// extractPackagesFromConfig reads configuration file and returns a package list required for the said configuration
-// Package list is assembled from packageList and KernelOptions.
-func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*pkgjson.PackageVer, err error) {
-	cfg, err := configuration.LoadWithAbsolutePaths(configFile, baseDirPath)
-	if err != nil {
-		logger.Log.Errorf("Failed to load config file (%s) with base directory (%s) for package list generation", configFile, baseDirPath)
-		return
+// CalculatePackagesToBuildFromSpecs converts the input strings to PackageVer structures that are understood by the graph.
+// If a string is a spec name, it will convert it to all packages built from that spec.
+// If the string is NOT a spec name, it will check, if the string is a package present in the graph.
+// If the package is not present in the graph, it will return an error.
+// All packages without a build node are considered invalid.
+//
+// Note: since "SRPM_PACK_LIST" can work only with spec names, spec names take priority over package names
+// so that passing "X" to "SRPM_PACK_LIST", "PACKAGE_IGNORE_LIST", and "*_BUILD_LIST" arguments targets the same set of packages.
+func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *pkggraph.PkgGraph) (packageVers []*pkgjson.PackageVer, err error) {
+	var (
+		foundNode          *pkggraph.LookupNode
+		specToPackageNodes map[string]map[*pkggraph.PkgNode]bool
+	)
+
+	logger.Log.Debugf("Converting package/spec names to build nodes' PackageVers: %v", packageOrSpecNames)
+
+	packageVersMap := make(map[*pkgjson.PackageVer]bool)
+
+	for _, node := range dependencyGraph.AllBuildNodes() {
+		specToPackageNodes[node.SpecName()][node] = true
 	}
 
-	packageList, err = installutils.PackageNamesFromConfig(cfg)
-	if err != nil {
-		return
-	}
-
-	// Add kernel packages from KernelOptions
-	packageList = append(packageList, installutils.KernelPackages(cfg)...)
-
-	return
-}
-
-// filterLocalPackagesOnly returns the subset of packageVersionsInConfig that only contains local packages.
-func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inputGraph string) (filteredPackages []*pkgjson.PackageVer, err error) {
-	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file.")
-
-	dependencyGraph := pkggraph.NewPkgGraph()
-	err = pkggraph.ReadDOTGraphFile(dependencyGraph, inputGraph)
-	if err != nil {
-		return
-	}
-
-	for _, pkgVer := range packageVersionsInConfig {
-		pkgNode, _ := dependencyGraph.FindBestPkgNode(pkgVer)
-
-		// A pkgNode for a local package has the following characteristics:
-		// 1) The pkgNode exists in the graph (is not nil).
-		// 2) The pkgNode doesn't have the 'StateUnresolved' or 'StateCached' state. These are reserved for external dependencies nodes.
-		if pkgNode != nil && pkgNode.RunNode.State != pkggraph.StateUnresolved && pkgNode.RunNode.State != pkggraph.StateCached {
-			filteredPackages = append(filteredPackages, pkgVer)
+	for _, packageOrSpecName := range packageOrSpecNames {
+		if nodes, ok := specToPackageNodes[packageOrSpecName]; ok {
+			logger.Log.Debugf("Name '%s' matched a spec name. Adding all packages built from this spec to the list.", packageOrSpecName)
+			for pkg := range nodes {
+				packageVersMap[pkg.VersionedPkg] = true
+			}
 		} else {
-			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
+			foundNode, err = dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
+			if err != nil {
+				logger.Log.Errorf("Name '%s' matches neither a spec nor a package name.", packageOrSpecName)
+				return
+			}
+			if foundNode.BuildNode == nil {
+				logger.Log.Errorf("Found package '%s' but it is not a locally-built package.", packageOrSpecName)
+				err = fmt.Errorf("found package '%s' but it is not a locally-built package", packageOrSpecName)
+				return
+			}
+
+			logger.Log.Debugf("Name '%s' matched a package name. Adding it to the list.", packageOrSpecName)
+			packageVersMap[foundNode.BuildNode.VersionedPkg] = true
 		}
 	}
+
+	packageVers = sliceutils.PackageVersSetToSlice(packageVersMap)
 
 	return
 }
@@ -145,4 +135,58 @@ func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 		}
 	}
 	return false
+}
+
+// extractPackagesFromConfig reads configuration file and returns a package list required for the said configuration
+// Package list is assembled from packageList and KernelOptions.
+func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*pkgjson.PackageVer, err error) {
+	if configFile == "" {
+		return
+	}
+
+	cfg, err := configuration.LoadWithAbsolutePaths(configFile, baseDirPath)
+	if err != nil {
+		logger.Log.Errorf("Failed to load config file (%s) with base directory (%s) for package list generation", configFile, baseDirPath)
+		return
+	}
+
+	packageList, err = installutils.PackageNamesFromConfig(cfg)
+	if err != nil {
+		return
+	}
+
+	// Add kernel packages from KernelOptions
+	packageList = append(packageList, installutils.KernelPackages(cfg)...)
+
+	return
+}
+
+// filterLocalPackagesOnly returns the subset of packageVersionsInConfig that only contains local packages.
+func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, dependencyGraph *pkggraph.PkgGraph) (filteredPackages []*pkgjson.PackageVer, err error) {
+	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file.")
+
+	for _, pkgVer := range packageVersionsInConfig {
+		pkgNode, _ := dependencyGraph.FindBestPkgNode(pkgVer)
+
+		// A pkgNode for a local package has the following characteristics:
+		// 1) The pkgNode exists in the graph (is not nil).
+		// 2) The pkgNode doesn't have the 'StateUnresolved' or 'StateCached' state. These are reserved for external dependencies nodes.
+		if pkgNode != nil && pkgNode.RunNode.State != pkggraph.StateUnresolved && pkgNode.RunNode.State != pkggraph.StateCached {
+			filteredPackages = append(filteredPackages, pkgVer)
+		} else {
+			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
+		}
+	}
+
+	return
+}
+
+func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.PackageVer {
+	uniquePackageVersToBuild := make(map[*pkgjson.PackageVer]bool)
+
+	for _, packageVer := range packageVers {
+		uniquePackageVersToBuild[packageVer] = true
+	}
+
+	return sliceutils.PackageVersSetToSlice(uniquePackageVersToBuild)
 }
