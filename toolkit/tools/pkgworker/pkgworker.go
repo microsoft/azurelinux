@@ -299,7 +299,7 @@ func tdnfInstall(packages []string) (err error) {
 		return
 	}
 
-	installArgs := []string{"install", "-y", releaseverCliArg}
+	installArgs := []string{"install", "-y", releaseverCliArg, "--disablerepo=mariner-official-base"}
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
 	foundNoMatchingPackages := false
