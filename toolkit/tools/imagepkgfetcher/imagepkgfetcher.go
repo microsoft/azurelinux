@@ -130,8 +130,7 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 
 // filterExternalPackagesOnly returns the subset of packageVersionsInConfig that only contains external packages.
 func filterExternalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inputGraph string) (filteredPackages []*pkgjson.PackageVer, err error) {
-	dependencyGraph := pkggraph.NewPkgGraph()
-	err = pkggraph.ReadDOTGraphFile(dependencyGraph, inputGraph)
+	dependencyGraph, err := pkggraph.ReadDOTGraphFile(inputGraph)
 	if err != nil {
 		return
 	}

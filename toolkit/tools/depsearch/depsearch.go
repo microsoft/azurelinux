@@ -78,8 +78,7 @@ func main() {
 	specSearchList := exe.ParseListArgument(*specsToSearch)
 	goalSearchList := exe.ParseListArgument(*goalsToSearch)
 
-	graph := pkggraph.NewPkgGraph()
-	err := pkggraph.ReadDOTGraphFile(graph, *inputGraphFile)
+	graph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {
 		logger.Log.Panicf("Failed to read DOT graph with error: %s", err)
 	}

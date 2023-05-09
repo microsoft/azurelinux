@@ -67,9 +67,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	scrubbedGraph := pkggraph.NewPkgGraph()
-
-	err := pkggraph.ReadDOTGraphFile(scrubbedGraph, *inputGraphFile)
+	scrubbedGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {
 		logger.Log.Panicf("Failed to read graph to file, %s. Error: %s", *inputGraphFile, err)
 	}

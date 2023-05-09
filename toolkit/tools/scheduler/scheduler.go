@@ -92,8 +92,6 @@ var (
 )
 
 func main() {
-	var dependencyGraph *pkggraph.PkgGraph
-
 	app.Version(exe.ToolkitVersion)
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -108,7 +106,7 @@ func main() {
 		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d", *buildAttempts)
 	}
 
-	err := pkggraph.ReadDOTGraphFile(dependencyGraph, *inputGraphFile)
+	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {
 		return
 	}
