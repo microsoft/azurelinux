@@ -12291,8 +12291,8 @@
         "type": "other",
         "other": {
           "name": "lua",
-          "version": "5.4.3",
-          "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
+          "version": "5.4.4",
+          "downloadUrl": "https://www.lua.org/ftp/lua-5.4.4.tar.gz"
         }
       }
     },
