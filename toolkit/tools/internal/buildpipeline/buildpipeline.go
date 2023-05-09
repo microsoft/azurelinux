@@ -190,6 +190,7 @@ func CleanupDockerChroot(chroot string) (err error) {
 		"dev",
 		"proc",
 		"localrpms",
+		"toolchainrpms",
 		"upstream-cached-rpms",
 		"sys",
 		chrootUse,
