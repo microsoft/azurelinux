@@ -24,7 +24,7 @@
 
 Name:          %{project}-%{repo}
 Version:       1.1.1
-Release:       9%{?dist}
+Release:       8%{?dist}
 Summary:       Libraries for writing CNI plugin
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -35,6 +35,7 @@ Source0: %{download_url}#/%{name}-%{version}.tar.gz
 BuildRequires: golang
 BuildRequires: git
 BuildRequires: go-md2man
+BuildRequires: go-rpm-macros
 BuildRequires: systemd-devel
 Requires:      systemd
 
@@ -104,7 +105,7 @@ for d in $PLUGINS; do
         if [ -d "$d" ]; then
                 plugin="$(basename "$d")"
                 echo "  $plugin"
-                go build -o "${PWD}/bin/$plugin" "$@" "$REPO_PATH"/$d
+                %gobuild -o "${PWD}/bin/$plugin" "$@" "$REPO_PATH"/$d
         fi
 done
 
@@ -128,10 +129,6 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %{_unitdir}/cni-dhcp.socket
 
 %changelog
-* Mon Apr 08 2023 Betty Lakes <bettylakes@microsoft.com> - 1.1.1-9
-- Remove distro specific macros 
-- License verified
-
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-8
 - Bump release to rebuild with go 1.19.8
 
