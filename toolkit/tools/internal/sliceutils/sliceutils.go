@@ -43,12 +43,8 @@ func FindMatches(slice []string, isMatch func(string) bool) []string {
 
 // StringMatch is intended to be used with "Contains" and "Find" for slices of strings.
 func StringMatch(expected, given interface{}) bool {
-	if expected == nil && given == nil {
-		return true
-	}
-
-	if expected == nil || given == nil {
-		return false
+	if checkValid, checkResult := nilCheck(expected, given); checkValid {
+		return checkResult
 	}
 
 	return expected.(string) == given.(string)
@@ -56,15 +52,26 @@ func StringMatch(expected, given interface{}) bool {
 
 // PackageVerMatch is intended to be used with "Contains" and "Find" for slices of *pkgjson.PackageVers.
 func PackageVerMatch(expected, given interface{}) bool {
-	if expected == nil && given == nil {
-		return true
-	}
-
-	if expected == nil || given == nil {
-		return false
+	if checkValid, checkResult := nilCheck(expected, given); checkValid {
+		return checkResult
 	}
 
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
+}
+
+// PackageVersSetToSlice converts a map[*pkgjson.PackageVer]bool to a slice containing the map's keys.
+func PackageVersSetToSlice(inputSet map[*pkgjson.PackageVer]bool) []*pkgjson.PackageVer {
+	index := 0
+	outputSlice := make([]*pkgjson.PackageVer, len(inputSet))
+
+	for element, elementInSet := range inputSet {
+		if elementInSet {
+			outputSlice[index] = element
+			index++
+		}
+	}
+
+	return outputSlice[:index]
 }
 
 // StringsSetToSlice converts a map[string]bool to a slice containing the map's keys.
@@ -82,17 +89,14 @@ func StringsSetToSlice(inputSet map[string]bool) []string {
 	return outputSlice[:index]
 }
 
-// PackageVersSetToSlice converts a map[*pkgjson.PackageVer]bool to a slice containing the map's keys.
-func PackageVersSetToSlice(inputSet map[*pkgjson.PackageVer]bool) []*pkgjson.PackageVer {
-	index := 0
-	outputSlice := make([]*pkgjson.PackageVer, len(inputSet))
-
-	for element, elementInSet := range inputSet {
-		if elementInSet {
-			outputSlice[index] = element
-			index++
-		}
+func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
+	if expected == nil && given == nil {
+		return true, true
 	}
 
-	return outputSlice[:index]
+	if expected == nil || given == nil {
+		return true, false
+	}
+
+	return
 }
