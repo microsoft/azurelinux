@@ -42,7 +42,7 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 	return
 }
 
-// CalculatePackagesToBuildFromSpecs converts the input strings to PackageVer structures that are understood by the graph.
+// PackageNamesToBuiltPackages converts the input strings to PackageVer structures that are understood by the graph.
 // If a string is a spec name, it will convert it to all packages built from that spec.
 // If the string is NOT a spec name, it will check, if the string is a package present in the graph.
 // If the package is not present in the graph, it will return an error.
