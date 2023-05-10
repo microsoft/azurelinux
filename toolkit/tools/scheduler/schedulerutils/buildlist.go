@@ -69,7 +69,12 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 		} else {
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
-				logger.Log.Errorf("Name '%s' matches neither a spec nor a package name.", packageOrSpecName)
+				logger.Log.Errorf("Failed while searching the dependency graph for package '%s', error: %s", packageOrSpecName, err)
+				return nil, err
+			}
+			if foundNode == nil {
+				logger.Log.Errorf("Couldn't find package '%s' in the dependency graph.", packageOrSpecName)
+				err = fmt.Errorf("couldn't find package '%s' in the dependency graph", packageOrSpecName)
 				return nil, err
 			}
 			if foundNode.BuildNode == nil {

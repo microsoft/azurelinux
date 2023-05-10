@@ -103,7 +103,7 @@ func main() {
 	}
 
 	if *buildAttempts <= 0 {
-		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d", *buildAttempts)
+		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d.", *buildAttempts)
 	}
 
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
@@ -115,32 +115,32 @@ func main() {
 	// If none are requested then all packages will be built.
 	packagesToBuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToBuild), dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to build, error: %s", err)
+		logger.Log.Fatalf("Unable to find build nodes for the packages to build, error: %s.", err)
 	}
 
 	packagesToRebuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToRebuild), dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error: %s", err)
+		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error: %s.", err)
 	}
 
 	ignoredPackages, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*ignoredPackages), dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error: %s", err)
+		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error: %s.", err)
 	}
 
 	ignoredAndRebuiltPackages := intersect.Hash(ignoredPackages, packagesToRebuild)
 	if len(ignoredAndRebuiltPackages) != 0 {
-		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
+		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v.", ignoredAndRebuiltPackages)
 	}
 
 	finalPackagesToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesToBuild, packagesToRebuild, *imageConfig, *baseDirPath, dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to generate package build list, error: %s", err)
+		logger.Log.Fatalf("Unable to generate package build list, error: %s.", err)
 	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	if err != nil {
-		logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
+		logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s.", *toolchainManifest, err)
 	}
 
 	// Setup a build agent to handle build requests from the scheduler.
@@ -170,12 +170,12 @@ func main() {
 
 	agent, err := buildagents.BuildAgentFactory(*buildAgent)
 	if err != nil {
-		logger.Log.Fatalf("Unable to select build agent, error: %s", err)
+		logger.Log.Fatalf("Unable to select build agent, error: %s.", err)
 	}
 
 	err = agent.Initialize(buildAgentConfig)
 	if err != nil {
-		logger.Log.Fatalf("Unable to initialize build agent, error: %s", err)
+		logger.Log.Fatalf("Unable to initialize build agent, error: %s.", err)
 	}
 
 	// Setup cleanup routines to ensure no builds are left running when scheduler is exiting.
@@ -188,7 +188,7 @@ func main() {
 
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, ignoredPackages, toolchainPackages, *deltaBuild, *allowToolchainRebuilds)
 	if err != nil {
-		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
+		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
 }
 
