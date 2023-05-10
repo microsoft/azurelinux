@@ -155,11 +155,14 @@ pushd %{__cmake_builddir}/python
 popd
 find %{buildroot} -name '*.pyc' -delete
 
+%post
+/sbin/ldconfig
 # Required step to ensure new history util from version 3.4.1 does not fail
 [ -f %{_tdnf_history_db_dir}/history.db ] || %{_libdir}/tdnf/tdnf-history-util init
 
-%ldconfig_scriptlets
 
+%postun
+/sbin/ldconfig
 
 %files
 %license COPYING
