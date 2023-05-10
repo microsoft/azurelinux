@@ -242,7 +242,7 @@ mariner-repos-microsoft-2.0-8.cm2.noarch.rpm
 mariner-repos-microsoft-preview-2.0-8.cm2.noarch.rpm
 mariner-repos-preview-2.0-8.cm2.noarch.rpm
 mariner-repos-shared-2.0-8.cm2.noarch.rpm
-mariner-rpm-macros-2.0-20.cm2.noarch.rpm
+mariner-rpm-macros-2.0-21.cm2.noarch.rpm
 meson-0.60.2-2.cm2.noarch.rpm
 mpfr-4.1.0-1.cm2.aarch64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.aarch64.rpm
