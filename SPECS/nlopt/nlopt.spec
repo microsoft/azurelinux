@@ -44,7 +44,7 @@ Distribution:      Mariner
 # praxis/*  subplex/*
 #
 License:           BSD and LGPLv2+ and MIT and Public Domain
-URL:               http://ab-initio.mit.edu/%{name}
+URL:               http://ab-initio.mit.edu/nlopt
 Source0:           https://github.com/stevengj/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Kill RPATH.
