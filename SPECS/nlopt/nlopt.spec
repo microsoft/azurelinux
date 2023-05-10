@@ -61,7 +61,6 @@ BuildRequires:     make
 BuildRequires:     ncurses-devel
 
 # The "gnulib" is a copylib and has a wildcard-permission from FPC.
-# See: https://fedorahosted.org/fpc/ticket/174
 Provides:          bundled(gnulib)
 Provides:          %{name}                                      =  %{version}-%{release}
 Provides:          %{name}%{?_isa}                              =  %{version}-%{release}
