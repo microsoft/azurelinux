@@ -9,9 +9,8 @@
 # use the non-underscored macros to refer to Python in spec, etc.
 %python3 %__python3
 
-# For backwards compatibility only
-# See the comments in https://src.fedoraproject.org/rpms/python-rpm-macros/pull-request/22
-%__python /usr/bin/python
+# Set default python macro to the version of python shipped with the OS
+%__python /usr/bin/python3
 
 # Users can use %%python only if they redefined %%__python (e.g. to %%__python3)
 %python() %{lua:\
