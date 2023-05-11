@@ -8032,7 +8032,7 @@
         "other": {
           "name": "kata-containers-cc",
           "version": "0.4.1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.0.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.1.tar.gz"
         }
       }
     },
