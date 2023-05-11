@@ -67,6 +67,10 @@ users with existing grubby users.
 %install
 %make_install mandir=%{_mandir} sbindir=%{_sbindir} libexecdir=%{_libexecdir}
 
+# We do not supply the installkernel script from grubby. Instead users should
+# install it from the dedicated installkernel package supplied by our distro.
+rm %{buildroot}%{_sbindir}/installkernel
+
 mkdir -p %{buildroot}%{_libexecdir}/{grubby}/ %{buildroot}%{_sbindir}/
 mv -v %{buildroot}%{_sbindir}/grubby %{buildroot}%{_libexecdir}/grubby/grubby
 cp -v %{SOURCE1} %{buildroot}%{_libexecdir}/grubby/
