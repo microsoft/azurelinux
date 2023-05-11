@@ -45,6 +45,7 @@ BuildRequires:  util-linux-ng
 Requires:       findutils
 Requires:       grub2-tools
 Requires:       grub2-tools-minimal
+Requires:       installkernel
 Requires:       util-linux
 
 %description
@@ -67,8 +68,9 @@ users with existing grubby users.
 %install
 %make_install mandir=%{_mandir} sbindir=%{_sbindir} libexecdir=%{_libexecdir}
 
-# We do not supply the installkernel script from grubby. Instead users should
-# install it from the dedicated installkernel package supplied by our distro.
+# Do not supply the default installkernel script from grubby. Instead this
+# script will be supplied from the dedicated installkernel package, which
+# is a package requires for this grubby package.
 rm %{buildroot}%{_sbindir}/installkernel
 
 mkdir -p %{buildroot}%{_libexecdir}/{grubby}/ %{buildroot}%{_sbindir}/
@@ -111,7 +113,7 @@ current boot environment.
 
 %changelog
 * Wed May 10 2022 Chris Co <chrco@microsoft.com> - 8.40-45
-- Remove installkernel functionality. Supplied in a separate installkernel package
+- Remove default installkernel file and add requires for installkernel package
 
 * Sun Sep 11 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.40-44
 - Support rpm 4.18.0
