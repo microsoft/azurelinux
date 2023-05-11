@@ -938,6 +938,7 @@
                 "nilfs-utils",
                 "nkf",
                 "nload",
+                "nlopt",
                 "nodejs-packaging",
                 "nss-pam-ldapd",
                 "nss_nis",

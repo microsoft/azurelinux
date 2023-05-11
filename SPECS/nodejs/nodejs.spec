@@ -6,7 +6,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        16.19.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -80,7 +80,10 @@ python3 configure.py \
   --without-dtrace \
   --openssl-use-def-ca-store
 
-JOBS=4 make %{?_smp_mflags} V=0
+# Some build scripts expect a "python" executable - create symlink to python3
+ln -sv /usr/bin/python3 /usr/bin/python
+
+%ninja_build -C out/Release
 
 %install
 
@@ -114,6 +117,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Thu May 04 2023 Andrew Phelps <anphel@microsoft.com> - 16.19.1-2
+- Speed up compilation by using ninja build system
+
 * Wed Mar 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.19.1-1
 - Auto-upgrade to 16.19.1 - to fix CVE-2023-23936
 - Update npm version to 8.19.3 to reflect the actual version of npm bundled with v16.19.1
