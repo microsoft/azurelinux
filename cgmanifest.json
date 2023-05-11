@@ -24874,8 +24874,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qtbase",
-          "version": "5.12.11",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtbase-everywhere-src-5.12.11.tar.xz"
+          "version": "5.15.9",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qtbase-everywhere-opensource-src-5.15.9.tar.xz"
         }
       }
     },
@@ -24914,8 +24914,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qtsvg",
-          "version": "5.12.11",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
+          "version": "5.15.9",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qtsvg-everywhere-opensource-src-5.15.9.tar.xz"
         }
       }
     },
