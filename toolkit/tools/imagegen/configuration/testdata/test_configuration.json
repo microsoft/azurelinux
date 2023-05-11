@@ -176,12 +176,15 @@
                 {
                     "Name": "repo1",
                     "BaseUrl": "https://repo1.com",
-                    "Install": false
+                    "Install": true,
+                    "GPGKeys": "file:///etc/pki/rpm-gpg/MY-CUSTOM-KEY"
                 },
                 {
                     "Name": "repo2",
                     "BaseUrl": "https://repo2.com",
-                    "Install": false
+                    "Install": false,
+                    "GPGCheck": false,
+                    "RepoGPGCheck": false
                 }
             ],
             "PreInstallScripts":[

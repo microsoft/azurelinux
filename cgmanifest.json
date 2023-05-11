@@ -3890,8 +3890,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.12.1",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz"
+          "version": "2.13.0",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.gz"
         }
       }
     },
@@ -8031,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.0.tar.gz"
+          "version": "0.4.1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.1.tar.gz"
         }
       }
     },
@@ -14075,6 +14075,16 @@
           "name": "nlohmann-json",
           "version": "3.10.4",
           "downloadUrl": "https://github.com/nlohmann/json/archive/v3.10.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nlopt",
+          "version": "2.7.1",
+          "downloadUrl": "https://github.com/stevengj/nlopt/archive/v2.7.1/nlopt-2.7.1.tar.gz"
         }
       }
     },
