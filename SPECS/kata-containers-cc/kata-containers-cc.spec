@@ -6,8 +6,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.4.0
-Release:      2%{?dist}
+Version:      0.4.1
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -229,6 +229,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
+*   Wed May 10 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-1
+-   Add version 0.4.1 and fix CVEs
+
 *   Wed Apr 26 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
 -   Remove containerd override and add dependency on moby-containerd-cc
 
