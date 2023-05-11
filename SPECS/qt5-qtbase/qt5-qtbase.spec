@@ -139,7 +139,6 @@ Patch102: CVE-2023-24607.patch
 # filter plugin provides
 %global __provides_exclude_from ^%{_qt5_plugindir}/.*\\.so$
 
-BuildRequires: make
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
