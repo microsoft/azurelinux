@@ -1,0 +1,162 @@
+From 89bf481b9b14f038c5e16421a7fce6dc6523785f Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Wed, 29 Mar 2023 16:36:03 +0200
+Subject: [PATCH 19/19] Models: Avoid crashes when deleting cache items
+
+Pick-to: 6.5 6.2 5.15
+Fixes: QTBUG-91425
+Change-Id: I58cf9ee29922f83fc6621f771b80ed557b31f106
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit 0cfdecba54e4f40468c4c9a8a6668cc1bc0eff65)
+
+* asturmlechner 2023-04-08: Resolve conflict with dev branch commit
+  c2d490a2385ea6f389340a296acaac0fa198c8b9 (qAsConst to std::as_const)
+---
+ src/qmlmodels/qqmldelegatemodel.cpp           | 23 ++++++---
+ .../qml/qqmldelegatemodel/data/deleteRace.qml | 50 +++++++++++++++++++
+ .../tst_qqmldelegatemodel.cpp                 | 12 +++++
+ 3 files changed, 78 insertions(+), 7 deletions(-)
+ create mode 100644 tests/auto/qml/qqmldelegatemodel/data/deleteRace.qml
+
+diff --git a/src/qmlmodels/qqmldelegatemodel.cpp b/src/qmlmodels/qqmldelegatemodel.cpp
+index bc6b2447af..551e0ede95 100644
+--- a/src/qmlmodels/qqmldelegatemodel.cpp
++++ b/src/qmlmodels/qqmldelegatemodel.cpp
+@@ -1883,10 +1883,15 @@ void QQmlDelegateModelPrivate::emitChanges()
+     for (int i = 1; i < m_groupCount; ++i)
+         QQmlDelegateModelGroupPrivate::get(m_groups[i])->emitModelUpdated(reset);
+ 
+-    auto cacheCopy = m_cache; // deliberate; emitChanges may alter m_cache
+-    for (QQmlDelegateModelItem *cacheItem : qAsConst(cacheCopy)) {
+-        if (cacheItem->attached)
+-            cacheItem->attached->emitChanges();
++    // emitChanges may alter m_cache and delete items
++    QVarLengthArray<QPointer<QQmlDelegateModelAttached>> attachedObjects;
++    attachedObjects.reserve(m_cache.length());
++    for (const QQmlDelegateModelItem *cacheItem : qAsConst(m_cache))
++        attachedObjects.append(cacheItem->attached);
++
++    for (const QPointer<QQmlDelegateModelAttached> &attached : qAsConst(attachedObjects)) {
++        if (attached && attached->m_cacheItem)
++            attached->emitChanges();
+     }
+ }
+ 
+@@ -2707,20 +2712,24 @@ void QQmlDelegateModelAttached::emitChanges()
+     m_previousGroups = m_cacheItem->groups;
+ 
+     int indexChanges = 0;
+-    for (int i = 1; i < m_cacheItem->metaType->groupCount; ++i) {
++    const int groupCount = m_cacheItem->metaType->groupCount;
++    for (int i = 1; i < groupCount; ++i) {
+         if (m_previousIndex[i] != m_currentIndex[i]) {
+             m_previousIndex[i] = m_currentIndex[i];
+             indexChanges |= (1 << i);
+         }
+     }
+ 
++    // Don't access m_cacheItem anymore once we've started sending signals.
++    // We don't own it and someone might delete it.
++
+     int notifierId = 0;
+     const QMetaObject *meta = metaObject();
+-    for (int i = 1; i < m_cacheItem->metaType->groupCount; ++i, ++notifierId) {
++    for (int i = 1; i < groupCount; ++i, ++notifierId) {
+         if (groupChanges & (1 << i))
+             QMetaObject::activate(this, meta, notifierId, nullptr);
+     }
+-    for (int i = 1; i < m_cacheItem->metaType->groupCount; ++i, ++notifierId) {
++    for (int i = 1; i < groupCount; ++i, ++notifierId) {
+         if (indexChanges & (1 << i))
+             QMetaObject::activate(this, meta, notifierId, nullptr);
+     }
+diff --git a/tests/auto/qml/qqmldelegatemodel/data/deleteRace.qml b/tests/auto/qml/qqmldelegatemodel/data/deleteRace.qml
+new file mode 100644
+index 0000000000..23874970e7
+--- /dev/null
++++ b/tests/auto/qml/qqmldelegatemodel/data/deleteRace.qml
+@@ -0,0 +1,50 @@
++import QtQuick 2.15
++import QtQml.Models 2.15
++
++Item {
++    DelegateModel {
++        id: delegateModel
++        model: ListModel {
++            id: sourceModel
++
++            ListElement { title: "foo" }
++            ListElement { title: "bar" }
++
++            function clear() {
++                if (count > 0)
++                    remove(0, count);
++            }
++        }
++
++        groups: [
++            DelegateModelGroup { name: "selectedItems" }
++        ]
++
++        delegate: Text {
++            height: DelegateModel.inSelectedItems ? implicitHeight * 2 : implicitHeight
++            Component.onCompleted: {
++                if (index === 0)
++                    DelegateModel.inSelectedItems = true;
++            }
++        }
++
++        Component.onCompleted: {
++            items.create(0)
++            items.create(1)
++        }
++    }
++
++    ListView {
++        anchors.fill: parent
++        model: delegateModel
++    }
++
++    Timer {
++        running: true
++        interval: 10
++        onTriggered: sourceModel.clear()
++    }
++
++    property int count: delegateModel.items.count
++}
++
+diff --git a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
+index 1722447830..f473cff75f 100644
+--- a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
++++ b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
+@@ -50,6 +50,7 @@ private slots:
+     void qtbug_86017();
+     void contextAccessedByHandler();
+     void redrawUponColumnChange();
++    void deleteRace();
+ };
+ 
+ class AbstractItemModel : public QAbstractItemModel
+@@ -213,6 +214,17 @@ void tst_QQmlDelegateModel::redrawUponColumnChange()
+     QCOMPARE(item->property("text").toString(), "Coconut");
+ }
+ 
++void tst_QQmlDelegateModel::deleteRace()
++{
++    QQmlEngine engine;
++    QQmlComponent c(&engine, testFileUrl("deleteRace.qml"));
++    QVERIFY2(c.isReady(), qPrintable(c.errorString()));
++    QScopedPointer<QObject> o(c.create());
++    QVERIFY(!o.isNull());
++    QTRY_COMPARE(o->property("count").toInt(), 2);
++    QTRY_COMPARE(o->property("count").toInt(), 0);
++}
++
+ QTEST_MAIN(tst_QQmlDelegateModel)
+ 
+ #include "tst_qqmldelegatemodel.moc"
+-- 
+2.40.0
+

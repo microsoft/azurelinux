@@ -1,0 +1,46 @@
+From bdb3af04019b9134d6e815f4fe54317db63d0152 Mon Sep 17 00:00:00 2001
+From: Fushan Wen <qydwhotmail@gmail.com>
+Date: Sat, 5 Nov 2022 01:44:30 +0800
+Subject: [PATCH 10/19] Send ObjectShow event for visible components after
+ initialized
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Currently ObjectShow event is only sent when the visible property
+changes from false to true, but for items with the notification
+accessible role, a screen reader like Orca needs to receive an
+ObjectShow event to read the notification, so also send the event after
+a component is initialized.
+
+See also: https://gitlab.gnome.org/GNOME/orca/-/merge_requests/134
+
+Pick-to: 6.4
+Change-Id: I626594b65ffe4d0582dcee9f489df0c2c63e53b7
+Reviewed-by: Jan Arve Sæther <jan-arve.saether@qt.io>
+(cherry picked from commit 9a4f2d23ecec2c7ff19f83cff28df6b97e3fda98)
+---
+ src/quick/items/qquickitem.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index ec55fb2998..499fb61d1b 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -5125,6 +5125,13 @@ void QQuickItem::componentComplete()
+         d->addToDirtyList();
+         QQuickWindowPrivate::get(d->window)->dirtyItem(this);
+     }
++
++#if QT_CONFIG(accessibility)
++    if (d->isAccessible && d->effectiveVisible) {
++        QAccessibleEvent ev(this, QAccessible::ObjectShow);
++        QAccessible::updateAccessibility(&ev);
++    }
++#endif
+ }
+ 
+ QQuickStateGroup *QQuickItemPrivate::_states()
+-- 
+2.40.0
+

@@ -1,0 +1,57 @@
+From 5ed173f4ba070bca6c9ec3335b84cc322885b01d Mon Sep 17 00:00:00 2001
+From: Harald Sitter <sitter@kde.org>
+Date: Mon, 28 Nov 2022 14:59:33 +0100
+Subject: [PATCH 12/19] a11y: track item enabled state
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+disabled items are neither enabled nor focusable
+
+Change-Id: I4f286c7b85605d5ad6fa787d1f5cfcce1297d268
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Reviewed-by: Jan Arve Sæther <jan-arve.saether@qt.io>
+(cherry picked from commit 20fd2902a6d7bdb4a3306005d2718ca5a8fef96d)
+---
+ src/quick/accessible/qaccessiblequickitem.cpp | 4 ++++
+ src/quick/items/qquickitem.cpp                | 9 +++++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/src/quick/accessible/qaccessiblequickitem.cpp b/src/quick/accessible/qaccessiblequickitem.cpp
+index 0692ce634d..a8df58d450 100644
+--- a/src/quick/accessible/qaccessiblequickitem.cpp
++++ b/src/quick/accessible/qaccessiblequickitem.cpp
+@@ -215,6 +215,10 @@ QAccessible::State QAccessibleQuickItem::state() const
+     if (role() == QAccessible::EditableText)
+         if (auto ti = qobject_cast<QQuickTextInput *>(item()))
+             state.passwordEdit = ti->echoMode() != QQuickTextInput::Normal;
++    if (!item()->isEnabled()) {
++        state.focusable = false;
++        state.disabled = true;
++    }
+     return state;
+ }
+ 
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index 5ee2a440a3..c370d6e5c3 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -6174,6 +6174,15 @@ void QQuickItemPrivate::setEffectiveEnableRecur(QQuickItem *scope, bool newEffec
+     }
+ 
+     itemChange(QQuickItem::ItemEnabledHasChanged, effectiveEnable);
++#if QT_CONFIG(accessibility)
++    if (isAccessible) {
++        QAccessible::State changedState;
++        changedState.disabled = true;
++        changedState.focusable = true;
++        QAccessibleStateChangeEvent ev(q, changedState);
++        QAccessible::updateAccessibility(&ev);
++    }
++#endif
+     emit q->enabledChanged();
+ }
+ 
+-- 
+2.40.0
+

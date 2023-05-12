@@ -24904,8 +24904,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qtdeclarative",
-          "version": "5.12.5",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.5/submodules/qtdeclarative-everywhere-src-5.12.5.tar.xz"
+          "version": "5.15.9",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qtdeclarative-everywhere-opensource-src-5.15.9.tar.xz"
         }
       }
     },
@@ -24934,8 +24934,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qttools",
-          "version": "5.12.5",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
+          "version": "5.15.9",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qttools-everywhere-opensource-src-5.15.9.tar.xz"
         }
       }
     },
