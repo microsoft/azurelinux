@@ -6,7 +6,7 @@ Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
 Release:        8%{?dist}
-License:        LGPLv2.1 AND GPLv2
+License:        LGPL-2.1-only AND GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/RPM
