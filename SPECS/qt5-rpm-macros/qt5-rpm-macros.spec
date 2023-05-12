@@ -45,6 +45,7 @@ sed -i \
 %changelog
 * Thu May 11 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.9-1
 - Bump version to 5.15.9
+- Verified license.
 
 * Thu Apr 02 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.5-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
