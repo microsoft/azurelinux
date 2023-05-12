@@ -31,6 +31,7 @@ Source1:        disks-images-provider.yaml
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
+Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang

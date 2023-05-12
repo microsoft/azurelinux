@@ -1,6 +1,6 @@
-From 16c98473d5b3e80b65eda99b0d135669c2d7635e Mon Sep 17 00:00:00 2001
+From 79847c89951f8da3772760e50406924b49a0ac6a Mon Sep 17 00:00:00 2001
 From: Kanika Nema <kanikanema@microsoft.com>
-Date: Fri, 5 May 2023 18:19:59 +0000
+Date: Fri, 12 May 2023 14:57:03 +0000
 Subject: [PATCH] Cleanup housekeeping cgroup on vm delete
 
 Move cgroup.threads back to parent cgroup and rmdir the
@@ -9,32 +9,13 @@ housekeeping cgroup before the vm is deleted.
 This prevents a bug in runc where it cannot read housekeeping/cgroup.procs
 stopping vm from being deleted
 ---
- .../services/renderresources.go               |  6 ++-
- pkg/virt-handler/cgroup/cgroup.go             |  6 +++
- pkg/virt-handler/cgroup/cgroup_v1_manager.go  | 19 ++++++++
- pkg/virt-handler/cgroup/cgroup_v2_manager.go  | 19 ++++++++
- pkg/virt-handler/cgroup/util.go               | 33 ++++++++++++++
- pkg/virt-handler/vm.go                        | 44 +++++++++++++++++++
- 6 files changed, 125 insertions(+), 2 deletions(-)
+ pkg/virt-handler/cgroup/cgroup.go            |  6 +++
+ pkg/virt-handler/cgroup/cgroup_v1_manager.go | 19 +++++++++
+ pkg/virt-handler/cgroup/cgroup_v2_manager.go | 19 +++++++++
+ pkg/virt-handler/cgroup/util.go              | 33 +++++++++++++++
+ pkg/virt-handler/vm.go                       | 44 ++++++++++++++++++++
+ 5 files changed, 121 insertions(+)
 
-diff --git a/pkg/virt-controller/services/renderresources.go b/pkg/virt-controller/services/renderresources.go
-index 46b242932..d75354bc5 100644
---- a/pkg/virt-controller/services/renderresources.go
-+++ b/pkg/virt-controller/services/renderresources.go
-@@ -194,9 +194,11 @@ func WithCPUPinning(cpu *v1.CPU) ResourceRendererOption {
- 			}
- 		}
- 
--		// allocate 1 more pcpu if IsolateEmulatorThread request
-+		// allocate 2 more pcpu if IsolateEmulatorThread request
-+		// the extra cpu ensures hyperthread SMT cpu alignment when cpu-manager
-+		// policy full-pcpus-only is used.
- 		if cpu.IsolateEmulatorThread {
--			emulatorThreadCPU := resource.NewQuantity(1, resource.BinarySI)
-+			emulatorThreadCPU := resource.NewQuantity(2, resource.BinarySI)
- 			limits := renderer.calculatedLimits[k8sv1.ResourceCPU]
- 			limits.Add(*emulatorThreadCPU)
- 			renderer.vmLimits[k8sv1.ResourceCPU] = limits
 diff --git a/pkg/virt-handler/cgroup/cgroup.go b/pkg/virt-handler/cgroup/cgroup.go
 index b0b28a046..052b5aa96 100644
 --- a/pkg/virt-handler/cgroup/cgroup.go
