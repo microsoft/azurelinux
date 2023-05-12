@@ -87,13 +87,13 @@ package_list="openssh nano"
 # OPTIONAL:
 #   If you want a fast (but possibly less accurate) build, only pack the specific packages we want to build and
 #   use upstream stable packages to fulfill all dependencies.
-pkg_filter="SRPM_PACK_LIST='$packages'"
+pkg_filter="SRPM_PACK_LIST='$package_list'"
 #   Otherwise, trust the scheduler to optimize the build
 pkg_filter=""
 
 # Modify your package
 touch ../SPECS/nano/nano.spec
-touch ../SPECS/nano/opessh.spec
+touch ../SPECS/nano/openssh.spec
 
 # Update signature files, or tell the tools to do it automatically
 sha256sum ../SPECS/nano/my_new_nano_file.txt
@@ -128,7 +128,7 @@ sudo make clean-expand-specs clean-input-srpms
 #   $toolchain              Where to get our toolchain (see above)
 #   PACKAGE_REBUILD_LIST    List of packages to ALWAYS rebuild, even if they look unchanged (PACKAGE_BUILD_LIST will build them only if they are missing)
 #   SRPM_FILE_SIGNATURE_HANDLING Auto update the signature files
-sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $pkg_filter $toolchain PACKAGE_REBUILD_LIST="$packages" $signature_handle
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE="" REBUILD_TOOLS=y $pkg_filter $toolchain PACKAGE_REBUILD_LIST="$package_list" $signature_handle
 
 # Repeat as needed
 ```
