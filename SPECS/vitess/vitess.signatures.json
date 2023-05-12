@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "vitess-8.0.0-vendor.tar.gz": "888c1449ed82c8487d266cfb4a8af39cf759b76f0657c295e3a55a2f91856154",
-  "vitess-8.0.0.tar.gz": "c47320b9bcb874b1a6dfca78ec677be7c4bb4c7b2a6470df80bd1bc0ad125e92"
+  "vitess-16.0.2-vendor.tar.gz": "86cb3d667cef20d65bd122d47f71271a3cb7163a1e474dd1feba17674435ce2e",
+  "vitess-16.0.2.tar.gz": "89328d683f2694de4ada21c7a815d396a853ad45d39607aca467996678b69e0c"
  }
 }
