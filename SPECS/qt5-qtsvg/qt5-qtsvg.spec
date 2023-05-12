@@ -3,7 +3,7 @@
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License:        LGPLv2 WITH exceptions OR GPLv3 WITH exceptions
 Vendor:         Microsoft Corporation
