@@ -93,7 +93,7 @@ pkg_filter=""
 
 # Modify your package
 touch ../SPECS/nano/nano.spec
-touch ../SPECS/nano/openssh.spec
+touch ../SPECS/openssh/openssh.spec
 
 # Update signature files, or tell the tools to do it automatically
 sha256sum ../SPECS/nano/my_new_nano_file.txt
