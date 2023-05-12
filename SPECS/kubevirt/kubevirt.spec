@@ -209,7 +209,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Fri May 05 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-2
+* Fri May 12 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-2
 - Patch 0.59.0 with Operator Nexus patches 
 
 * Fri May 05 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-1
