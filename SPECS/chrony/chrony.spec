@@ -151,7 +151,7 @@ install -m 755 -p %{SOURCE4} $RPM_BUILD_ROOT%{_libexecdir}/chrony-helper
 
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/chronyd <<EOF
 # Command-line options for chronyd
-OPTIONS=""
+OPTIONS="-u chrony"
 EOF
 
 touch $RPM_BUILD_ROOT%{_localstatedir}/lib/chrony/{drift,rtc}
