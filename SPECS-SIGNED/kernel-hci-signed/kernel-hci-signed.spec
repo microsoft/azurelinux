@@ -5,7 +5,7 @@
 Summary:        Signed Linux Kernel for HCI
 Name:           kernel-hci-signed-%{buildarch}
 Version:        5.15.110.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -149,6 +149,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Thu May 11 2023 Elaheh Dehghani <edehghani@microsoft.com> - 5.15.110.1-2
+- Enable mstflint driver for secure boot.
+
 * Mon May 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.110.1-1
 - Auto-upgrade to 5.15.110.1
 

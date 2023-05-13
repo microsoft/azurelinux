@@ -2091,6 +2091,7 @@ CONFIG_VMWARE_VMCI=m
 # CONFIG_HABANA_AI is not set
 # CONFIG_UACCE is not set
 # CONFIG_PVPANIC is not set
+CONFIG_MSTFLINT=m
 # end of Misc devices
 
 #
