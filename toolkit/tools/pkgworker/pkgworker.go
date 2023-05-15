@@ -299,7 +299,10 @@ func tdnfInstall(packages []string) (err error) {
 		return
 	}
 
+	disableRepoArgs := []string{"--disablerepo=fedora", "--disablerepo=fedora-debuginfo"}
+
 	installArgs := []string{"install", "-y", releaseverCliArg}
+	installArgs = append(installArgs, disableRepoArgs...)
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
 	foundNoMatchingPackages := false
