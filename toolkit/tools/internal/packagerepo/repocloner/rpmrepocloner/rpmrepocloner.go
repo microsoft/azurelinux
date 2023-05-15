@@ -25,6 +25,10 @@ const (
 	allRepoIDs             = "*"
 	builtRepoID            = "local-repo"
 	cacheRepoID            = "upstream-cache-repo"
+	marinerBaseRepoID      = "mariner-official-base"
+	marinerExtendedRepoID  = "mariner-extended"
+	marinerExtrasRepoID    = "mariner-extras"
+	marinerMicrosoftRepoID = "mariner-microsoft"
 	fedoraRepoID           = "fedora"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
@@ -297,7 +301,7 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cacheRepoID, fedoraRepoID, allRepoIDs}
+			repoOrderList := []string{builtRepoID, cacheRepoID, marinerBaseRepoID, marinerExtendedRepoID, marinerExtrasRepoID, marinerMicrosoftRepoID, fedoraRepoID, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -309,6 +313,43 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 	return
 }
+
+//function to return list of repos in the chroot
+func (r *RpmRepoCloner) GetRepoList() (repoList []string, err error) {
+	err = r.chroot.Run(func() (err error) {
+		repoList, err = r.getRepoList()
+		return
+	})
+	return
+}
+
+//function to return list of repos in the chroot
+func (r *RpmRepoCloner) getRepoList() (repoList []string, err error) {
+	repoList = []string{}
+	cmd := "/etc/yum.repos.d/ -l | awk '{ print $NF }' | grep repo | grep -o '^[^.]*'"
+	//split the above command into args by spaces
+	args := strings.Fields(cmd)
+	//print the args
+	for _, arg := range args {
+		fmt.Println(arg)
+	}
+	//run the command
+	stdout, stderr, err := shell.Execute("ls", args...)
+//	logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
+
+	if err != nil {
+		logger.Log.Debugf("Failed to get repos, error: '%s'", stderr)
+		return
+	}
+	//print all the repos
+	for _, repo := range stdout {
+		fmt.Println("repo obtained is: ")
+		fmt.Println(repo)
+		repoList = append(repoList, string(repo))
+	}
+	return repoList, err
+}
+
 
 // WhatProvides attempts to find packages which provide the requested PackageVer.
 func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
@@ -526,7 +567,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		)
 		stdout, stderr, err = shell.Execute("tdnf", args...)
 
-//		logger.Log.Debugf("stdout: %s", stdout)
+		logger.Log.Debugf("tdnf stdout: %s", stdout)
 //		logger.Log.Debugf("stderr: %s", stderr)
 
 		if err != nil {
