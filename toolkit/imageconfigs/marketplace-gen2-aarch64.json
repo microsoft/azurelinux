@@ -28,6 +28,7 @@
                 },
                 {
                     "ID": "rootfs",
+                    "Name": "rootfs",
                     "Start": 565,
                     "End": 0,
                     "FsType": "ext4"
@@ -51,7 +52,8 @@
                 },
                 {
                     "ID": "rootfs",
-                    "MountPoint": "/"
+                    "MountPoint": "/",
+                    "MountIdentifier": "partlabel"
                 }
             ],
             "PackageLists": [
