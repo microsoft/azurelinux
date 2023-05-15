@@ -188,6 +188,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	if err != nil {
 		logger.Log.Errorf("Failed to add edge failed between %+v and %+v.", packageNode, dependency)
 	}
+	logger.Log.Debugf("Added edge between %+v and %+v.", packageNode, dependency)
 
 	return err
 }
