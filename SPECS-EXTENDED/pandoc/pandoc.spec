@@ -183,19 +183,19 @@ Requires:       ghc-%{name}%{?_isa} = %{version}-%{release}
 This package provides the Haskell %{name} library development files.
 
 
-%package pdf
-Summary:        Metapackage for pandoc pdf support
-Requires:       %{name} = %{version}
-Requires:       texlive-collection-latex
-Requires:       texlive-ec
-Obsoletes:      pandoc-markdown2pdf < %{version}-%{release}
-
-%description pdf
-This package pulls in the TeXLive latex package collection needed by
-pandoc to generate pdf output using pdflatex.
-
-To use --latex-engine=xelatex or lualatex, install texlive-collection-xetex
-or texlive-collection-luatex respectively.
+#%package pdf
+#Summary:        Metapackage for pandoc pdf support
+#Requires:       %{name} = %{version}
+#Requires:       texlive-collection-latex
+#Requires:       texlive-ec
+#Obsoletes:      pandoc-markdown2pdf < %{version}-%{release}
+#
+#%description pdf
+#This package pulls in the TeXLive latex package collection needed by
+#pandoc to generate pdf output using pdflatex.
+#
+#To use --latex-engine=xelatex or lualatex, install texlive-collection-xetex
+#or texlive-collection-luatex respectively.
 
 
 %if %{with haddock}
@@ -296,7 +296,7 @@ touch %{buildroot}%{_datadir}/bash-completion/completions/%{name}
 %{_datadir}/%{pkgver}
 # End cabal-rpm files
 
-%files pdf
+#%files pdf
 
 
 %files -n ghc-%{name} -f ghc-%{name}.files
