@@ -623,6 +623,12 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 		releaseverCliArg string
 	)
 
+	err = shell.ExecuteLive(squashErrors, "/usr/lib/tdnf/tdnf-history-util", "init")
+	if err != nil {
+		logger.Log.Errorf("Error running history util: %v", err)
+		return
+	}
+
 	logger.Log.Debugf("Downloading '%s' package to a clean RPM root under '%s'.", releasePackage, installRoot)
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
