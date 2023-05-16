@@ -543,7 +543,7 @@ func initializeRpmDatabase(installRoot string, diffDiskBuild bool) (err error) {
 			return err
 		}
 	}
-	err = initializeTdnfConfiguration(installRoot)
+	//err = initializeTdnfConfiguration(installRoot)
 	return
 }
 
@@ -623,12 +623,6 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 		releaseverCliArg string
 	)
 
-	err = shell.ExecuteLive(squashErrors, "/usr/lib/tdnf/tdnf-history-util", "init")
-	if err != nil {
-		logger.Log.Errorf("Error running history util: %v", err)
-		return
-	}
-
 	logger.Log.Debugf("Downloading '%s' package to a clean RPM root under '%s'.", releasePackage, installRoot)
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
@@ -636,6 +630,7 @@ func initializeTdnfConfiguration(installRoot string) (err error) {
 		return
 	}
 
+	
 	err = shell.ExecuteLive(squashErrors, "tdnf", "install", "-y", "--downloadonly", releaseverCliArg, "--alldeps", "--downloaddir", installRoot, releasePackage)
 	if err != nil {
 		logger.Log.Errorf("Failed to prepare the RPM database on downloading the 'mariner-release' package: %v", err)
