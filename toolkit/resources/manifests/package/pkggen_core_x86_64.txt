@@ -20,6 +20,7 @@ binutils-devel-2.37-5.cm2.x86_64.rpm
 gmp-6.2.1-2.cm2.x86_64.rpm
 ghc-rpm-macros-2.4.4-2.cm2.noarch.rpm
 ghc-rpm-macros-extra-2.4.4-2.cm2.noarch.rpm
+chrpath-0.16-4.cm2.x86_64.rpm
 gmp-devel-6.2.1-2.cm2.x86_64.rpm
 mpfr-4.1.0-1.cm2.x86_64.rpm
 mpfr-devel-4.1.0-1.cm2.x86_64.rpm
