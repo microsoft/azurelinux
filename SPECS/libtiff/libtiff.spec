@@ -14,9 +14,7 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libtool
-
 Requires:       libjpeg-turbo
-
 Provides:       %{name}-tools = %{version}-%{release}
 
 %description
@@ -24,7 +22,6 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
-
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
 
