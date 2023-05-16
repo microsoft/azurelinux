@@ -8,7 +8,7 @@
 Summary:           Open vSwitch daemon/database/utilities
 Name:              openvswitch
 Version:           2.17.5
-Release:           1%{?dist}
+Release:           2%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
 Distribution:      Mariner
@@ -50,6 +50,7 @@ Requires(post):    /bin/sed
 Requires(post):    systemd-units
 Requires(preun):   systemd-units
 Requires(postun):  systemd-units
+Patch0:            CVE-2023-1668.patch
 
 
 %description
@@ -373,6 +374,9 @@ fi
 %{_unitdir}/openvswitch-ipsec.service
 
 %changelog
+* Tue May 02 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.17.5-2
+- Add patch to fix CVE-2023-1668
+
 * Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.5-1
 - Auto-upgrade to 2.17.5 - to fix CVE-2022-4337, CVE-2022-4338
 

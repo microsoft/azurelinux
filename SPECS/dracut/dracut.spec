@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -18,6 +18,7 @@ Source2:        mkinitrd
 Source3:        megaraid.conf
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
+Patch2:         fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 BuildRequires:  asciidoc
 BuildRequires:  bash
 BuildRequires:  git
@@ -187,6 +188,9 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Thu Apr 27 2023 Daniel McIlvaney <damcilva@microsoft.com> - 055-5
+- Avoid using JIT'd perl in grep since it is blocked by SELinux.
+
 * Fri Mar 31 2023 Vince Perri <viperri@microsoft.com> - 055-4
 - Add dracut-megaraid package.
 

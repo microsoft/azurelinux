@@ -7,7 +7,7 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,10 @@ BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
 BuildRequires:  perl-generators
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(File::Temp)
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       curl
 
@@ -79,6 +83,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Apr 27 2023 Olivia Crain <oliviacrain@microsoft.com> - 4.17-14
+- Fix package test by adding check-time requirement on perl(Test::More), perl(File::Temp)
+
 * Fri Mar 17 2023 Muhammad Falak <mwani@microsoft.com> - 4.17-13
 - Introduce patches to workaround macro bug which breaks build
 - Add BR on perl(FindBin) & perl(Module::CoreList)

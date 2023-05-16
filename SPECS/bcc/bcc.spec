@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
-Version:        0.24.0
+Version:        0.27.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -22,6 +22,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
+BuildRequires:  zip
 Requires:       elfutils-libelf
 
 %description
@@ -121,6 +122,10 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Fri Apr 28 2023 Muhammad Falak <mwani@microsoft.com> - 0.27.0-1
+- Add an explicit BR on zip
+- Update to 0.27.0
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.24.0-1
 - Update to 0.24.0
 

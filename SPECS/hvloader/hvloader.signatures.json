@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "hvloader-1.0.1.tar.gz": "4e0a15cfab98a89a0a93f747df876ea3ee5366c3ffbd158c28e296bf52c7dfba",
+  "edk2-submodules-edk2-stable202211.tar.gz": "81a84900be864fab94935637278ac4db47b06bad1d00c1d1738c294c7caf23c7",
+  "target-x86.txt": "fcf4f427d3b80e67296be2a1d17ec124d65f673d4f6ea37d238f8d3fc1ddc4b8"
+}
+}
