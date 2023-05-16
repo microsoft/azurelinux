@@ -1,17 +1,17 @@
-From 24163dbd2edb027112ad57ba2ffe75365dc06a1d Mon Sep 17 00:00:00 2001
+From cfc660cfd919d256306700c54059a0518f5c2ded Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Mon, 8 May 2023 14:57:38 -0700
 Subject: [PATCH] Add retry logic for connection failure
 
 ---
- client/remoterepo.c | 64 ++++++++++++++++++++++++++++++---------------
- 1 file changed, 43 insertions(+), 21 deletions(-)
+ client/remoterepo.c | 61 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 40 insertions(+), 21 deletions(-)
 
 diff --git a/client/remoterepo.c b/client/remoterepo.c
-index de0e04c..88e3f92 100644
+index de0e04c..7d37cc2 100644
 --- a/client/remoterepo.c
 +++ b/client/remoterepo.c
-@@ -173,32 +173,54 @@ TDNFDownloadFile(
+@@ -173,32 +173,51 @@ TDNFDownloadFile(
          }
      }
  
@@ -22,16 +22,12 @@ index de0e04c..88e3f92 100644
 +    BAIL_ON_TDNF_CURL_ERROR(dwError);
 +
 +    /* Add retry logic for connection failure*/
-+    int retries = 2;
++    int retries = 3;
 +    for( int i = 0; i < retries; i++)
      {
 -        dwError = errno;
 -        BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
 -    }
-+        if (i > 0)
-+        {
-+            printf("Retrying from connection timeout failure\n");
-+        }
 +        fp = fopen(pszFile, "wb");
 +        if(!fp)
 +        {
@@ -47,8 +43,9 @@ index de0e04c..88e3f92 100644
 -    dwError = curl_easy_perform(pCurl);
 -    BAIL_ON_TDNF_CURL_ERROR(dwError);
 +        dwError = curl_easy_perform(pCurl);
-+        if (i < (retries - 1) && dwError == 22)
++        if (i < (retries - 1) && dwError == CURLE_OPERATION_TIMEDOUT)
 +        {
++            printf("Attempt %d timed out. Retrying Connection.\n", i + 1);
 +            /* Retry on Connection timeout failure */
 +            fclose(fp);
 +            fp = NULL;
