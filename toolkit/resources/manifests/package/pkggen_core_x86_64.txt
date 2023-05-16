@@ -14,7 +14,6 @@ zlib-devel-1.2.12-2.cm2.x86_64.rpm
 file-5.40-2.cm2.x86_64.rpm
 file-devel-5.40-2.cm2.x86_64.rpm
 file-libs-5.40-2.cm2.x86_64.rpm
-fedora-2.0-8.cm2.noarch.rpm
 binutils-2.37-5.cm2.x86_64.rpm
 binutils-devel-2.37-5.cm2.x86_64.rpm
 gmp-6.2.1-2.cm2.x86_64.rpm

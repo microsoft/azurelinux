@@ -77,7 +77,6 @@ expat-2.5.0-1.cm2.x86_64.rpm
 expat-debuginfo-2.5.0-1.cm2.x86_64.rpm
 expat-devel-2.5.0-1.cm2.x86_64.rpm
 expat-libs-2.5.0-1.cm2.x86_64.rpm
-fedora-2.0-8.cm2.noarch.rpm
 file-5.40-2.cm2.x86_64.rpm
 file-debuginfo-5.40-2.cm2.x86_64.rpm
 file-devel-5.40-2.cm2.x86_64.rpm
