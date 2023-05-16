@@ -1,0 +1,32 @@
+From 0185d7c34b2dfd44064101c742aadc0448a5239e Mon Sep 17 00:00:00 2001
+From: Kalev Lember <klember@redhat.com>
+Date: Thu, 9 Dec 2021 13:46:55 +0100
+Subject: [PATCH] CMake: Fix guile detection in Fedora
+
+Add support for version-suffixed guile and guile-config as it's packaged
+in Fedora (guile3.0, guile-config3.0 and guile2.2, guile-config2.2).
+---
+ cmake/FindGuile.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/FindGuile.cmake b/cmake/FindGuile.cmake
+index d28b9fd..026c25c 100644
+--- a/cmake/FindGuile.cmake
++++ b/cmake/FindGuile.cmake
+@@ -64,11 +64,11 @@ if (GUILE_INCLUDE_DIR)
+ endif ()
+ 
+ find_program(GUILE_EXECUTABLE
+-              NAMES guile
++              NAMES guile3.0 guile2.2 guile2.0 guile
+            )
+ 
+ find_program(GUILE_CONFIG_EXECUTABLE
+-              NAMES guile-config
++              NAMES guile-config3.0 guile-config2.2 guile-config2.0 guile-config
+            )
+ 
+ 
+-- 
+2.33.1
+

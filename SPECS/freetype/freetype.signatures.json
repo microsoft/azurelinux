@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "freetype-2.12.1.tar.gz": "efe71fd4b8246f1b0b1b9bfca13cfff1c9ad85930340c27df469733bbb620938",
-  "freetype-doc-2.12.1.tar.gz": "6cf582e20cb25788eea639bb1b70f05b37f70dc8d1a5b6ede9f10cbe80543cbc"
- }
+  "Signatures": {
+    "freetype-doc-2.13.0.tar.gz": "62086392a5c747ac0a64b5c63870e4b31d4609160f399e7a6154b7de427f6cd6",
+    "freetype-2.13.0.tar.gz": "a7aca0e532a276ea8d85bd31149f0a74c33d19c8d287116ef8f5f8357b4f1f80"
+  }
 }
