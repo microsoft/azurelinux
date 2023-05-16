@@ -1596,8 +1596,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.12.1",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz"
+          "version": "2.13.0",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.gz"
         }
       }
     },
@@ -1716,8 +1716,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.33.7",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.7.tar.xz"
+          "version": "2.33.8",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.33.8.tar.xz"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.177.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.177.1.tar.gz"
+          "version": "5.10.179.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.177.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.177.1.tar.gz"
+          "version": "5.10.179.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.177.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.177.1.tar.gz"
+          "version": "5.10.179.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.177.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.177.1.tar.gz"
+          "version": "5.10.179.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
         }
       }
     },
@@ -4436,8 +4436,8 @@
         "type": "other",
         "other": {
           "name": "ncurses",
-          "version": "6.3",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.3-20220612.tgz"
+          "version": "6.4",
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230408.tgz"
         }
       }
     },
@@ -7036,8 +7036,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.11",
-          "downloadUrl": "http://download.redis.io/releases/redis-6.2.11.tar.gz"
+          "version": "6.2.12",
+          "downloadUrl": "http://download.redis.io/releases/redis-6.2.12.tar.gz"
         }
       }
     },
@@ -8636,8 +8636,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.1402",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1402.tar.gz"
+          "version": "9.0.1527",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.1527.tar.gz"
         }
       }
     },

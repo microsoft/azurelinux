@@ -190,6 +190,9 @@ func CleanupDockerChroot(chroot string) (err error) {
 		"dev",
 		"proc",
 		"localrpms",
+		// toolchainrpms is not used by Mariner 1.0 builds, but is still mounted in our chroots
+		// and we should not attempt to delete it.
+		"toolchainrpms",
 		"upstream-cached-rpms",
 		"sys",
 		chrootUse,
