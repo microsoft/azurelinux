@@ -52,8 +52,7 @@
                 },
                 {
                     "ID": "rootfs",
-                    "MountPoint": "/",
-                    "MountIdentifier": "partlabel"
+                    "MountPoint": "/"
                 }
             ],
             "PackageLists": [
