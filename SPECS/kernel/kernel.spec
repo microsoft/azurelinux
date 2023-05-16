@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.110.1
-Release:        5%{?dist}
+Version:        5.15.111.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -420,6 +420,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon May 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.111.1-1
+- Auto-upgrade to 5.15.111.1
+
 * Mon May 15 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-5
 - Revert CONFIG_NVME_MULTIPATH
 
