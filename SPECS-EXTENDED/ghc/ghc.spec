@@ -48,6 +48,9 @@ Distribution:   Mariner
 
 %global ghc_unregisterized_arches s390 s390x %{mips} riscv64
 
+#to avoid configure: error: cannot compute alignment (char)
+%undefine mariner_module_ldflags
+
 Name: ghc
 Version: 8.10.7
 # Since library subpackages are versioned:
