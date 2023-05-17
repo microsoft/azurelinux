@@ -12,7 +12,6 @@ end}
   option = option:gsub('_', '-')
   print(string.format("-D%s=%s", option, value))
 end}
-
 %bcond_without radeon
 %bcond_without amdgpu
 %bcond_without nouveau
@@ -36,19 +35,16 @@ Source3:        LICENSE.PTR
 Patch1001:      libdrm-make-dri-perms-okay.patch
 # Remove backwards compat not needed on CBL-Mariner
 Patch1002:      libdrm-2.4.0-no-bc.patch
-
 %ifarch %{ix86} x86_64
 %bcond_without intel
 %else
 %bcond_with    intel
 %endif
-
 %ifarch %{arm}
 %bcond_without omap
 %else
 %bcond_with    omap
 %endif
-
 %ifarch %{arm} aarch64
 %bcond_without exynos
 %bcond_without freedreno
@@ -62,13 +58,11 @@ Patch1002:      libdrm-2.4.0-no-bc.patch
 %bcond_with    vc4
 %bcond_with    etnaviv
 %endif
-
 %ifarch %{valgrind_arches}
 %bcond_without valgrind
 %else
 %bcond_with    valgrind
 %endif
-
 BuildRequires:  chrpath
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -77,19 +71,15 @@ BuildRequires:  libatomic_ops-devel
 BuildRequires:  meson >= 0.43
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(cairo)
-
 %if %{with intel}
 BuildRequires:  pkgconfig(pciaccess) >= 0.10
 %endif
-
 %if %{with man_pages}
 BuildRequires:  python3-docutils
 %endif
-
 %if %{with valgrind}
 BuildRequires:  valgrind-devel
 %endif
-
 %if %{with udev}
 BuildRequires:  systemd-devel
 %endif
@@ -99,7 +89,6 @@ Direct Rendering Manager runtime library
 
 %package        devel
 Summary:        Direct Rendering Manager development package
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       kernel-headers
 
@@ -109,7 +98,6 @@ Direct Rendering Manager development package.
 %if %{with install_test_programs}
 %package -n drm-utils
 Summary:        Direct Rendering Manager utilities
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n drm-utils
