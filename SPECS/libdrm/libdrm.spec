@@ -13,20 +13,42 @@ end}
   print(string.format("-D%s=%s", option, value))
 end}
 
+%bcond_without radeon
+%bcond_without amdgpu
+%bcond_without nouveau
+%bcond_without vmwgfx
+%bcond_without man_pages
+%bcond_without install_test_programs
+%bcond_without udev
+Summary:        Direct Rendering Manager runtime library
+Name:           libdrm
+Version:        2.4.114
+Release:        1%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://dri.freedesktop.org
+Source0:        %{url}/libdrm/%{name}-%{version}.tar.xz
+Source1:        README.rst
+Source2:        91-drm-modeset.rules
+Source3:        LICENSE.PTR
+# Hardcode the 666 instead of 660 for device nodes
+Patch1001:      libdrm-make-dri-perms-okay.patch
+# Remove backwards compat not needed on CBL-Mariner
+Patch1002:      libdrm-2.4.0-no-bc.patch
+
 %ifarch %{ix86} x86_64
 %bcond_without intel
 %else
 %bcond_with    intel
 %endif
-%bcond_without radeon
-%bcond_without amdgpu
-%bcond_without nouveau
-%bcond_without vmwgfx
+
 %ifarch %{arm}
 %bcond_without omap
 %else
 %bcond_with    omap
 %endif
+
 %ifarch %{arm} aarch64
 %bcond_without exynos
 %bcond_without freedreno
@@ -40,47 +62,34 @@ end}
 %bcond_with    vc4
 %bcond_with    etnaviv
 %endif
-%bcond_without man_pages
+
 %ifarch %{valgrind_arches}
 %bcond_without valgrind
 %else
 %bcond_with    valgrind
 %endif
-%bcond_without install_test_programs
-%bcond_without udev
 
-Summary:        Direct Rendering Manager runtime library
-Name:           libdrm
-Version:        2.4.114
-Release:        1%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://dri.freedesktop.org
-Source0:        %{url}/libdrm/%{name}-%{version}.tar.xz
-Source1:        README.rst
-Source2:        91-drm-modeset.rules
-Source3:        LICENSE.PTR
-# hardcode the 666 instead of 660 for device nodes
-Patch1001:      libdrm-make-dri-perms-okay.patch
-# remove backwards compat not needed on Fedora
-Patch1002:      libdrm-2.4.0-no-bc.patch
 BuildRequires:  chrpath
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
 BuildRequires:  libatomic_ops-devel
 BuildRequires:  meson >= 0.43
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(cairo)
+
 %if %{with intel}
 BuildRequires:  pkgconfig(pciaccess) >= 0.10
 %endif
+
 %if %{with man_pages}
 BuildRequires:  python3-docutils
 %endif
+
 %if %{with valgrind}
 BuildRequires:  valgrind-devel
 %endif
+
 %if %{with udev}
 BuildRequires:  systemd-devel
 %endif
@@ -90,6 +99,7 @@ Direct Rendering Manager runtime library
 
 %package        devel
 Summary:        Direct Rendering Manager development package
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       kernel-headers
 
@@ -99,6 +109,7 @@ Direct Rendering Manager development package.
 %if %{with install_test_programs}
 %package -n drm-utils
 Summary:        Direct Rendering Manager utilities
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n drm-utils
@@ -136,7 +147,7 @@ chrpath -d %{_vpath_builddir}/tests/drmdevice
 install -Dpm0755 -t %{buildroot}%{_bindir} %{_vpath_builddir}/tests/drmdevice
 %endif
 %if %{with udev}
-install -Dpm0644 -t %{buildroot}%{_udevrulesdir} %{S:2}
+install -Dpm0644 -t %{buildroot}%{_udevrulesdir} %{SOURCE2}
 %endif
 mkdir -p %{buildroot}%{_docdir}/libdrm
 cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
@@ -149,43 +160,53 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_libdir}/libdrm.so.2
 %{_libdir}/libdrm.so.2.4.0
 %dir %{_datadir}/libdrm
+
 %if %{with intel}
 %{_libdir}/libdrm_intel.so.1
 %{_libdir}/libdrm_intel.so.1.0.0
 %endif
+
 %if %{with radeon}
 %{_libdir}/libdrm_radeon.so.1
 %{_libdir}/libdrm_radeon.so.1.0.1
 %endif
+
 %if %{with amdgpu}
 %{_libdir}/libdrm_amdgpu.so.1
 %{_libdir}/libdrm_amdgpu.so.1.0.0
 %{_datadir}/libdrm/amdgpu.ids
 %endif
+
 %if %{with nouveau}
 %{_libdir}/libdrm_nouveau.so.2
 %{_libdir}/libdrm_nouveau.so.2.0.0
 %endif
+
 %if %{with omap}
 %{_libdir}/libdrm_omap.so.1
 %{_libdir}/libdrm_omap.so.1.0.0
 %endif
+
 %if %{with exynos}
 %{_libdir}/libdrm_exynos.so.1
 %{_libdir}/libdrm_exynos.so.1.0.0
 %endif
+
 %if %{with freedreno}
 %{_libdir}/libdrm_freedreno.so.1
 %{_libdir}/libdrm_freedreno.so.1.0.0
 %endif
+
 %if %{with tegra}
 %{_libdir}/libdrm_tegra.so.0
 %{_libdir}/libdrm_tegra.so.0.0.0
 %endif
+
 %if %{with etnaviv}
 %{_libdir}/libdrm_etnaviv.so.1
 %{_libdir}/libdrm_etnaviv.so.1.0.0
 %endif
+
 %if %{with udev}
 %{_udevrulesdir}/91-drm-modeset.rules
 %endif
@@ -586,8 +607,8 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 
 * Fri Nov 08 2013 Dave Airlie <airlied@redhat.com> 2.4.47-1
 - libdrm 2.4.47
-
 - add fix for nouveau with gcc 4.8
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.46-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
