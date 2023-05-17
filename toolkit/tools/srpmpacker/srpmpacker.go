@@ -68,7 +68,9 @@ const (
 
 const (
 	defaultBuildDir    = "./build/SRPMS"
-	defaultWorkerCount = "10"
+	defaultWorkerCount = "0"
+	// rpmbuild usually sits doing nothing most of the time, so we can run multiple instances of it in parallel.
+	defaultWorkerCountMultiplier = 8
 )
 
 // sourceRetrievalConfiguration holds information on where to hydrate files from.
@@ -136,6 +138,12 @@ func main() {
 	defer timestamp.CompleteTiming()
 
 	timestamp.StartEvent("configuring packer", nil)
+
+	// rpmbuild is fairly light and single-threaded, so we can run multiple instances of it in parallel.
+	if *workers <= 0 {
+		*workers = runtime.NumCPU() * defaultWorkerCountMultiplier
+		logger.Log.Debugf("No worker count supplied, running %d workers per logical CPUs (total= %d).", defaultWorkerCountMultiplier, *workers)
+	}
 
 	if *workers <= 0 {
 		logger.Log.Fatalf("Value in --workers must be greater than zero. Found %d", *workers)
