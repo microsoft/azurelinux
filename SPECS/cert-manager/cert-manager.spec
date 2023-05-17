@@ -123,7 +123,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-10
 - Bump release to rebuild with go 1.19.8
 
-* Mon Mar 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-9
+* Wed Mar 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-9
 - Add patch for CVE-2023-25165
 
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-8
