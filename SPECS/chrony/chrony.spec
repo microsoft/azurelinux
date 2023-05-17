@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -151,7 +151,7 @@ install -m 755 -p %{SOURCE4} $RPM_BUILD_ROOT%{_libexecdir}/chrony-helper
 
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/chronyd <<EOF
 # Command-line options for chronyd
-OPTIONS=""
+OPTIONS="-u chrony"
 EOF
 
 touch $RPM_BUILD_ROOT%{_localstatedir}/lib/chrony/{drift,rtc}
@@ -206,6 +206,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Thu May 18 2023 Tobias Brick <tobiasb@microsoft.com> - 4.1-2
+- Explicitly run chronyd as the user chrony
+
 * Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.1-1
 - Upgrade to version 4.1
 
