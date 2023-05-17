@@ -1,0 +1,113 @@
+From 19afcf36b92dc36e83b613e4b9ee383f6beb02dc Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Wed, 9 Nov 2022 15:34:11 +0100
+Subject: [PATCH 11/19] QQuickItem: avoid emitting signals during destruction
+
+If a QQuickItem is in the QQuickItem destructor, then it is both unsafe
+and unnecessary to emit property change notifications. Connected code
+can no longer rely on the state of the emitting object - if it was
+originally a subclass of QQuickItem, then those subclass destructors
+will already have run. And the QQuickItem destructor will also have
+partially run, leaving the object in an undefined state.
+
+Add a flag that we set to true at the top of ~QQuickItem, and don't emit
+visibleChildrenChanged, parentChanged, visibleChanged, and
+childrenChanged for items that are partially destroyed already.
+
+[ChangeLog][Qt Quick][QQuickItem] QQuickItem no longer emits change
+notifications for the parent, children, visible, and visibleChildren
+properties while it is being destroyed.
+
+Task-number: QTBUG-107850
+Change-Id: I36ea98842c89ad89fcc1c4a328d138f66f2a0446
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+Reviewed-by: Mitch Curtis <mitch.curtis@qt.io>
+(cherry picked from commit 74873324bdf3399753f9fcaf7461c0e00df628b1)
+---
+ src/quick/items/qquickitem.cpp | 21 +++++++++++++--------
+ src/quick/items/qquickitem_p.h |  1 +
+ 2 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index 499fb61d1b..5ee2a440a3 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -2327,6 +2327,7 @@ QQuickItem::QQuickItem(QQuickItemPrivate &dd, QQuickItem *parent)
+ QQuickItem::~QQuickItem()
+ {
+     Q_D(QQuickItem);
++    d->inDestructor = true;
+ 
+     if (d->windowRefCount > 1)
+         d->windowRefCount = 1; // Make sure window is set to null in next call to derefWindow().
+@@ -2694,9 +2695,8 @@ void QQuickItem::setParentItem(QQuickItem *parentItem)
+ 
+         const bool wasVisible = isVisible();
+         op->removeChild(this);
+-        if (wasVisible) {
++        if (wasVisible && !op->inDestructor)
+             emit oldParentItem->visibleChildrenChanged();
+-        }
+     } else if (d->window) {
+         QQuickWindowPrivate::get(d->window)->parentlessItems.remove(this);
+     }
+@@ -2773,8 +2773,9 @@ void QQuickItem::setParentItem(QQuickItem *parentItem)
+ 
+     d->itemChange(ItemParentHasChanged, d->parentItem);
+ 
+-    emit parentChanged(d->parentItem);
+-    if (isVisible() && d->parentItem)
++    if (!d->inDestructor)
++        emit parentChanged(d->parentItem);
++    if (isVisible() && d->parentItem && !QQuickItemPrivate::get(d->parentItem)->inDestructor)
+         emit d->parentItem->visibleChildrenChanged();
+ }
+ 
+@@ -2970,7 +2971,8 @@ void QQuickItemPrivate::removeChild(QQuickItem *child)
+ 
+     itemChange(QQuickItem::ItemChildRemovedChange, child);
+ 
+-    emit q->childrenChanged();
++    if (!inDestructor)
++        emit q->childrenChanged();
+ }
+ 
+ void QQuickItemPrivate::refWindow(QQuickWindow *c)
+@@ -3199,6 +3201,7 @@ QQuickItemPrivate::QQuickItemPrivate()
+     , touchEnabled(false)
+ #endif
+     , hasCursorHandler(false)
++    , inDestructor(false)
+     , dirtyAttributes(0)
+     , nextDirtyItem(nullptr)
+     , prevDirtyItem(nullptr)
+@@ -6118,9 +6121,11 @@ bool QQuickItemPrivate::setEffectiveVisibleRecur(bool newEffectiveVisible)
+         QAccessible::updateAccessibility(&ev);
+     }
+ #endif
+-    emit q->visibleChanged();
+-    if (childVisibilityChanged)
+-        emit q->visibleChildrenChanged();
++    if (!inDestructor) {
++        emit q->visibleChanged();
++        if (childVisibilityChanged)
++            emit q->visibleChildrenChanged();
++    }
+ 
+     return true;    // effective visibility DID change
+ }
+diff --git a/src/quick/items/qquickitem_p.h b/src/quick/items/qquickitem_p.h
+index 841d91bb40..ade8fb61f2 100644
+--- a/src/quick/items/qquickitem_p.h
++++ b/src/quick/items/qquickitem_p.h
+@@ -472,6 +472,7 @@ public:
+     bool replayingPressEvent:1;
+     bool touchEnabled:1;
+     bool hasCursorHandler:1;
++    quint32 inDestructor:1; // has entered ~QQuickItem
+ 
+     enum DirtyType {
+         TransformOrigin         = 0x00000001,
+-- 
+2.40.0
+

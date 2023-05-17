@@ -1,0 +1,61 @@
+From 2842ffc4e6bc4f6a7578866fbbe58c8ceb1efb16 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Tue, 16 Nov 2021 22:43:37 +0100
+Subject: [PATCH 04/19] Revert "Fix TapHandler so that it actually registers a
+ tap"
+
+This reverts commit 36e8ccd434f948e4f11a8f9d59139ec072e41ff5.
+
+It's causing regresions
+---
+ src/quick/handlers/qquickhandlerpoint.cpp       | 4 ++--
+ src/quick/handlers/qquicksinglepointhandler.cpp | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/quick/handlers/qquickhandlerpoint.cpp b/src/quick/handlers/qquickhandlerpoint.cpp
+index 6aef3545dd..72efdfd0f4 100644
+--- a/src/quick/handlers/qquickhandlerpoint.cpp
++++ b/src/quick/handlers/qquickhandlerpoint.cpp
+@@ -82,7 +82,7 @@ void QQuickHandlerPoint::localize(QQuickItem *item)
+ 
+ void QQuickHandlerPoint::reset()
+ {
+-    m_id = -1;
++    m_id = 0;
+     m_uniqueId = QPointingDeviceUniqueId();
+     m_position = QPointF();
+     m_scenePosition = QPointF();
+@@ -165,7 +165,7 @@ void QQuickHandlerPoint::reset(const QVector<QQuickHandlerPoint> &points)
+         pressureSum += point.pressure();
+         ellipseDiameterSum += point.ellipseDiameters();
+     }
+-    m_id = -1;
++    m_id = 0;
+     m_uniqueId = QPointingDeviceUniqueId();
+     // all points are required to be from the same event, so pressed buttons and modifiers should be the same
+     m_pressedButtons = points.first().pressedButtons();
+diff --git a/src/quick/handlers/qquicksinglepointhandler.cpp b/src/quick/handlers/qquicksinglepointhandler.cpp
+index 89081b4e84..b51f53b74f 100644
+--- a/src/quick/handlers/qquicksinglepointhandler.cpp
++++ b/src/quick/handlers/qquicksinglepointhandler.cpp
+@@ -75,7 +75,7 @@ bool QQuickSinglePointHandler::wantsPointerEvent(QQuickPointerEvent *event)
+     if (!QQuickPointerDeviceHandler::wantsPointerEvent(event))
+         return false;
+ 
+-    if (d->pointInfo.id() != -1) {
++    if (d->pointInfo.id()) {
+         // We already know which one we want, so check whether it's there.
+         // It's expected to be an update or a release.
+         // If we no longer want it, cancel the grab.
+@@ -125,7 +125,7 @@ bool QQuickSinglePointHandler::wantsPointerEvent(QQuickPointerEvent *event)
+             chosen->setAccepted();
+         }
+     }
+-    return d->pointInfo.id() != -1;
++    return d->pointInfo.id();
+ }
+ 
+ void QQuickSinglePointHandler::handlePointerEventImpl(QQuickPointerEvent *event)
+-- 
+2.40.0
+

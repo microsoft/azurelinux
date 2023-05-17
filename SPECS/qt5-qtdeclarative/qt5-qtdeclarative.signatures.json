@@ -1,5 +1,6 @@
 {
- "Signatures": {
-  "qtdeclarative-everywhere-src-5.12.5.tar.xz": "22c5323d4b01259e6e352eef1b54129d6dfee00a406f0312905fa7db322b9190"
- }
+  "Signatures": {
+    "qtdeclarative-everywhere-opensource-src-5.15.9.tar.xz": "124aa6e0513f8d4b33a1b351b8d0980be37522da68f7051d0db9adfcf07ba726",
+    "qv4global_p-multilib.h": "44e465d3c5bea45aa18344b043a24128939022ac0bd43c04bc2b92b964cedae7"
+  }
 }

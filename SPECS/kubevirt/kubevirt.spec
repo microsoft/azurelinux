@@ -19,8 +19,8 @@
 %global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        0.58.0
-Release:        7%{?dist}
+Version:        0.59.0
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,8 +28,10 @@ Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        disks-images-provider.yaml
-# Upstream patch to fix issue #8544, PR #8594
-Patch0:         fgetxattr-for-relabel.patch
+# Nexus team needs these to-be-upstreamed patches for the operator Edge to work
+# correctly.
+Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
+Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang
@@ -143,7 +145,7 @@ install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}
 # virt-launcher configurations
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
 install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
-install -p -m 0644 cmd/virt-launcher/libvirtd.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
+install -p -m 0644 cmd/virt-launcher/virtqemud.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
 install -p -m 0644 cmd/virt-launcher/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
 
 
@@ -153,9 +155,6 @@ install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
 # Install network stuff
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
-install -p -m 0644 cmd/virt-handler/ipv4-nat.nft %{buildroot}%{_datadir}/kube-virt/virt-handler/
-install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-virt/virt-handler/
-
 
 %files virtctl
 %license LICENSE
@@ -211,6 +210,12 @@ install -p -m 0644 cmd/virt-handler/ipv6-nat.nft %{buildroot}%{_datadir}/kube-vi
 %{_bindir}/virt-tests
 
 %changelog
+* Fri May 12 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-2
+- Patch 0.59.0 with Operator Nexus patches 
+
+* Fri May 05 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-1
+- Upgrade to v0.59.0 
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58.0-7
 - Bump release to rebuild with go 1.19.8
 

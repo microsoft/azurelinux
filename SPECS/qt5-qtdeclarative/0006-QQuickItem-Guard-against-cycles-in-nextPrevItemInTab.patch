@@ -1,0 +1,122 @@
+From 9a3d7bc6cf8eea575e597ff1af03d87f7fbdc9aa Mon Sep 17 00:00:00 2001
+From: Fabian Kosmale <fabian.kosmale@qt.io>
+Date: Wed, 4 May 2022 09:10:54 +0200
+Subject: [PATCH 06/19] QQuickItem: Guard against cycles in
+ nextPrevItemInTabFocusChain
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+nextPrevItemInTabFocusChain already had a check to prevent running into
+cycles, it would however only detect if we reached the original item. If
+our cycle instead would loop between reachable items without ever
+returning to the initial one, as in the diagram below, then we would
+never terminate the loop.
+
+            /-->other item<---next item
+initial-item           \          ^
+                        \         |
+			 --->different item
+
+To prevent this from happening, we keep track of all items we've seen so
+far. One last complications arises due to the fact that we do visit the
+parent twice under some cicrcumstances, but we already have the skip
+variable to indicate that case – we simply skip the duplicate check if
+it is set to true.
+
+Pick-to: 6.2 6.3
+Fixes: QTBUG-87190
+Change-Id: I1449a7ebf8f325f00c296e8a8db4360faf1049e4
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit e74bcf751495d9fe27efd195bc04e2a6ae6732a4)
+---
+ src/quick/items/qquickitem.cpp                      |  7 ++++++-
+ .../data/activeFocusOnTab_infiniteLoop3.qml         | 13 +++++++++++++
+ tests/auto/quick/qquickitem2/tst_qquickitem.cpp     | 12 ++++++++++++
+ 3 files changed, 31 insertions(+), 1 deletion(-)
+ create mode 100644 tests/auto/quick/qquickitem2/data/activeFocusOnTab_infiniteLoop3.qml
+
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index 33da9762d3..ec55fb2998 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -59,6 +59,7 @@
+ #include <QtCore/private/qnumeric_p.h>
+ #include <QtGui/qpa/qplatformtheme.h>
+ #include <QtCore/qloggingcategory.h>
++#include <QtCore/private/qduplicatetracker_p.h>
+ 
+ #include <private/qqmlglobal_p.h>
+ #include <private/qqmlengine_p.h>
+@@ -2526,6 +2527,7 @@ QQuickItem* QQuickItemPrivate::nextPrevItemInTabFocusChain(QQuickItem *item, boo
+     QQuickItem *current = item;
+     qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: startItem:" << startItem;
+     qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: firstFromItem:" << firstFromItem;
++    QDuplicateTracker<QQuickItem *> cycleDetector;
+     do {
+         qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: current:" << current;
+         qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: from:" << from;
+@@ -2592,7 +2594,10 @@ QQuickItem* QQuickItemPrivate::nextPrevItemInTabFocusChain(QQuickItem *item, boo
+         // traversed all of the chain (by compare the [current] item with [startItem])
+         // Since the [startItem] might be promoted to its parent if it is invisible,
+         // we still have to check [current] item with original start item
+-        if ((current == startItem || current == originalStartItem) && from == firstFromItem) {
++        // We might also run into a cycle before we reach firstFromItem again
++        // but note that we have to ignore current if we are meant to skip it
++        if (((current == startItem || current == originalStartItem) && from == firstFromItem) ||
++                (!skip && cycleDetector.hasSeen(current))) {
+             // wrapped around, avoid endless loops
+             if (item == contentItem) {
+                 qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: looped, return contentItem";
+diff --git a/tests/auto/quick/qquickitem2/data/activeFocusOnTab_infiniteLoop3.qml b/tests/auto/quick/qquickitem2/data/activeFocusOnTab_infiniteLoop3.qml
+new file mode 100644
+index 0000000000..889e480f3b
+--- /dev/null
++++ b/tests/auto/quick/qquickitem2/data/activeFocusOnTab_infiniteLoop3.qml
+@@ -0,0 +1,13 @@
++import QtQuick 2.6
++
++Item {
++    visible: true
++    Item {
++        visible: false
++        Item {
++            objectName: "hiddenChild"
++            activeFocusOnTab: true
++            focus: true
++        }
++    }
++}
+diff --git a/tests/auto/quick/qquickitem2/tst_qquickitem.cpp b/tests/auto/quick/qquickitem2/tst_qquickitem.cpp
+index c8f251dbe1..c8ef36ee68 100644
+--- a/tests/auto/quick/qquickitem2/tst_qquickitem.cpp
++++ b/tests/auto/quick/qquickitem2/tst_qquickitem.cpp
+@@ -67,6 +67,7 @@ private slots:
+     void activeFocusOnTab10();
+     void activeFocusOnTab_infiniteLoop_data();
+     void activeFocusOnTab_infiniteLoop();
++    void activeFocusOnTab_infiniteLoopControls();
+ 
+     void nextItemInFocusChain();
+     void nextItemInFocusChain2();
+@@ -1057,6 +1058,17 @@ void tst_QQuickItem::activeFocusOnTab_infiniteLoop()
+     QCOMPARE(item, window->rootObject());
+ }
+ 
++
++void tst_QQuickItem::activeFocusOnTab_infiniteLoopControls()
++{
++    auto source = testFileUrl("activeFocusOnTab_infiniteLoop3.qml");
++    QScopedPointer<QQuickView>window(new QQuickView());
++    window->setSource(source);
++    window->show();
++    QVERIFY(window->errors().isEmpty());
++    QTest::keyClick(window.get(), Qt::Key_Tab); // should not hang
++}
++
+ void tst_QQuickItem::nextItemInFocusChain()
+ {
+     if (!qt_tab_all_widgets())
+-- 
+2.40.0
+

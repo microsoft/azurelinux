@@ -1,0 +1,35 @@
+From adc1d82fbac1f85791977ff42299e1f84f0f8db4 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <albert.astals.cid@kdab.com>
+Date: Thu, 17 Jun 2021 16:32:28 +0200
+Subject: [PATCH 01/19] Remove unused QPointer<QQuickPointerMask>
+
+Change-Id: I009fa6bbd8599dc3bb2e810176fe20e70ed50851
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+(cherry picked from commit ac03b4b8ee9cc8d4522e0c8cf1018ff086f80c1b)
+---
+ src/quick/items/qquickmousearea_p_p.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/quick/items/qquickmousearea_p_p.h b/src/quick/items/qquickmousearea_p_p.h
+index fba383e268..0d63618622 100644
+--- a/src/quick/items/qquickmousearea_p_p.h
++++ b/src/quick/items/qquickmousearea_p_p.h
+@@ -61,7 +61,6 @@ QT_BEGIN_NAMESPACE
+ 
+ class QQuickMouseEvent;
+ class QQuickMouseArea;
+-class QQuickPointerMask;
+ class QQuickMouseAreaPrivate : public QQuickItemPrivate
+ {
+     Q_DECLARE_PUBLIC(QQuickMouseArea)
+@@ -100,7 +99,6 @@ public:
+ #if QT_CONFIG(quick_draganddrop)
+     QQuickDrag *drag;
+ #endif
+-    QPointer<QQuickPointerMask> mask;
+     QPointF startScene;
+     QPointF targetStartPos;
+     QPointF lastPos;
+-- 
+2.40.0
+

@@ -1,0 +1,54 @@
+From d54b978c0cba2bf75e145c9e1b00d2a9ab495d70 Mon Sep 17 00:00:00 2001
+From: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+Date: Mon, 19 Dec 2022 10:05:33 +0100
+Subject: [PATCH 15/19] Fix missing glyphs when using NativeRendering
+
+When we look up glyphs with subpixel positions in the glyph cache,
+we use the calculated subpixel position (from a set of predefined
+subpixel positions) as key. In some very rare cases, we could end
+up with different subpixel positions when looking up an on-screen
+position than when we entered it into the cache, due to numerical
+differences when doing the calculation.
+
+The reason for this was that when entering the glyph into the
+cache, we used the 16.6 fixed point representation, whereas when
+looking up, we used the unmodified float. In some cases, the
+converted fixed point approximation might snap to a different
+predefined subpixel position than the floating point equivalent.
+
+To avoid this, we reuse the converted fixed point positions when
+looking up the glyphs in the cache.
+
+[ChangeLog][Text] Fixed an issue where text using NativeRendering
+would sometimes be missing glyphs.
+
+Pick-to: 5.15 6.2 6.4 6.5
+Fixes: QTBUG-108713
+Change-Id: Iecc264eb3d27e875c24257eaefcfb18a1a5fb5be
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Lars Knoll <lars@knoll.priv.no>
+(cherry picked from commit 4bad329985b75090c68a70cceee7edadc172d7ab)
+---
+ src/quick/scenegraph/qsgdefaultglyphnode_p.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp b/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp
+index f912da5799..fd128aa06e 100644
+--- a/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp
++++ b/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp
+@@ -839,9 +839,11 @@ void QSGTextMaskMaterial::populate(const QPointF &p,
+     bool supportsSubPixelPositions = fontD->fontEngine->supportsSubPixelPositions();
+     for (int i=0; i<glyphIndexes.size(); ++i) {
+          QPointF glyphPosition = glyphPositions.at(i) + position;
++         QFixedPoint fixedPointPosition = fixedPointPositions.at(i);
++
+          QFixed subPixelPosition;
+          if (supportsSubPixelPositions)
+-             subPixelPosition = fontD->fontEngine->subPixelPositionForX(QFixed::fromReal(glyphPosition.x()));
++             subPixelPosition = fontD->fontEngine->subPixelPositionForX(QFixed::fromReal(fixedPointPosition.x.toReal() * glyphCacheScaleX));
+ 
+          QTextureGlyphCache::GlyphAndSubPixelPosition glyph(glyphIndexes.at(i), subPixelPosition);
+          const QTextureGlyphCache::Coord &c = cache->coords.value(glyph);
+-- 
+2.40.0
+

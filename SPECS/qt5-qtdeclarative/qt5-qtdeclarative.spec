@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtDeclarative component
 Name:         qt5-qtdeclarative
-Version:      5.12.5
-Release:      4%{?dist}
+Version:      5.15.9
+Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -9,11 +9,44 @@ Distribution: Mariner
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-opensource-src-%{version}.tar.xz
+
+# header file to workaround multilib issue
+# https://bugzilla.redhat.com/show_bug.cgi?id=1441343
+Source5: qv4global_p-multilib.h
 
 ## upstream patches
+## repo: https://invent.kde.org/qt/qt/qtdeclarative
+## branch: kde/5.15
+## git format-patch v5.15.9-lts-lgpl
+Patch1:  0001-Remove-unused-QPointer-QQuickPointerMask.patch
+Patch2:  0002-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
+Patch3:  0003-Fix-TapHandler-so-that-it-actually-registers-a-tap.patch
+Patch4:  0004-Revert-Fix-TapHandler-so-that-it-actually-registers-.patch
+Patch5:  0005-Make-sure-QQuickWidget-and-its-offscreen-window-s-sc.patch
+Patch6:  0006-QQuickItem-Guard-against-cycles-in-nextPrevItemInTab.patch
+Patch7:  0007-Don-t-convert-QByteArray-in-startDrag.patch
+Patch8:  0008-Fix-build-after-95290f66b806a307b8da1f72f8fc2c698019.patch
+Patch9:  0009-Implement-accessibility-for-QQuickWidget.patch
+Patch10: 0010-Send-ObjectShow-event-for-visible-components-after-i.patch
+Patch11: 0011-QQuickItem-avoid-emitting-signals-during-destruction.patch
+Patch12: 0012-a11y-track-item-enabled-state.patch
+Patch13: 0013-Make-QaccessibleQuickWidget-private-API.patch
+Patch14: 0014-Qml-Don-t-crash-when-as-casting-to-type-with-errors.patch
+Patch15: 0015-Fix-missing-glyphs-when-using-NativeRendering.patch
+Patch16: 0016-Revert-Fix-missing-glyphs-when-using-NativeRendering.patch
+Patch17: 0017-QQmlImportDatabase-Make-sure-the-newly-added-import-.patch
+Patch18: 0018-QQuickState-when-handle-QJSValue-properties-correctl.patch
+Patch19: 0019-Models-Avoid-crashes-when-deleting-cache-items.patch
+
 
 ## upstreamable patches
+Patch100: %{name}-gcc11.patch
+# https://pagure.io/fedora-kde/SIG/issue/82
+Patch101: qtdeclarative-5.15.0-FixMaxXMaxYExtent.patch
+# From: https://codereview.qt-project.org/c/qt/qtdeclarative/+/466808
+# Cf. https://bugzilla.redhat.com/show_bug.cgi?id=2177696
+Patch102: qt-QTBUG-111935-fix-V4-jit.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -23,6 +56,8 @@ BuildRequires: gcc
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 BuildRequires: python3
+BuildRequires: libGL-devel
+BuildRequires: vulkan-devel
 
 %description
 %{summary}.
@@ -48,7 +83,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%setup -q -n qtdeclarative-everywhere-src-%{version}
+%autosetup -n qtdeclarative-everywhere-src-%{version} -p1
 
 %build
 
@@ -102,10 +137,11 @@ popd
 %files
 %license LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Qml.so.5*
+%{_qt5_libdir}/libQt5QmlModels.so.5*
+%{_qt5_libdir}/libQt5QmlWorkerScript.so.5*
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickWidgets.so.5*
-# Not needed for calamares
-#%{_qt5_libdir}/libQt5QuickParticles.so.5*
+%{_qt5_libdir}/libQt5QuickParticles.so.5*
 %{_qt5_libdir}/libQt5QuickShapes.so.5*
 %{_qt5_libdir}/libQt5QuickTest.so.5*
 %{_qt5_plugindir}/qmltooling/
@@ -117,19 +153,21 @@ popd
 %{_qt5_headerdir}/Qt*/
 %{_qt5_libdir}/libQt5Qml.so
 %{_qt5_libdir}/libQt5Qml.prl
+%{_qt5_libdir}/libQt5QmlModels.so
+%{_qt5_libdir}/libQt5QmlModels.prl
+%{_qt5_libdir}/libQt5QmlWorkerScript.so
+%{_qt5_libdir}/libQt5QmlWorkerScript.prl
 %{_qt5_libdir}/libQt5Quick*.so
 %{_qt5_libdir}/libQt5Quick*.prl
 %dir %{_qt5_libdir}/cmake/Qt5Quick*/
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
+%{_qt5_libdir}/metatypes/qt5*_metatypes.json
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
-%{_qt5_archdatadir}/mkspecs/modules/*.pri
-%{_qt5_archdatadir}/mkspecs/features/*.prf
 %dir %{_qt5_libdir}/cmake/Qt5Qml/
 %{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
+%{_qt5_libdir}/cmake/Qt5QmlImportScanner/Qt5QmlImportScannerTemplate.cpp.in
 
 %files static
-%{_qt5_libdir}/libQt5QmlDevTools.a
-%{_qt5_libdir}/libQt5QmlDevTools.prl
 %{_qt5_libdir}/libQt5PacketProtocol.a
 %{_qt5_libdir}/libQt5PacketProtocol.prl
 %{_qt5_libdir}/libQt5QmlDebug.a
@@ -141,6 +179,9 @@ popd
 
 
 %changelog
+* Thu May 11 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.9-1
+- Bump version to 5.15.9
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-4
 - Update source download path.
 - License verified.
