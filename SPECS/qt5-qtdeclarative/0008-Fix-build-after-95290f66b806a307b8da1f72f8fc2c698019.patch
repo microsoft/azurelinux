@@ -1,0 +1,26 @@
+From cbb5f2d37a07b75f9d340fd1e1f34a6d1e078eba Mon Sep 17 00:00:00 2001
+From: Hannah von Reth <vonreth@kde.org>
+Date: Sat, 5 Nov 2022 18:48:41 +0100
+Subject: [PATCH 08/19] Fix build after
+ 95290f66b806a307b8da1f72f8fc2c69801933d0
+
+---
+ src/quick/items/qquickdrag.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/quick/items/qquickdrag.cpp b/src/quick/items/qquickdrag.cpp
+index 3b50370355..383078b3b9 100644
+--- a/src/quick/items/qquickdrag.cpp
++++ b/src/quick/items/qquickdrag.cpp
+@@ -769,7 +769,7 @@ Qt::DropAction QQuickDragAttachedPrivate::startDrag(Qt::DropActions supportedAct
+     QMimeData *mimeData = new QMimeData();
+ 
+     for (auto it = externalMimeData.cbegin(), end = externalMimeData.cend(); it != end; ++it) {
+-        if (it.value().typeId() == QMetaType::QByteArray)
++        if (static_cast<QMetaType::Type>(it.value().type()) == QMetaType::QByteArray)
+             mimeData->setData(it.key(), it.value().toByteArray());
+         else
+             mimeData->setData(it.key(), it.value().toString().toUtf8());
+-- 
+2.40.0
+

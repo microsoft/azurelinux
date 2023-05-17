@@ -1,0 +1,102 @@
+From 0e1bed3c3e27d44d86d6f68a8b93b96a4821575c Mon Sep 17 00:00:00 2001
+From: Fabian Kosmale <fabian.kosmale@qt.io>
+Date: Wed, 20 Jul 2022 11:44:43 +0200
+Subject: [PATCH 18/19] QQuickState::when: handle QJSValue properties correctly
+
+If one assigns a binding whose evaluation results in a QJSValue, care
+must be take to correctly convert it into a bool. Instead of directly
+using QVariant::value<bool>, one needs to first extract the QJSValue,
+and only convert it to bool afterwards.
+This is necessary due to the custom binding evaluation we're doing to
+avoid state oscillation.
+Amends a8c729d83979fb0b9939044d246e73b1d578e65b.
+
+Fixes: QTBUG-105000
+Pick-to: 6.4 6.3 6.2 5.15
+Change-Id: I4b093b48edecf9e0f09d2b54d10c2ff527f24ac3
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 2c31d25a44b1221c151681e1bb68ef78618e0166)
+---
+ src/quick/util/qquickstategroup.cpp            | 10 ++++++++--
+ .../quick/qquickstates/data/jsValueWhen.qml    | 18 ++++++++++++++++++
+ .../quick/qquickstates/tst_qquickstates.cpp    | 11 +++++++++++
+ 3 files changed, 37 insertions(+), 2 deletions(-)
+ create mode 100644 tests/auto/quick/qquickstates/data/jsValueWhen.qml
+
+diff --git a/src/quick/util/qquickstategroup.cpp b/src/quick/util/qquickstategroup.cpp
+index 7cb3138618..f732b1eb4a 100644
+--- a/src/quick/util/qquickstategroup.cpp
++++ b/src/quick/util/qquickstategroup.cpp
+@@ -381,8 +381,14 @@ bool QQuickStateGroupPrivate::updateAutoState()
+                 const auto potentialWhenBinding = QQmlPropertyPrivate::binding(whenProp);
+                 // if there is a binding, the value in when might not be up-to-date at this point
+                 // so we manually reevaluate the binding
+-                if (auto abstractBinding = dynamic_cast<QQmlBinding *>(potentialWhenBinding))
+-                    whenValue = abstractBinding->evaluate().toBool();
++                if (auto abstractBinding = dynamic_cast<QQmlBinding *>(potentialWhenBinding)) {
++                    QVariant evalResult = abstractBinding->evaluate();
++                    if (evalResult.userType() == qMetaTypeId<QJSValue>())
++                        whenValue = evalResult.value<QJSValue>().toBool();
++                    else
++                        whenValue = evalResult.toBool();
++                }
++
+                 if (whenValue) {
+                     if (stateChangeDebug())
+                         qWarning() << "Setting auto state due to expression";
+diff --git a/tests/auto/quick/qquickstates/data/jsValueWhen.qml b/tests/auto/quick/qquickstates/data/jsValueWhen.qml
+new file mode 100644
+index 0000000000..6d5eb1600c
+--- /dev/null
++++ b/tests/auto/quick/qquickstates/data/jsValueWhen.qml
+@@ -0,0 +1,18 @@
++import QtQuick 2.15
++
++Item {
++    id: root
++    property var prop: null
++    property bool works: false
++    states: [
++        State {
++            name: "mystate"
++            when: root.prop
++            PropertyChanges {
++                target: root
++                works: "works"
++            }
++        }
++    ]
++    Component.onCompleted: root.prop = new Object
++}
+diff --git a/tests/auto/quick/qquickstates/tst_qquickstates.cpp b/tests/auto/quick/qquickstates/tst_qquickstates.cpp
+index aa55b42935..26e86672b0 100644
+--- a/tests/auto/quick/qquickstates/tst_qquickstates.cpp
++++ b/tests/auto/quick/qquickstates/tst_qquickstates.cpp
+@@ -188,6 +188,7 @@ private slots:
+     void revertListMemoryLeak();
+     void duplicateStateName();
+     void trivialWhen();
++    void jsValueWhen();
+     void noStateOsciallation();
+     void parentChangeCorrectReversal();
+     void revertNullObjectBinding();
+@@ -1734,6 +1735,16 @@ void tst_qquickstates::trivialWhen()
+     QVERIFY(c.create());
+ }
+ 
++void tst_qquickstates::jsValueWhen()
++{
++    QQmlEngine engine;
++
++    QQmlComponent c(&engine, testFileUrl("jsValueWhen.qml"));
++    QScopedPointer<QObject> root(c.create());
++    QVERIFY(root);
++    QVERIFY(root->property("works").toBool());
++}
++
+ void tst_qquickstates::noStateOsciallation()
+ {
+    QQmlEngine engine;
+-- 
+2.40.0
+

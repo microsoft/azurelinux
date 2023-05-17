@@ -1,0 +1,178 @@
+From 3784ed7ea1ffe1f4be126b3425841aba44b369d8 Mon Sep 17 00:00:00 2001
+From: Aleix Pol <aleixpol@kde.org>
+Date: Thu, 23 Sep 2021 03:43:04 +0200
+Subject: [PATCH 02/19] QQmlDelegateModel: Refresh the view when a column is
+ added at 0
+
+It can happen that a model reports n>0 rows but columns=0 (See
+QConcatenateTablesProxyModel). In those cases we would render glitchy
+items until the elements are marked as dirty.
+
+Change-Id: I615c9cacbb1b6f9dee3898b03476605e5ac39d0a
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit ec9251efb918f37971aeefa1f687d137d037ff12)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+Signed-off-by: Aleix Pol <aleixpol@kde.org>
+---
+ src/qmlmodels/qqmldelegatemodel.cpp           | 44 +++++++++++++++++++
+ src/qmlmodels/qqmldelegatemodel_p.h           |  3 ++
+ .../data/redrawUponColumnChange.qml           | 11 +++++
+ .../tst_qqmldelegatemodel.cpp                 | 27 ++++++++++++
+ 4 files changed, 85 insertions(+)
+ create mode 100644 tests/auto/qml/qqmldelegatemodel/data/redrawUponColumnChange.qml
+
+diff --git a/src/qmlmodels/qqmldelegatemodel.cpp b/src/qmlmodels/qqmldelegatemodel.cpp
+index 523c0df779..bc6b2447af 100644
+--- a/src/qmlmodels/qqmldelegatemodel.cpp
++++ b/src/qmlmodels/qqmldelegatemodel.cpp
+@@ -389,6 +389,12 @@ void QQmlDelegateModelPrivate::connectToAbstractItemModel()
+                       q,  QQmlDelegateModel, SLOT(_q_rowsRemoved(QModelIndex,int,int)));
+     qmlobject_connect(aim, QAbstractItemModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),
+                       q,  QQmlDelegateModel, SLOT(_q_rowsAboutToBeRemoved(QModelIndex,int,int)));
++    qmlobject_connect(aim, QAbstractItemModel, SIGNAL(columnsInserted(QModelIndex,int,int)),
++                      q, QQmlDelegateModel, SLOT(_q_columnsInserted(QModelIndex,int,int)));
++    qmlobject_connect(aim, QAbstractItemModel, SIGNAL(columnsRemoved(QModelIndex,int,int)),
++                      q, QQmlDelegateModel, SLOT(_q_columnsRemoved(QModelIndex,int,int)));
++    qmlobject_connect(aim, QAbstractItemModel, SIGNAL(columnsMoved(QModelIndex,int,int,QModelIndex,int)),
++                      q, QQmlDelegateModel, SLOT(_q_columnsMoved(QModelIndex,int,int,QModelIndex,int)));
+     qmlobject_connect(aim, QAbstractItemModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+                       q, QQmlDelegateModel, SLOT(_q_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
+     qmlobject_connect(aim, QAbstractItemModel, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
+@@ -413,6 +419,12 @@ void QQmlDelegateModelPrivate::disconnectFromAbstractItemModel()
+                         q, SLOT(_q_rowsAboutToBeRemoved(QModelIndex,int,int)));
+     QObject::disconnect(aim, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                         q, SLOT(_q_rowsRemoved(QModelIndex,int,int)));
++    QObject::disconnect(aim, SIGNAL(columnsInserted(QModelIndex,int,int)), q,
++                        SLOT(_q_columnsInserted(QModelIndex,int,int)));
++    QObject::disconnect(aim, SIGNAL(columnsRemoved(QModelIndex,int,int)), q,
++                        SLOT(_q_columnsRemoved(QModelIndex,int,int)));
++    QObject::disconnect(aim, SIGNAL(columnsMoved(QModelIndex,int,int,QModelIndex,int)), q,
++                        SLOT(_q_columnsMoved(QModelIndex,int,int,QModelIndex,int)));
+     QObject::disconnect(aim, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+                         q, SLOT(_q_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
+     QObject::disconnect(aim, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
+@@ -1974,6 +1986,38 @@ void QQmlDelegateModel::_q_rowsMoved(
+     }
+ }
+ 
++void QQmlDelegateModel::_q_columnsInserted(const QModelIndex &parent, int begin, int end)
++{
++    Q_D(QQmlDelegateModel);
++    Q_UNUSED(end);
++    if (parent == d->m_adaptorModel.rootIndex && begin == 0) {
++        // mark all items as changed
++        _q_itemsChanged(0, d->m_count, QVector<int>());
++    }
++}
++
++void QQmlDelegateModel::_q_columnsRemoved(const QModelIndex &parent, int begin, int end)
++{
++    Q_D(QQmlDelegateModel);
++    Q_UNUSED(end);
++    if (parent == d->m_adaptorModel.rootIndex && begin == 0) {
++        // mark all items as changed
++        _q_itemsChanged(0, d->m_count, QVector<int>());
++    }
++}
++
++void QQmlDelegateModel::_q_columnsMoved(const QModelIndex &parent, int start, int end,
++                                        const QModelIndex &destination, int column)
++{
++    Q_D(QQmlDelegateModel);
++    Q_UNUSED(end);
++    if ((parent == d->m_adaptorModel.rootIndex && start == 0)
++        || (destination == d->m_adaptorModel.rootIndex && column == 0)) {
++        // mark all items as changed
++        _q_itemsChanged(0, d->m_count, QVector<int>());
++    }
++}
++
+ void QQmlDelegateModel::_q_dataChanged(const QModelIndex &begin, const QModelIndex &end, const QVector<int> &roles)
+ {
+     Q_D(QQmlDelegateModel);
+diff --git a/src/qmlmodels/qqmldelegatemodel_p.h b/src/qmlmodels/qqmldelegatemodel_p.h
+index 8aab4badca..d140bfbaaf 100644
+--- a/src/qmlmodels/qqmldelegatemodel_p.h
++++ b/src/qmlmodels/qqmldelegatemodel_p.h
+@@ -152,6 +152,9 @@ private Q_SLOTS:
+     void _q_itemsMoved(int from, int to, int count);
+     void _q_modelReset();
+     void _q_rowsInserted(const QModelIndex &,int,int);
++    void _q_columnsInserted(const QModelIndex &, int, int);
++    void _q_columnsRemoved(const QModelIndex &, int, int);
++    void _q_columnsMoved(const QModelIndex &, int, int, const QModelIndex &, int);
+     void _q_rowsAboutToBeRemoved(const QModelIndex &parent, int begin, int end);
+     void _q_rowsRemoved(const QModelIndex &,int,int);
+     void _q_rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int);
+diff --git a/tests/auto/qml/qqmldelegatemodel/data/redrawUponColumnChange.qml b/tests/auto/qml/qqmldelegatemodel/data/redrawUponColumnChange.qml
+new file mode 100644
+index 0000000000..206133bb39
+--- /dev/null
++++ b/tests/auto/qml/qqmldelegatemodel/data/redrawUponColumnChange.qml
+@@ -0,0 +1,11 @@
++import QtQuick 2.8
++
++ListView {
++    id: root
++    width: 200
++    height: 200
++
++    delegate: Text {
++        text: display
++    }
++}
+diff --git a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
+index 35f1e2c94d..1722447830 100644
+--- a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
++++ b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
+@@ -27,6 +27,8 @@
+ ****************************************************************************/
+ 
+ #include <QtTest/qtest.h>
++#include <QtCore/QConcatenateTablesProxyModel>
++#include <QtGui/QStandardItemModel>
+ #include <QtQml/qqmlcomponent.h>
+ #include <QtQmlModels/private/qqmldelegatemodel_p.h>
+ #include <QtQuick/qquickview.h>
+@@ -47,6 +49,7 @@ private slots:
+     void filterOnGroup_removeWhenCompleted();
+     void qtbug_86017();
+     void contextAccessedByHandler();
++    void redrawUponColumnChange();
+ };
+ 
+ class AbstractItemModel : public QAbstractItemModel
+@@ -186,6 +189,30 @@ void tst_QQmlDelegateModel::contextAccessedByHandler()
+     QVERIFY(root->property("works").toBool());
+ }
+ 
++void tst_QQmlDelegateModel::redrawUponColumnChange()
++{
++    QStandardItemModel m1;
++    m1.appendRow({
++            new QStandardItem("Banana"),
++            new QStandardItem("Coconut"),
++    });
++
++    QQuickView view(testFileUrl("redrawUponColumnChange.qml"));
++    QCOMPARE(view.status(), QQuickView::Ready);
++    view.show();
++    QQuickItem *root = view.rootObject();
++    root->setProperty("model", QVariant::fromValue<QObject *>(&m1));
++
++    QObject *item = root->property("currentItem").value<QObject *>();
++    QVERIFY(item);
++    QCOMPARE(item->property("text").toString(), "Banana");
++
++    QVERIFY(root);
++    m1.removeColumn(0);
++
++    QCOMPARE(item->property("text").toString(), "Coconut");
++}
++
+ QTEST_MAIN(tst_QQmlDelegateModel)
+ 
+ #include "tst_qqmldelegatemodel.moc"
+-- 
+2.40.0
+

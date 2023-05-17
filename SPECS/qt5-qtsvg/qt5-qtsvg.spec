@@ -2,23 +2,26 @@
 
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
-Version:        5.12.11
-Release:        4%{?dist}
+Version:        5.15.9
+Release:        1%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:        GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.qt.io
-Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
+Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-opensource-src-%{version}.tar.xz
 # No gui add no patch
 Patch100:       CVE-2021-38593.nopatch
 Patch101:       CVE-2018-21035.nopatch
 # Vulnerability is limited to the Windows OS.
 Patch102:       CVE-2022-25634.nopatch
+Patch103:       CVE-2023-32573.patch
 
+BuildRequires:  make
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
 BuildRequires:  zlib-devel
+BuildRequires:  libGL-devel
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
@@ -65,13 +68,14 @@ for prl_file in libQt5*.prl ; do
 done
 popd
 
+%ldconfig_scriptlets
+
 %files
 %license LICENSE.*
 %{_qt5_libdir}/libQt5Svg.so.5*
 %{_qt5_plugindir}/iconengines/libqsvgicon.so
 %{_qt5_plugindir}/imageformats/libqsvg.so
-%dir %{_qt5_libdir}/cmake/Qt5Svg/
-%{_qt5_libdir}/cmake/Qt5Svg/Qt5Svg_*Plugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QSvg*Plugin.cmake
 
 %files devel
 %{_qt5_headerdir}/QtSvg/
@@ -79,12 +83,15 @@ popd
 %{_qt5_libdir}/libQt5Svg.prl
 %{_qt5_libdir}/cmake/Qt5Svg/Qt5SvgConfig*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5Svg.pc
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_svg*.pri
 
 %files examples
 %{_qt5_examplesdir}/
 
 %changelog
+* Wed May 10 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.9-1
+- Bump version to 5.15.9
+- Add patch for CVE-2023-32573
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
 - Update source download path.
 

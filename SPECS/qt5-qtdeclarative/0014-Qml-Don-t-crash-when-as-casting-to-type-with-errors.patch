@@ -1,0 +1,113 @@
+From 7be5422134167fe6d9fd44ef683f407bbda1bce7 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Tue, 30 Nov 2021 14:39:48 +0100
+Subject: [PATCH 14/19] Qml: Don't crash when as-casting to type with errors
+
+Such types don't have a compilation unit, but we still know their names.
+
+Pick-to: 6.2
+Fixes: QTBUG-98792
+Change-Id: I2db8dea3a5a02ec1492f7f7a054fd3ad4c6ad69a
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Mitch Curtis <mitch.curtis@qt.io>
+(cherry picked from commit e0cd201e91ae64b9c03e0128cd17656b00611fbb)
+---
+ src/qml/qml/qqmltypewrapper.cpp                  |  6 ++++--
+ src/qml/types/qqmlconnections.cpp                |  2 +-
+ tests/auto/qml/qqmllanguage/data/Broken.qml      |  5 +++++
+ tests/auto/qml/qqmllanguage/data/asBroken.qml    |  6 ++++++
+ tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp | 16 ++++++++++++++++
+ 5 files changed, 32 insertions(+), 3 deletions(-)
+ create mode 100644 tests/auto/qml/qqmllanguage/data/Broken.qml
+ create mode 100644 tests/auto/qml/qqmllanguage/data/asBroken.qml
+
+diff --git a/src/qml/qml/qqmltypewrapper.cpp b/src/qml/qml/qqmltypewrapper.cpp
+index 175de8b936..a6ba4b8cb3 100644
+--- a/src/qml/qml/qqmltypewrapper.cpp
++++ b/src/qml/qml/qqmltypewrapper.cpp
+@@ -419,8 +419,10 @@ ReturnedValue QQmlTypeWrapper::virtualInstanceOf(const Object *typeObject, const
+             return Encode(false);
+ 
+         QQmlRefPointer<QQmlTypeData> td = qenginepriv->typeLoader.getType(typeWrapper->d()->type().sourceUrl());
+-        ExecutableCompilationUnit *cu = td->compilationUnit();
+-        myQmlType = qenginepriv->metaObjectForType(cu->metaTypeId);
++        if (ExecutableCompilationUnit *cu = td->compilationUnit())
++            myQmlType = qenginepriv->metaObjectForType(cu->metaTypeId);
++        else
++            return Encode(false); // It seems myQmlType has some errors, so we could not compile it.
+     } else {
+         myQmlType = qenginepriv->metaObjectForType(myTypeId);
+     }
+diff --git a/src/qml/types/qqmlconnections.cpp b/src/qml/types/qqmlconnections.cpp
+index 29ed62cd39..aba930dfe1 100644
+--- a/src/qml/types/qqmlconnections.cpp
++++ b/src/qml/types/qqmlconnections.cpp
+@@ -338,7 +338,7 @@ void QQmlConnections::connectSignalsToMethods()
+                    && propName.at(2).isUpper()) {
+             qmlWarning(this) << tr("Detected function \"%1\" in Connections element. "
+                                    "This is probably intended to be a signal handler but no "
+-                                   "signal of the target matches the name.").arg(propName);
++                                   "signal of the \"%2\" target matches the name.").arg(propName).arg(target->metaObject()->className());
+         }
+     }
+ }
+diff --git a/tests/auto/qml/qqmllanguage/data/Broken.qml b/tests/auto/qml/qqmllanguage/data/Broken.qml
+new file mode 100644
+index 0000000000..e24d9112a8
+--- /dev/null
++++ b/tests/auto/qml/qqmllanguage/data/Broken.qml
+@@ -0,0 +1,5 @@
++import QtQml 2.15
++
++QtObject {
++    notThere: 5
++}
+diff --git a/tests/auto/qml/qqmllanguage/data/asBroken.qml b/tests/auto/qml/qqmllanguage/data/asBroken.qml
+new file mode 100644
+index 0000000000..bd88d14c76
+--- /dev/null
++++ b/tests/auto/qml/qqmllanguage/data/asBroken.qml
+@@ -0,0 +1,6 @@
++import QtQml 2.15
++
++QtObject {
++    id: self
++    property var selfAsBroken: self as Broken
++}
+diff --git a/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp b/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
+index bffb62c59e..97cc64991f 100644
+--- a/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
++++ b/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
+@@ -336,6 +336,7 @@ private slots:
+     void bareInlineComponent();
+ 
+     void hangOnWarning();
++    void objectAsBroken();
+ 
+     void ambiguousContainingType();
+ 
+@@ -5876,6 +5877,21 @@ void tst_qqmllanguage::ambiguousContainingType()
+     }
+ }
+ 
++void tst_qqmllanguage::objectAsBroken()
++{
++    QQmlEngine engine;
++    QQmlComponent c(&engine, testFileUrl("asBroken.qml"));
++    QVERIFY2(c.isReady(), qPrintable(c.errorString()));
++    QScopedPointer<QObject> o(c.create());
++    QVERIFY(!o.isNull());
++    QVariant selfAsBroken = o->property("selfAsBroken");
++    QVERIFY(selfAsBroken.isValid());
++    // QCOMPARE(selfAsBroken.metaType(), QMetaType::fromType<std::nullptr_t>());
++
++    QQmlComponent b(&engine, testFileUrl("Broken.qml"));
++    QVERIFY(b.isError());
++}
++
+ QTEST_MAIN(tst_qqmllanguage)
+ 
+ #include "tst_qqmllanguage.moc"
+-- 
+2.40.0
+

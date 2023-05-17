@@ -1,0 +1,60 @@
+From c257eb6a0eeb159c670c9cf6b37d3009ec8879e5 Mon Sep 17 00:00:00 2001
+From: Fushan Wen <qydwhotmail@gmail.com>
+Date: Tue, 1 Nov 2022 22:35:24 +0800
+Subject: [PATCH 07/19] Don't convert QByteArray in `startDrag`
+
+QMimeData::setData expects the provided data to contain the correctly
+encoded QByteArray, so if the variant contains a QByteArray, then take
+it as is to avoid data loss.
+
+If the variant is not already a byte array, then we ideally would make
+sure that the mime type (i.e. the key of the map) and the QVariant's
+type are compatible (image/png with a QImage works; text/plain with a
+QImage does not). This changes behavior and needs to be a follow-up
+commit.
+
+Fixes: QTBUG-71922
+Change-Id: I9b9f10fd332e1f9568f6835a69a1c359457f823c
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 062f9bf57657b54dc708015ec5fed3c89e5cc3ca)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+
+
+(cherry picked from commit 22de23c4bb9ac5e2c545e9de3149a7d4f8edd5ee)
+---
+ src/quick/items/qquickdrag.cpp | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/quick/items/qquickdrag.cpp b/src/quick/items/qquickdrag.cpp
+index 8321fcfeed..3b50370355 100644
+--- a/src/quick/items/qquickdrag.cpp
++++ b/src/quick/items/qquickdrag.cpp
+@@ -481,7 +481,9 @@ void QQuickDragAttached::setKeys(const QStringList &keys)
+     \qmlattachedproperty stringlist QtQuick::Drag::mimeData
+     \since 5.2
+ 
+-    This property holds a map of mimeData that is used during startDrag.
++    This property holds a map from mime type to data that is used during startDrag.
++    The mime data needs to be a \c string, or an \c ArrayBuffer with the data encoded
++    according to the mime type.
+ */
+ 
+ QVariantMap QQuickDragAttached::mimeData() const
+@@ -766,8 +768,12 @@ Qt::DropAction QQuickDragAttachedPrivate::startDrag(Qt::DropActions supportedAct
+     QDrag *drag = new QDrag(source ? source : q);
+     QMimeData *mimeData = new QMimeData();
+ 
+-    for (auto it = externalMimeData.cbegin(), end = externalMimeData.cend(); it != end; ++it)
+-        mimeData->setData(it.key(), it.value().toString().toUtf8());
++    for (auto it = externalMimeData.cbegin(), end = externalMimeData.cend(); it != end; ++it) {
++        if (it.value().typeId() == QMetaType::QByteArray)
++            mimeData->setData(it.key(), it.value().toByteArray());
++        else
++            mimeData->setData(it.key(), it.value().toString().toUtf8());
++    }
+ 
+     drag->setMimeData(mimeData);
+     if (pixmapLoader.isReady()) {
+-- 
+2.40.0
+
