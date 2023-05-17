@@ -21,7 +21,6 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 Source1:        %{name}-%{version}-govendor.tar.gz
 
 BuildRequires:  golang
-BuildRequires:  patch
 
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -116,6 +115,8 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %changelog
 * Mon May 15 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.11.0-1
 - Upgrade to v1.11.2
+- Removed patch for CVE-2023-25165
+- This version uses helm v3.11.1, which fixes CVE-2023-25165 and thus we do not need the patch file anymore
 
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-10
 - Bump release to rebuild with go 1.19.8
