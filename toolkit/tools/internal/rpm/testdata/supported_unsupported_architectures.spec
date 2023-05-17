@@ -8,6 +8,8 @@ Group:          Test
 Vendor:         Microsoft
 Distribution:   Mariner
 
+BuildArch:      noarch
+
 # Must contain only architectures not supported by CBL-Mariner!
 ExcludeArch:    i686
 
