@@ -1,0 +1,32 @@
+From 70b44dd18b9727e9aae857297265a751700a297e Mon Sep 17 00:00:00 2001
+From: Fushan Wen <qydwhotmail@gmail.com>
+Date: Tue, 10 Jan 2023 20:42:04 +0800
+Subject: [PATCH 16/19] Revert "Fix missing glyphs when using NativeRendering"
+
+This reverts commit da5e53b649f50cd9cdd89dadbba16f05e4070be2.
+
+It breaks fonts on Wayland when global scale > 100%.
+---
+ src/quick/scenegraph/qsgdefaultglyphnode_p.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp b/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp
+index fd128aa06e..f912da5799 100644
+--- a/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp
++++ b/src/quick/scenegraph/qsgdefaultglyphnode_p.cpp
+@@ -839,11 +839,9 @@ void QSGTextMaskMaterial::populate(const QPointF &p,
+     bool supportsSubPixelPositions = fontD->fontEngine->supportsSubPixelPositions();
+     for (int i=0; i<glyphIndexes.size(); ++i) {
+          QPointF glyphPosition = glyphPositions.at(i) + position;
+-         QFixedPoint fixedPointPosition = fixedPointPositions.at(i);
+-
+          QFixed subPixelPosition;
+          if (supportsSubPixelPositions)
+-             subPixelPosition = fontD->fontEngine->subPixelPositionForX(QFixed::fromReal(fixedPointPosition.x.toReal() * glyphCacheScaleX));
++             subPixelPosition = fontD->fontEngine->subPixelPositionForX(QFixed::fromReal(glyphPosition.x()));
+ 
+          QTextureGlyphCache::GlyphAndSubPixelPosition glyph(glyphIndexes.at(i), subPixelPosition);
+          const QTextureGlyphCache::Coord &c = cache->coords.value(glyph);
+-- 
+2.40.0
+
