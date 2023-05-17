@@ -28406,16 +28406,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "toolbox",
-          "version": "0.0.18",
-          "downloadUrl": "https://github.com/containers/toolbox/releases/download/0.0.18/toolbox-0.0.18.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tpm-quote-tools",
           "version": "1.0.4",
           "downloadUrl": "http://downloads.sourceforge.net/tpmquotetools/tpm-quote-tools-1.0.4.tar.gz"
