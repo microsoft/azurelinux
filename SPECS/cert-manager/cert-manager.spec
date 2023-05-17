@@ -19,9 +19,6 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
-# Should be removed once 'cert-manager' starts using the 3.12.0 version of 'helm' containing this commit:
-#   https://github.com/helm/helm/commit/5abcf74227bfe8e5a3dbf105fe62e7b12deb58d2
-Patch0:         CVE-2023-25165.patch
 
 BuildRequires:  golang
 BuildRequires:  patch
