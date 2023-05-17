@@ -108,7 +108,19 @@ tar xf %{SOURCE1}
 
 echo "Installing npm_modules"
 tar fx %{SOURCE2}
+find . -name 'parseQuery.js'
+echo "START node_modules/loader-utils/lib/parseQuery.js"
+echo "================================================="
+cat node_modules/loader-utils/lib/parseQuery.js
+echo "================================================="
+echo "END node_modules/loader-utils/lib/parseQuery.js"
+patch --version
 patch -p1 {PATCH0}
+echo "START node_modules/loader-utils/lib/parseQuery.js"
+echo "================================================="
+cat node_modules/loader-utils/lib/parseQuery.js
+echo "================================================="
+echo "END node_modules/loader-utils/lib/parseQuery.js"
 popd
 
 # Building using maven in offline mode.
