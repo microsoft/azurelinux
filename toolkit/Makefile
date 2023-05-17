@@ -30,35 +30,37 @@ include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
 
-UPDATE_TOOLCHAIN_LIST           ?= n
-REBUILD_PACKAGES                ?= y
-DOWNLOAD_SRPMS                  ?= n
-ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
-RUN_CHECK                       ?= n
-USE_PREVIEW_REPO                ?= n
-DISABLE_UPSTREAM_REPOS          ?= n
-DISABLE_DEFAULT_REPOS           ?= n
-TOOLCHAIN_CONTAINER_ARCHIVE     ?=
-TOOLCHAIN_ARCHIVE               ?=
-TOOLCHAIN_SOURCES_ARCHIVE       ?=
-CACHE_DIR                       ?=
-PACKAGE_CACHE_SUMMARY           ?=
-IMAGE_CACHE_SUMMARY             ?=
-INITRD_CACHE_SUMMARY            ?=
-PACKAGE_ARCHIVE                 ?=
-PACKAGE_BUILD_RETRIES           ?= 1
-CHECK_BUILD_RETRIES             ?= 1
-REFRESH_WORKER_CHROOT           ?= y
+UPDATE_TOOLCHAIN_LIST                ?= n
+REBUILD_PACKAGES                     ?= y
+DOWNLOAD_SRPMS                       ?= n
+ALLOW_SRPM_DOWNLOAD_FAIL             ?= n
+RUN_CHECK                            ?= n
+USE_PREVIEW_REPO                     ?= n
+DISABLE_UPSTREAM_REPOS               ?= n
+DISABLE_DEFAULT_REPOS                ?= n
+TOOLCHAIN_CONTAINER_ARCHIVE          ?=
+TOOLCHAIN_ARCHIVE                    ?=
+TOOLCHAIN_SOURCES_ARCHIVE            ?=
+CACHE_DIR                            ?=
+PACKAGE_CACHE_SUMMARY                ?=
+IMAGE_CACHE_SUMMARY                  ?=
+INITRD_CACHE_SUMMARY                 ?=
+PACKAGE_ARCHIVE                      ?=
+PACKAGE_BUILD_RETRIES                ?= 1
+CHECK_BUILD_RETRIES                  ?= 1
+REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
-CONCURRENT_PACKAGE_BUILDS       ?= 0
+CONCURRENT_PACKAGE_BUILDS            ?= 0
 # Set to 0 to print all available results.
-NUM_OF_ANALYTICS_RESULTS        ?= 10
-CLEANUP_PACKAGE_BUILDS          ?= y
-USE_PACKAGE_BUILD_CACHE         ?= y
-REBUILD_DEP_CHAINS              ?= y
-HYDRATED_BUILD                  ?= n
-TARGET_ARCH                     ?=
-ALLOW_TOOLCHAIN_REBUILDS        ?= n
+NUM_OF_ANALYTICS_RESULTS             ?= 10
+CLEANUP_PACKAGE_BUILDS               ?= y
+USE_PACKAGE_BUILD_CACHE              ?= y
+REBUILD_DEP_CHAINS                   ?= y
+HYDRATED_BUILD                       ?= n
+TARGET_ARCH                          ?=
+ALLOW_TOOLCHAIN_REBUILDS             ?= n
+RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
+IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n

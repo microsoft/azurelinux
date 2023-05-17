@@ -18,6 +18,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
@@ -297,6 +298,49 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	}
 
 	valid = true
+	return
+}
+
+/*check if a runNode already exists for the same version of the remoteNode, if exists, replace runNode in the lookup with remoteNode*/
+func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
+	var (
+		requestInterval, nodeInterval pkgjson.PackageVerInterval
+	)
+
+	if pkgNode.Type != TypeRemoteRun {
+		logger.Log.Tracef("Skipping %+v, not valid for replacing lookup", pkgNode)
+		return
+	}
+
+	if deferSort {
+		logger.Log.Tracef("Deferring sort for %s", pkgNode.FriendlyName())
+	}
+
+	requestInterval, err = pkgNode.VersionedPkg.Interval()
+	if err != nil {
+		return
+	}
+	samePkgNodes := g.lookupTable()[pkgNode.VersionedPkg.Name]
+	for _, lookupNode := range samePkgNodes {
+		if lookupNode.RunNode == nil {
+			continue
+		}
+		logger.Log.Debugf("Found an existing lookup entry for %s of type %s", pkgNode.FriendlyName(), lookupNode.RunNode.State.String())
+
+		if lookupNode.RunNode.Type != TypeLocalRun {
+			continue
+		}
+
+		nodeInterval, err = lookupNode.RunNode.VersionedPkg.Interval()
+		if err != nil {
+			return
+		}
+		//Exact lookup must match the exact node, including conditionals.
+		if requestInterval.Equal(&nodeInterval) {
+			logger.Log.Debugf("Replacing lookupNode %+v with %+v in lookup", lookupNode.RunNode, pkgNode)
+			lookupNode.RunNode = pkgNode
+		}
+	}
 	return
 }
 
@@ -607,6 +651,26 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 		return false
 	})
 	return nodes
+}
+
+func (g *PkgGraph) printLookupTable() {
+	for pkgname, list := range g.lookupTable() {
+		logger.Log.Debugf("----------------------------------")
+		logger.Log.Debugf("Package name: %s", pkgname)
+		for _, node := range list {
+			//check if node.RunNode is nil
+			if node.RunNode == nil {
+				logger.Log.Debugf("RunNode: NIL")
+			} else {
+				logger.Log.Debugf("RunNode: %s state: %s", node.RunNode.FriendlyName(), node.RunNode.State.String())
+			}
+			if node.BuildNode == nil {
+				logger.Log.Debugf("BuildNode: NIL")
+			} else {
+				logger.Log.Debugf("BuildNode: %s state: %s", node.BuildNode.FriendlyName(), node.BuildNode.State.String())
+			}
+		}
+	}
 }
 
 // AllRunNodes returns a list of all run nodes in the graph
@@ -1127,6 +1191,13 @@ func (g *PkgGraph) CreateSubGraph(rootNode *PkgNode) (subGraph *PkgGraph, err er
 	return
 }
 
+// The function will lock 'graphMutex' before performing the check if the mutex is not nil.
+func isSRPMAvailableUpstream(pkgGraph *PkgGraph, graphMutex *sync.RWMutex, srpmPath string, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (isAvailableUpstream bool, err error) {
+	expectedRpmNodes := NodesProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
+	isAvailableUpstream, err = findAllRPMSUpstream(expectedRpmNodes, ignoreVersionToResolveSelfDep, cloner)
+	return
+}
+
 // IsSRPMPrebuilt checks if an SRPM is prebuilt, returning true if so along with a slice of corresponding prebuilt RPMs.
 // The function will lock 'graphMutex' before performing the check if the mutex is not nil.
 func IsSRPMPrebuilt(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, expectedFiles, missingFiles []string) {
@@ -1202,10 +1273,9 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 
 // MakeDAG ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
-func (g *PkgGraph) MakeDAG() (err error) {
+func (g *PkgGraph) MakeDAG(resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	timestamp.StartEvent("convert to DAG", nil)
 	defer timestamp.StopEvent(nil)
-
 	var cycle []*PkgNode
 
 	for {
@@ -1214,7 +1284,7 @@ func (g *PkgGraph) MakeDAG() (err error) {
 			return
 		}
 
-		err = g.fixCycle(cycle)
+		err = g.fixCycle(cycle, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep, cloner)
 		if err != nil {
 			return formatCycleErrorMessage(cycle, err)
 		}
@@ -1253,7 +1323,7 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 // fixCycle attempts to fix a cycle. Cycles may be acceptable if:
 // - all nodes are from the same spec file or
 // - at least one of the nodes of the cycle represents a pre-built SRPM.
-func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
+func (g *PkgGraph) fixCycle(cycle []*PkgNode, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	logger.Log.Debugf("Found cycle: %v", cycle)
 
 	// Omit the first element of the cycle, since it is repeated as the last element
@@ -1264,7 +1334,7 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
 		return
 	}
 
-	return g.fixPrebuiltSRPMsCycle(trimmedCycle)
+	return g.fixPrebuiltSRPMsCycle(trimmedCycle, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep, cloner)
 }
 
 // fixIntraSpecCycle attempts to fix a cycle if none of the cycle nodes are build nodes.
@@ -1332,9 +1402,25 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 	return
 }
 
+func (g *PkgGraph) replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode, previousNode *PkgNode) {
+	parentNodes := g.To(currentNode.ID())
+	for parentNodes.Next() {
+		parentNode := parentNodes.Node().(*PkgNode)
+		if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == previousNode.SrpmPath {
+			g.RemoveEdge(parentNode.ID(), currentNode.ID())
+
+			err := g.AddEdge(parentNode, preBuiltNode)
+			if err != nil {
+				logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
+				return
+			}
+		}
+	}
+}
+
 // fixPrebuiltSRPMsCycle attempts to fix a cycle if at least one node is a pre-built SRPM.
 // If a cycle can be fixed, edges representing the build dependencies of the pre-built SRPM will be removed.
-func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
+func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
 
 	currentNode := trimmedCycle[len(trimmedCycle)-1]
@@ -1355,23 +1441,28 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 
 			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
-			parentNodes := g.To(currentNode.ID())
-			for parentNodes.Next() {
-				parentNode := parentNodes.Node().(*PkgNode)
-				if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == previousNode.SrpmPath {
-					g.RemoveEdge(parentNode.ID(), currentNode.ID())
-
-					err = g.AddEdge(parentNode, preBuiltNode)
-					if err != nil {
-						logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
-						return
-					}
-				}
-			}
+			g.replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode, previousNode)
 
 			return
 		}
+		if resolveCyclesFromUpstream {
+			isAvailableUpstream := false
+			isAvailableUpstream, err = isSRPMAvailableUpstream(g, nil, currentNode.SrpmPath, ignoreVersionToResolveSelfDep, cloner)
+			if buildToRunEdge && isAvailableUpstream {
+				//Mark node as unresolved remote to be fetched by pkgfetcher
+				logger.Log.Debugf("Cycle contains SRPM %s whose rpms are all available in PMC. MARK this node as remote unresolved", currentNode.SrpmPath)
+				logger.Log.Debugf("Cycle contains SRPM '%s' that is availabe in repo. Replacing edges from build nodes associated with '%s' with an edge to a new 'remote-unresolved' node.",
+					currentNode.SrpmPath, previousNode.SrpmPath)
+				upstreamAvailableNode := g.CloneNode(currentNode)
+				upstreamAvailableNode.State = StateUnresolved
+				upstreamAvailableNode.Type = TypeRemoteRun
 
+				logger.Log.Debugf("Adding a remote unresolved node '%s' with id %d.", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
+				g.replaceCurrentNodeWithPrebuiltNode(currentNode, upstreamAvailableNode, previousNode)
+				logger.Log.Info("Cycle resolved using upstream SRPMs.")
+				return
+			}
+		}
 		currentNode = previousNode
 	}
 
@@ -1409,6 +1500,49 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	logger.Log.Warn("╚════════════════════════════════════════════════════════════════════════════════════════════════╝")
 
 	return fmt.Errorf("cycles detected in dependency graph")
+}
+
+// NodesProvidedBySRPM returns all RPMs produced from a SRPM file.
+func NodesProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (rpmNodes []*PkgNode) {
+	if graphMutex != nil {
+		graphMutex.RLock()
+		defer graphMutex.RUnlock()
+	}
+
+	/*Get count of the number of rpms provided by the SRPM*/
+	count := 0
+	for _, node := range pkgGraph.AllRunNodes() {
+		if node.SrpmPath != srpmPath {
+			continue
+		}
+		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
+			continue
+		}
+		count++
+	}
+
+	rpmNodes = make([]*PkgNode, 0, count)
+	runNodes := pkgGraph.AllRunNodes()
+	for _, node := range runNodes {
+		if node.SrpmPath != srpmPath {
+			continue
+		}
+
+		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
+			continue
+		}
+
+		rpmNodes = append(rpmNodes, node)
+	}
+
+	return
+}
+
+func clearVersion(pkg *pkgjson.PackageVer) {
+	pkg.Version = ""
+	pkg.SVersion = ""
+	pkg.Condition = ""
+	pkg.SCondition = ""
 }
 
 // rpmsProvidedBySRPM returns all RPMs produced from a SRPM file.
@@ -1451,5 +1585,40 @@ func findAllRPMS(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) 
 	}
 	foundAllRpms = len(missingRpms) == 0
 
+	return
+}
+
+// findAllRPMSUpstream returns true if all RPMs requested are found in PMC/repo.
+//
+//	This is used to check if all RPMs are available in PMC/repo before starting a build.
+//	needs repo-list, manifest files rpmrepocloner
+func findAllRPMSUpstream(rpmsToFind []*PkgNode, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (foundAllRpms bool, err error) {
+	/*assuming allRPMs found, to be set to false on error return or when a package is not found*/
+	foundAllRpms = true
+	for _, node := range rpmsToFind {
+		logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
+		// Resolve nodes to exact package names so they can be referenced in the graph.
+		if ignoreVersionToResolveSelfDep {
+			/*clear Version information so that any available version and release can be used*/
+			clearVersion(node.VersionedPkg)
+		}
+		//initialize an array of strings to hold the resolved packages
+		var resolvedPackages []string
+		resolvedPackages, err = cloner.WhatProvides(node.VersionedPkg)
+		if err != nil {
+			foundAllRpms = false
+			msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
+			logger.Log.Debug(msg)
+			if node.Implicit {
+				logger.Log.Debug("Implicit node, might be available later, but still treated as not found")
+			}
+			return
+		}
+		if len(resolvedPackages) == 0 {
+			logger.Log.Debugf("Did not find (%s) in repos", node.VersionedPkg.Name)
+			foundAllRpms = false
+			logger.Log.Infof("failed to find any packages providing '%v'", node.VersionedPkg)
+		}
+	}
 	return
 }
