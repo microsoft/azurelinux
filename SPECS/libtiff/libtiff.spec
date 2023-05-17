@@ -65,7 +65,7 @@ make %{?_smp_mflags} -k check
 %changelog
 * Mon May 15 2023 Andrew Phelps <anphel@microsoft.com> - 4.5.0-2
 - Patch CVE-2023-0795 CVE-2023-0796 CVE-2023-0797 CVE-2023-0798 CVE-2023-0799
-- Patch CVE-2023-0801 CVE-2023-0802 CVE-2023-0803 CVE-2023-0804
+- Patch CVE-2023-0800 CVE-2023-0801 CVE-2023-0802 CVE-2023-0803 CVE-2023-0804
 
 * Mon Mar 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.5.0-1
 - Auto-upgrade to 4.5.0 - to fix CVE-2022-4645
