@@ -88,6 +88,7 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.12-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
+- License verified
 
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.12-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
