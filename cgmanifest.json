@@ -3746,6 +3746,16 @@
     {
       "component": {
         "type": "other",
+        "other": {
+          "name": "fonts-rpm-macros",
+          "version": "2.0.5",
+          "downloadUrl": ""
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
         "other": {
           "name": "font-util",
