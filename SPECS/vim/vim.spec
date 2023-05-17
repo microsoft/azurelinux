@@ -1,6 +1,6 @@
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1527
+Version:        9.0.1562
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -192,6 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed May 17 2023 Muhammad Falak <mwani@microsoft.com> - 9.0.1562-1
+- Bump version to address CVE-2023-2609 & CVE-2023-2610
+
 * Mon May 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1527-1
 - Auto-upgrade to 9.0.1527 - Fix CVE-2023-2426
 
