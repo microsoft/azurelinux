@@ -36,7 +36,7 @@ var (
 	reverseSearch = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
 
 	printTree       = app.Flag("tree", "Print output as a simple tree instead of a list").Bool()
-	verbosity       = app.Flag("verbosity", "Print the full node details (3), RPM (2), or SPEC name (1) for each result").Default("1").Int()
+	verbosity       = app.Flag("verbosity", "Print the full node details (4), limited details (3), RPM (2), or SPEC name (1) for each result").Default("1").Int()
 	maxDepth        = app.Flag("max-depth", "Maximum depth into the tree to scan, -1 for unlimited").Default("-1").Int()
 	printDuplicates = app.Flag("print-duplicates", "In tree mode, if there is a duplicate node in the tree don't replace it with '...'").Bool()
 	filterFile      = app.Flag("rpm-filter-file", "Filter the returned packages based on this list of *.rpm filenames (defaults to the x86_64 toolchain manifest './resources/manifests/package/toolchain_x86_64.txt' if it exists)").ExistingFile()
@@ -56,8 +56,8 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	// only understand verbosity from 1 - 3 (spec, rpm, full node)
-	if verbosity == nil || *verbosity > 3 || *verbosity < 1 {
+	// only understand verbosity from 1 - 4 (spec, rpm, details, full node)
+	if verbosity == nil || *verbosity > 4 || *verbosity < 1 {
 		verbosity = new(int)
 		*verbosity = 1
 	}
@@ -242,6 +242,8 @@ func formatNode(n *pkggraph.PkgNode, verbosity int) string {
 		return filepath.Base(n.RpmPath)
 	case 3:
 		return fmt.Sprintf("'%s' from node '%s'", filepath.Base(n.RpmPath), n.FriendlyName())
+	case 4:
+		return fmt.Sprintf("'%s'", n)
 	default:
 		logger.Log.Fatalf("Invalid verbosity level %v", verbosity)
 	}
