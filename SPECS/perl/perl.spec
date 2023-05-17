@@ -35,7 +35,7 @@ The Perl package contains the Practical Extraction and
 Report Language.
 %prep
 %setup -q
-pushd perl-%{version}/cpan
+pushd cpan
 %patch0 -p1
 popd
 sed -i 's/-fstack-protector/&-all/' Configure
@@ -91,7 +91,7 @@ make test TEST_SKIP_VERSION_CHECK=1
 -   Added %%license line automatically
 *   Fri May 8 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.28.1-3
 -   Undo caretx.c patch
-*   Thu Apr 29 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.28.1-2
+*   Wed Apr 29 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.28.1-2
 -   Patch caretx.c so perl works from chroot inside Doccker container
 *   Tue Apr 21 2020 Emre Girgin <mrgirgin@microsoft.com> 5.28.1-1
 -   Upgrade to 5.28.1.
