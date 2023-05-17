@@ -8,6 +8,8 @@ Group:          Test
 Vendor:         Microsoft
 Distribution:   Mariner
 
+BuildArch:      noarch
+
 # Must contain an architecture for each of the supported builds of CBL-Mariner!
 ExcludeArch:    x86_64 aarch64
 
