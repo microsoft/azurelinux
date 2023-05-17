@@ -35,7 +35,7 @@ The Perl package contains the Practical Extraction and
 Report Language.
 %prep
 %setup -q
-pushd cpan
+pushd cpan/CPAN
 %patch0 -p1
 popd
 sed -i 's/-fstack-protector/&-all/' Configure
