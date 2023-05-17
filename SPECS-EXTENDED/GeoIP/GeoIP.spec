@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:		GeoIP
 Version:	1.6.12
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Library for country/city/organization to IP address or hostname mapping
 License:	LGPLv2+
 URL:		http://www.maxmind.com/app/c
@@ -15,7 +15,6 @@ BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	sed
 BuildRequires:	zlib-devel
-Requires:	GeoIP-data
 
 
 # Old name of GeoIP library package
@@ -84,6 +83,9 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_libdir}/pkgconfig/geoip.pc
 
 %changelog
+* Wed May 17 2023 Andy Zaugg <azaugg@linkedin.com> - 1.6.12-8
+- Dropping GeoIP-data package requirement
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.12-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
