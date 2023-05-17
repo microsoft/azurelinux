@@ -412,21 +412,8 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 }
 
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
+// Packages will be placed in a flat directory.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
-	srcDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
-	repoDir := srcDir
-
-	if !buildpipeline.IsRegularBuild() {
-		// Docker based build doesn't use overlay so repo folder
-		// must be explicitely set to the RPMs cache folder
-		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
-	}
-
-	err = rpmrepomanager.OrganizePackagesByArch(srcDir, repoDir)
-	if err != nil {
-		return
-	}
-
 	err = r.initializeMountedChrootRepo(chrootDownloadDir)
 	if err != nil {
 		return
@@ -587,27 +574,25 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 }
 
 func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
-	tdnfArg = pkgVer.Name
 	// TDNF does not accept versioning information on implicit provides.
 	if pkgVer.IsImplicitPackage() {
 		if pkgVer.Condition != "" {
 			logger.Log.Warnf("Discarding version constraint for implicit package: %v", pkgVer)
 		}
+		tdnfArg = pkgVer.Name
 		return
 	}
 
 	// Treat <= as =
 	// Treat > and >= as "latest"
 	switch pkgVer.Condition {
-	case "<=":
-		logger.Log.Warnf("Treating '%s' version constraint as '=' for: %v", pkgVer.Condition, pkgVer)
-		fallthrough
-	case "=":
-		tdnfArg = fmt.Sprintf("%s-%s", tdnfArg, pkgVer.Version)
-	case "":
-		break
+	case "<=", "<", "=":
+		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
+	case "", ">", ">=":
+		tdnfArg = pkgVer.Name
 	default:
 		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+		tdnfArg = pkgVer.Name
 	}
 
 	return
