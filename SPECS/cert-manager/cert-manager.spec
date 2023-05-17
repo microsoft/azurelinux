@@ -65,10 +65,8 @@ Summary:        cert-manager's webhook binary
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
 
 %prep
-# Reserving 0-99 patches for the vendored dependencies from the *-govendor.tar.gz source.
-%autosetup -D -a 1 -N
-%autopatch -m100 -p1
-%patch0 -d vendor/helm.sh/helm/v3/ -p1
+%autosetup -p1
+%setup -q -T -D -a 1
 
 %build
 go build -o bin/acmesolver cmd/acmesolver/main.go
