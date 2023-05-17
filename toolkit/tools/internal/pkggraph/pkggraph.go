@@ -1013,8 +1013,9 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 	return
 }
 
-// AddGoalNode adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
-func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, strict bool) (goalNode *PkgNode, err error) {
+// AddGoalNode adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes.
+// useSRPMPath will use also include any additional matches based on the SRPM path, not just the package name.
+func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, strict bool, useSRPMPath bool) (goalNode *PkgNode, err error) {
 	// Check if we already have a goal node with the requested name
 	if g.FindGoalNode(goalName) != nil {
 		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
@@ -1056,6 +1057,9 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 	goalNode.This = goalNode
 	g.AddNode(goalNode)
 
+	// We want to expand the goal node to include all RPMs that use the same SRPM
+	srpmPathSet := make(map[string]bool)
+
 	for pkg := range goalSet {
 		var existingNode *LookupNode
 		// Try to find an exact match first (to make sure we match revision number exactly, if available)
@@ -1076,12 +1080,24 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 			goalEdge := g.NewEdge(goalNode, existingNode.RunNode)
 			g.SetEdge(goalEdge)
 			goalSet[pkg] = false
+			if useSRPMPath {
+				srpmPathSet[existingNode.RunNode.SrpmPath] = true
+			}
 		} else {
 			logger.Log.Warnf("Could not goal package %+v", pkg)
 			if strict {
 				logger.Log.Warnf("Missing %+v", pkg)
 				err = fmt.Errorf("could not find all goal nodes with strict=true")
 			}
+		}
+	}
+
+	//Now grab the nodes by SRPM path if we set useSRPMPath
+	for _, node := range g.AllRunNodes() {
+		if srpmPathSet[node.SrpmPath] {
+			logger.Log.Tracef("Found %s to satisfy SRPM linked goal %s", node, node.SrpmPath)
+			goalEdge := g.NewEdge(goalNode, node)
+			g.SetEdge(goalEdge)
 		}
 	}
 

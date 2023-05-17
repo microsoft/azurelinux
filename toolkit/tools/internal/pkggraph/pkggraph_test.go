@@ -226,6 +226,7 @@ func buildTestGraphHelper() (g *PkgGraph, err error) {
 }
 
 func checkTestGraph(t *testing.T, g *PkgGraph) {
+	t.Helper()
 	// Make sure we got the same graph back!
 	assert.Equal(t, len(allNodes), len(g.AllNodes()))
 	assert.Equal(t, len(runNodes)+len(unresolvedNodes), len(g.AllRunNodes()))
@@ -286,6 +287,29 @@ func TestCreateTestGraph(t *testing.T) {
 	checkTestGraph(t, g)
 }
 
+func TestReadWriteGraph(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	_ = os.Remove("test_graph.dot")
+	assert.NoError(t, err)
+	err = WriteDOTGraphFile(gOut, "test_graph.dot")
+	assert.NoError(t, err)
+
+	gIn := NewPkgGraph()
+	err = ReadDOTGraphFile(gIn, "test_graph.dot")
+	assert.NoError(t, err)
+	err = os.Remove("test_graph.dot")
+	assert.NoError(t, err)
+
+	checkTestGraph(t, gIn)
+
+	noGraph := NewPkgGraph()
+	err = ReadDOTGraphFile(noGraph, "no_such_file.dot")
+	assert.Error(t, err)
+}
+
 // TestNodeStateString checks the NoteState -> string functionality
 func TestNodeStateString(t *testing.T) {
 	assert.Equal(t, "Meta", StateMeta.String())
@@ -344,7 +368,7 @@ func TestDOTID(t *testing.T) {
 	assert.Equal(t, "D--REMOTE<Unresolved> (ID=0,TYPE=Remote,STATE=Unresolved)", pkgD1Unresolved.DOTID())
 
 	g := NewPkgGraph()
-	goal, err := g.AddGoalNode("test", nil, false)
+	goal, err := g.AddGoalNode("test", nil, false, false)
 	assert.NoError(t, err)
 	assert.Equal(t, "test (ID=0,TYPE=Goal,STATE=Meta)", goal.DOTID())
 
@@ -684,12 +708,12 @@ func TestLookupWithoutRunNodes(t *testing.T) {
 // Add a goal node
 func TestAddGoalToEmptyGraph(t *testing.T) {
 	g := NewPkgGraph()
-	goal, err := g.AddGoalNode("test", nil, false)
+	goal, err := g.AddGoalNode("test", nil, false, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test", goal.GoalName)
 
-	goal, err = g.AddGoalNode("test2", nil, true)
+	goal, err = g.AddGoalNode("test2", nil, true, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test2", goal.GoalName)
@@ -698,12 +722,12 @@ func TestAddGoalToEmptyGraph(t *testing.T) {
 // Make sure we can't add duplicate goal nodes
 func TestDuplicateGoal(t *testing.T) {
 	g := NewPkgGraph()
-	goal, err := g.AddGoalNode("test", nil, false)
+	goal, err := g.AddGoalNode("test", nil, false, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test", goal.GoalName)
 
-	_, err = g.AddGoalNode("test", nil, false)
+	_, err = g.AddGoalNode("test", nil, false, false)
 	assert.Error(t, err)
 }
 
@@ -714,7 +738,7 @@ func TestGoalWithPackages(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	goal, err := g.AddGoalNode("test", pkgVersions, false)
+	goal, err := g.AddGoalNode("test", pkgVersions, false, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, len(allNodes)+1, len(g.AllNodes()))
@@ -724,7 +748,7 @@ func TestGoalWithPackages(t *testing.T) {
 	goal, err = g.AddGoalNode("test2", []*pkgjson.PackageVer{
 		&pkgjson.PackageVer{Name: "A"},
 		&pkgjson.PackageVer{Name: "B"},
-	}, false)
+	}, false, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, len(allNodes)+2, len(g.AllNodes()))
@@ -739,8 +763,66 @@ func TestStrictGoalNodes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	_, err = g.AddGoalNode("test", []*pkgjson.PackageVer{&pkgjson.PackageVer{Name: "Not a package"}}, true)
+	_, err = g.AddGoalNode("test", []*pkgjson.PackageVer{&pkgjson.PackageVer{Name: "Not a package"}}, true, false)
 	assert.Error(t, err)
+}
+
+// Make sure we also get SRPM path matching if we request it
+func TestGoalWithSRPMs(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+
+	pkgASubPackage := pkgjson.PackageVer{Name: "A-subpkg", Version: "1"}
+	pkgASubPackageRun := buildRunNodeHelper(&pkgASubPackage)
+	// Grab the existing nodes srpm path
+	pkgASubPackageRun.SrpmPath = pkgARun.SrpmPath
+	// Add a copy to the graph
+	_, err = addNodeToGraphHelper(g, pkgASubPackageRun)
+	assert.NoError(t, err)
+
+	// Test with SRPM matching on
+	goal, err := g.AddGoalNode("test_with_srpm", []*pkgjson.PackageVer{&pkgA}, true, true)
+	assert.NoError(t, err)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	goalNodes := graph.NodesOf(g.From(goal.ID()))
+	assert.Equal(t, 2, len(goalNodes))
+
+	foundA := false
+	foundASub := false
+
+	for _, n := range goalNodes {
+		if n.(*PkgNode).Equal(pkgARun) {
+			foundA = true
+		} else if n.(*PkgNode).Equal(pkgASubPackageRun) {
+			foundASub = true
+		}
+	}
+	assert.True(t, foundA)
+	assert.True(t, foundASub)
+
+	// Test with SRPM matching off
+	goal, err = g.AddGoalNode("test_without_srpm", []*pkgjson.PackageVer{&pkgA}, true, false)
+	assert.NoError(t, err)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	goalNodes = graph.NodesOf(g.From(goal.ID()))
+	assert.Equal(t, 1, len(goalNodes))
+
+	foundA = false
+	foundASub = false
+
+	for _, n := range goalNodes {
+		if n.(*PkgNode).Equal(pkgARun) {
+			foundA = true
+		} else if n.(*PkgNode).Equal(pkgASubPackageRun) {
+			foundASub = true
+		}
+	}
+	assert.True(t, foundA)
+	assert.False(t, foundASub)
 }
 
 // Add a meta node which should link the two disconnected graph components in the test graph
@@ -894,29 +976,6 @@ func TestEncodeDecodeMultiDOT(t *testing.T) {
 	checkTestGraph(t, gFinal)
 }
 
-func TestReadWriteGraph(t *testing.T) {
-	gOut, err := buildTestGraphHelper()
-	assert.NoError(t, err)
-	assert.NotNil(t, gOut)
-
-	_ = os.Remove("test_graph.dot")
-	assert.NoError(t, err)
-	err = WriteDOTGraphFile(gOut, "test_graph.dot")
-	assert.NoError(t, err)
-
-	gIn := NewPkgGraph()
-	err = ReadDOTGraphFile(gIn, "test_graph.dot")
-	assert.NoError(t, err)
-	err = os.Remove("test_graph.dot")
-	assert.NoError(t, err)
-
-	checkTestGraph(t, gIn)
-
-	noGraph := NewPkgGraph()
-	err = ReadDOTGraphFile(noGraph, "no_such_file.dot")
-	assert.Error(t, err)
-}
-
 // Validate the reference graph is valid, and that it matches the output of the test graph.
 func TestReferenceDOTFile(t *testing.T) {
 	gIn := NewPkgGraph()
@@ -1014,7 +1073,7 @@ func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, gOut)
 
-	goalNode, err := gOut.AddGoalNode("test", nil, true)
+	goalNode, err := gOut.AddGoalNode("test", nil, true, false)
 	assert.NotNil(t, goalNode)
 	assert.NoError(t, err)
 

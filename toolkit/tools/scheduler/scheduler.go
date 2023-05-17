@@ -202,8 +202,9 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages, toolchainPackages []string, deltaBuild bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
+	const useSRPMPathMatching = false
 
-	isGraphOptimized, pkgGraph, goalNode, err := schedulerutils.InitializeGraph(inputFile, packagesToBuild, deltaBuild)
+	isGraphOptimized, pkgGraph, goalNode, err := schedulerutils.InitializeGraph(inputFile, packagesToBuild, deltaBuild, useSRPMPathMatching)
 	if err != nil {
 		return
 	}
@@ -410,6 +411,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
 // It will also attempt to subgraph the graph if it becomes solvable with the new implicit provides.
 func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode, err error) {
+	const useSRPMPathMatching = false
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
@@ -420,7 +422,7 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 	} else if didInjectAny {
 		// Failure to optimize the graph is non fatal as there may simply be unresolved dynamic dependencies
 		var subgraphErr error
-		newGraph, newGoalNode, subgraphErr = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit)
+		newGraph, newGoalNode, subgraphErr = schedulerutils.OptimizeGraph(pkgGraph, useCachedImplicit, useSRPMPathMatching)
 		if subgraphErr == nil {
 			logger.Log.Infof("Created solvable subgraph with new implicit provide information")
 			didOptimize = true

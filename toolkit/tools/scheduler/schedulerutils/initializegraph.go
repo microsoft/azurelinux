@@ -19,7 +19,7 @@ const (
 // InitializeGraph initializes and prepares a graph dot file for building.
 // - It will load and return the graph.
 // - It will subgraph the graph to only contain the desired packages if possible.
-func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, deltaBuild bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, deltaBuild bool, matchSRPMPath bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
@@ -32,12 +32,12 @@ func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, de
 		return
 	}
 
-	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, strictGoalNode)
+	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, strictGoalNode, matchSRPMPath)
 	if err != nil {
 		return
 	}
 
-	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit)
+	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit, matchSRPMPath)
 	if optimizeErr == nil {
 		logger.Log.Infof("Successfully created solvable subgraph")
 		isOptimized = true
@@ -55,7 +55,7 @@ func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, de
 }
 
 // OptimizeGraph will attempt to create a solvable subgraph that satisfies the build goal node.
-func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool, matchSRPMPath bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	buildGoalNode := pkgGraph.FindGoalNode(buildGoalNodeName)
 	if buildGoalNode == nil {
 		err = fmt.Errorf("could not find goal node %s", buildGoalNodeName)
@@ -71,7 +71,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (opti
 		}
 
 		// Create a solvable ALL goal node
-		goalNode, err = optimizedGraph.AddGoalNode(allGoalNodeName, nil, true)
+		goalNode, err = optimizedGraph.AddGoalNode(allGoalNodeName, nil, true, matchSRPMPath)
 		if err != nil {
 			logger.Log.Warnf("Failed to add goal node (%s), error: %s", allGoalNodeName, err)
 			return
