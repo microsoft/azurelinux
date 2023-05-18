@@ -15,7 +15,7 @@ BuildRequires:  openssl-libs
 BuildRequires:  pam-devel
 BuildRequires:  sed
 BuildRequires:  zlib-devel
-BuildRequires:  openldap
+BuildRequires:  openldap-devel
 Requires:       audit-libs
 Requires:       openssl-libs
 Requires:       pam
@@ -38,7 +38,6 @@ the ability to run some (or all) commands as root or another user while logging 
     --with-env-editor \
     --with-pam \
     --with-ldap \
-    --with-ldap-conf-file=/etc/sudo-ldap.conf \
     --with-linux-audit \
     --enable-zlib=system \
     --with-passprompt="[sudo] password for %p: "
