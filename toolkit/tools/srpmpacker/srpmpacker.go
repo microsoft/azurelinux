@@ -28,6 +28,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/spectosrpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
@@ -88,14 +89,6 @@ type packResult struct {
 	err      error
 }
 
-// specState holds the state of a SPEC file: if it should be packed and the resulting SRPM if it is.
-type specState struct {
-	specFile string
-	srpmFile string
-	toPack   bool
-	err      error
-}
-
 var (
 	app = kingpin.New("srpmpacker", "A tool to package a SRPM.")
 
@@ -109,6 +102,7 @@ var (
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
 	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	summaryFile  = app.Flag("summary-file", "Path to a file to write a summary of the SRPMs created.").String()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
@@ -192,8 +186,21 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
+	packagedSRPMs, err := createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
+
+	// Create empty summary file if one was specified and get a file handle to it for writing.
+	if *summaryFile != "" {
+		summaryFileHandle, err := os.Create(*summaryFile)
+		logger.PanicOnError(err)
+		defer summaryFileHandle.Close()
+
+		// Write each SRPM to the summary file.
+		for _, srpm := range packagedSRPMs {
+			_, err = summaryFileHandle.WriteString(srpm + "\n")
+			logger.PanicOnError(err)
+		}
+	}
 }
 
 // parsePackListFile will parse a list of packages to pack if one is specified.
@@ -231,7 +238,7 @@ func parsePackListFile(packListFile string) (packList map[string]bool, err error
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (packagedSRPMs []string, err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
@@ -244,7 +251,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	}
 
 	doCreateAll := func() error {
-		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, runCheck, packList, templateSrcConfig)
+		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, runCheck, packList, templateSrcConfig, &packagedSRPMs)
 	}
 
 	if chroot != nil {
@@ -270,58 +277,24 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 }
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
-func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration, packagedSRPMs *[]string) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 	timestamp.StartEvent("packing SRPMS", nil)
 	defer timestamp.StopEvent(nil)
 
 	timestamp.StartEvent("determining specs to pack", nil)
-	specFiles, err := findSPECFiles(specsDir, packList)
+	specFiles, err := spectosrpm.FindSPECFiles(specsDir, packList)
 	if err != nil {
 		return
 	}
 
-	specStates, err := calculateSPECsToRepack(specFiles, distTag, outDir, nestedSourcesDir, repackAll, runCheck, workers)
+	specStates, err := spectosrpm.CalculateSPECsToRepack(specFiles, distTag, outDir, nestedSourcesDir, repackAll, false, runCheck, workers)
 	if err != nil {
 		return
 	}
 	timestamp.StopEvent(nil)
 
-	err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
-	return
-}
-
-// findSPECFiles finds all SPEC files that should be considered for packing.
-// Takes into consideration a packList if provided.
-func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []string, err error) {
-	if len(packList) == 0 {
-		specSearch := filepath.Join(specsDir, "**/*.spec")
-		specFiles, err = filepath.Glob(specSearch)
-	} else {
-		for specName := range packList {
-			var specFile []string
-
-			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
-			specFile, err = filepath.Glob(specSearch)
-
-			// If a SPEC is in the pack list, it must be packed.
-			if err != nil {
-				return
-			}
-			if len(specFile) != 1 {
-				if strings.HasPrefix(specName, "msopenjdk-11") {
-					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
-					continue
-				} else {
-					err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
-					return
-				}
-			}
-
-			specFiles = append(specFiles, specFile[0])
-		}
-	}
-
+	*packagedSRPMs, err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
 	return
 }
 
@@ -395,191 +368,16 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	return
 }
 
-// calculateSPECsToRepack will check which SPECs should be packed.
-// If the resulting SRPM does not exist, or is older than a modification to
-// one of the files used by the SPEC then it is repacked.
-func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool, workers int) (states []*specState, err error) {
-	var wg sync.WaitGroup
-
-	requests := make(chan string, len(specFiles))
-	results := make(chan *specState, len(specFiles))
-	cancel := make(chan struct{})
-
-	logger.Log.Infof("Calculating SPECs to repack")
-
-	arch, err := rpm.GetRpmArch(runtime.GOARCH)
-	if err != nil {
-		return
-	}
-
-	// Start the workers now so they begin working as soon as a new job is buffered.
-	for i := 0; i < workers; i++ {
-		wg.Add(1)
-		go specsToPackWorker(requests, results, cancel, &wg, distTag, outDir, arch, nestedSourcesDir, repackAll, runCheck)
-	}
-
-	for _, specFile := range specFiles {
-		requests <- specFile
-	}
-
-	// Signal to the workers that there are no more new spec files
-	close(requests)
-
-	// Transfer the results from the channel into states.
-	//
-	// While the channel itself could be returned and passed to the consumer of
-	// the results, additional functionality would have to be added to limit the total workers
-	// in use at any given time.
-	//
-	// Since this worker pool and future worker pools in the application are opening file descriptors
-	// if too many are active at once it can exhaust the file descriptor limit.
-	// Currently all functions that employ workers pool of size `workers` are serialized,
-	// resulting in `workers` being the upper capacity at any given time.
-	totalToRepack := 0
-	states = make([]*specState, len(specFiles))
-	for i := 0; i < len(specFiles); i++ {
-		result := <-results
-		states[i] = result
-
-		if result.err != nil {
-			logger.Log.Errorf("Failed to check (%s). Error: %s", result.specFile, result.err)
-			err = result.err
-			close(cancel)
-			break
-		}
-
-		if result.toPack {
-			totalToRepack++
-		}
-	}
-
-	logger.Log.Debug("Waiting for outstanding workers to finish")
-	wg.Wait()
-
-	if err != nil {
-		return
-	}
-
-	logger.Log.Infof("Packing %d/%d SPECs", totalToRepack, len(specFiles))
-	return
-}
-
-// specsToPackWorker will process a channel of spec files that should be checked if packing is needed.
-func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, arch string, nestedSourcesDir, repackAll, runCheck bool) {
-	const (
-		queryFormat         = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
-		nestedSourceDirName = "SOURCES"
-	)
-
-	const (
-		srpmQueryResultsIndex   = iota
-		expectedQueryResultsLen = iota
-	)
-
-	defer wg.Done()
-
-	for specFile := range requests {
-		select {
-		case <-cancel:
-			logger.Log.Debug("Cancellation signal received")
-			return
-		default:
-		}
-
-		result := &specState{
-			specFile: specFile,
-		}
-
-		containingDir := filepath.Dir(specFile)
-
-		// Find the SRPM that this SPEC will produce.
-		defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
-
-		// Allow the user to configure if the SPEC sources are in a nested 'SOURCES' directory.
-		// Otherwise assume source files are next to the SPEC file.
-		sourceDir := containingDir
-		if nestedSourcesDir {
-			sourceDir = filepath.Join(sourceDir, nestedSourceDirName)
-		}
-		specQueryResults, err := rpm.QuerySPEC(specFile, sourceDir, queryFormat, arch, defines, rpm.QueryHeaderArgument)
-
-		if err != nil {
-			if err.Error() == rpm.NoCompatibleArchError {
-				logger.Log.Infof("Skipping SPEC (%s) due to incompatible build architecture", specFile)
-			} else {
-				result.err = err
-			}
-
-			results <- result
-			continue
-		}
-
-		if len(specQueryResults) != expectedQueryResultsLen {
-			result.err = fmt.Errorf("unexpected query results, wanted (%d) results but got (%d), results: %v", expectedQueryResultsLen, len(specQueryResults), specQueryResults)
-			results <- result
-			continue
-		}
-
-		// Resolve the full path of the SRPM that would be packed from this SPEC file.
-		producedSRPM := specQueryResults[srpmQueryResultsIndex]
-		fullSRPMPath := filepath.Join(outDir, producedSRPM)
-		result.srpmFile = fullSRPMPath
-
-		if repackAll {
-			result.toPack = true
-			results <- result
-			continue
-		}
-
-		// Sanity check that SRPMS is meant to be built for the machine architecture
-		isCompatible, err := rpm.SpecArchIsCompatible(specFile, sourceDir, arch, defines)
-		if err != nil {
-			result.err = err
-			results <- result
-			continue
-		}
-
-		if !isCompatible {
-			logger.Log.Infof(`Skipping (%s) since it cannot be built on current architecture.`, specFile)
-			results <- result
-			continue
-		}
-
-		// Check if the SRPM is already on disk and if so its modification time.
-		srpmInfo, err := os.Stat(fullSRPMPath)
-		if err != nil {
-			logger.Log.Debugf("Updating (%s) since (%s) is not yet built", specFile, fullSRPMPath)
-			result.toPack = true
-			results <- result
-			continue
-		}
-
-		// Check if a file used by the SPEC has been modified since the resulting SRPM was previously packed.
-		specModTime, latestFile, err := directory.LastModifiedFile(containingDir)
-		if err != nil {
-			result.err = fmt.Errorf("failed to query modification time for SPEC (%s). Error: %s", specFile, err)
-			results <- result
-			continue
-		}
-
-		if specModTime.After(srpmInfo.ModTime()) {
-			logger.Log.Debugf("Updating (%s) since (%s) has changed", specFile, latestFile)
-			result.toPack = true
-		}
-
-		results <- result
-	}
-}
-
 // packSRPMs will pack any SPEC files that have been marked as `toPack`.
-func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers int) (err error) {
+func packSRPMs(specStates []*spectosrpm.SpecState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers int) (packagedSRPMs []string, err error) {
 	tsRoot, _ := timestamp.StartEvent("packing SRPMs", nil)
 	defer timestamp.StopEvent(nil)
 	var wg sync.WaitGroup
 
-	allSpecStates := make(chan *specState, len(specStates))
+	allSpecStates := make(chan *spectosrpm.SpecState, len(specStates))
 	results := make(chan *packResult, len(specStates))
 	cancel := make(chan struct{})
+	packagedSRPMs = make([]string, 0, len(specStates))
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
@@ -609,6 +407,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 			continue
 		}
 
+		packagedSRPMs = append(packagedSRPMs, result.srpmFile)
 		logger.Log.Infof("Packed (%s) -> (%s)", filepath.Base(result.specFile), filepath.Base(result.srpmFile))
 	}
 
@@ -619,7 +418,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 }
 
 // packSRPMWorker will process a channel of SPECs and pack any that are marked as toPack.
-func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
+func packSRPMWorker(allSpecStates <-chan *spectosrpm.SpecState, results chan<- *packResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
 	defer wg.Done()
 
 	for specState := range allSpecStates {
@@ -633,18 +432,18 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 		ts, _ := timestamp.StartEvent(filepath.Base(specState.specFile), tsRoot)
 
 		result := &packResult{
-			specFile: specState.specFile,
+			specFile: specState.SpecFile,
 		}
 
 		// Its a no-op if the SPEC does not need to be packed
-		if !specState.toPack {
+		if !specState.ToPack {
 			results <- result
 			timestamp.StopEvent(ts)
 			continue
 		}
 
 		// Setup a source retrieval configuration based on the provided template
-		signaturesFilePath := specPathToSignaturesPath(specState.specFile)
+		signaturesFilePath := specPathToSignaturesPath(specState.SpecFile)
 		srcConfig, err := initializeSourceConfig(templateSrcConfig, signaturesFilePath)
 		if err != nil {
 			result.err = err
@@ -652,7 +451,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		fullOutDirPath := filepath.Dir(specState.srpmFile)
+		fullOutDirPath := filepath.Dir(specState.SrpmFile)
 		err = os.MkdirAll(fullOutDirPath, os.ModePerm)
 		if err != nil {
 			result.err = err
@@ -660,7 +459,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
+		outputPath, err := packSingleSPEC(specState.SpecFile, specState.SrpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
 		if err != nil {
 			result.err = err
 			results <- result
