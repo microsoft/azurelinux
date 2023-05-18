@@ -2,42 +2,47 @@
 [source.crates-io]
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/cloud-hypervisor/kvm-bindings?branch=ch-v0.6.0-tdx"]
+[source."https://github.com/cloud-hypervisor/kvm-bindings"]
 git = "https://github.com/cloud-hypervisor/kvm-bindings"
 branch = "ch-v0.6.0-tdx"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/cloud-hypervisor/versionize_derive?branch=ch"]
+[source."https://github.com/cloud-hypervisor/versionize_derive"]
 git = "https://github.com/cloud-hypervisor/versionize_derive"
 branch = "ch"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/firecracker-microvm/micro-http?branch=main"]
+[source."https://github.com/firecracker-microvm/micro-http"]
 git = "https://github.com/firecracker-microvm/micro-http"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/rust-vmm/acpi_tables?branch=main"]
+[source."https://github.com/rust-vmm/acpi_tables"]
 git = "https://github.com/rust-vmm/acpi_tables"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/rust-vmm/mshv?branch=main"]
+[source."https://github.com/rust-vmm/kvm-ioctls"]
+git = "https://github.com/rust-vmm/kvm-ioctls"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/mshv"]
 git = "https://github.com/rust-vmm/mshv"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/rust-vmm/vfio-user?branch=main"]
-git = "https://github.com/rust-vmm/vfio-user"
-branch = "main"
-replace-with = "vendored-sources"
-
-[source."git+https://github.com/rust-vmm/vfio?branch=main"]
+[source."https://github.com/rust-vmm/vfio"]
 git = "https://github.com/rust-vmm/vfio"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/rust-vmm/vm-fdt?branch=main"]
+[source."https://github.com/rust-vmm/vfio-user"]
+git = "https://github.com/rust-vmm/vfio-user"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/vm-fdt"]
 git = "https://github.com/rust-vmm/vm-fdt"
 branch = "main"
 replace-with = "vendored-sources"
