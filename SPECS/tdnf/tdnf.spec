@@ -107,7 +107,7 @@ python bindings for tdnf
 
 %package        autoupdate
 Summary:        systemd services for periodic automatic update
-Group:          Applciations/RPM
+Group:          Applications/RPM
 Requires:       %{name} = %{version}-%{release}
 
 %description autoupdate
