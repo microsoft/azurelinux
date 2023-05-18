@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.7
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Thu May 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-11
+- Bump release to rebuild with go 1.19.9
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-10
 - Bump release to rebuild with go 1.19.8
 
