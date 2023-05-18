@@ -2698,8 +2698,8 @@
         "type": "other",
         "other": {
           "name": "dmidecode",
-          "version": "3.3",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.3.tar.xz"
+          "version": "3.5",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.5.tar.xz"
         }
       }
     },
