@@ -8,7 +8,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "https://github.com/microsoft/CBL-Mariner/pull/84"
         },
         "CONFIG_DRM_AMDGPU_SI": {
             "value": [
@@ -82,7 +82,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "https://github.com/microsoft/CBL-Mariner/pull/3300"
         },
         "CONFIG_SCHEDSTATS": {
             "value": [
@@ -92,7 +92,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_BLK_DEV_IO_TRACE": {
             "value": [
@@ -112,7 +112,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_DELL_WMI_LED": {
             "value": [
@@ -133,7 +133,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_TASK_IO_ACCOUNTING": {
             "value": [
@@ -143,7 +143,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_DELL_SMBIOS_SMM": {
             "value": [
@@ -163,7 +163,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_TASK_XACCT": {
             "value": [
@@ -173,7 +173,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_INFINIBAND_BNXT_RE": {
             "value": [
@@ -216,7 +216,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "https://github.com/microsoft/CBL-Mariner/pull/5406"
         },
         "CONFIG_DELL_RBU": {
             "value": [
@@ -238,7 +238,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "https://github.com/microsoft/CBL-Mariner/pull/5283"
         },
         "CONFIG_DELL_SMBIOS_WMI": {
             "value": [
@@ -290,7 +290,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "https://github.com/microsoft/CBL-Mariner/pull/5283"
         },
         "CONFIG_DELL_WMI_AIO": {
             "value": [
@@ -322,7 +322,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_DELL_SMBIOS": {
             "value": [
@@ -354,7 +354,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "https://github.com/microsoft/CBL-Mariner/pull/135"
         },
         "CONFIG_HW_RANDOM_TPM": {
             "value": [
@@ -364,7 +364,7 @@
                 "AMD64"
             ],
             "comment": "Needed for customer",
-            "PR": null
+            "PR": "Initial CBL-Mariner PR"
         },
         "CONFIG_EDAC_SKX": {
             "value": [
