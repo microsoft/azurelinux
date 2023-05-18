@@ -22,51 +22,51 @@ def check_config_arch(input_file):
 
 # find the lines in the diff that contain +/- CONFIG
 # ignore the lines that contain @
+# return the set of words that follow +/-
 def find_matching_lines(input_string):
     pattern = r'(?!.*@)[+-]\s*.*CONFIG.*'
     matching_lines = re.findall(pattern, input_string)
-
-    return matching_lines
+    holder=[re.sub(r"\+|\-|=y|=m|\#|is not set", r"", s).strip() for s in matching_lines]
+    config_set = set(holder)
+    return config_set
 
 # parse diff for new kernel configs
 # check if they are in required configs
-def find_missing_words(json_file, arch, config_diff):
+def find_missing_configs(json_file, arch, config_diff):
     # Load the JSON object
     with open(json_file, 'r') as file:
         data = json.load(file)
-    configData = data['required-configs']
+    config_data = data['required-configs']
 
     # Extract the words from the string
     config_words = find_matching_lines(config_diff)
-    holder = [ s.replace('+', '').replace('-', '').replace('=y','').replace('=m','').replace(' is not set', '').replace('#', '').strip() for s in config_words]
-    wordSet = set(holder)
 
     # Find the missing words
-    missing_words = []
-    for word in wordSet:
-        if word not in configData or arch not in configData[word]["arch"] :
-            missing_words.append(word)
-    return missing_words
+    missing_configs = []
+    for word in config_words:
+        if word not in config_data or arch not in config_data[word]["arch"] :
+            missing_configs.append(word)
+    return missing_configs
 
 
 parser = argparse.ArgumentParser(
-description="Tool for checking if known required kernel configs are present.")
-parser.add_argument('--required_configs', help='path to json of required configs', required=True)
+description="Tool for checking new configs are present in required configs JSON.")
+parser.add_argument('--required_configs', help='path to JSON of required configs', required=True)
 parser.add_argument('--config_file', help='path to config', required=True)
-parser.add_argument('--config_str', help='config diff', required=True)
+parser.add_argument('--config_diff', help='config diff', required=True)
 args = parser.parse_args()
-requiredConfigs = args.required_configs
-configFile = args.config_file
-configDiff = args.config_str
-arch = check_config_arch(configFile)
+required_configs = args.required_configs
+config_file = args.config_file
+config_diff = args.config_diff
+arch = check_config_arch(config_file)
 
-missing_words = find_missing_words(requiredConfigs, arch, configDiff)
-print("Missing words:", missing_words)
-if len(missing_words) == 0:
+missing_configs = find_missing_configs(required_configs, arch, config_diff)
+print("Missing words:", missing_configs)
+if len(missing_configs) == 0:
     print("All configs are present in required configs")
 else:
-    print ("====================== Kernel new config verification FAILED for {0} ======================".format(arch))
-    print("New configs detected for {0}. Please add the following to toolkit/scripts/mariner-required-configs.json".format(arch))
-    for word in missing_words:
-        print('{0}'.format(word))
+    print (f"====================== Kernel new config verification FAILED for {arch} ======================")
+    print(f"New configs detected for {arch}. Please add the following to toolkit/scripts/mariner-required-configs.json")
+    for word in missing_configs:
+        print(word)
     sys.exit(1)

@@ -20,7 +20,7 @@ jobs:
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
@@ -36,10 +36,9 @@ jobs:
           echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
           echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
-
       # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
       - name: Setup Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
 
@@ -52,19 +51,19 @@ jobs:
           echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
           changed_configs=$(git diff-tree --diff-filter=d  --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/kernel/config.*$" || test $? = 1; })
           echo "Files to validate: '${changed_configs}'"
-          echo "updated-configs=$(echo ${changed_configs})" >> $GITHUB_ENV
+          echo "updated_configs=$(echo ${changed_configs})" >> $GITHUB_ENV
 
       # Check if new configs were added
       - name: Parse for new config changes
         run: |
           # Check for new configs in the PR
           # and check if they are in required configs
-          if [[ -n "${{ env.updated-configs }}" ]]; then
-            holder="${{ env.updated-configs }}"
-            for word in $holder; do
-              config_diff=$(git diff-tree -p -r ${{ env.base_sha }} ${{ github.sha }} -- ${word})
-              echo "config_diff for ${word} : ${config_diff}"
-              python3 .github/workflows/check_new_kernel_configs.py --required_configs=toolkit/scripts/mariner-required-configs.json --config_file="${word}" --config_str="${config_diff}"
+          if [[ -n "${{ env.updated_configs }}" ]]; then
+            holder="${{ env.updated_configs }}"
+            for file in $holder; do
+              config_diff=$(git diff-tree -p -r ${{ env.base_sha }} ${{ github.sha }} -- ${file})
+              echo "config_diff for ${file} : ${config_diff}"
+              python3 .github/workflows/check_new_kernel_configs.py --required_configs=toolkit/scripts/mariner-required-configs.json --config_file="${file}" --config_diff="${config_diff}"
             done
           fi
 

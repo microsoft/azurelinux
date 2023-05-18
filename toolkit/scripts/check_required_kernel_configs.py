@@ -23,7 +23,7 @@ def check_strings_in_file(json_file, arch, input_file):
     
     with open(json_file, 'r') as file:
         data = json.load(file)
-        configData = data['required-configs']
+        config_data = data['required-configs']
 
     with open(input_file, 'r') as file:
         contents = file.read().split("\n")
@@ -32,7 +32,7 @@ def check_strings_in_file(json_file, arch, input_file):
     missing_configs = {}
 
     # go through required configs
-    for key, value in configData.items():
+    for key, value in config_data.items():
         # check for arch
         if arch not in value['arch']:
             continue
@@ -40,7 +40,7 @@ def check_strings_in_file(json_file, arch, input_file):
         found = False
         for line in contents:
             # check for config in line (without extra _VALUE)
-            if "{0}=".format(key) in line or "{0} is not set".format(key) in line:
+            if f"{key}=" in line or f"{key} is not set" in line:
                 for val in value['value']:
                     if val in line and val != "":
                         found = True
@@ -60,12 +60,12 @@ def print_verbose(json_file, results):
 
     with open(json_file, 'r') as file:
         data = json.load(file)
-        configData = data['required-configs']
+        config_data = data['required-configs']
     print_data = [["Option", "Required Arch", "Expected Value", "Comment"]]
-    for key, value in configData.items():
+    for key, value in config_data.items():
         if arch in value['arch']:
             if key in results:
-                print_data.append([key, value['arch'], value['value'], "FAIL: Unexpected value: {0}. See: {1}".format(results[key][0], value['PR'])])
+                print_data.append([key, value['arch'], value['value'], f"FAIL: Unexpected value: {results[key][0]}. See: {value['PR']}"])
             else:
                 print_data.append([key, value['arch'], value['value'], "OK"])
     # Calculate maximum width for each column
@@ -90,18 +90,18 @@ if __name__ == '__main__':
     parser.add_argument('--config_file', help='path to config being checked', required=True)
     parser.add_argument('--verbose', action='store_true', help='get full report', required=False)
     args = parser.parse_args()
-    requiredConfigs = args.required_configs
-    configFile = args.config_file
-    arch = check_config_arch(configFile)
+    required_configs = args.required_configs
+    config_file = args.config_file
+    arch = check_config_arch(config_file)
 
     # result is map: {config: (newValue, expectedValue, comment, PR)}
-    result = check_strings_in_file(requiredConfigs, arch, configFile)
+    result = check_strings_in_file(required_configs, arch, config_file)
     print()
     print("===============================================================================")
-    print("== Results for {0} ==".format(configFile))
+    print(f"== Results for {config_file} ==")
     print("===============================================================================")
     if args.verbose:
-        print_verbose(requiredConfigs, result)
+        print_verbose(required_configs, result)
     else:
         if result == {}:
             print("All required configs are present")
@@ -109,8 +109,8 @@ if __name__ == '__main__':
             print()
             print ("----------------- Kernel config verification FAILED -----------------")
             for key, value in result.items():
-                print('{0} is "{1}", expected {2}.\nReason: {3}'.format(key, value[0], value[1], value[2]))
+                print(f'{key} is "{value[0]}", expected {value[1]}.\nReason: {value[2]}')
                 if value[3] != None:
-                    print('PR: {0}'.format(value[3]))
+                    print(f"PR: {value[3]}")
                 print()
             sys.exit(1)
