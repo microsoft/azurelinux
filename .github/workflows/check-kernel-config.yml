@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# This action checks that certain groups of specs have matching tags.
-# The main use case is to ensure that signed specs have the same Version and
-#   Release tags as their unsigned counterparts
+# This action checks that required kernel configs have not been removed or
+# modified to an undesirable value. It also checks that new configs added to
+# the kernel config files are in the list of required configs.
 name: Kernel Required Configs Check
 
 on:
