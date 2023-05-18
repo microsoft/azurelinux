@@ -1,4 +1,6 @@
 %undefine __cmake_in_source_build
+%define _tdnfpluginsdir %{_libdir}/tdnf-plugins
+%define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
 
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
@@ -60,9 +62,6 @@ BuildRequires:  python3-xml
 
 %description
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
-
-%define _tdnfpluginsdir %{_libdir}/tdnf-plugins
-%define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
 
 %package    devel
 Summary:        A Library providing C API for tdnf
