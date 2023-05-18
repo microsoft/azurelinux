@@ -2,6 +2,17 @@ From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 11 Apr 2023 17:44:54 +0000
 Subject: [PATCH] Fix the default distroverpkg
 
+fix default distroverpkg to prevent error:
+Error(1022) : distroverpkg config entry is set to a package that is not installed. Check /etc/tdnf/tdnf.conf
+
+Fixes: Bug 24144834: TDNF does not support $basearch and $releasever in .repo files - distroverpkg error
+
+By default, determine $ basearch and $ releasever from this package:
+mariner_user@mariner-aks [ /etc/tdnf ]$ sudo tdnf --refresh list installed | grep mariner
+mariner-release.noarch                      1.0-1.cm1                @System
+
+Workaround: add the following to /etc/tdnf/tdnf.conf
+distroverpkg=mariner-release
 ---
  client/defines.h | 2 +-
  common/config.h  | 2 +-
