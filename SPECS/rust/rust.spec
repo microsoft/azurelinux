@@ -9,20 +9,20 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.68.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
-# Notes: 
+# Notes:
 #  - rust source official repo is https://github.com/rust-lang/rust
 #  - cargo source official repo is https://github.com/rust-lang/cargo
 #  - crates.io source official repo is https://github.com/rust-lang/crates.io
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache, leverage the: generate_source_tarball.sh
-#   
+#
 # An example run for rust 1.68.2:
 # - Download Rust Source (1.68.2):
 #   wget https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz
@@ -39,6 +39,7 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Patch0:         CVE-2023-27477.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -162,6 +163,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Wed May 17 2023 Tobias Brick <tobiasb@microsoft.com> - 1.68.2-2
+- Fix CVE-2023-27477 by patching cranelift vulnerability that is exposed in rust
+
 * Tue Mar 28 2023 Muhammad Falak <mwani@microsoft.com> - 1.68.2-1
 - Bump version to 1.68.2 to revoke leaked github keys
 
