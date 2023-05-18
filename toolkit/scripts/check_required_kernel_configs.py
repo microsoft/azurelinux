@@ -63,10 +63,11 @@ def print_verbose(json_file, results):
         configData = data['required-configs']
     print_data = [["Option", "Required Arch", "Expected Value", "Comment"]]
     for key, value in configData.items():
-        if key in results:
-            print_data.append([key, value['arch'], value['value'], "FAIL: Unexpected value: {0}. See: {1}".format(results[key][0], value['PR'])])
-        else:
-            print_data.append([key, value['arch'], value['value'], "OK"])
+        if arch in value['arch']:
+            if key in results:
+                print_data.append([key, value['arch'], value['value'], "FAIL: Unexpected value: {0}. See: {1}".format(results[key][0], value['PR'])])
+            else:
+                print_data.append([key, value['arch'], value['value'], "OK"])
     # Calculate maximum width for each column
     column_widths = [max(len(str(row[i])) for row in print_data) for i in range(len(print_data[0]))]
 
@@ -76,7 +77,7 @@ def print_verbose(json_file, results):
             print(str(column).ljust(column_widths[i] + 2), end='')
         print()
         if j == 0:
-            print("-" * sum(column_widths) + "")
+            print("-------------------------------------------------------------------------------")
 
 
 ## Main
