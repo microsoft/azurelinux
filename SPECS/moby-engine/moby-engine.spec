@@ -4,7 +4,7 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.24
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -126,6 +126,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Thu May 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.24-2
+- Bump release to rebuild with go 1.19.9
+
 * Fri May 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.24-1
 - Auto-upgrade to 20.10.24 - since moby-cli was upgraded
 

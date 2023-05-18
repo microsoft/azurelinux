@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -146,6 +146,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu May 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.1-12
+- Bump release to rebuild with go 1.19.9
+
 * Wed Apr 19 2023 Bala <balakumaran.kannan@microsoft.com> - 3.5.1-11
 - Patch CVE-2021-28235
 - Update patch fuzz to 1 for backporting patch
