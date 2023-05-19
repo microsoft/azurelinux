@@ -7,4 +7,5 @@ package repomanager
 type RepoManager interface {
 	// CreateRepo will create a package repository at repoDir
 	CreateRepo(repoDir string) error
+	ValidateRpmPaths(repoDir string) error
 }

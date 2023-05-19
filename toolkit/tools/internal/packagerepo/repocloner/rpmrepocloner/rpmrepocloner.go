@@ -419,6 +419,22 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 		return
 	}
 
+	repoDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
+
+	if !buildpipeline.IsRegularBuild() {
+		// Docker based build doesn't use overlay so repo folder
+		// must be explicitely set to the RPMs cache folder
+		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
+	}
+
+	// Print warnings for any invalid RPMs
+	err = rpmrepomanager.ValidateRpmPaths(repoDir)
+	if err != nil {
+		logger.Log.Warnf("Failed to validate RPM paths: %s", err)
+		// We treat this as just a warning, not a real error.
+		err = nil
+	}
+
 	if !buildpipeline.IsRegularBuild() {
 		// Docker based build doesn't use overlay so cache repo
 		// must be explicitly initialized
