@@ -87,7 +87,6 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 %lang(sr) %{_datadir}/locale/uk/LC_SCRIPTS/ki18n5/
 
 %files devel
-%{_kf5_includedir}/ki18n_version.h
 %{_kf5_includedir}/KI18n/
 %{_kf5_libdir}/libKF5I18n.so
 %{_kf5_libdir}/cmake/KF5I18n/

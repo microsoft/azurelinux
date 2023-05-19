@@ -59,15 +59,16 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 %files -f kwidgetsaddons5_qt.lang
 %doc README.md
 %license LICENSES/*
-%{_kf5_libdir}/libKF5WidgetsAddons.so.*
 %{_kf5_datadir}/kf5/kcharselect/
+%{_kf5_datadir}/qlogging-categories5/kwidgetsaddons.*
+%{_kf5_libdir}/libKF5WidgetsAddons.so.*
+%{_kf5_qtplugindir}/designer/kwidgetsaddons5widgets.so
 
 %files devel
+%{_kf5_archdatadir}/mkspecs/modules/qt_KWidgetsAddons.pri
 %{_kf5_includedir}/KWidgetsAddons/
 %{_kf5_libdir}/libKF5WidgetsAddons.so
 %{_kf5_libdir}/cmake/KF5WidgetsAddons/
-%{_kf5_archdatadir}/mkspecs/modules/qt_KWidgetsAddons.pri
-
 
 %changelog
 * Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1

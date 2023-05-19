@@ -102,7 +102,6 @@ popd
 %{_kf5_libdir}/libKF5ConfigGui.so.*
 
 %files devel
-%{_kf5_includedir}/kconfig_version.h
 %{_kf5_includedir}/KConfigCore/
 %{_kf5_includedir}/KConfigGui/
 %{_kf5_libdir}/libKF5ConfigCore.so
