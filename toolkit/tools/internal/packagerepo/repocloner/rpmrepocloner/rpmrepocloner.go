@@ -605,10 +605,12 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	switch pkgVer.Condition {
 	case "<=", "<", "=":
 		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
-	default:
+	case ">", ">=", "":
 		if pkgVer.Condition != "" {
 			logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
 		}
+	default:
+		logger.Log.Errorf("Unsupported version constraint: %s", pkgVer.Condition)
 	}
 
 	return
