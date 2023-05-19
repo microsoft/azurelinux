@@ -1093,11 +1093,13 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 	}
 
 	//Now grab the nodes by SRPM path if we set useSRPMPath
-	for _, node := range g.AllRunNodes() {
-		if srpmPathSet[node.SrpmPath] {
-			logger.Log.Tracef("Found %s to satisfy SRPM linked goal %s", node, node.SrpmPath)
-			goalEdge := g.NewEdge(goalNode, node)
-			g.SetEdge(goalEdge)
+	if useSRPMPath {
+		for _, node := range g.AllRunNodes() {
+			if srpmPathSet[node.SrpmPath] {
+				logger.Log.Tracef("Found %s to satisfy SRPM linked goal %s", node, node.SrpmPath)
+				goalEdge := g.NewEdge(goalNode, node)
+				g.SetEdge(goalEdge)
+			}
 		}
 	}
 
