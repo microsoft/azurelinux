@@ -2,10 +2,14 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
 Name:           kf5-%{framework}
-Version:        5.61.0
-Release:        4%{?dist}
+Version:        5.106.0
+Release:        1%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon for localization
-License:        BSD and LGPLv2+
+# Licenses retrieved from source files with:
+# grep -hR -oP "(?<=SPDX-License-Identifier: ).*" <source_dir>/* | sort | uniq
+# and:
+# ls -la <source_dir>/LICENSES/
+License:        BSD-3-Clause AND CC0-1.0 AND LGPL-2.0-or-later AND (LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL) AND LGPL-2.1-or-later AND ODbL-1.0
 URL:            https://cgit.kde.org/%{framework}.git
 Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
@@ -63,7 +67,7 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 %files -f %{name}.lang
 %doc README.md
-%license COPYING.LIB
+%license LICENSES/*
 %{_kf5_libdir}/libKF5I18n.so.*
 %{_kf5_qtplugindir}/kf5/ktranscript.so
 %lang(ca) %{_datadir}/locale/ca/LC_SCRIPTS/ki18n5/
@@ -90,6 +94,10 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 
 %changelog
+* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
+- Updating to 5.106.0 to fix build issues with newer versions of Qt5.
+- Updated license information.
+
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 5.61.0-4
 - Remove python2, replace with python3
 
