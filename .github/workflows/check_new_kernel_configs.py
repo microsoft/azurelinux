@@ -9,10 +9,16 @@ import argparse
 import sys
 import re
 
+def check_kernel(input_file):
+    match = re.search(r'SPECS/(.*?)/', input_file)
+    if match:
+        return match.group(1)
+    else:
+        return None
+
 def check_config_arch(input_file):
     with open(input_file, 'r') as file:
         contents = file.read()
-    file.close()
     if "Linux/x86_64" in contents:
         return "AMD64"
     elif "Linux/arm64" in contents:
@@ -32,11 +38,14 @@ def find_matching_lines(input_string):
 
 # parse diff for new kernel configs
 # check if they are in required configs
-def find_missing_configs(json_file, arch, config_diff):
+def find_missing_configs(json_file, kernel, arch, config_diff):
     # Load the JSON object
     with open(json_file, 'r') as file:
         data = json.load(file)
-    config_data = data['required-configs']
+        if kernel not in data:
+            print(f"Kernel {kernel} not found in {json_file}")
+            return None
+        config_data = data[kernel]['required-configs']
 
     # Extract the words from the string
     config_words = find_matching_lines(config_diff)
@@ -58,9 +67,23 @@ args = parser.parse_args()
 required_configs = args.required_configs
 config_file = args.config_file
 config_diff = args.config_diff
-arch = check_config_arch(config_file)
 
-missing_configs = find_missing_configs(required_configs, arch, config_diff)
+kernel = check_kernel(config_file)
+if kernel == None:
+    print("Kernel not found in config filepath")
+    sys.exit(1)
+
+arch = check_config_arch(config_file)
+if arch == None:
+    print("Architecture not found in config file")
+    sys.exit(1)
+
+
+missing_configs = find_missing_configs(required_configs, kernel, arch, config_diff)
+if missing_configs == None:
+    print(f"Could not find required configs for {kernel}")
+    sys.exit(0)
+
 print("Missing words:", missing_configs)
 if len(missing_configs) == 0:
     print("All configs are present in required configs")

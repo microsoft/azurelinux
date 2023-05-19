@@ -7,11 +7,19 @@
 import json
 import argparse
 import sys
+import re
+
+def check_kernel(input_file):
+    match = re.search(r'SPECS/(.*?)/', input_file)
+    if match:
+        return match.group(1)
+    else:
+        return None
+
 
 def check_config_arch(input_file):
     with open(input_file, 'r') as file:
         input_config = file.read()
-    file.close()
     if "Linux/x86_64" in input_config:
         return "AMD64"
     elif "Linux/arm64" in input_config:
@@ -19,11 +27,13 @@ def check_config_arch(input_file):
     else:
         return None
 
-def check_strings_in_file(json_file, arch, input_file):
-    
+def check_strings_in_file(json_file, kernel, arch, input_file):
     with open(json_file, 'r') as file:
         data = json.load(file)
-        required_configs_data = data['required-configs']
+        if kernel not in data:
+            print(f"Kernel {kernel} not found in {json_file}")
+            return None
+        required_configs_data = data[kernel]['required-configs']
 
     with open(input_file, 'r') as file:
         input_config = file.read().split("\n")
@@ -93,14 +103,30 @@ if __name__ == '__main__':
     args = parser.parse_args()
     required_configs = args.required_configs
     config_file = args.config_file
-    arch = check_config_arch(config_file)
 
-    # result is map: {config: (newValue, expectedValue, comment, PR)}
-    result = check_strings_in_file(required_configs, arch, config_file)
+    kernel = check_kernel(config_file)
+    if kernel == None:
+        print("Kernel not found in config filepath")
+        sys.exit(1)
+
+    arch = check_config_arch(config_file)
+    if arch == None:
+        print("Architecture not found in config file")
+        sys.exit(1)
+
     print()
     print("===============================================================================")
     print(f"== Results for {config_file} ==")
     print("===============================================================================")
+
+    # result is map: {config: (newValue, expectedValue, comment, PR)}
+    result = check_strings_in_file(required_configs, kernel, arch, config_file)
+    # check if required configs are present
+    # not an error is not all kernels are being checked
+    if result == None:
+        print(f"No required configs for {kernel} in json")
+        sys.exit(0)
+    
     if args.verbose:
         print_verbose(required_configs, result)
     else:
