@@ -1,0 +1,49 @@
+diff --git a/src/linguist/lprodump/main.cpp b/src/linguist/lprodump/main.cpp
+index 857786b..2a65299 100644
+--- a/src/linguist/lprodump/main.cpp
++++ b/src/linguist/lprodump/main.cpp
+@@ -438,7 +438,7 @@ int main(int argc, char **argv)
+     ProFileGlobals option;
+     option.qmake_abslocation = QString::fromLocal8Bit(qgetenv("QMAKE"));
+     if (option.qmake_abslocation.isEmpty())
+-        option.qmake_abslocation = app.applicationDirPath() + QLatin1String("/qmake");
++        option.qmake_abslocation = app.applicationDirPath() + QLatin1String("/qmake-qt5");
+     option.debugLevel = proDebug;
+     option.initProperties();
+     option.setCommandLineArguments(QDir::currentPath(),
+diff --git a/src/linguist/lrelease-pro/main.cpp b/src/linguist/lrelease-pro/main.cpp
+index 9f4ca25..207f401 100644
+--- a/src/linguist/lrelease-pro/main.cpp
++++ b/src/linguist/lrelease-pro/main.cpp
+@@ -145,6 +145,6 @@ int main(int argc, char **argv)
+         projectDescription->setAutoRemove(false);
+     lreleaseOptions << QStringLiteral("-project") << projectDescription->fileName();
+ 
+-    runQtTool(QStringLiteral("lrelease"), lreleaseOptions);
++    runQtTool(QStringLiteral("lrelease-qt5"), lreleaseOptions);
+     return 0;
+ }
+diff --git a/src/linguist/lupdate-pro/main.cpp b/src/linguist/lupdate-pro/main.cpp
+index ab5b7eb..1ce039c 100644
+--- a/src/linguist/lupdate-pro/main.cpp
++++ b/src/linguist/lupdate-pro/main.cpp
+@@ -154,6 +154,6 @@ int main(int argc, char **argv)
+         projectDescription->setAutoRemove(false);
+     lupdateOptions << QStringLiteral("-project") << projectDescription->fileName();
+ 
+-    runQtTool(QStringLiteral("lupdate"), lupdateOptions);
++    runQtTool(QStringLiteral("lupdate-qt5"), lupdateOptions);
+     return 0;
+ }
+diff --git a/src/linguist/shared/runqttool.cpp b/src/linguist/shared/runqttool.cpp
+index e36a3a2..020fe06 100644
+--- a/src/linguist/shared/runqttool.cpp
++++ b/src/linguist/shared/runqttool.cpp
+@@ -114,6 +114,6 @@ std::unique_ptr<QTemporaryFile> createProjectDescription(QStringList args)
+     }
+     file->close();
+     args << QStringLiteral("-out") << file->fileName();
+-    runQtTool(QStringLiteral("lprodump"), args);
++    runQtTool(QStringLiteral("lprodump-qt5"), args);
+     return file;
+ }

@@ -32,15 +32,15 @@
 
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
-Version:      5.12.11
-Release:      4%{?dist}
-# See LICENSE.GPL3-EXCEPT.txt, for exception details
+Version:      5.15.9
+Release:      1%{?dist}
+# See LICENSE.GPL3-EXCEPT, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 URL:          https://qt-project.org/
 %global       majmin %(echo %{version} | cut -d. -f1-2)
-Source0:      https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0:      https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz
 
 BuildRequires: build-essential
 BuildRequires: systemd
@@ -73,7 +73,7 @@ Source5: qconfig-multilib.h
 
 # xinitrc script to check for OpenGL 1 only drivers and automatically set
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
-#Source6: 10-qt5-check-opengl2.sh
+Source6: 10-qt5-check-opengl2.sh
 
 # macros
 Source10: macros.qt5-qtbase
@@ -81,23 +81,12 @@ Source10: macros.qt5-qtbase
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
-# fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
-
-# borrowed from opensuse
-# track private api via properly versioned symbols
-# downside: binaries produced with these differently-versioned symbols are no longer
-# compatible with qt-project.org's Qt binary releases.
-Patch8: tell-the-truth-about-private-api.patch
+# make mixing versions with private apis a warning instead of fatal error
+Patch3: qtbase-everywhere-src-5.15.6-private_api_warning.patch
 
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 Patch50: qtbase-opensource-src-5.8.0-QT_VERSION_CHECK.patch
-
-# 1381828 - Broken window scaling for some QT5 applications (#1381828)
-# This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
-# the same value GNOME uses. It's not a complete solution...
-Patch51: qtbase-hidpi_scale_at_192.patch
 
 # 1. Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -112,23 +101,34 @@ Patch53: qtbase-everywhere-src-5.12.1-qt5gui_cmake_isystem_includes.patch
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
+# don't use relocatable heuristics to guess prefix when using -no-feature-relocatable
+Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
+
+# fix FTBFS against libglvnd-1.3.4+
+Patch56: qtbase-everywhere-src-5.15.2-libglvnd.patch
+
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.12.1-firebird.patch
+Patch63: qt5-qtbase-5.12.1-firebird.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
-
-# python3
-Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
 # https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
 
 ## upstream patches
+# Fix CVE-2022-27404, CVE-2022-27405, CVE-2022-27406
+Patch100: CVE-2022-27404.patch
+
+# Fix CVE-2022-37434
+Patch101: CVE-2022-37434.patch
+
+# Fix CVE-2023-24607
+Patch102: CVE-2023-24607.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -139,16 +139,47 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # filter plugin provides
 %global __provides_exclude_from ^%{_qt5_plugindir}/.*\\.so$
 
-# http://bugzilla.redhat.com/1196359
-%global dbus -dbus-linked
+BuildRequires: cups-devel
+BuildRequires: desktop-file-utils
+BuildRequires: findutils
+BuildRequires: libjpeg-devel
+BuildRequires: libtiff-devel
+BuildRequires: pkgconfig(alsa)
+# required for -accessibility
+BuildRequires: pkgconfig(atspi-2)
+BuildRequires: pkgconfig(dbus-1)
+BuildRequires: pkgconfig(libdrm)
+BuildRequires: pkgconfig(fontconfig)
+BuildRequires: pkgconfig(gl)
+BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: pkgconfig(gtk+-3.0)
 # xcb-sm
+BuildRequires: pkgconfig(ice) pkgconfig(sm)
+BuildRequires: pkgconfig(libpng)
+BuildRequires: pkgconfig(libinput)
+BuildRequires: pkgconfig(xcb-xkb) >= 1.10
+BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
+BuildRequires: pkgconfig(xkeyboard-config)
+%global vulkan 1
+BuildRequires: pkgconfig(vulkan)
 %global egl 0
-## TODO: apparently only needed if building opengl_es2 support, do we actually use it?  -- rex
-## this dep was removed in rawhide with introduction of mesa-19.1
-# System sqlite doesn't work (?)
-%global sqlite -qt-sqlite
-%global harfbuzz -system-harfbuzz
-%global pcre -system-pcre
+BuildRequires: libicu-devel
+%global pcre -qt-pcre
+BuildRequires: pkgconfig(zlib)
+BuildRequires: pkgconfig(libzstd)
+BuildRequires: perl-generators
+
+%if 0%{?tests}
+BuildRequires: dbus-x11
+BuildRequires: mesa-dri-drivers
+BuildRequires: time
+BuildRequires: xorg-x11-server-Xvfb
+%endif
+
+## Sql drivers
+%global ibase -no-sql-ibase
+%global tds -no-sql-tds
 
 # workaround gold linker bug(s) by not using it
 # https://bugzilla.redhat.com/1458003
@@ -215,26 +246,27 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
+## downstream patches
+%patch -P3 -p1 -b .private_api_warning
+
 ## upstream fixes
 
-%patch4 -p1 -b .QTBUG-35459
-# omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
-%patch8 -p1
-
 %patch50 -p1 -b .QT_VERSION_CHECK
-%patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
+%patch55 -p1 -b .no_relocatable
+%patch56 -p1 -b .libglvnd
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-%patch64 -p1 -b .firebird
+%patch63 -p1 -b .firebird
 %patch65 -p1 -b .mysql
-%patch68 -p1
 
 %patch80 -p1 -b .use-wayland-on-gnome.patch
 
 ## upstream patches
 
+# apply CVE fixes
+%autopatch -p1 100 101 102
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -258,7 +290,6 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
 
 # gcc 11 requires <limits> to be explicitly included for std::numeric_limits
 sed -i 's/#  include <utility>/#  include <utility>\n#  include <limits>/g' src/corelib/global/qglobal.h
-
 
 %build
 ## FIXME/TODO:
@@ -286,13 +317,10 @@ ls /sbin
 echo USRBIN
 ls /usr/bin/
 
-
 ./configure \
   -verbose \
-  -opensource \
   -confirm-license \
-  -platform linuxfb \
-  -no-opengl \
+  -opensource \
   -prefix %{_qt5_prefix} \
   -archdatadir %{_qt5_archdatadir} \
   -bindir %{_qt5_bindir} \
@@ -320,24 +348,29 @@ ls /usr/bin/
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
+  -no-reduce-relocations \
   -no-rpath \
   -no-separate-debug-info \
   %{?no_sse2} \
   -no-strip \
+  -system-libjpeg \
+  -system-libpng \
   %{?harfbuzz} \
   %{?pcre} \
   %{?sqlite} \
   %{?tds} \
   %{?xcb} \
   %{?xkbcommon} \
-  -zlib \
+  -system-zlib \
   %{?use_gold_linker} \
+  -no-directfb \
+  -no-feature-relocatable \
   %{?no_feature_renameat2} \
   %{?no_feature_statx} \
+  %{?no_feature_getentropy} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
-
 
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
 make clean -C qmake
@@ -394,10 +427,9 @@ sed -i \
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
 
-# hardlink binaries from %{_qt5_bindir} to {_bindir}, add -qt5 postfix to not conflict
+# hardlink files to {_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
-
 for i in * ; do
   case "${i}" in
     moc|qdbuscpp2xml|qdbusxml2cpp|qmake|rcc|syncqt|uic)
@@ -410,6 +442,12 @@ for i in * ; do
   esac
 done
 popd
+
+%ifarch %{multilib_archs}
+# multilib: qconfig.h
+  mv %{buildroot}%{_qt5_headerdir}/QtCore/qconfig.h %{buildroot}%{_qt5_headerdir}/QtCore/qconfig-%{__isa_bits}.h
+  install -p -m644 -D %{SOURCE5} %{buildroot}%{_qt5_headerdir}/QtCore/qconfig.h
+%endif
 
 # qtchooser conf
 %if 0%{?qtchooser}
@@ -435,10 +473,15 @@ for prl_file in libQt5*.prl ; do
 done
 popd
 
+install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
+
 # install privat headers for qtxcb
 mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
 install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt5_headerdir}/QtXcb/
 
+# drop Qt5Bootstrap from -static (#2017661)
+rm -f %{buildroot}%{_qt5_libdir}/libQt5Bootstrap.*a
+rm -f %{buildroot}%{_qt5_libdir}/libQt5Bootstrap.prl
 
 %check
 # verify Qt5.pc
@@ -508,7 +551,6 @@ fi
 %license LICENSE.FDL
 %license LICENSE.GPL*
 %license LICENSE.LGPL*
-%license LICENSE.QT-LICENSE-AGREEMENT-4.2
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -521,7 +563,6 @@ fi
 %{_qt5_libdir}/libQt5Core.so.5*
 %{_qt5_libdir}/libQt5DBus.so.5*
 %{_qt5_libdir}/libQt5Network.so.5*
-%{_qt5_libdir}/libQt5PrintSupport.so.5*
 %{_qt5_libdir}/libQt5Sql.so.5*
 %{_qt5_libdir}/libQt5Test.so.5*
 %{_qt5_libdir}/libQt5Xml.so.5*
@@ -532,6 +573,7 @@ fi
 %dir %{_qt5_libdir}/cmake/Qt5DBus/
 %dir %{_qt5_libdir}/cmake/Qt5Gui/
 %dir %{_qt5_libdir}/cmake/Qt5Network/
+%dir %{_qt5_libdir}/cmake/Qt5OpenGL/
 %dir %{_qt5_libdir}/cmake/Qt5PrintSupport/
 %dir %{_qt5_libdir}/cmake/Qt5Sql/
 %dir %{_qt5_libdir}/cmake/Qt5Test/
@@ -539,6 +581,7 @@ fi
 %dir %{_qt5_libdir}/cmake/Qt5Xml/
 %dir %{_qt5_docdir}/
 %{_qt5_docdir}/global/
+%{_qt5_docdir}/config/
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
 %if "%{_qt5_prefix}" != "%{_prefix}"
@@ -563,6 +606,7 @@ fi
 %dir %{_qt5_plugindir}/platforminputcontexts/
 %dir %{_qt5_plugindir}/platforms/
 %dir %{_qt5_plugindir}/platformthemes/
+%dir %{_qt5_plugindir}/printsupport/
 %dir %{_qt5_plugindir}/script/
 %dir %{_qt5_plugindir}/sqldrivers/
 %dir %{_qt5_plugindir}/styles/
@@ -587,6 +631,7 @@ fi
 %{_bindir}/qlalr
 %{_bindir}/fixqt4headers.pl
 %{_bindir}/qvkgen
+%{_bindir}/tracegen
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
@@ -605,6 +650,7 @@ fi
 %{_qt5_headerdir}/QtDBus/
 %{_qt5_headerdir}/QtGui/
 %{_qt5_headerdir}/QtNetwork/
+%{_qt5_headerdir}/QtOpenGL/
 %{_qt5_headerdir}/QtPlatformHeaders/
 %{_qt5_headerdir}/QtPrintSupport/
 %{_qt5_headerdir}/QtSql/
@@ -614,6 +660,11 @@ fi
 %{_qt5_headerdir}/QtXml/
 %{_qt5_headerdir}/QtInputSupport
 %{_qt5_headerdir}/QtEdidSupport
+%{_qt5_headerdir}/QtXkbCommonSupport
+%{_qt5_headerdir}/QtEglFSDeviceIntegration/QtEglFSDeviceIntegration
+%{_qt5_headerdir}/QtEglFSDeviceIntegration/QtEglFSDeviceIntegrationDepends
+%{_qt5_headerdir}/QtEglFSDeviceIntegration/QtEglFSDeviceIntegrationVersion
+%{_qt5_headerdir}/QtEglFSDeviceIntegration/qteglfsdeviceintegrationversion.h
 %{_qt5_archdatadir}/mkspecs/
 %{_qt5_libdir}/libQt5Concurrent.prl
 %{_qt5_libdir}/libQt5Concurrent.so
@@ -625,6 +676,8 @@ fi
 %{_qt5_libdir}/libQt5Gui.so
 %{_qt5_libdir}/libQt5Network.prl
 %{_qt5_libdir}/libQt5Network.so
+%{_qt5_libdir}/libQt5OpenGL.prl
+%{_qt5_libdir}/libQt5OpenGL.so
 %{_qt5_libdir}/libQt5PrintSupport.prl
 %{_qt5_libdir}/libQt5PrintSupport.so
 %{_qt5_libdir}/libQt5Sql.prl
@@ -642,8 +695,13 @@ fi
 %{_qt5_libdir}/cmake/Qt5Core/Qt5CTestMacros.cmake
 %{_qt5_libdir}/cmake/Qt5DBus/Qt5DBusConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5DBus/Qt5DBusMacros.cmake
+%{_qt5_libdir}/cmake/Qt5EglFSDeviceIntegration/Qt5EglFSDeviceIntegration*.cmake
+%{_qt5_libdir}/cmake/Qt5EglFsKmsSupport/Qt5EglFsKmsSupport*.cmake
+%{_qt5_libdir}/cmake/Qt5EglSupport/Qt5EglSupportConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5GuiConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_*.cmake
 %{_qt5_libdir}/cmake/Qt5Network/Qt5NetworkConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5OpenGL/Qt5OpenGLConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupportConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5SqlConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Test/Qt5TestConfig*.cmake
@@ -651,17 +709,35 @@ fi
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake
 %{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
+%{_qt5_libdir}/cmake/Qt5AccessibilitySupport/
+%{_qt5_libdir}/cmake/Qt5DeviceDiscoverySupport/
+%{_qt5_libdir}/cmake/Qt5EdidSupport/
+%{_qt5_libdir}/cmake/Qt5EventDispatcherSupport/
+%{_qt5_libdir}/cmake/Qt5FbSupport/
+%{_qt5_libdir}/cmake/Qt5FontDatabaseSupport/
+%{_qt5_libdir}/cmake/Qt5GlxSupport/
+%{_qt5_libdir}/cmake/Qt5InputSupport/
+%{_qt5_libdir}/cmake/Qt5KmsSupport/
+%{_qt5_libdir}/cmake/Qt5PlatformCompositorSupport/
+%{_qt5_libdir}/cmake/Qt5ServiceSupport/
+%{_qt5_libdir}/cmake/Qt5ThemeSupport/
+%{_qt5_libdir}/cmake/Qt5XkbCommonSupport/
+%{_qt5_libdir}/metatypes/qt5core_metatypes.json
+%{_qt5_libdir}/metatypes/qt5gui_metatypes.json
+%{_qt5_libdir}/metatypes/qt5widgets_metatypes.json
 %{_qt5_libdir}/pkgconfig/Qt5.pc
 %{_qt5_libdir}/pkgconfig/Qt5Concurrent.pc
 %{_qt5_libdir}/pkgconfig/Qt5Core.pc
 %{_qt5_libdir}/pkgconfig/Qt5DBus.pc
 %{_qt5_libdir}/pkgconfig/Qt5Gui.pc
 %{_qt5_libdir}/pkgconfig/Qt5Network.pc
+%{_qt5_libdir}/pkgconfig/Qt5OpenGL.pc
 %{_qt5_libdir}/pkgconfig/Qt5PrintSupport.pc
 %{_qt5_libdir}/pkgconfig/Qt5Sql.pc
 %{_qt5_libdir}/pkgconfig/Qt5Test.pc
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
+%{_qt5_libdir}/qt5/bin/tracegen
 ## private-devel globs
 # keep mkspecs/modules stuff  in -devel for now, https://bugzilla.redhat.com/show_bug.cgi?id=1705280
 # PERCENT_SIGN exclude PERCENT_SIGN {_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
@@ -671,14 +747,20 @@ fi
 %{_qt5_headerdir}/*/%{version}/*/private/
 
 %files static
-%{_qt5_libdir}/libQt5Bootstrap.*a
-%{_qt5_libdir}/libQt5Bootstrap.prl
+%{_qt5_headerdir}/QtOpenGLExtensions/
+%{_qt5_libdir}/libQt5OpenGLExtensions.*a
+%{_qt5_libdir}/libQt5OpenGLExtensions.prl
+%{_qt5_libdir}/cmake/Qt5OpenGLExtensions/
+%{_qt5_libdir}/pkgconfig/Qt5OpenGLExtensions.pc
 %{_qt5_libdir}/libQt5AccessibilitySupport.*a
 %{_qt5_libdir}/libQt5AccessibilitySupport.prl
 %{_qt5_headerdir}/QtAccessibilitySupport
 %{_qt5_libdir}/libQt5DeviceDiscoverySupport.*a
 %{_qt5_libdir}/libQt5DeviceDiscoverySupport.prl
 %{_qt5_headerdir}/QtDeviceDiscoverySupport
+%{_qt5_libdir}/libQt5EglSupport.*a
+%{_qt5_libdir}/libQt5EglSupport.prl
+%{_qt5_headerdir}/QtEglSupport
 %{_qt5_libdir}/libQt5EventDispatcherSupport.*a
 %{_qt5_libdir}/libQt5EventDispatcherSupport.prl
 %{_qt5_headerdir}/QtEventDispatcherSupport
@@ -688,24 +770,48 @@ fi
 %{_qt5_libdir}/libQt5FontDatabaseSupport.*a
 %{_qt5_libdir}/libQt5FontDatabaseSupport.prl
 %{_qt5_headerdir}/QtFontDatabaseSupport
+%{_qt5_libdir}/libQt5GlxSupport.*a
+%{_qt5_libdir}/libQt5GlxSupport.prl
+%{_qt5_headerdir}/QtGlxSupport
 %{_qt5_libdir}/libQt5InputSupport.*a
 %{_qt5_libdir}/libQt5InputSupport.prl
+%{_qt5_libdir}/libQt5PlatformCompositorSupport.*a
+%{_qt5_libdir}/libQt5PlatformCompositorSupport.prl
+%{_qt5_headerdir}/QtPlatformCompositorSupport
 %{_qt5_libdir}/libQt5ServiceSupport.*a
 %{_qt5_libdir}/libQt5ServiceSupport.prl
 %{_qt5_headerdir}/QtServiceSupport
 %{_qt5_libdir}/libQt5ThemeSupport.*a
 %{_qt5_libdir}/libQt5ThemeSupport.prl
 %{_qt5_headerdir}/QtThemeSupport
+%{_qt5_libdir}/libQt5KmsSupport.*a
+%{_qt5_libdir}/libQt5KmsSupport.prl
+%{_qt5_headerdir}/QtKmsSupport
 %{_qt5_libdir}/libQt5EdidSupport.*a
 %{_qt5_libdir}/libQt5EdidSupport.prl
+%{_qt5_libdir}/libQt5XkbCommonSupport.*a
+%{_qt5_libdir}/libQt5XkbCommonSupport.prl
+%if 0%{?vulkan}
+%{_qt5_headerdir}/QtVulkanSupport/
+%{_qt5_libdir}/cmake/Qt5VulkanSupport/
+%{_qt5_libdir}/libQt5VulkanSupport.*a
+%{_qt5_libdir}/libQt5VulkanSupport.prl
+%endif
 
 %if 0%{?examples}
 %files examples
 %{_qt5_examplesdir}/
 %endif
 
+%ldconfig_scriptlets gui
+
 %files gui
+%dir %{_sysconfdir}/X11/xinit
+%dir %{_sysconfdir}/X11/xinit/xinitrc.d/
+%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 %{_qt5_libdir}/libQt5Gui.so.5*
+%{_qt5_libdir}/libQt5OpenGL.so.5*
+%{_qt5_libdir}/libQt5PrintSupport.so.5*
 %{_qt5_libdir}/libQt5Widgets.so.5*
 %{_qt5_plugindir}/generic/libqevdevkeyboardplugin.so
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
@@ -723,8 +829,27 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake
+%{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.prl
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so.5*
+%{_qt5_libdir}/libQt5EglFsKmsSupport.prl
+%{_qt5_libdir}/libQt5EglFsKmsSupport.so
+%{_qt5_libdir}/libQt5EglFsKmsSupport.so.5*
+%{_qt5_plugindir}/platforms/libqeglfs.so
+%{_qt5_plugindir}/platforms/libqminimalegl.so
+%dir %{_qt5_plugindir}/egldeviceintegrations/
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-emu-integration.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
 %{_qt5_plugindir}/platforms/libqoffscreen.so
@@ -734,9 +859,23 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake
 %{_qt5_plugindir}/platformthemes/libqxdgdesktopportal.so
+%{_qt5_plugindir}/platformthemes/libqgtk3.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
+%{_qt5_plugindir}/printsupport/libcupsprintersupport.so
+%{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
 %changelog
+* Wed May 10 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.9-1
+- Bump version to 5.15.9
+- Update patch for CVE-2023-24607
+- Add fixes for CVE-2022-27404, CVE-2022-27405, CVE-2022-27406, CVE-2022-37434, CVE-2023-24607
+- Sync patch files from Fedora 38 (license: MIT)
+- Removed patch files for changes that already went upstream
+
+* Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.12.11-5
+- Added patch to fix CVE-2023-24607
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
 - Update source download path and remove recommends mesa-dri-drivers for gui sub package.
 

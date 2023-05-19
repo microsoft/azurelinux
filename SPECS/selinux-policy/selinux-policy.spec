@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,10 @@ Patch32:        0032-Port-PKI-module-from-Fedora-policy.patch
 Patch33:        0033-domain-Unconfined-can-transition-to-other-domains.patch
 Patch34:        0034-systemd-Updates-for-systemd-locale.patch
 Patch35:        0035-modutils-Handle-running-dracut-during-rpm-postinst.patch
+Patch36:        0036-iptables-Support-Mariner-non-standard-config-locatio.patch
+Patch37:        0037-cloudinit-Add-permissions-derived-from-sysadm.patch
+Patch38:        0038-systemd-Fix-run-systemd-shutdown-handling.patch
+Patch39:        0039-modutils-Temporary-fix-for-mkinitrd-dracut.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -339,6 +343,13 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Apr 11 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-2
+- Handle non-standard location for iptables rules configuration.
+- Add further cloud-init permissions to handle a wider variety of use cases
+  without requiring policy changes.
+- Fix scheduled shutdown/reboot.
+- Add temporary fix for mkinitrd issues until final implementation is ready.
+
 * Wed Mar 01 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-1
 - Update to new upstream release.
 - Fix iscsid access to initiatorname.iscsi.

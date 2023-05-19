@@ -1,0 +1,30 @@
+From 19909d360c0c1b58b0e603d5222d429c1409a329 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Tue, 11 Apr 2023 13:49:30 +0000
+Subject: [PATCH 39/39] modutils: Temporary fix for mkinitrd (dracut).
+
+MSFT_TAG: not upstreamable.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/modutils.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/modutils.te b/policy/modules/system/modutils.te
+index fb388ce98..e19745a89 100644
+--- a/policy/modules/system/modutils.te
++++ b/policy/modules/system/modutils.te
+@@ -116,6 +116,10 @@ seutil_read_file_contexts(kmod_t)
+ userdom_use_user_terminals(kmod_t)
+ 
+ userdom_dontaudit_search_user_home_dirs(kmod_t)
++# dracut:
++allow kmod_t user_tmp_t:dir rw_dir_perms;
++allow kmod_t user_tmp_t:file { create rename rw_file_perms };
++allow kmod_t user_tmp_t:lnk_file read_lnk_file_perms;
+ 
+ ifdef(`init_systemd',`
+ 	# for /run/tmpfiles.d/kmod.conf
+-- 
+2.34.1
+

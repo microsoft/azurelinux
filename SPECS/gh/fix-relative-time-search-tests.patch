@@ -1,0 +1,149 @@
+From b7acb23d583de0e154388dad5ee56b642b500f9e Mon Sep 17 00:00:00 2001
+From: Sam Coe <samcoe@users.noreply.github.com>
+Date: Tue, 25 Apr 2023 17:11:11 -0700
+Subject: [PATCH] Stub out time.Now for search tests (#6299)
+
+Signed-off-by: Olivia Crain <oliviacrain@microsoft.com>
+---
+ pkg/cmd/search/repos/repos.go        | 10 +++++++---
+ pkg/cmd/search/repos/repos_test.go   |  4 +++-
+ pkg/cmd/search/shared/shared.go      |  9 ++++++---
+ pkg/cmd/search/shared/shared_test.go |  6 ++++--
+ 4 files changed, 20 insertions(+), 9 deletions(-)
+
+diff --git a/pkg/cmd/search/repos/repos.go b/pkg/cmd/search/repos/repos.go
+index 57f3766..a54187a 100644
+--- a/pkg/cmd/search/repos/repos.go
++++ b/pkg/cmd/search/repos/repos.go
+@@ -19,6 +19,7 @@ type ReposOptions struct {
+ 	Browser  cmdutil.Browser
+ 	Exporter cmdutil.Exporter
+ 	IO       *iostreams.IOStreams
++	Now      time.Time
+ 	Query    search.Query
+ 	Searcher search.Searcher
+ 	WebMode  bool
+@@ -147,10 +148,13 @@ func reposRun(opts *ReposOptions) error {
+ 	if len(result.Items) == 0 {
+ 		return cmdutil.NewNoResultsError("no repositories matched your search")
+ 	}
+-	return displayResults(io, result)
++	return displayResults(io, opts.Now, result)
+ }
+ 
+-func displayResults(io *iostreams.IOStreams, results search.RepositoriesResult) error {
++func displayResults(io *iostreams.IOStreams, now time.Time, results search.RepositoriesResult) error {
++	if now.IsZero() {
++		now = time.Now()
++	}
+ 	cs := io.ColorScheme()
+ 	tp := utils.NewTablePrinter(io)
+ 	for _, repo := range results.Items {
+@@ -171,7 +175,7 @@ func displayResults(io *iostreams.IOStreams, results search.RepositoriesResult)
+ 		tp.AddField(text.ReplaceExcessiveWhitespace(description), nil, nil)
+ 		tp.AddField(info, nil, infoColor)
+ 		if tp.IsTTY() {
+-			tp.AddField(utils.FuzzyAgoAbbr(time.Now(), repo.UpdatedAt), nil, cs.Gray)
++			tp.AddField(utils.FuzzyAgoAbbr(now, repo.UpdatedAt), nil, cs.Gray)
+ 		} else {
+ 			tp.AddField(repo.UpdatedAt.Format(time.RFC3339), nil, nil)
+ 		}
+diff --git a/pkg/cmd/search/repos/repos_test.go b/pkg/cmd/search/repos/repos_test.go
+index fc7bf6d..5803fcb 100644
+--- a/pkg/cmd/search/repos/repos_test.go
++++ b/pkg/cmd/search/repos/repos_test.go
+@@ -148,6 +148,8 @@ func TestNewCmdRepos(t *testing.T) {
+ }
+ 
+ func TestReposRun(t *testing.T) {
++	var now = time.Date(2022, 2, 28, 12, 30, 0, 0, time.UTC)
++	var updatedAt = time.Date(2021, 2, 28, 12, 30, 0, 0, time.UTC)
+ 	var query = search.Query{
+ 		Keywords: []string{"cli"},
+ 		Kind:     "repositories",
+@@ -157,7 +159,6 @@ func TestReposRun(t *testing.T) {
+ 			Topic: []string{"golang"},
+ 		},
+ 	}
+-	var updatedAt = time.Date(2021, 2, 28, 12, 30, 0, 0, time.UTC)
+ 	tests := []struct {
+ 		errMsg     string
+ 		name       string
+@@ -269,6 +270,7 @@ func TestReposRun(t *testing.T) {
+ 		ios.SetStdoutTTY(tt.tty)
+ 		ios.SetStderrTTY(tt.tty)
+ 		tt.opts.IO = ios
++		tt.opts.Now = now
+ 		t.Run(tt.name, func(t *testing.T) {
+ 			err := reposRun(tt.opts)
+ 			if tt.wantErr {
+diff --git a/pkg/cmd/search/shared/shared.go b/pkg/cmd/search/shared/shared.go
+index 1b506ea..eb8615f 100644
+--- a/pkg/cmd/search/shared/shared.go
++++ b/pkg/cmd/search/shared/shared.go
+@@ -30,6 +30,7 @@ type IssuesOptions struct {
+ 	Entity   EntityType
+ 	Exporter cmdutil.Exporter
+ 	IO       *iostreams.IOStreams
++	Now      time.Time
+ 	Query    search.Query
+ 	Searcher search.Searcher
+ 	WebMode  bool
+@@ -90,10 +91,13 @@ func SearchIssues(opts *IssuesOptions) error {
+ 		return cmdutil.NewNoResultsError(msg)
+ 	}
+ 
+-	return displayIssueResults(io, opts.Entity, result)
++	return displayIssueResults(io, opts.Now, opts.Entity, result)
+ }
+ 
+-func displayIssueResults(io *iostreams.IOStreams, et EntityType, results search.IssuesResult) error {
++func displayIssueResults(io *iostreams.IOStreams, now time.Time, et EntityType, results search.IssuesResult) error {
++	if now.IsZero() {
++		now = time.Now()
++	}
+ 	cs := io.ColorScheme()
+ 	tp := utils.NewTablePrinter(io)
+ 	for _, issue := range results.Items {
+@@ -121,7 +125,6 @@ func displayIssueResults(io *iostreams.IOStreams, et EntityType, results search.
+ 		}
+ 		tp.AddField(text.ReplaceExcessiveWhitespace(issue.Title), nil, nil)
+ 		tp.AddField(listIssueLabels(&issue, cs, tp.IsTTY()), nil, nil)
+-		now := time.Now()
+ 		ago := now.Sub(issue.UpdatedAt)
+ 		if tp.IsTTY() {
+ 			tp.AddField(utils.FuzzyAgo(ago), nil, cs.Gray)
+diff --git a/pkg/cmd/search/shared/shared_test.go b/pkg/cmd/search/shared/shared_test.go
+index 1c4e621..873b846 100644
+--- a/pkg/cmd/search/shared/shared_test.go
++++ b/pkg/cmd/search/shared/shared_test.go
+@@ -23,7 +23,9 @@ func TestSearcher(t *testing.T) {
+ }
+ 
+ func TestSearchIssues(t *testing.T) {
+-	query := search.Query{
++	var now = time.Date(2022, 2, 28, 12, 30, 0, 0, time.UTC)
++	var updatedAt = time.Date(2021, 2, 28, 12, 30, 0, 0, time.UTC)
++	var query = search.Query{
+ 		Keywords: []string{"keyword"},
+ 		Kind:     "issues",
+ 		Limit:    30,
+@@ -34,7 +36,6 @@ func TestSearchIssues(t *testing.T) {
+ 		},
+ 	}
+ 
+-	var updatedAt = time.Date(2021, 2, 28, 12, 30, 0, 0, time.UTC)
+ 	tests := []struct {
+ 		errMsg     string
+ 		name       string
+@@ -193,6 +194,7 @@ func TestSearchIssues(t *testing.T) {
+ 		ios.SetStdoutTTY(tt.tty)
+ 		ios.SetStderrTTY(tt.tty)
+ 		tt.opts.IO = ios
++		tt.opts.Now = now
+ 		t.Run(tt.name, func(t *testing.T) {
+ 			err := SearchIssues(tt.opts)
+ 			if tt.wantErr {
+-- 
+2.34.1
+

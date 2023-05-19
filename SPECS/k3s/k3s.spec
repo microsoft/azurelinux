@@ -1,10 +1,21 @@
+%global debug_package %{nil}
+%define install_path  %{_prefix}/local/bin
+%define util_path     %{_datadir}/k3s
+%define install_sh    %{util_path}/setup/install.sh
+%define uninstall_sh  %{util_path}/setup/uninstall.sh
+%define k3s_binary    k3s
 Summary:        Lightweight Kubernetes
 Name:           k3s
-Version:        1.25.0
-Release:        8%{?dist}
+Version:        1.26.3
+Release:        1%{?dist}
 License:        ASL 2.0
+# Note: k3s is not exclusive with coredns, etcd, containerd, runc and other CBL-Mariner packages which it embeds.
+# This means there may be multiple versions of these packages. At this time exclusivity is not being enforced to
+# allow k3s to use its required version even when other versions are installed.
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System Environment/Base
-URL:            http://k3s.io
+URL:            https://k3s.io
 Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+k3s1.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
@@ -15,28 +26,20 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 3. cd %%{name}-%%{version}-k3s1
 # 4. go mod vendor
 # 5. pushd vendor
-# 6. git clone --single-branch --branch="v1.6.8-k3s1" --depth=1 https://github.com/k3s-io/containerd
+# 6. git clone --single-branch --branch="v1.6.18" --depth=1 https://github.com/k3s-io/containerd
 # 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
 # 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         vendor_build.patch
-%global debug_package %{nil}
-%define install_path  /usr/local/bin
-%define util_path     %{_datadir}/k3s
-%define install_sh    %{util_path}/setup/install.sh
-%define uninstall_sh  %{util_path}/setup/uninstall.sh
-%define k3s_binary    k3s
-BuildRequires:  golang <= 1.18.8
-BuildRequires:  libseccomp-devel
 BuildRequires:  btrfs-progs-devel
+BuildRequires:  git
+BuildRequires:  golang
+BuildRequires:  libseccomp-devel
 Requires:       apparmor-parser
 # K3s on Mariner is supported on x86_64 only:
 ExclusiveArch:  x86_64
-# Note: k3s is not exclusive with coredns, etcd, containerd, runc and other CBL-Mariner packages which it embeds.
-# This means there may be multiple versions of these packages. At this time exclusivity is not being enforced to
-# allow k3s to use its required version even when other versions are installed.
 
 %description
 The certified Kubernetes distribution built for IoT & Edge computing.
@@ -79,6 +82,10 @@ exit 0
 %{install_sh}
 
 %changelog
+* Mon Apr 17 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.3-1
+- Updated k3s to 1.26.3
+- Drop version constraint on golang <= 1.18.8
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.0-8
 - Bump release to rebuild with go 1.19.8
 

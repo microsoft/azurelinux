@@ -1,20 +1,25 @@
 Summary:      Qt5 - QtTool components
 Name:         qt5-qttools
-Version:      5.12.5
-Release:      6%{?dist}
+Version:      5.15.9
+Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
 License: LGPLv3 or LGPLv2
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qttools-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qttools-everywhere-opensource-src-%{version}.tar.xz
 
 # help lrelease/lupdate use/prefer qmake-qt5
 # https://bugzilla.redhat.com/show_bug.cgi?id=1009893
-Patch0: qttools-opensource-src-5.5.0-qmake-qt5.patch
+Patch2: qttools-opensource-src-5.13.2-runqttools-with-qt5-suffix.patch
+
+# 32-bit MIPS needs explicit -latomic
+Patch4: qttools-opensource-src-5.7-add-libatomic.patch
 
 BuildRequires: coreutils
+BuildRequires: libGL-devel
+BuildRequires: vulkan-devel
 
 BuildRequires: qt5-qtbase-private-devel
 # Qt macros
@@ -117,8 +122,7 @@ Requires: %{name}-common = %{version}-%{release}
 
 
 %prep
-%setup -q -n qttools-everywhere-src-%{version}
-%patch0 -p1 -b .qmake-qt5
+%autosetup -p1 -n qttools-everywhere-src-%{version}
 
 %build
 
@@ -258,9 +262,7 @@ fi
 %files -n qt5-doctools
 %{_bindir}/qdoc*
 %{_qt5_bindir}/qdoc*
-%{_bindir}/qdistancefieldgenerator*
 %{_bindir}/qhelpgenerator*
-%{_qt5_bindir}/qdistancefieldgenerator*
 %{_qt5_bindir}/qhelpgenerator*
 %{_bindir}/qtattributionsscanner-qt5
 %{_qt5_bindir}/qtattributionsscanner*
@@ -284,6 +286,7 @@ fi
 %{_bindir}/designer*
 %{_qt5_bindir}/designer*
 %{_datadir}/icons/hicolor/*/apps/designer*.*
+%{_qt5_libdir}/cmake/Qt5DesignerComponents/Qt5DesignerComponentsConfig*.cmake
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 %post -n qt5-linguist
@@ -310,9 +313,11 @@ fi
 %{_bindir}/lconvert*
 %{_bindir}/lrelease*
 %{_bindir}/lupdate*
+%{_bindir}/lprodump*
 %{_qt5_bindir}/lconvert*
 %{_qt5_bindir}/lrelease*
 %{_qt5_bindir}/lupdate*
+%{_qt5_bindir}/lprodump*
 # cmake config
 %dir %{_qt5_libdir}/cmake/Qt5LinguistTools/
 %{_qt5_libdir}/cmake/Qt5LinguistTools/Qt5LinguistToolsConfig*.cmake
@@ -365,12 +370,8 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Designer.pc
 %{_qt5_libdir}/pkgconfig/Qt5Help.pc
 %{_qt5_libdir}/pkgconfig/Qt5UiPlugin.pc
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_designer.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_designer_private.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_designercomponents_private.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_help.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_help_private.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_uiplugin.pri
+%{_qt5_libdir}/cmake/Qt5AttributionsScannerTools/Qt5AttributionsScannerToolsConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5DocTools/Qt5DocToolsConfig*.cmake
 
 %files static
 %{_qt5_headerdir}/QtUiTools/
@@ -378,8 +379,6 @@ fi
 %{_qt5_libdir}/libQt5UiTools.prl
 %{_qt5_libdir}/cmake/Qt5UiTools/
 %{_qt5_libdir}/pkgconfig/Qt5UiTools.pc
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_uitools.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_uitools_private.pri
 
 %if ! 0%{?no_examples:1}
 %files examples
@@ -391,6 +390,9 @@ fi
 
 
 %changelog
+* Thu May 11 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.9-1
+- Bump version to 5.15.9
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
 - Update source download path
 - License verified.

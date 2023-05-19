@@ -1,7 +1,7 @@
 Summary:        Command line tool for updating bootloader configs
 Name:           grubby
 Version:        8.40
-Release:        44%{?dist}
+Release:        45%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,8 +12,6 @@ URL:            https://github.com/rhinstaller/grubby
 Source0:        https://github.com/rhboot/grubby/archive/%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        grubby-bls
 Source2:        grubby.in
-Source3:        installkernel.in
-Source4:        installkernel-bls
 Source5:        95-kernel-hooks.install
 Patch0001:      0001-remove-the-old-crufty-u-boot-support.patch
 Patch0002:      0002-Change-return-type-in-getRootSpecifier.patch
@@ -47,6 +45,7 @@ BuildRequires:  util-linux-ng
 Requires:       findutils
 Requires:       grub2-tools
 Requires:       grub2-tools-minimal
+Requires:       installkernel
 Requires:       util-linux
 
 %description
@@ -69,15 +68,16 @@ users with existing grubby users.
 %install
 %make_install mandir=%{_mandir} sbindir=%{_sbindir} libexecdir=%{_libexecdir}
 
-mkdir -p %{buildroot}%{_libexecdir}/{grubby,installkernel}/ %{buildroot}%{_sbindir}/
+# Do not supply the default installkernel script from grubby. Instead this
+# script will be supplied from the dedicated installkernel package, which
+# is a package requires for this grubby package.
+rm %{buildroot}%{_sbindir}/installkernel
+
+mkdir -p %{buildroot}%{_libexecdir}/{grubby}/ %{buildroot}%{_sbindir}/
 mv -v %{buildroot}%{_sbindir}/grubby %{buildroot}%{_libexecdir}/grubby/grubby
-mv -v %{buildroot}%{_sbindir}/installkernel %{buildroot}%{_libexecdir}/installkernel/installkernel
 cp -v %{SOURCE1} %{buildroot}%{_libexecdir}/grubby/
-cp -v %{SOURCE4} %{buildroot}%{_libexecdir}/installkernel/
 sed -e "s,@@LIBEXECDIR@@,%{_libexecdir}/grubby,g" %{SOURCE2} \
 	> %{buildroot}%{_sbindir}/grubby
-sed -e "s,@@LIBEXECDIR@@,%{_libexecdir}/installkernel,g" %{SOURCE3} \
-	> %{buildroot}%{_sbindir}/installkernel
 install -D -m 0755 -t %{buildroot}%{_libdir}/kernel/install.d/ %{SOURCE5}
 
 %package        deprecated
@@ -97,28 +97,25 @@ current boot environment.
 %files
 %license COPYING
 %dir %{_libexecdir}/grubby
-%dir %{_libexecdir}/installkernel
 %attr(0755,root,root) %{_libexecdir}/grubby/grubby-bls
 %attr(0755,root,root) %{_libexecdir}/grubby/rpm-sort
 %attr(0755,root,root) %{_sbindir}/grubby
-%attr(0755,root,root) %{_libexecdir}/installkernel/installkernel-bls
-%attr(0755,root,root) %{_sbindir}/installkernel
 %attr(0755,root,root) %{_libdir}/kernel/install.d/95-kernel-hooks.install
 %{_mandir}/man8/[gi]*.8*
 
 %files deprecated
 %license COPYING
 %dir %{_libexecdir}/grubby
-%dir %{_libexecdir}/installkernel
 %attr(0755,root,root) %{_libexecdir}/grubby/grubby
-%attr(0755,root,root) %{_libexecdir}/installkernel/installkernel
 %attr(0755,root,root) %{_sbindir}/grubby
-%attr(0755,root,root) %{_sbindir}/installkernel
 %attr(0755,root,root) %{_sbindir}/new-kernel-pkg
 %{_mandir}/man8/*.8*
 
 %changelog
-* Sun Sep 11 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.40.44
+* Wed May 10 2022 Chris Co <chrco@microsoft.com> - 8.40-45
+- Remove default installkernel file and add requires for installkernel package
+
+* Sun Sep 11 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.40-44
 - Support rpm 4.18.0
 
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.40-43

@@ -2,6 +2,16 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 
+# find_debuginfo.sh arguments are set by default in rpm's macros.
+# The default arguments regenerate the build-id for vmlinux in the 
+# debuginfo package causing a mismatch with the build-id for vmlinuz in
+# the kernel package. Therefore, explicilty set the relevant default 
+# settings to prevent this behavior.
+%undefine _unique_build_ids
+%undefine _unique_debug_names
+%global _missing_build_ids_terminate_build 1
+%global _no_recompute_build_ids 1
+
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
@@ -17,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-azure
-Version:        5.15.102.1
+Version:        5.15.111.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -406,6 +416,18 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon May 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.111.1-1
+- Auto-upgrade to 5.15.111.1
+
+* Mon May 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.110.1-1
+- Auto-upgrade to 5.15.110.1
+
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
+- Disable rpm's debuginfo defaults which regenerate build-ids
+
+* Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
+- Auto-upgrade to 5.15.107.1
+
 * Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
 - Auto-upgrade to 5.15.102.1
 

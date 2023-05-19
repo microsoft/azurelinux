@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 5.15.102.1 Kernel Configuration
+# Linux/x86_64 5.15.111.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -2019,9 +2019,9 @@ CONFIG_NVME_CORE=y
 CONFIG_BLK_DEV_NVME=y
 # CONFIG_NVME_MULTIPATH is not set
 CONFIG_NVME_FABRICS=m
-# CONFIG_NVME_RDMA is not set
+CONFIG_NVME_RDMA=m
 # CONFIG_NVME_FC is not set
-# CONFIG_NVME_TCP is not set
+CONFIG_NVME_TCP=m
 CONFIG_NVME_TARGET=m
 # CONFIG_NVME_TARGET_PASSTHRU is not set
 CONFIG_NVME_TARGET_LOOP=m
@@ -2091,6 +2091,7 @@ CONFIG_VMWARE_VMCI=m
 # CONFIG_HABANA_AI is not set
 # CONFIG_UACCE is not set
 # CONFIG_PVPANIC is not set
+CONFIG_MSTFLINT=m
 # end of Misc devices
 
 #

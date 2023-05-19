@@ -1,3 +1,4 @@
+%global homedir %{_datadir}/%{name}
 %global debug_package %{nil}
 %global pkg_base_name maven
 %define m2_cache_tarball_name apache-%{pkg_base_name}-%{version}-m2.tar.gz
@@ -11,7 +12,7 @@
 Summary:        Apache Maven alternative package with no jdk bindings
 Name:           maven3
 Version:        3.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +39,16 @@ Conflicts:      maven
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
+
+%package openjdk11
+Summary:        MSOpenJDK 11 binding for Maven
+RemovePathPostfixes: -openjdk11
+Requires: %{name} = %{version}-%{release}
+Requires: msopenjdk-11
+Provides: %{name}-jdk-binding = %{version}-%{release}
+
+%description openjdk11
+Configures Maven to run with OpenJDK 11.
 
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
@@ -106,6 +117,16 @@ cp %{_builddir}/apache-maven-%{version}/LICENSE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/NOTICE %{buildroot}%{_prefixmvn}/
 cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_prefixmvn}/
 
+
+mkdir -p %{buildroot}%{homedir}/bin
+ln -sfv %{_bindirmvn}/mvn %{buildroot}%{homedir}/bin/mvn
+ln -sfv %{_bindirmvn}/mvnDebug %{buildroot}%{homedir}/bin/mvnDebug
+ln -sfv %{_bindirmvn}/mvn.1.gz %{buildroot}%{homedir}/bin/mvn.1.gz
+ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/java/
+echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.conf-openjdk11
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -116,6 +137,7 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %dir %{_datadir}/java/maven
 %{_libdirmvn}/*
 %{_bindirmvn}/*
+%{homedir}/bin/mvn*
 /bin/*
 %{_datadir}/java/maven/*.jar
 %{_prefixmvn}/boot/plexus-classworlds*
@@ -126,7 +148,14 @@ cp %{_builddir}/apache-maven-%{version}/apache-maven/README.txt %{buildroot}%{_p
 %{_prefixmvn}/NOTICE
 %{_prefixmvn}/README.txt
 
+%files openjdk11
+%config /etc/java/maven.conf-openjdk11
+
 %changelog
+* Tue Apr 04 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
+- Added openjdk11 subpackage
+- Added symlink for binaries requires by xmvn package
+
 * Thu Feb 16 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.8.7-1
 - Original version for CBL-Mariner (license: MIT)
 - Remove Runtime dependency on any msopenjdk-* version

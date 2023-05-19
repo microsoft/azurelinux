@@ -63,6 +63,7 @@
         "veritysetup",
         "vim",
         "words",
+        "xfsprogs",
         "xz",
         "zlib"
     ]

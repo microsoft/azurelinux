@@ -1,6 +1,6 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
-Version:        7.92
+Version:        7.93
 Release:        1%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
@@ -17,6 +17,8 @@ BuildRequires:  lua-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
+
+Patch1:         remove_openssl_macro.patch
 
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
@@ -35,8 +37,7 @@ Nmap implementation of the ncat tool
 rm -rf libpcap macosx mswin32 libssh2 libz
 
 %build
-# Zenmap and Ndiff are python2 only: https://github.com/nmap/nmap/issues/1176
-%configure --without-zenmap --without-ndiff
+%configure
 %make_build
 
 %install
@@ -58,6 +59,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Mon Apr 17 2023 Saul Paredes <saulparedes@microsoft.com> - 7.93-1
+- Upgrading to latest version to fix CVE-2018-25032
+
 * Wed Feb 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 7.92-1
 - Upgrading to latest version.
 

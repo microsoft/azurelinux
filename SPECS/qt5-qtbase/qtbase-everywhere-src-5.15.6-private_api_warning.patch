@@ -1,0 +1,12 @@
+diff -up qtbase-everywhere-src-5.15.6/src/corelib/kernel/qobject_p.h.private_api_warning qtbase-everywhere-src-5.15.6/src/corelib/kernel/qobject_p.h
+--- qtbase-everywhere-src-5.15.6/src/corelib/kernel/qobject_p.h.private_api_warning	2022-10-11 09:08:33.712070523 -0500
++++ qtbase-everywhere-src-5.15.6/src/corelib/kernel/qobject_p.h	2022-10-11 09:10:58.647038619 -0500
+@@ -435,7 +435,7 @@ inline void QObjectPrivate::checkForInco
+     Q_UNUSED(version);
+ #else
+     if (Q_UNLIKELY(version != QObjectPrivateVersion)) {
+-        qFatal("Cannot mix incompatible Qt library (%d.%d.%d) with this library (%d.%d.%d)",
++        qWarning("Cannot mix incompatible Qt library (%d.%d.%d) with this library (%d.%d.%d)",
+                 (version >> 16) & 0xff, (version >> 8) & 0xff, version & 0xff,
+                 (QObjectPrivateVersion >> 16) & 0xff, (QObjectPrivateVersion >> 8) & 0xff, QObjectPrivateVersion & 0xff);
+     }

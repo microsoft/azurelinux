@@ -1,0 +1,57 @@
+From c1e41d061329cc886a56477c8c2fd0e81add7780 Mon Sep 17 00:00:00 2001
+From: Jaeyoon Jung <jaeyoon.jung@lge.com>
+Date: Fri, 19 Feb 2021 08:11:57 +0900
+Subject: [PATCH 17/19] QQmlImportDatabase: Make sure the newly added import
+ path be first
+
+If it already exists in the import list, move it to the first place.
+This is as per the description of QQmlEngine::addImportPath:
+| The newly added path will be first in the importPathList().
+
+Change-Id: I782d355c46ada2a46cff72e63326208f39028e01
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 3e413803c698d21f398daf0450c8f501204eb167)
+---
+ src/qml/qml/qqmlimport.cpp                   | 9 ++++++---
+ tests/auto/qml/qqmlimport/tst_qqmlimport.cpp | 5 +++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/qml/qml/qqmlimport.cpp b/src/qml/qml/qqmlimport.cpp
+index 10c6c41338..39bfcdc999 100644
+--- a/src/qml/qml/qqmlimport.cpp
++++ b/src/qml/qml/qqmlimport.cpp
+@@ -2120,9 +2120,12 @@ void QQmlImportDatabase::addImportPath(const QString& path)
+         cPath.replace(Backslash, Slash);
+     }
+ 
+-    if (!cPath.isEmpty()
+-        && !fileImportPath.contains(cPath))
+-        fileImportPath.prepend(cPath);
++    if (!cPath.isEmpty()) {
++        if (fileImportPath.contains(cPath))
++            fileImportPath.move(fileImportPath.indexOf(cPath), 0);
++        else
++            fileImportPath.prepend(cPath);
++    }
+ }
+ 
+ /*!
+diff --git a/tests/auto/qml/qqmlimport/tst_qqmlimport.cpp b/tests/auto/qml/qqmlimport/tst_qqmlimport.cpp
+index 9c865b3f73..1f788f7a7f 100644
+--- a/tests/auto/qml/qqmlimport/tst_qqmlimport.cpp
++++ b/tests/auto/qml/qqmlimport/tst_qqmlimport.cpp
+@@ -154,6 +154,11 @@ void tst_QQmlImport::importPathOrder()
+     engine.addImportPath(QT_QMLTEST_DATADIR);
+     expectedImportPaths.prepend(QT_QMLTEST_DATADIR);
+     QCOMPARE(expectedImportPaths, engine.importPathList());
++
++    // Add qml2Imports again to make it the first of the list
++    engine.addImportPath(qml2Imports);
++    expectedImportPaths.move(expectedImportPaths.indexOf(qml2Imports), 0);
++    QCOMPARE(expectedImportPaths, engine.importPathList());
+ }
+ 
+ Q_DECLARE_METATYPE(QQmlImports::ImportVersion)
+-- 
+2.40.0
+

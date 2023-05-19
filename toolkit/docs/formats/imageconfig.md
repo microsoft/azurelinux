@@ -45,7 +45,7 @@ partition on the disk.
 
 Note that Partitions do not have to be provided; the resulting image is going to be a rootfs.
 
-Supported partition FsTypes: fat32, fat16, vfat, ext2, ext3, ext4, linux-swap.
+Supported partition FsTypes: fat32, fat16, vfat, ext2, ext3, ext4, xfs, linux-swap.
 
 Sample partitions entry, specifying a boot partition and a root partition:
 
@@ -228,6 +228,19 @@ PostInstallScripts run immediately after all packages have been installed, but b
 
 FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized (converted to .vhdx, etc.). The finalizeimage scripts are run from the context of the installed system.
 
+### AdditionalFiles
+
+The `AdditionalFiles` list provides a mechanism to add arbitrary files to the image. The elemments are are `"src": "dst"` pairs. `src` is relative to the image config `.json` file, while `dst` is an absolute path on the installed system.
+
+ISO installers will include the files on the installation media and will place them  into the final installed image.
+
+```json
+    "AdditionalFiles": [
+        "../../out/tools/imager": "/installer/imager",
+        "additionalconfigs": "/etc/my/config.conf"
+    ]
+```
+
 ### Networks
 
 The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config. 
@@ -249,11 +262,38 @@ A sample Networks entry pointing to one network configuration:
 ],
 ```
 
+### PackageRepos
+
+The `PackageRepos` list defines custom package repos to use with **ISO installers**. Each repo must set `Name` and `BaseUrl`. Each repo may also set `GPGCheck`/`RepoGPGCheck` (both default to `true`), `GPGKeys` (a string of the form `file:///path/to/key1 file:///path/to/key2 ...`. `GPGKeys` defaults to the Microsoft RPM signing keys if left unset), and `Install` which causes the repo file to be installed into the final image.
+
+If a custom repo entry is present, the default local file repo entires **will not be used during install**. If you want to also use them you will need to add an entry for [local.repo](toolkit/resources/manifests/image/local.repo) into the repo list. The default behavior is to pre-download the required packages into the ISO installer from repos defined in `REPO_LIST`.
+
+By default the repo will only be used during ISO install, it may also be made available to the installed image by setting `Install` to `true`.
+
+> **Currently ISO installers don't support custom keys. Only installed repos support them. The keys must be provisioned via [AdditionalFiles](#additionalfiles)**
+
+```json
+"PackageRepos": [
+    {
+        "Name":     "PackageMicrosoftComMirror",
+        "BaseUrl":  "https://contoso.com/pmc-mirror/$releasever/prod/base/$basearch",
+        "Install":  false,
+    },
+    {
+        "Name":     "MyCopyOfOfficialRepo",
+        "BaseUrl":  "https://contoso.com/cbl-mariner-custom-packages/$releasever/prod/base/$basearch",
+        "Install":  true,
+        "GPGCheck": true,
+        "RepoGPGCheck": false,
+        "GPGKeys": "file:///etc/pki/rpm-gpg/my-custom-key"
+    }
+]
+```
+
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.
 Removing the RPM database may break any package managers inside the image.
-
 
 ### KernelOptions
 

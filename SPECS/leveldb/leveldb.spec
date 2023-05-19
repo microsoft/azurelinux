@@ -1,9 +1,7 @@
-%undefine __cmake_in_source_build
-
 Summary:        A fast and lightweight key/value database library by Google
 Name:           leveldb
 Version:        1.23
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 URL:            https://github.com/google/leveldb
 Vendor:         Microsoft Corporation
@@ -104,6 +102,9 @@ ctest -V %{?_smp_mflags}
 %{_libdir}/cmake/%{name}/
 
 %changelog
+* Thu Apr 06 2023 Bala <balakumaran.kannan@microsoft.com> 1.23.3
+- Remove __cmake_in_source_build macro undefine to match make_build with cmake
+
 * Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-2
 - Address gmock-devel/snappy-devel incompatibility
 
