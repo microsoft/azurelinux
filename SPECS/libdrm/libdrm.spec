@@ -12,13 +12,41 @@ end}
   option = option:gsub('_', '-')
   print(string.format("-D%s=%s", option, value))
 end}
-%bcond_without radeon
 %bcond_without amdgpu
-%bcond_without nouveau
-%bcond_without vmwgfx
-%bcond_without man_pages
+%bcond_without radeon
 %bcond_without install_test_programs
+%bcond_without man_pages
+%bcond_without nouveau
 %bcond_without udev
+%bcond_without vmwgfx
+%ifarch %{ix86} x86_64
+%bcond_without intel
+%else
+%bcond_with    intel
+%endif
+%ifarch %{arm}
+%bcond_without omap
+%else
+%bcond_with    omap
+%endif
+%ifarch %{arm} aarch64
+%bcond_without etnaviv
+%bcond_without exynos
+%bcond_without freedreno
+%bcond_without tegra
+%bcond_without vc4
+%else
+%bcond_with    etnaviv
+%bcond_with    exynos
+%bcond_with    freedreno
+%bcond_with    tegra
+%bcond_with    vc4
+%endif
+%ifarch %{valgrind_arches}
+%bcond_without valgrind
+%else
+%bcond_with    valgrind
+%endif
 Summary:        Direct Rendering Manager runtime library
 Name:           libdrm
 Version:        2.4.114
@@ -35,34 +63,6 @@ Source3:        LICENSE.PTR
 Patch1001:      libdrm-make-dri-perms-okay.patch
 # Remove backwards compat not needed on CBL-Mariner
 Patch1002:      libdrm-2.4.0-no-bc.patch
-%ifarch %{ix86} x86_64
-%bcond_without intel
-%else
-%bcond_with    intel
-%endif
-%ifarch %{arm}
-%bcond_without omap
-%else
-%bcond_with    omap
-%endif
-%ifarch %{arm} aarch64
-%bcond_without exynos
-%bcond_without freedreno
-%bcond_without tegra
-%bcond_without vc4
-%bcond_without etnaviv
-%else
-%bcond_with    exynos
-%bcond_with    freedreno
-%bcond_with    tegra
-%bcond_with    vc4
-%bcond_with    etnaviv
-%endif
-%ifarch %{valgrind_arches}
-%bcond_without valgrind
-%else
-%bcond_with    valgrind
-%endif
 BuildRequires:  chrpath
 BuildRequires:  cmake
 BuildRequires:  gcc
