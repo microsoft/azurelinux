@@ -5,18 +5,8 @@ name: Livepatch specs check
 
 on:
   push:
-    paths:
-      - '.github/workflows/overwrite_shell_link.sh'
-      - '**/kernel*/**'
-      - '**/livepatch*/**'
-      - 'toolkit/scripts/**'
     branches: [2.0]
   pull_request:
-    paths:
-      - '.github/workflows/overwrite_shell_link.sh'
-      - '**/kernel*/**'
-      - '**/livepatch*/**'
-      - 'toolkit/scripts/**'
     branches: [2.0]
 
 jobs:

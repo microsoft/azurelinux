@@ -6,14 +6,8 @@ name: Static glibc version check
 
 on:
   push:
-    paths:
-      - '**.spec'
-      - 'toolkit/scripts/**'
     branches: [main, dev, 1.0*, 2.0*]
   pull_request:
-    paths:
-      - '**.spec'
-      - 'toolkit/scripts/**'
     branches: [main, dev, 1.0*, 2.0*]
 
 jobs:

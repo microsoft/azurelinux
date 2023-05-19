@@ -5,16 +5,8 @@ name: Check Manifests
 
 on:
   push:
-    paths:
-      - 'SPECS/**.spec'
-      - 'toolkit/resources/manifests/package/*'
-      - 'toolkit/scripts/**'
     branches: [main, dev, 1.0*, 2.0*]
   pull_request:
-    paths:
-      - 'SPECS/**.spec'
-      - 'toolkit/resources/manifests/package/*'
-      - 'toolkit/scripts/**'
     branches: [main, dev, 1.0*, 2.0*]
 
 jobs:
