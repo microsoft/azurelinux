@@ -145,6 +145,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
+	// The old way of including mariner-release in images was reliant on some old behavior
+	// from tdnf, i.e. not detecting packages installed via rpm. Which caused an issue when
+	// tdnf was upgraded past 3.4.1 to include a package install history. Instead of pre-installing
+	// mariner-release ahead of calculating the packages + dependencies for the image, now we will
+	// simply add mariner-release to each image's package list to be installed.
 	packagesToInstall = append([]string{marinerReleasePackage}, packagesToInstall...)
 
 	isRootFS = len(systemConfig.PartitionSettings) == 0
