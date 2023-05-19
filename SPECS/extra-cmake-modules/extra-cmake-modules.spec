@@ -1,16 +1,19 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Name:         extra-cmake-modules
 Summary:      Additional modules for CMake build system
-Version:      5.90.0
+Version:      5.106.0
 Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
-License:      BSD
+# Licenses retrieved from source files with:
+# grep -hR -oP "(?<=SPDX-License-Identifier: ).*" <source_dir>/* | sort | uniq
+# and:
+# ls -la <source_dir>/LICENSES/
+License:      BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND MIT
 URL:          https://github.com/KDE/extra-cmake-modules
-
-%global versiondir %(echo %{version} | cut -d. -f1-2)
-
-Source0:   https://download.kde.org/stable/frameworks/%{versiondir}/%{name}-%{version}.tar.xz
-BuildArch: noarch
+Source0:      https://download.kde.org/stable/frameworks/%{majmin}/%{name}-%{version}.tar.xz
+BuildArch:    noarch
 
 # bundle clang python bindings here, at least until they are properly packaged elsewhere, see:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1490997
@@ -57,7 +60,7 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 
 %files
 %doc README.rst
-%license COPYING-CMAKE-SCRIPTS
+%license COPYING-CMAKE-SCRIPTS LICENSES/*
 %{_datadir}/ECM/
 %if 0%{?docs}
 %{_kf5_docdir}/ECM/html/
@@ -66,6 +69,10 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 
 
 %changelog
+* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
+- Updating to 5.106.0.
+- Updated license information.
+
 * Tue Jan 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.90.0-1
 - Update source to 5.90.0
 - License verified

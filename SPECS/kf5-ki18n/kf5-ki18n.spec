@@ -95,7 +95,7 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 %changelog
 * Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
-- Updating to 5.106.0 to fix build issues with newer versions of Qt5.
+- Updating to 5.106.0.
 - Updated license information.
 
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 5.61.0-4
