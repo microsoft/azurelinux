@@ -5,8 +5,16 @@ name: Go Test Coverage
 
 on:
   push:
+    paths:
+      - '**.go'
+      - 'toolkit/scripts/**'
+      - 'toolkit/tools/go.*'
     branches: [main, dev, 1.0*, 2.0*]
   pull_request:
+    paths:
+      - '**.go'
+      - 'toolkit/scripts/**'
+      - 'toolkit/tools/go.*'
     branches: [main, dev, 1.0*, 2.0*]
 
 jobs:

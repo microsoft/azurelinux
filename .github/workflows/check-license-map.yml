@@ -7,8 +7,16 @@ name: Spec License Map Check
 
 on:
   push:
+    paths:
+      - 'SPECS/LICENSES-AND-NOTICES/data/licenses.json'
+      - 'SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md'
+      - 'toolkit/scripts/**'
     branches: [main, dev, 1.0*, 2.0*]
   pull_request:
+    paths:
+      - 'SPECS/LICENSES-AND-NOTICES/data/licenses.json'
+      - 'SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md'
+      - 'toolkit/scripts/**'
     branches: [main, dev, 1.0*, 2.0*]
 
 jobs:
