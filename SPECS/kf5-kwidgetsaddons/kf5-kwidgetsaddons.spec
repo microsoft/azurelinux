@@ -63,7 +63,6 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 %{_kf5_datadir}/kf5/kcharselect/
 
 %files devel
-%{_kf5_includedir}/kwidgetsaddons_version.h
 %{_kf5_includedir}/KWidgetsAddons/
 %{_kf5_libdir}/libKF5WidgetsAddons.so
 %{_kf5_libdir}/cmake/KF5WidgetsAddons/

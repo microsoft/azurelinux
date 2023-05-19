@@ -25,6 +25,7 @@ BuildRequires:  extra-cmake-modules >= %{majmin}
 BuildRequires:  kf5-rpm-macros >= %{majmin}
 
 BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtdeclarative-devel
 BuildRequires:  qt5-qttools-devel
 
 Requires:       kf5-filesystem >= %{majmin}

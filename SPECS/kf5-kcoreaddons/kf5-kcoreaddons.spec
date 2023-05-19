@@ -81,7 +81,6 @@ update-mime-database %{_datadir}/mime &> /dev/null || :
 %{_kf5_datadir}/kf5/licenses/
 
 %files devel
-%{_kf5_includedir}/kcoreaddons_version.h
 %{_kf5_includedir}/KCoreAddons/
 %{_kf5_libdir}/libKF5CoreAddons.so
 %{_kf5_libdir}/cmake/KF5CoreAddons/

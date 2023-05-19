@@ -25,6 +25,7 @@ BuildRequires:  gettext
 BuildRequires:  kf5-rpm-macros >= %{majmin}
 BuildRequires:  python3
 BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtbase-private-devel
 BuildRequires:  qt5-qtdeclarative-devel
 
 Requires:       kf5-filesystem >= %{majmin}
