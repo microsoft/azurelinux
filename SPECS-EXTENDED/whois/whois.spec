@@ -4,7 +4,7 @@
 
 Summary:        Improved WHOIS client
 Name:           whois
-Version:        5.5.15
+Version:        5.5.16
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
