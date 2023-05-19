@@ -10,11 +10,11 @@ import sys
 
 def check_config_arch(input_file):
     with open(input_file, 'r') as file:
-        contents = file.read()
+        input_config = file.read()
     file.close()
-    if "Linux/x86_64" in contents:
+    if "Linux/x86_64" in input_config:
         return "AMD64"
-    elif "Linux/arm64" in contents:
+    elif "Linux/arm64" in input_config:
         return "ARM64"
     else:
         return None
@@ -23,46 +23,47 @@ def check_strings_in_file(json_file, arch, input_file):
     
     with open(json_file, 'r') as file:
         data = json.load(file)
-        config_data = data['required-configs']
+        required_configs_data = data['required-configs']
 
     with open(input_file, 'r') as file:
-        contents = file.read().split("\n")
+        input_config = file.read().split("\n")
 
-    #missing configs is map: {config: (newValue, expectedValue, comment, PR)}
-    missing_configs = {}
+    #incorrect configs is map: {config: (newValue, expectedValue, comment, PR)}
+    incorrect_configs = {}
 
     # go through required configs
-    for key, value in config_data.items():
+    for key, value in required_configs_data.items():
         # check for arch
         if arch not in value['arch']:
             continue
-        # check if config is present with correct value
+        # check if required config is present with correct value
         found = False
-        for line in contents:
-            # check for config in line (without extra _VALUE)
+        # check for required config in each input config line (without extra _VALUE)
+        for line in input_config:
             if f"{key}=" in line or f"{key} is not set" in line:
                 for val in value['value']:
                     if val in line and val != "":
                         found = True
                         break
-                else:
-                    missing_configs[key] = (line.split(key)[1].replace('=',''), value['value'], value['comment'], value['PR'])
+                # config was found but value is not correct
+                # mark as found and add to incorrect_configs
+                if not found:
+                    incorrect_configs[key] = (line.split(key)[1].replace('=',''), value['value'], value['comment'], value['PR'])
                     found = True
-                    break
         if not found:
             # check if config can be missing
             if "" not in value['value']:
-                missing_configs[key] = (line, value['value'], value['comment'], value['PR'])
+                incorrect_configs[key] = (line, value['value'], value['comment'], value['PR'])
 
-    return missing_configs
+    return incorrect_configs
 
 def print_verbose(json_file, results):
 
     with open(json_file, 'r') as file:
         data = json.load(file)
-        config_data = data['required-configs']
+        required_configs_data = data['required-configs']
     print_data = [["Option", "Required Arch", "Expected Value", "Comment"]]
-    for key, value in config_data.items():
+    for key, value in required_configs_data.items():
         if arch in value['arch']:
             if key in results:
                 print_data.append([key, value['arch'], value['value'], f"FAIL: Unexpected value: {results[key][0]}. See: {value['PR']}"])
