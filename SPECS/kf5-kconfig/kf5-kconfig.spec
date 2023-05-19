@@ -91,7 +91,9 @@ popd
 %files core -f kconfig5_qt.lang
 %{_kf5_bindir}/kreadconfig5
 %{_kf5_bindir}/kwriteconfig5
-%{_kf5_libdir}/libKF5ConfigCore.so.*
+%{_kf5_datadir}/qlogging-categories5/kconfig.*
+%{_kf5_libdir}/libKF5ConfigCore.so.5*
+%{_kf5_libdir}/libKF5ConfigQml.so.5*
 %{_kf5_libexecdir}/kconfig_compiler_kf5
 %{_kf5_libexecdir}/kconf_update
 
@@ -99,13 +101,16 @@ popd
 %postun gui -p /sbin/ldconfig
 
 %files gui
-%{_kf5_libdir}/libKF5ConfigGui.so.*
+%{_kf5_libdir}/libKF5ConfigGui.so.5*
 
 %files devel
+%{_kf5_includedir}/KConfig/
 %{_kf5_includedir}/KConfigCore/
 %{_kf5_includedir}/KConfigGui/
+%{_kf5_includedir}/KConfigQml/
 %{_kf5_libdir}/libKF5ConfigCore.so
 %{_kf5_libdir}/libKF5ConfigGui.so
+%{_kf5_libdir}/libKF5ConfigQml.so
 %{_kf5_libdir}/cmake/KF5Config/
 %{_kf5_archdatadir}/mkspecs/modules/qt_KConfigCore.pri
 %{_kf5_archdatadir}/mkspecs/modules/qt_KConfigGui.pri

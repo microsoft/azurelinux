@@ -69,7 +69,10 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 %files -f %{name}.lang
 %doc README.md
 %license LICENSES/*
-%{_kf5_libdir}/libKF5I18n.so.*
+%{_kf5_datadir}/qlogging-categories5/ki18n.*
+%{_kf5_libdir}/qt5/qml/org/kde/i18n/localeData/*
+%{_kf5_libdir}/libKF5I18n.so.5*
+%{_kf5_libdir}/libKF5I18nLocaleData.so.5*
 %{_kf5_qtplugindir}/kf5/ktranscript.so
 %lang(ca) %{_datadir}/locale/ca/LC_SCRIPTS/ki18n5/
 %lang(ca@valencia) %{_datadir}/locale/ca@valencia/LC_SCRIPTS/ki18n5/
@@ -88,7 +91,9 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 %files devel
 %{_kf5_includedir}/KI18n/
+%{_kf5_includedir}/KI18nLocaleData/
 %{_kf5_libdir}/libKF5I18n.so
+%{_kf5_libdir}/libKF5I18nLocaleData.so
 %{_kf5_libdir}/cmake/KF5I18n/
 %{_kf5_archdatadir}/mkspecs/modules/qt_KI18n.pri
 
