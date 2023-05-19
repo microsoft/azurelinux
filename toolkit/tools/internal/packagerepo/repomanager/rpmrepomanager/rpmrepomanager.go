@@ -4,12 +4,9 @@
 package rpmrepomanager
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -41,57 +38,6 @@ func CreateRepo(repoDir string) (err error) {
 	_, stderr, err := shell.Execute("createrepo", repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
-	}
-
-	return
-}
-
-// OrganizePackagesByArch will recursively move RPMs from srcDir into architecture folders under repoDir
-func OrganizePackagesByArch(srcDir, repoDir string) (err error) {
-	const noArch = "noarch"
-
-	logger.Log.Debugf("Organizing RPM packages from (%s) to (%s)", srcDir, repoDir)
-
-	stdout, stderr, err := shell.Execute("uname", "-m")
-	if err != nil {
-		logger.Log.Warnf("Could not fetch current architecture from shell: %v", stderr)
-		return
-	}
-	currentArch := strings.TrimSpace(stdout)
-
-	didMovePackages := false
-	pkgArches := []string{noArch, currentArch}
-
-	for _, arch := range pkgArches {
-		var rpmFiles []string
-
-		err = os.MkdirAll(filepath.Join(repoDir, arch), os.ModePerm)
-		if err != nil {
-			return
-		}
-
-		rpmSearch := filepath.Join(srcDir, fmt.Sprintf("*.%s.rpm", arch))
-		rpmFiles, err = filepath.Glob(rpmSearch)
-		if err != nil {
-			return
-		}
-
-		for _, rpmFile := range rpmFiles {
-			dstFile := filepath.Join(repoDir, arch, filepath.Base(rpmFile))
-			err = file.Move(rpmFile, dstFile)
-			if err != nil {
-				logger.Log.Warnf("Unable to move (%s) to (%s)", rpmFile, dstFile)
-				return
-			}
-		}
-
-		if len(rpmFiles) > 0 {
-			didMovePackages = true
-		}
-	}
-
-	if !didMovePackages {
-		logger.Log.Debugf("Failed to locate any downloaded packages. All packages are assumed to be locally available.")
 	}
 
 	return

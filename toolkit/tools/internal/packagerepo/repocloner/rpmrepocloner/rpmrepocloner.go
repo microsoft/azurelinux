@@ -574,25 +574,23 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 }
 
 func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
+	tdnfArg = pkgVer.Name
+
 	// TDNF does not accept versioning information on implicit provides.
 	if pkgVer.IsImplicitPackage() {
 		if pkgVer.Condition != "" {
 			logger.Log.Warnf("Discarding version constraint for implicit package: %v", pkgVer)
 		}
-		tdnfArg = pkgVer.Name
 		return
 	}
 
-	// Treat <= as =
-	// Treat > and >= as "latest"
+	// To avoid significant overhead we only download the latest version of a package
+	// for ">" and ">=" constraints (ie remove constraints).
 	switch pkgVer.Condition {
 	case "<=", "<", "=":
 		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
-	case "", ">", ">=":
-		tdnfArg = pkgVer.Name
 	default:
 		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
-		tdnfArg = pkgVer.Name
 	}
 
 	return
