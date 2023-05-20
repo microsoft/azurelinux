@@ -41,10 +41,10 @@ jobs:
           echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
       # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
-      - name: Setup Python 3.7
+      - name: Setup Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.11
 
       - name: Get Python dependencies
         run: python3 -m pip install -r toolkit/scripts/requirements.txt
