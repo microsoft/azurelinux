@@ -9,6 +9,17 @@ import argparse
 import sys
 import re
 
+# Define a class
+    #incorrect configs is map: {config: (newValue, expectedValue, comment, PR)}
+class IncorrectConfig:
+    def __init__(self, name, newValue, expectedValue, comment, PR):
+        self.name = name
+        self.newValue = newValue
+        self.expectedValue = expectedValue
+        self.comment = comment
+        self.PR = PR
+
+
 def get_data_from_config(input_file):
     with open(input_file, 'r') as file:
         input_config_data = file.read()
@@ -58,12 +69,12 @@ def check_strings_in_file(json_file, kernel, arch, input_config_data):
                 # config was found but value is not correct
                 # mark as found and add to incorrect_configs
                 if not found:
-                    incorrect_configs[key] = (line.split(key)[1].replace('=',''), value['value'], value['comment'], value['PR'])
+                    incorrect_configs[key] = (IncorrectConfig(key, line.split(key)[1].replace('=',''), value['value'], value['comment'], value['PR']))
                     found = True
         if not found:
             # check if config can be missing
             if "" not in value['value']:
-                incorrect_configs[key] = (line, value['value'], value['comment'], value['PR'])
+                incorrect_configs[key] = (IncorrectConfig(key, line, value['value'], value['comment'], value['PR']))
 
     return incorrect_configs
 
@@ -138,8 +149,7 @@ if __name__ == '__main__':
             print()
             print ("----------------- Kernel config verification FAILED -----------------")
             for key, value in result.items():
-                print(f'{key} is "{value[0]}", expected {value[1]}.\nReason: {value[2]}')
-                if value[3] != None:
-                    print(f"PR: {value[3]}")
+                print(f'{key} is "{value.newValue}", expected {value.expectedValue}.\nReason: {value.comment}')
+                print(f"PR: {value.PR}")
                 print()
             sys.exit(1)

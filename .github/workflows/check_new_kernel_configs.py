@@ -48,16 +48,16 @@ def find_missing_configs(json_file, kernel, arch, config_diff):
         if kernel not in data:
             print(f"Kernel {kernel} not found in {json_file}")
             return None
-        config_data = data[kernel]['required-configs']
+        required_configs_data = data[kernel]['required-configs']
 
     # Extract the words from the string
     config_words = find_matching_lines(config_diff)
 
     # Find the missing words
     missing_configs = []
-    for word in config_words:
-        if word not in config_data or arch not in config_data[word]["arch"] :
-            missing_configs.append(word)
+    for config_option in config_words:
+        if config_option not in required_configs_data or arch not in required_configs_data[config_option]["arch"] :
+            missing_configs.append(config_option)
     return missing_configs
 
 
@@ -88,7 +88,7 @@ if missing_configs == None:
     print(f"Could not find required configs for {kernel}")
     sys.exit(0)
 
-print("Missing words:", missing_configs)
+print("Missing configs:", missing_configs)
 if len(missing_configs) == 0:
     print("All configs are present in required configs")
 else:
