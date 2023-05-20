@@ -10,11 +10,11 @@ on:
   push:
     branches: [main, dev, 1.0*, 2.0*]
     paths:
-      - 'SPECS/kernel/config*'
+      - 'SPECS/kernel*/config*'
   pull_request:
     branches: [main, dev, 1.0*, 2.0*]
     paths:
-      - 'SPECS/kernel/config*'
+      - 'SPECS/kernel*/config*'
 
 jobs:
   check:
@@ -53,7 +53,7 @@ jobs:
       - name: Check if config files changed
         run: |
           echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
-          changed_configs=$(git diff-tree --diff-filter=d  --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/kernel/config.*$" || test $? = 1; })
+          changed_configs=$(git diff-tree --diff-filter=d  --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/kernel.*/config.*$" || test $? = 1; })
           echo "Files to validate: '${changed_configs}'"
           echo "updated_configs=$(echo ${changed_configs})" >> $GITHUB_ENV
 
