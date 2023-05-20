@@ -9,6 +9,11 @@ import argparse
 import sys
 import re
 
+def get_data_from_config(input_file):
+    with open(input_file, 'r') as file:
+        input_config_data = file.read()
+    return input_config_data
+
 def check_kernel(input_file):
     match = re.search(r'SPECS/(.*?)/', input_file)
     if match:
@@ -17,26 +22,21 @@ def check_kernel(input_file):
         return None
 
 
-def check_config_arch(input_file):
-    with open(input_file, 'r') as file:
-        input_config = file.read()
-    if "Linux/x86_64" in input_config:
+def check_config_arch(input_config_data):
+    if "Linux/x86_64" in input_config_data:
         return "AMD64"
-    elif "Linux/arm64" in input_config:
+    elif "Linux/arm64" in input_config_data:
         return "ARM64"
     else:
         return None
 
-def check_strings_in_file(json_file, kernel, arch, input_file):
+def check_strings_in_file(json_file, kernel, arch, input_config_data):
     with open(json_file, 'r') as file:
         data = json.load(file)
         if kernel not in data:
             print(f"Kernel {kernel} not found in {json_file}")
             return None
         required_configs_data = data[kernel]['required-configs']
-
-    with open(input_file, 'r') as file:
-        input_config = file.read().split("\n")
 
     #incorrect configs is map: {config: (newValue, expectedValue, comment, PR)}
     incorrect_configs = {}
@@ -49,7 +49,7 @@ def check_strings_in_file(json_file, kernel, arch, input_file):
         # check if required config is present with correct value
         found = False
         # check for required config in each input config line (without extra _VALUE)
-        for line in input_config:
+        for line in input_config_data.split('\n'):
             if f"{key}=" in line or f"{key} is not set" in line:
                 for val in value['value']:
                     if val in line and val != "":
@@ -109,7 +109,9 @@ if __name__ == '__main__':
         print("Kernel not found in config filepath")
         sys.exit(1)
 
-    arch = check_config_arch(config_file)
+    input_config_data = get_data_from_config(config_file)
+
+    arch = check_config_arch(input_config_data)
     if arch == None:
         print("Architecture not found in config file")
         sys.exit(1)
@@ -120,7 +122,7 @@ if __name__ == '__main__':
     print("===============================================================================")
 
     # result is map: {config: (newValue, expectedValue, comment, PR)}
-    result = check_strings_in_file(required_configs, kernel, arch, config_file)
+    result = check_strings_in_file(required_configs, kernel, arch, input_config_data)
     # check if required configs are present
     # not an error is not all kernels are being checked
     if result == None:

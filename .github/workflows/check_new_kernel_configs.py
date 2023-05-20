@@ -9,6 +9,11 @@ import argparse
 import sys
 import re
 
+def get_data_from_config(input_file):
+    with open(input_file, 'r') as file:
+        input_config_data = file.read()
+    return input_config_data
+
 def check_kernel(input_file):
     match = re.search(r'SPECS/(.*?)/', input_file)
     if match:
@@ -16,12 +21,10 @@ def check_kernel(input_file):
     else:
         return None
 
-def check_config_arch(input_file):
-    with open(input_file, 'r') as file:
-        contents = file.read()
-    if "Linux/x86_64" in contents:
+def check_config_arch(input_config_data):
+    if "Linux/x86_64" in input_config_data:
         return "AMD64"
-    elif "Linux/arm64" in contents:
+    elif "Linux/arm64" in input_config_data:
         return "ARM64"
     else:
         return None
@@ -73,11 +76,12 @@ if kernel == None:
     print("Kernel not found in config filepath")
     sys.exit(1)
 
-arch = check_config_arch(config_file)
+input_config_data = get_data_from_config(config_file)
+
+arch = check_config_arch(input_config_data)
 if arch == None:
     print("Architecture not found in config file")
     sys.exit(1)
-
 
 missing_configs = find_missing_configs(required_configs, kernel, arch, config_diff)
 if missing_configs == None:
