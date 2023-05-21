@@ -20,6 +20,8 @@ BuildArch:    noarch
 Source1: clang-python-4.0.1.tar.gz
 
 BuildRequires: kf5-rpm-macros
+BuildRequires: qt5-qtbase-devel
+
 Requires: kf5-rpm-macros
 
 # use pkgname instead of cmake since el7 qt5 pkgs currently do not include cmake() provides
@@ -72,6 +74,7 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 * Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
 - Updating to 5.106.0.
 - Updated license information.
+- Adjusted BRs after kf5 update.
 
 * Tue Jan 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.90.0-1
 - Update source to 5.90.0
