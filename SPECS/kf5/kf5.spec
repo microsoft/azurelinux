@@ -78,6 +78,7 @@ sed -i \
 * Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
 - Updating to 5.106.0 using Fedora 38's (license: MIT) spec for guidelines.
 - Removing unused and unneeded default package.
+- License verified.
 
 * Tue Mar 31 2020 Joe Schmitt <joschmit@microsoft.com> - 5.61.0-4
 - Generate kf5 package
