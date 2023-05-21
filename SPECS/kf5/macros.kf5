@@ -2,7 +2,7 @@
 %_kf5_archdatadir %_qt5_archdatadir
 %_kf5_bindir %_kf5_prefix/bin
 %_kf5_datadir %_datadir
-%_kf5_docdir /usr/share/doc
+%_kf5_docdir %_docdir
 %_kf5_includedir %_includedir/KF5
 %_kf5_libdir %_libdir
 %_kf5_libexecdir %_libexecdir/kf5
@@ -15,13 +15,17 @@
 %_kf5_qmldir %_kf5_archdatadir/qml
 %_kf5_version @@KF5_VERSION@@
 
-%cmake_kf5 \
+%cmake_kf5 \\\
+  %undefine __cmake_in_source_build \
   QTDIR="%{_qt5_prefix}" ; export QTDIR ; \
   PATH="%{_qt5_bindir}:$PATH" ; export PATH ; \
   CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ; \
   CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ; \
   FFLAGS="${FFLAGS:-%optflags%{?_fmoddir: -I%_fmoddir}}" ; export FFLAGS ; \
-  cmake \\\
+  %{?__global_ldflags:LDFLAGS="${LDFLAGS:-%__global_ldflags}" ; export LDFLAGS ;} \
+    %{__cmake} \\\
+    %{?__cmake_builddir:-S "%{_vpath_srcdir}"} \\\
+    %{?__cmake_builddir:-B "%{__cmake_builddir}"} \\\
     -DCMAKE_C_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
     -DCMAKE_CXX_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
     -DCMAKE_Fortran_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
