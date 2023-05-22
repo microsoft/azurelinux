@@ -22,9 +22,6 @@
 %skip_check_vim 1
 %skip_check_gnutls 1
 
-# Chmods /dev/null to 600 breaking many non-root applications.
-%skip_check_zstd 1
-
 # JNA requires X11 dependencies which are only available in toolchain build environment
 %skip_check_jna 1
 
