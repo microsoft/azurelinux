@@ -25,10 +25,15 @@ A core cryptographic library written by Microsoft
 # Only x86_64 and aarch64 are currently supported
 %ifarch x86_64
 %define symcrypt_arch AMD64
+%define symcrypt_cc %{__cc}
+%define symcrypt_cxx %{__cxx}
 %endif
 
 %ifarch aarch64
 %define symcrypt_arch ARM64
+# Currently SymCrypt ARM64 build requires use of clang
+%define symcrypt_cc clang
+%define symcrypt_cxx clang++
 %endif
 
 %prep
@@ -41,7 +46,9 @@ ln -s jitterentropy-library-3.3.1 jitterentropy-library
 %build
 cmake   -S . -B bin \
         -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER=%{symcrypt_cc} \
+        -DCMAKE_CXX_COMPILER=%{symcrypt_cxx}
 
 cmake --build bin
 
