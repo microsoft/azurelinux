@@ -1,0 +1,86 @@
+From 99a8134486f3f5ffc5360034b7bd4ce3ada27112 Mon Sep 17 00:00:00 2001
+From: Kate <kit.ty.kate@disroot.org>
+Date: Fri, 5 Aug 2022 21:56:46 +0100
+Subject: [PATCH] Upgrade the tests to sexplib0.v0.15
+
+Signed-off-by: Kate <kit.ty.kate@disroot.org>
+Signed-off-by: Olivia Crain <oliviacrain@microsoft.com>
+---
+ test/base/test.ml                    |  6 +++---
+ test/driver/exception_handling/run.t | 10 +++++-----
+ test/ppx_import_support/test.ml      |  4 ++--
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/test/base/test.ml b/test/base/test.ml
+index 7cf282a5..77c27e52 100644
+--- a/test/base/test.ml
++++ b/test/base/test.ml
+@@ -106,17 +106,17 @@ let _ = convert_longident "Base.( land )"
+ 
+ let _ = convert_longident "A(B)"
+ [%%expect{|
+-Exception: (Invalid_argument "Ppxlib.Longident.parse: \"A(B)\"")
++Exception: Invalid_argument "Ppxlib.Longident.parse: \"A(B)\"".
+ |}]
+ 
+ let _ = convert_longident "A.B(C)"
+ [%%expect{|
+-Exception: (Invalid_argument "Ppxlib.Longident.parse: \"A.B(C)\"")
++Exception: Invalid_argument "Ppxlib.Longident.parse: \"A.B(C)\"".
+ |}]
+ 
+ let _ = convert_longident ")"
+ [%%expect{|
+-Exception: (Invalid_argument "Ppxlib.Longident.parse: \")\"")
++Exception: Invalid_argument "Ppxlib.Longident.parse: \")\"".
+ |}]
+ 
+ let _ = Ppxlib.Code_path.(file_path @@ top_level ~file_path:"dir/main.ml")
+diff --git a/test/driver/exception_handling/run.t b/test/driver/exception_handling/run.t
+index f0a5cc6f..d303b148 100644
+--- a/test/driver/exception_handling/run.t
++++ b/test/driver/exception_handling/run.t
+@@ -102,10 +102,10 @@ and the whole AST is prepended with an error extension node.
+ 
+   $ echo "let _ = [%gen_raise_exc] + [%gen_raise_exc]" > impl.ml
+   $ ./extender.exe impl.ml
+-  Fatal error: exception (Failure "A raised exception")
++  Fatal error: exception Failure("A raised exception")
+   [2]
+   $ ./extender.exe -embed-errors impl.ml
+-  Fatal error: exception (Failure "A raised exception")
++  Fatal error: exception Failure("A raised exception")
+   [2]
+ 
+  In the case of derivers
+@@ -113,14 +113,14 @@ and the whole AST is prepended with an error extension node.
+   $ echo "type a = int" > impl.ml
+   $ echo "type b = int [@@deriving deriver_raised_exception]" >> impl.ml
+   $ ./deriver.exe -embed-errors impl.ml
+-  Fatal error: exception (Failure "A raised exception")
++  Fatal error: exception Failure("A raised exception")
+   [2]
+ 
+  In the case of whole file transformations:
+ 
+   $ ./whole_file_exception.exe impl.ml
+-  Fatal error: exception (Failure "An exception in a whole file transform")
++  Fatal error: exception Failure("An exception in a whole file transform")
+   [2]
+   $ ./whole_file_exception.exe -embed-errors impl.ml
+-  Fatal error: exception (Failure "An exception in a whole file transform")
++  Fatal error: exception Failure("An exception in a whole file transform")
+   [2]
+diff --git a/test/ppx_import_support/test.ml b/test/ppx_import_support/test.ml
+index e32d39b0..66fd12bf 100644
+--- a/test/ppx_import_support/test.ml
++++ b/test/ppx_import_support/test.ml
+@@ -108,6 +108,6 @@ let id_for_core_types =
+     (fun ~ctxt:_ core_type -> core_type)
+ [%%expect{|
+ Exception:
+-(Failure
+-  "Some ppx-es tried to register conflicting transformations: Extension 'id' on type declarations matches extension 'id'")
++Failure
++ "Some ppx-es tried to register conflicting transformations: Extension 'id' on type declarations matches extension 'id'".
+ |}]
