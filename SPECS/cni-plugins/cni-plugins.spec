@@ -13,6 +13,8 @@ URL:            https://github.com/containernetworking/plugins
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  golang >= 1.5
 
+Provides:      kubernetes-cni
+
 %description
 The CNI (Container Network Interface) project consists of a specification and libraries for writing plugins to configure network interfaces in Linux containers, along with a number of supported plugins.
 
