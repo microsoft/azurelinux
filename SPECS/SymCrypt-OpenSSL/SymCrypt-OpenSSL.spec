@@ -41,12 +41,12 @@ cmake   .. \
 
 cmake --build .
 
-%check
-./bin/SslPlay/SslPlay
-
 %install
 cd bin
 cmake --build . --target install
+
+%check
+./bin/SslPlay/SslPlay
 
 %files
 %license LICENSE

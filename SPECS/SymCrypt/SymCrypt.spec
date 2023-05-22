@@ -45,9 +45,6 @@ cmake   -S . -B bin \
 
 cmake --build bin
 
-%check
-./bin/exe/symcryptunittest
-
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
@@ -55,6 +52,9 @@ install inc/symcrypt* %{buildroot}%{_includedir}
 # Use cp -P to preserve symbolic links
 cp -P bin/module/generic/libsymcrypt.so* %{buildroot}%{_libdir}
 chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
+
+%check
+./bin/exe/symcryptunittest
 
 %files
 %license LICENSE
