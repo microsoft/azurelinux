@@ -19,9 +19,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
-
 BuildRequires:  golang
-
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
 Requires:       %{name}-cmctl
