@@ -45,7 +45,8 @@ func CreateRepo(repoDir string) (err error) {
 	return
 }
 
-// ValidateRpmPaths d
+// ValidateRpmPaths checks for any rpm filenames in the cache that don't match the expected output according to 'rpm -qp ...'.  It
+// will return an error with all the mismatched pairs if it finds any.
 func ValidateRpmPaths(repoDir string) (err error) {
 	rpmSearch := filepath.Join(repoDir, "*.rpm")
 	rpmFiles, err := filepath.Glob(rpmSearch)
