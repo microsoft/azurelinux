@@ -25,8 +25,8 @@ A core cryptographic library written by Microsoft
 # Only x86_64 and aarch64 are currently supported
 %ifarch x86_64
 %define symcrypt_arch AMD64
-%define symcrypt_cc %{__cc}
-%define symcrypt_cxx %{__cxx}
+%define symcrypt_cc gcc
+%define symcrypt_cxx g++
 %endif
 
 %ifarch aarch64
