@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        8.0.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -33,6 +33,9 @@ Patch1:         0001-Fix-for-newer-azure-storage-blob.patch
 # Fix unit test error
 Patch2:         0001-Fix-unit-test-error.patch
 Patch3:         update-go-module-version.patch
+Patch4:    CVE-2023-29194.patch
+Patch5:    CVE-2023-29195.patch
+Patch6:    CVE-2023-29195-1.patch
 BuildRequires: golang
 
 %description
@@ -107,6 +110,9 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.0-13
+- Add patch for CVE-2023-29194, CVE-2023-29195
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.0-12
 - Bump release to rebuild with go 1.19.8
 
