@@ -90,13 +90,5 @@ func StringsSetToSlice(inputSet map[string]bool) []string {
 }
 
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
-	if expected == nil && given == nil {
-		return true, true
-	}
-
-	if expected == nil || given == nil {
-		return true, false
-	}
-
-	return
+	return (expected == nil || given == nil), (expected == nil && given == nil)
 }

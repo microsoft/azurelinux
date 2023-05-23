@@ -66,6 +66,26 @@ func TestPackageVerShouldNotMatchNil(t *testing.T) {
 	assert.False(t, PackageVerMatch(packageVer1, nil))
 }
 
+func TestStringShouldMatch(t *testing.T) {
+	assert.True(t, StringMatch("A", "A"))
+}
+
+func TestStringShouldNotMatch(t *testing.T) {
+	assert.False(t, StringMatch("A", "B"))
+}
+
+func TestStringShouldNotMatchForNilFirst(t *testing.T) {
+	assert.False(t, StringMatch(nil, "A"))
+}
+
+func TestStringShouldNotMatchNilSecond(t *testing.T) {
+	assert.False(t, StringMatch("A", nil))
+}
+
+func TestStringShouldMatchForNilInBoth(t *testing.T) {
+	assert.True(t, StringMatch(nil, nil))
+}
+
 func TestStringsSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
 	outputSlice := StringsSetToSlice(nil)
 
