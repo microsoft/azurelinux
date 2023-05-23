@@ -217,7 +217,6 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 		return
 	}
 
-	// Approximately 1 management + 1 idle node per package build, so take size of graph x3 for expected weight
 	rootTS, _ := timestamp.StartEvent("build graph", nil)
 	defer timestamp.StopEvent(rootTS)
 

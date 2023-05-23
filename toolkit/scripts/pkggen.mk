@@ -88,7 +88,7 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		$(logging_command) \
 		--timestamp-file=$(TIMESTAMP_DIR)/specreader.jsonl \
 		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
-	  --output $@
+		--output $@
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
