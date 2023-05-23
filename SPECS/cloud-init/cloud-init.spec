@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        22.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
+Patch0:    CVE-2023-1786.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -146,6 +147,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 22.4-3
+- Add patch for CVE-2023-1786
+
 * Mon Apr 03 2023 Minghe Ren <mingheren@microsoft.com> - 22.4-2
 - Install python serial module in check section to avoid test failure
 
