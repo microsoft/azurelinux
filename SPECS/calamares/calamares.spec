@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        40%{?dist}
+Release:        41%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -152,10 +152,7 @@ mv %{SOURCE24} src/modules/users/users.conf
 %patch5 -p1
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF ..
-popd
+%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF
 
 make %{?_smp_mflags} -C %{_target_platform}
 
@@ -231,6 +228,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.11-41
+- Updating build steps to newer version of "kf5-rpm-macros" package.
+
 * Fri Jan 27 2023 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.11-40
 - Fix application crash when discoverin partitions due to a race condition with serialize-read-access.patch
 - Fix application crash when the Mariner installer process thread have already exited during progress bar installation view

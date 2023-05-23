@@ -49,10 +49,7 @@ developing applications that use %{name}.
 
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} .. -DPYTHON_EXECUTABLE=%{python3}
-popd
+%{cmake_kf5} -DPYTHON_EXECUTABLE=%{python3}
 
 %make_build -C %{_target_platform}
 

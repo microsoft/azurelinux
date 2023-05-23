@@ -1,7 +1,7 @@
 
 Name:           kpmcore
 Version:        3.3.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Library for managing partitions by KDE programs
 License:        GPLv3+
 URL:            https://github.com/KDE/kpmcore
@@ -47,10 +47,7 @@ developing applications that use %{name}
 %setup -q
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
+%{cmake_kf5}
 
 make %{?_smp_mflags} -C %{_target_platform}
 
@@ -76,6 +73,9 @@ make install/fast -C %{_target_platform} DESTDIR=%{buildroot}
 
 
 %changelog
+* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-8
+- Updating build steps to newer version of "kf5-rpm-macros" package.
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.3.0-7
 - License verified.
 

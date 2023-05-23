@@ -41,10 +41,7 @@ Additional modules for CMake build system needed by KDE Frameworks.
 PYTHONPATH=`pwd`/python
 export PYTHONPATH
 
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
+%{cmake_kf5}
 
 %make_build -C %{_target_platform}
 

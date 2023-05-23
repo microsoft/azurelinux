@@ -65,12 +65,9 @@ their changes to their respective configuration files.
 
 %build
 
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} .. \
+%{cmake_kf5} \
   -G Ninja \
   %{?tests:-DBUILD_TESTING:BOOL=ON}
-popd
 
 %ninja_build -C %{_target_platform}
 

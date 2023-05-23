@@ -39,10 +39,7 @@ developing applications that use %{name}.
 %setup -q -n %{framework}-%{version}
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
+%{cmake_kf5}
 
 %make_build -C %{_target_platform}
 
