@@ -1,6 +1,6 @@
 Summary:        Netwide Assembler.
 Name:           nasm
-Version:        2.15.05
+Version:        2.16
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ make %{?_smp_mflags} -k test
 %{_datadir}/*
 
 %changelog
+* Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.16-1
+- Auto-upgrade to 2.16 - patch CVE-2022-44370
+
 * Thu Jan 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.15.05-1
 - Upgrading to 2.15.05.
 - License verified.
