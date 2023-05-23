@@ -711,17 +711,17 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 rm -f $RPM_BUILD_ROOT%{_mandir}/man3/nbdkit-rust-plugin.3*
 
 # Remove some plugins we cannot --disable.
-%if{with cdi}
+%if %{with cdi}
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-cdi-plugin.so
 rm -f $RPM_BUILD_ROOT%{_mandir}/man?/nbdkit-cdi-plugin.*
 %endif
 
-%if{with torrent}
+%if %{with torrent}
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-torrent-plugin.so
 rm -f $RPM_BUILD_ROOT%{_mandir}/man?/nbdkit-torrent-plugin.*
 %endif
 
-%if{with s3}
+%if %{with s3}
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-S3-plugin
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/nbdkit-S3-plugin.1*
 %endif
