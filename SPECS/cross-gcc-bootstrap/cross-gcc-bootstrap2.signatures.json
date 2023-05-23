@@ -1,0 +1,8 @@
+{
+    "Signatures": {
+     "gcc-11.2.0.tar.xz": "d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b",
+     "gmp-6.2.1.tar.xz": "fd4829912cddd12f84181c3451cc752be224643e87fac497b69edddadc49b4f2",
+     "mpc-1.2.1.tar.gz": "17503d2c395dfcf106b622dc142683c1199431d095367c6aacba6eec30340459",
+     "mpfr-4.1.0.tar.xz": "0c98a3f1732ff6ca4ea690552079da9c597872d30e96ec28414ee23c95558a7f"
+    }
+   }
