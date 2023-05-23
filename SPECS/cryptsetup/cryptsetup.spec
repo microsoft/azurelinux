@@ -24,8 +24,7 @@ BuildRequires:  popt-devel
 BuildRequires:  util-linux
 Requires:       cryptsetup-libs = %{version}-%{release}
 Requires:       libpwquality >= 1.2.0
-# Currently disabling  SSH tokens with --disable-ssh-token until libssh is available
-#BuildRequires:  libssh-devel
+BuildRequires:  libssh-devel
 Provides:       cryptsetup-luks = %{version}-%{release}
 
 %description
@@ -86,7 +85,7 @@ chmod -x misc/dracut_90reencrypt/*
 
 %build
 ./autogen.sh
-%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-default-luks-format=LUKS2 --disable-ssh-token
+%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-default-luks-format=LUKS2
 make %{?_smp_mflags}
 
 %install
