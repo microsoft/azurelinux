@@ -217,8 +217,8 @@ popd
 
 %changelog
 * Tue May 09 2023 Bala <balakumaran.kannan@microsoft.com> - 5.4.4-1
-* Upgrade to version 5.4.4 to fix CVE-2021-44964
-* Removed patches that are already part of new version
+- Upgrade to version 5.4.4 to fix CVE-2021-44964
+- Removed patches that are already part of new version
 
 * Mon Apr 14 2023 Bala <balakumaran.kannan@microsoft.com> - 5.4.3-5
 - Patching CVE-2021-45985
