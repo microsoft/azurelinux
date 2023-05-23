@@ -10961,8 +10961,8 @@
         "type": "other",
         "other": {
           "name": "libssh",
-          "version": "0.9.5",
-          "downloadUrl": "https://www.libssh.org/files/0.9/libssh-0.9.5.tar.xz"
+          "version": "0.10.4",
+          "downloadUrl": "https://www.libssh.org/files/0.10/libssh-0.10.4.tar.xz"
         }
       }
     },
@@ -13833,8 +13833,8 @@
         "type": "other",
         "other": {
           "name": "nbdkit",
-          "version": "1.20.7",
-          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.20-stable/nbdkit-1.20.7.tar.gz"
+          "version": "1.32.6",
+          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.32-stable/nbdkit-1.32.6.tar.gz"
         }
       }
     },
