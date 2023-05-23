@@ -145,6 +145,7 @@ popd
 
 %changelog
 * Mon May 22 2023 Vince Perri <viperri@microsoft.com> - 0.10.4-3
+- License verified.
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 
 * Thu Oct 06 2022 Norbert Pocs <npocs@redhat.com> - 0.10.4-2
