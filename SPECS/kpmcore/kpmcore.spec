@@ -1,37 +1,45 @@
+%global kf5min 5.90
+%global qtmin 5.15.0
+%global sover 12
 
 Name:           kpmcore
-Version:        3.3.0
-Release:        8%{?dist}
+Version:        22.12.3
+Release:        1%{?dist}
 Summary:        Library for managing partitions by KDE programs
-License:        GPLv3+
+# Licenses retrieved from source files with:
+# grep -hR -oP "(?<=SPDX-License-Identifier: ).*" <source_dir>/* | sort | uniq
+# and:
+# ls -la <source_dir>/LICENSES/
+License:        CC0-1.0 AND CC-BY-4.0 AND GPL-3.0-or-later AND MIT
 URL:            https://github.com/KDE/kpmcore
-#Source0:       http://download.kde.org/stable/%{name}/%{version}/src/%{name}-%{version}.tar.xz
-Source0:        %{name}-%{version}.tar.xz
+Source0:        https://download.kde.org/stable/release-service/%{version}/src/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-BuildRequires:  cmake
+BuildRequires:  cmake >= 3.16
 BuildRequires:  extra-cmake-modules
 BuildRequires:  gettext
-BuildRequires:  kf5-kcoreaddons-devel
-BuildRequires:  kf5-ki18n-devel
-BuildRequires:  kf5-kwidgetsaddons-devel
-BuildRequires:  qt5-qtbase-devel
+BuildRequires:  kf5-kcoreaddons-devel >= %{kf5min}
+BuildRequires:  kf5-ki18n-devel >= %{kf5min}
+BuildRequires:  kf5-kwidgetsaddons-devel >= %{kf5min}
+BuildRequires:  qt5-qtbase-devel >= %{qtmin}
 BuildRequires:  kf5-rpm-macros
 
-BuildRequires:  util-linux-devel
-BuildRequires:  libatasmart-devel
-BuildRequires:  pkg-config
-BuildRequires:  parted
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(blkid) >= 2.33.2
+BuildRequires:  pkgconfig(polkit-qt5-1)
 
-Requires:       parted
 Requires:       e2fsprogs
 Requires:       kf5-filesystem
+
+Recommends:     dosfstools
+Recommends:     jfsutils
+Recommends:     nilfs-utils
+Recommends:     udftools
 
 %description
 KPMcore contains common code for managing partitions by KDE Partition Manager 
 and other KDE projects
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -42,39 +50,39 @@ Requires:       qt5-qtbase-devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}
 
-
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%{cmake_kf5}
-
-make %{?_smp_mflags} -C %{_target_platform}
-
+%cmake_kf5
+%cmake_build
 
 %install
-make install/fast -C %{_target_platform} DESTDIR=%{buildroot}
-%find_lang %{name} --with-kde
+%cmake_install
+%find_lang %{name}
+%find_lang %{name}._policy_
 
-
-
-%files -f %{name}.lang
-%license COPYING.GPL3
-%{_kf5_libdir}/libkpmcore.so.*
-%{_kf5_qtplugindir}/libpm*.so
-%{_kf5_datadir}/kservices5/pm*backendplugin.desktop
-%{_kf5_datadir}/kservicetypes5/pm*backendplugin.desktop
+%files -f %{name}.lang -f %{name}._policy_.lang
+%license LICENSES/*
+%doc README.md
+%{_kf5_libdir}/libkpmcore.so.%{sover}
+%{_kf5_libdir}/libkpmcore.so.%{version}
+%{_kf5_qtplugindir}/kpmcore
+%{_libexecdir}/kpmcore_externalcommand
+%{_datadir}/dbus-1/system.d/org.kde.kpmcore.*.conf
+%{_datadir}/dbus-1/system-services/org.kde.kpmcore.*.service
+%{_datadir}/polkit-1/actions/org.kde.kpmcore.externalcommand.policy
 
 %files devel
 %{_includedir}/%{name}/
 %{_kf5_libdir}/cmake/KPMcore
 %{_kf5_libdir}/libkpmcore.so
 
-
-
 %changelog
-* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-8
+* Tue May 23 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 22.12.3-1
+- Updating to version 22.12.3 using Fedora 37 (license: MIT) spec for guidance.
 - Updating build steps to newer version of "kf5-rpm-macros" package.
+- Updating license information.
 
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.3.0-7
 - License verified.
