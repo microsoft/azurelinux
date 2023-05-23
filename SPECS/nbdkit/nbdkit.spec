@@ -79,6 +79,9 @@ BuildRequires:  libnbd-devel >= 1.3.11
 BuildRequires:  libssh-devel
 BuildRequires:  e2fsprogs, e2fsprogs-devel
 BuildRequires:  xorriso
+%if %{with torrent}
+BuildRequires:  rb_libtorrent-devel
+%endif
 BuildRequires:  bash-completion
 BuildRequires:  perl-devel
 BuildRequires:  perl(ExtUtils::Embed)
@@ -246,10 +249,26 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 Requires:       gcc
 Requires:       /bin/cat
 
+
 %description cc-plugin
 This package contains support for writing inline C plugins and scripts
 for %{name}.  NOTE this is NOT the right package for writing plugins
 in C, install %{name}-devel for that.
+
+
+%if %{with cdi}
+%package cdi-plugin
+Summary:        Containerized Data Import plugin for %{name}
+License:        BSD
+
+Requires:       %{name}-server%{?_isa} = %{version}-%{release}
+Requires:       jq
+Requires:       podman
+
+
+%description cdi-plugin
+This package contains Containerized Data Import support for %{name}.
+%endif
 
 
 %package curl-plugin
@@ -394,6 +413,22 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ruby-plugin
 This package lets you write Ruby plugins for %{name}.
+%endif
+
+
+%if %{with s3}
+# In theory this is noarch, but because plugins are placed in _libdir
+# which varies across architectures, RPM does not allow this.
+%package S3-plugin
+Summary:        Amazon S3 and Ceph plugin for %{name}
+License:        BSD
+Requires:       %{name}-python-plugin >= 1.22
+# XXX Should not need to add this.
+Requires:       python3-boto3
+
+%description S3-plugin
+This package lets you open disk images stored in Amazon S3
+or Ceph using %{name}.
 %endif
 
 
@@ -673,6 +708,9 @@ export PYTHON=%{__python3}
     --disable-static \
     --disable-golang \
     --disable-rust \
+%if !%{with torrent}
+    --disable-torrent \
+%endif
 %if !%{with ruby}
     --disable-ruby \
 %endif
@@ -714,11 +752,6 @@ rm -f $RPM_BUILD_ROOT%{_mandir}/man3/nbdkit-rust-plugin.3*
 %if %{with cdi}
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-cdi-plugin.so
 rm -f $RPM_BUILD_ROOT%{_mandir}/man?/nbdkit-cdi-plugin.*
-%endif
-
-%if %{with torrent}
-rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins/nbdkit-torrent-plugin.so
-rm -f $RPM_BUILD_ROOT%{_mandir}/man?/nbdkit-torrent-plugin.*
 %endif
 
 %if %{with s3}
@@ -1134,7 +1167,8 @@ export LIBGUESTFS_TRACE=1
 - License verified.
 - Removing libxcrypt-compat requirement from vddk plugin.
 - Disabling torrent, S3, and cdi plugins.
-- Removing nbdkit-srpm-macros, adding equivalent Provides directives.
+- Removing torrent .so with --disable-torrent instead of rm -rf.
+- Removing nbdkit-srpm-macros package after adding desired 'Provides'.
 - Avoid non-zero exit from `%check` section
 - Disabling plug-in for Ruby due to building issues.
 - Removing in-spec verification of source tarballs.
