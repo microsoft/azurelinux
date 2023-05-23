@@ -20,17 +20,25 @@ Requires:       openssl >= 1.1.1
 %description
  The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 
+%ifarch x86_64
+%define keysinuse_arch amd64
+%endif
+
+%ifarch aarch64
+%define keysinuse_arch aarch64
+%endif
+
 %prep
 %setup -q
 
 %build
 export GO111MODULE=off
 
-cmake -DCMAKE_TOOLCHAIN_FILE=./cmake-toolchains/linux-amd64-glibc.cmake -H./ -B./build
+cmake -DCMAKE_TOOLCHAIN_FILE=./cmake-toolchains/linux-%{keysinuse_arch}-glibc.cmake -H./ -B./build
 cmake --build ./build --target keysinuse
 
 cd ./packaging/util
-make $(realpath ../../bin/keysinuseutil)
+make CONFIG=%{keysinuse_arch} $(realpath ../../bin/keysinuseutil)
 
 %install
 mkdir -p %{buildroot}/%{_libdir}/engines-1.1/
