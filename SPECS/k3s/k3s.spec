@@ -7,7 +7,7 @@
 Summary:        Lightweight Kubernetes
 Name:           k3s
 Version:        1.26.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 # Note: k3s is not exclusive with coredns, etcd, containerd, runc and other CBL-Mariner packages which it embeds.
 # This means there may be multiple versions of these packages. At this time exclusivity is not being enforced to
@@ -28,7 +28,7 @@ Source0:        https://github.com/k3s-io/%{name}/archive/refs/tags/v%{version}+
 # 5. pushd vendor
 # 6. git clone --single-branch --branch="v1.6.18" --depth=1 https://github.com/k3s-io/containerd
 # 7. git clone -b "v1.1.1-k3s1" https://github.com/rancher/plugins.git
-# 8. git clone --single-branch --branch="v1.1.4" --depth=1 https://github.com/opencontainers/runc
+# 8. git clone --single-branch --branch="v1.1.5" --depth=1 https://github.com/opencontainers/runc
 # 9. popd
 # 10. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
 Source1:        %{name}-%{version}-vendor.tar.gz
@@ -82,6 +82,9 @@ exit 0
 %{install_sh}
 
 %changelog
+* Wed May 24 2023 Betty Lakes <bettylakes@microsoft.com> - 1.26.3-2
+- Update run version to 1.1.5 to fix CVE-2023-28642
+
 * Mon Apr 17 2023 Anuj Garg <anujgarg@microsoft.com> - 1.26.3-1
 - Updated k3s to 1.26.3
 - Drop version constraint on golang <= 1.18.8
