@@ -108,7 +108,7 @@ func main() {
 
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {
-		return
+		logger.Log.Fatalf("Failed to read DOT graph with error: %s", err)
 	}
 
 	// Generate the list of packages that need to be built.
