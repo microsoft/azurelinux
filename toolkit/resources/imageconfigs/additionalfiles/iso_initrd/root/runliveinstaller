@@ -43,7 +43,7 @@ function retry {
     local sleep_seconds=15
     while [ $retry -lt $limit ]
     do
-        "$@" && break
+        eval "$@" && break
         echo "$@" failed. Retrying... 
         ((retry++))
         sleep $sleep_seconds
@@ -75,8 +75,9 @@ elif grep -q "image-config" $CMDLINE; then
 else
     echo Attempt to mount the ISO root
     # It is possible that the partition isn't ready to be mounted when this script
-    # is first run. So use a retry loop.
-    retry mount -L $LABEL -o ro $ISO_ROOT
+    # is first run. So use a retry loop. There is a race condition so we should check
+    # each time if we have already mounted and bail early if so.
+    retry "{ grep -qs $ISO_ROOT /proc/mounts || mount -L $LABEL -o ro $ISO_ROOT ; }"
 fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
