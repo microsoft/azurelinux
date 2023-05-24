@@ -233,7 +233,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %changelog
 *   Wed May 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-2
--   Enable static resource management and buidl with host's openssl
+-   Enable static resource management and build with host's openssl
 
 *   Wed May 10 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-1
 -   Add version 0.4.1 and fix CVEs
