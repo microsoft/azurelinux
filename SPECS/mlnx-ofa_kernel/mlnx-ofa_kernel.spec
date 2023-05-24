@@ -60,10 +60,7 @@
 %{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
 
-# %global MLNX_OFED_VERSION 5.6-1.0.3
-%global MLNX_OFED_VERSION 5.8-1.1.2.1
-
-# %global highest_supported_kernel 5.15.102.1-1
+%global MLNX_OFED_VERSION 23.04-0.5.3.tgz 
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -72,15 +69,15 @@
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 # Update OFED version along with version updates
-Version:        5.6
-Release:        2%{?dist}
+Version:        23.04
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz#/%{name}-%{version}.tgz
-BuildRequires:  kernel-devel <= %{highest_supported_kernel}
+Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz
+BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -95,7 +92,7 @@ Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Requires: coreutils
 Requires: grep
-Requires: kernel <= %{highest_supported_kernel}
+Requires: kernel
 Requires: lsof
 Requires: mlnx-tools >= 5.2.0
 Requires: module-init-tools
