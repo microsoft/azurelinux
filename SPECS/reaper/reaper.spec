@@ -12,7 +12,7 @@
 
 Name:           reaper
 Version:        3.1.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 License:        ASL 2.0
 Distribution:   Mariner
@@ -108,7 +108,7 @@ tar xf %{SOURCE1}
 
 echo "Installing npm_modules"
 tar fx %{SOURCE2}
-patch -p1 {PATCH0}
+patch -p1 < %{PATCH0}
 popd
 
 # Building using maven in offline mode.
@@ -179,8 +179,11 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Tue May 23 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-4
+- Update CVE-2022-37601.patch to patch two other occurances of the same CVE
+
 * Wed Apr 19 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-3
-* Patch CVE-2022-37601 for webpack/loader-utils npm module
+- Patch CVE-2022-37601 for webpack/loader-utils npm module
 
 * Tue Sep 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-2
 - Adding Runtime requirement on msopenjdk.
