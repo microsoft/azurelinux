@@ -108,7 +108,7 @@ tar xf %{SOURCE1}
 
 echo "Installing npm_modules"
 tar fx %{SOURCE2}
-patch -p1 {PATCH0}
+patch -p1 < %{PATCH0}
 popd
 
 # Building using maven in offline mode.
