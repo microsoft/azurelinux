@@ -1,7 +1,7 @@
 Summary:        Text editor
 Name:           nano
 Version:        6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

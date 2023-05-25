@@ -18,9 +18,8 @@ SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
-full_pack_list_file = $(BUILD_SRPMS_DIR)/full_pack_list.txt
+srpm_keep_list_file = $(BUILD_SRPMS_DIR)/keep_list.txt
 srpm_packed_files   = $(BUILD_SRPMS_DIR)/packed_files.txt
-srpm_tidy_files     = $(BUILD_SRPMS_DIR)/tidy_files.txt
 srpm_packed_files_toolchain = $(BUILD_SRPMS_DIR)/packed_files_toolchain.txt
 existing_srpms = $(call shell_real_build_only, find $(BUILD_SRPMS_DIR)/ -type f -name '*.src.rpm')
 
@@ -29,14 +28,24 @@ existing_srpms = $(call shell_real_build_only, find $(BUILD_SRPMS_DIR)/ -type f 
 override SRPM_PACK_LIST := $(strip $(SRPM_PACK_LIST))
 
 ifneq ($(SRPM_PACK_LIST),) # Pack list has user entries in it, only build selected .spec files
+
 local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(SRPM_PACK_LIST))))
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 	@echo $(SRPM_PACK_LIST) | tr " " "\n" > $(srpm_pack_list_file)
+$(srpm_keep_list_file): $(srpm_pack_list_file) $(toolchain_spec_list)
+	@cat $(srpm_pack_list_file) $(toolchain_spec_list) > $@
+
 else # Empty pack list, build all under $(SPECS_DIR)
+
 local_specs = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 	@truncate -s 0 $@
-endif
+$(srpm_keep_list_file): $(srpm_pack_list_file)
+	@cat $(srpm_pack_list_file) > $@
+
+endif # $(SRPM_PACK_LIST)
+
+
 local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
 
@@ -57,7 +66,7 @@ clean-input-srpms:
 	$(SCRIPTS_DIR)/safeunmount.sh "$(SRPM_BUILD_CHROOT_DIR)" && \
 	rm -rf $(SRPM_BUILD_CHROOT_DIR)
 
-foo: $(STATUS_FLAGS_DIR)/build_srpms.flag
+foo: $(STATUS_FLAGS_DIR)/build_srpms.flag $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo "!!!!!"
 	touch $@
 
@@ -68,25 +77,6 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo Finished updating $@
 
 .PHONY: srpm_always_run_phony
-
-bar: $(STATUS_FLAGS_DIR)/tidy_srpms.flag
-$(STATUS_FLAGS_DIR)/tidy_srpms.flag: $(go-srpmtidy) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(srpm_pack_list_file) $(toolchain_spec_list) srpm_always_run_phony
-	[ -f $@ ] || touch $@
-	cat $(srpm_pack_list_file) $(toolchain_spec_list) > $(full_pack_list_file)
-	GODEBUG=netdns=go $(go-srpmtidy) \
-		--dir=$(SPECS_DIR) \
-		--output-dir=$(BUILD_SRPMS_DIR) \
-		--dist-tag=$(DIST_TAG) \
-		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
-		--worker-tar=$(chroot_worker) \
-		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		--pack-list=$(full_pack_list_file) \
-		--summary-file=$(srpm_tidy_files) \
-		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
-		--log-level=$(LOG_LEVEL) && \
-	if [ -s "$(srpm_tidy_files)" ]; then \
-		touch "$@"; \
-	fi
 
 ifeq ($(DOWNLOAD_SRPMS),y)
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR)
@@ -113,7 +103,8 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file) $(local_spec_sources) srpm_always_run_phony
+
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file) $(srpm_keep_list_file) $(local_spec_sources) srpm_always_run_phony
 	[ -f $@ ] || touch $@
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
@@ -127,7 +118,8 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
+		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file) --keep-list=$(srpm_keep_list_file)) \
+		--tidy \
 		--summary-file=$(srpm_packed_files) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \

@@ -104,6 +104,8 @@ var (
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
 	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	keepListFile = app.Flag("keep-list", "Path to a list of SPECs to keep. If empty will keep all SPECs.").ExistingFile()
+	doTidy       = app.Flag("tidy", "Whether or not to tidy the SRPMs before packing.").Bool()
 	summaryFile  = app.Flag("summary-file", "Path to a file to write a summary of the SRPMs created.").String()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
@@ -194,7 +196,19 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	packagedSRPMs, err := createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
+	// A keep list may be provided. It will be combined with the pack list to decide
+	// which SRPMS to keep. If it is empty all packages will be kept (but only the
+	// most recent version of each).
+	keepList := map[string]bool{}
+	if *keepListFile != "" {
+		keepList, err = parsePackListFile(*keepListFile)
+		for spec := range packList {
+			keepList[spec] = true
+		}
+		logger.PanicOnError(err)
+	}
+
+	packagedSRPMs, tidiedSRPMs, err := createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, keepList, *doTidy, templateSrcConfig)
 	logger.PanicOnError(err)
 
 	// Create empty summary file if one was specified and get a file handle to it for writing.
@@ -204,8 +218,13 @@ func main() {
 		defer summaryFileHandle.Close()
 
 		// Write each SRPM to the summary file.
+		for _, srpm := range tidiedSRPMs {
+			_, err = summaryFileHandle.WriteString(fmt.Sprintf("%s: %s\n", "Deleted", srpm))
+			logger.PanicOnError(err)
+		}
+		// Write each SRPM to the summary file.
 		for _, srpm := range packagedSRPMs {
-			_, err = summaryFileHandle.WriteString(srpm + "\n")
+			_, err = summaryFileHandle.WriteString(fmt.Sprintf("%s: %s\n", "Packed", srpm))
 			logger.PanicOnError(err)
 		}
 	}
@@ -246,7 +265,7 @@ func parsePackListFile(packListFile string) (packList map[string]bool, err error
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (packagedSRPMs []string, err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList, keepList map[string]bool, doTidy bool, templateSrcConfig sourceRetrievalConfiguration) (packagedSRPMs, tidiedSRPMs []string, err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
@@ -259,7 +278,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	}
 
 	doCreateAll := func() error {
-		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, runCheck, packList, templateSrcConfig, &packagedSRPMs)
+		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, runCheck, packList, keepList, doTidy, templateSrcConfig, &packagedSRPMs, &tidiedSRPMs)
 	}
 
 	if chroot != nil {
@@ -285,22 +304,55 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 }
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
-func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration, packagedSRPMs *[]string) (err error) {
+func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList, keepList map[string]bool, doTidy bool, templateSrcConfig sourceRetrievalConfiguration, packagedSRPMs, tidiedSRPMs *[]string) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 	timestamp.StartEvent("packing SRPMS", nil)
 	defer timestamp.StopEvent(nil)
 
 	timestamp.StartEvent("determining specs to pack", nil)
-	specFiles, err := spectosrpm.FindSPECFiles(specsDir, packList)
+	var specFilesToKeep []string
+	var specStates []*spectosrpm.SpecState
+	if doTidy {
+		timestamp.StartEvent("calculating specs that need tidying", nil)
+		// First pass to remove any SPECs that should not be packed and are stale.
+		specFilesToKeep, err = spectosrpm.FindSPECFiles(specsDir, keepList)
+		if err != nil {
+			return
+		}
+
+		specStates, err = spectosrpm.CalculateSPECsToRepack(specFilesToKeep, distTag, outDir, false, false, true, runCheck, workers)
+		if err != nil {
+			return fmt.Errorf("error calculating SRPM states: %w", err)
+		}
+
+		var srpmsToKeepMap map[string]bool
+		// Convert the results to a map of SRPMs to keep
+		srpmsToKeepMap, err = convertSpecStatesToMap(specStates)
+		if err != nil {
+			return fmt.Errorf("error calculating SRPM states: %w", err)
+		}
+
+		*tidiedSRPMs, err = deleteStaleSRPMs(srpmsToKeepMap, distTag, outDir, workers)
+		if err != nil {
+			err = fmt.Errorf("error deleting stale SRPMs: %w", err)
+			return
+		}
+		timestamp.StopEvent(nil) // calculating specs that need tidying
+	} else {
+		*tidiedSRPMs = []string{}
+	}
+
+	// Second pass to actually check the any SPECs that need to be packed for stale sources.
+	specFilesToPackage, err := spectosrpm.FindSPECFiles(specsDir, packList)
 	if err != nil {
 		return
 	}
 
-	specStates, err := spectosrpm.CalculateSPECsToRepack(specFiles, distTag, outDir, nestedSourcesDir, repackAll, false, runCheck, workers)
+	specStates, err = spectosrpm.CalculateSPECsToRepack(specFilesToPackage, distTag, outDir, false, false, false, runCheck, workers)
 	if err != nil {
-		return
+		return fmt.Errorf("error calculating SRPM states: %w", err)
 	}
-	timestamp.StopEvent(nil)
+	timestamp.StopEvent(nil) // determining specs to pack
 
 	*packagedSRPMs, err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
 	return
@@ -373,6 +425,30 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	}
 
 	err = chroot.AddFiles(files...)
+	return
+}
+
+func deleteStaleSRPMs(srpmsToKeep map[string]bool, distTag, outDir string, workers int) (packagedSRPMs []string, err error) {
+	// Scan every file in outDir and delete any that are not in srpmsToKeep.
+	err = filepath.Walk(outDir, func(path string, info os.FileInfo, err error) error {
+		// Skip the root directory, and any file that isn't .src.rpm.
+		if path == outDir || !strings.HasSuffix(path, ".src.rpm") {
+			return nil
+		}
+		if !srpmsToKeep[path] {
+			// Delete the file.
+			logger.Log.Infof("Deleting stale SRPM %s", path)
+			err := os.Remove(path)
+			if err != nil {
+				return fmt.Errorf("error deleting stale SRPM %s: %w", path, err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		err = fmt.Errorf("error deleting stale SRPMs: %w", err)
+	}
+
 	return
 }
 
@@ -479,6 +555,16 @@ func packSRPMWorker(allSpecStates <-chan *spectosrpm.SpecState, results chan<- *
 		results <- result
 		timestamp.StopEvent(ts)
 	}
+}
+
+func convertSpecStatesToMap(specStates []*spectosrpm.SpecState) (srpmsToKeep map[string]bool, err error) {
+	srpmsToKeep = make(map[string]bool)
+	for _, state := range specStates {
+		if state.ToPack {
+			srpmsToKeep[state.SrpmFile] = true
+		}
+	}
+	return
 }
 
 func specPathToSignaturesPath(specFilePath string) string {

@@ -87,7 +87,11 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	results := make(chan *SpecState, len(specFiles))
 	cancel := make(chan struct{})
 
-	logger.Log.Infof("Calculating SPECs to repack")
+	if !dryRun {
+		logger.Log.Infof("Calculating SPECs to repack")
+	} else {
+		logger.Log.Debugf("Calculating SPECs to repack (dryrun)")
+	}
 
 	arch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
@@ -142,7 +146,11 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 		return
 	}
 
-	logger.Log.Infof("Packing %d/%d SPECs", totalToRepack, len(specFiles))
+	if !dryRun {
+		logger.Log.Infof("Packing %d/%d SPECs", totalToRepack, len(specFiles))
+	} else {
+		logger.Log.Debugf("Would pack %d/%d SPECs (dryrun)", totalToRepack, len(specFiles))
+	}
 	return
 }
 
