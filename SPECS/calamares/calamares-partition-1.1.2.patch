@@ -1,0 +1,13 @@
+diff --git a/src/modules/partition/core/PartitionActions.cpp b/src/modules/partition/core/PartitionActions.cpp
+index 0759aaf..3c15344 100644
+--- a/src/modules/partition/core/PartitionActions.cpp
++++ b/src/modules/partition/core/PartitionActions.cpp
+@@ -135,7 +135,7 @@ doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionO
+     {
+         const QString MarinerBootMountPoint = "/boot/efi/";
+         PartitionInfo::setMountPoint( efiPartition, MarinerBootMountPoint );
+-        core->createPartition( dev, efiPartition, KPM_PARTITION_FLAG(Esp) | KPM_PARTITION_FLAG(Boot));
++        core->createPartition( dev, efiPartition, KPM_PARTITION_FLAG_ESP | KPM_PARTITION_FLAG(Boot));
+ 
+     }
+     else

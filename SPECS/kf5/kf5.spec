@@ -1,6 +1,6 @@
 Name:         kf5
-Version:      5.61.0
-Release:      4%{?dist}
+Version:      5.106.0
+Release:      1%{?dist}
 Summary:      Filesystem and RPM macros for KDE Frameworks 5
 License:      BSD
 URL:          http://www.kde.org
@@ -9,9 +9,6 @@ Distribution: Mariner
 
 BuildArch: noarch
 Source0: macros.kf5
-
-Requires: %{name}-filesystem
-Requires: %{name}-rpm-macros
 
 %description
 Filesystem and RPM macros for KDE Frameworks 5
@@ -26,8 +23,10 @@ Filesystem for KDE Frameworks 5.
 
 %package rpm-macros
 Summary: RPM macros for KDE Frameworks 5
-Requires: cmake
-Requires: qt5-qtbase-devel >= 5.11
+
+Requires: cmake >= 3
+Requires: qt5-rpm-macros >= 5.11
+Requires: gcc-c++
 
 %description rpm-macros
 RPM macros for building KDE Frameworks 5 packages.
@@ -40,8 +39,10 @@ mkdir -p %{buildroot}%{_includedir}/KF5
 mkdir -p %{buildroot}%{_datadir}/{config.kcfg,kconf_update,kf5,kservicetypes5}
 mkdir -p %{buildroot}%{_datadir}/kpackage/{genericqml,kcms}
 mkdir -p %{buildroot}%{_datadir}/kservices5/ServiceMenus
+mkdir -p %{buildroot}%{_datadir}/knsrcfiles/
 mkdir -p %{buildroot}%{_datadir}/qlogging-categories5/
 mkdir -p %{buildroot}%{_datadir}/solid/{actions,devices}
+mkdir -p %{buildroot}%{_docdir}/qt5
 mkdir -p %{buildroot}%{_libexecdir}/kf5
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/{env,shutdown}
 
@@ -49,8 +50,6 @@ install -Dpm644 %{SOURCE0} %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf5
 sed -i \
   -e "s|@@KF5_VERSION@@|%{version}|g" \
   %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf5
-
-%files
 
 %files filesystem
 %{_sysconfdir}/xdg/plasma-workspace/
@@ -66,14 +65,21 @@ sed -i \
 %{_datadir}/kpackage/
 %{_datadir}/kservices5/
 %{_datadir}/kservicetypes5/
+%{_datadir}/knsrcfiles/
 %{_datadir}/qlogging-categories5/
 %{_datadir}/solid/
+%{_docdir}/qt5/
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.kf5
 
 
 %changelog
+* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
+- Updating to 5.106.0 using Fedora 38's (license: MIT) spec for guidelines.
+- Removing unused and unneeded default package.
+- License verified.
+
 * Tue Mar 31 2020 Joe Schmitt <joschmit@microsoft.com> - 5.61.0-4
 - Generate kf5 package
 

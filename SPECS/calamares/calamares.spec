@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        40%{?dist}
+Release:        41%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,6 +55,10 @@ Patch4:         serialize-read-access.patch
 # such result means a critical error. However, depending on timing
 # the process might return false since it already exited. Patch5 fixes that bug.
 Patch5:         install-progress-bar-fix.patch
+# Patch adjusting our custom partiion module to work with newer versions of 'kpmcore'.
+Patch6:         calamares-partition-1.1.2.patch
+# Patch adjusting our custom partiion module to work with Qt5GUI 5.15+.
+Patch7:         calamares-partition-1.1.2-qt5gui-5.15.patch
 
 # Compilation tools
 BuildRequires:  cmake
@@ -74,6 +78,7 @@ BuildRequires:  kpmcore-devel >= 3.3
 BuildRequires:  libatasmart-devel
 # Other libraries
 BuildRequires:  libgcrypt-devel
+BuildRequires:  libglvnd-devel
 BuildRequires:  libpwquality-devel
 BuildRequires:  parted
 BuildRequires:  pkg-config
@@ -150,12 +155,11 @@ mv %{SOURCE24} src/modules/users/users.conf
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF ..
-popd
+%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF
 
 make %{?_smp_mflags} -C %{_target_platform}
 
@@ -231,6 +235,10 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Tue May 23 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.11-41
+- Updating BRs after fixing "kf5" and "Qt5" builds.
+- Updating build steps to work with the newer version of the "kf5-rpm-macros" package.
+
 * Fri Jan 27 2023 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.11-40
 - Fix application crash when discoverin partitions due to a race condition with serialize-read-access.patch
 - Fix application crash when the Mariner installer process thread have already exited during progress bar installation view
