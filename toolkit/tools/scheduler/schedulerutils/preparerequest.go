@@ -32,6 +32,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			Node:           node,
 			PkgGraph:       pkgGraph,
 			AncillaryNodes: []*pkggraph.PkgNode{node},
+			IsDelta:        node.State == pkggraph.StateDelta,
 		}
 
 		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, deltaBuild)
@@ -42,10 +43,21 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	for _, nodes := range buildNodes {
 		const defaultNode = 0
 
+		// Check if any of the nodes in buildNodes is a delta node and mark it. We will use this to determine if the
+		// build is a delta build that might have pre-built .rpm files available.
+		hasADeltaNode := false
+		for _, node := range nodes {
+			if node.State == pkggraph.StateDelta {
+				hasADeltaNode = true
+				break
+			}
+		}
+
 		req := &BuildRequest{
 			Node:           nodes[defaultNode],
 			PkgGraph:       pkgGraph,
 			AncillaryNodes: nodes,
+			IsDelta:        hasADeltaNode,
 		}
 
 		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, deltaBuild)
@@ -69,7 +81,13 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 
 	// Check if the node corresponds to an entry in packagesToRebuild
 	specName := node.SpecName()
-	canUseCache = !sliceutils.Contains(packagesToRebuild, specName, sliceutils.StringMatch)
+	// Some nodes have no VersionedPkg, but get the name if it exists otherwise use ""
+	pkgName := ""
+	if node.VersionedPkg != nil {
+		pkgName = node.VersionedPkg.Name
+	}
+	canUseCache = !sliceutils.Contains(packagesToRebuild, specName, sliceutils.StringMatch) &&
+		!sliceutils.Contains(packagesToRebuild, pkgName, sliceutils.StringMatch)
 	if !canUseCache {
 		logger.Log.Debugf("Marking (%s) for rebuild per user request", specName)
 		return

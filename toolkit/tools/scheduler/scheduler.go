@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"time"
@@ -361,6 +362,19 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 					}
 				}
 
+				if res.Node.Type == pkggraph.TypeBuild && res.WasDelta {
+					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
+					// We will need to update the graph with paths to any delta files that were actually rebuilt.
+					err = setAssociatedDeltaPaths(res, res.BuiltFiles, pkgGraph, graphMutex)
+					if err != nil {
+						// Failures to manipulate the graph are fatal.
+						err = fmt.Errorf("error setting delta paths for ancillary nodes: %w", err)
+						logger.Log.Error(err)
+						stopBuilding = true
+						stopBuild(channels, buildState)
+					}
+				}
+
 				nodesToBuild = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, graphMutex, buildState)
 			} else if stopOnFailure {
 				stopBuilding = true
@@ -424,6 +438,53 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 		if subgraphErr == nil {
 			logger.Log.Infof("Created solvable subgraph with new implicit provide information")
 			didOptimize = true
+		}
+	}
+
+	return
+}
+
+// setAssociatedDeltaPaths sets the DeltaPath for all of the request's ancillary nodes (both build and run) to the actual
+// RPM paths. A delta node will normally point at the cached RPM path, but we want to point it at the actual RPM if we built it.
+func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, builtFiles []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (err error) {
+	graphMutex.Lock()
+	defer graphMutex.Unlock()
+
+	if !res.WasDelta {
+		err = fmt.Errorf("setAssociatedDeltaPaths called on non-delta node: %s", res.Node.FriendlyName())
+		return
+	}
+
+	// Build map of basename to full path for built files. This will allow us to find the actual RPM path we built for
+	// any given .rpm file built from our ancillary nodes.
+	builtFileMap := make(map[string]string)
+	for _, builtFile := range builtFiles {
+		// We should not expect to see multiple built files with the same basename
+		_, hasConflict := builtFileMap[filepath.Base(builtFile)]
+		if hasConflict {
+			err = fmt.Errorf("multiple built files with same basename: %s", filepath.Base(builtFile))
+			return
+		}
+		logger.Log.Tracef("Built delta file: %s", builtFile)
+		builtFileMap[filepath.Base(builtFile)] = builtFile
+	}
+
+	// Now we can scan for all the run nodes that use the cached RPM path and update them to the actual RPM path.
+	for _, node := range pkgGraph.AllRunNodes() {
+		// Get base path of the .rpm for the node and find the built file in the map
+		rpmBasePath := filepath.Base(node.RpmPath)
+		builtFile, ok := builtFileMap[rpmBasePath]
+		if ok {
+			// We only care about nodes that are deltas
+			if node.State == pkggraph.StateDelta {
+				logger.Log.Tracef("Found delta run node: %s", node)
+				// Update the node to point at the actual RPM path from our map of built files
+				logger.Log.Tracef("Updating delta run node from %s to %s", node.RpmPath, builtFile)
+				node.RpmPath = builtFile
+			} else {
+				err = fmt.Errorf("unexpected node type/state when scanning for delta run node '%s' when updating paths to '%s'", node, rpmBasePath)
+				return
+			}
 		}
 	}
 
