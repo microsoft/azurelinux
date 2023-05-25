@@ -53,13 +53,12 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *pkggraph.PkgGraph) (packageVers []*pkgjson.PackageVer, err error) {
 	logger.Log.Debugf("Converting package/spec names to build nodes' PackageVers: %v", packageOrSpecNames)
 
-	packageVersMap := make(map[*pkgjson.PackageVer]bool)
 	specToPackageNodes := make(map[string][]*pkggraph.PkgNode)
-
 	for _, node := range dependencyGraph.AllBuildNodes() {
 		specToPackageNodes[node.SpecName()] = append(specToPackageNodes[node.SpecName()], node)
 	}
 
+	packageVersMap := make(map[*pkgjson.PackageVer]bool)
 	for _, packageOrSpecName := range packageOrSpecNames {
 		if nodes, ok := specToPackageNodes[packageOrSpecName]; ok {
 			logger.Log.Debugf("Name '%s' matched a spec name. Adding all packages built from this spec to the list.", packageOrSpecName)
@@ -67,6 +66,7 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 				packageVersMap[pkg.VersionedPkg] = true
 			}
 		} else {
+			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
 				logger.Log.Errorf("Failed while searching the dependency graph for package '%s', error: %s", packageOrSpecName, err)
@@ -89,6 +89,42 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 	}
 
 	packageVers = sliceutils.PackageVersSetToSlice(packageVersMap)
+
+	return
+}
+
+// PruneUnknownPackages removes all packages from the input list that do not have a build node in the graph.
+// The function also returns a slice with the unknown package names.
+func PruneUnknownPackages(packageOrSpecNames []string, dependencyGraph *pkggraph.PkgGraph) (prunedNames, unknownNames []string, err error) {
+	logger.Log.Debugf("Pruning unknown packages from the following list: %v", packageOrSpecNames)
+
+	specNames := make(map[string]bool)
+	for _, node := range dependencyGraph.AllBuildNodes() {
+		specNames[node.SpecName()] = true
+	}
+
+	for _, packageOrSpecName := range packageOrSpecNames {
+		if specNames[packageOrSpecName] {
+			logger.Log.Tracef("Name '%s' matched a spec name, keeping it in the list.", packageOrSpecName)
+			prunedNames = append(prunedNames, packageOrSpecName)
+		} else {
+			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
+			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
+			if err != nil {
+				logger.Log.Errorf("Failed while searching the dependency graph for package '%s', error: %s", packageOrSpecName, err)
+				return nil, nil, err
+			}
+
+			if (foundNode == nil) || (foundNode.BuildNode == nil) {
+				logger.Log.Tracef("Couldn't find package '%s' in the dependency graph. Pruning from the list.", packageOrSpecName)
+				unknownNames = append(unknownNames, packageOrSpecName)
+				continue
+			}
+
+			logger.Log.Debugf("Name '%s' matched a package name, keeping it in the list.", packageOrSpecName)
+			prunedNames = append(prunedNames, packageOrSpecName)
+		}
+	}
 
 	return
 }

@@ -82,7 +82,7 @@ var (
 	buildAgentProgram    = app.Flag("build-agent-program", "Path to the build agent that will be invoked to build packages.").String()
 	workers              = app.Flag("workers", "Number of concurrent build agents to spawn. If set to 0, will automatically set to the logical CPU count.").Default(defaultWorkerCount).Int()
 
-	ignoredPackages = app.Flag("ignored-packages", "Space separated list of specs ignoring rebuilds if their dependencies have been updated. Will still build if all of the spec's RPMs have not been built.").String()
+	pkgsToIgnore = app.Flag("ignored-packages", "Space separated list of specs ignoring rebuilds if their dependencies have been updated. Will still build if all of the spec's RPMs have not been built.").String()
 
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
@@ -123,12 +123,21 @@ func main() {
 		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error: %s.", err)
 	}
 
-	ignoredPackages, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*ignoredPackages), dependencyGraph)
+	prunedIgnoredPackageNames, unknownNames, err := schedulerutils.PruneUnknownPackages(exe.ParseListArgument(*pkgsToIgnore), dependencyGraph)
+	if err != nil {
+		logger.Log.Fatalf("Failed to prune unknown package/spec names from the ignored list, error: %s.", err)
+	}
+
+	if len(unknownNames) != 0 {
+		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
+	}
+
+	packagesToIgnore, err := schedulerutils.PackageNamesToBuiltPackages(prunedIgnoredPackageNames, dependencyGraph)
 	if err != nil {
 		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error: %s.", err)
 	}
 
-	ignoredAndRebuiltPackages := intersect.Hash(ignoredPackages, packagesToRebuild)
+	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
 	if len(ignoredAndRebuiltPackages) != 0 {
 		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v.", ignoredAndRebuiltPackages)
 	}
@@ -186,7 +195,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, ignoredPackages, toolchainPackages, *deltaBuild, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, toolchainPackages, *deltaBuild, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
