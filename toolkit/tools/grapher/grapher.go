@@ -24,8 +24,6 @@ var (
 	logLevel         = exe.LogLevelFlag(app)
 	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
-
-	depGraph = pkggraph.NewPkgGraph()
 )
 
 func main() {
@@ -43,6 +41,7 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
+	depGraph := pkggraph.NewPkgGraph()
 	err = populateGraph(depGraph, &localPackages)
 	if err != nil {
 		logger.Log.Panic(err)

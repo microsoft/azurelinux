@@ -3,7 +3,11 @@
 
 package sliceutils
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+)
 
 // NotFound value is returned by Find(), if a given value is not present in the slice.
 const NotFound = -1
@@ -37,11 +41,40 @@ func FindMatches(slice []string, isMatch func(string) bool) []string {
 	return result
 }
 
-// StringMatch is intended to be used with "Find" for slices of strings.
+// StringMatch is intended to be used with "Contains" and "Find" for slices of strings.
 func StringMatch(expected, given interface{}) bool {
+	if checkValid, checkResult := nilCheck(expected, given); checkValid {
+		return checkResult
+	}
+
 	return expected.(string) == given.(string)
 }
 
+// PackageVerMatch is intended to be used with "Contains" and "Find" for slices of *pkgjson.PackageVers.
+func PackageVerMatch(expected, given interface{}) bool {
+	if checkValid, checkResult := nilCheck(expected, given); checkValid {
+		return checkResult
+	}
+
+	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
+}
+
+// PackageVersSetToSlice converts a map[*pkgjson.PackageVer]bool to a slice containing the map's keys.
+func PackageVersSetToSlice(inputSet map[*pkgjson.PackageVer]bool) []*pkgjson.PackageVer {
+	index := 0
+	outputSlice := make([]*pkgjson.PackageVer, len(inputSet))
+
+	for element, elementInSet := range inputSet {
+		if elementInSet {
+			outputSlice[index] = element
+			index++
+		}
+	}
+
+	return outputSlice[:index]
+}
+
+// StringsSetToSlice converts a map[string]bool to a slice containing the map's keys.
 func StringsSetToSlice(inputSet map[string]bool) []string {
 	index := 0
 	outputSlice := make([]string, len(inputSet))
@@ -54,4 +87,8 @@ func StringsSetToSlice(inputSet map[string]bool) []string {
 	}
 
 	return outputSlice[:index]
+}
+
+func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
+	return (expected == nil || given == nil), (expected == nil && given == nil)
 }
