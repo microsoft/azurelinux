@@ -1,0 +1,64 @@
+From 12c165489d3144e8844c58242d7b00df9e66b340 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Thu, 25 May 2023 11:17:43 -0700
+Subject: [PATCH] add logging to tdnf resolve
+
+---
+ client/api.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/client/api.c b/client/api.c
+index 8b134e8..049f000 100644
+--- a/client/api.c
++++ b/client/api.c
+@@ -1647,12 +1647,14 @@ TDNFResolve(
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+     if (!pTdnf->pArgs->nBuildDeps) {
++        printf("Calling TDNFPrepareAllPackages\n");
+         dwError = TDNFPrepareAllPackages(
+                       pTdnf,
+                       &nAlterType,
+                       ppszPkgsNotResolved,
+                       &queueGoal);
+     } else {
++        printf("Calling TDNFResolveBuildDependencies\n");
+         dwError = TDNFResolveBuildDependencies(
+                         pTdnf,
+                         ppszPkgNames,
+@@ -1662,12 +1664,14 @@ TDNFResolve(
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+     if (!pTdnf->pArgs->nSource && !pTdnf->pArgs->nNoDeps) {
++        printf("Calling TDNFGoal\n");
+         dwError = TDNFGoal(
+                       pTdnf,
+                       &queueGoal,
+                       &pSolvedPkgInfo,
+                       nAlterType);
+     } else {
++        printf("Calling TDNFGoalNoDeps\n");
+         dwError = TDNFGoalNoDeps(
+                       pTdnf,
+                       &queueGoal,
+@@ -1689,7 +1693,7 @@ TDNFResolve(
+         pSolvedPkgInfo->pPkgsToUpgrade ||
+         pSolvedPkgInfo->pPkgsToDowngrade ||
+         pSolvedPkgInfo->pPkgsToReinstall;
+-
++    printf("Post Goals\n");
+     dwError = TDNFGetAvailableCacheBytes(pTdnf->pConf, &qwAvailCacheBytes);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+@@ -1701,7 +1705,7 @@ TDNFResolve(
+ 
+     pSolvedPkgInfo->ppszPkgsNotResolved = ppszPkgsNotResolved;
+     *ppSolvedPkgInfo = pSolvedPkgInfo;
+-
++    print("End Resolve\n");
+ cleanup:
+     /* only free the pointers */
+     TDNF_SAFE_FREE_MEMORY(ppszPkgNames);
+-- 
+2.25.1
+
