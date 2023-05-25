@@ -28,11 +28,13 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 
 	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
 	if err != nil {
+		err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
 		return
 	}
 
 	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
 	if err != nil {
+		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
 		return
 	}
 
@@ -69,16 +71,14 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
-				logger.Log.Errorf("Failed while searching the dependency graph for package '%s', error: %s", packageOrSpecName, err)
+				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
 				return nil, err
 			}
 			if foundNode == nil {
-				logger.Log.Errorf("Couldn't find package '%s' in the dependency graph.", packageOrSpecName)
 				err = fmt.Errorf("couldn't find package '%s' in the dependency graph", packageOrSpecName)
 				return nil, err
 			}
 			if foundNode.BuildNode == nil {
-				logger.Log.Errorf("Found package '%s' but it is not a locally-built package.", packageOrSpecName)
 				err = fmt.Errorf("found package '%s' but it is not a locally-built package", packageOrSpecName)
 				return nil, err
 			}
@@ -111,7 +111,7 @@ func PruneUnknownPackages(packageOrSpecNames []string, dependencyGraph *pkggraph
 			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
-				logger.Log.Errorf("Failed while searching the dependency graph for package '%s', error: %s", packageOrSpecName, err)
+				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
 				return nil, nil, err
 			}
 
