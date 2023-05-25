@@ -108,24 +108,24 @@ func main() {
 
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {
-		logger.Log.Fatalf("Failed to read DOT graph with error:\n%w", err)
+		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
 	packagesToBuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToBuild), dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to build, error:\n%w.", err)
+		logger.Log.Fatalf("Unable to find build nodes for the packages to build, error:\n%s.", err)
 	}
 
 	packagesToRebuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToRebuild), dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error:\n%w.", err)
+		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error:\n%s.", err)
 	}
 
 	prunedIgnoredPackageNames, unknownNames, err := schedulerutils.PruneUnknownPackages(exe.ParseListArgument(*pkgsToIgnore), dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Failed to prune unknown package/spec names from the ignored list, error:\n%w.", err)
+		logger.Log.Fatalf("Failed to prune unknown package/spec names from the ignored list, error:\n%s.", err)
 	}
 
 	if len(unknownNames) != 0 {
@@ -134,7 +134,7 @@ func main() {
 
 	packagesToIgnore, err := schedulerutils.PackageNamesToBuiltPackages(prunedIgnoredPackageNames, dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error:\n%w.", err)
+		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error:\n%s.", err)
 	}
 
 	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
@@ -144,7 +144,7 @@ func main() {
 
 	finalPackagesToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesToBuild, packagesToRebuild, *imageConfig, *baseDirPath, dependencyGraph)
 	if err != nil {
-		logger.Log.Fatalf("Unable to generate package build list, error:\n%w.", err)
+		logger.Log.Fatalf("Unable to generate package build list, error:\n%s.", err)
 	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
