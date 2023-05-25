@@ -124,6 +124,14 @@ ifeq ($(STOP_ON_FETCH_FAIL),y)
 graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
+ifeq ($(DELTA_FETCH),y)
+graphpkgfetcher_extra_flags += --packages="$(PACKAGE_BUILD_LIST)"
+graphpkgfetcher_extra_flags += --image-config-file="$(CONFIG_FILE)"
+graphpkgfetcher_extra_flags += --try-download-delta-rpms
+graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)")
+$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST)
+endif
+
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \

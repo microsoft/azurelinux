@@ -61,6 +61,7 @@ DELTA_BUILD    = y
 # on to be friendly to the user unless they have explicitly set it to off.
 USE_CCACHE    ?= y
 REBUILD_TOOLS ?= y
+DELTA_FETCH   ?= y
 endif
 
 ######## SET REMAINING FLAG DEFAULTS ########
@@ -71,6 +72,7 @@ REBUILD_TOOLS                   ?= n
 USE_CCACHE                      ?= n
 DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
+DELTA_FETCH                     ?= n
 
 ######## HANDLE INCREMENTAL_TOOLCHAIN DEPRECATION ########
 

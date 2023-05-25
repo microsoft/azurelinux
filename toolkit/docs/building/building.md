@@ -509,6 +509,16 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Delete all `marinertoolchain*` containers and images associated with this working directory when running `make clean`.
 
+#### `DELTA_FETCH=...`
+
+##### `DELTA_FETCH=n`
+
+> Don't download pre-built packages to avoid rebuilds..
+
+##### `DELTA_FETCH=`**`y`** *(default)*
+
+> Try to download pre-built packages if the versions match the local spec files.
+
 #### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
 
 ##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`n`** *(default)*
