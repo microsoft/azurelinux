@@ -23683,16 +23683,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-pyvmomi",
-          "version": "7.0.3",
-          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/refs/tags/v7.0.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-pywbem",
           "version": "1.0.1",
           "downloadUrl": "https://github.com/pywbem/pywbem/archive/1.0.1.tar.gz"
