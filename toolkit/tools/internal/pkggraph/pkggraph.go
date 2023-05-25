@@ -42,6 +42,7 @@ const (
 	StateUnresolved NodeState = iota            // A dependency is not available locally and must be acquired from a remote repo
 	StateCached     NodeState = iota            // A dependency was not available locally, but is now available in the chache
 	StateBuildError NodeState = iota            // A package from a local SRPM which failed to build
+	StateDelta      NodeState = iota            // Same as build state, but an attempt has been made to pre-download the .rpm to the cache
 	StateMAX        NodeState = StateBuildError // Max allowable state
 )
 
@@ -120,6 +121,8 @@ func (n NodeState) String() string {
 		return "Unresolved"
 	case StateCached:
 		return "Cached"
+	case StateDelta:
+		return "Delta"
 	default:
 		logger.Log.Panic("Invalid NodeState encountered when serializing to string!")
 		return "error"
@@ -167,6 +170,8 @@ func (n *PkgNode) DOTColor() string {
 		return "crimson"
 	case StateCached:
 		return "darkorchid"
+	case StateDelta:
+		return "gold4"
 	default:
 		logger.Log.Panic("Invalid NodeState encountered when serializing to color!")
 		return "error"
