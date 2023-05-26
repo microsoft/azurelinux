@@ -2,7 +2,7 @@
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -132,6 +132,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %ghost %dir /run/cryptsetup
 
 %changelog
+* Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-2
+- Re-enable SSH tokens now that libssh has been promoted to core
+
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.3-1
 - Update to version 2.4.3
 - We currently do not support SSH tokens, re-enable once libssh is available
