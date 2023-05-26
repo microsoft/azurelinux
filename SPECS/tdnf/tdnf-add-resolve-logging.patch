@@ -1,14 +1,15 @@
-From 12c165489d3144e8844c58242d7b00df9e66b340 Mon Sep 17 00:00:00 2001
+From 3ab831a570a1e443c328fd901cbda61fe74d7731 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 25 May 2023 11:17:43 -0700
-Subject: [PATCH] add logging to tdnf resolve
+Subject: [PATCH] add logging to TDNFResolve and TDNFPrepareAllPackages
 
 ---
- client/api.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ client/api.c     |  8 ++++++--
+ client/resolve.c | 16 ++++++++++++++++
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/client/api.c b/client/api.c
-index 8b134e8..049f000 100644
+index 8b134e8..ab2b23c 100644
 --- a/client/api.c
 +++ b/client/api.c
 @@ -1647,12 +1647,14 @@ TDNFResolve(
@@ -59,6 +60,117 @@ index 8b134e8..049f000 100644
  cleanup:
      /* only free the pointers */
      TDNF_SAFE_FREE_MEMORY(ppszPkgNames);
+diff --git a/client/resolve.c b/client/resolve.c
+index cb7ca0f..ed384e9 100644
+--- a/client/resolve.c
++++ b/client/resolve.c
+@@ -71,9 +71,11 @@ TDNFPrepareAllPackages(
+     uint32_t dwRebootRequired = 0;
+     TDNF_ALTERTYPE nAlterType = 0;
+ 
++    printf("Starting TDNFPrepareAllPackages\n");
+     if(!pTdnf || !pTdnf->pSack ||
+        !pTdnf->pArgs || !ppszPkgsNotResolved || !queueGoal || !pAlterType)
+     {
++        printf("Bailed from TDNFPrepareAllPackages\n");
+         dwError = ERROR_TDNF_INVALID_PARAMETER;
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+@@ -96,12 +98,14 @@ TDNFPrepareAllPackages(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
++    printf("Calling TDNFGetSecuritySeverityOption\n");
+     dwError = TDNFGetSecuritySeverityOption(
+                   pTdnf,
+                   &dwSecurity,
+                   &pszSeverity);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
++    printf("Calling TDNFGetRebootRequiredOption\n");
+     dwError = TDNFGetRebootRequiredOption(
+                   pTdnf,
+                   &dwRebootRequired);
+@@ -111,11 +115,14 @@ TDNFPrepareAllPackages(
+          nAlterType == ALTER_UPGRADE) &&
+         (dwSecurity || pszSeverity || dwRebootRequired))
+     {
++        printf("In Upgrade section\n");
+         //pAlterType is changed to ALTER_UPGRADE and later used in TDNFGoal() to add exclude the
+         // list of packages that are added in --exclude option.
+         *pAlterType = ALTER_UPGRADE;
++        printf("Calling TDNFGetUpdatePkgs\n");
+         dwError = TDNFGetUpdatePkgs(pTdnf, &ppszPkgArray, &dwCount);
+         BAIL_ON_TDNF_ERROR(dwError);
++        printf("Looping TDNFPrepareSinglePkg\n");
+         for(nPkgIndex = 0; (uint32_t)nPkgIndex < dwCount; ++nPkgIndex)
+         {
+             dwError = TDNFPrepareSinglePkg(
+@@ -126,6 +133,7 @@ TDNFPrepareAllPackages(
+                           queueGoal);
+             BAIL_ON_TDNF_ERROR(dwError);
+         }
++        printf("Done Upgrade section\n");
+     }
+     else
+     {
+@@ -135,7 +143,9 @@ TDNFPrepareAllPackages(
+ 
+            if(TDNFIsGlob(pszPkgName))
+            {
++               printf("In TDNF Glob section\n");
+                queue_empty(&queueLocal);
++               printf("Calling TDNFGetGlobPackages\n");
+                dwError = TDNFGetGlobPackages(
+                              pTdnf->pSack,
+                              pszPkgName,
+@@ -143,6 +153,7 @@ TDNFPrepareAllPackages(
+                BAIL_ON_TDNF_ERROR(dwError);
+                if(queueLocal.count == 0)
+                {
++                   printf("Calling TDNFAddNotResolved\n");
+                    dwError = TDNFAddNotResolved(ppszPkgsNotResolved, pszPkgName);
+                    BAIL_ON_TDNF_ERROR(dwError);
+                }
+@@ -151,12 +162,14 @@ TDNFPrepareAllPackages(
+                    nPkgIndex = 0;
+                    for(nPkgIndex = 0; nPkgIndex < queueLocal.count; nPkgIndex++)
+                    {
++                       printf("Calling SolvGetPkgNameFromId\n");
+                        dwError = SolvGetPkgNameFromId(
+                                      pTdnf->pSack,
+                                      queueLocal.elements[nPkgIndex],
+                                      &pszName);
+                        BAIL_ON_TDNF_ERROR(dwError);
+ 
++                       printf("Calling TDNFPrepareSinglePkg\n");
+                        dwError = TDNFPrepareSinglePkg(
+                                      pTdnf,
+                                      pszName,
+@@ -168,6 +181,7 @@ TDNFPrepareAllPackages(
+                        pszName = NULL;
+                    }
+                }
++               printf("Done Glob section\n");
+            }
+            else
+            {
+@@ -176,6 +190,7 @@ TDNFPrepareAllPackages(
+                    continue;
+                }
+ 
++               printf("Calling TDNFPrepareSinglePkg\n");
+                dwError = TDNFPrepareSinglePkg(
+                              pTdnf,
+                              pszPkgName,
+@@ -186,6 +201,7 @@ TDNFPrepareAllPackages(
+            }
+        }
+     }
++    printf("Done TDNFPrepareAllPackages\n");
+ 
+ cleanup:
+     TDNF_SAFE_FREE_MEMORY(pszSeverity);
 -- 
 2.25.1
 
