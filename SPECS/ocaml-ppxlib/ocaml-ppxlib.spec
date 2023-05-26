@@ -11,7 +11,7 @@
 Summary:        Base library and tools for ppx rewriters
 Name:           ocaml-%{srcname}
 Version:        0.24.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ URL:            https://github.com/ocaml-ppx/ppxlib
 Source0:        https://github.com/ocaml-ppx/ppxlib/releases/download/%{version}/%{srcname}-%{version}.tbz
 # We do not have 'stdlib-shims'.
 Patch0:         %{name}-stdlib-shims.patch
+Patch1:         test-fix-sexplib0-0.15.0.patch
 
 BuildRequires:  ocaml >= 4.04.1
 BuildRequires:  ocaml-base-devel
@@ -29,7 +30,7 @@ BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-migrate-parsetree-devel >= 2.1.0
 BuildRequires:  ocaml-ppx-derivers-devel >= 1.0
 BuildRequires:  ocaml-re-devel >= 1.9.0
-BuildRequires:  ocaml-sexplib0-devel
+BuildRequires:  ocaml-sexplib0-devel >= 0.15.0
 BuildRequires:  ocaml-stdio-devel
 
 %if %{with doc}
@@ -104,16 +105,8 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 # We do not want to install the test binaries
 rm -fr %{buildroot}%{_bindir}
 
-# FIXME: On arm only, building the tests fails:
-# /usr/bin/ld: src/.cinaps/.cinaps.eobjs/native/dune__exe__Cinaps.o: relocation R_ARM_THM_MOVW_ABS_NC against `camlCinaps_runtime' can not be used when making a shared object; recompile with -fPIC
-# src/.cinaps/.cinaps.eobjs/native/dune__exe__Cinaps.o: in function `.L297': :(.text+0xdec): dangerous relocation: unsupported relocation
-# <many more such warnings>
-#
-# Disable the tests on arm until we can figure out what is going wrong.
-%ifnarch %{arm}
 %check
 dune runtest
-%endif
 
 %files
 %doc CHANGES.md HISTORY.md README.md
@@ -165,10 +158,14 @@ dune runtest
 %endif
 
 %changelog
+* Fri May 19 2023 Olivia Crain <oliviacrain@microsoft.com> - 0.24.0-3
+- Add upstream patch to fix tests with ocaml-sexplib0-0.15.0
+- Remove %%{arm} arch gating on tests (not supported by Mariner)
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.0-2
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.24.0-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.24.0-1
 - Upgrade to latest version
 - License verified
 

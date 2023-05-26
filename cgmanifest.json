@@ -1567,8 +1567,8 @@
         "type": "other",
         "other": {
           "name": "cert-manager",
-          "version": "1.7.3",
-          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.7.3.tar.gz"
+          "version": "1.11.2",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.11.2.tar.gz"
         }
       }
     },
@@ -1767,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "30.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v30.0.tar.gz"
+          "version": "31.1",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v31.1.tar.gz"
         }
       }
     },
@@ -6490,8 +6490,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.111.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.111.1.tar.gz"
+          "version": "5.15.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.111.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.111.1.tar.gz"
+          "version": "5.15.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.111.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.111.1.tar.gz"
+          "version": "5.15.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.111.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.111.1.tar.gz"
+          "version": "5.15.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.111.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.111.1.tar.gz"
+          "version": "5.15.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.98.mshv1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.98.mshv1.tar.gz"
+          "version": "5.15.110.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.110.mshv2.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "5.15.98.mshv1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.98.mshv1.tar.gz"
+          "version": "5.15.110.mshv2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.110.mshv2.tar.gz"
         }
       }
     },
@@ -12291,8 +12291,8 @@
         "type": "other",
         "other": {
           "name": "lua",
-          "version": "5.4.3",
-          "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
+          "version": "5.4.4",
+          "downloadUrl": "https://www.lua.org/ftp/lua-5.4.4.tar.gz"
         }
       }
     },
@@ -13183,8 +13183,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd-cc",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.1.tar.gz"
         }
       }
     },
@@ -13813,8 +13813,8 @@
         "type": "other",
         "other": {
           "name": "nasm",
-          "version": "2.15.05",
-          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.gz"
+          "version": "2.16",
+          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.16/nasm-2.16.tar.gz"
         }
       }
     },
@@ -24894,8 +24894,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qtbase",
-          "version": "5.15.9",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qtbase-everywhere-opensource-src-5.15.9.tar.xz"
+          "version": "5.12.11",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtbase-everywhere-src-5.12.11.tar.xz"
         }
       }
     },
@@ -24914,8 +24914,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qtdeclarative",
-          "version": "5.15.9",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qtdeclarative-everywhere-opensource-src-5.15.9.tar.xz"
+          "version": "5.12.5",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.5/submodules/qtdeclarative-everywhere-src-5.12.5.tar.xz"
         }
       }
     },
@@ -24934,8 +24934,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qtsvg",
-          "version": "5.15.9",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qtsvg-everywhere-opensource-src-5.15.9.tar.xz"
+          "version": "5.12.11",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
         }
       }
     },
@@ -24944,8 +24944,8 @@
         "type": "other",
         "other": {
           "name": "qt5-qttools",
-          "version": "5.15.9",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.15/5.15.9/submodules/qttools-everywhere-opensource-src-5.15.9.tar.xz"
+          "version": "5.12.5",
+          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
         }
       }
     },
@@ -29077,8 +29077,8 @@
         "type": "other",
         "other": {
           "name": "vitess",
-          "version": "8.0.0",
-          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v8.0.0.tar.gz"
+          "version": "16.0.2",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v16.0.2.tar.gz"
         }
       }
     },

@@ -21,7 +21,7 @@ jobs:
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
@@ -45,7 +45,7 @@ jobs:
           echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
       - name: Main branch checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: 'main'
           path: 'main-checkout'
@@ -53,7 +53,7 @@ jobs:
       # Our linter is based on the spec-cleaner tool from the folks at openSUSE
       # We apply a patch to modify it for CBL-Mariner's needs
       - name: spec-cleaner checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 'rpm-software-management/spec-cleaner'
           ref: 'spec-cleaner-1.2.0'
@@ -61,7 +61,7 @@ jobs:
 
       # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
       - name: Setup Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
 

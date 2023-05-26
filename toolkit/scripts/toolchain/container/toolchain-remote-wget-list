@@ -25,13 +25,13 @@ https://tukaani.org/xz/xz-5.2.5.tar.xz
 https://src.fedoraproject.org/repo/pkgs/zlib/zlib-1.2.12.tar.xz/sha512/12940e81e988f7661da52fa20bdc333314ae86a621fdb748804a20840b065a1d6d984430f2d41f3a057de0effc6ff9bcf42f9ee9510b88219085f59cbbd082bd/zlib-1.2.12.tar.xz
 https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2
 https://github.com/libarchive/libarchive/releases/download/v3.6.1/libarchive-3.6.1.tar.gz
-https://www.lua.org/ftp/lua-5.4.3.tar.gz
+https://www.lua.org/ftp/lua-5.4.4.tar.gz
 http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz
 https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
-https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.3-shared_library-1.patch
+https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.4-shared_library-2.patch
 https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz
 https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.35-fhs-1.patch

@@ -5,8 +5,8 @@
 
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
-Version: 1.7.0
-Release: 2%{?dist}
+Version: 1.7.1
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -77,6 +77,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+*   Mon May 22 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.1-1
+-   Fix unit test arguments for TestSnapshotterFromPodSandboxConfig
+
 *   Wed May 17 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-2
 -   Add build version dependency on golang
 

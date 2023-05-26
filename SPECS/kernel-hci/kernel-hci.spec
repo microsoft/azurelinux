@@ -17,7 +17,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.111.1
+Version:        5.15.112.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -429,6 +429,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.112.1-1
+- Auto-upgrade to 5.15.112.1
+
 * Mon May 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.111.1-1
 - Auto-upgrade to 5.15.111.1
 

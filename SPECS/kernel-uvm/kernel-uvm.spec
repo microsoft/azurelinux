@@ -10,8 +10,8 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        5.15.98.mshv1
-Release:        4%{?dist}
+Version:        5.15.110.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -154,6 +154,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Fri May 12 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.110.mshv2-1
+- Update to v5.15.110.mshv2
+
 * Mon May 1 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.98.mshv1-4
 - Install the bzImage
 

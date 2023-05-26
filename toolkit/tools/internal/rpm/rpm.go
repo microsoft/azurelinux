@@ -57,7 +57,9 @@ const (
 )
 
 const (
-	installedRPMRegexRPMIndex = 1
+	installedRPMRegexRPMIndex        = 1
+	installedRPMRegexArchIndex       = 2
+	installedRPMRegexExpectedMatches = 3
 
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
@@ -77,7 +79,7 @@ var (
 	// Example:
 	//
 	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
-	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+).*$`)
+	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 )
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
@@ -323,11 +325,6 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 // ResolveCompetingPackages takes in a list of RPMs and returns only the ones, which would
 // end up being installed after resolving outdated, obsoleted, or conflicting packages.
 func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs []string, err error) {
-	const (
-		queryFormat  = ""
-		squashErrors = true
-	)
-
 	args := []string{
 		"-Uvvh",
 		"--replacepkgs",
@@ -349,8 +346,9 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	uniqueResolvedRPMs := map[string]bool{}
 	for _, line := range splitStdout {
 		matches := installedRPMRegex.FindStringSubmatch(line)
-		if len(matches) != 0 {
-			uniqueResolvedRPMs[matches[installedRPMRegexRPMIndex]] = true
+		if len(matches) == installedRPMRegexExpectedMatches {
+			rpmName := fmt.Sprintf("%s.%s", matches[installedRPMRegexRPMIndex], matches[installedRPMRegexArchIndex])
+			uniqueResolvedRPMs[rpmName] = true
 		}
 	}
 

@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -113,8 +113,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %dir %{_prefix}%{_var}/run/uuidd
 %dir %{_sharedstatedir}/libuuid
 /bin/*
-%attr(0755,root,root) /bin/mount
-%attr(0755,root,root) /bin/umount
+%attr(4755,root,root) /bin/mount
+%attr(4755,root,root) /bin/umount
 /sbin/*
 %{_bindir}/*
 %{_sbindir}/*
@@ -148,6 +148,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 2.37.4-6
+- Add SETUID bit to mount and umount.
+
 * Mon Feb 06 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.37.4-5
 - Add patch to prevent cdrom probe on Azure VMs
 
