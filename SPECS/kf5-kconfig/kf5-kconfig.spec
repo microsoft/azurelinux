@@ -1,15 +1,12 @@
 %global framework kconfig
+
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
 Name:           kf5-%{framework}
-Version:        5.106.0
-Release:        1%{?dist}
+Version:        5.61.0
+Release:        3%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with advanced configuration system
-# Licenses retrieved from source files with:
-# grep -hR -oP "(?<=SPDX-License-Identifier: ).*" <source_dir>/* | sort | uniq
-# and:
-# ls -la <source_dir>/LICENSES/
-License:        BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.0-only AND (LGPL-2.0-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL) AND LGPL-2.0-or-later AND (LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL) AND MIT
+License:        LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
 Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
@@ -25,7 +22,6 @@ BuildRequires:  extra-cmake-modules >= %{majmin}
 BuildRequires:  kf5-rpm-macros >= %{majmin}
 
 BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qtdeclarative-devel
 BuildRequires:  qt5-qttools-devel
 
 Requires:       kf5-filesystem >= %{majmin}
@@ -63,11 +59,15 @@ their changes to their respective configuration files.
 %prep
 %setup -q -n %{framework}-%{version}
 
+
 %build
 
-%{cmake_kf5} \
+mkdir %{_target_platform}
+pushd %{_target_platform}
+%{cmake_kf5} .. \
   -G Ninja \
   %{?tests:-DBUILD_TESTING:BOOL=ON}
+popd
 
 %ninja_build -C %{_target_platform}
 
@@ -80,7 +80,7 @@ their changes to their respective configuration files.
 
 %files
 %doc DESIGN README.md TODO
-%license LICENSES/*
+%license COPYING.LIB
 
 %post   core -p /sbin/ldconfig
 %postun core -p /sbin/ldconfig
@@ -88,9 +88,7 @@ their changes to their respective configuration files.
 %files core -f kconfig5_qt.lang
 %{_kf5_bindir}/kreadconfig5
 %{_kf5_bindir}/kwriteconfig5
-%{_kf5_datadir}/qlogging-categories5/kconfig.*
-%{_kf5_libdir}/libKF5ConfigCore.so.5*
-%{_kf5_libdir}/libKF5ConfigQml.so.5*
+%{_kf5_libdir}/libKF5ConfigCore.so.*
 %{_kf5_libexecdir}/kconfig_compiler_kf5
 %{_kf5_libexecdir}/kconf_update
 
@@ -98,26 +96,20 @@ their changes to their respective configuration files.
 %postun gui -p /sbin/ldconfig
 
 %files gui
-%{_kf5_libdir}/libKF5ConfigGui.so.5*
+%{_kf5_libdir}/libKF5ConfigGui.so.*
 
 %files devel
-%{_kf5_includedir}/KConfig/
+%{_kf5_includedir}/kconfig_version.h
 %{_kf5_includedir}/KConfigCore/
 %{_kf5_includedir}/KConfigGui/
-%{_kf5_includedir}/KConfigQml/
 %{_kf5_libdir}/libKF5ConfigCore.so
 %{_kf5_libdir}/libKF5ConfigGui.so
-%{_kf5_libdir}/libKF5ConfigQml.so
 %{_kf5_libdir}/cmake/KF5Config/
 %{_kf5_archdatadir}/mkspecs/modules/qt_KConfigCore.pri
 %{_kf5_archdatadir}/mkspecs/modules/qt_KConfigGui.pri
 
 
 %changelog
-* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
-- Updating to 5.106.0.
-- Updated license information.
-
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.
