@@ -1,13 +1,14 @@
 Summary:        The Sysstat package contains utilities to monitor system performance and usage activity
 Name:           sysstat
 Version:        12.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            http://sebastien.godard.pagesperso-orange.fr/
 Group:          Development/Debuggers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-33204.patch
 
 BuildRequires:  cronie-anacron
 
@@ -17,7 +18,7 @@ Requires:       cronie-anacron
  The Sysstat package contains utilities to monitor system performance and usage activity. Sysstat contains the sar utility, common to many commercial Unixes, and tools you can schedule via cron to collect and historize performance and activity data.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -53,6 +54,9 @@ install -D -m 0644 %{_builddir}/%{name}-%{version}/cron/sysstat-collect.service 
 
 
 %changelog
+* Fri May 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 12.7.1-2
+- Patch to fix CVE-2023-33204
+
 * Fri Nov 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.7.1-1
 - Upgrading to version 12.7.1 to fix CVE-2022-39377.
 
