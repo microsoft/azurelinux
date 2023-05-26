@@ -1,14 +1,15 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
 Version:        5.8.1
-Release:        3%{?dist}
-License:        ASL 2.0
+Release:        4%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://docs.openstack.org/developer/pbr/
 Source0:        https://pypi.io/packages/source/p/pbr/pbr-%{version}.tar.gz
 Patch0:         disable-test-wsgi.patch
+Patch1:         test-pin-sphinx.patch
 BuildArch:      noarch
 
 %description
@@ -41,7 +42,7 @@ export SKIP_PIP_INSTALL=1
 ln -s pbr %{buildroot}/%{_bindir}/pbr3
 
 %check
-pip3 install coverage hacking mock testrepository testresources testscenarios virtualenv wheel 'tox>=3.27.1,<4.0.0'
+pip3 install 'tox>=3.27.1,<4.0.0'
 tox -e py%{python3_version_nodots}
 
 %files -n python3-pbr
@@ -54,6 +55,11 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/pbr
 
 %changelog
+* Fri May 19 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.8.1-4
+- Add patch to pin version of sphinx used in tests to a known compatible version
+- Remove check-time install of packages that should be handled by tox
+- Use SPDX license expression in license tag
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 5.8.1-3
 - Update version of tox used for package tests
 

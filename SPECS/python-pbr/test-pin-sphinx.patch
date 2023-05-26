@@ -1,0 +1,29 @@
+From 5197ac16ec7286ee610eb47f8647f6ddf69cc340 Mon Sep 17 00:00:00 2001
+From: Olivia Crain <olivia@olivia.dev>
+Date: Fri, 19 May 2023 15:01:31 -0700
+Subject: [PATCH] Pin sphinx used in tests to <7.0.0
+
+Sphinx 7.0.0 removed setuptools support, which is tested by the pbr
+package
+
+Signed-off-by: Olivia Crain <olivia@olivia.dev>
+---
+ test-requirements.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test-requirements.txt b/test-requirements.txt
+index 3af261d..79f8267 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -17,7 +17,7 @@ coverage!=4.4,>=4.0 # Apache-2.0
+ 
+ # optionally exposed by distutils commands
+ sphinx!=1.6.6,!=1.6.7,>=1.6.2,<2.0.0;python_version=='2.7' # BSD
+-sphinx!=1.6.6,!=1.6.7,>=1.6.2;python_version>='3.4' # BSD
++sphinx!=1.6.6,!=1.6.7,>=1.6.2,<7.0.0;python_version>='3.4' # BSD
+ testrepository>=0.0.18 # Apache-2.0/BSD
+ 
+ pre-commit>=2.6.0;python_version>='3.6' # MIT
+-- 
+2.34.1
+
