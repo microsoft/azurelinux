@@ -13813,8 +13813,8 @@
         "type": "other",
         "other": {
           "name": "nasm",
-          "version": "2.15.05",
-          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.gz"
+          "version": "2.16",
+          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.16/nasm-2.16.tar.gz"
         }
       }
     },
