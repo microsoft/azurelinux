@@ -2,7 +2,7 @@ Summary:        The Sysstat package contains utilities to monitor system perform
 Name:           sysstat
 Version:        12.7.1
 Release:        2%{?dist}
-License:        GPLv2
+License:        GPL-2.0-only
 URL:            http://sebastien.godard.pagesperso-orange.fr/
 Group:          Development/Debuggers
 Vendor:         Microsoft Corporation
