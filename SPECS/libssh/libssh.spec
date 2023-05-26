@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libssh
-Version:        0.10.4
-Release:        3%{?dist}
+Version:        0.10.5
+Release:        2%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
@@ -25,6 +25,7 @@ BuildRequires:  pam_wrapper
 BuildRequires:  socket_wrapper
 BuildRequires:  nss_wrapper
 BuildRequires:  uid_wrapper
+BuildRequires:  priv_wrapper
 BuildRequires:  openssh-clients
 BuildRequires:  openssh-server
 BuildRequires:  nmap-ncat
@@ -42,8 +43,6 @@ Provides: libssh_threads.so.4()(64bit)
 Provides: libssh_threads.so.4
 %endif
 
-Patch1: pkcs11_test_fix.patch
-
 %description
 The ssh library was designed to be used by programmers needing a working SSH
 implementation by the mean of a library. The complete control of the client is
@@ -55,6 +54,7 @@ third-party programs others than libcrypto (from openssl).
 %package devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       cmake-filesystem
 
 %description devel
 The %{name}-devel package contains libraries and header files for developing
@@ -76,6 +76,7 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 if test ! -e "obj"; then
   mkdir obj
 fi
+
 pushd obj
 
 %cmake .. \
@@ -120,7 +121,8 @@ popd
 pushd obj
 # Tests are randomly failing when run in parallel
 %global _smp_build_ncpus 1
-%ctest
+# the torture rekey tests with different than initial kex is now failing in rawhide because of OpenSSH bug #2203241
+%ctest --exclude-regex torture_rekey
 popd
 
 %files
@@ -131,8 +133,6 @@ popd
 
 %files devel
 %{_includedir}/libssh/
-# own this to avoid dep on cmake -- rex
-%dir  %{_libdir}/cmake/
 %{_libdir}/cmake/libssh/
 %{_libdir}/pkgconfig/libssh.pc
 %{_libdir}/libssh.so
@@ -144,9 +144,20 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
-* Mon May 22 2023 Vince Perri <viperri@microsoft.com> - 0.10.4-3
+* Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 0.10.5-2
 - License verified.
+- Switched to out-of-source build.
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
+
+* Fri May 05 2023 Orion Poplawski <orion@nwra.com> - 0.10.5-1
+- Update to 0.10.5 (CVE-2023-1667 CVE-2023-2283)
+- Have libssh-devel require cmake-filesystem
+
+* Sun Mar 05 2023 Andreas Schneider <asn@redhat.com> - 0.10.4-4
+- Update License to SPDX expression
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Thu Oct 06 2022 Norbert Pocs <npocs@redhat.com> - 0.10.4-2
 - Enable pkcs11 support
@@ -176,13 +187,13 @@ popd
 * Mon Jan 10 2022 Stephen Gallagher <sgallagh@redhat.com> - 0.9.6-2
 - Skip broken torture_auth tests
 
-* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.9.5-4
-- Rebuilt with OpenSSL 3.0.0
-
-* Mon Sep 13 2021 Norbert Pocs <npocs@redhat.com> - 0.9.6-1
+* Wed Sep 15 2021 Norbert Pocs <npocs@redhat.com> - 0.9.6-1
 - Fix CVE-CVE-2021-3634 libssh: possible heap-based buffer
   overflow when rekeying
 - Resolves: rhbz#1994600
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.9.5-4
+- Rebuilt with OpenSSL 3.0.0
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
