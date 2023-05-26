@@ -55,7 +55,7 @@ index 8b134e8..049f000 100644
      pSolvedPkgInfo->ppszPkgsNotResolved = ppszPkgsNotResolved;
      *ppSolvedPkgInfo = pSolvedPkgInfo;
 -
-+    print("End Resolve\n");
++    printf("End Resolve\n");
  cleanup:
      /* only free the pointers */
      TDNF_SAFE_FREE_MEMORY(ppszPkgNames);
