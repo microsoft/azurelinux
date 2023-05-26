@@ -60,7 +60,7 @@
 %{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
 
-%global MLNX_OFED_VERSION 23.04-0.5.3.tgz 
+%global MLNX_OFED_VERSION 23.04-0.5.3
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
