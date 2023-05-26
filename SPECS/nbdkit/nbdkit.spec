@@ -175,6 +175,23 @@ the metapackage "nbdkit".
 Summary:        Basic plugins for %{name}
 License:        BSD
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
+Provides:       %{name}-data-plugin = %{version}-%{release}
+Provides:       %{name}-eval-plugin = %{version}-%{release}
+Provides:       %{name}-file-plugin = %{version}-%{release}
+Provides:       %{name}-floppy-plugin = %{version}-%{release}
+Provides:       %{name}-full-plugin = %{version}-%{release}
+Provides:       %{name}-info-plugin = %{version}-%{release}
+Provides:       %{name}-memory-plugin = %{version}-%{release}
+Provides:       %{name}-null-plugin = %{version}-%{release}
+Provides:       %{name}-ondemand-plugin = %{version}-%{release}
+Provides:       %{name}-ones-plugin = %{version}-%{release}
+Provides:       %{name}-partitioning-plugin = %{version}-%{release}
+Provides:       %{name}-pattern-plugin = %{version}-%{release}
+Provides:       %{name}-random-plugin = %{version}-%{release}
+Provides:       %{name}-sh-plugin = %{version}-%{release}
+Provides:       %{name}-sparse-random-plugin = %{version}-%{release}
+Provides:       %{name}-split-plugin = %{version}-%{release}
+Provides:       %{name}-zero-plugin = %{version}-%{release}
 
 
 %description basic-plugins
@@ -467,6 +484,43 @@ VMware VDDK for accessing VMware disks and servers.
 Summary:        Basic filters for %{name}
 License:        BSD
 Requires:       %{name}-server%{?_isa} = %{version}-%{release}
+Provides:       %{name}-blocksize-filter = %{version}-%{release}
+Provides:       %{name}-blocksize-policy-filter = %{version}-%{release}
+Provides:       %{name}-cacheextents-filter = %{version}-%{release}
+Provides:       %{name}-cache-filter = %{version}-%{release}
+Provides:       %{name}-checkwrite-filter = %{version}-%{release}
+Provides:       %{name}-cow-filter = %{version}-%{release}
+Provides:       %{name}-ddrescue-filter = %{version}-%{release}
+Provides:       %{name}-delay-filter = %{version}-%{release}
+Provides:       %{name}-error-filter = %{version}-%{release}
+Provides:       %{name}-evil-filter = %{version}-%{release}
+Provides:       %{name}-exitlast-filter = %{version}-%{release}
+Provides:       %{name}-exitwhen-filter = %{version}-%{release}
+Provides:       %{name}-exportname-filter = %{version}-%{release}
+Provides:       %{name}-extentlist-filter = %{version}-%{release}
+Provides:       %{name}-fua-filter = %{version}-%{release}
+Provides:       %{name}-ip-filter = %{version}-%{release}
+Provides:       %{name}-limit-filter = %{version}-%{release}
+Provides:       %{name}-log-filter = %{version}-%{release}
+Provides:       %{name}-luks-filter = %{version}-%{release}
+Provides:       %{name}-multi-conn-filter = %{version}-%{release}
+Provides:       %{name}-nocache-filter = %{version}-%{release}
+Provides:       %{name}-noextents-filter = %{version}-%{release}
+Provides:       %{name}-nofilter-filter = %{version}-%{release}
+Provides:       %{name}-noparallel-filter = %{version}-%{release}
+Provides:       %{name}-nozero-filter = %{version}-%{release}
+Provides:       %{name}-offset-filter = %{version}-%{release}
+Provides:       %{name}-partition-filter = %{version}-%{release}
+Provides:       %{name}-pause-filter = %{version}-%{release}
+Provides:       %{name}-protect-filter = %{version}-%{release}
+Provides:       %{name}-rate-filter = %{version}-%{release}
+Provides:       %{name}-readahead-filter = %{version}-%{release}
+Provides:       %{name}-retry-filter = %{version}-%{release}
+Provides:       %{name}-retry-request-filter = %{version}-%{release}
+Provides:       %{name}-scan-filter = %{version}-%{release}
+Provides:       %{name}-swab-filter = %{version}-%{release}
+Provides:       %{name}-tls-fallback-filter = %{version}-%{release}
+Provides:       %{name}-truncate-filter = %{version}-%{release}
 
 %description basic-filters
 This package contains filters for %{name} which only depend on simple
