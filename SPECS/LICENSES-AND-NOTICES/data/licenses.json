@@ -1550,7 +1550,6 @@
                 "poetry",
                 "policycoreutils",
                 "polkit-pkla-compat",
-                "polkit-qt-1",
                 "portreserve",
                 "postfix",
                 "potrace",

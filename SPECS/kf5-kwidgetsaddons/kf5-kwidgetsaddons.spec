@@ -2,14 +2,10 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
 Name:           kf5-%{framework}
-Version:        5.106.0
-Release:        1%{?dist}
+Version:        5.61.0
+Release:        3%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with various classes on top of QtWidgets
-# Licenses retrieved from source files with:
-# grep -hR -oP "(?<=SPDX-License-Identifier: ).*" <source_dir>/* | sort | uniq
-# and:
-# ls -la <source_dir>/LICENSES/
-License:        BSD-3-Clause AND CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.0-only AND (LGPL-2.0-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL) AND LGPL-2.0-or-later AND (LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL) AND LGPL-2.1-or-later AND LGPL-3.0-or-later
+License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://cgit.kde.org/%{framework}.git
 Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
@@ -38,8 +34,12 @@ developing applications that use %{name}.
 %prep
 %setup -q -n %{framework}-%{version}
 
+
 %build
-%{cmake_kf5}
+mkdir %{_target_platform}
+pushd %{_target_platform}
+%{cmake_kf5} ..
+popd
 
 %make_build -C %{_target_platform}
 
@@ -55,23 +55,19 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 %files -f kwidgetsaddons5_qt.lang
 %doc README.md
-%license LICENSES/*
-%{_kf5_datadir}/kf5/kcharselect/
-%{_kf5_datadir}/qlogging-categories5/kwidgetsaddons.*
+%license COPYING.LIB
 %{_kf5_libdir}/libKF5WidgetsAddons.so.*
-%{_kf5_qtplugindir}/designer/kwidgetsaddons5widgets.so
+%{_kf5_datadir}/kf5/kcharselect/
 
 %files devel
-%{_kf5_archdatadir}/mkspecs/modules/qt_KWidgetsAddons.pri
+%{_kf5_includedir}/kwidgetsaddons_version.h
 %{_kf5_includedir}/KWidgetsAddons/
 %{_kf5_libdir}/libKF5WidgetsAddons.so
 %{_kf5_libdir}/cmake/KF5WidgetsAddons/
+%{_kf5_archdatadir}/mkspecs/modules/qt_KWidgetsAddons.pri
+
 
 %changelog
-* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
-- Updating to 5.106.0.
-- Updated license information.
-
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.

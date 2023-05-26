@@ -3448,8 +3448,8 @@
         "type": "other",
         "other": {
           "name": "extra-cmake-modules",
-          "version": "5.106.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.106/extra-cmake-modules-5.106.0.tar.xz"
+          "version": "5.90.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.90/extra-cmake-modules-5.90.0.tar.xz"
         }
       }
     },
@@ -8221,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kf5-kconfig",
-          "version": "5.106.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.106/kconfig-5.106.0.tar.xz"
+          "version": "5.61.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kconfig-5.61.0.tar.xz"
         }
       }
     },
@@ -8231,8 +8231,8 @@
         "type": "other",
         "other": {
           "name": "kf5-kcoreaddons",
-          "version": "5.106.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.106/kcoreaddons-5.106.0.tar.xz"
+          "version": "5.61.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kcoreaddons-5.61.0.tar.xz"
         }
       }
     },
@@ -8241,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kf5-ki18n",
-          "version": "5.106.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.106/ki18n-5.106.0.tar.xz"
+          "version": "5.61.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/ki18n-5.61.0.tar.xz"
         }
       }
     },
@@ -8251,8 +8251,8 @@
         "type": "other",
         "other": {
           "name": "kf5-kwidgetsaddons",
-          "version": "5.106.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.106/kwidgetsaddons-5.106.0.tar.xz"
+          "version": "5.61.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kwidgetsaddons-5.61.0.tar.xz"
         }
       }
     },
@@ -8301,8 +8301,8 @@
         "type": "other",
         "other": {
           "name": "kpmcore",
-          "version": "22.12.3",
-          "downloadUrl": "https://download.kde.org/stable/release-service/22.12.3/src/kpmcore-22.12.3.tar.xz"
+          "version": "3.3.0",
+          "downloadUrl": "http://download.kde.org/stable/kpmcore/3.3.0/src/kpmcore-3.3.0.tar.xz"
         }
       }
     },
@@ -21096,16 +21096,6 @@
           "name": "polkit-pkla-compat",
           "version": "0.1",
           "downloadUrl": "http://releases.pagure.org/polkit-pkla-compat/polkit-pkla-compat-0.1.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "polkit-qt-1",
-          "version": "0.114.0",
-          "downloadUrl": "https://download.kde.org/stable/polkit-qt-1/polkit-qt-1-0.114.0.tar.xz"
         }
       }
     },

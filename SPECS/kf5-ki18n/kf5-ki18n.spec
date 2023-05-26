@@ -2,14 +2,10 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
 Name:           kf5-%{framework}
-Version:        5.106.0
-Release:        1%{?dist}
+Version:        5.61.0
+Release:        4%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon for localization
-# Licenses retrieved from source files with:
-# grep -hR -oP "(?<=SPDX-License-Identifier: ).*" <source_dir>/* | sort | uniq
-# and:
-# ls -la <source_dir>/LICENSES/
-License:        BSD-3-Clause AND CC0-1.0 AND LGPL-2.0-or-later AND (LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL) AND LGPL-2.1-or-later AND ODbL-1.0
+License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
 Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
@@ -25,7 +21,6 @@ BuildRequires:  gettext
 BuildRequires:  kf5-rpm-macros >= %{majmin}
 BuildRequires:  python3
 BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qtbase-private-devel
 BuildRequires:  qt5-qtdeclarative-devel
 
 Requires:       kf5-filesystem >= %{majmin}
@@ -49,7 +44,10 @@ developing applications that use %{name}.
 
 
 %build
-%{cmake_kf5} -DPYTHON_EXECUTABLE=%{python3}
+mkdir %{_target_platform}
+pushd %{_target_platform}
+%{cmake_kf5} .. -DPYTHON_EXECUTABLE=%{python3}
+popd
 
 %make_build -C %{_target_platform}
 
@@ -65,11 +63,8 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 %files -f %{name}.lang
 %doc README.md
-%license LICENSES/*
-%{_kf5_datadir}/qlogging-categories5/ki18n.*
-%{_kf5_libdir}/qt5/qml/org/kde/i18n/localeData/*
-%{_kf5_libdir}/libKF5I18n.so.5*
-%{_kf5_libdir}/libKF5I18nLocaleData.so.5*
+%license COPYING.LIB
+%{_kf5_libdir}/libKF5I18n.so.*
 %{_kf5_qtplugindir}/kf5/ktranscript.so
 %lang(ca) %{_datadir}/locale/ca/LC_SCRIPTS/ki18n5/
 %lang(ca@valencia) %{_datadir}/locale/ca@valencia/LC_SCRIPTS/ki18n5/
@@ -87,19 +82,14 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 %lang(sr) %{_datadir}/locale/uk/LC_SCRIPTS/ki18n5/
 
 %files devel
+%{_kf5_includedir}/ki18n_version.h
 %{_kf5_includedir}/KI18n/
-%{_kf5_includedir}/KI18nLocaleData/
 %{_kf5_libdir}/libKF5I18n.so
-%{_kf5_libdir}/libKF5I18nLocaleData.so
 %{_kf5_libdir}/cmake/KF5I18n/
 %{_kf5_archdatadir}/mkspecs/modules/qt_KI18n.pri
 
 
 %changelog
-* Fri May 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.106.0-1
-- Updating to 5.106.0.
-- Updated license information.
-
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 5.61.0-4
 - Remove python2, replace with python3
 
