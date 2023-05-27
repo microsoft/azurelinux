@@ -4,6 +4,8 @@
 package timestamp
 
 import (
+	"bufio"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -160,7 +162,6 @@ func TestResumeAndAppend(t *testing.T) {
 	assert.FileExists(testFile)
 
 	err = ResumeTiming("test", testFile)
-	defer CompleteTiming()
 
 	assert.NoError(err)
 	root := timestampMgr.root
@@ -173,6 +174,14 @@ func TestResumeAndAppend(t *testing.T) {
 	// make sure the ID generator doesn't cause collision
 	assert.Equal(root.ID+1, ts.ID)
 	assert.Equal(root.ID, ts.ParentID)
+	FlushAndCleanUpResources()
+
+	err = ResumeTiming("test", testFile)
+	ts, err = StopEventByPath("test/A")
+	assert.NoError(err)
+	FlushAndCleanUpResources()
+
+	assert.NotNil(ts.EndTime)
 }
 
 func TestStartStopEvent(t *testing.T) {
@@ -212,4 +221,44 @@ func TestStartStopEvent(t *testing.T) {
 	assert.Equal(tsA.DisplayName(), "test/A")
 	assert.Equal(tsB.DisplayName(), "test/A/B")
 	assert.Equal(tsC.DisplayName(), "test/C")
+}
+
+func TestPauseResumeEvent(t *testing.T) {
+	assert := assert.New(t)
+
+	testFile := testOutputDir + "test_start_stop_event.jsonl"
+	root, err := BeginTiming("test", testFile)
+
+	ts, err := StartEvent("A", root)
+	idA := ts.ID
+	ts, err = PauseEvent(ts)
+	ts, err = ResumeEvent(ts)
+	ts, err = StopEvent(ts)
+
+	FlushAndCleanUpResources()
+
+	records := make([]*TimeStamp, 0)
+	fd, err := os.OpenFile(testFile, os.O_RDONLY, 0644)
+	if err != nil {
+		return
+	}
+	scanner := bufio.NewScanner(fd)
+	for scanner.Scan() {
+		var record TimeStampRecord
+		err = json.Unmarshal(scanner.Bytes(), &record)
+		if err != nil {
+			return
+		}
+		if idA != record.ID {
+			continue
+		}
+		if record.EventType == EventPause || record.EventType == EventStop {
+			records = append(records, record.TimeStamp)
+		}
+	}
+
+	assert.Equal(len(records), 2)
+	assert.Greater(records[0].ElapsedTime(), 0)
+	assert.Greater(records[1].ElapsedTime(), 0)
+	assert.Less(records[0].EndTime, records[1].StartTime)
 }
