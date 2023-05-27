@@ -456,14 +456,20 @@ var expectedConfiguration Config = Config{
 			},
 			PackageRepos: []PackageRepo{
 				{
-					Name:    "repo1",
-					BaseUrl: "https://repo1.com",
-					Install: false,
+					Name:         "repo1",
+					BaseUrl:      "https://repo1.com",
+					Install:      true,
+					GPGCheck:     true,
+					RepoGPGCheck: true,
+					GPGKeys:      "file:///etc/pki/rpm-gpg/MY-CUSTOM-KEY",
 				},
 				{
-					Name:    "repo2",
-					BaseUrl: "https://repo2.com",
-					Install: false,
+					Name:         "repo2",
+					BaseUrl:      "https://repo2.com",
+					Install:      false,
+					GPGCheck:     false,
+					RepoGPGCheck: false,
+					GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 				},
 			},
 			PreInstallScripts: []InstallScript{

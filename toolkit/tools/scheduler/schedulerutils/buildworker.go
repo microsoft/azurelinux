@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
@@ -92,7 +93,7 @@ func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish 
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages []string, tsRoot *timestamp.TimeStamp) {
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer, tsRoot *timestamp.TimeStamp) {
 	// Track the time a worker spends waiting on a task. We will add a timing node each time we finish processing a request, and stop
 	// it when we pick up the next request
 	idleTimestamp, _ := timestamp.StartEvent("worker idle", tsRoot)
@@ -134,12 +135,12 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
 	var missingFiles []string
 
 	baseSrpmName := node.SRPMFileName()
 	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
-	skipped = sliceutils.Contains(ignoredPackages, node.SpecName(), sliceutils.StringMatch)
+	skipped = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
 	if skipped {
 		logger.Log.Debugf("%s explicitly marked to be skipped.", baseSrpmName)

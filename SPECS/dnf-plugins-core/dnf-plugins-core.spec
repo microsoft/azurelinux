@@ -9,7 +9,7 @@
 Summary:        Core Plugins for DNF
 Name:           dnf-plugins-core
 Version:        4.0.24
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,11 +75,6 @@ Summary:        Core Plugins for DNF
 BuildRequires:  python3-dbus
 BuildRequires:  python3-devel
 BuildRequires:  python3-dnf >= %{dnf_lowest_compatible}
-
-%if %{with_check}
-BuildRequires:  python3-nose2
-%endif
-
 Requires:       python3-dateutil
 Requires:       python3-dbus
 Requires:       python3-distro
@@ -252,7 +247,8 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %endif
 
 %check
-PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
+export PYTHONPATH=./plugins
+python3 -m unittest discover -t . -s tests/
 
 %files
 %{_mandir}/man8/dnf-builddep.*
@@ -415,16 +411,19 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %endif
 
 %changelog
+* Mon May 22 2023 Olivia Crain <oliviacrain@microsoft.com> - 4.0.24-3
+- Fix tests by replacing nose with built-in unittests runner, per upstream recommendation
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.0.24-1
 - Upgrade to undeprecated python3-nose2
 - Update source to 4.0.24
 - License verified
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.18-5
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.0.18-5
 - Only require python3-nose when building tests
 - License verified
 
-* Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com>  - 4.0.18-4
+* Tue Aug 10 2021 Olivia Crain <oliviacrain@microsoft.com>  - 4.0.18-4
 - Remove python2 support, distro-specific checks
 
 * Mon Jun 28 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.18-3

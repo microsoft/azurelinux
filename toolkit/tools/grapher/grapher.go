@@ -48,6 +48,7 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
+	depGraph := pkggraph.NewPkgGraph()
 	err = populateGraph(depGraph, &localPackages)
 	if err != nil {
 		logger.Log.Panic(err)

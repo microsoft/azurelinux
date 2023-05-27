@@ -1,0 +1,22 @@
+Index: nlopt-2.6.2/CMakeLists.txt
+===================================================================
+--- nlopt-2.6.2.orig/CMakeLists.txt
++++ nlopt-2.6.2/CMakeLists.txt
+@@ -76,12 +76,12 @@ foreach (p LIB BIN INCLUDE DATA CMAKE)
+ endforeach ()
+ 
+ 
+-set (CMAKE_INSTALL_RPATH ${INSTALL_LIB_DIR})
+-set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+-if(POLICY CMP0042)
++#set (CMAKE_INSTALL_RPATH ${INSTALL_LIB_DIR})
++#set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
++#if(POLICY CMP0042)
+   # Set MACOSX_RPATH to ON
+-  cmake_policy(SET CMP0042 NEW)
+-endif()
++  #cmake_policy(SET CMP0042 NEW)
++#endif()
+ if (POLICY CMP0086)
+   # UseSWIG honors SWIG_MODULE_NAME via -module flag
+   cmake_policy(SET CMP0086 NEW)

@@ -22,7 +22,6 @@ Source12:       useradd-default
 Source13:       login-defs
 Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
-Patch2:         CVE-2023-29383.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
@@ -71,7 +70,6 @@ Libraries and headers for libsubid
 %setup -q -n shadow-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 autoreconf -fiv
 
@@ -165,7 +163,7 @@ chmod 000 %{_sysconfdir}/shadow
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*
-%attr(0755,root,root) /bin/passwd
+%attr(4755,root,root) /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
 %attr(0000,root,root) %config(noreplace,missingok) %ghost %{_sysconfdir}/shadow
 
@@ -178,11 +176,11 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
-* Tue May 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9-12
-- Add patch for CVE-2023-29383
+* Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 4.9-12
+- Add SETUID bit to passwd binary
 
 * Mon Jul 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-11
-- Update login-defs, system-auth, passwd to improve security 
+- Update login-defs, system-auth, passwd to improve security
 
 * Fri Jul 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-10
 - Remove su binary which is now provided by util-linux

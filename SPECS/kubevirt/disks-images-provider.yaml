@@ -22,12 +22,12 @@ spec:
       serviceAccountName: kubevirt-testing
       containers:
         - name: target
-          image: quay.io/kubevirt/disks-images-provider:v0.58.0
+          image: quay.io/kubevirt/disks-images-provider:v0.59.0
           imagePullPolicy: Always
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh","-c","source /etc/bashrc && chroot /host losetup -d ${LOOP_DEVICE} && chroot /host umount ${LOOP_DEVICE_HP} && chroot /host losetup -d ${LOOP_DEVICE_HP}"]
+                command: ["/bin/sh","-c","source /etc/bashrc && chroot /host umount ${LOOP_DEVICE_HP} && chroot /host losetup -d ${LOOP_DEVICE_HP}"]
           volumeMounts:
           - name: images
             mountPath: /hostImages

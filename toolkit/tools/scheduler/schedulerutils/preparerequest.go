@@ -8,6 +8,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
@@ -15,7 +16,7 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool, deltaBuild bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool, deltaBuild bool) (requests []*BuildRequest) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -64,7 +65,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 // - It will check if the node corresponds to an entry in packagesToRebuild.
 // - It will check if all dependencies of the node were also cached. Exceptions:
 //   - "TypePreBuilt" nodes must use the cache and have no dependencies to check.
-func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, deltaBuild bool) (canUseCache bool) {
+func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, deltaBuild bool) (canUseCache bool) {
 	// The "TypePreBuilt" nodes always use the cache.
 	if node.Type == pkggraph.TypePreBuilt {
 		canUseCache = true
@@ -72,15 +73,15 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 	}
 
 	// Check if the node corresponds to an entry in packagesToRebuild
-	specName := node.SpecName()
-	canUseCache = !sliceutils.Contains(packagesToRebuild, specName, sliceutils.StringMatch)
+	packageVer := node.VersionedPkg
+	canUseCache = !sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
 	if !canUseCache {
-		logger.Log.Debugf("Marking (%s) for rebuild per user request", specName)
+		logger.Log.Debugf("Marking (%s) for rebuild per user request", packageVer)
 		return
 	}
 
 	// If delta build enabled, then we can use the cache, unless a dependency of this package is rebuilding
-	if deltaBuild == true {
+	if deltaBuild {
 		logger.Log.Warnf("Delta build: Using cached version of %v regardles of rebuilding dependencies", node.FriendlyName())
 		canUseCache = true
 		return

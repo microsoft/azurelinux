@@ -1,4 +1,5 @@
 %global runtime_make_vars       DEFSERVICEOFFLOAD=true \\\
+                                DEFSTATICRESOURCEMGMT=true \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu
@@ -6,7 +7,7 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.4.0
+Version:      0.4.1
 Release:      2%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
@@ -32,6 +33,7 @@ BuildRequires:  perl-FindBin
 BuildRequires:  perl-lib
 BuildRequires:  libseccomp-devel
 BuildRequires:  kernel-uvm-devel
+BuildRequires:  openssl-devel
 
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
@@ -87,6 +89,7 @@ popd
 
 # Agent
 pushd %{_builddir}/%{name}-%{version}/src/agent
+export OPENSSL_NO_VENDOR=1
 %make_build %{agent_make_vars}
 popd
 
@@ -229,6 +232,12 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
+*   Wed May 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-2
+-   Enable static resource management and build with host's openssl
+
+*   Wed May 10 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-1
+-   Add version 0.4.1 and fix CVEs
+
 *   Wed Apr 26 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
 -   Remove containerd override and add dependency on moby-containerd-cc
 

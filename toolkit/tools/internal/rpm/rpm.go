@@ -57,7 +57,9 @@ const (
 )
 
 const (
-	installedRPMRegexRPMIndex = 1
+	installedRPMRegexRPMIndex        = 1
+	installedRPMRegexArchIndex       = 2
+	installedRPMRegexExpectedMatches = 3
 
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
@@ -77,7 +79,7 @@ var (
 	// Example:
 	//
 	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
-	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+).*$`)
+	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 )
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
@@ -323,11 +325,6 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 // ResolveCompetingPackages takes in a list of RPMs and returns only the ones, which would
 // end up being installed after resolving outdated, obsoleted, or conflicting packages.
 func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs []string, err error) {
-	const (
-		queryFormat  = ""
-		squashErrors = true
-	)
-
 	args := []string{
 		"-Uvvh",
 		"--replacepkgs",
@@ -349,8 +346,9 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	uniqueResolvedRPMs := map[string]bool{}
 	for _, line := range splitStdout {
 		matches := installedRPMRegex.FindStringSubmatch(line)
-		if len(matches) != 0 {
-			uniqueResolvedRPMs[matches[installedRPMRegexRPMIndex]] = true
+		if len(matches) == installedRPMRegexExpectedMatches {
+			rpmName := fmt.Sprintf("%s.%s", matches[installedRPMRegexRPMIndex], matches[installedRPMRegexArchIndex])
+			uniqueResolvedRPMs[rpmName] = true
 		}
 	}
 
@@ -360,58 +358,49 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 
 // SpecExclusiveArchIsCompatible verifies the "ExclusiveArch" tag is compatible with the current machine's architecture.
 func SpecExclusiveArchIsCompatible(specfile, sourcedir, arch string, defines map[string]string) (isCompatible bool, err error) {
-	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
-
 	const (
-		machineArchField   = iota
-		exclusiveArchField = iota
-		minimumFieldsCount = iota
+		exclusiveArchIndex = 0
+		exclusiveArchQuery = "[%{EXCLUSIVEARCH} ]"
 	)
 
 	// Sanity check that this SPEC is meant to be built for the current machine architecture
-	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, arch, defines, QueryHeaderArgument)
+	queryOutput, err := QuerySPEC(specfile, sourcedir, exclusiveArchQuery, arch, defines, QueryHeaderArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
 		return
 	}
 
-	// If the list does not return enough lines then there is no exclusive arch set
-	if len(exclusiveArchList) < minimumFieldsCount {
+	// Empty result means the package is buildable for all architectures.
+	if len(queryOutput) == 0 {
 		isCompatible = true
 		return
 	}
 
-	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
-		isCompatible = true
-		return
-	}
+	isCompatible = strings.Contains(queryOutput[exclusiveArchIndex], arch)
 
 	return
 }
 
 // SpecExcludeArchIsCompatible verifies the "ExcludeArch" tag is compatible with the current machine's architecture.
 func SpecExcludeArchIsCompatible(specfile, sourcedir, arch string, defines map[string]string) (isCompatible bool, err error) {
-	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUDEARCH} ]\n"
-
 	const (
-		machineArchField   = iota
-		excludeArchField   = iota
-		minimumFieldsCount = iota
+		excludeArchIndex = 0
+		excludeArchQuery = "[%{EXCLUDEARCH} ]"
 	)
 
-	excludedArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, arch, defines, QueryHeaderArgument)
+	queryOutput, err := QuerySPEC(specfile, sourcedir, excludeArchQuery, arch, defines, QueryHeaderArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
 		return
 	}
 
-	// If the list does not return enough lines then there is no excluded architectures set.
-	if len(excludedArchList) < minimumFieldsCount {
+	// Empty result means the package is buildable for all architectures.
+	if len(queryOutput) == 0 {
 		isCompatible = true
 		return
 	}
 
-	isCompatible = !strings.Contains(excludedArchList[excludeArchField], excludedArchList[machineArchField])
+	isCompatible = !strings.Contains(queryOutput[excludeArchIndex], arch)
 
 	return
 }

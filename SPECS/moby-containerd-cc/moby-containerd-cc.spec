@@ -5,7 +5,7 @@
 
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
-Version: 1.7.0
+Version: 1.7.1
 Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
@@ -21,7 +21,7 @@ Source2: containerd.toml
 
 BuildRequires: btrfs-progs-devel
 BuildRequires: git
-BuildRequires: golang
+BuildRequires: golang >= 1.19.0
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -77,6 +77,12 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+*   Mon May 22 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.1-1
+-   Fix unit test arguments for TestSnapshotterFromPodSandboxConfig
+
+*   Wed May 17 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-2
+-   Add build version dependency on golang
+
 *   Tue Apr 25 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-1
 -   Add initial spec
 -   License verified.

@@ -1,0 +1,230 @@
+From 79847c89951f8da3772760e50406924b49a0ac6a Mon Sep 17 00:00:00 2001
+From: Kanika Nema <kanikanema@microsoft.com>
+Date: Fri, 12 May 2023 14:57:03 +0000
+Subject: [PATCH] Cleanup housekeeping cgroup on vm delete
+
+Move cgroup.threads back to parent cgroup and rmdir the
+housekeeping cgroup before the vm is deleted.
+
+This prevents a bug in runc where it cannot read housekeeping/cgroup.procs
+stopping vm from being deleted
+---
+ pkg/virt-handler/cgroup/cgroup.go            |  6 +++
+ pkg/virt-handler/cgroup/cgroup_v1_manager.go | 19 +++++++++
+ pkg/virt-handler/cgroup/cgroup_v2_manager.go | 19 +++++++++
+ pkg/virt-handler/cgroup/util.go              | 33 +++++++++++++++
+ pkg/virt-handler/vm.go                       | 44 ++++++++++++++++++++
+ 5 files changed, 121 insertions(+)
+
+diff --git a/pkg/virt-handler/cgroup/cgroup.go b/pkg/virt-handler/cgroup/cgroup.go
+index b0b28a046..052b5aa96 100644
+--- a/pkg/virt-handler/cgroup/cgroup.go
++++ b/pkg/virt-handler/cgroup/cgroup.go
+@@ -63,11 +63,17 @@ type Manager interface {
+ 	// Create new child cgroup
+ 	CreateChildCgroup(name string, subSystem string) error
+ 
++	// Delete child cgroup
++	DeleteChildCgroup(name string, subSystem string) error
++
+ 	// Attach TID to cgroup
+ 	AttachTID(subSystem string, subCgroup string, tid int) error
+ 
+ 	// Get list of threads attached to cgroup
+ 	GetCgroupThreads() ([]int, error)
++
++	// Get list of threads attached to a child cgroup
++	GetChildCgroupThreads(childCgroup string) ([]int, error)
+ }
+ 
+ // This is here so that mockgen would create a mock out of it. That way we would have a mocked runc manager.
+diff --git a/pkg/virt-handler/cgroup/cgroup_v1_manager.go b/pkg/virt-handler/cgroup/cgroup_v1_manager.go
+index 073d7a820..c5ee7706b 100644
+--- a/pkg/virt-handler/cgroup/cgroup_v1_manager.go
++++ b/pkg/virt-handler/cgroup/cgroup_v1_manager.go
+@@ -183,6 +183,21 @@ func init_cgroup(groupPath string, newCgroupName string, subSystem string) (err
+ 	return nil
+ }
+ 
++func (v *v1Manager) DeleteChildCgroup(name string, subSystem string) error {
++	subSysPath, err := v.GetBasePathToHostSubsystem(subSystem)
++	if err != nil {
++		return err
++	}
++
++	newGroupPath := filepath.Join(subSysPath, name)
++
++	err = os.Remove(newGroupPath)
++	if err != nil {
++		log.Log.Warningf("rmdir %s failed", newGroupPath)
++	}
++	return nil
++}
++
+ func (v *v1Manager) CreateChildCgroup(name string, subSystem string) error {
+ 	subSysPath, err := v.GetBasePathToHostSubsystem(subSystem)
+ 	if err != nil {
+@@ -201,6 +216,10 @@ func (v *v1Manager) GetCgroupThreads() ([]int, error) {
+ 	return getCgroupThreadsHelper(v, "tasks")
+ }
+ 
++func (v *v1Manager) GetChildCgroupThreads(childCgroup string) ([]int, error) {
++	return getChildCgroupThreadsHelper(v, childCgroup, "cgroup.threads")
++}
++
+ func (v *v1Manager) SetCpuSet(subcgroup string, cpulist []int) error {
+ 	return setCpuSetHelper(v, subcgroup, cpulist)
+ }
+diff --git a/pkg/virt-handler/cgroup/cgroup_v2_manager.go b/pkg/virt-handler/cgroup/cgroup_v2_manager.go
+index 4b8bf63f0..6dbaf3189 100644
+--- a/pkg/virt-handler/cgroup/cgroup_v2_manager.go
++++ b/pkg/virt-handler/cgroup/cgroup_v2_manager.go
+@@ -75,6 +75,21 @@ func (v *v2Manager) GetCpuSet() (string, error) {
+ 	return getCpuSetPath(v, "cpuset.cpus.effective")
+ }
+ 
++func (v *v2Manager) DeleteChildCgroup(name string, subSystem string) error {
++	subSysPath, err := v.GetBasePathToHostSubsystem(subSystem)
++	if err != nil {
++		return err
++	}
++
++	newGroupPath := filepath.Join(subSysPath, name)
++
++	err = os.Remove(newGroupPath)
++	if err != nil {
++		log.Log.Warningf("rmdir %s failed", newGroupPath)
++	}
++	return nil
++}
++
+ func (v *v2Manager) CreateChildCgroup(name string, subSystem string) error {
+ 	subSysPath, err := v.GetBasePathToHostSubsystem(subSystem)
+ 	if err != nil {
+@@ -140,6 +155,10 @@ func (v *v2Manager) GetCgroupThreads() ([]int, error) {
+ 	return getCgroupThreadsHelper(v, "cgroup.threads")
+ }
+ 
++func (v *v2Manager) GetChildCgroupThreads(childCgroup string) ([]int, error) {
++	return getChildCgroupThreadsHelper(v, childCgroup, "cgroup.threads")
++}
++
+ func (v *v2Manager) SetCpuSet(subcgroup string, cpulist []int) error {
+ 	return setCpuSetHelper(v, subcgroup, cpulist)
+ }
+diff --git a/pkg/virt-handler/cgroup/util.go b/pkg/virt-handler/cgroup/util.go
+index f088dc4ce..820671f8f 100644
+--- a/pkg/virt-handler/cgroup/util.go
++++ b/pkg/virt-handler/cgroup/util.go
+@@ -222,6 +222,39 @@ func getCgroupThreadsHelper(manager Manager, fname string) ([]int, error) {
+ 	return tIds, nil
+ }
+ 
++func getChildCgroupThreadsHelper(manager Manager, childCgroup string, fname string) ([]int, error) {
++	tIds := make([]int, 0, 10)
++
++	subSysPath, err := manager.GetBasePathToHostSubsystem("cpuset")
++	if err != nil {
++		return nil, err
++	}
++
++	fh, err := os.Open(filepath.Join(subSysPath, childCgroup, fname))
++	if err != nil {
++		log.Log.Warningf("no %s in path %s/%s - %v", fname, subSysPath, childCgroup, err)
++		// file didnt exist, so effectively the thread list is empty.  return that and dont error.
++		return tIds, nil
++	}
++	defer fh.Close()
++
++	scanner := bufio.NewScanner(fh)
++	for scanner.Scan() {
++		line := scanner.Text()
++		intVal, err := strconv.Atoi(line)
++		if err != nil {
++			log.Log.Errorf("error converting %s: %v", line, err)
++			return nil, err
++		}
++		tIds = append(tIds, intVal)
++	}
++	if err := scanner.Err(); err != nil {
++		log.Log.Errorf("error reading %s: %v", fname, err)
++		return nil, err
++	}
++	return tIds, nil
++}
++
+ // set cpus "cpusList" on the allowed CPUs. Optionally on a subcgroup of
+ // the pods control group (if subcgroup != nil).
+ func setCpuSetHelper(manager Manager, subCgroup string, cpusList []int) error {
+diff --git a/pkg/virt-handler/vm.go b/pkg/virt-handler/vm.go
+index 698133860..d0b0051d2 100644
+--- a/pkg/virt-handler/vm.go
++++ b/pkg/virt-handler/vm.go
+@@ -2135,6 +2135,13 @@ func (d *VirtualMachineController) processVmShutdown(vmi *v1.VirtualMachineInsta
+ 		return err
+ 	}
+ 
++	if vmi.IsCPUDedicated() && vmi.Spec.Domain.CPU.IsolateEmulatorThread {
++		err = d.removeHousekeepingCgroup(vmi)
++		if err != nil {
++			return err
++		}
++	}
++
+ 	// Only attempt to gracefully shutdown if the domain has the ACPI feature enabled
+ 	if isACPIEnabled(vmi, domain) {
+ 		if expired, timeLeft := d.hasGracePeriodExpired(domain); !expired {
+@@ -2215,6 +2222,13 @@ func (d *VirtualMachineController) processVmDelete(vmi *v1.VirtualMachineInstanc
+ 		// pending deletion.
+ 		d.recorder.Event(vmi, k8sv1.EventTypeNormal, v1.Deleted.String(), VMISignalDeletion)
+ 
++		if vmi.IsCPUDedicated() && vmi.Spec.Domain.CPU.IsolateEmulatorThread {
++			err = d.removeHousekeepingCgroup(vmi)
++			if err != nil {
++				return err
++			}
++		}
++
+ 		err = client.DeleteDomain(vmi)
+ 		if err != nil && !cmdclient.IsDisconnected(err) {
+ 			// Only report err if it wasn't the result of a disconnect.
+@@ -2688,6 +2702,36 @@ func (d *VirtualMachineController) configureHousekeepingCgroup(vmi *v1.VirtualMa
+ 	return nil
+ }
+ 
++func (d *VirtualMachineController) removeHousekeepingCgroup(vmi *v1.VirtualMachineInstance) error {
++	cgroupManager, err := cgroup.NewManagerFromVM(vmi)
++	if err != nil {
++		return err
++	}
++
++	log.Log.Object(vmi).Info("Getting housekeeping cgroup.threads")
++	tids, err := cgroupManager.GetChildCgroupThreads("housekeeping")
++	if err != nil {
++		return err
++	}
++
++	log.Log.Object(vmi).Infof("Moving housekeeping threads back to parent cgroup. ids: %v", tids)
++	for _, tid := range tids {
++		err = cgroupManager.AttachTID("cpuset", "", tid)
++		if err != nil {
++			log.Log.Object(vmi).Errorf("Error attaching tid %d: %v", tid, err.Error())
++			return err
++		}
++	}
++
++	log.Log.Object(vmi).Info("Deleting housekeeping cgroup")
++	err = cgroupManager.DeleteChildCgroup("housekeeping", "cpuset")
++	if err != nil {
++		return err
++	}
++
++	return nil
++}
++
+ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMachineInstance, domainExists bool) error {
+ 	client, err := d.getLauncherClient(origVMI)
+ 	if err != nil {
+-- 
+2.25.1
+

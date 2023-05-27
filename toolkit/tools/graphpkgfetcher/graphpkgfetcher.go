@@ -60,9 +60,7 @@ func main() {
 	timestamp.BeginTiming("graphpkgfetcher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	dependencyGraph := pkggraph.NewPkgGraph()
-
-	err := pkggraph.ReadDOTGraphFile(dependencyGraph, *inputGraph)
+	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraph)
 	if err != nil {
 		logger.Log.Panicf("Failed to read graph to file. Error: %s", err)
 	}

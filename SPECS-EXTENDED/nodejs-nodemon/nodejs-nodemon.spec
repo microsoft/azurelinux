@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:          nodejs-%{npm_name}
 Version:       2.0.3
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       Simple monitor script for use during development of a node.js app
 License:       MIT
 URL:           https://github.com/remy/nodemon
@@ -16,7 +16,6 @@ Source0:       %{_mariner_sources_url}/%{npm_name}-v%{version}-bundled.tar.gz
 
 BuildRequires: nodejs-devel
 BuildRequires: nodejs-packaging
-BuildRequires: npm
 
 ExclusiveArch: %{nodejs_arches} noarch
 BuildArch:     noarch
@@ -79,6 +78,9 @@ npm run test
 %{_bindir}/nodemon
 
 %changelog
+* Mon May 15 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.0.3-4
+- Remove explicit build-time dependency on npm (provided by nodejs-devel)
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.3-3
 - Updated source URL.
 - License verified.

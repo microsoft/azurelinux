@@ -419,9 +419,14 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 }
 
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
+// Packages will be placed in a flat directory.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
-	srcDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
-	repoDir := srcDir
+	err = r.initializeMountedChrootRepo(chrootDownloadDir)
+	if err != nil {
+		return
+	}
+
+	repoDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
 
 	if !buildpipeline.IsRegularBuild() {
 		// Docker based build doesn't use overlay so repo folder
@@ -429,14 +434,12 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
 	}
 
-	err = rpmrepomanager.OrganizePackagesByArch(srcDir, repoDir)
+	// Print warnings for any invalid RPMs
+	err = rpmrepomanager.ValidateRpmPaths(repoDir)
 	if err != nil {
-		return
-	}
-
-	err = r.initializeMountedChrootRepo(chrootDownloadDir)
-	if err != nil {
-		return
+		logger.Log.Warnf("Failed to validate RPM paths: %s", err)
+		// We treat this as just a warning, not a real error.
+		err = nil
 	}
 
 	if !buildpipeline.IsRegularBuild() {
@@ -595,6 +598,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 
 func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
 	tdnfArg = pkgVer.Name
+
 	// TDNF does not accept versioning information on implicit provides.
 	if pkgVer.IsImplicitPackage() {
 		if pkgVer.Condition != "" {
@@ -603,18 +607,17 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 		return
 	}
 
-	// Treat <= as =
-	// Treat > and >= as "latest"
+	// To avoid significant overhead we only download the latest version of a package
+	// for ">" and ">=" constraints (ie remove constraints).
 	switch pkgVer.Condition {
-	case "<=":
-		logger.Log.Warnf("Treating '%s' version constraint as '=' for: %v", pkgVer.Condition, pkgVer)
-		fallthrough
-	case "=":
-		tdnfArg = fmt.Sprintf("%s-%s", tdnfArg, pkgVer.Version)
-	case "":
-		break
+	case "<=", "<", "=":
+		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
+	case ">", ">=", "":
+		if pkgVer.Condition != "" {
+			logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+		}
 	default:
-		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+		logger.Log.Errorf("Unsupported version constraint: %s", pkgVer.Condition)
 	}
 
 	return
