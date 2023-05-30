@@ -1,14 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libssh
-Version:        0.9.5
+Version:        0.10.5
 Release:        2%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
 
-Source0:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz
-Source1:        https://www.libssh.org/files/0.9/%{name}-%{version}.tar.xz.asc
+Source0:        https://www.libssh.org/files/0.10/%{name}-%{version}.tar.xz
+Source1:        https://www.libssh.org/files/0.10/%{name}-%{version}.tar.xz.asc
 Source2:        https://cryptomilk.org/gpgkey-8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D.gpg#/%{name}.keyring
 Source3:        libssh_client.config
 Source4:        libssh_server.config
@@ -25,9 +25,13 @@ BuildRequires:  pam_wrapper
 BuildRequires:  socket_wrapper
 BuildRequires:  nss_wrapper
 BuildRequires:  uid_wrapper
+BuildRequires:  priv_wrapper
 BuildRequires:  openssh-clients
 BuildRequires:  openssh-server
 BuildRequires:  nmap-ncat
+BuildRequires:  openssl-pkcs11
+BuildRequires:  softhsm
+BuildRequires:  gnutls-utils
 
 Requires:       %{name}-config = %{version}-%{release}
 
@@ -50,6 +54,7 @@ third-party programs others than libcrypto (from openssl).
 %package devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       cmake-filesystem
 
 %description devel
 The %{name}-devel package contains libraries and header files for developing
@@ -71,16 +76,18 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 if test ! -e "obj"; then
   mkdir obj
 fi
+
 pushd obj
 
 %cmake .. \
     -DUNIT_TESTING=ON \
     -DCLIENT_TESTING=ON \
     -DSERVER_TESTING=ON \
+    -DWITH_PKCS11_URI=ON \
     -DGLOBAL_CLIENT_CONFIG="%{_sysconfdir}/libssh/libssh_client.config" \
     -DGLOBAL_BIND_CONFIG="%{_sysconfdir}/libssh/libssh_server.config"
 
-%make_build VERBOSE=1
+%cmake_build
 
 popd
 
@@ -112,19 +119,20 @@ popd
 
 %check
 pushd obj
-ctest --output-on-failure
+# Tests are randomly failing when run in parallel
+%global _smp_build_ncpus 1
+# the torture rekey tests with different than initial kex is now failing in rawhide because of OpenSSH bug #2203241
+%ctest --exclude-regex torture_rekey
 popd
 
 %files
-%doc AUTHORS BSD ChangeLog README
+%doc AUTHORS BSD CHANGELOG README
 %license COPYING
 %{_libdir}/libssh.so.4*
 %{_libdir}/libssh_threads.so.4*
 
 %files devel
 %{_includedir}/libssh/
-# own this to avoid dep on cmake -- rex
-%dir  %{_libdir}/cmake/
 %{_libdir}/cmake/libssh/
 %{_libdir}/pkgconfig/libssh.pc
 %{_libdir}/libssh.so
@@ -136,8 +144,62 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.5-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 0.10.5-2
+- License verified.
+- Switched to out-of-source build.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+
+* Fri May 05 2023 Orion Poplawski <orion@nwra.com> - 0.10.5-1
+- Update to 0.10.5 (CVE-2023-1667 CVE-2023-2283)
+- Have libssh-devel require cmake-filesystem
+
+* Sun Mar 05 2023 Andreas Schneider <asn@redhat.com> - 0.10.4-4
+- Update License to SPDX expression
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Oct 06 2022 Norbert Pocs <npocs@redhat.com> - 0.10.4-2
+- Enable pkcs11 support
+
+* Wed Sep 07 2022 Andreas Schneider <asn@redhat.com> - 0.10.4-1
+- Update to version 0.10.4
+  https://git.libssh.org/projects/libssh.git/tag/?h=libssh-0.10.4
+
+* Fri Sep 02 2022 Andreas Schneider <asn@redhat.com> - 0.10.3-1
+- Update to version 0.10.3
+  https://git.libssh.org/projects/libssh.git/tag/?h=libssh-0.10.3
+  https://git.libssh.org/projects/libssh.git/tag/?h=libssh-0.10.2
+  https://git.libssh.org/projects/libssh.git/tag/?h=libssh-0.10.1
+  https://git.libssh.org/projects/libssh.git/tag/?h=libssh-0.10.0
+- Removed libssh-0.9.6-openssh-8.8p1-compat.patch
+- resolves: rhbz#2121741
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 28 2022 Jakub Jelen <jjelen@redhat.com> - 0.9.6-4
+- Fix build-time tests to work with OpenSSH 8.8p1
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 10 2022 Stephen Gallagher <sgallagh@redhat.com> - 0.9.6-2
+- Skip broken torture_auth tests
+
+* Wed Sep 15 2021 Norbert Pocs <npocs@redhat.com> - 0.9.6-1
+- Fix CVE-CVE-2021-3634 libssh: possible heap-based buffer
+  overflow when rekeying
+- Resolves: rhbz#1994600
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.9.5-4
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Thu Sep 10 2020 Anderson Sasaki <ansasaki@redhat.com> - 0.9.5-1
 - Update to version 0.9.5
@@ -145,6 +207,13 @@ popd
 - Removed patch to re-enable algorithms using sha1 in sshd for testing
 - The algorithms supported by sshd are now automatically detected for testing
 - Resolves: #1862457 - CVE-2020-16135
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.4-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Jun 22 2020 Anderson Sasaki <ansasaki@redhat.com> - 0.9.4-3
 - Do not return error when server properly closed the channel (#1849069)

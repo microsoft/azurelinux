@@ -10961,8 +10961,8 @@
         "type": "other",
         "other": {
           "name": "libssh",
-          "version": "0.9.5",
-          "downloadUrl": "https://www.libssh.org/files/0.9/libssh-0.9.5.tar.xz"
+          "version": "0.10.5",
+          "downloadUrl": "https://www.libssh.org/files/0.10/libssh-0.10.5.tar.xz"
         }
       }
     },
@@ -13843,8 +13843,8 @@
         "type": "other",
         "other": {
           "name": "nbdkit",
-          "version": "1.20.7",
-          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.20-stable/nbdkit-1.20.7.tar.gz"
+          "version": "1.35.3",
+          "downloadUrl": "http://libguestfs.org/download/nbdkit/1.35-development/nbdkit-1.35.3.tar.gz"
         }
       }
     },
@@ -21196,6 +21196,16 @@
           "name": "pptp",
           "version": "1.10.0",
           "downloadUrl": "http://downloads.sf.net/pptpclient/pptp-1.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "priv_wrapper",
+          "version": "1.0.1",
+          "downloadUrl": "https://ftp.samba.org/pub/cwrap/priv_wrapper-1.0.1.tar.gz"
         }
       }
     },
