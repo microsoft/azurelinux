@@ -206,6 +206,9 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_includedir}/libdrm/drm_mode.h
 %{_includedir}/libdrm/drm_sarea.h
 %{_includedir}/libdrm/*_drm.h
+%{_includedir}/libsync.h
+%{_includedir}/xf86drm.h
+%{_includedir}/xf86drmMode.h
 %{_libdir}/libdrm.so
 %{_libdir}/pkgconfig/libdrm.pc
 %if %{with intel}
@@ -260,9 +263,6 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_libdir}/libdrm_etnaviv.so
 %{_libdir}/pkgconfig/libdrm_etnaviv.pc
 %endif
-%{_includedir}/libsync.h
-%{_includedir}/xf86drm.h
-%{_includedir}/xf86drmMode.h
 %if %{with man_pages}
 %{_mandir}/man3/drm*.3*
 %{_mandir}/man7/drm*.7*
