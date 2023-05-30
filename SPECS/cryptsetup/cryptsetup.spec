@@ -51,6 +51,13 @@ Provides:       cryptsetup-luks-libs = %{version}-%{release}
 %description libs
 This package contains the cryptsetup shared library, libcryptsetup.
 
+%package ssh-token
+Summary:        Cryptsetup LUKS2 SSH token
+Requires:       cryptsetup-libs = %{version}-%{release}
+
+%description ssh-token
+This package contains the LUKS2 SSH token.
+
 %package -n veritysetup
 Summary:        A utility for setting up dm-verity volumes
 Group:          Applications/System
@@ -131,9 +138,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
 
+%files ssh-token
+%license COPYING COPYING.LGPL
+%{_libdir}/%{name}/libcryptsetup-token-ssh.so
+%{_mandir}/man8/cryptsetup-ssh.8.gz
+%{_sbindir}/cryptsetup-ssh
+
 %changelog
-* Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-2
-- Re-enable SSH tokens now that libssh has been promoted to core
+* Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-2
+- Add back ssh-token subpackage now that libssh has been promoted to core
 
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.3-1
 - Update to version 2.4.3
