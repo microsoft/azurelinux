@@ -1,14 +1,16 @@
-From 8d18371f17de932cfb68d5f812873ad93493c32f Mon Sep 17 00:00:00 2001
+From d9f0e24e68232b7a1b95c425b5645a1d52c70424 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 25 May 2023 11:17:43 -0700
-Subject: [PATCH] add logging to TDNFResolve, TDNFPrepareAllPackages,
- TDNFPrepareSinglePackage, and TDNFAddPackagesForInstall
+Subject: [PATCH] add logging to resolve.c, tdnfpackage.c, tdnfquery.c. Add
+ SELECTION_DOTARCH flag to libsolv call
 
 ---
  client/api.c          |  8 ++++++--
  client/packageutils.c |  5 ++++-
- client/resolve.c      | 27 ++++++++++++++++++++++++++-
- 3 files changed, 36 insertions(+), 4 deletions(-)
+ client/resolve.c      | 28 +++++++++++++++++++++++++++-
+ solv/tdnfpackage.c    | 10 +++++++++-
+ solv/tdnfquery.c      |  5 +++++
+ 5 files changed, 51 insertions(+), 5 deletions(-)
 
 diff --git a/client/api.c b/client/api.c
 index 8b134e8..ab2b23c 100644
@@ -99,7 +101,7 @@ index adc3870..6368f43 100644
  cleanup:
      return dwError;
 diff --git a/client/resolve.c b/client/resolve.c
-index cb7ca0f..79cea7d 100644
+index cb7ca0f..e511b5e 100644
 --- a/client/resolve.c
 +++ b/client/resolve.c
 @@ -71,9 +71,11 @@ TDNFPrepareAllPackages(
@@ -226,7 +228,15 @@ index cb7ca0f..79cea7d 100644
      //Check if this is a known package. If not add to unresolved
      dwError = SolvCountPkgByName(pSack, pszPkgName, pTdnf->pArgs->nSource, &dwCount);
      if (dwError == ERROR_TDNF_NO_MATCH)
-@@ -343,11 +360,14 @@ TDNFPrepareSinglePkg(
+@@ -334,6 +351,7 @@ TDNFPrepareSinglePkg(
+         }
+     }
+     BAIL_ON_TDNF_ERROR(dwError);
++    printf("After SolvCountPkgByName\n");
+ 
+     if (dwCount == 0)
+     {
+@@ -343,11 +361,14 @@ TDNFPrepareSinglePkg(
  
      if(nAlterType == ALTER_REINSTALL)
      {
@@ -241,7 +251,7 @@ index cb7ca0f..79cea7d 100644
      }
  
      if(nAlterType == ALTER_ERASE ||
-@@ -371,8 +391,10 @@ TDNFPrepareSinglePkg(
+@@ -371,8 +392,10 @@ TDNFPrepareSinglePkg(
      }
      else if (nAlterType == ALTER_INSTALL)
      {
@@ -252,7 +262,7 @@ index cb7ca0f..79cea7d 100644
          dwError = TDNFAddPackagesForInstall(
                        pSack,
                        queueGoal,
-@@ -382,6 +404,7 @@ TDNFPrepareSinglePkg(
+@@ -382,6 +405,7 @@ TDNFPrepareSinglePkg(
          {
              /* the package may have been already installed as a dependency,
                 but now the user wants it on its own */
@@ -260,7 +270,7 @@ index cb7ca0f..79cea7d 100644
              dwError = TDNFMarkAutoInstalledSinglePkg(pTdnf, pszPkgName);
              BAIL_ON_TDNF_ERROR(dwError);
              /* if TDNFMarkAutoInstalledSinglePkg() was successful, restore
-@@ -389,6 +412,7 @@ TDNFPrepareSinglePkg(
+@@ -389,6 +413,7 @@ TDNFPrepareSinglePkg(
              dwError = ERROR_TDNF_ALREADY_INSTALLED;
          }
          BAIL_ON_TDNF_ERROR(dwError);
@@ -268,7 +278,7 @@ index cb7ca0f..79cea7d 100644
      }
      else if (nAlterType == ALTER_UPGRADE)
      {
-@@ -407,6 +431,7 @@ TDNFPrepareSinglePkg(
+@@ -407,6 +432,7 @@ TDNFPrepareSinglePkg(
                        pszPkgName);
          BAIL_ON_TDNF_ERROR(dwError);
      }
@@ -276,6 +286,96 @@ index cb7ca0f..79cea7d 100644
  
  cleanup:
      if(pInstalledPkgList)
+diff --git a/solv/tdnfpackage.c b/solv/tdnfpackage.c
+index cfa66e1..ca415f9 100644
+--- a/solv/tdnfpackage.c
++++ b/solv/tdnfpackage.c
+@@ -125,6 +125,7 @@ SolvGetQueryResult(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
++    printf("Calling SolvQueueToPackageList\n");
+     dwError = SolvQueueToPackageList(&pQuery->queueResult, &pPkgList);
+     BAIL_ON_TDNF_ERROR(dwError);
+     *ppPkgList = pPkgList;
+@@ -988,7 +989,8 @@ SolvCountPkgByName(
+     PSolvQuery pQuery = NULL;
+     PSolvPackageList pPkgList = NULL;
+     uint32_t dwCount = 0;
+-
++    
++    printf("Starting SolvCountPkgByName\n");
+     if(!pSack || IsNullOrEmptyString(pszName) ||
+        !pdwCount)
+     {
+@@ -996,22 +998,28 @@ SolvCountPkgByName(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
++    printf("Calling SolvCreateQuery\n");
+     dwError = SolvCreateQuery(pSack, &pQuery);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+     if (nSource) {
++        printf("Setting nScope\n");
+         pQuery->nScope = SCOPE_SOURCE;
+     }
+ 
++    printf("Calling SolvApplySinglePackageFilter\n");
+     dwError = SolvApplySinglePackageFilter(pQuery, pszName);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
++    printf("Calling SolvApplyListQuery\n")
+     dwError = SolvApplyListQuery(pQuery);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
++    printf("Calling SolvGetQueryResult\n");
+     dwError = SolvGetQueryResult(pQuery, &pPkgList);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
++    printf("Calling SolvGetPackageListSize\n");
+     dwError = SolvGetPackageListSize(pPkgList, &dwCount);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+diff --git a/solv/tdnfquery.c b/solv/tdnfquery.c
+index e5d9144..e4c29da 100644
+--- a/solv/tdnfquery.c
++++ b/solv/tdnfquery.c
+@@ -595,6 +595,7 @@ SolvApplyListQuery(
+     Queue queueTmp = {0};
+     uint32_t nFlags = 0;
+ 
++    printf("Starting SolvApplyListQuery\n")
+     if(!pQuery)
+     {
+         dwError = ERROR_TDNF_INVALID_PARAMETER;
+@@ -606,22 +607,26 @@ SolvApplyListQuery(
+              SELECTION_PROVIDES |
+              SELECTION_GLOB |     /* foo* */
+              SELECTION_CANON |    /* foo-1.2-3.ph4.noarch */
++             SELECTION_ARCH |     /* allow .<arch> tags in packages */
+              SELECTION_REL;       /* foo>=1.2-3 */
+ 
+     if (pQuery->nScope == SCOPE_SOURCE) {
+         nFlags |= SELECTION_SOURCE_ONLY;
+     }
+ 
++    printf("Calling GenerateCommonJob\n");
+     dwError = SolvGenerateCommonJob(pQuery, nFlags);
+     BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
+ 
+     if(pQuery->nScope == SCOPE_UPGRADES)
+     {
++        print("Calling SolvApplyUpDownScope (1)\n");
+         dwError = SolvApplyUpDownScope(pQuery, 1);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+     else if(pQuery->nScope == SCOPE_DOWNGRADES)
+     {
++        print("Calling SolvApplyUpDownScope (0)\n");
+         dwError = SolvApplyUpDownScope(pQuery, 0);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
 -- 
 2.25.1
 
