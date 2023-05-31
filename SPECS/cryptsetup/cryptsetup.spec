@@ -154,6 +154,14 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
 
+%if %{with ssh}
+%files ssh-token
+%license COPYING COPYING.LGPL
+%{_libdir}/%{name}/libcryptsetup-token-ssh.so
+%{_mandir}/man8/cryptsetup-ssh.8.gz
+%{_sbindir}/cryptsetup-ssh
+%endif
+
 %changelog
 * Wed May 31 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-3
 - Disable ssh-token subpackage since requiring libssh-devel creates a circular
