@@ -136,7 +136,7 @@ STOP_ON_PKG_FAIL   ?= n
 STOP_ON_FETCH_FAIL ?= n
 
 ######## HIGH LEVEL TARGETS ########
-`
+
 .PHONY: all clean
 all: toolchain go-tools chroot-tools
 
