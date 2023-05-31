@@ -2,7 +2,7 @@
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.4.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,10 @@ BuildRequires:  popt-devel
 BuildRequires:  util-linux
 Requires:       cryptsetup-libs = %{version}-%{release}
 Requires:       libpwquality >= 1.2.0
-BuildRequires:  libssh-devel
+# Disabling SSH tokens with --disable-ssh-token since libssh-devel here creates
+a circular dependency with systemd through its dependency on openssh-clients:
+#   systemd -> cryptsetup-devel -> libssh-devel -> openssh-clients -> systemd
+#BuildRequires:  libssh-devel
 Provides:       cryptsetup-luks = %{version}-%{release}
 
 %description
@@ -50,13 +53,6 @@ Provides:       cryptsetup-luks-libs = %{version}-%{release}
 
 %description libs
 This package contains the cryptsetup shared library, libcryptsetup.
-
-%package ssh-token
-Summary:        Cryptsetup LUKS2 SSH token
-Requires:       cryptsetup-libs = %{version}-%{release}
-
-%description ssh-token
-This package contains the LUKS2 SSH token.
 
 %package -n veritysetup
 Summary:        A utility for setting up dm-verity volumes
@@ -92,7 +88,7 @@ chmod -x misc/dracut_90reencrypt/*
 
 %build
 ./autogen.sh
-%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-default-luks-format=LUKS2
+%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-default-luks-format=LUKS2 --disable-ssh-token
 make %{?_smp_mflags}
 
 %install
@@ -138,13 +134,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
 
-%files ssh-token
-%license COPYING COPYING.LGPL
-%{_libdir}/%{name}/libcryptsetup-token-ssh.so
-%{_mandir}/man8/cryptsetup-ssh.8.gz
-%{_sbindir}/cryptsetup-ssh
-
 %changelog
+* Wed May 31 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-3
+- Disable ssh-token since requiring libssh-devel creates a circular dependency.
+
 * Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-2
 - Add back ssh-token subpackage now that libssh has been promoted to core
 
