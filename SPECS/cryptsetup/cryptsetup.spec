@@ -1,6 +1,4 @@
 %bcond_with ssh
-
-%global         urlversion  2.4
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.4.3
@@ -12,6 +10,7 @@ Group:          Applications/System
 URL:            https://gitlab.com/cryptsetup/cryptsetup
 Source0:        https://www.kernel.org/pub/linux/utils/cryptsetup/v%{urlversion}/%{name}-%{version}.tar.xz
 Patch0:         cryptsetup-add-system-library-paths.patch
+%global         urlversion  2.4
 BuildRequires:  device-mapper-devel
 BuildRequires:  findutils
 BuildRequires:  gcc
