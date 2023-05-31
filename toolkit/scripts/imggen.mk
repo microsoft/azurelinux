@@ -93,6 +93,10 @@ ifeq ($(DISABLE_UPSTREAM_REPOS),y)
 imagepkgfetcher_extra_flags += --disable-upstream-repos
 endif
 
+ifeq ($(DISABLE_MARINER_REPOS),y)
+imagepkgfetcher_extra_flags += --disable-mariner-repos
+endif
+
 ifeq ($(USE_PREVIEW_REPO),y)
 imagepkgfetcher_extra_flags += --use-preview-repo
 endif

@@ -24,6 +24,7 @@ import (
 
 const (
 	allRepoIDs             = "*"
+	marinerReposGlob       = "mariner*"
 	builtRepoID            = "local-repo"
 	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
@@ -69,9 +70,10 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot         *safechroot.Chroot
-	usePreviewRepo bool
-	cloneDir       string
+	chroot              *safechroot.Chroot
+	usePreviewRepo      bool
+	disableMarinerRepos bool
+	cloneDir            string
 }
 
 // New creates a new RpmRepoCloner
@@ -87,7 +89,7 @@ func New() *RpmRepoCloner {
 //   - prebuiltRpmsDir is the directory with toolchain RPMs
 //   - usePreviewRepo if set, the upstream preview repository will be used.
 //   - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string, disableMarinerRepos bool) (err error) {
 	const (
 		isExistingDir = false
 
@@ -107,6 +109,11 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	r.usePreviewRepo = usePreviewRepo
 	if usePreviewRepo {
 		logger.Log.Info("Enabling preview repo")
+	}
+
+	r.disableMarinerRepos = disableMarinerRepos
+	if disableMarinerRepos {
+		logger.Log.Info("Disabling Mariner repos")
 	}
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -236,6 +243,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
 		return
 	}
+	logger.Log.Debug("repo files = ", existingRepoFiles)
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
@@ -378,6 +386,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 
 			if !r.usePreviewRepo {
 				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+			}
+
+			if r.disableMarinerRepos {
+				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", marinerReposGlob))
 			}
 
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
@@ -550,6 +562,10 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 
 		if !r.usePreviewRepo {
 			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
+		}
+
+		if r.disableMarinerRepos {
+			args = append(args, fmt.Sprintf("--disablerepo=%s", marinerReposGlob))
 		}
 
 		var (
