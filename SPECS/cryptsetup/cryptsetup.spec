@@ -26,13 +26,13 @@ BuildRequires:  popt-devel
 BuildRequires:  util-linux
 Requires:       cryptsetup-libs = %{version}-%{release}
 Requires:       libpwquality >= 1.2.0
+Provides:       cryptsetup-luks = %{version}-%{release}
 # Disabling SSH tokens with --disable-ssh-token since libssh-devel here creates
 # a circular dependency with systemd through its dependency on openssh-clients:
 #   systemd -> cryptsetup-devel -> libssh-devel -> openssh-clients -> systemd
 %if %{with ssh}
 BuildRequires:  libssh-devel
 %endif
-Provides:       cryptsetup-luks = %{version}-%{release}
 
 %description
 The cryptsetup package contains a utility for setting up
