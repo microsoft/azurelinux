@@ -8,9 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://gitlab.com/cryptsetup/cryptsetup
-Source0:        https://www.kernel.org/pub/linux/utils/cryptsetup/v%{urlversion}/%{name}-%{version}.tar.xz
+Source0:        https://www.kernel.org/pub/linux/utils/cryptsetup/v2.4/%{name}-%{version}.tar.xz
 Patch0:         cryptsetup-add-system-library-paths.patch
-%global         urlversion  2.4
 BuildRequires:  device-mapper-devel
 BuildRequires:  findutils
 BuildRequires:  gcc
