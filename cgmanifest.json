@@ -6866,8 +6866,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.13",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz"
+          "version": "3.7.16",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.16/Python-3.7.16.tar.xz"
         }
       }
     },
