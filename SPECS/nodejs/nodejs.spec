@@ -117,7 +117,7 @@ make cctest
 
 %changelog
 * Tue May 30 2023 Dallas Delaney <dadelan@microsoft.com> - 16.19.1-2
-- Fix CVE-2023-32067
+- Fix CVE-2023-32067, CVE-2023-31130, CVE-2023-31147 by using system c-ares
 
 * Wed Mar 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.19.1-1
 - Auto-upgrade to 16.19.1 - to fix CVE-2023-23936

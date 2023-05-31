@@ -1,7 +1,7 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
 Version:        2.0.9
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,7 +23,6 @@ BuildRequires:  pkgconfig
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
-BuildRequires:  c-ares-devel
 
 %description
 
@@ -57,7 +56,6 @@ Development files for %{name}
     -DFLB_TLS=On \
     -DFLB_JEMALLOC=On \
     -DFLB_LUAJIT=Off \
-    -DFLB_CARES_SHARED=On \
 
 %cmake_build
 
@@ -77,9 +75,6 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
-* Tue May 30 2023 Dallas Delaney <dadelan@microsoft.com> - 2.0.9-2
-- Fix CVE 2023-32067
-
 * Fri Feb 24 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.0.9-1
 - Upgrade version to 2.0.9
 - Use SPDX license expression in license tag
