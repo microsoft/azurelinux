@@ -9,5 +9,20 @@
 #keep commented till upgrade issues are sorted
 #-A INPUT -j LOG --log-prefix "FIREWALL:INPUT "
 -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow DHCPv6 client requests
+# Support SLACC
+-A INPUT -p udp --dport 546 -d fe80::/64 -j ACCEPT
+# Packet Too Big
+-A INPUT -p icmpv6 --icmpv6-type 2 -j ACCEPT
+# Router Solicitation 
+-A INPUT -p icmpv6 --icmpv6-type 133 -j ACCEPT
+# Router Advertisement
+-A INPUT -p icmpv6 --icmpv6-type 134 -j ACCEPT
+# Neighbour Solicitation
+-A INPUT -p icmpv6 --icmpv6-type 135 -j ACCEPT
+# Neighbour Advertisement
+-A INPUT -p icmpv6 --icmpv6-type 136 -j ACCEPT
+# Redirect
+-A INPUT -p icmpv6 --icmpv6-type 137 -j ACCEPT
 -A OUTPUT -j ACCEPT
 COMMIT
