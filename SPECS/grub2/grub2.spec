@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -290,7 +290,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_bindir}/*
 %{_datarootdir}/grub/*
 %{_sysconfdir}/sysconfig/grub
-%{_sysconfdir}/default/grub
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
 %ghost %config(noreplace) /boot/%{name}/grub.cfg
 
 %ifarch x86_64
@@ -326,6 +326,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Wed May 31 2023 Ievgen Priadka <ipriadka@linkedin.com> - 2.06-10
+- Maintain changes in /etc/default/grub
+
 * Wed Apr 05 2023 Andy Zaugg <azaugg@linkedin.com> - 2.06-9
 - Adding XFS support to GRUB
 
