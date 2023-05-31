@@ -243,7 +243,6 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
 		return
 	}
-	logger.Log.Debug("repo files = ", existingRepoFiles)
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
