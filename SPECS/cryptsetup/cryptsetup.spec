@@ -1,3 +1,5 @@
+%bcond_with ssh
+
 %global         urlversion  2.4
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
@@ -27,7 +29,9 @@ Requires:       libpwquality >= 1.2.0
 # Disabling SSH tokens with --disable-ssh-token since libssh-devel here creates
 # a circular dependency with systemd through its dependency on openssh-clients:
 #   systemd -> cryptsetup-devel -> libssh-devel -> openssh-clients -> systemd
-#BuildRequires:  libssh-devel
+%if %{with ssh}
+BuildRequires:  libssh-devel
+%endif
 Provides:       cryptsetup-luks = %{version}-%{release}
 
 %description
@@ -53,6 +57,15 @@ Provides:       cryptsetup-luks-libs = %{version}-%{release}
 
 %description libs
 This package contains the cryptsetup shared library, libcryptsetup.
+
+%if %{with ssh}
+%package ssh-token
+Summary:        Cryptsetup LUKS2 SSH token
+Requires:       cryptsetup-libs = %{version}-%{release}
+
+%description ssh-token
+This package contains the LUKS2 SSH token.
+%endif
 
 %package -n veritysetup
 Summary:        A utility for setting up dm-verity volumes
@@ -88,7 +101,14 @@ chmod -x misc/dracut_90reencrypt/*
 
 %build
 ./autogen.sh
-%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-default-luks-format=LUKS2 --disable-ssh-token
+%configure \
+    --enable-fips \
+    --enable-pwquality \
+    --enable-internal-sse-argon2 \
+%if !%{with ssh}
+    --disable-ssh-token \
+%endif
+    --with-default-luks-format=LUKS2 \
 make %{?_smp_mflags}
 
 %install
@@ -136,7 +156,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Wed May 31 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-3
-- Disable ssh-token since requiring libssh-devel creates a circular dependency.
+- Disable ssh-token subpackage since requiring libssh-devel creates a circular
+- dependency.
 
 * Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-2
 - Add back ssh-token subpackage now that libssh has been promoted to core
