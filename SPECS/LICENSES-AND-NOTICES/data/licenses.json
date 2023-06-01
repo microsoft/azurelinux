@@ -2950,7 +2950,6 @@
                 "python-pycurl",
                 "python-pygments",
                 "python-pynacl",
-                "python-pyvmomi",
                 "python-requests",
                 "python-setuptools_scm",
                 "python-simplejson",
