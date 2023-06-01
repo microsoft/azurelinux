@@ -113,7 +113,7 @@ tar --strip-components=1 -xf %{SOURCE0}
 export GOPATH=%{_builddir}/go
 export GOFLAGS+="-buildmode=pie -mod=vendor"
 env \
-CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%{s})" \
+CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
