@@ -196,7 +196,6 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %dir %{_datadir}/cdi/manifests/release
 %{_datadir}/cdi/manifests
 
-
 %changelog
 * Fri May 26 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-0
 - Update to verion 1.55.0
