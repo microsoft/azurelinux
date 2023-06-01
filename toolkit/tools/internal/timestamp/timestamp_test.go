@@ -176,7 +176,7 @@ func TestResumeAndAppend(t *testing.T) {
 	assert.Equal(root.ID, ts.ParentID)
 	FlushAndCleanUpResources()
 
-	err = ResumeTiming("test", testFile)
+	ResumeTiming("test", testFile)
 	ts, err = StopEventByPath("test/A")
 	assert.NoError(err)
 	FlushAndCleanUpResources()
@@ -226,14 +226,14 @@ func TestStartStopEvent(t *testing.T) {
 func TestPauseResumeEvent(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_start_stop_event.jsonl"
-	root, err := BeginTiming("test", testFile)
+	testFile := testOutputDir + "test_pause_resume_event.jsonl"
+	root, _ := BeginTiming("test", testFile)
 
-	ts, err := StartEvent("A", root)
+	ts, _ := StartEvent("A", root)
 	idA := ts.ID
-	ts, err = PauseEvent(ts)
-	ts, err = ResumeEvent(ts)
-	ts, err = StopEvent(ts)
+	ts, _ = PauseEvent(ts)
+	ts, _ = ResumeEvent(ts)
+	StopEvent(ts)
 
 	FlushAndCleanUpResources()
 
@@ -258,7 +258,7 @@ func TestPauseResumeEvent(t *testing.T) {
 	}
 
 	assert.Equal(len(records), 2)
-	assert.Greater(records[0].ElapsedTime(), 0)
-	assert.Greater(records[1].ElapsedTime(), 0)
-	assert.Less(records[0].EndTime, records[1].StartTime)
+	assert.Greater(records[0].ElapsedTime(), time.Duration(0))
+	assert.Greater(records[1].ElapsedTime(), time.Duration(0))
+	assert.Less(*records[0].EndTime, *records[1].StartTime)
 }
