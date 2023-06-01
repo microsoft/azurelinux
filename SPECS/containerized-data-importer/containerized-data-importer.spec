@@ -31,8 +31,8 @@ BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-ExclusiveArch:  x86_64 aarch64
 Provides:       cdi = %{version}-%{release}
+ExclusiveArch:  x86_64 aarch64
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
@@ -113,7 +113,7 @@ tar --strip-components=1 -xf %{SOURCE0}
 export GOPATH=%{_builddir}/go
 export GOFLAGS+="-buildmode=pie -mod=vendor"
 env \
-CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
+CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%{s})" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
