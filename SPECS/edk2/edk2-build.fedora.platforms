@@ -1,0 +1,47 @@
+
+#####################################################################
+# ext4 driver
+
+[build.ext4.x64]
+desc = ext4 driver
+conf = Features/Ext4Pkg/Ext4Pkg.dsc
+arch = X64
+plat = Ext4Pkg
+dest = Fedora/drivers
+cpy1 = X64/Ext4Dxe.efi ext4x64.efi
+
+[build.ext4.aa64]
+desc = ext4 driver
+conf = Features/Ext4Pkg/Ext4Pkg.dsc
+arch = AARCH64
+plat = Ext4Pkg
+dest = Fedora/drivers
+cpy1 = AARCH64/Ext4Dxe.efi ext4aa64.efi
+
+[build.ext4.riscv64]
+desc = ext4 driver
+conf = Features/Ext4Pkg/Ext4Pkg.dsc
+arch = RISCV64
+plat = Ext4Pkg
+dest = Fedora/drivers
+cpy1 = RISCV64/Ext4Dxe.efi ext4riscv64.efi
+
+
+#####################################################################
+# arm standalone mm
+
+[build.standalone.mm.aa64]
+conf = Platform/StandaloneMm/PlatformStandaloneMmPkg/PlatformStandaloneMmRpmb.dsc
+arch = AARCH64
+plat = MmStandaloneRpmb
+dest = Fedora/aarch64
+cpy1 = FV/BL32_AP_MM.fd
+
+
+#####################################################################
+# loongarch builds
+
+[build.loongarch]
+desc = Loongarch build
+conf = Platform/Loongson/LoongArchQemuPkg/Loongson.dsc
+arch = LOONGARCH64

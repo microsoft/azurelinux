@@ -1,0 +1,66 @@
+From 51846ff74e3352151f99cfcfbe091c09f3ec8097 Mon Sep 17 00:00:00 2001
+From: Michael Brown <mcb30@ipxe.org>
+Date: Tue, 9 May 2023 12:09:30 +0000
+Subject: [PATCH 16/18] OvmfPkg: Clarify invariants for NestedInterruptTplLib
+
+NestedInterruptTplLib relies on CPU interrupts being disabled to
+guarantee exclusive (and hence atomic) access to the shared state in
+IsrState.  Nothing in the calling interrupt handler should have
+re-enabled interrupts before calling NestedInterruptRestoreTPL(), and
+the loop in NestedInterruptRestoreTPL() itself maintains the invariant
+that interrupts are disabled at the start of each iteration.
+
+Add assertions to clarify this invariant, and expand the comments
+around the calls to RestoreTPL() and DisableInterrupts() to clarify
+the expectations around enabling and disabling interrupts.
+
+Signed-off-by: Michael Brown <mcb30@ipxe.org>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit ae0be176a83efebe9a8c13d2124151f7dd13443a)
+---
+ OvmfPkg/Library/NestedInterruptTplLib/Tpl.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c b/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c
+index e19d98878eb7..e921a09c5599 100644
+--- a/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c
++++ b/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c
+@@ -104,6 +104,7 @@ NestedInterruptRestoreTPL (
+   // defer our call to RestoreTPL() to the in-progress outer instance
+   // of the same interrupt handler.
+   //
++  ASSERT (GetInterruptState () == FALSE);
+   if (InterruptedTPL == IsrState->InProgressRestoreTPL) {
+     //
+     // Trigger outer instance of this interrupt handler to perform the
+@@ -153,6 +154,7 @@ NestedInterruptRestoreTPL (
+     //
+     // Check shared state loop invariants.
+     //
++    ASSERT (GetInterruptState () == FALSE);
+     ASSERT (IsrState->InProgressRestoreTPL < InterruptedTPL);
+     ASSERT (IsrState->DeferredRestoreTPL == FALSE);
+ 
+@@ -167,13 +169,17 @@ NestedInterruptRestoreTPL (
+ 
+     //
+     // Call RestoreTPL() to allow event notifications to be
+-    // dispatched.  This will implicitly re-enable interrupts.
++    // dispatched.  This will implicitly re-enable interrupts (if
++    // InterruptedTPL is below TPL_HIGH_LEVEL), even though we are
++    // still inside the interrupt handler.
+     //
+     gBS->RestoreTPL (InterruptedTPL);
+ 
+     //
+     // Re-disable interrupts after the call to RestoreTPL() to ensure
+-    // that we have exclusive access to the shared state.
++    // that we have exclusive access to the shared state.  Interrupts
++    // will be re-enabled by the IRET or equivalent instruction when
++    // we subsequently return from the interrupt handler.
+     //
+     DisableInterrupts ();
+ 
+-- 
+2.40.1
+
