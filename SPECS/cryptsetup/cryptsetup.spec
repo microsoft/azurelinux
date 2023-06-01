@@ -106,7 +106,7 @@ chmod -x misc/dracut_90reencrypt/*
 %if !%{with ssh}
     --disable-ssh-token \
 %endif
-    --with-default-luks-format=LUKS2 \
+    --with-default-luks-format=LUKS2
 make %{?_smp_mflags}
 
 %install
