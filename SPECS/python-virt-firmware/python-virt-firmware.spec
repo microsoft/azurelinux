@@ -1,3 +1,4 @@
+%bcond_with tests
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 ## START: Set by rpmautospec
@@ -52,6 +53,7 @@ Conflicts:      python3-virt-firmware < 1.6
 %description -n python3-virt-firmware-peutils
 Some utilities to inspect efi (pe) binaries.
 
+%if %{with tests}
 %package -n     python3-virt-firmware-tests
 Summary:        %{summary} - test cases
 Requires:       python3-virt-firmware
@@ -59,6 +61,7 @@ Requires:       python3dist(pytest)
 Requires:       edk2-ovmf
 %description -n python3-virt-firmware-tests
 test cases
+%endif
 
 %prep
 %autosetup -n virt-firmware-%{pypi_version}
@@ -71,9 +74,12 @@ test cases
 # manpages
 install -m 755 -d      %{buildroot}%{_mandir}/man1
 install -m 644 man/*.1 %{buildroot}%{_mandir}/man1
+
 # tests
+%if %{with tests}
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -ar tests %{buildroot}%{_datadir}/%{name}
+%endif
 
 %files -n python3-virt-firmware
 %license LICENSE
@@ -93,8 +99,10 @@ cp -ar tests %{buildroot}%{_datadir}/%{name}
 %{_bindir}/pe-listsigs
 %{_bindir}/pe-addsigs
 
+%if %{with tests}
 %files -n python3-virt-firmware-tests
 %{_datadir}/%{name}/tests
+%endif
 
 %changelog
 * Thu May 04 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.5-1
