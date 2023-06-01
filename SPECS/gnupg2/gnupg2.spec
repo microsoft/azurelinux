@@ -1,14 +1,17 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.2.20
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 URL:            https://gnupg.org/index.html
 Group:          Applications/Cryptography.
 Source0:        https://gnupg.org/ftp/gcrypt/gnupg/gnupg-%{version}.tar.bz2
+# CVE-2022-34903: cherry-pick upstream commit
+# 34c649b3601383cd11dbc76221747ec16fd68e1b, which can be found at
+# https://dev.gnupg.org/rG34c649b3601383cd11dbc76221747ec16fd68e1bi
+Patch0:         CVE-2022-34903.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
@@ -40,6 +43,7 @@ is provided by the gnupg2-smime package.
 
 %prep
 %setup -q -n gnupg-%{version}
+%patch0 -p1
 
 %build
 %configure
@@ -65,23 +69,34 @@ make %{?_smp_mflags} check
 %exclude /usr/share/doc/*
 
 %changelog
+*   Thu Jun 01 2023 Cameron Baird <cameronbaird@microsoft.com> 2.2.20-4
+-   Patch CVE-2022-34903.
+
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.2.20-3
 -   Adding a license reference.
 -   License verified.
+
 *   Thu Apr 16 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.2.20-2
 -   Rename gnupg to gnupg2
 -   Update description.
+
 *   Tue Mar 24 2020 Henry Beberman <henry.beberman@microsoft.com> 2.2.20-1
 -   Update to 2.2.20. License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.10-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Sat Oct 20 2018 Ankit Jain <ankitja@vmware.com> 2.2.10-1
 -   Update to 2.2.10
+
 *   Wed Aug 30 2017 Alexey Makhalov <amakhalov@vmware.com> 2.1.20-3
 -   Add requires libgcrypt
+
 *   Wed Jun 07 2017 Danut Moraru <dmoraru@vmware.com> 2.1.20-2
 -   Add pinentry dependency
+
 *   Tue Apr 11 2017 Danut Moraru <dmoraru@vmware.com> 2.1.20-1
 -   Update to 2.1.20
+
 *   Wed Jul 27 2016 Kumar Kaushik <kaushikk@vmware.com> 2.0.30-1
 -   Initial Build.
