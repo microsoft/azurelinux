@@ -17,7 +17,7 @@
 
 Summary:        Container native virtualization
 Name:           containerized-data-importer
-Version:        1.51.0
+Version:        1.55.0
 Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -31,8 +31,8 @@ BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-ExclusiveArch:  x86_64 aarch64
 Provides:       cdi = %{version}-%{release}
+ExclusiveArch:  x86_64 aarch64
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
@@ -196,8 +196,10 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %dir %{_datadir}/cdi/manifests/release
 %{_datadir}/cdi/manifests
 
-
 %changelog
+* Fri May 26 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-0
+- Update to verion 1.55.0
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.51.0-10
 - Bump release to rebuild with go 1.19.8
 
