@@ -9,10 +9,15 @@
 # otherwise it returns 1. Target arch can be specified as an argument, otherwise it defaults to
 # the current system arch.
 
-# Invoke via the following command:
-# ./filter_check_arch.sh <path to spec file> [(optional) rpm target arch]
-
 set -e
+
+help() {
+    echo "Usage: $0 [--path='path to spec file'] [--arch='(optional) rpm target arch'] [--check-compat]"
+    echo "  --path:           path to spec file to check"
+    echo "  --arch:           (optional) rpm target arch to check against, defaults to system arch"
+    echo "  --check-compat:   checks if the rpmspec tool is available and supports the --load argument"
+    exit 0
+}
 
 # Find the path to rpmops.sh relative to this script
 SCRIPT_PATH="$(realpath "$0")"
@@ -26,7 +31,8 @@ get_current_system_arch() {
 
 check_rpmspec_load_arg() {
     # check if rpmspec supports --load argument
-    rpmspec --help | grep -qe "--load" || { echo "FILTER ERROR: rpmspec does not support --load argument"; exit 1; }
+    rpmspec --help | grep -qe "--load" || { echo "FILTER ERROR: rpmspec does not support --load argument"; return 1; }
+    return 0
 }
 
 parsed_spec_read_tag() {
@@ -52,25 +58,45 @@ parsed_spec_read_tag() {
     fi
 }
 
-# Validate inputs
-# $1 - path to spec file directory
-# $2 - (optional) target arch to check against
+# Check if we have the right number of arguments
+if [[ $# -lt 1 ]]; then
+    echo "FILTER ERROR: Invalid number of arguments"
+    help
+fi
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --path=*)
+            spec_file_path="${1#*=}"
+            shift
+            ;;
+        --arch=*)
+            target_arch="${1#*=}"
+            shift
+            ;;
+        --check-compat)
+            check_rpmspec_load_arg && exit 0
+            echo "FILTER ERROR: rpmspec does not support --load argument!"
+            rpmspec --help
+            exit 1
+            ;;
+        *)
+            echo "FILTER ERROR: Invalid argument $1"
+            help
+            ;;
+    esac
+done
 
 # Check if the spec file path is specified
-if [[ -z "$1" ]]; then
+if [[ -z "$spec_file_path" ]]; then
     echo "FILTER ERROR: Spec file path not specified"
     exit 1
 fi
-
-# Check if the spec file exists
-spec_file_path=$1
 if [[ ! -f "$spec_file_path" ]]; then
     echo "FILTER ERROR: Spec file $spec_file_path does not exist"
     exit 1
 fi
-
-spec_file_path=$1
-target_arch=$2
 
 # Default arch to get_current_system_arch() if not specified
 if [[ -z "$target_arch" ]]; then
@@ -84,7 +110,7 @@ if [[ ! " $valid_arches" == *"$target_arch"* ]]; then
 fi
 
 # Check if we have a good version of rpmspec
-check_rpmspec_load_arg
+check_rpmspec_load_arg || exit 1
 
 # Check if the spec file is a valid spec file
 if parsed_spec_read_tag "$spec_file_path" "$target_arch"; then
