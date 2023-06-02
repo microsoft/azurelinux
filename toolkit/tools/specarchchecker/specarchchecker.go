@@ -50,12 +50,11 @@ func main() {
 	archChecker := specarchchecker.New(*buildDirPath, *workerTar)
 	filteredSpecNames, err := archChecker.FilterSpecsByArch(*specsDirPath, *distTag, specNames)
 	if err != nil {
-		logger.Log.Errorf("Failed to filter specs folder (%s) Error: %v", *specsDirPath, err)
+		logger.Log.Fatalf("Failed to filter specs folder (%s) Error: %v", *specsDirPath, err)
 	}
 
 	// Print the list of specs that were filtered out space separated into the output file
 	outputString := strings.Join(filteredSpecNames, " ")
-	// Open the file using go libraries
 	err = file.Write(outputString, *outputFilteredList)
 	if err != nil {
 		logger.Log.Fatalf("Failed to write output file (%s) Error: %v", *outputFilteredList, err)

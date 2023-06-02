@@ -82,14 +82,14 @@ func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distT
 
 	logger.Log.Debugf("Distribution tag: %s.", distTag)
 
-	err = s.Chroot.Run(func() error {
+	err = s.Chroot().Run(func() error {
 		return s.generateSnapshotInChroot(distTag)
 	})
 	if err != nil {
 		return
 	}
 
-	chrootOutputFileFullPath := filepath.Join(s.Chroot.RootDir(), chrootOutputFilePath)
+	chrootOutputFileFullPath := filepath.Join(s.Chroot().RootDir(), chrootOutputFilePath)
 	err = file.Move(chrootOutputFileFullPath, outputFilePath)
 	if err != nil {
 		logger.Log.Errorf("Failed to retrieve the snapshot from the chroot. Error: %v.", err)
@@ -130,7 +130,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 	defines := s.BuildDefines(distTag)
 	specPaths, err = s.BuildCompatibleSpecsList([]string{}, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.ChrootSpecDir, err)
+		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.ChrootSpecDir(), err)
 		return
 	}
 
