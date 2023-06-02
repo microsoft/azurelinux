@@ -68,6 +68,9 @@ Below are the executable tools used as part of the build system.
 #### boilerplate
 The `boilerplate` tool is a sample go tool which shows a minimal implementation of the argument parsing and logging packages.
 
+#### bldtracker
+The `bldtracker` tool is used to initialize a JSONL file or record a new timestamp for shell scripts during the image-building process.
+
 #### depsearch
 The `depsearch` tool is used to list all packages which depend on another set of packages. The tool operates on dependency graphs (see [Dependency Graphing](3_package_building.md#dependency-graphing)) produced by the workplan creation system. Passing `--input=../build/pkg_artifacts/graph.dot --packges="pkg1 pkg2" --specs=./path/to/others.spec` will return a list of all packages which depend on the pkg1.rpm, pkg2.rpm, other*.rpm packages.
 

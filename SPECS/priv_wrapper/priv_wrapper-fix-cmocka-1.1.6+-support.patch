@@ -1,0 +1,31 @@
+From 295bcbe9de1fb37531678d482efb12583b77c6d0 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 17 Feb 2023 17:51:27 +0100
+Subject: [PATCH] cmake: Fix cmocka >= 1.1.6 find_package() in CONFIG mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Pavel Filipenský <pfilipensky@samba.org>
+---
+ tests/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index d33cf15..46147cf 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1,5 +1,9 @@
+ project(tests C)
+ 
++if (TARGET cmocka::cmocka)
++    set(CMOCKA_LIBRARY cmocka::cmocka)
++endif()
++
+ include_directories(
+   ${CMAKE_BINARY_DIR}
+   ${CMAKE_CURRENT_SOURCE_DIR}
+-- 
+2.39.2
+

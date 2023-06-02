@@ -82,6 +82,7 @@ STATUS_FLAGS_DIR   ?= $(BUILD_DIR)/make_status
 CHROOT_DIR         ?= $(BUILD_DIR)/worker/chroot
 IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
 TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
+TIMESTAMP_DIR      ?= $(BUILD_DIR)/timestamp
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
@@ -143,6 +144,9 @@ all: toolchain go-tools chroot-tools
 # Misc function defines
 # Variable prerequisite tracking
 include $(SCRIPTS_DIR)/utils.mk
+
+# Set up for the timestamp feature
+include $(SCRIPTS_DIR)/timestamp.mk
 
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
