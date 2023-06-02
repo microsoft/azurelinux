@@ -92,6 +92,7 @@ func fetchPackages() (err error) {
 	}
 
 	if hasUnresolvedNodes {
+		logger.Log.Info("Found unresolved packages to cache, downloading packages")
 		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
 			err = fmt.Errorf("failed to resolve graph:\n%w", err)
