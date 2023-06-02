@@ -85,7 +85,7 @@ func fetchPackages() (err error) {
 		// Create the worker environment
 		cloner, err = rpmrepocloner.ConstrcuctClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *repoFiles)
 		if err != nil {
-			err = fmt.Errorf("failed to setup new cloner: %w", err)
+			err = fmt.Errorf("failed to setup new cloner:\n%w", err)
 			return
 		}
 		defer cloner.Close()
@@ -94,7 +94,7 @@ func fetchPackages() (err error) {
 	if hasUnresolvedNodes {
 		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
-			err = fmt.Errorf("failed to resolve graph: %w", err)
+			err = fmt.Errorf("failed to resolve graph:\n%w", err)
 			return
 		}
 	} else {
@@ -104,7 +104,7 @@ func fetchPackages() (err error) {
 	// Write the graph to file (even if we are going to download delta RPMs, we want to save the graph with the resolved nodes first)
 	err = pkggraph.WriteDOTGraphFile(dependencyGraph, *outputGraph)
 	if err != nil {
-		err = fmt.Errorf("failed to write cache graph to file: %w", err)
+		err = fmt.Errorf("failed to write cache graph to file:\n%w", err)
 		return
 	}
 
@@ -113,7 +113,7 @@ func fetchPackages() (err error) {
 		logger.Log.Info("Configuring downloaded RPMs as a local repository")
 		err = cloner.ConvertDownloadedPackagesIntoRepo()
 		if err != nil {
-			err = fmt.Errorf("failed to convert downloaded RPMs into a repo: %w", err)
+			err = fmt.Errorf("failed to convert downloaded RPMs into a repo:\n%w", err)
 			return
 		}
 	}

@@ -96,14 +96,14 @@ func ConstrcuctClonerWithNetwork(destinationDir, tmpDir, workerTar, existingRpms
 	r = New()
 	err = r.Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, usePreviewRepo, repoDefinitions)
 	if err != nil {
-		err = fmt.Errorf("failed to prep new rpm cloner: %w", err)
+		err = fmt.Errorf("failed to prep new rpm cloner:\n%w", err)
 	}
 
 	if !disableUpstreamRepos {
 		tlsKey, tlsCert := strings.TrimSpace(tlsKey), strings.TrimSpace(tlsCert)
 		err = r.AddNetworkFiles(tlsCert, tlsKey)
 		if err != nil {
-			err = fmt.Errorf("failed to customize RPM repo cloner. Error: %w", err)
+			err = fmt.Errorf("failed to customize RPM repo cloner. Error:\n%w", err)
 			return
 		}
 	}
