@@ -27,11 +27,13 @@ Patch0: %{name}-skip_tests_with_connection_errors.patch
 
 Patch1: %{name}-fix_tests.patch
 
+%if 0%{?python3_version_nodots} >= 311
 # https://docs.python.org/3.11/whatsnew/3.11.html
 Patch2: %{name}-python311.patch
 
 # https://github.com/PythonCharmers/python-future/pull/619
 Patch3: %{name}-python312.patch
+%endif
 
 %description
 %{_description}
@@ -45,7 +47,7 @@ BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-pytest
 Provides:      future-python3 = 0:%{version}-%{release}
 Provides:      future = 0:%{version}-%{release}
-%py_provides   python3-%{name}
+Provides:      python3-%{name} = %{version}-%{release}
 
 Obsoletes: python2-%{name} < 0:%{version}-%{release}
 Obsoletes: %{name}-python2 < 0:%{version}-%{release}
@@ -57,11 +59,11 @@ Obsoletes: python34-%{name} < 0:%{version}-%{release}
 %prep
 %setup -q -n python-future-%{version}
 
-%patch 0 -p1 -b .backup
-%patch 1 -p1 -b .backup
+%patch0 -p1 -b .backup
+%patch1 -p1 -b .backup
 %if 0%{?python3_version_nodots} >= 311
-%patch 2 -p1 -b .backup
-%patch 3 -p1 -b .backup
+%patch2 -p1 -b .backup
+%patch3 -p1 -b .backup
 %endif
 
 find . -name '*.py' | xargs %{_pathfix} -pn -i "%{__python3}"
