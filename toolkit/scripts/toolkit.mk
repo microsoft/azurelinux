@@ -109,7 +109,7 @@ print-build-summary:
 # This will run the spec arch checker and generate a list of valid spec names suitable for passing to PACKAGE_BUILD_LIST et. al.
 .PHONY: prepare-spec-arch-checker
 run-specarchchecker: $(valid_arch_spec_names)
-	@echo $$(cat $(valid_arch_spec_names))
+	@cat $(valid_arch_spec_names) && echo "" # File doesn't have a newline at the end, so add one via echo.
 	@echo "Valid arch spec names generated under '$(valid_arch_spec_names)'."
 
 $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) 
