@@ -42,7 +42,7 @@ functionality up into several modules. The S/MIME and smartcard functionality
 is provided by the gnupg2-smime package.
 
 %prep
-%autosetup -p1 -q -n gnupg-%{version}
+%autosetup -p1 -n gnupg-%{version}
 
 %build
 %configure
