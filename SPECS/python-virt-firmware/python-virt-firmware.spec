@@ -20,7 +20,7 @@ Summary:        Tools for virtual machine firmware volumes
 
 License:        GPLv2
 URL:            https://pypi.org/project/virt-firmware/
-Source0:        python-virt-firmware-%{pypi_version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-%{pypi_version}.tar.gz#/python-virt-firmware-%{pypi_version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel

@@ -54,7 +54,7 @@ URL:        http://www.tianocore.org
 # COMMIT=bb1bba3d7767
 # git archive --format=tar --prefix=edk2-$COMMIT/ $COMMIT \
 # | xz -9ev >/tmp/edk2-$COMMIT.tar.xz
-Source0: edk2-%{GITCOMMIT}.tar.xz
+Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/af802257f010b63d973dc909b57ee845b7734e8d494b081050ba1f197349663b081e1f2edc5244726e2479ff6d16d79d0a6fceb00f4840b59982f10b79facf66/edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
 Source2: edk2-openssl-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz
 Source3: edk2-softfloat-%{softfloat_version}.tar.xz
