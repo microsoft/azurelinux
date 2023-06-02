@@ -26,7 +26,7 @@ Some of the tasks that pefile makes possible are:\
 
 
 #Source0:       https://github.com/erocarrera/%%{srcname}/archive/v%%{version}/%%{srcname}-%%{version}.tar.gz
-Source0:        https://github.com/erocarrera/%{srcname}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/erocarrera/%{srcname}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python%{python3_pkgversion}-devel

@@ -1,4 +1,5 @@
 %bcond_with experimental
+%bcond_with arm
 
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,8 +36,8 @@ ExclusiveArch: x86_64
 %define DBXDATE        20230509
 
 %define build_ovmf 1
-%define build_aarch64 1
-%define build_riscv64 1
+%define build_aarch64 0
+%define build_riscv64 0
 
 %global softfloat_version 20180726-gitb64af41
 %define disable_werror 1
@@ -55,10 +56,10 @@ URL:        http://www.tianocore.org
 # | xz -9ev >/tmp/edk2-$COMMIT.tar.xz
 Source0: edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
-Source2: openssl-rhel-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz
-Source3: softfloat-%{softfloat_version}.tar.xz
+Source2: edk2-openssl-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz
+Source3: edk2-softfloat-%{softfloat_version}.tar.xz
 Source4: edk2-platforms-54306d023e7d.tar.xz
-Source5: jansson-2.13.1.tar.bz2
+Source5: edk2-jansson-2.13.1.tar.bz2
 
 # json description files
 Source10: 50-edk2-aarch64-qcow2.json
@@ -124,13 +125,17 @@ BuildRequires:  nasm
 
 # Only OVMF includes the Secure Boot feature, for which we need to separate out
 # the UEFI shell.
-# VIPERRI XXX May not be needed BuildRequires:  dosfstools
-# VIPERRI XXX May not be needed BuildRequires:  mtools
+BuildRequires:  dosfstools
+BuildRequires:  mtools
 BuildRequires:  xorriso
 
 # For generating the variable store template with the default certificates
 # enrolled.
 BuildRequires:  python3-virt-firmware >= 23.5
+BuildRequires:  python3-virt-firmware-peutils >= 23.5
+
+# For mkisofs.
+BuildRequires:  cdrkit
 
 # endif build_ovmf
 %endif
@@ -230,6 +235,7 @@ EFI Development Kit II
 Open Virtual Machine Firmware (experimental builds)
 %endif
 
+%if %{with arm}
 %package arm
 Summary:        ARM Virtual Machine Firmware
 BuildArch:      noarch
@@ -237,7 +243,9 @@ License:        BSD-2-Clause-Patent and OpenSSL
 %description arm
 EFI Development Kit II
 ARMv7 UEFI Firmware
+%endif
 
+%if %{build_riscv64}
 %package riscv64
 Summary:        RISC-V Virtual Machine Firmware
 BuildArch:      noarch
@@ -245,6 +253,7 @@ License:        BSD-2-Clause-Patent and OpenSSL
 %description riscv64
 EFI Development Kit II
 RISC-V UEFI Firmware
+%endif
 
 %package ext4
 Summary:        Ext4 filesystem driver
@@ -625,6 +634,7 @@ done
 %{_datadir}/%{name}/xen/*.fd
 %endif
 
+%if %{with arm}
 %files arm
 %common_files
 %dir %{_datadir}/AAVMF/
@@ -635,11 +645,14 @@ done
 %{_datadir}/%{name}/arm/QEMU_VARS.fd
 %{_datadir}/%{name}/arm/vars-template-pflash.raw
 %{_datadir}/qemu/firmware/50-edk2-arm-verbose.json
+%endif
 
+%if %{build_riscv64}
 %files riscv64
 %common_files
 %{_datadir}/%{name}/riscv/*.fd
 %{_datadir}/%{name}/riscv/*.raw
+%endif
 
 %files ext4
 %common_files
@@ -665,7 +678,8 @@ done
 %changelog
 * Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 20230301gitf80f052277c8-32
 - License verified.
-- Disable ovmf-experimental subpackage due to build error.
+- Disable aarch64 and riscv64 builds.
+- Disable ovmf-experimental and arm subpackages due to build error.
 - Pass _smp_mflags to edk-build.py commands for parallel builds.
 - Disable cross-compilation.
 - Add --wildcards to fix tar command.

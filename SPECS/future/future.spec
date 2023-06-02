@@ -19,7 +19,7 @@ Version: 0.18.3
 Release: 6%{?dist}
 License: MIT
 URL: http://python-future.org/
-Source0: https://github.com/PythonCharmers/python-future/archive/refs/tags/v%{version}/python-%{name}-%{version}.tar.gz
+Source0: https://github.com/PythonCharmers/python-future/archive/refs/tags/v%{version}/python-%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 # https://github.com/PythonCharmers/python-future/issues/165

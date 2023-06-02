@@ -24,9 +24,9 @@
   "edk2-build.py": "505f6bef60135c9d12a0f243bab08bff4e5d384d557e82ae30f476a31931d11c",
   "edk2-f80f052277c8.tar.xz": "3a6c90d31390a847b27d1070c7420d7fbbdf8f8342305e51977790839c5dd663",
   "edk2-platforms-54306d023e7d.tar.xz": "102ea5103c3522c5666209e4b933686678d4c4e3298f83e1b7dba418e69712e3",
-  "jansson-2.13.1.tar.bz2": "ee90a0f879d2b7b7159124ff22b937a2a9a8c36d3bb65d1da7dd3f04370a10bd",
-  "openssl-rhel-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz": "615de54b35787df151aea967a6fc3ff35e7b5aad2890b0df27ff60a8a582ac90",
+  "edk2-jansson-2.13.1.tar.bz2": "ee90a0f879d2b7b7159124ff22b937a2a9a8c36d3bb65d1da7dd3f04370a10bd",
+  "edk2-openssl-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz": "615de54b35787df151aea967a6fc3ff35e7b5aad2890b0df27ff60a8a582ac90",
   "ovmf-whitepaper-c770f8c.txt": "842518adadaa837914dbb13a6628002fb7f7acca107c6d6f41815b399dc9f8b8",
-  "softfloat-20180726-gitb64af41.tar.xz": "c7f2172357ca3022621b9464fd92bf2b462256bda3e019bf9a669fa6b5aeea91"
+  "edk2-softfloat-20180726-gitb64af41.tar.xz": "c7f2172357ca3022621b9464fd92bf2b462256bda3e019bf9a669fa6b5aeea91"
  }
 }
