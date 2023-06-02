@@ -316,7 +316,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 	return
 }
 
-// downloadDeltaRPMs scans a graph and for each build node in the graph and tries to replace it with a cached node instead.
+// downloadAllAvailableDeltaRPMs scans a graph and for each build node in the graph and tries to replace it with a cached node instead.
 // to satisfy it.
 //   - realDependencyGraph: The graph to use to find the packages we need to build. Should have any caching operations already
 //     performed on it. Will be updated with the paths to the delta RPMs we download.
