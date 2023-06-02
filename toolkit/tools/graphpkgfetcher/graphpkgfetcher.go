@@ -69,7 +69,7 @@ func main() {
 func fetchPackages() (err error) {
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraph)
 	if err != nil {
-		err = fmt.Errorf("failed to read graph to file: %w", err)
+		err = fmt.Errorf("failed to read graph to file:\n%w", err)
 		return
 	}
 
@@ -229,7 +229,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 
 			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
 			if err != nil {
-				err = fmt.Errorf("Failed to clone '%s' from RPM repo: %w", resolvedPackage, err)
+				err = fmt.Errorf("failed to clone '%s' from RPM repo: %w", resolvedPackage, err)
 				return
 			}
 			fetchedPackages[resolvedPackage] = true
@@ -241,7 +241,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 
 	err = assignRPMPath(node, outDir, resolvedPackages)
 	if err != nil {
-		err = fmt.Errorf("Failed to find an RPM to provide '%s': %w", node.VersionedPkg.Name, err)
+		err = fmt.Errorf("failed to find an RPM to provide '%s': %w", node.VersionedPkg.Name, err)
 		return
 	}
 
