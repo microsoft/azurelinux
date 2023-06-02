@@ -83,7 +83,7 @@ func fetchPackages() (err error) {
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
 	if hasUnresolvedNodes {
 		// Create the worker environment
-		cloner, err = prepRpmCloner(*outDir, *disableUpstreamRepos)
+		cloner, err = rpmrepocloner.ConstrcuctClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *repoFiles)
 		if err != nil {
 			err = fmt.Errorf("failed to setup new cloner: %w", err)
 			return
@@ -308,27 +308,4 @@ func isToolchainPackage(rpmPath string, toolchainRPMs []string) bool {
 		}
 	}
 	return false
-}
-
-func prepRpmCloner(outDir string, disableUpstreamRepos bool) (cloner *rpmrepocloner.RpmRepoCloner, err error) {
-	timestamp.StartEvent("initialize and configure cloner", nil)
-	timestamp.StopEvent(nil) // initialize and configure cloner
-
-	cloner = rpmrepocloner.New()
-	err = cloner.Initialize(outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
-	if err != nil {
-		err = fmt.Errorf("failed to prep new rpm cloner: %w", err)
-		return
-	}
-
-	if !disableUpstreamRepos {
-		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
-		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-		if err != nil {
-			err = fmt.Errorf("failed to customize RPM repo cloner. Error: %w", err)
-			return
-		}
-	}
-
-	return
 }
