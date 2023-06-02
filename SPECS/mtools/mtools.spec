@@ -2,15 +2,18 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary: Programs for accessing MS-DOS disks without mounting the disks
 Name: mtools
-Version: 4.0.26
+Version: 4.0.43
 Release: 2%{?dist}
 License: GPLv3+
 Source0: ftp://ftp.gnu.org/gnu/mtools/mtools-%{version}.tar.gz
 Url: https://www.gnu.org/software/mtools/
 Patch0: mtools-3.9.6-config.patch
 
-BuildRequires:  gcc
-BuildRequires: texinfo, autoconf
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: texinfo
+BuildRequires: autoconf
+BuildRequires: automake
 
 %description
 Mtools is a collection of utilities for accessing MS-DOS files.
@@ -27,12 +30,12 @@ Mtools should be installed if you need to use MS-DOS disks
 %build
 autoreconf -fiv
 %configure --disable-floppyd
-make %{?_smp_mflags}
+%make_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc $RPM_BUILD_ROOT/%{_infodir}
-%makeinstall
+%make_install
 install -m644 mtools.conf $RPM_BUILD_ROOT/etc
 gzip -9f $RPM_BUILD_ROOT/%{_infodir}/*
 
@@ -54,14 +57,94 @@ ln -s mtools.5.gz %{buildroot}%{_mandir}/man5/mtools.conf.5.gz
 %{_infodir}/mtools.info*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.26-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jun 02 2023 Vince Perri <viperri@microsoft.com> 4.0.43-2
+- License verified.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+
+* Wed Mar 22 2023 Vojtech Trefny <vtrefny@redhat.com> 4.0.43-1
+- Update to 4.0.43
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.42-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Nov 11 2022 Vojtech Trefny <vtrefny@redhat.com> - 4.0.42-2
+- Change license string to the SPDX format required by Fedora
+
+* Mon Oct 24 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.42-1
+- Update to 4.0.42
+
+* Tue Sep 20 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.41-1
+- Update to 4.0.41
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.40-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 06 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.40-1
+- Update to 4.0.40
+
+* Tue Apr 12 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.39-1
+- Update to 4.0.39
+
+* Mon Mar 07 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.38-1
+- Update to 4.0.38
+
+* Tue Feb 15 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.37-3
+- Rebuilt for glibc flatpak dependency update
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.37-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 10 2022 Vojtech Trefny <vtrefny@redhat.com> 4.0.37-1
+- Update to 4.0.37
+
+* Mon Nov 22 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.36-1
+- Update to 4.0.36
+
+* Wed Nov 10 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.35-2
+- Add dependency on glibc-gconv-extra (#2021637)
+
+* Sun Aug 08 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.35-1
+- Update to 4.0.35
+
+* Sun Jul 25 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.34-1
+- Update to 4.0.34
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 19 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.33-1
+- Update to 4.0.33
+
+* Wed Jul 14 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.32-1
+- Update to 4.0.32
+
+* Mon Jun 28 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.31-1
+- Update to 4.0.31
+
+* Fri Jun 18 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.30-1
+- Update to 4.0.30
+
+* Tue Jun 01 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.29-1
+- Update to 4.0.29
+
+* Mon Apr 19 2021 Vojtech Trefny <vtrefny@redhat.com> 4.0.27-1
+- Update to 4.0.27
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.26-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Nov 30 2020 Vojtech Trefny <vtrefny@redhat.com> 4.0.26-1
 - Update to 4.0.26
 
 * Thu Oct 29 2020 Vojtech Trefny <vtrefny@redhat.com> 4.0.25-1
 - Update to 4.0.25
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.24-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 4.0.24-2
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
 * Sun Mar 22 2020 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 4.0.24-1
 - Update to 4.0.24 (#1815863)
