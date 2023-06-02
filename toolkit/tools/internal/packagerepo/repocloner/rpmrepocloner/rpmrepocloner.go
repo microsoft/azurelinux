@@ -61,7 +61,7 @@ var (
 	//   - dist:            cm1
 	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
 
-	// The line specifying a yum repo ID is enclosed in square brackets, and can only contain the following characters:
+	// The line specifying a yum repo ID is enclosed in square brackets, and can only contain the following characters, see `man dnf.conf(5)`:
 	// - alphanumeric characters
 	// - hyphens (-)
 	// - underscores (_)
