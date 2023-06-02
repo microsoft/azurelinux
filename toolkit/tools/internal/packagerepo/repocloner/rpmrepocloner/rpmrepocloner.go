@@ -4,6 +4,7 @@
 package rpmrepocloner
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -29,6 +30,8 @@ const (
 	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
+	chrootRepoDir          = "/etc/yum.repos.d/"
+	chrootRepoFile         = "allrepos.repo"
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
 	updateRepoID           = "mariner-official-update"
@@ -57,6 +60,14 @@ var (
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm1
 	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
+
+	// The line specifying a yum repo ID is enclosed in square brackets, and can only contain the following characters:
+	// - alphanumeric characters
+	// - hyphens (-)
+	// - underscores (_)
+	// - dots (.)
+	// - colon (:)
+	yumConfRepoIDLineRegex = regexp.MustCompile(`^\[([[:alnum:]_.:-]+)\]$`)
 )
 
 const (
@@ -89,7 +100,7 @@ func New() *RpmRepoCloner {
 //   - prebuiltRpmsDir is the directory with toolchain RPMs
 //   - usePreviewRepo if set, the upstream preview repository will be used.
 //   - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string, disableMarinerRepos bool) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo, disableMarinerRepos bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
@@ -109,11 +120,6 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	r.usePreviewRepo = usePreviewRepo
 	if usePreviewRepo {
 		logger.Log.Info("Enabling preview repo")
-	}
-
-	r.disableMarinerRepos = disableMarinerRepos
-	if disableMarinerRepos {
-		logger.Log.Info("Disabling Mariner repos")
 	}
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -188,6 +194,21 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		return
 	}
 
+	r.disableMarinerRepos = disableMarinerRepos
+	if r.disableMarinerRepos {
+		repoList, err := r.getRepoList()
+		if err != nil {
+			return err
+		}
+		disabledMarinerRepos := make([]string, 0)
+		for _, repoID := range repoList {
+			if matched, err := filepath.Match(marinerReposGlob, repoID); err == nil && matched {
+				disabledMarinerRepos = append(disabledMarinerRepos, repoID)
+			}
+		}
+		logger.Log.Warnf("Disabling Mariner repos: %v", disabledMarinerRepos)
+	}
+
 	return
 }
 
@@ -221,11 +242,6 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// In order to simulate repository priority, concatenate all requested repofiles into a single file.
 	// TDNF will read the file top-down. It will then parse the results into a linked list, meaning
 	// the first repo entry in the file is the first to be checked.
-	const (
-		chrootRepoDir  = "/etc/yum.repos.d/"
-		chrootRepoFile = "allrepos.repo"
-	)
-
 	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
 	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
 
@@ -289,6 +305,25 @@ func appendRepoFile(repoFilePath string, dstFile *os.File) (err error) {
 
 	// Append a new line
 	_, err = dstFile.WriteString("\n")
+	return
+}
+
+func (r *RpmRepoCloner) getRepoList() (repoList []string, err error) {
+	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
+	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
+
+	fd, err := os.OpenFile(fullRepoFilePath, os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return
+	}
+	defer fd.Close()
+
+	scanner := bufio.NewScanner(fd)
+	for scanner.Scan() {
+		if yumConfRepoIDLineRegex.Match(scanner.Bytes()) {
+			repoList = append(repoList, yumConfRepoIDLineRegex.FindStringSubmatch(scanner.Text())[1])
+		}
+	}
 	return
 }
 

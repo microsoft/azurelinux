@@ -66,7 +66,7 @@ func main() {
 	timestamp.StartEvent("initialize and configure cloner", nil)
 
 	cloner := rpmrepocloner.New()
-	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles, *disableMarinerRepos)
+	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *disableMarinerRepos, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}

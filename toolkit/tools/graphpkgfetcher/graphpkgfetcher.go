@@ -111,7 +111,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	timestamp.StartEvent("initialize and configure cloner", nil)
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
-	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles, *disableMarinerRepos)
+	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *disableMarinerRepos, *repoFiles)
 	if err != nil {
 		logger.Log.Errorf("Failed to initialize RPM repo cloner. Error: %s", err)
 		return
