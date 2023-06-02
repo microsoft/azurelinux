@@ -79,17 +79,6 @@ URL:            https://www.mellanox.com/
 Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
 Requires: coreutils
 Requires: grep
 Requires: kernel
@@ -106,18 +95,6 @@ Utilities rpm with OFED release %MLNX_OFED_VERSION.
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %package -n %{non_kmp_pname}
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
-Obsoletes: mlnx-rdma-rxe
 Version: %{version}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
@@ -127,18 +104,6 @@ Non-KMP format kernel modules rpm.
 
 %package -n %{devel_pname}
 Version: %{version}
-Obsoletes: kernel-ib-devel
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
 Requires: coreutils
 Requires: pciutils
 Requires(post): %{_sbindir}/update-alternatives
