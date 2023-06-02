@@ -39,7 +39,6 @@ ExclusiveArch: x86_64
 %define build_riscv64 1
 
 %global softfloat_version 20180726-gitb64af41
-%define cross 0
 %define disable_werror 1
 
 
@@ -135,14 +134,6 @@ BuildRequires:  python3-virt-firmware >= 23.5
 
 # endif build_ovmf
 %endif
-
-%if %{cross}
-BuildRequires:  gcc-aarch64-linux-gnu
-BuildRequires:  gcc-arm-linux-gnu
-BuildRequires:  gcc-x86_64-linux-gnu
-BuildRequires:  gcc-riscv64-linux-gnu
-%endif
-
 
 
 %package ovmf
@@ -349,8 +340,8 @@ export RELEASE_DATE="$(echo %{GITDATE} | sed -e 's|\(....\)\(..\)\(..\)|\2/\3/\1
 touch OvmfPkg/AmdSev/Grub/grub.efi   # dummy
 
 %if %{build_ovmf}
-./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora --release-date "$RELEASE_DATE" -m ovmf
-./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora.platforms -m x64
+./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora --silent --release-date "$RELEASE_DATE" -m ovmf
+./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora.platforms --silent -m x64
 virt-fw-vars --input   Fedora/ovmf/OVMF_VARS.fd \
              --output  Fedora/ovmf/OVMF_VARS.secboot.fd \
              --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
@@ -396,8 +387,8 @@ done
 %endif
 
 %if %{build_aarch64}
-./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora --release-date "$RELEASE_DATE" -m armvirt
-./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora.platforms -m aa64
+./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora --silent --release-date "$RELEASE_DATE" -m armvirt
+./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora.platforms --silent -m aa64
 for raw in */aarch64/*.raw; do
     qcow2="${raw%.raw}.qcow2"
     qemu-img convert -f raw -O qcow2 -o cluster_size=4096 -S 4096 "$raw" "$qcow2"
@@ -405,8 +396,8 @@ done
 %endif
 
 %if %{build_riscv64}
-./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora --release-date "$RELEASE_DATE" -m riscv
-./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora.platforms -m riscv
+./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora --silent --release-date "$RELEASE_DATE" -m riscv
+./edk2-build.py %{?_smp_mflags} --config edk2-build.fedora.platforms --silent -m riscv
 %endif
 
 %install
@@ -676,7 +667,6 @@ done
 - License verified.
 - Disable ovmf-experimental subpackage due to build error.
 - Pass _smp_mflags to edk-build.py commands for parallel builds.
-- Remove --silent from edk-build.py commands.
 - Disable cross-compilation.
 - Add --wildcards to fix tar command.
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
