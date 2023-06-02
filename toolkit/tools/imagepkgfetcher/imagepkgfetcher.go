@@ -89,7 +89,6 @@ func main() {
 
 	timestamp.StartEvent("finalize cloned packages", nil)
 
-	logger.Log.Info("Configuring downloaded RPMs as a local repository")
 	err = cloner.ConvertDownloadedPackagesIntoRepo()
 	if err != nil {
 		logger.Log.Panicf("Failed to convert downloaded RPMs into a repo. Error: %s", err)

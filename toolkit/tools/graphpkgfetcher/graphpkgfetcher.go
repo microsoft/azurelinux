@@ -110,7 +110,6 @@ func fetchPackages() (err error) {
 
 	// If we grabbed any RPMs, we need to convert them into a local repo
 	if hasUnresolvedNodes {
-		logger.Log.Info("Configuring downloaded RPMs as a local repository")
 		err = cloner.ConvertDownloadedPackagesIntoRepo()
 		if err != nil {
 			err = fmt.Errorf("failed to convert downloaded RPMs into a repo:\n%w", err)

@@ -452,6 +452,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
 // Packages will be placed in a flat directory.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
+	logger.Log.Info("Configuring downloaded RPMs as a local repository")
+	timestamp.StartEvent("covert packages to repo", nil)
+	defer timestamp.StopEvent(nil)
+
 	err = r.initializeMountedChrootRepo(chrootDownloadDir)
 	if err != nil {
 		return
