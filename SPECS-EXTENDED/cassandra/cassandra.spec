@@ -3,7 +3,7 @@
 
 Summary:        Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store
 Name:           cassandra
-Version:        4.0.7
+Version:        4.0.10
 Release:        1%{?dist}
 URL:            http://cassandra.apache.org/
 License:        Apache License, Version 2.0
@@ -141,6 +141,9 @@ fi
 %exclude %{_var}/opt/cassandra/build/lib
 
 %changelog
+* Tue May 30 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.10-1
+- Upgrade version to 4.0.10 to address CVE-2023-30601.
+
 * Fri Oct 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.7-1
 - Upgrade version to 4.0.7.
 

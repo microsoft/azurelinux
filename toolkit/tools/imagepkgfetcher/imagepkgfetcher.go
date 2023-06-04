@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -45,18 +46,23 @@ var (
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp.BeginTiming("imagepkgfetcher", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	if *externalOnly && strings.TrimSpace(*inputGraph) == "" {
 		logger.Log.Fatal("input-graph must be provided if external-only is set.")
 	}
+
+	timestamp.StartEvent("initialize and configure cloner", nil)
 
 	cloner := rpmrepocloner.New()
 	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
@@ -73,9 +79,15 @@ func main() {
 		}
 	}
 
+	timestamp.StopEvent(nil) // initialize and configure cloner
+
 	if strings.TrimSpace(*inputSummaryFile) != "" {
+		timestamp.StartEvent("restore packages", nil)
+
 		// If an input summary file was provided, simply restore the cache using the file.
 		err = repoutils.RestoreClonedRepoContents(cloner, *inputSummaryFile)
+
+		timestamp.StopEvent(nil) // restore packages
 	} else {
 		err = cloneSystemConfigs(cloner, *configFile, *baseDirPath, *externalOnly, *inputGraph)
 	}
@@ -83,6 +95,8 @@ func main() {
 	if err != nil {
 		logger.Log.Panicf("Failed to clone RPM repo. Error: %s", err)
 	}
+
+	timestamp.StartEvent("finalize cloned packages", nil)
 
 	logger.Log.Info("Configuring downloaded RPMs as a local repository")
 	err = cloner.ConvertDownloadedPackagesIntoRepo()
@@ -94,9 +108,15 @@ func main() {
 		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
 		logger.PanicOnError(err, "Failed to save cloned repo contents")
 	}
+
+	timestamp.StopEvent(nil) // finalize cloned packages
+
 }
 
 func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {
+	timestamp.StartEvent("cloning system config", nil)
+	defer timestamp.StopEvent(nil)
+
 	const cloneDeps = true
 
 	cfg, err := configuration.LoadWithAbsolutePaths(configFile, baseDirPath)
