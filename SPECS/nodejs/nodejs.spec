@@ -1,18 +1,19 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 Version:        14.21.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/nodejs/node
-# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball 
+# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball
 # !!!! because it contains patented algorithms.
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         patch_tls_nodejs14.patch
 Patch1:         remove_unsupported_tlsv13_ciphers.patch
+Patch2:         CVE-2023-28155.patch
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
@@ -79,6 +80,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Thu May 25 2023 Tobias Brick <tobiasb@microsoft.com> - 14.21.1-2
+- Add patch to fix CVE-2023-28155
+
 * Sun Dec 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.21.1-1
 - Auto-upgrade to 14.21.1 - CVE-2022-3602_CVE-2022-3786_CVE-2022-43548
 

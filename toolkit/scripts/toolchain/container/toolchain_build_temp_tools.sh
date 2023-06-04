@@ -114,7 +114,7 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-KERNEL_VERSION="5.10.179.1"
+KERNEL_VERSION="5.10.181.1"
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
@@ -543,15 +543,15 @@ rm -rf perl-5.30.3
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.7.13
-tar xf Python-3.7.13.tar.xz
-pushd Python-3.7.13
+echo Python-3.7.16
+tar xf Python-3.7.16.tar.xz
+pushd Python-3.7.16
 sed -i '/def add_multiarch_paths/a \        return' setup.py
 ./configure --prefix=/tools --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.7.13
+rm -rf Python-3.7.16
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

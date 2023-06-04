@@ -57,7 +57,7 @@ set -e
 #
 cd /sources
 
-KERNEL_VERSION="5.10.179.1"
+KERNEL_VERSION="5.10.181.1"
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-${KERNEL_VERSION}
@@ -773,9 +773,9 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.7.13
-tar xf Python-3.7.13.tar.xz
-pushd Python-3.7.13
+echo Python-3.7.16
+tar xf Python-3.7.16.tar.xz
+pushd Python-3.7.16
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat \
@@ -787,7 +787,7 @@ chmod -v 755 /usr/lib/libpython3.7m.so
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.7 /usr/bin/pip3
 popd
-rm -rf Python-3.7.13
+rm -rf Python-3.7.16
 touch /logs/status_python3710_complete
 
 echo Coreutils-8.30
