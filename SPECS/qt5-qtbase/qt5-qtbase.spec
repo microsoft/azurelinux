@@ -42,7 +42,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      4%{?dist}
+Release:      5%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -765,6 +765,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Fri May 12 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-5
+- Update patch for CVE-2023-24607
+
 * Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.12.11-4
 - Added patch to fix CVE-2023-24607
 

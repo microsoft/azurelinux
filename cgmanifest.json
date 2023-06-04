@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.179.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
+          "version": "5.10.181.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.179.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
+          "version": "5.10.181.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.179.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
+          "version": "5.10.181.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.179.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.179.1.tar.gz"
+          "version": "5.10.181.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
         }
       }
     },
@@ -4426,8 +4426,8 @@
         "type": "other",
         "other": {
           "name": "nasm",
-          "version": "2.13.03",
-          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz"
+          "version": "2.16",
+          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.16/nasm-2.16.tar.gz"
         }
       }
     },
@@ -6866,8 +6866,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.13",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz"
+          "version": "3.7.16",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.16/Python-3.7.16.tar.xz"
         }
       }
     },
@@ -6937,7 +6937,7 @@
         "other": {
           "name": "qt5-qtsvg",
           "version": "5.12.11",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
+          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
         }
       }
     },
