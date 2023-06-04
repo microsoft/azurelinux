@@ -1,9 +1,3 @@
-%{!?python3_pkgversion: %global python3_pkgversion 3}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 %{_bindir}/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}"  %{__python3} setup.py build}
-%{!?py3_install: %define py3_install  %{__python3} setup.py install --skip-build --root %{buildroot}}
 %global pypi_name click
 %global _description \
 click is a Python package for creating beautiful command line\
@@ -14,8 +8,8 @@ comes with good defaults out of the box.
 Summary:        Simple wrapper around optparse for powerful command line utilities
 Name:           python-%{pypi_name}
 Version:        7.1.2
-Release:        6%{?dist}
-License:        BSD
+Release:        7%{?dist}
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/mitsuhiko/click
@@ -45,7 +39,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 %py3_install
 
 %check
-pip3 install pytest
+pip3 install pytest==7.2.2
 pip3 install .
 pytest -v tests
 
@@ -56,6 +50,10 @@ pytest -v tests
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
 %changelog
+* Tue May 30 2023 Olivia Crain <oliviacrain@microsoft.com> - 7.1.2-7
+- Change %%check to install known-good version of pytest
+- Use SPDX license expression in license tag
+
 * Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsft.com> - 7.1.2-6
 - Migrate the package to Mariner Core.
 

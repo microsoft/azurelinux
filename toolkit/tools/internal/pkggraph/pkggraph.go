@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/versioncompare"
 
 	"gonum.org/v1/gonum/graph"
@@ -1197,6 +1198,9 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 // MakeDAG ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
 func (g *PkgGraph) MakeDAG() (err error) {
+	timestamp.StartEvent("convert to DAG", nil)
+	defer timestamp.StopEvent(nil)
+
 	var cycle []*PkgNode
 
 	for {

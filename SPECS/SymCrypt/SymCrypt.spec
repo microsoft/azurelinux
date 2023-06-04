@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        102.0.0
+Version:        103.0.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -25,10 +25,15 @@ A core cryptographic library written by Microsoft
 # Only x86_64 and aarch64 are currently supported
 %ifarch x86_64
 %define symcrypt_arch AMD64
+%define symcrypt_cc gcc
+%define symcrypt_cxx g++
 %endif
 
 %ifarch aarch64
 %define symcrypt_arch ARM64
+# Currently SymCrypt ARM64 build requires use of clang
+%define symcrypt_cc clang
+%define symcrypt_cxx clang++
 %endif
 
 %prep
@@ -39,21 +44,24 @@ rm -rf jitterentropy-library
 ln -s jitterentropy-library-3.3.1 jitterentropy-library
 
 %build
-mkdir bin; cd bin
+cmake   -S . -B bin \
+        -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER=%{symcrypt_cc} \
+        -DCMAKE_CXX_COMPILER=%{symcrypt_cxx}
 
-cmake   .. \
-        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-%{symcrypt_arch}.cmake" \
-        -DCMAKE_BUILD_TYPE=Release
-
-cmake --build .
+cmake --build bin
 
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
 install inc/symcrypt* %{buildroot}%{_includedir}
 # Use cp -P to preserve symbolic links
-cp -P bin/module/%{symcrypt_arch}/LinuxUserMode/generic/libsymcrypt.so* %{buildroot}%{_libdir}
+cp -P bin/module/generic/libsymcrypt.so* %{buildroot}%{_libdir}
 chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
+
+%check
+./bin/exe/symcryptunittest
 
 %files
 %license LICENSE
@@ -62,6 +70,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Mon May 22 2023 Samuel Lee <saml@microsoft.com> - 103.0.1-1
+- Update SymCrypt to v103.0.1 for FIPS certification. Run unit tests in check
+
 * Fri Oct 07 2022 Andy Caldwell <andycaldwell@microsoft.com> - 102.0.0-2
 - Update `clang` on aarch64 builds to enable `-pie`
 
