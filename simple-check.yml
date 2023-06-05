@@ -4,8 +4,6 @@
 # https://aka.ms/yaml
 
 trigger: none
-pr:
-  - fasttrack/*
 
 pool:
   vmImage: ubuntu-latest

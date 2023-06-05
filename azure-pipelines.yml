@@ -4,8 +4,6 @@
 # https://aka.ms/yaml
 
 trigger: none
-pr:
-  - fasttrack/*
 
 # pool: mariner-core-x64-1es-mariner2-gpt-test
 
