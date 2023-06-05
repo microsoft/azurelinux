@@ -4,7 +4,6 @@
 package rpmrepocloner
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -25,7 +24,6 @@ import (
 
 const (
 	allRepoIDs             = "*"
-	marinerReposGlob       = "mariner*"
 	builtRepoID            = "local-repo"
 	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
@@ -60,14 +58,6 @@ var (
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm1
 	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
-
-	// The line specifying a yum repo ID is enclosed in square brackets, and can only contain the following characters, see `man dnf.conf(5)`:
-	// - alphanumeric characters
-	// - hyphens (-)
-	// - underscores (_)
-	// - dots (.)
-	// - colon (:)
-	yumConfRepoIDLineRegex = regexp.MustCompile(`^\[([[:alnum:]_.:-]+)\]$`)
 )
 
 const (
@@ -120,6 +110,11 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	r.usePreviewRepo = usePreviewRepo
 	if usePreviewRepo {
 		logger.Log.Info("Enabling preview repo")
+	}
+
+	r.disableMarinerRepos = disableMarinerRepos
+	if r.disableMarinerRepos {
+		logger.Log.Info("Disabling built-in Mariner repos")
 	}
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -194,21 +189,6 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		return
 	}
 
-	r.disableMarinerRepos = disableMarinerRepos
-	if r.disableMarinerRepos {
-		repoList, err := r.getRepoList()
-		if err != nil {
-			return err
-		}
-		disabledMarinerRepos := make([]string, 0)
-		for _, repoID := range repoList {
-			if matched, err := filepath.Match(marinerReposGlob, repoID); err == nil && matched {
-				disabledMarinerRepos = append(disabledMarinerRepos, repoID)
-			}
-		}
-		logger.Log.Warnf("Disabling Mariner repos: %v", disabledMarinerRepos)
-	}
-
 	return
 }
 
@@ -278,9 +258,13 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
 	for _, originalRepoFilePath := range existingRepoFiles {
-		err = appendRepoFile(originalRepoFilePath, dstFile)
-		if err != nil {
-			return
+		if !r.disableMarinerRepos {
+			err = appendRepoFile(originalRepoFilePath, dstFile)
+			if err != nil {
+				return
+			}
+		} else {
+			logger.Log.Infof("Disabling repositories listed in %s", originalRepoFilePath)
 		}
 		err = os.Remove(originalRepoFilePath)
 		if err != nil {
@@ -305,25 +289,6 @@ func appendRepoFile(repoFilePath string, dstFile *os.File) (err error) {
 
 	// Append a new line
 	_, err = dstFile.WriteString("\n")
-	return
-}
-
-func (r *RpmRepoCloner) getRepoList() (repoList []string, err error) {
-	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
-	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
-
-	fd, err := os.OpenFile(fullRepoFilePath, os.O_RDONLY, os.ModePerm)
-	if err != nil {
-		return
-	}
-	defer fd.Close()
-
-	scanner := bufio.NewScanner(fd)
-	for scanner.Scan() {
-		if yumConfRepoIDLineRegex.Match(scanner.Bytes()) {
-			repoList = append(repoList, yumConfRepoIDLineRegex.FindStringSubmatch(scanner.Text())[1])
-		}
-	}
 	return
 }
 
@@ -420,10 +385,6 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 
 			if !r.usePreviewRepo {
 				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
-			}
-
-			if r.disableMarinerRepos {
-				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", marinerReposGlob))
 			}
 
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
@@ -596,10 +557,6 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 
 		if !r.usePreviewRepo {
 			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
-		}
-
-		if r.disableMarinerRepos {
-			args = append(args, fmt.Sprintf("--disablerepo=%s", marinerReposGlob))
 		}
 
 		var (
