@@ -16,7 +16,7 @@
 Name:           openjdk8
 Summary:        OpenJDK
 Version:        %{_jdk_version}.%{_jdk_update}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -113,6 +113,7 @@ unset JAVA_HOME &&
 	--with-freetype-lib=%{_libdir} \
 	--with-stdc++lib=dynamic \
 	--with-native-debug-symbols=none \
+  --with-zlib=system \
 	--disable-zip-debug-info
 
 make \
@@ -275,6 +276,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
+*   Mon Jun 05 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.0.332-2
+-   Explicitly set --with-zlib=system to ensure we do not use a version of
+-   zlib that is vulnerable to CVE-2018-25032
 *   Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.0.332-1
 -   Update to 1.8.0.332 to address the below CVEs:
 -   CVE-2022-21248 CVE-2022-21282 CVE-2022-21283 CVE-2022-21293
