@@ -1,32 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Read https://bugzilla.redhat.com/show_bug.cgi?id=1654765
-# mangling shebang in /usr/sbin/debootstrap from /bin/sh to /usr/bin/sh
+# Mariner does not use the %%__brp_mangle_shebangs buildroot policy, but may in the future
+# Mangling shebang in /usr/sbin/debootstrap from /bin/sh to /usr/bin/sh
 %undefine __brp_mangle_shebangs
 
-Name:           debootstrap
-Version:        1.0.123
-Release:        2%{?dist}
 Summary:        Debian GNU/Linux bootstrapper
-
+Name:           debootstrap
+Version:        1.0.128+nmu2
+Release:        1%{?dist}
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://wiki.debian.org/Debootstrap
-Source0:        http://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_%{version}.tar.gz
-
-BuildArch:      noarch
-
+Source0:        https://deb.debian.org/debian/pool/main/d/%{name}/%{name}_%{version}.tar.gz
 BuildRequires:  fakeroot
+BuildRequires:  make
+Requires:       binutils
 Requires:       gettext
+Requires:       gpg
 Requires:       perl-interpreter
 Requires:       wget
 Requires:       tar
 Requires:       gzip
-Requires:       dpkg
 Requires:       xz
-%if 0%{?fedora} || 0%{?rhel} >= 8
-Recommends:     ubu-keyring
-Recommends:     debian-keyring
-%endif
+Requires:       zstd
+BuildArch:      noarch
 
 %description
 debootstrap is used to create a Debian base system from scratch, without
@@ -39,7 +35,7 @@ Debian GNU/Linux guest system.
 
 
 %prep
-%setup -q -n debootstrap
+%autosetup -n %{name}
 
 %build
 # nothing to do
@@ -52,13 +48,20 @@ mkdir -p %{buildroot}%{_mandir}/man8
 install -p -m 0644 debootstrap.8 %{buildroot}%{_mandir}/man8
 
 %files
-%doc debian/changelog README
 %license debian/copyright
+%doc README
 %{_datadir}/debootstrap
+%{_datadir}/debootstrap/scripts/*
 %{_sbindir}/debootstrap
 %{_mandir}/man8/debootstrap.8*
 
 %changelog
+* Tue Jun 06 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.0.128+nmu2-1
+- Upgrade to latest upstream version and promote to base repo
+- Remove requirement on dpkg- ar (from binutils) is sufficient to unpack debs
+- Verified license
+- Verified license tag uses SPDX expression
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.123-2
 - Initial CBL-Mariner import from Fedora 20 (license: MIT).
 
