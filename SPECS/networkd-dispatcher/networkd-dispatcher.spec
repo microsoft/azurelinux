@@ -24,12 +24,35 @@ This allows it to be used for tasks such as starting a VPN after a connection is
 %autosetup -p1
 
 %build
+make
 
 %install
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_sysconfdir}/conf.d
+install -m755 %{name} %{buildroot}%{_bindir}/%{name}
+install -m644 -D %{name}.service %{buildroot}%{_bindir}/systemd/system/%{name}.service
+install -m644 -D  %{name}.conf %{buildroot}%{_sysconfdir}/conf.d/%{name}.conf
+mkdir -p  %{buildroot}%{_sysconfdir}/%{name}/{off.d,routable.d,dormant.d,no-carrier.d,carrier.d,degraded.d,configured.d,configuring.d}
+install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
+install -Dm644 README.md  %{buildroot}%{_datadir}/doc/%{name}/README.md
+install -Dm644 %{name}.8  %{buildroot}%{_datadir}/man/man8/%{name}.8
 
 %files
 %license LICENSE
 %doc README.md
+%dir %{_sysconfdir}/conf.d
+%{_bindir}/%{name}
+%{_bindir}/systemd/system/%{name}.service
+%{_sysconfdir}/conf.d/%{name}.conf
+%{_datadir}/man/man8/%{name}.8
+%dir %{_sysconfdir}/%{name}/off.d
+%dir %{_sysconfdir}/%{name}/routable.d
+%dir %{_sysconfdir}/%{name}/dormant.d
+%dir %{_sysconfdir}/%{name}/no-carrier.d
+%dir %{_sysconfdir}/%{name}/carrier.d
+%dir %{_sysconfdir}/%{name}/degraded.d
+%dir %{_sysconfdir}/%{name}/configured.d
+%dir %{_sysconfdir}/%{name}/configuring.d
 
 %changelog
 * Fri Jun 2 2023 Aditya Dubey <adityadubey@microsoft.com> - 2.2.4-1
