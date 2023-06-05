@@ -7,7 +7,6 @@ trigger: none
 pr:
   - fasttrack/*
 
-
 pool:
   vmImage: ubuntu-latest
 
