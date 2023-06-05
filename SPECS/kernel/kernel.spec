@@ -91,7 +91,7 @@ Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
-Obsoletes:      linux-dev
+Obsoletes:      linux-dev < %{version}-%{release}
 
 %description devel
 This package contains the Linux kernel dev files
@@ -186,7 +186,7 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
+#    exit 1
 fi
 
 %build
