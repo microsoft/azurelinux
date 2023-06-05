@@ -98,7 +98,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
-* Wed May 31 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-2
+* Wed May 31 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-2
 - Modify defaults to account for DHCPv6
 
 * Wed Jan 05 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-1
