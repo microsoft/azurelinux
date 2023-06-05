@@ -67,6 +67,7 @@ func main() {
 }
 
 func fetchPackages() (err error) {
+	var cloner *rpmrepocloner.RpmRepoCloner
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraph)
 	if err != nil {
 		err = fmt.Errorf("failed to read graph to file:\n%w", err)
@@ -79,14 +80,13 @@ func fetchPackages() (err error) {
 		return
 	}
 
-	var cloner *rpmrepocloner.RpmRepoCloner
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
 	if hasUnresolvedNodes {
 		// Create the worker environment
 		cloner, err = rpmrepocloner.ConstrcuctClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *repoFiles)
 		if err != nil {
 			err = fmt.Errorf("failed to setup new cloner:\n%w", err)
-			return
+			return err
 		}
 		defer cloner.Close()
 	}
@@ -96,7 +96,7 @@ func fetchPackages() (err error) {
 		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
 			err = fmt.Errorf("failed to resolve graph:\n%w", err)
-			return
+			return err
 		}
 	} else {
 		logger.Log.Info("No unresolved packages to cache")
@@ -114,7 +114,7 @@ func fetchPackages() (err error) {
 		err = cloner.ConvertDownloadedPackagesIntoRepo()
 		if err != nil {
 			err = fmt.Errorf("failed to convert downloaded RPMs into a repo:\n%w", err)
-			return
+			return err
 		}
 	}
 
@@ -160,7 +160,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 			// Failing to clone a dependency should not halt a build.
 			// The build should continue and attempt best effort to build as many packages as possible.
 			if resolveErr != nil {
-				logger.Log.Error(resolveErr)
+				logger.Log.Warn(resolveErr)
 				cachingSucceeded = false
 				errorMessage := strings.Builder{}
 				errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
