@@ -71,6 +71,9 @@ extends:
       - job: configure_build_number
         pool:
           type: linux
+          isCustom: true
+          name: 'mariner-core-x64-1es-mariner2-gpt-test'
+          vmImage: 'Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test'
         variables:
           ob_outputDirectory: '$(Build.SourcesDirectory)/ToBePublished'
         steps:
