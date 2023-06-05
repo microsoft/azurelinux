@@ -1,0 +1,121 @@
+From 9070eb8deb0a973e9dd8f96b70955c7d3abca074 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 21 Nov 2017 00:57:45 +0100
+Subject: [PATCH 06/14] OvmfPkg: enable DEBUG_VERBOSE (RHEL only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- Extend the DSC change to the new OvmfPkg/AmdSev platform, which has been
+  introduced upstream in commit 30d277ed7a82 ("OvmfPkg/Amdsev: Base commit
+  to build encrypted boot specific OVMF", 2020-12-14), for TianoCore#3077.
+
+- Remove obsolete commit message tags related to downstream patch
+  management: Message-id, Patchwork-id, O-Subject, Acked-by, From
+  (RHBZ#1846481).
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- context difference from upstream commit 46bb81200742 ("OvmfPkg: Make
+  SOURCE_DEBUG_ENABLE actually need to be set to TRUE", 2019-10-22)
+  resolved automatically
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- no change
+
+Notes about the RHEL-8.0/20180508-ee3198e672e2 ->
+RHEL-8.1/20190308-89910a39dcfd rebase:
+
+- no change
+
+Notes about the RHEL-7.6/ovmf-20180508-2.gitee3198e672e2.el7 ->
+RHEL-8.0/20180508-ee3198e672e2 rebase:
+
+- reorder the rebase changelog in the commit message so that it reads like
+  a blog: place more recent entries near the top
+- no changes to the patch body
+
+Notes about the 20171011-92d07e48907f -> 20180508-ee3198e672e2 rebase:
+
+- no changes
+
+Bugzilla: 1488247
+
+Set the DEBUG_VERBOSE bit (0x00400000) in the log mask. We want detailed
+debug messages, and code in OvmfPkg logs many messages on the
+DEBUG_VERBOSE level.
+
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(this patch was previously applied as commit 78d3ed73172b5738e32d2b0bc03f7984b9584117)
+(cherry picked from commit 7aeeaabc9871f657e65d2b99d81011b4964a1ce9)
+(cherry picked from commit a0617a6be1a80966099ddceb010f89202a79ee76)
+(cherry picked from commit 759bd3f591e2db699bdef4c7ea4e97c908e7f027)
+(cherry picked from commit 7e6d5dc4078c64be6d55d8fc3317c59a91507a50)
+(cherry picked from commit 3cb92f9ba18ac79911bd5258ff4f949cc617ae89)
+(cherry picked from commit 5ecc18badaabe774d9d0806b027ab63a30c6a2d7)
+---
+ OvmfPkg/AmdSev/AmdSevX64.dsc | 2 +-
+ OvmfPkg/OvmfPkgIa32.dsc      | 2 +-
+ OvmfPkg/OvmfPkgIa32X64.dsc   | 2 +-
+ OvmfPkg/OvmfPkgX64.dsc       | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/OvmfPkg/AmdSev/AmdSevX64.dsc b/OvmfPkg/AmdSev/AmdSevX64.dsc
+index 0bec51d5eeac..ae3f9c75c4a4 100644
+--- a/OvmfPkg/AmdSev/AmdSevX64.dsc
++++ b/OvmfPkg/AmdSev/AmdSevX64.dsc
+@@ -429,7 +429,7 @@ [PcdsFixedAtBuild]
+   # DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+   #                             // significantly impact boot performance
+   # DEBUG_ERROR     0x80000000  // Error
+-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+ 
+ !if $(SOURCE_DEBUG_ENABLE) == TRUE
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+index 9242e7714036..bb3b0c1c96f3 100644
+--- a/OvmfPkg/OvmfPkgIa32.dsc
++++ b/OvmfPkg/OvmfPkgIa32.dsc
+@@ -546,7 +546,7 @@ [PcdsFixedAtBuild]
+   # DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+   #                             // significantly impact boot performance
+   # DEBUG_ERROR     0x80000000  // Error
+-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+ 
+ !if $(SOURCE_DEBUG_ENABLE) == TRUE
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+index 43d40ddc9c46..19b968bd945d 100644
+--- a/OvmfPkg/OvmfPkgIa32X64.dsc
++++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+@@ -551,7 +551,7 @@ [PcdsFixedAtBuild]
+   # DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+   #                             // significantly impact boot performance
+   # DEBUG_ERROR     0x80000000  // Error
+-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+ 
+ !if $(SOURCE_DEBUG_ENABLE) == TRUE
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+index 231e5e7e4d1c..876f2374a2cc 100644
+--- a/OvmfPkg/OvmfPkgX64.dsc
++++ b/OvmfPkg/OvmfPkgX64.dsc
+@@ -572,7 +572,7 @@ [PcdsFixedAtBuild]
+   # DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+   #                             // significantly impact boot performance
+   # DEBUG_ERROR     0x80000000  // Error
+-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8040004F
+ 
+ !if $(SOURCE_DEBUG_ENABLE) == TRUE
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+-- 
+2.39.2
+

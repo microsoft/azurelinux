@@ -3118,8 +3118,8 @@
         "type": "other",
         "other": {
           "name": "edk2",
-          "version": "20200801stable",
-          "downloadUrl": "https://github.com/tianocore/edk2/archive/edk2-stable202008.tar.gz"
+          "version": "20230301gitf80f052277c8",
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-f80f052277c8.tar.xz/sha512/af802257f010b63d973dc909b57ee845b7734e8d494b081050ba1f197349663b081e1f2edc5244726e2479ff6d16d79d0a6fceb00f4840b59982f10b79facf66/edk2-f80f052277c8.tar.xz"
         }
       }
     },
@@ -3990,8 +3990,8 @@
         "type": "other",
         "other": {
           "name": "future",
-          "version": "0.18.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/future/future-0.18.2.tar.gz"
+          "version": "0.18.3",
+          "downloadUrl": "https://github.com/PythonCharmers/python-future/archive/refs/tags/v0.18.3/python-future-0.18.3.tar.gz"
         }
       }
     },
@@ -13513,8 +13513,8 @@
         "type": "other",
         "other": {
           "name": "mtools",
-          "version": "4.0.26",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/mtools/mtools-4.0.26.tar.gz"
+          "version": "4.0.43",
+          "downloadUrl": "ftp://ftp.gnu.org/gnu/mtools/mtools-4.0.43.tar.gz"
         }
       }
     },
@@ -23293,6 +23293,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pefile",
+          "version": "2023.2.7",
+          "downloadUrl": "https://github.com/erocarrera/pefile/releases/download/v2023.2.7/pefile-2023.2.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
@@ -24566,6 +24576,16 @@
           "name": "python-virtualenv",
           "version": "20.14.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-virt-firmware",
+          "version": "23.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
         }
       }
     },
