@@ -6,7 +6,7 @@ License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.com/craftyguy/networkd-dispatcher
-Source0:        https://gitlab.com/craftyguy/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://gitlab.com/craftyguy/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  asciidoc
 Requires:       python3
 Requires:       dbus-python
