@@ -1,0 +1,50 @@
+From 7115ded03e80aa8f359a9e45979715a8dc47257c Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Thu, 4 Jun 2020 13:39:08 +0200
+Subject: [PATCH 02/14] MdeModulePkg: remove package-private Brotli include
+ path (RH only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- no change
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- New patch.
+
+Originating from upstream commit 58802e02c41b
+("MdeModulePkg/BrotliCustomDecompressLib: Make brotli a submodule",
+2020-04-16), "MdeModulePkg/MdeModulePkg.dec" contains a package-internal
+include path into a Brotli submodule.
+
+The edk2 build system requires such include paths to resolve successfully,
+regardless of the firmware platform being built. Because
+BrotliCustomDecompressLib is not consumed by any OvmfPkg or ArmVirtPkg
+platforms, and we've removed the submodule earlier in this patch set,
+remove the include path too.
+
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit e05e0de713c4a2b8adb6ff9809611f222bfe50ed)
+---
+ MdeModulePkg/MdeModulePkg.dec | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/MdeModulePkg/MdeModulePkg.dec b/MdeModulePkg/MdeModulePkg.dec
+index e8058c8bfaec..f33312fb3510 100644
+--- a/MdeModulePkg/MdeModulePkg.dec
++++ b/MdeModulePkg/MdeModulePkg.dec
+@@ -25,9 +25,6 @@ [Defines]
+ [Includes]
+   Include
+ 
+-[Includes.Common.Private]
+-  Library/BrotliCustomDecompressLib/brotli/c/include
+-
+ [LibraryClasses]
+   ##  @libraryclass  Defines a set of methods to reset whole system.
+   ResetSystemLib|Include/Library/ResetSystemLib.h
+-- 
+2.39.2
+

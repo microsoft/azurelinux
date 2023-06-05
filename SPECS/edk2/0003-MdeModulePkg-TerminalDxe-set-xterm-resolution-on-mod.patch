@@ -1,0 +1,180 @@
+From 84149154c873d3521bf0848d8473f2c09f3ccca0 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Tue, 25 Feb 2014 22:40:01 +0100
+Subject: [PATCH 03/14] MdeModulePkg: TerminalDxe: set xterm resolution on mode
+ change (RH only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- Resolve harmless conflict in "MdeModulePkg/MdeModulePkg.dec",
+  originating from new upstream commits
+  - 45bc28172fbf ("MdeModulePkg.dec: Change PCDs for status code.",
+                  2020-06-18),
+  - 0785c619a58a ("MdeModulePkg/Bus/Pci/PciBusDxe: Support PCIe Resizable
+                  BAR Capability", 2021-01-04),
+  - ef23012e5439 ("MdeModulePkg: Change default value of
+                  PcdPcieResizableBarSupport to FALSE", 2021-01-14).
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- Resolve trivial conflict in "MdeModulePkg/MdeModulePkg.dec", arising
+  from upstream commit 166830d8f7ca ("MdeModulePkg/dec: add
+  PcdTcgPfpMeasurementRevision PCD", 2020-01-06).
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- Conflict in "MdeModulePkg/MdeModulePkg.dec" due to upstream commits
+  - 1103ba946aee ("MdeModulePkg: Add Capsule On Disk related definition.",
+    2019-06-26),
+  - 1c7b3eb84631 ("MdeModulePkg/DxeIpl: Introduce PCD
+    PcdUse5LevelPageTable", 2019-08-09),
+  with easy manual resolution.
+
+Notes about the RHEL-8.0/20180508-ee3198e672e2 ->
+RHEL-8.1/20190308-89910a39dcfd rebase:
+
+- no change
+
+Notes about the RHEL-7.6/ovmf-20180508-2.gitee3198e672e2.el7 ->
+RHEL-8.0/20180508-ee3198e672e2 rebase:
+
+- reorder the rebase changelog in the commit message so that it reads like
+  a blog: place more recent entries near the top
+- no changes to the patch body
+
+Notes about the 20171011-92d07e48907f -> 20180508-ee3198e672e2 rebase:
+
+- no change
+
+Notes about the 20170228-c325e41585e3 -> 20171011-92d07e48907f rebase:
+
+- Refresh downstream-only commit 2909e025db68 against "MdeModulePkg.dec"
+  context change from upstream commits e043f7895b83 ("MdeModulePkg: Add
+  PCD PcdPteMemoryEncryptionAddressOrMask", 2017-02-27) and 76081dfcc5b2
+  ("MdeModulePkg: Add PROMPT&HELP string of pcd to UNI file", 2017-03-03).
+
+Notes about the 20160608b-988715a -> 20170228-c325e41585e3 rebase:
+
+- refresh commit 519b9751573e against various context changes
+
+The
+
+  CSI Ps ; Ps ; Ps t
+
+escape sequence serves for window manipulation. We can use the
+
+  CSI 8 ; <rows> ; <columns> t
+
+sequence to adapt eg. the xterm window size to the selected console mode.
+
+Reference: <http://rtfm.etla.org/xterm/ctlseq.html>
+Contributed-under: TianoCore Contribution Agreement 1.0
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit 2909e025db6878723b49644a8a0cf160d07e6444)
+(cherry picked from commit b9c5c901f25e48d68eef6e78a4abca00e153f574)
+(cherry picked from commit b7f6115b745de8cbc5214b6ede33c9a8558beb90)
+(cherry picked from commit 67415982afdc77922aa37496c981adeb4351acdb)
+(cherry picked from commit cfccb98d13e955beb0b93b4a75a973f30c273ffc)
+(cherry picked from commit a11602f5e2ef930be5b693ddfd0c789a1bd4c60c)
+(cherry picked from commit bc2266f20de5db1636e09a07e4a72c8dbf505f5a)
+---
+ MdeModulePkg/MdeModulePkg.dec                 |  4 +++
+ .../Console/TerminalDxe/TerminalDxe.inf       |  2 ++
+ .../Console/TerminalDxe/TerminalConOut.c      | 29 +++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+
+diff --git a/MdeModulePkg/MdeModulePkg.dec b/MdeModulePkg/MdeModulePkg.dec
+index f33312fb3510..020f62fcc668 100644
+--- a/MdeModulePkg/MdeModulePkg.dec
++++ b/MdeModulePkg/MdeModulePkg.dec
+@@ -2102,6 +2102,10 @@ [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+   # @Prompt The shared bit mask when Intel Tdx is enabled.
+   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x10000025
+ 
++  ## Controls whether TerminalDxe outputs an XTerm resize sequence on terminal
++  #  mode change.
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE|BOOLEAN|0x00010080
++
+ [PcdsPatchableInModule]
+   ## Specify memory size with page number for PEI code when
+   #  Loading Module at Fixed Address feature is enabled.
+diff --git a/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf b/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+index b2a8aeba8510..eff625346539 100644
+--- a/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
++++ b/MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+@@ -55,6 +55,7 @@ [LibraryClasses]
+   DebugLib
+   PcdLib
+   BaseLib
++  PrintLib
+ 
+ [Guids]
+   ## SOMETIMES_PRODUCES ## Variable:L"ConInDev"
+@@ -87,6 +88,7 @@ [Protocols]
+ [Pcd]
+   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType           ## SOMETIMES_CONSUMES
+   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable    ## CONSUMES
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm             ## CONSUMES
+ 
+ # [Event]
+ # # Relative timer event set by UnicodeToEfiKey(), used to be one 2 seconds input timeout.
+diff --git a/MdeModulePkg/Universal/Console/TerminalDxe/TerminalConOut.c b/MdeModulePkg/Universal/Console/TerminalDxe/TerminalConOut.c
+index 7809869e7d49..496849458db4 100644
+--- a/MdeModulePkg/Universal/Console/TerminalDxe/TerminalConOut.c
++++ b/MdeModulePkg/Universal/Console/TerminalDxe/TerminalConOut.c
+@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
+ 
+ **/
+ 
++#include <Library/PrintLib.h>
++
+ #include "Terminal.h"
+ 
+ //
+@@ -80,6 +82,15 @@ CHAR16  mSetCursorPositionString[] = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0
+ CHAR16  mCursorForwardString[]     = { ESC, '[', '0', '0', 'C', 0 };
+ CHAR16  mCursorBackwardString[]    = { ESC, '[', '0', '0', 'D', 0 };
+ 
++//
++// Note that this is an ASCII format string, taking two INT32 arguments:
++// rows, columns.
++//
++// A %d (INT32) format specification can expand to at most 11 characters.
++//
++CHAR8  mResizeTextAreaFormatString[] = "\x1B[8;%d;%dt";
++#define RESIZE_SEQ_SIZE  (sizeof mResizeTextAreaFormatString + 2 * (11 - 2))
++
+ //
+ // Body of the ConOut functions
+ //
+@@ -498,6 +509,24 @@ TerminalConOutSetMode (
+     return EFI_DEVICE_ERROR;
+   }
+ 
++  if (PcdGetBool (PcdResizeXterm)) {
++    CHAR16  ResizeSequence[RESIZE_SEQ_SIZE];
++
++    UnicodeSPrintAsciiFormat (
++      ResizeSequence,
++      sizeof ResizeSequence,
++      mResizeTextAreaFormatString,
++      (INT32)TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows,
++      (INT32)TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns
++      );
++    TerminalDevice->OutputEscChar = TRUE;
++    Status                        = This->OutputString (This, ResizeSequence);
++    TerminalDevice->OutputEscChar = FALSE;
++    if (EFI_ERROR (Status)) {
++      return EFI_DEVICE_ERROR;
++    }
++  }
++
+   This->Mode->Mode = (INT32)ModeNumber;
+ 
+   Status = This->ClearScreen (This);
+-- 
+2.39.2
+

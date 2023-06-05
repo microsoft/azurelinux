@@ -1,0 +1,219 @@
+From defcdb8fe170e58cb0b0de8ddd2784bcc2dd67d7 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Wed, 14 Oct 2015 15:59:06 +0200
+Subject: [PATCH 04/14] OvmfPkg: take PcdResizeXterm from the QEMU command line
+ (RH only)
+
+edk2-stable202205 rebase
+
+- re-add UPDATE_BOOLEAN_PCD_FROM_FW_CFG
+- add microvm, cloudhw and inteltdx
+
+edk2-stable202108 rebase
+
+- resolve conflict in OvmfPkg/PlatformPei/PlatformPei.inf
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- Extend the DSC change to the new OvmfPkg/AmdSev platform, which has been
+  introduced upstream in commit 30d277ed7a82 ("OvmfPkg/Amdsev: Base commit
+  to build encrypted boot specific OVMF", 2020-12-14), for TianoCore#3077.
+
+  We've always patched all those DSC/FDF files in OvmfPkg down-stream that
+  made sense at least in theory on QEMU. (For example, we've always
+  patched "OvmfPkgIa32.dsc" and "OvmfPkgIa32.fdf", even though we never
+  build or ship the pure IA32 firmware platform.) Follow suit with
+  "AmdSevX64.dsc".
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- Resolve contextual conflict in the DSC files, from upstream commit
+  b0ed7ebdebd1 ("OvmfPkg: set fixed FlashNvStorage base addresses with -D
+  SMM_REQUIRE", 2020-03-12).
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- no change
+
+Notes about the RHEL-8.0/20180508-ee3198e672e2 ->
+RHEL-8.1/20190308-89910a39dcfd rebase:
+
+- no change
+
+Notes about the RHEL-7.6/ovmf-20180508-2.gitee3198e672e2.el7 ->
+RHEL-8.0/20180508-ee3198e672e2 rebase:
+
+- reorder the rebase changelog in the commit message so that it reads like
+  a blog: place more recent entries near the top
+- no changes to the patch body
+
+Notes about the 20171011-92d07e48907f -> 20180508-ee3198e672e2 rebase:
+
+- no change
+
+Notes about the 20170228-c325e41585e3 -> 20171011-92d07e48907f rebase:
+
+- refresh downstream-only commit 8abc2a6ddad2 against context differences
+  in the DSC files from upstream commit 5e167d7e784c
+  ("OvmfPkg/PlatformPei: don't allocate reserved mem varstore if
+  SMM_REQUIRE", 2017-03-12).
+
+Notes about the 20160608b-988715a -> 20170228-c325e41585e3 rebase:
+
+- no changes
+
+Contributed-under: TianoCore Contribution Agreement 1.0
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit 6fa0c4d67c0bb8bde2ddd6db41c19eb0c40b2721)
+(cherry picked from commit 8abc2a6ddad25af7e88dc0cf57d55dfb75fbf92d)
+(cherry picked from commit b311932d3841c017a0f0fec553edcac365cc2038)
+(cherry picked from commit 61914fb81cf624c9028d015533b400b2794e52d3)
+(cherry picked from commit 2ebf3cc2ae99275d63bb6efd3c22dec76251a853)
+(cherry picked from commit f9b73437b9b231773c1a20e0c516168817a930a2)
+(cherry picked from commit 2cc462ee963d0be119bc97bfc9c70d292a40516f)
+(cherry picked from commit 51e0de961029af84b5bdbfddcc9762b1819d500f)
+---
+ OvmfPkg/AmdSev/AmdSevX64.dsc        |  1 +
+ OvmfPkg/CloudHv/CloudHvX64.dsc      |  1 +
+ OvmfPkg/IntelTdx/IntelTdxX64.dsc    |  1 +
+ OvmfPkg/Microvm/MicrovmX64.dsc      |  1 +
+ OvmfPkg/OvmfPkgIa32.dsc             |  1 +
+ OvmfPkg/OvmfPkgIa32X64.dsc          |  1 +
+ OvmfPkg/OvmfPkgX64.dsc              |  1 +
+ OvmfPkg/PlatformPei/PlatformPei.inf |  1 +
+ OvmfPkg/PlatformPei/Platform.c      | 13 +++++++++++++
+ 9 files changed, 21 insertions(+)
+
+diff --git a/OvmfPkg/AmdSev/AmdSevX64.dsc b/OvmfPkg/AmdSev/AmdSevX64.dsc
+index 1cebd6b4bcc2..0bec51d5eeac 100644
+--- a/OvmfPkg/AmdSev/AmdSevX64.dsc
++++ b/OvmfPkg/AmdSev/AmdSevX64.dsc
+@@ -477,6 +477,7 @@ [PcdsFixedAtBuild]
+ [PcdsDynamicDefault]
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+diff --git a/OvmfPkg/CloudHv/CloudHvX64.dsc b/OvmfPkg/CloudHv/CloudHvX64.dsc
+index fda7d2b9e52f..97a74cfb07e4 100644
+--- a/OvmfPkg/CloudHv/CloudHvX64.dsc
++++ b/OvmfPkg/CloudHv/CloudHvX64.dsc
+@@ -587,6 +587,7 @@ [PcdsDynamicDefault]
+   #   ($(SMM_REQUIRE) == FALSE)
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+ !if $(SMM_REQUIRE) == FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+diff --git a/OvmfPkg/IntelTdx/IntelTdxX64.dsc b/OvmfPkg/IntelTdx/IntelTdxX64.dsc
+index 95b9594ddce0..bf4bf4cb1d4c 100644
+--- a/OvmfPkg/IntelTdx/IntelTdxX64.dsc
++++ b/OvmfPkg/IntelTdx/IntelTdxX64.dsc
+@@ -485,6 +485,7 @@ [PcdsDynamicDefault]
+   #   ($(SMM_REQUIRE) == FALSE)
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+diff --git a/OvmfPkg/Microvm/MicrovmX64.dsc b/OvmfPkg/Microvm/MicrovmX64.dsc
+index 0d65d21e651c..f123ca853085 100644
+--- a/OvmfPkg/Microvm/MicrovmX64.dsc
++++ b/OvmfPkg/Microvm/MicrovmX64.dsc
+@@ -585,6 +585,7 @@ [PcdsDynamicDefault]
+   #   ($(SMM_REQUIRE) == FALSE)
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
+diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+index 22dc29330d2d..9242e7714036 100644
+--- a/OvmfPkg/OvmfPkgIa32.dsc
++++ b/OvmfPkg/OvmfPkgIa32.dsc
+@@ -606,6 +606,7 @@ [PcdsDynamicDefault]
+   #   ($(SMM_REQUIRE) == FALSE)
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+ !if $(SMM_REQUIRE) == FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+index 6b539814bdb0..43d40ddc9c46 100644
+--- a/OvmfPkg/OvmfPkgIa32X64.dsc
++++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+@@ -613,6 +613,7 @@ [PcdsDynamicDefault]
+   #   ($(SMM_REQUIRE) == FALSE)
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+ !if $(SMM_REQUIRE) == FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+index e3c64456dfef..231e5e7e4d1c 100644
+--- a/OvmfPkg/OvmfPkgX64.dsc
++++ b/OvmfPkg/OvmfPkgX64.dsc
+@@ -636,6 +636,7 @@ [PcdsDynamicDefault]
+   #   ($(SMM_REQUIRE) == FALSE)
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
+ !if $(SMM_REQUIRE) == FALSE
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+diff --git a/OvmfPkg/PlatformPei/PlatformPei.inf b/OvmfPkg/PlatformPei/PlatformPei.inf
+index 1fadadeb5565..3e28e1596d32 100644
+--- a/OvmfPkg/PlatformPei/PlatformPei.inf
++++ b/OvmfPkg/PlatformPei/PlatformPei.inf
+@@ -99,6 +99,7 @@ [Pcd]
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm
+   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
+diff --git a/OvmfPkg/PlatformPei/Platform.c b/OvmfPkg/PlatformPei/Platform.c
+index 148240342b4b..d324ae95f8f5 100644
+--- a/OvmfPkg/PlatformPei/Platform.c
++++ b/OvmfPkg/PlatformPei/Platform.c
+@@ -41,6 +41,18 @@
+ 
+ #include "Platform.h"
+ 
++#define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
++          do {                                                      \
++            BOOLEAN       Setting;                                  \
++            RETURN_STATUS PcdStatus;                                \
++                                                                    \
++            if (!RETURN_ERROR (QemuFwCfgParseBool (                 \
++                              "opt/ovmf/" #TokenName, &Setting))) { \
++              PcdStatus = PcdSetBoolS (TokenName, Setting);         \
++              ASSERT_RETURN_ERROR (PcdStatus);                      \
++            }                                                       \
++          } while (0)
++
+ EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
+   {
+     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+@@ -385,6 +397,7 @@ InitializePlatform (
+     MemTypeInfoInitialization (PlatformInfoHob);
+     MemMapInitialization (PlatformInfoHob);
+     NoexecDxeInitialization (PlatformInfoHob);
++    UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdResizeXterm);
+   }
+ 
+   InstallClearCacheCallback ();
+-- 
+2.39.2
+

@@ -1,0 +1,32 @@
+{
+    "description": "UEFI firmware for ARM64 virtual machines",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "flash",
+        "mode" : "split",
+        "executable": {
+            "filename": "/usr/share/edk2/aarch64/QEMU_EFI-silent-pflash.raw",
+            "format": "raw"
+        },
+        "nvram-template": {
+            "filename": "/usr/share/edk2/aarch64/vars-template-pflash.raw",
+            "format": "raw"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "aarch64",
+            "machines": [
+                "virt-*"
+            ]
+        }
+    ],
+    "features": [
+
+    ],
+    "tags": [
+
+    ]
+}
