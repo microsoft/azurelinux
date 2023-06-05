@@ -3749,7 +3749,7 @@
         "other": {
           "name": "fonts-rpm-macros",
           "version": "2.0.5",
-          "downloadUrl": "https://pagure.io/fonts-rpm-macros"
+		  "downloadUrl": "https://pagure.io/fonts-rpm-macros/archive/2.0.5/fonts-rpm-macros-2.0.5.tar.gz"
         }
       }
     },
