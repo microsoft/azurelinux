@@ -1,0 +1,33 @@
+{
+    "tool": "Credential Scanner",
+    "suppressions": [
+        {
+            "file": "SPECS/shadow-utils/shadow-utils.signatures.json",
+            "_justification": "False positive - file contain SHA256 hashes of source files, not passwords."
+        },
+        {
+            "file": "toolkit/imageconfigs/read-only-root-efi.json",
+            "_justification": "This is a sample image configuration. The password isn't used anywhere in real life."
+        },
+        {
+            "file": "toolkit/docs/quick_start/quickstart.md",
+            "_justification": "Documentation containing an example of an image password. The password isn't used anywhere in real life."
+        },
+        {
+            "file": "toolkit/tools/imagegen/configuration/configuration_test.go",
+            "_justification": "Test file containing a sample password hash. The password isn't used anywhere in real life."
+        },
+        {
+            "file": "toolkit/tools/imagegen/configuration/configuration_test.go",
+            "_justification": "Test file containing a sample password hash. The password isn't used anywhere in real life."
+        },
+        {
+            "file": "toolkit/tools/imagegen/configuration/user_test.go",
+            "_justification": "Test file containing a sample password hash. The password isn't used anywhere in real life."
+        },
+        {
+            "file": "toolkit/tools/imagegen/configuration/testdata/test_configuration.json",
+            "_justification": "Test file containing a sample password hash. The password isn't used anywhere in real life."
+        }
+    ]
+}

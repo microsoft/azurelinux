@@ -5,9 +5,7 @@
 
 trigger: none
 pr:
-  - 1.0-dev
-  - fasttrack*
-  - main
+  - fasttrack/*
 
 
 pool:

@@ -3,17 +3,140 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- tests/*
+trigger: none
+pr:
+  - fasttrack/*
 
-pool:
-  vmImage: ubuntu-latest
+# pool: mariner-core-x64-1es-mariner2-gpt-test
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+resources:
+  repositories:
+  - repository: CBL-Mariner-Pipelines
+    type: git
+    name: mariner/CBL-Mariner-Pipelines
+    ref: refs/heads/pawelwi/GH-Actions-Test
+  - repository: templates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+parameters:
+  - name: 'pipelinesRepoFolder'
+    type: string
+    default: 'CBL-Mariner-Pipelines'
+
+variables:
+  buildArtifacts: 'buildArtifacts'
+  buildLogs: 'buildLogs'
+  coreSpecsDir: 'SPECS'
+  extendedSpecsDir: 'SPECS-EXTENDED'
+  LinuxContainerImage: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0 # Docker image which is used to build the project https://aka.ms/obpipelines/containers
+  parameterSentinelValue: 'unknown'
+  pipelinesRepoRoot: '$(Agent.BuildDirectory)/${{ parameters.pipelinesRepoFolder }}'
+  repoName: 'CBL-Mariner'
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  parameters:
+    globalSdl:
+      credscan:
+        suppressionsFile: pipelines/.config/CredScanSuppressions.json
+      policheck:
+        break: true
+    stages:
+    - stage: default_nonsense
+      jobs:
+      - job: nonsense
+        pool:
+          type: linux
+        variables:
+          ob_outputDirectory: '$(Build.SourcesDirectory)/ToBePublished'
+        steps:
+          - checkout: CBL-Mariner-Pipelines
+            path: '${{ parameters.pipelinesRepoFolder }}'
+          
+          - script: echo Hello, world!
+            displayName: 'Run a one-line script'
+          
+          - script: |
+              echo Add other tasks to build, test, and deploy your project.
+              echo See https://aka.ms/yaml
+            displayName: 'Run a multi-line script'
+          
+          - template: .pipelines/templates/KernelModulesSigning.yml@CBL-Mariner-Pipelines
+            parameters:
+              artifactsFolder: '$(Build.ArtifactStagingDirectory)/$(buildArtifactsFolder)'
+              repoRootPath: '$(pipelinesRepoRoot)'
+
+    - stage: buddy_build
+      jobs:
+      # Validate parameters at template parse-time
+      - job: configure_build_number
+        pool:
+          type: linux
+        variables:
+          ob_outputDirectory: '$(Build.SourcesDirectory)/ToBePublished'
+        steps:
+          - checkout: CBL-Mariner-Pipelines
+            path: '${{ parameters.pipelinesRepoFolder }}'
+
+          - bash: |
+              # set build number
+              NEW_BUILD_NB=main
+              NEW_BUILD_NB=${NEW_BUILD_NB//[\/]/+}
+              echo "Set build number to $NEW_BUILD_NB"
+              echo "##vso[task.setvariable variable=customBuildNb;isoutput=true]$NEW_BUILD_NB"
+            displayName: 'Set build number (1)'
+            name: setConfig
+
+          - task: onebranch.pipeline.version@1
+            displayName: 'Set build number (2)'
+            inputs:
+              system: 'Custom'
+              customVersion: '$(setConfig.customBuildNb)'
+            condition: succeededOrFailed()
+
+      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
+        parameters:
+          repoName: '${{ parameters.pipelinesRepoFolder }}'
+          hostArchitecture: amd64
+          isCheckBuild: false
+          jobName: build_amd64
+          topicBranch: main
+          coreSpecsToBuild: 'which zlib wget'
+          extendedSpecsToBuild: 'whois'
+
+      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
+        parameters:
+          repoName: '${{ parameters.pipelinesRepoFolder }}'
+          hostArchitecture: arm64
+          isCheckBuild: false
+          jobName: build_arm64
+          topicBranch: main
+          coreSpecsToBuild: 'which zlib wget'
+          extendedSpecsToBuild: 'whois'
+
+      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
+        parameters:
+          repoName: '${{ parameters.pipelinesRepoFolder }}'
+          hostArchitecture: amd64
+          isCheckBuild: true
+          jobName: build_amd64_check
+          topicBranch: main
+          coreSpecsToBuild: 'which zlib wget'
+          extendedSpecsToBuild: 'whois'
+
+      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
+        parameters:
+          repoName: '${{ parameters.pipelinesRepoFolder }}'
+          hostArchitecture: arm64
+          isCheckBuild: true
+          jobName: build_arm64_check
+          topicBranch: main
+          coreSpecsToBuild: 'which zlib wget'
+          extendedSpecsToBuild: 'whois'
+
+
+# - script: |
+#       exit 1
+#   displayName: 'Fail'
