@@ -279,6 +279,7 @@ rm -rf %{buildroot}/*
 *   Mon Jun 05 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.0.332-2
 -   Explicitly set --with-zlib=system to ensure we do not use a version of
 -   zlib that is vulnerable to CVE-2018-25032
+
 *   Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.0.332-1
 -   Update to 1.8.0.332 to address the below CVEs:
 -   CVE-2022-21248 CVE-2022-21282 CVE-2022-21283 CVE-2022-21293
