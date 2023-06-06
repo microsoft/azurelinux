@@ -14002,6 +14002,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "networkd-dispatcher",
+          "version": "2.2.4",
+          "downloadUrl": "https://gitlab.com/craftyguy/networkd-dispatcher/-/archive/2.2.4/networkd-dispatcher-2.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "newt",
           "version": "0.52.21",
           "downloadUrl": "https://pagure.io/releases/newt/newt-0.52.21.tar.gz"

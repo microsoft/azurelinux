@@ -46,7 +46,7 @@ install -Dm644 %{name}.8 %{buildroot}%{_mandir}/man8/%{name}.8
 %{_bindir}/%{name}
 %{_bindir}/systemd/system/%{name}.service
 %{_sysconfdir}/conf.d/%{name}.conf
-/usr/share/man/man8/networkd-dispatcher.8*
+%{_mandir}/man8/networkd-dispatcher.8*
 %dir %{_sysconfdir}/%{name}/off.d
 %dir %{_sysconfdir}/%{name}/routable.d
 %dir %{_sysconfdir}/%{name}/dormant.d
