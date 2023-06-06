@@ -1,4 +1,4 @@
-From 30aca967bbe9832a64530066a8b443a0901ff7ec Mon Sep 17 00:00:00 2001
+From 856bafaa8f868b2f202f59d4c38eff201109b746 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 25 May 2023 11:17:43 -0700
 Subject: [PATCH] add logging to resolve.c, tdnfpackage.c, tdnfquery.c. Add
@@ -9,8 +9,8 @@ Subject: [PATCH] add logging to resolve.c, tdnfpackage.c, tdnfquery.c. Add
  client/packageutils.c |  5 ++++-
  client/resolve.c      | 28 +++++++++++++++++++++++++++-
  solv/tdnfpackage.c    | 10 +++++++++-
- solv/tdnfquery.c      |  5 +++++
- 5 files changed, 51 insertions(+), 5 deletions(-)
+ solv/tdnfquery.c      | 10 +++++++++-
+ 5 files changed, 55 insertions(+), 6 deletions(-)
 
 diff --git a/client/api.c b/client/api.c
 index 8b134e8..ab2b23c 100644
@@ -338,10 +338,36 @@ index cfa66e1..c6e2661 100644
      BAIL_ON_TDNF_ERROR(dwError);
  
 diff --git a/solv/tdnfquery.c b/solv/tdnfquery.c
-index e5d9144..db30408 100644
+index e5d9144..e56f069 100644
 --- a/solv/tdnfquery.c
 +++ b/solv/tdnfquery.c
-@@ -595,6 +595,7 @@ SolvApplyListQuery(
+@@ -427,7 +427,8 @@ SolvGenerateCommonJob(
+     Queue queueJob = {0};
+     uint32_t nFlags = 0;
+     uint32_t nRetFlags = 0;
+-
++    
++    printf("Starting SolvGenerateCommonJob\n");
+     if(!pQuery || !pQuery->pSack)
+     {
+         dwError = ERROR_TDNF_INVALID_PARAMETER;
+@@ -437,6 +438,7 @@ SolvGenerateCommonJob(
+     ppszPkgNames = pQuery->ppszPackageNames;
+     queue_init(&queueJob);
+     pPool = pQuery->pSack->pPool;
++    printf("assigned pPool\n");
+     if(ppszPkgNames)
+     {
+         while(*ppszPkgNames)
+@@ -444,6 +446,7 @@ SolvGenerateCommonJob(
+             nFlags  = dwSelectFlags;
+             nRetFlags = 0;
+ 
++            printf("Looping over package names\n");
+             queue_empty(&queueJob);
+             if (!pPool || !pPool->solvables || !pPool->whatprovides)
+             {
+@@ -595,6 +598,7 @@ SolvApplyListQuery(
      Queue queueTmp = {0};
      uint32_t nFlags = 0;
  
@@ -349,7 +375,7 @@ index e5d9144..db30408 100644
      if(!pQuery)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -606,22 +607,26 @@ SolvApplyListQuery(
+@@ -606,22 +610,26 @@ SolvApplyListQuery(
               SELECTION_PROVIDES |
               SELECTION_GLOB |     /* foo* */
               SELECTION_CANON |    /* foo-1.2-3.ph4.noarch */
