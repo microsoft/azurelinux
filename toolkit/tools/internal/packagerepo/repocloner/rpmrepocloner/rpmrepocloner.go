@@ -28,8 +28,6 @@ const (
 	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
-	chrootRepoDir          = "/etc/yum.repos.d/"
-	chrootRepoFile         = "allrepos.repo"
 	chrootDownloadDir      = "/outputrpms"
 	leaveChrootFilesOnDisk = false
 	updateRepoID           = "mariner-official-update"
@@ -71,10 +69,9 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot              *safechroot.Chroot
-	usePreviewRepo      bool
-	disableMarinerRepos bool
-	cloneDir            string
+	chroot         *safechroot.Chroot
+	usePreviewRepo bool
+	cloneDir       string
 }
 
 // New creates a new RpmRepoCloner
@@ -112,9 +109,8 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		logger.Log.Info("Enabling preview repo")
 	}
 
-	r.disableMarinerRepos = disableMarinerRepos
-	if r.disableMarinerRepos {
-		logger.Log.Info("Disabling built-in Mariner repos")
+	if disableMarinerRepos {
+		logger.Log.Info("Disabling default upstream PMC repositories")
 	}
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -184,7 +180,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	}
 
 	logger.Log.Info("Initializing repository configurations")
-	err = r.initializeRepoDefinitions(repoDefinitions)
+	err = r.initializeRepoDefinitions(disableMarinerRepos, repoDefinitions)
 	if err != nil {
 		return
 	}
@@ -214,7 +210,7 @@ func (r *RpmRepoCloner) AddNetworkFiles(tlsClientCert, tlsClientKey string) (err
 
 // initializeRepoDefinitions will configure the chroot's repo files to match those
 // provided by the caller.
-func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) initializeRepoDefinitions(disableMarinerRepos bool, repoDefinitions []string) (err error) {
 	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
 	// Unlike some other package managers, TDNF has no notion of repository priority.
 	// It reads the repo files using `readdir`, which should be assumed to be random ordering.
@@ -222,6 +218,11 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// In order to simulate repository priority, concatenate all requested repofiles into a single file.
 	// TDNF will read the file top-down. It will then parse the results into a linked list, meaning
 	// the first repo entry in the file is the first to be checked.
+	const (
+		chrootRepoDir  = "/etc/yum.repos.d/"
+		chrootRepoFile = "allrepos.repo"
+	)
+
 	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
 	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
 
@@ -258,13 +259,13 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
 	for _, originalRepoFilePath := range existingRepoFiles {
-		if !r.disableMarinerRepos {
+		if !disableMarinerRepos {
 			err = appendRepoFile(originalRepoFilePath, dstFile)
 			if err != nil {
 				return
 			}
 		} else {
-			logger.Log.Infof("Disabling repositories listed in %s", originalRepoFilePath)
+			logger.Log.Debugf("Disabling repositories listed in %s", originalRepoFilePath)
 		}
 		err = os.Remove(originalRepoFilePath)
 		if err != nil {
