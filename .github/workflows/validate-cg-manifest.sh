@@ -55,7 +55,8 @@ ignore_no_source_tarball=" \
 
 # Specs where cgmanifest validation has known issues checking URLs.
 ignore_known_issues=" \
-  virglrenderer"
+  virglrenderer \
+  libesmtp"
 
 alt_source_tag="Source9999"
 
