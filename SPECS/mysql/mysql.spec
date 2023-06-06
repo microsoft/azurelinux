@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ URL:            https://www.mysql.com
 # Note that the community download page is here: https://dev.mysql.com/downloads/mysql/
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
+Patch1:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
+Patch2:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
+
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -93,6 +96,9 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/private/icudt69l/unames.icu
 
 %changelog
+* Tue Jun 6 2023 Dan Streetman <ddstreet@ieee.org> - 8.0.32-2
+- Patch vendored curl for CVE-2023-23914
+
 * Thu Mar 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.32-1
 - Auto-upgrade to 8.0.32 - fix CVE-2023-21875 to CVE-2023-21887
 
