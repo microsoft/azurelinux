@@ -11,6 +11,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/pprof"
+	"runtime/trace"
 	"sort"
 	"strings"
 	"sync"
@@ -57,12 +59,58 @@ var (
 	logFile                 = exe.LogFileFlag(app)
 	logLevel                = exe.LogLevelFlag(app)
 	timestampFile           = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	enableCpuProf           = app.Flag("enable-cpu-prof", "Enable CPU pprof data collection.").Bool()
+	enableMemProf           = app.Flag("enable-mem-prof", "Enable Memory pprof data collection.").Bool()
+	enableTrace             = app.Flag("enable-trace", "Enable trace data collection.").Bool()
+	cpuProfFile             = app.Flag("cpu-prof-file", "File that stores CPU pprof data.").String()
+	memProfFile             = app.Flag("mem-prof-file", "File that stores Memory pprof data.").String()
+	traceFile               = app.Flag("trace-file", "File that stores trace data.").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	// CPU Profiling
+	if *enableCpuProf {
+		cpf, err := os.Create(*cpuProfFile)
+		if err != nil {
+			logger.Log.Fatalf("Unable to create cpu-pprof file: %s", err)
+		}
+		defer cpf.Close()
+
+		pprof.StartCPUProfile(cpf)
+		defer pprof.StopCPUProfile()
+	}
+
+	// Memory Profiling
+	if *enableMemProf {
+		mpf, err := os.Create(*memProfFile)
+		if err != nil {
+			logger.Log.Fatalf("Unable to create memory-pprof file: %s", err)
+		}
+		defer mpf.Close()
+
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(mpf); err != nil {
+			logger.Log.Fatalf("Unable to write memory profile pprof file: %s", err)
+		}
+	}
+
+	// Tracing
+	if *enableTrace {
+		tf, err := os.Create(*traceFile)
+		if err != nil {
+			logger.Log.Fatalf("Unable to create trace file: %s", err)
+		}
+		defer tf.Close()
+
+		if err := trace.Start(tf); err != nil {
+			logger.Log.Fatalf("Unable to write trace file: %s", err)
+		}
+		defer trace.Stop()
+	}
 
 	timestamp.BeginTiming("specreader", *timestampFile)
 	defer timestamp.CompleteTiming()
