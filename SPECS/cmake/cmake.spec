@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,8 @@ Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
 # We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
 Patch1:         CVE-2022-43551.patch
+Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
+Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -81,6 +83,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Tue Jun 06 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4.5
+- Patch vendored curl for CVE-2023-23914
+
 * Mon Apr 03 2023 Bala <balakumaran.kannan@microsoft.com> - 3.21.4.4
 - Add build directory to %cmake macro to align with %cmake_build
 
