@@ -11,8 +11,8 @@ URL:            https://gitlab.com/craftyguy/networkd-dispatcher
 Source0:        https://gitlab.com/craftyguy/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  asciidoc
 Requires:       python3
-Requires:       dbus-python
-Requires:       pygobject3
+Requires:       python3-dbus
+Requires:       python3-gobject
 Requires:       dbus-glib
 
 %description
