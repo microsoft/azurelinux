@@ -66,7 +66,7 @@ jobs:
           for file in $holder; do
             config_diff=$(git diff-tree -p -r ${{ env.base_sha }} ${{ github.sha }} -- ${file})
             echo "config_diff for ${file} : ${config_diff}"
-            python3 .github/workflows/check_new_kernel_configs.py --required_configs=toolkit/scripts/mariner-required-configs.json --config_file="${file}" --config_diff="${config_diff}"
+            python3 toolkit/scripts/check_new_kernel_configs.py --required_configs=toolkit/scripts/mariner-required-configs.json --config_file="${file}" --config_diff="${config_diff}"
           done
 
       # Check if required configs were removed or modified

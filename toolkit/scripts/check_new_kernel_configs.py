@@ -8,54 +8,37 @@ import json
 import argparse
 import sys
 import re
+from kernel_sources_analysis import get_data_from_config, extract_kernel_dir_name, extract_config_arch
 
-def get_data_from_config(input_file):
-    with open(input_file, 'r') as file:
-        input_config_data = file.read()
-    return input_config_data
-
-def check_kernel(input_file):
-    match = re.search(r'SPECS/(.*?)/', input_file)
-    if match:
-        return match.group(1)
-    else:
-        return None
-
-def check_config_arch(input_config_data):
-    if "Linux/x86_64" in input_config_data:
-        return "AMD64"
-    elif "Linux/arm64" in input_config_data:
-        return "ARM64"
-    else:
-        return None
-
-# find the lines in the diff that contain +/- CONFIG
-# ignore the lines that contain @
-# return the set of words that follow +/-
-def find_matching_lines(input_string):
+# Find the lines in the diff that contain +/- CONFIG
+# Ignore the lines that contain @
+# Return the set of configs that follow +/-
+def extract_modified_configs(input_string):
     pattern = r'(?!.*@)[+-]\s*.*CONFIG.*'
     matching_lines = re.findall(pattern, input_string)
     holder=[re.sub(r"\+|\-|=y|=m|\#|is not set", r"", s).strip() for s in matching_lines]
     config_set = set(holder)
     return config_set
 
-# parse diff for new kernel configs
-# check if they are in required configs
-def find_missing_configs(json_file, kernel, arch, config_diff):
+# Parse diff for new kernel configs
+# Check if they are in required configs
+def find_missing_configs(config_json_path, kernel, arch, config_diff):
     # Load the JSON object
-    with open(json_file, 'r') as file:
-        data = json.load(file)
-        if kernel not in data:
-            print(f"Kernel {kernel} not found in {json_file}")
+    with open(config_json_path, 'r') as config_json_file:
+        config_json_data = json.load(config_json_file)
+        if kernel not in config_json_data:
+            print(f"Kernel {kernel} not found in {config_json_path}")
+            print(f"Please provide required configs for {kernel} in {config_json_path}")
+            print(f"Exiting...")
             return None
-        required_configs_data = data[kernel]['required-configs']
+        required_configs_data = config_json_data[kernel]['required-configs']
 
-    # Extract the words from the string
-    config_words = find_matching_lines(config_diff)
+    # Extract the configs from the string
+    config_set = extract_modified_configs(config_diff)
 
-    # Find the missing words
+    # Find the missing configs
     missing_configs = []
-    for config_option in config_words:
+    for config_option in config_set:
         if config_option not in required_configs_data or arch not in required_configs_data[config_option]["arch"] :
             missing_configs.append(config_option)
     return missing_configs
@@ -65,20 +48,20 @@ parser = argparse.ArgumentParser(
 description="Tool for checking new configs are present in required configs JSON.")
 parser.add_argument('--required_configs', help='path to JSON of required configs', required=True)
 parser.add_argument('--config_file', help='path to config', required=True)
-parser.add_argument('--config_diff', help='config diff', required=True)
+parser.add_argument('--config_diff', help='diff showing changes for just the config_file', required=True)
 args = parser.parse_args()
 required_configs = args.required_configs
 config_file = args.config_file
 config_diff = args.config_diff
 
-kernel = check_kernel(config_file)
+kernel = extract_kernel_dir_name(config_file)
 if kernel == None:
     print("Kernel not found in config filepath")
     sys.exit(1)
 
 input_config_data = get_data_from_config(config_file)
 
-arch = check_config_arch(input_config_data)
+arch = extract_config_arch(input_config_data)
 if arch == None:
     print("Architecture not found in config file")
     sys.exit(1)
@@ -88,7 +71,6 @@ if missing_configs == None:
     print(f"Could not find required configs for {kernel}")
     sys.exit(0)
 
-print("Missing configs:", missing_configs)
 if len(missing_configs) == 0:
     print("All configs are present in required configs")
 else:
