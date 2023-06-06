@@ -43,7 +43,7 @@ install -Dm644 %{name}.8 %{buildroot}%{_mandir}/man8/%{name}.8
 %doc README.md
 %dir %{_sysconfdir}/conf.d
 %{_bindir}/%{name}
-%{_bindir}/systemd/system/%{name}.service
+%{_libdir}/systemd/system/%{name}.service
 %{_sysconfdir}/conf.d/%{name}.conf
 %{_mandir}/man8/networkd-dispatcher.8*
 %dir %{_sysconfdir}/%{name}/off.d
