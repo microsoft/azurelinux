@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 Summary:        A dispatcher daemon for systemd-networkd events
 Name:           networkd-dispatcher
 Version:        2.2.4
@@ -31,11 +33,11 @@ mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_sysconfdir}/conf.d
 install -m755 %{name} %{buildroot}%{_bindir}/%{name}
 install -m644 -D %{name}.service %{buildroot}%{_bindir}/systemd/system/%{name}.service
-install -m644 -D  %{name}.conf %{buildroot}%{_sysconfdir}/conf.d/%{name}.conf
-mkdir -p  %{buildroot}%{_sysconfdir}/%{name}/{off.d,routable.d,dormant.d,no-carrier.d,carrier.d,degraded.d,configured.d,configuring.d}
+install -m644 -D %{name}.conf %{buildroot}%{_sysconfdir}/conf.d/%{name}.conf
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/{off.d,routable.d,dormant.d,no-carrier.d,carrier.d,degraded.d,configured.d,configuring.d}
 install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
-install -Dm644 README.md  %{buildroot}%{_datadir}/doc/%{name}/README.md
-install -Dm644 %{name}.8  %{buildroot}%{_datadir}/man/man8/%{name}.8
+install -Dm644 README.md %{buildroot}%{_datadir}/doc/%{name}/README.md
+install -Dm644 %{name}.8 %{buildroot}%{_mandir}/man8/%{name}.8
 
 %files
 %license LICENSE
@@ -44,7 +46,7 @@ install -Dm644 %{name}.8  %{buildroot}%{_datadir}/man/man8/%{name}.8
 %{_bindir}/%{name}
 %{_bindir}/systemd/system/%{name}.service
 %{_sysconfdir}/conf.d/%{name}.conf
-%{_datadir}/man/man8/%{name}.8
+/usr/share/man/man8/networkd-dispatcher.8*
 %dir %{_sysconfdir}/%{name}/off.d
 %dir %{_sysconfdir}/%{name}/routable.d
 %dir %{_sysconfdir}/%{name}/dormant.d
