@@ -325,7 +325,7 @@ index cfa66e1..ca415f9 100644
      dwError = SolvApplySinglePackageFilter(pQuery, pszName);
      BAIL_ON_TDNF_ERROR(dwError);
  
-+    printf("Calling SolvApplyListQuery\n")
++    printf("Calling SolvApplyListQuery\n");
      dwError = SolvApplyListQuery(pQuery);
      BAIL_ON_TDNF_ERROR(dwError);
  
