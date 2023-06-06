@@ -60,7 +60,8 @@
 %{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
 
-%global MLNX_OFED_VERSION 23.04-0.5.3
+%global MLNX_OFED_VERSION 23.04
+%global MLNX_OFED_RELEASE 0.5.3
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -69,14 +70,14 @@
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 # Update OFED version along with version updates
-Version:        23.04
+Version:        %{MLNX_OFED_VERSION}
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}.tgz
+Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}-%{MLNX_OFED_RELEASE}.tgz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Requires: coreutils
@@ -95,7 +96,7 @@ Utilities rpm with OFED release %MLNX_OFED_VERSION.
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %package -n %{non_kmp_pname}
-Version: %{version}
+Version: %{MLNX_OFED_VERSION}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -103,7 +104,7 @@ Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
 
 %package -n %{devel_pname}
-Version: %{version}
+Version: %{MLNX_OFED_VERSION}
 Requires: coreutils
 Requires: pciutils
 Requires(post): %{_sbindir}/update-alternatives
@@ -126,7 +127,7 @@ drivers against it.
 %global install_mod_dir extra/%{name}
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{MLNX_OFED_VERSION}
 set -- *
 mkdir source
 mv "$@" source/
@@ -416,7 +417,6 @@ update-alternatives --remove \
 /lib/udev/sf-rep-netdev-rename
 /lib/udev/auxdev-sf-netdev-rename
 /usr/sbin/setup_mr_cache.sh
-/usr/sbin/odp_stat.sh
 %_datadir/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
 %config(noreplace) /etc/modprobe.d/mlnx.conf
 %config(noreplace) /etc/modprobe.d/mlnx-bf.conf
