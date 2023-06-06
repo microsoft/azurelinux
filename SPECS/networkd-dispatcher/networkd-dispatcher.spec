@@ -31,7 +31,7 @@ make
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_sysconfdir}/conf.d
 install -m755 %{name} %{buildroot}%{_bindir}/%{name}
-install -m644 -D %{name}.service %{buildroot}%{_bindir}/systemd/system/%{name}.service
+install -m644 -D %{name}.service %{buildroot}%{_libdir}/systemd/system/%{name}.service
 install -m644 -D %{name}.conf %{buildroot}%{_sysconfdir}/conf.d/%{name}.conf
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/{off.d,routable.d,dormant.d,no-carrier.d,carrier.d,degraded.d,configured.d,configuring.d}
 install -Dm644 LICENSE %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
