@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.35.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -102,6 +102,9 @@ find %{buildroot} -name '*.cmake' -delete
 %{_bindir}/grpc_*_plugin
 
 %changelog
+* Tue Jun 6 2023 Dallas Delaney <dadelan@microsoft.com> - 1.42.0-5
+- Rebuild against c-ares to Fix CVE-2023-32067, CVE-2023-31130, CVE-2023-31147
+
 * Mon Nov 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.0-8
 - Building with CBL-Mariner's default C++ version.
 
