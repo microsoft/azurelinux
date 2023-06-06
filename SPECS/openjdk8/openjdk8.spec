@@ -113,7 +113,7 @@ unset JAVA_HOME &&
 	--with-freetype-lib=%{_libdir} \
 	--with-stdc++lib=dynamic \
 	--with-native-debug-symbols=none \
-  --with-zlib=system \
+	--with-zlib=system \
 	--disable-zip-debug-info
 
 make \
