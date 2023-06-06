@@ -1,4 +1,4 @@
-From d9f0e24e68232b7a1b95c425b5645a1d52c70424 Mon Sep 17 00:00:00 2001
+From 30aca967bbe9832a64530066a8b443a0901ff7ec Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 25 May 2023 11:17:43 -0700
 Subject: [PATCH] add logging to resolve.c, tdnfpackage.c, tdnfquery.c. Add
@@ -287,7 +287,7 @@ index cb7ca0f..e511b5e 100644
  cleanup:
      if(pInstalledPkgList)
 diff --git a/solv/tdnfpackage.c b/solv/tdnfpackage.c
-index cfa66e1..ca415f9 100644
+index cfa66e1..c6e2661 100644
 --- a/solv/tdnfpackage.c
 +++ b/solv/tdnfpackage.c
 @@ -125,6 +125,7 @@ SolvGetQueryResult(
@@ -338,14 +338,14 @@ index cfa66e1..ca415f9 100644
      BAIL_ON_TDNF_ERROR(dwError);
  
 diff --git a/solv/tdnfquery.c b/solv/tdnfquery.c
-index e5d9144..e4c29da 100644
+index e5d9144..db30408 100644
 --- a/solv/tdnfquery.c
 +++ b/solv/tdnfquery.c
 @@ -595,6 +595,7 @@ SolvApplyListQuery(
      Queue queueTmp = {0};
      uint32_t nFlags = 0;
  
-+    printf("Starting SolvApplyListQuery\n")
++    printf("Starting SolvApplyListQuery\n");
      if(!pQuery)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
@@ -353,7 +353,7 @@ index e5d9144..e4c29da 100644
               SELECTION_PROVIDES |
               SELECTION_GLOB |     /* foo* */
               SELECTION_CANON |    /* foo-1.2-3.ph4.noarch */
-+             SELECTION_ARCH |     /* allow .<arch> tags in packages */
++             SELECTION_DOTARCH |     /* allow .<arch> tags in packages */
               SELECTION_REL;       /* foo>=1.2-3 */
  
      if (pQuery->nScope == SCOPE_SOURCE) {
@@ -366,13 +366,13 @@ index e5d9144..e4c29da 100644
  
      if(pQuery->nScope == SCOPE_UPGRADES)
      {
-+        print("Calling SolvApplyUpDownScope (1)\n");
++        printf("Calling SolvApplyUpDownScope (1)\n");
          dwError = SolvApplyUpDownScope(pQuery, 1);
          BAIL_ON_TDNF_ERROR(dwError);
      }
      else if(pQuery->nScope == SCOPE_DOWNGRADES)
      {
-+        print("Calling SolvApplyUpDownScope (0)\n");
++        printf("Calling SolvApplyUpDownScope (0)\n");
          dwError = SolvApplyUpDownScope(pQuery, 0);
          BAIL_ON_TDNF_ERROR(dwError);
      }
