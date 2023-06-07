@@ -33,6 +33,7 @@ package timestamp
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -128,7 +129,7 @@ func initTimeStampManager() {
 
 func ensureManagerExists() error {
 	if timestampMgr == nil {
-		return fmt.Errorf("Timestamping has not been initialized. Make sure BeginTiming is called first.")
+		return errors.New("timestamping has not been initialized. Make sure BeginTiming is called first")
 	}
 	return nil
 }
@@ -137,7 +138,7 @@ func ensureManagerExists() error {
 func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 	if outputFile == "" {
 		err := fmt.Errorf("timestamp output file is not specified, the feature will be turned off for %s", toolName)
-		logger.Log.Warn(err)
+		logger.Log.Info(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -145,7 +146,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 
 	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY, 0664)
 	if err != nil {
-		err = fmt.Errorf("Unable to create file %s: %v", outputFile, err)
+		err = fmt.Errorf("unable to create file %s: %v", outputFile, err)
 		logger.Log.Warn(err.Error())
 		return &TimeStamp{}, err
 	}
@@ -154,13 +155,15 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 	timestampMgr.fileDescriptor = outputFileDescriptor
 	_, err = StartEvent(toolName, nil)
 	if err != nil {
-		err = fmt.Errorf("Unable to initialize root TimeStamp object for %s: %v", toolName, err)
+		err = fmt.Errorf("unable to initialize root TimeStamp object for %s: %v", toolName, err)
+		logger.Log.Warn(err.Error())
 		timestampMgr.eventProcessorFinished <- true
 		FlushAndCleanUpResources()
 		return &TimeStamp{}, err
 	}
 
 	go timestampMgr.processEventsInQueue()
+	logger.Log.Debugf("Begin recording timestamp for %s", toolName)
 	return timestampMgr.root, err
 }
 
@@ -168,7 +171,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 func ResumeTiming(toolName, outputFile string) error {
 	if outputFile == "" {
 		err := fmt.Errorf("timestamp output file is not specified, the feature will be turned off for %s", toolName)
-		logger.Log.Warn(err)
+		logger.Log.Info(err.Error())
 		return err
 	}
 
@@ -176,7 +179,7 @@ func ResumeTiming(toolName, outputFile string) error {
 
 	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_RDWR, 0664)
 	if err != nil {
-		err = fmt.Errorf("Unable to open file %s: %v", outputFile, err)
+		err = fmt.Errorf("unable to open file %s: %v", outputFile, err)
 		logger.Log.Warn(err.Error())
 		return err
 	}
@@ -187,6 +190,7 @@ func ResumeTiming(toolName, outputFile string) error {
 	timestampMgr.fileDescriptor.Seek(0, 2)
 
 	go timestampMgr.processEventsInQueue()
+	logger.Log.Debugf("Resume recording timestamp for %s", toolName)
 	return nil
 }
 
@@ -199,6 +203,7 @@ func CompleteTiming() (err error) {
 	StopEvent(timestampMgr.root)
 	FlushAndCleanUpResources()
 	timestampMgr = nil
+	logger.Log.Debugf("Completed recording timestamp, results written to %s", timestampMgr.filePath)
 	return
 }
 
@@ -219,7 +224,7 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 	ts, err = newTimeStamp(name, parentTS)
 	ts.ID = timestampMgr.nextID()
 	if err != nil {
-		err = fmt.Errorf("Failed to create a timestamp object %s: %v", name, err)
+		err = fmt.Errorf("failed to create a timestamp object %s: %v", name, err)
 		return &TimeStamp{}, err
 	}
 	timestampMgr.submitEvent(EventStart, ts)
@@ -235,7 +240,7 @@ func StartEventByPath(path string) (ts *TimeStamp, err error) {
 	ts, err = newTimeStampByPath(timestampMgr.root, path)
 	ts.ID = timestampMgr.nextID()
 	if err != nil {
-		err = fmt.Errorf("Failed to create a timestamp object %s: %v", path, err)
+		err = fmt.Errorf("failed to create a timestamp object %s: %v", path, err)
 		return &TimeStamp{}, err
 	}
 	timestampMgr.submitEvent(EventStart, ts)
@@ -260,7 +265,7 @@ func StopEventByPath(path string) (ts *TimeStamp, err error) {
 
 	components := strings.Split(path, pathSeparator)
 	if components[0] != timestampMgr.root.Name {
-		err = fmt.Errorf("Timestamp root mismatch ('%s', expected '%s')", components[0], timestampMgr.root.Name)
+		err = fmt.Errorf("timestamp root mismatch ('%s', expected '%s')", components[0], timestampMgr.root.Name)
 		return
 	}
 	ts, err = getTimeStampFromPath(timestampMgr.root, components, 1)
@@ -392,7 +397,6 @@ func (mgr *TimeStampManager) updateRead(record *TimeStampRecord) {
 			mgr.lastVisited = ts
 		}
 	}
-	return
 }
 
 // Read records written to a file and build a (partially) finished timestamp tree. This is useful for resuming
