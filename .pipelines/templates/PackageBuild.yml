@@ -1,7 +1,4 @@
 parameters:
-  - name: hostArchitecture
-    type: string
-    default: "x64"
   - name: isCheckBuild
     type: string
     default: 'false'
@@ -10,7 +7,7 @@ steps:
   - script: |
       cat <<EOF
       This is a package build.
-      The host architecture is: ${{ parameters.hostArchitecture }}
+      The host architecture is: $(uname -m)
       Running checks: ${{ parameters.isCheckBuild }}
       EOF
     displayName: "Print parameters"

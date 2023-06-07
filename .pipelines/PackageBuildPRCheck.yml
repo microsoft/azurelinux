@@ -5,27 +5,13 @@ pr:
 
 resources:
   repositories:
-    # - repository: CBL-Mariner-Pipelines
-    #   type: git
-    #   name: mariner/CBL-Mariner-Pipelines
-    #   ref: refs/heads/pawelwi/GH-Actions-Test
     - repository: templates
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
 
-# variables:
-#   buildArtifacts: "buildArtifacts"
-#   buildLogs: "buildLogs"
-#   coreSpecsDir: "SPECS"
-#   extendedSpecsDir: "SPECS-EXTENDED"
-#   LinuxContainerImage: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0 # Docker image which is used to build the project https://aka.ms/obpipelines/containers
-#   parameterSentinelValue: "unknown"
-#   pipelinesRepoRoot: "$(Agent.BuildDirectory)/${{ parameters.pipelinesRepoFolder }}"
-#   repoName: "CBL-Mariner"
-
 extends:
-  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
     featureFlags:
       runOnHost: true
@@ -39,47 +25,51 @@ extends:
       - stage: Toolchain
         jobs:
           - job: Build
-            pool:
-              type: linux
-              isCustom: true
-              name: "mariner-core-x64-1es-mariner2-gpt-test"
-              vmImage: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
             strategy:
               matrix:
                 AMD64:
-                  arch: "amd64"
+                  agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
+                  agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
                 ARM64:
-                  arch: "arm64"
+                  agentPool: "mariner-core-arm64-1es-mariner2"
+                  agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
+            pool:
+              type: linux
+              isCustom: true
+              name: "$(agentPool)"
+              vmImage: "$(agentVMName)"
             variables:
               ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
             steps:
               - template: .pipelines/templates/ToolchainBuild.yml@self
-                parameters:
-                  hostArchitecture: $(arch)
 
       - stage: RPMs
         dependsOn: Toolchain
         jobs:
           - job: Build
-            pool:
-              type: linux
-              isCustom: true
-              name: "mariner-core-x64-1es-mariner2-gpt-test"
-              vmImage: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
             strategy:
               matrix:
                 AMD64_NO_CHECK:
-                  arch: "amd64"
+                  agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
+                  agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
                   check: "false"
                 ARM64_NO_CHECK:
-                  arch: "arm64"
+                  agentPool: "mariner-core-arm64-1es-mariner2"
+                  agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
                   check: "false"
                 AMD64_WITH_CHECK:
-                  arch: "amd64"
+                  agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
+                  agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
                   check: "true"
                 ARM64_WITH_CHECK:
-                  arch: "arm64"
+                  agentPool: "mariner-core-arm64-1es-mariner2"
+                  agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
                   check: "true"
+            pool:
+              type: linux
+              isCustom: true
+              name: "$(agentPool)"
+              vmImage: "$(agentVMName)"
             variables:
               ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
             steps:
