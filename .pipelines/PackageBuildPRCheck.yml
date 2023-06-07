@@ -1,44 +1,36 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger: none
 pr:
   - fasttrack/*
+  - main
 
-# pool: mariner-core-x64-1es-mariner2-gpt-test
+pool: mariner-core-x64-1es-mariner2-gpt-test
 
 resources:
   repositories:
-  - repository: CBL-Mariner-Pipelines
-    type: git
-    name: mariner/CBL-Mariner-Pipelines
-    ref: refs/heads/pawelwi/GH-Actions-Test
-  - repository: templates
-    type: git
-    name: OneBranch.Pipelines/GovernedTemplates
-    ref: refs/heads/main
+    # - repository: CBL-Mariner-Pipelines
+    #   type: git
+    #   name: mariner/CBL-Mariner-Pipelines
+    #   ref: refs/heads/pawelwi/GH-Actions-Test
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
 
-parameters:
-  - name: 'pipelinesRepoFolder'
-    type: string
-    default: 'CBL-Mariner-Pipelines'
-
-variables:
-  buildArtifacts: 'buildArtifacts'
-  buildLogs: 'buildLogs'
-  coreSpecsDir: 'SPECS'
-  extendedSpecsDir: 'SPECS-EXTENDED'
-  LinuxContainerImage: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0 # Docker image which is used to build the project https://aka.ms/obpipelines/containers
-  parameterSentinelValue: 'unknown'
-  pipelinesRepoRoot: '$(Agent.BuildDirectory)/${{ parameters.pipelinesRepoFolder }}'
-  repoName: 'CBL-Mariner'
+# variables:
+#   buildArtifacts: "buildArtifacts"
+#   buildLogs: "buildLogs"
+#   coreSpecsDir: "SPECS"
+#   extendedSpecsDir: "SPECS-EXTENDED"
+#   LinuxContainerImage: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0 # Docker image which is used to build the project https://aka.ms/obpipelines/containers
+#   parameterSentinelValue: "unknown"
+#   pipelinesRepoRoot: "$(Agent.BuildDirectory)/${{ parameters.pipelinesRepoFolder }}"
+#   repoName: "CBL-Mariner"
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
   parameters:
     featureFlags:
+      runOnHost: true
       skipPoliciesValidation: True
     globalSdl:
       credscan:
@@ -46,92 +38,54 @@ extends:
       policheck:
         break: true
     stages:
-    - stage: default_nonsense
-      jobs:
-      - job: nonsense
-        pool:
-          type: linux
-        variables:
-          ob_outputDirectory: '$(Build.SourcesDirectory)/ToBePublished'
-        steps:
-          - checkout: CBL-Mariner-Pipelines
-            path: '${{ parameters.pipelinesRepoFolder }}'
-          
-          - script: echo Hello, world!
-            displayName: 'Run a one-line script'
-          
-          - script: |
-              echo Add other tasks to build, test, and deploy your project.
-              echo See https://aka.ms/yaml
-            displayName: 'Run a multi-line script'
+      - stage: Toolchain
+        jobs:
+          - job: Build
+            pool:
+              type: linux
+              isCustom: true
+              name: "mariner-core-x64-1es-mariner2-gpt-test"
+              vmImage: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
+            strategy:
+              matrix:
+                AMD64:
+                  arch: "amd64"
+                ARM64:
+                  arch: "arm64"
+            variables:
+              ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
+            steps:
+              - template: .pipelines/templates/ToolchainBuild.yml
+                parameters:
+                  hostArchitecture: $(arch)
 
-    - stage: buddy_build
-      jobs:
-      # Validate parameters at template parse-time
-      - job: configure_build_number
-        pool:
-          type: linux
-          isCustom: true
-          name: 'mariner-core-x64-1es-mariner2-gpt-test'
-          vmImage: 'Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test'
-        variables:
-          ob_outputDirectory: '$(Build.SourcesDirectory)/ToBePublished'
-        steps:
-          - checkout: CBL-Mariner-Pipelines
-            path: '${{ parameters.pipelinesRepoFolder }}'
-
-          - bash: |
-              # set build number
-              NEW_BUILD_NB=main
-              NEW_BUILD_NB=${NEW_BUILD_NB//[\/]/+}
-              echo "Set build number to $NEW_BUILD_NB"
-              echo "##vso[task.setvariable variable=customBuildNb;isoutput=true]$NEW_BUILD_NB"
-            displayName: 'Set build number (1)'
-            name: setConfig
-
-          - task: onebranch.pipeline.version@1
-            displayName: 'Set build number (2)'
-            inputs:
-              system: 'Custom'
-              customVersion: '$(setConfig.customBuildNb)'
-            condition: succeededOrFailed()
-
-      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
-        parameters:
-          repoName: '${{ parameters.pipelinesRepoFolder }}'
-          hostArchitecture: amd64
-          isCheckBuild: false
-          jobName: build_amd64
-          topicBranch: main
-          coreSpecsToBuild: 'which zlib wget'
-          extendedSpecsToBuild: 'whois'
-
-      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
-        parameters:
-          repoName: '${{ parameters.pipelinesRepoFolder }}'
-          hostArchitecture: arm64
-          isCheckBuild: false
-          jobName: build_arm64
-          topicBranch: main
-          coreSpecsToBuild: 'which zlib wget'
-          extendedSpecsToBuild: 'whois'
-
-      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
-        parameters:
-          repoName: '${{ parameters.pipelinesRepoFolder }}'
-          hostArchitecture: amd64
-          isCheckBuild: true
-          jobName: build_amd64_check
-          topicBranch: main
-          coreSpecsToBuild: 'which zlib wget'
-          extendedSpecsToBuild: 'whois'
-
-      - template: .pipelines/templates/UnifiedBuddyBuildCommonJob.yml@CBL-Mariner-Pipelines
-        parameters:
-          repoName: '${{ parameters.pipelinesRepoFolder }}'
-          hostArchitecture: arm64
-          isCheckBuild: true
-          jobName: build_arm64_check
-          topicBranch: main
-          coreSpecsToBuild: 'which zlib wget'
-          extendedSpecsToBuild: 'whois'
+      - stage: Toolchain
+        dependsOn: Toolchain
+        jobs:
+          - job: Build
+            pool:
+              type: linux
+              isCustom: true
+              name: "mariner-core-x64-1es-mariner2-gpt-test"
+              vmImage: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
+            strategy:
+              matrix:
+                AMD64_NO_CHECK:
+                  arch: "amd64"
+                  check: "false"
+                ARM64_NO_CHECK:
+                  arch: "arm64"
+                  check: "false"
+                AMD64_WITH_CHECK:
+                  arch: "amd64"
+                  check: "true"
+                ARM64_WITH_CHECK:
+                  arch: "arm64"
+                  check: "true"
+            variables:
+              ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
+            steps:
+              - template: .pipelines/templates/PackageBuild.yml
+                parameters:
+                  hostArchitecture: $(arch)
+                  isCheckBuild: $(check)

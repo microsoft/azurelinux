@@ -1,0 +1,29 @@
+parameters:
+  - name: hostArchitecture
+    type: string
+    default: 'x64'
+
+steps:
+  - script: echo "Hello world!" > hello.txt
+    displayName: 'Write file'
+
+  - script: |
+      echo "The contents of the file are:"
+      cat hello.txt
+    displayName: 'Read file'
+
+  - script: |
+      if [[ $(wc -l < hello.txt) -gt 3 ]]; then
+        echo "##vso[task.setvariable variable=bigFile;isOutput=true]true"
+      else
+        echo "##vso[task.setvariable variable=bigFile;isOutput=true]false"
+      fi
+    displayName: 'Set pipeline variable'
+
+  - script: |
+      echo "The file has more than 3 lines: $(bigFile)"
+    displayName: 'Use pipeline variable'
+
+  - script: |
+      echo "The used architecture is: $(hostArchitecture)"
+    displayName: 'Use parameter'

@@ -1,0 +1,16 @@
+parameters:
+  - name: hostArchitecture
+    type: string
+    default: "x64"
+  - name: isCheckBuild
+    type: boolean
+    default: false
+
+steps:
+  - script: |
+      cat <<EOF
+      This is a package build.
+      The host architecture is: $(hostArchitecture)
+      Running checks: $(isCheckBuild)
+      EOF
+    displayName: "Print parameters"
