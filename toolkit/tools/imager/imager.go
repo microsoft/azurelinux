@@ -34,7 +34,7 @@ var (
 	outputDir       = app.Flag("output-dir", "Path to directory to place final image.").ExistingDir()
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
-	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
+	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 	logFile         = exe.LogFileFlag(app)
 	logLevel        = exe.LogLevelFlag(app)
 )
