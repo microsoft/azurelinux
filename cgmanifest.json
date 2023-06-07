@@ -3746,6 +3746,16 @@
     {
       "component": {
         "type": "other",
+        "other": {
+          "name": "fonts-rpm-macros",
+          "version": "2.0.5",
+		  "downloadUrl": "https://pagure.io/fonts-rpm-macros/archive/2.0.5/fonts-rpm-macros-2.0.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
         "other": {
           "name": "font-util",
