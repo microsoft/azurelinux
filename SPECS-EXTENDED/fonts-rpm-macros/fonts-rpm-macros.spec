@@ -157,7 +157,7 @@ install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
 
 %changelog
 * Tue May 16 2023 Bala <balakumaran.kannan@microsoft.com> - 1:2.0.5-12
-- Initial import from Fedora
+- Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License verified
 - Updated the path relevant to Mariner
 
