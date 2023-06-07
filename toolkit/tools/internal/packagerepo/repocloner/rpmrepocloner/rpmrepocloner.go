@@ -87,7 +87,7 @@ func New() *RpmRepoCloner {
 //   - prebuiltRpmsDir is the directory with toolchain RPMs
 //   - usePreviewRepo if set, the upstream preview repository will be used.
 //   - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo, disableMarinerRepos bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo, disableDefaultRepos bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
@@ -109,7 +109,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		logger.Log.Info("Enabling preview repo")
 	}
 
-	if disableMarinerRepos {
+	if disableDefaultRepos {
 		logger.Log.Info("Disabling default upstream PMC repositories")
 	}
 
@@ -180,7 +180,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	}
 
 	logger.Log.Info("Initializing repository configurations")
-	err = r.initializeRepoDefinitions(disableMarinerRepos, repoDefinitions)
+	err = r.initializeRepoDefinitions(disableDefaultRepos, repoDefinitions)
 	if err != nil {
 		return
 	}
@@ -210,7 +210,7 @@ func (r *RpmRepoCloner) AddNetworkFiles(tlsClientCert, tlsClientKey string) (err
 
 // initializeRepoDefinitions will configure the chroot's repo files to match those
 // provided by the caller.
-func (r *RpmRepoCloner) initializeRepoDefinitions(disableMarinerRepos bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) initializeRepoDefinitions(disableDefaultRepos bool, repoDefinitions []string) (err error) {
 	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
 	// Unlike some other package managers, TDNF has no notion of repository priority.
 	// It reads the repo files using `readdir`, which should be assumed to be random ordering.
@@ -259,7 +259,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(disableMarinerRepos bool, repo
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
 	for _, originalRepoFilePath := range existingRepoFiles {
-		if !disableMarinerRepos {
+		if !disableDefaultRepos {
 			err = appendRepoFile(originalRepoFilePath, dstFile)
 			if err != nil {
 				return

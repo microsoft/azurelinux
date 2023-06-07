@@ -47,6 +47,9 @@
       - [`DISABLE_UPSTREAM_REPOS=...`](#disable_upstream_repos)
         - [`DISABLE_UPSTREAM_REPOS=`**`n`** *(default)*](#disable_upstream_reposn-default)
         - [`DISABLE_UPSTREAM_REPOS=`**`y`**](#disable_upstream_reposy)
+      - [`DISABLE_DEFAULT_REPOS=...`](#disable_default_repos)
+        - [`DISABLE_DEFAULT_REPOS=`**`n`** *(default)*](#disable_default_reposn-default)
+        - [`DISABLE_DEFAULT_REPOS=`**`y`**](#disable_default_reposy)
       - [`REBUILD_PACKAGES=...`](#rebuild_packages)
         - [`REBUILD_PACKAGES=`**`y`** *(default)*](#rebuild_packagesy-default)
         - [`REBUILD_PACKAGES=`**`n`**](#rebuild_packagesn)
@@ -549,13 +552,13 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Only pull missing packages from local repositories. This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 
-#### `DISABLE_MARINER_REPOS=...`
+#### `DISABLE_DEFAULT_REPOS=...`
 
-##### `DISABLE_MARINER_REPOS=`**`n`** *(default)*
+##### `DISABLE_DEFAULT_REPOS=`**`n`** *(default)*
 
 > Pull packages from all set repositories, including PMC repositories.
 
-##### `DISABLE_MARINER_REPOS=`**`y`**
+##### `DISABLE_DEFAULT_REPOS=`**`y`**
 
 > Only pull missing packages from local and repositories specified in `$(REPO_LIST)` files.
 
@@ -758,7 +761,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
 | USE_PREVIEW_REPO              | n                                                                                                      | Pull missing packages from the upstream preview repository in addition to the base repository?
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
-| DISABLE_MARINER_REPOS         | n                                                                                                      | Disable pulling packages from PMC. Use this option with `REPO_LIST` if you want to use your own repository exclusively.
+| DISABLE_DEFAULT_REPOS         | n                                                                                                      | Disable pulling packages from PMC. Use this option with `REPO_LIST` if you want to use your own repository exclusively.
 
 ---
 

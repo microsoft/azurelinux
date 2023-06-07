@@ -118,8 +118,8 @@ ifeq ($(DISABLE_UPSTREAM_REPOS),y)
 graphpkgfetcher_extra_flags += --disable-upstream-repos
 endif
 
-ifeq ($(DISABLE_MARINER_REPOS),y)
-graphpkgfetcher_extra_flags += --disable-mariner-repos
+ifeq ($(DISABLE_DEFAULT_REPOS),y)
+graphpkgfetcher_extra_flags += --disable-default-repos
 endif
 
 ifeq ($(USE_PREVIEW_REPO),y)
