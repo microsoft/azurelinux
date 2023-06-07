@@ -202,8 +202,8 @@ func CompleteTiming() (err error) {
 
 	StopEvent(timestampMgr.root)
 	FlushAndCleanUpResources()
-	timestampMgr = nil
 	logger.Log.Debugf("Completed recording timestamp, results written to %s", timestampMgr.filePath)
+	timestampMgr = nil
 	return
 }
 
