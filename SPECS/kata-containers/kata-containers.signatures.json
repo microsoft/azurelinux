@@ -4,7 +4,7 @@
   "50-kata": "fb108c6337b3d3bf80b43ab04f2bf9a3bdecd29075ebd16320aefe8f81c502a7",
   "kata-containers-3.1.0-vendor.tar.gz": "d14032fc30e0f8e1bd9afc57264ed703df6cdf48ad2b1845b02e046763ac3352",
   "kata-containers-3.1.0.tar.gz": "9785078a2250a784c30692f156de4a1a2cfa754a38b48b755ece7517902ffed3",
-  "kata-osbuilder-generate.service": "4438c39799297efbf88cfc549964432a41506a3c89e13073fa908658a5bd6376",
-  "kata-osbuilder.sh": "43d82b8c43332a23fa6e8dedf194c786c1d46d35ac901dc4ccb194da63034a9e"
+  "kata-osbuilder-generate.service": "997385c630d1aed099abf20436f0bdff78d960636a8eb55f0df08a46cf5d5deb",
+  "kata-osbuilder.sh": "d0651a9a60cb622ab5b5a9b324cffd150a7773637aa798b1f571995434f6466a"
  }
 }
