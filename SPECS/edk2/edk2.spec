@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    32%{?dist}
+Release:    33%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -109,6 +109,7 @@ Patch0015: 0015-SecurityPkg-add-TIS-sanity-check-tpm12.patch
 Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 
+Patch1000: CVE-2023-0464.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -284,10 +285,16 @@ git config core.whitespace cr-at-eol
 git config am.keepcr true
 # -T is passed to %%setup to not re-extract the archive
 # -D is passed to %%setup to not delete the existing archive dir
-%autosetup -T -D -n edk2-%{GITCOMMIT} -S git_am
+# -N to disable automatic patching
+%autosetup -T -D -n edk2-%{GITCOMMIT} -S git_am -N
+# -M Apply patches up to 999
+%autopatch -M 999
 
 cp -a -- %{SOURCE1} .
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
+# Need to patch CVE-2023-0464 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
+
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
 tar -xf %{SOURCE4} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
@@ -678,6 +685,9 @@ done
 
 
 %changelog
+* Tue Jun 6 2023 Daniel McIlvaney <damcilva@microsoft.com> - 20230301gitf80f052277c8-33
+- Patch CVE-2023-0464 in bundled OpenSSL.
+
 * Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 20230301gitf80f052277c8-32
 - License verified.
 - Disable aarch64 and riscv64 builds.
