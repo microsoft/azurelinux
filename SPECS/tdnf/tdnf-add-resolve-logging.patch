@@ -1,16 +1,18 @@
-From baed27eb7776ca3259ccc8dcbfd41a8522d49c89 Mon Sep 17 00:00:00 2001
+From c5c40279216944b781eb6a416e48187bc8365399 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 25 May 2023 11:17:43 -0700
 Subject: [PATCH] add logging to resolve.c, tdnfpackage.c, tdnfquery.c. Add
- SELECTION_DOTARCH flag to libsolv call
+ SELECTION_DOTARCH flag to libsolv call. moved getrepomd call ahead of
+ create_repo call in repo.c
 
 ---
  client/api.c          |  8 ++++++--
  client/packageutils.c |  5 ++++-
+ client/repo.c         | 14 +++++++++-----
  client/resolve.c      | 28 +++++++++++++++++++++++++++-
  solv/tdnfpackage.c    | 10 +++++++++-
  solv/tdnfquery.c      | 13 ++++++++++++-
- 5 files changed, 58 insertions(+), 6 deletions(-)
+ 6 files changed, 67 insertions(+), 11 deletions(-)
 
 diff --git a/client/api.c b/client/api.c
 index 8b134e8..ab2b23c 100644
@@ -100,6 +102,38 @@ index adc3870..6368f43 100644
  
  cleanup:
      return dwError;
+diff --git a/client/repo.c b/client/repo.c
+index 9e910cd..a42797e 100644
+--- a/client/repo.c
++++ b/client/repo.c
+@@ -63,6 +63,15 @@ TDNFInitRepo(
+                   (void**)&pSolvRepoInfo);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
++    /* move metadata retrieval up ahead of repo_create to avoid adding a blank repo to the pool */
++    if (pRepoData->nHasMetaData) {
++        dwError = TDNFGetRepoMD(pTdnf,
++                                pRepoData,
++                                pszRepoDataDir,
++                                &pRepoMD);
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
+     pRepo = repo_create(pPool, pRepoData->pszId);
+     if (!pRepo)
+     {
+@@ -74,11 +83,6 @@ TDNFInitRepo(
+     pRepo->appdata = pSolvRepoInfo;
+ 
+     if (pRepoData->nHasMetaData) {
+-        dwError = TDNFGetRepoMD(pTdnf,
+-                                pRepoData,
+-                                pszRepoDataDir,
+-                                &pRepoMD);
+-        BAIL_ON_TDNF_ERROR(dwError);
+ 
+         dwError = SolvCalculateCookieForFile(pRepoMD->pszRepoMD, pSolvRepoInfo->cookie);
+         BAIL_ON_TDNF_ERROR(dwError);
 diff --git a/client/resolve.c b/client/resolve.c
 index cb7ca0f..e511b5e 100644
 --- a/client/resolve.c
