@@ -45,7 +45,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-BuildRequires:  tox
+BuildRequires:  python-tox
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 Requires:       python3-libs
